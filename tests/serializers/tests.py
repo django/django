@@ -7,6 +7,7 @@ from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
+from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import Approximate
@@ -18,6 +19,7 @@ from .models import (
     AuthorProfile,
     BaseModel,
     Category,
+    CategoryMetaData,
     Child,
     ComplexModel,
     Movie,
@@ -275,17 +277,44 @@ class SerializersTestBase:
             serializers.serialize(self.serializer_name, [mv])
 
     def test_serialize_prefetch_related_m2m(self):
-        # One query for the Article table and one for each prefetched m2m
-        # field.
-        with self.assertNumQueries(4):
+        # One query for the Article table, one for each prefetched m2m
+        # field, and one extra one for the nested prefetch for the Topics
+        # that have a relationship to the Category.
+        with self.assertNumQueries(5):
             serializers.serialize(
                 self.serializer_name,
-                Article.objects.prefetch_related("categories", "meta_data", "topics"),
+                Article.objects.prefetch_related(
+                    "meta_data",
+                    "topics",
+                    Prefetch(
+                        "categories",
+                        queryset=Category.objects.prefetch_related("topic_set"),
+                    ),
+                ),
             )
         # One query for the Article table, and three m2m queries for each
         # article.
         with self.assertNumQueries(7):
             serializers.serialize(self.serializer_name, Article.objects.all())
+
+    def test_serialize_prefetch_related_m2m_with_natural_keys(self):
+        # One query for the Article table, one for each prefetched m2m
+        # field, and a query to get the categories for each Article (two in
+        # total).
+        with self.assertNumQueries(5):
+            serializers.serialize(
+                self.serializer_name,
+                Article.objects.prefetch_related(
+                    Prefetch(
+                        "meta_data",
+                        queryset=CategoryMetaData.objects.prefetch_related(
+                            "category_set"
+                        ),
+                    ),
+                    "topics",
+                ),
+                use_natural_foreign_keys=True,
+            )
 
     def test_serialize_with_null_pk(self):
         """
