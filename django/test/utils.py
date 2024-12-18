@@ -205,7 +205,6 @@ def setup_databases(
                         verbosity=verbosity,
                         autoclobber=not interactive,
                         keepdb=keepdb,
-                        serialize=False,
                     )
                     if serialized_aliases is None or alias in serialized_aliases:
                         serialize_connections.append(connection)

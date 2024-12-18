@@ -235,7 +235,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
+  ``serialize_db_to_string()`` instead.
 
 Dropped support for MariaDB 10.5
 --------------------------------
@@ -278,7 +279,8 @@ Features deprecated in 6.0
 Miscellaneous
 -------------
 
-* ...
+* ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
+  ``serialize_db_to_string()`` instead.
 
 Features removed in 6.0
 =======================
