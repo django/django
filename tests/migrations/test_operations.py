@@ -1,4 +1,5 @@
 import math
+import unittest
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist
@@ -6577,6 +6578,54 @@ class OperationTests(OperationTestBase):
         obj_2 = Pony.objects.get(id=obj_2.id)
         self.assertEqual(obj_2.id, 2)
         self.assertEqual(obj_2.pk, obj_2.id)
+
+
+class PrimaryKeyOperations(OperationTestBase):
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_slugfields_change_primary_key_operations(self):
+        # Create a model with two fields
+        operation1 = migrations.CreateModel(
+            "SimpleModel",
+            [
+                ("field1", models.SlugField(max_length=20, primary_key=True)),
+                ("field2", models.SlugField(max_length=20)),
+            ],
+        )
+        # Drop field1 primary key constraint - this doesn't fail
+        operation2 = migrations.AlterField(
+            "SimpleModel",
+            "field1",
+            models.SlugField(max_length=20, primary_key=False),
+        )
+        # Add a primary key constraint to field2 - this fails
+        operation3 = migrations.AlterField(
+            "SimpleModel",
+            "field2",
+            models.SlugField(max_length=20, primary_key=True),
+        )
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation1.state_forwards("migrtest", new_state)
+
+        self.assertTableNotExists("migrtest_simplemodel")
+        with connection.schema_editor() as editor:
+            operation1.database_forwards("migrtest", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation2.state_forwards("migrtest", new_state)
+            operation2.database_forwards("migrtest", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation3.state_forwards("migrtest", new_state)
+            operation3.database_forwards("migrtest", editor, project_state, new_state)
+        self.assertTableExists("migrtest_simplemodel")
+        self.assertColumnExists("migrtest_simplemodel", "field1")
+        self.assertColumnExists("migrtest_simplemodel", "field2")
+        with connection.cursor() as cursor:
+            primary_keys = connection.introspection.get_primary_key_columns(
+                cursor, "migrtest_simplemodel"
+            )
+        self.assertEqual(["field2"], primary_keys)
+        self.assertIndexExists("migrtest_simplemodel", ["field1"], index_type="idx")
+        self.assertIndexExists("migrtest_simplemodel", ["field2"], index_type="idx")
 
 
 class SwappableOperationTests(OperationTestBase):
