@@ -272,6 +272,7 @@ class ManagementUtility:
             klass = load_command_class(app_name, subcommand)
         if self.settings_exception and klass.requires_settings:
             sys.stderr.write(str(self.settings_exception) + "\n")
+            sys.exit(1)
         return klass
 
     def autocomplete(self):
