@@ -2,6 +2,7 @@
 Tests for built in Function expressions.
 """
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 
@@ -55,3 +56,7 @@ class IntegerModel(models.Model):
 class FloatModel(models.Model):
     f1 = models.FloatField(null=True, blank=True)
     f2 = models.FloatField(null=True, blank=True)
+
+
+class UserPreferences(models.Model):
+    settings = models.JSONField(encoder=DjangoJSONEncoder)
