@@ -123,11 +123,11 @@ ticket system and use your feedback to improve the documentation for everybody.
 
 Note, however, that tickets should explicitly relate to the documentation,
 rather than asking broad tech-support questions. If you need help with your
-particular Django setup, try the |django-users| mailing list or the `#django
-IRC channel`_ instead.
+particular Django setup, try the |django-users| mailing list or the
+`Django Discord server`_ instead.
 
 .. _ticket system: https://code.djangoproject.com/
-.. _#django IRC channel: https://web.libera.chat/#django
+.. _Django Discord server: https://discord.gg/xcRH6mN4fa
 
 In plain text
 -------------
