@@ -373,6 +373,8 @@ class TestUtilsHtml(SimpleTestCase):
             "foo@.example.com",
             "foo@localhost",
             "foo@localhost.",
+            "foo@example.com,",
+            "foor@example?;+!.com",
             # trim_punctuation catastrophic tests
             "(" * 100_000 + ":" + ")" * 100_000,
             "(" * 100_000 + "&:" + ")" * 100_000,

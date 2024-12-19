@@ -7,7 +7,8 @@ import warnings
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ValidationError
+from django.core.validators import validate_email
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import punycode
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
@@ -467,6 +468,10 @@ class Urlizer:
             return False
         # Dot must be in p2 (e.g. example.com)
         if "." not in p2 or p2.startswith("."):
+            return False
+        try:
+            validate_email(value)
+        except ValidationError:
             return False
         return True
 
