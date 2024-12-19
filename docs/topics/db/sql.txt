@@ -403,6 +403,37 @@ is equivalent to::
     finally:
         c.close()
 
+.. _async-connection-cursor:
+
+Async Connections and cursors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+On backends that support async-native connections, you can request an async
+cursor::
+
+    from django.db import new_connection
+
+    async with new_connection() as connection:
+        async with connection.acursor() as c:
+            await c.aexecute(...)
+
+Async cursors provide the following methods:
+
+* ``.aexecute()``
+* ``.aexecutemany()``
+* ``.afetchone()``
+* ``.afetchmany()``
+* ``.afetchall()``
+* ``.acopy()``
+* ``.astream()``
+* ``.ascroll()``
+
+Currently, Django ships with the following async-enabled backend:
+
+* ``django.db.backends.postgresql`` with ``psycopg3``.
+
 Calling stored procedures
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
