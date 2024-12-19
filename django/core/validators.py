@@ -6,7 +6,7 @@ from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import punycode
+from django.utils.encoding import idna2008_encode
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
@@ -254,7 +254,8 @@ class EmailValidator:
         ):
             # Try for possible IDN domain-part
             try:
-                domain_part = punycode(domain_part)
+                domain_part = idna2008_encode(domain_part)
+
             except UnicodeError:
                 pass
             else:
