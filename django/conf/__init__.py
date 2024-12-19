@@ -163,7 +163,15 @@ class Settings:
         # store the settings module in case someone later cares
         self.SETTINGS_MODULE = settings_module
 
-        mod = importlib.import_module(self.SETTINGS_MODULE)
+        try:
+            mod = importlib.import_module(self.SETTINGS_MODULE)
+        except ImportError as exc:
+            # If settings module cannot be imported, treat it as a configuration error.
+            if exc.name == self.SETTINGS_MODULE:
+                raise ImproperlyConfigured(
+                    f"Settings module {self.SETTINGS_MODULE} could not be imported"
+                ) from exc
+            raise
 
         tuple_settings = (
             "ALLOWED_HOSTS",
