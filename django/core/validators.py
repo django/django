@@ -6,7 +6,6 @@ from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import punycode
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
@@ -219,8 +218,16 @@ class EmailValidator:
         re.IGNORECASE,
     )
     domain_regex = _lazy_re_compile(
-        # max length for domain name labels is 63 characters per RFC 1034
-        r"((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))\Z",
+        # Standard ASCII domain pattern
+        r"(?:"
+        r"((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))"
+        r"|"
+        # IDN pattern
+        r"(?:" + DomainNameValidator.hostname_re + DomainNameValidator.domain_re + r"\."
+        r"(?!-)"
+        r"(?:[a-z" + DomainNameValidator.ul + "-]{2,63}|xn--[a-z0-9]{1,59})"
+        r"(?<!-))"
+        r")\Z",
         re.IGNORECASE,
     )
     literal_regex = _lazy_re_compile(
@@ -252,14 +259,6 @@ class EmailValidator:
         if domain_part not in self.domain_allowlist and not self.validate_domain_part(
             domain_part
         ):
-            # Try for possible IDN domain-part
-            try:
-                domain_part = punycode(domain_part)
-            except UnicodeError:
-                pass
-            else:
-                if self.validate_domain_part(domain_part):
-                    return
             raise ValidationError(self.message, code=self.code, params={"value": value})
 
     def validate_domain_part(self, domain_part):
