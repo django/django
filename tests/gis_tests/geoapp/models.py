@@ -28,6 +28,13 @@ class City(NamedModel):
         app_label = "geoapp"
 
 
+class Town(NamedModel):
+    point = models.PointField(null=True)
+
+    class Meta:
+        app_label = "geoapp"
+
+
 # This is an inherited model from City
 class PennsylvaniaCity(City):
     county = models.CharField(max_length=30)

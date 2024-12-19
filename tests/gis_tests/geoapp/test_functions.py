@@ -11,7 +11,15 @@ from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
-from .models import City, Country, CountryWebMercator, ManyPointModel, State, Track
+from .models import (
+    City,
+    Country,
+    CountryWebMercator,
+    ManyPointModel,
+    State,
+    Town,
+    Track,
+)
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -413,7 +421,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 self.assertIs(c.inter.empty, True)
 
     @skipUnlessDBFeature("supports_empty_geometries", "has_IsEmpty_function")
-    def test_isempty(self):
+    def test_isempty_empty_geometry(self):
         empty = City.objects.create(name="Nowhere", point=Point(srid=4326))
         City.objects.create(name="Somewhere", point=Point(6.825, 47.1, srid=4326))
         self.assertSequenceEqual(
@@ -423,6 +431,29 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             [empty],
         )
         self.assertSequenceEqual(City.objects.filter(point__isempty=True), [empty])
+
+    @skipUnlessDBFeature("has_IsEmpty_function")
+    def test_isempty_null_geometry(self):
+        null_geometry = Town.objects.create(name="Nowhere", point=None)
+        Town.objects.create(name="Somewhere", point=Point(6.825, 47.1, srid=4326))
+        if connection.ops.spatialite:
+            self.assertSequenceEqual(
+                Town.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                    isempty=True
+                ),
+                [null_geometry],
+            )
+            self.assertSequenceEqual(
+                Town.objects.filter(point__isempty=True), [null_geometry]
+            )
+        else:
+            self.assertSequenceEqual(
+                Town.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                    isempty=True
+                ),
+                [],
+            )
+            self.assertSequenceEqual(Town.objects.filter(point__isempty=True), [])
 
     @skipUnlessDBFeature("has_IsValid_function")
     def test_isvalid(self):
