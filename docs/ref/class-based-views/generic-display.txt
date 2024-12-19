@@ -31,6 +31,7 @@ many projects they are typically the most commonly used views.
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset()`
+    #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_model`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
