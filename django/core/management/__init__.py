@@ -259,6 +259,7 @@ class ManagementUtility:
                 sys.exit(1)
             elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")
+                sys.exit(1)
             possible_matches = get_close_matches(subcommand, commands)
             sys.stderr.write("Unknown command: %r" % subcommand)
             if possible_matches:

@@ -317,7 +317,6 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -417,7 +416,6 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -508,7 +506,6 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -600,7 +597,6 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -696,7 +692,6 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -806,7 +801,6 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_builtin_with_settings(self):
         """
