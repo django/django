@@ -62,6 +62,7 @@ class BaseSpatialOperations:
         "Perimeter",
         "PointOnSurface",
         "Reverse",
+        "Rotate",
         "Scale",
         "SnapToGrid",
         "SymDifference",

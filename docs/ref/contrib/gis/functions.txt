@@ -576,6 +576,32 @@ SpatiaLite
 Accepts a single geographic field or expression and returns a geometry with
 reversed coordinates.
 
+``Rotate``
+===========
+
+.. class:: Rotate(expression, angle, x=0.0, y=0.0, origin=None, **extra)
+
+   .. versionadded:: 5.2
+
+   *Availability*: `PostGIS <https://postgis.net/docs/ST_Rotate.html>`__
+
+   Rotates a geometry by a specified ``angle`` around the origin. Optionally,
+   the rotation can be performed around a specified point, defined by either
+   the ``x`` and ``y`` parameters or the ``origin`` parameter.
+
+   :param expression: A geographic field or expression to rotate.
+   :param angle: The angle in radians by which to rotate the geometry.
+                 Positive values result in counterclockwise rotation,
+                 negative values result in clockwise rotation.
+   :param x: The X-coordinate of the point around which the geometry will be rotated.
+   :param y: The Y-coordinate of the point around which the geometry will be rotated.
+   :param origin: A :class:`~django.contrib.gis.geos.Point` around which
+                  to rotate. Takes precedence over ``x`` and ``y``.
+   :param extra: Additional arguments passed to the underlying function.
+
+   :returns: A geometry with coordinates rotated by the specified angle.
+   :rtype: :class:`~django.contrib.gis.geos.GEOSGeometry`
+
 ``Scale``
 =========
 
