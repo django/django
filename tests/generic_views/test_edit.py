@@ -164,7 +164,7 @@ class CreateViewTests(TestCase):
         self.assertIsInstance(res.context["form"], views.AuthorForm)
         self.assertNotIn("object", res.context)
         self.assertNotIn("author", res.context)
-        self.assertTemplateUsed(res, "generic_views/form.html")
+        self.assertTemplateUsed(res, "generic_views/author_form.html")
 
         res = self.client.post(
             "/edit/authors/create/special/",
@@ -324,7 +324,7 @@ class UpdateViewTests(TestCase):
         self.assertEqual(res.context["object"], self.author)
         self.assertEqual(res.context["thingy"], self.author)
         self.assertNotIn("author", res.context)
-        self.assertTemplateUsed(res, "generic_views/form.html")
+        self.assertTemplateUsed(res, "generic_views/author_form.html")
 
         res = self.client.post(
             "/edit/author/%d/update/special/" % self.author.pk,

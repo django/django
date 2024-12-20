@@ -1,5 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.forms import Form
+from django.forms import Form, ModelForm
 from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
@@ -102,6 +102,13 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         if hasattr(self, "object"):
             kwargs.update({"instance": self.object})
         return kwargs
+
+    def _get_model(self):
+        model = super()._get_model()
+        if model is None and self.form_class is not None:
+            if issubclass(self.form_class, ModelForm):
+                model = self.form_class.Meta.model
+        return model
 
     def get_success_url(self):
         """Return the URL to redirect to after processing a valid form."""

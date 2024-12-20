@@ -231,6 +231,11 @@ Generic Views
   overridden. If ``queryset`` is provided, it takes precedence as the source
   of objects.
 
+* The new :meth:`~django.views.generic.detail.SingleObjectMixin._get_model`
+  method is overridden in :class:`~django.views.generic.edit.ModelFormMixin`
+  to allow `ModelFormMixin` to retrive the view's `model` from the `form_class`
+  if a `ModelForm` is specified for `form_class`.
+
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
