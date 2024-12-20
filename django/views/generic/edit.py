@@ -1,5 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.forms import Form
+from django.forms import Form, ModelForm
 from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
@@ -87,18 +87,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         if self.form_class:
             return self.form_class
         else:
-            if self.model is not None:
-                # If a model has been explicitly provided, use it
-                model = self.model
-            elif getattr(self, "object", None) is not None:
-                # If this view is operating on a single object, use
-                # the class of that object
-                model = self.object.__class__
-            else:
-                # Try to get a queryset and extract the model class
-                # from that
-                model = self.get_queryset().model
-
+            model = self._get_model() or self.get_queryset().model
             if self.fields is None:
                 raise ImproperlyConfigured(
                     "Using ModelFormMixin (base class of %s) without "
@@ -113,6 +102,13 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         if hasattr(self, "object"):
             kwargs.update({"instance": self.object})
         return kwargs
+
+    def _get_model(self):
+        model = super()._get_model()
+        if model is None and self.form_class is not None:
+            if issubclass(self.form_class, ModelForm):
+                model = self.form_class.Meta.model
+        return model
 
     def get_success_url(self):
         """Return the URL to redirect to after processing a valid form."""
