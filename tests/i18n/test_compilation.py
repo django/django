@@ -43,9 +43,9 @@ class PoFileTests(MessageCompilationTests):
     def test_no_write_access(self):
         mo_file_en = Path(self.MO_FILE_EN)
         err_buffer = StringIO()
-        # Put file in read-only mode.
-        old_mode = mo_file_en.stat().st_mode
-        mo_file_en.chmod(stat.S_IREAD)
+        # Put parent directory in read-only mode.
+        old_mode = mo_file_en.parent.stat().st_mode
+        mo_file_en.parent.chmod(stat.S_IRUSR | stat.S_IXUSR)
         # Ensure .po file is more recent than .mo file.
         mo_file_en.with_suffix(".po").touch()
         try:
@@ -57,7 +57,7 @@ class PoFileTests(MessageCompilationTests):
                 )
             self.assertIn("not writable location", err_buffer.getvalue())
         finally:
-            mo_file_en.chmod(old_mode)
+            mo_file_en.parent.chmod(old_mode)
 
     def test_no_compile_when_unneeded(self):
         mo_file_en = Path(self.MO_FILE_EN)
@@ -256,6 +256,9 @@ class IgnoreDirectoryCompilationTests(MessageCompilationTests):
 class CompilationErrorHandling(MessageCompilationTests):
     def test_error_reported_by_msgfmt(self):
         # po file contains wrong po formatting.
+        with self.assertRaises(CommandError):
+            call_command("compilemessages", locale=["ja"], verbosity=0)
+        # It should still fail a second time.
         with self.assertRaises(CommandError):
             call_command("compilemessages", locale=["ja"], verbosity=0)
 
