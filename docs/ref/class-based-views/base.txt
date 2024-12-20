@@ -87,6 +87,12 @@ MRO is an acronym for Method Resolution Order.
 
         Performs key view initialization prior to :meth:`dispatch`.
 
+        Sets up three key instance attributes:
+
+        * ``self.request`` - The current request object
+        * ``self.args`` - Positional arguments captured from the URL pattern
+        * ``self.kwargs`` - Keyword arguments captured from the URL pattern
+
         If overriding this method, you must call ``super()``.
 
     .. method:: dispatch(request, *args, **kwargs)
