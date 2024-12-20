@@ -330,13 +330,6 @@ various useful things are stored on ``self``; as well as the request
 (``self.request``) this includes the positional (``self.args``) and name-based
 (``self.kwargs``) arguments captured according to the URLconf.
 
-These attributes are set up by the view's ``setup()`` method, which is called at 
-the beginning of the view processing. The ``setup()`` method sets:
-
-* ``self.request`` - The current request object
-* ``self.args`` - Positional arguments captured from the URL pattern
-* ``self.kwargs`` - Keyword arguments captured from the URL pattern
-
 Here, we have a URLconf with a single captured group::
 
     # urls.py
