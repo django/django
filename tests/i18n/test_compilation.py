@@ -59,14 +59,6 @@ class PoFileTests(MessageCompilationTests):
         finally:
             mo_file_en.chmod(old_mode)
 
-    def test_no_compile_when_unneeded(self):
-        mo_file_en = Path(self.MO_FILE_EN)
-        mo_file_en.touch()
-        stdout = StringIO()
-        call_command("compilemessages", locale=["en"], stdout=stdout, verbosity=1)
-        msg = "%s” is already compiled and up to date." % mo_file_en.with_suffix(".po")
-        self.assertIn(msg, stdout.getvalue())
-
 
 class PoFileContentsTests(MessageCompilationTests):
     # Ticket #11240
@@ -256,6 +248,9 @@ class IgnoreDirectoryCompilationTests(MessageCompilationTests):
 class CompilationErrorHandling(MessageCompilationTests):
     def test_error_reported_by_msgfmt(self):
         # po file contains wrong po formatting.
+        with self.assertRaises(CommandError):
+            call_command("compilemessages", locale=["ja"], verbosity=0)
+
         with self.assertRaises(CommandError):
             call_command("compilemessages", locale=["ja"], verbosity=0)
 

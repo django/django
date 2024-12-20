@@ -149,16 +149,7 @@ class Command(BaseCommand):
             for i, (dirpath, f) in enumerate(locations):
                 po_path = Path(dirpath) / f
                 mo_path = po_path.with_suffix(".mo")
-                try:
-                    if mo_path.stat().st_mtime >= po_path.stat().st_mtime:
-                        if self.verbosity > 0:
-                            self.stdout.write(
-                                "File “%s” is already compiled and up to date."
-                                % po_path
-                            )
-                        continue
-                except FileNotFoundError:
-                    pass
+                
                 if self.verbosity > 0:
                     self.stdout.write("processing file %s in %s" % (f, dirpath))
 
