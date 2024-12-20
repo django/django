@@ -277,11 +277,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "unique": kind in {"PRIMARY KEY", "UNIQUE"},
                     "index": False,
                     "check": False,
-                    "foreign_key": (ref_table, ref_column) if ref_column else None,
+                    "foreign_key": None,
                 }
                 if self.connection.features.supports_index_column_ordering:
                     constraints[constraint]["orders"] = []
             constraints[constraint]["columns"].add(column)
+            if ref_column:
+                if constraints[constraint]["foreign_key"]:
+                    constraints[constraint]["foreign_key"] += (ref_column,)
+                else:
+                    constraints[constraint]["foreign_key"] = (ref_table, ref_column)
         # Add check constraints.
         if self.connection.features.can_introspect_check_constraints:
             unnamed_constraints_index = 0
