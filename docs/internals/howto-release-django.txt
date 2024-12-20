@@ -128,9 +128,7 @@ permissions.
 * Access to create a post in the `Django Forum - Announcements category
   <https://forum.djangoproject.com/c/announcements/7>`_ and to  send emails to
   the following mailing lists:
-
-  * `django-users <https://groups.google.com/g/django-users/>`_
-  * `django-developers <https://groups.google.com/g/django-developers/>`_
+  
   * `django-announce <https://groups.google.com/g/django-announce/>`_
 
 * Access to the ``django-security`` repo in GitHub. Among other things, this

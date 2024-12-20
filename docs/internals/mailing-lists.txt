@@ -48,12 +48,8 @@ installation, usage, or debugging of Django.
     <message-does-not-appear-on-django-users>` instantly.
 
 * `django-users mailing archive`_
-* `django-users subscription email address`_
-* `django-users posting email`_
 
 .. _django-users mailing archive: https://groups.google.com/g/django-users
-.. _django-users subscription email address: mailto:django-users+subscribe@googlegroups.com
-.. _django-users posting email: mailto:django-users@googlegroups.com
 
 .. _django-developers-mailing-list:
 
@@ -78,12 +74,8 @@ answered there.
     to ask for tech support, doing so in this list is inappropriate.
 
 * `django-developers mailing archive`_
-* `django-developers subscription email address`_
-* `django-developers posting email`_
 
 .. _django-developers mailing archive: https://groups.google.com/g/django-developers
-.. _django-developers subscription email address: mailto:django-developers+subscribe@googlegroups.com
-.. _django-developers posting email: mailto:django-developers@googlegroups.com
 
 .. _django-announce-mailing-list:
 
@@ -94,12 +86,8 @@ A (very) low-traffic list for announcing :ref:`upcoming security releases
 <security-disclosure>`, new releases of Django, and security advisories.
 
 * `django-announce mailing archive`_
-* `django-announce subscription email address`_
-* `django-announce posting email`_
 
 .. _django-announce mailing archive: https://groups.google.com/g/django-announce
-.. _django-announce subscription email address: mailto:django-announce+subscribe@googlegroups.com
-.. _django-announce posting email: mailto:django-announce@googlegroups.com
 
 .. _django-updates-mailing-list:
 
@@ -110,9 +98,5 @@ All the ticket updates are mailed automatically to this list, which is tracked
 by developers and interested community members.
 
 * `django-updates mailing archive`_
-* `django-updates subscription email address`_
-* `django-updates posting email`_
 
 .. _django-updates mailing archive: https://groups.google.com/g/django-updates
-.. _django-updates subscription email address: mailto:django-updates+subscribe@googlegroups.com
-.. _django-updates posting email: mailto:django-updates@googlegroups.com
