@@ -10,6 +10,7 @@ from ..fields import (
     HStoreField,
     IntegerRangeField,
     SearchVectorField,
+    UUID4AutoField,
 )
 from ..models import TagField
 
@@ -406,6 +407,24 @@ class Migration(migrations.Migration):
                 ),
                 ("when", models.DateTimeField(null=True, default=None)),
             ],
+        ),
+        migrations.CreateModel(
+            name="UUIDv4DBSetModel",
+            fields=[
+                (
+                    "id",
+                    UUID4AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+            ],
+            options={
+                "required_db_vendor": "postgresql",
+            },
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name="UUIDTestModel",
