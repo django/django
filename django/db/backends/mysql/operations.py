@@ -3,8 +3,10 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta
-from django.db.models import Exists, ExpressionWrapper, Lookup
+from django.db.models import Exists, ExpressionWrapper, Func, Lookup, UUIDField, Value
 from django.db.models.constants import OnConflict
+from django.db.models.fields.json import KeyTextTransform
+from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.regex_helper import _lazy_re_compile
@@ -453,3 +455,21 @@ class DatabaseOperations(BaseDatabaseOperations):
             update_fields,
             unique_fields,
         )
+
+    def prepare_join_composite_pk_on_json_array(self, lhs, rhs, index):
+        # e.g. `a`.`id` = CAST((`b`.`object_id` ->> '$[0]') AS signed integer)
+        json_array = rhs
+        json_element = KeyTextTransform(index, json_array)
+
+        if isinstance(lhs.field, UUIDField):
+            json_element = Func(
+                json_element,
+                Value("-"),
+                Value(""),
+                function="REPLACE",
+                output_field=UUIDField(),
+            )
+        if json_element.field != lhs.field:
+            json_element = Cast(json_element, lhs.field)
+
+        return lhs, json_element
