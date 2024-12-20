@@ -53,6 +53,7 @@ class AdminSite:
     empty_value_display = "-"
 
     login_form = None
+    template_engine = None
     index_template = None
     app_index_template = None
     login_template = None
@@ -572,7 +573,7 @@ class AdminSite:
         request.current_app = self.name
 
         return TemplateResponse(
-            request, self.index_template or "admin/index.html", context
+            request, self.index_template or "admin/index.html", context, using=self.template_engine
         )
 
     def app_index(self, request, app_label, extra_context=None):
@@ -597,6 +598,7 @@ class AdminSite:
             self.app_index_template
             or ["admin/%s/app_index.html" % app_label, "admin/app_index.html"],
             context,
+            using=self.template_engine,
         )
 
     def get_log_entries(self, request):

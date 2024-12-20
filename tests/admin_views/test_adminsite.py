@@ -6,6 +6,7 @@ from django.test.client import RequestFactory
 from django.urls import path, reverse
 
 from .models import Article
+from .sites import CustomAdminSiteWithCustomTemplateEngine
 
 site = admin.AdminSite(name="test_adminsite")
 site.register(User)
@@ -126,3 +127,20 @@ class SiteActionsTests(SimpleTestCase):
         self.assertEqual(self.site.get_action(action_name), delete_selected)
         self.site.disable_action(action_name)
         self.assertEqual(self.site.get_action(action_name), delete_selected)
+
+class AdminSiteCustomTemplateEngineTests(TestCase):
+    request_factory = RequestFactory()
+
+    @classmethod
+    def setUp(cls):
+        cls.user = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+
+    def test_template_engine(self):
+        admin_site = CustomAdminSiteWithCustomTemplateEngine(name="other")
+        request = RequestFactory().get("/")
+        request.user = self.user
+        index_response = admin_site.index(request=request)
+
+        self.assertEqual(index_response.using, CustomAdminSiteWithCustomTemplateEngine.template_engine)

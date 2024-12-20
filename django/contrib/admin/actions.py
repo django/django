@@ -91,4 +91,5 @@ def delete_selected(modeladmin, request, queryset):
             "admin/delete_selected_confirmation.html",
         ],
         context,
+        using=modeladmin.admin_site.template_engine
     )
