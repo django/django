@@ -1226,3 +1226,25 @@ class SelectDateWidget(Widget):
             ("{}_{}".format(name, interval) in data)
             for interval in ("year", "month", "day")
         )
+
+
+class Input(Widget):
+    input_type = None  # Subclass must define this
+
+    def __init__(self, attrs=None, placeholder=None):
+        self.placeholder = placeholder  # Add placeholder attribute
+        super().__init__(attrs)
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        if self.placeholder:
+            attrs = attrs or {}
+            attrs.setdefault("placeholder", self.placeholder)
+        context["widget"]["attrs"] = attrs
+        return context
+
+    def render(self, name, value, attrs=None, renderer=None):
+        attrs = attrs or {}
+        if self.placeholder:
+            attrs["placeholder"] = self.placeholder
+        return super().render(name, value, attrs, renderer)
