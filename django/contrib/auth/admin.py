@@ -1,3 +1,5 @@
+import copy
+
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.options import IS_POPUP_VAR
@@ -82,10 +84,23 @@ class UserAdmin(admin.ModelAdmin):
         "user_permissions",
     )
 
+    @staticmethod
+    def _remove_fields_from_fieldsets(fieldsets, fields):
+        fieldset_without_fields = []
+        for fieldset_name, fieldset in copy.deepcopy(fieldsets):
+            fieldset["fields"] = [f for f in fieldset["fields"] if f not in fields]
+            fieldset_without_fields.append((fieldset_name, fieldset))
+        return fieldset_without_fields
+
     def get_fieldsets(self, request, obj=None):
         if not obj:
             return self.add_fieldsets
-        return super().get_fieldsets(request, obj)
+        fieldsets = super().get_fieldsets(request, obj)
+        if not self.has_change_permission(request, obj):
+            return self._remove_fields_from_fieldsets(
+                fieldsets=fieldsets, fields=["password"]
+            )
+        return fieldsets
 
     def get_form(self, request, obj=None, **kwargs):
         """
