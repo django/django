@@ -223,6 +223,9 @@ FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 # Set to True to assume "https" during the Django 5.x release cycle.
 FORMS_URLFIELD_ASSUME_HTTPS = False
 
+# ToDo: Documentation string
+FORMS_DEFAULT_BLANK_CHOICE_LABEL = gettext_noop("- Select an option -")
+
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = "webmaster@localhost"
