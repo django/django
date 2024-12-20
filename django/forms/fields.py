@@ -29,6 +29,7 @@ from django.forms.widgets import (
     EmailInput,
     FileInput,
     HiddenInput,
+    Input,
     MultipleHiddenInput,
     NullBooleanSelect,
     NumberInput,
@@ -1408,3 +1409,17 @@ class JSONField(CharField):
         return json.dumps(initial, sort_keys=True, cls=self.encoder) != json.dumps(
             self.to_python(data), sort_keys=True, cls=self.encoder
         )
+
+
+class CustomField:
+    def __init__(self, *, widget=None, placeholder=None, **kwargs):
+        self.placeholder = placeholder
+        if widget:
+            self.widget = widget
+        else:
+            self.widget = Input()
+
+        if self.placeholder:
+            self.widget.attrs.setdefault("placeholder", self.placeholder)
+
+        super().__init__(**kwargs)

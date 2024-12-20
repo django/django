@@ -1,5 +1,6 @@
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.test import override_settings
+from django.forms import CharField, Form, TextInput
+from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
 from ..models import Article
@@ -22,3 +23,17 @@ class LiveWidgetTests(AdminSeleniumTestCase):
         self.selenium.find_element(By.ID, "submit").click()
         article = Article.objects.get(pk=article.pk)
         self.assertEqual(article.content, "\r\nTst\r\n")
+
+
+class WidgetPlaceholderTests(SimpleTestCase):
+    def test_placeholder_in_input_widget(self):
+        widget = TextInput(attrs={"placeholder": "Enter text"})
+        output = widget.render("name", "")
+        self.assertIn('placeholder="Enter text"', output)
+
+    def test_placeholder_in_field(self):
+        class ExampleForm(Form):
+            name = CharField(widget=TextInput(attrs={"placeholder": "Your name"}))
+
+        form = ExampleForm()
+        self.assertIn('placeholder="Your name"', str(form["name"]))
