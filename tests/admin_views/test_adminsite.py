@@ -128,6 +128,7 @@ class SiteActionsTests(SimpleTestCase):
         self.site.disable_action(action_name)
         self.assertEqual(self.site.get_action(action_name), delete_selected)
 
+
 class AdminSiteCustomTemplateEngineTests(TestCase):
     request_factory = RequestFactory()
 
@@ -143,4 +144,7 @@ class AdminSiteCustomTemplateEngineTests(TestCase):
         request.user = self.user
         index_response = admin_site.index(request=request)
 
-        self.assertEqual(index_response.using, CustomAdminSiteWithCustomTemplateEngine.template_engine)
+        self.assertEqual(
+            index_response.using,
+            CustomAdminSiteWithCustomTemplateEngine.template_engine,
+        )

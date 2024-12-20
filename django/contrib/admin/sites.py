@@ -573,7 +573,10 @@ class AdminSite:
         request.current_app = self.name
 
         return TemplateResponse(
-            request, self.index_template or "admin/index.html", context, using=self.template_engine
+            request,
+            self.index_template or "admin/index.html",
+            context,
+            using=self.template_engine,
         )
 
     def app_index(self, request, app_label, extra_context=None):
