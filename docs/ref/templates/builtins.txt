@@ -1630,13 +1630,8 @@ If ``value`` is ``"String with spaces"``, the output will be
 
 Formats a date according to the given format.
 
-Uses a similar format to PHP's `date()
-<https://www.php.net/manual/en/function.date.php>`_ function with some
-differences.
-
 .. note::
-    These format characters are not used in Django outside of templates. They
-    were designed to be compatible with PHP to ease transitioning for designers.
+    These format characters are not used in Django outside of templates.
 
 .. _date-and-time-formatting-specifiers:
 
@@ -1690,10 +1685,7 @@ Format character  Description                               Example output
 ``i``             Minutes.                                  ``'00'`` to ``'59'``
 ``s``             Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
 ``u``             Microseconds.                             ``000000`` to ``999999``
-``a``             ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
-                  this is slightly different than PHP's
-                  output, because this includes periods
-                  to match Associated Press style.)
+``a``             ``'a.m.'`` or ``'p.m.'``.
 ``A``             ``'AM'`` or ``'PM'``.                     ``'AM'``
 ``f``             Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
                   with minutes left off if they're zero.
