@@ -259,6 +259,10 @@ Forms
 * An :attr:`~django.forms.BoundField.aria_describedby` property is added to
   ``BoundField`` to ease use of this HTML attribute in templates.
 
+* To improve accessibility for screen reader users ``aria-describedby`` is used
+  to associated form fields with their error messages. See
+  :ref:`how form errors are displayed <form-error-display>` for details.
+
 Generic Views
 ~~~~~~~~~~~~~
 
