@@ -339,7 +339,7 @@ class SettingsTests(SimpleTestCase):
             settings._setup()
 
     def test_unable_to_import_settings_module(self):
-        msg = "Settings module fake_settings_module could not be imported"
+        msg = "Settings module 'fake_settings_module' could not be imported"
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             Settings("fake_settings_module")
 
