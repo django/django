@@ -427,6 +427,17 @@ Dropped support for PostgreSQL 13
 Upstream support for PostgreSQL 13 ends in November 2025. Django 5.2 supports
 PostgreSQL 14 and higher.
 
+Models
+------
+
+* Multiple changes have been made to the undocumented ``django.db.models.sql.compiler.SQLCompiler.execute_sql``
+  method.
+
+  * ``ROW_COUNT`` has been added as a result type, which returns the number of rows
+    returned by the query directly, closing the cursor in the process.
+  * ``SQLUpdateCompiler.execute_sql`` now only accepts ``NO_RESULT`` and ``ROW_COUNT``
+    as result types.
+
 Changed MySQL connection character set default
 ----------------------------------------------
 
