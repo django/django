@@ -1403,6 +1403,7 @@ class ModelAdmin(BaseModelAdmin):
                 "admin/change_form.html",
             ],
             context,
+            using=self.admin_site.template_engine,
         )
 
     def _get_preserved_qsl(self, request, preserved_filters):
@@ -1458,6 +1459,7 @@ class ModelAdmin(BaseModelAdmin):
                 {
                     "popup_response_data": popup_response_data,
                 },
+                using=self.admin_site.template_engine,
             )
 
         elif "_continue" in request.POST or (
@@ -1540,6 +1542,7 @@ class ModelAdmin(BaseModelAdmin):
                 {
                     "popup_response_data": popup_response_data,
                 },
+                using=self.admin_site.template_engine,
             )
 
         opts = self.opts
@@ -1720,6 +1723,7 @@ class ModelAdmin(BaseModelAdmin):
                 {
                     "popup_response_data": popup_response_data,
                 },
+                using=self.admin_site.template_engine,
             )
 
         self.message_user(
@@ -1766,6 +1770,7 @@ class ModelAdmin(BaseModelAdmin):
                 "admin/delete_confirmation.html",
             ],
             context,
+            using=self.admin_site.template_engine,
         )
 
     def get_inline_formsets(self, request, formsets, inline_instances, obj=None):
@@ -2035,6 +2040,7 @@ class ModelAdmin(BaseModelAdmin):
                     {
                         "title": _("Database error"),
                     },
+                    using=self.admin_site.template_engine,
                 )
             return HttpResponseRedirect(request.path + "?" + ERROR_FLAG + "=1")
 
@@ -2189,6 +2195,7 @@ class ModelAdmin(BaseModelAdmin):
                 "admin/change_list.html",
             ],
             context,
+            using=self.admin_site.template_engine,
         )
 
     def get_deleted_objects(self, objs, request):
@@ -2329,6 +2336,7 @@ class ModelAdmin(BaseModelAdmin):
                 "admin/object_history.html",
             ],
             context,
+            using=self.admin_site.template_engine,
         )
 
     def get_formset_kwargs(self, request, obj, inline, prefix):

@@ -2949,6 +2949,11 @@ Templates can override or extend base admin templates as described in
     The text to put at the top of the admin index page (a string). By default,
     this is "Site administration".
 
+.. attribute:: AdminSite.template_engine
+
+    Name of a template engine, as specified in your ``TEMPLATES`` setting, that
+    will be used to render the admin site's views.
+
 .. attribute:: AdminSite.index_template
 
     Path to a custom template that will be used by the admin site main index
