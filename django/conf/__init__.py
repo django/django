@@ -169,7 +169,7 @@ class Settings:
             # If settings module cannot be imported, treat it as a configuration error.
             if exc.name == self.SETTINGS_MODULE:
                 raise ImproperlyConfigured(
-                    f"Settings module {self.SETTINGS_MODULE} could not be imported"
+                    f"Settings module '{self.SETTINGS_MODULE}' could not be imported."
                 ) from exc
             raise
 
