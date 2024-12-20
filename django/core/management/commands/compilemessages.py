@@ -149,7 +149,7 @@ class Command(BaseCommand):
             for i, (dirpath, f) in enumerate(locations):
                 po_path = Path(dirpath) / f
                 mo_path = po_path.with_suffix(".mo")
-                
+
                 if self.verbosity > 0:
                     self.stdout.write("processing file %s in %s" % (f, dirpath))
 
