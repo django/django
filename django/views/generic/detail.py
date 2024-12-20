@@ -66,8 +66,8 @@ class SingleObjectMixin(ContextMixin):
         may not be called if get_object() is overridden.
         """
         if self.queryset is None:
-            if self.model:
-                return self.model._default_manager.all()
+            if (model := self._get_model()) is not None:
+                return model._default_manager.all()
             else:
                 raise ImproperlyConfigured(
                     "%(cls)s is missing a QuerySet. Define "
@@ -75,6 +75,13 @@ class SingleObjectMixin(ContextMixin):
                     "%(cls)s.get_queryset()." % {"cls": self.__class__.__name__}
                 )
         return self.queryset.all()
+
+    def _get_model(self):
+        """Return the model of the object the view is displaying."""
+        model = self.model
+        if model is None and getattr(self, "object", None) is not None:
+            return self.object.__class__
+        return model
 
     def get_slug_field(self):
         """Get the name of a slug field to be used to look up by slug."""
@@ -155,14 +162,14 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                         self.template_name_suffix,
                     )
                 )
-            elif getattr(self, "model", None) is not None and issubclass(
-                self.model, models.Model
+            elif (model := getattr(self, "_get_model", lambda: None)()) and issubclass(
+                model, models.Model
             ):
                 names.append(
                     "%s/%s%s.html"
                     % (
-                        self.model._meta.app_label,
-                        self.model._meta.model_name,
+                        model._meta.app_label,
+                        model._meta.model_name,
                         self.template_name_suffix,
                     )
                 )

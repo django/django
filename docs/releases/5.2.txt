@@ -226,7 +226,10 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`~django.views.generic.detail.SingleObjectMixin._get_model`
+  method returns the model defined for the view, or a custom model if
+  overridden. If ``queryset`` is provided, it takes precedence as the source
+  of objects.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~

@@ -43,6 +43,20 @@ class AuthorCustomDetail(generic.DetailView):
         return self.render_to_response(context)
 
 
+class AuthorDetailOverridesGetModel(generic.DetailView):
+    def _get_model(self):
+        return Author
+
+
+class AuthorDetailConflictingModelAndQueryset(generic.DetailView):
+    queryset = Author.objects.all()
+    model = Artist
+
+
+class MissingModelView(generic.DetailView):
+    pass
+
+
 class PageDetail(generic.DetailView):
     queryset = Page.objects.all()
     template_name_field = "template"

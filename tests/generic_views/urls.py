@@ -5,7 +5,7 @@ from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView, dates
 
 from . import views
-from .models import Book
+from .models import Artist, Book
 
 urlpatterns = [
     # TemplateView
@@ -75,6 +75,23 @@ urlpatterns = [
     path("detail/author/invalid/qs/", views.AuthorDetail.as_view(queryset=None)),
     path("detail/nonmodel/1/", views.NonModelDetail.as_view()),
     path("detail/doesnotexist/<pk>/", views.ObjectDoesNotExistDetail.as_view()),
+    path(
+        "detail/author/getmodel/<int:pk>/",
+        views.AuthorDetailOverridesGetModel.as_view(),
+    ),
+    path("missing-model/", views.MissingModelView.as_view()),
+    path(
+        "detail/conflicting-model-and-getmodel/<int:pk>/",
+        views.AuthorDetailOverridesGetModel.as_view(model=Artist),
+    ),
+    path(
+        "detail/author/conflicting-model-and-queryset/<int:pk>/",
+        views.AuthorDetailConflictingModelAndQueryset.as_view(),
+    ),
+    path(
+        "detail/conflicting-queryset-and-getmodel/<int:pk>/",
+        views.AuthorDetailOverridesGetModel.as_view(queryset=Artist.objects.all()),
+    ),
     # FormView
     path("contact/", views.ContactView.as_view()),
     path("late-validation/", views.LateValidationView.as_view()),
