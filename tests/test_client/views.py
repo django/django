@@ -13,6 +13,7 @@ from django.http import (
     HttpResponseNotAllowed,
     HttpResponseNotFound,
     HttpResponseRedirect,
+    JsonResponse,
 )
 from django.shortcuts import render
 from django.template import Context, Template
@@ -432,3 +433,8 @@ def two_arg_exception(request):
 
 class CBView(TemplateView):
     template_name = "base.html"
+
+
+def async_default_headers(request):
+    data = {"message": "This is a trial view"}
+    return JsonResponse(data)
