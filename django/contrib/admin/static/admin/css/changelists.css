@@ -11,6 +11,14 @@
     min-width: 0;
 }
 
+#changelist .changelist-form-container a {
+    text-decoration: underline;
+}
+
+#changelist .changelist-form-container table thead a {
+    text-decoration: none;
+}
+
 #changelist table {
     width: 100%;
 }
@@ -51,6 +59,9 @@
 }
 
 /* CHANGELIST TABLES */
+#changelist .paginator a{
+    text-decoration: none;
+}
 
 #changelist table thead th {
     padding: 0;
