@@ -30,7 +30,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = EmailField()
         # Check for runaway regex security problem. This will take a long time
         # if the security fix isn't in place.
-        addr = "viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058"
+        addr = "viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058.aa"
         self.assertEqual(addr, f.clean(addr))
 
     def test_emailfield_not_required(self):
