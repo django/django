@@ -19,6 +19,7 @@ from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.boundfield import BoundField
+from django.forms.fields import Field as DjangoField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     FILE_INPUT_CONTRADICTION,
@@ -29,6 +30,7 @@ from django.forms.widgets import (
     EmailInput,
     FileInput,
     HiddenInput,
+    Input,
     MultipleHiddenInput,
     NullBooleanSelect,
     NumberInput,
@@ -1408,3 +1410,14 @@ class JSONField(CharField):
         return json.dumps(initial, sort_keys=True, cls=self.encoder) != json.dumps(
             self.to_python(data), sort_keys=True, cls=self.encoder
         )
+
+
+class CustomField(DjangoField):
+    def __init__(self, *, widget=None, placeholder=None, **kwargs):
+        self.placeholder = placeholder
+        widget = widget or Input()
+
+        if self.placeholder:
+            widget.attrs.setdefault("placeholder", self.placeholder)
+
+        super().__init__(widget=widget, **kwargs)
