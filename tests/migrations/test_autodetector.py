@@ -1596,6 +1596,28 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
 
     @mock.patch(
+        "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition",
+        side_effect=AssertionError("Should not have prompted for not null addition"),
+    )
+    def test_remove_primary_key_attribute(self, mocked_ask_method):
+        initial_state = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("pkfield", models.IntegerField(primary_key=True)),
+            ],
+        )
+        updated_state = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("pkfield", models.IntegerField(primary_key=False)),
+            ],
+        )
+        self.get_changes([initial_state], [updated_state])
+
+    @mock.patch(
         "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration",
         return_value=models.NOT_PROVIDED,
     )
