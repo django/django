@@ -10,9 +10,9 @@ Content Security Policy (CSP)
    :synopsis: Middleware for Content Security Policy headers
 
 Content Security Policy (CSP) is a web security standard that helps prevent
-attacks by controlling the sources from which content can be loaded. :ref:`CSP
-enforcement <security-csp>` plays an important role in a comprehensive security
-strategy.
+attacks by controlling the sources from which content can be loaded. CSP
+enforcement plays an important role in a comprehensive :doc:`security strategy
+</topics/security>`.
 
 .. _using-csp:
 
