@@ -75,14 +75,14 @@ class DomainNameValidator(RegexValidator):
     # Max length for domain name labels is 63 characters per RFC 1034 sec. 3.1.
     domain_re = r"(?:\.(?!-)[a-z" + ul + r"0-9-]{1,63}(?<!-))*"
     # Top-level domain.
-    tld_re = (
+    tld_no_fqdn_re = (
         r"\."  # dot
         r"(?!-)"  # can't start with a dash
         r"(?:[a-z" + ul + "-]{2,63}"  # domain label
         r"|xn--[a-z0-9]{1,59})"  # or punycode label
         r"(?<!-)"  # can't end with a dash
-        r"\.?"  # may have a trailing dot
     )
+    tld_re = tld_no_fqdn_re + r"\.?"
     ascii_only_hostname_re = r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
     ascii_only_domain_re = r"(?:\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*"
     ascii_only_tld_re = (
@@ -209,9 +209,9 @@ def validate_integer(value):
 class EmailValidator:
     message = _("Enter a valid email address.")
     code = "invalid"
-    host_re = DomainNameValidator.hostname_re
+    hostname_re = DomainNameValidator.hostname_re
     domain_re = DomainNameValidator.domain_re
-    ul = DomainNameValidator.ul
+    tld_no_fqdn_re = DomainNameValidator.tld_no_fqdn_re
 
     user_regex = _lazy_re_compile(
         # dot-atom
@@ -222,10 +222,7 @@ class EmailValidator:
         re.IGNORECASE,
     )
     domain_regex = _lazy_re_compile(
-        # Negative look-ahead disallowing \r or \n
-        r"(?i)^(?!.*[\r\n])" r"(?:" + host_re + domain_re +
-        # Final TLD label:
-        r"\.(?!-)(?:[a-z" + ul + r"0-9-]{2,63}|xn--[a-z0-9]{1,59})(?<!-)" r")$",
+        r"^" + hostname_re + domain_re + tld_no_fqdn_re + r"\Z",
         re.IGNORECASE,
     )
     literal_regex = _lazy_re_compile(
