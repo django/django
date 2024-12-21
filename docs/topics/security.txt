@@ -286,6 +286,36 @@ User-uploaded content
 
 .. _same-origin policy: https://en.wikipedia.org/wiki/Same-origin_policy
 
+.. _security-csp:
+
+Content Security Policy (CSP)
+=============================
+
+.. versionadded:: 5.2
+
+Content Security Policy (CSP) is a powerful security feature that helps protect
+web applications against various types of attacks, particularly Cross-Site
+Scripting (XSS) and other code injection attacks.
+
+CSP works by allowing you to specify which sources of content are considered
+trusted, and instructing the browser to only execute or render resources from
+those trusted sources. This effectively creates an allowlist of content sources,
+significantly reducing the risk of malicious code execution.
+
+Key benefits of implementing CSP include:
+
+1. Mitigating XSS attacks by preventing the execution of inline scripts and
+   restricting which external scripts can be loaded.
+2. Controlling which external resources (like images, fonts, or stylesheets) can
+   be loaded by your site.
+3. Preventing unwanted framing of your site, protecting against clickjacking
+   attacks.
+4. Reporting policy violations to a specified URL, allowing you to monitor
+   potential attacks or misconfigured directives.
+
+For detailed information on how to enable and configure CSP in your Django
+project, refer to the :ref:`Using CSP <using-csp>` documentation.
+
 .. _additional-security-topics:
 
 Additional security topics
