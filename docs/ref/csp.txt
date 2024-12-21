@@ -239,31 +239,45 @@ parts of your application.
 Limitations and Considerations
 ==============================
 
-While Content Security Policy (CSP) is a powerful security feature, it's important to be aware of
-its limitations and considerations, especially in the context of Django's implementation:
+While Content Security Policy (CSP) is a powerful security feature, it's
+important to be aware of its limitations and considerations, especially in the
+context of Django's implementation:
 
-* Browser Support: While most modern browsers support CSP, support for directives vary.
+* Policy Exclusion Risks: Weakening or excluding a CSP policy on any page can
+  compromise the security of the entire site. Due to the "same origin" policy,
+  an attacker can exploit a vulnerability on one page to access other parts of
+  the site. Therefore, excluding any path from CSP protection negates its
+  benefits across the site.
 
-* Performance Impact: Implementing CSP, especially with nonces, can have a slight performance
-  impact due to the additional processing required for each request.
+* Third-party Integration Complexity: If your application relies heavily on
+  third-party scripts or services, implementing a strict CSP can be challenging
+  and may require careful configuration and ongoing maintenance.
 
-* Third-party Scripts: If your application relies heavily on third-party scripts or services,
-  implementing a strict CSP can be challenging and may require careful configuration.
+* Nonce Caching Challenges: Nonces are single-use tokens. If your project uses
+  caching, take into consideration that caching can potentially lead to
+  mismatches between the CSP header and the content, requiring careful cache
+  configuration to ensure consistency.
+
+* Limited Directive Validation: Django's CSP middleware doesn't validate that
+  all specified directives match the CSP specification. It's the developer's
+  responsibility to ensure the correctness of the directives.
 
 * Report-Only Mode Limitations: While useful for testing, the report-only mode
-  (``SECURE_CSP_REPORT_ONLY``) doesn't actually prevent any violations, it only reports them.
+  (``SECURE_CSP_REPORT_ONLY``) doesn't actually prevent any violations, it only
+  reports them.
 
-* Nonce Limitations: Nonces are single-use tokens. If your project uses caching, take into
-  consideration that caching can potentially lead to mismatches between the CSP header and the
-  content, and ensure they stay consistent.
+* Violation Report Handling: While Django provides a way to set up CSP
+  reporting, it doesn't include built-in functionality to handle and analyze
+  these reports. You'll need to implement this separately or use a 3rd party
+  service if you want to make use of violation reports.
 
-* Limited Directive Validation: Django's CSP middleware doesn't validate that all specified
-  directives match the CSP specification. It's the developer's responsibility to ensure the
-  correctness of the directives.
+* Performance Overhead: Implementing CSP, especially with nonces, can have a
+  performance impact due to the additional header processing and nonce
+  generation required for each request.
 
-* Violation Reports: While Django provides a way to set up CSP reporting, it doesn't include 
-  built-in functionality to handle and analyze these reports. You'll need to implement this 
-  separately or use a 3rd party service if you want to make use of violation reports.
+* Browser Support Variations: While most modern browsers support CSP, support
+  for specific directives can vary significantly between browsers and versions.
 
-Remember, while these limitations exist, CSP is still a valuable tool in your security arsenal. It's
-important to understand these constraints and plan your implementation accordingly.
+Remember, while these limitations exist, CSP is still a valuable tool in your
+security arsenal. It's important to understand these constraints and plan your
+implementation accordingly.
