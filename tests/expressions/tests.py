@@ -1574,7 +1574,7 @@ class ExpressionsNumericTests(TestCase):
                     float(result.ratio),
                     float(expected),
                     places=4,
-                    msg=f"Division de {num} par {den} devrait donner {expected}",
+                    msg=f"Divide {num} by {den} should give result: {expected}",
                 )
 
 

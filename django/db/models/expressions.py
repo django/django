@@ -758,26 +758,30 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         expression_params.extend(params)
         # order of precedence
         expression_wrapper = "(%s)"
-        # Check if all expr will be all integer for truediv
         if self.connector == "/":
-            if any(self._is_duration_field(e) for e in (self.lhs, self.rhs)):
-                # Division directe pour les durations
-                sql = "%s / %s" % (expressions[0], expressions[1])
-            elif any(
+            is_duration = any(self._is_duration_field(e) for e in (self.lhs, self.rhs))
+            is_decimal = any(
                 isinstance(
                     getattr(e, "output_field", None),
                     (fields.DecimalField, fields.FloatField),
                 )
                 for e in (self.lhs, self.rhs)
-            ):
-                # Division avec CAST pour decimal/float
+            )
+            is_integer = all(self._is_integer_field(e) for e in (self.lhs, self.rhs))
+            if is_duration:
+                sql = "%s / %s" % (expressions[0], expressions[1])
+            elif is_decimal and connection.vendor == "sqlite":
+                sql = "CAST(%s AS REAL) / CAST(%s AS REAL)" % (
+                    expressions[0],
+                    expressions[1],
+                )
+            elif is_decimal:
                 sql = connection.ops.combine_expression(self.connector, expressions)
-            elif all(self._is_integer_field(e) for e in (self.lhs, self.rhs)):
-                # Division entière pour les entiers
+            elif is_integer:
                 sql = connection.ops.combine_expression(self.connector, expressions)
             else:
-                # Division standard pour les autres cas
                 sql = "%s / %s" % (expressions[0], expressions[1])
+
         else:
             sql = connection.ops.combine_expression(self.connector, expressions)
 
