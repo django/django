@@ -9,26 +9,12 @@ Content Security Policy (CSP)
 .. module:: django.middleware.csp
    :synopsis: Middleware for Content Security Policy headers
 
-Django provides built-in support for Content Security Policy (CSP) headers through the CSP
-middleware. Content Security Policy is a powerful security feature that helps protect web applications
-against various types of attacks, particularly Cross-Site Scripting (XSS) and other code injection attacks.
+Content Security Policy (CSP) is a web security standard that helps prevent
+attacks by controlling the sources from which content can be loaded. :ref:`CSP
+enforcement <security-csp>` plays an important role in a comprehensive security
+strategy.
 
-CSP works by allowing you to specify which sources of content are considered trusted, and instructing
-the browser to only execute or render resources from those trusted sources. This effectively creates a
-whitelist of content sources, significantly reducing the risk of malicious code execution.
-
-Some key benefits of implementing CSP include:
-
-1. Mitigating XSS attacks by preventing the execution of inline scripts and restricting which external
-   scripts can be loaded.
-2. Controlling which external resources (like images, fonts, or stylesheets) can be loaded by your site.
-3. Preventing unwanted framing of your site, protecting against clickjacking attacks.
-4. Reporting policy violations to a specified URL, allowing you to monitor potential attacks or
-   misconfigured directives.
-
-CSP provides a robust and flexible framework for securing your web application, giving you fine-grained
-control over the resources your site can use and interact with. By leveraging Django's CSP middleware,
-you can easily implement and manage these policies in your project.
+.. _using-csp:
 
 Using CSP
 =========
@@ -267,7 +253,7 @@ its limitations and considerations, especially in the context of Django's implem
 * Report-Only Mode Limitations: While useful for testing, the report-only mode
   (``SECURE_CSP_REPORT_ONLY``) doesn't actually prevent any violations, it only reports them.
 
-* Nonce Limitations: Nonces are single-use tokens.  If your project uses caching, take into
+* Nonce Limitations: Nonces are single-use tokens. If your project uses caching, take into
   consideration that caching can potentially lead to mismatches between the CSP header and the
   content, and ensure they stay consistent.
 
