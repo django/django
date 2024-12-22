@@ -332,10 +332,23 @@ class DatabaseOperations(BaseDatabaseOperations):
             )
 
             def converter(value, expression, connection):
-                if value is not None:
-                    return create_decimal(value).quantize(
+                if value is None:
+                    return None
+                try:
+                    if isinstance(value, str):
+                        dec = decimal.Decimal(value)
+                    elif isinstance(value, float):
+                        dec = decimal.Decimal(f"{value:.15f}")
+                    else:
+                        dec = decimal.Decimal(str(value))
+
+                    return dec.quantize(
                         quantize_value, context=expression.output_field.context
                     )
+                except decimal.InvalidOperation:
+                    if isinstance(value, (int, float)):
+                        return create_decimal(float(value))
+                    raise
 
         else:
 

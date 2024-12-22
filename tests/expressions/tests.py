@@ -1524,6 +1524,53 @@ class ExpressionsNumericTests(TestCase):
         n.refresh_from_db()
         self.assertEqual(n.decimal_value, Decimal("0.1"))
 
+    def test_decimal_division_precision(self):
+        """
+        Test that division with Decimal preserves numeric type and precision
+        Specifically tests division of integer by Decimal(3.0)
+        """
+        # Create an object with an integer field
+        obj = Number.objects.create(integer=2, decimal_value=Decimal("0"))
+
+        # Annotate with a division that should produce a precise decimal value
+        qs = Number.objects.annotate(
+            x=ExpressionWrapper(
+                F("integer") / Decimal("3.0"),
+                output_field=DecimalField(max_digits=10, decimal_places=4),
+            )
+        ).get(pk=obj.pk)
+
+        # Check that the result is close to 0.6666
+        self.assertAlmostEqual(
+            float(qs.x),
+            float(Decimal("2") / Decimal("3.0")),
+            places=4,
+            msg="Division should preserve decimal precision",
+        )
+
+    def test_decimal_type_preservation(self):
+        """
+        Test that Decimal values are preserved with their original type
+        """
+        test_cases = [
+            Decimal("1000.0"),  # Decimal with .0
+            Decimal("1000"),  # Integer-like Decimal
+            Decimal("1000.00001"),  # Decimal with significant digits
+        ]
+
+        for test_value in test_cases:
+            with self.subTest(value=test_value):
+                # Create an object with the value
+                obj = Number.objects.create(integer=0, decimal_value=test_value)
+
+                # Retrieve and check that the value is preserved
+                retrieved_obj = Number.objects.get(pk=obj.pk)
+                self.assertEqual(
+                    retrieved_obj.decimal_value,
+                    test_value,
+                    f"Decimal value {test_value} should be preserved",
+                )
+
 
 class ExpressionOperatorTests(TestCase):
     @classmethod
