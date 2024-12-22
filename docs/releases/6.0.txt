@@ -184,6 +184,16 @@ Models
 * :doc:`Constraints </ref/models/constraints>` now implement a ``check()``
   method that is already registered with the check framework.
 
+* The new ``order_by`` argument for :class:`~django.db.models.Aggregate` allows
+  specifying the ordering of the elements in the result.
+
+* The new :attr:`.Aggregate.allow_order_by` class attribute determines whether
+  the aggregate function allows passing an ``order_by`` keyword argument.
+
+* The new :class:`~django.db.models.StringAgg` aggregate returns the input
+  values concatenated into a string, separated by the ``delimiter`` string.
+  This aggregate was previously supported only for PostgreSQL.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -287,6 +297,9 @@ Miscellaneous
 
 * ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
   ``serialize_db_to_string()`` instead.
+
+* The PostgreSQL ``StringAgg`` class is deprecated in favor of the generally
+  available :class:`~django.db.models.StringAgg` class.
 
 Features removed in 6.0
 =======================
