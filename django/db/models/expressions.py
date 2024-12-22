@@ -1145,10 +1145,15 @@ class Value(SQLiteNumericMixin, Expression):
          * output_field: an instance of the model field type that this
            expression will return, such as IntegerField() or CharField().
         """
+        if isinstance(value, Decimal):
+            value = Decimal(f"{value:.10f}")
         super().__init__(output_field=output_field)
         self.value = value
 
     def __repr__(self):
+        if isinstance(self.value, Decimal):
+            value_repr = str(self.value.normalize())
+            return f"{self.__class__.__name__}(Decimal('{value_repr}'))"
         return f"{self.__class__.__name__}({self.value!r})"
 
     def as_sql(self, compiler, connection):
