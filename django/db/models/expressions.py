@@ -61,6 +61,13 @@ class Combinable:
     BITXOR = "#"
 
     def _combine(self, other, connector, reversed):
+        if connector in [self.DIV, self.MUL, self.ADD, self.SUB] and isinstance(
+            other, (int, float, Decimal)
+        ):
+            other = Value(
+                Decimal(str(other)),
+                output_field=fields.DecimalField(max_digits=20, decimal_places=10),
+            )
         if not hasattr(other, "resolve_expression"):
             # everything must be resolvable to an expression
             other = Value(other)
@@ -1172,6 +1179,8 @@ class Value(SQLiteNumericMixin, Expression):
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
     ):
+        if isinstance(self.value, Decimal) and not self.output_field:
+            self.output_field = fields.DecimalField(max_digits=20, decimal_places=10)
         c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
         c.for_save = for_save
         return c
