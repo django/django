@@ -4046,6 +4046,25 @@ by the aggregate.
         However, if ``sample=True``, the return value will be the sample
         variance.
 
+``StringAgg``
+~~~~~~~~~~~~~
+
+.. versionadded:: 6.0
+
+.. class:: StringAgg(expression, delimiter, output_field=None, distinct=False, filter=None, order_by=None, default=None, **extra)
+
+    Returns the input values concatenated into a string, separated by the
+    ``delimiter`` string, or ``default`` if there are no values.
+
+    * Default alias: ``<field>__stringagg``
+    * Return type: ``string`` or ``output_field`` if supplied. If the
+      queryset or grouping is empty, ``default`` is returned.
+
+    .. attribute:: delimiter
+
+        A ``Value`` or expression representing the string that should separate
+        each of the values. For example, ``Value(",")``.
+
 Query-related tools
 ===================
 

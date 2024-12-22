@@ -18,6 +18,8 @@ details on these changes.
 * The ``serialize`` keyword argument of
   ``BaseDatabaseCreation.create_test_db()`` will be removed.
 
+* The ``django.contrib.postgres.aggregates.StringAgg`` class will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

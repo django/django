@@ -194,6 +194,8 @@ General-purpose aggregation functions
 
 .. class:: StringAgg(expression, delimiter, distinct=False, filter=None, default=None, order_by=())
 
+    .. deprecated:: 6.0
+
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string, or ``default`` if there are no values.
 
