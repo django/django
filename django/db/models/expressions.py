@@ -1481,6 +1481,21 @@ class OrderByList(ExpressionList):
         )
         super().__init__(*expressions, **extra)
 
+    @classmethod
+    def from_param(cls, context, param):
+        if param is None:
+            return None
+        if isinstance(param, (list, tuple)):
+            if not param:
+                return None
+            return cls(*param)
+        elif isinstance(param, str) or hasattr(param, "resolve_expression"):
+            return cls(param)
+        raise ValueError(
+            f"{context} must be either a string reference to a "
+            f"field, an expression, or a list or tuple of them not {param!r}."
+        )
+
 
 @deconstructible(path="django.db.models.ExpressionWrapper")
 class ExpressionWrapper(SQLiteNumericMixin, Expression):
@@ -1943,16 +1958,7 @@ class Window(SQLiteNumericMixin, Expression):
                 self.partition_by = (self.partition_by,)
             self.partition_by = ExpressionList(*self.partition_by)
 
-        if self.order_by is not None:
-            if isinstance(self.order_by, (list, tuple)):
-                self.order_by = OrderByList(*self.order_by)
-            elif isinstance(self.order_by, (BaseExpression, str)):
-                self.order_by = OrderByList(self.order_by)
-            else:
-                raise ValueError(
-                    "Window.order_by must be either a string reference to a "
-                    "field, an expression, or a list or tuple of them."
-                )
+        self.order_by = OrderByList.from_param("Window.order_by", self.order_by)
         super().__init__(output_field=output_field)
         self.source_expression = self._parse_expressions(expression)[0]
 
