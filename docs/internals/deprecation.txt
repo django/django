@@ -35,6 +35,13 @@ details on these changes.
   argument of ``django.core.paginator.Paginator`` and
   ``django.core.paginator.AsyncPaginator`` will no longer be allowed.
 
+* The ability to attach Python's legacy email ``MIMEBase`` objects
+  to a ``django.core.mail.EmailMessage`` will be removed.
+
+* The ``django.core.mail.BadHeaderError``, ``SafeMIMEText`` and
+  ``SafeMIMEMultipart`` classes will be removed, along with the undocumented
+  ``forbid_multi_line_headers()`` and ``sanitize_address()`` functions.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

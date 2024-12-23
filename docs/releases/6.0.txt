@@ -136,7 +136,13 @@ Decorators
 Email
 ~~~~~
 
-* ...
+* ``EmailMessage.message()`` now uses Python's "modern email" API and returns
+  an instance of :class:`email.message.EmailMessage`. It accepts a new
+  ``policy`` argument.
+
+* ``EmailMessage.attach()`` now accepts a :class:`~email.message.MIMEPart`
+  object from Python's modern email API.
+
 
 Error Reporting
 ~~~~~~~~~~~~~~~
@@ -327,6 +333,21 @@ of each library are the first to add or confirm compatibility with Python 3.12:
 * ``sqlparse`` 0.5.0
 * ``tblib`` 3.0.0
 
+Email
+-----
+
+* The undocumented ``mixed_subtype`` and ``alternative_subtype`` properties
+  of :class:`~django.core.mail.EmailMessage` and
+  :class:`~django.core.mail.EmailMultiAlternatives` are no longer supported.
+
+* The undocumented ``encoding`` property of :class:`~django.core.mail.EmailMessage`
+  no longer supports Python legacy :py:class:`email.charset.Charset` objects.
+
+* The internal implementations of :class:`~django.core.mail.EmailMessage` and
+  :class:`~django.core.mail.EmailMultiAlternatives` have changed significantly.
+  Closely examine any custom EmailMessage subclasses that rely on overriding
+  undocumented, internal underscore methods.
+
 Miscellaneous
 -------------
 
@@ -346,6 +367,24 @@ Miscellaneous
 
 Features deprecated in 6.0
 ==========================
+
+Email
+-----
+
+* Passing Python's legacy email :class:`~email.mime.base.MIMEBase` object to
+  ``EmailMessage.attach()`` (or including one in the message's ``attachments``
+  list) is deprecated. For complex attachments requiring additional headers or
+  parameters, switch to the modern email API's :class:`~email.message.MIMEPart`.
+
+* ``BadHeaderError`` is deprecated. Python's modern email raises a
+  :exc:`!ValueError` for email headers containing prohibited characters.
+
+* ``django.core.mail.SafeMIMEText`` and ``SafeMIMEMultipart`` are deprecated.
+  (In earlier releases, they had been documented as the return types of
+  ``EmailMessage.message()``.)
+
+* The undocumented email APIs ``django.core.mail.forbid_multi_line_headers()``
+  and ``django.core.mail.message.sanitize_address()`` are deprecated.
 
 Miscellaneous
 -------------
