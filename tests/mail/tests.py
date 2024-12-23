@@ -8,6 +8,7 @@ import tempfile
 from email import charset, message_from_binary_file
 from email import message_from_bytes as _message_from_bytes
 from email import policy
+from email.headerregistry import Address
 from email.message import EmailMessage as PyEmailMessage
 from email.message import Message as PyMessage
 from email.mime.image import MIMEImage
@@ -53,7 +54,14 @@ def message_from_bytes(s):
     email.message_from_bytes() using modern email.policy.default.
     Returns a modern email.message.EmailMessage.
     """
-    return _message_from_bytes(s, policy=policy.default)
+    # The modern email parser has a bug with adjacent rfc2047 encoded-words.
+    # This doesn't affect django.core.mail (which doesn't parse messages),
+    # but it can confuse our tests that try to verify sent content by reparsing
+    # the generated message. Apply a workaround if needed.
+    message = _message_from_bytes(s, policy=policy.default)
+    if _needs_cpython_128110_workaround and _rfc2047_prefix_bytes in s:
+        _apply_cpython_128110_workaround(message, s)
+    return message
 
 
 class MailTestsMixin:
@@ -182,6 +190,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(message["From"], "from@example.com")
         self.assertEqual(message["To"], "to@example.com")
 
+    # The following test is specific to Python's legacy MIMEText, and can be safely
+    # removed when EmailMessage.message() uses Python's modern email API.
+    # (Using surrogateescape for non-utf8 is also covered in test_encoding().)
     @mock.patch("django.core.mail.message.MIMEText.set_payload")
     def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
         """Line length check should encode the payload supporting `surrogateescape`.
@@ -422,16 +433,17 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         """
         email = EmailMessage(
             "Long subject lines that get wrapped should contain a space continuation "
-            "character to get expected behavior in Outlook and Thunderbird",
-            "Content",
-            "from@example.com",
-            ["to@example.com"],
+            "character to comply with RFC 822",
         )
         message = email.message()
-        self.assertEqual(
-            message["Subject"].encode(),
-            b"Long subject lines that get wrapped should contain a space continuation\n"
-            b" character to get expected behavior in Outlook and Thunderbird",
+        msg_bytes = message.as_bytes()
+        # Python's legacy email wraps this more than strictly necessary
+        # (but uses FWS properly at each wrap). Modern email wraps it better.
+        self.assertIn(
+            b"Subject: Long subject lines that get wrapped should contain a space\n"
+            b" continuation\n"
+            b" character to comply with RFC 822",
+            msg_bytes,
         )
 
     def test_message_header_overrides(self):
@@ -535,17 +547,25 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         email = EmailMessage(
             to=['"Firstname Sürname" <to@example.com>', "other@example.com"],
         )
+        parsed = message_from_bytes(email.message().as_bytes())
         self.assertEqual(
-            email.message()["To"],
-            "=?utf-8?q?Firstname_S=C3=BCrname?= <to@example.com>, other@example.com",
+            parsed["To"].addresses,
+            (
+                Address(display_name="Firstname Sürname", addr_spec="to@example.com"),
+                Address(addr_spec="other@example.com"),
+            ),
         )
 
         email = EmailMessage(
             to=['"Sürname, Firstname" <to@example.com>', "other@example.com"],
         )
+        parsed = message_from_bytes(email.message().as_bytes())
         self.assertEqual(
-            email.message()["To"],
-            "=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com",
+            parsed["To"].addresses,
+            (
+                Address(display_name="Sürname, Firstname", addr_spec="to@example.com"),
+                Address(addr_spec="other@example.com"),
+            ),
         )
 
     def test_unicode_headers(self):
@@ -558,13 +578,19 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             },
         )
         message = email.message()
-        self.assertEqual(message["Subject"], "=?utf-8?b?R8W8ZWfFvMOzxYJrYQ==?=")
+
+        # Verify sent headers use RFC 2047 encoded-words (not raw utf-8).
+        # The exact encoding details don't matter so long as the result parses
+        # to the original values.
+        msg_bytes = message.as_bytes()
+        self.assertTrue(msg_bytes.isascii())  # not unencoded utf-8.
+        parsed = message_from_bytes(msg_bytes)
+        self.assertEqual(parsed["Subject"], "Gżegżółka")
         self.assertEqual(
-            message["Sender"], "=?utf-8?q?Firstname_S=C3=BCrname?= <sender@example.com>"
+            parsed["Sender"].address,
+            Address(display_name="Firstname Sürname", addr_spec="sender@example.com"),
         )
-        self.assertEqual(
-            message["Comments"], "=?utf-8?q?My_S=C3=BCrname_is_non-ASCII?="
-        )
+        self.assertEqual(parsed["Comments"], "My Sürname is non-ASCII")
 
     def test_non_utf8_headers_multipart(self):
         """
@@ -576,22 +602,27 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         to = '"Sürname, Firstname" <to@example.com>'
         text_content = "This is an important message."
         html_content = "<p>This is an <strong>important</strong> message.</p>"
-        msg = EmailMultiAlternatives(
+        email = EmailMultiAlternatives(
             "Message from Firstname Sürname",
             text_content,
             from_email,
             [to],
             headers=headers,
         )
-        msg.attach_alternative(html_content, "text/html")
-        msg.encoding = "iso-8859-1"
+        email.attach_alternative(html_content, "text/html")
+        email.encoding = "iso-8859-1"
+        message = email.message()
+
+        # Verify sent headers use RFC 2047 encoded-words, not raw utf-8.
+        msg_bytes = message.as_bytes()
+        self.assertTrue(msg_bytes.isascii())
+
+        # Verify sent headers parse to original values.
+        parsed = message_from_bytes(msg_bytes)
+        self.assertEqual(parsed["Subject"], "Message from Firstname Sürname")
         self.assertEqual(
-            msg.message()["To"],
-            "=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>",
-        )
-        self.assertEqual(
-            msg.message()["Subject"],
-            "=?iso-8859-1?q?Message_from_Firstname_S=FCrname?=",
+            parsed["To"].addresses,
+            (Address(display_name="Sürname, Firstname", addr_spec="to@example.com"),),
         )
 
     def test_multipart_with_attachments(self):
@@ -692,15 +723,19 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         email = EmailMessage(body="Firstname Sürname is a great guy.\n")
         email.encoding = "iso-8859-1"
         message = email.message()
-        self.assertMessageHasHeaders(
-            message,
-            {
-                ("MIME-Version", "1.0"),
-                ("Content-Type", 'text/plain; charset="iso-8859-1"'),
-                ("Content-Transfer-Encoding", "quoted-printable"),
-            },
-        )
-        self.assertEqual(message.get_payload(), "Firstname S=FCrname is a great guy.\n")
+        self.assertEqual(message["Content-Type"], 'text/plain; charset="iso-8859-1"')
+
+        # Check that body is actually encoded with iso-8859-1.
+        msg_bytes = message.as_bytes()
+        if message["Content-Transfer-Encoding"] == "quoted-printable":
+            self.assertIn(b"Firstname S=FCrname is a great guy.", msg_bytes)
+        elif message["Content-Transfer-Encoding"] == "8bit":
+            self.assertIn(b"Firstname S\xfc", msg_bytes)
+        else:
+            self.fail("Unexpected Content-Transfer-Encoding")
+
+        parsed = message_from_bytes(msg_bytes)
+        self.assertEqual(parsed.get_content(), "Firstname Sürname is a great guy.\n")
 
     def test_encoding_alternatives(self):
         """
@@ -712,37 +747,18 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         email.encoding = "iso-8859-1"
         email.attach_alternative(html_content, "text/html")
         message = email.message()
-        # Check the text/plain part.
-        payload0 = message.get_payload(0)
-        self.assertMessageHasHeaders(
-            payload0,
-            {
-                # (The MIME-Version header is neither required nor meaningful
-                # in a subpart, and this check for it can be safely removed.)
-                ("MIME-Version", "1.0"),
-                ("Content-Type", 'text/plain; charset="iso-8859-1"'),
-                ("Content-Transfer-Encoding", "quoted-printable"),
-            },
+        # Check both parts are sent using the specified encoding.
+        self.assertEqual(
+            message.get_payload(0)["Content-Type"], 'text/plain; charset="iso-8859-1"'
         )
-        self.assertEndsWith(
-            payload0.as_bytes(), b"\n\nFirstname S=FCrname is a great guy.\n"
+        self.assertEqual(
+            message.get_payload(1)["Content-Type"], 'text/html; charset="iso-8859-1"'
         )
-        # Check the text/html alternative.
-        payload1 = message.get_payload(1)
-        self.assertMessageHasHeaders(
-            payload1,
-            {
-                # (The MIME-Version header is neither required nor meaningful
-                # in a subpart, and this check for it can be safely removed.)
-                ("MIME-Version", "1.0"),
-                ("Content-Type", 'text/html; charset="iso-8859-1"'),
-                ("Content-Transfer-Encoding", "quoted-printable"),
-            },
-        )
-        self.assertEndsWith(
-            payload1.as_bytes(),
-            b"\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>\n",
-        )
+
+        # Check both parts decode to the original content at the receiving end.
+        parsed = message_from_bytes(message.as_bytes())
+        self.assertEqual(parsed.get_body(("plain",)).get_content(), text_content)
+        self.assertEqual(parsed.get_body(("html",)).get_content(), html_content)
 
     def test_attachments(self):
         msg = EmailMessage()
@@ -1201,31 +1217,27 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         msg = EmailMessage(body="Body with latin characters: àáä.")
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: 8bit", s)
-        # The following test is left over from Python 2 and can be safely removed.
-        # 8bit CTE within a Unicode str is not meaningful, and Python's modern
-        # email api won't generate it. (The test still works with the legacy api.)
-        s = msg.message().as_string()
-        self.assertIn("Content-Transfer-Encoding: 8bit", s)
 
         # Long body lines that require folding should use quoted-printable or base64,
         # whichever is shorter. However, Python's legacy email API avoids re-folding
         # non-ASCII text and just uses CTE 8bit. (The modern API would correctly choose
         # base64 here. Any of these is deliverable.)
         msg = EmailMessage(
-            "Subject",
-            "Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.",
-            "bounce@example.com",
-            ["to@example.com"],
-            headers={"From": "from@example.com"},
+            body=(
+                "Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.\n"
+                "Because it has a line > 78 utf-8 octets, it should be folded, and "
+                "must then be encoded using the shorter of quoted-printable or base64."
+            ),
         )
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: 8bit", s)
-        # The following test is left over from Python 2.
-        s = msg.message().as_string()
-        self.assertIn("Content-Transfer-Encoding: 8bit", s)
 
     def test_custom_utf8_encoding(self):
         """A UTF-8 charset with a custom body encoding is respected."""
+        # The tests that the undocumented EmailMessage.encoding property allows
+        # a custom, legacy email.charset.Charset object. Modern email doesn't
+        # support that, and this test will be removed. (A str charset name like
+        # `msg.encoding = "iso-8859-1"` will still work, and is tested elsewhere.)
         body = "Body with latin characters: àáä.\n"
         msg = EmailMessage("Subject", body, "bounce@example.com", ["to@example.com"])
         encoding = charset.Charset("utf-8")
@@ -1244,6 +1256,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_sanitize_address(self):
         """Email addresses are properly sanitized."""
+        # This is a unit test for the internal sanitize_address() function.
+        # Many of these cases are now duplicated in test_address_header_handling(),
+        # which verifies headers in the generated message.
         for email_address, encoding, expected_result in (
             # ASCII addresses.
             ("to@example.com", "ascii", "to@example.com"),
@@ -1331,6 +1346,11 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 )
 
     def test_sanitize_address_invalid(self):
+        # This is a unit test for the internal sanitize_address() function.
+        # Note that Django's EmailMessage.message() will _not_ catch these cases,
+        # as it only calls sanitize_address() if an address also includes non-ASCII
+        # chars. Django detects these cases in the SMTP EmailBackend during sending.
+        # See SMTPBackendTests.test_avoids_sending_to_invalid_addresses() below.
         for email_address in (
             # Invalid address with two @ signs.
             "to@other.com@example.com",
@@ -1347,6 +1367,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                     sanitize_address(email_address, encoding="utf-8")
 
     def test_sanitize_address_header_injection(self):
+        # This is a unit test for the internal sanitize_address() function.
+        # These cases are also duplicated in test_address_header_handling(),
+        # which verifies headers in the generated message.
         msg = "Invalid address; address parts cannot contain newlines."
         tests = [
             "Name\nInjection <to@example.com>",
@@ -1358,6 +1381,127 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             with self.subTest(email_address=email_address):
                 with self.assertRaisesMessage(ValueError, msg):
                     sanitize_address(email_address, encoding="utf-8")
+
+    def test_address_header_handling(self):
+        # This verifies the modern email API's address header handling.
+        # (Adapted from older test_sanitize_address() for legacy email API.)
+        cases = [
+            # (address, expected_display_name, expected_addr_spec)
+            ("to@example.com", "", "to@example.com"),
+            # Addresses with display-names.
+            ("A name <to@example.com>", "A name", "to@example.com"),
+            ('"A name" <to@example.com>', "A name", "to@example.com"),
+            (
+                '"Comma, requires quotes" <to@example.com>',
+                "Comma, requires quotes",
+                "to@example.com",
+            ),
+            ('"to@other.com" <to@example.com>', "to@other.com", "to@example.com"),
+            # Non-ASCII addr-spec: IDNA encoding for domain.
+            # (Note: no RFC permits encoding a non-ASCII localpart.)
+            ("to@éxample.com", "", "to@xn--xample-9ua.com"),
+            (
+                "To Example <to@éxample.com>",
+                "To Example",
+                "to@xn--xample-9ua.com",
+            ),
+            # Pre-encoded IDNA domain is left as is.
+            # (Make sure IDNA 2008 is not downgraded to IDNA 2003.)
+            ("to@xn--fa-hia.example.com", "", "to@xn--fa-hia.example.com"),
+            (
+                "<to@xn--10cl1a0b660p.example.com>",
+                "",
+                "to@xn--10cl1a0b660p.example.com",
+            ),
+            (
+                '"Display, Name" <to@xn--nxasmm1c.example.com>',
+                "Display, Name",
+                "to@xn--nxasmm1c.example.com",
+            ),
+            # Non-ASCII display-name.
+            ("Tó Example <to@example.com>", "Tó Example", "to@example.com"),
+            # Addresses with two @ signs (quoted-string localpart).
+            ('"to@other.com"@example.com', "", '"to@other.com"@example.com'),
+            (
+                'To Example <"to@other.com"@example.com>',
+                "To Example",
+                '"to@other.com"@example.com',
+            ),
+            # Addresses with long non-ASCII display names.
+            (
+                "Tó Example very long" * 4 + " <to@example.com>",
+                "Tó Example very long" * 4,
+                "to@example.com",
+            ),
+            # Address with long display name and non-ASCII domain.
+            (
+                "To Example very long" * 4 + " <to@exampl€.com>",
+                "To Example very long" * 4,
+                "to@xn--exampl-nc1c.com",
+            ),
+        ]
+        for address, name, addr in cases:
+            with self.subTest(address=address):
+                email = EmailMessage(to=[address])
+                parsed = message_from_bytes(email.message().as_bytes())
+                actual = parsed["To"].addresses
+                expected = (Address(display_name=name, addr_spec=addr),)
+                self.assertEqual(actual, expected)
+
+    def test_address_header_injection(self):
+        # (This error message comes from Django's internal forbid_multi_line_headers().)
+        msg = "Header values can't contain newlines"
+        cases = [
+            "Name\nInjection <to@example.com>",
+            '"Name\nInjection" <to@example.com>',
+            '"Name\rInjection" <to@example.com>',
+            '"Name\r\nInjection" <to@example.com>',
+            "Name <to\ninjection@example.com>",
+            "to\ninjection@example.com",
+        ]
+
+        # Structured address header fields (from RFC 5322 3.6.x).
+        headers = [
+            "From",
+            "Sender",
+            "Reply-To",
+            "To",
+            "Cc",
+            # "Bcc" is not checked by EmailMessage.message().
+            # (See SMTPBackendTests.test_avoids_sending_to_invalid_addresses().)
+            "Resent-From",
+            "Resent-Sender",
+            "Resent-To",
+            "Resent-Cc",
+            "Resent-Bcc",
+        ]
+
+        for header in headers:
+            for email_address in cases:
+                with self.subTest(header=header, email_address=email_address):
+                    # Construct an EmailMessage with header set to email_address.
+                    # Specific constructor params vary by header.
+                    if header == "From":
+                        email = EmailMessage(from_email=email_address)
+                    elif header in ("To", "Cc", "Bcc", "Reply-To"):
+                        param = header.lower().replace("-", "_")
+                        email = EmailMessage(**{param: [email_address]})
+                    else:
+                        email = EmailMessage(headers={header: email_address})
+                    with self.assertRaisesMessage(ValueError, msg):
+                        email.message()
+
+    def test_localpart_only_address(self):
+        """
+        Django allows sending to a localpart-only email address (without @domain).
+        This is not a valid RFC 822/2822/5322 addr-spec, but is accepted by some
+        SMTP servers for local delivery. Regression for #15042.
+        """
+        email = EmailMessage(to=["localpartonly"])
+        parsed = message_from_bytes(email.message().as_bytes())
+        self.assertEqual(
+            parsed["To"].addresses, (Address(username="localpartonly", domain=""),)
+        )
 
     def test_email_multi_alternatives_content_mimetype_none(self):
         email_msg = EmailMultiAlternatives()
@@ -1713,30 +1857,42 @@ class BaseEmailBackendTests(MailTestsMixin):
         self.assertEqual(num_sent, 1)
         message = self.get_the_message()
         self.assertEqual(message["subject"], "Chère maman")
-        self.assertIn(b"Subject: =?utf-8?q?Ch=C3=A8re_maman?=", message.as_bytes())
         self.assertEqual(message.get_content(), "Je t'aime très fort\n")
 
     def test_send_long_lines(self):
         """
-        Email line length is limited to 998 chars by the RFC 5322 Section
-        2.1.1.
-        Message body containing longer lines are converted to Quoted-Printable
-        to avoid having to insert newlines, which could be hairy to do properly.
+        Email line length is limited to 998 chars by the RFC 5322 Section 2.1.1.
+        A message body containing longer lines is converted to quoted-printable
+        or base64 (whichever is shorter), to avoid having to insert newlines
+        in a way that alters the intended text.
         """
-        # Unencoded body length is < 998 (840) but > 998 when utf-8 encoded.
-        email = EmailMessage(
-            "Subject", "В южных морях " * 60, "from@example.com", ["to@example.com"]
-        )
-        email.send()
-        message = self.get_the_message()
-        self.assertMessageHasHeaders(
-            message,
-            {
-                ("MIME-Version", "1.0"),
-                ("Content-Type", 'text/plain; charset="utf-8"'),
-                ("Content-Transfer-Encoding", "quoted-printable"),
-            },
-        )
+        # Django with Python's legacy email API uses quoted-printable for both cases
+        # below. Python's modern API would prefer shorter base64 for the first case.
+        cases = [
+            # (body, expected_cte)
+            ("В южных морях " * 60, "quoted-printable"),
+            ("I de sørlige hav " * 58, "quoted-printable"),
+        ]
+        for body, expected_cte in cases:
+            with self.subTest(body=f"{body[:10]}…", expected_cte=expected_cte):
+                self.flush_mailbox()
+                # Test precondition: Body is a single line < 998 characters,
+                # but utf-8 encoding of body is > 998 octets (forcing a CTE
+                # that avoids inserting newlines).
+                self.assertLess(len(body), 998)
+                self.assertGreater(len(body.encode()), 998)
+
+                email = EmailMessage(body=body, to=["to@example.com"])
+                email.send()
+                message = self.get_the_message()
+                self.assertMessageHasHeaders(
+                    message,
+                    {
+                        ("MIME-Version", "1.0"),
+                        ("Content-Type", 'text/plain; charset="utf-8"'),
+                        ("Content-Transfer-Encoding", expected_cte),
+                    },
+                )
 
     def test_send_many(self):
         email1 = EmailMessage(to=["to-1@example.com"])
@@ -1761,10 +1917,6 @@ class BaseEmailBackendTests(MailTestsMixin):
         email.send()
         message = self.get_the_message()
         self.assertEqual(message["from"], "Firstname Sürname <from@example.com>")
-        self.assertIn(
-            b"From: =?utf-8?q?Firstname_S=C3=BCrname?= <from@example.com>",
-            message.as_bytes(),
-        )
 
     def test_plaintext_send_mail(self):
         """
@@ -2622,3 +2774,65 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
             self.backend.open()
         self.backend.fail_silently = True
         self.backend.open()
+
+
+# Check whether python/cpython#128110 has been fixed by seeing if space
+# between encoded-words is ignored (as required by RFC 2047 section 6.2).
+_needs_cpython_128110_workaround = (
+    _message_from_bytes(b"To: =??q?a?= =??q?b?= <to@ex>", policy=policy.default)
+)["To"].addresses[0].display_name != "ab"
+
+_rfc2047_prefix = "=?"  # start of an encoded-word.
+_rfc2047_prefix_bytes = _rfc2047_prefix.encode()
+
+
+def _apply_cpython_128110_workaround(message, msg_bytes):
+    """
+    Updates message in place to correct misparsed rfc2047 display-names
+    in address headers caused by https://github.com/python/cpython/issues/128110.
+
+    :param email.message.EmailMessage message: Message parsed with modern policy.
+    :param bytes msg_bytes: Content from which message was parsed.
+    """
+    from email.header import decode_header
+    from email.headerregistry import AddressHeader
+    from email.parser import BytesHeaderParser
+    from email.utils import getaddresses
+
+    def rfc2047_decode(s):
+        # Decode using legacy decode_header() (which doesn't have the bug).
+        return "".join(
+            (
+                segment
+                if charset is None and isinstance(segment, str)
+                else segment.decode(charset or "ascii")
+            )
+            for segment, charset in decode_header(s)
+        )
+
+    def build_address(name, address):
+        if "@" in address:
+            return Address(display_name=name, addr_spec=address)
+        else:
+            return Address(display_name=name, username=address, domain="")
+
+    # This workaround only applies to messages parsed with a modern policy.
+    assert not isinstance(message.policy, policy.Compat32)
+
+    # Reparse with compat32 to get access to raw (undecoded) headers.
+    raw_headers = BytesHeaderParser(policy=policy.compat32).parsebytes(msg_bytes)
+    for header, modern_value in message.items():
+        if not isinstance(modern_value, AddressHeader):
+            # The bug only affects structured address headers.
+            continue
+        raw_value = raw_headers[header]
+        if _rfc2047_prefix in raw_value:
+            # This workaround doesn't handle headers that appear more than once.
+            assert len(message.get_all(header)) == 1
+            # Reconstruct Address objects using legacy APIs (which don't have the bug).
+            unfolded = raw_value.replace("\r\n", "").replace("\n", "")
+            corrected_addresses = (
+                build_address(rfc2047_decode(name), address)
+                for name, address in getaddresses([unfolded])
+            )
+            message.replace_header(header, corrected_addresses)
