@@ -13,6 +13,7 @@ from django.db import (
     OperationalError,
     connection,
     models,
+    transaction,
 )
 from django.db.models import (
     Count,
@@ -974,7 +975,7 @@ class TestQuerying(TestCase):
             ("value__i__in", [False, "foo"], [self.objs[4]]),
         ]
         for lookup, value, expected in tests:
-            with self.subTest(lookup=lookup, value=value):
+            with self.subTest(lookup=lookup, value=value), transaction.atomic():
                 self.assertCountEqual(
                     NullableJSONModel.objects.filter(**{lookup: value}),
                     expected,
