@@ -12,6 +12,7 @@ from email.message import EmailMessage as PyEmailMessage
 from email.message import Message as PyMessage
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
+from email.utils import formataddr
 from io import StringIO
 from pathlib import Path
 from smtplib import SMTP, SMTPException
@@ -1470,6 +1471,33 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(
             parsed["To"].addresses, (Address(username="localpartonly", domain=""),)
         )
+
+    def test_python_address_refolding_bugs(self):
+        """
+        Test that python/cpython#80222 and python/cpython#121284
+        do not affect generated messages.
+        """
+        # The length and positioning of punctuation and non-ASCII characters in these
+        # display-names are carefully designed to trigger the bugs. (If you change
+        # them, be careful not to accidentally sidestep the problem.)
+        names = [
+            # python/cpython#80222
+            "This long display-name needs to stay in a quoted-string even when"
+            " folded, OK?",
+            # python/cpython#121284 (similar issue, but with rfc2047 encoding)
+            "Dette lange display-name skal forblive kodet, selv når det er opdelt, OK?",
+        ]
+        for name in names:
+            with self.subTest(name=f"{name[:20]}…"):
+                # email.utils.formataddr() ensures proper quoting and encoding of name.
+                address = formataddr((name, "to@example.com"))
+                email = EmailMessage(to=[address])
+                parsed = message_from_bytes(email.message().as_bytes())
+                # We've only sent to one address. If there are now two, that's the bug.
+                self.assertEqual(
+                    parsed["To"].addresses,
+                    (Address(display_name=name, addr_spec="to@example.com"),),
+                )
 
     def test_email_multi_alternatives_content_mimetype_none(self):
         email_msg = EmailMultiAlternatives()
