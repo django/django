@@ -4,7 +4,15 @@ import warnings
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models.expressions import Case, ColPairs, Expression, Func, Value, When
+from django.db.models.expressions import (
+    Case,
+    ColPairs,
+    Expression,
+    ExpressionList,
+    Func,
+    Value,
+    When,
+)
 from django.db.models.fields import (
     BooleanField,
     CharField,
@@ -298,12 +306,13 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     def get_prep_lookup(self):
         if hasattr(self.rhs, "resolve_expression"):
             return self.rhs
+        contains_expr = False
         prepared_values = []
         for rhs_value in self.rhs:
             if hasattr(rhs_value, "resolve_expression"):
                 # An expression will be handled by the database but can coexist
                 # alongside real values.
-                pass
+                contains_expr = True
             elif (
                 self.prepare_rhs
                 and hasattr(self.lhs, "output_field")
@@ -311,6 +320,19 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
             ):
                 rhs_value = self.lhs.output_field.get_prep_value(rhs_value)
             prepared_values.append(rhs_value)
+        if contains_expr:
+            return ExpressionList(
+                *[
+                    # Expression defaults `str` to field references while
+                    # lookups default them to literal values.
+                    (
+                        Value(prep_value, self.lhs.output_field)
+                        if isinstance(prep_value, str)
+                        else prep_value
+                    )
+                    for prep_value in prepared_values
+                ]
+            )
         return prepared_values
 
     def process_rhs(self, compiler, connection):
@@ -318,6 +340,12 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
             # rhs should be an iterable of values. Use batch_process_rhs()
             # to prepare/transform those values.
             return self.batch_process_rhs(compiler, connection)
+        elif isinstance(self.rhs, ExpressionList):
+            # rhs contains at least one expression. Unwrap them and delegate
+            # to batch_process_rhs() to prepare/transform those values.
+            copy = self.copy()
+            copy.rhs = self.rhs.get_source_expressions()
+            return copy.process_rhs(compiler, connection)
         else:
             return super().process_rhs(compiler, connection)
 
