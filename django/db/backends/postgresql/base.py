@@ -85,6 +85,7 @@ def _get_varchar_column(data):
         return "varchar"
     return "varchar(%(max_length)s)" % data
 
+
 def _get_numeric_column(data):
     if data["max_digits"] is None and data["decimal_places"] is None:
         return "numeric"
