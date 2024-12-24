@@ -85,6 +85,13 @@ def _get_varchar_column(data):
         return "varchar"
     return "varchar(%(max_length)s)" % data
 
+def _get_numeric_column(data):
+    if data["max_digits"] is None and data["decimal_places"] is None:
+        return "numeric"
+    elif data["decimal_places"] is None:
+        return "numeric(%(max_digits)s)" % data
+    return "numeric(%(max_digits)s, %(decimal_places)s)" % data
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "postgresql"
@@ -101,7 +108,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "CharField": _get_varchar_column,
         "DateField": "date",
         "DateTimeField": "timestamp with time zone",
-        "DecimalField": "numeric(%(max_digits)s, %(decimal_places)s)",
+        "DecimalField": _get_numeric_column,
         "DurationField": "interval",
         "FileField": "varchar(%(max_length)s)",
         "FilePathField": "varchar(%(max_length)s)",
