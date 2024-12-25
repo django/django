@@ -158,8 +158,8 @@ site.register(Parent, NoListDisplayLinksParentAdmin)
 
 
 class ListDisplayLinksGenreAdmin(admin.ModelAdmin):
-    list_display = ["name", "file"]
-    list_display_links = ["file"]
+    list_display = ["name", "file", "url"]
+    list_display_links = ["file", "url"]
 
 
 site.register(Genre, ListDisplayLinksGenreAdmin)
