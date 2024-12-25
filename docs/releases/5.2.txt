@@ -80,6 +80,8 @@ Minor features
   :ref:`extrabody <extrabody>` for adding custom code before the closing
   ``</body>`` tag.
 
+* The value of a :class:`~django.db.models.URLField` now renders as a link.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
