@@ -157,6 +157,7 @@ class UtilsTests(SimpleTestCase):
             models.DateField(),
             models.DecimalField(),
             models.FloatField(),
+            models.URLField(),
             models.JSONField(),
             models.TimeField(),
         ]
@@ -195,6 +196,14 @@ class UtilsTests(SimpleTestCase):
                     display_for_field(value, models.JSONField(), self.empty_value),
                     display_value,
                 )
+
+    def test_url_display_for_field(self):
+        model_field = models.URLField()
+        display_value = display_for_field(
+            "http://example.com", model_field, self.empty_value
+        )
+        expected = '<a href="http://example.com">http://example.com</a>'
+        self.assertHTMLEqual(display_value, expected)
 
     def test_number_formats_display_for_field(self):
         display_value = display_for_field(

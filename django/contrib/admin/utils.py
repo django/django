@@ -454,6 +454,8 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
         return formats.number_format(value)
     elif isinstance(field, models.FileField) and value and not avoid_link:
         return format_html('<a href="{}">{}</a>', value.url, value)
+    elif isinstance(field, models.URLField) and value and not avoid_link:
+        return format_html('<a href="{}">{}</a>', value, value)
     elif isinstance(field, models.JSONField) and value:
         try:
             return json.dumps(value, ensure_ascii=False, cls=field.encoder)
