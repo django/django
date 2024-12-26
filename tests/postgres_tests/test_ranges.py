@@ -305,7 +305,24 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_decimal_contains_range(self):
-        self.assertSequenceEqual(RangesModel.objects.filter(decimals__contains=199), [])
+        decimals = RangesModel.objects.bulk_create(
+            [
+                RangesModel(decimals=NumericRange(None, 10)),
+                RangesModel(decimals=NumericRange(10, None)),
+                RangesModel(decimals=NumericRange(5, 15)),
+                RangesModel(decimals=NumericRange(5, 15, "(]")),
+            ]
+        )
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(decimals__contains=199), [decimals[1]]
+        )
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(decimals__contains=1), [decimals[0]]
+        )
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(decimals__contains=15),
+            [decimals[1], decimals[3]],
+        )
 
     def test_contained_by(self):
         self.assertSequenceEqual(
