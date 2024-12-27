@@ -19,6 +19,7 @@ from django.contrib.admin.utils import (
 )
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
+from django.db.models.fields import files
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
@@ -157,6 +158,7 @@ class UtilsTests(SimpleTestCase):
             models.DateField(),
             models.DecimalField(),
             models.FloatField(),
+            models.FileField(),
             models.JSONField(),
             models.TimeField(),
         ]
@@ -180,6 +182,13 @@ class UtilsTests(SimpleTestCase):
             f'<img src="{settings.STATIC_URL}admin/img/icon-unknown.svg" alt="None" />'
         )
         self.assertHTMLEqual(display_value, expected)
+
+    @override_settings(MEDIA_URL="/korea/")
+    def test_file_display_for_field(self):
+        value = files.FieldFile(None, files.FileField(), "chicken.jpg")
+        display_value = display_for_field(value, models.FileField(), self.empty_value)
+        expected = '<a href="/korea/chicken.jpg">chicken.jpg</a>'
+        self.assertEqual(display_value, expected)
 
     def test_json_display_for_field(self):
         tests = [
