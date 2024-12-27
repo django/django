@@ -128,7 +128,7 @@ class CompositePKTests(TestCase):
 
     def test_error_on_comment_pk_conflict(self):
         with self.assertRaises(IntegrityError):
-            Comment.objects.create(tenant=self.tenant, id=self.comment.id)
+            Comment.objects.create(tenant=self.tenant, id=self.comment.id, user_id=1)
 
     def test_get_primary_key_columns(self):
         self.assertEqual(
