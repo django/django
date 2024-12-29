@@ -1127,7 +1127,7 @@ class Func(SQLiteNumericMixin, Expression):
         template = template or data.get("template", self.template)
         arg_joiner = arg_joiner or data.get("arg_joiner", self.arg_joiner)
         data["expressions"] = data["field"] = arg_joiner.join(sql_parts)
-        return template % data, params
+        return template % data, tuple(params)
 
     def copy(self):
         copy = super().copy()
@@ -1323,7 +1323,7 @@ class Col(Expression):
         alias, column = self.alias, self.target.column
         identifiers = (alias, column) if alias else (column,)
         sql = ".".join(map(compiler.quote_name_unless_alias, identifiers))
-        return sql, []
+        return sql, ()
 
     def relabeled_clone(self, relabels):
         if self.alias is None:
