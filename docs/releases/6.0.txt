@@ -427,6 +427,24 @@ Email
   significantly, closely examine any custom subclasses that rely on overriding
   undocumented, internal underscore methods.
 
+Custom ORM expressions should return params as a tuple
+------------------------------------------------------
+
+Prior to Django 6.0, :doc:`custom lookups </howto/custom-lookups>` and
+:ref:`custom expressions <writing-your-own-query-expressions>` implementing the
+``as_sql()`` method (and its supporting methods ``process_lhs()`` and
+``process_rhs()``) were allowed to return a sequence of params in either a list
+or a tuple. To address the interoperability problems that resulted, the second
+return element of the ``as_sql()`` method should now be a tuple::
+
+  def as_sql(self, compiler, connection) -> tuple[str, tuple]: ...
+
+If your custom expressions support multiple versions of Django, you should
+adjust any pre-processing of parameters to be resilient against either tuples
+or lists. For instance, prefer unpacking like this::
+
+  params = (*lhs_params, *rhs_params)
+
 Miscellaneous
 -------------
 
