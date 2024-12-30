@@ -777,7 +777,7 @@ class Field(RegisterLookupMixin):
         Some validators can't be created at field initialization time.
         This method provides a way to delay their creation until required.
         """
-        return [*self.default_validators, *self._validators]
+        return self.default_validators + self._validators
 
     def run_validators(self, value):
         if value in self.empty_values:
@@ -2672,7 +2672,7 @@ class BinaryField(Field):
             self.validators.append(validators.MaxLengthValidator(self.max_length))
 
     def check(self, **kwargs):
-        return [*super().check(**kwargs), *self._check_str_default_value()]
+        return super().check(**kwargs) + self._check_str_default_value()
 
     def _check_str_default_value(self):
         if self.has_default() and isinstance(self.default, str):
