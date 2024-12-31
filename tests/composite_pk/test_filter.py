@@ -1,4 +1,9 @@
+from django.db import NotSupportedError, ProgrammingError
+from django.db.models import F, TextField
+from django.db.models.fields.json import JSONField
+from django.db.models.functions import Cast
 from django.test import TestCase
+from django.test.testcases import skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Comment, Tenant, User
 
@@ -410,3 +415,19 @@ class CompositePKFilterTests(TestCase):
         subquery = Comment.objects.filter(id=3).only("pk")
         queryset = User.objects.filter(comments__in=subquery)
         self.assertSequenceEqual(queryset, (self.user_2,))
+
+    @skipUnlessDBFeature("supports_cast_tuple_to_text")
+    def test_cast_pk_to_text(self):
+        qs = Comment.objects.filter(text__gt=Cast(F("pk"), TextField()))
+        self.assertSequenceEqual(qs, [])
+
+    @skipIfDBFeature("supports_cast_tuple_to_text")
+    def test_cannot_cast_pk_to_text(self):
+        msg = "This backend doesn't support casting CompositePrimaryKey."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Comment.objects.filter(text__gt=Cast(F("pk"), TextField())).count()
+
+    @skipUnlessDBFeature("supports_cast_tuple_to_text")
+    def test_cannot_cast_pk_to_json(self):
+        with self.assertRaises(ProgrammingError):
+            Comment.objects.filter(text__gt=Cast(F("pk"), JSONField())).count()
