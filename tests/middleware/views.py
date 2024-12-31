@@ -1,6 +1,9 @@
+import sys
+
 from django.http import HttpResponse
 from django.middleware import csp
 from django.utils.decorators import method_decorator
+from django.views.debug import technical_500_response
 from django.views.decorators.common import no_append_slash
 from django.views.decorators.csp import csp_exempt, csp_override
 from django.views.generic import View
@@ -61,3 +64,10 @@ def override_csp_enforced(request):
 @csp_override(csp_policy_override, enforced=False)
 def override_csp_report_only(request):
     return HttpResponse()
+
+
+def csp_500(request):
+    try:
+        raise Exception
+    except Exception:
+        return technical_500_response(request, *sys.exc_info())

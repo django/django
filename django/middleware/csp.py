@@ -1,15 +1,11 @@
 import base64
 import os
 from functools import partial
+from http import client as http_client
 
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
-
-# TODO: Do we want to exclude CSP from a default set of views in DEBUG mode?
-
-# TODO: Should we add a security check to warn if the CSP settings are empty
-# that no CSP headers will be sent. (docs/refs/checks.txt)
 
 HEADER = "Content-Security-Policy"
 HEADER_REPORT_ONLY = "Content-Security-Policy-Report-Only"
@@ -52,6 +48,15 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         request.csp_nonce = SimpleLazyObject(nonce)
 
     def process_response(self, request, response):
+        # In DEBUG mode, exclude CSP headers for specific status codes that
+        # trigger the debug view.
+        exempted_status_codes = (
+            http_client.INTERNAL_SERVER_ERROR,
+            http_client.NOT_FOUND,
+        )
+        if settings.DEBUG and response.status_code in exempted_status_codes:
+            return response
+
         # If headers are already set on the response, don't overwrite them.
         # This allows for views to set their own CSP headers as needed.
         no_csp_header = HEADER not in response
