@@ -4,7 +4,7 @@ import warnings
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models.expressions import Case, Expression, Func, Value, When
+from django.db.models.expressions import Case, ColPairs, Expression, Func, Value, When
 from django.db.models.fields import (
     BooleanField,
     CharField,
@@ -119,6 +119,10 @@ class Lookup(Expression):
             value = value.resolve_expression(compiler.query)
         if hasattr(value, "as_sql"):
             sql, params = compiler.compile(value)
+            if isinstance(value, ColPairs):
+                raise ValueError(
+                    "CompositePrimaryKey cannot be used as a lookup value."
+                )
             # Ensure expression is wrapped in parentheses to respect operator
             # precedence but avoid double wrapping as it can be misinterpreted
             # on some backends (e.g. subqueries on SQLite).
