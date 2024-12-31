@@ -205,6 +205,32 @@ class CSPMiddlewareTest(SimpleTestCase):
         self.assertEqual(response[csp.HEADER], basic_policy)
         self.assertEqual(response[csp.HEADER_REPORT_ONLY], basic_policy)
 
+    @override_settings(
+        DEBUG=True,
+        SECURE_CSP=basic_config,
+        SECURE_CSP_REPORT_ONLY=basic_config,
+    )
+    def test_csp_404_debug_view(self):
+        """
+        Test that the CSP headers are not added to the debug view.
+        """
+        response = self.client.get("/csp-404/")
+        self.assertNotIn(csp.HEADER, response)
+        self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
+
+    @override_settings(
+        DEBUG=True,
+        SECURE_CSP=basic_config,
+        SECURE_CSP_REPORT_ONLY=basic_config,
+    )
+    def test_csp_500_debug_view(self):
+        """
+        Test that the CSP headers are not added to the debug view.
+        """
+        response = self.client.get("/csp-500/")
+        self.assertNotIn(csp.HEADER, response)
+        self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
+
 
 @override_settings(
     MIDDLEWARE=["django.middleware.csp.ContentSecurityPolicyMiddleware"],
