@@ -59,6 +59,20 @@ class CompositePKFilterTests(TestCase):
             with self.subTest(lookup=lookup, count=count):
                 self.assertEqual(User.objects.filter(**lookup).count(), count)
 
+    def test_rhs_pk(self):
+        msg = "CompositePrimaryKey cannot be used as a lookup value."
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.filter(text__gt=F("pk")).count()
+
+    def test_rhs_combinable(self):
+        msg = "CompositePrimaryKey is not combinable."
+        for expr in [F("pk") + (1, 1), (1, 1) + F("pk")]:
+            with (
+                self.subTest(expression=expr),
+                self.assertRaisesMessage(ValueError, msg),
+            ):
+                Comment.objects.filter(text__gt=expr).count()
+
     def test_order_comments_by_pk_asc(self):
         self.assertSequenceEqual(
             Comment.objects.order_by("pk"),
