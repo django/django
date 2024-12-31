@@ -1303,6 +1303,7 @@ def create_many_to_many_intermediary_model(field, klass):
             "verbose_name_plural": _("%(from)s-%(to)s relationships")
             % {"from": from_, "to": to},
             "apps": field.model._meta.apps,
+            "indexes": [models.Index(fields=(from_, to), name="index_together")],
         },
     )
     # Construct and return the new class.
