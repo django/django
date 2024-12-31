@@ -20,4 +20,5 @@ urlpatterns = [
     path("override-csp-both/", views.override_csp_both),
     path("override-csp-enforced/", views.override_csp_enforced),
     path("override-csp-report-only/", views.override_csp_report_only),
+    path("csp-500/", views.csp_500),
 ]
