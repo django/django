@@ -1304,7 +1304,9 @@ def create_many_to_many_intermediary_model(field, klass):
             % {"from": from_, "to": to},
             "apps": field.model._meta.apps,
             "indexes": [
-                models.Index(fields=(from_, to), name=f"{name}_{from_}_{to}_index_together")
+                models.Index(
+                    fields=(from_, to), name=f"{name}_{from_}_{to}_index_together"
+                )
             ],
         },
     )
