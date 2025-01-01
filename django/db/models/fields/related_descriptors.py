@@ -183,7 +183,7 @@ class ForwardManyToOneDescriptor:
 
         # FIXME: This will need to be revisited when we introduce support for
         # composite fields. In the meantime we take this practical approach to
-        # solve a regression on 1.6 when the reverse manager in hidden
+        # solve a regression on 1.6 when the reverse manager is hidden
         # (related_name ends with a '+'). Refs #21410.
         # The check for len(...) == 1 is a special case that allows the query
         # to be join-less and smaller. Refs #21760.
