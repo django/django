@@ -179,18 +179,26 @@ class Count(Aggregate):
         super().__init__(expression, *expressions[1:], filter=filter, **extra)
 
     def resolve_expression(self, *args, **kwargs):
-        result = super().resolve_expression(*args, **kwargs)
-        expr = result.source_expressions[0]
+        try:
+            result = super().resolve_expression(*args, **kwargs)
+        except TypeError as e:
+            # Try again without arity in case there is a composite primary key.
+            arity_before = self.arity
+            self.arity = None
+            result = super().resolve_expression(*args, **kwargs)
+            self.arity = arity_before
+            expr = result.source_expressions[0]
+            # In case of composite primary keys, count the first column.
+            if isinstance(expr, ColPairs):
+                if self.distinct:
+                    raise NotSupportedError(
+                        "COUNT(DISTINCT) doesn't support composite primary keys"
+                    )
 
-        # In case of composite primary keys, count the first column.
-        if isinstance(expr, ColPairs):
-            if self.distinct:
-                raise NotSupportedError(
-                    "COUNT(DISTINCT) doesn't support composite primary keys"
-                )
-
-            cols = expr.get_cols()
-            return Count(cols[0], filter=result.filter)
+                cols = expr.get_cols()
+                return Count(cols[0], filter=result.filter)
+            else:
+                raise e
 
         return result
 
