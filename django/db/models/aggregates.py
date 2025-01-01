@@ -158,6 +158,7 @@ class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
     function = "AVG"
     name = "Avg"
     allow_distinct = True
+    arity = 1
 
 
 class Count(Aggregate):
@@ -166,6 +167,7 @@ class Count(Aggregate):
     output_field = IntegerField()
     allow_distinct = True
     empty_result_set_value = 0
+    arity = 1
     allows_composite_expressions = True
 
     def __init__(self, expression, filter=None, **extra):
@@ -195,15 +197,18 @@ class Count(Aggregate):
 class Max(Aggregate):
     function = "MAX"
     name = "Max"
+    arity = 1
 
 
 class Min(Aggregate):
     function = "MIN"
     name = "Min"
+    arity = 1
 
 
 class StdDev(NumericOutputFieldMixin, Aggregate):
     name = "StdDev"
+    arity = 1
 
     def __init__(self, expression, sample=False, **extra):
         self.function = "STDDEV_SAMP" if sample else "STDDEV_POP"
@@ -217,10 +222,12 @@ class Sum(FixDurationInputMixin, Aggregate):
     function = "SUM"
     name = "Sum"
     allow_distinct = True
+    arity = 1
 
 
 class Variance(NumericOutputFieldMixin, Aggregate):
     name = "Variance"
+    arity = 1
 
     def __init__(self, expression, sample=False, **extra):
         self.function = "VAR_SAMP" if sample else "VAR_POP"
