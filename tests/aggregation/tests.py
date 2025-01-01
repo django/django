@@ -1276,6 +1276,8 @@ class AggregateTestCase(TestCase):
             Book.objects.annotate(Max("id")).annotate(Sum("id__max"))
 
         class MyMax(Max):
+            arity = None
+
             def as_sql(self, compiler, connection):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
                 return super().as_sql(compiler, connection)
@@ -1288,6 +1290,7 @@ class AggregateTestCase(TestCase):
     def test_multi_arg_aggregate(self):
         class MyMax(Max):
             output_field = DecimalField()
+            arity = None
 
             def as_sql(self, compiler, connection):
                 copy = self.copy()
@@ -2177,6 +2180,16 @@ class AggregateTestCase(TestCase):
             .values_list("sum", flat=True)
         )
         self.assertEqual(list(author_qs), [337])
+
+    def test_aggregate_arity(self):
+        functions = [Avg, Count, Max, Min, StdDev, Sum, Variance]
+        msg = "takes exactly 1 argument (2 given)"
+        for function in functions:
+            with (
+                self.subTest(function=function),
+                self.assertRaisesMessage(TypeError, msg),
+            ):
+                function(Value(1), Value(2))
 
 
 class AggregateAnnotationPruningTests(TestCase):
