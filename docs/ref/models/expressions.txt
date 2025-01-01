@@ -516,6 +516,7 @@ generated. Here's a brief example::
         function = "SUM"
         template = "%(function)s(%(all_values)s%(expressions)s)"
         allow_distinct = False
+        arity = 1
 
         def __init__(self, expression, all_values=False, **extra):
             super().__init__(expression, all_values="ALL " if all_values else "", **extra)
