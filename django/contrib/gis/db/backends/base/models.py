@@ -12,30 +12,29 @@ class SpatialRefSysMixin:
         """
         Return a GDAL SpatialReference object.
         """
-        # TODO: Is caching really necessary here?  Is complexity worth it?
+        # TODO: Evaluate whether caching is necessary or if its complexity adds value.
         if hasattr(self, "_srs"):
             # Returning a clone of the cached SpatialReference object.
             return self._srs.clone()
-        else:
-            # Attempting to cache a SpatialReference object.
 
+        # Attempting to cache a SpatialReference object.
+        try:
             # Trying to get from WKT first.
-            try:
-                self._srs = gdal.SpatialReference(self.wkt)
-                return self.srs
-            except Exception as e:
-                msg = e
+            self._srs = gdal.SpatialReference(self.wkt)
+            return self.srs
+        except Exception as e:
+            msg = e
 
-            try:
-                self._srs = gdal.SpatialReference(self.proj4text)
-                return self.srs
-            except Exception as e:
-                msg = e
+        try:
+            self._srs = gdal.SpatialReference(self.proj4text)
+            return self.srs
+        except Exception as e:
+            msg = e
 
-            raise Exception(
-                "Could not get OSR SpatialReference from WKT: %s\nError:\n%s"
-                % (self.wkt, msg)
-            )
+        raise Exception(
+            "Could not get OSR SpatialReference from WKT: %s\nError:\n%s"
+            % (self.wkt, msg)
+        )
 
     @property
     def ellipsoid(self):
