@@ -87,7 +87,7 @@ the respective field according to your needs.
   arguments (choose an appropriate default for the type of the field you're
   adding).
 
-* Run the :djadmin:`makemigrations` command. This should generate a migration
+* Run the :djcli:`makemigrations` command. This should generate a migration
   with an ``AddField`` operation.
 
 * Generate two empty migration files for the same app by running
@@ -173,7 +173,7 @@ the respective field according to your needs.
             migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
         ]
 
-* Now you can apply the migrations as usual with the :djadmin:`migrate`
+* Now you can apply the migrations as usual with the :djcli:`migrate`
   command.
 
   Note there is a race condition if you allow objects to be created while this
@@ -238,7 +238,7 @@ Django determines the order in which migrations should be applied not by the
 filename of each migration, but by building a graph using two properties on the
 ``Migration`` class: ``dependencies`` and ``run_before``.
 
-If you've used the :djadmin:`makemigrations` command you've probably
+If you've used the :djcli:`makemigrations` command you've probably
 already seen ``dependencies`` in action because auto-created
 migrations have this defined as part of their creation process.
 
@@ -337,7 +337,7 @@ one, losing the existing relations. To avoid this, you can use
 :class:`.SeparateDatabaseAndState` to rename the existing table to the new
 table name while telling the migration autodetector that the new model has
 been created. You can check the existing table name and constraint name through
-:djadmin:`sqlmigrate` or :djadmin:`dbshell`. You can check the new table name
+:djcli:`sqlmigrate` or :djcli:`dbshell`. You can check the new table name
 with the through model's ``_meta.db_table`` property. Your new ``through``
 model should use the same names for the ``ForeignKey``\s as Django did. Also if
 it needs any extra fields, they should be added in operations after

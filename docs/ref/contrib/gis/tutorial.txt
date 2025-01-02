@@ -55,12 +55,12 @@ would for any other project. We provide some tips for selected databases:
 Create a New Project
 --------------------
 
-Use the standard ``django-admin`` script to create a project called
+Use the standard ``django`` script to create a project called
 ``geodjango``:
 
 .. console::
 
-    $ django-admin startproject geodjango
+    $ django startproject geodjango
 
 This will initialize a new project. Now, create a ``world`` Django application
 within the ``geodjango`` project:
@@ -289,7 +289,7 @@ This command should produce the following output:
     CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ("mpoly");
     COMMIT;
 
-If this looks correct, run :djadmin:`migrate` to create this table in the
+If this looks correct, run :djcli:`migrate` to create this table in the
 database:
 
 .. console::
@@ -534,8 +534,8 @@ Try ``ogrinspect``
 
 Now that you've seen how to define geographic models and import data with the
 :doc:`/ref/contrib/gis/layermapping`, it's possible to further automate this
-process with use of the :djadmin:`ogrinspect` management command. The
-:djadmin:`ogrinspect` command  introspects a GDAL-supported vector data source
+process with use of the :djcli:`ogrinspect` management command. The
+:djcli:`ogrinspect` command  introspects a GDAL-supported vector data source
 (e.g., a shapefile) and generates a model definition and ``LayerMapping``
 dictionary automatically.
 

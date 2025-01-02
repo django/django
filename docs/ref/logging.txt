@@ -156,7 +156,7 @@ Messages to this logger have the following extra context:
 ~~~~~~~~~~~~~~~~~
 
 Log messages related to the handling of requests received by the server invoked
-by the :djadmin:`runserver` command. HTTP 5XX responses are logged as ``ERROR``
+by the :djcli:`runserver` command. HTTP 5XX responses are logged as ``ERROR``
 messages, 4XX responses are logged as ``WARNING`` messages, and everything else
 is logged as ``INFO``.
 

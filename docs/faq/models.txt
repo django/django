@@ -54,8 +54,8 @@ Take a look at Django's support for :mod:`schema migrations
 <django.db.migrations>`.
 
 If you don't mind clearing data, your project's ``manage.py`` utility has a
-:djadmin:`flush` option to reset the database to the state it was in
-immediately after :djadmin:`migrate` was executed.
+:djcli:`flush` option to reset the database to the state it was in
+immediately after :djcli:`migrate` was executed.
 
 Do Django models support multiple-column primary keys?
 ======================================================

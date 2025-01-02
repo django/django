@@ -59,7 +59,7 @@ Adding ``'django.contrib.auth.backends.ModelBackend'`` to the
 if ``REMOTE_USER`` is absent, which will solve these issues.
 
 Django's user management, such as the views in ``contrib.admin`` and
-the :djadmin:`createsuperuser` management command, doesn't integrate with
+the :djcli:`createsuperuser` management command, doesn't integrate with
 remote users. These interfaces work with users stored in the database
 regardless of ``AUTHENTICATION_BACKENDS``.
 

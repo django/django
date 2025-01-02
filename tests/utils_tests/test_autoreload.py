@@ -231,6 +231,17 @@ class TestChildArguments(SimpleTestCase):
     @mock.patch("sys.warnoptions", [])
     def test_exe_fallback(self):
         with tempfile.TemporaryDirectory() as tmpdir:
+            exe_path = Path(tmpdir) / "django.exe"
+            exe_path.touch()
+            with mock.patch("sys.argv", [exe_path.with_suffix(""), "runserver"]):
+                self.assertEqual(
+                    autoreload.get_child_arguments(), [exe_path, "runserver"]
+                )
+
+    @mock.patch("__main__.__spec__", None)
+    @mock.patch("sys.warnoptions", [])
+    def test_exe_fallback_legacy(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
             exe_path = Path(tmpdir) / "django-admin.exe"
             exe_path.touch()
             with mock.patch("sys.argv", [exe_path.with_suffix(""), "runserver"]):
@@ -241,6 +252,17 @@ class TestChildArguments(SimpleTestCase):
     @mock.patch("sys.warnoptions", [])
     @mock.patch.dict(sys.modules, {"__main__": django.__main__})
     def test_use_exe_when_main_spec(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            exe_path = Path(tmpdir) / "django.exe"
+            exe_path.touch()
+            with mock.patch("sys.argv", [exe_path.with_suffix(""), "runserver"]):
+                self.assertEqual(
+                    autoreload.get_child_arguments(), [exe_path, "runserver"]
+                )
+
+    @mock.patch("sys.warnoptions", [])
+    @mock.patch.dict(sys.modules, {"__main__": django.__main__})
+    def test_use_exe_when_main_spec_legacy(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             exe_path = Path(tmpdir) / "django-admin.exe"
             exe_path.touch()
@@ -253,6 +275,19 @@ class TestChildArguments(SimpleTestCase):
     @mock.patch("sys.warnoptions", [])
     @mock.patch("sys._xoptions", {})
     def test_entrypoint_fallback(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            script_path = Path(tmpdir) / "django-script.py"
+            script_path.touch()
+            with mock.patch("sys.argv", [script_path.with_name("django"), "runserver"]):
+                self.assertEqual(
+                    autoreload.get_child_arguments(),
+                    [sys.executable, script_path, "runserver"],
+                )
+
+    @mock.patch("__main__.__spec__", None)
+    @mock.patch("sys.warnoptions", [])
+    @mock.patch("sys._xoptions", {})
+    def test_entrypoint_fallback_legacy(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             script_path = Path(tmpdir) / "django-admin-script.py"
             script_path.touch()

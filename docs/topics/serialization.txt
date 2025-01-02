@@ -10,7 +10,7 @@ serializer to handle any format (text-based or not).
 .. seealso::
 
     If you just want to get some data from your tables into a serialized
-    form, you could use the :djadmin:`dumpdata` management command.
+    form, you could use the :djcli:`dumpdata` management command.
 
 Serializing data
 ================
@@ -447,7 +447,7 @@ serialize an object that refers to a content type, then you need to have a way
 to refer to that content type to begin with. Since ``ContentType`` objects are
 automatically created by Django during the database synchronization process,
 the primary key of a given content type isn't easy to predict; it will
-depend on how and when :djadmin:`migrate` was executed. This is true for all
+depend on how and when :djcli:`migrate` was executed. This is true for all
 models which automatically generate objects, notably including
 :class:`~django.contrib.auth.models.Permission`,
 :class:`~django.contrib.auth.models.Group`, and
@@ -628,7 +628,7 @@ database and you cannot guarantee that the serialized primary key value is not
 already in use, and do not need to ensure that deserialized objects retain the
 same primary keys.
 
-If you are using :djadmin:`dumpdata` to generate serialized data, use the
+If you are using :djcli:`dumpdata` to generate serialized data, use the
 :option:`dumpdata --natural-foreign` and :option:`dumpdata --natural-primary`
 command line flags to generate natural keys.
 
@@ -701,7 +701,7 @@ Dependencies during serialization
 It's often possible to avoid explicitly having to handle forward references by
 taking care with the ordering of objects within a fixture.
 
-To help with this, calls to :djadmin:`dumpdata` that use the :option:`dumpdata
+To help with this, calls to :djcli:`dumpdata` that use the :option:`dumpdata
 --natural-foreign` option will serialize any model with a ``natural_key()``
 method before serializing standard primary key objects.
 

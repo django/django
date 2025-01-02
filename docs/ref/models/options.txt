@@ -58,7 +58,7 @@ Table names
 To save you time, Django automatically derives the name of the database table
 from the name of your model class and the app that contains it. A model's
 database table name is constructed by joining the model's "app label" -- the
-name you used in :djadmin:`manage.py startapp <startapp>` -- to the model's
+name you used in :djcli:`manage.py startapp <startapp>` -- to the model's
 class name, with an underscore between them.
 
 For example, if you have an app ``bookstore`` (as created by
@@ -169,8 +169,8 @@ not be looking at your Django code. For example::
 .. attribute:: Options.managed
 
     Defaults to ``True``, meaning Django will create the appropriate database
-    tables in :djadmin:`migrate` or as part of migrations and remove them as
-    part of a :djadmin:`flush` management command. That is, Django
+    tables in :djcli:`migrate` or as part of migrations and remove them as
+    part of a :djcli:`flush` management command. That is, Django
     *manages* the database tables' lifecycles.
 
     If ``False``, no database table creation, modification, or deletion
@@ -275,7 +275,7 @@ not be looking at your Django code. For example::
 
     Because ``order_with_respect_to`` adds a new database column, be sure to
     make and apply the appropriate migrations if you add or change
-    ``order_with_respect_to`` after your initial :djadmin:`migrate`.
+    ``order_with_respect_to`` after your initial :djcli:`migrate`.
 
 ``ordering``
 ------------
@@ -353,7 +353,7 @@ not be looking at your Django code. For example::
     Defaults to ``('add', 'change', 'delete', 'view')``. You may customize this
     list, for example, by setting this to an empty list if your app doesn't
     require any of the default permissions. It must be specified on the model
-    before the model is created by :djadmin:`migrate` in order to prevent any
+    before the model is created by :djcli:`migrate` in order to prevent any
     omitted permissions from being created.
 
 ``proxy``

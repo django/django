@@ -24,7 +24,7 @@ Testing operates at different levels. Some tests might apply to a tiny detail
 examine the overall operation of the software (*does a sequence of user inputs
 on the site produce the desired result?*). That's no different from the kind of
 testing you did earlier in :doc:`Tutorial 2 </intro/tutorial02>`, using the
-:djadmin:`shell` to examine the behavior of a method, or running the
+:djcli:`shell` to examine the behavior of a method, or running the
 application and entering data to check how it behaves.
 
 What's different in *automated* tests is that the testing work is done for
@@ -141,7 +141,7 @@ if the ``Question`` was published within the last day (which is correct) but
 also if the ``Question``’s ``pub_date`` field is in the future (which certainly
 isn't).
 
-Confirm the bug by using the :djadmin:`shell` to check the method on a question
+Confirm the bug by using the :djcli:`shell` to check the method on a question
 whose date lies in the future:
 
 .. console::
@@ -163,7 +163,7 @@ Since things in the future are not 'recent', this is clearly wrong.
 Create a test to expose the bug
 -------------------------------
 
-What we've just done in the :djadmin:`shell` to test for the problem is exactly
+What we've just done in the :djcli:`shell` to test for the problem is exactly
 what we can do in an automated test, so let's turn that into an automated test.
 
 A conventional place for an application's tests is in the application's
@@ -356,11 +356,11 @@ The Django test client
 
 Django provides a test :class:`~django.test.Client` to simulate a user
 interacting with the code at the view level. We can use it in ``tests.py``
-or even in the :djadmin:`shell`.
+or even in the :djcli:`shell`.
 
-We will start again with the :djadmin:`shell`, where we need to do a couple of
+We will start again with the :djcli:`shell`, where we need to do a couple of
 things that won't be necessary in ``tests.py``. The first is to set up the test
-environment in the :djadmin:`shell`:
+environment in the :djcli:`shell`:
 
 .. console::
 
@@ -468,7 +468,7 @@ Now you can satisfy yourself that this behaves as expected by firing up
 entries with dates in the past and future, and checking that only those that
 have been published are listed. You don't want to have to do that *every single
 time you make any change that might affect this* - so let's also create a test,
-based on our :djadmin:`shell` session above.
+based on our :djcli:`shell` session above.
 
 Add the following to ``polls/tests.py``:
 

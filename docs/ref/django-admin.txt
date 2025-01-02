@@ -1,26 +1,28 @@
-==================================
-``django-admin`` and ``manage.py``
-==================================
+====================================
+The ``django`` CLI and ``manage.py``
+====================================
 
-``django-admin`` is Django's command-line utility for administrative tasks.
+``django`` is Django's command-line utility for administrative tasks.
 This document outlines all it can do.
 
+``django-admin`` remains an alias for ``django`` indefinitely.
+
 In addition, ``manage.py`` is automatically created in each Django project. It
-does the same thing as ``django-admin`` but also sets the
+does the same thing as ``django`` but also sets the
 :envvar:`DJANGO_SETTINGS_MODULE` environment variable so that it points to your
 project's ``settings.py`` file.
 
-The ``django-admin`` script should be on your system path if you installed
+The ``django`` script should be on your system path if you installed
 Django via ``pip``. If it's not in your path, ensure you have your virtual
 environment activated.
 
 Generally, when working on a single Django project, it's easier to use
-``manage.py`` than ``django-admin``. If you need to switch between multiple
-Django settings files, use ``django-admin`` with
+``manage.py`` than ``django``. If you need to switch between multiple
+Django settings files, use ``django`` with
 :envvar:`DJANGO_SETTINGS_MODULE` or the :option:`--settings` command line
 option.
 
-The command-line examples throughout this document use ``django-admin`` to
+The command-line examples throughout this document use ``django`` to
 be consistent, but any example can use ``manage.py`` or ``python -m django``
 just as well.
 
@@ -29,7 +31,7 @@ Usage
 
 .. console::
 
-    $ django-admin <command> [options]
+    $ django <command> [options]
     $ manage.py <command> [options]
     $ python -m django <command> [options]
 
@@ -42,13 +44,13 @@ Getting runtime help
 
 .. django-admin:: help
 
-Run ``django-admin help`` to display usage information and a list of the
+Run ``django help`` to display usage information and a list of the
 commands provided by each application.
 
-Run ``django-admin help --commands`` to display a list of all available
+Run ``django help --commands`` to display a list of all available
 commands.
 
-Run ``django-admin help <command>`` to display a description of the given
+Run ``django help <command>`` to display a description of the given
 command and a list of its available options.
 
 App names
@@ -63,7 +65,7 @@ Determining the version
 
 .. django-admin:: version
 
-Run ``django-admin version`` to display the current Django version.
+Run ``django version`` to display the current Django version.
 
 The output follows the schema described in :pep:`440`:
 
@@ -79,7 +81,7 @@ Displaying debug output
 .. program:: None
 
 Use :option:`--verbosity`, where it is supported, to specify the amount of
-notification and debug information that ``django-admin`` prints to the console.
+notification and debug information that ``django`` prints to the console.
 
 Available commands
 ==================
@@ -107,7 +109,7 @@ providing a list of app labels as arguments:
 
 .. console::
 
-    django-admin check auth admin myapp
+    django check auth admin myapp
 
 .. django-admin-option:: --tag TAGS, -t TAGS
 
@@ -118,7 +120,7 @@ For example, to perform only models and compatibility checks, run:
 
 .. console::
 
-    django-admin check --tag models --tag compatibility
+    django check --tag models --tag compatibility
 
 .. django-admin-option:: --database DATABASE
 
@@ -126,7 +128,7 @@ Specifies the database to run checks requiring database access:
 
 .. console::
 
-    django-admin check --database default --database other
+    django check --database default --database other
 
 By default, these checks will not be run.
 
@@ -147,7 +149,7 @@ environment variable, or by passing the ``--settings`` option:
 
 .. console::
 
-    django-admin check --deploy --settings=production_settings
+    django check --deploy --settings=production_settings
 
 Or you could run it directly on a production or staging deployment to verify
 that the correct settings are in use (omitting ``--settings``). You could even
@@ -183,14 +185,14 @@ Example usage:
 
 .. console::
 
-    django-admin compilemessages --locale=pt_BR
-    django-admin compilemessages --locale=pt_BR --locale=fr -f
-    django-admin compilemessages -l pt_BR
-    django-admin compilemessages -l pt_BR -l fr --use-fuzzy
-    django-admin compilemessages --exclude=pt_BR
-    django-admin compilemessages --exclude=pt_BR --exclude=fr
-    django-admin compilemessages -x pt_BR
-    django-admin compilemessages -x pt_BR -x fr
+    django compilemessages --locale=pt_BR
+    django compilemessages --locale=pt_BR --locale=fr -f
+    django compilemessages -l pt_BR
+    django compilemessages -l pt_BR -l fr --use-fuzzy
+    django compilemessages --exclude=pt_BR
+    django compilemessages --exclude=pt_BR --exclude=fr
+    django compilemessages -x pt_BR
+    django compilemessages -x pt_BR -x fr
 
 .. _fuzzy translations: https://www.gnu.org/software/gettext/manual/html_node/Fuzzy-Entries.html
 
@@ -203,7 +205,7 @@ Example usage:
 
 .. console::
 
-    django-admin compilemessages --ignore=node_modules --ignore=outdated/*/locale
+    django compilemessages --ignore=node_modules --ignore=outdated/*/locale
 
 ``createcachetable``
 --------------------
@@ -255,7 +257,7 @@ command's ``-c`` flag to execute a raw SQL query directly:
 
 .. console::
 
-    $ django-admin dbshell -- -c 'select current_user'
+    $ django dbshell -- -c 'select current_user'
      current_user
     --------------
      postgres
@@ -265,7 +267,7 @@ On MySQL/MariaDB, you can do this with the ``mysql`` command's ``-e`` flag:
 
 .. console::
 
-    $ django-admin dbshell -- -e "select user()"
+    $ django dbshell -- -e "select user()"
     +----------------------+
     | user()               |
     +----------------------+
@@ -358,7 +360,7 @@ once:
 
 .. console::
 
-    django-admin dumpdata --exclude=auth --exclude=contenttypes
+    django dumpdata --exclude=auth --exclude=contenttypes
 
 .. django-admin-option:: --database DATABASE
 
@@ -401,7 +403,7 @@ For example, to output the data as a compressed JSON file:
 
 .. console::
 
-    django-admin dumpdata -o mydata.json.gz
+    django dumpdata -o mydata.json.gz
 
 ``flush``
 ---------
@@ -584,7 +586,7 @@ example:
 
 .. console::
 
-    django-admin loaddata --format=json -
+    django loaddata --format=json -
 
 When reading from ``stdin``, the :option:`--format <loaddata --format>` option
 is required to specify the :ref:`serialization format <serialization-formats>`
@@ -595,7 +597,7 @@ For example:
 
 .. console::
 
-    django-admin dumpdata --format=json --database=test app_label.ModelName | django-admin loaddata --format=json --database=prod -
+    django dumpdata --format=json --database=test app_label.ModelName | django loaddata --format=json --database=prod -
 
 The :djadmin:`dumpdata` command can be used to generate input for ``loaddata``.
 
@@ -632,14 +634,14 @@ Example usage:
 
 .. console::
 
-    django-admin makemessages --locale=de --extension xhtml
+    django makemessages --locale=de --extension xhtml
 
 Separate multiple extensions with commas or use ``-e`` or ``--extension``
 multiple times:
 
 .. console::
 
-    django-admin makemessages --locale=de --extension=html,txt --extension xml
+    django makemessages --locale=de --extension=html,txt --extension xml
 
 .. django-admin-option:: --locale LOCALE, -l LOCALE
 
@@ -654,14 +656,14 @@ Example usage:
 
 .. console::
 
-    django-admin makemessages --locale=pt_BR
-    django-admin makemessages --locale=pt_BR --locale=fr
-    django-admin makemessages -l pt_BR
-    django-admin makemessages -l pt_BR -l fr
-    django-admin makemessages --exclude=pt_BR
-    django-admin makemessages --exclude=pt_BR --exclude=fr
-    django-admin makemessages -x pt_BR
-    django-admin makemessages -x pt_BR -x fr
+    django makemessages --locale=pt_BR
+    django makemessages --locale=pt_BR --locale=fr
+    django makemessages -l pt_BR
+    django makemessages -l pt_BR -l fr
+    django makemessages --exclude=pt_BR
+    django makemessages --exclude=pt_BR --exclude=fr
+    django makemessages -x pt_BR
+    django makemessages -x pt_BR -x fr
 
 .. django-admin-option:: --domain DOMAIN, -d DOMAIN
 
@@ -678,7 +680,7 @@ Example usage:
 
 .. console::
 
-    django-admin makemessages --locale=de --symlinks
+    django makemessages --locale=de --symlinks
 
 .. django-admin-option:: --ignore PATTERN, -i PATTERN
 
@@ -691,7 +693,7 @@ Example usage:
 
 .. console::
 
-    django-admin makemessages --locale=en_US --ignore=apps/* --ignore=secret/*.html
+    django makemessages --locale=en_US --ignore=apps/* --ignore=secret/*.html
 
 .. django-admin-option:: --no-default-ignore
 
@@ -954,7 +956,7 @@ errors are found, they will be printed to standard output. You can use the
 ``--skip-checks`` option to skip running system checks.
 
 You can run as many concurrent servers as you want, as long as they're on
-separate ports by executing ``django-admin runserver`` more than once.
+separate ports by executing ``django runserver`` more than once.
 
 Note that the default IP address, ``127.0.0.1``, is not accessible from other
 machines on your network. To make your development server viewable to other
@@ -1008,55 +1010,55 @@ Port 8000 on IP address ``127.0.0.1``:
 
 .. console::
 
-    django-admin runserver
+    django runserver
 
 Port 8000 on IP address ``1.2.3.4``:
 
 .. console::
 
-    django-admin runserver 1.2.3.4:8000
+    django runserver 1.2.3.4:8000
 
 Port 7000 on IP address ``127.0.0.1``:
 
 .. console::
 
-    django-admin runserver 7000
+    django runserver 7000
 
 Port 7000 on IP address ``1.2.3.4``:
 
 .. console::
 
-    django-admin runserver 1.2.3.4:7000
+    django runserver 1.2.3.4:7000
 
 Port 8000 on IPv6 address ``::1``:
 
 .. console::
 
-    django-admin runserver -6
+    django runserver -6
 
 Port 7000 on IPv6 address ``::1``:
 
 .. console::
 
-    django-admin runserver -6 7000
+    django runserver -6 7000
 
 Port 7000 on IPv6 address ``2001:0db8:1234:5678::9``:
 
 .. console::
 
-    django-admin runserver [2001:0db8:1234:5678::9]:7000
+    django runserver [2001:0db8:1234:5678::9]:7000
 
 Port 8000 on IPv4 address of host ``localhost``:
 
 .. console::
 
-    django-admin runserver localhost:8000
+    django runserver localhost:8000
 
 Port 8000 on IPv6 address of host ``localhost``:
 
 .. console::
 
-    django-admin runserver -6 localhost:8000
+    django runserver -6 localhost:8000
 
 Serving static files with the development server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1083,7 +1085,7 @@ recipient(s) specified. For example:
 
 .. console::
 
-    django-admin sendtestemail foo@example.com bar@example.com
+    django sendtestemail foo@example.com bar@example.com
 
 The following options may be used in any combination with each other and with
 recipient email arguments.
@@ -1136,20 +1138,20 @@ IPython:
 
 .. console::
 
-    django-admin shell -i ipython
+    django shell -i ipython
 
 bpython:
 
 .. console::
 
-    django-admin shell -i bpython
+    django shell -i bpython
 
 If you have a "rich" shell installed but want to force use of the "plain"
 Python interpreter, use ``python`` as the interface name, like so:
 
 .. console::
 
-    django-admin shell -i python
+    django shell -i python
 
 .. _IPython: https://ipython.org/
 .. _bpython: https://bpython-interpreter.org/
@@ -1170,13 +1172,13 @@ Lets you pass a command as a string to execute it as Django, like so:
 
 .. console::
 
-    django-admin shell --command="import django; print(django.__version__)"
+    django shell --command="import django; print(django.__version__)"
 
 You can also pass code in on standard input to execute it. For example:
 
 .. code-block:: console
 
-    $ django-admin shell <<EOF
+    $ django shell <<EOF
     > import django
     > print(django.__version__)
     > EOF
@@ -1321,7 +1323,7 @@ For example:
 
 .. console::
 
-    django-admin startapp myapp /Users/jezdez/Code/myapp
+    django startapp myapp /Users/jezdez/Code/myapp
 
 .. _custom-app-and-project-templates:
 
@@ -1337,7 +1339,7 @@ creating the ``myapp`` app:
 
 .. console::
 
-    django-admin startapp --template=/Users/jezdez/Code/my_app_template myapp
+    django startapp --template=/Users/jezdez/Code/my_app_template myapp
 
 Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
 archives with the app template files, downloading and extracting them on the
@@ -1348,7 +1350,7 @@ zip files, you can use a URL like:
 
 .. console::
 
-    django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/main.zip myapp
+    django startapp --template=https://github.com/githubuser/django-app-template/archive/main.zip myapp
 
 .. warning::
 
@@ -1443,7 +1445,7 @@ For example:
 
 .. console::
 
-    django-admin startproject myproject /Users/jezdez/Code/myproject_repo
+    django startproject myproject /Users/jezdez/Code/myproject_repo
 
 .. django-admin-option:: --template TEMPLATE
 
@@ -1661,7 +1663,7 @@ For example, this command:
 
 .. console::
 
-    django-admin testserver mydata.json
+    django testserver mydata.json
 
 ...would perform the following steps:
 
@@ -1701,8 +1703,8 @@ To run the test server on port 7000 with ``fixture1`` and ``fixture2``:
 
 .. console::
 
-    django-admin testserver --addrport 7000 fixture1 fixture2
-    django-admin testserver fixture1 fixture2 --addrport 7000
+    django testserver --addrport 7000 fixture1 fixture2
+    django testserver fixture1 fixture2 --addrport 7000
 
 (The above statements are equivalent. We include both of them to demonstrate
 that it doesn't matter whether the options come before or after the fixture
@@ -1712,7 +1714,7 @@ To run on 1.2.3.4:7000 with a ``test`` fixture:
 
 .. console::
 
-    django-admin testserver --addrport 1.2.3.4:7000 test
+    django testserver --addrport 1.2.3.4:7000 test
 
 .. django-admin-option:: --noinput, --no-input
 
@@ -1751,7 +1753,7 @@ Example usage:
 
 .. console::
 
-    django-admin changepassword ringo
+    django changepassword ringo
 
 ``createsuperuser``
 ~~~~~~~~~~~~~~~~~~~
@@ -1885,7 +1887,7 @@ allows for the following options by default:
 .. django-admin-option:: --pythonpath PYTHONPATH
 
 Adds the given filesystem path to the Python :data:`sys.path` module
-attribute. If this isn't provided, ``django-admin`` will use the
+attribute. If this isn't provided, ``django`` will use the
 :envvar:`PYTHONPATH` environment variable.
 
 This option is unnecessary in ``manage.py``, because it takes care of setting
@@ -1895,13 +1897,13 @@ Example usage:
 
 .. console::
 
-    django-admin migrate --pythonpath='/home/djangoprojects/myproject'
+    django migrate --pythonpath='/home/djangoprojects/myproject'
 
 .. django-admin-option:: --settings SETTINGS
 
 Specifies the settings module to use. The settings module should be in Python
 package syntax, e.g. ``mysite.settings``. If this isn't provided,
-``django-admin`` will use the :envvar:`DJANGO_SETTINGS_MODULE` environment
+``django`` will use the :envvar:`DJANGO_SETTINGS_MODULE` environment
 variable.
 
 This option is unnecessary in ``manage.py``, because it uses
@@ -1911,12 +1913,12 @@ Example usage:
 
 .. console::
 
-    django-admin migrate --settings=mysite.settings
+    django migrate --settings=mysite.settings
 
 .. django-admin-option:: --traceback
 
 Displays a full stack trace when a :exc:`~django.core.management.CommandError`
-is raised. By default, ``django-admin`` will show an error message when a
+is raised. By default, ``django`` will show an error message when a
 ``CommandError`` occurs and a full stack trace for any other exception.
 
 This option is ignored by :djadmin:`runserver`.
@@ -1925,7 +1927,7 @@ Example usage:
 
 .. console::
 
-    django-admin migrate --traceback
+    django migrate --traceback
 
 .. django-admin-option:: --verbosity {0,1,2,3}, -v {0,1,2,3}
 
@@ -1943,7 +1945,7 @@ Example usage:
 
 .. console::
 
-    django-admin migrate --verbosity 2
+    django migrate --verbosity 2
 
 .. django-admin-option:: --no-color
 
@@ -1955,7 +1957,7 @@ Example usage:
 
 .. console::
 
-    django-admin runserver --no-color
+    django runserver --no-color
 
 .. django-admin-option:: --force-color
 
@@ -1974,7 +1976,7 @@ Example usage:
 
 .. console::
 
-    django-admin migrate --skip-checks
+    django migrate --skip-checks
 
 Extra niceties
 ==============
@@ -1986,7 +1988,7 @@ Syntax coloring
 
 .. envvar:: DJANGO_COLORS
 
-The ``django-admin`` / ``manage.py`` commands will use pretty
+The ``django`` / ``manage.py`` commands will use pretty
 color-coded output if your terminal supports ANSI-colored output. It
 won't use the color codes if you're piping the command's output to
 another program unless the :option:`--force-color` option is used.
@@ -2126,10 +2128,10 @@ Bash completion
 
 If you use the Bash shell, consider installing the Django bash completion
 script, which lives in :source:`extras/django_bash_completion` in the Django
-source distribution. It enables tab-completion of ``django-admin`` and
+source distribution. It enables tab-completion of ``django`` and
 ``manage.py`` commands, so you can, for instance...
 
-* Type ``django-admin``.
+* Type ``django``.
 * Press [TAB] to see all available options.
 * Type ``sql``, then [TAB], to see all available options whose names start
   with ``sql``.
@@ -2149,13 +2151,13 @@ current project, you can set the ``PATH`` explicitly:
 
 .. code-block:: shell
 
-    PATH=path/to/venv/bin django-admin makemigrations
+    PATH=path/to/venv/bin django makemigrations
 
 For commands using ``stdout`` you can pipe the output to ``black`` if needed:
 
 .. code-block:: shell
 
-    django-admin inspectdb | black -
+    django inspectdb | black -
 
 ==========================================
 Running management commands from your code
@@ -2206,7 +2208,7 @@ Named arguments can be passed by using either one of the following syntaxes::
       management.call_command("dumpdata", use_natural_foreign_keys=True)
 
 Some command options have different names when using ``call_command()`` instead
-of ``django-admin`` or ``manage.py``. For example, ``django-admin
+of ``django`` or ``manage.py``. For example, ``django
 createsuperuser --no-input`` translates to ``call_command('createsuperuser',
 interactive=False)``. To find what keyword argument name to use for
 ``call_command()``, check the command's source code for the ``dest`` argument
