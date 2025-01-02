@@ -353,7 +353,7 @@ def truncatewords_html(value, arg):
     return Truncator(value).words(length, html=True, truncate=" …")
 
 
-@register.filter(is_safe=False)
+@register.filter(is_safe=True)
 @stringfilter
 def upper(value):
     """Convert a string into all uppercase."""
