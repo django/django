@@ -11,6 +11,13 @@ from argparse import (
 from collections import defaultdict
 from difflib import get_close_matches
 from importlib import import_module
+from pathlib import Path
+
+try:
+    import tomllib
+except ImportError:
+    # Python < 3.11
+    import tomli as tomllib
 
 import django
 from django.apps import apps
@@ -377,6 +384,24 @@ class ManagementUtility:
             handle_default_options(options)
         except CommandError:
             pass  # Ignore any option errors at this point.
+
+        # Read the settings module from the local pyproject.toml if present.
+        pyproject = Path("pyproject.toml")
+        if pyproject.is_file():
+            with pyproject.open("rb") as f:
+                _config = tomllib.load(f)
+            _settings_module = (
+                _config.get("tool", {}).get("django", {}).get("settings_module")
+            )
+            if _settings_module is not None:
+                os.environ.setdefault("DJANGO_SETTINGS_MODULE", _settings_module)
+                if _settings_module == os.environ["DJANGO_SETTINGS_MODULE"]:
+                    # The runserver command starts up a subprocess that has
+                    # DJANGO_SETTINGS_MODULE set, so we can't only add to
+                    # the path if DJANGO_SETTINGS_MODULE is not already set.
+                    #
+                    # Insert the pyproject.toml directory into the path.
+                    sys.path.insert(0, os.getcwd())
 
         try:
             settings.INSTALLED_APPS

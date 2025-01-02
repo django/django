@@ -10,6 +10,7 @@ dependencies = [
     "asgiref>=3.8.1",
     "sqlparse>=0.3.1",
     "tzdata; sys_platform == 'win32'",
+    "tomli; python_version < '3.11'",
 ]
 authors = [
   {name = "Django Software Foundation", email = "foundation@djangoproject.com"},
