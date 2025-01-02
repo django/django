@@ -23,7 +23,7 @@ Overview
 ========
 
 The admin is enabled in the default project template used by
-:djadmin:`startproject`.
+:djcli:`startproject`.
 
 If you're not using the default project template, here are the requirements:
 
@@ -52,7 +52,7 @@ If you're not using the default project template, here are the requirements:
 After you've taken these steps, you'll be able to use the admin site by
 visiting the URL you hooked it into (``/admin/``, by default).
 
-If you need to create a user to login with, use the :djadmin:`createsuperuser`
+If you need to create a user to login with, use the :djcli:`createsuperuser`
 command. By default, logging in to the admin requires that the user has the
 :attr:`~.User.is_staff` attribute set to ``True``.
 

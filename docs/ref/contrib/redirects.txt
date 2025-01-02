@@ -20,7 +20,7 @@ To install the redirects app, follow these steps:
    setting.
 #. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
    to your :setting:`MIDDLEWARE` setting.
-#. Run the command :djadmin:`manage.py migrate <migrate>`.
+#. Run the command :djcli:`manage.py migrate <migrate>`.
 
 How it works
 ============

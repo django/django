@@ -30,7 +30,7 @@ connection:
 Auto-generate the models
 ========================
 
-Django comes with a utility called :djadmin:`inspectdb` that can create models
+Django comes with a utility called :djcli:`inspectdb` that can create models
 by introspecting an existing database. You can view the output by running this
 command:
 
@@ -45,13 +45,13 @@ Save this as a file by using standard Unix output redirection:
     $ python manage.py inspectdb > models.py
 
 This feature is meant as a shortcut, not as definitive model generation. See
-the :djadmin:`documentation of inspectdb <inspectdb>` for more information.
+the :djcli:`documentation of inspectdb <inspectdb>` for more information.
 
 Once you've cleaned up your models, name the file ``models.py`` and put it in
 the Python package that holds your app. Then add the app to your
 :setting:`INSTALLED_APPS` setting.
 
-By default, :djadmin:`inspectdb` creates unmanaged models. That is,
+By default, :djcli:`inspectdb` creates unmanaged models. That is,
 ``managed = False`` in the model's ``Meta`` class tells Django not to manage
 each table's creation, modification, and deletion::
 
@@ -70,7 +70,7 @@ change the :attr:`~django.db.models.Options.managed` option above to ``True``
 Install the core Django tables
 ==============================
 
-Next, run the :djadmin:`migrate` command to install any extra needed database
+Next, run the :djcli:`migrate` command to install any extra needed database
 records such as admin permissions and content types:
 
 .. code-block:: shell

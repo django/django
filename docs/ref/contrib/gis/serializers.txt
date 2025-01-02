@@ -11,7 +11,7 @@ GeoDjango provides a specific serializer for the `GeoJSON`__ format. See
 __ https://geojson.org/
 
 The ``geojson`` serializer is not meant for round-tripping data, as it has no
-deserializer equivalent. For example, you cannot use :djadmin:`loaddata` to
+deserializer equivalent. For example, you cannot use :djcli:`loaddata` to
 reload the output produced by this serializer. If you plan to reload the
 outputted data, use the plain :ref:`json serializer
 <serialization-formats-json>` instead.

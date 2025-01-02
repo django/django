@@ -197,7 +197,7 @@ def call_command(command_name, *args, **options):
 
 class ManagementUtility:
     """
-    Encapsulate the logic of the django-admin and manage.py utilities.
+    Encapsulate the logic of the django and manage.py utilities.
     """
 
     def __init__(self, argv=None):
@@ -248,7 +248,7 @@ class ManagementUtility:
         """
         Try to fetch the given subcommand, printing a message with the
         appropriate command called from the command line (usually
-        "django-admin" or "manage.py") if it can't be found.
+        "django" or "manage.py") if it can't be found.
         """
         # Get commands outside of try block to prevent swallowing exceptions
         commands = get_commands()
@@ -356,6 +356,16 @@ class ManagementUtility:
         Given the command-line arguments, figure out which subcommand is being
         run, create a parser appropriate to that command, and run it.
         """
+        if self.prog_name == "django-admin":
+            # `django-admin` will continue to work indefinitely,
+            # but we want to encourage people to use `django` instead.
+            sys.stderr.write(
+                "The django-admin command is being renamed to django. "
+                "You can keep using either name, "
+                "they are equivalent except for the printing of this message. "
+                "For more details on the naming change, see DEP 16.\n"
+            )
+
         try:
             subcommand = self.argv[1]
         except IndexError:
@@ -427,8 +437,8 @@ class ManagementUtility:
                 self.fetch_command(options.args[0]).print_help(
                     self.prog_name, options.args[0]
                 )
-        # Special-cases: We want 'django-admin --version' and
-        # 'django-admin --help' to work, for backwards compatibility.
+        # Special-cases: We want 'django --version' and
+        # 'django --help' to work, for backwards compatibility.
         elif subcommand == "version" or self.argv[1:] == ["--version"]:
             sys.stdout.write(django.get_version() + "\n")
         elif self.argv[1:] in (["--help"], ["-h"]):

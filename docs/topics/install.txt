@@ -237,8 +237,7 @@ latest bug fixes and improvements, follow these instructions:
         $ python -m pip install -e django/
 
    This will make Django's code importable, and will also make the
-   ``django-admin`` utility command available. In other words, you're all
-   set!
+   ``django`` CLI available. In other words, you're all set!
 
 When you want to update your copy of the Django source code, run the command
 ``git pull`` from within the ``django`` directory. When you do this, Git will

@@ -1,6 +1,6 @@
-==============================================
-How to create custom ``django-admin`` commands
-==============================================
+============================================
+How to create custom ``django`` CLI commands
+============================================
 
 .. module:: django.core.management
 
@@ -124,7 +124,7 @@ parameter of the handle method. See the :mod:`argparse` Python documentation
 for more about ``add_argument`` usage.
 
 In addition to being able to add custom command line options, all
-:doc:`management commands</ref/django-admin>` can accept some default options
+:doc:`management commands</ref/django-cli>` can accept some default options
 such as :option:`--verbosity` and :option:`--traceback`.
 
 .. _management-commands-and-locales:

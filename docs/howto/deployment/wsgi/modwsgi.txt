@@ -59,7 +59,7 @@ The ``<Directory>`` piece ensures that Apache can access your :file:`wsgi.py`
 file.
 
 Next we'll need to ensure this :file:`wsgi.py` with a WSGI application object
-exists. As of Django version 1.4, :djadmin:`startproject` will have created one
+exists. As of Django version 1.4, :djcli:`startproject` will have created one
 for you; otherwise, you'll need to create it. See the :doc:`WSGI overview
 documentation</howto/deployment/wsgi/index>` for the default contents you
 should put in this file, and what else you can add to it.
@@ -206,7 +206,7 @@ Django distribution.
 
 We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle the
 admin files (along with a web server as outlined in the previous section; this
-means using the :djadmin:`collectstatic` management command to collect the
+means using the :djcli:`collectstatic` management command to collect the
 static files in :setting:`STATIC_ROOT`, and then configuring your web server to
 serve :setting:`STATIC_ROOT` at :setting:`STATIC_URL`), but here are three
 other approaches:

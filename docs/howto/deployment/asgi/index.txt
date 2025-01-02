@@ -7,7 +7,7 @@ standard for asynchronous web servers and applications.
 
 .. _ASGI: https://asgi.readthedocs.io/en/latest/
 
-Django's :djadmin:`startproject` management command sets up a default ASGI
+Django's :djcli:`startproject` management command sets up a default ASGI
 configuration for you, which you can tweak as needed for your project, and
 direct any ASGI-compliant application server to use.
 
@@ -29,7 +29,7 @@ the application server uses to communicate with your code. It's commonly
 provided as an object named ``application`` in a Python module accessible to
 the server.
 
-The :djadmin:`startproject` command creates a file
+The :djcli:`startproject` command creates a file
 :file:`<project_name>/asgi.py` that contains such an ``application`` callable.
 
 It's not used by the development server (``runserver``), but can be used by

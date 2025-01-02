@@ -11,7 +11,7 @@ application safely.
 
 #. Remove all models from the corresponding ``models.py`` file.
 
-#. Create relevant migrations by running :djadmin:`makemigrations`. This step
+#. Create relevant migrations by running :djcli:`makemigrations`. This step
    generates a migration that deletes tables for the removed models, and any
    other required migration for updating relationships connected to those
    models.

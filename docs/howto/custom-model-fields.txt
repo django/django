@@ -693,7 +693,7 @@ For example::
             return "CharField"
 
 No matter which database backend we are using, this will mean that
-:djadmin:`migrate` and other SQL commands create the right column type for
+:djcli:`migrate` and other SQL commands create the right column type for
 storing a string.
 
 If :meth:`.get_internal_type` returns a string that is not known to Django for

@@ -47,34 +47,34 @@ e.g. ``mysite.settings``. Note that the settings module should be on the
 Python :data:`sys.path`.
 
 
-The ``django-admin`` utility
-----------------------------
+The ``django`` CLI
+------------------
 
-When using :doc:`django-admin </ref/django-admin>`, you can either set the
+When using :doc:`django </ref/django-cli>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
-you run the utility.
+you run the CLI.
 
 Example (Unix Bash shell):
 
 .. code-block:: shell
 
     export DJANGO_SETTINGS_MODULE=mysite.settings
-    django-admin runserver
+    django runserver
 
 Example (Windows shell):
 
 .. code-block:: doscon
 
     set DJANGO_SETTINGS_MODULE=mysite.settings
-    django-admin runserver
+    django runserver
 
 Use the ``--settings`` command-line argument to specify the settings manually:
 
 .. code-block:: shell
 
-    django-admin runserver --settings=mysite.settings
+    django runserver --settings=mysite.settings
 
-.. _django-admin: ../django-admin/
+.. _django-admin: ../django-cli/
 
 On the server (``mod_wsgi``)
 ----------------------------
@@ -112,7 +112,7 @@ Seeing which settings you've changed
 The command ``python manage.py diffsettings`` displays differences between the
 current settings file and Django's default settings.
 
-For more, see the :djadmin:`diffsettings` documentation.
+For more, see the :djcli:`diffsettings` documentation.
 
 Using settings in Python code
 =============================
@@ -295,8 +295,8 @@ settings and populate Django's application registry. For example::
     from myapp import models
 
 Note that calling ``django.setup()`` is only necessary if your code is truly
-standalone. When invoked by your web server, or through :doc:`django-admin
-</ref/django-admin>`, Django will handle this for you.
+standalone. When invoked by your web server, or through the :doc:`django
+</ref/django-cli>` command, Django will handle this for you.
 
 .. admonition:: ``django.setup()`` may only be called once.
 

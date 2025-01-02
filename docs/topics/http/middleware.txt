@@ -107,7 +107,7 @@ your Django settings.
 
 In :setting:`MIDDLEWARE`, each middleware component is represented by a string:
 the full Python path to the middleware factory's class or function name. For
-example, here's the default value created by :djadmin:`django-admin
+example, here's the default value created by :djcli:`django
 startproject <startproject>`::
 
     MIDDLEWARE = [

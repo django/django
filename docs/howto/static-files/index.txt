@@ -38,7 +38,7 @@ Configuring static files
     serve the static files.
 
     During development, if you use :mod:`django.contrib.staticfiles`, this will
-    be done automatically by :djadmin:`runserver` when :setting:`DEBUG` is set
+    be done automatically by :djcli:`runserver` when :setting:`DEBUG` is set
     to ``True`` (see :func:`django.contrib.staticfiles.views.serve`).
 
     This method is **grossly inefficient** and probably **insecure**,
@@ -81,7 +81,7 @@ Serving static files during development
 =======================================
 
 If you use :mod:`django.contrib.staticfiles` as explained above,
-:djadmin:`runserver` will do this automatically when :setting:`DEBUG` is set
+:djcli:`runserver` will do this automatically when :setting:`DEBUG` is set
 to ``True``. If you don't have ``django.contrib.staticfiles`` in
 :setting:`INSTALLED_APPS`, you can still manually serve static files using the
 :func:`django.views.static.serve` view.
@@ -159,7 +159,7 @@ Because of this, ``staticfiles`` ships its own
 subclass of the built-in one that has the ability to transparently serve all
 the assets during execution of these tests in a way very similar to what we get
 at development time with ``DEBUG = True``, i.e. without having to collect them
-using :djadmin:`collectstatic` first.
+using :djcli:`collectstatic` first.
 
 Deployment
 ==========
@@ -172,7 +172,7 @@ for gathering static files in a single directory so you can serve them easily.
 
        STATIC_ROOT = "/var/www/example.com/static/"
 
-#. Run the :djadmin:`collectstatic` management command:
+#. Run the :djcli:`collectstatic` management command:
 
    .. code-block:: shell
 

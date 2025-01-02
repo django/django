@@ -211,8 +211,8 @@ testing of Django applications:
 * **Exceptions:**
   :doc:`Overview </ref/exceptions>`
 
-* **django-admin and manage.py:**
-  :doc:`Overview </ref/django-admin>` |
+* **The django CLI and manage.py:**
+  :doc:`Overview </ref/django-cli>` |
   :doc:`Adding custom commands </howto/custom-management-commands>`
 
 * **Testing:**
