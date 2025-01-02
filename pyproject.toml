@@ -43,6 +43,7 @@ argon2 = ["argon2-cffi>=19.1.0"]
 bcrypt = ["bcrypt"]
 
 [project.scripts]
+django = "django.core.management:execute_from_command_line"
 django-admin = "django.core.management:execute_from_command_line"
 
 [project.urls]
