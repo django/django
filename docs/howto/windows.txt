@@ -98,7 +98,7 @@ the following command:
 This will download and install the latest Django release.
 
 After the installation has completed, you can verify your Django installation
-by executing ``django-admin --version`` in the command prompt.
+by executing ``django --version`` in the command prompt.
 
 See :ref:`database-installation` for information on database installation
 with Django.
@@ -123,7 +123,7 @@ See :ref:`syntax-coloring` for more information on color settings.
 Common pitfalls
 ===============
 
-* If ``django-admin`` only displays the help text no matter what arguments
+* If ``django`` only displays the help text no matter what arguments
   it is given, there is probably a problem with the file association in
   Windows. Check if there is more than one environment variable set for
   running Python scripts in ``PATH``. This usually occurs when there is more

@@ -102,7 +102,7 @@ feature include:
 - Avoiding data corruption problems around DST transitions.
 
 Time zone support is enabled by default in new projects created with
-:djadmin:`startproject`. If you want to use this feature in an existing
+:cli:`startproject`. If you want to use this feature in an existing
 project, read the :ref:`migration guide <time-zones-migration-guide>`. If you
 encounter problems, there's a helpful :ref:`FAQ <time-zones-faq>`.
 
@@ -122,7 +122,7 @@ Updated default project layout and ``manage.py``
 ------------------------------------------------
 
 Django 1.4 ships with an updated default project layout and ``manage.py`` file
-for the :djadmin:`startproject` management command. These fix some issues with
+for the :cli:`startproject` management command. These fix some issues with
 the previous ``manage.py`` handling of Python import paths that caused double
 imports, trouble moving from development to deployment, and other
 difficult-to-debug path issues.
@@ -191,7 +191,7 @@ switching to the new ``manage.py``.
 Custom project and app templates
 --------------------------------
 
-The :djadmin:`startapp` and :djadmin:`startproject` management commands
+The :cli:`startapp` and :cli:`startproject` management commands
 now have a ``--template`` option for specifying a path or URL to a custom app
 or project template.
 
@@ -203,29 +203,29 @@ when you run the following command:
     django-admin.py startproject --template=/path/to/my_project_template myproject
 
 You can also now provide a destination directory as the second
-argument to both :djadmin:`startapp` and :djadmin:`startproject`:
+argument to both :cli:`startapp` and :cli:`startproject`:
 
 .. code-block:: shell
 
     django-admin.py startapp myapp /path/to/new/app
     django-admin.py startproject myproject /path/to/new/project
 
-For more information, see the :djadmin:`startapp` and :djadmin:`startproject`
+For more information, see the :cli:`startapp` and :cli:`startproject`
 documentation.
 
 Improved WSGI support
 ---------------------
 
-The :djadmin:`startproject` management command now adds a :file:`wsgi.py`
+The :cli:`startproject` management command now adds a :file:`wsgi.py`
 module to the initial project layout, containing a simple WSGI application that
 can be used for :doc:`deploying with WSGI app
 servers</howto/deployment/wsgi/index>`.
 
-The :djadmin:`built-in development server<runserver>` now supports using an
+The :cli:`built-in development server<runserver>` now supports using an
 externally-defined WSGI callable, which makes it possible to run ``runserver``
 with the same WSGI configuration that is used for deployment. The new
 :setting:`WSGI_APPLICATION` setting lets you configure which WSGI callable
-:djadmin:`runserver` uses.
+:cli:`runserver` uses.
 
 (The ``runfcgi`` management command also internally wraps the WSGI
 callable configured via :setting:`WSGI_APPLICATION`.)
@@ -476,7 +476,7 @@ files from a cloud service<staticfiles-from-cdn>`.
 
 The :mod:`staticfiles<django.contrib.staticfiles>` contrib app now has a
 ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` backend
-that caches the files it saves (when running the :djadmin:`collectstatic`
+that caches the files it saves (when running the :cli:`collectstatic`
 management command) by appending the MD5 hash of the file's content to the
 filename. For example, the file ``css/styles.css`` would also be saved as
 ``css/styles.55e7cbb9ba48.css``
@@ -586,7 +586,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   to the :mod:`django.contrib.auth.hashers` module. Importing it from the old
   location will still work, but you should update your imports.
 
-* The :djadmin:`collectstatic` management command now has a ``--clear`` option
+* The :cli:`collectstatic` management command now has a ``--clear`` option
   to delete all files at the destination before copying or linking the static
   files.
 
@@ -599,7 +599,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   documentation about :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>`
   for more information.
 
-* The :djadmin:`makemessages` command uses a new and more accurate lexer,
+* The :cli:`makemessages` command uses a new and more accurate lexer,
   :pypi:`JsLex <jslex>`, for extracting translatable strings from JavaScript
   files.
 
@@ -1126,14 +1126,14 @@ after tests' execution, then you can restore the previous behavior by
 subclassing ``DjangoTestRunner`` and overriding its ``teardown_databases()``
 method.
 
-Output of :djadmin:`manage.py help <help>`
+Output of :cli:`manage.py help <help>`
 ------------------------------------------
 
-:djadmin:`manage.py help <help>` now groups available commands by application.
+:cli:`manage.py help <help>` now groups available commands by application.
 If you depended on the output of this command -- if you parsed it, for example
 -- then you'll need to update your code. To get a list of all available
 management commands in a script, use
-:djadmin:`manage.py help --commands <help>` instead.
+:cli:`manage.py help --commands <help>` instead.
 
 ``extends`` template tag
 ------------------------
@@ -1282,7 +1282,7 @@ a third-party project.
 ----------------------------------------
 
 This function temporarily modified ``sys.path`` in order to make the parent
-"project" directory importable under the old flat :djadmin:`startproject`
+"project" directory importable under the old flat :cli:`startproject`
 layout. This function is now deprecated, as its path workarounds are no longer
 needed with the new ``manage.py`` and default project layout.
 

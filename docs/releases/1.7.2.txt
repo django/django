@@ -22,10 +22,10 @@ Bugfixes
   ``RuntimeError`` was raised every time two models clashed in the app
   registry. (:ticket:`23621`).
 
-* Prevented :djadmin:`flush` from loading initial data for migrated apps
+* Prevented :cli:`flush` from loading initial data for migrated apps
   (:ticket:`23699`).
 
-* Fixed a :djadmin:`makemessages` regression in 1.7.1 when
+* Fixed a :cli:`makemessages` regression in 1.7.1 when
   :setting:`STATIC_ROOT` has the default ``None`` value (:ticket:`23717`).
 
 * Added GeoDjango compatibility with mysqlclient database driver.
@@ -63,7 +63,7 @@ Bugfixes
 * Fixed a migration crash when a field is renamed that is part of an
   ``index_together`` (:ticket:`23859`).
 
-* Fixed :djadmin:`squashmigrations` to respect the ``--no-optimize`` parameter
+* Fixed :cli:`squashmigrations` to respect the ``--no-optimize`` parameter
   (:ticket:`23799`).
 
 * Made :class:`~django.db.migrations.operations.RenameModel` reversible
