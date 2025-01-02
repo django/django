@@ -312,6 +312,17 @@ Models
 * :meth:`.QuerySet.explain` now supports the ``memory`` and ``serialize``
   options on PostgreSQL 17+.
 
+Pagination
+~~~~~~~~~~
+* The Paginator now supports asynchronous operations with the
+  :class:`~django.core.paginator.AsyncPaginator` and
+  :class:`~django.core.paginator.AsyncPage`.
+* The methods are supported by prefixing the existing
+  :class:`~django.core.paginator.Paginator`
+  and :class:`~django.core.paginator.Page` methods with 'a'.
+* Please refer to the documentation for the methods
+  that do not have equivalent counterparts.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
