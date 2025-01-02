@@ -528,7 +528,7 @@ Should become::
     class MyModel(models.Model):
         uuid = Char32UUIDField(primary_key=True, default=uuid.uuid4)
 
-Running the :djadmin:`makemigrations` command will generate a migration
+Running the :cli:`makemigrations` command will generate a migration
 containing a no-op ``AlterField`` operation.
 
 Miscellaneous

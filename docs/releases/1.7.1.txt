@@ -108,7 +108,7 @@ Bugfixes
 * Made :func:`~django.utils.http.urlsafe_base64_decode` return the proper
   type (bytestring) on Python 3 (:ticket:`23333`).
 
-* :djadmin:`makemigrations` can now serialize timezone-aware values
+* :cli:`makemigrations` can now serialize timezone-aware values
   (:ticket:`23365`).
 
 * Added a prompt to the migrations questioner when removing the null constraint
@@ -128,11 +128,11 @@ Bugfixes
 * Made the Oracle test database creation drop the test user in the event of an
   unclean exit of a previous test run (:ticket:`23649`).
 
-* Fixed :djadmin:`makemigrations` to detect changes to
+* Fixed :cli:`makemigrations` to detect changes to
   :attr:`Meta.db_table <django.db.models.Options.db_table>` (:ticket:`23629`).
 
 * Fixed a regression when feeding the Django test client with an empty data
   string (:ticket:`21740`).
 
-* Fixed a regression in :djadmin:`makemessages` where static files were
+* Fixed a regression in :cli:`makemessages` where static files were
   unexpectedly ignored (:ticket:`23583`).

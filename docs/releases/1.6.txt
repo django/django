@@ -51,7 +51,7 @@ What's new in Django 1.6
 Simplified default project and app templates
 --------------------------------------------
 
-The default templates used by :djadmin:`startproject` and :djadmin:`startapp`
+The default templates used by :cli:`startproject` and :cli:`startapp`
 have been simplified and modernized. The :doc:`admin
 </ref/contrib/admin/index>` is now enabled by default in new projects; the
 :doc:`sites </ref/contrib/sites>` framework no longer is. :ref:`clickjacking
@@ -134,7 +134,7 @@ framework.
 ``check`` management command added for verifying compatibility
 --------------------------------------------------------------
 
-A :djadmin:`check` management command was added, enabling you to verify if your
+A :cli:`check` management command was added, enabling you to verify if your
 current configuration (currently oriented at settings) is compatible with the
 current version of Django.
 
@@ -241,7 +241,7 @@ Minor features
 * The documentation contains a :doc:`deployment checklist
   </howto/deployment/checklist>`.
 
-* The :djadmin:`diffsettings` command gained a ``--all`` option.
+* The :cli:`diffsettings` command gained a ``--all`` option.
 
 * ``django.forms.fields.Field.__init__`` now calls ``super()``, allowing
   field mixins to implement ``__init__()`` methods that will reliably be
@@ -567,7 +567,7 @@ Extraction of translations after comments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Extraction of translatable literals from templates with the
-:djadmin:`makemessages` command now correctly detects i18n constructs when
+:cli:`makemessages` command now correctly detects i18n constructs when
 they are located after a ``{#`` / ``#}``-type comment on the same line. E.g.:
 
 .. code-block:: html+django
@@ -579,7 +579,7 @@ Location of translator comments
 
 :ref:`translator-comments-in-templates` specified using ``{#`` / ``#}`` need to
 be at the end of a line. If they are not, the comments are ignored and
-:djadmin:`makemessages` will generate a warning. For example:
+:cli:`makemessages` will generate a warning. For example:
 
 .. code-block:: html+django
 

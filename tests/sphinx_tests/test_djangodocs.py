@@ -83,31 +83,31 @@ class DjangoDocsExtensionTests(DjangoDocsTestCase):
 
     def test_django_admin_directive(self):
         result = self.build_sphinx("""
-            .. django-admin:: check [app_label ...]
+            .. cli:: check [app_label ...]
 
             Description of check command.
 
-            .. django-admin-option:: --tag TAG
+            .. cli-option:: --tag TAG
 
             Tag option description.
 
-            See :djadmin:`check` and :option:`check --tag`.
+            See :cli:`check` and :option:`check --tag`.
             """)
         self.assertEqual(result.warning, "")
         html = result.files["index.html"]
 
-        # .. django-admin::
-        self.assertIn('<dl class="std django-admin">', html)
+        # .. cli::
+        self.assertIn('<dl class="std cli">', html)
         self.assertIn('<dt class="sig sig-object std" id="django-admin-check">', html)
         self.assertInHTML(
-            '<span class="sig-name descname"><span class="pre">django-admin</span>'
+            '<span class="sig-name descname"><span class="pre">django</span>'
             ' <span class="pre">check</span> <span class="pre">[app_label</span>'
             ' <span class="pre">...]</span></span>',
             html,
         )
 
-        # .. django-admin-option::
-        self.assertIn('<dl class="django-admin-option">', html)
+        # .. cli-option::
+        self.assertIn('<dl class="cli-option">', html)
         self.assertIn('<dt class="sig sig-object" id="cmdoption-check-tag">', html)
         self.assertInHTML(
             '<span class="sig-name descname"><span class="pre">--tag</span></span>'
@@ -118,8 +118,8 @@ class DjangoDocsExtensionTests(DjangoDocsTestCase):
 
         # References.
         self.assertInHTML(
-            '<a class="reference internal" href="#django-admin-check">'
-            '<code class="xref std std-djadmin docutils literal notranslate">'
+            '<a class="reference internal" href="#cli-check">'
+            '<code class="xref std std-cli docutils literal notranslate">'
             '<span class="pre">check</span></code></a>',
             html,
         )
@@ -133,7 +133,7 @@ class DjangoDocsExtensionTests(DjangoDocsTestCase):
         # Index entries.
         genindex = result.files["genindex.html"]
         self.assertIn("check", genindex)
-        self.assertIn("django-admin command", genindex)
+        self.assertIn("django command", genindex)
 
     def test_default_role_error(self):
         result = self.build_sphinx(
