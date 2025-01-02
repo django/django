@@ -473,7 +473,7 @@ Miscellaneous
 * The minimum supported version of ``oracledb`` is increased from 1.3.2 to
   2.3.0.
 
-* The ``django`` command is added as an alterative spelling for ``django-admin``.
+* The ``django`` command is added as an alternative spelling for ``django-admin``.
 
 .. _deprecated-features-5.2:
 
