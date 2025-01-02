@@ -2846,6 +2846,10 @@ For example:
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"JOEL IS A SLUG"``.
 
+.. versionchanged:: 5.2
+
+    In older versions, the ``upper`` output wasn't marked as safe.
+
 .. templatefilter:: urlencode
 
 ``urlencode``

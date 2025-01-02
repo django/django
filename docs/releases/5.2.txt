@@ -473,6 +473,10 @@ Miscellaneous
 * The minimum supported version of ``oracledb`` is increased from 1.3.2 to
   2.3.0.
 
+* The :tfilter:`upper` template filter is now marked as safe, since it cannot
+  introduce unsafe HTML characters. Use :tfilter:`force_escape` to opt back
+  into old behavior, e.g.  ``{{ value|upper|force_escape }}``.
+
 .. _deprecated-features-5.2:
 
 Features deprecated in 5.2
