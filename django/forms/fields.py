@@ -1217,7 +1217,7 @@ class FilePathField(ChoiceField):
         if self.required:
             self.choices = []
         else:
-            self.choices = [("", "---------")]
+            self.choices = [("", settings.FORMS_DEFAULT_BLANK_CHOICE_LABEL)]
 
         if self.match is not None:
             self.match_re = re.compile(self.match)
