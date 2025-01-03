@@ -219,3 +219,48 @@ class DetailViewTest(TestCase):
         res = self.client.get("/detail/nonmodel/1/")
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["object"].id, "non_model_1")
+
+    def test_get_model_override(self):
+        res = self.client.get("/detail/author/getmodel/%s/" % self.author1.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context["object"], self.author1)
+        self.assertTemplateUsed(res, "generic_views/author_detail.html")
+
+    def test_invalid_model_configuration(self):
+        msg = (
+            "MissingModelView is missing a QuerySet. Define MissingModelView.model, "
+            "MissingModelView.queryset, or override MissingModelView.get_queryset()."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get("/missing-model/")
+
+    def test_conflicting_model_and_get_model(self):
+        """
+        `_get_model` takes precedence over model.
+        """
+        url = "/detail/conflicting-model-and-getmodel/%s/" % self.author1.pk
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context["object"], self.author1)
+        self.assertTemplateUsed(res, "generic_views/author_detail.html")
+
+    def test_model_and_queryset_ignores_model(self):
+        """
+        Queryset takes precedence over model as source of objects.
+        """
+        url = "/detail/author/conflicting-model-and-queryset/%s/" % self.author1.pk
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context["object"], self.author1)
+        self.assertTemplateUsed(res, "generic_views/author_detail.html")
+
+    def test_queryset_and_get_model_ignores_get_model(self):
+        """
+        When queryset is defined, it takes precedence over `_get_model` as
+        source of model objects.
+        """
+        url = "/detail/conflicting-queryset-and-getmodel/%s/" % self.artist1.pk
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context["object"], self.artist1)
+        self.assertTemplateUsed(res, "generic_views/artist_detail.html")

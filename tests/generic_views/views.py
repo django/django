@@ -43,6 +43,20 @@ class AuthorCustomDetail(generic.DetailView):
         return self.render_to_response(context)
 
 
+class AuthorDetailOverridesGetModel(generic.DetailView):
+    def _get_model(self):
+        return Author
+
+
+class AuthorDetailConflictingModelAndQueryset(generic.DetailView):
+    queryset = Author.objects.all()
+    model = Artist
+
+
+class MissingModelView(generic.DetailView):
+    pass
+
+
 class PageDetail(generic.DetailView):
     queryset = Page.objects.all()
     template_name_field = "template"
@@ -130,9 +144,7 @@ class AuthorCreate(generic.CreateView):
 
 
 class SpecializedAuthorCreate(generic.CreateView):
-    model = Author
     form_class = AuthorForm
-    template_name = "generic_views/form.html"
     context_object_name = "thingy"
 
     def get_success_url(self):
@@ -173,9 +185,7 @@ class OneAuthorUpdate(generic.UpdateView):
 
 
 class SpecializedAuthorUpdate(generic.UpdateView):
-    model = Author
     form_class = AuthorForm
-    template_name = "generic_views/form.html"
     context_object_name = "thingy"
 
     def get_success_url(self):
