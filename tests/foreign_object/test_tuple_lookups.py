@@ -1,6 +1,5 @@
 import itertools
 
-from django.db import NotSupportedError
 from django.db.models import F
 from django.db.models.fields.tuple_lookups import (
     TupleExact,
@@ -65,7 +64,7 @@ class TupleLookupsTests(TestCase):
 
     def test_exact_subquery(self):
         with self.assertRaisesMessage(
-            NotSupportedError, "'exact' doesn't support multi-column subqueries."
+            ValueError, "'exact' doesn't support multi-column subqueries."
         ):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
@@ -239,7 +238,7 @@ class TupleLookupsTests(TestCase):
 
     def test_lt_subquery(self):
         with self.assertRaisesMessage(
-            NotSupportedError, "'lt' doesn't support multi-column subqueries."
+            ValueError, "'lt' doesn't support multi-column subqueries."
         ):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
@@ -287,7 +286,7 @@ class TupleLookupsTests(TestCase):
 
     def test_lte_subquery(self):
         with self.assertRaisesMessage(
-            NotSupportedError, "'lte' doesn't support multi-column subqueries."
+            ValueError, "'lte' doesn't support multi-column subqueries."
         ):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
@@ -327,7 +326,7 @@ class TupleLookupsTests(TestCase):
 
     def test_gt_subquery(self):
         with self.assertRaisesMessage(
-            NotSupportedError, "'gt' doesn't support multi-column subqueries."
+            ValueError, "'gt' doesn't support multi-column subqueries."
         ):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
@@ -375,7 +374,7 @@ class TupleLookupsTests(TestCase):
 
     def test_gte_subquery(self):
         with self.assertRaisesMessage(
-            NotSupportedError, "'gte' doesn't support multi-column subqueries."
+            ValueError, "'gte' doesn't support multi-column subqueries."
         ):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
@@ -419,7 +418,7 @@ class TupleLookupsTests(TestCase):
 
     def test_isnull_subquery(self):
         with self.assertRaisesMessage(
-            NotSupportedError, "'isnull' doesn't support multi-column subqueries."
+            ValueError, "'isnull' doesn't support multi-column subqueries."
         ):
             subquery = Customer.objects.filter(id=0)[:1]
             self.assertSequenceEqual(

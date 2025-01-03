@@ -3,7 +3,6 @@ Classes to represent the definitions of aggregate functions.
 """
 
 from django.core.exceptions import FieldError, FullResultSet
-from django.db import NotSupportedError
 from django.db.models.expressions import Case, ColPairs, Func, Star, Value, When
 from django.db.models.fields import IntegerField
 from django.db.models.functions import Coalesce
@@ -182,7 +181,7 @@ class Count(Aggregate):
         # In case of composite primary keys, count the first column.
         if isinstance(expr, ColPairs):
             if self.distinct:
-                raise NotSupportedError(
+                raise ValueError(
                     "COUNT(DISTINCT) doesn't support composite primary keys"
                 )
 
