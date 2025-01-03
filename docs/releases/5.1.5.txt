@@ -11,3 +11,4 @@ Bugfixes
 
 * Fixed a crash when applying migrations with references to the removed
   ``Meta.index_together`` option (:ticket:`34856`).
+* The :tfilter:`upper` template filter is now marked as safe since it cannot introduce unsafe HTML characters. This means that ``{{ value|upper }}`` no longer requires an additional ``|force_escape`` filter when ``value`` is marked as safe.
