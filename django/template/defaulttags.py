@@ -4,12 +4,13 @@ import re
 import sys
 import warnings
 from collections import namedtuple
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from itertools import cycle as itertools_cycle
 from itertools import groupby
 
 from django.conf import settings
+from django.http import QueryDict
 from django.utils import timezone
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -1170,11 +1171,13 @@ def now(parser, token):
 
 
 @register.simple_tag(name="querystring", takes_context=True)
-def querystring(context, query_dict=None, **kwargs):
+def querystring(context, *args, **kwargs):
     """
-    Add, remove, and change parameters of a ``QueryDict`` and return the result
-    as a query string. If the ``query_dict`` argument is not provided, default
-    to ``request.GET``.
+    Modify and return a query string with updated parameters.
+
+    Add, remove, or change parameters in a given `QueryDict` or `dict`,
+    returning the result as a query string. Any arguments provided will
+    override existing keys. If no arguments are given, `request.GET` is used.
 
     For example::
 
@@ -1188,21 +1191,44 @@ def querystring(context, query_dict=None, **kwargs):
 
         {% querystring page=page_obj.next_page_number %}
 
-    A custom ``QueryDict`` can also be used::
+    A custom `QueryDict` can be used::
 
         {% querystring my_query_dict foo=3 %}
+
+    Or a `dict` can be used::
+
+        {% querystring my_dict foo=3 %}
+
+    As can a mix of multiple args and kwargs::
+
+        {% querystring my_dict my_query_dict foo=3 bar=None %}
     """
-    if query_dict is None:
-        query_dict = context.request.GET
-    query_dict = query_dict.copy()
-    for key, value in kwargs.items():
-        if value is None:
-            if key in query_dict:
-                del query_dict[key]
-        elif isinstance(value, Iterable) and not isinstance(value, str):
-            query_dict.setlist(key, value)
-        else:
-            query_dict[key] = value
+    try:
+        query_dict = context.request.GET.copy()
+    except AttributeError:
+        if not args:
+            raise
+        query_dict = QueryDict(mutable=True)
+    for d in args + (kwargs,):
+        if d is None:
+            continue
+        if not isinstance(d, Mapping):
+            raise TemplateSyntaxError(
+                "querystring requires mappings for positional arguments (received %r "
+                "instead)." % d
+            )
+        for key, value in d.items():
+            if not isinstance(key, str):
+                raise TemplateSyntaxError(
+                    "querystring requires strings for mapping keys (received %r "
+                    "instead)." % key
+                )
+            if value is None:
+                query_dict.pop(key, None)
+            elif isinstance(value, Iterable) and not isinstance(value, str):
+                query_dict.setlist(key, value)
+            else:
+                query_dict[key] = value
     if not query_dict:
         return ""
     query_string = query_dict.urlencode()
