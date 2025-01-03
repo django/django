@@ -241,8 +241,8 @@ ones:
     If ``True``, this field is the primary key for the model.
 
     If you don't specify :attr:`primary_key=True <Field.primary_key>` for
-    any fields in your model, Django will automatically add an
-    :class:`IntegerField` to hold the primary key, so you don't need to set
+    any fields in your model, Django will automatically add a field to hold
+    the primary key, so you don't need to set
     :attr:`primary_key=True <Field.primary_key>` on any of your fields
     unless you want to override the default primary-key behavior. For more,
     see :ref:`automatic-primary-key-fields`.

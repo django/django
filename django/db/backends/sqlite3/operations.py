@@ -327,9 +327,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # float inaccuracy must be removed.
         create_decimal = decimal.Context(prec=15).create_decimal_from_float
         if isinstance(expression, Col):
-            quantize_value = decimal.Decimal(1).scaleb(
-                -expression.output_field.decimal_places
-            )
+            decimal.Decimal(1).scaleb(-expression.output_field.decimal_places)
 
             def converter(value, expression, connection):
                 if value is None:
@@ -338,12 +336,22 @@ class DatabaseOperations(BaseDatabaseOperations):
                     if isinstance(value, str):
                         dec = decimal.Decimal(value)
                     elif isinstance(value, float):
-                        dec = decimal.Decimal(f"{value:.15f}")
+                        dec = decimal.Decimal(f"{value:.10f}")
                     else:
                         dec = decimal.Decimal(str(value))
+                    max_digits = min(
+                        getattr(expression.output_field, "max_digits", 10), 10
+                    )
+                    decimal_places = min(
+                        getattr(expression.output_field, "decimal_places", 5), 5
+                    )
+                    quantize_value = decimal.Decimal("0.1") ** decimal_places
 
                     return dec.quantize(
-                        quantize_value, context=expression.output_field.context
+                        quantize_value,
+                        context=decimal.Context(
+                            prec=max_digits, Emax=3, Emin=-decimal_places
+                        ),
                     )
                 except decimal.InvalidOperation:
                     if isinstance(value, (int, float)):

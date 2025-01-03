@@ -1704,12 +1704,12 @@ class Query(BaseExpression):
                             "relations outside the %r (got %r)."
                             % (filtered_relation.relation_name, lookup)
                         )
-                else:
-                    raise ValueError(
-                        "FilteredRelation's condition doesn't support nested "
-                        "relations deeper than the relation_name (got %r for "
-                        "%r)." % (lookup, filtered_relation.relation_name)
-                    )
+            if len(lookup_field_parts) > len(relation_field_parts) + 1:
+                raise ValueError(
+                    "FilteredRelation's condition doesn't support nested "
+                    "relations deeper than the relation_name (got %r for "
+                    "%r)." % (lookup, filtered_relation.relation_name)
+                )
         filtered_relation.condition = rename_prefix_from_q(
             filtered_relation.relation_name,
             alias,

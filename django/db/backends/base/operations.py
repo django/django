@@ -681,6 +681,11 @@ class BaseDatabaseOperations:
         can vary between backends (e.g., Oracle with %% and &) and between
         subexpression types (e.g., date expressions).
         """
+        if connector == "/":
+            return (
+                "ROUND(CAST(CAST(%s AS numeric) / CAST(%s AS numeric) AS numeric), 4)"
+                % (sub_expressions[0], sub_expressions[1])
+            )
         conn = " %s " % connector
         return conn.join(sub_expressions)
 
