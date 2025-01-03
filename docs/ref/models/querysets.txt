@@ -4050,6 +4050,19 @@ by the aggregate.
         However, if ``sample=True``, the return value will be the sample
         variance.
 
+``JSONArrayAgg``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+.. class:: JSONArrayAgg(expression, output_field=None, sample=False, filter=None, default=None, **extra)
+
+    Converts each expression to a JSON value and returns a single JSON array
+    containing those JSON values.
+
+    * Return type: ``list`` containing an element for each value
+      in a set of JSON or SQL values.
+
 Query-related tools
 ===================
 

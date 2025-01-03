@@ -4,7 +4,7 @@ import re
 from decimal import Decimal
 
 from django.core.exceptions import FieldError
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import (
     Avg,
     Case,
@@ -17,6 +17,7 @@ from django.db.models import (
     F,
     FloatField,
     IntegerField,
+    JSONArrayAgg,
     Max,
     Min,
     OuterRef,
@@ -45,7 +46,7 @@ from django.db.models.functions import (
     TruncHour,
 )
 from django.test import TestCase
-from django.test.testcases import skipUnlessDBFeature
+from django.test.testcases import skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import timezone
 
@@ -2380,3 +2381,91 @@ class AggregateAnnotationPruningTests(TestCase):
             )
         )
         self.assertEqual(qs.count(), 3)
+
+
+class JSONArrayAggTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(name="Adrian Holovaty", age=34)
+        cls.a2 = Author.objects.create(name="Jacob Kaplan-Moss", age=45)
+        cls.p1 = Publisher.objects.create(num_awards=3)
+        cls.p2 = Publisher.objects.create(num_awards=1)
+        cls.b1 = Book.objects.create(
+            isbn="159059725",
+            name="b1",
+            pages=447,
+            rating=4.5,
+            price=Decimal("30.00"),
+            contact=cls.a1,
+            publisher=cls.p1,
+            pubdate=datetime.date(2007, 12, 6),
+        )
+        cls.b1.authors.add(cls.a1)
+        cls.b2 = Book.objects.create(
+            isbn="067232959",
+            name="b2",
+            pages=528,
+            rating=3.0,
+            price=Decimal("23.09"),
+            contact=cls.a2,
+            publisher=cls.p2,
+            pubdate=datetime.date(2008, 3, 3),
+        )
+        cls.b2.authors.add(cls.a2)
+
+    def test(self):
+        vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("contact__name"))
+        self.assertEqual(
+            vals,
+            {"jsonarrayagg": ["Adrian Holovaty", "Jacob Kaplan-Moss"]},
+        )
+
+    def test_datefield(self):
+        vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__pubdate"))
+        self.assertEqual(
+            vals,
+            {
+                "jsonarrayagg": [
+                    "2007-12-06",
+                    "2008-03-03",
+                ]
+            },
+        )
+
+    def test_decimalfield(self):
+        vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__price"))
+        self.assertEqual(vals, {"jsonarrayagg": [30.0, 23.09]})
+
+    def test_integerfield(self):
+        vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__pages"))
+        self.assertEqual(vals, {"jsonarrayagg": [447, 528]})
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_filter(self):
+        vals = Book.objects.aggregate(
+            jsonarrayagg=JSONArrayAgg("contact__age", filter=Q(contact__age__gt=35))
+        )
+        self.assertEqual(vals, {"jsonarrayagg": [45]})
+
+    def test_empty_result_set(self):
+        Author.objects.all().delete()
+        val = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("age"))
+        self.assertEqual(val, {"jsonarrayagg": None})
+
+    def test_default_set(self):
+        Author.objects.all().delete()
+        val = Author.objects.aggregate(
+            jsonarrayagg=JSONArrayAgg("name", default=["<empty>"])
+        )
+        self.assertEqual(val, {"jsonarrayagg": ["<empty>"]})
+
+    def test_distinct_true(self):
+        msg = "JSONArrayAgg does not allow distinct."
+        with self.assertRaisesMessage(TypeError, msg):
+            JSONArrayAgg("age", distinct=True)
+
+    @skipIfDBFeature("supports_aggregate_filter_clause")
+    def test_not_supported(self):
+        msg = "JSONArrayAgg(filter) is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.aggregate(arrayagg=JSONArrayAgg("age", filter=Q(age__gt=35)))
