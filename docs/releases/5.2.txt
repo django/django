@@ -132,6 +132,10 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
   are now supported on MariaDB 11.7+.
 
+* The new :class:`~django.contrib.gis.db.models.functions.Rotate` database
+  function rotates a geometry by a specified angle around the origin or a
+  specified point.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
