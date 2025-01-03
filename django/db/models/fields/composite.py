@@ -56,6 +56,8 @@ class CompositePrimaryKey(Field):
             raise ValueError("CompositePrimaryKey cannot have a default.")
         if kwargs.get("db_default", NOT_PROVIDED) is not NOT_PROVIDED:
             raise ValueError("CompositePrimaryKey cannot have a database default.")
+        if kwargs.get("db_column", None) is not None:
+            raise ValueError("CompositePrimaryKey cannot have a db_column.")
         if kwargs.setdefault("editable", False):
             raise ValueError("CompositePrimaryKey cannot be editable.")
         if not kwargs.setdefault("primary_key", True):

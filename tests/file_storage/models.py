@@ -80,5 +80,5 @@ class Storage(models.Model):
         storage=temp_storage, upload_to="tests", max_length=20
     )
     extended_length = models.FileField(
-        storage=temp_storage, upload_to="tests", max_length=300
+        storage=temp_storage, upload_to="tests", max_length=1024
     )

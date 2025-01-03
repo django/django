@@ -323,6 +323,16 @@ class ProjectState:
                         for from_field_name in from_fields
                     ]
                 )
+            # Fix field names (e.g. for CompositePrimaryKey) to refer to the
+            # new field.
+            if field_names := getattr(field, "field_names", None):
+                if old_name in field_names:
+                    field.field_names = tuple(
+                        [
+                            new_name if field_name == old_name else field_name
+                            for field_name in field.field_names
+                        ]
+                    )
         # Fix index/unique_together to refer to the new field.
         options = model_state.options
         for option in ("index_together", "unique_together"):
