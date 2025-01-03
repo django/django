@@ -67,7 +67,6 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                 )
             )
         else:
-            # Remove the field name checks as they are not needed here.
             base_checks = self.base_field.check()
             if base_checks:
                 error_messages = "\n    ".join(
