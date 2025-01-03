@@ -65,3 +65,7 @@ class Book(models.Model):
         db_column="publisher_id_column",
     )
     updated = models.DateTimeField(auto_now=True)
+
+
+class ComicBook(Book):
+    pass

@@ -995,7 +995,7 @@ class QuerySet(AltersData):
                 # This is to maintain backward compatibility as these fields
                 # are not updated unless explicitly specified in the
                 # update_fields list.
-                for field in self.model._meta.local_concrete_fields:
+                for field in self.model._meta.concrete_fields:
                     if not (
                         field.primary_key or field.__class__.pre_save is Field.pre_save
                     ):
