@@ -1075,6 +1075,20 @@ class Func(SQLiteNumericMixin, Expression):
             c.source_expressions[pos] = arg.resolve_expression(
                 query, allow_joins, reuse, summarize, for_save
             )
+        num_expressions = sum(
+            len(expr) if isinstance(expr, ColPairs) else 1
+            for expr in c.source_expressions
+        )
+        if self.arity is not None and num_expressions != self.arity:
+            raise TypeError(
+                "'%s' takes exactly %s %s (%s given)"
+                % (
+                    self.__class__.__name__,
+                    self.arity,
+                    "argument" if self.arity == 1 else "arguments",
+                    num_expressions,
+                )
+            )
         return c
 
     def as_sql(

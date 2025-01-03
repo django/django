@@ -159,6 +159,7 @@ class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
     function = "AVG"
     name = "Avg"
     allow_distinct = True
+    arity = 1
 
 
 class Count(Aggregate):
@@ -167,27 +168,37 @@ class Count(Aggregate):
     output_field = IntegerField()
     allow_distinct = True
     empty_result_set_value = 0
+    arity = 1
 
-    def __init__(self, expression, filter=None, **extra):
+    def __init__(self, *expressions, filter=None, **extra):
+        expression = expressions[0]
         if expression == "*":
             expression = Star()
         if isinstance(expression, Star) and filter is not None:
             raise ValueError("Star cannot be used with filter. Please specify a field.")
-        super().__init__(expression, filter=filter, **extra)
+        super().__init__(expression, *expressions[1:], filter=filter, **extra)
 
     def resolve_expression(self, *args, **kwargs):
-        result = super().resolve_expression(*args, **kwargs)
-        expr = result.source_expressions[0]
+        try:
+            result = super().resolve_expression(*args, **kwargs)
+        except TypeError as e:
+            # Try again without arity in case there is a composite primary key.
+            arity_before = self.arity
+            self.arity = None
+            result = super().resolve_expression(*args, **kwargs)
+            self.arity = arity_before
+            expr = result.source_expressions[0]
+            # In case of composite primary keys, count the first column.
+            if isinstance(expr, ColPairs):
+                if self.distinct:
+                    raise NotSupportedError(
+                        "COUNT(DISTINCT) doesn't support composite primary keys"
+                    )
 
-        # In case of composite primary keys, count the first column.
-        if isinstance(expr, ColPairs):
-            if self.distinct:
-                raise NotSupportedError(
-                    "COUNT(DISTINCT) doesn't support composite primary keys"
-                )
-
-            cols = expr.get_cols()
-            return Count(cols[0], filter=result.filter)
+                cols = expr.get_cols()
+                return Count(cols[0], filter=result.filter)
+            else:
+                raise e
 
         return result
 
@@ -195,19 +206,22 @@ class Count(Aggregate):
 class Max(Aggregate):
     function = "MAX"
     name = "Max"
+    arity = 1
 
 
 class Min(Aggregate):
     function = "MIN"
     name = "Min"
+    arity = 1
 
 
 class StdDev(NumericOutputFieldMixin, Aggregate):
     name = "StdDev"
+    arity = 1
 
-    def __init__(self, expression, sample=False, **extra):
+    def __init__(self, *expressions, sample=False, **extra):
         self.function = "STDDEV_SAMP" if sample else "STDDEV_POP"
-        super().__init__(expression, **extra)
+        super().__init__(*expressions, **extra)
 
     def _get_repr_options(self):
         return {**super()._get_repr_options(), "sample": self.function == "STDDEV_SAMP"}
@@ -217,14 +231,16 @@ class Sum(FixDurationInputMixin, Aggregate):
     function = "SUM"
     name = "Sum"
     allow_distinct = True
+    arity = 1
 
 
 class Variance(NumericOutputFieldMixin, Aggregate):
     name = "Variance"
+    arity = 1
 
-    def __init__(self, expression, sample=False, **extra):
+    def __init__(self, *expressions, sample=False, **extra):
         self.function = "VAR_SAMP" if sample else "VAR_POP"
-        super().__init__(expression, **extra)
+        super().__init__(*expressions, **extra)
 
     def _get_repr_options(self):
         return {**super()._get_repr_options(), "sample": self.function == "VAR_SAMP"}

@@ -1,5 +1,5 @@
 from django.db import NotSupportedError
-from django.db.models import Count, Q
+from django.db.models import Count, Max, Q
 from django.test import TestCase
 
 from .models import Comment, Tenant, User
@@ -31,6 +31,12 @@ class CompositePKAggregateTests(TestCase):
         cls.comment_4 = Comment.objects.create(id=4, user=cls.user_3, text="foobarbaz")
         cls.comment_5 = Comment.objects.create(id=5, user=cls.user_3, text="barbaz")
         cls.comment_6 = Comment.objects.create(id=6, user=cls.user_3, text="baz")
+
+    def test_max_pk(self):
+        with self.assertRaisesMessage(
+            TypeError, "'Max' takes exactly 1 argument (2 given)"
+        ):
+            Comment.objects.aggregate(Max("pk"))
 
     def test_users_annotated_with_comments_id_count(self):
         user_1, user_2, user_3 = User.objects.annotate(Count("comments__id")).order_by(

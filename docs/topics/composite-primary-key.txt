@@ -142,12 +142,15 @@ Many database functions only accept a single expression.
     MAX("product_id", "order_id")  -- ERROR
 
 As a consequence, they cannot be used with composite primary key references as
-they are composed of multiple column expressions.
+they are composed of multiple column expressions. A :exc:`TypeError` will be
+raised in this situation if the function declares its
+:attr:`~django.db.models.Func.arity`. An exception is made for ``Count``.
 
 .. code-block:: python
 
     Max("order_id")  # OK
-    Max("pk")  # ERROR
+    Max("pk")  # raises TypeError
+    Count("pk")  # OK
 
 Composite primary keys in forms
 ===============================
