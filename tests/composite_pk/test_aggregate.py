@@ -1,4 +1,3 @@
-from django.db import NotSupportedError
 from django.db.models import Count, Q
 from django.test import TestCase
 
@@ -82,7 +81,7 @@ class CompositePKAggregateTests(TestCase):
 
     def test_count_distinct_not_supported(self):
         with self.assertRaisesMessage(
-            NotSupportedError, "COUNT(DISTINCT) doesn't support composite primary keys"
+            ValueError, "COUNT(DISTINCT) doesn't support composite primary keys"
         ):
             self.assertIsNone(
                 User.objects.annotate(comments__count=Count("comments", distinct=True))
