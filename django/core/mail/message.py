@@ -109,13 +109,15 @@ def sanitize_address(addr, encoding):
     # Avoid UTF-8 encode, if it's possible.
     try:
         nm.encode("ascii")
-        nm = Header(nm).encode()
+        nm = Header(nm, None, RFC5322_EMAIL_LINE_LENGTH_LIMIT).encode()
     except UnicodeEncodeError:
-        nm = Header(nm, encoding).encode()
+        nm = Header(nm, encoding, RFC5322_EMAIL_LINE_LENGTH_LIMIT).encode()
     try:
         localpart.encode("ascii")
     except UnicodeEncodeError:
-        localpart = Header(localpart, encoding).encode()
+        localpart = Header(
+            localpart, encoding, RFC5322_EMAIL_LINE_LENGTH_LIMIT
+        ).encode()
     domain = punycode(domain)
 
     parsed_address = Address(username=localpart, domain=domain)
