@@ -55,6 +55,11 @@ def setup(templates, *args, test_once=False):
                 libraries=libraries,
                 loaders=loaders,
             )
+            self.multiline_engine = Engine(
+                libraries=libraries,
+                loaders=loaders,
+                multiline=True,
+            )
             func(self)
             if test_once:
                 return
@@ -65,6 +70,12 @@ def setup(templates, *args, test_once=False):
                 loaders=loaders,
                 string_if_invalid="INVALID",
             )
+            self.multiline_engine = Engine(
+                libraries=libraries,
+                loaders=loaders,
+                string_if_invalid="INVALID",
+                multiline=True,
+            )
             func(self)
             func(self)
 
@@ -72,6 +83,12 @@ def setup(templates, *args, test_once=False):
                 debug=True,
                 libraries=libraries,
                 loaders=loaders,
+            )
+            self.multiline_engine = Engine(
+                debug=True,
+                libraries=libraries,
+                loaders=loaders,
+                multiline=True,
             )
             func(self)
             func(self)
