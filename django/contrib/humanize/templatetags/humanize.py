@@ -175,7 +175,7 @@ def apnumber(value):
 # Perform the comparison in the default time zone when USE_TZ = True
 # (unless a specific time zone has been applied with the |timezone filter).
 @register.filter(expects_localtime=True)
-def naturalday(value, arg=None):
+def naturalday(value, arg=None, **kwargs):
     """
     For date values that are tomorrow, today or yesterday compared to
     present day return representing string. Otherwise, return a string
