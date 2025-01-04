@@ -33,7 +33,7 @@ from django.db.models.expressions import (
     Value,
 )
 from django.db.models.fields import Field
-from django.db.models.lookups import Lookup
+from django.db.models.lookups import Lookup, UnresolvedLookup
 from django.db.models.query_utils import (
     Q,
     check_rel_lookup_compatibility,
@@ -1414,7 +1414,7 @@ class Query(BaseExpression):
         # For Oracle '' is equivalent to null. The check must be done at this
         # stage because join promotion can't be done in the compiler. Using
         # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
-        # A similar thing is done in is_nullable(), too.
+        # A similar thing is done in Field.nullable, too.
         if (
             lookup_name == "exact"
             and lookup.rhs == ""
@@ -1450,6 +1450,16 @@ class Query(BaseExpression):
                 "Unsupported lookup '%s' for %s or join on the field not "
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
+
+    def _build_lookup_clause(self, lookup, current_negated, nullable_aliases):
+        conditions = [lookup]
+        require_outer = lookup.constrains_nulls and not current_negated
+        if current_negated and not lookup.constrains_nulls:
+            require_outer = True
+            exclude_nulls = lookup.exclude_nulls(nullable_aliases)
+            if exclude_nulls:
+                conditions.extend(exclude_nulls)
+        return WhereNode(conditions, connector=AND), require_outer
 
     def build_filter(
         self,
@@ -1502,115 +1512,50 @@ class Query(BaseExpression):
                 summarize=summarize,
                 update_join_types=update_join_types,
             )
-        if hasattr(filter_expr, "resolve_expression"):
-            if not getattr(filter_expr, "conditional", False):
-                raise TypeError("Cannot filter against a non-conditional expression.")
-            condition = filter_expr.resolve_expression(
-                self, allow_joins=allow_joins, reuse=can_reuse, summarize=summarize
+        if isinstance(filter_expr, tuple):
+            return self.build_filter(
+                UnresolvedLookup.from_lookup(*filter_expr),
+                branch_negated=branch_negated,
+                current_negated=current_negated,
+                can_reuse=can_reuse,
+                allow_joins=allow_joins,
+                split_subq=split_subq,
+                check_filterable=check_filterable,
+                summarize=summarize,
+                update_join_types=update_join_types,
             )
-            if not isinstance(condition, Lookup):
-                condition = self.build_lookup(["exact"], condition, True)
-            return WhereNode([condition], connector=AND), []
-        arg, value = filter_expr
-        if not arg:
-            raise FieldError("Cannot parse keyword query %r" % arg)
-        lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
-
-        if check_filterable:
-            self.check_filterable(reffed_expression)
-
-        if not allow_joins and len(parts) > 1:
-            raise FieldError("Joined field references are not permitted in this query")
+        if (
+            resolve_expression := getattr(filter_expr, "resolve_expression", None)
+        ) is None:
+            raise TypeError(f"Cannot filter against {filter_expr!r}")
+        if not getattr(filter_expr, "conditional", False):
+            raise TypeError("Cannot filter against a non-conditional expression.")
 
         pre_joins = self.alias_refcount.copy()
-        value = self.resolve_lookup_value(value, can_reuse, allow_joins, summarize)
-        used_joins = {
-            k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)
-        }
-
-        if check_filterable:
-            self.check_filterable(value)
-
-        if reffed_expression:
-            condition = self.build_lookup(lookups, reffed_expression, value)
-            return WhereNode([condition], connector=AND), []
-
-        opts = self.get_meta()
-        alias = self.get_initial_alias()
-        allow_many = not branch_negated or not split_subq
-
         try:
-            join_info = self.setup_joins(
-                parts,
-                opts,
-                alias,
-                can_reuse=can_reuse,
-                allow_many=allow_many,
+            resolved = resolve_expression(
+                self, allow_joins=allow_joins, reuse=can_reuse, summarize=summarize
             )
-
-            # Prevent iterator from being consumed by check_related_objects()
-            if isinstance(value, Iterator):
-                value = list(value)
-            self.check_related_objects(join_info.final_field, value, join_info.opts)
-
+            # XXX: Hack to avoid modifying the resolve_expression return signature.
+            # See UnresolvedLookup.
+            used_joins = getattr(resolved, "_used_joins", None)
+            lookup_joins = getattr(resolved, "_lookup_joins", set())
             # split_exclude() needs to know which joins were generated for the
             # lookup parts
-            self._lookup_joins = join_info.joins
+            self._lookup_joins = lookup_joins
         except MultiJoin as e:
             return self.split_exclude(filter_expr, can_reuse, e.names_with_path)
-
-        # Update used_joins before trimming since they are reused to determine
-        # which joins could be later promoted to INNER.
-        used_joins.update(join_info.joins)
-        targets, alias, join_list = self.trim_joins(
-            join_info.targets, join_info.joins, join_info.path
-        )
-        if can_reuse is not None:
-            can_reuse.update(join_list)
-
-        if join_info.final_field.is_relation:
-            if len(targets) == 1:
-                col = self._get_col(targets[0], join_info.final_field, alias)
-            else:
-                col = ColPairs(alias, targets, join_info.targets, join_info.final_field)
-        else:
-            col = self._get_col(targets[0], join_info.final_field, alias)
-
-        condition = self.build_lookup(lookups, col, value)
-        lookup_type = condition.lookup_name
-        clause = WhereNode([condition], connector=AND)
-
-        require_outer = (
-            lookup_type == "isnull" and condition.rhs is True and not current_negated
-        )
-        if (
-            current_negated
-            and (lookup_type != "isnull" or condition.rhs is False)
-            and condition.rhs is not None
-        ):
-            require_outer = True
-            if lookup_type != "isnull":
-                # The condition added here will be SQL like this:
-                # NOT (col IS NOT NULL), where the first NOT is added in
-                # upper layers of code. The reason for addition is that if col
-                # is null, then col != someval will result in SQL "unknown"
-                # which isn't the same as in Python. The Python None handling
-                # is wanted, and it can be gotten by
-                # (col IS NULL OR col != someval)
-                #   <=>
-                # NOT (col IS NOT NULL AND col = someval).
-                if (
-                    self.is_nullable(targets[0])
-                    or self.alias_map[join_list[-1]].join_type == LOUTER
-                ):
-                    lookup_class = targets[0].get_lookup("isnull")
-                    col = self._get_col(targets[0], join_info.targets[0], alias)
-                    clause.add(lookup_class(col, False), AND)
-                # If someval is a nullable column, someval IS NOT NULL is
-                # added.
-                if isinstance(value, Col) and self.is_nullable(value.target):
-                    lookup_class = value.target.get_lookup("isnull")
-                    clause.add(lookup_class(value, False), AND)
+        if check_filterable:
+            self.check_filterable(resolved)
+        if used_joins is None:
+            used_joins = {
+                k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)
+            }
+            # XXX: Not clear if this is needed given this is really just a fallback.
+            used_joins.update(lookup_joins)
+        if not isinstance(resolved, Lookup):
+            resolved = self.build_lookup(["exact"], resolved, True)
+        clause, require_outer = self._build_lookup_clause(resolved, current_negated, {})
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_lhs, filter_rhs):
@@ -1931,7 +1876,7 @@ class Query(BaseExpression):
                 table_alias = None
             opts = join.to_opts
             if join.direct:
-                nullable = self.is_nullable(join.join_field)
+                nullable = join.join_field.nullable
             else:
                 nullable = True
             connection = self.join_class(
@@ -2104,7 +2049,13 @@ class Query(BaseExpression):
             lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
             query.where.add(lookup, AND)
 
-        condition, needed_inner = self.build_filter(Exists(query))
+        query.where.add(lookup, AND)
+        condition, needed_inner = self.build_filter(
+            Exists(query),
+            current_negated=True,
+            branch_negated=True,
+            can_reuse=can_reuse,
+        )
 
         if contains_louter:
             or_null_condition, _ = self.build_filter(
@@ -2656,23 +2607,11 @@ class Query(BaseExpression):
         self.set_select([f.get_col(select_alias) for f in select_fields])
         return trimmed_prefix, contains_louter
 
-    def is_nullable(self, field):
-        """
-        Check if the given field should be treated as nullable.
-
-        Some backends treat '' as null and Django treats such fields as
-        nullable for those backends. In such situations field.null can be
-        False even if we should treat the field as nullable.
-        """
-        # We need to use DEFAULT_DB_ALIAS here, as QuerySet does not have
-        # (nor should it have) knowledge of which connection is going to be
-        # used. The proper fix would be to defer all decisions where
-        # is_nullable() is needed to the compiler stage, but that is not easy
-        # to do currently.
-        return field.null or (
-            field.empty_strings_allowed
-            and connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
-        )
+    def is_nullable(self, nullable_aliases):
+        # A subquery can always return no rows and thus be nullable but the ORM
+        # currently has some expectations with regards to IN vs ANY lookups that
+        # must be revisited to allow this logic to work properly.
+        return False
 
 
 def get_order_dir(field, default="ASC"):

@@ -559,6 +559,13 @@ class Field(RegisterLookupMixin):
 
         return Col(self.model._meta.db_table, self)
 
+    @cached_property
+    def nullable(self):
+        return self.null or (
+            self.empty_strings_allowed
+            and connection.features.interprets_empty_strings_as_nulls
+        )
+
     def select_format(self, compiler, sql, params):
         """
         Custom format for select clauses. For example, GIS columns need to be
