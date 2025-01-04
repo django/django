@@ -2838,7 +2838,7 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
 
 Converts a string into all uppercase.
 
-.. versionchanged:: 5.1.5
+.. versionchanged:: 5.2
 
     The filter is now marked as safe since it cannot introduce unsafe HTML characters.
 

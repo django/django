@@ -487,3 +487,8 @@ Miscellaneous
 * The fallback to ``request.user`` when ``user`` is ``None`` in
   ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
   removed.
+
+Features
+========
+
+* The :tfilter:`upper` template filter is now marked as safe since it cannot introduce unsafe HTML characters. This means that ``{{ value|upper }}`` no longer requires an additional ``|force_escape`` filter when ``value`` is marked as safe.
