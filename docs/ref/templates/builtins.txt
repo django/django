@@ -3536,8 +3536,7 @@ For example in Python:
 
 The output of ``urlized`` will be
 
-"Check out <a href="http://www.djangoproject.com" rel="nofollow"> 
-    www.djangoproject.com</a>"
+``"Check out <a href="http://www.djangoproject.com" rel="nofollow"> www.djangoproject.com</a>"``
 
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
