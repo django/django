@@ -161,6 +161,75 @@ Attributes
 
     A 1-based range iterator of page numbers, e.g. yielding ``[1, 2, 3, 4]``.
 
+``AsyncPaginator`` class
+========================
+
+.. versionadded:: 5.2
+
+.. class:: AsyncPaginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None)
+
+    Asynchronous version of :class:`Paginator`.
+
+.. attribute:: AsyncPaginator.object_list
+
+    See :attr:`.Paginator.object_list`.
+
+.. attribute:: AsyncPaginator.per_page
+
+    See :attr:`.Paginator.per_page`.
+
+.. attribute:: AsyncPaginator.orphans
+
+    See :attr:`.Paginator.orphans`.
+
+.. attribute:: AsyncPaginator.allow_empty_first_page
+
+    See :attr:`.Paginator.allow_empty_first_page`.
+
+.. attribute:: AsyncPaginator.error_messages
+
+    See :attr:`.Paginator.error_messages`.
+
+Methods
+-------
+
+.. method:: AsyncPaginator.aget_page(number)
+
+    See :meth:`.Paginator.get_page`.
+
+.. method:: AsyncPaginator.apage(number)
+
+    See :meth:`.Paginator.page`.
+
+.. method:: AsyncPaginator.aget_elided_page_range(number, *, on_each_side=3, on_ends=2)
+
+    See :meth:`.Paginator.get_elided_page_range`.
+
+.. method:: AsyncPaginator.acount()
+
+    The asynchronous version is supported as a method.
+
+    See :attr:`.Paginator.count`.
+
+.. method:: AsyncPaginator.anum_pages()
+
+    The asynchronous version is supported as a method.
+
+    See :attr:`.Paginator.num_pages`.
+
+.. method:: AsyncPaginator.apage_range()
+
+    The asynchronous version is supported as a method.
+
+    See :attr:`.Paginator.page_range`.
+
+Attributes
+----------
+
+.. attribute:: AsyncPaginator.ELLIPSIS
+
+    See :attr:`.Paginator.ELLIPSIS`.
+
 ``Page`` class
 ==============
 
@@ -225,6 +294,75 @@ Attributes
 .. attribute:: Page.paginator
 
     The associated :class:`Paginator` object.
+
+``AsyncPage`` class
+===================
+
+.. versionadded:: 5.2
+
+.. class:: AsyncPage(object_list, number, paginator)
+
+    Asynchronous version of :class:`Page`.
+
+    AsyncPage does not behave like a sequence.
+
+    You need to use :meth:`.AsyncPage.alength`. and :meth:`.AsyncPage.agetitem`.
+
+Methods
+-------
+
+.. method:: AsyncPage.agetitem()
+
+    Returns the point at the specified index
+    for :attr:`.AsyncPage.object_list`.
+
+.. method:: AsyncPage.alength()
+
+    Returns length of :attr:`.AsyncPage.object_list`.
+
+.. method:: AsyncPage.ahas_next()
+
+    See :meth:`.Page.has_next`.
+
+.. method:: AsyncPage.ahas_previous()
+
+    See :meth:`.Page.has_previous`.
+
+.. method:: AsyncPage.ahas_other_pages()
+
+    See :meth:`.Page.has_other_pages`.
+
+.. method:: AsyncPage.anext_page_number()
+
+    See :meth:`.Page.next_page_number`.
+
+.. method:: AsyncPage.aprevious_page_number()
+
+    See :meth:`.Page.previous_page_number`.
+
+.. method:: AsyncPage.astart_index()
+
+    See :meth:`.Page.start_index`.
+
+.. method:: AsyncPage.aend_index()
+
+    See :meth:`.Page.end_index`.
+
+
+Attributes
+----------
+
+.. attribute:: AsyncPage.object_list
+
+    See :attr:`.Page.object_list`.
+
+.. attribute:: AsyncPage.number
+
+    See :attr:`.Page.number`.
+
+.. attribute:: AsyncPage.paginator
+
+    See :attr:`.Page.paginator`.
 
 Exceptions
 ==========
