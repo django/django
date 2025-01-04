@@ -149,7 +149,7 @@ Requires core.js and SelectBox.js.
 
             // Set up the JavaScript event handlers for the select box filter interface
             const move_selection = function(e, elem, move_func, from, to) {
-                if (elem.classList.contains('active')) {
+                if (!elem.hasAttribute('disabled')) {
                     move_func(from, to);
                     SelectFilter.refresh_icons(field_id);
                     SelectFilter.refresh_filtered_selects(field_id);
@@ -248,13 +248,12 @@ Requires core.js and SelectBox.js.
         refresh_icons: function(field_id) {
             const from = document.getElementById(field_id + '_from');
             const to = document.getElementById(field_id + '_to');
-            // Active if at least one item is selected
-            document.getElementById(field_id + '_add').classList.toggle('active', SelectFilter.any_selected(from));
-            document.getElementById(field_id + '_remove').classList.toggle('active', SelectFilter.any_selected(to));
-            // Active if the corresponding box isn't empty
-            document.getElementById(field_id + '_add_all').classList.toggle('active', from.querySelector('option'));
-            document.getElementById(field_id + '_remove_all').classList.toggle('active', to.querySelector('option'));
-            SelectFilter.refresh_filtered_warning(field_id);
+            // Disabled if no items are selected.
+            document.getElementById(field_id + '_add').disabled = !SelectFilter.any_selected(from);
+            document.getElementById(field_id + '_remove').disabled = !SelectFilter.any_selected(to);
+            // Disabled if the corresponding box is empty.
+            document.getElementById(field_id + '_add_all').disabled = !from.querySelector('option');
+            document.getElementById(field_id + '_remove_all').disabled = !to.querySelector('option');
         },
         filter_key_press: function(event, field_id, source, target) {
             const source_box = document.getElementById(field_id + source);
