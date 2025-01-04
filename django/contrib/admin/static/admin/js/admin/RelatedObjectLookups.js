@@ -122,7 +122,7 @@
         });
     }
 
-    function dismissAddRelatedObjectPopup(win, newId, newRepr) {
+    function dismissAddRelatedObjectPopup(win, newId, newRepr, optgroup) {
         const name = removePopupIndex(win.name);
         const elem = document.getElementById(name);
         if (elem) {
@@ -142,8 +142,9 @@
         } else {
             const toId = name + "_to";
             const toElem = document.getElementById(toId);
-            const o = new Option(newRepr, newId);
-            SelectBox.add_to_cache(toId, o);
+            const newOption = new Option(newRepr, newId);
+            newOption.group = optgroup;
+            SelectBox.add_to_cache(toId, newOption);
             SelectBox.redisplay(toId);
             if (toElem && toElem.nodeName.toUpperCase() === 'SELECT') {
                 const skipIds = [name + "_from"];
