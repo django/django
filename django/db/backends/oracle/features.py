@@ -31,7 +31,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     truncates_names = True
     supports_comments = True
     supports_tablespaces = True
-    supports_sequence_reset = False
     can_introspect_materialized_views = True
     atomic_transactions = False
     nulls_order_largest = True
