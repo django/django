@@ -130,7 +130,8 @@ translations wouldn't be able to reorder placeholder text.
 
 Since string extraction is done by the ``xgettext`` command, only syntaxes
 supported by ``gettext`` are supported by Django. In particular, Python
-:py:ref:`f-strings <f-strings>` are not yet supported by ``xgettext``, and
+:py:ref:`f-strings <f-strings>` need ``xgettext`` 0.23+ and do not support
+expressions in embedded variables, such as accessing a slice of a list.
 JavaScript template strings need ``gettext`` 0.21+.
 
 .. _translator-comments:
