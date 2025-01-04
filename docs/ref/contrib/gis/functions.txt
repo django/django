@@ -28,9 +28,9 @@ Measurement                Relationships             Operations              Edi
 :class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`                      :class:`AsGeoJSON`  :class:`IsEmpty`
 :class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`                           :class:`AsGML`      :class:`IsValid`
 :class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`                             :class:`AsKML`      :class:`MemSize`
-:class:`Length`            :class:`ClosestPoint`     :class:`Union`          :class:`Scale`                               :class:`AsSVG`      :class:`NumGeometries`
-:class:`Perimeter`         :class:`Envelope`                                 :class:`SnapToGrid`      :class:`FromWKB`    :class:`AsWKB`      :class:`NumPoints`
-                           :class:`LineLocatePoint`                          :class:`Transform`       :class:`FromWKT`    :class:`AsWKT`
+:class:`Length`            :class:`ClosestPoint`     :class:`Union`          :class:`Scale`                               :class:`AsSVG`      :class:`NumDimensions`
+:class:`Perimeter`         :class:`Envelope`                                 :class:`SnapToGrid`      :class:`FromWKB`    :class:`AsWKB`      :class:`NumGeometries`
+                           :class:`LineLocatePoint`                          :class:`Transform`       :class:`FromWKT`    :class:`AsWKT`      :class:`NumPoints`
                            :class:`PointOnSurface`                           :class:`Translate`                           :class:`GeoHash`
 =========================  ========================  ======================  =======================  ==================  ==================  ======================
 
@@ -512,6 +512,19 @@ multipolygon and the result might be of lower dimension than the input.
 
 Accepts a single geographic field or expression and returns the memory size
 (number of bytes) that the geometry field takes.
+
+``NumDimensions``
+=================
+
+.. class:: NumDimensions(expression, **extra)
+
+.. versionadded:: 5.2
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_NDims.html>`__,
+SpatiaLite
+
+Accepts a single geometry field or expression and returns the number of
+dimensions used by the geometry.
 
 ``NumGeometries``
 =================

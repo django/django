@@ -395,6 +395,29 @@ Oracle                               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(p
 
     MariaDB 11.7+ support was added.
 
+
+.. fieldlookup:: num_dimensions
+
+``num_dimensions``
+------------------
+
+.. versionadded:: 5.2
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_NDims.html>`__,
+SpatiaLite
+
+Returns the number of dimensions used by the geometry.
+
+Example::
+
+    Zipcode.objects.filter(geom__num_dimensions=3)
+
+===================  ==================
+Backend              SQL Equivalent
+===================  ==================
+PostGIS, SpatiaLite  ``ST_NDims(poly)``
+===================  ==================
+
 .. fieldlookup:: overlaps
 
 ``overlaps``
