@@ -251,19 +251,6 @@ A few days before any release
 
    and then commit the changed man page.
 
-#. If this is the alpha release of a new series, create a new stable branch
-   from main. For example, when releasing Django 4.2:
-
-   .. code-block:: shell
-
-    $ git checkout -b stable/4.2.x origin/main
-    $ git push origin -u stable/4.2.x:stable/4.2.x
-
-   At the same time, update the ``django_next_version`` variable in
-   ``docs/conf.py`` on the stable release branch to point to the new
-   development version. For example, when creating ``stable/4.2.x``, set
-   ``django_next_version`` to ``'5.0'`` on the new branch.
-
 #. If this is the "dot zero" release of a new series, create a new branch from
    the current stable branch in the `django-docs-translations
    <https://github.com/django/django-docs-translations>`_ repository. For
@@ -282,6 +269,78 @@ A few days before any release
 __ https://www.djangoproject.com/weblog/2013/feb/19/security/
 __ https://www.djangoproject.com/weblog/2012/mar/23/14/
 __ https://www.djangoproject.com/weblog/2012/nov/27/15-beta-1/
+
+A few days before a feature freeze
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before the feature freeze, a branch targeting ``main`` must be created to
+prepare for the next feature release. It should be reviewed and approved a few
+days before the freeze, allowing it to be merged after the stable branch is
+cut. The following items should be addressed in this branch:
+
+#. Create a stub release note for the next feature release. Use the stub from
+   the previous feature release or copy the contents from the current version
+   and delete most of the contents leaving only the headings.
+
+#. Increase the default PBKDF2 iterations in
+   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%
+   (pick a round number). Run the tests, and update the 3 failing
+   hasher tests with the new values. Make sure this gets noted in the
+   release notes (see the 4.1 release notes for an example).
+
+#. Remove features that have reached the end of their deprecation cycle. Each
+   removal should be done in a separate commit for clarity. In the commit
+   message, add a "refs #XXXX" to the original ticket where the deprecation
+   began if possible.
+
+#. Remove ``.. versionadded::``, ``.. versionchanged::``, and
+   ``.. deprecated::`` annotations in the documentation from two releases ago.
+   For example, in Django 4.2, notes for 4.0 will be removed.
+
+Concrete examples for past feature release bootstrap branches: `5.2 bootstrap
+<https://github.com/django/django/pull/18127>`_, `5.1 bootstrap
+<https://github.com/django/django/pull/17246>`_, `5.0 bootstrap
+<https://github.com/django/django/pull/16432>`_.
+
+Feature freeze tasks
+====================
+
+#. Create a new stable branch from ``main``. For example, when feature freezing
+   Django 4.2:
+
+   .. code-block:: shell
+
+    $ git checkout -b stable/4.2.x origin/main
+    $ git push origin -u stable/4.2.x:stable/4.2.x
+
+   At the same time, update the ``django_next_version`` variable in
+   ``docs/conf.py`` on the stable release branch to point to the new
+   development version. For example, when creating ``stable/4.2.x``, set
+   ``django_next_version`` to ``'5.0'`` on the new stable branch.
+
+#. Create a new ``DocumentRelease`` object in the ``docs.djangoproject.com``
+   database for the new version's docs.
+
+#. Add the new branch to `Read the Docs
+   <https://readthedocs.org/projects/django/>`_. Since the automatically
+   generated version names ("stable-A.B.x") differ from the version names
+   used in Read the Docs ("A.B.x"), `create a ticket
+   <https://github.com/readthedocs/readthedocs.org/issues/5537>`_ requesting
+   the new version.
+
+#. `Request the new classifier on PyPI
+   <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
+   ``Framework :: Django :: 3.1``.
+
+#. Update the current branch under active development and add pre-release
+   branch in the `Django release process
+   <https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
+
+#. Update the ``docs/fixtures/doc_releases.json`` JSON fixture for
+   djangoproject.com, so people without access to the production DB can still
+   run an up-to-date copy of the docs site
+   (`example PR <https://github.com/django/djangoproject.com/pull/1446>`__).
+
 
 Actually rolling the release
 ============================
@@ -595,53 +654,6 @@ You're almost done! All that's left to do now is:
    details of the issues addressed.
 
 .. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
-
-New stable branch tasks
-=======================
-
-There are several items to do in the time following the creation of a new
-stable branch (often following an alpha release). Some of these tasks don't
-need to be done by the releaser.
-
-#. Create a new ``DocumentRelease`` object in the ``docs.djangoproject.com``
-   database for the new version's docs, and update the
-   ``docs/fixtures/doc_releases.json`` JSON fixture, so people without access
-   to the production DB can still run an up-to-date copy of the docs site
-   (`example PR <https://github.com/django/djangoproject.com/pull/1446>`__).
-
-#. Create a stub release note for the new feature version. Use the stub from
-   the previous feature release version or copy the contents from the previous
-   feature version and delete most of the contents leaving only the headings.
-
-#. Increase the default PBKDF2 iterations in
-   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%
-   (pick a round number). Run the tests, and update the 3 failing
-   hasher tests with the new values. Make sure this gets noted in the
-   release notes (see the 4.1 release notes for an example).
-
-#. Remove features that have reached the end of their deprecation cycle. Each
-   removal should be done in a separate commit for clarity. In the commit
-   message, add a "refs #XXXX" to the original ticket where the deprecation
-   began if possible.
-
-#. Remove ``.. versionadded::``, ``.. versionchanged::``, and
-   ``.. deprecated::`` annotations in the documentation from two releases ago.
-   For example, in Django 4.2, notes for 4.0 will be removed.
-
-#. Add the new branch to `Read the Docs
-   <https://readthedocs.org/projects/django/>`_. Since the automatically
-   generated version names ("stable-A.B.x") differ from the version names
-   used in Read the Docs ("A.B.x"), `create a ticket
-   <https://github.com/readthedocs/readthedocs.org/issues/5537>`_ requesting
-   the new version.
-
-#. `Request the new classifier on PyPI
-   <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
-   ``Framework :: Django :: 3.1``.
-
-#. Update the current branch under active development and add pre-release
-   branch in the `Django release process
-   <https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
 
 Notes on setting the VERSION tuple
 ==================================
