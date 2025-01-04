@@ -1,3 +1,5 @@
+from django.db.models import F, OuterRef, Subquery
+from django.db.models.lookups import Exact
 from django.test import TestCase
 
 from .models import Comment, Tenant, User
@@ -410,3 +412,43 @@ class CompositePKFilterTests(TestCase):
         subquery = Comment.objects.filter(id=3).only("pk")
         queryset = User.objects.filter(comments__in=subquery)
         self.assertSequenceEqual(queryset, (self.user_2,))
+
+    def test_outer_ref_pk(self):
+        subquery = Comment.objects.filter(pk=OuterRef("pk")).values("id")
+
+        with self.subTest("exact"):
+            queryset = Comment.objects.filter(id=Subquery(subquery))
+            self.assertEqual(queryset.count(), 5)
+        with self.subTest("gt"):
+            queryset = Comment.objects.filter(id__gt=Subquery(subquery))
+            self.assertEqual(queryset.count(), 0)
+        with self.subTest("gte"):
+            queryset = Comment.objects.filter(id__gte=Subquery(subquery))
+            self.assertEqual(queryset.count(), 5)
+        with self.subTest("lt"):
+            queryset = Comment.objects.filter(id__lt=Subquery(subquery))
+            self.assertEqual(queryset.count(), 0)
+        with self.subTest("lte"):
+            queryset = Comment.objects.filter(id__lte=Subquery(subquery))
+            self.assertEqual(queryset.count(), 5)
+
+    def test_non_outer_ref_subquery(self):
+        # If rhs is any non-OuterRef object with an as_sql() function.
+        pk = Exact(F("tenant_id"), 1)
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "'exact' subquery lookup of 'pk' "
+            "only supports OuterRef objects (received 'Exact')",
+        ):
+            Comment.objects.filter(pk=pk)
+
+    def test_outer_ref_not_composite_pk(self):
+        subquery = Comment.objects.filter(pk=OuterRef("id")).values("id")
+        queryset = Comment.objects.filter(id=Subquery(subquery))
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "OuterRef must refer to a CompositePrimaryKey",
+        ):
+            self.assertEqual(queryset.count(), 5)

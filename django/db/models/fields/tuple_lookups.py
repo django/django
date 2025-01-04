@@ -2,7 +2,7 @@ import itertools
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models import Field
-from django.db.models.expressions import ColPairs, Func, Value
+from django.db.models.expressions import ColPairs, Func, ResolvedOuterRef, Value
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -29,8 +29,11 @@ class Tuple(Func):
 
 class TupleLookupMixin:
     def get_prep_lookup(self):
-        self.check_rhs_is_tuple_or_list()
-        self.check_rhs_length_equals_lhs_length()
+        if self.rhs_is_direct_value():
+            self.check_rhs_is_tuple_or_list()
+            self.check_rhs_length_equals_lhs_length()
+        else:
+            self.check_rhs_is_outer_ref()
         return self.rhs
 
     def check_rhs_is_tuple_or_list(self):
@@ -46,6 +49,15 @@ class TupleLookupMixin:
             lhs_str = self.get_lhs_str()
             raise ValueError(
                 f"{self.lookup_name!r} lookup of {lhs_str} must have {len_lhs} elements"
+            )
+
+    def check_rhs_is_outer_ref(self):
+        if not isinstance(self.rhs, ResolvedOuterRef):
+            lhs_str = self.get_lhs_str()
+            rhs_cls = self.rhs.__class__.__name__
+            raise ValueError(
+                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
+                f"only supports OuterRef objects (received {rhs_cls!r})"
             )
 
     def get_lhs_str(self):
@@ -67,11 +79,17 @@ class TupleLookupMixin:
         return sql, params
 
     def process_rhs(self, compiler, connection):
-        values = [
-            Value(val, output_field=col.output_field)
-            for col, val in zip(self.lhs, self.rhs)
-        ]
-        return Tuple(*values).as_sql(compiler, connection)
+        if self.rhs_is_direct_value():
+            args = [
+                Value(val, output_field=col.output_field)
+                for col, val in zip(self.lhs, self.rhs)
+            ]
+        else:
+            args = self.rhs.resolve_expression(compiler.query)
+            if not isinstance(args, ColPairs):
+                raise ValueError("OuterRef must refer to a CompositePrimaryKey")
+
+        return Tuple(*args).as_sql(compiler, connection)
 
 
 class TupleExact(TupleLookupMixin, Exact):
