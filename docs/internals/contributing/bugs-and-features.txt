@@ -17,7 +17,7 @@ Otherwise, before reporting a bug or requesting a new feature on the
   `searching`_ or running `custom queries`_ in the ticket tracker.
 
 * Don't use the ticket system to ask support questions. Use the
-  |django-users| list or the `#django`_ IRC channel for that.
+  |django-users| list or the `Django Discord server`_ for that.
 
 * Don't reopen issues that have been marked "wontfix" without finding consensus
   to do so on the `Django Forum`_ or |django-developers| list.
@@ -39,8 +39,8 @@ particular:
 * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might
   be a well-known question.
 
-* **Do** ask on |django-users| or `#django`_ *first* if you're not sure if
-  what you're seeing is a bug.
+* **Do** ask on |django-users| or the `Django Discord server`_ *first* if
+  you're not sure if what you're seeing is a bug.
 
 * **Do** write complete, reproducible, specific bug reports. You must
   include a clear, concise description of the problem, and a set of
@@ -166,5 +166,5 @@ Votes on technical matters should be announced and held in public on the
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
-.. _#django: https://web.libera.chat/#django
 .. _Django Forum: https://forum.djangoproject.com/
+.. _Django Discord server: https://discord.gg/xcRH6mN4fa
