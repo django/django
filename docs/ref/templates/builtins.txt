@@ -1548,6 +1548,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import add
+
     sometext = add(4, 2)
 
 The value of ``sometext`` will be ``6``.
@@ -1571,6 +1572,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import add
+
     sometext = add([1, 2, 3], [4, 5, 6])
 
 The output of ``sometext`` will be ``[1, 2, 3, 4, 5, 6]``.
@@ -1601,6 +1603,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import addslashes
+
     sometext = addslashes("I'm using Django")
 
 If ``value`` is ``"I'm using Django"``, the output will be
@@ -1627,6 +1630,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import capfirst
+
     sometext = capfirst("django")
 
 If ``value`` is ``"django"``, the output will be ``"Django"``.
@@ -1651,6 +1655,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import center
+
     sometext = center("Django", 15)
 
 If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
@@ -1676,6 +1681,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import cut
+
     sometext = cut("String with spaces", " ")
 
 If ``sometext`` is ``"String with spaces"``, the output will be
@@ -1909,6 +1915,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import default
+
     sometext = default("", "nothing")
 
 The output of ``sometext`` will be ``nothing``.
@@ -1937,6 +1944,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import default_if_none
+
     sometext = default_if_none(None, "nothing")
 
 The output of ``sometext`` will be ``nothing``.
@@ -2040,11 +2048,15 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import dictsort
-    sorted_list = dictsort([
-        {"name": "zed", "age": 19},
-        {"name": "amy", "age": 22},
-        {"name": "joe", "age": 31},
-    ], "name")
+
+    sorted_list = dictsort(
+        [
+            {"name": "zed", "age": 19},
+            {"name": "amy", "age": 22},
+            {"name": "joe", "age": 31},
+        ],
+        "name",
+    )
 
 The value of ``sorted_list`` will be:
 
@@ -2063,11 +2075,15 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import dictsort
-    sorted_list = dictsort([
-        {"title": "1984", "author": {"name": "George", "age": 45}},
-        {"title": "Timequake", "author": {"name": "Kurt", "age": 75}},
-        {"title": "Alice", "author": {"name": "Lewis", "age": 33}},
-    ], "author.age")
+
+    sorted_list = dictsort(
+        [
+            {"title": "1984", "author": {"name": "George", "age": 45}},
+            {"title": "Timequake", "author": {"name": "Kurt", "age": 75}},
+            {"title": "Alice", "author": {"name": "Lewis", "age": 33}},
+        ],
+        "author.age",
+    )
 
 The value of ``sorted_list`` will be:
 
@@ -2088,11 +2104,15 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import dictsort
-    sorted_list = dictsort([
-        ("a", "42"),
-        ("c", "string"),
-        ("b", "foo"),
-    ], 0)
+
+    sorted_list = dictsort(
+        [
+            ("a", "42"),
+            ("c", "string"),
+            ("b", "foo"),
+        ],
+        0,
+    )
 
 The value of ``sorted_list`` will be:
 
@@ -2135,6 +2155,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import divisibleby
+
     is_divisible = divisibleby(21, 3)
 
 The value of ``is_divisible`` will be ``True``.
@@ -2249,6 +2270,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import filesizeformat
+
     formatted_size = filesizeformat(123456789)
 
 The value of ``formatted_size`` will be ``'117.7\xa0MB'``.
@@ -2281,7 +2303,8 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import first
-    first_item = first(['a', 'b', 'c'])
+
+    first_item = first(["a", "b", "c"])
 
 The value of ``first_item`` will be ``'a'``.
 
@@ -2367,6 +2390,7 @@ This can also be used in Python by doing the following:
 .. code-block:: python
 
     from django.template.defaultfilters import floatformat
+
     formatted_float = floatformat(34.23234, 3)
 
 The example table above used for the templates will return the same results.
@@ -2414,6 +2438,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import get_digit
+
     digit = get_digit(123456789, 2)
 
 The output of ``digit`` will be ``8``.
@@ -2444,6 +2469,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import iriencode
+
     url = iriencode("?test=I ♥ Django")
 
 If ``value`` is ``"?test=I ♥ Django"``, the output will be
@@ -2470,7 +2496,8 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import join
-    joined = join(['a', 'b', 'c'], " // ")
+
+    joined = join(["a", "b", "c"], " // ")
 
 The output of ``joined`` will be ``"a // b // c"``.
 
@@ -2534,7 +2561,8 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import last
-    last_item = last(['a', 'b', 'c', 'd'])
+
+    last_item = last(["a", "b", "c", "d"])
 
 The value of ``last_item`` will be ``"d"``.
 
@@ -2559,7 +2587,8 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import length
-    length_of_value = length(['a', 'b', 'c', 'd'])
+
+    length_of_value = length(["a", "b", "c", "d"])
 
 The value of ``length_of_value`` will be ``4``.
 
@@ -2605,6 +2634,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import linebreaksbr
+
     line_broken = linebreaksbr("Joel\nis a slug")
 
 The output will be ``"Joel<br>is a slug"``.
@@ -2643,6 +2673,7 @@ for example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import linenumbers
+
     numbered_text = linenumbers("one\ntwo\nthree")
 
 the output will be:
@@ -2673,6 +2704,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import ljust
+
     left_aligned = ljust("Django", 10)
 
 The output will be ``"Django    "``.
@@ -2698,6 +2730,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import lower
+
     lowercased = lower("Totally LOVING this Album!")
 
 The output will be ``"totally loving this album!"``.
@@ -2725,6 +2758,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import make_list
+
     list_of_chars = make_list("Joel")
 
 The output will be the list ``['J', 'o', 'e', 'l']``.
@@ -2788,6 +2822,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import pluralize
+
     single_message = f"You have 1 message{{pluralize(1)}}"
     multiple_messages = f"You have 2 messages{{pluralize(2)}}"
 
@@ -2800,6 +2835,7 @@ suffix as a parameter to the filter.
 .. code-block:: python
 
     from django.template.defaultfilters import pluralize
+
     single_walrus = f"You have 1 walrus{pluralize(1, "es")}"
     multiple_walrus = f"You have 1 walrus{pluralize(2, "es")}"
 
@@ -2812,6 +2848,7 @@ both a singular and plural suffix, separated by a comma.
 .. code-block:: python
 
     from django.template.defaultfilters import pluralize
+
     cherry_singular = f"You have 1 cherr{pluralize(1, "y,ies")}"
     cherry_pluralized = f"You have 1 cherr{pluralize(2, "y,ies")}"
 
@@ -2847,7 +2884,8 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import random
-    random_item = random(['a', 'b', 'c', 'd'])
+
+    random_item = random(["a", "b", "c", "d"])
 
 The value of ``random_item`` will be a random item from the list.
 
@@ -2873,6 +2911,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import rjust
+
     right_aligned = rjust("Django", 10)
 
 The output will be ``"    Django"``.
@@ -2953,6 +2992,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import slugify
+
     slug = slugify("Joel is a slug")
 
 The value of ``slug`` will be ``"joel-is-a-slug"``.
@@ -2979,6 +3019,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import stringformat
+
     formatted_value = stringformat(10, "E")
 
 The value of ``formatted_value`` will be ``"1.000000E+01"``.
@@ -3004,6 +3045,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import striptags
+
     stripped_value = striptags("<b>Joel</b> <button>is</button> a <span>slug</span>")
 
 The value of ``stripped_value`` will be ``"Joel is a slug"``.
@@ -3195,6 +3237,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import title
+
     titled = title("my FIRST post")
 
 The output of ``titled`` will be ``"My First Post"``.
@@ -3366,13 +3409,14 @@ In Python:
 .. code-block:: python
 
     from django.template.defaultfilters import unordered_list
-    html = unordered_list(['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']])
+
+    html = unordered_list(["States", ["Kansas", ["Lawrence", "Topeka"], "Illinois"]])
 
 The output of ``html`` will be
 
 .. code-block:: python
 
-    '\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>'
+    "\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>"
 
 .. templatefilter:: upper
 
@@ -3394,6 +3438,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import upper
+
     uppercased = upper("Joel is a slug")
 
 The output of ``uppercased`` will be ``"JOEL IS A SLUG"``.
@@ -3486,6 +3531,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import urlize
+
     urlized = urlize("Check out www.djangoproject.com")
 
 The output of ``urlized`` will be
@@ -3546,6 +3592,7 @@ For example in Python:
 .. code-block:: python
 
     from django.template.defaultfilters import urlizetrunc
+
     truncated = urlizetrunc("Check out www.djangoproject.com", 15)
 
 The output of ``truncated`` will be
