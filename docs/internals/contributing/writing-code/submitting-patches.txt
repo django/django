@@ -268,7 +268,10 @@ previous behavior, or standalone items that are unnecessary or unused when the
 deprecation ends. For example::
 
     import warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from django.utils.deprecation import (
+        RemovedInDjangoXXWarning,
+        adjust_stacklevel_for_warning,
+    )
 
 
     # RemovedInDjangoXXWarning.
@@ -281,7 +284,7 @@ deprecation ends. For example::
         warnings.warn(
             "foo() is deprecated.",
             category=RemovedInDjangoXXWarning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         old_private_helper()
         ...
