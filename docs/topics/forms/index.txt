@@ -536,7 +536,7 @@ Then you can configure the :setting:`FORM_RENDERER` setting:
     from django.forms.renderers import TemplatesSetting
 
 
-    class CustomFormRenderer(TemplatesSetting):
+    class CustomFormRenderer(DjangoTemplates):
         form_template_name = "form_snippet.html"
 
 
@@ -599,7 +599,7 @@ project-level :setting:`FORM_RENDERER`::
     from django.forms.renderers import TemplatesSetting
 
 
-    class CustomFormRenderer(TemplatesSetting):
+    class CustomFormRenderer(DjangoTemplates):
         field_template_name = "field_snippet.html"
 
 … or on a single field::
