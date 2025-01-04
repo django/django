@@ -6,7 +6,6 @@ from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import punycode
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
@@ -76,14 +75,14 @@ class DomainNameValidator(RegexValidator):
     # Max length for domain name labels is 63 characters per RFC 1034 sec. 3.1.
     domain_re = r"(?:\.(?!-)[a-z" + ul + r"0-9-]{1,63}(?<!-))*"
     # Top-level domain.
-    tld_re = (
+    tld_no_fqdn_re = (
         r"\."  # dot
         r"(?!-)"  # can't start with a dash
         r"(?:[a-z" + ul + "-]{2,63}"  # domain label
         r"|xn--[a-z0-9]{1,59})"  # or punycode label
         r"(?<!-)"  # can't end with a dash
-        r"\.?"  # may have a trailing dot
     )
+    tld_re = tld_no_fqdn_re + r"\.?"
     ascii_only_hostname_re = r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
     ascii_only_domain_re = r"(?:\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*"
     ascii_only_tld_re = (
@@ -210,6 +209,10 @@ def validate_integer(value):
 class EmailValidator:
     message = _("Enter a valid email address.")
     code = "invalid"
+    hostname_re = DomainNameValidator.hostname_re
+    domain_re = DomainNameValidator.domain_re
+    tld_no_fqdn_re = DomainNameValidator.tld_no_fqdn_re
+
     user_regex = _lazy_re_compile(
         # dot-atom
         r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"
@@ -219,8 +222,7 @@ class EmailValidator:
         re.IGNORECASE,
     )
     domain_regex = _lazy_re_compile(
-        # max length for domain name labels is 63 characters per RFC 1034
-        r"((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))\Z",
+        r"^" + hostname_re + domain_re + tld_no_fqdn_re + r"\Z",
         re.IGNORECASE,
     )
     literal_regex = _lazy_re_compile(
@@ -252,14 +254,6 @@ class EmailValidator:
         if domain_part not in self.domain_allowlist and not self.validate_domain_part(
             domain_part
         ):
-            # Try for possible IDN domain-part
-            try:
-                domain_part = punycode(domain_part)
-            except UnicodeError:
-                pass
-            else:
-                if self.validate_domain_part(domain_part):
-                    return
             raise ValidationError(self.message, code=self.code, params={"value": value})
 
     def validate_domain_part(self, domain_part):
