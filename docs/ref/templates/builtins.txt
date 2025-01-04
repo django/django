@@ -1662,13 +1662,23 @@ If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
 
 Removes all values of arg from the given string.
 
-For example:
+For example in t a template:
 
 .. code-block:: html+django
 
     {{ value|cut:" " }}
 
 If ``value`` is ``"String with spaces"``, the output will be
+``"Stringwithspaces"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import cut
+    sometext = cut("String with spaces", " ")
+
+If ``sometext`` is ``"String with spaces"``, the output will be
 ``"Stringwithspaces"``.
 
 .. templatefilter:: date
