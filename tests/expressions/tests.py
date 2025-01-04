@@ -1524,6 +1524,94 @@ class ExpressionsNumericTests(TestCase):
         n.refresh_from_db()
         self.assertEqual(n.decimal_value, Decimal("0.1"))
 
+    def test_decimal_division_precision(self):
+        """
+        Test that division with Decimal preserves numeric type and precision
+        Specifically tests division of integer by Decimal(3.0)
+        """
+        obj = Number.objects.create(integer=2, decimal_value=Decimal("2"))
+
+        qs = Number.objects.annotate(
+            x=ExpressionWrapper(
+                F("integer") / Decimal("3.0"),
+                output_field=DecimalField(max_digits=10, decimal_places=4),
+            )
+        ).get(pk=obj.pk)
+
+        self.assertAlmostEqual(
+            float(qs.x),
+            float(Decimal("2") / Decimal("3.0")),
+            places=4,
+            msg="Division should preserve decimal precision",
+        )
+
+    def test_decimal_type_preservation(self):
+        """
+        Test that Decimal values are preserved with their original type
+        """
+        test_cases = [
+            Decimal("1000.0"),  # Decimal with .0
+            Decimal("1000"),  # Integer-like Decimal
+            Decimal("1000.00001"),  # Decimal with significant digits
+        ]
+
+        for test_value in test_cases:
+            with self.subTest(value=test_value):
+                obj = Number.objects.create(integer=0, decimal_value=test_value)
+                retrieved_obj = Number.objects.get(pk=obj.pk)
+                self.assertEqual(
+                    retrieved_obj.decimal_value,
+                    test_value,
+                    f"Decimal value {test_value} should be preserved",
+                )
+
+    def test_decimal_division_types(self):
+        """Test that division with different Decimal formats preserves numeric type"""
+        cases = [
+            (2, Decimal("3.0"), "0.6667"),  # Float-like decimal
+            (2, Decimal("3"), "0.6667"),  # Integer-like decimal
+            (2, Decimal("3.000"), "0.6667"),  # Zero-padded decimal
+        ]
+
+        for numerator, denominator, expected in cases:
+            with self.subTest(num=numerator, den=denominator):
+                obj = Number.objects.create(integer=numerator)
+                qs = Number.objects.annotate(
+                    ratio=ExpressionWrapper(
+                        F("integer") / Value(denominator),
+                        output_field=DecimalField(max_digits=20, decimal_places=15),
+                    )
+                ).get(pk=obj.pk)
+                self.assertAlmostEqual(
+                    float(qs.ratio),
+                    float(Decimal(expected)),
+                    places=15,
+                    msg=f"Division of {numerator} by {denominator}"
+                    f"should result {expected}",
+                )
+
+    def test_decimal_divider_minimal(self):
+        """Test minimal divider operation"""
+        from django.db.models.functions import Cast
+
+        number = Number.objects.create(integer=2)
+
+        dividend = Cast(
+            F("integer"), output_field=DecimalField(max_digits=20, decimal_places=10)
+        )
+        divisor = Cast(
+            Value(3.0), output_field=DecimalField(max_digits=20, decimal_places=10)
+        )
+
+        division = ExpressionWrapper(
+            dividend / divisor,
+            output_field=DecimalField(max_digits=20, decimal_places=10),
+        )
+        result = Number.objects.annotate(ratio=division).get(pk=number.pk)
+
+        expected = Decimal("2.0") / Decimal("3.0")
+        self.assertAlmostEqual(float(result.ratio), float(expected), places=4)
+
 
 class ExpressionOperatorTests(TestCase):
     @classmethod
