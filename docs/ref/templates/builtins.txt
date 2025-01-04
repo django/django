@@ -1949,10 +1949,7 @@ The output of ``sometext`` will be ``nothing``.
 Takes a list of dictionaries and returns that list sorted by the key given in
 the argument.
 
-Template Examples
-=================
-
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2037,9 +2034,6 @@ produce empty output:
 .. code-block:: html+django
 
     {{ values|dictsort:"0" }}
-
-Python Examples
-===============
 
 For example in Python:
 
@@ -2478,7 +2472,7 @@ For example in Python:
     from django.template.defaultfilters import join
     joined = join(['a', 'b', 'c'], " // ")
 
-The outout of ``joined`` will be ``"a // b // c"``.
+The output of ``joined`` will be ``"a // b // c"``.
 
 .. templatefilter:: json_script
 
@@ -2762,10 +2756,7 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 Returns a plural suffix if the value is not ``1``, ``'1'``, or an object of
 length 1. By default, this suffix is ``'s'``.
 
-Template Examples
-=================
-
-Example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2792,8 +2783,7 @@ Example:
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
 
-Python Examples
-===============
+For example in Python:
 
 .. code-block:: python
 
@@ -3432,7 +3422,8 @@ For example in Python:
 
     escaped = urlencode("https://www.example.org/foo?a=b&c=d")
 
-The output of ``escaped`` will be ``"https%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
+The output of ``escaped`` will be 
+``"https%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
 
 An optional argument containing the characters which should not be escaped can
 be provided.
@@ -3501,7 +3492,8 @@ The output of ``urlized`` will be
 
 .. code-block:: python
 
-    "Check out <a href="http://www.djangoproject.com" rel="nofollow">www.djangoproject.com</a>"
+    "Check out <a href="http://www.djangoproject.com" rel="nofollow">
+        www.djangoproject.com</a>"
 
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
@@ -3559,7 +3551,8 @@ For example in Python:
     truncated = urlizetrunc("Check out www.djangoproject.com", 15)
 
 The output of ``truncated`` will be
-``'Check out <a href="http://www.djangoproject.com" rel="nofollow">www.djangoproj…</a>"``
+``'Check out <a href="http://www.djangoproject.com" rel="nofollow">
+www.djangoproj…</a>"``
 
 As with urlize_, this filter should only be applied to plain text.
 
