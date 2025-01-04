@@ -2,6 +2,8 @@
 Tools for sending email.
 """
 
+import warnings
+
 from django.conf import settings
 
 # Imported for backwards compatibility and for the sake
@@ -10,17 +12,14 @@ from django.conf import settings
 # backends and the subsequent reorganization (See #10355)
 from django.core.mail.message import (
     DEFAULT_ATTACHMENT_MIME_TYPE,
-    BadHeaderError,
     EmailAlternative,
     EmailAttachment,
     EmailMessage,
     EmailMultiAlternatives,
-    SafeMIMEMultipart,
-    SafeMIMEText,
-    forbid_multi_line_headers,
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
+from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -28,12 +27,8 @@ __all__ = [
     "DNS_NAME",
     "EmailMessage",
     "EmailMultiAlternatives",
-    "SafeMIMEText",
-    "SafeMIMEMultipart",
     "DEFAULT_ATTACHMENT_MIME_TYPE",
     "make_msgid",
-    "BadHeaderError",
-    "forbid_multi_line_headers",
     "get_connection",
     "send_mail",
     "send_mass_mail",
@@ -41,6 +36,11 @@ __all__ = [
     "mail_managers",
     "EmailAlternative",
     "EmailAttachment",
+    # RemovedInDjango61Warning:
+    "BadHeaderError",
+    "SafeMIMEText",
+    "SafeMIMEMultipart",
+    "forbid_multi_line_headers",
 ]
 
 
@@ -157,3 +157,34 @@ def mail_managers(
     if html_message:
         mail.attach_alternative(html_message, "text/html")
     mail.send(fail_silently=fail_silently)
+
+
+# RemovedInDjango61Warning
+_deprecate_on_import = {
+    "BadHeaderError": "BadHeaderError is deprecated. Replace with ValueError.",
+    "SafeMIMEText": (
+        "SafeMIMEText is deprecated. The return value"
+        " of EmailMessage.message() is an email.message.EmailMessage."
+    ),
+    "SafeMIMEMultipart": (
+        "SafeMIMEMultipart is deprecated. The return value"
+        " of EmailMessage.message() is an email.message.EmailMessage."
+    ),
+    "forbid_multi_line_headers": (
+        "The internal API forbid_multi_line_headers() is deprecated."
+    ),
+}
+
+
+# RemovedInDjango61Warning
+# Issue deprecation warnings at time of import.
+def __getattr__(name):
+    try:
+        msg = _deprecate_on_import[name]
+    except KeyError:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
+    else:
+        from django.core.mail import _deprecated
+
+        warnings.warn(msg, category=RemovedInDjango61Warning)
+        return getattr(_deprecated, name)

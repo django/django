@@ -1347,13 +1347,13 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         self.assertTrue(
             re.match(
                 r"^http://example.com/reset/[\w/-]+",
-                message.get_payload(0).get_payload(),
+                message.get_payload(0).get_content(),
             )
         )
         self.assertTrue(
             re.match(
                 r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$',
-                message.get_payload(1).get_payload(),
+                message.get_payload(1).get_content(),
             )
         )
 
