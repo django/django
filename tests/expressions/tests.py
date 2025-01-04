@@ -1524,6 +1524,59 @@ class ExpressionsNumericTests(TestCase):
         n.refresh_from_db()
         self.assertEqual(n.decimal_value, Decimal("0.1"))
 
+    def test_decimal_division_precision(self):
+        """Test that division with Decimal preserves numeric type and precision"""
+        obj = Number.objects.create(integer=2)
+        qs = Number.objects.annotate(
+            ratio=ExpressionWrapper(
+                F("integer") / Value(3.0),
+                output_field=DecimalField(max_digits=10, decimal_places=4),
+            )
+        ).filter(pk=obj.pk)
+        self.assertAlmostEqual(
+            float(qs.get().ratio),
+            float(Decimal("2") / Decimal("3")),
+            places=4,
+            msg="Division should preserve decimal precision",
+        )
+
+    def test_decimal_division_types(self):
+        """Test division avec précision décimale"""
+        Number.objects.all().delete()
+        for num, den, expected in [
+            (2, Decimal("3"), "0.6667"),
+        ]:
+            with self.subTest(num=num, den=den):
+                # print("\n=== Test Division Décimale ===")
+                # print(f"Numérateur: {num} ({type(num)})")
+                # print(f"Dénominateur: {den} ({type(den)})")
+
+                Number.objects.create(integer=num)
+
+                # Vérifier le type de champ
+                # print(f"\nType champ integer:
+                # {Number._meta.get_field('integer').__class__}")
+
+                qs = Number.objects.annotate(
+                    ratio=ExpressionWrapper(
+                        F("integer") / Value(den, output_field=DecimalField()),
+                        output_field=DecimalField(max_digits=10, decimal_places=4),
+                    )
+                )
+
+                # print(f"\nRequête SQL: {qs.query}")
+                result = qs.get()
+                # print(f"Résultat brut: {result.ratio}")
+                # print(f"Type résultat: {type(result.ratio)}")
+                # print("============================\n")
+
+                self.assertAlmostEqual(
+                    float(result.ratio),
+                    float(expected),
+                    places=4,
+                    msg=f"Division de {num} par {den} devrait donner {expected}",
+                )
+
 
 class ExpressionOperatorTests(TestCase):
     @classmethod

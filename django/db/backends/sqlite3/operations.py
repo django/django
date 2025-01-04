@@ -354,9 +354,23 @@ class DatabaseOperations(BaseDatabaseOperations):
         return bool(value) if value in (1, 0) else value
 
     def combine_expression(self, connector, sub_expressions):
+        if connector == "/":
+            if hasattr(self, "_is_duration"):
+                return "django_format_dtdelta('/', %s, %s)" % (
+                    sub_expressions[0],
+                    sub_expressions[1],
+                )
+            return """
+                CAST(
+                    CAST(CAST(%s AS REAL) / CAST(%s AS REAL) AS NUMERIC(10,4))
+                AS NUMERIC(10,4))
+            """ % (
+                sub_expressions[0],
+                sub_expressions[1],
+            )
         # SQLite doesn't have a ^ operator, so use the user-defined POWER
         # function that's registered in connect().
-        if connector == "^":
+        elif connector == "^":
             return "POWER(%s)" % ",".join(sub_expressions)
         elif connector == "#":
             return "BITXOR(%s)" % ",".join(sub_expressions)

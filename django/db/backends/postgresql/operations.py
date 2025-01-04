@@ -420,3 +420,17 @@ class DatabaseOperations(BaseDatabaseOperations):
             rhs_expr = Cast(rhs_expr, lhs_field)
 
         return lhs_expr, rhs_expr
+
+    def combine_expression(self, connector, sub_expressions):
+        if connector == "/":
+            return """
+                CAST(
+                    CAST(%s AS NUMERIC(20, 10)) /
+                    CAST(%s AS NUMERIC(20, 10))
+                AS NUMERIC(20, 10))
+            """ % (
+                sub_expressions[0],
+                sub_expressions[1],
+            )
+
+        return super().combine_expression(connector, sub_expressions)

@@ -712,6 +712,18 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
     def __str__(self):
         return "{} {} {}".format(self.lhs, self.connector, self.rhs)
 
+    def _is_integer_field(self, expr):
+        try:
+            return isinstance(expr.output_field, fields.IntegerField)
+        except AttributeError:
+            return False
+
+    def _is_duration_field(self, expr):
+        try:
+            return isinstance(expr.output_field, fields.DurationField)
+        except AttributeError:
+            return False
+
     def get_source_expressions(self):
         return [self.lhs, self.rhs]
 
@@ -746,7 +758,29 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         expression_params.extend(params)
         # order of precedence
         expression_wrapper = "(%s)"
-        sql = connection.ops.combine_expression(self.connector, expressions)
+        # Check if all expr will be all integer for truediv
+        if self.connector == "/":
+            if any(self._is_duration_field(e) for e in (self.lhs, self.rhs)):
+                # Division directe pour les durations
+                sql = "%s / %s" % (expressions[0], expressions[1])
+            elif any(
+                isinstance(
+                    getattr(e, "output_field", None),
+                    (fields.DecimalField, fields.FloatField),
+                )
+                for e in (self.lhs, self.rhs)
+            ):
+                # Division avec CAST pour decimal/float
+                sql = connection.ops.combine_expression(self.connector, expressions)
+            elif all(self._is_integer_field(e) for e in (self.lhs, self.rhs)):
+                # Division entière pour les entiers
+                sql = connection.ops.combine_expression(self.connector, expressions)
+            else:
+                # Division standard pour les autres cas
+                sql = "%s / %s" % (expressions[0], expressions[1])
+        else:
+            sql = connection.ops.combine_expression(self.connector, expressions)
+
         return expression_wrapper % sql, expression_params
 
     def resolve_expression(
