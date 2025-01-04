@@ -142,7 +142,7 @@ class DjangoHelpFormatter(HelpFormatter):
         super().add_arguments(self._reordered_actions(actions))
 
 
-class OutputWrapper(TextIOBase):
+class OutputWrapper:
     """
     Wrapper around stdout/stderr
     """
@@ -179,6 +179,9 @@ class OutputWrapper(TextIOBase):
             msg += ending
         style_func = style_func or self.style_func
         self._out.write(style_func(msg))
+
+
+TextIOBase.register(OutputWrapper)
 
 
 class BaseCommand:
