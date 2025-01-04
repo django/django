@@ -1,5 +1,6 @@
 from django.db.migrations.utils import field_references
 from django.db.models import NOT_PROVIDED
+from django.utils.copy import replace
 from django.utils.functional import cached_property
 
 from .base import Operation, OperationCategory
@@ -134,8 +135,8 @@ class AddField(FieldOperation):
         ):
             if isinstance(operation, AlterField):
                 return [
-                    AddField(
-                        model_name=self.model_name,
+                    replace(
+                        self,
                         name=operation.name,
                         field=operation.field,
                     ),
@@ -144,10 +145,9 @@ class AddField(FieldOperation):
                 return []
             elif isinstance(operation, RenameField):
                 return [
-                    AddField(
-                        model_name=self.model_name,
+                    replace(
+                        self,
                         name=operation.new_name,
-                        field=self.field,
                     ),
                 ]
         return super().reduce(operation, app_label)
@@ -264,10 +264,9 @@ class AlterField(FieldOperation):
         ):
             return [
                 operation,
-                AlterField(
-                    model_name=self.model_name,
+                replace(
+                    self,
                     name=operation.new_name,
-                    field=self.field,
                 ),
             ]
         return super().reduce(operation, app_label)
@@ -351,11 +350,7 @@ class RenameField(FieldOperation):
             and self.new_name_lower == operation.old_name_lower
         ):
             return [
-                RenameField(
-                    self.model_name,
-                    self.old_name,
-                    operation.new_name,
-                ),
+                replace(self, new_name=operation.new_name),
             ]
         # Skip `FieldOperation.reduce` as we want to run `references_field`
         # against self.old_name and self.new_name.
