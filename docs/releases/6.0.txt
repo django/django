@@ -122,6 +122,12 @@ CSRF
 
 * ...
 
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* SQLite backends now support :ref:`negative array indexing
+  <key-index-and-path-transforms>` in :class:`~django.db.models.JSONField`
+
 Decorators
 ~~~~~~~~~~
 
