@@ -2330,6 +2330,22 @@ class SchemaTests(TransactionTestCase):
         # Ensure the foreign key reference was updated.
         self.assertForeignKeyExists(Book, "author_id", "schema_author", "renamed")
 
+    @isolate_apps("schema")
+    def test_remove_primary_key_field_so_model_is_empty(self):
+        class Author(Model):
+            name = CharField(max_length=255, primary_key=True)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        with connection.schema_editor() as editor:
+            editor.remove_field(Author, Author._meta.get_field("name"))
+
+        columns = self.column_classes(Author)
+        self.assertNotIn("name", columns)
+
     @skipIfDBFeature("interprets_empty_strings_as_nulls")
     def test_rename_keep_null_status(self):
         """
