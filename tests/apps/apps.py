@@ -36,3 +36,8 @@ class RelabeledAppsConfig(AppConfig):
 class ModelPKAppsConfig(AppConfig):
     name = "apps"
     default_auto_field = "django.db.models.BigAutoField"
+
+
+class UUIDv4AutoAppConfig(AppConfig):
+    name = "apps"
+    default_auto_field = "django.contrib.postgres.fields.UUID4AutoField"
