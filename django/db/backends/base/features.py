@@ -266,6 +266,8 @@ class BaseDatabaseFeatures:
     supports_frame_exclusion = False
     only_supports_unbounded_with_preceding_and_following = False
 
+    # Does the backend support casting a tuple to a text value?
+    supports_cast_tuple_to_text = False
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True
 

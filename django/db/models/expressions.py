@@ -758,6 +758,8 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         rhs = self.rhs.resolve_expression(
             query, allow_joins, reuse, summarize, for_save
         )
+        if isinstance(lhs, ColPairs) or isinstance(rhs, ColPairs):
+            raise ValueError("CompositePrimaryKey is not combinable.")
         if not isinstance(self, (DurationExpression, TemporalSubtraction)):
             try:
                 lhs_type = lhs.output_field.get_internal_type()

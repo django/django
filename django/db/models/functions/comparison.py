@@ -1,6 +1,7 @@
 """Database functions that do comparisons or type conversions."""
 
-from django.db.models.expressions import Func, Value
+from django.db import NotSupportedError
+from django.db.models.expressions import ColPairs, Func, Value
 from django.utils.regex_helper import _lazy_re_compile
 
 
@@ -15,6 +16,13 @@ class Cast(Func):
 
     def as_sql(self, compiler, connection, **extra_context):
         extra_context["db_type"] = self.output_field.cast_db_type(connection)
+        if not connection.features.supports_cast_tuple_to_text and any(
+            isinstance(expr, ColPairs) for expr in self.source_expressions
+        ):
+            raise NotSupportedError(
+                "This backend doesn't support casting CompositePrimaryKey."
+            )
+
         return super().as_sql(compiler, connection, **extra_context)
 
     def as_sqlite(self, compiler, connection, **extra_context):
