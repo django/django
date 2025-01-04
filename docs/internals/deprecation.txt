@@ -22,6 +22,9 @@ details on these changes.
   ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
   removed.
 
+* The ``serialize`` keyword argument of ``BaseDatabaseCreation.create_test_db``
+  will be removed.
+
 .. _deprecation-removed-in-6.0:
 
 6.0

@@ -41,7 +41,8 @@ class Command(BaseCommand):
 
         # Create a test database.
         db_name = connection.creation.create_test_db(
-            verbosity=verbosity, autoclobber=not interactive, serialize=False
+            verbosity=verbosity,
+            autoclobber=not interactive,
         )
 
         # Import the fixture data into the test database.
