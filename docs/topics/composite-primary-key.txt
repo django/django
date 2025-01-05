@@ -131,6 +131,8 @@ database.
     ``ForeignObject`` is an internal API. This means it is not covered by our
     :ref:`deprecation policy <internal-release-deprecation-policy>`.
 
+.. _cpk-and-database-functions:
+
 Composite primary keys and database functions
 =============================================
 
@@ -141,13 +143,15 @@ Many database functions only accept a single expression.
     MAX("order_id")  -- OK
     MAX("product_id", "order_id")  -- ERROR
 
-As a consequence, they cannot be used with composite primary key references as
-they are composed of multiple column expressions.
+In these cases, providing a composite primary key reference raises a
+``ValueError``, since it is composed of multiple column expressions. An
+exception is made for ``Count``.
 
 .. code-block:: python
 
     Max("order_id")  # OK
-    Max("pk")  # ERROR
+    Max("pk")  # ValueError
+    Count("pk")  # OK
 
 Composite primary keys in forms
 ===============================
