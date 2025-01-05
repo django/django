@@ -184,6 +184,8 @@ class BaseExpression:
     constraint_validation_compatible = True
     # Does the expression possibly return more than one row?
     set_returning = False
+    # Does the expression allow composite expressions?
+    allows_composite_expressions = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -1077,6 +1079,12 @@ class Func(SQLiteNumericMixin, Expression):
             c.source_expressions[pos] = arg.resolve_expression(
                 query, allow_joins, reuse, summarize, for_save
             )
+        if not self.allows_composite_expressions and any(
+            isinstance(expr, ColPairs) for expr in c.get_source_expressions()
+        ):
+            raise ValueError(
+                f"{self.__class__.__name__} does not support composite primary keys."
+            )
         return c
 
     def as_sql(
@@ -1827,6 +1835,7 @@ class OrderBy(Expression):
     template = "%(expression)s %(ordering)s"
     conditional = False
     constraint_validation_compatible = False
+    allows_composite_expressions = True
 
     def __init__(self, expression, descending=False, nulls_first=None, nulls_last=None):
         if nulls_first and nulls_last:

@@ -330,6 +330,10 @@ Models
   accepts a list of field names or expressions and returns a JSON array
   containing those values.
 
+* The new :attr:`.Expression.allows_composite_expressions` attribute specifies
+  that the expression allows composite expressions, for example, to support
+  :ref:`composite primary keys <cpk-and-database-functions>`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
