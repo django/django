@@ -1057,6 +1057,16 @@ class ChangeListTests(TestCase):
         link = reverse("admin:admin_changelist_parent_change", args=(p.pk,))
         self.assertNotContains(response, '<a href="%s">' % link)
 
+    def test_link_field_display_links(self):
+        self.client.force_login(self.superuser)
+        g = Genre.objects.create(name="Blues", file="documents/blues_history.txt")
+        response = self.client.get(reverse("admin:admin_changelist_genre_changelist"))
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_changelist/genre/%s/change/">'
+            "documents/blues_history.txt</a>" % g.pk,
+        )
+
     def test_clear_all_filters_link(self):
         self.client.force_login(self.superuser)
         url = reverse("admin:auth_user_changelist")
