@@ -428,6 +428,6 @@ class CompositePKFilterTests(TestCase):
         self.assertSequenceEqual(queryset, (self.user_2,))
 
     def test_cannot_cast_pk(self):
-        msg = "Casting CompositePrimaryKey is not supported."
+        msg = "Cast does not support composite primary keys."
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.filter(text__gt=Cast(F("pk"), TextField())).count()

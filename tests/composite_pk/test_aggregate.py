@@ -1,4 +1,4 @@
-from django.db.models import Count, Q
+from django.db.models import Count, Max, Q
 from django.test import TestCase
 
 from .models import Comment, Tenant, User
@@ -136,3 +136,8 @@ class CompositePKAggregateTests(TestCase):
             ),
             (self.user_3, self.user_1, self.user_2),
         )
+
+    def test_max_pk(self):
+        msg = "Max does not support composite primary keys."
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.aggregate(Max("pk"))

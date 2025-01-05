@@ -166,6 +166,7 @@ class Count(Aggregate):
     output_field = IntegerField()
     allow_distinct = True
     empty_result_set_value = 0
+    allows_composite_expressions = True
 
     def __init__(self, expression, filter=None, **extra):
         if expression == "*":
