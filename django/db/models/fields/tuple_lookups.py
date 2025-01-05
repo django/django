@@ -17,6 +17,7 @@ from django.db.models.sql.where import AND, OR, WhereNode
 
 
 class Tuple(Func):
+    allows_composite_expressions = True
     function = ""
     output_field = Field()
 
@@ -28,6 +29,8 @@ class Tuple(Func):
 
 
 class TupleLookupMixin:
+    allows_composite_expressions = True
+
     def get_prep_lookup(self):
         self.check_rhs_is_tuple_or_list()
         self.check_rhs_length_equals_lhs_length()
