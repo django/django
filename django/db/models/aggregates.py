@@ -241,6 +241,10 @@ class JSONArrayAgg(Aggregate):
     arity = 1
 
     def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_json_field:
+            raise NotSupportedError(
+                "JSONFields are not supported on this database backend."
+            )
         if self.filter and not connection.features.supports_aggregate_filter_clause:
             raise NotSupportedError(
                 "JSONArrayAgg(filter) is not supported on this database backend."
