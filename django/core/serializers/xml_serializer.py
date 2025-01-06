@@ -56,7 +56,7 @@ class Serializer(base.Serializer):
         if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
             obj_pk = obj.pk
             if obj_pk is not None:
-                attrs["pk"] = str(obj_pk)
+                attrs["pk"] = obj._meta.pk.value_to_string(obj)
 
         self.xml.startElement("object", attrs)
 
