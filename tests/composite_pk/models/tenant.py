@@ -48,3 +48,9 @@ class Post(models.Model):
     pk = models.CompositePrimaryKey("tenant_id", "id")
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
     id = models.UUIDField()
+
+
+class TimeStamped(models.Model):
+    pk = models.CompositePrimaryKey("id", "created")
+    id = models.SmallIntegerField(unique=True)
+    created = models.DateTimeField(auto_now_add=True)
