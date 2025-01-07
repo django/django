@@ -1796,6 +1796,8 @@ class ManyToManyField(RelatedField):
                 kwargs["through"] = self.remote_field.through
             elif not self.remote_field.through._meta.auto_created:
                 kwargs["through"] = self.remote_field.through._meta.label
+        if through_fields := getattr(self.remote_field, "through_fields", None):
+            kwargs["through_fields"] = through_fields
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
