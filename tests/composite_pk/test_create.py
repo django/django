@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Tenant, User
 
@@ -76,6 +76,21 @@ class CompositePKCreateTests(TestCase):
         self.assertEqual(obj_3.id, 8214)
         self.assertEqual(obj_3.pk, (obj_3.tenant_id, obj_3.id))
         self.assertEqual(obj_3.email, "user8214@example.com")
+
+    @skipUnlessDBFeature(
+        "supports_update_conflicts",
+        "supports_update_conflicts_with_target",
+    )
+    def test_bulk_create_user_with_pk_field_in_update_fields(self):
+        objs = [User(tenant=self.tenant, id=8291, email="user8291@example.com")]
+        msg = "bulk_create() cannot be used with primary keys in update_fields."
+        with self.assertRaisesMessage(ValueError, msg):
+            User.objects.bulk_create(
+                objs,
+                update_conflicts=True,
+                update_fields=["tenant_id"],
+                unique_fields=["id", "tenant_id"],
+            )
 
     def test_get_or_create_user(self):
         test_cases = (
