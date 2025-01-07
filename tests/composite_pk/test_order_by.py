@@ -1,3 +1,4 @@
+from django.db.models import F
 from django.test import TestCase
 
 from .models import Comment, Tenant, User
@@ -54,4 +55,18 @@ class CompositePKOrderByTests(TestCase):
                 self.comment_2,  # (1, 2)
                 self.comment_1,  # (1, 1)
             ),
+        )
+
+    def test_order_comments_by_pk_expr(self):
+        self.assertQuerySetEqual(
+            Comment.objects.order_by("pk"),
+            Comment.objects.order_by(F("pk")),
+        )
+        self.assertQuerySetEqual(
+            Comment.objects.order_by("-pk"),
+            Comment.objects.order_by(F("pk").desc()),
+        )
+        self.assertQuerySetEqual(
+            Comment.objects.order_by("-pk"),
+            Comment.objects.order_by(F("pk").desc(nulls_last=True)),
         )

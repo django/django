@@ -1117,10 +1117,9 @@ class SQLCompiler:
                 )
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
-        target_fields = composite.unnest(targets)
         return [
             (OrderBy(transform_function(t, alias), descending=descending), False)
-            for t in target_fields
+            for t in targets
         ]
 
     def _setup_joins(self, pieces, opts, alias):
