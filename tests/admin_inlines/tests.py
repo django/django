@@ -825,6 +825,66 @@ class TestInline(TestDataMixin, TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")
+class TestInlineCanDelete(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="tester",
+            password="password",
+            is_staff=True,
+        )
+        # can_delete True case
+        pc_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ProfileCollection)
+        )
+        p_permission = Permission.objects.filter(
+            codename__in=["view_profile", "delete_profile"],
+            content_type=ContentType.objects.get_for_model(Profile),
+        )
+        pc = ProfileCollection.objects.create()
+        Profile.objects.create(collection=pc, first_name="SiHyun", last_name="Lee")
+        # can_delete False case
+        sp_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(SomeParentModel)
+        )
+        sc_permission = Permission.objects.filter(
+            codename__in=["view_somechildmodel"],
+            content_type=ContentType.objects.get_for_model(SomeChildModel),
+        )
+        sp = SomeParentModel.objects.create(name="p")
+        SomeChildModel.objects.create(name="c", position="0", parent=sp)
+        cls.user.user_permissions.add(
+            *pc_permission, *p_permission, *sp_permission, *sc_permission
+        )
+
+        cls.pc_url = reverse(
+            "admin:admin_inlines_profilecollection_change", args=(pc.pk,)
+        )
+        cls.sp_url = reverse(
+            "admin:admin_inlines_someparentmodel_change", args=(sp.pk,)
+        )
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_tabular_inline_delete_field(self):
+        response = self.client.get(self.pc_url)
+        self.assertContains(response, "<th>Delete?</th>")
+        response = self.client.get(self.sp_url)
+        self.assertNotContains(response, "<th>Delete?</th>")
+
+    def test_tabular_inline_delete_checkbox_layout(self):
+        response = self.client.get(self.pc_url)
+        self.assertContains(
+            response,
+            '<td class="delete"><input type="checkbox" name="profile_set-0-DELETE" '
+            'id="id_profile_set-0-DELETE"></td>',
+        )
+        response = self.client.get(self.sp_url)
+        self.assertContains(response, '<td class="delete"></td>')
+
+
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
 class TestInlineMedia(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -2213,13 +2273,11 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Click on a few delete buttons
         self.selenium.find_element(
             By.CSS_SELECTOR,
-            "form#profilecollection_form tr.dynamic-profile_set#profile_set-1 "
-            "td.delete a",
+            "form#profilecollection_form tr.dynamic-profile_set#profile_set-1 " "a",
         ).click()
         self.selenium.find_element(
             By.CSS_SELECTOR,
-            "form#profilecollection_form tr.dynamic-profile_set#profile_set-2 "
-            "td.delete a",
+            "form#profilecollection_form tr.dynamic-profile_set#profile_set-2 " "a",
         ).click()
         # The rows are gone and the IDs have been re-sequenced
         self.assertCountSeleniumElements(
@@ -2480,7 +2538,7 @@ class SeleniumTests(AdminSeleniumTestCase):
                 "CREATION DATE",
                 "UPDATE DATE",
                 "UPDATED BY",
-                "DELETE?",
+                "",
             ],
         )
         # There are no fieldset section names rendered.
