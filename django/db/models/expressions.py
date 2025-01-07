@@ -1861,6 +1861,16 @@ class OrderBy(Expression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
+        if isinstance(self.expression, ColPairs):
+            sql_parts = []
+            params = []
+            for col in self.expression.get_cols():
+                copy = self.copy()
+                copy.set_source_expressions([col])
+                sql, col_params = compiler.compile(copy)
+                sql_parts.append(sql)
+                params.extend(col_params)
+            return ", ".join(sql_parts), params
         template = template or self.template
         if connection.features.supports_order_by_nulls_modifier:
             if self.nulls_last:
