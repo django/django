@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
@@ -48,3 +50,13 @@ class Post(models.Model):
     pk = models.CompositePrimaryKey("tenant_id", "id")
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
     id = models.UUIDField()
+    tags = GenericRelation("Tag", related_query_name="post")
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=10)
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name="composite_pk_tags"
+    )
+    object_id = models.CharField(max_length=255)
+    content_object = GenericForeignKey("content_type", "object_id")

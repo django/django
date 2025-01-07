@@ -1,4 +1,5 @@
 import itertools
+from collections.abc import Iterable
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models import Field
@@ -211,9 +212,16 @@ class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
 
 
 class TupleIn(TupleLookupMixin, In):
+    def check_rhs_is_iterable(self):
+        if not isinstance(self.rhs, Iterable):
+            lhs_str = self.get_lhs_str()
+            raise ValueError(
+                f"{self.lookup_name!r} lookup of {lhs_str} must be an iterable"
+            )
+
     def get_prep_lookup(self):
         if self.rhs_is_direct_value():
-            self.check_rhs_is_tuple_or_list()
+            self.check_rhs_is_iterable()
             self.check_rhs_is_collection_of_tuples_or_lists()
             self.check_rhs_elements_length_equals_lhs_length()
         else:

@@ -473,7 +473,6 @@ class TupleLookupsTests(TestCase):
                 TupleGreaterThanOrEqual,
                 TupleLessThan,
                 TupleLessThanOrEqual,
-                TupleIn,
             ),
             (
                 0,
@@ -494,6 +493,24 @@ class TupleLookupsTests(TestCase):
                     "must be a tuple or a list",
                 ):
                     lookup_cls((F("customer_code"), F("company_code")), rhs)
+
+    def test_tuple_in_lookup_rhs_must_be_iterable(self):
+        test_cases = (
+            0,
+            1,
+            None,
+            True,
+            False,
+        )
+
+        for rhs in test_cases:
+            with self.subTest(lookup_name="in", rhs=rhs):
+                with self.assertRaisesMessage(
+                    ValueError,
+                    "'in' lookup of ('customer_code', 'company_code') "
+                    "must be an iterable",
+                ):
+                    TupleIn((F("customer_code"), F("company_code")), rhs)
 
     def test_tuple_lookup_rhs_must_have_2_elements(self):
         test_cases = itertools.product(

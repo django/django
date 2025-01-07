@@ -6,6 +6,7 @@ the SQL domain.
 import warnings
 
 from django.core.exceptions import FullResultSet
+from django.db import models
 from django.db.models.sql.constants import INNER, LOUTER
 from django.utils.deprecation import RemovedInDjango60Warning
 
@@ -105,6 +106,39 @@ class Join:
                 # the branch for strings.
                 lhs_full_name = "%s.%s" % (qn(self.parent_alias), qn2(lhs))
                 rhs_full_name = "%s.%s" % (qn(self.table_alias), qn2(rhs))
+                join_conditions.append(f"{lhs_full_name} = {rhs_full_name}")
+            elif isinstance(lhs, (models.CharField, models.TextField)) and isinstance(
+                rhs, models.CompositePrimaryKey
+            ):
+                lhs_col = lhs.get_col(self.parent_alias)
+                for index, field in enumerate(rhs):
+                    rhs_col = field.get_col(self.table_alias)
+                    lhs_expr, rhs_expr = (
+                        connection.ops.prepare_join_composite_pk_on_json_array(
+                            rhs_col, lhs_col, index
+                        )
+                    )
+                    lhs_sql, lhs_params = compiler.compile(lhs_expr)
+                    rhs_sql, rhs_params = compiler.compile(rhs_expr)
+                    join_conditions.append(f"{lhs_sql} = {rhs_sql}")
+                    params.extend(lhs_params)
+                    params.extend(rhs_params)
+            elif isinstance(lhs, models.CompositePrimaryKey) and isinstance(
+                rhs, (models.CharField, models.TextField)
+            ):
+                rhs_col = rhs.get_col(self.table_alias)
+                for index, field in enumerate(lhs):
+                    lhs_col = field.get_col(self.parent_alias)
+                    lhs_expr, rhs_expr = (
+                        connection.ops.prepare_join_composite_pk_on_json_array(
+                            lhs_col, rhs_col, index
+                        )
+                    )
+                    lhs_sql, lhs_params = compiler.compile(lhs_expr)
+                    rhs_sql, rhs_params = compiler.compile(rhs_expr)
+                    join_conditions.append(f"{lhs_sql} = {rhs_sql}")
+                    params.extend(lhs_params)
+                    params.extend(rhs_params)
             else:
                 lhs, rhs = connection.ops.prepare_join_on_clause(
                     self.parent_alias, lhs, self.table_alias, rhs
@@ -113,7 +147,7 @@ class Join:
                 lhs_full_name = lhs_sql % lhs_params
                 rhs_sql, rhs_params = compiler.compile(rhs)
                 rhs_full_name = rhs_sql % rhs_params
-            join_conditions.append(f"{lhs_full_name} = {rhs_full_name}")
+                join_conditions.append(f"{lhs_full_name} = {rhs_full_name}")
 
         # Add a single condition inside parentheses for whatever
         # get_extra_restriction() returns.
