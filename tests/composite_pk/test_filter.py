@@ -1,5 +1,6 @@
-from django.db.models import F, TextField
+from django.db.models import F, FilteredRelation, OuterRef, Q, Subquery, TextField
 from django.db.models.functions import Cast
+from django.db.models.lookups import Exact
 from django.test import TestCase
 
 from .models import Comment, Tenant, User
@@ -407,3 +408,51 @@ class CompositePKFilterTests(TestCase):
         msg = "Cast does not support composite primary keys."
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.filter(text__gt=Cast(F("pk"), TextField())).count()
+
+    def test_outer_ref_pk(self):
+        subquery = Subquery(Comment.objects.filter(pk=OuterRef("pk")).values("id"))
+        tests = [
+            ("", 5),
+            ("__gt", 0),
+            ("__gte", 5),
+            ("__lt", 0),
+            ("__lte", 5),
+        ]
+        for lookup, expected_count in tests:
+            with self.subTest(f"id{lookup}"):
+                queryset = Comment.objects.filter(**{f"id{lookup}": subquery})
+                self.assertEqual(queryset.count(), expected_count)
+
+    def test_non_outer_ref_subquery(self):
+        # If rhs is any non-OuterRef object with an as_sql() function.
+        pk = Exact(F("tenant_id"), 1)
+        msg = (
+            "'exact' subquery lookup of 'pk' only supports OuterRef objects "
+            "(received 'Exact')"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.filter(pk=pk)
+
+    def test_outer_ref_not_composite_pk(self):
+        subquery = Comment.objects.filter(pk=OuterRef("id")).values("id")
+        queryset = Comment.objects.filter(id=Subquery(subquery))
+
+        msg = "Composite field lookups only work with composite expressions."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.assertEqual(queryset.count(), 5)
+
+    def test_outer_ref_in_filtered_relation(self):
+        msg = (
+            "This queryset contains a reference to an outer query and may only be used "
+            "in a subquery."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.assertSequenceEqual(
+                Tenant.objects.annotate(
+                    filtered_tokens=FilteredRelation(
+                        "tokens",
+                        condition=Q(tokens__pk__gte=OuterRef("tokens")),
+                    )
+                ).filter(filtered_tokens=(1, 1)),
+                [self.tenant_1],
+            )
