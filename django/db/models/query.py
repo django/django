@@ -728,7 +728,7 @@ class QuerySet(AltersData):
                     "bulk_create() can only be used with concrete fields in "
                     "update_fields."
                 )
-            if any(f.primary_key for f in update_fields):
+            if any(f in self.model._meta.pk_fields for f in update_fields):
                 raise ValueError(
                     "bulk_create() cannot be used with primary keys in "
                     "update_fields."
