@@ -60,11 +60,11 @@ For each version of Python, only the latest micro release (A.B.C) is officially
 supported. You can find the latest micro version for each series on the `Python
 download page <https://www.python.org/downloads/>`_.
 
-Typically, we will support a Python version up to and including the first
-Django LTS release whose security support ends after security support for that
-version of Python ends. For example, Python 3.9 security support ends in
-October 2025 and Django 4.2 LTS security support ends in April 2026. Therefore
-Django 4.2 is the last version to support Python 3.9.
+We will support a Python version up to and including the first Django LTS
+release whose security support ends after security support for that version of
+Python ends. For example, Python 3.9 security support ends in October 2025 and
+Django 4.2 LTS security support ends in April 2026. Therefore Django 4.2 is the
+last version to support Python 3.9.
 
 What Python version should I use with Django?
 =============================================
