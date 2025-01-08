@@ -1414,7 +1414,7 @@ precede the definition of any keyword arguments. For example::
 
 ... would not be valid.
 
-``Q`` objects can directly be used inside annotations. For example::
+``Q`` objects can directly be used inside annotations. For example ::
 
     queryset = Poll.objects.annotate(
         published_in_2007=Q(pub_date__year='2007')
