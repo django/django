@@ -1091,10 +1091,11 @@ class Model(AltersData, metaclass=ModelBase):
         for a single table.
         """
         meta = cls._meta
+        pk_fields = meta.pk_fields
         non_pks_non_generated = [
             f
             for f in meta.local_concrete_fields
-            if not f.primary_key and not f.generated
+            if f not in pk_fields and not f.generated
         ]
 
         if update_fields:
