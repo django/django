@@ -552,9 +552,8 @@ object's primary key attribute does **not** define a
 :attr:`~django.db.models.Field.default` or
 :attr:`~django.db.models.Field.db_default`, Django follows this algorithm:
 
-* If the object's primary key attribute is set to a value that evaluates to
-  ``True`` (i.e., a value other than ``None`` or the empty string), Django
-  executes an ``UPDATE``.
+* If the object's primary key attribute is set to anything except ``None``,
+  Django executes an ``UPDATE``.
 * If the object's primary key attribute is *not* set or if the ``UPDATE``
   didn't update anything (e.g. if primary key is set to a value that doesn't
   exist in the database), Django executes an ``INSERT``.
