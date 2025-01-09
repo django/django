@@ -340,6 +340,7 @@ class CompositePKFixturesTests(TestCase):
                     "fields": {
                         "id": 1,
                         "created": "2022-01-12T05:55:14.956",
+                        "text": "",
                     },
                 },
             ],

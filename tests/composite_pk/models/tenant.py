@@ -56,3 +56,4 @@ class TimeStamped(models.Model):
     pk = models.CompositePrimaryKey("id", "created")
     id = models.SmallIntegerField(unique=True)
     created = models.DateTimeField(auto_now_add=True)
+    text = models.TextField(default="", blank=True)

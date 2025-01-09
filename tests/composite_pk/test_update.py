@@ -1,7 +1,7 @@
 from django.db import connection
 from django.test import TestCase
 
-from .models import Comment, Tenant, Token, User
+from .models import Comment, Tenant, TimeStamped, Token, User
 
 
 class CompositePKUpdateTests(TestCase):
@@ -57,6 +57,28 @@ class CompositePKUpdateTests(TestCase):
         self.assertEqual(user.email, email)
         self.assertEqual(count, User.objects.count())
 
+    def test_update_fields_deferred(self):
+        c = Comment.objects.defer("text", "user_id").get(pk=self.comment_1.pk)
+        c.text = "Hello"
+
+        with self.assertNumQueries(1) as ctx:
+            c.save()
+
+        sql = ctx[0]["sql"]
+        self.assertEqual(sql.count(connection.ops.quote_name("tenant_id")), 1)
+        self.assertEqual(sql.count(connection.ops.quote_name("comment_id")), 1)
+
+        c = Comment.objects.get(pk=self.comment_1.pk)
+        self.assertEqual(c.text, "Hello")
+
+    def test_update_fields_pk_field(self):
+        msg = (
+            "The following fields do not exist in this model, are m2m fields, "
+            "or are non-concrete fields: id"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.user_1.save(update_fields=["id"])
+
     def test_bulk_update_comments(self):
         comment_1 = Comment.objects.get(pk=self.comment_1.pk)
         comment_2 = Comment.objects.get(pk=self.comment_2.pk)
@@ -76,6 +98,11 @@ class CompositePKUpdateTests(TestCase):
         self.assertEqual(comment_1.text, "foo")
         self.assertEqual(comment_2.text, "bar")
         self.assertEqual(comment_3.text, "baz")
+
+    def test_bulk_update_primary_key_fields(self):
+        message = "bulk_update() cannot be used with primary key fields."
+        with self.assertRaisesMessage(ValueError, message):
+            Comment.objects.bulk_update([self.comment_1, self.comment_2], ["id"])
 
     def test_update_or_create_user(self):
         test_cases = (
@@ -109,6 +136,16 @@ class CompositePKUpdateTests(TestCase):
                 self.assertEqual(user.tenant_id, self.tenant_1.id)
                 self.assertEqual(user.email, fields["defaults"]["email"])
                 self.assertEqual(count, User.objects.count())
+
+    def test_update_or_create_with_pre_save_pk_field(self):
+        t = TimeStamped.objects.create(id=1)
+        self.assertEqual(TimeStamped.objects.count(), 1)
+        t, created = TimeStamped.objects.update_or_create(
+            pk=t.pk, defaults={"text": "new text"}
+        )
+        self.assertIs(created, False)
+        self.assertEqual(TimeStamped.objects.count(), 1)
+        self.assertEqual(t.text, "new text")
 
     def test_update_comment_by_user_email(self):
         result = Comment.objects.filter(user__email=self.user_1.email).update(
