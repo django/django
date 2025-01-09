@@ -878,7 +878,7 @@ class QuerySet(AltersData):
         fields = [self.model._meta.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
-        if any(f.primary_key for f in fields):
+        if any(f in self.model._meta.pk_fields for f in fields):
             raise ValueError("bulk_update() cannot be used with primary key fields.")
         if not objs:
             return 0
@@ -995,9 +995,10 @@ class QuerySet(AltersData):
                 # This is to maintain backward compatibility as these fields
                 # are not updated unless explicitly specified in the
                 # update_fields list.
+                pk_fields = self.model._meta.pk_fields
                 for field in self.model._meta.local_concrete_fields:
                     if not (
-                        field.primary_key or field.__class__.pre_save is Field.pre_save
+                        field in pk_fields or field.__class__.pre_save is Field.pre_save
                     ):
                         update_fields.add(field.name)
                         if field.name != field.attname:
