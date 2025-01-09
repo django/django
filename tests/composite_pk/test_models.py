@@ -118,6 +118,10 @@ class CompositePKModelsTests(TestCase):
 
                 self.assertSequenceEqual(ctx.exception.messages, messages)
 
+    def test_full_clean_update(self):
+        with self.assertNumQueries(1):
+            self.comment_1.full_clean()
+
     def test_field_conflicts(self):
         test_cases = (
             ({"pk": (1, 1), "id": 2}, (1, 1)),

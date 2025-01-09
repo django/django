@@ -1009,7 +1009,7 @@ class Options:
         """
         names = []
         for field in self.concrete_fields:
-            if not field.primary_key:
+            if field not in self.pk_fields:
                 names.append(field.name)
                 if field.name != field.attname:
                     names.append(field.attname)
