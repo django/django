@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 
@@ -46,8 +48,8 @@ class Comment(models.Model):
 
 class Post(models.Model):
     pk = models.CompositePrimaryKey("tenant_id", "id")
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    id = models.UUIDField()
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, default=1)
+    id = models.UUIDField(default=uuid.uuid4)
 
 
 class TimeStamped(models.Model):
