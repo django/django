@@ -1,7 +1,7 @@
 import sys
 
+from django.conf import csp
 from django.http import HttpResponse
-from django.middleware import csp
 from django.utils.decorators import method_decorator
 from django.views.debug import technical_500_response
 from django.views.decorators.common import no_append_slash

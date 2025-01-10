@@ -3,37 +3,9 @@ import os
 from functools import partial
 from http import client as http_client
 
-from django.conf import settings
+from django.conf import csp, settings
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
-
-HEADER = "Content-Security-Policy"
-HEADER_REPORT_ONLY = "Content-Security-Policy-Report-Only"
-
-NONE = "'none'"
-REPORT_SAMPLE = "'report-sample'"
-SELF = "'self'"
-STRICT_DYNAMIC = "'strict-dynamic'"
-UNSAFE_ALLOW_REDIRECTS = "'unsafe-allow-redirects'"
-UNSAFE_EVAL = "'unsafe-eval'"
-UNSAFE_HASHES = "'unsafe-hashes'"
-UNSAFE_INLINE = "'unsafe-inline'"
-WASM_UNSAFE_EVAL = "'wasm-unsafe-eval'"
-
-
-class Nonce:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-
-    def __repr__(self):
-        return "django.middleware.csp.NONCE"
-
-
-NONCE = Nonce()
 
 
 class ContentSecurityPolicyMiddleware(MiddlewareMixin):
@@ -59,19 +31,21 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
         # If headers are already set on the response, don't overwrite them.
         # This allows for views to set their own CSP headers as needed.
-        no_csp_header = HEADER not in response
+        no_csp_header = csp.HEADER not in response
         is_not_exempt = getattr(response, "_csp_exempt", False) is False
         if no_csp_header and is_not_exempt:
             config, nonce = self.get_policy(request, response)
             if config:
-                response.headers[HEADER] = self.build_policy(config, nonce)
+                response.headers[csp.HEADER] = self.build_policy(config, nonce)
 
-        no_csp_header = HEADER_REPORT_ONLY not in response
+        no_csp_header = csp.HEADER_REPORT_ONLY not in response
         is_not_exempt = getattr(response, "_csp_exempt_ro", False) is False
         if no_csp_header and is_not_exempt:
             config, nonce = self.get_policy(request, response, report_only=True)
             if config:
-                response.headers[HEADER_REPORT_ONLY] = self.build_policy(config, nonce)
+                response.headers[csp.HEADER_REPORT_ONLY] = self.build_policy(
+                    config, nonce
+                )
 
         return response
 
@@ -104,12 +78,12 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
                 continue
             if not isinstance(value, (list, tuple)):
                 value = [value]
-            if NONCE in value:
+            if csp.NONCE in value:
                 if nonce:
-                    value = [f"'nonce-{nonce}'" if v == NONCE else v for v in value]
+                    value = [f"'nonce-{nonce}'" if v == csp.NONCE else v for v in value]
                 else:
                     # Remove the `NONCE` sentinel value if no nonce is provided.
-                    value = [v for v in value if v != NONCE]
+                    value = [v for v in value if v != csp.NONCE]
             if len(value):
                 # Support boolean directives, like `upgrade-insecure-requests`.
                 if value[0] is True:

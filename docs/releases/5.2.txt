@@ -150,7 +150,7 @@ You can customize your CSP policy through Django settings:
 
 Here's an an example of a basic CSP config::
 
-  from django.middleware import csp
+  from django.conf import csp
 
   SECURE_CSP = {
       "DIRECTIVES": {
