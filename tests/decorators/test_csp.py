@@ -1,7 +1,7 @@
 from asgiref.sync import iscoroutinefunction
 
+from django.conf import csp
 from django.http import HttpRequest, HttpResponse
-from django.middleware import csp
 from django.test import SimpleTestCase
 from django.views.decorators.csp import csp_exempt, csp_override
 

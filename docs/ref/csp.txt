@@ -32,7 +32,7 @@ To enable CSP in your Django project:
 2. Configure your CSP policies in your ``settings.py`` using either
    ``SECURE_CSP`` or ``SECURE_CSP_REPORT_ONLY``::
 
-      from django.middleware import csp
+      from django.conf import csp
 
       SECURE_CSP = {
           "DIRECTIVES": {
@@ -125,7 +125,7 @@ and their corresponding policies.
 Here's a comprehensive example that demonstrates a decent starting point for
 many applications::
 
-    from django.middleware import csp
+    from django.conf import csp
 
     SECURE_CSP = {
         "DIRECTIVES": {
@@ -209,8 +209,8 @@ class-based views<decorating-class-based-views>`.
     customize which header is overridden. By default, both headers are
     overridden. Example::
 
+        from django.conf import csp
         from django.http import HttpResponse
-        from django.middleware import csp
         from django.views.decorators.csp import csp_override
 
 

@@ -2,7 +2,7 @@
 Tests for Django's bundled context processors.
 """
 
-from django.middleware import csp
+from django.conf import csp
 from django.test import SimpleTestCase, TestCase, override_settings
 
 

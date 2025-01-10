@@ -1,4 +1,4 @@
-from django.middleware import csp
+from django.conf import csp
 from django.middleware.csp import ContentSecurityPolicyMiddleware
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -127,11 +127,6 @@ class BuildCSPTest(SimpleTestCase):
     def test_config_with_empty_directive(self):
         policy = {"DIRECTIVES": {"default-src": []}}
         self.assertPolicyEqual(self.build_policy(policy), "")
-
-    def test_nonce_sentinel(self):
-        self.assertEqual(csp.Nonce(), csp.Nonce())
-        self.assertEqual(csp.NONCE, csp.Nonce())
-        self.assertEqual(repr(csp.Nonce()), "django.middleware.csp.NONCE")
 
 
 @override_settings(
