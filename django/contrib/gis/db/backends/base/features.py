@@ -21,6 +21,8 @@ class BaseSpatialFeatures:
     # Reference implementation of 3D functions is:
     # https://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
     supports_3d_functions = False
+    # Does the backend support storing 4D geometries?
+    supports_4d_storage = False
     # Does the database support SRID transform operations?
     supports_transform = True
     # Can geometry fields be null?

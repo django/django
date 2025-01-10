@@ -9,7 +9,9 @@ class GeoModelAdminMixin:
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         if isinstance(db_field, models.GeometryField) and (
-            db_field.dim < 3 or self.gis_widget.supports_3d
+            db_field.dim < 3
+            or self.gis_widget.supports_3d
+            or self.gis_widget.supports_4d
         ):
             kwargs["widget"] = self.gis_widget(**self.gis_widget_kwargs)
             return db_field.formfield(**kwargs)

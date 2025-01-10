@@ -21,6 +21,7 @@ class BaseGeometryWidget(Widget):
     display_raw = False
 
     supports_3d = False
+    supports_4d = False
     template_name = ""  # set on subclasses
 
     def __init__(self, attrs=None):

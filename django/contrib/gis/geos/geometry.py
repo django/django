@@ -63,9 +63,12 @@ class GEOSGeometryBase(GEOSBase):
         "Perform post-initialization setup."
         # Setting the coordinate sequence for the geometry (will be None on
         # geometries that do not have coordinate sequences)
-        self._cs = (
-            GEOSCoordSeq(capi.get_cs(self.ptr), self.hasz) if self.has_cs else None
-        )
+        if geos_version_tuple() < (3, 12) and self.has_cs:
+            self._cs = GEOSCoordSeq(capi.get_cs(self.ptr), self.hasz)
+        elif self.has_cs:
+            self._cs = GEOSCoordSeq(capi.get_cs(self.ptr), self.hasz, self.hasm)
+        else:
+            self._cs = None
 
     def __copy__(self):
         """
@@ -397,7 +400,13 @@ class GEOSGeometryBase(GEOSBase):
     @property
     def wkt(self):
         "Return the WKT (Well-Known Text) representation of this Geometry."
-        return wkt_w(dim=3 if self.hasz else 2, trim=True).write(self).decode()
+        if self.hasz and self.hasm:
+            dim = 4
+        elif self.hasz or self.hasm:
+            dim = 3
+        else:
+            dim = 2
+        return wkt_w(dim=dim, trim=True).write(self).decode()
 
     @property
     def hex(self):
@@ -408,7 +417,13 @@ class GEOSGeometryBase(GEOSBase):
         """
         # A possible faster, all-python, implementation:
         #  str(self.wkb).encode('hex')
-        return wkb_w(dim=3 if self.hasz else 2).write_hex(self)
+        if self.hasz and self.hasm:
+            dim = 4
+        elif self.hasz or self.hasm:
+            dim = 3
+        else:
+            dim = 2
+        return wkb_w(dim=dim).write_hex(self)
 
     @property
     def hexewkb(self):
@@ -417,7 +432,13 @@ class GEOSGeometryBase(GEOSBase):
         extension of the WKB specification that includes SRID value that are
         a part of this geometry.
         """
-        return ewkb_w(dim=3 if self.hasz else 2).write_hex(self)
+        if self.hasz and self.hasm:
+            dim = 4
+        elif self.hasz or self.hasm:
+            dim = 3
+        else:
+            dim = 2
+        return ewkb_w(dim=dim).write_hex(self)
 
     @property
     def json(self):
@@ -435,7 +456,13 @@ class GEOSGeometryBase(GEOSBase):
         as a Python memoryview. SRID and Z values are not included, use the
         `ewkb` property instead.
         """
-        return wkb_w(3 if self.hasz else 2).write(self)
+        if self.hasz and self.hasm:
+            dim = 4
+        elif self.hasz or self.hasm:
+            dim = 3
+        else:
+            dim = 2
+        return wkb_w(dim=dim).write(self)
 
     @property
     def ewkb(self):
@@ -444,7 +471,13 @@ class GEOSGeometryBase(GEOSBase):
         This is an extension of the WKB specification that includes any SRID
         value that are a part of this geometry.
         """
-        return ewkb_w(3 if self.hasz else 2).write(self)
+        if self.hasz and self.hasm:
+            dim = 4
+        elif self.hasz or self.hasm:
+            dim = 3
+        else:
+            dim = 2
+        return ewkb_w(dim=dim).write(self)
 
     @property
     def kml(self):

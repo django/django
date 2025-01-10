@@ -123,6 +123,8 @@ wkb_writer_get_byteorder = WKBWriterGet("GEOSWKBWriter_getByteOrder")
 wkb_writer_set_byteorder = WKBWriterSet("GEOSWKBWriter_setByteOrder")
 wkb_writer_get_outdim = WKBWriterGet("GEOSWKBWriter_getOutputDimension")
 wkb_writer_set_outdim = WKBWriterSet("GEOSWKBWriter_setOutputDimension")
+wkb_writer_get_flavor = WKBWriterGet("GEOSWKBWriter_getFlavor")
+wkb_writer_set_flavor = WKBWriterSet("GEOSWKBWriter_setFlavor")
 wkb_writer_get_include_srid = WKBWriterGet(
     "GEOSWKBWriter_getIncludeSRID", restype=c_byte
 )
@@ -215,8 +217,8 @@ class WKTWriter(IOBase):
 
     @outdim.setter
     def outdim(self, new_dim):
-        if new_dim not in (2, 3):
-            raise ValueError("WKT output dimension must be 2 or 3")
+        if new_dim not in (2, 3, 4):
+            raise ValueError("WKT output dimension must be 2, 3, or 4")
         wkt_writer_set_outdim(self.ptr, new_dim)
 
     @property
@@ -250,9 +252,10 @@ class WKBWriter(IOBase):
     destructor = wkb_writer_destroy
     geos_version = geos_version_tuple()
 
-    def __init__(self, dim=2):
+    def __init__(self, dim=2, flavor=2):
         super().__init__()
         self.outdim = dim
+        self.flavor = flavor
 
     def _handle_empty_point(self, geom):
         from django.contrib.gis.geos import Point
@@ -301,9 +304,20 @@ class WKBWriter(IOBase):
 
     @outdim.setter
     def outdim(self, new_dim):
-        if new_dim not in (2, 3):
-            raise ValueError("WKB output dimension must be 2 or 3")
+        if new_dim not in (2, 3, 4):
+            raise ValueError("WKB output dimension must be 2, 3, or 4")
         wkb_writer_set_outdim(self.ptr, new_dim)
+
+    # Property for getting/setting the output dimension.
+    @property
+    def flavor(self):
+        return wkb_writer_get_flavor(self.ptr)
+
+    @flavor.setter
+    def flavor(self, new_flavor):
+        if new_flavor not in (1, 2):
+            raise ValueError("WKB flavor must be 1 (Extended) or 2 (ISO)")
+        wkb_writer_set_flavor(self.ptr, new_flavor)
 
     # Property for getting/setting the include srid flag.
     @property
