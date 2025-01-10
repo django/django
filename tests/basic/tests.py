@@ -32,6 +32,8 @@ from .models import (
     FeaturedArticle,
     PrimaryKeyWithDbDefault,
     PrimaryKeyWithDefault,
+    PrimaryKeyWithFalseyDbDefault,
+    PrimaryKeyWithFalseyDefault,
     SelfRef,
 )
 
@@ -202,6 +204,14 @@ class ModelInstanceCreationTests(TestCase):
         # default.
         with self.assertNumQueries(2):
             ChildPrimaryKeyWithDefault().save()
+
+    def test_save_primary_with_falsey_default(self):
+        with self.assertNumQueries(1):
+            PrimaryKeyWithFalseyDefault().save()
+
+    def test_save_primary_with_falsey_db_default(self):
+        with self.assertNumQueries(1):
+            PrimaryKeyWithFalseyDbDefault().save()
 
     def test_save_deprecation(self):
         a = Article(headline="original", pub_date=datetime(2014, 5, 16))
