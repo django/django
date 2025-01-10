@@ -12,6 +12,7 @@ from django.utils.functional import lazy
 from .models import (
     Author,
     Book,
+    ComicBook,
     DefaultPerson,
     Journalist,
     ManualPrimaryKeyTest,
@@ -579,12 +580,14 @@ class UpdateOrCreateTests(TestCase):
 
     def test_update_only_defaults_and_pre_save_fields_when_local_fields(self):
         publisher = Publisher.objects.create(name="Acme Publishing")
-        book = Book.objects.create(publisher=publisher, name="The Book of Ed & Fred")
+        book = ComicBook.objects.create(
+            publisher=publisher, name="The Book of Ed & Fred"
+        )
 
         for defaults in [{"publisher": publisher}, {"publisher_id": publisher}]:
             with self.subTest(defaults=defaults):
                 with CaptureQueriesContext(connection) as captured_queries:
-                    book, created = Book.objects.update_or_create(
+                    book, created = ComicBook.objects.update_or_create(
                         pk=book.pk,
                         defaults=defaults,
                     )
