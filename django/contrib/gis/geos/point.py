@@ -11,31 +11,53 @@ class Point(GEOSGeometry):
     _maxlength = 3
     has_cs = True
 
-    def __init__(self, x=None, y=None, z=None, srid=None):
+    def __init__(self, x=None, y=None, z=None, m=None, srid=None):
         """
         The Point object may be initialized with either a tuple, or individual
         parameters.
 
         For example:
-        >>> p = Point((5, 23))  # 2D point, passed in as a tuple
-        >>> p = Point(5, 23, 8)  # 3D point, passed as individual parameters
+        >>> p = Point((5, 23))           # 2D point (XY)
+        >>> p = Point(5, 23)             # 2D point (XY)
+        >>> p = Point((5, 23, 8))        # 3D point with Z (XYZ)
+        >>> p = Point(5, 23, 8)          # 3D point with Z (XYZ)
+        >>> p = Point(5, 23, m=10)       # 3D point with M (XYM)
+        >>> p = Point((5, 23, 10, 20))   # 4D point (XYZM)
+        >>> p = Point(5, 23, 10, 20)     # 4D point (XYZM)
         """
+        hasz = False
+        hasm = False
         if x is None:
             coords = []
         elif isinstance(x, (tuple, list)):
             # Here a tuple or list was passed in under the `x` parameter.
             coords = x
+            if len(x) >= 3:
+                hasz = True
+            if len(x) == 4:
+                hasm = True
         elif isinstance(x, (float, int)) and isinstance(y, (float, int)):
-            # Here X, Y, and (optionally) Z were passed in individually, as
-            # parameters.
-            if isinstance(z, (float, int)):
+            # Here X, Y, and (optionally) Z and M were passed in individually,
+            # as parameters.
+            # TODO do we need to check x is a float or int?
+            if isinstance(z, (float, int)) and isinstance(m, (float, int)):
+                coords = [x, y, z, m]
+                hasz = True
+                hasm = True
+            elif isinstance(z, (float, int)):
                 coords = [x, y, z]
+                hasz = True
+            elif isinstance(m, (float, int)):
+                coords = [x, y, m]
+                hasm = True
             else:
                 coords = [x, y]
+
         else:
             raise TypeError("Invalid parameters given for Point initialization.")
 
-        point = self._create_point(len(coords), coords)
+        # Assume `Point((1, 2, 3))` has Z dimension.
+        point = self._create_point(len(coords), coords, hasz, hasm)
 
         # Initializing using the address returned from the GEOS
         #  createPoint factory.
@@ -54,31 +76,33 @@ class Point(GEOSGeometry):
 
     @classmethod
     def _create_empty(cls):
-        return cls._create_point(None, None)
+        return cls._create_point(None, None, False, False)
 
     @classmethod
-    def _create_point(cls, ndim, coords):
+    def _create_point(cls, ndim, coords, hasz, hasm):
         """
-        Create a coordinate sequence, set X, Y, [Z], and create point
+        Create a coordinate sequence, set X, Y, [Z], [M] and create point
         """
         if not ndim:
             return capi.create_point(None)
 
-        if ndim < 2 or ndim > 3:
+        if ndim < 2 or ndim > 4:
             raise TypeError("Invalid point dimension: %s" % ndim)
 
         coords_buffer = (c_double * ndim)(*coords)
         cs = capi.coordseq_from_buffer(
             coords_buffer,
             1,
-            int(ndim == 3),
-            0,  # hazM not yet supported.
+            int(hasz),
+            int(hasm),
         )
 
         return capi.create_point(cs)
 
     def _set_list(self, length, items):
-        ptr = self._create_point(length, items)
+        hasz = length >= 3
+        hasm = length == 4
+        ptr = self._create_point(length, items, hasz, hasm)
         if ptr:
             srid = self.srid
             capi.destroy_geom(self.ptr)
@@ -99,10 +123,15 @@ class Point(GEOSGeometry):
             yield self[i]
 
     def __len__(self):
-        "Return the number of dimensions for this Point (either 0, 2 or 3)."
+        """
+        Return the number of dimensions for this Point (either 0, 2, 3, or 4).
+        """
         if self.empty:
             return 0
-        if self.hasz:
+        elif self.hasm:
+            return 4
+        # todo could be hasm and not hasz?
+        elif self.hasz:
             return 3
         else:
             return 2
@@ -148,6 +177,18 @@ class Point(GEOSGeometry):
         if not self.hasz:
             raise GEOSException("Cannot set Z on 2D Point.")
         self._cs.setOrdinate(2, 0, value)
+
+    @property
+    def m(self):
+        "Return the M component of the Point."
+        return self._cs.getOrdinate(3, 0) if self.hasm else None
+
+    @m.setter
+    def m(self, value):
+        "Set the M component of the Point."
+        if not self.hasm:
+            raise GEOSException("Cannot set M on 2D.")
+        self._cs.setOrdinate(3, 0, value)
 
     # ### Tuple setting and retrieval routines. ###
     @property

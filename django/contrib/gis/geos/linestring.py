@@ -90,8 +90,8 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         cs_ptr = capi.coordseq_from_buffer(
             coords_buffer,
             ncoords,
-            int(ndim == 3),
-            0,  # hasM not yet supported.
+            int(ndim >= 3),
+            int(ndim == 4),
         )
         super().__init__(self._init_func(cs_ptr), srid=srid)
 
@@ -134,7 +134,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         self._cs[index] = value
 
     def _checkdim(self, dim):
-        if dim not in (2, 3):
+        if dim not in (2, 3, 4):
             raise TypeError("Dimension mismatch.")
 
     # #### Sequence Properties ####
@@ -178,6 +178,14 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
             return None
         else:
             return self._listarr(self._cs.getZ)
+
+    @property
+    def m(self):
+        "Return a list or numpy array of the M variable."
+        if not self.hasm:
+            return None
+        else:
+            return self._listarr(self._cs.getM)
 
 
 # LinearRings are LineStrings used within Polygons.
