@@ -22,6 +22,7 @@ from .models import (
     GeneratedModelCheckConstraint,
     GeneratedModelCheckConstraintVirtual,
     GeneratedModelFieldWithConverters,
+    GeneratedModelNonAutoPk,
     GeneratedModelNull,
     GeneratedModelNullVirtual,
     GeneratedModelOutputFieldDbCollation,
@@ -355,6 +356,12 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         obj = GeneratedModelFieldWithConverters.objects.create(field=uuid.uuid4())
         obj = self._refresh_if_needed(obj)
         self.assertEqual(obj.field, obj.field_copy)
+
+    def test_create_with_non_auto_pk(self):
+        obj = GeneratedModelNonAutoPk.objects.create(id=1, a=2)
+        self.assertEqual(obj.id, 1)
+        self.assertEqual(obj.a, 2)
+        self.assertEqual(obj.b, 2)
 
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")

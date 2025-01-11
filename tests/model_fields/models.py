@@ -527,6 +527,19 @@ class GeneratedModel(models.Model):
         required_db_features = {"supports_stored_generated_columns"}
 
 
+class GeneratedModelNonAutoPk(models.Model):
+    id = models.IntegerField(primary_key=True)
+    a = models.IntegerField()
+    b = models.GeneratedField(
+        expression=F("a"),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
 class GeneratedModelVirtual(models.Model):
     a = models.IntegerField()
     b = models.IntegerField()
