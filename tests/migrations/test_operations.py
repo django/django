@@ -6562,6 +6562,9 @@ class OperationTests(OperationTestBase):
     def test_composite_pk_operations(self):
         app_label = "test_d8d90af6"
         project_state = self.set_up_test_model(app_label)
+        operation_0 = migrations.AlterField(
+            "Pony", "id", models.IntegerField(primary_key=True)
+        )
         operation_1 = migrations.AddField(
             "Pony", "pk", models.CompositePrimaryKey("id", "pink")
         )
@@ -6571,12 +6574,12 @@ class OperationTests(OperationTestBase):
 
         # 1. Add field (pk).
         new_state = project_state.clone()
-        operation_1.state_forwards(app_label, new_state)
-        with connection.schema_editor() as editor:
-            operation_1.database_forwards(app_label, editor, project_state, new_state)
+        new_state = self.apply_operations(
+            app_label, new_state, [operation_0, operation_1]
+        )
         self.assertColumnNotExists(table_name, "pk")
         Pony = new_state.apps.get_model(app_label, "pony")
-        obj_1 = Pony.objects.create(weight=1)
+        obj_1 = Pony.objects.create(id=1, weight=1)
         msg = (
             f"obj_1={obj_1}, "
             f"obj_1.id={obj_1.id}, "
