@@ -139,7 +139,7 @@ def role_required(
     roles: list[str],
     test_all=False,
     redirect_field_name=REDIRECT_FIELD_NAME,
-    login_url=None
+    login_url=None,
 ):
     """
     Decorator for views that checks that the user has a specific role,
