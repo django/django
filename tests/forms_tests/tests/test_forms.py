@@ -5371,7 +5371,7 @@ class TemplateTests(SimpleTestCase):
         f = MyForm()
         self.assertHTMLEqual(
             f.render(),
-            '<div><label for="id_first_name">First name:</label><p>Custom Field<p>'
+            '<div><label for="id_first_name">First name:</label><p>Custom Field</p>'
             '<input type="text" name="first_name" required id="id_first_name"></div>',
         )
 
@@ -5382,7 +5382,7 @@ class TemplateTests(SimpleTestCase):
         f = MyForm()
         self.assertHTMLEqual(
             f["first_name"].render(template_name="forms_tests/custom_field.html"),
-            '<label for="id_first_name">First name:</label><p>Custom Field<p>'
+            '<label for="id_first_name">First name:</label><p>Custom Field</p>'
             '<input type="text" name="first_name" required id="id_first_name">',
         )
 
@@ -5410,7 +5410,7 @@ class OverrideTests(SimpleTestCase):
         html = t.render(Context({"form": Person()}))
         expected = """
         <label for="id_first_name">First name:</label>
-        <p>Custom Field<p>
+        <p>Custom Field</p>
         <input type="text" name="first_name" required id="id_first_name">
         """
         self.assertHTMLEqual(html, expected)
