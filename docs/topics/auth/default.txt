@@ -637,13 +637,20 @@ The ``role_required`` decorator
 
 
         @login_required
-        @role_required(['is_seller'], login_url='/create-store/')
+        @role_required(["is_seller"], login_url="/create-store/")
         def my_view(request): ...
 
 
         @login_required
-        @role_required(['is_admin', 'is_moderator'], test_all=True, login_url='/create-store/')
+        @role_required(["is_admin", "is_moderator"], test_all=True, login_url="/create-store/")
         def admin_dashboard(request): ...
+
+
+.. note::
+
+    The ``role_required`` decorator does NOT check the ``is_active`` flag on a
+    user, but the default :setting:`AUTHENTICATION_BACKENDS` reject inactive
+    users.
 
 
 .. currentmodule:: django.contrib.auth.mixins

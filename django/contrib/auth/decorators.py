@@ -144,10 +144,8 @@ def role_required(
     """
     Decorator for views that checks that the user has a specific role,
     redirecting to the log-in page if necessary.
-    
-    role: must be a list of valid string user attributes as they ware 
+    role: must be a list of valid string user attributes as they ware
     declared in their models
-    
     test_all: bool value that determines if all roles are required or just one.
     """
     def _test_role(user):
@@ -158,7 +156,6 @@ def role_required(
         return user.is_authenticated and any(
             getattr(user, role, False) for role in roles
         )
-    
     actual_decorator = user_passes_test(
         lambda u: _test_role(u),
         login_url,
