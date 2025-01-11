@@ -167,6 +167,13 @@ The examples below assume you are using function-based views. If you
 are working with class-based views, you can refer to :ref:`Decorating
 class-based views<decorating-class-based-views>`.
 
+.. warning::
+
+    Weakening or excluding a CSP policy on any page can compromise the
+    security of the entire site. Due to the "same origin" policy, an
+    attacker can exploit a vulnerability on one page to access other parts
+    of the site.
+
 .. function:: csp_disabled(enforced=True, report_only=True)(view)
 
     This decorator marks a view as being disabled from the Content Security Policy
