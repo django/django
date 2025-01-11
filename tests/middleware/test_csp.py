@@ -323,27 +323,27 @@ class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
         self.assertEqual(response[csp.HEADER], basic_policy)
         self.assertEqual(response[csp.HEADER_REPORT_ONLY], basic_policy)
 
-    def test_csp_exempt_both(self):
+    def test_csp_disabled_both(self):
         """
-        Test that `csp_exempt` will clear both headers.
+        Test that `csp_disabled` will clear both headers.
         """
-        response = self.client.get("/csp-exempt/")
+        response = self.client.get("/csp-disabled/")
         self.assertNotIn(csp.HEADER, response)
         self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
 
-    def test_csp_exempt_decorator(self):
+    def test_csp_disabled_decorator(self):
         """
-        Test that `csp_exempt` will clear the enforced header.
+        Test that `csp_disabled` will clear the enforced header.
         """
-        response = self.client.get("/csp-exempt-enforced/")
+        response = self.client.get("/csp-disabled-enforced/")
         self.assertNotIn(csp.HEADER, response)
         self.assertEqual(response[csp.HEADER_REPORT_ONLY], basic_policy)
 
-    def test_csp_exempt_report_only_decorator(self):
+    def test_csp_disabled_report_only_decorator(self):
         """
-        Test that `csp_exempt` will clear the report-only header.
+        Test that `csp_disabled` will clear the report-only header.
         """
-        response = self.client.get("/csp-exempt-report-only/")
+        response = self.client.get("/csp-disabled-report-only/")
         self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
         self.assertEqual(response[csp.HEADER], basic_policy)
 
