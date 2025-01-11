@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import (
     login_not_required,
     login_required,
     permission_required,
-    user_passes_test,
     role_required,
+    user_passes_test,
 )
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -428,7 +428,9 @@ class UserPassesTestDecoratorTest(TestCase):
 class RoleRequiredDecoratorTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = models.User.objects.create_user(username='testuser', password='testpass')
+        self.user = models.User.objects.create_user(
+            username='testuser', password='testpass'
+        )
         self.user.is_seller = True
         self.user.is_admin = True
         self.user.is_moderator = False
