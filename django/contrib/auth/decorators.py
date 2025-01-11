@@ -133,3 +133,34 @@ def permission_required(perm, login_url=None, raise_exception=False):
         return user_passes_test(check_perms, login_url=login_url)(view_func)
 
     return decorator
+
+
+def role_required(
+    roles: list[str],
+    test_all=False,
+    redirect_field_name=REDIRECT_FIELD_NAME,
+    login_url=None,
+):
+    """
+    Decorator for views that checks that the user has a specific role,
+    redirecting to the log-in page if necessary.
+    role: must be a list of valid string user attributes as they ware
+    declared in their models
+    test_all: bool value that determines if all roles are required or just one.
+    """
+
+    def _test_role(user):
+        if test_all:
+            return user.is_authenticated and all(
+                getattr(user, role, False) for role in roles
+            )
+        return user.is_authenticated and any(
+            getattr(user, role, False) for role in roles
+        )
+
+    actual_decorator = user_passes_test(
+        lambda u: _test_role(u),
+        login_url,
+        redirect_field_name,
+    )
+    return actual_decorator
