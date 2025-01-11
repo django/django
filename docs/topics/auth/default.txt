@@ -605,6 +605,49 @@ The ``login_required`` decorator
 
     Support for wrapping asynchronous view functions was added.
 
+The ``role_required`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: role_required(roles, test_all=False, redirect_field_name='next', login_url=None)
+
+    The :func:`~django.contrib.auth.decorators.role_required` decorator restricts
+    access to views based on user roles. It checks if the user has one or all of the 
+    specified roles (depending on the ``test_all`` parameter) and redirects unauthorized 
+    users to the login page.
+
+    func:`~django.contrib.auth.decorators.login_required` has these 2 specific params
+    (alongside with the ``redirect_field_name`` and the ``login_url``)
+
+    *``roles`` (list[str]):
+      A list of role attributes to check on the user model. Each role must be a valid 
+      attribute of the user model.
+      Example: ``['is_seller', 'is_admin']``.
+
+    *``test_all`` (bool, optional):
+      If ``True``, the user must have **all** the specified roles to access the view.
+      If ``False``, the user needs **any one** of the specified roles.
+      Default: ``False``.
+
+    The func:`~django.contrib.auth.decorators.login_required` returns a decorator that 
+    can be applied to view functions.
+
+    *Examples*
+    The usage of this decorator is as follows::
+
+        from django.contrib.auth.decorators import login_required, role_required
+
+
+        @login_required
+        @role_required(['is_seller'], login_url='/create-store/')
+        def my_view(request): ...
+
+
+        @login_required
+        @role_required(['is_admin', 'is_moderator'], test_all=True, login_url='/create-store/')
+        def admin_dashboard(request):
+        return render(request, 'admin_dashboard.html')
+
+
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``LoginRequiredMixin`` mixin
