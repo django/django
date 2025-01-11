@@ -167,33 +167,33 @@ The examples below assume you are using function-based views. If you
 are working with class-based views, you can refer to :ref:`Decorating
 class-based views<decorating-class-based-views>`.
 
-.. function:: csp_exempt(enforced=True, report_only=True)(view)
+.. function:: csp_disabled(enforced=True, report_only=True)(view)
 
-    This decorator marks a view as being exempt from the Content Security Policy
+    This decorator marks a view as being disabled from the Content Security Policy
     protection ensured by the middleware. Example::
 
         from django.http import HttpResponse
-        from django.views.decorators.csp import csp_exempt
+        from django.views.decorators.csp import csp_disabled
 
 
-        @csp_exempt
+        @csp_disabled
         def my_view(request):
             return HttpResponse("This view will not have either CSP headers")
 
     This decorator takes optional boolean arguments ``enforced`` and
-    ``report_only`` to customize which header is exempt. By default, both
-    headers are exempt. Example::
+    ``report_only`` to customize which header is disabled. By default, both
+    headers are disabled. Example::
 
         from django.http import HttpResponse
-        from django.views.decorators.csp import csp_exempt
+        from django.views.decorators.csp import csp_disabled
 
 
-        @csp_exempt(report_only=False)
+        @csp_disabled(report_only=False)
         def my_view(request):
             return HttpResponse("This view will only have an enforced CSP header")
 
 
-        @csp_exempt(enforced=False)
+        @csp_disabled(enforced=False)
         def another_view(request):
             return HttpResponse("This view will only have a report-only CSP header")
 

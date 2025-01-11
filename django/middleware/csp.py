@@ -32,15 +32,15 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         # If headers are already set on the response, don't overwrite them.
         # This allows for views to set their own CSP headers as needed.
         no_csp_header = csp.HEADER not in response
-        is_not_exempt = not getattr(response, "_csp_exempt", False)
-        if no_csp_header and is_not_exempt:
+        is_not_disabled = not getattr(response, "_csp_disabled", False)
+        if no_csp_header and is_not_disabled:
             config, nonce = self.get_policy(request, response)
             if config:
                 response.headers[csp.HEADER] = self.build_policy(config, nonce)
 
         no_csp_header = csp.HEADER_REPORT_ONLY not in response
-        is_not_exempt = not getattr(response, "_csp_exempt_ro", False)
-        if no_csp_header and is_not_exempt:
+        is_not_disabled = not getattr(response, "_csp_disabled_ro", False)
+        if no_csp_header and is_not_disabled:
             config, nonce = self.get_policy(request, response, report_only=True)
             if config:
                 response.headers[csp.HEADER_REPORT_ONLY] = self.build_policy(

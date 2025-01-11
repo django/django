@@ -629,7 +629,7 @@ You can customize your CSP policy through Django settings:
 * :setting:`SECURE_CSP_REPORT_ONLY` for the report-only policy
 
 For per-view manipulation of CSP headers, the decorators :func:`~django.views.decorators.csp.csp_override`
-and :func:`~django.views.decorators.csp.csp_exempt` are also available.
+and :func:`~django.views.decorators.csp.csp_disabled` are also available.
 
 Middleware ordering
 ===================

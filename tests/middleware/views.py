@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.debug import technical_500_response
 from django.views.decorators.common import no_append_slash
-from django.views.decorators.csp import csp_exempt, csp_override
+from django.views.decorators.csp import csp_disabled, csp_override
 from django.views.generic import View
 
 
@@ -28,18 +28,18 @@ def csp_nonce(request):
     return HttpResponse(request.csp_nonce)
 
 
-@csp_exempt
-def csp_exempt_both(request):
+@csp_disabled
+def csp_disabled_both(request):
     return HttpResponse()
 
 
-@csp_exempt(report_only=False)
-def csp_exempt_enforced(request):
+@csp_disabled(report_only=False)
+def csp_disabled_enforced(request):
     return HttpResponse()
 
 
-@csp_exempt(enforced=False)
-def csp_exempt_ro(request):
+@csp_disabled(enforced=False)
+def csp_disabled_ro(request):
     return HttpResponse()
 
 

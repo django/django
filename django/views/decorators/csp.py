@@ -32,25 +32,25 @@ def csp_override(config, enforced=True, report_only=True):
     return decorator
 
 
-def csp_exempt(enforced=True, report_only=True):
-    def _set_exempt(response, enforced, report_only):
+def csp_disabled(enforced=True, report_only=True):
+    def _set_disabled(response, enforced, report_only):
         if enforced:
-            response._csp_exempt = enforced
+            response._csp_disabled = enforced
         if report_only:
-            response._csp_exempt_ro = report_only
+            response._csp_disabled_ro = report_only
         return response
 
     def decorator(view_func):
         @wraps(view_func)
         async def _wrapped_async_view(request, *args, **kwargs):
             response = await view_func(request, *args, **kwargs)
-            response = _set_exempt(response, enforced, report_only)
+            response = _set_disabled(response, enforced, report_only)
             return response
 
         @wraps(view_func)
         def _wrapped_sync_view(request, *args, **kwargs):
             response = view_func(request, *args, **kwargs)
-            response = _set_exempt(response, enforced, report_only)
+            response = _set_disabled(response, enforced, report_only)
             return response
 
         # Determine whether to wrap as async or sync function

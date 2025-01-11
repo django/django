@@ -14,9 +14,9 @@ urlpatterns = [
     # Used in CSP tests.
     path("csp-base/", views.empty_view),
     path("csp-nonce/", views.csp_nonce),
-    path("csp-exempt/", views.csp_exempt_both),
-    path("csp-exempt-enforced/", views.csp_exempt_enforced),
-    path("csp-exempt-report-only/", views.csp_exempt_ro),
+    path("csp-disabled/", views.csp_disabled_both),
+    path("csp-disabled-enforced/", views.csp_disabled_enforced),
+    path("csp-disabled-report-only/", views.csp_disabled_ro),
     path("override-csp-both/", views.override_csp_both),
     path("override-csp-enforced/", views.override_csp_enforced),
     path("override-csp-report-only/", views.override_csp_report_only),

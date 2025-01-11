@@ -162,7 +162,7 @@ Here's an an example of a basic CSP config::
   }
 
 Per-view policy customization with can be achieved via the 
-:func:`~django.views.decorators.csp.csp_exempt` and
+:func:`~django.views.decorators.csp.csp_disabled` and
 :func:`~django.views.decorators.csp.csp_override` decorators.
 
 See :ref:`Using CSP <using-csp>` for more usage details.
