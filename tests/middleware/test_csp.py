@@ -1,4 +1,5 @@
 from django.conf import csp
+from django.http import HttpRequest, HttpResponse
 from django.middleware.csp import ContentSecurityPolicyMiddleware
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -8,12 +9,17 @@ basic_config = {
         "default-src": [csp.SELF],
     }
 }
+alt_config = {
+    "DIRECTIVES": {
+        "default-src": [csp.SELF, csp.UNSAFE_INLINE],
+    }
+}
 basic_policy = "default-src 'self'"
 
 
-class BuildCSPTest(SimpleTestCase):
+class CSPBuildPolicyTest(SimpleTestCase):
     def build_policy(self, policy, nonce=None):
-        return ContentSecurityPolicyMiddleware("").build_policy(policy, nonce)
+        return ContentSecurityPolicyMiddleware.build_policy(policy, nonce)
 
     def assertPolicyEqual(self, a, b):
         parts_a = sorted(a.split("; ")) if a is not None else None
@@ -127,6 +133,81 @@ class BuildCSPTest(SimpleTestCase):
     def test_config_with_empty_directive(self):
         policy = {"DIRECTIVES": {"default-src": []}}
         self.assertPolicyEqual(self.build_policy(policy), "")
+
+
+class CSPGetPolicyTest(SimpleTestCase):
+    nonce = "test-nonce"
+
+    def get_policy(self, request, response, report_only=False):
+        return ContentSecurityPolicyMiddleware.get_policy(
+            request, response, report_only
+        )
+
+    def test_default(self):
+        request = HttpRequest()
+        response = HttpResponse()
+        self.assertEqual(self.get_policy(request, response), (None, None))
+        request._csp_nonce = self.nonce
+        self.assertEqual(self.get_policy(request, response), (None, self.nonce))
+
+    def test_default_report_only(self):
+        request = HttpRequest()
+        response = HttpResponse()
+        self.assertEqual(
+            self.get_policy(request, response, report_only=True), (None, None)
+        )
+        request._csp_nonce = self.nonce
+        self.assertEqual(self.get_policy(request, response), (None, self.nonce))
+
+    def test_settings(self):
+        request = HttpRequest()
+        response = HttpResponse()
+        with self.settings(SECURE_CSP=basic_config):
+            self.assertEqual(self.get_policy(request, response), (basic_config, None))
+            request._csp_nonce = self.nonce
+            self.assertEqual(
+                self.get_policy(request, response), (basic_config, self.nonce)
+            )
+
+    def test_settings_report_only(self):
+        request = HttpRequest()
+        response = HttpResponse()
+        with self.settings(SECURE_CSP_REPORT_ONLY=basic_config):
+            self.assertEqual(
+                self.get_policy(request, response, report_only=True),
+                (basic_config, None),
+            )
+            request._csp_nonce = self.nonce
+            self.assertEqual(
+                self.get_policy(request, response, report_only=True),
+                (basic_config, self.nonce),
+            )
+
+    def test_response_override(self):
+        request = HttpRequest()
+        response = HttpResponse()
+        response._csp_config = basic_config
+        with self.settings(SECURE_CSP=alt_config):
+            self.assertEqual(self.get_policy(request, response), (basic_config, None))
+            request._csp_nonce = self.nonce
+            self.assertEqual(
+                self.get_policy(request, response), (basic_config, self.nonce)
+            )
+
+    def test_response_override_report_only(self):
+        request = HttpRequest()
+        response = HttpResponse()
+        response._csp_config_ro = basic_config
+        with self.settings(SECURE_CSP=alt_config):
+            self.assertEqual(
+                self.get_policy(request, response, report_only=True),
+                (basic_config, None),
+            )
+            request._csp_nonce = self.nonce
+            self.assertEqual(
+                self.get_policy(request, response, report_only=True),
+                (basic_config, self.nonce),
+            )
 
 
 @override_settings(
