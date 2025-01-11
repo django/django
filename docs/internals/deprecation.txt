@@ -104,6 +104,9 @@ details on these changes.
 
 * The ``get_cache_name()`` method of ``FieldCacheMixin`` will be removed.
 
+* The ``DEFAULT_TABLESPACE`` and ``DEFAULT_INDEX_TABLESPACE`` settings will be
+  removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

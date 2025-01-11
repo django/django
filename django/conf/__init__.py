@@ -27,6 +27,10 @@ STATICFILES_STORAGE_ALIAS = "staticfiles"
 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
     "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
 )
+DEFAULT_TABLESPACE_DEPRECATED_MSG = "The DEFAULT_TABLESPACE setting is deprecated."
+DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG = (
+    "The DEFAULT_INDEX_TABLESPACE setting is deprecated."
+)
 
 
 class SettingsReference(str):
@@ -192,6 +196,18 @@ class Settings:
                 RemovedInDjango60Warning,
             )
 
+        if self.is_overridden("DEFAULT_TABLESPACE"):
+            warnings.warn(
+                DEFAULT_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+
+        if self.is_overridden("DEFAULT_INDEX_TABLESPACE"):
+            warnings.warn(
+                DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -239,6 +255,16 @@ class UserSettingsHolder:
         if name == "FORMS_URLFIELD_ASSUME_HTTPS":
             warnings.warn(
                 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if name == "DEFAULT_TABLESPACE":
+            warnings.warn(
+                DEFAULT_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if name == "DEFAULT_INDEX_TABLESPACE":
+            warnings.warn(
+                DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG,
                 RemovedInDjango60Warning,
             )
         super().__setattr__(name, value)

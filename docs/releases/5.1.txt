@@ -432,6 +432,9 @@ Miscellaneous
 
 * Overriding existing converters with ``django.urls.register_converter()`` is
   deprecated.
+* The :setting:`DEFAULT_TABLESPACE` and :setting:`DEFAULT_INDEX_TABLESPACE`
+  settings are deprecated. Set them in your database configuration in
+  :setting:`DATABASES` instead.
 
 * The ``check`` keyword argument of ``CheckConstraint`` is deprecated in favor
   of ``condition``.

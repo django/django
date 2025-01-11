@@ -21,10 +21,15 @@ the :attr:`~django.db.models.Options.db_tablespace` option inside the model's
 ``class Meta``. This option also affects tables automatically created for
 :class:`~django.db.models.ManyToManyField`\ s in the model.
 
-You can use the :setting:`DEFAULT_TABLESPACE` setting to specify a default value
-for :attr:`~django.db.models.Options.db_tablespace`. This is useful for setting
-a tablespace for the built-in Django apps and other applications whose code you
+You can use ``DEFAULT_TABLESPACE`` in your database configuration in
+:setting:`DATABASES` to specify a default value for
+:attr:`~django.db.models.Options.db_tablespace`. This is useful for setting a
+tablespace for the built-in Django apps and other applications whose code you
 cannot control.
+
+.. warning::
+    The :setting:`DEFAULT_TABLESPACE` global setting, which works the same way,
+    has been deprecated.
 
 Declaring tablespaces for indexes
 =================================
@@ -36,12 +41,17 @@ For single field indexes, you can pass the
 to specify an alternate tablespace for the field's column index. If the column
 doesn't have an index, the option is ignored.
 
-You can use the :setting:`DEFAULT_INDEX_TABLESPACE` setting to specify
-a default value for :attr:`~django.db.models.Field.db_tablespace`.
+You can use ``DEFAULT_INDEX_TABLESPACE`` in your database configuration in
+:setting:`DATABASES` to specify a default value for
+:attr:`~django.db.models.Field.db_tablespace`.
 
 If :attr:`~django.db.models.Field.db_tablespace` isn't specified and you didn't
-set :setting:`DEFAULT_INDEX_TABLESPACE`, the index is created in the same
-tablespace as the tables.
+set ``DEFAULT_INDEX_TABLESPACE``, the index is created in the same tablespace
+as the tables.
+
+.. warning::
+    The :setting:`DEFAULT_INDEX_TABLESPACE` global setting, which works the
+    same way, has been deprecated.
 
 An example
 ==========
