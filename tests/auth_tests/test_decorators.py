@@ -429,7 +429,8 @@ class RoleRequiredDecoratorTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.user = models.User.objects.create_user(
-            username='testuser', password='testpass'
+            username="testuser",
+            password="testpass",
         )
         self.user.is_seller = True
         self.user.is_admin = True
@@ -437,41 +438,41 @@ class RoleRequiredDecoratorTests(TestCase):
         self.user.save()
 
     def test_single_role_required_success(self):
-        @role_required(['is_seller'])
+        @role_required(["is_seller"])
         def dummy_view(request):
             return HttpResponse("Success")
 
-        request = self.factory.get('/')
+        request = self.factory.get("/")
         request.user = self.user
         response = dummy_view(request)
         self.assertEqual(response.content.decode(), "Success")
 
     def test_single_role_required_failure(self):
-        @role_required(['is_moderator'])
+        @role_required(["is_moderator"])
         def dummy_view(request):
             return HttpResponse("Success")
 
-        request = self.factory.get('/')
+        request = self.factory.get("/")
         request.user = self.user
         response = dummy_view(request)
         self.assertEqual(response.status_code, 302)  # Redirect to login
 
     def test_multiple_roles_any_success(self):
-        @role_required(['is_admin', 'is_moderator'], test_all=False)
+        @role_required(["is_admin", "is_moderator"], test_all=False)
         def dummy_view(request):
             return HttpResponse("Success")
 
-        request = self.factory.get('/')
+        request = self.factory.get("/")
         request.user = self.user
         response = dummy_view(request)
         self.assertEqual(response.content.decode(), "Success")
 
     def test_multiple_roles_any_failure(self):
-        @role_required(['is_moderator', 'is_editor'], test_all=False)
+        @role_required(["is_moderator", "is_editor"], test_all=False)
         def dummy_view(request):
             return HttpResponse("Success")
 
-        request = self.factory.get('/')
+        request = self.factory.get("/")
         request.user = self.user
         response = dummy_view(request)
         self.assertEqual(response.status_code, 302)  # Redirect to login
@@ -480,41 +481,41 @@ class RoleRequiredDecoratorTests(TestCase):
         self.user.is_moderator = True
         self.user.save()
 
-        @role_required(['is_admin', 'is_moderator'], test_all=True)
+        @role_required(["is_admin", "is_moderator"], test_all=True)
         def dummy_view(request):
             return HttpResponse("Success")
 
-        request = self.factory.get('/')
+        request = self.factory.get("/")
         request.user = self.user
         response = dummy_view(request)
         self.assertEqual(response.content.decode(), "Success")
 
     def test_multiple_roles_all_failure(self):
-        @role_required(['is_admin', 'is_moderator'], test_all=True)
+        @role_required(["is_admin", "is_moderator"], test_all=True)
         def dummy_view(request):
             return HttpResponse("Success")
 
-        request = self.factory.get('/')
+        request = self.factory.get("/")
         request.user = self.user
         response = dummy_view(request)
         self.assertEqual(response.status_code, 302)  # Redirect to login
 
     def test_custom_login_url(self):
-        @role_required(['is_moderator'], login_url='/custom-login/')
+        @role_required(["is_moderator"], login_url="/custom-login/")
         def dummy_view(request):
             return HttpResponse("Success")
 
-        request = self.factory.get('/')
+        request = self.factory.get("/")
         request.user = self.user
         response = dummy_view(request)
-        self.assertEqual(response.url, '/custom-login/?next=/')
+        self.assertEqual(response.url, "/custom-login/?next=/")
 
     def test_unauthenticated_user(self):
-        @role_required(['is_seller'])
+        @role_required(["is_seller"])
         def dummy_view(request):
             return HttpResponse("Success")
 
-        request = self.factory.get('/')
+        request = self.factory.get("/")
         request.user = models.AnonymousUser()  # Anonymous user
         response = dummy_view(request)
         self.assertEqual(response.status_code, 302)  # Redirect to login
