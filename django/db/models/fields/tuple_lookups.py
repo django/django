@@ -99,6 +99,8 @@ class TupleLookupMixin:
 
 class TupleExact(TupleLookupMixin, Exact):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) == (x, y, z) as SQL:
         # WHERE a = x AND b = y AND c = z
         lookups = [Exact(col, val) for col, val in zip(self.lhs, self.rhs)]
@@ -131,6 +133,8 @@ class TupleIsNull(TupleLookupMixin, IsNull):
 
 class TupleGreaterThan(TupleLookupMixin, GreaterThan):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) > (x, y, z) as SQL:
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND c > z)))
         lookups = itertools.cycle([GreaterThan, Exact])
@@ -157,6 +161,8 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
 
 class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) >= (x, y, z) as SQL:
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND (c > z OR c = z))))
         lookups = itertools.cycle([GreaterThan, Exact])
@@ -183,6 +189,8 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
 
 class TupleLessThan(TupleLookupMixin, LessThan):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) < (x, y, z) as SQL:
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND c < z)))
         lookups = itertools.cycle([LessThan, Exact])
@@ -209,6 +217,8 @@ class TupleLessThan(TupleLookupMixin, LessThan):
 
 class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) <= (x, y, z) as SQL:
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND (c < z OR c = z))))
         lookups = itertools.cycle([LessThan, Exact])
