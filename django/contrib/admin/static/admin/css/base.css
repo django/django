@@ -773,7 +773,6 @@ a.deletelink:focus, a.deletelink:hover {
     padding-left: 0;
     float: right;
     position: relative;
-    margin-top: -48px;
 }
 
 .object-tools li {
@@ -819,6 +818,10 @@ a.deletelink:focus, a.deletelink:hover {
 
 .object-tools a.addlink {
     background-image: url(../img/tooltag-add.svg);
+}
+
+.object-tools:has(a.addlink) {
+    margin-top: -48px;
 }
 
 /* OBJECT HISTORY */
