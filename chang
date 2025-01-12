@@ -1,0 +1,98 @@
+# settings.py configuration
+# Ensure your Django project is properly set up with installed apps and middleware
+
+# models.py
+from django.db import models
+from django.contrib.auth.models import User
+
+class ImageGenerationRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    image_input = models.ImageField(upload_to='input_images/')
+    generated_image = models.ImageField(upload_to='generated_images/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_paid = models.BooleanField(default=False)
+
+class Payment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+# forms.py
+from django import forms
+from .models import ImageGenerationRequest
+
+class ImageUploadForm(forms.ModelForm):
+    class Meta:
+        model = ImageGenerationRequest
+        fields = ['image_input']
+
+# views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import ImageGenerationRequest
+from .forms import ImageUploadForm
+
+@login_required
+def generate_image(request):
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.user = request.user
+            instance.save()
+            # Call your AI API here
+            # Example placeholder: generated_image_path = api_call(instance.image_input)
+            instance.generated_image = "path_to_generated_image"
+            instance.save()
+            return redirect('view_image', pk=instance.pk)
+    else:
+        form = ImageUploadForm()
+    return render(request, 'generate_image.html', {'form': form})
+
+@login_required
+def view_image(request, pk):
+    request_instance = ImageGenerationRequest.objects.get(pk=pk, user=request.user)
+    return render(request, 'view_image.html', {'image_request': request_instance})
+
+# Pricing and payment logic
+def pricing_plan(request):
+    user_requests = ImageGenerationRequest.objects.filter(user=request.user)
+    free_limit = 3
+    paid = user_requests.filter(is_paid=True).count()
+    remaining_free = max(0, free_limit - paid)
+    return render(request, 'pricing.html', {'remaining_free': remaining_free})
+
+# Template placeholders
+# Add placeholders for where to integrate IBAN and API.
+
+# urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('generate/', views.generate_image, name='generate_image'),
+    path('view/<int:pk>/', views.view_image, name='view_image'),
+    path('pricing/', views.pricing_plan, name='pricing_plan'),
+]
+
+# Add instructions to settings.py for API and IBAN.
+# Example placeholder:
+# API_KEY = 'import requests
+
+url = "https://api.pexels.com/v1/search"
+headers = {
+    "Authorization": "bWXXkGPiuth5jZF5n6zqtMeJcfZUh047djmvgx5sXnGaskk1CVMkk1Qz"
+}
+params = {
+    "query": "la sauce et la pate",
+    "per_page": 10
+}
+
+response = requests.get(url, headers=headers, params=params)
+if response.status_code == 200:
+    data = response.json()
+    print(data)  # Replace this with your desired processing
+else:
+    print(f"Error: {response.status_code}")
+'
+# IBAN_ACCOUNT = 'BE67 9674 4781 2687'
