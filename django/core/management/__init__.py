@@ -11,6 +11,7 @@ from argparse import (
 from collections import defaultdict
 from difflib import get_close_matches
 from importlib import import_module
+from typing import Dict
 
 import django
 from django.apps import apps
@@ -209,7 +210,7 @@ class ManagementUtility:
     def main_help_text(self, commands_only=False):
         """Return the script's main help text, as a string."""
         if commands_only:
-            usage = sorted(get_commands())
+            usage = sorted(self.get_management_commands())
         else:
             usage = [
                 "",
@@ -219,7 +220,7 @@ class ManagementUtility:
                 "Available subcommands:",
             ]
             commands_dict = defaultdict(lambda: [])
-            for name, app in get_commands().items():
+            for name, app in self.get_management_commands().items():
                 if app == "django.core":
                     app = "django"
                 else:
@@ -243,6 +244,12 @@ class ManagementUtility:
 
         return "\n".join(usage)
 
+    def get_management_commands(self) -> Dict[str, str]:
+        """
+        Return a dictionary mapping command names to their callback applications.
+        """
+        return get_commands()
+
     def fetch_command(self, subcommand):
         """
         Try to fetch the given subcommand, printing a message with the
@@ -250,7 +257,7 @@ class ManagementUtility:
         "django-admin" or "manage.py") if it can't be found.
         """
         # Get commands outside of try block to prevent swallowing exceptions
-        commands = get_commands()
+        commands = self.get_management_commands()
         try:
             app_name = commands[subcommand]
         except KeyError:
@@ -308,7 +315,7 @@ class ManagementUtility:
         except IndexError:
             curr = ""
 
-        subcommands = [*get_commands(), "help"]
+        subcommands = [*self.get_management_commands(), "help"]
         options = [("--help", False)]
 
         # subcommand
