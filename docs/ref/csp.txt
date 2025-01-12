@@ -100,61 +100,58 @@ many applications::
 
     SECURE_CSP = {
         "DIRECTIVES": {
-            # Here we restrict all content to self-hosted by default. If you
-            # rely on third-party resources (e.g., CDNs or APIs) they could be
-            # added here or, preferably, with their more selective directive.
             "default-src": [csp.SELF],
-            # Restricts the origins that can be used in <base> tags.
             "base-uri": [csp.SELF],
-            # Controls where fetch, XHR, WebSocket, and similar requests can go.
-            # If your application uses external APIs, analytics platforms, or
-            # WebSockets, you'll need to include their domains here.
             "connect-src": [csp.SELF],
-            # Restricts the origins from which fonts can be loaded. Add trusted
-            # CDNs if you use external fonts to avoid loading issues.
             "font-src": [csp.SELF],
-            # Limits where forms can be submitted. If your app interacts with
-            # third-party form handlers (e.g., payment gateways or external
-            # APIs), include their origins here.
             "form-action": [csp.SELF],
-            # Prevents embedding your site in iframes by default. Keeping this
-            # as NONE is ideal for preventing clickjacking unless you explicitly
-            # allow trusted domains to frame your site.
             "frame-ancestors": [csp.NONE],
-            # Restricts the origins of iframes or embedded content. Use NONE if
-            # your app doesn’t embed external iframes. Otherwise, include only
-            # trusted origins (e.g., YouTube for videos).
             "frame-src": [csp.NONE],
-            # Controls where images can be loaded from. Include trusted image
-            # CDNs or services, if needed.
             "img-src": [csp.SELF],
-            # Restricts audio and video sources. Keep as SELF if media is hosted
-            # internally, or add trusted domains (e.g., video platforms or
-            # external storage) for external media.
             "media-src": [csp.SELF],
-            # Blocks the use of <object>, <embed>, and <applet> tags. These are
-            # rarely needed in modern applications and are often vectors for
-            # attacks. Keep this as NONE unless absolutely necessary.
             "object-src": [csp.NONE],
-            # Limits where scripts can be loaded from. Add external domains
-            # if you use third-party scripts.
-            # Consider using `csp.NONCE` for inline scripts.
             "script-src": [csp.SELF],
-            # Limits where stylesheets can be loaded from. Add external domains
-            # if using third-party CSS.
-            # Consider using `csp.NONCE` for inline styles.
             "style-src": [csp.SELF],
-            # Automatically upgrades all HTTP requests to HTTPS. This is a great
-            # default for security, but ensure all dependencies are
-            # HTTPS-compatible to avoid breakages.
             "upgrade-insecure-requests": True,
         }
     }
 
-Many other directives (e.g., those with ``'-src'`` in them like ``script-src``,
-``img-src``, etc.) fall back to ``default-src`` if they are not explicitly
-defined. It is recommended to keep ``default-src`` restrictive and override it
-for specific needs in other directives.
+Explanation of the CSP Directives
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ``default-src``: Restricts all content to self-hosted by default. Add
+  trusted third-party resources (e.g., CDNs or APIs) here if required.
+  
+  * ``default-src`` serves as a fallback for other fetch directives (e.g.,
+    ``script-src``, ``img-src``, and their more specific variants) if they are
+    not explicitly defined. To maintain security, it is recommended to keep
+    ``default-src`` restrictive and override it only where necessary.
+
+* ``base-uri``: Limits the origins allowed in ``<base>`` tags.
+* ``connect-src``: Controls where fetch, XHR, WebSocket, and similar
+  requests can be made. Add external APIs, analytics platforms, or WebSocket
+  origins.
+* ``font-src``: Restricts the origins for font files. Add trusted font based
+  CDNs if necessary.
+* ``form-action``: Limits where forms can be submitted. Add external form
+  handlers (e.g., payment gateways) if required.
+* ``frame-ancestors``: Prevents embedding your site in an iframe by default.
+  Use ``csp.NONE`` to block all embedding or add specific trusted domains.
+* ``frame-src``: Restricts the origins for iframe or embedded content. Use
+  ``csp.NONE`` to disallow embedding unless explicitly required.
+* ``img-src``: Controls where images can be loaded from. Add trusted image
+  CDNs or external sources if needed.
+* ``media-src``: Limits the origins for audio and video content. Add external
+  platforms if media is hosted offsite.
+* ``object-src``: Blocks ``<object>``, ``<embed>``, and ``<applet>`` tags,
+  which are often unnecessary and pose security risks. Use ``csp.NONE`` unless
+  required.
+* ``script-src``: Specifies where JavaScript can be loaded from. Consider
+  using ``csp.NONCE`` for inline scripts to enhance security.
+* ``style-src``: Specifies where CSS can be loaded from. Use ``csp.NONCE``
+  for inline styles.
+* ``upgrade-insecure-requests``: Automatically upgrades all HTTP requests to
+  HTTPS. Ensure all resources are HTTPS-compatible to avoid disruptions.
+
 
 .. _`Content-Security-Policy specification`: https://www.w3.org/TR/CSP3/
 
