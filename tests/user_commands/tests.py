@@ -109,6 +109,7 @@ class CommandTests(SimpleTestCase):
         """
         commands = management.ManagementUtility(["manage.py"]).get_management_commands()
         self.assertIn("shell", commands)
+
         class FilteredCommands(management.ManagementUtility):
             def get_management_commands(self) -> Dict[str, str]:
                 commands_ = super().get_management_commands()
