@@ -319,6 +319,9 @@ Management Commands
   custom commands to control the running of system checks, e.g. to opt into
   database-dependent checks.
 
+* The new :meth:`.ManagementUtility.get_management_commands` method can be overridden in
+  custom ManagementUtility to exclude some unwanted command from the command line utility.
+
 Migrations
 ~~~~~~~~~~
 

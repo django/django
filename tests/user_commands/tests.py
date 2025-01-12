@@ -3,6 +3,7 @@ import sys
 from argparse import ArgumentDefaultsHelpFormatter
 from io import BytesIO, StringIO, TextIOWrapper
 from pathlib import Path
+from typing import Dict
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -101,6 +102,21 @@ class CommandTests(SimpleTestCase):
         finally:
             dance.Command.requires_system_checks = "__all__"
         self.assertIn("CommandError", stderr.getvalue())
+
+    def test_get_management_commands(self):
+        """
+        Ensure that the get_management_commands is working and can be overridden.
+        """
+        commands = management.ManagementUtility(["manage.py"]).get_management_commands()
+        self.assertIn("shell", commands)
+        class FilteredCommands(management.ManagementUtility):
+            def get_management_commands(self) -> Dict[str, str]:
+                commands_ = super().get_management_commands()
+                del commands_["shell"]
+                return commands_
+
+        commands = FilteredCommands(["manage.py"]).get_management_commands()
+        self.assertNotIn("shell", commands)
 
     def test_no_translations_deactivate_translations(self):
         """
