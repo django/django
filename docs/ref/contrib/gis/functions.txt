@@ -28,10 +28,11 @@ Measurement                Relationships             Operations              Edi
 :class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`                      :class:`AsGeoJSON`  :class:`IsEmpty`
 :class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`                           :class:`AsGML`      :class:`IsValid`
 :class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`                             :class:`AsKML`      :class:`MemSize`
-:class:`Length`            :class:`ClosestPoint`     :class:`Union`          :class:`Scale`                               :class:`AsSVG`      :class:`NumGeometries`
-:class:`Perimeter`         :class:`Envelope`                                 :class:`SnapToGrid`      :class:`FromWKB`    :class:`AsWKB`      :class:`NumPoints`
-                           :class:`LineLocatePoint`                          :class:`Transform`       :class:`FromWKT`    :class:`AsWKT`
-                           :class:`PointOnSurface`                           :class:`Translate`                           :class:`GeoHash`
+:class:`Length`            :class:`ClosestPoint`     :class:`Union`          :class:`Rotate`                              :class:`AsSVG`      :class:`NumGeometries`
+:class:`Perimeter`         :class:`Envelope`                                 :class:`Scale`           :class:`FromWKB`    :class:`AsWKB`      :class:`NumPoints`
+                           :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`FromWKT`    :class:`AsWKT`
+                           :class:`PointOnSurface`                           :class:`Transform`                           :class:`GeoHash`
+                                                                             :class:`Translate`
 =========================  ========================  ======================  =======================  ==================  ==================  ======================
 
 ``Area``
