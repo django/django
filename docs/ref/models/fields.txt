@@ -2005,6 +2005,10 @@ that control how the relationship functions.
     the Django model that represents the intermediate table that you want to
     use.
 
+    The ``through`` model can be specified using either the model class
+    directly or a :ref:`lazy reference <lazy-relationships>` to the model
+    class.
+
     The most common use for this option is when you want to associate
     :ref:`extra data with a many-to-many relationship
     <intermediary-manytomany>`.
