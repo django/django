@@ -69,6 +69,7 @@ __all__ = [
     "TimeField",
     "URLField",
     "UUIDField",
+    "AutoFieldMixin",
 ]
 
 
