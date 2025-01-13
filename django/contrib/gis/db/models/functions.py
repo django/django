@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.point import Point
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError
 from django.db.models import (
@@ -527,6 +528,19 @@ class PointOnSurface(OracleToleranceMixin, GeomOutputGeoFunc):
 
 class Reverse(GeoFunc):
     arity = 1
+
+
+class Rotate(GeomOutputGeoFunc):
+    def __init__(self, expression, angle, origin=None, **extra):
+        expressions = [
+            expression,
+            self._handle_param(angle, "angle", NUMERIC_TYPES),
+        ]
+        if origin is not None:
+            if not isinstance(origin, Point):
+                raise TypeError("origin argument must be a Point")
+            expressions.append(Value(origin.wkt, output_field=GeometryField()))
+        super().__init__(*expressions, **extra)
 
 
 class Scale(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):
