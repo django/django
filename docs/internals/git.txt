@@ -80,7 +80,7 @@ If you're going to be working on Django's code (say, to fix a bug or
 develop a new feature), you can probably stop reading here and move
 over to :doc:`the documentation for contributing to Django
 </internals/contributing/index>`, which covers things like the preferred
-coding style and how to generate and submit a patch.
+coding style and how to submit a pull request.
 
 Stable branches
 ===============
