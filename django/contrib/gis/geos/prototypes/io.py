@@ -215,8 +215,8 @@ class WKTWriter(IOBase):
 
     @outdim.setter
     def outdim(self, new_dim):
-        if new_dim not in (2, 3):
-            raise ValueError("WKT output dimension must be 2 or 3")
+        if new_dim not in (2, 3, 4):
+            raise ValueError("WKT output dimension must be 2, 3, or 4")
         wkt_writer_set_outdim(self.ptr, new_dim)
 
     @property
@@ -301,8 +301,8 @@ class WKBWriter(IOBase):
 
     @outdim.setter
     def outdim(self, new_dim):
-        if new_dim not in (2, 3):
-            raise ValueError("WKB output dimension must be 2 or 3")
+        if new_dim not in (2, 3, 4):
+            raise ValueError("WKB output dimension must be 2, 3, or 4")
         wkb_writer_set_outdim(self.ptr, new_dim)
 
     # Property for getting/setting the include srid flag.

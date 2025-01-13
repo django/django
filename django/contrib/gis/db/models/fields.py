@@ -267,6 +267,10 @@ class GeometryField(BaseSpatialField):
         # Setting the dimension of the geometry field.
         self.dim = dim
 
+        # In 3 dimensional geometries the third dimension can be Z or M and defaults to
+        # Z.  If the geometry is 4 dimensions the geometry includes Z and M.
+        self.is_measured = kwargs.get("is_measured", False) or dim == 4
+
         # Is this a geography rather than a geometry column?
         self.geography = geography
 
@@ -307,8 +311,10 @@ class GeometryField(BaseSpatialField):
             "srid": self.srid,
             **kwargs,
         }
-        if self.dim > 2 and not getattr(
-            defaults["form_class"].widget, "supports_3d", False
+        if (
+            self.dim > 2
+            and not getattr(defaults["form_class"].widget, "supports_3d", False)
+            and not getattr(defaults["form_class"].widget, "supports_4d", False)
         ):
             defaults.setdefault("widget", forms.Textarea)
         return super().formfield(**defaults)

@@ -219,7 +219,7 @@ class OGRGeometry(GDALBase):
     @coord_dim.setter
     def coord_dim(self, dim):
         "Set the coordinate dimension of this Geometry."
-        msg = "coord_dim setter is deprecated. Use set_3d() instead."
+        msg = "coord_dim setter is deprecated. Use set_3d() or set_measured() instead."
         warnings.warn(msg, RemovedInDjango60Warning, stacklevel=2)
         if dim not in (2, 3):
             raise ValueError("Geometry dimension must be either 2 or 3")
