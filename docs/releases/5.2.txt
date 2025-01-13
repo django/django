@@ -392,6 +392,13 @@ Signals
 
 * ...
 
+System checks
+~~~~~~~~~~~~~
+
+* Added a new system check for detecting removed Django setting variables.
+  This check will point out all usages of known removals starting from
+  Django v1.0 and will raise a **settings.W001** warning.
+
 Templates
 ~~~~~~~~~
 
