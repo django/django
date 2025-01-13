@@ -505,7 +505,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         }
         if self.manifest_storage.exists(self.manifest_name):
             self.manifest_storage.delete(self.manifest_name)
-        contents = json.dumps(payload).encode()
+        contents = json.dumps(payload, sort_keys=True).encode()
         self.manifest_storage._save(self.manifest_name, ContentFile(contents))
 
     def stored_name(self, name):
