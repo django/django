@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
             ],
             options={},
             bases=(models.Model,),
+            metaclass="CustomModelBase",
         ),
         migrations.CreateModel(
             name="UnmigratedModel",
