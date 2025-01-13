@@ -49,8 +49,13 @@ requires a security release:
 * The vulnerability is within a :ref:`supported version <security-support>` of
   Django.
 
-* The vulnerability applies to a production-grade Django application. This means
-  the following do not require a security release:
+* The vulnerability does not depend on manual actions performed by a project's
+  developer or maintainer. For example, attacks that require executing commands
+  with specific parameters (e.g., processing translations, creating a project
+  with a particular template, generating migrations, etc.) do not qualify.
+
+* The vulnerability applies to a production-grade Django application. This
+  means the following scenarios do not require a security release:
 
   * Exploits that only affect local development, for example when using
     :djadmin:`runserver`.
