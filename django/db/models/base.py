@@ -1493,7 +1493,7 @@ class Model(AltersData, metaclass=ModelBase):
                 ):
                     # no value, skip the lookup
                     continue
-                if f in self._meta.pk_fields and not self._state.adding:
+                if f in model_class._meta.pk_fields and not self._state.adding:
                     # no need to check for unique primary key when editing
                     continue
                 lookup_kwargs[str(field_name)] = lookup_value
