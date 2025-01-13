@@ -1,5 +1,10 @@
 from .custom_permissions import CustomPermissionsUser
-from .custom_user import CustomUser, CustomUserWithoutIsActiveField, ExtensionUser
+from .custom_user import (
+    CustomUser,
+    CustomUserCompositePrimaryKey,
+    CustomUserWithoutIsActiveField,
+    ExtensionUser,
+)
 from .invalid_models import CustomUserNonUniqueUsername
 from .is_active import IsActiveTestUser1
 from .minimal import MinimalUser
@@ -17,6 +22,7 @@ __all__ = (
     "CustomEmailField",
     "CustomPermissionsUser",
     "CustomUser",
+    "CustomUserCompositePrimaryKey",
     "CustomUserNonUniqueUsername",
     "CustomUserWithFK",
     "CustomUserWithM2M",
