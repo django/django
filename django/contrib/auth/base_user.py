@@ -58,11 +58,8 @@ class AbstractBaseUser(models.Model):
     def __str__(self):
         return self.get_username()
 
-    # RemovedInDjango60Warning: When the deprecation ends, replace with:
-    # def save(self, **kwargs):
-    #   super().save(**kwargs)
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    def save(self, **kwargs):
+        super().save(**kwargs)
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None

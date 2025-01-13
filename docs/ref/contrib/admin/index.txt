@@ -432,11 +432,6 @@ subclass::
         collapsed, using an expandable widget with a toggle for switching
         their visibility.
 
-        .. versionchanged:: 5.1
-
-            ``fieldsets`` using the ``collapse`` class now use ``<details>``
-            and ``<summary>`` elements, provided they define a ``name``.
-
     * ``description``
         A string of optional extra text to be displayed at the top of each
         fieldset, under the heading of the fieldset.
@@ -638,11 +633,6 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ["name", "decade_born_in"]
-
-    .. versionchanged:: 5.1
-
-        Support for using ``__`` lookups was added, when targeting related
-        fields.
 
     A few special cases to note about ``list_display``:
 
@@ -2336,11 +2326,6 @@ The ``InlineModelAdmin`` class adds or customizes:
     is rendered for the inlines. Defaults to ``None``. As with classes
     configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
     class will be initially collapsed using an expandable widget.
-
-    .. versionchanged:: 5.1
-
-        ``fieldsets`` using the ``collapse`` class now use ``<details>`` and
-        ``<summary>`` elements, provided they define a ``name``.
 
 .. attribute:: InlineModelAdmin.extra
 

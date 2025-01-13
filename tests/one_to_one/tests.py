@@ -1,6 +1,5 @@
 from django.db import IntegrityError, connection, transaction
 from django.test import TestCase
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Bar,
@@ -605,16 +604,6 @@ class OneToOneTests(TestCase):
         self.b1.place_id = self.p2.pk
         self.b1.save()
         self.assertEqual(self.b1.place, self.p2)
-
-    def test_get_prefetch_queryset_warning(self):
-        places = Place.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Place.bar.get_prefetch_queryset(places)
-        self.assertEqual(ctx.filename, __file__)
 
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         places = Place.objects.all()

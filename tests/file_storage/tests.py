@@ -25,18 +25,11 @@ from django.core.files.uploadedfile import (
 )
 from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
-from django.test import (
-    LiveServerTestCase,
-    SimpleTestCase,
-    TestCase,
-    ignore_warnings,
-    override_settings,
-)
+from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Storage,
@@ -607,69 +600,6 @@ class CustomStorageTests(FileStorageTests):
         self.assertEqual(second, "custom_storage.2")
         self.storage.delete(first)
         self.storage.delete(second)
-
-
-# RemovedInDjango60Warning: Remove this class.
-class OverwritingStorage(FileSystemStorage):
-    """
-    Overwrite existing files instead of appending a suffix to generate an
-    unused name.
-    """
-
-    # Mask out O_EXCL so os.open() doesn't raise OSError if the file exists.
-    OS_OPEN_FLAGS = FileSystemStorage.OS_OPEN_FLAGS & ~os.O_EXCL
-
-    def get_available_name(self, name, max_length=None):
-        """Override the effort to find an used name."""
-        return name
-
-
-# RemovedInDjango60Warning: Remove this test class.
-class OverwritingStorageOSOpenFlagsWarningTests(SimpleTestCase):
-    storage_class = OverwritingStorage
-
-    def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.temp_dir)
-
-    def test_os_open_flags_deprecation_warning(self):
-        msg = "Overriding OS_OPEN_FLAGS is deprecated. Use the allow_overwrite "
-        msg += "parameter instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            self.storage = self.storage_class(
-                location=self.temp_dir, base_url="/test_media_url/"
-            )
-        self.assertEqual(ctx.filename, __file__)
-
-
-# RemovedInDjango60Warning: Remove this test class.
-@ignore_warnings(category=RemovedInDjango60Warning)
-class OverwritingStorageOSOpenFlagsTests(FileStorageTests):
-    storage_class = OverwritingStorage
-
-    def test_save_overwrite_behavior(self):
-        """Saving to same file name twice overwrites the first file."""
-        name = "test.file"
-        self.assertFalse(self.storage.exists(name))
-        content_1 = b"content one"
-        content_2 = b"second content"
-        f_1 = ContentFile(content_1)
-        f_2 = ContentFile(content_2)
-        stored_name_1 = self.storage.save(name, f_1)
-        try:
-            self.assertEqual(stored_name_1, name)
-            self.assertTrue(self.storage.exists(name))
-            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
-            with self.storage.open(name) as fp:
-                self.assertEqual(fp.read(), content_1)
-            stored_name_2 = self.storage.save(name, f_2)
-            self.assertEqual(stored_name_2, name)
-            self.assertTrue(self.storage.exists(name))
-            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
-            with self.storage.open(name) as fp:
-                self.assertEqual(fp.read(), content_2)
-        finally:
-            self.storage.delete(name)
 
 
 class OverwritingStorageTests(FileStorageTests):

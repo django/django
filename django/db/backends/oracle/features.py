@@ -1,6 +1,5 @@
 from django.db import DatabaseError, InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.db.backends.oracle.oracledb_any import is_oracledb
 from django.utils.functional import cached_property
 
 
@@ -158,7 +157,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
-        if is_oracledb and self.connection.oracledb_version >= (2, 1, 2):
+        if self.connection.oracledb_version >= (2, 1, 2):
             skips.update(
                 {
                     "python-oracledb 2.1.2+ no longer hides 'ORA-1403: no data found' "

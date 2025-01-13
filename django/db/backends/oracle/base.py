@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.oracle.oracledb_any import is_oracledb
 from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
@@ -22,7 +21,7 @@ from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 try:
-    from django.db.backends.oracle.oracledb_any import oracledb as Database
+    import oracledb as Database
 except ImportError as e:
     raise ImproperlyConfigured(f"Error loading oracledb module: {e}")
 
@@ -286,11 +285,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return self.oracle_version
 
     def get_connection_params(self):
-        # Pooling feature is only supported for oracledb.
-        if self.is_pool and not is_oracledb:
-            raise ImproperlyConfigured(
-                "Pooling isn't supported by cx_Oracle. Use python-oracledb instead."
-            )
         conn_params = self.settings_dict["OPTIONS"].copy()
         if "use_returning_into" in conn_params:
             del conn_params["use_returning_into"]

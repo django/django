@@ -57,10 +57,6 @@ available from the ``django.contrib.postgres.indexes`` module.
     whether deduplication is enabled. PostgreSQL enables deduplication by
     default.
 
-    .. versionchanged:: 5.1
-
-        The ``deduplicate_items`` parameter was added.
-
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
     .. _deduplicate_items: https://www.postgresql.org/docs/current/btree-implementation.html#BTREE-DEDUPLICATION
 

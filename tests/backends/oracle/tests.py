@@ -9,11 +9,6 @@ from django.test import TestCase, TransactionTestCase
 
 from ..models import Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
-try:
-    from django.db.backends.oracle.oracledb_any import is_oracledb
-except ImportError:
-    is_oracledb = False
-
 
 def no_pool_connection(alias=None):
     new_connection = connection.copy(alias)
@@ -85,7 +80,6 @@ class Tests(TestCase):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
 
-    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pool_set_to_true(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = True
@@ -94,7 +88,6 @@ class Tests(TestCase):
         finally:
             new_connection.close_pool()
 
-    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pool_reuse(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = {
@@ -128,7 +121,6 @@ class Tests(TestCase):
                 conn.close()
             new_connection.close_pool()
 
-    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_cannot_open_new_connection_in_atomic_block(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = True
@@ -138,7 +130,6 @@ class Tests(TestCase):
         with self.assertRaisesMessage(ProgrammingError, msg):
             new_connection.ensure_connection()
 
-    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pooling_not_support_persistent_connections(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = True
@@ -146,14 +137,6 @@ class Tests(TestCase):
         msg = "Pooling doesn't support persistent connections."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.pool
-
-    @unittest.skipIf(is_oracledb, "cx_oracle specific tests")
-    def test_cx_Oracle_not_support_pooling(self):
-        new_connection = no_pool_connection()
-        new_connection.settings_dict["OPTIONS"]["pool"] = True
-        msg = "Pooling isn't supported by cx_Oracle. Use python-oracledb instead."
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            new_connection.connect()
 
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")

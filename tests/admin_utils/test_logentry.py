@@ -8,10 +8,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.html import escape
 
-from .models import Article, ArticleProxy, Car, InheritedLogEntryManager, Site
+from .models import Article, ArticleProxy, Car, Site
 
 
 @override_settings(ROOT_URLCONF="admin_utils.urls")
@@ -236,22 +235,6 @@ class LogEntryTests(TestCase):
         logentry = LogEntry.objects.first()
         self.assertEqual(repr(logentry), str(logentry.action_time))
 
-    # RemovedInDjango60Warning.
-    def test_log_action(self):
-        msg = "LogEntryManager.log_action() is deprecated. Use log_actions() instead."
-        content_type_val = ContentType.objects.get_for_model(Article).pk
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            log_entry = LogEntry.objects.log_action(
-                self.user.pk,
-                content_type_val,
-                self.a1.pk,
-                repr(self.a1),
-                CHANGE,
-                change_message="Changed something else",
-            )
-        self.assertEqual(log_entry, LogEntry.objects.latest("id"))
-        self.assertEqual(ctx.filename, __file__)
-
     def test_log_actions(self):
         queryset = Article.objects.all().order_by("-id")
         msg = "Deleted Something"
@@ -288,46 +271,6 @@ class LogEntryTests(TestCase):
             for obj in queryset
         ]
         self.assertSequenceEqual(logs, expected_log_values)
-
-    # RemovedInDjango60Warning.
-    def test_log_action_fallback(self):
-        LogEntry.objects2 = InheritedLogEntryManager()
-        queryset = Article.objects.all().order_by("-id")
-        content_type = ContentType.objects.get_for_model(self.a1)
-        self.assertEqual(len(queryset), 3)
-        msg = (
-            "The usage of log_action() is deprecated. Implement log_actions() instead."
-        )
-        with (
-            self.assertNumQueries(3),
-            self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx,
-        ):
-            LogEntry.objects2.log_actions(self.user.pk, queryset, DELETION)
-        self.assertEqual(ctx.filename, __file__)
-        log_values = (
-            LogEntry.objects.filter(action_flag=DELETION)
-            .order_by("id")
-            .values_list(
-                "user",
-                "content_type",
-                "object_id",
-                "object_repr",
-                "action_flag",
-                "change_message",
-            )
-        )
-        expected_log_values = [
-            (
-                self.user.pk,
-                content_type.id,
-                str(obj.pk),
-                "Test Repr",
-                DELETION,
-                "",
-            )
-            for obj in queryset
-        ]
-        self.assertSequenceEqual(log_values, expected_log_values)
 
     def test_recentactions_without_content_type(self):
         """

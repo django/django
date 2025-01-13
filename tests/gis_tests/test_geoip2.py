@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import GEOSGeometry
 from django.test import SimpleTestCase, override_settings
-from django.utils.deprecation import RemovedInDjango60Warning
 
 if HAS_GEOIP2:
     import geoip2
@@ -200,22 +199,6 @@ class GeoLite2Test(SimpleTestCase):
         m = g._metadata
         version = f"{m.binary_format_major_version}.{m.binary_format_minor_version}"
         self.assertEqual(repr(g), f"<GeoIP2 [v{version}] _path='{g._path}'>")
-
-    def test_coords_deprecation_warning(self):
-        g = GeoIP2()
-        msg = "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            e1, e2 = g.coords(self.ipv4_str)
-        self.assertIsInstance(e1, float)
-        self.assertIsInstance(e2, float)
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_open_deprecation_warning(self):
-        msg = "GeoIP2.open() is deprecated. Use GeoIP2() instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            g = GeoIP2.open(settings.GEOIP_PATH, GeoIP2.MODE_AUTO)
-        self.assertTrue(g._reader)
-        self.assertEqual(ctx.filename, __file__)
 
 
 @skipUnless(HAS_GEOIP2, "GeoIP2 is required.")
