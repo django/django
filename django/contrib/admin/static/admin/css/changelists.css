@@ -15,6 +15,14 @@
     width: 100%;
 }
 
+.change-list .changelist-form-container a {
+    text-decoration: underline;
+}
+
+.change-list .changelist-form-container table thead a {
+    text-decoration: none;
+}
+
 .change-list .hiddenfields { display:none; }
 
 .change-list .filtered table {
@@ -48,6 +56,14 @@
     border-bottom: 1px solid var(--hairline-color);
     background: var(--body-bg);
     overflow: hidden;
+}
+
+#changelist .paginator a {
+    text-decoration: none;
+}
+
+#changelist .paginator .showall {
+    text-decoration: underline;
 }
 
 /* CHANGELIST TABLES */
@@ -243,6 +259,7 @@
 
 .change-list .toplinks .date-back {
     color: var(--body-quiet-color);
+    text-decoration: none;
 }
 
 .change-list .toplinks .date-back:focus,
