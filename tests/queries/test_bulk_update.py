@@ -144,6 +144,10 @@ class BulkUpdateTests(TestCase):
         with self.assertRaisesMessage(ValueError, self.pk_fields_error):
             CustomPk.objects.bulk_update([], ["name"])
 
+    def test_update_inherited_primary_key(self):
+        with self.assertRaisesMessage(ValueError, self.pk_fields_error):
+            SpecialCategory.objects.bulk_update([], ["id"])
+
     def test_empty_objects(self):
         with self.assertNumQueries(0):
             rows_updated = Note.objects.bulk_update([], ["note"])
