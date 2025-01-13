@@ -430,6 +430,12 @@ class RelatedJSONModel(models.Model):
         required_db_features = {"supports_json_field"}
 
 
+class GfkModel(models.Model):
+    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
+    gfk = GenericForeignKey()
+
+
 class AllFieldsModel(models.Model):
     big_integer = models.BigIntegerField()
     binary = models.BinaryField()
@@ -467,7 +473,7 @@ class AllFieldsModel(models.Model):
     object_id = models.PositiveIntegerField()
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     gfk = GenericForeignKey()
-    gr = GenericRelation(DataModel)
+    gr = GenericRelation(GfkModel)
 
 
 class ManyToMany(models.Model):
