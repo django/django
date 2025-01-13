@@ -13,3 +13,7 @@ def debug_processor(request):
         "other_debug_objects": DebugObject.objects.using("other"),
     }
     return render(request, "context_processors/debug.html", context)
+
+
+def csp_nonce_processor(request):
+    return render(request, "context_processors/csp_nonce.html")

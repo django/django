@@ -667,3 +667,9 @@ SECURE_REDIRECT_EXEMPT = []
 SECURE_REFERRER_POLICY = "same-origin"
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False
+
+##################
+# CSP MIDDLEWARE #
+##################
+SECURE_CSP = {}
+SECURE_CSP_REPORT_ONLY = {}
