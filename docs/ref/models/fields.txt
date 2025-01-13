@@ -542,18 +542,20 @@ cross-site scripting attack.
 
 If ``True``, this field is the primary key for the model.
 
-If you don't specify ``primary_key=True`` for any field in your model, Django
-will automatically add a field to hold the primary key, so you don't need to
-set ``primary_key=True`` on any of your fields unless you want to override the
-default primary-key behavior. The type of auto-created primary key fields can
-be specified per app in :attr:`AppConfig.default_auto_field
-<django.apps.AppConfig.default_auto_field>` or globally in the
-:setting:`DEFAULT_AUTO_FIELD` setting. For more, see
+If you don't specify ``primary_key=True`` for any field in your model and have
+not defined a composite primary key, Django will automatically add a field to
+hold the primary key. So, you don't need to set ``primary_key=True`` on any of
+your fields unless you want to override the default primary-key behavior. The
+type of auto-created primary key fields can be specified per app in
+:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+or globally in the :setting:`DEFAULT_AUTO_FIELD` setting. For more, see
 :ref:`automatic-primary-key-fields`.
 
 ``primary_key=True`` implies :attr:`null=False <Field.null>` and
-:attr:`unique=True <Field.unique>`. Only one primary key is allowed on an
-object.
+:attr:`unique=True <Field.unique>`. Only one field per model can set
+``primary_key=True``. Composite primary keys must be defined using
+:class:`CompositePrimaryKey` instead of setting this flag to ``True`` for all
+fields to maintain this invariant.
 
 The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
@@ -561,6 +563,10 @@ alongside the old one.
 
 The primary key field is set to ``None`` when
 :meth:`deleting <django.db.models.Model.delete>` an object.
+
+.. versionchanged:: 5.2
+
+    The ``CompositePrimaryKey`` field was added.
 
 ``unique``
 ----------
