@@ -317,18 +317,20 @@ class Urlizer:
         safe_input = isinstance(text, SafeData)
 
         words = self.word_split_re.split(str(text))
-        return "".join(
-            [
-                self.handle_word(
+        local_cache = {}
+        urlized_words = []
+        for word in words:
+            if (urlized_word := local_cache.get(word)) is None:
+                urlized_word = self.handle_word(
                     word,
                     safe_input=safe_input,
                     trim_url_limit=trim_url_limit,
                     nofollow=nofollow,
                     autoescape=autoescape,
                 )
-                for word in words
-            ]
-        )
+                local_cache[word] = urlized_word
+            urlized_words.append(urlized_word)
+        return "".join(urlized_words)
 
     def handle_word(
         self,
