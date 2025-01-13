@@ -511,6 +511,10 @@ Miscellaneous
 * The minimum supported version of ``oracledb`` is increased from 1.3.2 to
   2.3.0.
 
+* Built-in aggregate functions accepting only one argument (``Avg``, ``Count``,
+  ``Max``, ``Min``, ``StdDev``, ``Sum``, and ``Variance``) now raise
+  :exc:`TypeError` when called with an incorrect number of arguments.
+
 .. _deprecated-features-5.2:
 
 Features deprecated in 5.2
