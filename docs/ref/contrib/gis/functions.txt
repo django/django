@@ -583,22 +583,11 @@ reversed coordinates.
 
 .. class:: Rotate(expression, angle, origin=None, **extra)
 
-   *Availability*: `PostGIS <https://postgis.net/docs/ST_Rotate.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Rotate.html>`__
 
-   Rotates a geometry by a specified ``angle`` around the origin. Optionally,
-   the rotation can be performed around a specified point, defined by 
-   ``origin`` parameter.
-
-   :param expression: A geographic field or expression to rotate.
-   :param angle: The angle in radians by which to rotate the geometry.
-                 Positive values result in counterclockwise rotation,
-                 negative values result in clockwise rotation.
-   :param origin: A :class:`~django.contrib.gis.geos.Point` around which
-                  to rotate.
-   :param extra: Additional arguments passed to the underlying function.
-
-   :returns: A geometry with coordinates rotated by the specified angle.
-   :rtype: :class:`~django.contrib.gis.geos.GEOSGeometry`
+Rotates a geometry by a specified ``angle`` around the origin. Optionally, the
+rotation can be performed around a specified point, defined by the ``origin``
+parameter.
 
 ``Scale``
 =========
