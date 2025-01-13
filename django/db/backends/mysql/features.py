@@ -104,6 +104,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
             },
+            "MySQL does not support negative array indices in JSON paths": {
+                "model_fields.test_jsonfield.TestQuerying."
+                "test_shallow_list_negative_lookup",
+                "model_fields.test_jsonfield.TestQuerying."
+                "test_deep_negative_lookup_array",
+                "model_fields.test_jsonfield.TestQuerying."
+                "test_deep_negative_lookup_mixed",
+            },
         }
         if self.connection.mysql_is_mariadb and (
             self.connection.mysql_version < (10, 5, 2)
