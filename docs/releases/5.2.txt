@@ -356,6 +356,15 @@ Models
   that the expression allows composite expressions, for example, to support
   :ref:`composite primary keys <cpk-and-database-functions>`.
 
+* The new ``order_by`` argument for :class:`~django.db.models.Aggregate` allows
+  to specify the ordering of the elements in the result.
+
+* The new :attr:`.Aggregate.allow_order_by` class attribute determines whether
+  the aggregate function allows passing an ``order_by`` keyword argument.
+
+* The new :class:`~django.db.models.StringAgg` aggregate returns the input
+  values concatenated into a string, separated by the ``delimiter`` string.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -531,3 +540,12 @@ Miscellaneous
   ``django.contrib.postgres.aggregates.JSONBAgg``, and
   ``django.contrib.postgres.aggregates.StringAgg`` is deprecated in favor
   of the ``order_by`` argument.
+
+* The PostgreSQL ``ordering`` argument on aggregates class is deprecated in
+  favor of the ``order_by`` argument instead.
+
+* The PostgreSQL ``StringAgg`` class is deprecated in favor of the generally
+  available ``StringAgg`` class.
+
+* The PostgreSQL ``OrderableAggMixin`` is deprecated in favor of the
+  ``order_by`` attribute now available on the ``Aggregate`` class.
