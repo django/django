@@ -8,7 +8,7 @@ from django.test.selenium import screenshot_cases
 from django.urls import reverse
 from django.utils.translation import gettext
 
-from .admin import InnerInline
+from .admin import InnerInline, ProfileInline
 from .admin import site as admin_site
 from .models import (
     Author,
@@ -821,6 +821,57 @@ class TestInline(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         parent.refresh_from_db()
         self.assertIs(parent.show_inlines, True)
+
+
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
+class TestInlineCanDelete(TestDataMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="tester",
+            password="password",
+            is_staff=True,
+        )
+        pc_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ProfileCollection)
+        )
+        profile_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(Profile)
+        )
+        cls.user.user_permissions.add(*pc_permission, *profile_permission)
+        pc = ProfileCollection.objects.create()
+        Profile.objects.create(collection=pc, first_name="SiHyun", last_name="Lee")
+        cls.change_url = reverse(
+            "admin:admin_inlines_profilecollection_change",
+            args=(pc.id,),
+        )
+        cls.check_html = "<th>Delete?</th>"
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_inline_can_delete(self):
+        response = self.client.get(self.change_url)
+        self.assertContains(response, self.check_html)
+
+    def test_inline_can_delete_with_no_permission(self):
+        delete_permission = Permission.objects.get(
+            codename="delete_profile",
+            content_type=ContentType.objects.get_for_model(Profile),
+        )
+        self.user.user_permissions.remove(delete_permission)
+        response = self.client.get(self.change_url)
+        self.assertNotContains(response, self.check_html)
+
+    def test_inline_can_delete_with_can_delete_is_false(self):
+        ProfileInline.can_delete = False
+        response = self.client.get(self.change_url)
+        self.assertNotContains(response, self.check_html)
+
+    def test_inline_can_delete_with_no_object(self):
+        Profile.objects.all().delete()
+        response = self.client.get(self.change_url)
+        self.assertNotContains(response, self.check_html)
 
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")
@@ -2212,13 +2263,11 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Click on a few delete buttons
         self.selenium.find_element(
             By.CSS_SELECTOR,
-            "form#profilecollection_form tr.dynamic-profile_set#profile_set-1 "
-            "td.delete a",
+            "form#profilecollection_form tr.dynamic-profile_set#profile_set-1 " "a",
         ).click()
         self.selenium.find_element(
             By.CSS_SELECTOR,
-            "form#profilecollection_form tr.dynamic-profile_set#profile_set-2 "
-            "td.delete a",
+            "form#profilecollection_form tr.dynamic-profile_set#profile_set-2 " "a",
         ).click()
         # The rows are gone and the IDs have been re-sequenced
         self.assertCountSeleniumElements(
@@ -2479,7 +2528,6 @@ class SeleniumTests(AdminSeleniumTestCase):
                 "CREATION DATE",
                 "UPDATE DATE",
                 "UPDATED BY",
-                "DELETE?",
             ],
         )
         # There are no fieldset section names rendered.
@@ -2493,3 +2541,23 @@ class SeleniumTests(AdminSeleniumTestCase):
             tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
             [],
         )
+
+    def test_tabular_inline_layout_with_object_exist(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret")
+        pc = ProfileCollection.objects.create()
+        Profile.objects.create(collection=pc, first_name="SiHyun", last_name="Lee")
+        url = reverse("admin:admin_inlines_profilecollection_change", args=(pc.pk,))
+        self.selenium.get(self.live_server_url + url)
+        headers = self.selenium.find_elements(
+            By.CSS_SELECTOR, "form#profilecollection_form tr th"
+        )
+        self.assertTrue(any(h.text == "DELETE?" for h in headers))
+        delete_inline_block = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            "form#profilecollection_form tr.dynamic-profile_set#profile_set-0 "
+            "td.delete",
+        )
+        self.assertEqual(delete_inline_block.tag_name, "td")
+        self.assertEqual(delete_inline_block.get_attribute("class"), "delete")
