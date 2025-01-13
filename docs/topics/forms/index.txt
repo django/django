@@ -533,10 +533,10 @@ Then you can configure the :setting:`FORM_RENDERER` setting:
 .. code-block:: python
     :caption: ``settings.py``
 
-    from django.forms.renderers import TemplatesSetting
+    from django.forms.renderers import DjangoTemplates
 
 
-    class CustomFormRenderer(TemplatesSetting):
+    class CustomFormRenderer(DjangoTemplates):
         form_template_name = "form_snippet.html"
 
 
@@ -596,10 +596,10 @@ The default template can be customized by setting
 :attr:`~django.forms.renderers.BaseRenderer.field_template_name` in your
 project-level :setting:`FORM_RENDERER`::
 
-    from django.forms.renderers import TemplatesSetting
+    from django.forms.renderers import DjangoTemplates
 
 
-    class CustomFormRenderer(TemplatesSetting):
+    class CustomFormRenderer(DjangoTemplates):
         field_template_name = "field_snippet.html"
 
 … or on a single field::
