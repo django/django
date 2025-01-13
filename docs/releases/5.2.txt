@@ -154,6 +154,10 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
   are now supported on MariaDB 11.7+.
 
+* The :lookup:`isempty` lookup and
+  :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
+  expression are now supported on SpatiaLite.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
