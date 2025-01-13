@@ -11,12 +11,12 @@ they're the closest concept currently available.
 
 import warnings
 
+from django.conf import settings
 from django.core import exceptions
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
-from . import BLANK_CHOICE_DASH
 from .mixins import FieldCacheMixin
 
 
@@ -175,7 +175,7 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_choices(
         self,
         include_blank=True,
-        blank_choice=BLANK_CHOICE_DASH,
+        blank_choice=None,
         limit_choices_to=None,
         ordering=(),
     ):
@@ -186,6 +186,8 @@ class ForeignObjectRel(FieldCacheMixin):
         Analog of django.db.models.fields.Field.get_choices(), provided
         initially for utilization by RelatedFieldListFilter.
         """
+        if blank_choice is None:
+            blank_choice = [("", settings.FORMS_DEFAULT_BLANK_CHOICE_LABEL)]
         limit_choices_to = limit_choices_to or self.limit_choices_to
         qs = self.related_model._default_manager.complex_filter(limit_choices_to)
         if ordering:
