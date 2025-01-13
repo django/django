@@ -478,11 +478,12 @@ class PasswordResetForm(forms.Form):
         email_field_name = UserModel.get_email_field_name()
         for user in self.get_users(email):
             user_email = getattr(user, email_field_name)
+            user_pk_bytes = force_bytes(UserModel._meta.pk.value_to_string(user))
             context = {
                 "email": user_email,
                 "domain": domain,
                 "site_name": site_name,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                "uid": urlsafe_base64_encode(user_pk_bytes),
                 "user": user,
                 "token": token_generator.make_token(user),
                 "protocol": "https" if use_https else "http",
