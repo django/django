@@ -2493,3 +2493,33 @@ class SeleniumTests(AdminSeleniumTestCase):
             tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
             [],
         )
+
+    def test_tabular_inline_delete_layout(self):
+        from selenium.webdriver.common.by import By
+
+        user = User.objects.create_user("testing", password="password", is_staff=True)
+        pf_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ProfileCollection),
+        )
+        p_permission = Permission.objects.filter(
+            codename__in=["view_profile", "add_profile"],
+            content_type=ContentType.objects.get_for_model(Profile),
+        )
+        user.user_permissions.add(*pf_permission, *p_permission)
+        self.admin_login(username="testing", password="password")
+        pc = ProfileCollection.objects.create()
+        url = reverse("admin:admin_inlines_profilecollection_change", args=(pc.pk,))
+        self.selenium.get(self.live_server_url + url)
+        headers = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module thead tr th"
+        )
+        self.assertEqual(headers[-1].get_attribute("outerHTML"), "<th></th>")
+        fields = self.selenium.find_elements(
+            By.CSS_SELECTOR,
+            "fieldset.module tbody tr.dynamic-profile_set#profile_set-0 td",
+        )
+        self.assertEqual(
+            fields[-1].get_attribute("outerHTML"),
+            '<td class="delete"><div><a role="button" class="inline-deletelink" '
+            'href="#">Remove</a></div></td>',
+        )

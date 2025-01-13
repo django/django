@@ -23,7 +23,7 @@
        {% if field.help_text %}<img src="{% static "admin/img/icon-unknown.svg" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}">{% endif %}
        </th>
      {% endfor %}
-     {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}<th>{% translate "Delete?" %}</th>{% endif %}
+     <th>{% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}{% translate "Delete?" %}{% endif %}</th>
      </tr></thead>
 
      <tbody>
@@ -58,9 +58,7 @@
             {% endfor %}
           {% endfor %}
         {% endfor %}
-        {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}
-          <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
-        {% endif %}
+        <td class="delete">{% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission and inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
         </tr>
      {% endfor %}
      </tbody>
