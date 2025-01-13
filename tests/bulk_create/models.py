@@ -3,6 +3,7 @@ import uuid
 from decimal import Decimal
 
 from django.db import models
+from django.db.models.functions import Now
 from django.utils import timezone
 
 try:
@@ -141,3 +142,8 @@ class RelatedModel(models.Model):
     name = models.CharField(max_length=15, null=True)
     country = models.OneToOneField(Country, models.CASCADE, primary_key=True)
     big_auto_fields = models.ManyToManyField(BigAutoFieldModel)
+
+
+class DbDefaultModel(models.Model):
+    name = models.CharField(max_length=10)
+    created_at = models.DateTimeField(db_default=Now())
