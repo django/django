@@ -577,11 +577,11 @@ Accepts a single geographic field or expression and returns a geometry with
 reversed coordinates.
 
 ``Rotate``
-===========
+==========
+
+.. versionadded:: 5.2
 
 .. class:: Rotate(expression, angle, origin=None, **extra)
-
-   .. versionadded:: 5.2
 
    *Availability*: `PostGIS <https://postgis.net/docs/ST_Rotate.html>`__
 
