@@ -2424,12 +2424,7 @@ class JSONArrayAggTests(TestCase):
         vals = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("book__pubdate"))
         self.assertEqual(
             vals,
-            {
-                "jsonarrayagg": [
-                    "2007-12-06",
-                    "2008-03-03",
-                ]
-            },
+            {"jsonarrayagg": ["2007-12-06", "2008-03-03"]},
         )
 
     def test_decimalfield(self):
@@ -2448,13 +2443,11 @@ class JSONArrayAggTests(TestCase):
         self.assertEqual(vals, {"jsonarrayagg": [45]})
 
     def test_empty_result_set(self):
-        Author.objects.all().delete()
-        val = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("age"))
+        val = Author.objects.none().aggregate(jsonarrayagg=JSONArrayAgg("age"))
         self.assertEqual(val, {"jsonarrayagg": None})
 
     def test_default_set(self):
-        Author.objects.all().delete()
-        val = Author.objects.aggregate(
+        val = Author.objects.none().aggregate(
             jsonarrayagg=JSONArrayAgg("name", default=["<empty>"])
         )
         self.assertEqual(val, {"jsonarrayagg": ["<empty>"]})
