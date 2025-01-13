@@ -13,10 +13,11 @@ understand the capabilities of each model. The API is accessible through
 the ``_meta`` attribute of each model class, which is an instance of an
 ``django.db.models.options.Options`` object.
 
-Methods that it provides can be used to:
+Methods and attributes that it provides can be used to:
 
 * Retrieve all field instances of a model
 * Retrieve a single field instance of a model by name
+* Retrieve all fields that compose the primary key of a model
 
 .. _model-meta-field-api:
 
@@ -118,3 +119,42 @@ Retrieving all field instances of a model
          <django.db.models.fields.DateTimeField: date_joined>,
          <django.db.models.fields.related.ManyToManyField: groups>,
          <django.db.models.fields.related.ManyToManyField: user_permissions>)
+
+Retrieving fields composing the primary key of a model
+------------------------------------------------------
+
+.. versionadded:: 5.2
+
+.. attribute:: Options.pk_fields
+
+    Returns a list of the fields composing the primary key of a model.
+
+    When a :class:`composite primary key <django.db.models.CompositePrimaryKey>`
+    is defined on a model it will contain all the
+    :class:`fields <django.db.models.Field>` referenced by it.
+
+    .. code-block:: python
+
+        from django.db import models
+
+
+        class TenantUser(models.Model):
+            pk = models.CompositePrimaryKey("tenant_id", "id")
+            tenant_id = models.IntegerField()
+            id = models.IntegerField()
+
+    .. code-block:: pycon
+
+        >>> TenantUser._meta.pk_fields
+        [
+            <django.db.models.fields.IntegerField: tenant_id>,
+            <django.db.models.fields.IntegerField: id>
+        ]
+
+    Otherwise it will contain the single field declared as the
+    :attr:`primary key <django.db.models.Field.primary_key>` of the model.
+
+    .. code-block:: pycon
+
+        >>> User._meta.pk_fields
+        [<django.db.models.fields.AutoField: id>]
