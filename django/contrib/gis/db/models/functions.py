@@ -533,7 +533,7 @@ class Reverse(GeoFunc):
 class Rotate(GeomOutputGeoFunc):
     def __init__(self, expression, angle, origin=Point(0, 0), **extra):
         if not isinstance(origin, Point):
-            raise TypeError("Param origin must be of type Point")
+            raise TypeError("origin argument must be a Point")
         expressions = [
             expression,
             self._handle_param(angle, "angle", NUMERIC_TYPES),
