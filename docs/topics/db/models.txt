@@ -720,6 +720,24 @@ refer to the other model class wherever needed. For example::
             null=True,
         )
 
+Alternatively, you can use a lazy reference to the related model, specified as
+a string in the format ``"app_label.ModelName"``. This does not require the
+related model to be imported. For example::
+
+    from django.db import models
+
+
+    class Restaurant(models.Model):
+        # ...
+        zip_code = models.ForeignKey(
+            "geography.ZipCode",
+            on_delete=models.SET_NULL,
+            blank=True,
+            null=True,
+        )
+
+See :ref:`lazy relationships <lazy-relationships>` for more details.
+
 Field name restrictions
 -----------------------
 
