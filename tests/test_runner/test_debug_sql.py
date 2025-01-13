@@ -91,22 +91,26 @@ class TestDebugSQL(unittest.TestCase):
         (
             """SELECT COUNT(*) AS "__count"\n"""
             """FROM "test_runner_person"\n"""
-            """WHERE "test_runner_person"."first_name" = 'error';"""
+            """WHERE "test_runner_person"."first_name" = 'error'; """
+            """args=('error',); alias=default"""
         ),
         (
             """SELECT COUNT(*) AS "__count"\n"""
             """FROM "test_runner_person"\n"""
-            """WHERE "test_runner_person"."first_name" = 'fail';"""
+            """WHERE "test_runner_person"."first_name" = 'fail'; """
+            """args=('fail',); alias=default"""
         ),
         (
             """SELECT COUNT(*) AS "__count"\n"""
             """FROM "test_runner_person"\n"""
-            """WHERE "test_runner_person"."first_name" = 'subtest-error';"""
+            """WHERE "test_runner_person"."first_name" = 'subtest-error'; """
+            """args=('subtest-error',); alias=default"""
         ),
         (
             """SELECT COUNT(*) AS "__count"\n"""
             """FROM "test_runner_person"\n"""
-            """WHERE "test_runner_person"."first_name" = 'subtest-fail';"""
+            """WHERE "test_runner_person"."first_name" = 'subtest-fail'; """
+            """args=('subtest-fail',); alias=default"""
         ),
     ]
 
@@ -122,14 +126,16 @@ class TestDebugSQL(unittest.TestCase):
         f"runTest ({test_class_path}.FailingSubTest{method_name}) ...",
         f"runTest ({test_class_path}.ErrorSubTest{method_name}) ...",
         (
-            """SELECT COUNT(*) AS "__count" """
-            """FROM "test_runner_person" WHERE """
-            """"test_runner_person"."first_name" = 'pass';"""
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\nWHERE """
+            """"test_runner_person"."first_name" = 'pass'; """
+            """args=('pass',); alias=default"""
         ),
         (
-            """SELECT COUNT(*) AS "__count" """
-            """FROM "test_runner_person" WHERE """
-            """"test_runner_person"."first_name" = 'subtest-pass';"""
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\nWHERE """
+            """"test_runner_person"."first_name" = 'subtest-pass'; """
+            """args=('subtest-pass',); alias=default"""
         ),
     ]
 

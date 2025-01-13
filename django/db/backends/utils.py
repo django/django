@@ -151,7 +151,7 @@ class CursorDebugWrapper(CursorWrapper):
             logger.debug(
                 "(%.3f) %s; args=%s; alias=%s",
                 duration,
-                sql,
+                self.db.ops.format_debug_sql(sql),
                 params,
                 self.db.alias,
                 extra={
