@@ -1,5 +1,7 @@
 import traceback
+from decimal import Decimal
 from io import StringIO
+from ipaddress import IPv6Address
 
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
@@ -23,6 +25,16 @@ class TestUtilsIPv6(SimpleTestCase):
         self.assertTrue(is_valid_ipv6_address("::ffff:254.42.16.14"))
         self.assertTrue(is_valid_ipv6_address("::ffff:0a0a:0a0a"))
 
+    def test_validates_correct_with_ipv6_instance(self):
+        cases = [
+            IPv6Address("::ffff:2.125.160.216"),
+            IPv6Address("fe80::1"),
+            IPv6Address("::"),
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertIs(is_valid_ipv6_address(case), True)
+
     def test_validates_incorrect_plain_address(self):
         self.assertFalse(is_valid_ipv6_address("foo"))
         self.assertFalse(is_valid_ipv6_address("127.0.0.1"))
@@ -44,6 +56,12 @@ class TestUtilsIPv6(SimpleTestCase):
         self.assertTrue(is_valid_ipv6_address("::0a0a:0a0a"))
         self.assertFalse(is_valid_ipv6_address("::999.42.16.14"))
         self.assertFalse(is_valid_ipv6_address("::zzzz:0a0a"))
+
+    def test_validates_incorrect_with_non_string(self):
+        cases = [None, [], {}, (), Decimal("2.46"), 192.168, 42]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertIs(is_valid_ipv6_address(case), False)
 
     def test_cleans_plain_address(self):
         self.assertEqual(clean_ipv6_address("DEAD::0:BEEF"), "dead::beef")
