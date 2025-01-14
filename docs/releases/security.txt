@@ -36,6 +36,17 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+January 14, 2025 - :cve:`2024-56374`
+------------------------------------
+
+Potential denial-of-service vulnerability in IPv6 validation.
+`Full description
+<https://www.djangoproject.com/weblog/2025/jan/14/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <4806731e58f3e8700a3c802e77899d54ac6021fe>`
+* Django 5.0 :commit:`(patch) <e8d4a2005955dcf962193600b53bf461b190b455>`
+* Django 4.2 :commit:`(patch) <ad866a1ca3e7d60da888d25d27e46a8adb2ed36e>`
+
 December 4, 2024 - :cve:`2024-53907`
 ------------------------------------
 
