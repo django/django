@@ -35,6 +35,7 @@ class FavoriteAuthors(models.Model):
     likes_author = models.ForeignKey(
         Author, models.CASCADE, to_field="name", related_name="likes_me"
     )
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["id"]

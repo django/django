@@ -3,7 +3,7 @@ from unittest import mock
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
-from django.db.models import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models import F, Prefetch, QuerySet, prefetch_related_objects
 from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
@@ -361,7 +361,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
                     Query,
                     "add_q",
                     autospec=True,
-                    side_effect=lambda self, q: add_q(self, q),
+                    side_effect=lambda self, q, reuse_all: add_q(self, q),
                 ) as add_q_mock:
                     list(Book.objects.prefetch_related(relation))
                     self.assertEqual(add_q_mock.call_count, 1)
@@ -391,6 +391,46 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.prefetch_related("authors").iterator()
+
+    def test_m2m_join_reuse(self):
+        FavoriteAuthors.objects.bulk_create(
+            [
+                FavoriteAuthors(
+                    author=self.author1, likes_author=self.author3, is_active=True
+                ),
+                FavoriteAuthors(
+                    author=self.author1,
+                    likes_author=self.author4,
+                    is_active=False,
+                ),
+                FavoriteAuthors(
+                    author=self.author2, likes_author=self.author3, is_active=True
+                ),
+                FavoriteAuthors(
+                    author=self.author2, likes_author=self.author4, is_active=True
+                ),
+            ]
+        )
+        with self.assertNumQueries(2):
+            authors = list(
+                Author.objects.filter(
+                    pk__in=[self.author1.pk, self.author2.pk]
+                ).prefetch_related(
+                    Prefetch(
+                        "favorite_authors",
+                        queryset=(
+                            Author.objects.annotate(
+                                active_favorite=F("likes_me__is_active"),
+                            ).filter(active_favorite=True)
+                        ),
+                        to_attr="active_favorite_authors",
+                    )
+                )
+            )
+        self.assertEqual(authors[0].active_favorite_authors, [self.author3])
+        self.assertEqual(
+            authors[1].active_favorite_authors, [self.author3, self.author4]
+        )
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -1046,7 +1086,7 @@ class CustomPrefetchTests(TestCase):
             Query,
             "add_q",
             autospec=True,
-            side_effect=lambda self, q: add_q(self, q),
+            side_effect=lambda self, q, reuse_all: add_q(self, q),
         ) as add_q_mock:
             list(
                 House.objects.prefetch_related(
