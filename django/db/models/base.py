@@ -874,13 +874,13 @@ class Model(AltersData, metaclass=ModelBase):
 
             update_fields = frozenset(update_fields)
             field_names = self._meta._non_pk_concrete_field_names
-            non_model_fields = update_fields.difference(field_names)
+            not_updatable_fields = update_fields.difference(field_names)
 
-            if non_model_fields:
+            if not_updatable_fields:
                 raise ValueError(
                     "The following fields do not exist in this model, are m2m "
-                    "fields, or are non-concrete fields: %s"
-                    % ", ".join(non_model_fields)
+                    "fields, primary keys, or are non-concrete fields: %s"
+                    % ", ".join(not_updatable_fields)
                 )
 
         # If saving to the same database, and this model is deferred, then
