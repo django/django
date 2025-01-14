@@ -153,11 +153,12 @@ class GeoIP2:
         if require_city and not self.is_city:
             raise GeoIP2Exception(f"Invalid GeoIP city data file: {self._path}")
 
-        try:
-            validate_ipv46_address(query)
-        except ValidationError:
-            # GeoIP2 only takes IP addresses, so try to resolve a hostname.
-            query = socket.gethostbyname(query)
+        if isinstance(query, str):
+            try:
+                validate_ipv46_address(query)
+            except ValidationError:
+                # GeoIP2 only takes IP addresses, so try to resolve a hostname.
+                query = socket.gethostbyname(query)
 
         function = self._reader.city if self.is_city else self._reader.country
         return function(query)
