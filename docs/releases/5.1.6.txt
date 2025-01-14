@@ -1,0 +1,12 @@
+==========================
+Django 5.1.6 release notes
+==========================
+
+*Expected February 5, 2025*
+
+Django 5.1.6 fixes several bugs in 5.1.5.
+
+Bugfixes
+========
+
+* ...
