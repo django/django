@@ -11,8 +11,8 @@ In most cases, a single primary key should suffice. In database design,
 however, defining a primary key consisting of multiple fields is sometimes
 necessary.
 
-To use a composite primary key, when creating a model set the ``pk`` field to
-be a :class:`.CompositePrimaryKey`::
+To use a composite primary key, when defining a model set the ``pk`` attribute
+to be a :class:`.CompositePrimaryKey`::
 
     class Product(models.Model):
         name = models.CharField(max_length=100)
@@ -41,8 +41,8 @@ A composite primary key is represented by a ``tuple``:
     >>> item.pk
     (1, "A755H")
 
-You can assign a ``tuple`` to a composite primary key. This sets the associated
-field values.
+You can assign a ``tuple`` to the :attr:`~django.db.models.Model.pk` attribute.
+This sets the associated field values:
 
 .. code-block:: pycon
 
