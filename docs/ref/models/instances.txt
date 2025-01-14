@@ -468,9 +468,14 @@ The ``pk`` property
 Regardless of whether you define a primary key field yourself, or let Django
 supply one for you, each model will have a property called ``pk``. It behaves
 like a normal attribute on the model, but is actually an alias for whichever
-attribute is the primary key field for the model. You can read and set this
-value, just as you would for any other attribute, and it will update the
-correct field in the model.
+field or fields compose the primary key for the model. You can read and set
+this value, just as you would for any other attribute, and it will update the
+correct fields in the model.
+
+.. versionchanged:: 5.2
+
+    Support for the primary key to be composed of multiple fields was added via
+    ``CompositePrimaryKey``.
 
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
