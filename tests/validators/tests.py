@@ -1,3 +1,4 @@
+import ipaddress
 import re
 import types
 from datetime import datetime, timedelta
@@ -398,15 +399,25 @@ TEST_DATA = [
     (validate_ipv6_address, "fe80::1", None),
     (validate_ipv6_address, "::1", None),
     (validate_ipv6_address, "1:2:3:4:5:6:7:8", None),
+    (validate_ipv6_address, ipaddress.IPv6Address("::ffff:2.125.160.216"), None),
+    (validate_ipv6_address, ipaddress.IPv6Address("fe80::1"), None),
+    (validate_ipv6_address, Decimal("33.1"), ValidationError),
+    (validate_ipv6_address, 9.22, ValidationError),
     (validate_ipv6_address, "1:2", ValidationError),
     (validate_ipv6_address, "::zzz", ValidationError),
     (validate_ipv6_address, "12345::", ValidationError),
     (validate_ipv46_address, "1.1.1.1", None),
     (validate_ipv46_address, "255.0.0.0", None),
     (validate_ipv46_address, "0.0.0.0", None),
+    (validate_ipv46_address, ipaddress.IPv4Address("1.1.1.1"), None),
+    (validate_ipv46_address, ipaddress.IPv4Address("255.0.0.0"), None),
     (validate_ipv46_address, "fe80::1", None),
     (validate_ipv46_address, "::1", None),
     (validate_ipv46_address, "1:2:3:4:5:6:7:8", None),
+    (validate_ipv46_address, ipaddress.IPv6Address("::ffff:2.125.160.216"), None),
+    (validate_ipv46_address, ipaddress.IPv6Address("fe80::1"), None),
+    (validate_ipv46_address, Decimal("33.1"), ValidationError),
+    (validate_ipv46_address, 9.22, ValidationError),
     (validate_ipv46_address, "256.1.1.1", ValidationError),
     (validate_ipv46_address, "25.1.1.", ValidationError),
     (validate_ipv46_address, "25,1,1,1", ValidationError),
