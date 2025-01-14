@@ -51,12 +51,14 @@ def clean_ipv6_address(
     return str(addr)
 
 
-def is_valid_ipv6_address(ip_str):
+def is_valid_ipv6_address(ip_addr):
     """
-    Return whether or not the `ip_str` string is a valid IPv6 address.
+    Return whether the `ip_addr` object is a valid IPv6 address.
     """
+    if isinstance(ip_addr, ipaddress.IPv6Address):
+        return True
     try:
-        _ipv6_address_from_str(ip_str)
-    except ValueError:
+        _ipv6_address_from_str(ip_addr)
+    except (TypeError, ValueError):
         return False
     return True
