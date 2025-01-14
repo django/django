@@ -722,8 +722,8 @@ isn't defined.
 
 A virtual field used for defining a composite primary key.
 
-This field must be defined as the model's ``pk`` field. If present, Django will
-create the underlying model table with a composite primary key.
+This field must be defined as the model's ``pk`` attribute. If present, Django
+will create the underlying model table with a composite primary key.
 
 The ``*field_names`` argument is a list of positional field names that compose
 the primary key.
