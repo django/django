@@ -1,0 +1,7 @@
+===========================
+Django 5.0.11 release notes
+===========================
+
+*January 14, 2025*
+
+Django 5.0.11 fixes a security issue with severity "moderate" in 5.0.10.

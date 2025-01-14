@@ -71,5 +71,14 @@
             "tenant_id": 2,
             "id": "ffffffff-ffff-ffff-ffff-ffffffffffff"
         }
+    },
+    {
+        "pk": [1, "2022-01-12T05:55:14.956"],
+        "model": "composite_pk.timestamped",
+        "fields": {
+            "id": 1,
+            "created": "2022-01-12T05:55:14.956",
+            "text": ""
+        }
     }
 ]

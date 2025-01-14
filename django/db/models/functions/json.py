@@ -5,6 +5,66 @@ from django.db.models.fields.json import JSONField
 from django.db.models.functions import Cast
 
 
+class JSONArray(Func):
+    function = "JSON_ARRAY"
+    output_field = JSONField()
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_json_field:
+            raise NotSupportedError(
+                "JSONFields are not supported on this database backend."
+            )
+        return super().as_sql(compiler, connection, **extra_context)
+
+    def as_native(self, compiler, connection, *, returning, **extra_context):
+        # PostgreSQL 16+ and Oracle remove SQL NULL values from the array by
+        # default. Adds the NULL ON NULL clause to keep NULL values in the
+        # array, mapping them to JSON null values, which matches the behavior
+        # of SQLite.
+        null_on_null = "NULL ON NULL" if len(self.get_source_expressions()) > 0 else ""
+
+        return self.as_sql(
+            compiler,
+            connection,
+            template=(
+                f"%(function)s(%(expressions)s {null_on_null} RETURNING {returning})"
+            ),
+            **extra_context,
+        )
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        # Casting source expressions is only required using JSONB_BUILD_ARRAY
+        # or when using JSON_ARRAY on PostgreSQL 16+ with server-side bindings.
+        # This is done in all cases for consistency.
+        casted_obj = self.copy()
+        casted_obj.set_source_expressions(
+            [
+                (
+                    # Conditional Cast to avoid unnecessary wrapping.
+                    expression
+                    if isinstance(expression, Cast)
+                    else Cast(expression, expression.output_field)
+                )
+                for expression in casted_obj.get_source_expressions()
+            ]
+        )
+
+        if connection.features.is_postgresql_16:
+            return casted_obj.as_native(
+                compiler, connection, returning="JSONB", **extra_context
+            )
+
+        return casted_obj.as_sql(
+            compiler,
+            connection,
+            function="JSONB_BUILD_ARRAY",
+            **extra_context,
+        )
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return self.as_native(compiler, connection, returning="CLOB", **extra_context)
+
+
 class JSONObject(Func):
     function = "JSON_OBJECT"
     output_field = JSONField()

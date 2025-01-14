@@ -31,6 +31,26 @@ and only officially support the latest release of each series.
 What's new in Django 5.2
 ========================
 
+Automatic models import in the ``shell``
+----------------------------------------
+
+The :djadmin:`shell` management command now automatically imports models from
+all installed apps. You can view further details of the imported objects by
+setting the ``--verbosity`` flag to 2 or more:
+
+.. code-block:: pycon
+
+    $ python -Wall manage.py shell --verbosity=2
+    6 objects imported automatically, including:
+
+      from django.contrib.admin.models import LogEntry
+      from django.contrib.auth.models import Group, Permission, User
+      from django.contrib.contenttypes.models import ContentType
+      from django.contrib.sessions.models import Session
+
+This :ref:`behavior can be customized <customizing-shell-auto-imports>` to add
+or remove automatic imports.
+
 Composite Primary Keys
 ----------------------
 
@@ -59,6 +79,8 @@ Minor features
 * The ``admin/base.html`` template now has a new block
   :ref:`extrabody <extrabody>` for adding custom code before the closing
   ``</body>`` tag.
+
+* The value of a :class:`~django.db.models.URLField` now renders as a link.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -259,6 +281,14 @@ Forms
 * An :attr:`~django.forms.BoundField.aria_describedby` property is added to
   ``BoundField`` to ease use of this HTML attribute in templates.
 
+* To improve accessibility for screen reader users ``aria-describedby`` is used
+  to associated form fields with their error messages. See
+  :ref:`how form errors are displayed <form-error-display>` for details.
+
+* The new asset object :class:`~django.forms.Script` is available for adding
+  custom HTML-attributes to JavaScript in form media. See
+  :ref:`paths as objects <form-media-asset-objects>` for more details.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -318,8 +348,18 @@ Models
 * :meth:`.QuerySet.explain` now supports the ``memory`` and ``serialize``
   options on PostgreSQL 17+.
 
-* Added :class:`~django.db.models.JSONArrayAgg` aggregate function to support
-  ``JSON_ARRAYAGG`` and ``JSON_GROUP_ARRAY`` for SQLite.
+* The new :class:`~django.db.models.JSONArrayAgg` aggregate function accepts
+  a list of field names or expressions, converts each expression to a JSON
+  value, and returns a single JSON array containing those JSON values.
+
+* The new :class:`~django.db.models.functions.JSONArray` database function
+  accepts a list of field names or expressions and returns a JSON array
+  containing those values.
+
+* The new :attr:`.Expression.allows_composite_expressions` attribute specifies
+  that the expression allows composite expressions, for example, to support
+  :ref:`composite primary keys <cpk-and-database-functions>`.
+
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -490,3 +530,9 @@ Miscellaneous
 * The fallback to ``request.user`` when ``user`` is ``None`` in
   ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
   removed.
+
+* The ``ordering`` keyword argument of the PostgreSQL specific aggregation
+  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
+  ``django.contrib.postgres.aggregates.JSONBAgg``, and
+  ``django.contrib.postgres.aggregates.StringAgg`` is deprecated in favor
+  of the ``order_by`` argument.

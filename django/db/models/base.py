@@ -891,8 +891,9 @@ class Model(AltersData, metaclass=ModelBase):
             and using == self._state.db
         ):
             field_names = set()
+            pk_fields = self._meta.pk_fields
             for field in self._meta.concrete_fields:
-                if not field.primary_key and not hasattr(field, "through"):
+                if field not in pk_fields and not hasattr(field, "through"):
                     field_names.add(field.attname)
             loaded_fields = field_names.difference(deferred_non_generated_fields)
             if loaded_fields:
@@ -1091,10 +1092,11 @@ class Model(AltersData, metaclass=ModelBase):
         for a single table.
         """
         meta = cls._meta
+        pk_fields = meta.pk_fields
         non_pks_non_generated = [
             f
             for f in meta.local_concrete_fields
-            if not f.primary_key and not f.generated
+            if f not in pk_fields and not f.generated
         ]
 
         if update_fields:
@@ -1117,10 +1119,7 @@ class Model(AltersData, metaclass=ModelBase):
             and not force_insert
             and not force_update
             and self._state.adding
-            and (
-                (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
-                or (meta.pk.db_default and meta.pk.db_default is not NOT_PROVIDED)
-            )
+            and all(f.has_default() or f.has_db_default() for f in meta.pk_fields)
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
@@ -1494,7 +1493,7 @@ class Model(AltersData, metaclass=ModelBase):
                 ):
                     # no value, skip the lookup
                     continue
-                if f.primary_key and not self._state.adding:
+                if f in self._meta.pk_fields and not self._state.adding:
                     # no need to check for unique primary key when editing
                     continue
                 lookup_kwargs[str(field_name)] = lookup_value
@@ -1804,6 +1803,8 @@ class Model(AltersData, metaclass=ModelBase):
                 hint = f"{field_name!r} field may not set 'null=True'."
             elif field.generated:
                 hint = f"{field_name!r} field is a generated field."
+            elif field not in meta.local_fields:
+                hint = f"{field_name!r} field is not a local field."
             else:
                 seen_columns[field.column].append(field_name)
 

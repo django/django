@@ -38,7 +38,7 @@ from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
-from .models import CustomUser, UUIDUser
+from .models import CustomUser, CustomUserCompositePrimaryKey, UUIDUser
 from .settings import AUTH_TEMPLATES
 
 
@@ -538,6 +538,18 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
             },
         )
         self.assertRedirects(response, "/reset/done/")
+
+
+@override_settings(AUTH_USER_MODEL="auth_tests.CustomUserCompositePrimaryKey")
+class CustomUserCompositePrimaryKeyPasswordResetTest(CustomUserPasswordResetTest):
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = CustomUserCompositePrimaryKey.custom_objects.create(
+            email="staffmember@example.com",
+            date_of_birth=datetime.date(1976, 11, 8),
+        )
+        cls.u1.set_password("password")
+        cls.u1.save()
 
 
 @override_settings(AUTH_USER_MODEL="auth_tests.UUIDUser")

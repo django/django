@@ -8,8 +8,7 @@ from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
-from django.db.models.fields import composite
-from django.db.models.fields.composite import CompositePrimaryKey
+from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import select_related_descend
@@ -19,6 +18,7 @@ from django.db.models.sql.constants import (
     MULTI,
     NO_RESULTS,
     ORDER_DIR,
+    ROW_COUNT,
     SINGLE,
 )
 from django.db.models.sql.query import Query, get_order_dir
@@ -1116,10 +1116,9 @@ class SQLCompiler:
                 )
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
-        target_fields = composite.unnest(targets)
         return [
             (OrderBy(transform_function(t, alias), descending=descending), False)
-            for t in target_fields
+            for t in targets
         ]
 
     def _setup_joins(self, pieces, opts, alias):
@@ -1596,15 +1595,15 @@ class SQLCompiler:
     ):
         """
         Run the query against the database and return the result(s). The
-        return value is a single data item if result_type is SINGLE, or an
-        iterator over the results if the result_type is MULTI.
+        return value depends on the value of result_type.
 
-        result_type is either MULTI (use fetchmany() to retrieve all rows),
-        SINGLE (only retrieve a single row), or None. In this last case, the
-        cursor is returned if any query is executed, since it's used by
-        subclasses such as InsertQuery). It's possible, however, that no query
-        is needed, as the filters describe an empty set. In that case, None is
-        returned, to avoid any unnecessary database interaction.
+        When result_type is:
+        - MULTI: Retrieves all rows using fetchmany(). Wraps in an iterator for
+           chunked reads when supported.
+        - SINGLE: Retrieves a single row using fetchone().
+        - ROW_COUNT: Retrieves the number of rows in the result.
+        - CURSOR: Runs the query, and returns the cursor object. It is the
+           caller's responsibility to close the cursor.
         """
         result_type = result_type or NO_RESULTS
         try:
@@ -1627,6 +1626,11 @@ class SQLCompiler:
             cursor.close()
             raise
 
+        if result_type == ROW_COUNT:
+            try:
+                return cursor.rowcount
+            finally:
+                cursor.close()
         if result_type == CURSOR:
             # Give the caller the cursor to process and close.
             return cursor
@@ -1906,8 +1910,9 @@ class SQLInsertCompiler(SQLCompiler):
                     )
                 ]
                 cols = [field.get_col(opts.db_table) for field in self.returning_fields]
-            elif isinstance(opts.pk, CompositePrimaryKey):
-                returning_field = returning_fields[0]
+            elif returning_fields and isinstance(
+                returning_field := returning_fields[0], AutoField
+            ):
                 cols = [returning_field.get_col(opts.db_table)]
                 rows = [
                     (
@@ -1919,21 +1924,12 @@ class SQLInsertCompiler(SQLCompiler):
                     )
                 ]
             else:
-                cols = [opts.pk.get_col(opts.db_table)]
-                rows = [
-                    (
-                        self.connection.ops.last_insert_id(
-                            cursor,
-                            opts.db_table,
-                            opts.pk.column,
-                        ),
-                    )
-                ]
+                # Backend doesn't support returning fields and no auto-field
+                # that can be retrieved from `last_insert_id` was specified.
+                return []
         converters = self.get_converters(cols)
         if converters:
             rows = self.apply_converters(rows, converters)
-        if self.has_composite_fields(cols):
-            rows = self.composite_fields_to_tuples(rows, cols)
         return list(rows)
 
 
@@ -2069,19 +2065,19 @@ class SQLUpdateCompiler(SQLCompiler):
         non-empty query that is executed. Row counts for any subsequent,
         related queries are not available.
         """
-        cursor = super().execute_sql(result_type)
-        try:
-            rows = cursor.rowcount if cursor else 0
-            is_empty = cursor is None
-        finally:
-            if cursor:
-                cursor.close()
+        row_count = super().execute_sql(result_type)
+        is_empty = row_count is None
+        row_count = row_count or 0
+
         for query in self.query.get_related_updates():
-            aux_rows = query.get_compiler(self.using).execute_sql(result_type)
-            if is_empty and aux_rows:
-                rows = aux_rows
+            # If the result_type is NO_RESULTS then the aux_row_count is None.
+            aux_row_count = query.get_compiler(self.using).execute_sql(result_type)
+            if is_empty and aux_row_count:
+                # Returns the row count for any related updates as the number of
+                # rows updated.
+                row_count = aux_row_count
                 is_empty = False
-        return rows
+        return row_count
 
     def pre_sql_setup(self):
         """

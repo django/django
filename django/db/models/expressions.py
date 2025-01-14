@@ -184,6 +184,8 @@ class BaseExpression:
     constraint_validation_compatible = True
     # Does the expression possibly return more than one row?
     set_returning = False
+    # Does the expression allow composite expressions?
+    allows_composite_expressions = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -758,6 +760,8 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         rhs = self.rhs.resolve_expression(
             query, allow_joins, reuse, summarize, for_save
         )
+        if isinstance(lhs, ColPairs) or isinstance(rhs, ColPairs):
+            raise ValueError("CompositePrimaryKey is not combinable.")
         if not isinstance(self, (DurationExpression, TemporalSubtraction)):
             try:
                 lhs_type = lhs.output_field.get_internal_type()
@@ -1074,6 +1078,12 @@ class Func(SQLiteNumericMixin, Expression):
         for pos, arg in enumerate(c.source_expressions):
             c.source_expressions[pos] = arg.resolve_expression(
                 query, allow_joins, reuse, summarize, for_save
+            )
+        if not self.allows_composite_expressions and any(
+            isinstance(expr, ColPairs) for expr in c.get_source_expressions()
+        ):
+            raise ValueError(
+                f"{self.__class__.__name__} does not support composite primary keys."
             )
         return c
 
@@ -1825,6 +1835,7 @@ class OrderBy(Expression):
     template = "%(expression)s %(ordering)s"
     conditional = False
     constraint_validation_compatible = False
+    allows_composite_expressions = True
 
     def __init__(self, expression, descending=False, nulls_first=None, nulls_last=None):
         if nulls_first and nulls_last:
@@ -1850,6 +1861,16 @@ class OrderBy(Expression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
+        if isinstance(self.expression, ColPairs):
+            sql_parts = []
+            params = []
+            for col in self.expression.get_cols():
+                copy = self.copy()
+                copy.set_source_expressions([col])
+                sql, col_params = compiler.compile(copy)
+                sql_parts.append(sql)
+                params.extend(col_params)
+            return ", ".join(sql_parts), params
         template = template or self.template
         if connection.features.supports_order_by_nulls_modifier:
             if self.nulls_last:
