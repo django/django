@@ -9,4 +9,6 @@ Django 5.1.6 fixes several bugs in 5.1.5.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.1.5 that caused ``validate_ipv6_address()``
+  and ``validate_ipv46_address()`` to crash when handling non-string values
+  (:ticket:`36098`).
