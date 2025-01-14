@@ -111,7 +111,10 @@ def _filter_prefetch_queryset(queryset, field_name, instances):
         if high_mark is not None:
             predicate &= LessThanOrEqual(window, high_mark)
         queryset.query.clear_limits()
-    return queryset.filter(predicate)
+    # All pre-existing JOINs must be re-used when applying the predicate to
+    # avoid unintended spanning of multi-valued relationships.
+    queryset.query.add_q(predicate, reuse_all=True)
+    return queryset
 
 
 class ForwardManyToOneDescriptor:
@@ -1117,7 +1120,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
             queryset = _filter_prefetch_queryset(
-                queryset._next_is_sticky(), self.query_field_name, instances
+                queryset, self.query_field_name, instances
             )
 
             # M2M: need to annotate the query in order to get the primary model
