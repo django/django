@@ -1616,7 +1616,7 @@ class Query(BaseExpression):
     def add_filter(self, filter_lhs, filter_rhs):
         self.add_q(Q((filter_lhs, filter_rhs)))
 
-    def add_q(self, q_object):
+    def add_q(self, q_object, reuse_all=False):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
@@ -1630,7 +1630,11 @@ class Query(BaseExpression):
         existing_inner = {
             a for a in self.alias_map if self.alias_map[a].join_type == INNER
         }
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        if reuse_all:
+            can_reuse = set(self.alias_map)
+        else:
+            can_reuse = self.used_aliases
+        clause, _ = self._add_q(q_object, can_reuse)
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
