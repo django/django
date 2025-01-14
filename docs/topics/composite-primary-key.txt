@@ -186,6 +186,16 @@ field :exc:`.FieldError`.
     :attr:`.Field.editable` to ``False`` on all primary key fields to exclude
     them from ModelForms.
 
+Composite primary keys in model validation
+==========================================
+
+Since ``pk`` is only a virtual field, including ``pk`` as a field name in the
+``exclude`` argument of :meth:`.Model.clean_fields` has no effect. To exclude
+the composite primary key fields from
+:ref:`model validation <validating-objects>`, specify each field individually.
+:meth:`.Model.validate_unique` can still be called with ``exclude={"pk"}`` to
+skip uniqueness checks.
+
 Building composite primary key ready applications
 =================================================
 
