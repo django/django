@@ -360,7 +360,6 @@ Models
   that the expression allows composite expressions, for example, to support
   :ref:`composite primary keys <cpk-and-database-functions>`.
 
-
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
