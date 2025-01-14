@@ -4,8 +4,8 @@ Django 5.1.5 release notes
 
 *January 14, 2025*
 
-Django 5.1.5 fixes a security issue with severity "moderate" and several bugs
-in 5.1.4.
+Django 5.1.5 fixes a security issue with severity "moderate" and one bug in
+5.1.4.
 
 Bugfixes
 ========
