@@ -126,9 +126,6 @@ class BaseDatabaseFeatures:
     # in the SQL standard.
     supports_tablespaces = False
 
-    # Does the backend reset sequences between tests?
-    supports_sequence_reset = True
-
     # Can the backend introspect the default value of a column?
     can_introspect_default = True
 
