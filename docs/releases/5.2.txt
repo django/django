@@ -188,11 +188,6 @@ Minor features
   now have a new method ``get_error_message()``, which can be overridden in
   subclasses to customize the error messages.
 
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -210,41 +205,6 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
   are now supported on MariaDB 11.7+.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.postgres`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -252,21 +212,6 @@ Minor features
   a ``stylesheets`` attribute. If specified, an ``<? xml-stylesheet ?>``
   processing instruction will be added to the top of the document for each
   stylesheet in the given list. See :ref:`feed-stylesheets` for more details.
-
-Asynchronous views
-~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -307,16 +252,6 @@ Error Reporting
 * The attribute :attr:`.SafeExceptionReporterFilter.hidden_settings` now
   treats values as sensitive if their name includes ``AUTH``.
 
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
 Forms
 ~~~~~
 
@@ -344,21 +279,6 @@ Forms
 * The new asset object :class:`~django.forms.Script` is available for adding
   custom HTML-attributes to JavaScript in form media. See
   :ref:`paths as objects <form-media-asset-objects>` for more details.
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -431,22 +351,12 @@ Requests and Responses
   :func:`~django.shortcuts.redirect` allows to instruct the user agent to reuse
   the HTTP method and body during redirection using specific status codes.
 
-Security
-~~~~~~~~
-
-* ...
-
 Serialization
 ~~~~~~~~~~~~~
 
 * Each serialization format now defines a ``Deserializer`` class, rather than a
   function, to improve extensibility when defining a
   :ref:`custom serialization format <custom-serialization-formats>`.
-
-Signals
-~~~~~~~
-
-* ...
 
 Templates
 ~~~~~~~~~
@@ -485,11 +395,6 @@ Utilities
 * :func:`~django.utils.html.format_html_join` now supports taking an iterable
   of mappings, passing their contents as keyword arguments to
   :func:`~django.utils.html.format_html`.
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 .. _backwards-incompatible-5.2:
 
