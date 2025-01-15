@@ -223,29 +223,36 @@ class NaturalTimeFormatter:
         # and time unit.
         "past-second": ngettext_lazy("a second ago", "%(count)s seconds ago", "count"),
         "now": gettext_lazy("now"),
-        # Translators: please keep a non-breaking space (U+00A0) between count
-        # and time unit.
+        # fmt: off
+        # fmt turned off to avoid black splitting the ngettext_lazy calls to multiple
+        # lines, as this results in gettext missing the 'Translators:' comments.
         "future-second": ngettext_lazy(
+            # Translators: please keep a non-breaking space (U+00A0) between count
+            # and time unit.
             "a second from now", "%(count)s seconds from now", "count"
         ),
-        # Translators: please keep a non-breaking space (U+00A0) between count
-        # and time unit.
         "future-minute": ngettext_lazy(
-            "a minute from now", "%(count)s minutes from now", "count"
+            # Translators: please keep a non-breaking space (U+00A0) between count
+            # and time unit.
+            "a minute from now", "%(count)s minutes from now", "count",
         ),
-        # Translators: please keep a non-breaking space (U+00A0) between count
-        # and time unit.
         "future-hour": ngettext_lazy(
-            "an hour from now", "%(count)s hours from now", "count"
+            # Translators: please keep a non-breaking space (U+00A0) between count
+            # and time unit.
+            "an hour from now", "%(count)s hours from now", "count",
         ),
+        # fmt: on
         # Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
         "future-day": gettext_lazy("%(delta)s from now"),
     }
     past_substrings = {
-        # Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
+        # fmt: off
         "year": npgettext_lazy(
-            "naturaltime-past", "%(num)d year", "%(num)d years", "num"
+            # Translators: 'naturaltime-past' strings will be included in
+            # '%(delta)s ago'
+            "naturaltime-past", "%(num)d year", "%(num)d years", "num",
         ),
+        # fmt:on
         "month": npgettext_lazy(
             "naturaltime-past", "%(num)d month", "%(num)d months", "num"
         ),
@@ -261,11 +268,13 @@ class NaturalTimeFormatter:
         ),
     }
     future_substrings = {
-        # Translators: 'naturaltime-future' strings will be included in
-        # '%(delta)s from now'.
+        # fmt: off
         "year": npgettext_lazy(
-            "naturaltime-future", "%(num)d year", "%(num)d years", "num"
+            # Translators: 'naturaltime-future' strings will be included in
+            # '%(delta)s from now'.
+            "naturaltime-future", "%(num)d year", "%(num)d years", "num",
         ),
+        # fmt: on
         "month": npgettext_lazy(
             "naturaltime-future", "%(num)d month", "%(num)d months", "num"
         ),
