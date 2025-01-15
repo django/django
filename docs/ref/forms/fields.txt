@@ -1636,3 +1636,13 @@ only requirements are that it implement a ``clean()`` method and that its
 
 You can also customize how a field will be accessed by overriding
 :meth:`~django.forms.Field.get_bound_field()`.
+
+DateField
+---------
+Use this field to input dates. The default expected format is ``YYYY-MM-DD``.
+For example: ``2024-12-31``.
+
+TimeField
+---------
+Use this field to input time. The default expected format is ``HH:MM``.
+For example: ``14:30``.
