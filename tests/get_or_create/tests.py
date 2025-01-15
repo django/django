@@ -1,7 +1,8 @@
 import time
 import traceback
 from datetime import date, datetime, timedelta
-from threading import Thread
+from threading import Event, Thread, Timer
+from unittest.mock import patch
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
@@ -687,56 +688,75 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
         can update while it holds the lock. The updated field isn't a field in
         'defaults', so update_or_create() shouldn't have an effect on it.
         """
-        lock_status = {"lock_count": 0}
+        locked_for_update = Event()
+        save_allowed = Event()
 
-        def birthday_sleep():
-            lock_status["lock_count"] += 1
-            time.sleep(0.5)
+        def wait_or_fail(event, message):
+            if not event.wait(5):
+                raise AssertionError(message)
+
+        def birthday_yield():
+            # At this point the row should be locked as create or update
+            # defaults are only called once the SELECT FOR UPDATE is issued.
+            locked_for_update.set()
+            # Yield back the execution to the main thread until it allows
+            # save() to proceed.
+            save_allowed.clear()
             return date(1940, 10, 10)
 
-        def update_birthday_slowly():
+        person_save = Person.save
+
+        def wait_for_allowed_save(*args, **kwargs):
+            wait_or_fail(save_allowed, "Test took too long to allow save")
+            return person_save(*args, **kwargs)
+
+        def update_person():
             try:
-                Person.objects.update_or_create(
-                    first_name="John", defaults={"birthday": birthday_sleep}
-                )
+                with patch.object(Person, "save", wait_for_allowed_save):
+                    Person.objects.update_or_create(
+                        first_name="John",
+                        defaults={"last_name": "Doe", "birthday": birthday_yield},
+                    )
             finally:
-                # Avoid leaking connection for Oracle
+                # Avoid leaking connection for Oracle.
                 connection.close()
 
-        def lock_wait(expected_lock_count):
-            # timeout after ~0.5 seconds
-            for i in range(20):
-                time.sleep(0.025)
-                if lock_status["lock_count"] == expected_lock_count:
-                    return True
-            self.skipTest("Database took too long to lock the row")
-
-        # update_or_create in a separate thread.
-        t = Thread(target=update_birthday_slowly)
-        before_start = datetime.now()
+        t = Thread(target=update_person)
         t.start()
-        lock_wait(1)
+        wait_or_fail(locked_for_update, "Database took too long to lock row")
         # Create object *after* initial attempt by update_or_create to get obj
         # but before creation attempt.
-        Person.objects.create(
+        person = Person(
             first_name="John", last_name="Lennon", birthday=date(1940, 10, 9)
         )
-        lock_wait(2)
-        # At this point, the thread is pausing for 0.5 seconds, so now attempt
-        # to modify object before update_or_create() calls save(). This should
-        # be blocked until after the save().
+        # Don't use person.save() as it's gated by the save_allowed event.
+        person_save(person, force_insert=True)
+        # Now that the row is created allow the update_or_create() logic to
+        # attempt a save(force_insert) that will inevitably fail and wait
+        # until it yields back execution after performing a subsequent
+        # locked select for update with an intent to save(force_update).
+        locked_for_update.clear()
+        save_allowed.set()
+        wait_or_fail(locked_for_update, "Database took too long to lock row")
+        allow_save = Timer(0.5, save_allowed.set)
+        before_start = datetime.now()
+        allow_save.start()
+        # The following update() should block until the update_or_create()
+        # initiated save() is allowed to proceed by the `allow_save` timer
+        # setting `save_allowed` after 0.5 seconds.
         Person.objects.filter(first_name="John").update(last_name="NotLennon")
         after_update = datetime.now()
-        # Wait for thread to finish
+        # Wait for thread to finish.
         t.join()
         # Check call to update_or_create() succeeded and the subsequent
         # (blocked) call to update().
         updated_person = Person.objects.get(first_name="John")
-        self.assertEqual(
-            updated_person.birthday, date(1940, 10, 10)
-        )  # set by update_or_create()
-        self.assertEqual(updated_person.last_name, "NotLennon")  # set by update()
-        self.assertGreater(after_update - before_start, timedelta(seconds=1))
+        # Confirm update_or_create() performed an update.
+        self.assertEqual(updated_person.birthday, date(1940, 10, 10))
+        # Confirm update() was the last statement to run.
+        self.assertEqual(updated_person.last_name, "NotLennon")
+        # Confirm update() blocked at least the duration of the timer.
+        self.assertGreater(after_update - before_start, timedelta(seconds=0.5))
 
 
 class InvalidCreateArgumentsTests(TransactionTestCase):
