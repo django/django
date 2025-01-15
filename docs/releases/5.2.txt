@@ -70,6 +70,62 @@ to be a ``CompositePrimaryKey``::
 
 See :doc:`/topics/composite-primary-key` for more details.
 
+Simplified override of :class:`~django.forms.BoundField`
+--------------------------------------------------------
+
+Prior to version 5.2, overriding :meth:`.Field.get_bound_field()` was the only
+option to use a custom :class:`~django.forms.BoundField`. Django now supports
+specifying the following attributes to customize form rendering:
+
+* :attr:`.BaseRenderer.bound_field_class` at the project level,
+* :attr:`.Form.bound_field_class` at the form level, and
+* :attr:`.Field.bound_field_class` at the field level.
+
+For example, to customize the ``BoundField`` of a ``Form`` class::
+
+    from django.forms import Form
+
+
+    class CustomBoundField(forms.BoundField):
+
+        custom_class = "custom"
+
+        def css_classes(self, extra_classes=None):
+            result = super().css_classes(extra_classes)
+            if self.custom_class not in result:
+                result += f" {self.custom_class}"
+            return result.strip()
+
+
+    class CustomForm(forms.Form):
+        bound_field_class = CustomBoundField
+
+        name = forms.CharField(
+            label="Your Name",
+            max_length=100,
+            required=False,
+            widget=forms.TextInput(attrs={"class": "name-input-class"}),
+        )
+        email = forms.EmailField(label="Your Email")
+
+
+When rendering a ``CustomForm`` instance, the following HTML is included:
+
+.. code:: html
+
+    <div class="custom">
+      <label for="id_name">Your Name:</label>
+      <input type="text" name="name" class="name-input-class" maxlength="100" id="id_name">
+    </div>
+
+    <div class="custom">
+      <label for="id_email">Your Email:</label>
+      <input type="email" name="email" maxlength="320" required="" id="id_email">
+    </div>
+
+
+See :ref:`custom-boundfield` for more details about this feature.
+
 Minor features
 --------------
 
