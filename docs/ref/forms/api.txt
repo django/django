@@ -822,6 +822,9 @@ classes, as needed. The HTML will look something like:
     >>> f["subject"].legend_tag(attrs={"class": "foo"})
     <legend for="id_subject" class="foo required">Subject:</legend>
 
+You may further modify the rendering of form rows by using a
+:ref:`custom BoundField <custom-boundfield>`.
+
 .. _ref-forms-api-configuring-label:
 
 Configuring form elements' HTML ``id`` attributes and ``<label>`` tags
@@ -1148,6 +1151,12 @@ they're not the only way a form object can be displayed.
    :class:`Form` instance.
 
    The ``__str__()`` method of this object displays the HTML for this field.
+
+   You can use :attr:`.Form.bound_field_class` and
+   :attr:`.Field.bound_field_class` to specify a different ``BoundField`` class
+   per form or per field, respectively.
+
+   See :ref:`custom-boundfield` for examples of overriding a ``BoundField``.
 
 To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
 using the field's name as the key:
@@ -1488,23 +1497,34 @@ Methods of ``BoundField``
         >>> print(bound_form["subject"].value())
         hi
 
+.. _custom-boundfield:
+
 Customizing ``BoundField``
 ==========================
 
-If you need to access some additional information about a form field in a
-template and using a subclass of :class:`~django.forms.Field` isn't
-sufficient, consider also customizing :class:`~django.forms.BoundField`.
+.. attribute:: Form.bound_field_class
 
-A custom form field can override ``get_bound_field()``:
+.. versionadded:: 5.2
 
-.. method:: Field.get_bound_field(form, field_name)
+Define a custom :class:`~django.forms.BoundField` class to use when rendering
+the form. This takes precedence over the project-level
+:attr:`.BaseRenderer.bound_field_class` (along with a custom
+:setting:`FORM_RENDERER`), but can be overridden by the field-level
+:attr:`.Field.bound_field_class`.
 
-    Takes an instance of :class:`~django.forms.Form` and the name of the field.
-    The return value will be used when accessing the field in a template. Most
-    likely it will be an instance of a subclass of
-    :class:`~django.forms.BoundField`.
+If not defined as a class variable, ``bound_field_class`` can be set via the
+``bound_field_class`` argument in the :class:`Form` or :class:`Field`
+constructor.
 
-If you have a ``GPSCoordinatesField``, for example, and want to be able to
+For compatibility reasons, a custom form field can still override
+:meth:`.Field.get_bound_field()` to use a custom class, though any of the
+previous options are preferred.
+
+You may want to use a custom :class:`.BoundField` if you need to access some
+additional information about a form field in a template and using a subclass of
+:class:`~django.forms.Field` isn't sufficient.
+
+For example, if you have a ``GPSCoordinatesField``, and want to be able to
 access additional information about the coordinates in a template, this could
 be implemented as follows::
 
@@ -1523,11 +1543,73 @@ be implemented as follows::
 
 
     class GPSCoordinatesField(Field):
-        def get_bound_field(self, form, field_name):
-            return GPSCoordinatesBoundField(form, self, field_name)
+        bound_field_class = GPSCoordinatesBoundField
 
 Now you can access the country in a template with
 ``{{ form.coordinates.country }}``.
+
+You may also want to customize the default form field template rendering. For
+example, you can override :meth:`.BoundField.label_tag` to add a custom class::
+
+   class StyledLabelBoundField(BoundField):
+       def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+           attrs = attrs or {}
+           attrs["class"] = "wide"
+           return super().label_tag(contents, attrs, label_suffix, tag)
+
+
+   class UserForm(forms.Form):
+       bound_field_class = StyledLabelBoundField
+       name = CharField()
+
+This would update the default form rendering:
+
+.. code-block:: pycon
+
+   >>> f = UserForm()
+   >>> print(f["name"].label_tag)
+   <label for="id_name" class="wide">Name:</label>
+
+To add a CSS class to the wrapping HTML element of all fields, a ``BoundField``
+can be overridden to return a different collection of CSS classes::
+
+    class WrappedBoundField(BoundField):
+        def css_classes(self, extra_classes=None):
+            parent_css_classes = super().css_classes(extra_classes)
+            return f"field-class {parent_css_classes}".strip()
+
+
+    class UserForm(forms.Form):
+        bound_field_class = WrappedBoundField
+        name = CharField()
+
+This would update the form rendering as follows:
+
+.. code-block:: pycon
+
+   >>> f = UserForm()
+   >>> print(f)
+   <div class="field-class"><label for="id_name">Name:</label><input type="text" name="name" required id="id_name"></div>
+
+Alternatively, to override the ``BoundField`` class at the project level,
+:attr:`.BaseRenderer.bound_field_class` can be defined on a custom
+:setting:`FORM_RENDERER`:
+
+.. code-block:: python
+    :caption: ``mysite/renderers.py``
+
+    from django.forms.renderers import DjangoTemplates
+
+    from .forms import CustomBoundField
+
+
+    class CustomRenderer(DjangoTemplates):
+        bound_field_class = CustomBoundField
+
+.. code-block:: python
+    :caption: ``settings.py``
+
+    FORM_RENDERER = "mysite.renderers.CustomRenderer"
 
 .. _binding-uploaded-files:
 

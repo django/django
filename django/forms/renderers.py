@@ -21,6 +21,8 @@ class BaseRenderer:
     formset_template_name = "django/forms/formsets/div.html"
     field_template_name = "django/forms/field.html"
 
+    bound_field_class = None
+
     def get_template(self, template_name):
         raise NotImplementedError("subclasses must implement get_template()")
 
