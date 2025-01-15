@@ -1,11 +1,13 @@
 import datetime
 
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import Order, RevisionableModel, TestObject
 
 
+@ignore_warnings(category=RemovedInDjango60Warning)
 class ExtraRegressTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -468,3 +470,23 @@ class ExtraRegressTests(TestCase):
         self.assertSequenceEqual(
             qs.order_by("-second_extra").values_list("first"), [("a",), ("a",)]
         )
+
+
+class ExtraDeprecationTests(SimpleTestCase):
+    def test_extra_select_deprecation(self):
+        msg = "extra(select) usage is deprecated, use annotate() with RawSQL instead."
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            TestObject.objects.all().extra(select={"select": "%s"}, select_params=(1,))
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_extra_where_deprecation(self):
+        msg = "extra(where) usage is deprecated, use filter() with RawSQL instead."
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            TestObject.objects.all().extra(where={"where": "foo = %s"}, params=(1,))
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_extra_order_by_deprecation(self):
+        msg = "extra(order_by) usage is deprecated, use order_by() instead."
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            TestObject.objects.all().extra(order_by={"order_by": "random()"})
+        self.assertEqual(ctx.filename, __file__)

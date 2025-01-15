@@ -25,8 +25,9 @@ from django.db.models import (
     When,
 )
 from django.db.models.functions import Cast, Concat
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import Approximate
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Alfa,
@@ -238,6 +239,8 @@ class AggregationTests(TestCase):
         qs2 = books.filter(id__in=list(qs))
         self.assertEqual(list(qs1), list(qs2))
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_annotate_with_extra(self):
         """
@@ -287,14 +290,18 @@ class AggregationTests(TestCase):
             {"pages__sum": 3703, "pages__avg": Approximate(617.166, places=2)},
         )
 
-        # Aggregate overrides extra selected column
-        self.assertEqual(
-            Book.objects.extra(select={"price_per_page": "price / pages"}).aggregate(
-                Sum("pages")
-            ),
-            {"pages__sum": 3703},
-        )
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            # Aggregate overrides extra selected column
+            self.assertEqual(
+                Book.objects.extra(
+                    select={"price_per_page": "price / pages"}
+                ).aggregate(Sum("pages")),
+                {"pages__sum": 3703},
+            )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_annotation(self):
         # Annotations get combined with extra select clauses
         obj = (
@@ -879,37 +886,39 @@ class AggregationTests(TestCase):
 
         # Regression for #10132 - If the values() clause only mentioned extra
         # (select=) columns, those columns are used for grouping
-        qs = (
-            Book.objects.extra(select={"pub": "publisher_id"})
-            .values("pub")
-            .annotate(Count("id"))
-            .order_by("pub")
-        )
-        self.assertSequenceEqual(
-            qs,
-            [
-                {"pub": self.p1.id, "id__count": 2},
-                {"pub": self.p2.id, "id__count": 1},
-                {"pub": self.p3.id, "id__count": 2},
-                {"pub": self.p4.id, "id__count": 1},
-            ],
-        )
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            qs = (
+                Book.objects.extra(select={"pub": "publisher_id"})
+                .values("pub")
+                .annotate(Count("id"))
+                .order_by("pub")
+            )
+            self.assertSequenceEqual(
+                qs,
+                [
+                    {"pub": self.p1.id, "id__count": 2},
+                    {"pub": self.p2.id, "id__count": 1},
+                    {"pub": self.p3.id, "id__count": 2},
+                    {"pub": self.p4.id, "id__count": 1},
+                ],
+            )
 
-        qs = (
-            Book.objects.extra(select={"pub": "publisher_id", "foo": "pages"})
-            .values("pub")
-            .annotate(Count("id"))
-            .order_by("pub")
-        )
-        self.assertSequenceEqual(
-            qs,
-            [
-                {"pub": self.p1.id, "id__count": 2},
-                {"pub": self.p2.id, "id__count": 1},
-                {"pub": self.p3.id, "id__count": 2},
-                {"pub": self.p4.id, "id__count": 1},
-            ],
-        )
+            qs = (
+                Book.objects.extra(select={"pub": "publisher_id", "foo": "pages"})
+                .values("pub")
+                .annotate(Count("id"))
+                .order_by("pub")
+            )
+            self.assertSequenceEqual(
+                qs,
+                [
+                    {"pub": self.p1.id, "id__count": 2},
+                    {"pub": self.p2.id, "id__count": 1},
+                    {"pub": self.p3.id, "id__count": 2},
+                    {"pub": self.p4.id, "id__count": 1},
+                ],
+            )
 
         # Regression for #10182 - Queries with aggregate calls are correctly
         # realiased when used in a subquery
@@ -1058,15 +1067,17 @@ class AggregationTests(TestCase):
 
         # Regression for #10290 - extra selects with parameters can be used for
         # grouping.
-        qs = (
-            Book.objects.annotate(mean_auth_age=Avg("authors__age"))
-            .extra(select={"sheets": "(pages + %s) / %s"}, select_params=[1, 2])
-            .order_by("sheets")
-            .values("sheets")
-        )
-        self.assertQuerySetEqual(
-            qs, [150, 175, 224, 264, 473, 566], lambda b: int(b["sheets"])
-        )
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            qs = (
+                Book.objects.annotate(mean_auth_age=Avg("authors__age"))
+                .extra(select={"sheets": "(pages + %s) / %s"}, select_params=[1, 2])
+                .order_by("sheets")
+                .values("sheets")
+            )
+            self.assertQuerySetEqual(
+                qs, [150, 175, 224, 264, 473, 566], lambda b: int(b["sheets"])
+            )
 
         # Regression for 10425 - annotations don't get in the way of a count()
         # clause
