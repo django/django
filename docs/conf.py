@@ -135,7 +135,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = "5.2"
+django_next_version = "6.0"
 
 extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-%s"),
