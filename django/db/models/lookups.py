@@ -258,11 +258,7 @@ class FieldGetDbPrepValueMixin:
         return (
             "%s",
             [
-                (
-                    v
-                    if hasattr(v, "as_sql")
-                    else get_db_prep_value(v, connection, prepared=True)
-                )
+                (v if hasattr(v, "as_sql") else get_db_prep_value(v, connection))
                 for v in value
             ],
         )

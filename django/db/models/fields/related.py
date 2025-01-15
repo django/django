@@ -1165,8 +1165,8 @@ class ForeignKey(ForeignObject):
         else:
             return self.target_field.get_db_prep_save(value, connection=connection)
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        return self.target_field.get_db_prep_value(value, connection, prepared)
+    def get_db_prep_value(self, value, connection):
+        return self.target_field.get_db_prep_value(value, connection)
 
     def get_prep_value(self, value):
         return self.target_field.get_prep_value(value)
