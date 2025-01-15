@@ -95,6 +95,7 @@ class Field:
         "required": _("This field is required."),
     }
     empty_values = list(validators.EMPTY_VALUES)
+    bound_field_class = None
 
     def __init__(
         self,
@@ -111,6 +112,7 @@ class Field:
         disabled=False,
         label_suffix=None,
         template_name=None,
+        bound_field_class=None,
     ):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
@@ -135,11 +137,13 @@ class Field:
         #             is its widget is shown in the form but not editable.
         # label_suffix -- Suffix to be added to the label. Overrides
         #                 form's label_suffix.
+        # bound_field_class -- BoundField class to use in Field.get_bound_field.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         self.help_text = help_text
         self.disabled = disabled
         self.label_suffix = label_suffix
+        self.bound_field_class = bound_field_class or self.bound_field_class
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
@@ -251,7 +255,10 @@ class Field:
         Return a BoundField instance that will be used when accessing the form
         field in a template.
         """
-        return BoundField(form, self, field_name)
+        bound_field_class = (
+            self.bound_field_class or form.bound_field_class or BoundField
+        )
+        return bound_field_class(form, self, field_name)
 
     def __deepcopy__(self, memo):
         result = copy.copy(self)
