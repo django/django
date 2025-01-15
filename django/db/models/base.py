@@ -1299,7 +1299,7 @@ class Model(AltersData, metaclass=ModelBase):
         )
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
-        if not self.pk:
+        if not self._is_pk_set():
             raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
         op = "gt" if is_next else "lt"
         order = "" if is_next else "-"
