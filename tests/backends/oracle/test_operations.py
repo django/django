@@ -1,7 +1,9 @@
 import unittest
+from datetime import datetime
 
 from django.core.management.color import no_style
 from django.db import connection
+from django.db.backends.oracle.operations import DatabaseOperations
 from django.test import TransactionTestCase
 
 from ..models import Person, Tag
@@ -10,6 +12,9 @@ from ..models import Person, Tag
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
 class OperationsTests(TransactionTestCase):
     available_apps = ["backends"]
+
+    def setUp(self):
+        self.ops = DatabaseOperations(connection=connection)
 
     def test_sequence_name_truncation(self):
         seq_name = connection.ops._get_no_autofield_sequence_name(
@@ -141,3 +146,42 @@ class OperationsTests(TransactionTestCase):
         self.assertIn("BACKENDS_PERSON_SQ", statements[5])
         self.assertIn("BACKENDS_VERYLONGMODELN7BE2_SQ", statements[6])
         self.assertIn("BACKENDS_TAG_SQ", statements[7])
+
+    def test_date_extract_sql(self):
+        # Test for various lookup types
+        test_cases = [
+            ("year", "TO_CHAR(test_date, %s)", ["YYYY"]),
+            ("quarter", "TO_CHAR(test_date, %s)", ["Q"]),
+            ("month", "TO_CHAR(test_date, %s)", ["MM"]),
+            ("week", "TO_CHAR(test_date, %s)", ["IW"]),
+            ("week_day", "TO_CHAR(test_date, %s)", ["D"]),
+            ("iso_week_day", "TO_CHAR(test_date - 1, %s)", ["D"]),
+            ("hour", "EXTRACT(HOUR FROM test_date)", []),
+            ("minute", "EXTRACT(MINUTE FROM test_date)", []),
+            ("second", "FLOOR(EXTRACT(SECOND FROM test_date))", []),
+            ("iso_year", "TO_CHAR(test_date, %s)", ["IYYY"]),
+        ]
+
+        for lookup_type, expected_sql, expected_params in test_cases:
+            with self.subTest(lookup_type=lookup_type):
+                sql, params = self.ops.date_extract_sql(lookup_type, "test_date", [])
+                self.assertEqual(sql, expected_sql)
+                self.assertEqual(params, expected_params)
+
+    def test_date_extract_sql_invalid_lookup_type(self):
+        with self.assertRaises(ValueError):
+            self.ops.date_extract_sql("invalid", "test_date", [])
+
+    def test_date_extract_sql_with_timezone(self):
+        # Test that the method works correctly when a timezone is involved
+        sql, params = self.ops.date_extract_sql("hour", "test_date", ["UTC"])
+        self.assertEqual(sql, "EXTRACT(HOUR FROM test_date)")
+        self.assertEqual(params, ["UTC"])
+
+    def test_date_extract_sql_params_passing(self):
+        # Test that additional parameters are correctly passed through
+        sql, params = self.ops.date_extract_sql(
+            "year", "test_date", ["param1", "param2"]
+        )
+        self.assertEqual(sql, "TO_CHAR(test_date, %s)")
+        self.assertEqual(params, ["param1", "param2", "YYYY"])
