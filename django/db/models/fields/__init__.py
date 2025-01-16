@@ -2809,8 +2809,8 @@ class AutoFieldMixin:
     def validate(self, value, model_instance):
         pass
 
-    def get_db_prep_value(self, value, connection):
-        value = self.get_prep_value(value)
+    def get_db_prep_save(self, value, connection):
+        value = super().get_db_prep_save(value, connection)
         return connection.ops.validate_autopk_value(value)
 
     def contribute_to_class(self, cls, name, **kwargs):
