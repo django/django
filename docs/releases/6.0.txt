@@ -146,7 +146,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* ``forms.Media`` now returns ``NotImplemented`` in ``__add__`` for
+  non-``Media``-right-hand side values. This allows ``__radd__`` to be used if
+  available.
 
 Generic Views
 ~~~~~~~~~~~~~
