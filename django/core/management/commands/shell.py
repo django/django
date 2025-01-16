@@ -178,12 +178,11 @@ class Command(BaseCommand):
         return namespace
 
     def get_namespace(self):
-        apps_models = apps.get_models()
-        namespace = {}
-        for model in reversed(apps_models):
-            if model.__module__:
-                namespace[model.__name__] = model
-        return namespace
+        return {
+            model.__name__: model
+            for model in reversed(apps.get_models())
+            if model.__module__
+        }
 
     def handle(self, **options):
         # Execute the command and exit.
