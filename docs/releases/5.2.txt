@@ -83,7 +83,7 @@ specifying the following attributes to customize form rendering:
 
 For example, to customize the ``BoundField`` of a ``Form`` class::
 
-    from django.forms import Form
+    from django import forms
 
 
     class CustomBoundField(forms.BoundField):
@@ -273,7 +273,7 @@ Forms
   ``BoundField`` to ease use of this HTML attribute in templates.
 
 * To improve accessibility for screen reader users ``aria-describedby`` is used
-  to associated form fields with their error messages. See
+  to associate form fields with their error messages. See
   :ref:`how form errors are displayed <form-error-display>` for details.
 
 * The new asset object :class:`~django.forms.Script` is available for adding
@@ -306,7 +306,7 @@ Models
 
 * The ``SELECT`` clause generated when using :meth:`.QuerySet.values` and
   :meth:`.QuerySet.values_list` now matches the specified order of the
-  referenced expressions. Previously, the order was based of a set of
+  referenced expressions. Previously, the order was based on a set of
   counterintuitive rules which made query combination through methods such as
   :meth:`.QuerySet.union` unpredictable.
 
