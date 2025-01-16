@@ -122,6 +122,9 @@ PostgreSQL notes
 Django supports PostgreSQL 15 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
 2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended.
 
+* As of 6.0, dividing an ``IntegerField`` by a decimal constant in ORM
+    expressions yields a decimal/numeric result with preserved precision.
+
 .. note::
 
     Support for ``psycopg2`` is likely to be deprecated and removed at some
@@ -815,6 +818,9 @@ SQLite notes
 ============
 
 Django supports SQLite 3.37.0 and later.
+
+* As of 6.0, dividing an ``IntegerField`` by a decimal constant in ORM
+    expressions yields a decimal/numeric result with preserved precision.
 
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As

@@ -361,6 +361,10 @@ backends.
 * If the database supports ``UPDATE … RETURNING`` statements, backends can set
   ``DatabaseFeatures.can_return_rows_from_update=True``.
 
+* ORM (PostgreSQL, SQLite): Division of integer fields by decimal constants in
+  expressions now correctly preserves decimal precision (numeric semantics).
+  (Refs #36030, PR #19004)
+
 Dropped support for MariaDB 10.5
 --------------------------------
 

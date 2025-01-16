@@ -403,3 +403,13 @@ class DatabaseOperations(BaseDatabaseOperations):
             rhs_expr = Cast(rhs_expr, lhs_field)
 
         return lhs_expr, rhs_expr
+
+    def combine_expression(self, connector, sub_expressions):
+        if connector == "/":
+            lhs, rhs = sub_expressions
+            # PostgreSQL performs integer division for integer / integer.
+            # For divisions with Decimal operands, cast lhs to NUMERIC.
+            division_context = getattr(self, "_division_context", {})
+            if division_context.get("rhs_has_decimal"):
+                return f"CAST({lhs} AS NUMERIC) / {rhs}"
+        return super().combine_expression(connector, sub_expressions)

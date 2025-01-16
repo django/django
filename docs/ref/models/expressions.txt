@@ -18,6 +18,11 @@ Django supports negation, addition, subtraction, multiplication, division,
 modulo arithmetic, and the power operator on query expressions, using Python
 constants, variables, and even other expressions.
 
+.. versionchanged:: 6.0
+
+    On PostgreSQL and SQLite, dividing an ``IntegerField`` by a decimal
+    constant now correctly preserves fractional precision(numeric semantics).
+
 .. _output-field:
 
 Output field

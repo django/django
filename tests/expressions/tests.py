@@ -1653,6 +1653,85 @@ class ExpressionsNumericTests(TestCase):
         with self.assertNumQueries(expected_num_queries):
             self.assertEqual(n.decimal_value, Decimal("0.1"))
 
+    def test_decimal_division_precision(self):
+        """Test that division with Decimal preserves precision"""
+        obj = Number.objects.create(integer=2)
+        qs = Number.objects.annotate(
+            ratio=ExpressionWrapper(
+                F("integer") / Value(3.0),
+                output_field=DecimalField(max_digits=10, decimal_places=4),
+            )
+        ).filter(pk=obj.pk)
+        self.assertAlmostEqual(
+            float(qs.get().ratio),
+            float(Decimal("2") / Decimal("3")),
+            places=4,
+            msg="Division should preserve decimal precision",
+        )
+
+    def test_decimal_division_types(self):
+        """
+        Test that division with Decimal preserves numeric type.
+
+        Regression test for #36030: integer / Decimal should use NUMERIC
+        division, not INT division, regardless of Decimal formatting.
+        """
+        Number.objects.all().delete()
+        test_cases = [
+            # (numerator, denominator, expected_result, description)
+            # Original bug report: Decimal(3.0) formatted as "3" should still
+            # use NUMERIC division
+            (2, Decimal(3.0), "0.6667", "Decimal(3.0) - float constructor"),
+            (2, Decimal(3), "0.6667", "Decimal(3) - int constructor"),
+            (2, Decimal("3.0"), "0.6667", "Decimal('3.0') - string constructor"),
+            (5, Decimal("2"), "2.5000", "Decimal('2') - string int"),
+            (1, Decimal("3"), "0.3333", "Decimal('3') - string int"),
+            # Edge case: large numbers that format without decimals
+            (1000, Decimal(1000.0), "1.0000", "Large Decimal(1000.0)"),
+            (1000, Decimal("1000.0"), "1.0000", "Large Decimal('1000.0')"),
+        ]
+
+        for num, den, expected, description in test_cases:
+            with self.subTest(description=description, num=num, den=den):
+                number = Number.objects.create(integer=num)
+                qs = Number.objects.filter(pk=number.pk).annotate(
+                    ratio=ExpressionWrapper(
+                        F("integer") / Value(den, output_field=DecimalField()),
+                        output_field=DecimalField(max_digits=10, decimal_places=4),
+                    )
+                )
+                result = qs.get()
+                self.assertAlmostEqual(
+                    float(result.ratio),
+                    float(expected),
+                    places=4,
+                    msg=f"{description}: {num} / {den} should give {expected}",
+                )
+
+    def test_decimal_division_without_explicit_value(self):
+        """
+        Test the exact case from bug report #36030.
+
+        F("integer") / Decimal(...) should preserve decimal precision
+        even when used directly without wrapping in Value().
+        """
+        Number.objects.all().delete()
+        number = Number.objects.create(integer=2)
+
+        # This is the exact pattern from the bug report
+        qs = Number.objects.annotate(x=F("integer") / Decimal(3.0)).filter(pk=number.pk)
+
+        result = qs.get()
+        # Should be approximately 0.6667, not 0 (which would indicate
+        # INT division was used)
+        self.assertNotEqual(result.x, 0, "Division should not truncate to 0")
+        self.assertAlmostEqual(
+            float(result.x),
+            2.0 / 3.0,
+            places=4,
+            msg="F('integer') / Decimal(3.0) should preserve precision",
+        )
+
 
 class ExpressionOperatorTests(TestCase):
     @classmethod

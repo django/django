@@ -358,6 +358,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "POWER(%s)" % ",".join(sub_expressions)
         elif connector == "#":
             return "BITXOR(%s)" % ",".join(sub_expressions)
+        elif connector == "/":
+            lhs, rhs = sub_expressions
+            # SQLite performs floating-point division natively.
+            # For divisions with Decimal operands, explicitly cast to REAL
+            # to ensure precision is preserved in the output_field handling.
+            division_context = getattr(self, "_division_context", {})
+            if division_context.get("rhs_has_decimal"):
+                return f"CAST({lhs} AS REAL) / CAST({rhs} AS REAL)"
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):

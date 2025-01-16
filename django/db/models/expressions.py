@@ -768,8 +768,45 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         expression_params.extend(params)
         # order of precedence
         expression_wrapper = "(%s)"
+
+        # For division operations with Decimal operands, apply CAST directly
+        # to backends that need it (SQLite, PostgreSQL) without changing the
+        # public API. MySQL/MariaDB handle decimal division natively.
+        # Only applies to regular CombinedExpression, not DurationExpression
+        # or TemporalSubtraction which handle division differently.
+        if (
+            self.connector == "/"
+            and type(self) is CombinedExpression
+            and self.rhs_contains_decimal
+            and connection.vendor in ("sqlite", "postgresql")
+        ):
+            # Appliquer un CAST pour forcer la division décimale
+            cast_type = "REAL" if connection.vendor == "sqlite" else "NUMERIC"
+            expressions[0] = f"CAST({expressions[0]} AS {cast_type})"
+            expressions[1] = f"CAST({expressions[1]} AS {cast_type})"
+
         sql = connection.ops.combine_expression(self.connector, expressions)
         return expression_wrapper % sql, expression_params
+
+    @cached_property
+    def rhs_contains_decimal(self):
+        """Check if the right-hand side contains a Decimal value."""
+        from decimal import Decimal
+
+        # Check if it's a Value with Decimal
+        if isinstance(self.rhs, Value) and isinstance(self.rhs.value, Decimal):
+            return True
+        # Check if it has an output_field of DecimalField or FloatField
+        # Both need special handling to avoid integer division truncation.
+        try:
+            output_field = self.rhs.output_field
+            if output_field:
+                internal_type = output_field.get_internal_type()
+                if internal_type in ("DecimalField", "FloatField"):
+                    return True
+        except (AttributeError, FieldError):
+            pass
+        return False
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
