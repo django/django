@@ -272,6 +272,8 @@ validate_unicode_slug = RegexValidator(
 
 
 def validate_ipv4_address(value):
+    if isinstance(value, ipaddress.IPv4Address):
+        return
     try:
         ipaddress.IPv4Address(value)
     except ValueError:
