@@ -13,7 +13,7 @@ from django.urls import (
     resolve,
     reverse,
 )
-from django.urls.converters import IntConverter
+from django.urls.converters import REGISTERED_CONVERTERS, IntConverter
 from django.views import View
 
 from .converters import Base64Converter, DynamicConverter
@@ -209,8 +209,12 @@ class SimplifiedURLTests(SimpleTestCase):
 
     def test_warning_override_converter(self):
         msg = "Converter 'base64' is already registered."
-        with self.assertRaisesMessage(ValueError, msg):
-            register_converter(Base64Converter, "base64")
+        try:
+            with self.assertRaisesMessage(ValueError, msg):
+                register_converter(Base64Converter, "base64")
+                register_converter(Base64Converter, "base64")
+        finally:
+            REGISTERED_CONVERTERS.pop("base64", None)
 
     def test_invalid_view(self):
         msg = "view must be a callable or a list/tuple in the case of include()."
