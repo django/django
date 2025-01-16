@@ -2809,6 +2809,22 @@ class AutoFieldMixin:
     def validate(self, value, model_instance):
         pass
 
+    def get_db_prep_value(self, value, connection):
+        # Override get_db_prep_value() to avoid
+        # IntegerField.get_db_prep_value() which calls adapt_integerfield_value()
+        # and crashes on on PostgreSQL:
+        #
+        #  File "django/db/models/lookups.py", line 261, in <listcomp>
+        #    (v if hasattr(v, "as_sql") else get_db_prep_value(v, connection))
+        #  File "django/db/models/fields/__init__.py", line 2132, in get_db_prep_value
+        #    return connection.ops.adapt_integerfield_value(value, self.get_internal_type())  # noqa
+        #  File "django/db/backends/postgresql/operations.py", line 345, in adapt_integerfield_value  # noqa
+        #    return self.integerfield_type_map[internal_type](value)
+        # KeyError: 'AutoField'
+        #
+        # [this may not be the ideal fix]
+        return self.get_prep_value(value)
+
     def get_db_prep_save(self, value, connection):
         value = super().get_db_prep_save(value, connection)
         return connection.ops.validate_autopk_value(value)
