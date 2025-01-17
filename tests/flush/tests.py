@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.core.management import call_command
 from .models import Restaurant, Address
 
+
 class FlushCommandTest(TestCase):
     def setUp(self):
         Restaurant.objects.create(name="Jeff's Place")
