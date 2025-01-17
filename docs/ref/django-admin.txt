@@ -411,6 +411,12 @@ Suppresses all user prompts.
 
 Specifies the database to flush. Defaults to ``default``.
 
+.. django-admin-option:: --exclude EXCLUDE
+.. versionadded:: A.B
+
+Specifies a list of table names to exclude from flushing.
+Tables can be separated by commas, spaces, or both.
+
 ``inspectdb``
 -------------
 

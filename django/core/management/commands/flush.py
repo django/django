@@ -14,6 +14,20 @@ class Command(BaseCommand):
     )
     stealth_options = ("reset_sequences", "allow_cascade", "inhibit_post_migrate")
 
+    @staticmethod
+    def parse_exclude(value):
+        """
+        Parse the exclude input to handle multiple delimiters like space, comma,
+        or a combination of both.
+        """
+
+        if not value:
+            return []
+
+        # Replace commas with spaces and split the resulting string
+        tables = [table.strip() for table in value.replace(",", " ").split()]
+        return tables
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--noinput",
@@ -28,12 +42,23 @@ class Command(BaseCommand):
             choices=tuple(connections),
             help='Nominates a database to flush. Defaults to the "default" database.',
         )
+        parser.add_argument(
+            "--exclude",
+            type=self.parse_exclude,
+            default=[],
+            help=(
+                "A list of table names to exclude from flushing. "
+                "Tables can be separated by commas, spaces, or both. "
+                'Examples: "table1 table2", "table1,table2", "table1, table2".'
+            ),
+        )
 
     def handle(self, **options):
         database = options["database"]
         connection = connections[database]
         verbosity = options["verbosity"]
         interactive = options["interactive"]
+        exclude = options["exclude"]
         # The following are stealth options used by Django's internals.
         reset_sequences = options.get("reset_sequences", True)
         allow_cascade = options.get("allow_cascade", False)
@@ -54,6 +79,7 @@ class Command(BaseCommand):
             connection,
             reset_sequences=reset_sequences,
             allow_cascade=allow_cascade,
+            exclude=exclude,
         )
 
         if interactive:
