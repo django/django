@@ -28,7 +28,7 @@ from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.version import PY312, PY313
+from django.utils.version import PY313
 
 try:
     import ipdb as pdb
@@ -829,15 +829,14 @@ class DiscoverRunner:
                 "unittest -k option."
             ),
         )
-        if PY312:
-            parser.add_argument(
-                "--durations",
-                dest="durations",
-                type=int,
-                default=None,
-                metavar="N",
-                help="Show the N slowest test cases (N=0 for all).",
-            )
+        parser.add_argument(
+            "--durations",
+            dest="durations",
+            type=int,
+            default=None,
+            metavar="N",
+            help="Show the N slowest test cases (N=0 for all).",
+        )
 
     @property
     def shuffle_seed(self):
@@ -1005,9 +1004,8 @@ class DiscoverRunner:
             "resultclass": self.get_resultclass(),
             "verbosity": self.verbosity,
             "buffer": self.buffer,
+            "durations": self.durations,
         }
-        if PY312:
-            kwargs["durations"] = self.durations
         return kwargs
 
     def run_checks(self, databases):
