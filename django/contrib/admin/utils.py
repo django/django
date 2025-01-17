@@ -5,6 +5,8 @@ from collections import defaultdict
 from functools import reduce
 from operator import or_
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.exceptions import FieldDoesNotExist
 from django.core.validators import EMPTY_VALUES
 from django.db import models, router
@@ -429,7 +431,9 @@ def help_text_for_field(name, model):
 def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
-    if getattr(field, "flatchoices", None):
+    if field.name == "password" and field.model == get_user_model():
+        return render_password_as_hash(value)
+    elif getattr(field, "flatchoices", None):
         try:
             return dict(field.flatchoices).get(value, empty_value_display)
         except TypeError:
