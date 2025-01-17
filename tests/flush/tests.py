@@ -5,7 +5,8 @@ from .models import Address, Restaurant
 
 
 class FlushCommandTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Restaurant.objects.create(name="Jeff's Place")
         Restaurant.objects.create(name="Dotino's")
         Address.objects.create(street="Cool avenue")
