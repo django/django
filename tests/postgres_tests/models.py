@@ -64,6 +64,10 @@ class DateTimeArrayModel(PostgreSQLModel):
     times = ArrayField(models.TimeField())
 
 
+class WithSizeArrayModel(PostgreSQLModel):
+    field = ArrayField(models.FloatField(), size=3)
+
+
 class NestedIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(ArrayField(models.IntegerField()))
 

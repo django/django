@@ -43,7 +43,7 @@ class SQLInsertCompiler(BaseSQLInsertCompiler):
         db_types = [field.db_type(self.connection) for field in fields]
         # Abort if any of the fields are arrays as UNNEST indiscriminately
         # flatten them instead of reducing their nesting by one.
-        if any(db_type.endswith("[]") for db_type in db_types):
+        if any(db_type.endswith("]") for db_type in db_types):
             return super().assemble_as_sql(fields, value_rows)
         return InsertUnnest(["(%%s)::%s[]" % db_type for db_type in db_types]), [
             list(map(list, zip(*value_rows)))
