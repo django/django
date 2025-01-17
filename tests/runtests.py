@@ -34,7 +34,7 @@ else:
     )
     from django.utils.functional import classproperty
     from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PY312, PYPY
+    from django.utils.version import PYPY
 
 
 try:
@@ -691,15 +691,14 @@ if __name__ == "__main__":
             "Same as unittest -k option. Can be used multiple times."
         ),
     )
-    if PY312:
-        parser.add_argument(
-            "--durations",
-            dest="durations",
-            type=int,
-            default=None,
-            metavar="N",
-            help="Show the N slowest test cases (N=0 for all).",
-        )
+    parser.add_argument(
+        "--durations",
+        dest="durations",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Show the N slowest test cases (N=0 for all).",
+    )
 
     options = parser.parse_args()
 

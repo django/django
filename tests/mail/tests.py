@@ -184,7 +184,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         """Line length check should encode the payload supporting `surrogateescape`.
 
         Following https://github.com/python/cpython/issues/76511, newer
-        versions of Python (3.11.9, 3.12.3 and 3.13) ensure that a message's
+        versions of Python (3.12.3 and 3.13) ensure that a message's
         payload is encoded with the provided charset and `surrogateescape` is
         used as the error handling strategy.
 

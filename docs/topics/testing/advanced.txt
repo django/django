@@ -608,7 +608,6 @@ and tear down the test suite.
 
     ``durations`` will show a list of the N slowest test cases. Setting this
     option to ``0`` will result in the duration for all tests being shown.
-    Requires Python 3.12+.
 
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
