@@ -1609,3 +1609,38 @@ and keeping code analysis tools useful.
     :doc:`The Models Reference </ref/models/index>`
         Covers all the model related APIs including model fields, related
         objects, and ``QuerySet``.
+
+Using through models with ManyToManyField
+=========================================
+
+By default, when Django creates an implicit through table for a ``ManyToManyField``,
+it automatically creates a unique index on the pair of foreign keys. For example::
+
+    class Author(models.Model):
+        name = models.CharField(max_length=100)
+
+
+    class Book(models.Model):
+        title = models.CharField(max_length=100)
+        authors = models.ManyToManyField(Author)
+
+In this case, Django automatically creates a unique index for the through table.
+
+When using a custom through model, you need to explicitly define any unique
+constraints if needed::
+
+    class AuthorBook(models.Model):
+        author = models.ForeignKey(Author, on_delete=models.CASCADE)
+        book = models.ForeignKey(Book, on_delete=models.CASCADE)
+
+        class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["author", "book"],
+                    name="unique_author_book",
+                )
+            ]
+
+.. note::
+   It is recommended to use ``UniqueConstraint`` in the model's ``Meta`` options
+   rather than the older ``unique_together`` option to ensure proper index creation.
