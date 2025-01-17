@@ -8,7 +8,6 @@ from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
-from django.utils.version import PY311
 
 
 class Suit(models.IntegerChoices):
@@ -200,13 +199,7 @@ class ChoicesTests(SimpleTestCase):
 
     def test_do_not_call_in_templates_nonmember(self):
         self.assertNotIn("do_not_call_in_templates", Suit.__members__)
-        if PY311:
-            self.assertIs(Suit.do_not_call_in_templates, True)
-        else:
-            # Using @property on an enum does not behave as expected.
-            self.assertTrue(Suit.do_not_call_in_templates)
-            self.assertIsNot(Suit.do_not_call_in_templates, True)
-            self.assertIsInstance(Suit.do_not_call_in_templates, property)
+        self.assertIs(Suit.do_not_call_in_templates, True)
 
 
 class Separator(bytes, models.Choices):

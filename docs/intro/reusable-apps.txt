@@ -220,7 +220,7 @@ this. For a small app like polls, this process isn't too difficult.
        ]
        description = "A Django app to conduct web-based polls."
        readme = "README.rst"
-       requires-python = ">= 3.10"
+       requires-python = ">= 3.12"
        authors = [
            {name = "Your Name", email = "yourname@example.com"},
        ]
@@ -234,8 +234,6 @@ this. For a small app like polls, this process isn't too difficult.
            "Programming Language :: Python",
            "Programming Language :: Python :: 3",
            "Programming Language :: Python :: 3 :: Only",
-           "Programming Language :: Python :: 3.10",
-           "Programming Language :: Python :: 3.11",
            "Programming Language :: Python :: 3.12",
            "Programming Language :: Python :: 3.13",
            "Topic :: Internet :: WWW/HTTP",

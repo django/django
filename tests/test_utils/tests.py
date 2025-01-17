@@ -49,7 +49,6 @@ from django.test.utils import (
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
 from django.utils.html import VOID_ELEMENTS
-from django.utils.version import PY311
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -103,11 +102,9 @@ class SkippingTestCase(SimpleTestCase):
             SkipTestCase("test_foo").test_foo,
             ValueError,
             "skipUnlessDBFeature cannot be used on test_foo (test_utils.tests."
-            "SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase%s) "
-            "as SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase "
-            "doesn't allow queries against the 'default' database."
-            # Python 3.11 uses fully qualified test name in the output.
-            % (".test_foo" if PY311 else ""),
+            "SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase."
+            "test_foo) as SkippingTestCase.test_skip_unless_db_feature.<locals>."
+            "SkipTestCase doesn't allow queries against the 'default' database.",
         )
 
     def test_skip_if_db_feature(self):
@@ -150,11 +147,9 @@ class SkippingTestCase(SimpleTestCase):
             SkipTestCase("test_foo").test_foo,
             ValueError,
             "skipIfDBFeature cannot be used on test_foo (test_utils.tests."
-            "SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase%s) "
+            "SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase.test_foo) "
             "as SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase "
-            "doesn't allow queries against the 'default' database."
-            # Python 3.11 uses fully qualified test name in the output.
-            % (".test_foo" if PY311 else ""),
+            "doesn't allow queries against the 'default' database.",
         )
 
 

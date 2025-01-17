@@ -21,6 +21,8 @@ Python compatibility
 Django 6.0 supports Python 3.12 and 3.13. We **highly recommend** and only
 officially support the latest release of each series.
 
+The Django 5.2.x series is the last to support Python 3.10 and 3.11.
+
 Third-party library support for older version of Django
 =======================================================
 

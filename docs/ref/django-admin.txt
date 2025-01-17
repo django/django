@@ -1583,10 +1583,6 @@ Outputs timings, including database setup and total run time.
 
 Shows the N slowest test cases (N=0 for all).
 
-.. admonition:: Python 3.12 and later
-
-    This feature is only available for Python 3.12 and later.
-
 ``testserver``
 --------------
 

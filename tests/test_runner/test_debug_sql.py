@@ -4,7 +4,6 @@ from io import StringIO
 from django.db import connection
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
-from django.utils.version import PY311
 
 from .models import Person
 
@@ -114,17 +113,15 @@ class TestDebugSQL(unittest.TestCase):
         ),
     ]
 
-    # Python 3.11 uses fully qualified test name in the output.
-    method_name = ".runTest" if PY311 else ""
     test_class_path = "test_runner.test_debug_sql.TestDebugSQL"
     verbose_expected_outputs = [
-        f"runTest ({test_class_path}.FailingTest{method_name}) ... FAIL",
-        f"runTest ({test_class_path}.ErrorTest{method_name}) ... ERROR",
-        f"runTest ({test_class_path}.PassingTest{method_name}) ... ok",
+        f"runTest ({test_class_path}.FailingTest.runTest) ... FAIL",
+        f"runTest ({test_class_path}.ErrorTest.runTest) ... ERROR",
+        f"runTest ({test_class_path}.PassingTest.runTest) ... ok",
         # If there are errors/failures in subtests but not in test itself,
         # the status is not written. That behavior comes from Python.
-        f"runTest ({test_class_path}.FailingSubTest{method_name}) ...",
-        f"runTest ({test_class_path}.ErrorSubTest{method_name}) ...",
+        f"runTest ({test_class_path}.FailingSubTest.runTest) ...",
+        f"runTest ({test_class_path}.ErrorSubTest.runTest) ...",
         (
             """SELECT COUNT(*) AS "__count"\n"""
             """FROM "test_runner_person"\nWHERE """
