@@ -1,6 +1,7 @@
-from django.test import TestCase
 from django.core.management import call_command
-from .models import Restaurant, Address
+from django.test import TestCase
+
+from .models import Address, Restaurant
 
 
 class FlushCommandTest(TestCase):
