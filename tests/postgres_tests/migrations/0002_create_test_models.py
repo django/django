@@ -168,6 +168,28 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name="WithSizeArrayModel",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "field",
+                    ArrayField(models.FloatField(), size=2, null=True, blank=True),
+                ),
+            ],
+            options={
+                "required_db_vendor": "postgresql",
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name="NullableIntegerArrayModel",
             fields=[
                 (
