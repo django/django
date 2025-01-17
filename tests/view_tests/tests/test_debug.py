@@ -7,7 +7,7 @@ import tempfile
 import threading
 from io import StringIO
 from pathlib import Path
-from unittest import mock, skipIf, skipUnless
+from unittest import mock, skipIf
 
 from asgiref.sync import async_to_sync, iscoroutinefunction
 
@@ -24,7 +24,6 @@ from django.urls.converters import IntConverter
 from django.utils.functional import SimpleLazyObject
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
-from django.utils.version import PY311
 from django.views.debug import (
     CallableSettingWrapper,
     ExceptionCycleWarning,
@@ -695,7 +694,6 @@ class ExceptionReporterTests(SimpleTestCase):
             text,
         )
 
-    @skipUnless(PY311, "Exception notes were added in Python 3.11.")
     def test_exception_with_notes(self):
         request = self.rf.get("/test_view/")
         try:
@@ -806,7 +804,6 @@ class ExceptionReporterTests(SimpleTestCase):
         or os.environ.get("PYTHONNODEBUGRANGES", False),
         "Fine-grained error locations are disabled.",
     )
-    @skipUnless(PY311, "Fine-grained error locations were added in Python 3.11.")
     def test_highlight_error_position(self):
         request = self.rf.get("/test_view/")
         try:

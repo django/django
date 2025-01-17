@@ -16,7 +16,6 @@ from django.test.utils import (
     captured_stderr,
     captured_stdout,
 )
-from django.utils.version import PY312
 
 
 @contextmanager
@@ -768,7 +767,6 @@ class DiscoverRunnerTests(SimpleTestCase):
                 failures = runner.suite_result(suite, result)
                 self.assertEqual(failures, expected_failures)
 
-    @unittest.skipUnless(PY312, "unittest --durations option requires Python 3.12")
     def test_durations(self):
         with captured_stderr() as stderr, captured_stdout():
             runner = DiscoverRunner(durations=10)
@@ -776,7 +774,6 @@ class DiscoverRunnerTests(SimpleTestCase):
             runner.run_suite(suite)
         self.assertIn("Slowest test durations", stderr.getvalue())
 
-    @unittest.skipUnless(PY312, "unittest --durations option requires Python 3.12")
     def test_durations_debug_sql(self):
         with captured_stderr() as stderr, captured_stdout():
             runner = DiscoverRunner(durations=10, debug_sql=True)
