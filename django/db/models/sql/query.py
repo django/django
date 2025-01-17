@@ -1946,6 +1946,8 @@ class Query(BaseExpression):
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)
+            if join.filtered_relation and can_reuse is not None:
+                can_reuse.add(alias)
         return JoinInfo(final_field, targets, opts, joins, path, final_transformer)
 
     def trim_joins(self, targets, joins, path):
