@@ -312,6 +312,25 @@ Once you have completed these steps, you are finished with the deprecation.
 In each :term:`feature release <Feature release>`, all
 ``RemovedInDjangoXXWarning``\s matching the new version are removed.
 
+Testing with a Django project
+=============================
+
+It's important to test local changes using a Django project. This allows
+ensuring that the changes behave as expected in a real environment, especially
+for user-facing features such as templates, forms, or the admin.
+
+To do this:
+
+#. Create a virtual environment and :ref:`install the cloned copy of Django in
+   editable mode <intro-contributing-install-local-copy>`.
+
+#. Set up a Django project outside the source tree (you can use the :doc:`first
+   part of the tutorial </intro/tutorial01>` for guidance).
+
+With this setup, any changes made to the Django checkout will take effect
+immediately in the test project, allowing manual testing of contributions
+against a new or existing app.
+
 JavaScript contributions
 ========================
 
