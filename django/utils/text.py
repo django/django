@@ -1,3 +1,4 @@
+import builtins
 import gzip
 import re
 import secrets
@@ -8,6 +9,7 @@ from gzip import compress as gzip_compress
 from html import escape
 from html.parser import HTMLParser
 from io import BytesIO
+from itertools import islice
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.utils.functional import (
@@ -485,3 +487,150 @@ def _format_lazy(format_string, *args, **kwargs):
 
 
 format_lazy = lazy(_format_lazy, str)
+
+
+class DebugRepr:
+    """
+    Modified Reprlib.Repr from Python 3.12 that includes fillvalue customization.
+    """
+
+    def __init__(self, limit):
+        self.indent = 0
+        self.maxlevel = 2
+        self.limit = limit
+
+    def repr(self, x):
+        return self.repr1(x, self.maxlevel)
+
+    def repr1(self, x, level):
+        typename = type(x).__name__
+        if " " in typename:
+            parts = typename.split()
+            typename = "_".join(parts)
+        if hasattr(self, "repr_" + typename):
+            return getattr(self, "repr_" + typename)(x, level)
+        else:
+            return self.repr_instance(x, level)
+
+    def _join(self, pieces, level):
+        if self.indent is None:
+            return ", ".join(pieces)
+        if not pieces:
+            return ""
+        indent = self.indent
+        if isinstance(indent, int):
+            if indent < 0:
+                raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
+            indent *= " "
+        try:
+            sep = ", " + (self.maxlevel - level + 1) * indent
+        except TypeError as error:
+            raise TypeError(
+                f"Repr.indent must be a str, int or None, not {type(indent)}"
+            ) from error
+        return sep.join(("", *pieces))[1 : -len(indent) or None]
+
+    def _repr_iterable(self, x, level, left, right, maxiter, trail=""):
+        n = len(x)
+        fillvalue = self.gen_trim_msg(n)
+        if level <= 0 and n:
+            s = fillvalue
+        else:
+            newlevel = level - 1
+            repr1 = self.repr1
+            pieces = [repr1(elem, newlevel) for elem in islice(x, maxiter)]
+            if n > maxiter:
+                pieces.append(fillvalue)
+            s = self._join(pieces, level)
+            if n == 1 and trail and self.indent is None:
+                right = trail + right
+        return "%s%s%s" % (left, s, right)
+
+    def repr_tuple(self, x, level):
+        return self._repr_iterable(x, level, "(", ")", self.limit, ",")
+
+    def repr_list(self, x, level):
+        return self._repr_iterable(x, level, "[", "]", self.limit)
+
+    def repr_array(self, x, level):
+        if not x:
+            return "array('%s')" % x.typecode
+        header = "array('%s', [" % x.typecode
+        return self._repr_iterable(x, level, header, "])", self.limit)
+
+    def repr_set(self, x, level):
+        if not x:
+            return "set()"
+        x = _possibly_sorted(x)
+        return self._repr_iterable(x, level, "{", "}", self.limit)
+
+    def repr_frozenset(self, x, level):
+        if not x:
+            return "frozenset()"
+        x = _possibly_sorted(x)
+        return self._repr_iterable(x, level, "frozenset({", "})", self.limit)
+
+    def repr_deque(self, x, level):
+        return self._repr_iterable(x, level, "deque([", "])", self.limit)
+
+    def repr_dict(self, x, level):
+        n = len(x)
+        if n == 0:
+            return "{}"
+        fillvalue = self.gen_trim_msg(n)
+        if level <= 0:
+            return "{" + fillvalue + "}"
+        newlevel = level - 1
+        repr1 = self.repr1
+        pieces = []
+        for key in islice(_possibly_sorted(x), self.limit):
+            keyrepr = repr1(key, newlevel)
+            valrepr = repr1(x[key], newlevel)
+            pieces.append("%s: %s" % (keyrepr, valrepr))
+        if n > self.limit:
+            pieces.append(fillvalue)
+        s = self._join(pieces, level)
+        return "{%s}" % (s,)
+
+    def repr_int(self, x, level):
+        s = builtins.repr(x)
+        if len(s) > self.limit:
+            i = max(0, (self.limit - 3) // 2)
+            j = max(0, self.limit - 3 - i)
+            s = s[:i] + self.limit + s[len(s) - j :]
+        return s
+
+    def repr_instance(self, x, level):
+        try:
+            s = builtins.repr(x)
+            # Bugs in x.__repr__() can cause arbitrary
+            # exceptions -- then make up something
+        except Exception:
+            return "<%s instance at %#x>" % (x.__class__.__name__, id(x))
+        if len(s) > self.limit:
+            i = max(0, (self.limit - 3) // 2)
+            j = max(0, self.limit - 3 - i)
+            fillvalue = self.gen_trim_msg(len(s))
+            s = s[:i] + fillvalue + s[len(s) - j :]
+        return s
+
+    def repr_str(self, x, level):
+        return "'%s'" % (x[: self.limit] + self.gen_trim_msg(len(x)))
+
+    def print(self, value):
+        return self.repr(value)
+
+    def gen_trim_msg(self, length):
+        if length <= self.limit:
+            return ""
+        return "...<trimmed %d bytes string> " % (length - self.limit)
+
+
+def _possibly_sorted(x):
+    # Since not all sequences of items can be sorted and comparison
+    # functions may raise arbitrary exceptions, return an unsorted
+    # sequence in that case.
+    try:
+        return sorted(x)
+    except Exception:
+        return list(x)
