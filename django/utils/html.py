@@ -7,7 +7,8 @@ from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ValidationError
+from django.core.validators import EmailValidator
 from django.utils.encoding import punycode
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -455,20 +456,9 @@ class Urlizer:
     @staticmethod
     def is_email_simple(value):
         """Return True if value looks like an email address."""
-        # An @ must be in the middle of the value.
-        if "@" not in value or value.startswith("@") or value.endswith("@"):
-            return False
         try:
-            p1, p2 = value.split("@")
-        except ValueError:
-            # value contains more than one @.
-            return False
-        # Max length for domain name labels is 63 characters per RFC 1034.
-        # Helps to avoid ReDoS vectors in the domain part.
-        if len(p2) > 63:
-            return False
-        # Dot must be in p2 (e.g. example.com)
-        if "." not in p2 or p2.startswith("."):
+            EmailValidator(allowlist=[])(value)
+        except ValidationError:
             return False
         return True
 
