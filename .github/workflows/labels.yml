@@ -8,15 +8,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  pull-requests: write
+
 jobs:
   no_ticket:
-    name: "Label whether ticket linked from title"
+    name: "Flag if no Trac ticket is found in the title"
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
-
       - name: "Check title and manage labels"
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
         with:
@@ -44,4 +44,3 @@ jobs:
                 labels: [label]
               });
             }
-          github-token: ${{ secrets.GITHUB_TOKEN }}
