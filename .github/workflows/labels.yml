@@ -2,13 +2,14 @@ name: Labels
 
 on:
   pull_request:
-    types: [ edited, opened, reopened ]
+    types: [ edited, opened, reopened, ready_for_review ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
+  # contents: read
   pull-requests: write
 
 jobs:
