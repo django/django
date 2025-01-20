@@ -4,6 +4,7 @@ from importlib import import_module, reload
 
 from django.apps import apps
 from django.conf import settings
+from django.core.management import CommandError
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 
@@ -219,11 +220,37 @@ class MigrationLoader:
             if child is not None:
                 self.graph.add_dependency(migration, child, key, skip_validation=True)
 
+    def _resolve_replaced_migration_keys(self, migration):
+        resolved_keys = set()
+        for migration_key in set(migration.replaces):
+            migration_entry = self.disk_migrations.get(migration_key)
+            if migration_entry and migration_entry.replaces:
+                replace_keys = self._resolve_replaced_migration_keys(migration_entry)
+                resolved_keys.update(replace_keys)
+            else:
+                resolved_keys.add(migration_key)
+        return resolved_keys
+
     def replace_migration(self, migration_key):
+        if completed_replacement := self.replacements_progress.get(migration_key, None):
+            return
+        elif completed_replacement is False:
+            # Called before but not finished the replacement, this means there
+            # is a circular dependency.
+            raise CommandError(
+                f"Cyclical squash replacement found, starting at {migration_key}"
+            )
+        self.replacements_progress[migration_key] = False
         migration = self.replacements[migration_key]
+        # Process potential squashed migrations that the migration replaces.
+        for replace_migration_key in migration.replaces:
+            if replace_migration_key in self.replacements:
+                self.replace_migration(replace_migration_key)
+
+        replaced_keys = self._resolve_replaced_migration_keys(migration)
         # Get applied status of each found replacement target.
         applied_statuses = [
-            (target in self.applied_migrations) for target in migration.replaces
+            (target in self.applied_migrations) for target in replaced_keys
         ]
         # The replacing migration is only marked as applied if all of its
         # replacement targets are applied.
@@ -240,6 +267,8 @@ class MigrationLoader:
             # partially applied. Remove it from the graph and remap
             # dependencies to it (#25945).
             self.graph.remove_replacement_node(migration_key, migration.replaces)
+
+        self.replacements_progress[migration_key] = True
 
     def build_graph(self):
         """
@@ -272,6 +301,7 @@ class MigrationLoader:
             self.add_external_dependencies(key, migration)
         # Carry out replacements where possible and if enabled.
         if self.replace_migrations:
+            self.replacements_progress = {}
             for migration_key in self.replacements.keys():
                 self.replace_migration(migration_key)
         # Ensure the graph is consistent.
