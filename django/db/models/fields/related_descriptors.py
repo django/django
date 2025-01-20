@@ -74,6 +74,8 @@ from django.db import (
     transaction,
 )
 from django.db.models import Manager, Q, Window, signals
+from django.db.models.expressions import ColPairs
+from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
@@ -164,23 +166,19 @@ class ForwardManyToOneDescriptor:
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = {instance_attr(inst): inst for inst in instances}
-        related_field = self.field.foreign_related_fields[0]
+        related_fields = self.field.foreign_related_fields
         remote_field = self.field.remote_field
-
-        # FIXME: This will need to be revisited when we introduce support for
-        # composite fields. In the meantime we take this practical approach to
-        # solve a regression on 1.6 when the reverse manager is hidden
-        # (related_name ends with a '+'). Refs #21410.
-        # The check for len(...) == 1 is a special case that allows the query
-        # to be join-less and smaller. Refs #21760.
-        if remote_field.hidden or len(self.field.foreign_related_fields) == 1:
-            query = {
-                "%s__in"
-                % related_field.name: {instance_attr(inst)[0] for inst in instances}
-            }
-        else:
-            query = {"%s__in" % self.field.related_query_name(): instances}
-        queryset = queryset.filter(**query)
+        queryset = queryset.filter(
+            TupleIn(
+                ColPairs(
+                    queryset.model._meta.db_table,
+                    related_fields,
+                    related_fields,
+                    self.field,
+                ),
+                list(instances_dict),
+            )
+        )
         # There can be only one object prefetched for each instance so clear
         # ordering if the query allows it without side effects.
         queryset.query.clear_ordering()
