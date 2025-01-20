@@ -219,6 +219,28 @@ class MigrationLoader:
             if child is not None:
                 self.graph.add_dependency(migration, child, key, skip_validation=True)
 
+    def replace_migration(self, migration_key):
+        migration = self.replacements[migration_key]
+        # Get applied status of each found replacement target.
+        applied_statuses = [
+            (target in self.applied_migrations) for target in migration.replaces
+        ]
+        # The replacing migration is only marked as applied if all of its
+        # replacement targets are applied.
+        if all(applied_statuses):
+            self.applied_migrations[migration_key] = migration
+        else:
+            self.applied_migrations.pop(migration_key, None)
+        # A replacing migration can be used if either all or none of its
+        # replacement targets have been applied.
+        if all(applied_statuses) or (not any(applied_statuses)):
+            self.graph.remove_replaced_nodes(migration_key, migration.replaces)
+        else:
+            # This replacing migration cannot be used because it is
+            # partially applied. Remove it from the graph and remap
+            # dependencies to it (#25945).
+            self.graph.remove_replacement_node(migration_key, migration.replaces)
+
     def build_graph(self):
         """
         Build a migration dependency graph using both the disk and database.
@@ -250,27 +272,8 @@ class MigrationLoader:
             self.add_external_dependencies(key, migration)
         # Carry out replacements where possible and if enabled.
         if self.replace_migrations:
-            for key, migration in self.replacements.items():
-                # Get applied status of each of this migration's replacement
-                # targets.
-                applied_statuses = [
-                    (target in self.applied_migrations) for target in migration.replaces
-                ]
-                # The replacing migration is only marked as applied if all of
-                # its replacement targets are.
-                if all(applied_statuses):
-                    self.applied_migrations[key] = migration
-                else:
-                    self.applied_migrations.pop(key, None)
-                # A replacing migration can be used if either all or none of
-                # its replacement targets have been applied.
-                if all(applied_statuses) or (not any(applied_statuses)):
-                    self.graph.remove_replaced_nodes(key, migration.replaces)
-                else:
-                    # This replacing migration cannot be used because it is
-                    # partially applied. Remove it from the graph and remap
-                    # dependencies to it (#25945).
-                    self.graph.remove_replacement_node(key, migration.replaces)
+            for migration_key in self.replacements.keys():
+                self.replace_migration(migration_key)
         # Ensure the graph is consistent.
         try:
             self.graph.validate_consistency()
