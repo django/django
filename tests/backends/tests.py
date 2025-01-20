@@ -575,6 +575,7 @@ class BackendTestCase(TransactionTestCase):
     @override_settings(DEBUG=True)
     def test_queries_logger(self, mocked_logger):
         sql = "SELECT 1" + connection.features.bare_select_suffix
+        sql = connection.ops.format_debug_sql(sql)
         with connection.cursor() as cursor:
             cursor.execute(sql)
         params, kwargs = mocked_logger.debug.call_args
