@@ -107,6 +107,6 @@ class Friendship(models.Model):
         Person,
         from_fields=["to_friend_country_id", "to_friend_id"],
         to_fields=["person_country_id", "id"],
-        related_name="to_friend",
+        related_name="to_friend+",
         on_delete=models.CASCADE,
     )
