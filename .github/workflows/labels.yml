@@ -9,7 +9,6 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
   issues: write
   pull-requests: write
 
@@ -19,6 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug Authorization Header
+        run: |
+          # Send a test API request to GitHub with the GITHUB_TOKEN
+          curl -X GET \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/user"
 
       - name: "Check title and manage labels"
         uses: actions/github-script@v7
