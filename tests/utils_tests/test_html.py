@@ -374,15 +374,9 @@ class TestUtilsHtml(SimpleTestCase):
             (
                 # RFC 6068 requires a mailto URI to percent-encode a number of
                 # characters that can appear in <addr-spec>.
-                "yes;this=is&a%valid!email@example.com",
-                '<a href="mailto:yes%3Bthis%3Dis%26a%25valid%21email@example.com"'
-                ">yes;this=is&a%valid!email@example.com</a>",
-            ),
-            (
-                # Urlizer shouldn't urlize the "?org" part of this. But since
-                # it does, RFC 6068 requires percent encoding the "?".
-                "test@example.com?org",
-                '<a href="mailto:test@example.com%3Forg">test@example.com?org</a>',
+                "yes+this=is&a%valid!email@example.com",
+                '<a href="mailto:yes%2Bthis%3Dis%26a%25valid%21email@example.com"'
+                ">yes+this=is&a%valid!email@example.com</a>",
             ),
         )
         for value, output in tests:
@@ -402,6 +396,8 @@ class TestUtilsHtml(SimpleTestCase):
             "foo@.example.com",
             "foo@localhost",
             "foo@localhost.",
+            "test@example?;+!.com",
+            "email me@example.com,then I'll respond",
             # trim_punctuation catastrophic tests
             "(" * 100_000 + ":" + ")" * 100_000,
             "(" * 100_000 + "&:" + ")" * 100_000,
