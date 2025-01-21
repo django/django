@@ -1820,6 +1820,11 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         response = user_admin.user_change_password(request, str(user.pk))
         self.assertContains(response, '<div class="help">')
 
+    def test_custom_password_change_form(self):
+        self.client.force_login(self.superuser)
+        response = self.client.get(reverse("admin4:password_change"))
+        self.assertContains(response, "Custom old password label")
+
     def test_extended_bodyclass_template_index(self):
         """
         The admin/index.html template uses block.super in the bodyclass block.
