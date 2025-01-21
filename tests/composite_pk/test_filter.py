@@ -63,7 +63,7 @@ class CompositePKFilterTests(TestCase):
             Comment.objects.filter(text__gt=F("pk")).count()
 
     def test_rhs_combinable(self):
-        msg = "CompositePrimaryKey is not combinable."
+        msg = "CombinedExpression expression does not support composite primary keys."
         for expr in [F("pk") + (1, 1), (1, 1) + F("pk")]:
             with (
                 self.subTest(expression=expr),
@@ -405,7 +405,7 @@ class CompositePKFilterTests(TestCase):
         self.assertSequenceEqual(queryset, (self.user_2,))
 
     def test_cannot_cast_pk(self):
-        msg = "Cast does not support composite primary keys."
+        msg = "Cast expression does not support composite primary keys."
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.filter(text__gt=Cast(F("pk"), TextField())).count()
 
