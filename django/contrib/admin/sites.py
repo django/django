@@ -57,6 +57,7 @@ class AdminSite:
     app_index_template = None
     login_template = None
     logout_template = None
+    password_change_form = None
     password_change_template = None
     password_change_done_template = None
 
@@ -355,7 +356,7 @@ class AdminSite:
 
         url = reverse("admin:password_change_done", current_app=self.name)
         defaults = {
-            "form_class": AdminPasswordChangeForm,
+            "form_class": self.password_change_form or AdminPasswordChangeForm,
             "success_url": url,
             "extra_context": {**self.each_context(request), **(extra_context or {})},
         }

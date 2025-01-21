@@ -2980,6 +2980,13 @@ Templates can override or extend base admin templates as described in
 
     Path to a custom template that will be used by the admin site logout view.
 
+.. attribute:: AdminSite.password_change_form
+
+    .. versionadded:: 6.0
+
+    Subclass of :class:`~django.contrib.auth.forms.PasswordChangeForm` that
+    will be used by the admin site password change view.
+
 .. attribute:: AdminSite.password_change_template
 
     Path to a custom template that will be used by the admin site password
