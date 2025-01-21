@@ -223,6 +223,8 @@ def items_for_result(cl, result, form):
             empty_value_display = getattr(
                 attr, "empty_value_display", empty_value_display
             )
+            if isinstance(value, str) and value.strip() == "":
+                value = ""
             if f is None or f.auto_created:
                 if field_name == "action_checkbox":
                     row_classes = ["action-checkbox"]
