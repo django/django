@@ -1,4 +1,13 @@
-from django.db.models import F, FilteredRelation, OuterRef, Q, Subquery, TextField
+from django.db.models import (
+    Case,
+    F,
+    FilteredRelation,
+    OuterRef,
+    Q,
+    Subquery,
+    TextField,
+    When,
+)
 from django.db.models.functions import Cast
 from django.db.models.lookups import Exact
 from django.test import TestCase
@@ -408,6 +417,14 @@ class CompositePKFilterTests(TestCase):
         msg = "Cast expression does not support composite primary keys."
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.filter(text__gt=Cast(F("pk"), TextField())).count()
+
+    def test_filter_case_when(self):
+        msg = "When expression does not support composite primary keys."
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.filter(text=Case(When(text="", then="pk")))
+        msg = "Case expression does not support composite primary keys."
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.filter(text=Case(When(text="", then="text"), default="pk"))
 
     def test_outer_ref_pk(self):
         subquery = Subquery(Comment.objects.filter(pk=OuterRef("pk")).values("id"))
