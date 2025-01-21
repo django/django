@@ -99,6 +99,21 @@ ROLES = {
     "tag": "%s/tags/#%s",
 }
 
+explicit_title_re = re.compile(r"^(.+?)\s*(?<!\x00)<([^<]*?)>$", re.DOTALL)
+
+
+def split_explicit_title(text):
+    """
+    Split role content into title and target, if given.
+
+    From sphinx.util.nodes.split_explicit_title
+    See https://github.com/sphinx-doc/sphinx/blob/230ccf2/sphinx/util/nodes.py#L389
+    """
+    match = explicit_title_re.match(text)
+    if match:
+        return True, match.group(1), match.group(2)
+    return False, text, text
+
 
 def create_reference_role(rolename, urlbase):
     # Views and template names are case-sensitive.
@@ -107,14 +122,15 @@ def create_reference_role(rolename, urlbase):
     def _role(name, rawtext, text, lineno, inliner, options=None, content=None):
         if options is None:
             options = {}
+        _, title, target = split_explicit_title(text)
         node = docutils.nodes.reference(
             rawtext,
-            text,
+            title,
             refuri=(
                 urlbase
                 % (
                     inliner.document.settings.link_base,
-                    text if is_case_sensitive else text.lower(),
+                    target if is_case_sensitive else target.lower(),
                 )
             ),
             **options,
@@ -242,3 +258,7 @@ def remove_non_capturing_groups(pattern):
         final_pattern += pattern[prev_end:start]
         prev_end = end
     return final_pattern + pattern[prev_end:]
+
+
+def strip_p_tags(value):
+    return mark_safe(value.replace("<p>", "").replace("</p>", ""))

@@ -1375,6 +1375,7 @@ class Queries1Tests(TestCase):
         self.assertCountEqual(items_after, [self.i2, self.i3, self.i4])
         self.assertCountEqual(items_before, items_after)
 
+    @skipUnlessDBFeature("supports_select_union")
     def test_union_values_subquery(self):
         items = Item.objects.filter(creator=OuterRef("pk"))
         item_authors = Author.objects.annotate(is_creator=Exists(items)).order_by()

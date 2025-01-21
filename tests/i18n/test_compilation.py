@@ -8,7 +8,6 @@ from subprocess import run
 from unittest import mock
 
 from django.core.management import CommandError, call_command, execute_from_command_line
-from django.core.management.commands.makemessages import Command as MakeMessagesCommand
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
@@ -269,9 +268,6 @@ class CompilationErrorHandling(MessageCompilationTests):
             "django.core.management.utils.run",
             lambda *args, **kwargs: run(*args, env=env, **kwargs),
         ):
-            cmd = MakeMessagesCommand()
-            if cmd.gettext_version < (0, 18, 3):
-                self.skipTest("python-brace-format is a recent gettext addition.")
             stderr = StringIO()
             with self.assertRaisesMessage(
                 CommandError, "compilemessages generated one or more errors"

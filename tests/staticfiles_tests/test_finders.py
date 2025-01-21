@@ -37,11 +37,12 @@ class TestFinders:
 
     def test_find_all_deprecated_param(self):
         src, dst = self.find_all
-        with self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG):
+        with self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx:
             found = self.finder.find(src, all=True)
             found = [os.path.normcase(f) for f in found]
             dst = [os.path.normcase(d) for d in dst]
             self.assertEqual(found, dst)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_find_all_conflicting_params(self):
         src, dst = self.find_all
@@ -50,10 +51,11 @@ class TestFinders:
             "argument 'find_all'"
         )
         with (
-            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG),
+            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx,
             self.assertRaisesMessage(TypeError, msg),
         ):
             self.finder.find(src, find_all=True, all=True)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_find_all_unexpected_params(self):
         src, dst = self.find_all
@@ -62,10 +64,11 @@ class TestFinders:
             "argument 'wrong'"
         )
         with (
-            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG),
+            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx,
             self.assertRaisesMessage(TypeError, msg),
         ):
             self.finder.find(src, all=True, wrong=1)
+        self.assertEqual(ctx.filename, __file__)
 
         with self.assertRaisesMessage(TypeError, msg):
             self.finder.find(src, find_all=True, wrong=1)
@@ -165,28 +168,31 @@ class TestMiscFinder(SimpleTestCase):
         )
 
     def test_searched_locations_deprecated_all(self):
-        with self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG):
+        with self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx:
             finders.find("spam", all=True)
             self.assertEqual(
                 finders.searched_locations,
                 [os.path.join(TEST_ROOT, "project", "documents")],
             )
+        self.assertEqual(ctx.filename, __file__)
 
     def test_searched_locations_conflicting_params(self):
         msg = "find() got multiple values for argument 'find_all'"
         with (
-            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG),
+            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx,
             self.assertRaisesMessage(TypeError, msg),
         ):
             finders.find("spam", find_all=True, all=True)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_searched_locations_unexpected_params(self):
         msg = "find() got an unexpected keyword argument 'wrong'"
         with (
-            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG),
+            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx,
             self.assertRaisesMessage(TypeError, msg),
         ):
             finders.find("spam", all=True, wrong=1)
+        self.assertEqual(ctx.filename, __file__)
 
         with self.assertRaisesMessage(TypeError, msg):
             finders.find("spam", find_all=True, wrong=1)

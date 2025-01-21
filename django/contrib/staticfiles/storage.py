@@ -53,7 +53,8 @@ class HashedFilesMixin:
         (
             (
                 (
-                    r"""(?P<matched>import(?s:(?P<import>[\s\{].*?))"""
+                    r"""(?P<matched>import"""
+                    r"""(?s:(?P<import>[\s\{].*?|\*\s*as\s*\w+))"""
                     r"""\s*from\s*['"](?P<url>[./].*?)["']\s*;)"""
                 ),
                 """import%(import)s from "%(url)s";""",
@@ -307,22 +308,23 @@ class HashedFilesMixin:
                 processed_adjustable_paths[name] = (name, hashed_name, processed)
 
         paths = {path: paths[path] for path in adjustable_paths}
-        substitutions = False
-
+        unresolved_paths = []
         for i in range(self.max_post_process_passes):
-            substitutions = False
+            unresolved_paths = []
             for name, hashed_name, processed, subst in self._post_process(
                 paths, adjustable_paths, hashed_files
             ):
                 # Overwrite since hashed_name may be newer.
                 processed_adjustable_paths[name] = (name, hashed_name, processed)
-                substitutions = substitutions or subst
+                if subst:
+                    unresolved_paths.append(name)
 
-            if not substitutions:
+            if not unresolved_paths:
                 break
 
-        if substitutions:
-            yield "All", None, RuntimeError("Max post-process passes exceeded.")
+        if unresolved_paths:
+            problem_paths = ", ".join(sorted(unresolved_paths))
+            yield problem_paths, None, RuntimeError("Max post-process passes exceeded.")
 
         # Store the processed paths
         self.hashed_files.update(hashed_files)

@@ -1276,6 +1276,8 @@ class AggregateTestCase(TestCase):
             Book.objects.annotate(Max("id")).annotate(Sum("id__max"))
 
         class MyMax(Max):
+            arity = None
+
             def as_sql(self, compiler, connection):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
                 return super().as_sql(compiler, connection)
@@ -1288,6 +1290,7 @@ class AggregateTestCase(TestCase):
     def test_multi_arg_aggregate(self):
         class MyMax(Max):
             output_field = DecimalField()
+            arity = None
 
             def as_sql(self, compiler, connection):
                 copy = self.copy()
@@ -1750,6 +1753,26 @@ class AggregateTestCase(TestCase):
             ],
         )
 
+    def test_order_by_aggregate_default_alias(self):
+        publisher_books = (
+            Publisher.objects.values("book")
+            .annotate(Count("book"))
+            .order_by("book__count", "book__id")
+            .values_list("book", flat=True)
+        )
+        self.assertQuerySetEqual(
+            publisher_books,
+            [
+                None,
+                self.b1.id,
+                self.b2.id,
+                self.b3.id,
+                self.b4.id,
+                self.b5.id,
+                self.b6.id,
+            ],
+        )
+
     def test_empty_result_optimization(self):
         with self.assertNumQueries(0):
             self.assertEqual(
@@ -2158,6 +2181,27 @@ class AggregateTestCase(TestCase):
         )
         self.assertEqual(list(author_qs), [337])
 
+    def test_aggregate_arity(self):
+        funcs_with_inherited_constructors = [Avg, Max, Min, Sum]
+        msg = "takes exactly 1 argument (2 given)"
+        for function in funcs_with_inherited_constructors:
+            with (
+                self.subTest(function=function),
+                self.assertRaisesMessage(TypeError, msg),
+            ):
+                function(Value(1), Value(2))
+
+        funcs_with_custom_constructors = [Count, StdDev, Variance]
+        for function in funcs_with_custom_constructors:
+            with self.subTest(function=function):
+                # Extra arguments are rejected via the constructor.
+                with self.assertRaises(TypeError):
+                    function(Value(1), True, Value(2))
+                # If the constructor is skipped, the arity check runs.
+                func_instance = function(Value(1), True)
+                with self.assertRaisesMessage(TypeError, msg):
+                    super(function, func_instance).__init__(Value(1), Value(2))
+
 
 class AggregateAnnotationPruningTests(TestCase):
     @classmethod
@@ -2345,6 +2389,7 @@ class AggregateAnnotationPruningTests(TestCase):
         ).aggregate(count=Count("id", filter=Q(id__in=[F("max_book_author"), 0])))
         self.assertEqual(aggregates, {"count": 1})
 
+    @skipUnlessDBFeature("supports_select_union")
     def test_aggregate_combined_queries(self):
         # Combined queries could have members in their values select mask while
         # others have them in their annotation mask which makes annotation

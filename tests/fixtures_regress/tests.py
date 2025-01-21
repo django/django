@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import unittest
 from io import StringIO
 from pathlib import Path
 
@@ -55,6 +56,13 @@ from .models import (
     Widget,
 )
 
+try:
+    import yaml  # NOQA
+
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+
 _cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -96,12 +104,22 @@ class TestFixtures(TestCase):
         the serialized data for fields that have been removed
         from the database when not ignored.
         """
-        with self.assertRaises(DeserializationError):
-            management.call_command(
-                "loaddata",
-                "sequence_extra",
-                verbosity=0,
-            )
+        test_fixtures = [
+            "sequence_extra",
+            "sequence_extra_jsonl",
+        ]
+        if HAS_YAML:
+            test_fixtures.append("sequence_extra_yaml")
+        for fixture_file in test_fixtures:
+            with (
+                self.subTest(fixture_file=fixture_file),
+                self.assertRaises(DeserializationError),
+            ):
+                management.call_command(
+                    "loaddata",
+                    fixture_file,
+                    verbosity=0,
+                )
 
     def test_loaddata_not_found_fields_ignore(self):
         """
@@ -129,6 +147,33 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
         self.assertEqual(Animal.specimens.all()[0].name, "Wolf")
+
+    def test_loaddata_not_found_fields_ignore_jsonl(self):
+        management.call_command(
+            "loaddata",
+            "sequence_extra_jsonl",
+            ignore=True,
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
+
+    @unittest.skipUnless(HAS_YAML, "No yaml library detected")
+    def test_loaddata_not_found_fields_ignore_yaml(self):
+        management.call_command(
+            "loaddata",
+            "sequence_extra_yaml",
+            ignore=True,
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Cat")
+
+    def test_loaddata_empty_lines_jsonl(self):
+        management.call_command(
+            "loaddata",
+            "sequence_empty_lines_jsonl.jsonl",
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
 
     @skipIfDBFeature("interprets_empty_strings_as_nulls")
     def test_pretty_print_xml(self):

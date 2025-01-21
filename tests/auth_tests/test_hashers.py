@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from unittest import mock, skipUnless
 
 from django.conf.global_settings import PASSWORD_HASHERS
@@ -83,8 +84,8 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded = make_password("lètmein", "seasalt", "pbkdf2_sha256")
         self.assertEqual(
             encoded,
-            "pbkdf2_sha256$1000000$"
-            "seasalt$r1uLUxoxpP2Ued/qxvmje7UH9PUJBkRrvf9gGPL7Cps=",
+            "pbkdf2_sha256$1200000$"
+            "seasalt$6sTlFi4QohxXLuZigqDIUNX8xG9NxrTmV8+flFQdBqE=",
         )
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password("lètmein", encoded))
@@ -277,8 +278,8 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded = hasher.encode("lètmein", "seasalt2")
         self.assertEqual(
             encoded,
-            "pbkdf2_sha256$1000000$"
-            "seasalt2$egbhFghgsJVDo5Tpg/k9ZnfbySKQ1UQnBYXhR97a7sk=",
+            "pbkdf2_sha256$1200000$"
+            "seasalt2$hPlIUc6GqWsws6cZV1K8OuOARm1UrbZ3vLGFoHkH0ZI=",
         )
         self.assertTrue(hasher.verify("lètmein", encoded))
 
@@ -286,7 +287,7 @@ class TestUtilsHashPass(SimpleTestCase):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode("lètmein", "seasalt2")
         self.assertEqual(
-            encoded, "pbkdf2_sha1$1000000$seasalt2$3R9hvSAiAy5ARspAFy5GJ/2rjXo="
+            encoded, "pbkdf2_sha1$1200000$seasalt2$RGU4BAy93u+JDPtuMamdllndh+c="
         )
         self.assertTrue(hasher.verify("lètmein", encoded))
 
@@ -452,8 +453,33 @@ class TestUtilsHashPass(SimpleTestCase):
             check_password("wrong_password", encoded)
             self.assertEqual(hasher.harden_runtime.call_count, 1)
 
-    def test_check_password_calls_make_password_to_fake_runtime(self):
+    @contextmanager
+    def assertMakePasswordCalled(self, password, encoded, hasher_side_effect):
         hasher = get_hasher("default")
+        with (
+            mock.patch(
+                "django.contrib.auth.hashers.identify_hasher",
+                side_effect=hasher_side_effect,
+            ) as mock_identify_hasher,
+            mock.patch(
+                "django.contrib.auth.hashers.make_password"
+            ) as mock_make_password,
+            mock.patch(
+                "django.contrib.auth.hashers.get_random_string",
+                side_effect=lambda size: "x" * size,
+            ),
+            mock.patch.object(hasher, "verify"),
+        ):
+            # Ensure make_password is called to standardize timing.
+            yield
+            self.assertEqual(hasher.verify.call_count, 0)
+            self.assertEqual(mock_identify_hasher.mock_calls, [mock.call(encoded)])
+            self.assertEqual(
+                mock_make_password.mock_calls,
+                [mock.call("x" * UNUSABLE_PASSWORD_SUFFIX_LENGTH)],
+            )
+
+    def test_check_password_calls_make_password_to_fake_runtime(self):
         cases = [
             (None, None, None),  # no plain text password provided
             ("foo", make_password(password=None), None),  # unusable encoded
@@ -462,27 +488,22 @@ class TestUtilsHashPass(SimpleTestCase):
         for password, encoded, hasher_side_effect in cases:
             with (
                 self.subTest(encoded=encoded),
-                mock.patch(
-                    "django.contrib.auth.hashers.identify_hasher",
-                    side_effect=hasher_side_effect,
-                ) as mock_identify_hasher,
-                mock.patch(
-                    "django.contrib.auth.hashers.make_password"
-                ) as mock_make_password,
-                mock.patch(
-                    "django.contrib.auth.hashers.get_random_string",
-                    side_effect=lambda size: "x" * size,
-                ),
-                mock.patch.object(hasher, "verify"),
+                self.assertMakePasswordCalled(password, encoded, hasher_side_effect),
             ):
-                # Ensure make_password is called to standardize timing.
                 check_password(password, encoded)
-                self.assertEqual(hasher.verify.call_count, 0)
-                self.assertEqual(mock_identify_hasher.mock_calls, [mock.call(encoded)])
-                self.assertEqual(
-                    mock_make_password.mock_calls,
-                    [mock.call("x" * UNUSABLE_PASSWORD_SUFFIX_LENGTH)],
-                )
+
+    async def test_acheck_password_calls_make_password_to_fake_runtime(self):
+        cases = [
+            (None, None, None),  # no plain text password provided
+            ("foo", make_password(password=None), None),  # unusable encoded
+            ("letmein", make_password(password="letmein"), ValueError),  # valid encoded
+        ]
+        for password, encoded, hasher_side_effect in cases:
+            with (
+                self.subTest(encoded=encoded),
+                self.assertMakePasswordCalled(password, encoded, hasher_side_effect),
+            ):
+                await acheck_password(password, encoded)
 
     def test_encode_invalid_salt(self):
         hasher_classes = [

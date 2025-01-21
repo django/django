@@ -16,6 +16,7 @@ from .registry import Tags, register, run_checks, tag_exists
 # Import these to force registration of checks
 import django.core.checks.async_checks  # NOQA isort:skip
 import django.core.checks.caches  # NOQA isort:skip
+import django.core.checks.commands  # NOQA isort:skip
 import django.core.checks.compatibility.django_4_0  # NOQA isort:skip
 import django.core.checks.database  # NOQA isort:skip
 import django.core.checks.files  # NOQA isort:skip

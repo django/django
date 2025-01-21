@@ -16,7 +16,7 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango60Warning, RemovedInDjango61Warning
+from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -24,10 +24,6 @@ DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 DEFAULT_EMAIL_PROVIDER_ALIAS = "default"
 
-# RemovedInDjango60Warning.
-FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
-    "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
-)
 # RemovedInDjango61Warning.
 DEPRECATED_EMAIL_SETTINGS = {
     "EMAIL_BACKEND",
@@ -217,12 +213,6 @@ class Settings:
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
-        if self.is_overridden("FORMS_URLFIELD_ASSUME_HTTPS"):
-            warnings.warn(
-                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
-                RemovedInDjango60Warning,
-            )
-
         is_overridden_EMAIL_PROVIDERS = self.is_overridden("EMAIL_PROVIDERS")
         for deprecated_setting in DEPRECATED_EMAIL_SETTINGS:
             if self.is_overridden(deprecated_setting):
@@ -274,11 +264,6 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == "FORMS_URLFIELD_ASSUME_HTTPS":
-            warnings.warn(
-                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
-                RemovedInDjango60Warning,
-            )
         if (
             name == "EMAIL_PROVIDERS"
             and any(self.is_overridden(f) for f in DEPRECATED_EMAIL_SETTINGS)

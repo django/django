@@ -2,16 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
-# Igor Jerosimić, 2019,2021,2023
+# Igor Jerosimić, 2019,2021,2023-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Igor Jerosimić, 2019,2021,2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Igor Jerosimić, 2019,2021,2023-2024\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -205,10 +205,6 @@ msgstr ""
 "Објекат {name} \"{obj}\" успешно измењен. Можете га опет изменити испод."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "Објекат {name} \"{obj}\" успешно додат. Испод га можете изменити."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -376,6 +372,9 @@ msgstr "Унесите корисничко име и лозинку"
 msgid "Change password"
 msgstr "Промена лозинке"
 
+msgid "Set password"
+msgstr "Постави лозинку"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Молимо исправите грешку испод."
@@ -385,6 +384,19 @@ msgstr[2] "Молимо исправите грешке испод."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Унесите нову лозинку за корисника <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+" Ова акција ће<strong>омогућити</strong> аутентификацију засновану на "
+"лозинки за овог корисника."
+
+msgid "Disable password-based authentication"
+msgstr "Онемогући аутентификацију засновану на лозинки"
+
+msgid "Enable password-based authentication"
+msgstr "Омогући аутентификацију засновану на лозинки"
 
 msgid "Skip to main content"
 msgstr "Пређи на главни садржај"

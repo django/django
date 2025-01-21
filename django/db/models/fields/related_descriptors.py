@@ -63,8 +63,6 @@ and two directions (forward and reverse) for a total of six combinations.
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
 
-import warnings
-
 from asgiref.sync import sync_to_async
 
 from django.core.exceptions import FieldError
@@ -76,12 +74,13 @@ from django.db import (
     transaction,
 )
 from django.db.models import Manager, Q, Window, signals
+from django.db.models.expressions import ColPairs
+from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData, resolve_callables
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 
@@ -155,17 +154,6 @@ class ForwardManyToOneDescriptor:
     def get_queryset(self, **hints):
         return self.field.remote_field.model._base_manager.db_manager(hints=hints).all()
 
-    def get_prefetch_queryset(self, instances, queryset=None):
-        warnings.warn(
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        if queryset is None:
-            return self.get_prefetch_querysets(instances)
-        return self.get_prefetch_querysets(instances, [queryset])
-
     def get_prefetch_querysets(self, instances, querysets=None):
         if querysets and len(querysets) != 1:
             raise ValueError(
@@ -178,23 +166,19 @@ class ForwardManyToOneDescriptor:
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = {instance_attr(inst): inst for inst in instances}
-        related_field = self.field.foreign_related_fields[0]
+        related_fields = self.field.foreign_related_fields
         remote_field = self.field.remote_field
-
-        # FIXME: This will need to be revisited when we introduce support for
-        # composite fields. In the meantime we take this practical approach to
-        # solve a regression on 1.6 when the reverse manager in hidden
-        # (related_name ends with a '+'). Refs #21410.
-        # The check for len(...) == 1 is a special case that allows the query
-        # to be join-less and smaller. Refs #21760.
-        if remote_field.hidden or len(self.field.foreign_related_fields) == 1:
-            query = {
-                "%s__in"
-                % related_field.name: {instance_attr(inst)[0] for inst in instances}
-            }
-        else:
-            query = {"%s__in" % self.field.related_query_name(): instances}
-        queryset = queryset.filter(**query)
+        queryset = queryset.filter(
+            TupleIn(
+                ColPairs(
+                    queryset.model._meta.db_table,
+                    related_fields,
+                    related_fields,
+                    self.field,
+                ),
+                list(instances_dict),
+            )
+        )
         # There can be only one object prefetched for each instance so clear
         # ordering if the query allows it without side effects.
         queryset.query.clear_ordering()
@@ -447,17 +431,6 @@ class ReverseOneToOneDescriptor:
     def get_queryset(self, **hints):
         return self.related.related_model._base_manager.db_manager(hints=hints).all()
 
-    def get_prefetch_queryset(self, instances, queryset=None):
-        warnings.warn(
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        if queryset is None:
-            return self.get_prefetch_querysets(instances)
-        return self.get_prefetch_querysets(instances, [queryset])
-
     def get_prefetch_querysets(self, instances, querysets=None):
         if querysets and len(querysets) != 1:
             raise ValueError(
@@ -511,8 +484,7 @@ class ReverseOneToOneDescriptor:
         try:
             rel_obj = self.related.get_cached_value(instance)
         except KeyError:
-            related_pk = instance.pk
-            if related_pk is None:
+            if not instance._is_pk_set():
                 rel_obj = None
             else:
                 filter_args = self.related.field.get_forward_related_filter(instance)
@@ -753,7 +725,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             # Even if this relation is not to pk, we require still pk value.
             # The wish is that the instance has been already saved to DB,
             # although having a pk value isn't a guarantee of that.
-            if self.instance.pk is None:
+            if not self.instance._is_pk_set():
                 raise ValueError(
                     f"{self.instance.__class__.__name__!r} instance needs to have a "
                     f"primary key value before this relationship can be used."
@@ -765,17 +737,6 @@ def create_reverse_many_to_one_manager(superclass, rel):
             except (AttributeError, KeyError):
                 queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
-
-        def get_prefetch_queryset(self, instances, queryset=None):
-            warnings.warn(
-                "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-                "instead.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            if queryset is None:
-                return self.get_prefetch_querysets(instances)
-            return self.get_prefetch_querysets(instances, [queryset])
 
         def get_prefetch_querysets(self, instances, querysets=None):
             if querysets and len(querysets) != 1:
@@ -1081,7 +1042,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # Even if this relation is not to pk, we require still pk value.
             # The wish is that the instance has been already saved to DB,
             # although having a pk value isn't a guarantee of that.
-            if instance.pk is None:
+            if not instance._is_pk_set():
                 raise ValueError(
                     "%r instance needs to have a primary key value before "
                     "a many-to-many relationship can be used."
@@ -1145,17 +1106,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             else:
                 queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
-
-        def get_prefetch_queryset(self, instances, queryset=None):
-            warnings.warn(
-                "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-                "instead.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            if queryset is None:
-                return self.get_prefetch_querysets(instances)
-            return self.get_prefetch_querysets(instances, [queryset])
 
         def get_prefetch_querysets(self, instances, querysets=None):
             if querysets and len(querysets) != 1:

@@ -95,6 +95,17 @@ class CreateModel(ModelOperation):
         model = to_state.apps.get_model(app_label, self.name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
+            # While the `index_together` option has been deprecated some
+            # historical migrations might still have references to them.
+            # This can be moved to the schema editor once it's adapted to
+            # from model states instead of rendered models (#29898).
+            to_model_state = to_state.models[app_label, self.name_lower]
+            if index_together := to_model_state.options.get("index_together"):
+                schema_editor.alter_index_together(
+                    model,
+                    set(),
+                    index_together,
+                )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.name)
@@ -182,6 +193,38 @@ class CreateModel(ModelOperation):
                     options=self.options,
                     bases=self.bases,
                     managers=operation.managers,
+                ),
+            ]
+        elif (
+            isinstance(operation, AlterModelTable)
+            and self.name_lower == operation.name_lower
+        ):
+            return [
+                CreateModel(
+                    self.name,
+                    fields=self.fields,
+                    options={
+                        **self.options,
+                        "db_table": operation.table,
+                    },
+                    bases=self.bases,
+                    managers=self.managers,
+                ),
+            ]
+        elif (
+            isinstance(operation, AlterModelTableComment)
+            and self.name_lower == operation.name_lower
+        ):
+            return [
+                CreateModel(
+                    self.name,
+                    fields=self.fields,
+                    options={
+                        **self.options,
+                        "db_table_comment": operation.table_comment,
+                    },
+                    bases=self.bases,
+                    managers=self.managers,
                 ),
             ]
         elif (
@@ -668,12 +711,13 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
         if self.allow_migrate_model(schema_editor.connection.alias, new_model):
-            old_model = from_state.apps.get_model(app_label, self.name)
+            from_model_state = from_state.models[app_label, self.name_lower]
+            to_model_state = to_state.models[app_label, self.name_lower]
             alter_together = getattr(schema_editor, "alter_%s" % self.option_name)
             alter_together(
                 new_model,
-                getattr(old_model._meta, self.option_name, set()),
-                getattr(new_model._meta, self.option_name, set()),
+                from_model_state.options.get(self.option_name) or set(),
+                to_model_state.options.get(self.option_name) or set(),
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -947,7 +991,7 @@ class AddIndex(IndexOperation):
             return []
         if isinstance(operation, RenameIndex) and self.index.name == operation.old_name:
             self.index.name = operation.new_name
-            return [AddIndex(model_name=self.model_name, index=self.index)]
+            return [self.__class__(model_name=self.model_name, index=self.index)]
         return super().reduce(operation, app_label)
 
 
@@ -1198,6 +1242,12 @@ class AddConstraint(IndexOperation):
             and self.constraint.name == operation.name
         ):
             return []
+        if (
+            isinstance(operation, AlterConstraint)
+            and self.model_name_lower == operation.model_name_lower
+            and self.constraint.name == operation.name
+        ):
+            return [AddConstraint(self.model_name, operation.constraint)]
         return super().reduce(operation, app_label)
 
 
@@ -1242,3 +1292,51 @@ class RemoveConstraint(IndexOperation):
     @property
     def migration_name_fragment(self):
         return "remove_%s_%s" % (self.model_name_lower, self.name.lower())
+
+
+class AlterConstraint(IndexOperation):
+    category = OperationCategory.ALTERATION
+    option_name = "constraints"
+
+    def __init__(self, model_name, name, constraint):
+        self.model_name = model_name
+        self.name = name
+        self.constraint = constraint
+
+    def state_forwards(self, app_label, state):
+        state.alter_constraint(
+            app_label, self.model_name_lower, self.name, self.constraint
+        )
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [],
+            {
+                "model_name": self.model_name,
+                "name": self.name,
+                "constraint": self.constraint,
+            },
+        )
+
+    def describe(self):
+        return f"Alter constraint {self.name} on {self.model_name}"
+
+    @property
+    def migration_name_fragment(self):
+        return "alter_%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+
+    def reduce(self, operation, app_label):
+        if (
+            isinstance(operation, (AlterConstraint, RemoveConstraint))
+            and self.model_name_lower == operation.model_name_lower
+            and self.name == operation.name
+        ):
+            return [operation]
+        return super().reduce(operation, app_label)

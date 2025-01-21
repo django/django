@@ -29,6 +29,7 @@ from django.db.models import (
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
     KT,
+    HasKey,
     KeyTextTransform,
     KeyTransform,
     KeyTransformFactory,
@@ -582,6 +583,14 @@ class TestQuerying(TestCase):
                     [expected],
                 )
 
+    def test_has_key_literal_lookup(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(
+                HasKey(Value({"foo": "bar"}, JSONField()), "foo")
+            ).order_by("id"),
+            self.objs,
+        )
+
     def test_has_key_list(self):
         obj = NullableJSONModel.objects.create(value=[{"a": 1}, {"b": "x"}])
         tests = [
@@ -807,6 +816,59 @@ class TestQuerying(TestCase):
             [self.objs[3], self.objs[4]],
         )
         self.assertIs(NullableJSONModel.objects.filter(value__c__lt=5).exists(), False)
+
+    def test_lookups_special_chars(self):
+        test_keys = [
+            "CONTROL",
+            "single'",
+            "dollar$",
+            "dot.dot",
+            "with space",
+            "back\\slash",
+            "question?mark",
+            "user@name",
+            "emo🤡'ji",
+            "com,ma",
+            "curly{{{brace}}}s",
+            "escape\uffff'seq'\uffffue\uffff'nce",
+        ]
+        json_value = {key: "some value" for key in test_keys}
+        obj = NullableJSONModel.objects.create(value=json_value)
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, json_value)
+
+        for key in test_keys:
+            lookups = {
+                "has_key": Q(value__has_key=key),
+                "has_keys": Q(value__has_keys=[key, "CONTROL"]),
+                "has_any_keys": Q(value__has_any_keys=[key, "does_not_exist"]),
+                "exact": Q(**{f"value__{key}": "some value"}),
+            }
+            for lookup, condition in lookups.items():
+                results = NullableJSONModel.objects.filter(condition)
+                with self.subTest(key=key, lookup=lookup):
+                    self.assertSequenceEqual(results, [obj])
+
+    def test_lookups_special_chars_double_quotes(self):
+        test_keys = [
+            'double"',
+            "m\\i@x. m🤡'a,t{{{ch}}}e?d$\"'es\uffff'ca\uffff'pe",
+        ]
+        json_value = {key: "some value" for key in test_keys}
+        obj = NullableJSONModel.objects.create(value=json_value)
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, json_value)
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__has_keys=test_keys), [obj]
+        )
+        for key in test_keys:
+            with self.subTest(key=key):
+                results = NullableJSONModel.objects.filter(
+                    Q(value__has_key=key),
+                    Q(value__has_any_keys=[key, "does_not_exist"]),
+                    Q(**{f"value__{key}": "some value"}),
+                )
+                self.assertSequenceEqual(results, [obj])
 
     def test_lookup_exclude(self):
         tests = [

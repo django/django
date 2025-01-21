@@ -77,6 +77,7 @@ Django's system checks are organized using the following tags:
 * ``async_support``: Checks asynchronous-related configuration.
 * ``caches``: Checks cache related configuration.
 * ``compatibility``: Flags potential problems with version upgrades.
+* ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
   are not run by default because they do more than static code analysis as
   regular checks do. They are only run by the :djadmin:`migrate` command or if
@@ -180,6 +181,7 @@ Model fields
 * **fields.E011**: ``<database>`` does not support default database values with
   expressions (``db_default``).
 * **fields.E012**: ``<expression>`` cannot be used in ``db_default``.
+* **fields.E013**: ``CompositePrimaryKey`` must be named ``pk``.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*
@@ -336,6 +338,8 @@ Related fields
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
   symmetrical relationship, e.g. to "self".
 * **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
+* **fields.E347**: Field defines a relation to the ``CompositePrimaryKey`` of
+  model ``<model>`` which is not supported.
 
 Models
 ------
@@ -416,6 +420,8 @@ Models
 * **models.W040**: ``<database>`` does not support indexes with non-key
   columns.
 * **models.E041**: ``constraints`` refers to the joined field ``<field name>``.
+* **models.E042**: ``<field name>`` cannot be included in the composite
+  primary key.
 * **models.W042**: Auto-created primary key used when not defining a primary
   key type, by default ``django.db.models.AutoField``.
 * **models.W043**: ``<database>`` does not support indexes on expressions.
@@ -427,6 +433,17 @@ Models
   (``db_table_comment``).
 * **models.W047**: ``<database>`` does not support unique constraints with
   nulls distinct.
+* **models.E048**: ``constraints/indexes/unique_together`` refers to a
+  ``CompositePrimaryKey`` ``<field name>``, but ``CompositePrimaryKey``\s are
+  not supported for that option.
+
+Management Commands
+-------------------
+
+The following checks verify custom management commands are correctly configured:
+
+* **commands.E001**: The ``migrate`` and ``makemigrations`` commands must have
+  the same ``autodetector``.
 
 Security
 --------

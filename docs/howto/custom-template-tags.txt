@@ -498,6 +498,195 @@ you see fit:
     {% current_time "%Y-%m-%d %I:%M %p" as the_time %}
     <p>The time is {{ the_time }}.</p>
 
+.. _howto-custom-template-tags-simple-block-tags:
+
+Simple block tags
+-----------------
+
+.. versionadded:: 5.2
+
+.. method:: django.template.Library.simple_block_tag()
+
+When a section of rendered template needs to be passed into a custom tag,
+Django provides the ``simple_block_tag`` helper function to accomplish this.
+Similar to :meth:`~django.template.Library.simple_tag()`, this function accepts
+a custom tag function, but with the additional ``content`` argument, which
+contains the rendered content as defined inside the tag. This allows dynamic
+template sections to be easily incorporated into custom tags.
+
+For example, a custom block tag which creates a chart could look like this::
+
+    from django import template
+    from myapp.charts import render_chart
+
+    register = template.Library()
+
+
+    @register.simple_block_tag
+    def chart(content):
+        return render_chart(source=content)
+
+The ``content`` argument contains everything in between the ``{% chart %}``
+and ``{% endchart %}`` tags:
+
+.. code-block:: html+django
+
+    {% chart %}
+      digraph G {
+          label = "Chart for {{ request.user }}"
+          A -> {B C}
+      }
+    {% endchart %}
+
+If there are other template tags or variables inside the ``content`` block,
+they will be rendered before being passed to the tag function. In the example
+above, ``request.user`` will be resolved by the time ``render_chart`` is
+called.
+
+Block tags are closed with ``end{name}`` (for example, ``endchart``). This can
+be customized with the ``end_name`` parameter::
+
+    @register.simple_block_tag(end_name="endofchart")
+    def chart(content):
+        return render_chart(source=content)
+
+Which would require a template definition like this:
+
+.. code-block:: html+django
+
+    {% chart %}
+      digraph G {
+          label = "Chart for {{ request.user }}"
+          A -> {B C}
+      }
+    {% endofchart %}
+
+A few things to note about ``simple_block_tag``:
+
+* The first argument must be called ``content``, and it will contain the
+  contents of the template tag as a rendered string.
+* Variables passed to the tag are not included in the rendering context of the
+  content, as would be when using the ``{% with %}`` tag.
+
+Just like :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
+``simple_block_tag``:
+
+* Validates the quantity and quality of the arguments.
+* Strips quotes from arguments if necessary.
+* Escapes the output accordingly.
+* Supports passing ``takes_context=True`` at registration time to access
+  context. Note that in this case, the first argument to the custom function
+  *must* be called ``context``, and ``content`` must follow.
+* Supports renaming the tag by passing the ``name`` argument when registering.
+* Supports accepting any number of positional or keyword arguments.
+* Supports storing the result in a template variable using the ``as`` variant.
+
+.. admonition::  Content Escaping
+
+    ``simple_block_tag`` behaves similarly to ``simple_tag`` regarding
+    auto-escaping. For details on escaping and safety, refer to ``simple_tag``.
+    Because the ``content`` argument has already been rendered by Django, it is
+    already escaped.
+
+A complete example
+~~~~~~~~~~~~~~~~~~
+
+Consider a custom template tag that generates a message box that supports
+multiple message levels and content beyond a simple phrase. This could be
+implemented using a ``simple_block_tag`` as follows:
+
+.. code-block:: python
+    :caption: ``testapp/templatetags/testapptags.py``
+
+    from django import template
+    from django.utils.html import format_html
+
+
+    register = template.Library()
+
+
+    @register.simple_block_tag(takes_context=True)
+    def msgbox(context, content, level):
+        format_kwargs = {
+            "level": level.lower(),
+            "level_title": level.capitalize(),
+            "content": content,
+            "open": " open" if level.lower() == "error" else "",
+            "site": context.get("site", "My Site"),
+        }
+        result = """
+        <div class="msgbox {level}">
+          <details{open}>
+            <summary>
+              <strong>{level_title}</strong>: Please read for <i>{site}</i>
+            </summary>
+            <p>
+              {content}
+            </p>
+          </details>
+        </div>
+        """
+        return format_html(result, **format_kwargs)
+
+When combined with a minimal view and corresponding template, as shown here:
+
+.. code-block:: python
+    :caption: ``testapp/views.py``
+
+    from django.shortcuts import render
+
+
+    def simpleblocktag_view(request):
+        return render(request, "test.html", context={"site": "Important Site"})
+
+
+.. code-block:: html+django
+    :caption: ``testapp/templates/test.html``
+
+    {% extends "base.html" %}
+
+    {% load testapptags %}
+
+    {% block content %}
+
+      {% msgbox level="error" %}
+        Please fix all errors. Further documentation can be found at
+        <a href="http://example.com">Docs</a>.
+      {% endmsgbox %}
+
+      {% msgbox level="info" %}
+        More information at: <a href="http://othersite.com">Other Site</a>/
+      {% endmsgbox %}
+
+    {% endblock %}
+
+The following HTML is produced as the rendered output:
+
+.. code-block:: html
+
+    <div class="msgbox error">
+      <details open>
+        <summary>
+          <strong>Error</strong>: Please read for <i>Important Site</i>
+        </summary>
+        <p>
+          Please fix all errors. Further documentation can be found at
+          <a href="http://example.com">Docs</a>.
+        </p>
+      </details>
+    </div>
+
+    <div class="msgbox info">
+      <details>
+        <summary>
+          <strong>Info</strong>: Please read for <i>Important Site</i>
+        </summary>
+        <p>
+          More information at: <a href="http://othersite.com">Other Site</a>
+        </p>
+      </details>
+    </div>
+
 .. _howto-custom-template-tags-inclusion-tags:
 
 Inclusion tags

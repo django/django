@@ -124,6 +124,11 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
             searched_locations,
         )
 
+    def test_missing_args_message(self):
+        msg = "Enter at least one staticfile."
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command("findstatic")
+
 
 class TestConfiguration(StaticFilesTestCase):
     def test_location_empty(self):

@@ -2969,6 +2969,71 @@ class AutodetectorTests(BaseAutodetectorTests):
             ["CreateModel", "AddField", "AddIndex"],
         )
 
+    def test_alter_constraint(self):
+        book_constraint = models.CheckConstraint(
+            condition=models.Q(title__contains="title"),
+            name="title_contains_title",
+        )
+        book_altered_constraint = models.CheckConstraint(
+            condition=models.Q(title__contains="title"),
+            name="title_contains_title",
+            violation_error_code="error_code",
+        )
+        author_altered_constraint = models.CheckConstraint(
+            condition=models.Q(name__contains="Bob"),
+            name="name_contains_bob",
+            violation_error_message="Name doesn't contain Bob",
+        )
+
+        book_check_constraint = copy.deepcopy(self.book)
+        book_check_constraint_with_error_message = copy.deepcopy(self.book)
+        author_name_check_constraint_with_error_message = copy.deepcopy(
+            self.author_name_check_constraint
+        )
+
+        book_check_constraint.options = {"constraints": [book_constraint]}
+        book_check_constraint_with_error_message.options = {
+            "constraints": [book_altered_constraint]
+        }
+        author_name_check_constraint_with_error_message.options = {
+            "constraints": [author_altered_constraint]
+        }
+
+        changes = self.get_changes(
+            [self.author_name_check_constraint, book_check_constraint],
+            [
+                author_name_check_constraint_with_error_message,
+                book_check_constraint_with_error_message,
+            ],
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterConstraint"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            model_name="author",
+            name="name_contains_bob",
+            constraint=author_altered_constraint,
+        )
+
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["AlterConstraint"])
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            0,
+            model_name="book",
+            name="title_contains_title",
+            constraint=book_altered_constraint,
+        )
+        self.assertMigrationDependencies(
+            changes, "otherapp", 0, [("testapp", "auto_1")]
+        )
+
     def test_remove_constraints(self):
         """Test change detection of removed constraints."""
         changes = self.get_changes(
@@ -2979,6 +3044,43 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationTypes(changes, "testapp", 0, ["RemoveConstraint"])
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, model_name="author", name="name_contains_bob"
+        )
+
+    def test_constraint_dropped_and_recreated(self):
+        altered_constraint = models.CheckConstraint(
+            condition=models.Q(name__contains="bob"),
+            name="name_contains_bob",
+        )
+        author_name_check_constraint_lowercased = copy.deepcopy(
+            self.author_name_check_constraint
+        )
+        author_name_check_constraint_lowercased.options = {
+            "constraints": [altered_constraint]
+        }
+        changes = self.get_changes(
+            [self.author_name_check_constraint],
+            [author_name_check_constraint_lowercased],
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(
+            changes, "testapp", 0, ["RemoveConstraint", "AddConstraint"]
+        )
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            model_name="author",
+            name="name_contains_bob",
+        )
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            1,
+            model_name="author",
+            constraint=altered_constraint,
         )
 
     def test_add_unique_together(self):
@@ -4956,6 +5058,95 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="Book")
+
+    @mock.patch(
+        "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition"
+    )
+    def test_add_composite_pk(self, mocked_ask_method):
+        before = [
+            ModelState(
+                "app",
+                "foo",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+        ]
+        after = [
+            ModelState(
+                "app",
+                "foo",
+                [
+                    ("pk", models.CompositePrimaryKey("foo_id", "bar_id")),
+                    ("id", models.IntegerField()),
+                ],
+            ),
+        ]
+
+        changes = self.get_changes(before, after)
+        self.assertEqual(mocked_ask_method.call_count, 0)
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(changes, "app", 0, ["AddField", "AlterField"])
+        self.assertOperationAttributes(
+            changes,
+            "app",
+            0,
+            0,
+            name="pk",
+            model_name="foo",
+            preserve_default=True,
+        )
+        self.assertOperationAttributes(
+            changes,
+            "app",
+            0,
+            1,
+            name="id",
+            model_name="foo",
+            preserve_default=True,
+        )
+
+    def test_remove_composite_pk(self):
+        before = [
+            ModelState(
+                "app",
+                "foo",
+                [
+                    ("pk", models.CompositePrimaryKey("foo_id", "bar_id")),
+                    ("id", models.IntegerField()),
+                ],
+            ),
+        ]
+        after = [
+            ModelState(
+                "app",
+                "foo",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+        ]
+
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(changes, "app", 0, ["RemoveField", "AlterField"])
+        self.assertOperationAttributes(
+            changes,
+            "app",
+            0,
+            0,
+            name="pk",
+            model_name="foo",
+        )
+        self.assertOperationAttributes(
+            changes,
+            "app",
+            0,
+            1,
+            name="id",
+            model_name="foo",
+            preserve_default=True,
+        )
 
 
 class MigrationSuggestNameTests(SimpleTestCase):

@@ -13,6 +13,7 @@ html[data-theme="light"],
     --body-fg: #333;
     --body-bg: #fff;
     --body-quiet-color: #666;
+    --body-medium-color: #444;
     --body-loud-color: #000;
 
     --header-color: #ffc;
@@ -149,7 +150,6 @@ h1 {
     margin: 0 0 20px;
     font-weight: 300;
     font-size: 1.25rem;
-    color: var(--body-quiet-color);
 }
 
 h2 {
@@ -165,7 +165,7 @@ h2.subhead {
 h3 {
     font-size: 0.875rem;
     margin: .8em 0 .3em 0;
-    color: var(--body-quiet-color);
+    color: var(--body-medium-color);
     font-weight: bold;
 }
 
@@ -173,6 +173,7 @@ h4 {
     font-size: 0.75rem;
     margin: 1em 0 .8em 0;
     padding-bottom: 3px;
+    color: var(--body-medium-color);
 }
 
 h5 {
@@ -319,7 +320,7 @@ td, th {
 }
 
 th {
-    font-weight: 600;
+    font-weight: 500;
     text-align: left;
 }
 
@@ -340,7 +341,7 @@ tfoot td {
 }
 
 thead th.required {
-    color: var(--body-loud-color);
+    font-weight: bold;
 }
 
 tr.alt {

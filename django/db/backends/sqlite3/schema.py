@@ -6,7 +6,7 @@ from django.db import NotSupportedError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes
-from django.db.models import NOT_PROVIDED, UniqueConstraint
+from django.db.models import CompositePrimaryKey, UniqueConstraint
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -104,6 +104,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             f.name: f.clone() if is_self_referential(f) else f
             for f in model._meta.local_concrete_fields
         }
+
+        # Since CompositePrimaryKey is not a concrete field (column is None),
+        # it's not copied by default.
+        pk = model._meta.pk
+        if isinstance(pk, CompositePrimaryKey):
+            body[pk.name] = pk.clone()
+
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
         mapping = {
@@ -137,7 +144,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             body[create_field.name] = create_field
             # Choose a default and insert it into the copy map
             if (
-                create_field.db_default is NOT_PROVIDED
+                not create_field.has_db_default()
                 and not (create_field.many_to_many or create_field.generated)
                 and create_field.concrete
             ):
@@ -154,7 +161,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if new_field.generated:
                 continue
             if old_field.null and not new_field.null:
-                if new_field.db_default is NOT_PROVIDED:
+                if not new_field.has_db_default():
                     default = self.prepare_default(self.effective_default(new_field))
                 else:
                     default, _ = self.db_default_sql(new_field)
@@ -296,6 +303,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Special-case implicit M2M tables.
         if field.many_to_many and field.remote_field.through._meta.auto_created:
             self.create_model(field.remote_field.through)
+        elif isinstance(field, CompositePrimaryKey):
+            # If a CompositePrimaryKey field was added, the existing primary key field
+            # had to be altered too, resulting in an AddField, AlterField migration.
+            # The table cannot be re-created on AddField, it would result in a
+            # duplicate primary key error.
+            return
         elif (
             # Primary keys and unique fields are not supported in ALTER TABLE
             # ADD COLUMN.
@@ -308,10 +321,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             or self.effective_default(field) is not None
             # Fields with non-constant defaults cannot by handled by ALTER
             # TABLE ADD COLUMN statement.
-            or (
-                field.db_default is not NOT_PROVIDED
-                and not isinstance(field.db_default, Value)
-            )
+            or (field.has_db_default() and not isinstance(field.db_default, Value))
         ):
             self._remake_table(model, create_field=field)
         else:

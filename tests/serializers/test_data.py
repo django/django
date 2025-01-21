@@ -10,10 +10,11 @@ forward, backwards and self references.
 import datetime
 import decimal
 import uuid
+from collections import namedtuple
 
 from django.core import serializers
 from django.db import connection, models
-from django.test import TestCase
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     Anchor,
@@ -46,6 +47,7 @@ from .models import (
     GenericData,
     GenericIPAddressData,
     GenericIPAddressPKData,
+    ImageData,
     InheritAbstractModel,
     InheritBaseModel,
     IntegerData,
@@ -68,7 +70,9 @@ from .models import (
     SmallPKData,
     Tag,
     TextData,
+    TextPKData,
     TimeData,
+    TimePKData,
     UniqueAnchor,
     UUIDData,
     UUIDDefaultData,
@@ -237,24 +241,23 @@ def inherited_compare(testcase, pk, klass, data):
         testcase.assertEqual(value, getattr(instance, key))
 
 
-# Define some data types. Each data type is
-# actually a pair of functions; one to create
-# and one to compare objects of that type
-data_obj = (data_create, data_compare)
-generic_obj = (generic_create, generic_compare)
-fk_obj = (fk_create, fk_compare)
-m2m_obj = (m2m_create, m2m_compare)
-im2m_obj = (im2m_create, im2m_compare)
-im_obj = (im_create, im_compare)
-o2o_obj = (o2o_create, o2o_compare)
-pk_obj = (pk_create, pk_compare)
-inherited_obj = (inherited_create, inherited_compare)
+# Define some test helpers. Each has a pair of functions: one to create objects and one
+# to make assertions against objects of a particular type.
+TestHelper = namedtuple("TestHelper", ["create_object", "compare_object"])
+data_obj = TestHelper(data_create, data_compare)
+generic_obj = TestHelper(generic_create, generic_compare)
+fk_obj = TestHelper(fk_create, fk_compare)
+m2m_obj = TestHelper(m2m_create, m2m_compare)
+im2m_obj = TestHelper(im2m_create, im2m_compare)
+im_obj = TestHelper(im_create, im_compare)
+o2o_obj = TestHelper(o2o_create, o2o_compare)
+pk_obj = TestHelper(pk_create, pk_compare)
+inherited_obj = TestHelper(inherited_create, inherited_compare)
 uuid_obj = uuid.uuid4()
 
 test_data = [
-    # Format: (data type, PK value, Model Class, data)
+    # Format: (test helper, PK value, Model Class, data)
     (data_obj, 1, BinaryData, memoryview(b"\x05\xFD\x00")),
-    (data_obj, 2, BinaryData, None),
     (data_obj, 5, BooleanData, True),
     (data_obj, 6, BooleanData, False),
     (data_obj, 7, BooleanData, None),
@@ -263,7 +266,6 @@ test_data = [
     (data_obj, 12, CharData, "None"),
     (data_obj, 13, CharData, "null"),
     (data_obj, 14, CharData, "NULL"),
-    (data_obj, 15, CharData, None),
     # (We use something that will fit into a latin1 database encoding here,
     # because that is still the default used on many system setups.)
     (data_obj, 16, CharData, "\xa5"),
@@ -272,13 +274,11 @@ test_data = [
     (data_obj, 30, DateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 31, DateTimeData, None),
     (data_obj, 40, EmailData, "hovercraft@example.com"),
-    (data_obj, 41, EmailData, None),
     (data_obj, 42, EmailData, ""),
     (data_obj, 50, FileData, "file:///foo/bar/whiz.txt"),
     # (data_obj, 51, FileData, None),
     (data_obj, 52, FileData, ""),
     (data_obj, 60, FilePathData, "/foo/bar/whiz.txt"),
-    (data_obj, 61, FilePathData, None),
     (data_obj, 62, FilePathData, ""),
     (data_obj, 70, DecimalData, decimal.Decimal("12.345")),
     (data_obj, 71, DecimalData, decimal.Decimal("-12.345")),
@@ -292,7 +292,6 @@ test_data = [
     (data_obj, 81, IntegerData, -123456789),
     (data_obj, 82, IntegerData, 0),
     (data_obj, 83, IntegerData, None),
-    # (XX, ImageData
     (data_obj, 95, GenericIPAddressData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     (data_obj, 96, GenericIPAddressData, None),
     (data_obj, 110, PositiveBigIntegerData, 9223372036854775807),
@@ -302,7 +301,6 @@ test_data = [
     (data_obj, 130, PositiveSmallIntegerData, 12),
     (data_obj, 131, PositiveSmallIntegerData, None),
     (data_obj, 140, SlugData, "this-is-a-slug"),
-    (data_obj, 141, SlugData, None),
     (data_obj, 142, SlugData, ""),
     (data_obj, 150, SmallData, 12),
     (data_obj, 151, SmallData, -12),
@@ -318,7 +316,6 @@ Several of them.
 The end.""",
     ),
     (data_obj, 161, TextData, ""),
-    (data_obj, 162, TextData, None),
     (data_obj, 170, TimeData, datetime.time(10, 42, 37)),
     (data_obj, 171, TimeData, None),
     (generic_obj, 200, GenericData, ["Generic Object 1", "tag1", "tag2"]),
@@ -386,11 +383,7 @@ The end.""",
     (pk_obj, 750, SmallPKData, 12),
     (pk_obj, 751, SmallPKData, -12),
     (pk_obj, 752, SmallPKData, 0),
-    # (pk_obj, 760, TextPKData, """This is a long piece of text.
-    # It contains line breaks.
-    # Several of them.
-    # The end."""),
-    # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
+    (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
     (pk_obj, 793, UUIDDefaultData, uuid_obj),
@@ -412,67 +405,107 @@ The end.""",
     (data_obj, 1005, LengthModel, 1),
 ]
 
-
-# Because Oracle treats the empty string as NULL, Oracle is expected to fail
-# when field.empty_strings_allowed is True and the value is None; skip these
-# tests.
-if connection.features.interprets_empty_strings_as_nulls:
-    test_data = [
-        data
-        for data in test_data
-        if not (
-            data[0] == data_obj
-            and data[2]._meta.get_field("data").empty_strings_allowed
-            and data[3] is None
-        )
-    ]
+if ImageData is not None:
+    test_data.extend(
+        [
+            (data_obj, 86, ImageData, "file:///foo/bar/whiz.png"),
+            # (data_obj, 87, ImageData, None),
+            (data_obj, 88, ImageData, ""),
+        ]
+    )
 
 
 class SerializerDataTests(TestCase):
     pass
 
 
-def serializerTest(self, format):
-    # FK to an object with PK of 0. This won't work on MySQL without the
-    # NO_AUTO_VALUE_ON_ZERO SQL mode since it won't let you create an object
-    # with an autoincrement primary key of 0.
-    if connection.features.allows_auto_pk_0:
-        test_data.extend(
-            [
-                (data_obj, 0, Anchor, "Anchor 0"),
-                (fk_obj, 465, FKData, 0),
-            ]
-        )
-
-    # Create all the objects defined in the test data
+def assert_serializer(self, format, data):
+    # Create all the objects defined in the test data.
     objects = []
-    instance_count = {}
-    for func, pk, klass, datum in test_data:
+    for test_helper, pk, model, data_value in data:
         with connection.constraint_checks_disabled():
-            objects.extend(func[0](pk, klass, datum))
+            objects.extend(test_helper.create_object(pk, model, data_value))
 
-    # Get a count of the number of objects created for each class
-    for klass in instance_count:
-        instance_count[klass] = klass.objects.count()
+    # Get a count of the number of objects created for each model class.
+    instance_counts = {}
+    for _, _, model, _ in data:
+        if model not in instance_counts:
+            instance_counts[model] = model.objects.count()
 
-    # Add the generic tagged objects to the object list
+    # Add the generic tagged objects to the object list.
     objects.extend(Tag.objects.all())
 
-    # Serialize the test database
+    # Serialize the test database.
     serialized_data = serializers.serialize(format, objects, indent=2)
 
     for obj in serializers.deserialize(format, serialized_data):
         obj.save()
 
-    # Assert that the deserialized data is the same
-    # as the original source
-    for func, pk, klass, datum in test_data:
-        func[1](self, pk, klass, datum)
+    # Assert that the deserialized data is the same as the original source.
+    for test_helper, pk, model, data_value in data:
+        with self.subTest(model=model, data_value=data_value):
+            test_helper.compare_object(self, pk, model, data_value)
 
-    # Assert that the number of objects deserialized is the
-    # same as the number that was serialized.
-    for klass, count in instance_count.items():
-        self.assertEqual(count, klass.objects.count())
+    # Assert no new objects were created.
+    for model, count in instance_counts.items():
+        with self.subTest(model=model, count=count):
+            self.assertEqual(count, model.objects.count())
+
+
+def serializerTest(self, format):
+    assert_serializer(self, format, test_data)
+
+
+@skipUnlessDBFeature("allows_auto_pk_0")
+def serializerTestPK0(self, format):
+    # FK to an object with PK of 0. This won't work on MySQL without the
+    # NO_AUTO_VALUE_ON_ZERO SQL mode since it won't let you create an object
+    # with an autoincrement primary key of 0.
+    data = [
+        (data_obj, 0, Anchor, "Anchor 0"),
+        (fk_obj, 1, FKData, 0),
+    ]
+    assert_serializer(self, format, data)
+
+
+@skipIfDBFeature("interprets_empty_strings_as_nulls")
+def serializerTestNullValueStingField(self, format):
+    data = [
+        (data_obj, 1, BinaryData, None),
+        (data_obj, 2, CharData, None),
+        (data_obj, 3, EmailData, None),
+        (data_obj, 4, FilePathData, None),
+        (data_obj, 5, SlugData, None),
+        (data_obj, 6, TextData, None),
+    ]
+    assert_serializer(self, format, data)
+
+
+@skipUnlessDBFeature("supports_index_on_text_field")
+def serializerTestTextFieldPK(self, format):
+    data = [
+        (
+            pk_obj,
+            1,
+            TextPKData,
+            """This is a long piece of text.
+            It contains line breaks.
+            Several of them.
+            The end.""",
+        ),
+    ]
+    assert_serializer(self, format, data)
 
 
 register_tests(SerializerDataTests, "test_%s_serializer", serializerTest)
+register_tests(SerializerDataTests, "test_%s_serializer_pk_0", serializerTestPK0)
+register_tests(
+    SerializerDataTests,
+    "test_%s_serializer_null_value_string_field",
+    serializerTestNullValueStingField,
+)
+register_tests(
+    SerializerDataTests,
+    "test_%s_serializer_text_field_pk",
+    serializerTestTextFieldPK,
+)

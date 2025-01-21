@@ -237,6 +237,11 @@ class CreateCollation(CollationOperation):
     def migration_name_fragment(self):
         return "create_collation_%s" % self.name.lower()
 
+    def reduce(self, operation, app_label):
+        if isinstance(operation, RemoveCollation) and self.name == operation.name:
+            return []
+        return super().reduce(operation, app_label)
+
 
 class RemoveCollation(CollationOperation):
     """Remove a collation."""

@@ -7,7 +7,14 @@ from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.db import connections
-from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
+from django.db.models import (
+    AutoField,
+    CompositePrimaryKey,
+    Manager,
+    OrderWrt,
+    UniqueConstraint,
+)
+from django.db.models.fields import composite
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
@@ -974,6 +981,14 @@ class Options:
         ]
 
     @cached_property
+    def pk_fields(self):
+        return composite.unnest([self.pk])
+
+    @property
+    def is_composite_pk(self):
+        return isinstance(self.pk, CompositePrimaryKey)
+
+    @cached_property
     def _property_names(self):
         """Return a set of the names of the properties defined on the model."""
         names = set()
@@ -993,8 +1008,11 @@ class Options:
         Return a set of the non-pk concrete field names defined on the model.
         """
         names = []
+        all_pk_fields = set(self.pk_fields)
+        for parent in self.all_parents:
+            all_pk_fields.update(parent._meta.pk_fields)
         for field in self.concrete_fields:
-            if not field.primary_key:
+            if field not in all_pk_fields:
                 names.append(field.name)
                 if field.name != field.attname:
                     names.append(field.attname)

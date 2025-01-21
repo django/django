@@ -24,13 +24,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
-from django.db import connection
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
     RequestFactory,
     TestCase,
-    ignore_warnings,
     modify_settings,
     override_settings,
     skipUnlessDBFeature,
@@ -40,7 +38,6 @@ from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -296,9 +293,7 @@ class AdminViewBasicTestCase(TestCase):
         self.assertLess(
             response.content.index(text1.encode()),
             response.content.index(text2.encode()),
-            (failing_msg or "")
-            + "\nResponse:\n"
-            + response.content.decode(response.charset),
+            (failing_msg or "") + "\nResponse:\n" + response.text,
         )
 
 
@@ -799,7 +794,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             reverse("admin:admin_views_complexsortedperson_changelist"), {}
         )
         # Should have 5 columns (including action checkbox col)
-        self.assertContains(response, '<th scope="col"', count=5)
+        result_list_table_re = re.compile('<table id="result_list">(.*?)</thead>')
+        result_list_table_head = result_list_table_re.search(str(response.content))[0]
+        self.assertEqual(result_list_table_head.count('<th scope="col"'), 5)
 
         self.assertContains(response, "Name")
         self.assertContains(response, "Colored name")
@@ -830,7 +827,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 reverse("admin:admin_views_%s_changelist" % url), {}
             )
             # Should have 3 columns including action checkbox col.
-            self.assertContains(response, '<th scope="col"', count=3, msg_prefix=url)
+            result_list_table_re = re.compile('<table id="result_list">(.*?)</thead>')
+            result_list_table_head = result_list_table_re.search(str(response.content))[
+                0
+            ]
+            self.assertEqual(result_list_table_head.count('<th scope="col"'), 3)
             # Check if the correct column was selected. 2 is the index of the
             # 'order' column in the model admin's 'list_display' with 0 being
             # the implicit 'action_checkbox' and 1 being the column 'stuff'.
@@ -1502,6 +1503,24 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, "<h1>Change article</h1>")
         self.assertContains(response, "<h2>Article 2</h2>")
 
+    def test_error_in_titles(self):
+        for url, subtitle in [
+            (
+                reverse("admin:admin_views_article_change", args=(self.a1.pk,)),
+                "Article 1 | Change article",
+            ),
+            (reverse("admin:admin_views_article_add"), "Add article"),
+            (reverse("admin:login"), "Log in"),
+            (reverse("admin:password_change"), "Password change"),
+            (
+                reverse("admin:auth_user_password_change", args=(self.superuser.id,)),
+                "Change password: super",
+            ),
+        ]:
+            with self.subTest(url=url, subtitle=subtitle):
+                response = self.client.post(url, {})
+                self.assertContains(response, f"<title>Error: {subtitle}")
+
     def test_view_subtitle_per_object(self):
         viewuser = User.objects.create_user(
             username="viewuser",
@@ -1662,7 +1681,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.debug",
                     "django.template.context_processors.request",
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",
@@ -2512,6 +2530,19 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(
             response, '<input type="submit" value="Save and view" name="_continue">'
         )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-0-heading" class="fieldset-heading">Some fields</h2>',
+        )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-1-heading" class="fieldset-heading">'
+            "Some other fields</h2>",
+        )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-2-heading" class="fieldset-heading">이름</h2>',
+        )
         post = self.client.post(
             reverse("admin:admin_views_article_add"), add_dict, follow=False
         )
@@ -3003,6 +3034,7 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(
             reverse("admin:admin_views_section_delete", args=(self.s1.pk,))
         )
+        self.assertContains(response, "<h1>Delete</h1>")
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Articles: 3</li>")
         # test response contains link to related Article
@@ -3579,7 +3611,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         response = self.client.get(
             reverse("admin:admin_views_villain_delete", args=(self.v1.pk,))
         )
-        self.assertRegex(response.content.decode(), pattern)
+        self.assertRegex(response.text, pattern)
 
     def test_cyclic(self):
         """
@@ -6152,6 +6184,63 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.take_screenshot("selectbox-non-collapsible")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_selectbox_selected_rows(self):
+        from selenium.webdriver import ActionChains
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        # Create a new user to ensure that no extra permissions have been set.
+        user = User.objects.create_user(username="new", password="newuser")
+        url = self.live_server_url + reverse("admin:auth_user_change", args=[user.id])
+        self.selenium.get(url)
+
+        # Scroll to the User permissions section.
+        user_permissions = self.selenium.find_element(
+            By.CSS_SELECTOR, "#id_user_permissions_from"
+        )
+        ActionChains(self.selenium).move_to_element(user_permissions).perform()
+        self.take_screenshot("selectbox-available-perms-none-selected")
+
+        # Select multiple permissions from the "Available" list.
+        ct = ContentType.objects.get_for_model(Permission)
+        perms = list(Permission.objects.filter(content_type=ct))
+        for perm in perms:
+            elem = self.selenium.find_element(
+                By.CSS_SELECTOR, f"#id_user_permissions_from option[value='{perm.id}']"
+            )
+            ActionChains(self.selenium).key_down(Keys.CONTROL).click(elem).key_up(
+                Keys.CONTROL
+            ).perform()
+
+        # Move focus to other element.
+        self.selenium.find_element(
+            By.CSS_SELECTOR, "#id_user_permissions_input"
+        ).click()
+        self.take_screenshot("selectbox-available-perms-some-selected")
+
+        # Move permissions to the "Chosen" list, but none is selected yet.
+        self.selenium.find_element(By.CSS_SELECTOR, "#id_user_permissions_add").click()
+        self.take_screenshot("selectbox-chosen-perms-none-selected")
+
+        # Select some permissions from the "Chosen" list.
+        for perm in [perms[0], perms[-1]]:
+            elem = self.selenium.find_element(
+                By.CSS_SELECTOR, f"#id_user_permissions_to option[value='{perm.id}']"
+            )
+            ActionChains(self.selenium).key_down(Keys.CONTROL).click(elem).key_up(
+                Keys.CONTROL
+            ).perform()
+
+        # Move focus to other element.
+        self.selenium.find_element(
+            By.CSS_SELECTOR, "#id_user_permissions_selected_input"
+        ).click()
+        self.take_screenshot("selectbox-chosen-perms-some-selected")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""
         from selenium.webdriver.common.by import By
@@ -6782,7 +6871,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_get(self):
         response = self.client.get(reverse("admin:admin_views_post_add"))
         self.assertNotContains(response, 'name="posted"')
@@ -6843,7 +6931,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         self.assertContains(response, "%d amount of cool" % p.pk)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_text_field(self):
         p = Post.objects.create(
             title="Readonly test",
@@ -6863,7 +6950,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         # Checking readonly field in inline.
         self.assertContains(response, "test<br>link")
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_post(self):
         data = {
             "title": "Django Got Readonly Fields",
@@ -7009,7 +7095,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse("admin:admin_views_square_add"))
         self.assertContains(response, '<div class="readonly">-</div>')
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_field_overrides(self):
         """
         Regression test for #22087 - ModelForm Meta overrides are ignored by
@@ -7385,8 +7470,7 @@ class UserAdminTest(TestCase):
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
 
-        expected_num_queries = 8 if connection.features.uses_savepoints else 6
-        with self.assertNumQueries(expected_num_queries):
+        with self.assertNumQueries(8):
             response = self.client.get(reverse("admin:auth_user_change", args=(u.pk,)))
             self.assertEqual(response.status_code, 200)
 
@@ -7433,8 +7517,7 @@ class GroupAdminTest(TestCase):
         # Ensure no queries are skipped due to cached content type for Group.
         ContentType.objects.clear_cache()
 
-        expected_num_queries = 6 if connection.features.uses_savepoints else 4
-        with self.assertNumQueries(expected_num_queries):
+        with self.assertNumQueries(6):
             response = self.client.get(reverse("admin:auth_group_change", args=(g.pk,)))
             self.assertEqual(response.status_code, 200)
 
@@ -7469,7 +7552,6 @@ class CSSTest(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_field_prefix_css_classes(self):
         """
         Fields have a CSS class name with a 'field-' prefix.
@@ -7497,12 +7579,26 @@ class CSSTest(TestCase):
         # General index page
         response = self.client.get(reverse("admin:index"))
         self.assertContains(response, '<div class="app-admin_views module')
+        self.assertContains(
+            response,
+            '<thead class="visually-hidden"><tr><th scope="col">Model name</th>'
+            '<th scope="col">Add link</th><th scope="col">Change or view list link</th>'
+            "</tr></thead>",
+            html=True,
+        )
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
         # App index page
         response = self.client.get(reverse("admin:app_list", args=("admin_views",)))
         self.assertContains(response, '<div class="app-admin_views module')
+        self.assertContains(
+            response,
+            '<thead class="visually-hidden"><tr><th scope="col">Model name</th>'
+            '<th scope="col">Add link</th><th scope="col">Change or view list link</th>'
+            "</tr></thead>",
+            html=True,
+        )
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
@@ -7656,7 +7752,6 @@ class AdminDocsTest(TestCase):
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.debug",
                     "django.template.context_processors.request",
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",
@@ -8170,7 +8265,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the `change_view` link has the correct querystring.
         detail_link = re.search(
             '<a href="(.*?)">{}</a>'.format(self.joepublicuser.username),
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(detail_link[1], self.get_change_url())
 
@@ -8182,7 +8277,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the form action.
         form_action = re.search(
             '<form action="(.*?)" method="post" id="user_form" novalidate>',
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(
             form_action[1], "?%s" % self.get_preserved_filters_querystring()
@@ -8190,13 +8285,13 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the history link.
         history_link = re.search(
-            '<a href="(.*?)" class="historylink">History</a>', response.content.decode()
+            '<a href="(.*?)" class="historylink">History</a>', response.text
         )
         self.assertURLEqual(history_link[1], self.get_history_url())
 
         # Check the delete link.
         delete_link = re.search(
-            '<a href="(.*?)" class="deletelink">Delete</a>', response.content.decode()
+            '<a href="(.*?)" class="deletelink">Delete</a>', response.text
         )
         self.assertURLEqual(delete_link[1], self.get_delete_url())
 
@@ -8236,7 +8331,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.client.force_login(viewuser)
         response = self.client.get(self.get_change_url())
         close_link = re.search(
-            '<a href="(.*?)" class="closelink">Close</a>', response.content.decode()
+            '<a href="(.*?)" class="closelink">Close</a>', response.text
         )
         close_link = close_link[1].replace("&amp;", "&")
         self.assertURLEqual(close_link, self.get_changelist_url())
@@ -8254,7 +8349,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the form action.
         form_action = re.search(
             '<form action="(.*?)" method="post" id="user_form" novalidate>',
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(
             form_action[1], "?%s" % self.get_preserved_filters_querystring()
@@ -8555,6 +8650,19 @@ class AdminViewOnSiteTests(TestCase):
                     "object_id": self.c1.pk,
                 },
             ),
+        )
+
+    def test_view_on_site_url_non_integer_ids(self):
+        """The view_on_site URL accepts non-integer ids."""
+        self.assertEqual(
+            reverse(
+                "admin:view_on_site",
+                kwargs={
+                    "content_type_id": "37156b6a-8a82",
+                    "object_id": "37156b6a-8a83",
+                },
+            ),
+            "/test_admin/admin/r/37156b6a-8a82/37156b6a-8a83/",
         )
 
 

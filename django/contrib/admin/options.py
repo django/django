@@ -2,7 +2,6 @@ import copy
 import enum
 import json
 import re
-import warnings
 from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
@@ -41,6 +40,7 @@ from django.core.exceptions import (
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.functions import Cast
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet,
@@ -55,7 +55,6 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -447,9 +446,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             else self.get_list_display(request)
         )
 
-    # RemovedInDjango60Warning: when the deprecation ends, replace with:
-    # def lookup_allowed(self, lookup, value, request):
-    def lookup_allowed(self, lookup, value, request=None):
+    def lookup_allowed(self, lookup, value, request):
         from django.contrib.admin.filters import SimpleListFilter
 
         model = self.model
@@ -497,12 +494,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             # Either a local field filter, or no fields at all.
             return True
         valid_lookups = {self.date_hierarchy}
-        # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # for filter_item in self.get_list_filter(request):
-        list_filter = (
-            self.get_list_filter(request) if request is not None else self.list_filter
-        )
-        for filter_item in list_filter:
+        for filter_item in self.get_list_filter(request):
             if isinstance(filter_item, type) and issubclass(
                 filter_item, SimpleListFilter
             ):
@@ -973,28 +965,6 @@ class ModelAdmin(BaseModelAdmin):
             single_object=True,
         )
 
-    def log_deletion(self, request, obj, object_repr):
-        """
-        Log that an object will be deleted. Note that this method must be
-        called before the deletion.
-
-        The default implementation creates an admin LogEntry object.
-        """
-        warnings.warn(
-            "ModelAdmin.log_deletion() is deprecated. Use log_deletions() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        from django.contrib.admin.models import DELETION, LogEntry
-
-        return LogEntry.objects.log_action(
-            user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(obj).pk,
-            object_id=obj.pk,
-            object_repr=object_repr,
-            action_flag=DELETION,
-        )
-
     def log_deletions(self, request, queryset):
         """
         Log that objects will be deleted. Note that this method must be called
@@ -1003,16 +973,6 @@ class ModelAdmin(BaseModelAdmin):
         The default implementation creates admin LogEntry objects.
         """
         from django.contrib.admin.models import DELETION, LogEntry
-
-        # RemovedInDjango60Warning.
-        if type(self).log_deletion != ModelAdmin.log_deletion:
-            warnings.warn(
-                "The usage of log_deletion() is deprecated. Implement log_deletions() "
-                "instead.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            return [self.log_deletion(request, obj, str(obj)) for obj in queryset]
 
         return LogEntry.objects.log_actions(
             user_id=request.user.pk,
@@ -1177,17 +1137,17 @@ class ModelAdmin(BaseModelAdmin):
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
-                return "%s__istartswith" % field_name.removeprefix("^")
+                return "%s__istartswith" % field_name.removeprefix("^"), None
             elif field_name.startswith("="):
-                return "%s__iexact" % field_name.removeprefix("=")
+                return "%s__iexact" % field_name.removeprefix("="), None
             elif field_name.startswith("@"):
-                return "%s__search" % field_name.removeprefix("@")
+                return "%s__search" % field_name.removeprefix("@"), None
             # Use field_name if it includes a lookup.
             opts = queryset.model._meta
             lookup_fields = field_name.split(LOOKUP_SEP)
             # Go through the fields, following all relations.
             prev_field = None
-            for path_part in lookup_fields:
+            for i, path_part in enumerate(lookup_fields):
                 if path_part == "pk":
                     path_part = opts.pk.name
                 try:
@@ -1195,21 +1155,40 @@ class ModelAdmin(BaseModelAdmin):
                 except FieldDoesNotExist:
                     # Use valid query lookups.
                     if prev_field and prev_field.get_lookup(path_part):
-                        return field_name
+                        if path_part == "exact" and not isinstance(
+                            prev_field, (models.CharField, models.TextField)
+                        ):
+                            field_name_without_exact = "__".join(lookup_fields[:i])
+                            alias = Cast(
+                                field_name_without_exact,
+                                output_field=models.CharField(),
+                            )
+                            alias_name = "_".join(lookup_fields[:i])
+                            return f"{alias_name}_str", alias
+                        else:
+                            return field_name, None
                 else:
                     prev_field = field
                     if hasattr(field, "path_infos"):
                         # Update opts to follow the relation.
                         opts = field.path_infos[-1].to_opts
             # Otherwise, use the field with icontains.
-            return "%s__icontains" % field_name
+            return "%s__icontains" % field_name, None
 
         may_have_duplicates = False
         search_fields = self.get_search_fields(request)
         if search_fields and search_term:
-            orm_lookups = [
-                construct_search(str(search_field)) for search_field in search_fields
-            ]
+            str_aliases = {}
+            orm_lookups = []
+            for field in search_fields:
+                lookup, str_alias = construct_search(str(field))
+                orm_lookups.append(lookup)
+                if str_alias:
+                    str_aliases[lookup] = str_alias
+
+            if str_aliases:
+                queryset = queryset.alias(**str_aliases)
+
             term_queries = []
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
@@ -2229,7 +2208,7 @@ class ModelAdmin(BaseModelAdmin):
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
         else:
-            title = _("Are you sure?")
+            title = _("Delete")
 
         context = {
             **self.admin_site.each_context(request),

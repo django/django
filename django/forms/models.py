@@ -935,7 +935,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
             # 1. The object is an unexpected empty model, created by invalid
             #    POST data such as an object outside the formset's queryset.
             # 2. The object was already deleted from the database.
-            if obj.pk is None:
+            if not obj._is_pk_set():
                 continue
             if form in forms_to_delete:
                 self.deleted_objects.append(obj)
@@ -1103,7 +1103,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         self.save_as_new = save_as_new
         if queryset is None:
             queryset = self.model._default_manager
-        if self.instance.pk is not None:
+        if self.instance._is_pk_set():
             qs = queryset.filter(**{self.fk.name: self.instance})
         else:
             qs = queryset.none()

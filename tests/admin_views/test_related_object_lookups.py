@@ -36,8 +36,8 @@ class SeleniumTests(AdminSeleniumTestCase):
                     By.XPATH, f'//*[@id="{link_id}"]/img'
                 )
                 self.assertEqual(link_image.get_attribute("alt"), "")
-                self.assertEqual(link_image.get_attribute("width"), "20")
-                self.assertEqual(link_image.get_attribute("height"), "20")
+                self.assertEqual(link_image.get_attribute("width"), "24")
+                self.assertEqual(link_image.get_attribute("height"), "24")
 
     def test_related_object_lookup_link_initial_state(self):
         from selenium.webdriver.common.by import By
@@ -162,7 +162,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Move the new value to the from box.
         self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_to']/option").click()
-        self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_remove_link']").click()
+        self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_remove']").click()
 
         self.assertHTMLEqual(
             m2m_box.get_attribute("innerHTML"),
@@ -172,7 +172,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Move the new value to the to box.
         self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_from']/option").click()
-        self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_add_link']").click()
+        self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_add']").click()
 
         self.assertHTMLEqual(m2m_box.get_attribute("innerHTML"), "")
         self.assertHTMLEqual(

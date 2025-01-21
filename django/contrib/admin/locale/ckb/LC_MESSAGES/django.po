@@ -4,15 +4,15 @@
 # Abdulla Dlshad, 2023
 # Bakhtawar Barzan, 2021
 # Bakhtawar Barzan, 2021
-# kosar tofiq <kosar.belana@gmail.com>, 2020
+# Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020
 # pejar hewrami <gumle@protonmail.com>, 2020
 # Swara <swara09@gmail.com>, 2022,2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
 "Last-Translator: Swara <swara09@gmail.com>, 2022,2024\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
@@ -208,12 +208,6 @@ msgstr ""
 "بکەیتەوە."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}” بەسەرکەوتوویی زیادکرا. دەگونجێت تۆ لە خوارەوە دووبارە "
-"دەستکاری بکەیتەوە."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -379,6 +373,9 @@ msgstr "ناوی بەکارهێنەر و تێپەڕەوشە بنوسە"
 msgid "Change password"
 msgstr "گۆڕینی تێپەڕەوشە"
 
+msgid "Set password"
+msgstr "دانانی تێپەڕەوشە"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "تکایە ئەم هەڵەیەی خوارەوە ڕاست بکەرەوە."
@@ -387,6 +384,19 @@ msgstr[1] "تکایە هەڵەکانی خوارەوە ڕاست بکەرەوە."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "تێپەڕەوشەی نوێ بۆ بەکارهێنەری <strong>%(username)s</strong> بنوسە"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"ئەم کردارە <strong>چالاک دەکات</strong> لەسەر بنەمای تێپەڕەوشەی ئەم "
+"بەکارهێنەرە."
+
+msgid "Disable password-based authentication"
+msgstr "ناچالاککردنی ڕەسەنایەتی لەسەر بنەمای تێپەڕەوشە"
+
+msgid "Enable password-based authentication"
+msgstr "چالاککردنی ڕەسەنایەتی لەسەر بنەمای تێپەڕەوشە"
 
 msgid "Skip to main content"
 msgstr "تێیپەڕێنە بۆ ناوەڕۆکی سەرەکی"

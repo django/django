@@ -254,7 +254,7 @@ Common cases such as validating against an email or a regular expression can be
 handled using existing validator classes available in Django. For example,
 ``validators.validate_slug`` is an instance of
 a :class:`~django.core.validators.RegexValidator` constructed with the first
-argument being the pattern: ``^[-a-zA-Z0-9_]+$``. See the section on
+argument being the pattern: ``^[-a-zA-Z0-9_]+\Z``. See the section on
 :doc:`writing validators </ref/validators>` to see a list of what is already
 available and for an example of how to write a validator.
 

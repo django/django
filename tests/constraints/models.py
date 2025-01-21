@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Coalesce, Lower
 
 
 class Product(models.Model):
@@ -28,18 +29,56 @@ class Product(models.Model):
         ]
 
 
+class GeneratedFieldStoredProduct(models.Model):
+    name = models.CharField(max_length=255, null=True)
+    price = models.IntegerField(null=True)
+    discounted_price = models.IntegerField(null=True)
+    rebate = models.GeneratedField(
+        expression=Coalesce("price", 0)
+        - Coalesce("discounted_price", Coalesce("price", 0)),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+    lower_name = models.GeneratedField(
+        expression=Lower(models.F("name")),
+        output_field=models.CharField(max_length=255, null=True),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedFieldVirtualProduct(models.Model):
+    name = models.CharField(max_length=255, null=True)
+    price = models.IntegerField(null=True)
+    discounted_price = models.IntegerField(null=True)
+    rebate = models.GeneratedField(
+        expression=Coalesce("price", 0)
+        - Coalesce("discounted_price", Coalesce("price", 0)),
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
+    lower_name = models.GeneratedField(
+        expression=Lower(models.F("name")),
+        output_field=models.CharField(max_length=255, null=True),
+        db_persist=False,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
+
+
 class UniqueConstraintProduct(models.Model):
     name = models.CharField(max_length=255)
     color = models.CharField(max_length=32, null=True)
+    age = models.IntegerField(null=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "color"],
                 name="name_color_uniq",
-                # Custom message and error code are ignored.
-                violation_error_code="custom_code",
-                violation_error_message="Custom message",
             )
         ]
 
@@ -128,3 +167,10 @@ class JSONFieldModel(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+
+class ModelWithDatabaseDefault(models.Model):
+    field = models.CharField(max_length=255)
+    field_with_db_default = models.CharField(
+        max_length=255, db_default=models.Value("field_with_db_default")
+    )

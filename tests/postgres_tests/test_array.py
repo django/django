@@ -28,6 +28,7 @@ from .models import (
     OtherTypesArrayModel,
     PostgreSQLModel,
     Tag,
+    WithSizeArrayModel,
 )
 
 try:
@@ -215,6 +216,16 @@ class TestQuerying(PostgreSQLTestCase):
                 NullableIntegerArrayModel(order=5, field=None),
             ]
         )
+
+    def test_bulk_create_with_sized_arrayfield(self):
+        objs = WithSizeArrayModel.objects.bulk_create(
+            [
+                WithSizeArrayModel(field=[1, 2]),
+                WithSizeArrayModel(field=[3, 4]),
+            ]
+        )
+        self.assertEqual(objs[0].field, [1, 2])
+        self.assertEqual(objs[1].field, [3, 4])
 
     def test_empty_list(self):
         NullableIntegerArrayModel.objects.create(field=[])
@@ -547,7 +558,7 @@ class TestQuerying(PostgreSQLTestCase):
             NullableIntegerArrayModel.objects.filter(field__0_2=[2, 3]), self.objs[2:3]
         )
 
-    def test_order_by_slice(self):
+    def test_order_by_index(self):
         more_objs = (
             NullableIntegerArrayModel.objects.create(field=[1, 637]),
             NullableIntegerArrayModel.objects.create(field=[2, 1]),
@@ -1008,6 +1019,32 @@ class TestSerialization(PostgreSQLSimpleTestCase):
         self.assertEqual(instance.field, [1, 2, None])
 
 
+class TestStringSerialization(PostgreSQLSimpleTestCase):
+    field_values = [["Django", "Python", None], ["Джанго", "פייתון", None, "król"]]
+
+    @staticmethod
+    def create_json_data(array_field_value):
+        fields = {"field": json.dumps(array_field_value, ensure_ascii=False)}
+        return json.dumps(
+            [{"model": "postgres_tests.chararraymodel", "pk": None, "fields": fields}]
+        )
+
+    def test_encode(self):
+        for field_value in self.field_values:
+            with self.subTest(field_value=field_value):
+                instance = CharArrayModel(field=field_value)
+                data = serializers.serialize("json", [instance])
+                json_data = self.create_json_data(field_value)
+                self.assertEqual(json.loads(data), json.loads(json_data))
+
+    def test_decode(self):
+        for field_value in self.field_values:
+            with self.subTest(field_value=field_value):
+                json_data = self.create_json_data(field_value)
+                instance = list(serializers.deserialize("json", json_data))[0].object
+                self.assertEqual(instance.field, field_value)
+
+
 class TestValidation(PostgreSQLSimpleTestCase):
     def test_unbounded(self):
         field = ArrayField(models.IntegerField())
@@ -1336,6 +1373,22 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
                 "characters (it has 3).",
                 "Item 3 in the array did not validate: Ensure this value has at most 2 "
                 "characters (it has 4).",
+            ],
+        )
+
+    def test_invalid_char_length_with_remove_trailing_nulls(self):
+        field = SplitArrayField(
+            forms.CharField(max_length=2, required=False),
+            size=3,
+            remove_trailing_nulls=True,
+        )
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(["abc", "", ""])
+        self.assertEqual(
+            cm.exception.messages,
+            [
+                "Item 1 in the array did not validate: Ensure this value has at most 2 "
+                "characters (it has 3).",
             ],
         )
 

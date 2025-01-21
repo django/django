@@ -1,4 +1,5 @@
 from django.core.exceptions import FieldError
+from django.db import connection
 from django.db.models import (
     BooleanField,
     Exists,
@@ -327,3 +328,6 @@ class QCheckTests(TestCase):
             f"Got a database error calling check() on {q!r}: ",
             cm.records[0].getMessage(),
         )
+
+        # We must leave the connection in a usable state (#35712).
+        self.assertTrue(connection.is_usable())

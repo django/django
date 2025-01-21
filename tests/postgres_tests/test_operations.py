@@ -1,8 +1,9 @@
 import unittest
 
-from migrations.test_base import OperationTestBase
+from migrations.test_base import OperationTestBase, OptimizerTestBase
 
 from django.db import IntegrityError, NotSupportedError, connection, transaction
+from django.db.migrations.operations import RemoveIndex, RenameIndex
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import OperationWriter
 from django.db.models import CheckConstraint, Index, Q, UniqueConstraint
@@ -30,7 +31,7 @@ except ImportError:
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
 @modify_settings(INSTALLED_APPS={"append": "migrations"})
-class AddIndexConcurrentlyTests(OperationTestBase):
+class AddIndexConcurrentlyTests(OptimizerTestBase, OperationTestBase):
     app_label = "test_add_concurrently"
 
     def test_requires_atomic_false(self):
@@ -128,6 +129,51 @@ class AddIndexConcurrentlyTests(OperationTestBase):
                 self.app_label, editor, new_state, project_state
             )
         self.assertIndexNotExists(table_name, ["pink"])
+
+    def test_reduce_add_remove_concurrently(self):
+        self.assertOptimizesTo(
+            [
+                AddIndexConcurrently(
+                    "Pony",
+                    Index(fields=["pink"], name="pony_pink_idx"),
+                ),
+                RemoveIndex("Pony", "pony_pink_idx"),
+            ],
+            [],
+        )
+
+    def test_reduce_add_remove(self):
+        self.assertOptimizesTo(
+            [
+                AddIndexConcurrently(
+                    "Pony",
+                    Index(fields=["pink"], name="pony_pink_idx"),
+                ),
+                RemoveIndexConcurrently("Pony", "pony_pink_idx"),
+            ],
+            [],
+        )
+
+    def test_reduce_add_rename(self):
+        self.assertOptimizesTo(
+            [
+                AddIndexConcurrently(
+                    "Pony",
+                    Index(fields=["pink"], name="pony_pink_idx"),
+                ),
+                RenameIndex(
+                    "Pony",
+                    old_name="pony_pink_idx",
+                    new_name="pony_pink_index",
+                ),
+            ],
+            [
+                AddIndexConcurrently(
+                    "Pony",
+                    Index(fields=["pink"], name="pony_pink_index"),
+                ),
+            ],
+        )
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
@@ -272,7 +318,7 @@ class CreateExtensionTests(PostgreSQLTestCase):
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
-class CreateCollationTests(PostgreSQLTestCase):
+class CreateCollationTests(OptimizerTestBase, PostgreSQLTestCase):
     app_label = "test_allow_create_collation"
 
     @override_settings(DATABASE_ROUTERS=[NoMigrationRouter()])
@@ -411,6 +457,24 @@ class CreateCollationTests(PostgreSQLTestCase):
             "    provider='icu',\n"
             "    deterministic=False,\n"
             "),",
+        )
+
+    def test_reduce_create_remove(self):
+        self.assertOptimizesTo(
+            [
+                CreateCollation(
+                    "sample_collation",
+                    "und-u-ks-level2",
+                    provider="icu",
+                    deterministic=False,
+                ),
+                RemoveCollation(
+                    "sample_collation",
+                    # Different locale
+                    "de-u-ks-level1",
+                ),
+            ],
+            [],
         )
 
 

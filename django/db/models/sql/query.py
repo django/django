@@ -23,6 +23,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
     BaseExpression,
     Col,
+    ColPairs,
     Exists,
     F,
     OuterRef,
@@ -32,7 +33,6 @@ from django.db.models.expressions import (
     Value,
 )
 from django.db.models.fields import Field
-from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
@@ -491,6 +491,11 @@ class Query(BaseExpression):
             )
             or having
         )
+        set_returning_annotations = {
+            alias
+            for alias, annotation in self.annotation_select.items()
+            if getattr(annotation, "set_returning", False)
+        }
         # Decide if we need to use a subquery.
         #
         # Existing aggregations would cause incorrect results as
@@ -510,6 +515,7 @@ class Query(BaseExpression):
             or qualify
             or self.distinct
             or self.combinator
+            or set_returning_annotations
         ):
             from django.db.models.sql.subqueries import AggregateQuery
 
@@ -551,6 +557,9 @@ class Query(BaseExpression):
                         if annotation.get_group_by_cols():
                             annotation_mask.add(annotation_alias)
                     inner_query.set_annotation_mask(annotation_mask)
+                    # Annotations that possibly return multiple rows cannot
+                    # be masked as they might have an incidence on the query.
+                    annotation_mask |= set_returning_annotations
 
             # Add aggregates to the outer AggregateQuery. This requires making
             # sure all columns referenced by the aggregates are selected in the
@@ -618,8 +627,12 @@ class Query(BaseExpression):
         if result is None:
             result = empty_set_result
         else:
-            converters = compiler.get_converters(outer_query.annotation_select.values())
-            result = next(compiler.apply_converters((result,), converters))
+            cols = outer_query.annotation_select.values()
+            converters = compiler.get_converters(cols)
+            rows = compiler.apply_converters((result,), converters)
+            if compiler.has_composite_fields(cols):
+                rows = compiler.composite_fields_to_tuples(rows, cols)
+            result = next(rows)
 
         return dict(zip(outer_query.annotation_select, result))
 
@@ -1012,11 +1025,21 @@ class Query(BaseExpression):
                 if alias == old_alias:
                     table_aliases[pos] = new_alias
                     break
+
+        # 3. Rename the direct external aliases and the ones of combined
+        # queries (union, intersection, difference).
         self.external_aliases = {
             # Table is aliased or it's being changed and thus is aliased.
             change_map.get(alias, alias): (aliased or alias in change_map)
             for alias, aliased in self.external_aliases.items()
         }
+        for combined_query in self.combined_queries:
+            external_change_map = {
+                alias: aliased
+                for alias, aliased in change_map.items()
+                if alias in combined_query.external_aliases
+            }
+            combined_query.change_aliases(external_change_map)
 
     def bump_prefix(self, other_query, exclude=None):
         """
@@ -1549,9 +1572,7 @@ class Query(BaseExpression):
             if len(targets) == 1:
                 col = self._get_col(targets[0], join_info.final_field, alias)
             else:
-                col = MultiColSource(
-                    alias, targets, join_info.targets, join_info.final_field
-                )
+                col = ColPairs(alias, targets, join_info.targets, join_info.final_field)
         else:
             col = self._get_col(targets[0], join_info.final_field, alias)
 
@@ -1683,12 +1704,12 @@ class Query(BaseExpression):
                             "relations outside the %r (got %r)."
                             % (filtered_relation.relation_name, lookup)
                         )
-                else:
-                    raise ValueError(
-                        "FilteredRelation's condition doesn't support nested "
-                        "relations deeper than the relation_name (got %r for "
-                        "%r)." % (lookup, filtered_relation.relation_name)
-                    )
+            if len(lookup_field_parts) > len(relation_field_parts) + 1:
+                raise ValueError(
+                    "FilteredRelation's condition doesn't support nested "
+                    "relations deeper than the relation_name (got %r for "
+                    "%r)." % (lookup, filtered_relation.relation_name)
+                )
         filtered_relation.condition = rename_prefix_from_q(
             filtered_relation.relation_name,
             alias,
@@ -2463,6 +2484,8 @@ class Query(BaseExpression):
 
         selected = {}
         if fields:
+            for field in fields:
+                self.check_alias(field)
             field_names = []
             extra_names = []
             annotation_names = []

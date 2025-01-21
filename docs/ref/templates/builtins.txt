@@ -957,8 +957,6 @@ output (as a string) inside a variable. This is useful if you want to use
 ``querystring``
 ----------------
 
-.. versionadded:: 5.1
-
 Outputs a URL-encoded formatted query string based on the provided parameters.
 
 This tag requires a :class:`~django.http.QueryDict` instance, which defaults to
@@ -2922,6 +2920,17 @@ Django's built-in :tfilter:`escape` filter. The default value for
     email addresses that contain single quotes (``'``), things won't work as
     expected. Apply this filter only to plain text.
 
+.. warning::
+
+    Using ``urlize`` or ``urlizetrunc`` can incur a performance penalty, which
+    can become severe when applied to user controlled values such as content
+    stored in a :class:`~django.db.models.TextField`. You can use
+    :tfilter:`truncatechars` to add a limit to such inputs:
+
+    .. code-block:: html+django
+
+        {{ value|truncatechars:500|urlize }}
+
 .. templatefilter:: urlizetrunc
 
 ``urlizetrunc``
@@ -3089,7 +3098,7 @@ slightly different call:
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
-    <img src="{{ myphoto }}">
+    <img src="{{ myphoto }}" alt="Hi!">
 
 .. admonition:: Using Jinja2 templates?
 

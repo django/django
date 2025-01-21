@@ -47,6 +47,7 @@ from django.db.models import (
 )
 from django.db.models.expressions import (
     Col,
+    ColPairs,
     Combinable,
     CombinedExpression,
     NegatedExpression,
@@ -2315,11 +2316,6 @@ class ValueTests(TestCase):
         self.assertNotEqual(value, other_value)
         self.assertNotEqual(value, no_output_field)
 
-    def test_raise_empty_expressionlist(self):
-        msg = "ExpressionList requires at least one expression"
-        with self.assertRaisesMessage(ValueError, msg):
-            ExpressionList()
-
     def test_compile_unresolved(self):
         # This test might need to be revisited later on if #25425 is enforced.
         compiler = Time.objects.all().query.get_compiler(connection=connection)
@@ -2471,6 +2467,10 @@ class ReprTests(SimpleTestCase):
             "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value('legal')>",
         )
         self.assertEqual(repr(Col("alias", "field")), "Col(alias, field)")
+        self.assertEqual(
+            repr(ColPairs("alias", ["t1", "t2"], ["s1", "s2"], "f")),
+            "ColPairs('alias', ['t1', 't2'], ['s1', 's2'], 'f')",
+        )
         self.assertEqual(repr(F("published")), "F(published)")
         self.assertEqual(
             repr(F("cost") + F("tax")), "<CombinedExpression: F(cost) + F(tax)>"

@@ -2,15 +2,15 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011,2015
-# Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2023
+# Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2024
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2024\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -204,10 +204,6 @@ msgstr ""
 "{name} “{obj}” u ndryshua me sukses. Mund ta përpunoni sërish më poshtë."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” u shtua me sukses. Mund ta përpunoni sërish më poshtë."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -372,6 +368,9 @@ msgstr "Jepni emër përdoruesi dhe fjalëkalim."
 msgid "Change password"
 msgstr "Ndryshoni fjalëkalimin"
 
+msgid "Set password"
+msgstr "Caktoni fjalëkalim"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Ju lutemi, ndreqni gabimin më poshtë."
@@ -381,6 +380,19 @@ msgstr[1] "Ju lutemi, ndreqni gabimet më poshtë."
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Jepni një fjalëkalim të ri për përdoruesin <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Ky veprim do të <strong>aktivizojë</strong> për këtë përdorues mirëfilltësim "
+"me bazë fjalëkalimin."
+
+msgid "Disable password-based authentication"
+msgstr "Çaktivizo mirëfilltësim me bazë fjalëkalimin"
+
+msgid "Enable password-based authentication"
+msgstr "Aktivizo mirëfilltësim me bazë fjalëkalimin"
 
 msgid "Skip to main content"
 msgstr "Kalo te lënda bazë"

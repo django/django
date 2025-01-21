@@ -58,3 +58,11 @@ class Company(models.Model):
 class Ticket(models.Model):
     active_at = models.DateTimeField()
     duration = models.DurationField()
+
+
+class JsonModel(models.Model):
+    data = models.JSONField(default=dict, blank=True)
+    id = models.IntegerField(primary_key=True)
+
+    class Meta:
+        required_db_features = {"supports_json_field"}

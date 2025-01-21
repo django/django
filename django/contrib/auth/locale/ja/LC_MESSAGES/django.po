@@ -5,15 +5,16 @@
 # arupakan125 <koh@arupaka.net>, 2020
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2013-2016,2021,2023
+# Shinya Okano <tokibito@gmail.com>, 2013-2016,2021,2023-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2013-2016,2021,2023\n"
-"Language-Team: Japanese (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, "
+"2013-2016,2021,2023-2024\n"
+"Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,12 +35,22 @@ msgstr "重要な日程"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "主キーが %(key)r である %(name)s オブジェクトは存在しません。"
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "送信されたフォームデータは競合しています。もう一度試してみてください。"
+
 msgid "Password changed successfully."
 msgstr "パスワードを変更しました"
+
+msgid "Password-based authentication was disabled."
+msgstr "パスワードによる認証は無効化されました。"
 
 #, python-format
 msgid "Change password: %s"
 msgstr "パスワードの変更: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "パスワード設定: %s"
 
 msgid "Authentication and Authorization"
 msgstr "認証と認可"
@@ -56,8 +67,22 @@ msgstr "パスワードは設定されませんでした。"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "無効なパスワードか不明なハッシュアルゴリズムです。"
 
+msgid "Reset password"
+msgstr "パスワードをリセット"
+
+msgid "Set password"
+msgstr "パスワードを設定"
+
 msgid "The two password fields didn’t match."
 msgstr "確認用パスワードが一致しません。"
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"ユーザーがパスワードを使用して認証できるかどうか。無効にしても、シングルサイ"
+"ンオンや LDAP などの他のバックエンドを使用して認証できる可能性があります。"
 
 msgid "Password"
 msgstr "パスワード"
@@ -68,13 +93,23 @@ msgstr "パスワード(確認用)"
 msgid "Enter the same password as before, for verification."
 msgstr "確認のため、再度パスワードを入力してください。"
 
+msgid "Password-based authentication"
+msgstr "パスワードによる認証"
+
+msgid "Enabled"
+msgstr "有効"
+
+msgid "Disabled"
+msgstr "無効"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"生のパスワードは格納されていないため、このユーザのパスワードを確認する方法は"
-"ありません。しかし<a href=\"{}\">このフォーム</a>を使用してパスワードを変更で"
-"きます。"
+"パスワードは平文では保存されず、ユーザーのパスワードを見る方法もありません。"
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr "パスワードを設定し、このユーザーでパスワードによる認証を有効にします。"
 
 #, python-format
 msgid ""
@@ -101,9 +136,6 @@ msgstr "元のパスワードが間違っています。もう一度入力して
 
 msgid "Old password"
 msgstr "元のパスワード"
-
-msgid "Password (again)"
-msgstr "パスワード(確認用)"
 
 msgid "algorithm"
 msgstr "アルゴリズム"

@@ -1,0 +1,57 @@
+======================================
+How to customize the ``shell`` command
+======================================
+
+The Django :djadmin:`shell` is an interactive Python environment that provides
+access to models and settings, making it useful for testing code, experimenting
+with queries, and interacting with application data.
+
+Customizing the :djadmin:`shell` command allows adding extra functionality or
+pre-loading specific modules. To do this, create a new management command that subclasses
+``django.core.management.commands.shell.Command`` and overrides the existing
+``shell`` management command. For more details, refer to the guide on
+:ref:`overriding commands <overriding-commands>`.
+
+.. _customizing-shell-auto-imports:
+
+Customize automatic imports
+===========================
+
+.. versionadded:: 5.2
+
+To customize the automatic import behavior of the :djadmin:`shell` management
+command, override the ``get_namespace()`` method. For example:
+
+.. code-block:: python
+    :caption: ``polls/management/commands/shell.py``
+
+    from django.core.management.commands import shell
+
+
+    class Command(shell.Command):
+        def get_namespace(self):
+            from django.urls.base import resolve, reverse
+
+            return {
+                **super().get_namespace(),
+                "resolve": resolve,
+                "reverse": reverse,
+            }
+
+The above customization adds :func:`~django.urls.resolve` and
+:func:`~django.urls.reverse` to the default namespace, which includes all
+models from all apps. These two functions will then be available when the
+shell opens, without a manual import statement.
+
+If you prefer to not have models automatically imported, create a custom
+``get_namespace()`` that excludes the ``super().get_namespace()`` call:
+
+.. code-block:: python
+    :caption: ``polls/management/commands/shell.py``
+
+    from django.core.management.commands import shell
+
+
+    class Command(shell.Command):
+        def get_namespace(self):
+            return {}

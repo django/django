@@ -8,10 +8,10 @@ Django's strengths is the rich ecosystem of third-party packages. They're
 community developed packages that can be used to quickly improve the feature set
 of an application.
 
-This tutorial will show how to add `Django Debug Toolbar
-<https://django-debug-toolbar.readthedocs.io>`_, a commonly used third-party
-package. The Django Debug Toolbar has ranked in the top three most used
-third-party packages in the Django Developers Survey in recent years.
+This tutorial will show how to add :pypi:`Django Debug Toolbar
+<django-debug-toolbar>`, a commonly used third-party package. The Django Debug
+Toolbar has ranked in the top three most used third-party packages in the
+Django Developers Survey in recent years.
 
 .. admonition:: Where to get help:
 
@@ -22,10 +22,11 @@ Installing Django Debug Toolbar
 ===============================
 
 Django Debug Toolbar is a useful tool for debugging Django web applications.
-It's a third-party package maintained by the `Jazzband
-<https://jazzband.co>`_ organization. The toolbar helps you understand how your
-application functions and to identify problems. It does so by providing panels
-that provide debug information about the current request and response.
+It's a third-party package that is maintained by the community organization
+`Django Commons <https://github.com/django-commons>`_. The toolbar helps you
+understand how your application functions and to identify problems. It does so
+by providing panels that provide debug information about the current request
+and response.
 
 To install a third-party application like the toolbar, you need to install
 the package by running the below command within an activated virtual
@@ -67,10 +68,9 @@ resolve the issue yourself, there are options available to you.
    <https://django-debug-toolbar.readthedocs.io/en/latest/tips.html>`_ that
    outlines troubleshooting options.
 #. Search for similar issues on the package's issue tracker. Django Debug
-   Toolbar’s is `on GitHub <https://github.com/jazzband/django-debug-toolbar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc>`_.
+   Toolbar’s is `on GitHub <https://github.com/django-commons/django-debug-toolbar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc>`_.
 #. Consult the `Django Forum <https://forum.djangoproject.com/>`_.
 #. Join the `Django Discord server <https://discord.gg/xcRH6mN4fa>`_.
-#. Join the #Django IRC channel on `Libera.chat <https://libera.chat/>`_.
 
 Installing other third-party packages
 =====================================

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2023
+# BouRock, 2015-2024
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: BouRock, 2015-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: BouRock, 2015-2024\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -211,11 +211,6 @@ msgstr ""
 "düzenleyebilirsiniz."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}” başarılı olarak eklendi. Aşağıda tekrar düzenleyebilirsiniz."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -381,6 +376,9 @@ msgstr "Kullanıcı adı ve parola girin."
 msgid "Change password"
 msgstr "Parolayı değiştir"
 
+msgid "Set password"
+msgstr "Parola ayarla"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Lütfen aşağıdaki hatayı düzeltin."
@@ -389,6 +387,19 @@ msgstr[1] "Lütfen aşağıdaki hataları düzeltin."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> kullanıcısı için yeni bir parola girin."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Bu eylem, bu kullanıcı için parola tabanlı kimlik doğrulaması "
+"<strong>etkinleştirecektir</strong>."
+
+msgid "Disable password-based authentication"
+msgstr "Parola tabanlı kimlik doğrulamasını etkisizleştir"
+
+msgid "Enable password-based authentication"
+msgstr "Parola tabanlı kimlik doğrulamasını etkinleştir"
 
 msgid "Skip to main content"
 msgstr "Ana içeriğe atla"

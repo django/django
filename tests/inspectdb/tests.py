@@ -655,11 +655,10 @@ class InspectDBTransactionalTests(TransactionTestCase):
             call_command("inspectdb", table_name, stdout=out)
             output = out.getvalue()
             self.assertIn(
-                f"column_1 = models.{field_type}(primary_key=True)  # The composite "
-                f"primary key (column_1, column_2) found, that is not supported. The "
-                f"first column is selected.",
+                "pk = models.CompositePrimaryKey('column_1', 'column_2')",
                 output,
             )
+            self.assertIn(f"column_1 = models.{field_type}()", output)
             self.assertIn(
                 "column_2 = models.%s()"
                 % connection.features.introspected_field_types["IntegerField"],

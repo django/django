@@ -1,8 +1,8 @@
-============================================
-Django 5.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 5.1 release notes
+========================
 
-*Expected August 2024*
+*August 7, 2024*
 
 Welcome to Django 5.1!
 
@@ -18,8 +18,9 @@ project.
 Python compatibility
 ====================
 
-Django 5.1 supports Python 3.10, 3.11, and 3.12. We **highly recommend** and
-only officially support the latest release of each series.
+Django 5.1 supports Python 3.10, 3.11, 3.12, and 3.13 (as of 5.1.3). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-5.1:
 
@@ -91,11 +92,14 @@ redirects all unauthenticated requests to a login page. Views can allow
 unauthenticated requests by using the new
 :func:`~django.contrib.auth.decorators.login_not_required` decorator.
 
-The :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` respects
-the ``login_url`` and ``redirect_field_name`` values set via the
+``LoginRequiredMiddleware`` respects the ``login_url`` and
+``redirect_field_name`` values set via the
 :func:`~.django.contrib.auth.decorators.login_required` decorator, but does not
 support setting ``login_url`` or ``redirect_field_name`` via the
 :class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
+
+To enable this, add ``"django.contrib.auth.middleware.LoginRequiredMiddleware"``
+to your :setting:`MIDDLEWARE` setting.
 
 Minor features
 --------------
@@ -112,14 +116,14 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   720,000 to 870,000.
 
-* The default ``parallelism`` of the ``ScryptPasswordHasher`` is 
-  increased from 1 to 5, to follow OWASP recommendations.
+* The default ``parallelism`` of the ``ScryptPasswordHasher`` is increased from
+  1 to 5, to follow OWASP recommendations.
 
-* :class:`~django.contrib.auth.forms.BaseUserCreationForm` and
-  :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now support
-  disabling password-based authentication by setting an unusable password on
-  form save. This is now available in the admin when visiting the user creation
-  and password change pages.
+* The new :class:`~django.contrib.auth.forms.AdminUserCreationForm` and
+  the existing :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now
+  support disabling password-based authentication by setting an unusable
+  password on form save. This is now available in the admin when visiting the
+  user creation and password change pages.
 
 * :func:`~.django.contrib.auth.decorators.login_required`,
   :func:`~.django.contrib.auth.decorators.permission_required`, and

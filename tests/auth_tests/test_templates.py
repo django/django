@@ -37,6 +37,12 @@ class AuthTemplateTests(TestCase):
         )
         self.assertContains(response, "<h1>Password reset</h1>")
 
+    def test_password_reset_view_error_title(self):
+        response = self.client.post(reverse("password_reset"), {})
+        self.assertContains(
+            response, "<title>Error: Password reset | Django site admin</title>"
+        )
+
     def test_password_reset_done_view(self):
         response = PasswordResetDoneView.as_view()(self.request)
         self.assertContains(
@@ -75,6 +81,19 @@ class AuthTemplateTests(TestCase):
         self.assertContains(
             response,
             '<input class="hidden" autocomplete="username" value="jsmith">',
+        )
+
+    def test_password_reset_confirm_view_error_title(self):
+        client = PasswordResetConfirmClient()
+        default_token_generator = PasswordResetTokenGenerator()
+        token = default_token_generator.make_token(self.user)
+        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode())
+        url = reverse(
+            "password_reset_confirm", kwargs={"uidb64": uidb64, "token": token}
+        )
+        response = client.post(url, {})
+        self.assertContains(
+            response, "<title>Error: Enter new password | Django site admin</title>"
         )
 
     @override_settings(AUTH_USER_MODEL="auth_tests.CustomUser")

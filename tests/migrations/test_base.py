@@ -4,12 +4,17 @@ import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 
+from user_commands.utils import AssertFormatterFailureCaughtContext
+
 from django.apps import apps
+from django.core.management import call_command
 from django.db import connection, connections, migrations, models
 from django.db.migrations.migration import Migration
+from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.recorder import MigrationRecorder
+from django.db.migrations.serializer import serializer_factory
 from django.db.migrations.state import ProjectState
-from django.test import TransactionTestCase
+from django.test import SimpleTestCase, TransactionTestCase
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import module_dir
 
@@ -165,6 +170,15 @@ class MigrationTestBase(TransactionTestCase):
 
     def assertFKNotExists(self, table, columns, to):
         return self.assertFKExists(table, columns, to, False)
+
+    def assertFormatterFailureCaught(
+        self, *args, module="migrations.test_migrations", **kwargs
+    ):
+        with (
+            self.temporary_migration_module(module=module),
+            AssertFormatterFailureCaughtContext(self) as ctx,
+        ):
+            call_command(*args, stdout=ctx.stdout, stderr=ctx.stderr, **kwargs)
 
     @contextmanager
     def temporary_migration_module(self, app_label="migrations", module=None):
@@ -400,3 +414,38 @@ class OperationTestBase(MigrationTestBase):
                 )
             )
         return self.apply_operations(app_label, ProjectState(), operations)
+
+
+class OptimizerTestBase(SimpleTestCase):
+    """Common functions to help test the optimizer."""
+
+    def optimize(self, operations, app_label):
+        """
+        Handy shortcut for getting results + number of loops
+        """
+        optimizer = MigrationOptimizer()
+        return optimizer.optimize(operations, app_label), optimizer._iterations
+
+    def serialize(self, value):
+        return serializer_factory(value).serialize()[0]
+
+    def assertOptimizesTo(
+        self, operations, expected, exact=None, less_than=None, app_label=None
+    ):
+        result, iterations = self.optimize(operations, app_label or "migrations")
+        result = [self.serialize(f) for f in result]
+        expected = [self.serialize(f) for f in expected]
+        self.assertEqual(expected, result)
+        if exact is not None and iterations != exact:
+            raise self.failureException(
+                "Optimization did not take exactly %s iterations (it took %s)"
+                % (exact, iterations)
+            )
+        if less_than is not None and iterations >= less_than:
+            raise self.failureException(
+                "Optimization did not take less than %s iterations (it took %s)"
+                % (less_than, iterations)
+            )
+
+    def assertDoesNotOptimize(self, operations, **kwargs):
+        self.assertOptimizesTo(operations, operations, **kwargs)

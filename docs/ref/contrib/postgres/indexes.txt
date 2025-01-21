@@ -34,14 +34,14 @@ available from the ``django.contrib.postgres.indexes`` module.
 .. class:: BrinIndex(*expressions, autosummarize=None, pages_per_range=None, **options)
 
     Creates a `BRIN index
-    <https://www.postgresql.org/docs/current/brin-intro.html>`_.
+    <https://www.postgresql.org/docs/current/brin.html>`_.
 
     Set the ``autosummarize`` parameter to ``True`` to enable `automatic
     summarization`_ to be performed by autovacuum.
 
     The ``pages_per_range`` argument takes a positive integer.
 
-    .. _automatic summarization: https://www.postgresql.org/docs/current/brin-intro.html#BRIN-OPERATION
+    .. _automatic summarization: https://www.postgresql.org/docs/current/brin.html#BRIN-OPERATION
 
 ``BTreeIndex``
 ==============
@@ -56,10 +56,6 @@ available from the ``django.contrib.postgres.indexes`` module.
     Provide a boolean value to the deduplicate_items_ parameter to control
     whether deduplication is enabled. PostgreSQL enables deduplication by
     default.
-
-    .. versionchanged:: 5.1
-
-        The ``deduplicate_items`` parameter was added.
 
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
     .. _deduplicate_items: https://www.postgresql.org/docs/current/btree-implementation.html#BTREE-DEDUPLICATION

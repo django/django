@@ -115,3 +115,10 @@ class UUID(models.Model):
 
 class Text(models.Model):
     name = models.TextField()
+
+
+class JSONFieldModel(models.Model):
+    data = models.JSONField(null=True)
+
+    class Meta:
+        required_db_features = {"supports_json_field"}

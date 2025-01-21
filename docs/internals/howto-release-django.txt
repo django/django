@@ -561,9 +561,6 @@ Now you're ready to actually put the release out there. To do this:
    message body should include the vulnerability details, for example, the
    announcement blog post text. Include a link to the announcement blog post.
 
-#. Add a link to the blog post in the topic of the ``#django`` IRC channel:
-   ``/msg chanserv TOPIC #django new topic goes here``.
-
 Post-release
 ============
 
@@ -624,9 +621,9 @@ need to be done by the releaser.
    message, add a "refs #XXXX" to the original ticket where the deprecation
    began if possible.
 
-#. Remove ``.. versionadded::``, ``.. versionadded::``, and ``.. deprecated::``
-   annotations in the documentation from two releases ago. For example, in
-   Django 4.2, notes for 4.0 will be removed.
+#. Remove ``.. versionadded::``, ``.. versionchanged::``, and
+   ``.. deprecated::`` annotations in the documentation from two releases ago.
+   For example, in Django 4.2, notes for 4.0 will be removed.
 
 #. Add the new branch to `Read the Docs
    <https://readthedocs.org/projects/django/>`_. Since the automatically

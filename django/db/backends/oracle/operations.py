@@ -3,7 +3,7 @@ import uuid
 from functools import lru_cache
 
 from django.conf import settings
-from django.db import DatabaseError, NotSupportedError
+from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
 from django.db.models import AutoField, Exists, ExpressionWrapper, Lookup
@@ -295,15 +295,6 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
-            # Can be removed when cx_Oracle is no longer supported and
-            # python-oracle 2.1.2 becomes the minimum supported version.
-            if value == []:
-                raise DatabaseError(
-                    "The database did not return a new row id. Probably "
-                    '"ORA-1403: no data found" was raised internally but was '
-                    "hidden by the Oracle OCI library (see "
-                    "https://code.djangoproject.com/ticket/28859)."
-                )
             columns.append(value[0])
         return tuple(columns)
 
@@ -629,9 +620,6 @@ END;
             1900, 1, 1, value.hour, value.minute, value.second, value.microsecond
         )
 
-    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
-        return value
-
     def combine_expression(self, connector, sub_expressions):
         lhs, rhs = sub_expressions
         if connector == "%%":
@@ -678,24 +666,6 @@ END;
             for field in fields
             if field
         ]
-        if (
-            self.connection.features.supports_bulk_insert_with_multiple_rows
-            # A workaround with UNION of SELECTs is required for models without
-            # any fields.
-            and field_placeholders
-        ):
-            placeholder_rows_sql = []
-            for row in placeholder_rows:
-                placeholders_row = (
-                    field_placeholder % placeholder
-                    for field_placeholder, placeholder in zip(
-                        field_placeholders, row, strict=True
-                    )
-                )
-                placeholder_rows_sql.append(placeholders_row)
-            return super().bulk_insert_sql(fields, placeholder_rows_sql)
-        # Oracle < 23c doesn't support inserting multiple rows in a single
-        # statement, use UNION of SELECTs as a workaround.
         query = []
         for row in placeholder_rows:
             select = []

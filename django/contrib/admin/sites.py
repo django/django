@@ -113,6 +113,11 @@ class AdminSite:
                     "The model %s is abstract, so it cannot be registered with admin."
                     % model.__name__
                 )
+            if model._meta.is_composite_pk:
+                raise ImproperlyConfigured(
+                    "The model %s has a composite primary key, so it cannot be "
+                    "registered with admin." % model.__name__
+                )
 
             if self.is_registered(model):
                 registered_admin = str(self.get_model_admin(model))
@@ -282,7 +287,7 @@ class AdminSite:
             path("autocomplete/", wrap(self.autocomplete_view), name="autocomplete"),
             path("jsi18n/", wrap(self.i18n_javascript, cacheable=True), name="jsi18n"),
             path(
-                "r/<int:content_type_id>/<path:object_id>/",
+                "r/<path:content_type_id>/<path:object_id>/",
                 wrap(contenttype_views.shortcut),
                 name="view_on_site",
             ),

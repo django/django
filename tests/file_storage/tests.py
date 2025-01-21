@@ -25,18 +25,11 @@ from django.core.files.uploadedfile import (
 )
 from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
-from django.test import (
-    LiveServerTestCase,
-    SimpleTestCase,
-    TestCase,
-    ignore_warnings,
-    override_settings,
-)
+from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Storage,
@@ -609,68 +602,6 @@ class CustomStorageTests(FileStorageTests):
         self.storage.delete(second)
 
 
-# RemovedInDjango60Warning: Remove this class.
-class OverwritingStorage(FileSystemStorage):
-    """
-    Overwrite existing files instead of appending a suffix to generate an
-    unused name.
-    """
-
-    # Mask out O_EXCL so os.open() doesn't raise OSError if the file exists.
-    OS_OPEN_FLAGS = FileSystemStorage.OS_OPEN_FLAGS & ~os.O_EXCL
-
-    def get_available_name(self, name, max_length=None):
-        """Override the effort to find an used name."""
-        return name
-
-
-# RemovedInDjango60Warning: Remove this test class.
-class OverwritingStorageOSOpenFlagsWarningTests(SimpleTestCase):
-    storage_class = OverwritingStorage
-
-    def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.temp_dir)
-
-    def test_os_open_flags_deprecation_warning(self):
-        msg = "Overriding OS_OPEN_FLAGS is deprecated. Use the allow_overwrite "
-        msg += "parameter instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            self.storage = self.storage_class(
-                location=self.temp_dir, base_url="/test_media_url/"
-            )
-
-
-# RemovedInDjango60Warning: Remove this test class.
-@ignore_warnings(category=RemovedInDjango60Warning)
-class OverwritingStorageOSOpenFlagsTests(FileStorageTests):
-    storage_class = OverwritingStorage
-
-    def test_save_overwrite_behavior(self):
-        """Saving to same file name twice overwrites the first file."""
-        name = "test.file"
-        self.assertFalse(self.storage.exists(name))
-        content_1 = b"content one"
-        content_2 = b"second content"
-        f_1 = ContentFile(content_1)
-        f_2 = ContentFile(content_2)
-        stored_name_1 = self.storage.save(name, f_1)
-        try:
-            self.assertEqual(stored_name_1, name)
-            self.assertTrue(self.storage.exists(name))
-            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
-            with self.storage.open(name) as fp:
-                self.assertEqual(fp.read(), content_1)
-            stored_name_2 = self.storage.save(name, f_2)
-            self.assertEqual(stored_name_2, name)
-            self.assertTrue(self.storage.exists(name))
-            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
-            with self.storage.open(name) as fp:
-                self.assertEqual(fp.read(), content_2)
-        finally:
-            self.storage.delete(name)
-
-
 class OverwritingStorageTests(FileStorageTests):
     storage_class = FileSystemStorage
 
@@ -771,7 +702,8 @@ class DiscardingFalseContentStorageTests(FileStorageTests):
 
 class FileFieldStorageTests(TestCase):
     def tearDown(self):
-        shutil.rmtree(temp_storage_location)
+        if os.path.exists(temp_storage_location):
+            shutil.rmtree(temp_storage_location)
 
     def _storage_max_filename_length(self, storage):
         """
@@ -944,6 +876,20 @@ class FileFieldStorageTests(TestCase):
         self.assertEqual(obj.default.read(), b"default content")
         obj.default.close()
 
+    def test_filefield_db_default(self):
+        temp_storage.save("tests/db_default.txt", ContentFile("default content"))
+        obj = Storage.objects.create()
+        self.assertEqual(obj.db_default.name, "tests/db_default.txt")
+        self.assertEqual(obj.db_default.read(), b"default content")
+        obj.db_default.close()
+
+        # File is not deleted, even if there are no more objects using it.
+        obj.delete()
+        s = Storage()
+        self.assertEqual(s.db_default.name, "tests/db_default.txt")
+        self.assertEqual(s.db_default.read(), b"default content")
+        s.db_default.close()
+
     def test_empty_upload_to(self):
         # upload_to can be empty, meaning it does not use subdirectory.
         obj = Storage()
@@ -1008,6 +954,23 @@ class FileFieldStorageTests(TestCase):
         temp_storage.save("tests/stringio", output)
         self.assertTrue(temp_storage.exists("tests/stringio"))
         with temp_storage.open("tests/stringio") as f:
+            self.assertEqual(f.read(), b"content")
+
+    @override_settings(
+        STORAGES={
+            DEFAULT_STORAGE_ALIAS: {
+                "BACKEND": "django.core.files.storage.InMemoryStorage"
+            }
+        }
+    )
+    def test_create_file_field_from_another_file_field_in_memory_storage(self):
+        f = ContentFile("content", "file.txt")
+        obj = Storage.objects.create(storage_callable_default=f)
+        new_obj = Storage.objects.create(
+            storage_callable_default=obj.storage_callable_default.file
+        )
+        storage = callable_default_storage()
+        with storage.open(new_obj.storage_callable_default.name) as f:
             self.assertEqual(f.read(), b"content")
 
 
