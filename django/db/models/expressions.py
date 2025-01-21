@@ -1577,20 +1577,6 @@ class When(Expression):
         # We're only interested in the fields of the result expressions.
         return [self.result._output_field_or_none]
 
-    def resolve_expression(
-        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
-    ):
-        c = self.copy()
-        c.is_summary = summarize
-        if hasattr(c.condition, "resolve_expression"):
-            c.condition = c.condition.resolve_expression(
-                query, allow_joins, reuse, summarize, False
-            )
-        c.result = c.result.resolve_expression(
-            query, allow_joins, reuse, summarize, for_save
-        )
-        return c
-
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = extra_context
@@ -1657,20 +1643,6 @@ class Case(SQLiteNumericMixin, Expression):
 
     def set_source_expressions(self, exprs):
         *self.cases, self.default = exprs
-
-    def resolve_expression(
-        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
-    ):
-        c = self.copy()
-        c.is_summary = summarize
-        for pos, case in enumerate(c.cases):
-            c.cases[pos] = case.resolve_expression(
-                query, allow_joins, reuse, summarize, for_save
-            )
-        c.default = c.default.resolve_expression(
-            query, allow_joins, reuse, summarize, for_save
-        )
-        return c
 
     def copy(self):
         c = super().copy()
