@@ -29,46 +29,36 @@ FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
     "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
 )
 # RemovedInDjango61Warning.
-EMAIL_BACKEND_DEPRECATED_MSG = (
-    "The EMAIL_BACKEND setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["BACKEND"] instead.'
-)
-EMAIL_HOST_DEPRECATED_MSG = (
-    "The EMAIL_HOST setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["host"] instead.'
-)
-EMAIL_PORT_DEPRECATED_MSG = (
-    "The EMAIL_PORT setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["port"] instead.'
-)
-EMAIL_USE_LOCALTIME_DEPRECATED_MSG = (
-    "The EMAIL_USE_LOCALTIME setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["USE_LOCALTIME"] instead.'
-)
-EMAIL_HOST_USER_DEPRECATED_MSG = (
-    "The EMAIL_HOST_USER setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["username"] instead.'
-)
-EMAIL_HOST_PASSWORD_DEPRECATED_MSG = (
-    "The EMAIL_HOST_PASSWORD setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["password"] instead.'
-)
-EMAIL_USE_TLS_DEPRECATED_MSG = (
-    "The EMAIL_USE_TLS setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["use_tls"] instead.'
-)
-EMAIL_USE_SSL_DEPRECATED_MSG = (
-    "The EMAIL_USE_SSL setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["use_ssl"] instead.'
-)
-EMAIL_SSL_CERTFILE_DEPRECATED_MSG = (
-    "The EMAIL_SSL_CERTFILE setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["ssl_certfile"] instead.'
-)
-EMAIL_SSL_KEYFILE_DEPRECATED_MSG = (
-    "The EMAIL_SSL_KEYFILE setting is deprecated. "
-    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["ssl_keyfile"] instead.'
-)
+DEPRECATED_EMAIL_SETTINGS = {
+    "EMAIL_BACKEND",
+    "EMAIL_HOST",
+    "EMAIL_PORT",
+    "EMAIL_USE_LOCALTIME",
+    "EMAIL_HOST_USER",
+    "EMAIL_HOST_PASSWORD",
+    "EMAIL_USE_TLS",
+    "EMAIL_USE_SSL",
+    "EMAIL_SSL_CERTFILE",
+    "EMAIL_SSL_KEYFILE",
+}
+
+
+def warn_about_deprecated_email_setting(deprecated_setting):
+    assert deprecated_setting in DEPRECATED_EMAIL_SETTINGS
+    if deprecated_setting == "EMAIL_BACKEND":
+        replacement = "BACKEND"
+    else:
+        replacement = deprecated_setting[6:].lower()
+    warnings.warn(
+        f"{deprecated_setting} is deprecated. "
+        f"Use EMAIL_PROVIDERS['default']['{replacement}'] instead.",
+        RemovedInDjango61Warning,
+    )
+
+
+class EmailImproperlyConfigured(ImproperlyConfigured):
+    def __init__(self, property_name):
+        super().__init__(f"{property_name} and EMAIL_PROVIDERS are mutually exclusive.")
 
 
 class SettingsReference(str):
@@ -232,107 +222,13 @@ class Settings:
                 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
                 RemovedInDjango60Warning,
             )
-        self._is_overridden_EMAIL_PROVIDERS = self.is_overridden("EMAIL_PROVIDERS")
-        if self.is_overridden("EMAIL_BACKEND"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_BACKEND and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_BACKEND_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["BACKEND"] = self.EMAIL_BACKEND
-        if self.is_overridden("EMAIL_HOST"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_HOST and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_HOST_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["OPTIONS"]["host"] = self.EMAIL_HOST
-        if self.is_overridden("EMAIL_PORT"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_PORT and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_PORT_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["OPTIONS"]["port"] = self.EMAIL_PORT
-        if self.is_overridden("EMAIL_USE_LOCALTIME"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_USE_LOCALTIME and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_USE_LOCALTIME_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["USE_LOCALTIME"] = self.EMAIL_USE_LOCALTIME
-        if self.is_overridden("EMAIL_HOST_USER"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_HOST_USER and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_HOST_USER_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["OPTIONS"]["username"] = self.EMAIL_HOST_USER
-        if self.is_overridden("EMAIL_HOST_PASSWORD"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_HOST_PASSWORD and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_HOST_PASSWORD_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["OPTIONS"]["password"] = self.EMAIL_HOST_PASSWORD
-        if self.is_overridden("EMAIL_USE_TLS"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_USE_TLS and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_USE_TLS_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["OPTIONS"]["use_tls"] = self.EMAIL_USE_TLS
-        if self.is_overridden("EMAIL_USE_SSL"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_USE_SSL and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_USE_SSL_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["OPTIONS"]["use_ssl"] = self.EMAIL_USE_SSL
-        if self.is_overridden("EMAIL_SSL_CERTFILE"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_SSL_CERTFILE and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_SSL_CERTFILE_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["OPTIONS"]["ssl_certfile"] = self.EMAIL_SSL_CERTFILE
-        if self.is_overridden("EMAIL_SSL_KEYFILE"):
-            if self._is_overridden_EMAIL_PROVIDERS:
-                raise ImproperlyConfigured(
-                    "EMAIL_SSL_KEYFILE and EMAIL_PROVIDERS are mutually exclusive."
-                )
-            warnings.warn(
-                EMAIL_SSL_KEYFILE_DEPRECATED_MSG,
-                RemovedInDjango61Warning,
-            )
-            self.EMAIL_PROVIDER["default"]["OPTIONS"]["ssl_keyfile"] = self.EMAIL_SSL_KEYFILE
+
+        is_overridden_EMAIL_PROVIDERS = self.is_overridden("EMAIL_PROVIDERS")
+        for deprecated_setting in DEPRECATED_EMAIL_SETTINGS:
+            if self.is_overridden(deprecated_setting):
+                if is_overridden_EMAIL_PROVIDERS:
+                    raise EmailImproperlyConfigured(deprecated_setting)
+                warn_about_deprecated_email_setting(deprecated_setting)
 
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -383,6 +279,15 @@ class UserSettingsHolder:
                 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
                 RemovedInDjango60Warning,
             )
+        if (
+            name == "EMAIL_PROVIDERS"
+            and any(self.is_overridden(f) for f in DEPRECATED_EMAIL_SETTINGS)
+        ):
+            raise EmailImproperlyConfigured(name)
+        if name in DEPRECATED_EMAIL_SETTINGS:
+            if self.is_overridden("EMAIL_PROVIDERS"):
+                raise EmailImproperlyConfigured(name)
+            warn_about_deprecated_email_setting(name)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

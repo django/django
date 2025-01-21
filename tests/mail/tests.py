@@ -28,7 +28,7 @@ from django.core.mail import (
 )
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError, sanitize_address
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, modify_settings, override_settings
 from django.test.utils import requires_tz_support
 from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.translation import gettext_lazy
@@ -1382,6 +1382,64 @@ class PythonGlobalState(SimpleTestCase):
         self.assertIn("Content-Transfer-Encoding: base64", txt.as_string())
 
 
+class EmailDeprecatedConfigurationTests(SimpleTestCase):
+    def test_deprecated_backend_configuration(self):
+        with self.assertWarnsMessage(
+            RemovedInDjango61Warning,
+            "EMAIL_BACKEND is deprecated. "
+            "Use EMAIL_PROVIDERS['default']['BACKEND'] instead."
+        ):
+            with self.settings(
+                EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+            ):
+                pass
+
+    def test_deprecated_host_configuration(self):
+        with self.assertWarnsMessage(
+            RemovedInDjango61Warning,
+            "EMAIL_HOST is deprecated. "
+            "Use EMAIL_PROVIDERS['default']['host'] instead."
+        ):
+            with self.settings(
+                EMAIL_HOST="smtp.example.com",
+            ):
+                pass
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+            ),
+        },
+    )
+    def test_backend_configuration_mismatch(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "EMAIL_BACKEND and EMAIL_PROVIDERS are mutually exclusive."
+        ):
+            with self.settings(
+                EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+            ):
+                pass
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+            ),
+        },
+    )
+    def test_host_configuration_mismatch(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "EMAIL_HOST and EMAIL_PROVIDERS are mutually exclusive."
+        ):
+            with self.settings(
+                EMAIL_HOST="smtp.example.com",
+            ):
+                pass
+
+
 class BaseEmailBackendTests(HeadersCheckMixin):
     email_backend = None
 
@@ -2274,23 +2332,6 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertTrue(backend.use_ssl)
         with self.assertRaises(SSLError):
             with backend:
-                pass
-
-    @override_settings(
-        EMAIL_PROVIDERS={
-            "default": dict(
-                settings.EMAIL_PROVIDERS["default"],
-            ),
-        },
-        EMAIL_HOST = "localhost",
-    )
-    def test_email_provider_configuration_mismatch(self):
-        with self.assertRaises(ImproperlyConfigured):
-            connection = mail.get_connection()
-            # backend = smtp.EmailBackend(
-            #     **settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
-            # )
-            with connection:
                 pass
 
     def test_connection_timeout_default(self):
