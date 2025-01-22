@@ -29,7 +29,6 @@ DEPRECATED_EMAIL_SETTINGS = {
     "EMAIL_BACKEND",
     "EMAIL_HOST",
     "EMAIL_PORT",
-    "EMAIL_USE_LOCALTIME",
     "EMAIL_HOST_USER",
     "EMAIL_HOST_PASSWORD",
     "EMAIL_USE_TLS",
@@ -42,12 +41,13 @@ DEPRECATED_EMAIL_SETTINGS = {
 def warn_about_deprecated_email_setting(deprecated_setting):
     assert deprecated_setting in DEPRECATED_EMAIL_SETTINGS
     if deprecated_setting == "EMAIL_BACKEND":
-        replacement = "BACKEND"
+        replacement = "EMAIL_PROVIDERS['default']['BACKEND']"
     else:
-        replacement = deprecated_setting[6:].lower()
+        replacement = (
+            f"EMAIL_PROVIDERS['default']['OPTIONS']['{deprecated_setting[6:].lower()}']"
+        )
     warnings.warn(
-        f"{deprecated_setting} is deprecated. "
-        f"Use EMAIL_PROVIDERS['default']['{replacement}'] instead.",
+        f"{deprecated_setting} is deprecated. Use {replacement} instead.",
         RemovedInDjango61Warning,
     )
 

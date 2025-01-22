@@ -69,7 +69,7 @@ def get_connection(backend=None, fail_silently=False, *, provider=None, **kwds):
     klass = import_string(settings.EMAIL_PROVIDERS[provider]["BACKEND"])
     return klass(
         fail_silently=fail_silently,
-        use_localtime=settings.EMAIL_PROVIDERS[provider]["USE_LOCALTIME"],
+        use_localtime=settings.EMAIL_USE_LOCALTIME,
         **(settings.EMAIL_PROVIDERS[provider]["OPTIONS"] | kwds),
     )
 
@@ -109,14 +109,8 @@ def send_mail(
             fail_silently=fail_silently,
             **provider_settings["OPTIONS"],
         )
-    elif connection:
-        msg = (
-            "The connection argument is deprecated and will be removed in Django 6.2. "
-            "Please use provider with an appropriate configuration instead.",
-        )
-        warnings.warn(msg, RemovedInDjango61Warning, stacklevel=2)
     else:
-        connection = get_connection(
+        connection = connection or get_connection(
             username=auth_user,
             password=auth_password,
             fail_silently=fail_silently,
@@ -162,14 +156,8 @@ def send_mass_mail(
             fail_silently=fail_silently,
             **provider_settings["OPTIONS"],
         )
-    elif connection:
-        msg = (
-            "The connection argument is deprecated and will be removed in Django 6.2. "
-            "Please use provider with an appropriate configuration instead.",
-        )
-        warnings.warn(msg, RemovedInDjango61Warning, stacklevel=2)
     else:
-        connection = get_connection(
+        connection = connection or get_connection(
             username=auth_user,
             password=auth_password,
             fail_silently=fail_silently,

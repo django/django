@@ -28,23 +28,27 @@ class EmailBackend(BaseEmailBackend):
         timeout=None,
         ssl_keyfile=None,
         ssl_certfile=None,
+        provider=None,
         **kwargs,
     ):
         super().__init__(fail_silently=fail_silently)
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
-        self.use_tls = use_tls
-        self.use_ssl = use_ssl
-        self.ssl_keyfile = ssl_keyfile
-        self.ssl_certfile = ssl_certfile
+        if provider is None:
+            provider = "default"
+        options = settings.EMAIL_PROVIDERS[provider]["OPTIONS"]
+        self.host = options.get("host") if host is None else host
+        self.port = options.get("port") if port is None else port
+        self.username = options.get("username") if username is None else username
+        self.password = options.get("password") if password is None else password
+        self.use_tls = options.get("use_tls") if use_tls is None else use_tls
+        self.use_ssl = options.get("use_ssl") if use_ssl is None else use_ssl
+        self.ssl_keyfile = options.get("ssl_keyfile") if ssl_keyfile is None else ssl_keyfile
+        self.ssl_certfile = options.get("ssl_certfile") if ssl_certfile is None else ssl_certfile
         if self.use_ssl and self.use_tls:
             raise ValueError(
                 "use_tls/use_ssl are mutually exclusive, so only set "
                 "one of those settings to True."
             )
-        self.timeout = timeout
+        self.timeout = options.get("timeout") if timeout is None else timeout
         self.connection = None
         self._lock = threading.RLock()
 

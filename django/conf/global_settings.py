@@ -202,9 +202,11 @@ EMAIL_PROVIDERS = {
             "ssl_keyfile": None,
             "timeout": None,
         },
-        "USE_LOCALTIME": False,
     },
 }
+
+# Whether to send SMTP 'Date' header in the local time zone or in UTC.
+EMAIL_USE_LOCALTIME = False
 
 # deprecated
 # The default is to use the SMTP backend.
@@ -219,10 +221,6 @@ dep_EMAIL_HOST = "localhost"
 # deprecated
 # Port for sending email.
 dep_EMAIL_PORT = 25
-
-# deprecated
-# Whether to send SMTP 'Date' header in the local time zone or in UTC.
-dep_EMAIL_USE_LOCALTIME = False
 
 # deprecated
 # Optional SMTP authentication information for EMAIL_HOST.

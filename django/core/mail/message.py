@@ -268,7 +268,7 @@ class EmailMessage:
             )
         return self.connection
 
-    def message(self, use_localtime=False):
+    def message(self):
         encoding = self.encoding or settings.DEFAULT_CHARSET
         msg = SafeMIMEText(self.body, self.content_subtype, encoding)
         msg = self._create_message(msg)
@@ -286,7 +286,7 @@ class EmailMessage:
             # the stdlib/OS concept of a timezone, however, Django sets the
             # TZ environment variable based on the TIME_ZONE setting which
             # will get picked up by formatdate().
-            msg["Date"] = formatdate(localtime=use_localtime)
+            msg["Date"] = formatdate(localtime=settings.EMAIL_USE_LOCALTIME)
         if "message-id" not in header_names:
             # Use cached DNS_NAME for performance
             msg["Message-ID"] = make_msgid(domain=DNS_NAME)
