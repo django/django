@@ -264,9 +264,8 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if (
-            name == "EMAIL_PROVIDERS"
-            and any(self.is_overridden(f) for f in DEPRECATED_EMAIL_SETTINGS)
+        if name == "EMAIL_PROVIDERS" and any(
+            self.is_overridden(f) for f in DEPRECATED_EMAIL_SETTINGS
         ):
             raise EmailImproperlyConfigured(name)
         if name in DEPRECATED_EMAIL_SETTINGS:

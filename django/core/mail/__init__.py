@@ -2,8 +2,6 @@
 Tools for sending email.
 """
 
-import warnings
-
 from django.conf import settings
 
 # Imported for backwards compatibility and for the sake
@@ -23,7 +21,6 @@ from django.core.mail.message import (
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
-from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.module_loading import import_string
 
 __all__ = [

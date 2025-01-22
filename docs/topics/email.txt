@@ -25,8 +25,10 @@ plain text message::
         "Here is the message.",
         "from@example.com",
         ["to@example.com"],
-        fail_silently=False
+        fail_silently=False,
     )
+
+
 
 Mail is sent using the email backend as configured in the
 :setting:`EMAIL_PROVIDERS`. Check the implementation details of the
@@ -68,14 +70,15 @@ specific template and custom headers, you can use the following approach::
     msg.send()
 
 Mail is sent using the SMTP host and port specified in the
-:setting:`EMAIL_PROVIDER["default"]["host"]` and
-:setting:`EMAIL_PROVIDER["default"]["port"]` settings. The
-:setting:`EMAIL_PROVIDER["default"]["username"]` and
-:setting:`EMAIL_PROVIDER["default"]["password"]` settings, if
-set, are used to authenticate to the SMTP server, and the
-:setting:`EMAIL_PROVIDER["default"]["use_tls"]` and
-:setting:`EMAIL_PROVIDER["default"]["use_ssl"]` settings control whether a
-secure connection is used.
+:setting:`EMAIL_PROVIDERS` using
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["host"]`` and
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["port"]`` settings. The
+settings ``EMAIL_PROVIDERS["default"]["OPTIONS"]["username"]`` and
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["password"]`` are used to authenticate
+to the SMTP server. The settings
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["use_tls"]`` and
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["use_ssl"]`` are used to control
+whether a secure connection is used.
 
 .. note::
 
@@ -641,26 +644,23 @@ argument is ``None``:
 The SMTP backend is the default configuration inherited by Django. If you
 want to specify an alternative, put the following in your settings::
 
-  EMAIL_PROVIDERS = {
-      "default": {
-          "BACKEND": "django.core.mail.backends.console.EmailBackend",
-          "OPTIONS": {
-              ...
-          },
-      },
-      "alternative": {
-          "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-          "OPTIONS": {
-              "host": "smtp.example.com",
-              "port": 587,
-              "username": "myuser",
-              "password": "password",
-              "use_tls": True,
-              "timeout": 10,
-          },
-      },
-      ...
-  }
+    EMAIL_PROVIDERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.console.EmailBackend",
+            "OPTIONS": {...},
+        },
+        "alternative": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": "smtp.example.com",
+                "port": 587,
+                "username": "myuser",
+                "password": "password",
+                "use_tls": True,
+                "timeout": 10,
+            },
+        },
+    }
 
 If unspecified, the default ``timeout`` will be the one provided by
 :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).

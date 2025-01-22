@@ -41,8 +41,12 @@ class EmailBackend(BaseEmailBackend):
         self.password = options.get("password") if password is None else password
         self.use_tls = options.get("use_tls") if use_tls is None else use_tls
         self.use_ssl = options.get("use_ssl") if use_ssl is None else use_ssl
-        self.ssl_keyfile = options.get("ssl_keyfile") if ssl_keyfile is None else ssl_keyfile
-        self.ssl_certfile = options.get("ssl_certfile") if ssl_certfile is None else ssl_certfile
+        self.ssl_keyfile = (
+            options.get("ssl_keyfile") if ssl_keyfile is None else ssl_keyfile
+        )
+        self.ssl_certfile = (
+            options.get("ssl_certfile") if ssl_certfile is None else ssl_certfile
+        )
         if self.use_ssl and self.use_tls:
             raise ValueError(
                 "use_tls/use_ssl are mutually exclusive, so only set "

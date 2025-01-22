@@ -1618,7 +1618,7 @@ class EmailDeprecatedConfigurationTests(SimpleTestCase):
         with self.assertWarnsMessage(
             RemovedInDjango61Warning,
             "EMAIL_BACKEND is deprecated. "
-            "Use EMAIL_PROVIDERS['default']['BACKEND'] instead."
+            "Use EMAIL_PROVIDERS['default']['BACKEND'] instead.",
         ):
             with self.settings(
                 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
@@ -1629,7 +1629,7 @@ class EmailDeprecatedConfigurationTests(SimpleTestCase):
         with self.assertWarnsMessage(
             RemovedInDjango61Warning,
             "EMAIL_HOST is deprecated. "
-            "Use EMAIL_PROVIDERS['default']['OPTIONS']['host'] instead."
+            "Use EMAIL_PROVIDERS['default']['OPTIONS']['host'] instead.",
         ):
             with self.settings(
                 EMAIL_HOST="smtp.example.com",
@@ -1644,7 +1644,7 @@ class EmailDeprecatedConfigurationTests(SimpleTestCase):
     def test_backend_configuration_mismatch(self):
         with self.assertRaisesMessage(
             ImproperlyConfigured,
-            "EMAIL_BACKEND and EMAIL_PROVIDERS are mutually exclusive."
+            "EMAIL_BACKEND and EMAIL_PROVIDERS are mutually exclusive.",
         ):
             with self.settings(
                 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
@@ -1659,7 +1659,7 @@ class EmailDeprecatedConfigurationTests(SimpleTestCase):
     def test_host_configuration_mismatch(self):
         with self.assertRaisesMessage(
             ImproperlyConfigured,
-            "EMAIL_HOST and EMAIL_PROVIDERS are mutually exclusive."
+            "EMAIL_HOST and EMAIL_PROVIDERS are mutually exclusive.",
         ):
             with self.settings(
                 EMAIL_HOST="smtp.example.com",
@@ -1672,12 +1672,16 @@ class BaseEmailBackendTests(MailTestsMixin):
 
     @classmethod
     def setUpClass(cls):
-        cls.enterClassContext(override_settings(EMAIL_PROVIDERS={
-            "default": dict(
-                settings.EMAIL_PROVIDERS["default"],
-                BACKEND=cls.email_backend,
-            ),
-        }))
+        cls.enterClassContext(
+            override_settings(
+                EMAIL_PROVIDERS={
+                    "default": dict(
+                        settings.EMAIL_PROVIDERS["default"],
+                        BACKEND=cls.email_backend,
+                    ),
+                }
+            )
+        )
         super().setUpClass()
 
     def get_mailbox_content(self):
@@ -2286,7 +2290,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "default": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
                     username="not empty username",
                     password="not empty password",
@@ -2408,7 +2412,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "default": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
                     ssl_certfile="foo",
                 ),
@@ -2422,7 +2426,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "default": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
                     ssl_certfile="foo",
                 ),
@@ -2440,7 +2444,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "default": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
                     ssl_keyfile="foo",
                 ),
@@ -2454,7 +2458,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "default": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
                     ssl_keyfile="foo",
                 ),
@@ -2472,7 +2476,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "default": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
                     use_tls=True,
                 ),
@@ -2496,7 +2500,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "default": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
                     use_ssl=True,
                 ),
@@ -2537,7 +2541,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "default": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
                     timeout=10,
                 ),
@@ -2551,7 +2555,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(
         EMAIL_PROVIDERS={
             "alternative": {
-                "OPTIONS" : dict(
+                "OPTIONS": dict(
                     host="smtp.example.com",
                     port=587,
                     username="noreply",
