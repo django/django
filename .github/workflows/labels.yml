@@ -1,7 +1,7 @@
 name: Labels
 
 on:
-  pull_request:
+  pull_request_target:
     types: [ edited, opened, reopened, ready_for_review ]
 
 concurrency:
