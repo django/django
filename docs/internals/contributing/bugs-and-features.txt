@@ -167,4 +167,4 @@ Votes on technical matters should be announced and held in public on the
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
 .. _Django Forum: https://forum.djangoproject.com/
-.. _Django Discord server: https://discord.gg/xcRH6mN4fa
+.. _Django Discord server: https://chat.djangoproject.com

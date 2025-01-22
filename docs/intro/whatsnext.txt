@@ -127,7 +127,7 @@ particular Django setup, try the |django-users| mailing list or the
 `Django Discord server`_ instead.
 
 .. _ticket system: https://code.djangoproject.com/
-.. _Django Discord server: https://discord.gg/xcRH6mN4fa
+.. _Django Discord server: https://chat.djangoproject.com
 
 In plain text
 -------------
