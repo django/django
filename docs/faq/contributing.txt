@@ -68,7 +68,7 @@ issue over and over again. This sort of behavior will not gain you any
 additional attention -- certainly not the attention that you need in order to
 get your issue addressed.
 
-.. _`Django Discord server`: https://discord.gg/xcRH6mN4fa
+.. _`Django Discord server`: https://chat.djangoproject.com
 
 But I've reminded you several times and you keep ignoring my contribution!
 ==========================================================================

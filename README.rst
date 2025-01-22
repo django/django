@@ -35,7 +35,7 @@ To get more help:
 * Join the django-users mailing list, or read the archives, at
   https://groups.google.com/group/django-users.
 
-* Join the `Django Discord community <https://discord.gg/xcRH6mN4fa>`_.
+* Join the `Django Discord community <https://chat.djangoproject.com>`_.
 
 * Join the community on the `Django Forum <https://forum.djangoproject.com/>`_.
 

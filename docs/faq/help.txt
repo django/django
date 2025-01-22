@@ -25,7 +25,7 @@ Then, please post it in one of the following channels:
 * The `Django Discord server`_ for chat-based discussions.
 
 .. _`"Using Django"`: https://forum.djangoproject.com/c/users/6
-.. _`Django Discord server`: https://discord.gg/xcRH6mN4fa
+.. _`Django Discord server`: https://chat.djangoproject.com
 
 In all these channels please abide by the `Django Code of Conduct`_. In
 summary, being friendly and patient, considerate, respectful, and careful in
