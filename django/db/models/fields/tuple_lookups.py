@@ -2,7 +2,13 @@ import itertools
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models import Field
-from django.db.models.expressions import ColPairs, Func, ResolvedOuterRef, Value
+from django.db.models.expressions import (
+    ColPairs,
+    Func,
+    ResolvedOuterRef,
+    Subquery,
+    Value,
+)
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -36,7 +42,7 @@ class TupleLookupMixin:
             self.check_rhs_is_tuple_or_list()
             self.check_rhs_length_equals_lhs_length()
         else:
-            self.check_rhs_is_outer_ref()
+            self.check_rhs_is_subquery_or_outer_ref()
         return self.rhs
 
     def check_rhs_is_tuple_or_list(self):
@@ -54,13 +60,39 @@ class TupleLookupMixin:
                 f"{self.lookup_name!r} lookup of {lhs_str} must have {len_lhs} elements"
             )
 
-    def check_rhs_is_outer_ref(self):
-        if not isinstance(self.rhs, ResolvedOuterRef):
+    def check_rhs_is_subquery_or_outer_ref(self):
+        if isinstance(self.rhs, Subquery):
+            self.check_rhs_select_length_equals_lhs_length(subquery=True)
+        elif isinstance(self.rhs, ResolvedOuterRef):
+            pass
+        else:
             lhs_str = self.get_lhs_str()
             rhs_cls = self.rhs.__class__.__name__
             raise ValueError(
                 f"{self.lookup_name!r} subquery lookup of {lhs_str} "
-                f"only supports OuterRef objects (received {rhs_cls!r})"
+                f"only supports Subquery and OuterRef objects (received {rhs_cls!r})"
+            )
+
+    def check_rhs_is_query(self):
+        if not isinstance(self.rhs, Query):
+            lhs_str = self.get_lhs_str()
+            rhs_cls = self.rhs.__class__.__name__
+            raise ValueError(
+                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
+                f"must be a Query object (received {rhs_cls!r})"
+            )
+
+    def check_rhs_select_length_equals_lhs_length(self, subquery=False):
+        target = self.rhs.query if subquery else self.rhs
+        len_rhs = len(target.select)
+        if len_rhs == 1 and isinstance(target.select[0], ColPairs):
+            len_rhs = len(target.select[0])
+        len_lhs = len(self.lhs)
+        if len_rhs != len_lhs:
+            lhs_str = self.get_lhs_str()
+            raise ValueError(
+                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
+                f"must have {len_lhs} fields (received {len_rhs})"
             )
 
     def get_lhs_str(self):
@@ -90,7 +122,7 @@ class TupleLookupMixin:
             return Tuple(*args).as_sql(compiler, connection)
         else:
             sql, params = compiler.compile(self.rhs)
-            if not isinstance(self.rhs, ColPairs):
+            if not isinstance(self.rhs, (Subquery, ColPairs)):
                 raise ValueError(
                     "Composite field lookups only work with composite expressions."
                 )
@@ -101,6 +133,10 @@ class TupleExact(TupleLookupMixin, Exact):
     def as_oracle(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
+        if isinstance(self.rhs, Subquery):
+            raise NotImplementedError(
+                "Subquerying on composite fields is not yet implemented on Oracle."
+            )
         # e.g.: (a, b, c) == (x, y, z) as SQL:
         # WHERE a = x AND b = y AND c = z
         lookups = [Exact(col, val) for col, val in zip(self.lhs, self.rhs)]
@@ -135,6 +171,10 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
     def as_oracle(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
+        if isinstance(self.rhs, Subquery):
+            raise NotImplementedError(
+                "Subquerying on composite fields is not yet implemented on Oracle."
+            )
         # e.g.: (a, b, c) > (x, y, z) as SQL:
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND c > z)))
         lookups = itertools.cycle([GreaterThan, Exact])
@@ -163,6 +203,10 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
     def as_oracle(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
+        if isinstance(self.rhs, Subquery):
+            raise NotImplementedError(
+                "Subquerying on composite fields is not yet implemented on Oracle."
+            )
         # e.g.: (a, b, c) >= (x, y, z) as SQL:
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND (c > z OR c = z))))
         lookups = itertools.cycle([GreaterThan, Exact])
@@ -191,6 +235,10 @@ class TupleLessThan(TupleLookupMixin, LessThan):
     def as_oracle(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
+        if isinstance(self.rhs, Subquery):
+            raise NotImplementedError(
+                "Subquerying on composite fields is not yet implemented on Oracle."
+            )
         # e.g.: (a, b, c) < (x, y, z) as SQL:
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND c < z)))
         lookups = itertools.cycle([LessThan, Exact])
@@ -219,6 +267,10 @@ class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
     def as_oracle(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
+        if isinstance(self.rhs, Subquery):
+            raise NotImplementedError(
+                "Subquerying on composite fields is not yet implemented on Oracle."
+            )
         # e.g.: (a, b, c) <= (x, y, z) as SQL:
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND (c < z OR c = z))))
         lookups = itertools.cycle([LessThan, Exact])
@@ -270,27 +322,6 @@ class TupleIn(TupleLookupMixin, In):
             raise ValueError(
                 f"{self.lookup_name!r} lookup of {lhs_str} "
                 f"must have {len_lhs} elements each"
-            )
-
-    def check_rhs_is_query(self):
-        if not isinstance(self.rhs, Query):
-            lhs_str = self.get_lhs_str()
-            rhs_cls = self.rhs.__class__.__name__
-            raise ValueError(
-                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
-                f"must be a Query object (received {rhs_cls!r})"
-            )
-
-    def check_rhs_select_length_equals_lhs_length(self):
-        len_rhs = len(self.rhs.select)
-        if len_rhs == 1 and isinstance(self.rhs.select[0], ColPairs):
-            len_rhs = len(self.rhs.select[0])
-        len_lhs = len(self.lhs)
-        if len_rhs != len_lhs:
-            lhs_str = self.get_lhs_str()
-            raise ValueError(
-                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
-                f"must have {len_lhs} fields (received {len_rhs})"
             )
 
     def process_rhs(self, compiler, connection):
