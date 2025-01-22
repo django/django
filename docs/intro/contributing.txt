@@ -47,7 +47,7 @@ so that it can be of use to the widest audience.
 
 .. _Dive Into Python: https://diveintopython3.net/
 .. _Django Forum: https://forum.djangoproject.com/
-.. _Django Discord server: https://discord.gg/xcRH6mN4fa
+.. _Django Discord server: https://chat.djangoproject.com
 
 What does this tutorial cover?
 ------------------------------

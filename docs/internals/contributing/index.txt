@@ -46,7 +46,7 @@ a great ecosystem to work in:
 
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
 .. _community page: https://www.djangoproject.com/community/
-.. _Django Discord server: https://discord.gg/xcRH6mN4fa
+.. _Django Discord server: https://chat.djangoproject.com
 .. _Django forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
 
