@@ -132,7 +132,7 @@ but not completely certain, you might also try asking on the
 ``#contributing-getting-started`` channel in the `Django Discord server`_ to
 see if someone else can confirm your suspicions.
 
-.. _`Django Discord server`: https://discord.gg/xcRH6mN4fa
+.. _`Django Discord server`: https://chat.djangoproject.com
 
 Wait for feedback, and respond to feedback that you receive
 -----------------------------------------------------------
