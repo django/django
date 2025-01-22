@@ -65,21 +65,33 @@ class TupleLookupMixin:
             )
 
     def check_rhs_length_equals_lhs_length(self):
+        if isinstance(self.rhs, Subquery):
+            target = self.rhs.query.select
+        else:
+            target = self.rhs
+        len_rhs = len(target)
+        if len_rhs == 1 and isinstance(target[0], ColPairs):
+            len_rhs = len(target[0])
         len_lhs = len(self.lhs)
-        if len_lhs != len(self.rhs):
+        if len_lhs != len_rhs:
             lhs_str = self.get_lhs_str()
             raise ValueError(
                 f"{self.lookup_name!r} lookup of {lhs_str} must have {len_lhs} elements"
             )
 
     def check_rhs_is_supported_expression(self):
-        if not isinstance(self.rhs, (ResolvedOuterRef, Query)):
-            lhs_str = self.get_lhs_str()
-            rhs_cls = self.rhs.__class__.__name__
-            raise ValueError(
-                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
-                f"only supports OuterRef and QuerySet objects (received {rhs_cls!r})"
-            )
+        match self.rhs:
+            case ResolvedOuterRef() | Query():
+                pass
+            case Subquery():
+                self.check_rhs_length_equals_lhs_length()
+            case _:
+                lhs_str = self.get_lhs_str()
+                rhs_cls = self.rhs.__class__.__name__
+                raise ValueError(
+                    f"{self.lookup_name!r} subquery lookup of {lhs_str} only "
+                    f"supports OuterRef and QuerySet objects (received {rhs_cls!r})"
+                )
 
     def get_lhs_str(self):
         if isinstance(self.lhs, ColPairs):
@@ -110,6 +122,9 @@ class TupleLookupMixin:
             sql, params = compiler.compile(self.rhs)
             if isinstance(self.rhs, ColPairs):
                 return "(%s)" % sql, params
+            if isinstance(self.rhs, Subquery):
+                self.check_rhs_length_equals_lhs_length()
+                return super().process_rhs(compiler, connection)
             elif isinstance(self.rhs, Query):
                 return super().process_rhs(compiler, connection)
             else:

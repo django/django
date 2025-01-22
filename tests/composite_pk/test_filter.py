@@ -469,6 +469,26 @@ class CompositePKFilterTests(TestCase):
                 queryset = Comment.objects.filter(**{f"id{lookup}": subquery})
                 self.assertEqual(queryset.count(), expected_count)
 
+    def test_outer_ref_pk_select_pk(self):
+        subquery = Subquery(User.objects.filter(pk=OuterRef("pk")).values("pk"))
+        tests = [
+            ("", 2),
+            ("__gt", 0),
+            ("__gte", 2),
+            ("__lt", 0),
+            ("__lte", 2),
+        ]
+        for lookup, expected_count in tests:
+            with self.subTest(f"id{lookup}"):
+                queryset = Comment.objects.filter(**{f"pk{lookup}": subquery})
+                self.assertEqual(queryset.count(), expected_count)
+
+    def test_outer_ref_pk_select_unequal_size(self):
+        subquery = Subquery(User.objects.filter(pk=OuterRef("pk")).values("id"))
+        msg = "'exact' lookup of 'pk' must have 2 elements"
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.filter(pk=subquery).count()
+
     def test_unsupported_rhs(self):
         pk = Exact(F("tenant_id"), 1)
         msg = (
