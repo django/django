@@ -321,6 +321,10 @@ Models
   ``ValidationError`` instead of being silently accepted, and surrounding
   whitespace is stripped.
 
+* The :class:`~django.db.models.functions.JSONArray` database function now
+  accepts an ``absent_on_null`` parameter to control whether ``null`` values
+  are omitted.
+
 Requests and responses
 ----------------------
 

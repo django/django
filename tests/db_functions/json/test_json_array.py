@@ -107,6 +107,61 @@ class JSONArrayTests(TestCase):
         )
         self.assertQuerySetEqual(qs, Author.objects.order_by("-alias"))
 
+    def test_null_on_null(self):
+        obj = Author.objects.annotate(
+            arr=JSONArray(F("goes_by"), absent_on_null=False)
+        ).first()
+
+        self.assertEqual(obj.arr, [None])
+
+    @skipIfDBFeature("supports_json_absent_on_null")
+    def test_absent_on_null_not_supported(self):
+        msg = "ABSENT ON NULL is not supported by this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.annotate(
+                arr=JSONArray(F("goes_by"), absent_on_null=True)
+            ).first()
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_absent_on_null(self):
+        obj = Author.objects.annotate(
+            arr=JSONArray(F("goes_by"), F("name"), absent_on_null=True),
+            arr_first=F("arr__0"),
+        ).first()
+        self.assertEqual(obj.arr, ["Ivan Ivanov"])
+        self.assertEqual(obj.arr_first, "Ivan Ivanov")
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_nested_absent_on_null(self):
+        obj = Author.objects.annotate(
+            arr=JSONArray(
+                F("name"),
+                JSONArray(F("alias"), F("goes_by")),
+                F("goes_by"),
+                absent_on_null=True,
+            )
+        ).first()
+        self.assertEqual(obj.arr, ["Ivan Ivanov", ["iivanov", None]])
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_empty_absent_on_null(self):
+        obj = Author.objects.annotate(
+            json_array=JSONArray(absent_on_null=True),
+        ).first()
+        self.assertEqual(obj.json_array, [])
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_single_absent_on_null(self):
+        obj_null = Author.objects.annotate(
+            json_array=JSONArray(F("goes_by"), absent_on_null=True)
+        ).first()
+        self.assertEqual(obj_null.json_array, [])
+
+        obj_non_null = Author.objects.annotate(
+            json_array=JSONArray(F("name"), absent_on_null=True)
+        ).first()
+        self.assertEqual(obj_non_null.json_array, ["Ivan Ivanov"])
+
 
 @skipIfDBFeature("supports_json_field")
 class JSONArrayNotSupportedTests(TestCase):
