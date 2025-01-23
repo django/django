@@ -137,8 +137,9 @@ class URLValidator(RegexValidator):
     hostname_re = DomainNameValidator.hostname_re
     domain_re = DomainNameValidator.domain_re
     tld_re = DomainNameValidator.tld_re
+    local_re = DomainNameValidator.hostname_re
 
-    host_re = "(" + hostname_re + domain_re + tld_re + "|localhost)"
+    host_re = "(" + hostname_re + domain_re + tld_re + "|" + local_re + ")"
 
     regex = _lazy_re_compile(
         r"^(?:[a-z0-9.+-]*)://"  # scheme is validated separately
