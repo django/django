@@ -65,6 +65,18 @@ should return a rendered templates (as a string) or raise
 
         Defaults to ``"django/forms/field.html"``
 
+    .. attribute:: bound_field_class
+
+        .. versionadded:: 5.2
+
+        The default class used to represent form fields across the project.
+
+        Defaults to :class:`.BoundField` class.
+
+        This can be customized further using :attr:`.Form.bound_field_class`
+        for per-form overrides, or :attr:`.Field.bound_field_class` for
+        per-field overrides.
+
     .. method:: get_template(template_name)
 
         Subclasses must implement this method with the appropriate template
@@ -97,12 +109,6 @@ If you want to render templates with customizations from your
 :setting:`TEMPLATES` setting, such as context processors for example, use the
 :class:`TemplatesSetting` renderer.
 
-.. class:: DjangoDivFormRenderer
-
-.. deprecated:: 5.0
-
-The alias of :class:`DjangoTemplates`.
-
 ``Jinja2``
 ----------
 
@@ -118,12 +124,6 @@ third-party apps must have Jinja2 templates. Unless you provide your own Jinja2
 templates for widgets that don't have any, you can't use this renderer. For
 example, :mod:`django.contrib.admin` doesn't include Jinja2 templates for its
 widgets due to their usage of Django template tags.
-
-.. class:: Jinja2DivFormRenderer
-
-.. deprecated:: 5.0
-
-The alias of :class:`Jinja2`.
 
 ``TemplatesSetting``
 --------------------

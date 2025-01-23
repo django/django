@@ -142,7 +142,7 @@ class DjangoHelpFormatter(HelpFormatter):
         super().add_arguments(self._reordered_actions(actions))
 
 
-class OutputWrapper(TextIOBase):
+class OutputWrapper:
     """
     Wrapper around stdout/stderr
     """
@@ -179,6 +179,9 @@ class OutputWrapper(TextIOBase):
             msg += ending
         style_func = style_func or self.style_func
         self._out.write(style_func(msg))
+
+
+TextIOBase.register(OutputWrapper)
 
 
 class BaseCommand:
@@ -450,10 +453,8 @@ class BaseCommand:
             self.stderr = OutputWrapper(options["stderr"])
 
         if self.requires_system_checks and not options["skip_checks"]:
-            if self.requires_system_checks == ALL_CHECKS:
-                self.check()
-            else:
-                self.check(tags=self.requires_system_checks)
+            check_kwargs = self.get_check_kwargs(options)
+            self.check(**check_kwargs)
         if self.requires_migrations_checks:
             self.check_migrations()
         output = self.handle(*args, **options)
@@ -467,6 +468,11 @@ class BaseCommand:
                 )
             self.stdout.write(output)
         return output
+
+    def get_check_kwargs(self, options):
+        if self.requires_system_checks == ALL_CHECKS:
+            return {}
+        return {"tags": self.requires_system_checks}
 
     def check(
         self,

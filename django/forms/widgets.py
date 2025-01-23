@@ -9,7 +9,7 @@ from collections import defaultdict
 from graphlib import CycleError, TopologicalSorter
 from itertools import chain
 
-from django.forms.utils import to_current_timezone
+from django.forms.utils import flatatt, to_current_timezone
 from django.templatetags.static import static
 from django.utils import formats
 from django.utils.choices import normalize_choices
@@ -23,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from .renderers import get_default_renderer
 
 __all__ = (
+    "Script",
     "Media",
     "MediaDefiningClass",
     "Widget",
@@ -59,6 +60,53 @@ MEDIA_TYPES = ("css", "js")
 
 class MediaOrderConflictWarning(RuntimeWarning):
     pass
+
+
+@html_safe
+class MediaAsset:
+    element_template = "{path}"
+
+    def __init__(self, path, **attributes):
+        self._path = path
+        self.attributes = attributes
+
+    def __eq__(self, other):
+        # Compare the path only, to ensure performant comparison in Media.merge.
+        return (self.__class__ is other.__class__ and self.path == other.path) or (
+            isinstance(other, str) and self._path == other
+        )
+
+    def __hash__(self):
+        # Hash the path only, to ensure performant comparison in Media.merge.
+        return hash(self._path)
+
+    def __str__(self):
+        return format_html(
+            self.element_template,
+            path=self.path,
+            attributes=flatatt(self.attributes),
+        )
+
+    def __repr__(self):
+        return f"{type(self).__qualname__}({self._path!r})"
+
+    @property
+    def path(self):
+        """
+        Ensure an absolute path.
+        Relative paths are resolved via the {% static %} template tag.
+        """
+        if self._path.startswith(("http://", "https://", "/")):
+            return self._path
+        return static(self._path)
+
+
+class Script(MediaAsset):
+    element_template = '<script src="{path}"{attributes}></script>'
+
+    def __init__(self, src, **attributes):
+        # Alter the signature to allow src to be passed as a keyword argument.
+        super().__init__(src, **attributes)
 
 
 @html_safe

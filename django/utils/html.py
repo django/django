@@ -3,12 +3,12 @@
 import html
 import json
 import re
-import warnings
 from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.core.exceptions import SuspiciousOperation, ValidationError
+from django.core.validators import EmailValidator
 from django.utils.encoding import punycode
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -40,6 +40,7 @@ VOID_ELEMENTS = frozenset(
 )
 
 MAX_URL_LENGTH = 2048
+MAX_STRIP_TAGS_DEPTH = 50
 
 
 @keep_lazy(SafeString)
@@ -129,13 +130,7 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     if not (args or kwargs):
-        # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # raise TypeError("args or kwargs must be provided.")
-        warnings.warn(
-            "Calling format_html() without passing args or kwargs is deprecated.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
+        raise TypeError("args or kwargs must be provided.")
     args_safe = map(conditional_escape, args)
     kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
@@ -211,15 +206,19 @@ def _strip_once(value):
 @keep_lazy_text
 def strip_tags(value):
     """Return the given HTML with all tags stripped."""
-    # Note: in typical case this loop executes _strip_once once. Loop condition
-    # is redundant, but helps to reduce number of executions of _strip_once.
     value = str(value)
+    # Note: in typical case this loop executes _strip_once twice (the second
+    # execution does not remove any more tags).
+    strip_tags_depth = 0
     while "<" in value and ">" in value:
+        if strip_tags_depth >= MAX_STRIP_TAGS_DEPTH:
+            raise SuspiciousOperation
         new_value = _strip_once(value)
         if value.count("<") == new_value.count("<"):
             # _strip_once wasn't able to detect more tags.
             break
         value = new_value
+        strip_tags_depth += 1
     return value
 
 
@@ -311,18 +310,20 @@ class Urlizer:
         safe_input = isinstance(text, SafeData)
 
         words = self.word_split_re.split(str(text))
-        return "".join(
-            [
-                self.handle_word(
+        local_cache = {}
+        urlized_words = []
+        for word in words:
+            if (urlized_word := local_cache.get(word)) is None:
+                urlized_word = self.handle_word(
                     word,
                     safe_input=safe_input,
                     trim_url_limit=trim_url_limit,
                     nofollow=nofollow,
                     autoescape=autoescape,
                 )
-                for word in words
-            ]
-        )
+                local_cache[word] = urlized_word
+            urlized_words.append(urlized_word)
+        return "".join(urlized_words)
 
     def handle_word(
         self,
@@ -351,6 +352,8 @@ class Urlizer:
                     domain = punycode(domain)
                 except UnicodeError:
                     return word
+                local = quote(local, safe="")
+                domain = quote(domain, safe="")
                 url = self.mailto_template.format(local=local, domain=domain)
                 nofollow_attr = ""
             # Make link.
@@ -453,20 +456,9 @@ class Urlizer:
     @staticmethod
     def is_email_simple(value):
         """Return True if value looks like an email address."""
-        # An @ must be in the middle of the value.
-        if "@" not in value or value.startswith("@") or value.endswith("@"):
-            return False
         try:
-            p1, p2 = value.split("@")
-        except ValueError:
-            # value contains more than one @.
-            return False
-        # Max length for domain name labels is 63 characters per RFC 1034.
-        # Helps to avoid ReDoS vectors in the domain part.
-        if len(p2) > 63:
-            return False
-        # Dot must be in p2 (e.g. example.com)
-        if "." not in p2 or p2.startswith("."):
+            EmailValidator(allowlist=[])(value)
+        except ValidationError:
             return False
         return True
 

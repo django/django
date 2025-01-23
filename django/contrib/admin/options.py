@@ -2,7 +2,6 @@ import copy
 import enum
 import json
 import re
-import warnings
 from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
@@ -56,7 +55,6 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -448,9 +446,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             else self.get_list_display(request)
         )
 
-    # RemovedInDjango60Warning: when the deprecation ends, replace with:
-    # def lookup_allowed(self, lookup, value, request):
-    def lookup_allowed(self, lookup, value, request=None):
+    def lookup_allowed(self, lookup, value, request):
         from django.contrib.admin.filters import SimpleListFilter
 
         model = self.model
@@ -498,12 +494,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             # Either a local field filter, or no fields at all.
             return True
         valid_lookups = {self.date_hierarchy}
-        # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # for filter_item in self.get_list_filter(request):
-        list_filter = (
-            self.get_list_filter(request) if request is not None else self.list_filter
-        )
-        for filter_item in list_filter:
+        for filter_item in self.get_list_filter(request):
             if isinstance(filter_item, type) and issubclass(
                 filter_item, SimpleListFilter
             ):
@@ -974,28 +965,6 @@ class ModelAdmin(BaseModelAdmin):
             single_object=True,
         )
 
-    def log_deletion(self, request, obj, object_repr):
-        """
-        Log that an object will be deleted. Note that this method must be
-        called before the deletion.
-
-        The default implementation creates an admin LogEntry object.
-        """
-        warnings.warn(
-            "ModelAdmin.log_deletion() is deprecated. Use log_deletions() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        from django.contrib.admin.models import DELETION, LogEntry
-
-        return LogEntry.objects.log_action(
-            user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(obj).pk,
-            object_id=obj.pk,
-            object_repr=object_repr,
-            action_flag=DELETION,
-        )
-
     def log_deletions(self, request, queryset):
         """
         Log that objects will be deleted. Note that this method must be called
@@ -1004,16 +973,6 @@ class ModelAdmin(BaseModelAdmin):
         The default implementation creates admin LogEntry objects.
         """
         from django.contrib.admin.models import DELETION, LogEntry
-
-        # RemovedInDjango60Warning.
-        if type(self).log_deletion != ModelAdmin.log_deletion:
-            warnings.warn(
-                "The usage of log_deletion() is deprecated. Implement log_deletions() "
-                "instead.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            return [self.log_deletion(request, obj, str(obj)) for obj in queryset]
 
         return LogEntry.objects.log_actions(
             user_id=request.user.pk,

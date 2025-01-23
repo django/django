@@ -3106,10 +3106,6 @@ adverse effects on your database. For example, the ``ANALYZE`` flag supported
 by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
 there are triggers or if a function is called, even for a ``SELECT`` query.
 
-.. versionchanged:: 5.1
-
-    Support for the ``generic_plan`` option on PostgreSQL 16+ was added.
-
 .. versionchanged:: 5.2
 
     Support for the ``memory`` and ``serialize`` options on PostgreSQL 17+ was

@@ -80,8 +80,6 @@ The ``FileSystemStorage`` class
 
     .. attribute:: allow_overwrite
 
-        .. versionadded:: 5.1
-
         Flag to control allowing saving a new file over an existing one.
         Defaults to ``False``.
 

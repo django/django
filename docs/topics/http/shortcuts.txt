@@ -91,7 +91,7 @@ This example is equivalent to::
 ``redirect()``
 ==============
 
-.. function:: redirect(to, *args, permanent=False, **kwargs)
+.. function:: redirect(to, *args, permanent=False, preserve_request=False, **kwargs)
 
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
@@ -107,8 +107,27 @@ This example is equivalent to::
    * An absolute or relative URL, which will be used as-is for the redirect
      location.
 
-   By default issues a temporary redirect; pass ``permanent=True`` to issue a
-   permanent redirect.
+   By default, a temporary redirect is issued with a 302 status code. If
+   ``permanent=True``, a permanent redirect is issued with a 301 status code.
+
+   If ``preserve_request=True``, the response instructs the user agent to
+   preserve the method and body of the original request when issuing the
+   redirect. In this case, temporary redirects use a 307 status code, and
+   permanent redirects use a 308 status code. This is better illustrated in the
+   following table:
+
+   =========  ================ ================
+   permanent  preserve_request HTTP status code
+   =========  ================ ================
+   ``True``   ``False``        301
+   ``False``  ``False``        302
+   ``False``  ``True``         307
+   ``True``   ``True``         308
+   =========  ================ ================
+
+   .. versionchanged:: 5.2
+
+       The argument ``preserve_request`` was added.
 
 Examples
 --------
@@ -157,6 +176,17 @@ will be returned::
         ...
         obj = MyModel.objects.get(...)
         return redirect(obj, permanent=True)
+
+Additionally, the ``preserve_request`` argument can be used to preserve the
+original HTTP method::
+
+    def my_view(request):
+        # ...
+        obj = MyModel.objects.get(...)
+        if request.method in ("POST", "PUT"):
+            # Redirection preserves the original request method.
+            return redirect(obj, preserve_request=True)
+        # ...
 
 ``get_object_or_404()``
 =======================

@@ -238,10 +238,6 @@ polygon that can fully contain the geometry.
 
 The ``num_seg`` parameter is used only on PostGIS.
 
-.. versionchanged:: 5.1
-
-    SpatiaLite 5.1+ support was added.
-
 ``Centroid``
 ============
 
@@ -367,10 +363,6 @@ Creates geometry from `Well-known binary (WKB)`_ representation. The optional
 ``srid`` argument allows to specify the SRID of the resulting geometry.
 ``srid`` is ignored on Oracle.
 
-.. versionchanged:: 5.1
-
-    The ``srid`` argument was added.
-
 ``FromWKT``
 ===========
 
@@ -383,10 +375,6 @@ Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromText.html>`__, SpatiaLite
 Creates geometry from `Well-known text (WKT)`_ representation. The optional
 ``srid`` argument allows to specify the SRID of the resulting geometry.
 ``srid`` is ignored on Oracle.
-
-.. versionchanged:: 5.1
-
-    The ``srid`` argument was added.
 
 ``GeoHash``
 ===========

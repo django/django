@@ -77,7 +77,12 @@ class LastExecutedQueryTest(TestCase):
             connection.ops.last_executed_query(cursor, "", ())
 
     def test_debug_sql(self):
-        list(Reporter.objects.filter(first_name="test"))
+        qs = Reporter.objects.filter(first_name="test")
+        ops = connections[qs.db].ops
+        with mock.patch.object(ops, "format_debug_sql") as format_debug_sql:
+            list(qs)
+        # Queries are formatted with DatabaseOperations.format_debug_sql().
+        format_debug_sql.assert_called()
         sql = connection.queries[-1]["sql"].lower()
         self.assertIn("select", sql)
         self.assertIn(Reporter._meta.db_table, sql)
@@ -570,6 +575,7 @@ class BackendTestCase(TransactionTestCase):
     @override_settings(DEBUG=True)
     def test_queries_logger(self, mocked_logger):
         sql = "SELECT 1" + connection.features.bare_select_suffix
+        sql = connection.ops.format_debug_sql(sql)
         with connection.cursor() as cursor:
             cursor.execute(sql)
         params, kwargs = mocked_logger.debug.call_args

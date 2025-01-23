@@ -7,6 +7,7 @@ other serializers.
 from django.apps import apps
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
+from django.db.models import CompositePrimaryKey
 from django.utils.encoding import is_protected_type
 
 
@@ -39,6 +40,8 @@ class Serializer(base.Serializer):
         return data
 
     def _value_from_field(self, obj, field):
+        if isinstance(field, CompositePrimaryKey):
+            return [self._value_from_field(obj, f) for f in field]
         value = field.value_from_object(obj)
         # Protected types (i.e., primitives like None, numbers, dates,
         # and Decimals) are passed through as is. All other values are
@@ -71,7 +74,11 @@ class Serializer(base.Serializer):
                     return value.natural_key()
 
                 def queryset_iterator(obj, field):
-                    return getattr(obj, field.name).iterator()
+                    attr = getattr(obj, field.name)
+                    chunk_size = (
+                        2000 if getattr(attr, "prefetch_cache_name", None) else None
+                    )
+                    return attr.iterator(chunk_size)
 
             else:
 
@@ -79,12 +86,9 @@ class Serializer(base.Serializer):
                     return self._value_from_field(value, value._meta.pk)
 
                 def queryset_iterator(obj, field):
-                    return (
-                        getattr(obj, field.name)
-                        .select_related(None)
-                        .only("pk")
-                        .iterator()
-                    )
+                    query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
+                    return query_set.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,

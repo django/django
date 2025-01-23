@@ -14,13 +14,11 @@ directory corresponding to settings.GEOIP_PATH.
 
 import ipaddress
 import socket
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 __all__ = ["HAS_GEOIP2"]
@@ -153,11 +151,12 @@ class GeoIP2:
         if require_city and not self.is_city:
             raise GeoIP2Exception(f"Invalid GeoIP city data file: {self._path}")
 
-        try:
-            validate_ipv46_address(query)
-        except ValidationError:
-            # GeoIP2 only takes IP addresses, so try to resolve a hostname.
-            query = socket.gethostbyname(query)
+        if isinstance(query, str):
+            try:
+                validate_ipv46_address(query)
+            except ValidationError:
+                # GeoIP2 only takes IP addresses, so try to resolve a hostname.
+                query = socket.gethostbyname(query)
 
         function = self._reader.city if self.is_city else self._reader.country
         return function(query)
@@ -213,15 +212,6 @@ class GeoIP2:
             "is_in_european_union": response.country.is_in_european_union,
         }
 
-    def coords(self, query, ordering=("longitude", "latitude")):
-        warnings.warn(
-            "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        data = self.city(query)
-        return tuple(data[o] for o in ordering)
-
     def lon_lat(self, query):
         "Return a tuple of the (longitude, latitude) for the given query."
         data = self.city(query)
@@ -238,12 +228,3 @@ class GeoIP2:
         from django.contrib.gis.geos import Point
 
         return Point(self.lon_lat(query), srid=4326)
-
-    @classmethod
-    def open(cls, full_path, cache):
-        warnings.warn(
-            "GeoIP2.open() is deprecated. Use GeoIP2() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return GeoIP2(full_path, cache)

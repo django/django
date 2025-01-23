@@ -1,17 +1,14 @@
 import datetime
 import decimal
 import json
-import warnings
 from importlib import import_module
 
 import sqlparse
 
 from django.conf import settings
 from django.db import NotSupportedError, transaction
-from django.db.backends import utils
 from django.db.models.expressions import Col
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 
 
@@ -214,23 +211,6 @@ class BaseDatabaseOperations:
         statement into a table, return the newly created data.
         """
         return cursor.fetchone()
-
-    def field_cast_sql(self, db_type, internal_type):
-        """
-        Given a column type (e.g. 'BLOB', 'VARCHAR') and an internal type
-        (e.g. 'GenericIPAddressField'), return the SQL to cast it before using
-        it in a WHERE statement. The resulting string should contain a '%s'
-        placeholder for the column being searched against.
-        """
-        warnings.warn(
-            (
-                "DatabaseOperations.field_cast_sql() is deprecated use "
-                "DatabaseOperations.lookup_cast() instead."
-            ),
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return "%s"
 
     def force_group_by(self):
         """
@@ -586,7 +566,7 @@ class BaseDatabaseOperations:
         Transform a decimal.Decimal value to an object compatible with what is
         expected by the backend driver for decimal (numeric) columns.
         """
-        return utils.format_number(value, max_digits, decimal_places)
+        return value
 
     def adapt_ipaddressfield_value(self, value):
         """
@@ -805,3 +785,7 @@ class BaseDatabaseOperations:
         rhs_expr = Col(rhs_table, rhs_field)
 
         return lhs_expr, rhs_expr
+
+    def format_debug_sql(self, sql):
+        # Hook for backends (e.g. NoSQL) to customize formatting.
+        return sqlparse.format(sql, reindent=True, keyword_case="upper")

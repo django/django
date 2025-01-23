@@ -40,10 +40,8 @@ a great ecosystem to work in:
   build it!
 
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
-.. _#django IRC channel: https://web.libera.chat/#django
-.. _#django-dev IRC channel: https://web.libera.chat/#django-dev
 .. _community page: https://www.djangoproject.com/community/
-.. _Django Discord server: https://discord.gg/xcRH6mN4fa
+.. _Django Discord server: https://chat.djangoproject.com
 .. _Django forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
 

@@ -45,9 +45,9 @@ so that it can be of use to the widest audience.
     `#django-dev on irc.libera.chat`__ to chat with other Django users who
     might be able to help.
 
-__ https://web.libera.chat/#django-dev
 .. _Dive Into Python: https://diveintopython3.net/
 .. _Django Forum: https://forum.djangoproject.com/
+.. _Django Discord server: https://chat.djangoproject.com
 
 What does this tutorial cover?
 ------------------------------

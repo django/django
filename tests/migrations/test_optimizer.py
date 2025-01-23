@@ -1232,6 +1232,80 @@ class OptimizerTests(OptimizerTestBase):
             ],
         )
 
+    def test_multiple_alter_constraints(self):
+        gt_constraint_violation_msg_added = models.CheckConstraint(
+            condition=models.Q(pink__gt=2),
+            name="pink_gt_2",
+            violation_error_message="ERROR",
+        )
+        gt_constraint_violation_msg_altered = models.CheckConstraint(
+            condition=models.Q(pink__gt=2),
+            name="pink_gt_2",
+            violation_error_message="error",
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_2", gt_constraint_violation_msg_added
+                ),
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_2", gt_constraint_violation_msg_altered
+                ),
+            ],
+            [
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_2", gt_constraint_violation_msg_altered
+                )
+            ],
+        )
+        other_constraint_violation_msg = models.CheckConstraint(
+            condition=models.Q(weight__gt=3),
+            name="pink_gt_3",
+            violation_error_message="error",
+        )
+        self.assertDoesNotOptimize(
+            [
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_2", gt_constraint_violation_msg_added
+                ),
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_3", other_constraint_violation_msg
+                ),
+            ]
+        )
+
+    def test_alter_remove_constraint(self):
+        self.assertOptimizesTo(
+            [
+                migrations.AlterConstraint(
+                    "Pony",
+                    "pink_gt_2",
+                    models.CheckConstraint(
+                        condition=models.Q(pink__gt=2), name="pink_gt_2"
+                    ),
+                ),
+                migrations.RemoveConstraint("Pony", "pink_gt_2"),
+            ],
+            [migrations.RemoveConstraint("Pony", "pink_gt_2")],
+        )
+
+    def test_add_alter_constraint(self):
+        constraint = models.CheckConstraint(
+            condition=models.Q(pink__gt=2), name="pink_gt_2"
+        )
+        constraint_with_error = models.CheckConstraint(
+            condition=models.Q(pink__gt=2),
+            name="pink_gt_2",
+            violation_error_message="error",
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.AddConstraint("Pony", constraint),
+                migrations.AlterConstraint("Pony", "pink_gt_2", constraint_with_error),
+            ],
+            [migrations.AddConstraint("Pony", constraint_with_error)],
+        )
+
     def test_create_model_add_index(self):
         self.assertOptimizesTo(
             [

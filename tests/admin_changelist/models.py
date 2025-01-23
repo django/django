@@ -32,6 +32,8 @@ class GrandChild(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(max_length=20)
+    file = models.FileField(upload_to="documents/", blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
 
 
 class Band(models.Model):

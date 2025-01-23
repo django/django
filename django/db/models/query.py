@@ -26,14 +26,13 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, F, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
-from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
+from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
 from django.db.models.utils import (
     AltersData,
     create_namedtuple_class,
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property, partition
 
 # The maximum number of results to fetch in a get() query.
@@ -171,11 +170,14 @@ class RawModelIterable(BaseIterable):
                     "Raw query must include the primary key"
                 )
             fields = [self.queryset.model_fields.get(c) for c in self.queryset.columns]
-            converters = compiler.get_converters(
-                [f.get_col(f.model._meta.db_table) if f else None for f in fields]
-            )
+            cols = [f.get_col(f.model._meta.db_table) if f else None for f in fields]
+            converters = compiler.get_converters(cols)
             if converters:
                 query_iterator = compiler.apply_converters(query_iterator, converters)
+            if compiler.has_composite_fields(cols):
+                query_iterator = compiler.composite_fields_to_tuples(
+                    query_iterator, cols
+                )
             for values in query_iterator:
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
@@ -725,7 +727,7 @@ class QuerySet(AltersData):
                     "bulk_create() can only be used with concrete fields in "
                     "update_fields."
                 )
-            if any(f.primary_key for f in update_fields):
+            if any(f in self.model._meta.pk_fields for f in update_fields):
                 raise ValueError(
                     "bulk_create() cannot be used with primary keys in "
                     "update_fields."
@@ -875,7 +877,10 @@ class QuerySet(AltersData):
         fields = [self.model._meta.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
-        if any(f.primary_key for f in fields):
+        all_pk_fields = set(self.model._meta.pk_fields)
+        for parent in self.model._meta.all_parents:
+            all_pk_fields.update(parent._meta.pk_fields)
+        if any(f in all_pk_fields for f in fields):
             raise ValueError("bulk_update() cannot be used with primary key fields.")
         if not objs:
             return 0
@@ -992,9 +997,10 @@ class QuerySet(AltersData):
                 # This is to maintain backward compatibility as these fields
                 # are not updated unless explicitly specified in the
                 # update_fields list.
+                pk_fields = self.model._meta.pk_fields
                 for field in self.model._meta.local_concrete_fields:
                     if not (
-                        field.primary_key or field.__class__.pre_save is Field.pre_save
+                        field in pk_fields or field.__class__.pre_save is Field.pre_save
                     ):
                         update_fields.add(field.name)
                         if field.name != field.attname:
@@ -1206,11 +1212,7 @@ class QuerySet(AltersData):
         """
         query = self.query.clone()
         query.__class__ = sql.DeleteQuery
-        cursor = query.get_compiler(using).execute_sql(CURSOR)
-        if cursor:
-            with cursor:
-                return cursor.rowcount
-        return 0
+        return query.get_compiler(using).execute_sql(ROW_COUNT)
 
     _raw_delete.alters_data = True
 
@@ -1249,7 +1251,7 @@ class QuerySet(AltersData):
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
         with transaction.mark_for_rollback_on_error(using=self.db):
-            rows = query.get_compiler(self.db).execute_sql(CURSOR)
+            rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
         self._result_cache = None
         return rows
 
@@ -1274,7 +1276,7 @@ class QuerySet(AltersData):
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
         self._result_cache = None
-        return query.get_compiler(self.db).execute_sql(CURSOR)
+        return query.get_compiler(self.db).execute_sql(ROW_COUNT)
 
     _update.alters_data = True
     _update.queryset_only = False
@@ -1743,7 +1745,7 @@ class QuerySet(AltersData):
         Defer the loading of data for certain fields until they are accessed.
         Add the set of deferred fields to any existing set of deferred fields.
         The only exception to this is if None is passed in as the only
-        parameter, in which case removal all deferrals.
+        parameter, in which case remove all deferrals.
         """
         self._not_support_combined_queries("defer")
         if self._fields is not None:
@@ -2236,16 +2238,6 @@ class Prefetch:
         as_attr = self.to_attr and level == len(parts) - 1
         return to_attr, as_attr
 
-    def get_current_queryset(self, level):
-        warnings.warn(
-            "Prefetch.get_current_queryset() is deprecated. Use "
-            "get_current_querysets() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        querysets = self.get_current_querysets(level)
-        return querysets[0] if querysets is not None else None
-
     def get_current_querysets(self, level):
         if (
             self.get_current_prefetch_to(level) == self.prefetch_to
@@ -2477,11 +2469,7 @@ def get_prefetcher(instance, through_attr, to_attr):
         if rel_obj_descriptor:
             # singly related object, descriptor object has the
             # get_prefetch_querysets() method.
-            if (
-                hasattr(rel_obj_descriptor, "get_prefetch_querysets")
-                # RemovedInDjango60Warning.
-                or hasattr(rel_obj_descriptor, "get_prefetch_queryset")
-            ):
+            if hasattr(rel_obj_descriptor, "get_prefetch_querysets"):
                 prefetcher = rel_obj_descriptor
                 # If to_attr is set, check if the value has already been set,
                 # which is done with has_to_attr_attribute(). Do not use the
@@ -2494,11 +2482,7 @@ def get_prefetcher(instance, through_attr, to_attr):
                 # the attribute on the instance rather than the class to
                 # support many related managers
                 rel_obj = getattr(instance, through_attr)
-                if (
-                    hasattr(rel_obj, "get_prefetch_querysets")
-                    # RemovedInDjango60Warning.
-                    or hasattr(rel_obj, "get_prefetch_queryset")
-                ):
+                if hasattr(rel_obj, "get_prefetch_querysets"):
                     prefetcher = rel_obj
                 if through_attr == to_attr:
 
@@ -2531,36 +2515,16 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
 
     # The 'values to be matched' must be hashable as they will be used
     # in a dictionary.
-
-    if hasattr(prefetcher, "get_prefetch_querysets"):
-        (
-            rel_qs,
-            rel_obj_attr,
-            instance_attr,
-            single,
-            cache_name,
-            is_descriptor,
-        ) = prefetcher.get_prefetch_querysets(
-            instances, lookup.get_current_querysets(level)
-        )
-    else:
-        warnings.warn(
-            "The usage of get_prefetch_queryset() in prefetch_related_objects() is "
-            "deprecated. Implement get_prefetch_querysets() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        queryset = None
-        if querysets := lookup.get_current_querysets(level):
-            queryset = querysets[0]
-        (
-            rel_qs,
-            rel_obj_attr,
-            instance_attr,
-            single,
-            cache_name,
-            is_descriptor,
-        ) = prefetcher.get_prefetch_queryset(instances, queryset)
+    (
+        rel_qs,
+        rel_obj_attr,
+        instance_attr,
+        single,
+        cache_name,
+        is_descriptor,
+    ) = prefetcher.get_prefetch_querysets(
+        instances, lookup.get_current_querysets(level)
+    )
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need

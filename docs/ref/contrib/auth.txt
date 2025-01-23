@@ -30,10 +30,7 @@ Fields
 
         The ``max_length`` should be sufficient for many use cases. If you need
         a longer length, please use a :ref:`custom user model
-        <specifying-custom-user-model>`. If you use MySQL with the ``utf8mb4``
-        encoding (recommended for proper Unicode support), specify at most
-        ``max_length=191`` because MySQL can only create unique indexes with
-        191 characters in that case by default.
+        <specifying-custom-user-model>`.
 
     .. attribute:: first_name
 
@@ -422,8 +419,8 @@ fields:
 
     .. attribute:: content_type
 
-        Required. A reference to the ``django_content_type`` database table,
-        which contains a record for each installed model.
+        Required. A foreign key to the
+        :class:`~django.contrib.contenttypes.models.ContentType` model.
 
     .. attribute:: codename
 
@@ -682,7 +679,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         user permissions and group permissions. Returns an empty set if
         :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
-    
+
         .. versionchanged:: 5.2
 
             ``aget_all_permissions()`` function was added.

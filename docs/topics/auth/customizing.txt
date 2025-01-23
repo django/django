@@ -127,15 +127,19 @@ wasn't provided to :func:`~django.contrib.auth.authenticate` (which passes it
 on to the backend).
 
 The Django admin is tightly coupled to the Django :ref:`User object
-<user-objects>`. The best way to deal with this is to create a Django ``User``
-object for each user that exists for your backend (e.g., in your LDAP
-directory, your external SQL database, etc.) You can either write a script to
-do this in advance, or your ``authenticate`` method can do it the first time a
-user logs in.
+<user-objects>`. For example, for a user to access the admin,
+:attr:`.User.is_staff` and :attr:`.User.is_active` must be ``True`` (see
+:meth:`.AdminSite.has_permission` for details).
+
+The best way to deal with this is to create a Django ``User`` object for each
+user that exists for your backend (e.g., in your LDAP directory, your external
+SQL database, etc.). You can either write a script to do this in advance, or
+your ``authenticate`` method can do it the first time a user logs in.
 
 Here's an example backend that authenticates against a username and password
 variable defined in your ``settings.py`` file and creates a Django ``User``
-object the first time a user authenticates::
+object the first time a user authenticates. In this example, the created Django
+``User`` object is a superuser who will have full access to the admin::
 
     from django.conf import settings
     from django.contrib.auth.backends import BaseBackend
@@ -162,7 +166,7 @@ object the first time a user authenticates::
                 except User.DoesNotExist:
                     # Create a new user. There's no need to set a password
                     # because only the password from settings.py is checked.
-                    user = User(username=username)
+                    user = User(username=username)  # is_active defaults to True.
                     user.is_staff = True
                     user.is_superuser = True
                     user.save()

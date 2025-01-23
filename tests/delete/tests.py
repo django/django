@@ -794,6 +794,15 @@ class FastDeleteTests(TestCase):
             )
         self.assertIs(Base.objects.exists(), False)
 
+    def test_fast_delete_empty_result_set(self):
+        user = User.objects.create()
+        with self.assertNumQueries(0):
+            self.assertEqual(
+                User.objects.filter(pk__in=[]).delete(),
+                (0, {}),
+            )
+        self.assertSequenceEqual(User.objects.all(), [user])
+
     def test_fast_delete_full_match(self):
         avatar = Avatar.objects.create(desc="bar")
         User.objects.create(avatar=avatar)

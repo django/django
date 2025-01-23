@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
-from .models import Band, Child, Event, GrandChild, Parent, ProxyUser, Swallow
+from .models import Band, Child, Event, Genre, GrandChild, Parent, ProxyUser, Swallow
 
 site = admin.AdminSite(name="admin")
 
@@ -155,6 +155,14 @@ class NoListDisplayLinksParentAdmin(admin.ModelAdmin):
 
 
 site.register(Parent, NoListDisplayLinksParentAdmin)
+
+
+class ListDisplayLinksGenreAdmin(admin.ModelAdmin):
+    list_display = ["name", "file", "url"]
+    list_display_links = ["file", "url"]
+
+
+site.register(Genre, ListDisplayLinksGenreAdmin)
 
 
 class SwallowAdmin(admin.ModelAdmin):

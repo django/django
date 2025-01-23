@@ -1,10 +1,11 @@
 from collections import namedtuple
 
+import oracledb
+
 from django.db import models
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
-from django.db.backends.oracle.oracledb_any import oracledb
 
 FieldInfo = namedtuple(
     "FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json", "comment")

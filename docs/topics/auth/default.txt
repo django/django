@@ -601,10 +601,6 @@ The ``login_required`` decorator
     :func:`django.contrib.admin.views.decorators.staff_member_required`
     decorator a useful alternative to ``login_required()``.
 
-.. versionchanged:: 5.1
-
-    Support for wrapping asynchronous view functions was added.
-
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``LoginRequiredMixin`` mixin
@@ -646,8 +642,6 @@ inheritance list.
 
 The ``login_not_required`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 5.1
 
 When :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is
 installed, all views require authentication by default. Some views, such as the
@@ -718,11 +712,6 @@ email in the desired domain and if not, redirects to the login page::
 
         @user_passes_test(email_check, login_url="/login/")
         def my_view(request): ...
-
-    .. versionchanged:: 5.1
-
-        Support for wrapping asynchronous view functions and using asynchronous
-        test callables was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -827,10 +816,6 @@ The ``permission_required`` decorator
     This also avoids a redirect loop when :class:`.LoginView`'s
     ``redirect_authenticated_user=True`` and the logged-in user doesn't have
     all of the required permissions.
-
-.. versionchanged:: 5.1
-
-    Support for wrapping asynchronous view functions was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -1640,14 +1625,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     Takes the ``user`` as the first positional argument.
 
-    .. versionchanged:: 5.1
-
-        Option to disable (or reenable) password-based authentication was
-        added.
-
 .. class:: AdminUserCreationForm
-
-    .. versionadded:: 5.1.1
 
     A form used in the admin interface to create a new user. Inherits from
     :class:`UserCreationForm`.
