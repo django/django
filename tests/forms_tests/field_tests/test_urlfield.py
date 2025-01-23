@@ -80,6 +80,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_urlfield_clean_invalid(self):
         f = URLField()
         tests = [
+            "localhost",
             "foo",
             "com.",
             ".",
