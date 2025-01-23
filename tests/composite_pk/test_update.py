@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase
 
@@ -175,3 +176,9 @@ class CompositePKUpdateTests(TestCase):
 
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.update(user=User())
+
+    def test_cant_update_pk_field(self):
+        qs = Comment.objects.filter(user__email=self.user_1.email)
+        msg = "Composite primary key fields must be updated individually."
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.update(pk=(1, 10))
