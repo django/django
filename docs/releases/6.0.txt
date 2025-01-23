@@ -273,6 +273,9 @@ Pagination
   :class:`~django.core.paginator.AsyncPage` provide async implementations of
   :class:`~django.core.paginator.Paginator` and
   :class:`~django.core.paginator.Page` respectively.
+* The :class:`~django.db.models.functions.JSONArray` database function now
+  accepts an ``absent_on_null`` parameter to control whether ``null`` values
+  are omitted.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
