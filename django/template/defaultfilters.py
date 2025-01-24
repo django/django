@@ -919,15 +919,15 @@ def filesizeformat(bytes_):
     if bytes_ < KB:
         value = ngettext("%(size)d byte", "%(size)d bytes", bytes_) % {"size": bytes_}
     elif bytes_ < MB:
-        value = gettext("%s KB") % filesize_number_format(bytes_ / KB)
+        value = gettext("%s KiB") % filesize_number_format(bytes_ / KB)
     elif bytes_ < GB:
-        value = gettext("%s MB") % filesize_number_format(bytes_ / MB)
+        value = gettext("%s MiB") % filesize_number_format(bytes_ / MB)
     elif bytes_ < TB:
-        value = gettext("%s GB") % filesize_number_format(bytes_ / GB)
+        value = gettext("%s GiB") % filesize_number_format(bytes_ / GB)
     elif bytes_ < PB:
-        value = gettext("%s TB") % filesize_number_format(bytes_ / TB)
+        value = gettext("%s TiB") % filesize_number_format(bytes_ / TB)
     else:
-        value = gettext("%s PB") % filesize_number_format(bytes_ / PB)
+        value = gettext("%s PiB") % filesize_number_format(bytes_ / PB)
 
     if negative:
         value = "-%s" % value
