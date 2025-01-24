@@ -169,7 +169,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Squashed migrations can now themselves be squashed before being transitioned
+  to normal migrations.
 
 Models
 ~~~~~~
