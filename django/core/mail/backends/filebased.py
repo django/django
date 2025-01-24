@@ -16,9 +16,9 @@ class EmailBackend(ConsoleEmailBackend):
             self.file_path = file_path
         else:
             try:
-                self.file_path = (
-                    settings.EMAIL_PROVIDERS[provider]["OPTIONS"]["file_path"]
-                )
+                self.file_path = settings.EMAIL_PROVIDERS[provider]["OPTIONS"][
+                    "file_path"
+                ]
             except (AttributeError, KeyError):
                 raise ImproperlyConfigured(
                     "File path for saving email messages not specified for provider: %s"
