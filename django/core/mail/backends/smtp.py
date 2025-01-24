@@ -28,12 +28,10 @@ class EmailBackend(BaseEmailBackend):
         timeout=None,
         ssl_keyfile=None,
         ssl_certfile=None,
-        provider=None,
         **kwargs,
     ):
         super().__init__(fail_silently=fail_silently)
-        if provider is None:
-            provider = "default"
+        provider = kwargs.pop("provider", "default")
         options = settings.EMAIL_PROVIDERS[provider]["OPTIONS"]
         self.host = options.get("host") if host is None else host
         self.port = options.get("port") if port is None else port

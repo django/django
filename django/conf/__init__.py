@@ -16,7 +16,7 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango61Warning
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -42,13 +42,17 @@ def warn_about_deprecated_email_setting(deprecated_setting):
     assert deprecated_setting in DEPRECATED_EMAIL_SETTINGS
     if deprecated_setting == "EMAIL_BACKEND":
         replacement = "EMAIL_PROVIDERS['default']['BACKEND']"
+    elif deprecated_setting == "EMAIL_HOST_USER":
+        replacement = "EMAIL_PROVIDERS['default']['OPTIONS']['username']"
+    elif deprecated_setting == "EMAIL_HOST_PASSWORD":
+        replacement = "EMAIL_PROVIDERS['default']['OPTIONS']['password']"
     else:
         replacement = (
             f"EMAIL_PROVIDERS['default']['OPTIONS']['{deprecated_setting[6:].lower()}']"
         )
     warnings.warn(
         f"{deprecated_setting} is deprecated. Use {replacement} instead.",
-        RemovedInDjango61Warning,
+        RemovedInDjango70Warning,
     )
 
 
@@ -108,7 +112,20 @@ class LazySettings(LazyObject):
         if (_wrapped := self._wrapped) is empty:
             self._setup(name)
             _wrapped = self._wrapped
-        val = getattr(_wrapped, name)
+        try:
+            val = getattr(_wrapped, name)
+        except AttributeError:
+            # Special case for EMAIL_* settings. To avoid breaking existing third-party
+            # apps accessing the current Django settings. Can be removed in Django-7.
+            if name == "EMAIL_BACKEND":
+                return self.EMAIL_PROVIDERS["default"]["BACKEND"]
+            if name == "EMAIL_HOST_USER":
+                return self.EMAIL_PROVIDERS["default"]["OPTIONS"]["username"]
+            if name == "EMAIL_HOST_PASSWORD":
+                return self.EMAIL_PROVIDERS["default"]["OPTIONS"]["password"]
+            if name in DEPRECATED_EMAIL_SETTINGS:
+                return self.EMAIL_PROVIDERS["default"]['OPTIONS'][f'{name[6:].lower()}']
+            raise
 
         # Special case some settings which require further modification.
         # This is done here for performance reasons so the modified value is cached.

@@ -37,7 +37,7 @@ from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
-from django.utils.deprecation import RemovedInDjango61Warning
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.translation import gettext_lazy
 
 try:
@@ -1616,7 +1616,7 @@ class PythonGlobalState(SimpleTestCase):
 class EmailDeprecatedConfigurationTests(SimpleTestCase):
     def test_deprecated_backend_configuration(self):
         with self.assertWarnsMessage(
-            RemovedInDjango61Warning,
+            RemovedInDjango70Warning,
             "EMAIL_BACKEND is deprecated. "
             "Use EMAIL_PROVIDERS['default']['BACKEND'] instead.",
         ):
@@ -1627,7 +1627,7 @@ class EmailDeprecatedConfigurationTests(SimpleTestCase):
 
     def test_deprecated_host_configuration(self):
         with self.assertWarnsMessage(
-            RemovedInDjango61Warning,
+            RemovedInDjango70Warning,
             "EMAIL_HOST is deprecated. "
             "Use EMAIL_PROVIDERS['default']['OPTIONS']['host'] instead.",
         ):
@@ -1665,6 +1665,66 @@ class EmailDeprecatedConfigurationTests(SimpleTestCase):
                 EMAIL_HOST="smtp.example.com",
             ):
                 pass
+
+    def test_third_party_app_using_deprecated_default_configuration(self):
+        self.assertEqual(
+            settings.EMAIL_BACKEND,
+            "django.core.mail.backends.locmem.EmailBackend",
+        )
+        self.assertEqual(settings.EMAIL_HOST, "localhost")
+        self.assertEqual(settings.EMAIL_PORT, 25)
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.dummy.EmailBackend",
+            },
+        },
+    )
+    def test_third_party_app_using_deprecated_backend_configuration(self):
+        self.assertEqual(
+            settings.EMAIL_BACKEND,
+            "django.core.mail.backends.dummy.EmailBackend",
+        )
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "OPTIONS": dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    host="smtp.example.com",
+                ),
+            },
+        },
+    )
+    def test_third_party_app_using_deprecated_host_configuration(self):
+        self.assertEqual(settings.EMAIL_HOST, "smtp.example.com")
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "OPTIONS": dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    username="noreply",
+                ),
+            },
+        },
+    )
+    def test_third_party_app_using_deprecated_username_configuration(self):
+        self.assertEqual(settings.EMAIL_HOST_USER, "noreply")
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "OPTIONS": dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    password="secret",
+                ),
+            },
+        },
+    )
+    def test_third_party_app_using_deprecated_password_configuration(self):
+        self.assertEqual(settings.EMAIL_HOST_PASSWORD, "secret")
 
 
 class BaseEmailBackendTests(MailTestsMixin):

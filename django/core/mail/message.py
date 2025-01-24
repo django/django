@@ -255,7 +255,7 @@ class EmailMessage:
                 else:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
-        self.provider = provider
+        self.provider = provider or "default"
         self.connection = connection
 
     def get_connection(self, fail_silently=False):

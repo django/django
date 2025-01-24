@@ -44,7 +44,7 @@ __all__ = [
 ]
 
 
-def get_connection(backend=None, fail_silently=False, *, provider=None, **kwds):
+def get_connection(backend=None, fail_silently=False, **kwds):
     """Load an email backend and return an instance of it.
 
     If backend is None (default), use settings.EMAIL_PROVIDERS[provider]["BACKEND"].
@@ -53,6 +53,7 @@ def get_connection(backend=None, fail_silently=False, *, provider=None, **kwds):
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
+    provider = kwds.pop("provider", None)
     if backend:
         if provider:
             raise ValueError(
@@ -77,11 +78,11 @@ def send_mail(
     from_email,
     recipient_list,
     fail_silently=False,
-    provider=None,
     auth_user=None,
     auth_password=None,
     connection=None,
     html_message=None,
+    provider=None,
 ):
     """
     Easy wrapper for sending a single message to a recipient list. All members
@@ -124,10 +125,10 @@ def send_mail(
 def send_mass_mail(
     datatuple,
     fail_silently=False,
-    provider=None,
     auth_user=None,
     auth_password=None,
     connection=None,
+    provider=None,
 ):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), send
@@ -170,9 +171,9 @@ def mail_admins(
     subject,
     message,
     fail_silently=False,
-    provider=None,
     connection=None,
     html_message=None,
+    provider=None,
 ):
     """Send a message to the admins, as defined by the ADMINS setting."""
     if not settings.ADMINS:
@@ -196,9 +197,9 @@ def mail_managers(
     subject,
     message,
     fail_silently=False,
-    provider=None,
     connection=None,
     html_message=None,
+    provider=None,
 ):
     """Send a message to the managers, as defined by the MANAGERS setting."""
     if not settings.MANAGERS:
