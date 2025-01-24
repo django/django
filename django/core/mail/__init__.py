@@ -211,8 +211,8 @@ def mail_managers(
         message,
         settings.SERVER_EMAIL,
         [a[1] for a in settings.MANAGERS],
-        provider=provider,
         connection=connection,
+        provider=provider,
     )
     if html_message:
         mail.attach_alternative(html_message, "text/html")

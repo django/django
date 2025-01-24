@@ -11,10 +11,19 @@ from django.core.mail.backends.console import EmailBackend as ConsoleEmailBacken
 class EmailBackend(ConsoleEmailBackend):
     def __init__(self, *args, file_path=None, **kwargs):
         self._fname = None
+        provider = kwargs.pop("provider", "default")
         if file_path is not None:
             self.file_path = file_path
         else:
-            self.file_path = getattr(settings, "EMAIL_FILE_PATH", None)
+            try:
+                self.file_path = (
+                    settings.EMAIL_PROVIDERS[provider]["OPTIONS"]["file_path"]
+                )
+            except (AttributeError, KeyError):
+                raise ImproperlyConfigured(
+                    "File path for saving email messages not specified for provider: %s"
+                    % provider
+                )
         self.file_path = os.path.abspath(self.file_path)
         try:
             os.makedirs(self.file_path, exist_ok=True)

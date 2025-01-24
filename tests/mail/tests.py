@@ -19,6 +19,7 @@ from textwrap import dedent
 from unittest import mock, skipUnless
 
 from django.conf import settings
+from django.conf.global_settings import EMAIL_PROVIDERS
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import (
@@ -2116,7 +2117,12 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         super().setUp()
         self.tmp_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        _settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        _settings_override = override_settings(EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": self.email_backend,
+                "OPTIONS": {"file_path": self.tmp_dir},
+            },
+        })
         _settings_override.enable()
         self.addCleanup(_settings_override.disable)
 

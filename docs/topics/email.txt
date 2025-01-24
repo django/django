@@ -88,7 +88,7 @@ whether a secure connection is used.
 ``send_mail()``
 ===============
 
-.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, provider=None, html_message=None)
+.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=None, provider=None)
 
 In most cases, you can send email using ``django.core.mail.send_mail()``.
 
@@ -182,7 +182,7 @@ a single connection for all of its messages. This makes
 ``mail_admins()``
 =================
 
-.. function:: mail_admins(subject, message, fail_silently=False, provider=None, html_message=None)
+.. function:: mail_admins(subject, message, fail_silently=False, html_message=None, provider=None)
 
 ``django.core.mail.mail_admins()`` is a shortcut for sending an email to the
 site admins, as defined in the :setting:`ADMINS` setting.
@@ -203,7 +203,7 @@ If ``html_message`` is provided, the resulting email will be a
 ``mail_managers()``
 ===================
 
-.. function:: mail_managers(subject, message, fail_silently=False, provider=None, html_message=None)
+.. function:: mail_managers(subject, message, fail_silently=False, html_message=None, provider=None)
 
 ``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an email to the site managers, as defined in the :setting:`MANAGERS`
@@ -600,12 +600,12 @@ instance of the email backend that you can use.
 
 .. currentmodule:: django.core.mail
 
-.. function:: get_connection(provider=None, fail_silently=False, *args, **kwargs)
+.. function:: get_connection(backend=None, fail_silently=False, provider=None, **kwargs)
 
 By default, a call to ``get_connection()`` will return an instance of the
 default email backend as specified in :setting:`EMAIL_PROVIDERS`. If you
 specify the ``provider`` argument, an alternatively configured backend will be
-instantiated.
+instantiated. Arguments ``backend`` and ``provider`` are mutually exclusive.
 
 The ``fail_silently`` argument controls how the backend should handle errors.
 If ``fail_silently`` is True, exceptions during the email sending process
@@ -677,7 +677,7 @@ providing the ``stream`` keyword argument when constructing the connection.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+  EMAIL_PROVIDERS["default"]["BACKEND"] = "django.core.mail.backends.console.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -689,14 +689,14 @@ File backend
 
 The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
-written is either taken from the :setting:`EMAIL_FILE_PATH` setting or from
-the ``file_path`` keyword when creating a connection with
+written is either taken from the :setting:`EMAIL_PROVIDERS["default"]["file_path"]`
+setting or from the ``file_path`` keyword when creating a connection with
 :meth:`~django.core.mail.get_connection`.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-  EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
+  EMAIL_PROVIDERS["default"]["BACKEND"] = "django.core.mail.backends.filebased.EmailBackend"
+  EMAIL_PROVIDERS["default"]["file_path"] = "/tmp/app-messages"  # change this to a proper location
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
