@@ -319,7 +319,7 @@ END;
         # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, oracledb's
         # `statement` doesn't contain the query parameters. Substitute
         # parameters manually.
-        if params:
+        if statement and params:
             if isinstance(params, (tuple, list)):
                 params = {
                     f":arg{i}": param for i, param in enumerate(dict.fromkeys(params))

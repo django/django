@@ -73,8 +73,14 @@ class LastExecutedQueryTest(TestCase):
         last_executed_query should not raise an exception even if no previous
         query has been run.
         """
+        suffix = connection.features.bare_select_suffix
         with connection.cursor() as cursor:
+            if connection.vendor == "oracle":
+                cursor.statement = None
+            # No previous query has been run.
             connection.ops.last_executed_query(cursor, "", ())
+            # Previous query crashed.
+            connection.ops.last_executed_query(cursor, "SELECT %s" + suffix, (1,))
 
     def test_debug_sql(self):
         qs = Reporter.objects.filter(first_name="test")
