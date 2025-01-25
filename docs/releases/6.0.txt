@@ -223,6 +223,8 @@ Pagination
   :class:`~django.core.paginator.AsyncPage` provide async implementations of
   :class:`~django.core.paginator.Paginator` and
   :class:`~django.core.paginator.Page` respectively.
+* Added the ability to specify dynamic keys in
+  the :class:`~django.db.models.functions.JSONObject` database function.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
