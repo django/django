@@ -794,7 +794,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             for rel_obj in queryset:
                 if not self.field.is_cached(rel_obj):
                     instance = instances_dict[rel_obj_attr(rel_obj)]
-                    setattr(rel_obj, self.field.name, instance)
+                    self.field.set_cached_value(rel_obj, instance)
             cache_name = self.field.remote_field.cache_name
             return queryset, rel_obj_attr, instance_attr, False, cache_name, False
 
