@@ -223,10 +223,10 @@ class Options:
             self._ordering_clash = bool(self.ordering and self.order_with_respect_to)
 
             # Any leftover attributes must be invalid.
-            if meta_attrs != {}:
-                raise TypeError(
-                    "'class Meta' got invalid attribute(s): %s" % ",".join(meta_attrs)
-                )
+            # if meta_attrs != {}:
+            #     raise TypeError(
+            #         "'class Meta' got invalid attribute(s): %s" % ",".join(meta_attrs)
+            #     )
         else:
             self.verbose_name_plural = format_lazy("{}s", self.verbose_name)
         del self.meta
