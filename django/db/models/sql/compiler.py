@@ -2019,6 +2019,11 @@ class SQLUpdateCompiler(SQLCompiler):
                         "Window expressions are not allowed in this query "
                         "(%s=%r)." % (field.name, val)
                     )
+                if isinstance(val, ColPairs):
+                    raise FieldError(
+                        "Composite primary keys expressions are not allowed "
+                        "in this query (%s=F('pk'))." % field.name
+                    )
             elif hasattr(val, "prepare_database_save"):
                 if field.remote_field:
                     val = val.prepare_database_save(field)
