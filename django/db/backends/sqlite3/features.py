@@ -61,6 +61,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
     supports_unlimited_charfield = True
+    supports_tuple_lookups = False
 
     @cached_property
     def django_test_skips(self):
