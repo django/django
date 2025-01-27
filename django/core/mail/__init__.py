@@ -63,6 +63,10 @@ def get_connection(backend=None, fail_silently=False, **kwds):
         klass = import_string(backend)
         return klass(fail_silently=fail_silently, **kwds)
 
+    if settings.is_overridden("EMAIL_BACKEND"):
+        klass = import_string(settings.EMAIL_BACKEND)
+        return klass(fail_silently=fail_silently, **kwds)
+
     provider = provider or getattr(settings, "DEFAULT_EMAIL_PROVIDER_ALIAS", "default")
     klass = import_string(settings.EMAIL_PROVIDERS[provider]["BACKEND"])
     return klass(

@@ -14,6 +14,8 @@ class EmailBackend(ConsoleEmailBackend):
         provider = kwargs.pop("provider", "default")
         if file_path is not None:
             self.file_path = file_path
+        elif settings.is_overridden("EMAIL_FILE_PATH"):
+            self.file_path = settings.EMAIL_FILE_PATH
         else:
             try:
                 self.file_path = settings.EMAIL_PROVIDERS[provider]["OPTIONS"][

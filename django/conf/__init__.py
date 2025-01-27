@@ -35,6 +35,7 @@ DEPRECATED_EMAIL_SETTINGS = {
     "EMAIL_USE_SSL",
     "EMAIL_SSL_CERTFILE",
     "EMAIL_SSL_KEYFILE",
+    "EMAIL_TIMEOUT",
     "EMAIL_FILE_PATH",
 }
 
@@ -125,7 +126,9 @@ class LazySettings(LazyObject):
             if name == "EMAIL_HOST_PASSWORD":
                 return self.EMAIL_PROVIDERS["default"]["OPTIONS"]["password"]
             if name in DEPRECATED_EMAIL_SETTINGS:
-                return self.EMAIL_PROVIDERS["default"]["OPTIONS"][f"{name[6:].lower()}"]
+                return self.EMAIL_PROVIDERS["default"]["OPTIONS"].get(
+                    f"{name[6:].lower()}"
+                )
             raise
 
         # Special case some settings which require further modification.

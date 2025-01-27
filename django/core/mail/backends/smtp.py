@@ -31,26 +31,48 @@ class EmailBackend(BaseEmailBackend):
         **kwargs,
     ):
         super().__init__(fail_silently=fail_silently)
-        provider = kwargs.pop("provider", "default")
-        options = settings.EMAIL_PROVIDERS[provider]["OPTIONS"]
-        self.host = options.get("host") if host is None else host
-        self.port = options.get("port") if port is None else port
-        self.username = options.get("username") if username is None else username
-        self.password = options.get("password") if password is None else password
-        self.use_tls = options.get("use_tls") if use_tls is None else use_tls
-        self.use_ssl = options.get("use_ssl") if use_ssl is None else use_ssl
-        self.ssl_keyfile = (
-            options.get("ssl_keyfile") if ssl_keyfile is None else ssl_keyfile
-        )
-        self.ssl_certfile = (
-            options.get("ssl_certfile") if ssl_certfile is None else ssl_certfile
-        )
+        provider = kwargs.pop("provider", None)
+        if settings.is_overridden("EMAIL_BACKEND"):
+            if provider:
+                raise ValueError(
+                    "settings.EMAIL_BACKEND and provider are mutually exclusive, "
+                    "so only use either of those arguments."
+                )
+            self.host = host or settings.EMAIL_HOST
+            self.port = port or settings.EMAIL_PORT
+            self.username = settings.EMAIL_HOST_USER if username is None else username
+            self.password = (
+                settings.EMAIL_HOST_PASSWORD if password is None else password
+            )
+            self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
+            self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
+            self.ssl_keyfile = (
+                settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
+            )
+            self.ssl_certfile = (
+                settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
+            )
+            self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
+        else:
+            options = settings.EMAIL_PROVIDERS[provider or "default"]["OPTIONS"]
+            self.host = options.get("host") if host is None else host
+            self.port = options.get("port") if port is None else port
+            self.username = options.get("username") if username is None else username
+            self.password = options.get("password") if password is None else password
+            self.use_tls = options.get("use_tls") if use_tls is None else use_tls
+            self.use_ssl = options.get("use_ssl") if use_ssl is None else use_ssl
+            self.ssl_keyfile = (
+                options.get("ssl_keyfile") if ssl_keyfile is None else ssl_keyfile
+            )
+            self.ssl_certfile = (
+                options.get("ssl_certfile") if ssl_certfile is None else ssl_certfile
+            )
+            self.timeout = options.get("timeout") if timeout is None else timeout
         if self.use_ssl and self.use_tls:
             raise ValueError(
                 "use_tls/use_ssl are mutually exclusive, so only set "
                 "one of those settings to True."
             )
-        self.timeout = options.get("timeout") if timeout is None else timeout
         self.connection = None
         self._lock = threading.RLock()
 
