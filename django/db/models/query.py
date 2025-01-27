@@ -874,11 +874,12 @@ class QuerySet(AltersData):
         objs = tuple(objs)
         if not all(obj._is_pk_set() for obj in objs):
             raise ValueError("All bulk_update() objects must have a primary key set.")
-        fields = [self.model._meta.get_field(name) for name in fields]
+        opts = self.model._meta
+        fields = [opts.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
-        all_pk_fields = set(self.model._meta.pk_fields)
-        for parent in self.model._meta.all_parents:
+        all_pk_fields = set(opts.pk_fields)
+        for parent in opts.all_parents:
             all_pk_fields.update(parent._meta.pk_fields)
         if any(f in all_pk_fields for f in fields):
             raise ValueError("bulk_update() cannot be used with primary key fields.")
@@ -892,7 +893,9 @@ class QuerySet(AltersData):
         # and once in the WHEN. Each field will also have one CAST.
         self._for_write = True
         connection = connections[self.db]
-        max_batch_size = connection.ops.bulk_batch_size(["pk", "pk"] + fields, objs)
+        max_batch_size = connection.ops.bulk_batch_size(
+            [opts.pk, opts.pk] + fields, objs
+        )
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         requires_casting = connection.features.requires_casted_case_in_updates
         batches = (objs[i : i + batch_size] for i in range(0, len(objs), batch_size))
