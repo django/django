@@ -454,7 +454,7 @@ class CompositePKFilterTests(TestCase):
             with self.subTest(f"id{lookup}"):
                 queryset = Comment.objects.filter(**{f"pk{lookup}": subquery})
                 if connection.vendor == "oracle":
-                    msg = "Subquerying on composite fields is not yet implemented"
+                    msg = "Subquerying on composite fields is not implemented"
                     with self.assertRaisesMessage(NotImplementedError, msg):
                         queryset.count()
                 else:

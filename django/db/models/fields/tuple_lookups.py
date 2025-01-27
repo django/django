@@ -22,6 +22,12 @@ from django.db.models.sql import Query
 from django.db.models.sql.where import AND, OR, WhereNode
 
 
+class CompositeFieldSubqueryOracleError(NotImplementedError):
+    def __init__(self):
+        msg = "Subquerying on composite fields is not implemented on Oracle."
+        return super().__init__(self, msg)
+
+
 class Tuple(Func):
     allows_composite_expressions = True
     function = ""
@@ -134,9 +140,7 @@ class TupleExact(TupleLookupMixin, Exact):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         if isinstance(self.rhs, Subquery):
-            raise NotImplementedError(
-                "Subquerying on composite fields is not yet implemented on Oracle."
-            )
+            raise CompositeFieldSubqueryOracleError
         # e.g.: (a, b, c) == (x, y, z) as SQL:
         # WHERE a = x AND b = y AND c = z
         lookups = [Exact(col, val) for col, val in zip(self.lhs, self.rhs)]
@@ -172,9 +176,7 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         if isinstance(self.rhs, Subquery):
-            raise NotImplementedError(
-                "Subquerying on composite fields is not yet implemented on Oracle."
-            )
+            raise CompositeFieldSubqueryOracleError
         # e.g.: (a, b, c) > (x, y, z) as SQL:
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND c > z)))
         lookups = itertools.cycle([GreaterThan, Exact])
@@ -204,9 +206,7 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         if isinstance(self.rhs, Subquery):
-            raise NotImplementedError(
-                "Subquerying on composite fields is not yet implemented on Oracle."
-            )
+            raise CompositeFieldSubqueryOracleError
         # e.g.: (a, b, c) >= (x, y, z) as SQL:
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND (c > z OR c = z))))
         lookups = itertools.cycle([GreaterThan, Exact])
@@ -236,9 +236,7 @@ class TupleLessThan(TupleLookupMixin, LessThan):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         if isinstance(self.rhs, Subquery):
-            raise NotImplementedError(
-                "Subquerying on composite fields is not yet implemented on Oracle."
-            )
+            raise CompositeFieldSubqueryOracleError
         # e.g.: (a, b, c) < (x, y, z) as SQL:
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND c < z)))
         lookups = itertools.cycle([LessThan, Exact])
@@ -268,9 +266,7 @@ class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         if isinstance(self.rhs, Subquery):
-            raise NotImplementedError(
-                "Subquerying on composite fields is not yet implemented on Oracle."
-            )
+            raise CompositeFieldSubqueryOracleError
         # e.g.: (a, b, c) <= (x, y, z) as SQL:
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND (c < z OR c = z))))
         lookups = itertools.cycle([LessThan, Exact])
