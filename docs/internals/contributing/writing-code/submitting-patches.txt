@@ -312,6 +312,11 @@ Once you have completed these steps, you are finished with the deprecation.
 In each :term:`feature release <Feature release>`, all
 ``RemovedInDjangoXXWarning``\s matching the new version are removed.
 
+The :mod:`!django.utils.deprecation` module provides some helpful deprecation
+utilities, such as a ``@deprecate_posargs`` decorator to assist with converting
+positional-or-keyword arguments to keyword-only. See the inline documentation
+in the module source.
+
 JavaScript contributions
 ========================
 
