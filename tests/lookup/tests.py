@@ -789,6 +789,14 @@ class LookupTests(TestCase):
         sql = ctx.captured_queries[0]["sql"]
         self.assertIn("IN (%s)" % self.a1.pk, sql)
 
+    def test_in_select_mismatch(self):
+        msg = (
+            "The QuerySet value for the 'in' lookup must have 1 "
+            "selected fields (received 2)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.filter(id__in=Article.objects.values("id", "headline"))
+
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
         with self.assertRaisesMessage(
@@ -1363,6 +1371,14 @@ class LookupTests(TestCase):
         )
         authors = Author.objects.filter(id=authors_max_ids[:1])
         self.assertEqual(authors.get(), newest_author)
+
+    def test_exact_query_rhs_with_selected_columns_mismatch(self):
+        msg = (
+            "The QuerySet value for the exact lookup must have 1 "
+            "selected fields (received 2)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.filter(id=Author.objects.values("id", "name")[:1])
 
     def test_isnull_non_boolean_value(self):
         msg = "The QuerySet value for an isnull lookup must be True or False."
