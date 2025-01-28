@@ -373,16 +373,21 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import
 
-        if isinstance(self.rhs, Query):
-            if self.rhs.has_limit_one():
-                if not self.rhs.has_select_fields:
-                    self.rhs.clear_select_clause()
-                    self.rhs.add_fields(["pk"])
-            else:
+        if isinstance(query := self.rhs, Query):
+            if not query.has_limit_one():
                 raise ValueError(
                     "The QuerySet value for an exact lookup must be limited to "
                     "one result using slicing."
                 )
+            lhs_len = len(self.lhs) if isinstance(self.lhs, (ColPairs, tuple)) else 1
+            if (rhs_len := query._subquery_fields_len) != lhs_len:
+                raise ValueError(
+                    f"The QuerySet value for the exact lookup must have {lhs_len} "
+                    f"selected fields (received {rhs_len})"
+                )
+            if not query.has_select_fields:
+                query.clear_select_clause()
+                query.add_fields(["pk"])
         return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
@@ -499,6 +504,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         from django.db.models.sql.query import Query  # avoid circular import
 
         if isinstance(self.rhs, Query):
+            lhs_len = len(self.lhs) if isinstance(self.lhs, (ColPairs, tuple)) else 1
+            if (rhs_len := self.rhs._subquery_fields_len) != lhs_len:
+                raise ValueError(
+                    f"The QuerySet value for the 'in' lookup must have {lhs_len} "
+                    f"selected fields (received {rhs_len})"
+                )
             self.rhs.clear_ordering(clear_default=True)
             if not self.rhs.has_select_fields:
                 self.rhs.clear_select_clause()

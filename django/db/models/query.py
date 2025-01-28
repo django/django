@@ -1958,10 +1958,6 @@ class QuerySet(AltersData):
             self._known_related_objects.setdefault(field, {}).update(objects)
 
     def resolve_expression(self, *args, **kwargs):
-        if self._fields and len(self._fields) > 1:
-            # values() queryset can only be used as nested queries
-            # if they are set up to select only a single field.
-            raise TypeError("Cannot use multi-field values as a filter value.")
         query = self.query.resolve_expression(*args, **kwargs)
         query._db = self._db
         return query

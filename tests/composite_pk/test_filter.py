@@ -10,7 +10,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast
 from django.db.models.lookups import Exact
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Comment, Tenant, User
 
@@ -181,6 +181,30 @@ class CompositePKFilterTests(TestCase):
                 self.assertSequenceEqual(
                     Comment.objects.filter(pk__in=pks).order_by("pk"), objs
                 )
+
+    def test_filter_comments_by_pk_in_subquery(self):
+        self.assertSequenceEqual(
+            Comment.objects.filter(
+                pk__in=Comment.objects.filter(pk=self.comment_1.pk),
+            ),
+            [self.comment_1],
+        )
+        self.assertSequenceEqual(
+            Comment.objects.filter(
+                pk__in=Comment.objects.filter(pk=self.comment_1.pk).values(
+                    "tenant_id", "id"
+                ),
+            ),
+            [self.comment_1],
+        )
+        self.comment_2.integer = self.comment_1.id
+        self.comment_2.save()
+        self.assertSequenceEqual(
+            Comment.objects.filter(
+                pk__in=Comment.objects.values("tenant_id", "integer"),
+            ),
+            [self.comment_1],
+        )
 
     def test_filter_comments_by_user_and_order_by_pk_asc(self):
         self.assertSequenceEqual(
@@ -440,15 +464,39 @@ class CompositePKFilterTests(TestCase):
                 queryset = Comment.objects.filter(**{f"id{lookup}": subquery})
                 self.assertEqual(queryset.count(), expected_count)
 
-    def test_non_outer_ref_subquery(self):
-        # If rhs is any non-OuterRef object with an as_sql() function.
+    def test_unsupported_rhs(self):
         pk = Exact(F("tenant_id"), 1)
         msg = (
-            "'exact' subquery lookup of 'pk' only supports OuterRef objects "
-            "(received 'Exact')"
+            "'exact' subquery lookup of 'pk' only supports OuterRef "
+            "and QuerySet objects (received 'Exact')"
         )
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.filter(pk=pk)
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_filter_comments_by_pk_exact_subquery(self):
+        self.assertSequenceEqual(
+            Comment.objects.filter(
+                pk=Comment.objects.filter(pk=self.comment_1.pk)[:1],
+            ),
+            [self.comment_1],
+        )
+        self.assertSequenceEqual(
+            Comment.objects.filter(
+                pk__in=Comment.objects.filter(pk=self.comment_1.pk).values(
+                    "tenant_id", "id"
+                )[:1],
+            ),
+            [self.comment_1],
+        )
+        self.comment_2.integer = self.comment_1.id
+        self.comment_2.save()
+        self.assertSequenceEqual(
+            Comment.objects.filter(
+                pk__in=Comment.objects.values("tenant_id", "integer"),
+            )[:1],
+            [self.comment_1],
+        )
 
     def test_outer_ref_not_composite_pk(self):
         subquery = Comment.objects.filter(pk=OuterRef("id")).values("id")

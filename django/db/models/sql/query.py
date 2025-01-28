@@ -1224,6 +1224,12 @@ class Query(BaseExpression):
         if self.selected:
             self.selected[alias] = alias
 
+    @property
+    def _subquery_fields_len(self):
+        if self.has_select_fields:
+            return len(self.selected)
+        return len(self.model._meta.pk_fields)
+
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()
         # Subqueries need to use a different set of aliases than the outer query.
