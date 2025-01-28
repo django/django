@@ -40,7 +40,16 @@ def get_normalized_value(value, lhs):
 
 class RelatedIn(In):
     def get_prep_lookup(self):
-        if not isinstance(self.lhs, ColPairs):
+        from django.db.models.sql.query import Query  # avoid circular import
+
+        if isinstance(self.lhs, ColPairs):
+            if (
+                isinstance(self.rhs, Query)
+                and not self.rhs.has_select_fields
+                and self.lhs.output_field.related_model is self.rhs.model
+            ):
+                self.rhs.set_values([f.name for f in self.lhs.sources])
+        else:
             if self.rhs_is_direct_value():
                 # If we get here, we are dealing with single-column relations.
                 self.rhs = [get_normalized_value(val, self.lhs)[0] for val in self.rhs]
