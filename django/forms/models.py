@@ -203,6 +203,7 @@ def fields_for_model(
                 fields is not None
                 and f.name in fields
                 and (exclude is None or f.name not in exclude)
+                and f not in sortable_private_fields
             ):
                 raise FieldError(
                     "'%s' cannot be specified for %s model form as it is a "

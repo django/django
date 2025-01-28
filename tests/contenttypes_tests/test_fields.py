@@ -1,5 +1,6 @@
 import json
 
+from django import forms
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db import models
@@ -64,6 +65,25 @@ class GenericForeignKeyTests(TestCase):
         # The reverse relation is refreshed even when the text field is deferred.
         answer.refresh_from_db()
         self.assertIsNot(answer.question, old_question_obj)
+
+    def test_form_field(self):
+        class AnswerForm(forms.ModelForm):
+            class Meta:
+                model = Answer
+                fields = "__all__"
+
+        form = AnswerForm()
+        self.assertNotIn("question", form.fields)
+
+        class AnswerWithGFKForm(forms.ModelForm):
+            question = forms.CharField()
+
+            class Meta:
+                model = Answer
+                fields = ["question"]
+
+        form = AnswerWithGFKForm()
+        self.assertIn("question", form.fields)
 
 
 class GenericRelationTests(TestCase):
