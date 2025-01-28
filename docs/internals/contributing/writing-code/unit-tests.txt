@@ -306,27 +306,27 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
-* :pypi:`aiosmtpd`
-* :pypi:`argon2-cffi` 19.2.0+
+* :pypi:`aiosmtpd` 1.4.5+
+* :pypi:`argon2-cffi` 23.1.0+
 * :pypi:`asgiref` 3.8.1+ (required)
-* :pypi:`bcrypt`
+* :pypi:`bcrypt` 4.1.1+
 * :pypi:`colorama` 0.4.6+
 * :pypi:`docutils` 0.19+
-* :pypi:`geoip2`
+* :pypi:`geoip2` 4.8.0+
 * :pypi:`Jinja2` 2.11+
-* :pypi:`numpy`
-* :pypi:`Pillow` 6.2.1+
-* :pypi:`PyYAML`
+* :pypi:`numpy` 1.26.0+
+* :pypi:`Pillow` 10.1.0+
+* :pypi:`PyYAML` 6.0.2+
 * :pypi:`pywatchman`
-* :pypi:`redis` 3.4+
+* :pypi:`redis` 5.1.0+
 * :pypi:`setuptools`
 * :pypi:`pymemcache`, plus a `supported Python binding
   <https://memcached.org/>`_
 * `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_
   (:ref:`gettext_on_windows`)
-* :pypi:`selenium` 4.8.0+
-* :pypi:`sqlparse` 0.3.1+ (required)
-* :pypi:`tblib` 1.5.0+
+* :pypi:`selenium` 4.23.0+
+* :pypi:`sqlparse` 0.5.0+ (required)
+* :pypi:`tblib` 3.0.0+
 
 You can find these dependencies in `pip requirements files
 <https://pip.pypa.io/en/latest/user_guide/#requirements-files>`_ inside the

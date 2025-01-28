@@ -115,8 +115,8 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
-2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
+Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
+2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended.
 
 .. note::
 
@@ -486,7 +486,7 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.4.3 or later.
+Django requires `mysqlclient`_ 2.2.1 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
