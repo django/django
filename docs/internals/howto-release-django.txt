@@ -188,8 +188,12 @@ A week before a security release
 A few days before any release
 -----------------------------
 
-#. As the release approaches, watch Trac to make sure no release blockers
-   are left for the upcoming release.
+#. As the release approaches, watch Trac to make sure no release blockers are
+   left for the upcoming release. Under exceptional circumstances, such as to
+   meet a pre-determined security release date, a release could still go ahead
+   with an open release blocker. The releaser is trusted with the decision to
+   release with an open release blocker or to postpone the release date of a
+   non-security release if required.
 
 #. Check with the other mergers to make sure they don't have any uncommitted
    changes for the release.
