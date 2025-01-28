@@ -1367,6 +1367,9 @@ class ColPairs(Expression):
     def resolve_expression(self, *args, **kwargs):
         return self
 
+    def select_format(self, compiler, sql, params):
+        return sql, params
+
 
 class Ref(Expression):
     """

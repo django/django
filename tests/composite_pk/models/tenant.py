@@ -44,6 +44,7 @@ class Comment(models.Model):
         related_name="comments",
     )
     text = models.TextField(default="", blank=True)
+    integer = models.IntegerField(default=0)
 
 
 class Post(models.Model):
