@@ -1646,14 +1646,16 @@ class QuerySet(AltersData):
         )
         annotations = {}
         for arg in args:
-            # The default_alias property may raise a TypeError.
+            # The default_alias property raises TypeError if default_alias
+            # can't be set automatically or AttributeError if it isn't an
+            # attribute.
             try:
                 if arg.default_alias in kwargs:
                     raise ValueError(
                         "The named annotation '%s' conflicts with the "
                         "default name for another annotation." % arg.default_alias
                     )
-            except TypeError:
+            except (TypeError, AttributeError):
                 raise TypeError("Complex annotations require an alias")
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
