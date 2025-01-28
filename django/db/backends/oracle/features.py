@@ -80,7 +80,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_multiple_constraints_on_same_fields = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False
-    supports_tuple_lookups = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
@@ -217,3 +216,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def bare_select_suffix(self):
         return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"
+
+    @cached_property
+    def supports_tuple_lookups(self):
+        # Support is known to be missing on 23.2 but available on 23.4.
+        return self.connection.oracle_version >= (23, 4)
