@@ -1,6 +1,6 @@
 import re
 
-from utils.regex_helper import _lazy_re_compile
+from django.utils.regex_helper import _lazy_re_compile
 
 # Match the beginning of a named, unnamed, or non-capturing groups.
 named_group_matcher = _lazy_re_compile(r"\(\?P(<\w+>)")

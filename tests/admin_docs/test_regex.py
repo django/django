@@ -1,6 +1,5 @@
-from test import SimpleTestCase
-
-from contrib.admindocs.regex import simplify_regex
+from django.contrib.admindocs.regex import simplify_regex
+from django.test import SimpleTestCase
 
 
 class AdminDocViewFunctionsTests(SimpleTestCase):
