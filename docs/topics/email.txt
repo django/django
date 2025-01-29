@@ -647,7 +647,6 @@ want to specify an alternative, put the following in your settings::
     EMAIL_PROVIDERS = {
         "default": {
             "BACKEND": "django.core.mail.backends.console.EmailBackend",
-            "OPTIONS": {...},
         },
         "alternative": {
             "BACKEND": "django.core.mail.backends.smtp.EmailBackend",

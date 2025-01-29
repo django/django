@@ -1085,10 +1085,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     @override_settings(
         EMAIL_PROVIDERS={
-            "default": dict(
-                settings.EMAIL_PROVIDERS["default"],
-                BACKEND="django.core.mail.backends.locmem.EmailBackend",
-            ),
+            "default": {
+                "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
+            },
         },
         ADMINS=[("nobody", "nobody@example.com")],
         MANAGERS=[("nobody", "nobody@example.com")],

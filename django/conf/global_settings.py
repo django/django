@@ -208,30 +208,6 @@ EMAIL_PROVIDERS = {
 # Whether to send SMTP 'Date' header in the local time zone or in UTC.
 EMAIL_USE_LOCALTIME = False
 
-# deprecated
-# The default is to use the SMTP backend.
-# Third-party backends can be specified by providing a Python path
-# to a module that defines an EmailBackend class.
-dep_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-# deprecated
-# Host for sending email.
-dep_EMAIL_HOST = "localhost"
-
-# deprecated
-# Port for sending email.
-dep_EMAIL_PORT = 25
-
-# deprecated
-# Optional SMTP authentication information for EMAIL_HOST.
-dep_EMAIL_HOST_USER = ""
-dep_EMAIL_HOST_PASSWORD = ""
-dep_EMAIL_USE_TLS = False
-dep_EMAIL_USE_SSL = False
-dep_EMAIL_SSL_CERTFILE = None
-dep_EMAIL_SSL_KEYFILE = None
-dep_EMAIL_TIMEOUT = None
-
 # List of strings representing installed apps.
 INSTALLED_APPS = []
 

@@ -3,6 +3,7 @@ Tools for sending email.
 """
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 # Imported for backwards compatibility and for the sake
 # of a cleaner namespace. These symbols used to be in
@@ -44,7 +45,7 @@ __all__ = [
 ]
 
 
-def get_connection(backend=None, fail_silently=False, **kwds):
+def get_connection(backend=None, fail_silently=False, *, provider=None, **kwargs):
     """Load an email backend and return an instance of it.
 
     If backend is None (default), use settings.EMAIL_PROVIDERS[provider]["BACKEND"].
@@ -53,27 +54,38 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
-    provider = kwds.pop("provider", None)
-    if backend:
-        if provider:
-            raise ValueError(
-                "backend and provider are mutually exclusive, "
-                "so only use either of those arguments."
-            )
-        klass = import_string(backend)
-        return klass(fail_silently=fail_silently, **kwds)
+    if backend and provider:
+        raise ValueError("Specify `backend` or `provider`, not both.")
 
-    if settings.is_overridden("EMAIL_BACKEND"):
-        klass = import_string(settings.EMAIL_BACKEND)
-        return klass(fail_silently=fail_silently, **kwds)
+    options = {}
 
-    provider = provider or getattr(settings, "DEFAULT_EMAIL_PROVIDER_ALIAS", "default")
-    klass = import_string(settings.EMAIL_PROVIDERS[provider]["BACKEND"])
-    return klass(
-        fail_silently=fail_silently,
-        use_localtime=settings.EMAIL_USE_LOCALTIME,
-        **(settings.EMAIL_PROVIDERS[provider]["OPTIONS"] | kwds),
-    )
+    # RemovedInDjango70Warning: Use deprecated EMAIL_BACKEND if set.
+    if not backend and not provider:
+        backend = getattr(settings, "EMAIL_BACKEND", None)
+
+    if not backend:
+        provider = provider or settings.DEFAULT_EMAIL_PROVIDER_ALIAS
+        try:
+            provider_dict = settings.EMAIL_PROVIDERS[provider]
+        except KeyError:
+            raise ImproperlyConfigured(
+                f"Unknown EMAIL_PROVIDERS alias {provider!r}. "
+            ) from None
+        try:
+            backend = provider_dict["BACKEND"]
+        except KeyError:
+            raise ImproperlyConfigured(
+                f'EMAIL_PROVIDERS["{provider}"] does not specify a BACKEND.'
+            ) from None
+        try:
+            options.update(provider_dict["OPTIONS"])
+        except KeyError:
+            pass
+
+    # Any kwargs override OPTIONS.
+    options.update(kwargs)
+    klass = import_string(backend)
+    return klass(fail_silently=fail_silently, **options, provider=provider)
 
 
 def send_mail(
@@ -99,24 +111,16 @@ def send_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    if provider:
-        if connection or auth_user or auth_password:
-            raise ValueError(
-                "provider and connection/auth_user/auth_password are mutually "
-                "exclusive, so only use either of those arguments."
-            )
-        provider_settings = settings.EMAIL_PROVIDERS[provider]
+    if connection and provider:
+        raise ValueError("Specify `connection` or `provider`, not both.")
+    if not connection:
         connection = get_connection(
-            backend=provider_settings["BACKEND"],
+            provider=provider,
             fail_silently=fail_silently,
-            **provider_settings["OPTIONS"],
-        )
-    else:
-        connection = connection or get_connection(
             username=auth_user,
             password=auth_password,
-            fail_silently=fail_silently,
         )
+
     mail = EmailMultiAlternatives(
         subject, message, from_email, recipient_list, connection=connection
     )
@@ -146,24 +150,16 @@ def send_mass_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    if provider:
-        if connection or auth_user or auth_password:
-            raise ValueError(
-                "provider and connection/auth_user/auth_password are mutually "
-                "exclusive, so only use either of those arguments."
-            )
-        provider_settings = settings.EMAIL_PROVIDERS[provider]
+    if connection and provider:
+        raise ValueError("Specify `connection` or `provider`, not both.")
+    if not connection:
         connection = get_connection(
-            backend=provider_settings["BACKEND"],
+            provider=provider,
             fail_silently=fail_silently,
-            **provider_settings["OPTIONS"],
-        )
-    else:
-        connection = connection or get_connection(
             username=auth_user,
             password=auth_password,
-            fail_silently=fail_silently,
         )
+
     messages = [
         EmailMessage(subject, message, sender, recipient, connection=connection)
         for subject, message, sender, recipient in datatuple

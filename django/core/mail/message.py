@@ -256,7 +256,7 @@ class EmailMessage:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
         self.connection = connection
-        self.provider = provider or "default"
+        self.provider = provider
 
     def get_connection(self, fail_silently=False):
         from django.core.mail import get_connection
