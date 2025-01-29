@@ -128,7 +128,14 @@ This example is equivalent to::
    .. versionchanged:: 5.2
 
        The argument ``preserve_request`` was added.
+``make_toast()``
+================
 
+.. function:: make_toast()
+
+.. versionadded:: 2.2
+
+Returns ``'toast'``.
 Examples
 --------
 
