@@ -2199,9 +2199,9 @@ class DatabaseAliasTests(SimpleTestCase):
             self._validate_databases()
 
     def test_close_match(self):
-        self.__class__.databases = {"defualt"}
+        self.__class__.databases = {"default"}
         message = (
-            "test_utils.tests.DatabaseAliasTests.databases refers to 'defualt' which "
+            "test_utils.tests.DatabaseAliasTests.databases refers to 'default' which "
             "is not defined in settings.DATABASES. Did you mean 'default'?"
         )
         with self.assertRaisesMessage(ImproperlyConfigured, message):

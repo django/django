@@ -32,7 +32,7 @@ sys.path.insert(1, dirname(dirname(abspath(__file__))))
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(abspath(join(dirname(__file__), "_ext")))
 
-# Use the module to GitHub url resolver, but import it after the _ext directoy
+# Use the module to GitHub url resolver, but import it after the _ext directory
 # it lives in has been added to sys.path.
 import github_links  # NOQA
 
