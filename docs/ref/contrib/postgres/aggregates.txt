@@ -51,11 +51,10 @@ General-purpose aggregation functions
 
         Examples::
 
-            "some_field"
-            "-some_field"
             from django.db.models import F
 
-            F("some_field").desc()
+            ArrayAgg("a_field", order_by="-some_field")
+            ArrayAgg("a_field", order_by=F("some_field").desc())
 
     .. deprecated:: 5.2
 
