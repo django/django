@@ -64,14 +64,10 @@ class PaginationTests(SimpleTestCase):
             ((ten, 4, 0, False), (10, 3, [1, 2, 3])),
             ((ten, 4, 1, False), (10, 3, [1, 2, 3])),
             ((ten, 4, 2, False), (10, 2, [1, 2])),
-            ((ten, 4, 5, False), (10, 2, [1, 2])),
-            ((ten, 4, 6, False), (10, 1, [1])),
             # Ten items, varying orphans, allow empty first page.
             ((ten, 4, 0, True), (10, 3, [1, 2, 3])),
             ((ten, 4, 1, True), (10, 3, [1, 2, 3])),
             ((ten, 4, 2, True), (10, 2, [1, 2])),
-            ((ten, 4, 5, True), (10, 2, [1, 2])),
-            ((ten, 4, 6, True), (10, 1, [1])),
             # One item, varying orphans, no empty first page.
             (([1], 4, 0, False), (1, 1, [1])),
             (([1], 4, 1, False), (1, 1, [1])),
@@ -102,7 +98,6 @@ class PaginationTests(SimpleTestCase):
             (([1, 2, 3], 2, 0, True), (3, 2, [1, 2])),
             ((eleven, 10, 0, True), (11, 2, [1, 2])),
             # Number if items one more than per_page with one orphan.
-            (([1, 2], 1, 1, True), (2, 1, [1])),
             (([1, 2, 3], 2, 1, True), (3, 1, [1])),
             ((eleven, 10, 1, True), (11, 1, [1])),
             # Non-integer inputs
@@ -127,6 +122,17 @@ class PaginationTests(SimpleTestCase):
             paginator.validate_number("x")
         with self.assertRaises(PageNotAnInteger):
             paginator.validate_number(1.2)
+
+    def test_invalid_orphans(self):
+        """
+        Invalid orphans param result in the warning being raised.
+        """
+        msg = "The orphans value 2 must be smaller than the per_page value 2"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            Paginator([1, 2, 3], 2, 2)
+        msg = "The orphans value 3 must be smaller than the per_page value 2"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            Paginator([1, 2, 3], 2, 3)
 
     def test_error_messages(self):
         error_messages = {
@@ -244,14 +250,10 @@ class PaginationTests(SimpleTestCase):
             ((ten, 3, 0, True), (1, 3), (10, 10)),
             ((ten, 5, 0, True), (1, 5), (6, 10)),
             # Ten items, varying per_page, with orphans.
-            ((ten, 1, 1, True), (1, 1), (9, 10)),
-            ((ten, 1, 2, True), (1, 1), (8, 10)),
             ((ten, 3, 1, True), (1, 3), (7, 10)),
             ((ten, 3, 2, True), (1, 3), (7, 10)),
-            ((ten, 3, 4, True), (1, 3), (4, 10)),
             ((ten, 5, 1, True), (1, 5), (6, 10)),
             ((ten, 5, 2, True), (1, 5), (6, 10)),
-            ((ten, 5, 5, True), (1, 10), (1, 10)),
             # One item, varying orphans, no empty first page.
             (([1], 4, 0, False), (1, 1), (1, 1)),
             (([1], 4, 1, False), (1, 1), (1, 1)),

@@ -52,6 +52,13 @@ class Paginator:
             if error_messages is None
             else self.default_error_messages | error_messages
         )
+        if self.per_page <= self.orphans:
+            warnings.warn(
+                "The orphans value %d must be "
+                "smaller than the per_page value %d."
+                % (self.orphans, self.per_page),
+                RuntimeWarning,
+            )
 
     def __iter__(self):
         for page_number in self.page_range:
