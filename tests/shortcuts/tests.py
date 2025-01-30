@@ -1,5 +1,5 @@
 from django.http.response import HttpResponseRedirectBase
-from django.shortcuts import redirect
+from django.shortcuts import redirect, make_toast
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
 
@@ -56,3 +56,8 @@ class RedirectTests(SimpleTestCase):
                 )
                 self.assertIsInstance(response, HttpResponseRedirectBase)
                 self.assertEqual(response.status_code, expected_status_code)
+
+class MakeToastTest(SimpleTestCase):
+    def test_make_toast(self):
+        result = make_toast()
+        assert result == 'toast'
