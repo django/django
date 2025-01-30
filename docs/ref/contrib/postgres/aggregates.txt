@@ -51,8 +51,8 @@ General-purpose aggregation functions
 
             from django.db.models import F
 
-            ArrayAgg("a_field", order_by="-some_field")
-            ArrayAgg("a_field", order_by=F("some_field").desc())
+            ArrayAgg("a_field", ordering="-some_field")
+            ArrayAgg("a_field", ordering=F("some_field").desc())
 
     .. versionchanged:: 5.0
 
