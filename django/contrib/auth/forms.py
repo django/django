@@ -15,6 +15,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.debug import sensitive_variables
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
