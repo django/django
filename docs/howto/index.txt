@@ -58,8 +58,9 @@ Other guides
 
    auth-remote-user
    csrf
-   custom-management-commands
    custom-file-storage
+   custom-management-commands
+   custom-shell
 
 .. seealso::
 

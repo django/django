@@ -1,5 +1,4 @@
 import json
-import warnings
 
 from django.conf import settings
 from django.contrib.admin.utils import quote
@@ -7,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.text import get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -26,56 +24,9 @@ ACTION_FLAG_CHOICES = [
 class LogEntryManager(models.Manager):
     use_in_migrations = True
 
-    def log_action(
-        self,
-        user_id,
-        content_type_id,
-        object_id,
-        object_repr,
-        action_flag,
-        change_message="",
-    ):
-        warnings.warn(
-            "LogEntryManager.log_action() is deprecated. Use log_actions() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        if isinstance(change_message, list):
-            change_message = json.dumps(change_message)
-        return self.model.objects.create(
-            user_id=user_id,
-            content_type_id=content_type_id,
-            object_id=str(object_id),
-            object_repr=object_repr[:200],
-            action_flag=action_flag,
-            change_message=change_message,
-        )
-
     def log_actions(
         self, user_id, queryset, action_flag, change_message="", *, single_object=False
     ):
-        # RemovedInDjango60Warning.
-        if type(self).log_action != LogEntryManager.log_action:
-            warnings.warn(
-                "The usage of log_action() is deprecated. Implement log_actions() "
-                "instead.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            return [
-                self.log_action(
-                    user_id=user_id,
-                    content_type_id=ContentType.objects.get_for_model(
-                        obj, for_concrete_model=False
-                    ).id,
-                    object_id=obj.pk,
-                    object_repr=str(obj),
-                    action_flag=action_flag,
-                    change_message=change_message,
-                )
-                for obj in queryset
-            ]
-
         if isinstance(change_message, list):
             change_message = json.dumps(change_message)
 

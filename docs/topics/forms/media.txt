@@ -2,6 +2,8 @@
 Form Assets (the ``Media`` class)
 =================================
 
+.. currentmodule:: django.forms
+
 Rendering an attractive and easy-to-use web form requires more than just
 HTML - it also requires CSS stylesheets, and if you want to use fancy widgets,
 you may also need to include some JavaScript on each page. The exact
@@ -129,6 +131,24 @@ If this last CSS definition were to be rendered, it would become the following H
 A tuple describing the required JavaScript files. See :ref:`the
 section on paths <form-asset-paths>` for details of how to specify
 paths to these files.
+
+``Script`` objects
+~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+.. class:: Script(src, **attributes)
+
+    Represents a script file.
+
+    The first parameter, ``src``, is the string path to the script file. See
+    :ref:`the section on paths <form-asset-paths>` for details on how to
+    specify paths to these files.
+
+    The optional keyword arguments, ``**attributes``, are HTML attributes that
+    are set on the rendered ``<script>`` tag.
+
+    See :ref:`form-media-asset-objects` for usage examples.
 
 ``extend``
 ----------
@@ -271,29 +291,38 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
     <script src="https://static.example.com/animations.27e20196a850.js"></script>
     <script src="https://othersite.com/actions.js"></script>
 
+.. _form-media-asset-objects:
+
 Paths as objects
 ----------------
 
-Asset paths may also be given as hashable objects implementing an
-``__html__()`` method. The ``__html__()`` method is typically added using the
-:func:`~django.utils.html.html_safe` decorator. The object is responsible for
-outputting the complete HTML ``<script>`` or ``<link>`` tag content:
+Assets may also be object-based, using :class:`.Script`.
+Furthermore, these allow you to pass custom HTML attributes::
 
-.. code-block:: pycon
+    class Media:
+        js = [
+            Script(
+                "https://cdn.example.com/something.min.js",
+                **{
+                    "crossorigin": "anonymous",
+                    "async": True,
+                },
+            ),
+        ]
 
-    >>> from django import forms
-    >>> from django.utils.html import html_safe
-    >>>
-    >>> @html_safe
-    ... class JSPath:
-    ...     def __str__(self):
-    ...         return '<script src="https://example.org/asset.js" defer>'
-    ...
+If this Media definition were to be rendered, it would become the following
+HTML:
 
-    >>> class SomeWidget(forms.TextInput):
-    ...     class Media:
-    ...         js = [JSPath()]
-    ...
+.. code-block:: html+django
+
+    <script src="https://cdn.example.com/something.min.js"
+            crossorigin="anonymous"
+            async>
+    </script>
+
+.. versionchanged:: 5.2
+
+    The object class ``Script`` was added.
 
 ``Media`` objects
 =================

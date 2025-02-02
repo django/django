@@ -815,7 +815,7 @@ anything. The :pypi:`aiosmtpd` package provides a way to accomplish this:
 
 .. code-block:: shell
 
-    python -m pip install aiosmtpd
+    python -m pip install "aiosmtpd >= 1.4.5"
 
     python -m aiosmtpd -n -l localhost:8025
 

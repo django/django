@@ -158,10 +158,6 @@ Use the ``django.test.Client`` class to make requests.
     The ``json_encoder`` argument allows setting a custom JSON encoder for
     the JSON serialization that's described in :meth:`post`.
 
-    .. versionchanged:: 5.1
-
-        The ``query_params`` argument was added.
-
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
@@ -240,10 +236,6 @@ Use the ``django.test.Client`` class to make requests.
 
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
-
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
 
     .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
@@ -360,20 +352,12 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
-
     .. method:: Client.head(path, data=None, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
         including the ``follow``, ``secure``, ``headers``, ``query_params``,
         and ``extra`` parameters, except it does not return a message body.
-
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
 
     .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
@@ -386,10 +370,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
-
     .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
@@ -401,10 +381,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
-
     .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a PATCH request on the provided ``path`` and returns a
@@ -412,10 +388,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
 
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
@@ -428,10 +400,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
-
     .. method:: Client.trace(path, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a TRACE request on the provided ``path`` and returns a
@@ -443,10 +411,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
 
     .. method:: Client.login(**credentials)
     .. method:: Client.alogin(**credentials)
@@ -904,8 +868,8 @@ If your tests make any database queries, use subclasses
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase` to
 add some database-specific features:
 
-* Resetting the database to a known state at the beginning of each test to
-  ease testing and using the ORM.
+* Resetting the database to a known state at the end of each test to ease
+  testing and using the ORM.
 * Database :attr:`~TransactionTestCase.fixtures`.
 * Test :ref:`skipping based on database backend features <skipping-tests>`.
 * The remaining specialized :meth:`assert*
@@ -914,7 +878,7 @@ add some database-specific features:
 Django's :class:`TestCase` class is a more commonly used subclass of
 ``TransactionTestCase`` that makes use of database transaction facilities
 to speed up the process of resetting the database to a known state at the
-beginning of each test. A consequence of this, however, is that some database
+end of each test. A consequence of this, however, is that some database
 behaviors cannot be tested within a Django ``TestCase`` class. For instance,
 you cannot test that a block of code is executing within a transaction, as is
 required when using
@@ -1058,7 +1022,7 @@ First of all, you need to install the :pypi:`selenium` package:
 
 .. console::
 
-    $ python -m pip install "selenium >= 4.8.0"
+    $ python -m pip install "selenium >= 4.23.0"
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
 (for example: ``myapp/tests.py``). For this example, we'll assume you're using
@@ -1314,12 +1278,12 @@ by at least one test through ``databases``.
 
 However, a big part of the time taken to run a Django ``TestCase`` is consumed
 by the call to ``flush`` that ensures that you have a clean database at the
-start of each test run. If you have multiple databases, multiple flushes are
+end of each test run. If you have multiple databases, multiple flushes are
 required (one for each database), which can be a time consuming activity --
 especially if your tests don't need to test multi-database activity.
 
 As an optimization, Django only flushes the ``default`` database at
-the start of each test run. If your setup contains multiple databases,
+the end of each test run. If your setup contains multiple databases,
 and you have a test that requires every database to be clean, you can
 use the ``databases`` attribute on the test suite to request extra databases
 to be flushed.
@@ -1333,7 +1297,7 @@ For example::
             call_some_test_code()
 
 This test case class will flush the ``default`` and ``other`` test databases
-before running ``test_index_page_view``. You can also use ``'__all__'`` to
+after running ``test_index_page_view``. You can also use ``'__all__'`` to
 specify that all of the test databases must be flushed.
 
 The ``databases`` flag also controls which databases the
@@ -1548,11 +1512,6 @@ LOCALE_PATHS, LANGUAGE_CODE       Default translation and loaded translations
 STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
 ================================= ========================
 
-.. versionchanged:: 5.1
-
-    Resetting the default renderer when the ``FORM_RENDERER`` setting is
-    changed was added.
-
 Isolating apps
 --------------
 
@@ -1740,10 +1699,6 @@ your test suite.
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
-    .. versionchanged:: 5.1
-
-        In older versions, error messages didn't contain the response content.
-
 .. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
 
     Asserts that a :class:`response <django.http.HttpResponse>` produced the
@@ -1755,10 +1710,6 @@ your test suite.
     character-by-character equality. Whitespace is ignored in most cases,
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
-
-    .. versionchanged:: 5.1
-
-        In older versions, error messages didn't contain the response content.
 
 .. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='', count=None)
 
@@ -1896,13 +1847,7 @@ your test suite.
     Whitespace in most cases is ignored, and attribute ordering is not
     significant. See :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
-    .. versionchanged:: 5.1
-
-        In older versions, error messages didn't contain the ``haystack``.
-
 .. method:: SimpleTestCase.assertNotInHTML(needle, haystack, msg_prefix="")
-
-    .. versionadded:: 5.1
 
     Asserts that the HTML fragment ``needle`` is *not* contained in the
     ``haystack``.
@@ -2057,10 +2002,6 @@ test client, with the following exceptions:
 
     >>> c = AsyncClient()
     >>> c.get("/customers/details/", {"name": "fred", "age": 7}, ACCEPT="application/json")
-
-.. versionchanged:: 5.1
-
-    The ``query_params`` argument was added.
 
 Using ``AsyncClient`` any method that makes a request must be awaited::
 

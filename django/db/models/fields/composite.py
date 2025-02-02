@@ -1,3 +1,5 @@
+import json
+
 from django.core import checks
 from django.db.models import NOT_PROVIDED, Field
 from django.db.models.expressions import ColPairs
@@ -11,6 +13,11 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThanOrEqual,
 )
 from django.utils.functional import cached_property
+
+
+class AttributeSetter:
+    def __init__(self, name, value):
+        setattr(self, name, value)
 
 
 class CompositeAttribute:
@@ -56,6 +63,8 @@ class CompositePrimaryKey(Field):
             raise ValueError("CompositePrimaryKey cannot have a default.")
         if kwargs.get("db_default", NOT_PROVIDED) is not NOT_PROVIDED:
             raise ValueError("CompositePrimaryKey cannot have a database default.")
+        if kwargs.get("db_column", None) is not None:
+            raise ValueError("CompositePrimaryKey cannot have a db_column.")
         if kwargs.setdefault("editable", False):
             raise ValueError("CompositePrimaryKey cannot be editable.")
         if not kwargs.setdefault("primary_key", True):
@@ -127,6 +136,24 @@ class CompositePrimaryKey(Field):
                 id="fields.E013",
             )
         ]
+
+    def value_to_string(self, obj):
+        values = []
+        vals = self.value_from_object(obj)
+        for field, value in zip(self.fields, vals):
+            obj = AttributeSetter(field.attname, value)
+            values.append(field.value_to_string(obj))
+        return json.dumps(values, ensure_ascii=False)
+
+    def to_python(self, value):
+        if isinstance(value, str):
+            # Assume we're deserializing.
+            vals = json.loads(value)
+            value = [
+                field.to_python(val)
+                for field, val in zip(self.fields, vals, strict=True)
+            ]
+        return value
 
 
 CompositePrimaryKey.register_lookup(TupleExact)

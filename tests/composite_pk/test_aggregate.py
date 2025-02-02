@@ -1,5 +1,4 @@
-from django.db import NotSupportedError
-from django.db.models import Count, Q
+from django.db.models import Count, Max, Q
 from django.test import TestCase
 
 from .models import Comment, Tenant, User
@@ -82,7 +81,7 @@ class CompositePKAggregateTests(TestCase):
 
     def test_count_distinct_not_supported(self):
         with self.assertRaisesMessage(
-            NotSupportedError, "COUNT(DISTINCT) doesn't support composite primary keys"
+            ValueError, "COUNT(DISTINCT) doesn't support composite primary keys"
         ):
             self.assertIsNone(
                 User.objects.annotate(comments__count=Count("comments", distinct=True))
@@ -137,3 +136,8 @@ class CompositePKAggregateTests(TestCase):
             ),
             (self.user_3, self.user_1, self.user_2),
         )
+
+    def test_max_pk(self):
+        msg = "Max expression does not support composite primary keys."
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.aggregate(Max("pk"))

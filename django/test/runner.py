@@ -18,8 +18,6 @@ from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
 
-import sqlparse
-
 import django
 from django.core.management import call_command
 from django.db import connections
@@ -30,7 +28,7 @@ from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.version import PY312
+from django.utils.version import PY313
 
 try:
     import ipdb as pdb
@@ -97,9 +95,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln(
-                sqlparse.format(sql_debug, reindent=True, keyword_case="upper")
-            )
+            self.stream.writeln(sql_debug)
 
 
 class PDBDebugResult(unittest.TextTestResult):
@@ -126,7 +122,10 @@ class PDBDebugResult(unittest.TextTestResult):
         self.buffer = False
         exc_type, exc_value, traceback = error
         print("\nOpening PDB: %r" % exc_value)
-        pdb.post_mortem(traceback)
+        if PY313:
+            pdb.post_mortem(exc_value)
+        else:
+            pdb.post_mortem(traceback)
 
 
 class DummyList:
@@ -830,15 +829,14 @@ class DiscoverRunner:
                 "unittest -k option."
             ),
         )
-        if PY312:
-            parser.add_argument(
-                "--durations",
-                dest="durations",
-                type=int,
-                default=None,
-                metavar="N",
-                help="Show the N slowest test cases (N=0 for all).",
-            )
+        parser.add_argument(
+            "--durations",
+            dest="durations",
+            type=int,
+            default=None,
+            metavar="N",
+            help="Show the N slowest test cases (N=0 for all).",
+        )
 
     @property
     def shuffle_seed(self):
@@ -1006,9 +1004,8 @@ class DiscoverRunner:
             "resultclass": self.get_resultclass(),
             "verbosity": self.verbosity,
             "buffer": self.buffer,
+            "durations": self.durations,
         }
-        if PY312:
-            kwargs["durations"] = self.durations
         return kwargs
 
     def run_checks(self, databases):

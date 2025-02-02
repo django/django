@@ -1,6 +1,9 @@
+from unittest import mock
+
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
 from django.utils.functional import lazy
+from django.utils.html import Urlizer
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -226,19 +229,34 @@ class FunctionTests(SimpleTestCase):
         """
         #13704 - Check urlize handles IDN correctly
         """
+        # The "✶" below is \N{SIX POINTED BLACK STAR}, not "*" \N{ASTERISK}.
         self.assertEqual(
             urlize("http://c✶.ws"),
-            '<a href="http://xn--c-lgq.ws" rel="nofollow">http://c✶.ws</a>',
+            '<a href="http://c%E2%9C%B6.ws" rel="nofollow">http://c✶.ws</a>',
         )
         self.assertEqual(
             urlize("www.c✶.ws"),
-            '<a href="http://www.xn--c-lgq.ws" rel="nofollow">www.c✶.ws</a>',
+            '<a href="http://www.c%E2%9C%B6.ws" rel="nofollow">www.c✶.ws</a>',
         )
         self.assertEqual(
-            urlize("c✶.org"), '<a href="http://xn--c-lgq.org" rel="nofollow">c✶.org</a>'
+            urlize("c✶.org"),
+            '<a href="http://c%E2%9C%B6.org" rel="nofollow">c✶.org</a>',
         )
         self.assertEqual(
-            urlize("info@c✶.org"), '<a href="mailto:info@xn--c-lgq.org">info@c✶.org</a>'
+            urlize("info@c✶.org"),
+            '<a href="mailto:info@c%E2%9C%B6.org">info@c✶.org</a>',
+        )
+
+        # Pre-encoded IDNA is urlized but not re-encoded.
+        self.assertEqual(
+            urlize("www.xn--iny-zx5a.com/idna2003"),
+            '<a href="http://www.xn--iny-zx5a.com/idna2003"'
+            ' rel="nofollow">www.xn--iny-zx5a.com/idna2003</a>',
+        )
+        self.assertEqual(
+            urlize("www.xn--fa-hia.com/idna2008"),
+            '<a href="http://www.xn--fa-hia.com/idna2008"'
+            ' rel="nofollow">www.xn--fa-hia.com/idna2008</a>',
         )
 
     def test_malformed(self):
@@ -466,4 +484,38 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(
             urlize(prepend_www("google.com")),
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',
+        )
+
+    @mock.patch.object(Urlizer, "handle_word", return_value="test")
+    def test_caching_repeated_words(self, mock_handle_word):
+        urlize("test test test test")
+        common_handle_word_args = {
+            "safe_input": False,
+            "trim_url_limit": None,
+            "nofollow": True,
+            "autoescape": True,
+        }
+        self.assertEqual(
+            mock_handle_word.mock_calls,
+            [
+                mock.call("test", **common_handle_word_args),
+                mock.call(" ", **common_handle_word_args),
+            ],
+        )
+
+    @mock.patch.object(Urlizer, "handle_word", return_value="test")
+    def test_caching_repeated_calls(self, mock_handle_word):
+        urlize("test")
+        handle_word_test = mock.call(
+            "test",
+            safe_input=False,
+            trim_url_limit=None,
+            nofollow=True,
+            autoescape=True,
+        )
+        self.assertEqual(mock_handle_word.mock_calls, [handle_word_test])
+
+        urlize("test")
+        self.assertEqual(
+            mock_handle_word.mock_calls, [handle_word_test, handle_word_test]
         )

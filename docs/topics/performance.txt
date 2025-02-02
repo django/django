@@ -419,7 +419,8 @@ performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
 <https://www.pypy.org/compat.html>`_ with existing Python APIs and libraries.
-Django is compatible, but you will need to check the compatibility of other
+Django is compatible with versions of PyPy corresponding to the supported
+Python versions, but you will need to check the compatibility of other
 libraries you rely on.
 
 C implementations of Python libraries

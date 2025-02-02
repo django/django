@@ -57,5 +57,13 @@ class PrimaryKeyWithDbDefault(models.Model):
     uuid = models.IntegerField(primary_key=True, db_default=1)
 
 
+class PrimaryKeyWithFalseyDefault(models.Model):
+    uuid = models.IntegerField(primary_key=True, default=0)
+
+
+class PrimaryKeyWithFalseyDbDefault(models.Model):
+    uuid = models.IntegerField(primary_key=True, db_default=0)
+
+
 class ChildPrimaryKeyWithDefault(PrimaryKeyWithDefault):
     pass

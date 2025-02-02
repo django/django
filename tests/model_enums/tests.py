@@ -6,10 +6,8 @@ import uuid
 from django.db import models
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
-from django.utils.version import PY311
 
 
 class Suit(models.IntegerChoices):
@@ -201,13 +199,7 @@ class ChoicesTests(SimpleTestCase):
 
     def test_do_not_call_in_templates_nonmember(self):
         self.assertNotIn("do_not_call_in_templates", Suit.__members__)
-        if PY311:
-            self.assertIs(Suit.do_not_call_in_templates, True)
-        else:
-            # Using @property on an enum does not behave as expected.
-            self.assertTrue(Suit.do_not_call_in_templates)
-            self.assertIsNot(Suit.do_not_call_in_templates, True)
-            self.assertIsInstance(Suit.do_not_call_in_templates, property)
+        self.assertIs(Suit.do_not_call_in_templates, True)
 
 
 class Separator(bytes, models.Choices):
@@ -321,13 +313,3 @@ class CustomChoicesTests(SimpleTestCase):
 
             class Identifier(uuid.UUID, models.Choices):
                 A = "972ce4eb-a95f-4a56-9339-68c208a76f18"
-
-
-class ChoicesMetaDeprecationTests(SimpleTestCase):
-    def test_deprecation_warning(self):
-        from django.db.models import enums
-
-        msg = "ChoicesMeta is deprecated in favor of ChoicesType."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            enums.ChoicesMeta
-        self.assertEqual(ctx.filename, __file__)

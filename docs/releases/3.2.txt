@@ -250,7 +250,7 @@ Minor features
 * The new ``ExclusionConstraint.opclasses`` attribute allows setting PostgreSQL
   operator classes.
 
-* The new :attr:`.JSONBAgg.ordering` attribute determines the ordering of the
+* The new ``JSONBAgg.ordering`` attribute determines the ordering of the
   aggregated elements.
 
 * The new :attr:`.JSONBAgg.distinct` attribute determines if aggregated values

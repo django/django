@@ -7,6 +7,14 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-7.0:
+
+7.0
+---
+
+See the :ref:`Django 6.0 release notes <deprecated-features-6.0>` for more
+details on these changes.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
@@ -21,6 +29,11 @@ details on these changes.
 * The fallback to ``request.user`` when ``user`` is ``None`` in
   ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
   removed.
+
+* The ``ordering`` keyword argument of the PostgreSQL specific aggregation
+  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
+  ``django.contrib.postgres.aggregates.JSONBAgg``, and
+  ``django.contrib.postgres.aggregates.StringAgg`` will be removed.
 
 .. _deprecation-removed-in-6.0:
 

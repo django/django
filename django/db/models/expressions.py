@@ -167,13 +167,16 @@ class Combinable:
         return NegatedExpression(self)
 
 
+class OutputFieldIsNoneError(FieldError):
+    pass
+
+
 class BaseExpression:
     """Base class for all query expressions."""
 
     empty_result_set_value = NotImplemented
     # aggregate specific fields
     is_summary = False
-    _output_field_resolved_to_none = False
     # Can the expression be used in a WHERE clause?
     filterable = True
     # Can the expression be used as a source expression in Window?
@@ -184,6 +187,8 @@ class BaseExpression:
     constraint_validation_compatible = True
     # Does the expression possibly return more than one row?
     set_returning = False
+    # Does the expression allow composite expressions?
+    allows_composite_expressions = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -290,16 +295,22 @@ class BaseExpression:
         """
         c = self.copy()
         c.is_summary = summarize
-        c.set_source_expressions(
-            [
-                (
-                    expr.resolve_expression(query, allow_joins, reuse, summarize)
-                    if expr
-                    else None
-                )
-                for expr in c.get_source_expressions()
-            ]
-        )
+        source_expressions = [
+            (
+                expr.resolve_expression(query, allow_joins, reuse, summarize)
+                if expr is not None
+                else None
+            )
+            for expr in c.get_source_expressions()
+        ]
+        if not self.allows_composite_expressions and any(
+            isinstance(expr, ColPairs) for expr in source_expressions
+        ):
+            raise ValueError(
+                f"{self.__class__.__name__} expression does not support "
+                "composite primary keys."
+            )
+        c.set_source_expressions(source_expressions)
         return c
 
     @property
@@ -315,11 +326,12 @@ class BaseExpression:
         """Return the output type of this expressions."""
         output_field = self._resolve_output_field()
         if output_field is None:
-            self._output_field_resolved_to_none = True
-            raise FieldError("Cannot resolve expression type, unknown output_field")
+            raise OutputFieldIsNoneError(
+                "Cannot resolve expression type, unknown output_field"
+            )
         return output_field
 
-    @cached_property
+    @property
     def _output_field_or_none(self):
         """
         Return the output field of this expression, or None if
@@ -327,9 +339,8 @@ class BaseExpression:
         """
         try:
             return self.output_field
-        except FieldError:
-            if not self._output_field_resolved_to_none:
-                raise
+        except OutputFieldIsNoneError:
+            return
 
     def _resolve_output_field(self):
         """
@@ -752,30 +763,25 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
     ):
-        lhs = self.lhs.resolve_expression(
-            query, allow_joins, reuse, summarize, for_save
-        )
-        rhs = self.rhs.resolve_expression(
-            query, allow_joins, reuse, summarize, for_save
+        resolved = super().resolve_expression(
+            query,
+            allow_joins,
+            reuse,
+            summarize,
+            for_save,
         )
         if not isinstance(self, (DurationExpression, TemporalSubtraction)):
             try:
-                lhs_type = lhs.output_field.get_internal_type()
+                lhs_type = resolved.lhs.output_field.get_internal_type()
             except (AttributeError, FieldError):
                 lhs_type = None
             try:
-                rhs_type = rhs.output_field.get_internal_type()
+                rhs_type = resolved.rhs.output_field.get_internal_type()
             except (AttributeError, FieldError):
                 rhs_type = None
             if "DurationField" in {lhs_type, rhs_type} and lhs_type != rhs_type:
                 return DurationExpression(
-                    self.lhs, self.connector, self.rhs
-                ).resolve_expression(
-                    query,
-                    allow_joins,
-                    reuse,
-                    summarize,
-                    for_save,
+                    resolved.lhs, resolved.connector, resolved.rhs
                 )
             datetime_fields = {"DateField", "DateTimeField", "TimeField"}
             if (
@@ -783,18 +789,8 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
                 and lhs_type in datetime_fields
                 and lhs_type == rhs_type
             ):
-                return TemporalSubtraction(self.lhs, self.rhs).resolve_expression(
-                    query,
-                    allow_joins,
-                    reuse,
-                    summarize,
-                    for_save,
-                )
-        c = self.copy()
-        c.is_summary = summarize
-        c.lhs = lhs
-        c.rhs = rhs
-        return c
+                return TemporalSubtraction(resolved.lhs, resolved.rhs)
+        return resolved
 
     @cached_property
     def allowed_default(self):
@@ -1065,17 +1061,6 @@ class Func(SQLiteNumericMixin, Expression):
 
     def set_source_expressions(self, exprs):
         self.source_expressions = exprs
-
-    def resolve_expression(
-        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
-    ):
-        c = self.copy()
-        c.is_summary = summarize
-        for pos, arg in enumerate(c.source_expressions):
-            c.source_expressions[pos] = arg.resolve_expression(
-                query, allow_joins, reuse, summarize, for_save
-            )
-        return c
 
     def as_sql(
         self,
@@ -1595,20 +1580,6 @@ class When(Expression):
         # We're only interested in the fields of the result expressions.
         return [self.result._output_field_or_none]
 
-    def resolve_expression(
-        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
-    ):
-        c = self.copy()
-        c.is_summary = summarize
-        if hasattr(c.condition, "resolve_expression"):
-            c.condition = c.condition.resolve_expression(
-                query, allow_joins, reuse, summarize, False
-            )
-        c.result = c.result.resolve_expression(
-            query, allow_joins, reuse, summarize, for_save
-        )
-        return c
-
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = extra_context
@@ -1675,20 +1646,6 @@ class Case(SQLiteNumericMixin, Expression):
 
     def set_source_expressions(self, exprs):
         *self.cases, self.default = exprs
-
-    def resolve_expression(
-        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
-    ):
-        c = self.copy()
-        c.is_summary = summarize
-        for pos, case in enumerate(c.cases):
-            c.cases[pos] = case.resolve_expression(
-                query, allow_joins, reuse, summarize, for_save
-            )
-        c.default = c.default.resolve_expression(
-            query, allow_joins, reuse, summarize, for_save
-        )
-        return c
 
     def copy(self):
         c = super().copy()
@@ -1825,6 +1782,7 @@ class OrderBy(Expression):
     template = "%(expression)s %(ordering)s"
     conditional = False
     constraint_validation_compatible = False
+    allows_composite_expressions = True
 
     def __init__(self, expression, descending=False, nulls_first=None, nulls_last=None):
         if nulls_first and nulls_last:
@@ -1850,6 +1808,16 @@ class OrderBy(Expression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
+        if isinstance(self.expression, ColPairs):
+            sql_parts = []
+            params = []
+            for col in self.expression.get_cols():
+                copy = self.copy()
+                copy.set_source_expressions([col])
+                sql, col_params = compiler.compile(copy)
+                sql_parts.append(sql)
+                params.extend(col_params)
+            return ", ".join(sql_parts), params
         template = template or self.template
         if connection.features.supports_order_by_nulls_modifier:
             if self.nulls_last:

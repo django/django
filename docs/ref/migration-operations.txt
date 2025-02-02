@@ -498,8 +498,6 @@ For an example using ``SeparateDatabaseAndState``, see
 Operation category
 ==================
 
-.. versionadded:: 5.1
-
 .. currentmodule:: django.db.migrations.operations.base
 
 .. class:: OperationCategory

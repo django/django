@@ -894,10 +894,6 @@ aggregate, except it can be several orders of magnitude faster than performing
 a union because it rolls up geometries into a collection or multi object, not
 caring about dissolving boundaries.
 
-.. versionchanged:: 5.1
-
-    MySQL 8.0.24+ support was added.
-
 .. versionchanged:: 5.2
 
     MariaDB 11.7+ support was added.

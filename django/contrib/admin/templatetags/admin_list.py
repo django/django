@@ -214,6 +214,7 @@ def items_for_result(cl, result, form):
     for field_index, field_name in enumerate(cl.list_display):
         empty_value_display = cl.model_admin.get_empty_value_display()
         row_classes = ["field-%s" % _coerce_field_name(field_name, field_index)]
+        link_to_changelist = link_in_col(first, field_name, cl)
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
         except ObjectDoesNotExist:
@@ -222,6 +223,8 @@ def items_for_result(cl, result, form):
             empty_value_display = getattr(
                 attr, "empty_value_display", empty_value_display
             )
+            if isinstance(value, str) and value.strip() == "":
+                value = ""
             if f is None or f.auto_created:
                 if field_name == "action_checkbox":
                     row_classes = ["action-checkbox"]
@@ -240,14 +243,19 @@ def items_for_result(cl, result, form):
                     else:
                         result_repr = field_val
                 else:
-                    result_repr = display_for_field(value, f, empty_value_display)
+                    result_repr = display_for_field(
+                        value,
+                        f,
+                        empty_value_display,
+                        avoid_link=link_to_changelist,
+                    )
                 if isinstance(
                     f, (models.DateField, models.TimeField, models.ForeignKey)
                 ):
                     row_classes.append("nowrap")
         row_class = mark_safe(' class="%s"' % " ".join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
-        if link_in_col(first, field_name, cl):
+        if link_to_changelist:
             table_tag = "th" if first else "td"
             first = False
 

@@ -1,7 +1,7 @@
 import os
 import sys
 from argparse import ArgumentDefaultsHelpFormatter
-from io import StringIO
+from io import BytesIO, StringIO, TextIOWrapper
 from pathlib import Path
 from unittest import mock
 
@@ -11,6 +11,7 @@ from django.apps import apps
 from django.core import management
 from django.core.checks import Tags
 from django.core.management import BaseCommand, CommandError, find_commands
+from django.core.management.base import OutputWrapper
 from django.core.management.utils import (
     find_command,
     get_random_secret_key,
@@ -26,6 +27,29 @@ from django.utils import translation
 
 from .management.commands import dance
 from .utils import AssertFormatterFailureCaughtContext
+
+
+class OutputWrapperTests(SimpleTestCase):
+    def test_unhandled_exceptions(self):
+        cases = [
+            StringIO("Hello world"),
+            TextIOWrapper(BytesIO(b"Hello world")),
+        ]
+        for out in cases:
+            with self.subTest(out=out):
+                wrapper = OutputWrapper(out)
+                out.close()
+
+                unraisable_exceptions = []
+
+                def unraisablehook(unraisable):
+                    unraisable_exceptions.append(unraisable)
+                    sys.__unraisablehook__(unraisable)
+
+                with mock.patch.object(sys, "unraisablehook", unraisablehook):
+                    del wrapper
+
+                self.assertEqual(unraisable_exceptions, [])
 
 
 # A minimal set of apps to avoid system checks running on all apps.

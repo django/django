@@ -1,5 +1,6 @@
+import oracledb
+
 from django.db.backends.oracle.introspection import DatabaseIntrospection
-from django.db.backends.oracle.oracledb_any import oracledb
 from django.utils.functional import cached_property
 
 
