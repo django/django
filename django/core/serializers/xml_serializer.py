@@ -56,7 +56,7 @@ class Serializer(base.Serializer):
         if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
             obj_pk = obj.pk
             if obj_pk is not None:
-                attrs["pk"] = str(obj_pk)
+                attrs["pk"] = obj._meta.pk.value_to_string(obj)
 
         self.xml.startElement("object", attrs)
 
@@ -148,7 +148,11 @@ class Serializer(base.Serializer):
                     self.xml.endElement("object")
 
                 def queryset_iterator(obj, field):
-                    return getattr(obj, field.name).iterator()
+                    attr = getattr(obj, field.name)
+                    chunk_size = (
+                        2000 if getattr(attr, "prefetch_cache_name", None) else None
+                    )
+                    return attr.iterator(chunk_size)
 
             else:
 
@@ -156,12 +160,9 @@ class Serializer(base.Serializer):
                     self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
                 def queryset_iterator(obj, field):
-                    return (
-                        getattr(obj, field.name)
-                        .select_related(None)
-                        .only("pk")
-                        .iterator()
-                    )
+                    query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
+                    return query_set.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,

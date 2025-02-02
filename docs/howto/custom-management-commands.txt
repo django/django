@@ -157,6 +157,8 @@ Testing
 Information on how to test custom management commands can be found in the
 :ref:`testing docs <topics-testing-management-commands>`.
 
+.. _overriding-commands:
+
 Overriding commands
 ===================
 
@@ -318,6 +320,21 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     You can pass ``include_deployment_checks=True`` to also perform deployment
     checks, and list of database aliases in the ``databases`` to run database
     related checks against them.
+
+.. method:: BaseCommand.get_check_kwargs(options)
+
+    .. versionadded:: 5.2
+
+    Supplies kwargs for the call to :meth:`check`, including transforming the
+    value of :attr:`requires_system_checks` to the ``tag`` kwarg.
+
+    Override this method to change the values supplied to :meth:`check`. For
+    example, to opt into database related checks you can override
+    ``get_check_kwargs()`` as follows::
+
+        def get_check_kwargs(self, options):
+            kwargs = super().get_check_kwargs(options)
+            return {**kwargs, "databases": [options["database"]]}
 
 .. _ref-basecommand-subclasses:
 

@@ -551,24 +551,11 @@ coordinate transformation:
         >>> polygon.dimension
         2
 
-    .. attribute:: coord_dim
-
-    Returns the coordinate dimension of this geometry. For example, the value
-    would be 2 for two-dimensional geometries.
-
-    .. deprecated:: 5.1
-
-        The ``coord_dim`` setter is deprecated. Use :meth:`.set_3d` instead.
-
     .. attribute:: is_3d
-
-    .. versionadded:: 5.1
 
     A boolean indicating if this geometry has Z coordinates.
 
     .. method:: set_3d(value)
-
-    .. versionadded:: 5.1
 
     A method that adds or removes the Z coordinate dimension.
 
@@ -583,13 +570,9 @@ coordinate transformation:
 
     .. attribute:: is_measured
 
-    .. versionadded:: 5.1
-
     A boolean indicating if this geometry has M coordinates.
 
     .. method:: set_measured(value)
-
-    .. versionadded:: 5.1
 
     A method to add or remove the M coordinate dimension.
 
@@ -863,11 +846,6 @@ coordinate transformation:
 
     Returns a :class:`Point` representing the centroid of this geometry.
 
-    .. versionchanged:: 5.1
-
-        ``centroid`` was promoted from a :class:`.Polygon` only attribute to
-        being available on all geometry types.
-
     .. attribute:: tuple
 
     Returns the coordinates of a point geometry as a tuple, the
@@ -916,8 +894,6 @@ coordinate transformation:
 
     .. attribute:: m
 
-    .. versionadded:: 5.1
-
     Returns the M coordinate of this point, or ``None`` if the Point does not
     have an M coordinate:
 
@@ -957,8 +933,6 @@ coordinate transformation:
         [3.0, 6.0]
 
     .. attribute:: m
-
-    .. versionadded:: 5.1
 
     Returns a list of M coordinates in this line or ``None`` if the line does
     not have M coordinates:

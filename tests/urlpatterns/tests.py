@@ -14,7 +14,6 @@ from django.urls import (
     reverse,
 )
 from django.urls.converters import REGISTERED_CONVERTERS, IntConverter
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.views import View
 
 from .converters import Base64Converter, DynamicConverter
@@ -204,35 +203,18 @@ class SimplifiedURLTests(SimpleTestCase):
             path("foo/<nonexistent:var>/", empty_view)
 
     def test_warning_override_default_converter(self):
-        # RemovedInDjango60Warning: when the deprecation ends, replace with
-        # msg = "Converter 'int' is already registered."
-        # with self.assertRaisesMessage(ValueError, msg):
-        msg = (
-            "Converter 'int' is already registered. Support for overriding registered "
-            "converters is deprecated and will be removed in Django 6.0."
-        )
-        try:
-            with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-                register_converter(IntConverter, "int")
-        finally:
-            REGISTERED_CONVERTERS.pop("int", None)
-        self.assertEqual(ctx.filename, __file__)
+        msg = "Converter 'int' is already registered."
+        with self.assertRaisesMessage(ValueError, msg):
+            register_converter(IntConverter, "int")
 
     def test_warning_override_converter(self):
-        # RemovedInDjango60Warning: when the deprecation ends, replace with
-        # msg = "Converter 'base64' is already registered."
-        # with self.assertRaisesMessage(ValueError, msg):
-        msg = (
-            "Converter 'base64' is already registered. Support for overriding "
-            "registered converters is deprecated and will be removed in Django 6.0."
-        )
+        msg = "Converter 'base64' is already registered."
         try:
-            with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            with self.assertRaisesMessage(ValueError, msg):
                 register_converter(Base64Converter, "base64")
                 register_converter(Base64Converter, "base64")
         finally:
             REGISTERED_CONVERTERS.pop("base64", None)
-        self.assertEqual(ctx.filename, __file__)
 
     def test_invalid_view(self):
         msg = "view must be a callable or a list/tuple in the case of include()."

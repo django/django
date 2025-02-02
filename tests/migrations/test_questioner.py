@@ -85,8 +85,9 @@ class QuestionerHelperMethodsTests(SimpleTestCase):
 
     @mock.patch("builtins.input", side_effect=[KeyboardInterrupt()])
     def test_questioner_no_default_keyboard_interrupt(self, mock_input):
-        with self.assertRaises(KeyboardInterrupt):
+        with self.assertRaises(SystemExit):
             self.questioner._ask_default()
+        self.assertIn("Cancelled.\n", self.prompt.getvalue())
 
     @mock.patch("builtins.input", side_effect=["", "n"])
     def test_questioner_no_default_no_user_entry_boolean(self, mock_input):
@@ -105,3 +106,18 @@ class QuestionerHelperMethodsTests(SimpleTestCase):
         expected_msg = f"{question}\n" f" 1) a\n" f" 2) b\n" f" 3) c\n"
         self.assertIn(expected_msg, self.prompt.getvalue())
         self.assertEqual(value, 1)
+
+    @mock.patch("builtins.input", side_effect=[KeyboardInterrupt()])
+    def test_questioner_no_choice_keyboard_interrupt(self, mock_input):
+        question = "Make a choice:"
+        with self.assertRaises(SystemExit):
+            self.questioner._choice_input(question, choices="abc")
+        expected_msg = (
+            f"{question}\n"
+            f" 1) a\n"
+            f" 2) b\n"
+            f" 3) c\n"
+            f"Select an option: \n"
+            f"Cancelled.\n"
+        )
+        self.assertIn(expected_msg, self.prompt.getvalue())

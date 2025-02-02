@@ -115,10 +115,6 @@ model it represents, or to retrieve objects from that model:
     on that model, returning the corresponding object. The ``using`` argument
     can be used to specify a different database than the default one.
 
-    .. versionchanged:: 5.1
-
-        The ``using`` argument was added.
-
 .. method:: ContentType.model_class()
 
     Returns the model class represented by this
@@ -261,7 +257,7 @@ For example, it could be used for a tagging system like so::
     class TaggedItem(models.Model):
         tag = models.SlugField()
         content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-        object_id = models.PositiveIntegerField()
+        object_id = models.PositiveBigIntegerField()
         content_object = GenericForeignKey("content_type", "object_id")
 
         def __str__(self):
@@ -291,7 +287,7 @@ model:
 
     2. Give your model a field that can store primary key values from the
        models you'll be relating to. For most models, this means a
-       :class:`~django.db.models.PositiveIntegerField`. The usual name
+       :class:`~django.db.models.PositiveBigIntegerField`. The usual name
        for this field is "object_id".
 
     3. Give your model a

@@ -8,8 +8,7 @@ from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
-from django.db.models.fields import composite
-from django.db.models.fields.composite import CompositePrimaryKey
+from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import select_related_descend
@@ -19,6 +18,7 @@ from django.db.models.sql.constants import (
     MULTI,
     NO_RESULTS,
     ORDER_DIR,
+    ROW_COUNT,
     SINGLE,
 )
 from django.db.models.sql.query import Query, get_order_dir
@@ -1116,10 +1116,9 @@ class SQLCompiler:
                 )
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
-        target_fields = composite.unnest(targets)
         return [
             (OrderBy(transform_function(t, alias), descending=descending), False)
-            for t in target_fields
+            for t in targets
         ]
 
     def _setup_joins(self, pieces, opts, alias):
@@ -1596,15 +1595,15 @@ class SQLCompiler:
     ):
         """
         Run the query against the database and return the result(s). The
-        return value is a single data item if result_type is SINGLE, or an
-        iterator over the results if the result_type is MULTI.
+        return value depends on the value of result_type.
 
-        result_type is either MULTI (use fetchmany() to retrieve all rows),
-        SINGLE (only retrieve a single row), or None. In this last case, the
-        cursor is returned if any query is executed, since it's used by
-        subclasses such as InsertQuery). It's possible, however, that no query
-        is needed, as the filters describe an empty set. In that case, None is
-        returned, to avoid any unnecessary database interaction.
+        When result_type is:
+        - MULTI: Retrieves all rows using fetchmany(). Wraps in an iterator for
+           chunked reads when supported.
+        - SINGLE: Retrieves a single row using fetchone().
+        - ROW_COUNT: Retrieves the number of rows in the result.
+        - CURSOR: Runs the query, and returns the cursor object. It is the
+           caller's responsibility to close the cursor.
         """
         result_type = result_type or NO_RESULTS
         try:
@@ -1627,6 +1626,11 @@ class SQLCompiler:
             cursor.close()
             raise
 
+        if result_type == ROW_COUNT:
+            try:
+                return cursor.rowcount
+            finally:
+                cursor.close()
         if result_type == CURSOR:
             # Give the caller the cursor to process and close.
             return cursor
@@ -1688,7 +1692,7 @@ class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
     returning_params = ()
 
-    def field_as_sql(self, field, val):
+    def field_as_sql(self, field, get_placeholder, val):
         """
         Take a field and a value intended to be saved on that field, and
         return placeholder SQL and accompanying params. Check for raw values,
@@ -1703,10 +1707,10 @@ class SQLInsertCompiler(SQLCompiler):
         elif hasattr(val, "as_sql"):
             # This is an expression, let's compile it.
             sql, params = self.compile(val)
-        elif hasattr(field, "get_placeholder"):
+        elif get_placeholder is not None:
             # Some fields (e.g. geo fields) need special munging before
             # they can be inserted.
-            sql, params = field.get_placeholder(val, self, self.connection), [val]
+            sql, params = get_placeholder(val, self, self.connection), [val]
         else:
             # Return the common case for the placeholder
             sql, params = "%s", [val]
@@ -1775,8 +1779,12 @@ class SQLInsertCompiler(SQLCompiler):
 
         # list of (sql, [params]) tuples for each object to be saved
         # Shape: [n_objs][n_fields][2]
+        get_placeholders = [getattr(field, "get_placeholder", None) for field in fields]
         rows_of_fields_as_sql = (
-            (self.field_as_sql(field, v) for field, v in zip(fields, row))
+            (
+                self.field_as_sql(field, get_placeholder, value)
+                for field, get_placeholder, value in zip(fields, get_placeholders, row)
+            )
             for row in value_rows
         )
 
@@ -1802,23 +1810,65 @@ class SQLInsertCompiler(SQLCompiler):
             on_conflict=self.query.on_conflict,
         )
         result = ["%s %s" % (insert_statement, qn(opts.db_table))]
-        fields = self.query.fields or [opts.pk]
-        result.append("(%s)" % ", ".join(qn(f.column) for f in fields))
 
-        if self.query.fields:
-            value_rows = [
-                [
-                    self.prepare_value(field, self.pre_save_val(field, obj))
-                    for field in fields
+        if fields := list(self.query.fields):
+            from django.db.models.expressions import DatabaseDefault
+
+            supports_default_keyword_in_bulk_insert = (
+                self.connection.features.supports_default_keyword_in_bulk_insert
+            )
+            value_cols = []
+            for field in list(fields):
+                field_prepare = partial(self.prepare_value, field)
+                field_pre_save = partial(self.pre_save_val, field)
+                field_values = [
+                    field_prepare(field_pre_save(obj)) for obj in self.query.objs
                 ]
-                for obj in self.query.objs
-            ]
+
+                if not field.has_db_default():
+                    value_cols.append(field_values)
+                    continue
+
+                # If all values are DEFAULT don't include the field and its
+                # values in the query as they are redundant and could prevent
+                # optimizations. This cannot be done if we're dealing with the
+                # last field as INSERT statements require at least one.
+                if len(fields) > 1 and all(
+                    isinstance(value, DatabaseDefault) for value in field_values
+                ):
+                    fields.remove(field)
+                    continue
+
+                if supports_default_keyword_in_bulk_insert:
+                    value_cols.append(field_values)
+                    continue
+
+                # If the field cannot be excluded from the INSERT for the
+                # reasons listed above and the backend doesn't support the
+                # DEFAULT keyword each values must be expanded into their
+                # underlying expressions.
+                prepared_db_default = field_prepare(field.db_default)
+                field_values = [
+                    (
+                        prepared_db_default
+                        if isinstance(value, DatabaseDefault)
+                        else value
+                    )
+                    for value in field_values
+                ]
+                value_cols.append(field_values)
+            value_rows = list(zip(*value_cols))
+            result.append("(%s)" % ", ".join(qn(f.column) for f in fields))
         else:
-            # An empty object.
+            # No fields were specified but an INSERT statement must include at
+            # least one column. This can only happen when the model's primary
+            # key is composed of a single auto-field so default to including it
+            # as a placeholder to generate a valid INSERT statement.
             value_rows = [
                 [self.connection.ops.pk_default_value()] for _ in self.query.objs
             ]
             fields = [None]
+            result.append("(%s)" % qn(opts.pk.column))
 
         # Currently the backends just accept values when generating bulk
         # queries and generate their own placeholders. Doing that isn't
@@ -1902,8 +1952,9 @@ class SQLInsertCompiler(SQLCompiler):
                     )
                 ]
                 cols = [field.get_col(opts.db_table) for field in self.returning_fields]
-            elif isinstance(opts.pk, CompositePrimaryKey):
-                returning_field = returning_fields[0]
+            elif returning_fields and isinstance(
+                returning_field := returning_fields[0], AutoField
+            ):
                 cols = [returning_field.get_col(opts.db_table)]
                 rows = [
                     (
@@ -1915,21 +1966,12 @@ class SQLInsertCompiler(SQLCompiler):
                     )
                 ]
             else:
-                cols = [opts.pk.get_col(opts.db_table)]
-                rows = [
-                    (
-                        self.connection.ops.last_insert_id(
-                            cursor,
-                            opts.db_table,
-                            opts.pk.column,
-                        ),
-                    )
-                ]
+                # Backend doesn't support returning fields and no auto-field
+                # that can be retrieved from `last_insert_id` was specified.
+                return []
         converters = self.get_converters(cols)
         if converters:
             rows = self.apply_converters(rows, converters)
-        if self.has_composite_fields(cols):
-            rows = self.composite_fields_to_tuples(rows, cols)
         return list(rows)
 
 
@@ -2019,6 +2061,11 @@ class SQLUpdateCompiler(SQLCompiler):
                         "Window expressions are not allowed in this query "
                         "(%s=%r)." % (field.name, val)
                     )
+                if isinstance(val, ColPairs):
+                    raise FieldError(
+                        "Composite primary keys expressions are not allowed "
+                        "in this query (%s=F('pk'))." % field.name
+                    )
             elif hasattr(val, "prepare_database_save"):
                 if field.remote_field:
                     val = val.prepare_database_save(field)
@@ -2065,19 +2112,19 @@ class SQLUpdateCompiler(SQLCompiler):
         non-empty query that is executed. Row counts for any subsequent,
         related queries are not available.
         """
-        cursor = super().execute_sql(result_type)
-        try:
-            rows = cursor.rowcount if cursor else 0
-            is_empty = cursor is None
-        finally:
-            if cursor:
-                cursor.close()
+        row_count = super().execute_sql(result_type)
+        is_empty = row_count is None
+        row_count = row_count or 0
+
         for query in self.query.get_related_updates():
-            aux_rows = query.get_compiler(self.using).execute_sql(result_type)
-            if is_empty and aux_rows:
-                rows = aux_rows
+            # If the result_type is NO_RESULTS then the aux_row_count is None.
+            aux_row_count = query.get_compiler(self.using).execute_sql(result_type)
+            if is_empty and aux_row_count:
+                # Returns the row count for any related updates as the number of
+                # rows updated.
+                row_count = aux_row_count
                 is_empty = False
-        return rows
+        return row_count
 
     def pre_sql_setup(self):
         """

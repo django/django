@@ -150,7 +150,6 @@ whose date lies in the future:
 
     >>> import datetime
     >>> from django.utils import timezone
-    >>> from polls.models import Question
     >>> # create a Question instance with pub_date 30 days in the future
     >>> future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
     >>> # was it published recently?
@@ -456,7 +455,7 @@ and then we must amend the ``get_queryset`` method like so:
 
 ``Question.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
 containing ``Question``\s whose ``pub_date`` is less than or equal to - that
-is, earlier than or equal to - ``timezone.now``.
+is, earlier than or equal to - ``timezone.now()``.
 
 Testing our new view
 --------------------

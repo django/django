@@ -382,6 +382,9 @@ class BaseDatabaseFeatures:
     # SQL to create a model instance using the database defaults.
     insert_test_table_with_defaults = None
 
+    # Does the Round() database function round to even?
+    rounds_to_even = False
+
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
     django_test_expected_failures = set()

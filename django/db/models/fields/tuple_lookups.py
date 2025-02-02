@@ -2,7 +2,7 @@ import itertools
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models import Field
-from django.db.models.expressions import ColPairs, Func, Value
+from django.db.models.expressions import ColPairs, Func, ResolvedOuterRef, Value
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -17,6 +17,7 @@ from django.db.models.sql.where import AND, OR, WhereNode
 
 
 class Tuple(Func):
+    allows_composite_expressions = True
     function = ""
     output_field = Field()
 
@@ -28,9 +29,14 @@ class Tuple(Func):
 
 
 class TupleLookupMixin:
+    allows_composite_expressions = True
+
     def get_prep_lookup(self):
-        self.check_rhs_is_tuple_or_list()
-        self.check_rhs_length_equals_lhs_length()
+        if self.rhs_is_direct_value():
+            self.check_rhs_is_tuple_or_list()
+            self.check_rhs_length_equals_lhs_length()
+        else:
+            self.check_rhs_is_outer_ref()
         return self.rhs
 
     def check_rhs_is_tuple_or_list(self):
@@ -46,6 +52,15 @@ class TupleLookupMixin:
             lhs_str = self.get_lhs_str()
             raise ValueError(
                 f"{self.lookup_name!r} lookup of {lhs_str} must have {len_lhs} elements"
+            )
+
+    def check_rhs_is_outer_ref(self):
+        if not isinstance(self.rhs, ResolvedOuterRef):
+            lhs_str = self.get_lhs_str()
+            rhs_cls = self.rhs.__class__.__name__
+            raise ValueError(
+                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
+                f"only supports OuterRef objects (received {rhs_cls!r})"
             )
 
     def get_lhs_str(self):
@@ -67,15 +82,25 @@ class TupleLookupMixin:
         return sql, params
 
     def process_rhs(self, compiler, connection):
-        values = [
-            Value(val, output_field=col.output_field)
-            for col, val in zip(self.lhs, self.rhs)
-        ]
-        return Tuple(*values).as_sql(compiler, connection)
+        if self.rhs_is_direct_value():
+            args = [
+                Value(val, output_field=col.output_field)
+                for col, val in zip(self.lhs, self.rhs)
+            ]
+            return Tuple(*args).as_sql(compiler, connection)
+        else:
+            sql, params = compiler.compile(self.rhs)
+            if not isinstance(self.rhs, ColPairs):
+                raise ValueError(
+                    "Composite field lookups only work with composite expressions."
+                )
+            return "(%s)" % sql, params
 
 
 class TupleExact(TupleLookupMixin, Exact):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) == (x, y, z) as SQL:
         # WHERE a = x AND b = y AND c = z
         lookups = [Exact(col, val) for col, val in zip(self.lhs, self.rhs)]
@@ -108,6 +133,8 @@ class TupleIsNull(TupleLookupMixin, IsNull):
 
 class TupleGreaterThan(TupleLookupMixin, GreaterThan):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) > (x, y, z) as SQL:
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND c > z)))
         lookups = itertools.cycle([GreaterThan, Exact])
@@ -134,6 +161,8 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
 
 class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) >= (x, y, z) as SQL:
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND (c > z OR c = z))))
         lookups = itertools.cycle([GreaterThan, Exact])
@@ -160,6 +189,8 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
 
 class TupleLessThan(TupleLookupMixin, LessThan):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) < (x, y, z) as SQL:
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND c < z)))
         lookups = itertools.cycle([LessThan, Exact])
@@ -186,6 +217,8 @@ class TupleLessThan(TupleLookupMixin, LessThan):
 
 class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
     def as_oracle(self, compiler, connection):
+        # Process right-hand-side to trigger sanitization.
+        self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) <= (x, y, z) as SQL:
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND (c < z OR c = z))))
         lookups = itertools.cycle([LessThan, Exact])

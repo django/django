@@ -1,4 +1,3 @@
-from django.db import NotSupportedError
 from django.db.models.expressions import ColPairs
 from django.db.models.fields import composite
 from django.db.models.fields.tuple_lookups import TupleIn, tuple_lookups
@@ -117,7 +116,7 @@ class RelatedLookupMixin:
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, ColPairs):
             if not self.rhs_is_direct_value():
-                raise NotSupportedError(
+                raise ValueError(
                     f"'{self.lookup_name}' doesn't support multi-column subqueries."
                 )
             self.rhs = get_normalized_value(self.rhs, self.lhs)

@@ -50,7 +50,6 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.models.utils import AltersData, make_model_tuple
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -786,50 +785,9 @@ class Model(AltersData, metaclass=ModelBase):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
-    # RemovedInDjango60Warning: When the deprecation ends, remove completely.
-    def _parse_save_params(self, *args, method_name, **kwargs):
-        defaults = {
-            "force_insert": False,
-            "force_update": False,
-            "using": None,
-            "update_fields": None,
-        }
-
-        warnings.warn(
-            f"Passing positional arguments to {method_name}() is deprecated",
-            RemovedInDjango60Warning,
-            stacklevel=3,
-        )
-        total_len_args = len(args) + 1  # include self
-        max_len_args = len(defaults) + 1
-        if total_len_args > max_len_args:
-            # Recreate the proper TypeError message from Python.
-            raise TypeError(
-                f"Model.{method_name}() takes from 1 to {max_len_args} positional "
-                f"arguments but {total_len_args} were given"
-            )
-
-        def get_param(param_name, param_value, arg_index):
-            if arg_index < len(args):
-                if param_value is not defaults[param_name]:
-                    # Recreate the proper TypeError message from Python.
-                    raise TypeError(
-                        f"Model.{method_name}() got multiple values for argument "
-                        f"'{param_name}'"
-                    )
-                return args[arg_index]
-
-            return param_value
-
-        return [get_param(k, v, i) for i, (k, v) in enumerate(kwargs.items())]
-
-    # RemovedInDjango60Warning: When the deprecation ends, replace with:
-    # def save(
-    #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
-    # ):
     def save(
         self,
-        *args,
+        *,
         force_insert=False,
         force_update=False,
         using=None,
@@ -843,16 +801,6 @@ class Model(AltersData, metaclass=ModelBase):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
-        # RemovedInDjango60Warning.
-        if args:
-            force_insert, force_update, using, update_fields = self._parse_save_params(
-                *args,
-                method_name="save",
-                force_insert=force_insert,
-                force_update=force_update,
-                using=using,
-                update_fields=update_fields,
-            )
 
         self._prepare_related_fields_for_save(operation_name="save")
 
@@ -874,13 +822,13 @@ class Model(AltersData, metaclass=ModelBase):
 
             update_fields = frozenset(update_fields)
             field_names = self._meta._non_pk_concrete_field_names
-            non_model_fields = update_fields.difference(field_names)
+            not_updatable_fields = update_fields.difference(field_names)
 
-            if non_model_fields:
+            if not_updatable_fields:
                 raise ValueError(
                     "The following fields do not exist in this model, are m2m "
-                    "fields, or are non-concrete fields: %s"
-                    % ", ".join(non_model_fields)
+                    "fields, primary keys, or are non-concrete fields: %s"
+                    % ", ".join(not_updatable_fields)
                 )
 
         # If saving to the same database, and this model is deferred, then
@@ -891,8 +839,9 @@ class Model(AltersData, metaclass=ModelBase):
             and using == self._state.db
         ):
             field_names = set()
+            pk_fields = self._meta.pk_fields
             for field in self._meta.concrete_fields:
-                if not field.primary_key and not hasattr(field, "through"):
+                if field not in pk_fields and not hasattr(field, "through"):
                     field_names.add(field.attname)
             loaded_fields = field_names.difference(deferred_non_generated_fields)
             if loaded_fields:
@@ -907,28 +856,14 @@ class Model(AltersData, metaclass=ModelBase):
 
     save.alters_data = True
 
-    # RemovedInDjango60Warning: When the deprecation ends, replace with:
-    # async def asave(
-    #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
-    # ):
     async def asave(
         self,
-        *args,
+        *,
         force_insert=False,
         force_update=False,
         using=None,
         update_fields=None,
     ):
-        # RemovedInDjango60Warning.
-        if args:
-            force_insert, force_update, using, update_fields = self._parse_save_params(
-                *args,
-                method_name="asave",
-                force_insert=force_insert,
-                force_update=force_update,
-                using=using,
-                update_fields=update_fields,
-            )
         return await sync_to_async(self.save)(
             force_insert=force_insert,
             force_update=force_update,
@@ -1091,10 +1026,11 @@ class Model(AltersData, metaclass=ModelBase):
         for a single table.
         """
         meta = cls._meta
+        pk_fields = meta.pk_fields
         non_pks_non_generated = [
             f
             for f in meta.local_concrete_fields
-            if not f.primary_key and not f.generated
+            if f not in pk_fields and not f.generated
         ]
 
         if update_fields:
@@ -1117,10 +1053,7 @@ class Model(AltersData, metaclass=ModelBase):
             and not force_insert
             and not force_update
             and self._state.adding
-            and (
-                (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
-                or (meta.pk.db_default and meta.pk.db_default is not NOT_PROVIDED)
-            )
+            and all(f.has_default() or f.has_db_default() for f in meta.pk_fields)
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
@@ -1300,7 +1233,7 @@ class Model(AltersData, metaclass=ModelBase):
         )
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
-        if not self.pk:
+        if not self._is_pk_set():
             raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
         op = "gt" if is_next else "lt"
         order = "" if is_next else "-"
@@ -1494,7 +1427,7 @@ class Model(AltersData, metaclass=ModelBase):
                 ):
                     # no value, skip the lookup
                     continue
-                if f.primary_key and not self._state.adding:
+                if f in model_class._meta.pk_fields and not self._state.adding:
                     # no need to check for unique primary key when editing
                     continue
                 lookup_kwargs[str(field_name)] = lookup_value
@@ -1804,6 +1737,8 @@ class Model(AltersData, metaclass=ModelBase):
                 hint = f"{field_name!r} field may not set 'null=True'."
             elif field.generated:
                 hint = f"{field_name!r} field is a generated field."
+            elif field not in meta.local_fields:
+                hint = f"{field_name!r} field is not a local field."
             else:
                 seen_columns[field.column].append(field_name)
 
@@ -2286,6 +2221,16 @@ class Model(AltersData, metaclass=ModelBase):
                             ),
                             obj=cls,
                             id="models.E013",
+                        )
+                    )
+                elif isinstance(field, models.CompositePrimaryKey):
+                    errors.append(
+                        checks.Error(
+                            f"{option!r} refers to a CompositePrimaryKey "
+                            f"{field_name!r}, but CompositePrimaryKeys are not "
+                            f"permitted in {option!r}.",
+                            obj=cls,
+                            id="models.E048",
                         )
                     )
                 elif field not in cls._meta.local_fields:

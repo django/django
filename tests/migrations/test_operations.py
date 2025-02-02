@@ -3329,6 +3329,88 @@ class OperationTests(OperationTestBase):
         self.assertColumnExists("test_rnflut_pony", "pink")
         self.assertColumnNotExists("test_rnflut_pony", "blue")
 
+    def test_rename_field_index_together(self):
+        app_label = "test_rnflit"
+        operations = [
+            migrations.CreateModel(
+                "Pony",
+                fields=[
+                    ("id", models.AutoField(primary_key=True)),
+                    ("pink", models.IntegerField(default=3)),
+                    ("weight", models.FloatField()),
+                ],
+                options={
+                    "index_together": [("weight", "pink")],
+                },
+            ),
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        operation = migrations.RenameField("Pony", "pink", "blue")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rnflit", new_state)
+        self.assertIn("blue", new_state.models["test_rnflit", "pony"].fields)
+        self.assertNotIn("pink", new_state.models["test_rnflit", "pony"].fields)
+        # index_together has the renamed column.
+        self.assertIn(
+            "blue", new_state.models["test_rnflit", "pony"].options["index_together"][0]
+        )
+        self.assertNotIn(
+            "pink", new_state.models["test_rnflit", "pony"].options["index_together"][0]
+        )
+
+        # Rename field.
+        self.assertColumnExists("test_rnflit_pony", "pink")
+        self.assertColumnNotExists("test_rnflit_pony", "blue")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rnflit", editor, project_state, new_state)
+        self.assertColumnExists("test_rnflit_pony", "blue")
+        self.assertColumnNotExists("test_rnflit_pony", "pink")
+        # The index constraint has been ported over.
+        self.assertIndexExists("test_rnflit_pony", ["weight", "blue"])
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(
+                "test_rnflit", editor, new_state, project_state
+            )
+        self.assertIndexExists("test_rnflit_pony", ["weight", "pink"])
+
+    def test_rename_field_add_non_nullable_field_with_composite_pk(self):
+        app_label = "test_rnfafnnwcpk"
+        operations = [
+            migrations.CreateModel(
+                name="Release",
+                fields=[
+                    (
+                        "pk",
+                        models.CompositePrimaryKey("version", "name", primary_key=True),
+                    ),
+                    ("version", models.IntegerField()),
+                    ("name", models.CharField(max_length=20)),
+                ],
+            ),
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        new_state = project_state.clone()
+        # Rename field used by CompositePrimaryKey.
+        operation = migrations.RenameField("Release", "name", "renamed_field")
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnExists(f"{app_label}_release", "renamed_field")
+        project_state = new_state
+        new_state = new_state.clone()
+        # Add non-nullable field. Table is rebuilt on SQLite.
+        operation = migrations.AddField(
+            model_name="Release",
+            name="new_non_nullable_field",
+            field=models.CharField(default="x", max_length=20),
+        )
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnExists(f"{app_label}_release", "new_non_nullable_field")
+
     def test_rename_field_with_db_column(self):
         project_state = self.apply_operations(
             "test_rfwdbc",
@@ -3822,6 +3904,63 @@ class OperationTests(OperationTestBase):
         with self.assertRaisesMessage(ValueError, msg):
             migrations.RenameIndex("Pony", new_name="new_idx_name")
 
+    def test_rename_index_unnamed_index(self):
+        app_label = "test_rninui"
+        operations = [
+            migrations.CreateModel(
+                "Pony",
+                fields=[
+                    ("id", models.AutoField(primary_key=True)),
+                    ("pink", models.IntegerField(default=3)),
+                    ("weight", models.FloatField()),
+                ],
+                options={
+                    "index_together": [("weight", "pink")],
+                },
+            ),
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        table_name = app_label + "_pony"
+        self.assertIndexNameNotExists(table_name, "new_pony_test_idx")
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_test_idx", old_fields=("weight", "pink")
+        )
+        self.assertEqual(
+            operation.describe(),
+            "Rename unnamed index for ('weight', 'pink') on Pony to new_pony_test_idx",
+        )
+        self.assertEqual(
+            operation.migration_name_fragment,
+            "rename_pony_weight_pink_new_pony_test_idx",
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        # Rename index.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Reverse is a no-op.
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Reapply, RenameIndex operation is a noop when the old and new name
+        # match.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, new_state, project_state)
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RenameIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2],
+            {
+                "model_name": "Pony",
+                "new_name": "new_pony_test_idx",
+                "old_fields": ("weight", "pink"),
+            },
+        )
+
     def test_rename_index_unknown_unnamed_index(self):
         app_label = "test_rninuui"
         project_state = self.set_up_test_model(app_label)
@@ -3886,6 +4025,33 @@ class OperationTests(OperationTestBase):
 
         operation = migrations.RenameIndex(
             "Pony", new_name="new_pony_pink_idx", old_name="pony_pink_idx"
+        )
+        operation.state_forwards(app_label, new_state)
+        new_model = new_state.apps.get_model(app_label, "Pony")
+        self.assertIsNot(old_model, new_model)
+        self.assertEqual(new_model._meta.indexes[0].name, "new_pony_pink_idx")
+
+    def test_rename_index_state_forwards_unnamed_index(self):
+        app_label = "test_rnidsfui"
+        operations = [
+            migrations.CreateModel(
+                "Pony",
+                fields=[
+                    ("id", models.AutoField(primary_key=True)),
+                    ("pink", models.IntegerField(default=3)),
+                    ("weight", models.FloatField()),
+                ],
+                options={
+                    "index_together": [("weight", "pink")],
+                },
+            ),
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        old_model = project_state.apps.get_model(app_label, "Pony")
+        new_state = project_state.clone()
+
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_pink_idx", old_fields=("weight", "pink")
         )
         operation.state_forwards(app_label, new_state)
         new_model = new_state.apps.get_model(app_label, "Pony")
@@ -4011,6 +4177,58 @@ class OperationTests(OperationTestBase):
         # Ensure the index is still there
         self.assertIndexExists("test_alflin_pony", ["pink"])
 
+    def test_alter_index_together(self):
+        """
+        Tests the AlterIndexTogether operation.
+        """
+        project_state = self.set_up_test_model("test_alinto")
+        # Test the state alteration
+        operation = migrations.AlterIndexTogether("Pony", [("pink", "weight")])
+        self.assertEqual(
+            operation.describe(), "Alter index_together for Pony (1 constraint(s))"
+        )
+        self.assertEqual(
+            operation.migration_name_fragment,
+            "alter_pony_index_together",
+        )
+        new_state = project_state.clone()
+        operation.state_forwards("test_alinto", new_state)
+        self.assertEqual(
+            len(
+                project_state.models["test_alinto", "pony"].options.get(
+                    "index_together", set()
+                )
+            ),
+            0,
+        )
+        self.assertEqual(
+            len(
+                new_state.models["test_alinto", "pony"].options.get(
+                    "index_together", set()
+                )
+            ),
+            1,
+        )
+        # Make sure there's no matching index
+        self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alinto", editor, project_state, new_state)
+        self.assertIndexExists("test_alinto_pony", ["pink", "weight"])
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards(
+                "test_alinto", editor, new_state, project_state
+            )
+        self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterIndexTogether")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2], {"name": "Pony", "index_together": {("pink", "weight")}}
+        )
+
     def test_alter_index_together_remove(self):
         operation = migrations.AlterIndexTogether("Pony", None)
         self.assertEqual(
@@ -4020,6 +4238,29 @@ class OperationTests(OperationTestBase):
             operation.formatted_description(),
             "~ Alter index_together for Pony (0 constraint(s))",
         )
+
+    @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
+    def test_alter_index_together_remove_with_unique_together(self):
+        app_label = "test_alintoremove_wunto"
+        table_name = "%s_pony" % app_label
+        project_state = self.set_up_test_model(app_label, unique_together=True)
+        self.assertUniqueConstraintExists(table_name, ["pink", "weight"])
+        # Add index together.
+        new_state = project_state.clone()
+        operation = migrations.AlterIndexTogether("Pony", [("pink", "weight")])
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexExists(table_name, ["pink", "weight"])
+        # Remove index together.
+        project_state = new_state
+        new_state = project_state.clone()
+        operation = migrations.AlterIndexTogether("Pony", set())
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexNotExists(table_name, ["pink", "weight"])
+        self.assertUniqueConstraintExists(table_name, ["pink", "weight"])
 
     def test_add_constraint(self):
         project_state = self.set_up_test_model("test_addconstraint")
@@ -6211,6 +6452,37 @@ class OperationTests(OperationTestBase):
         self.assertColumnNotExists(f"{app_label}_pony", "modified_pink")
 
     @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_generated_field_changes_output_field(self):
+        app_label = "test_gfcof"
+        operation = migrations.AddField(
+            "Pony",
+            "modified_pink",
+            models.GeneratedField(
+                expression=F("pink") + F("pink"),
+                output_field=models.IntegerField(),
+                db_persist=True,
+            ),
+        )
+        from_state, to_state = self.make_test_state(app_label, operation)
+        # Add generated column.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        # Update output_field used in the generated field.
+        operation = migrations.AlterField(
+            "Pony",
+            "modified_pink",
+            models.GeneratedField(
+                expression=F("pink") + F("pink"),
+                output_field=models.DecimalField(decimal_places=2, max_digits=16),
+                db_persist=True,
+            ),
+        )
+        from_state = to_state.clone()
+        to_state = self.apply_operations(app_label, from_state, [operation])
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
     def test_add_generated_field_stored(self):
         self._test_add_generated_field(db_persist=True)
 
@@ -6290,6 +6562,9 @@ class OperationTests(OperationTestBase):
     def test_composite_pk_operations(self):
         app_label = "test_d8d90af6"
         project_state = self.set_up_test_model(app_label)
+        operation_0 = migrations.AlterField(
+            "Pony", "id", models.IntegerField(primary_key=True)
+        )
         operation_1 = migrations.AddField(
             "Pony", "pk", models.CompositePrimaryKey("id", "pink")
         )
@@ -6299,12 +6574,12 @@ class OperationTests(OperationTestBase):
 
         # 1. Add field (pk).
         new_state = project_state.clone()
-        operation_1.state_forwards(app_label, new_state)
-        with connection.schema_editor() as editor:
-            operation_1.database_forwards(app_label, editor, project_state, new_state)
+        new_state = self.apply_operations(
+            app_label, new_state, [operation_0, operation_1]
+        )
         self.assertColumnNotExists(table_name, "pk")
         Pony = new_state.apps.get_model(app_label, "pony")
-        obj_1 = Pony.objects.create(weight=1)
+        obj_1 = Pony.objects.create(id=1, weight=1)
         msg = (
             f"obj_1={obj_1}, "
             f"obj_1.id={obj_1.id}, "

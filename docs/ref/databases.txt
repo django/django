@@ -115,8 +115,8 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
-2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
+Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
+2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended.
 
 .. note::
 
@@ -249,8 +249,6 @@ database configuration in :setting:`DATABASES`::
 
 Connection pool
 ---------------
-
-.. versionadded:: 5.1
 
 To use a connection pool with `psycopg`_, you can either set ``"pool"`` in the
 :setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`
@@ -488,7 +486,7 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.4.3 or later.
+Django requires `mysqlclient`_ 2.2.1 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -898,8 +896,6 @@ If you're getting this error, you can solve it by:
 Transactions behavior
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 5.1
-
 SQLite supports three transaction modes: ``DEFERRED``, ``IMMEDIATE``, and
 ``EXCLUSIVE``.
 
@@ -969,8 +965,6 @@ To enable the JSON1 extension you can follow the instruction on
 Setting pragma options
 ----------------------
 
-.. versionadded:: 5.1
-
 `Pragma options`_ can be set upon connection by using the ``init_command`` in
 the :setting:`OPTIONS` part of your database configuration in
 :setting:`DATABASES`. The example below shows how to enable extra durability of
@@ -994,11 +988,7 @@ Oracle notes
 ============
 
 Django supports `Oracle Database Server`_ versions 19c and higher. Version
-1.3.2 or higher of the `oracledb`_ Python driver is required.
-
-.. deprecated:: 5.0
-
-    Support for ``cx_Oracle`` is deprecated.
+2.3.0 or higher of the `oracledb`_ Python driver is required.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
 .. _`oracledb`: https://oracle.github.io/python-oracledb/
@@ -1104,6 +1094,46 @@ Example of a full DSN string::
         "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))"
         "(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))"
     )
+
+.. _oracle-pool:
+
+Connection pool
+---------------
+
+.. versionadded:: 5.2
+
+To use a connection pool with `oracledb`_, set ``"pool"`` to ``True`` in the
+:setting:`OPTIONS` part of your database configuration. This uses the driver's
+`create_pool()`_ default values::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.oracle",
+            # ...
+            "OPTIONS": {
+                "pool": True,
+            },
+        },
+    }
+
+To pass custom parameters to the driver's `create_pool()`_  function, you can
+alternatively set ``"pool"`` to be a dict::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.oracle",
+            # ...
+            "OPTIONS": {
+                "pool": {
+                    "min": 1,
+                    "max": 10,
+                    # ...
+                }
+            },
+        },
+    }
+
+.. _`create_pool()`: https://python-oracledb.readthedocs.io/en/latest/user_guide/connection_handling.html#connection-pooling
 
 Threaded option
 ---------------

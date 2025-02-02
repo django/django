@@ -1,6 +1,7 @@
-from django.test import TestCase
+from django.db import IntegrityError
+from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Tenant, User
+from .models import Post, Tenant, User
 
 
 class CompositePKCreateTests(TestCase):
@@ -8,7 +9,7 @@ class CompositePKCreateTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.tenant = Tenant.objects.create()
+        cls.tenant = Tenant.objects.create(id=1)
         cls.user = User.objects.create(
             tenant=cls.tenant,
             id=1,
@@ -77,6 +78,21 @@ class CompositePKCreateTests(TestCase):
         self.assertEqual(obj_3.pk, (obj_3.tenant_id, obj_3.id))
         self.assertEqual(obj_3.email, "user8214@example.com")
 
+    @skipUnlessDBFeature(
+        "supports_update_conflicts",
+        "supports_update_conflicts_with_target",
+    )
+    def test_bulk_create_user_with_pk_field_in_update_fields(self):
+        objs = [User(tenant=self.tenant, id=8291, email="user8291@example.com")]
+        msg = "bulk_create() cannot be used with primary keys in update_fields."
+        with self.assertRaisesMessage(ValueError, msg):
+            User.objects.bulk_create(
+                objs,
+                update_conflicts=True,
+                update_fields=["tenant_id"],
+                unique_fields=["id", "tenant_id"],
+            )
+
     def test_get_or_create_user(self):
         test_cases = (
             {
@@ -136,3 +152,12 @@ class CompositePKCreateTests(TestCase):
                 self.assertEqual(user.email, fields["defaults"]["email"])
                 self.assertEqual(user.email, f"user{user.id}@example.com")
                 self.assertEqual(count + 1, User.objects.count())
+
+    def test_save_default_pk_not_set(self):
+        with self.assertNumQueries(1):
+            Post().save()
+
+    def test_save_default_pk_set(self):
+        post = Post.objects.create()
+        with self.assertRaises(IntegrityError):
+            Post(tenant_id=post.tenant_id, id=post.id).save()

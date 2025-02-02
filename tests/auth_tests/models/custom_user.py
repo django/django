@@ -119,6 +119,19 @@ class CustomUserWithoutIsActiveField(AbstractBaseUser):
     USERNAME_FIELD = "username"
 
 
+class CustomUserCompositePrimaryKey(AbstractBaseUser):
+    pk = models.CompositePrimaryKey("email", "date_of_birth")
+    email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    date_of_birth = models.DateField()
+
+    custom_objects = CustomUserManager()
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["date_of_birth"]
+
+
 # The extension user is a simple extension of the built-in user class,
 # adding a required date_of_birth field. This allows us to check for
 # any hard references to the name "User" in forms/handlers etc.

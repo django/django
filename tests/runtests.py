@@ -29,12 +29,12 @@ else:
     from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
-        RemovedInDjango60Warning,
         RemovedInDjango61Warning,
+        RemovedInDjango70Warning,
     )
     from django.utils.functional import classproperty
     from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PY312, PYPY
+    from django.utils.version import PYPY
 
 
 try:
@@ -46,7 +46,7 @@ else:
     warnings.filterwarnings("ignore", r"\(1003, *", category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter("error", RemovedInDjango60Warning)
+warnings.simplefilter("error", RemovedInDjango70Warning)
 warnings.simplefilter("error", RemovedInDjango61Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
@@ -691,15 +691,14 @@ if __name__ == "__main__":
             "Same as unittest -k option. Can be used multiple times."
         ),
     )
-    if PY312:
-        parser.add_argument(
-            "--durations",
-            dest="durations",
-            type=int,
-            default=None,
-            metavar="N",
-            help="Show the N slowest test cases (N=0 for all).",
-        )
+    parser.add_argument(
+        "--durations",
+        dest="durations",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Show the N slowest test cases (N=0 for all).",
+    )
 
     options = parser.parse_args()
 

@@ -11,8 +11,8 @@ In most cases, a single primary key should suffice. In database design,
 however, defining a primary key consisting of multiple fields is sometimes
 necessary.
 
-To use a composite primary key, when creating a model set the ``pk`` field to
-be a :class:`.CompositePrimaryKey`::
+To use a composite primary key, when defining a model set the ``pk`` attribute
+to be a :class:`.CompositePrimaryKey`::
 
     class Product(models.Model):
         name = models.CharField(max_length=100)
@@ -41,8 +41,8 @@ A composite primary key is represented by a ``tuple``:
     >>> item.pk
     (1, "A755H")
 
-You can assign a ``tuple`` to a composite primary key. This sets the associated
-field values.
+You can assign a ``tuple`` to the :attr:`~django.db.models.Model.pk` attribute.
+This sets the associated field values:
 
 .. code-block:: pycon
 
@@ -131,6 +131,8 @@ database.
     ``ForeignObject`` is an internal API. This means it is not covered by our
     :ref:`deprecation policy <internal-release-deprecation-policy>`.
 
+.. _cpk-and-database-functions:
+
 Composite primary keys and database functions
 =============================================
 
@@ -141,13 +143,15 @@ Many database functions only accept a single expression.
     MAX("order_id")  -- OK
     MAX("product_id", "order_id")  -- ERROR
 
-As a consequence, they cannot be used with composite primary key references as
-they are composed of multiple column expressions.
+In these cases, providing a composite primary key reference raises a
+``ValueError``, since it is composed of multiple column expressions. An
+exception is made for ``Count``.
 
 .. code-block:: python
 
     Max("order_id")  # OK
-    Max("pk")  # ERROR
+    Max("pk")  # ValueError
+    Count("pk")  # OK
 
 Composite primary keys in forms
 ===============================
@@ -181,3 +185,62 @@ field :exc:`.FieldError`.
     This is also true of composite primary keys. Hence, you may want to set
     :attr:`.Field.editable` to ``False`` on all primary key fields to exclude
     them from ModelForms.
+
+Composite primary keys in model validation
+==========================================
+
+Since ``pk`` is only a virtual field, including ``pk`` as a field name in the
+``exclude`` argument of :meth:`.Model.clean_fields` has no effect. To exclude
+the composite primary key fields from
+:ref:`model validation <validating-objects>`, specify each field individually.
+:meth:`.Model.validate_unique` can still be called with ``exclude={"pk"}`` to
+skip uniqueness checks.
+
+Building composite primary key ready applications
+=================================================
+
+Prior to the introduction of composite primary keys, the single field composing
+the primary key of a model could be retrieved by introspecting the
+:attr:`primary key <django.db.models.Field.primary_key>` attribute of its
+fields:
+
+.. code-block:: pycon
+
+    >>> pk_field = None
+    >>> for field in Product._meta.get_fields():
+    ...     if field.primary_key:
+    ...         pk_field = field
+    ...         break
+    ...
+    >>> pk_field
+    <django.db.models.fields.AutoField: id>
+
+Now that a primary key can be composed of multiple fields the
+:attr:`primary key <django.db.models.Field.primary_key>` attribute can no
+longer be relied upon to identify members of the primary key as it will be set
+to ``False`` to maintain the invariant that at most one field per model will
+have this attribute set to ``True``:
+
+.. code-block:: pycon
+
+    >>> pk_fields = []
+    >>> for field in OrderLineItem._meta.get_fields():
+    ...     if field.primary_key:
+    ...         pk_fields.append(field)
+    ...
+    >>> pk_fields
+    []
+
+In order to build application code that properly handles composite primary
+keys the :attr:`_meta.pk_fields <django.db.models.options.Options.pk_fields>`
+attribute should be used instead:
+
+.. code-block:: pycon
+
+    >>> Product._meta.pk_fields
+    [<django.db.models.fields.AutoField: id>]
+    >>> OrderLineItem._meta.pk_fields
+    [
+        <django.db.models.fields.ForeignKey: product>,
+        <django.db.models.fields.ForeignKey: order>
+    ]

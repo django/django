@@ -92,14 +92,14 @@ In addition to the default environments, ``tox`` supports running unit tests
 for other versions of Python and other database backends. Since Django's test
 suite doesn't bundle a settings file for database backends other than SQLite,
 however, you must :ref:`create and provide your own test settings
-<running-unit-tests-settings>`. For example, to run the tests on Python 3.10
+<running-unit-tests-settings>`. For example, to run the tests on Python 3.12
 using PostgreSQL:
 
 .. console::
 
-    $ tox -e py310-postgres -- --settings=my_postgres_settings
+    $ tox -e py312-postgres -- --settings=my_postgres_settings
 
-This command sets up a Python 3.10 virtual environment, installs Django's
+This command sets up a Python 3.12 virtual environment, installs Django's
 test suite dependencies (including those for PostgreSQL), and calls
 ``runtests.py`` with the supplied arguments (in this case,
 ``--settings=my_postgres_settings``).
@@ -114,14 +114,14 @@ above:
 
 .. code-block:: console
 
-    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py310-postgres
+    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py312-postgres
 
 Windows users should use:
 
 .. code-block:: doscon
 
     ...\> set DJANGO_SETTINGS_MODULE=my_postgres_settings
-    ...\> tox -e py310-postgres
+    ...\> tox -e py312-postgres
 
 Running the JavaScript tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -298,11 +298,6 @@ screen, one for a mobile screen, one for right-to-left languages on desktop,
 one for the dark mode on desktop, and one for high contrast mode on desktop
 when using chrome.
 
-.. versionchanged:: 5.1
-
-     The ``--screenshots`` option and ``@screenshot_cases`` decorator were
-     added.
-
 .. _running-unit-tests-dependencies:
 
 Running all the tests
@@ -311,27 +306,27 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
-* :pypi:`aiosmtpd`
-* :pypi:`argon2-cffi` 19.2.0+
+* :pypi:`aiosmtpd` 1.4.5+
+* :pypi:`argon2-cffi` 23.1.0+
 * :pypi:`asgiref` 3.8.1+ (required)
-* :pypi:`bcrypt`
+* :pypi:`bcrypt` 4.1.1+
 * :pypi:`colorama` 0.4.6+
 * :pypi:`docutils` 0.19+
-* :pypi:`geoip2`
+* :pypi:`geoip2` 4.8.0+
 * :pypi:`Jinja2` 2.11+
-* :pypi:`numpy`
-* :pypi:`Pillow` 6.2.1+
-* :pypi:`PyYAML`
+* :pypi:`numpy` 1.26.0+
+* :pypi:`Pillow` 10.1.0+
+* :pypi:`PyYAML` 6.0.2+
 * :pypi:`pywatchman`
-* :pypi:`redis` 3.4+
+* :pypi:`redis` 5.1.0+
 * :pypi:`setuptools`
-* :pypi:`python-memcached`, plus a `supported Python binding
+* :pypi:`pymemcache`, plus a `supported Python binding
   <https://memcached.org/>`_
 * `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_
   (:ref:`gettext_on_windows`)
-* :pypi:`selenium` 4.8.0+
-* :pypi:`sqlparse` 0.3.1+ (required)
-* :pypi:`tblib` 1.5.0+
+* :pypi:`selenium` 4.23.0+
+* :pypi:`sqlparse` 0.5.0+ (required)
+* :pypi:`tblib` 3.0.0+
 
 You can find these dependencies in `pip requirements files
 <https://pip.pypa.io/en/latest/user_guide/#requirements-files>`_ inside the
