@@ -121,7 +121,7 @@ class Collector:
 
         Return a list of all objects that were not already collected.
         """
-        if not objs:
+        if len(objs) == 0:
             return []
         new_objs = []
         model = objs[0].__class__
