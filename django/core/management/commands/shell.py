@@ -137,19 +137,29 @@ class Command(BaseCommand):
             return namespace
 
         amount = len(namespace)
-        msg = f"{amount} objects imported automatically"
+        msg = (
+            f"{amount} objects imported automatically"
+            if amount != 1
+            else f"{amount} object imported automatically"
+        )
 
         if verbosity < 2:
             self.stdout.write(f"{msg} (use -v 2 for details).", self.style.SUCCESS)
             return namespace
 
         imports_by_module = defaultdict(list)
+        imports_object = {}
         for obj_name, obj in namespace.items():
             if hasattr(obj, "__module__") and (
                 (hasattr(obj, "__qualname__") and obj.__qualname__.find(".") == -1)
                 or not hasattr(obj, "__qualname__")
             ):
-                imports_by_module[obj.__module__].append(obj_name)
+                if not callable(obj) and hasattr(obj, "__class__"):
+                    imports_object[obj_name] = (
+                        obj.__class__.__module__ + "." + obj.__class__.__name__
+                    )
+                else:
+                    imports_by_module[obj.__module__].append(obj_name)
             if not hasattr(obj, "__module__") and hasattr(obj, "__name__"):
                 tokens = obj.__name__.split(".")
                 if obj_name in tokens:
@@ -164,6 +174,14 @@ class Command(BaseCommand):
             ]
         )
 
+        import_objects_string = "\n\n" if import_string != "" else ""
+        import_objects_string += "\n".join(
+            [
+                f"  {obj_name}: instance of {class_name}"
+                for obj_name, class_name in imports_object.items()
+            ]
+        )
+
         try:
             import isort
         except ImportError:
@@ -172,7 +190,9 @@ class Command(BaseCommand):
             import_string = isort.code(import_string)
 
         self.stdout.write(
-            f"{msg}, including:\n\n{import_string}", self.style.SUCCESS, ending="\n\n"
+            f"{msg}, including:\n\n{import_string}{import_objects_string}",
+            self.style.SUCCESS,
+            ending="\n\n",
         )
 
         return namespace

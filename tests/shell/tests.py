@@ -271,6 +271,22 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
             "  from shell.models import Phone, Marker",
         )
 
+    def test_message_with_stdout_listing_object_locations(self):
+        class TestCommand(shell.Command):
+            def get_namespace(self):
+                from django.db import connection
+
+                return {"connection": connection}
+
+        with captured_stdout() as stdout:
+            TestCommand().get_and_report_namespace(verbosity=2)
+
+        self.assertEqual(
+            stdout.getvalue().strip(),
+            "1 object imported automatically, including:\n\n"
+            "  connection: instance of django.utils.connection.ConnectionProxy",
+        )
+
     @override_settings(INSTALLED_APPS=["shell", "django.contrib.contenttypes"])
     def test_message_with_stdout_listing_objects_with_isort(self):
         sorted_imports = (
