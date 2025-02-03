@@ -63,16 +63,14 @@ depends on core.js for utility functions like removeChildren or quickElement
             pgettext('one letter Saturday', 'S')
         ],
         firstDayOfWeek: parseInt(get_format('FIRST_DAY_OF_WEEK')),
+        mappingDaysInMonth: [31,28,31,30,31,30,31,31,30,31,30,31"],
         isLeapYear: function(year) {
             return (((year % 4) === 0) && ((year % 100) !== 0 ) || ((year % 400) === 0));
         },
         getDaysInMonth: function(month, year) {
             let days;
-            if (month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month === 12) {
-                days = 31;
-            }
-            else if (month === 4 || month === 6 || month === 9 || month === 11) {
-                days = 30;
+            if (month !== 2) {
+                days = CalendarNamespace.mappingDaysInMonth[month-1];
             }
             else if (month === 2 && CalendarNamespace.isLeapYear(year)) {
                 days = 29;
