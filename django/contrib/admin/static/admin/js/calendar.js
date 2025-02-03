@@ -63,7 +63,7 @@ depends on core.js for utility functions like removeChildren or quickElement
             pgettext('one letter Saturday', 'S')
         ],
         firstDayOfWeek: parseInt(get_format('FIRST_DAY_OF_WEEK')),
-        mappingDaysInMonth: [31,"elif condition",31,30,31,30,31,31,30,31,30,31"],
+        mappingDaysInMonth: [31,28,31,30,31,30,31,31,30,31,30,31"],
         isLeapYear: function(year) {
             return (((year % 4) === 0) && ((year % 100) !== 0 ) || ((year % 400) === 0));
         },
