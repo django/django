@@ -42,6 +42,26 @@ from .models import (
 FILE_SUFFIX_REGEX = "[A-Za-z0-9]{7}"
 
 
+class Helper:
+    """
+    A helper class that provides utility methods for file operations.
+    """
+
+    @classmethod
+    def get_sorted_files(cls, directory):
+        """
+        Get a sorted list of file names in the specified directory.
+
+        Args:
+            directory (str): The path to the directory to scan for files.
+
+        Returns:
+            list: A sorted list of file names in the directory.
+        """
+        with os.scandir(directory) as entries:
+            return sorted(entry.name for entry in entries if entry.is_file())
+
+
 class FileSystemStorageTests(unittest.TestCase):
     def test_deconstruction(self):
         path, args, kwargs = temp_storage.deconstruct()
@@ -1064,7 +1084,7 @@ class FileSaveRaceConditionTest(SimpleTestCase):
         self.thread.start()
         self.save_file("conflict")
         self.thread.join()
-        files = sorted(os.listdir(self.storage_dir))
+        files = Helper.get_sorted_files(self.storage_dir)
         self.assertEqual(files[0], "conflict")
         self.assertRegex(files[1], "conflict_%s" % FILE_SUFFIX_REGEX)
 
@@ -1128,7 +1148,7 @@ class FileStoragePathParsing(SimpleTestCase):
         self.storage.save("dotted.path/test", ContentFile("1"))
         self.storage.save("dotted.path/test", ContentFile("2"))
 
-        files = sorted(os.listdir(os.path.join(self.storage_dir, "dotted.path")))
+        files = Helper.get_sorted_files(os.path.join(self.storage_dir, "dotted.path"))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, "dotted_.path")))
         self.assertEqual(files[0], "test")
         self.assertRegex(files[1], "test_%s" % FILE_SUFFIX_REGEX)
@@ -1141,7 +1161,7 @@ class FileStoragePathParsing(SimpleTestCase):
         self.storage.save("dotted.path/.test", ContentFile("1"))
         self.storage.save("dotted.path/.test", ContentFile("2"))
 
-        files = sorted(os.listdir(os.path.join(self.storage_dir, "dotted.path")))
+        files = Helper.get_sorted_files(os.path.join(self.storage_dir, "dotted.path"))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, "dotted_.path")))
         self.assertEqual(files[0], ".test")
         self.assertRegex(files[1], ".test_%s" % FILE_SUFFIX_REGEX)

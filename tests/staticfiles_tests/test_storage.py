@@ -525,18 +525,11 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.hashed_file_path(missing_file_name)
 
     def test_intermediate_files(self):
-        cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, "cached"))
-        # Intermediate files shouldn't be created for reference.
-        self.assertEqual(
-            len(
-                [
-                    cached_file
-                    for cached_file in cached_files
-                    if cached_file.startswith("relative.")
-                ]
-            ),
-            2,
-        )
+        with os.scandir(os.path.join(settings.STATIC_ROOT, "cached")) as entries:
+            self.assertEqual(
+                sum(1 for entry in entries if entry.name.startswith("relative.")),
+                2,
+            )
 
     def test_manifest_hash(self):
         # Collect the additional file.

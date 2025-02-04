@@ -2017,18 +2017,24 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         return tempfile.mkdtemp()
 
     def flush_mailbox(self):
-        for filename in os.listdir(self.tmp_dir):
-            os.unlink(os.path.join(self.tmp_dir, filename))
+        with os.scandir(self.tmp_dir) as entries:
+            for entry in entries:
+                os.unlink(entry.path)
 
     def get_mailbox_content(self):
         messages = []
-        for filename in os.listdir(self.tmp_dir):
-            with open(os.path.join(self.tmp_dir, filename), "rb") as fp:
-                session = fp.read().split(b"\n" + (b"-" * 79) + b"\n")
-            messages.extend(message_from_bytes(m) for m in session if m)
+        with os.scandir(self.tmp_dir) as entries:
+            for entry in entries:
+                with open(entry.path, "rb") as fp:
+                    session = fp.read().split(b"\n" + (b"-" * 79) + b"\n")
+                messages.extend(message_from_bytes(m) for m in session if m)
         return messages
 
     def test_file_sessions(self):
+        def get_tmp_dir_files_count():
+            with os.scandir(self.tmp_dir) as entries:
+                return len(list(entries))
+
         """Make sure opening a connection creates a new file"""
         msg = EmailMessage(
             "Subject",
@@ -2040,9 +2046,16 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         connection = mail.get_connection()
         connection.send_messages([msg])
 
-        self.assertEqual(len(os.listdir(self.tmp_dir)), 1)
-        with open(os.path.join(self.tmp_dir, os.listdir(self.tmp_dir)[0]), "rb") as fp:
-            message = message_from_binary_file(fp, policy=policy.default)
+        with os.scandir(self.tmp_dir) as entries:
+            temp_file = next(entries)
+
+            # Assert that there is one and only one file in the directory
+            assert next(entries, None) is None
+            assert temp_file is not None
+
+            with open(temp_file.path, "rb") as fp:
+                message = message_from_binary_file(fp, policy=policy.default)
+
         self.assertEqual(message.get_content_type(), "text/plain")
         self.assertEqual(message.get("subject"), "Subject")
         self.assertEqual(message.get("from"), "from@example.com")
@@ -2050,17 +2063,17 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
         connection2 = mail.get_connection()
         connection2.send_messages([msg])
-        self.assertEqual(len(os.listdir(self.tmp_dir)), 2)
+        self.assertEqual(get_tmp_dir_files_count(), 2)
 
         connection.send_messages([msg])
-        self.assertEqual(len(os.listdir(self.tmp_dir)), 2)
+        self.assertEqual(get_tmp_dir_files_count(), 2)
 
         msg.connection = mail.get_connection()
         self.assertTrue(connection.open())
         msg.send()
-        self.assertEqual(len(os.listdir(self.tmp_dir)), 3)
+        self.assertEqual(get_tmp_dir_files_count(), 3)
         msg.send()
-        self.assertEqual(len(os.listdir(self.tmp_dir)), 3)
+        self.assertEqual(get_tmp_dir_files_count(), 3)
 
         connection.close()
 
