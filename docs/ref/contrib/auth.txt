@@ -322,6 +322,9 @@ Manager methods
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
         be called.
 
+        If no email is provided, :attr:`~django.contrib.auth.models.User.email`
+        will be set to an empty string.
+
         The ``extra_fields`` keyword arguments are passed through to the
         :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
         allow setting arbitrary fields on a :ref:`custom user model
