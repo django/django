@@ -18,19 +18,17 @@ class QueryStringTagTests(SimpleTestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, expected):
             self.engine.render_to_string(template_name, context)
 
-    @setup({"test_querystring_empty_get_params": "{% querystring %}"})
+    @setup({"querystring_empty_get_params": "{% querystring %}"})
     def test_querystring_empty_get_params(self):
         context = RequestContext(self.request_factory.get("/"))
-        self.assertRenderEqual(
-            "test_querystring_empty_get_params", context, expected=""
-        )
+        self.assertRenderEqual("querystring_empty_get_params", context, expected="")
 
-    @setup({"test_querystring_non_empty_get_params": "{% querystring %}"})
+    @setup({"querystring_non_empty_get_params": "{% querystring %}"})
     def test_querystring_non_empty_get_params(self):
         request = self.request_factory.get("/", {"a": "b"})
         context = RequestContext(request)
         self.assertRenderEqual(
-            "test_querystring_non_empty_get_params", context, expected="?a=b"
+            "querystring_non_empty_get_params", context, expected="?a=b"
         )
 
     @setup({"querystring_multiple": "{% querystring %}"})
@@ -39,15 +37,24 @@ class QueryStringTagTests(SimpleTestCase):
         context = RequestContext(request)
         self.assertRenderEqual("querystring_multiple", context, expected="?x=y&amp;a=b")
 
-    @setup({"test_querystring_empty_params": "{% querystring qd %}"})
+    @setup({"querystring_empty_params": "{% querystring qd %}"})
     def test_querystring_empty_params(self):
-        cases = [None, {}, QueryDict()]
+        cases = [{}, QueryDict()]
         request = self.request_factory.get("/")
         for param in cases:
             with self.subTest(param=param):
                 context = RequestContext(request, {"qd": param})
+                self.assertRenderEqual("querystring_empty_params", context, expected="")
+
+    @setup({"querystring_request_get_ignored": "{% querystring my_mapping %}"})
+    def test_querystring_request_get_ignored(self):
+        cases = [({"y": "x"}, "y=x"), ({}, "")]
+        request = self.request_factory.get("/", {"x": "y", "a": "b"})
+        for param, expected in cases:
+            with self.subTest(param=param):
+                context = RequestContext(request, {"my_mapping": param})
                 self.assertRenderEqual(
-                    "test_querystring_empty_params", context, expected=""
+                    "querystring_request_get_ignored", context, expected=expected
                 )
 
     @setup({"querystring_replace": "{% querystring a=1 %}"})
@@ -107,21 +114,6 @@ class QueryStringTagTests(SimpleTestCase):
             "querystring_dict_list", context, expected="?a=1&amp;a=2"
         )
 
-    @setup({"querystring_non_string_dict_keys": "{% querystring my_dict %}"})
-    def test_querystring_non_string_dict_keys(self):
-        context = {"my_dict": {0: 1}}
-        msg = "querystring requires strings for mapping keys (received 0 instead)."
-        self.assertTemplateSyntaxError("querystring_non_string_dict_keys", context, msg)
-
-    @setup({"querystring_non_dict_args": "{% querystring somevar %}"})
-    def test_querystring_non_dict_args(self):
-        context = {"somevar": 0}
-        msg = (
-            "querystring requires mappings for positional arguments (received 0 "
-            "instead)."
-        )
-        self.assertTemplateSyntaxError("querystring_non_dict_args", context, msg)
-
     @setup(
         {
             "querystring_multiple_args_override": (
@@ -136,6 +128,27 @@ class QueryStringTagTests(SimpleTestCase):
             context,
             expected="?x=3&amp;a=1&amp;b=2",
         )
+
+    @setup({"querystring_non_mapping_args": "{% querystring somevar %}"})
+    def test_querystring_non_mapping_args(self):
+        cases = [None, 0, "", []]
+        request = self.request_factory.get("/")
+        msg = (
+            "querystring requires mappings for positional arguments (received %r "
+            "instead)."
+        )
+        for param in cases:
+            with self.subTest(param=param):
+                context = RequestContext(request, {"somevar": param})
+                self.assertTemplateSyntaxError(
+                    "querystring_non_mapping_args", context, msg % param
+                )
+
+    @setup({"querystring_non_string_dict_keys": "{% querystring my_dict %}"})
+    def test_querystring_non_string_dict_keys(self):
+        context = {"my_dict": {0: 1}}
+        msg = "querystring requires strings for mapping keys (received 0 instead)."
+        self.assertTemplateSyntaxError("querystring_non_string_dict_keys", context, msg)
 
     @setup({"querystring_list": "{% querystring a=my_list %}"})
     def test_querystring_add_list(self):

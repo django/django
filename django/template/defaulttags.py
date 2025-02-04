@@ -1179,6 +1179,12 @@ def querystring(context, *args, **kwargs):
     returning the result as a query string. Any arguments provided will
     override existing keys. If no arguments are given, `request.GET` is used.
 
+    Positional arguments must be mappings and, in order of appearance, will
+    override existing keys.
+
+    Keyword arguments are treated as (key, value) pairs and will override the
+    query string as calculated so far.
+
     For example::
 
         {% querystring foo=3 %}
@@ -1210,8 +1216,6 @@ def querystring(context, *args, **kwargs):
             raise
         query_dict = QueryDict(mutable=True)
     for d in args + (kwargs,):
-        if d is None:
-            continue
         if not isinstance(d, Mapping):
             raise TemplateSyntaxError(
                 "querystring requires mappings for positional arguments (received %r "

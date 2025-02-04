@@ -971,8 +971,8 @@ an empty string.
     To use ``request.GET`` as the default ``QueryDict`` instance, the
     ``django.template.context_processors.request`` context processor should be
     enabled. If it's not enabled, you must either explicitly pass the
-    ``request`` object into the template context, or pass the ``request.GET``
-    ``QueryDict`` instance to this tag.
+    ``request`` object into the template context, or provide the
+    ``request.GET`` ``QueryDict`` instance to this tag.
 
 Basic usage
 ~~~~~~~~~~~
@@ -1005,10 +1005,9 @@ is ``<QueryDict: {'color': ['blue'], 'size': ['S']}>`` and ``my_dict`` is
 ``{'color': 'orange', 'fabric': 'silk'}``, this outputs
 ``?color=orange&size=S&fabric=silk``.
 
-.. versionchanged:: 5.2
+.. versionchanged:: 6.0
 
-    Support for multiple positional arguments and positional arguments of
-    type ``dict`` were added.
+    Support for multiple positional mapping arguments was added.
 
 Setting items
 ~~~~~~~~~~~~~
