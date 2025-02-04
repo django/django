@@ -1104,16 +1104,10 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             )
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
-    @override_settings(
-        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
-        ADMINS=[("nobody", "nobody@example.com")],
-        MANAGERS=[("nobody", "nobody@example.com")],
-    )
-    def test_connection_arg(self):
-        """Test connection argument to send_mail(), et. al."""
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_connection_arg_send_mail(self):
         mail.outbox = []
-
-        # Send using non-default connection
+        # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         send_mail(
             "Subject",
@@ -1126,6 +1120,10 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, "Subject")
 
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_connection_arg_send_mass_mail(self):
+        mail.outbox = []
+        # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         send_mass_mail(
             [
@@ -1139,12 +1137,26 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(connection.test_outbox[0].subject, "Subject1")
         self.assertEqual(connection.test_outbox[1].subject, "Subject2")
 
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        ADMINS=[("nobody", "nobody@example.com")],
+    )
+    def test_connection_arg_mail_admins(self):
+        mail.outbox = []
+        # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         mail_admins("Admin message", "Content", connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, "[Django] Admin message")
 
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        MANAGERS=[("nobody", "nobody@example.com")],
+    )
+    def test_connection_arg_mail_managers(self):
+        mail.outbox = []
+        # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         mail_managers("Manager message", "Content", connection=connection)
         self.assertEqual(mail.outbox, [])
@@ -1765,6 +1777,31 @@ class BaseEmailBackendTests(MailTestsMixin):
         self.assertEqual(message.get_payload(1).get_payload(), "HTML Content")
         self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
 
+    def test_mail_admins_and_managers(self):
+        tests = (
+            # The ADMINS and MANAGERS settings are lists of (name, address) tuples.
+            [("Name, Full", "test@example.com")],
+            # Lists and tuples are interchangeable.
+            [["Name, Full", "test@example.com"], ["ignored", "other@example.com"]],
+            (("", "test@example.com"), ("", "other@example.com")),
+            # Lazy strings are supported.
+            [(gettext_lazy("Name, Full"), gettext_lazy("test@example.com"))],
+        )
+        for setting, mail_func in (
+            ("ADMINS", mail_admins),
+            ("MANAGERS", mail_managers),
+        ):
+            for value in tests:
+                self.flush_mailbox()
+                with (
+                    self.subTest(setting=setting, value=value),
+                    self.settings(**{setting: value}),
+                ):
+                    mail_func("subject", "content")
+                    message = self.get_the_message()
+                    expected_to = ", ".join([str(address) for _, address in value])
+                    self.assertEqual(message.get_all("to"), [expected_to])
+
     @override_settings(MANAGERS=[("nobody", "nobody@example.com")])
     def test_html_mail_managers(self):
         """Test html_message argument to mail_managers"""
@@ -1804,14 +1841,12 @@ class BaseEmailBackendTests(MailTestsMixin):
         String prefix + lazy translated subject = bad output
         Regression for #13494
         """
-        mail_managers(gettext_lazy("Subject"), "Content")
-        message = self.get_the_message()
-        self.assertEqual(message.get("subject"), "[Django] Subject")
-
-        self.flush_mailbox()
-        mail_admins(gettext_lazy("Subject"), "Content")
-        message = self.get_the_message()
-        self.assertEqual(message.get("subject"), "[Django] Subject")
+        for mail_func in [mail_managers, mail_admins]:
+            with self.subTest(mail_func=mail_func):
+                mail_func(gettext_lazy("Subject"), "Content")
+                message = self.get_the_message()
+                self.assertEqual(message.get("subject"), "[Django] Subject")
+                self.flush_mailbox()
 
     @override_settings(ADMINS=[], MANAGERS=[])
     def test_empty_admins(self):
@@ -1819,17 +1854,21 @@ class BaseEmailBackendTests(MailTestsMixin):
         mail_admins/mail_managers doesn't connect to the mail server
         if there are no recipients (#9383)
         """
-        mail_admins("hi", "there")
-        self.assertEqual(self.get_mailbox_content(), [])
-        mail_managers("hi", "there")
-        self.assertEqual(self.get_mailbox_content(), [])
+        for mail_func in [mail_managers, mail_admins]:
+            with self.subTest(mail_func=mail_func):
+                mail_func("hi", "there")
+                self.assertEqual(self.get_mailbox_content(), [])
 
     def test_wrong_admins_managers(self):
         tests = (
             "test@example.com",
+            gettext_lazy("test@example.com"),
             ("test@example.com",),
             ["test@example.com", "other@example.com"],
             ("test@example.com", "other@example.com"),
+            [("name", "test", "example.com")],
+            [("Name <test@example.com",)],
+            [[]],
         )
         for setting, mail_func in (
             ("ADMINS", mail_admins),
