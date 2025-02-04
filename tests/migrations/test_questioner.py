@@ -89,6 +89,14 @@ class QuestionerHelperMethodsTests(SimpleTestCase):
             self.questioner._ask_default()
         self.assertIn("Cancelled.\n", self.prompt.getvalue())
 
+    @mock.patch("builtins.input", side_effect=["None", "exit"])
+    def test_questioner_no_default_user_entered_none(self, mock_input):
+        with self.assertRaises(SystemExit):
+            self.questioner._ask_default()
+        self.assertIn(
+            "Default value can not be None/NULL.", self.prompt.getvalue()
+        )
+
     @mock.patch("builtins.input", side_effect=["", "n"])
     def test_questioner_no_default_no_user_entry_boolean(self, mock_input):
         value = self.questioner._boolean_input("Proceed?")

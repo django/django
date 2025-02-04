@@ -161,6 +161,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 self.prompt_output.write(
                     "Please enter some code, or 'exit' (without quotes) to exit."
                 )
+            elif code == "None":
+                self.prompt_output.write("Default value can not be None/NULL.")
             elif code == "exit":
                 sys.exit(1)
             else:
