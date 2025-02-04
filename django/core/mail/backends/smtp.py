@@ -15,6 +15,8 @@ class EmailBackend(BaseEmailBackend):
     """
     A wrapper that manages the SMTP network connection.
     """
+    DEFAULT_HOST = "localhost"
+    DEFAULT_PORT = 25
 
     def __init__(
         self,
@@ -37,8 +39,8 @@ class EmailBackend(BaseEmailBackend):
         if provider is not None:
             # Being initialized from EMAIL_PROVIDERS.
             options = settings.EMAIL_PROVIDERS[provider]["OPTIONS"]
-            self.host = host or options.get("host")
-            self.port = port or options.get("port")
+            self.host = host or options.get("host", self.DEFAULT_HOST)
+            self.port = port or options.get("port", self.DEFAULT_PORT)
             self.username = options.get("username") if username is None else username
             self.password = options.get("password") if password is None else password
             self.use_tls = options.get("use_tls") if use_tls is None else use_tls
@@ -53,8 +55,8 @@ class EmailBackend(BaseEmailBackend):
         else:
             # RemovedInDjango70Warning: Not being initialized from EMAIL_PROVIDERS.
             # Check the deprecated EMAIL_FILE_PATH setting.
-            self.host = host or getattr(settings, "EMAIL_HOST", "localhost")
-            self.port = port or getattr(settings, "EMAIL_PORT", 25)
+            self.host = host or getattr(settings, "EMAIL_HOST", self.DEFAULT_HOST)
+            self.port = port or getattr(settings, "EMAIL_PORT", self.DEFAULT_PORT)
             self.username = (
                 getattr(settings, "EMAIL_HOST_USER", None)
                 if username is None
