@@ -21,69 +21,18 @@ There are several categories of discussion including:
   debugging of Django.
 * `Internals`_: for discussion of the development of Django itself.
 
+.. note::
+
+    Before asking a question about how to contribute, read
+    :doc:`/internals/contributing/index`. Many frequently asked questions are
+    answered there.
+
 .. _official Forum: https://forum.djangoproject.com
 .. _Internals: https://forum.djangoproject.com/c/internals/5
 .. _Using Django: https://forum.djangoproject.com/c/users/6
 
 In addition, Django has several official mailing lists on Google Groups that
 are open to anyone.
-
-.. _django-users-mailing-list:
-
-``django-users``
-================
-
-.. note::
-
-    The `Using Django`_ category of the `official Forum`_ is now the preferred
-    venue for asking usage questions.
-
-This is the right place if you are looking to ask any question regarding the
-installation, usage, or debugging of Django.
-
-.. note::
-
-    If it's the first time you send an email to this list, your email must be
-    accepted first so don't worry if :ref:`your message does not appear
-    <message-does-not-appear-on-django-users>` instantly.
-
-* `django-users mailing archive`_
-* `django-users subscription email address`_
-* `django-users posting email`_
-
-.. _django-users mailing archive: https://groups.google.com/g/django-users
-.. _django-users subscription email address: mailto:django-users+subscribe@googlegroups.com
-.. _django-users posting email: mailto:django-users@googlegroups.com
-
-.. _django-developers-mailing-list:
-
-``django-developers``
-=====================
-
-.. note::
-
-    The `Internals`_ category of the `official Forum`_ is now the preferred
-    venue for discussing the development of Django.
-
-The discussion about the development of Django itself takes place here.
-
-Before asking a question about how to contribute, read
-:doc:`/internals/contributing/index`. Many frequently asked questions are
-answered there.
-
-.. note::
-
-    Please make use of
-    :ref:`django-users mailing list <django-users-mailing-list>` if you want
-    to ask for tech support, doing so in this list is inappropriate.
-
-* `django-developers mailing archive`_
-* `django-developers subscription email address`_
-* `django-developers posting email`_
-
-.. _django-developers mailing archive: https://groups.google.com/g/django-developers
-.. _django-developers subscription email address: mailto:django-developers+subscribe@googlegroups.com
-.. _django-developers posting email: mailto:django-developers@googlegroups.com
 
 .. _django-announce-mailing-list:
 
@@ -116,3 +65,42 @@ by developers and interested community members.
 .. _django-updates mailing archive: https://groups.google.com/g/django-updates
 .. _django-updates subscription email address: mailto:django-updates+subscribe@googlegroups.com
 .. _django-updates posting email: mailto:django-updates@googlegroups.com
+
+Archived mailing lists
+======================
+
+The following mailing lists are archived and no longer active. These are still
+available as a historical resource.
+
+.. _django-users-mailing-list:
+
+``django-users``
+----------------
+
+.. note::
+
+    The `Using Django`_ category of the `official Forum`_ is now the preferred
+    venue for asking usage questions.
+
+This was used for questions regarding the installation, usage, or debugging of
+Django projects.
+
+* `django-users mailing archive`_
+
+.. _django-users mailing archive: https://groups.google.com/g/django-users
+
+.. _django-developers-mailing-list:
+
+``django-developers``
+---------------------
+
+.. note::
+
+    The `Internals`_ category of the `official Forum`_ is now the preferred
+    venue for discussing the development of Django.
+
+This was used for discussions about the development of Django itself.
+
+* `django-developers mailing archive`_
+
+.. _django-developers mailing archive: https://groups.google.com/g/django-developers
