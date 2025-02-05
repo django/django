@@ -322,7 +322,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.execute(index.remove_sql(model, self, concurrently=concurrently))
 
     def _delete_index_sql(self, model, name, sql=None, concurrently=False):
-        sql = (
+        sql = sql or (
             self.sql_delete_index_concurrently
             if concurrently
             else self.sql_delete_index
