@@ -21,15 +21,10 @@ Join the Django community
 There are several ways you can help the Django community and others to maintain
 a great ecosystem to work in:
 
-* Join the `Django forum`_. This forum is a place for discussing the Django
+* Join the `Django Forum`_. This forum is a place for discussing the Django
   framework and applications and projects that use it. This is also a good
   place to ask and answer any questions related to installing, using, or
   contributing to Django.
-
-* Join the |django-users| mailing list and answer questions. This
-  mailing list has a huge audience, and we really want to maintain a
-  friendly and helpful atmosphere. If you're new to the Django community,
-  you should read the `posting guidelines`_.
 
 * Join the `Django Discord server`_ to discuss and answer questions. By
   explaining Django to other users, you're going to learn a lot about the
@@ -44,10 +39,9 @@ a great ecosystem to work in:
   ecosystem of pluggable applications is a big strength of Django, help us
   build it!
 
-.. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
 .. _community page: https://www.djangoproject.com/community/
 .. _Django Discord server: https://chat.djangoproject.com
-.. _Django forum: https://forum.djangoproject.com/
+.. _Django Forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
 
 Getting started
