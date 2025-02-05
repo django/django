@@ -154,12 +154,11 @@ or introduces breaking changes.
 
 The following are different approaches for gaining feedback from the community.
 
-The Django Forum or django-developers mailing list
---------------------------------------------------
+The Django Forum
+----------------
 
-You can propose a change on the `Django Forum`_ or |django-developers| mailing
-list. You should explain the need for the change, go into details of the
-approach and discuss alternatives.
+You can propose a change on the `Django Forum`_. You should explain the need
+for the change, go into details of the approach and discuss alternatives.
 
 Please include a link to such discussions in your contributions.
 
@@ -175,8 +174,8 @@ third-party package first. You can iterate on the public API much faster, while
 also validating the need for the feature.
 
 Once this package becomes stable and there are clear benefits of incorporating
-aspects into Django core, starting a discussion on the `Django Forum`_ or
-|django-developers| mailing list would be the next step.
+aspects into Django core, starting a discussion on the `Django Forum`_ would be
+the next step.
 
 Django Enhancement Proposal (DEP)
 ---------------------------------
@@ -188,10 +187,9 @@ specifications of features, along with rationales. DEPs are also the primary
 mechanism for proposing and collecting community input on major new features.
 
 Before considering writing a DEP, it is recommended to first open a discussion
-on the `Django Forum`_ or |django-developers| mailing list. This allows the
-community to provide feedback and helps refine the proposal. Once the DEP is
-ready the :ref:`Steering Council <steering-council>` votes on whether to accept
-it.
+on the `Django Forum`_. This allows the community to provide feedback and helps
+refine the proposal. Once the DEP is ready the :ref:`Steering Council
+<steering-council>` votes on whether to accept it.
 
 Some examples of DEPs that have been approved and fully implemented:
 
