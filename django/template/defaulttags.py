@@ -1209,12 +1209,10 @@ def querystring(context, *args, **kwargs):
 
         {% querystring my_dict my_query_dict foo=3 bar=None %}
     """
-    try:
-        query_dict = context.request.GET.copy()
-    except AttributeError:
-        if not args:
-            raise
+    if args:
         query_dict = QueryDict(mutable=True)
+    else:
+        query_dict = context.request.GET.copy()
     for d in args + (kwargs,):
         if not isinstance(d, Mapping):
             raise TemplateSyntaxError(

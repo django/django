@@ -48,7 +48,7 @@ class QueryStringTagTests(SimpleTestCase):
 
     @setup({"querystring_request_get_ignored": "{% querystring my_mapping %}"})
     def test_querystring_request_get_ignored(self):
-        cases = [({"y": "x"}, "y=x"), ({}, "")]
+        cases = [({"y": "x"}, "?y=x"), ({}, "")]
         request = self.request_factory.get("/", {"x": "y", "a": "b"})
         for param, expected in cases:
             with self.subTest(param=param):
