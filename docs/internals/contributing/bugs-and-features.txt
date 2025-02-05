@@ -16,15 +16,15 @@ Otherwise, before reporting a bug or requesting a new feature on the
 * Check that someone hasn't already filed the bug or feature request by
   `searching`_ or running `custom queries`_ in the ticket tracker.
 
-* Don't use the ticket system to ask support questions. Use the
-  |django-users| list or the `Django Discord server`_ for that.
+* Don't use the ticket system to ask support questions. Use the `Django Forum`_
+  or the `Django Discord server`_ for that.
 
 * Don't reopen issues that have been marked "wontfix" without finding consensus
-  to do so on the `Django Forum`_ or |django-developers| list.
+  to do so on the `Django Forum`_.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
-  discussion to the `Django Forum`_ or |django-developers| list.
+  discussion to the `Django Forum`_.
 
 .. _reporting-bugs:
 
@@ -39,7 +39,7 @@ particular:
 * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might
   be a well-known question.
 
-* **Do** ask on |django-users| or the `Django Discord server`_ *first* if
+* **Do** ask on `Django Forum`_ or the `Django Discord server`_ *first* if
   you're not sure if what you're seeing is a bug.
 
 * **Do** write complete, reproducible, specific bug reports. You must
@@ -49,7 +49,7 @@ particular:
   small test case is the best way to report a bug, as it gives us a
   helpful way to confirm the bug quickly.
 
-* **Don't** post to |django-developers| only to announce that you have filed a
+* **Don't** post to `Django Forum`_ only to announce that you have filed a
   bug report. All the tickets are mailed to another list, |django-updates|,
   which is tracked by developers and interested community members; we see them
   as they are filed.
@@ -94,10 +94,10 @@ part of that. Here are some tips on how to make a request most effectively:
   suggest that you develop it independently. Then, if your project gathers
   sufficient community support, we may consider it for inclusion in Django.
 
-* First request the feature on the `Django Forum`_ or |django-developers| list,
-  not in the ticket tracker. It'll get read more closely if it's on the mailing
-  list. This is even more important for large-scale feature requests. We like
-  to discuss any big changes to Django's core before actually working on them.
+* First request the feature on the `Django Forum`_, not in the ticket tracker.
+  It'll get read more closely and reach a larger audience. This is even more
+  important for large-scale feature requests. We like to discuss any big
+  changes to Django's core before actually working on them.
 
 * Describe clearly and concisely what the missing feature is and how you'd
   like to see it implemented. Include example code (non-functional is OK)
@@ -127,9 +127,9 @@ How we make decisions
 =====================
 
 Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on |django-developers| or the Django Forum about a feature.
-In these votes we follow the voting style invented by Apache and used on Python
-itself, where votes are given as +1, +0, -0, or -1.
+have informal votes on the Django Forum about a feature. In these votes we
+follow the voting style invented by Apache and used on Python itself, where
+votes are given as +1, +0, -0, or -1.
 Roughly translated, these votes mean:
 
 * +1: "I love the idea and I'm strongly committed to it."
@@ -162,7 +162,7 @@ Since this process allows any steering council member to veto a proposal, a
 convert that "-1" into at least a "+0".
 
 Votes on technical matters should be announced and held in public on the
-|django-developers| mailing list or on the `Django Forum`_.
+`Django Forum`_.
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
