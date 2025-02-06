@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from django.conf import settings
 from django.contrib.auth import aauthenticate, authenticate
@@ -197,7 +197,7 @@ class RemoteUserTest(TestCase):
         # Set last_login to something so we can determine if it changes.
         default_login = datetime(2000, 1, 1)
         if settings.USE_TZ:
-            default_login = default_login.replace(tzinfo=timezone.utc)
+            default_login = default_login.replace(tzinfo=UTC)
         user.last_login = default_login
         user.save()
 
@@ -216,7 +216,7 @@ class RemoteUserTest(TestCase):
         # Set last_login to something so we can determine if it changes.
         default_login = datetime(2000, 1, 1)
         if settings.USE_TZ:
-            default_login = default_login.replace(tzinfo=timezone.utc)
+            default_login = default_login.replace(tzinfo=UTC)
         user.last_login = default_login
         await user.asave()
 

@@ -2428,7 +2428,7 @@ class SchemaTests(TransactionTestCase):
             data = JSONField(
                 encoder=DjangoJSONEncoder,
                 db_default={
-                    "epoch": datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+                    "epoch": datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC)
                 },
             )
 
@@ -5315,7 +5315,7 @@ class SchemaTests(TransactionTestCase):
         """
         now = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1)
         now_tz = datetime.datetime(
-            month=1, day=1, year=2000, hour=1, minute=1, tzinfo=datetime.timezone.utc
+            month=1, day=1, year=2000, hour=1, minute=1, tzinfo=datetime.UTC
         )
         mocked_datetime.now = mock.MagicMock(return_value=now)
         mocked_tz.now = mock.MagicMock(return_value=now_tz)
