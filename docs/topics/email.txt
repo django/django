@@ -503,8 +503,8 @@ Django's email library, you can do this using the
                 msg = EmailMultiAlternatives(subject, "I am content.", from_email, [to])
                 msg.attach_alternative("<p>I am content.</p>", "text/html")
 
-                self.assertIs(msg.body_contains("I am content"), True)
-                self.assertIs(msg.body_contains("<p>I am content.</p>"), False)
+                self.assertTrue(msg.body_contains("I am content"))
+                self.assertFalse(msg.body_contains("<p>I am content.</p>"))
 
 .. class:: EmailAlternative
 
