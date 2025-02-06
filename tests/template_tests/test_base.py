@@ -84,3 +84,26 @@ class VariableTests(SimpleTestCase):
         for var in var_names:
             with self.subTest(var=var):
                 self.assertIsNone(Variable(var).literal)
+
+    def test_scientific_notation_in_template(self):
+            """Add support for E to be used as a notation to carry exponential value"""
+            # Define test cases for scientific notation within the template context
+            cases = {
+                '{{ foo|default:"5.2e3" }}': 5200.0,       # 5.2 × 10³ = 5200.0
+                '{{ foo|default:"5.2E3" }}': 5200.0,       # Case-insensitive
+                '{{ foo|default:"5.2e-3"}}': 0.0052,    
+                '{{ foo|default:"-1.5E4" }}': -15000.0,    # Negative exponent
+                '{{ foo|default:"+3.0e2" }}': 300.0,       # Explicit positive exponent
+                '{{ foo|default:".5e2" }}': 50.0,          # 0.5 × 10² = 50.0
+            }
+
+            # Create a template for each test case and assert the output
+            for template_string, expected in cases.items():
+                with self.subTest(template=template_string):
+                    # Use the context with a placeholder for the 'foo' variable
+                    context = Context({"foo": None})
+                    template = Template(template_string)
+                    rendered = template.render(context)
+
+                    # Check if the output matches the expected result
+                    self.assertEqual(float(rendered.strip()), expected)
