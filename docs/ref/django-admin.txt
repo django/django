@@ -1111,6 +1111,12 @@ Disables reading the startup script for the "plain" Python interpreter. By
 default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment
 variable or the ``~/.pythonrc.py`` script is read.
 
+.. django-admin-option:: --no-imports
+
+.. versionadded:: 5.2
+
+Disables the automatic import of models from :setting:`INSTALLED_APPS`.
+
 .. django-admin-option:: --command COMMAND, -c COMMAND
 
 Lets you pass a command as a string to execute it as Django, like so:
