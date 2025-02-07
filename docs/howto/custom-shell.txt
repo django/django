@@ -20,7 +20,9 @@ Customize automatic imports
 .. versionadded:: 5.2
 
 To customize the automatic import behavior of the :djadmin:`shell` management
-command, override the ``get_namespace()`` method. For example:
+command, override the ``get_auto_imports()`` method. This method should return
+a sequence of import paths for objects or modules available in the application.
+For example:
 
 .. code-block:: python
     :caption: ``polls/management/commands/shell.py``
@@ -29,16 +31,36 @@ command, override the ``get_namespace()`` method. For example:
 
 
     class Command(shell.Command):
-        def get_namespace(self):
-            from django.urls.base import resolve, reverse
+        def get_auto_imports(self):
+            return super().get_auto_imports() + [
+                "django.urls.reverse",
+                "django.urls.resolve",
+            ]
 
-            return {
-                **super().get_namespace(),
-                "resolve": resolve,
-                "reverse": reverse,
-            }
+The customization above adds :func:`~django.urls.resolve` and
+:func:`~django.urls.reverse` to the default namespace, which already includes
+all models from the apps listed in :setting:`INSTALLED_APPS`. These objects
+will be available in the ``shell`` without requiring a manual import.
 
-The above customization adds :func:`~django.urls.resolve` and
-:func:`~django.urls.reverse` to the default namespace, which includes all
-models from all apps. These two functions will then be available when the
-shell opens, without a manual import statement.
+Running this customized ``shell`` command with ``verbosity=2`` would show:
+
+.. console::
+
+    8 objects imported automatically:
+
+      from django.contrib.admin.models import LogEntry
+      from django.contrib.auth.models import Group, Permission, User
+      from django.contrib.contenttypes.models import ContentType
+      from django.contrib.sessions.models import Session
+      from django.urls import resolve, reverse
+
+If an overridden ``shell`` command includes paths that cannot be imported,
+these errors are shown when ``verbosity`` is set to ``1`` or higher.
+
+Note that automatic imports can be disabled for a specific ``shell`` session
+using the :option:`--no-imports <shell --no-imports>` flag. To permanently
+disable automatic imports, override ``get_auto_imports()`` to return ``None``::
+
+    class Command(shell.Command):
+        def get_auto_imports(self):
+            return None
