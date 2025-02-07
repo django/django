@@ -2495,7 +2495,7 @@ updated:
     >>> Entry.objects.bulk_update(objs, ["headline"])
     2
 
-This method is atomic, i.e., all batches of creation succeed or none.
+This method is atomic, i.e., all batches of updates succeed or none.
 :meth:`.QuerySet.update` is used to save the changes, so this is more efficient
 than iterating through the list of models and calling ``save()`` on each of
 them, but it has a few caveats:
