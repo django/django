@@ -523,6 +523,18 @@ class Expression(BaseExpression, Combinable):
     def _constructor_signature(cls):
         return inspect.signature(cls.__init__)
 
+    @classmethod
+    def _identity(cls, value):
+        if isinstance(value, tuple):
+            return tuple(map(cls._identity, value))
+        if isinstance(value, dict):
+            return tuple((key, cls._identity(val)) for key, val in value.items())
+        if isinstance(value, fields.Field):
+            if value.name and value.model:
+                return value.model._meta.label, value.name
+            return type(value)
+        return make_hashable(value)
+
     @cached_property
     def identity(self):
         args, kwargs = self._constructor_args
@@ -532,13 +544,10 @@ class Expression(BaseExpression, Combinable):
         next(arguments)
         identity = [self.__class__]
         for arg, value in arguments:
-            if isinstance(value, fields.Field):
-                if value.name and value.model:
-                    value = (value.model._meta.label, value.name)
-                else:
-                    value = type(value)
-            else:
-                value = make_hashable(value)
+            # If __init__() makes use of *args or **kwargs captures `value`
+            # will respectively be a tuple or a dict that must have its
+            # constituents unpacked (mainly if contain Field instances).
+            value = self._identity(value)
             identity.append((arg, value))
         return tuple(identity)
 
