@@ -1433,6 +1433,29 @@ class SimpleExpressionTests(SimpleTestCase):
             Expression(TestModel._meta.get_field("other_field")),
         )
 
+        class InitCaptureExpression(Expression):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+        # The identity of expressions that obscure their __init__() signature
+        # with *args and **kwargs cannot be determined when bound with
+        # different combinations or *args and **kwargs.
+        self.assertNotEqual(
+            InitCaptureExpression(IntegerField()),
+            InitCaptureExpression(output_field=IntegerField()),
+        )
+
+        # However, they should be considered equal when their bindings are
+        # equal.
+        self.assertEqual(
+            InitCaptureExpression(IntegerField()),
+            InitCaptureExpression(IntegerField()),
+        )
+        self.assertEqual(
+            InitCaptureExpression(output_field=IntegerField()),
+            InitCaptureExpression(output_field=IntegerField()),
+        )
+
     def test_hash(self):
         self.assertEqual(hash(Expression()), hash(Expression()))
         self.assertEqual(
