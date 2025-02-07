@@ -54,27 +54,18 @@ class Command(BaseCommand):
     def ipython(self, options):
         from IPython import start_ipython
 
-        start_ipython(
-            argv=[],
-            user_ns=self.get_and_report_namespace(
-                options["verbosity"], options["no_imports"]
-            ),
-        )
+        start_ipython(argv=[], user_ns=self.get_and_report_namespace(**options))
 
     def bpython(self, options):
         import bpython
 
-        bpython.embed(
-            self.get_and_report_namespace(options["verbosity"], options["no_imports"])
-        )
+        bpython.embed(self.get_and_report_namespace(**options))
 
     def python(self, options):
         import code
 
         # Set up a dictionary to serve as the environment for the shell.
-        imported_objects = self.get_and_report_namespace(
-            options["verbosity"], options["no_imports"]
-        )
+        imported_objects = self.get_and_report_namespace(**options)
 
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
@@ -127,12 +118,13 @@ class Command(BaseCommand):
         # Start the interactive interpreter.
         code.interact(local=imported_objects)
 
-    def get_and_report_namespace(self, verbosity, no_imports=False):
-        if no_imports:
+    def get_and_report_namespace(self, **options):
+        if options and options.get("no_imports"):
             return {}
 
         namespace = self.get_namespace()
 
+        verbosity = options["verbosity"] if options else 0
         if verbosity < 1:
             return namespace
 
