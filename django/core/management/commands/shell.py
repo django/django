@@ -129,10 +129,13 @@ class Command(BaseCommand):
             return namespace
 
         amount = len(namespace)
-        msg = f"{amount} objects imported automatically"
+        objects_str = "objects" if amount != 1 else "object"
+        msg = f"{amount} {objects_str} imported automatically"
 
         if verbosity < 2:
-            self.stdout.write(f"{msg} (use -v 2 for details).", self.style.SUCCESS)
+            if amount:
+                msg += " (use -v 2 for details)"
+            self.stdout.write(f"{msg}.", self.style.SUCCESS)
             return namespace
 
         imports_by_module = defaultdict(list)
@@ -163,9 +166,12 @@ class Command(BaseCommand):
         else:
             import_string = isort.code(import_string)
 
-        self.stdout.write(
-            f"{msg}, including:\n\n{import_string}", self.style.SUCCESS, ending="\n\n"
-        )
+        if import_string:
+            msg = f"{msg}, including:\n\n{import_string}"
+        else:
+            msg = f"{msg}."
+
+        self.stdout.write(msg, self.style.SUCCESS, ending="\n\n")
 
         return namespace
 
