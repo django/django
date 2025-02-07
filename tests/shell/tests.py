@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import CommandError, call_command
 from django.core.management.commands import shell
-from django.db import models
+from django.db import connection, models
 from django.test import SimpleTestCase
 from django.test.utils import (
     captured_stdin,
@@ -274,6 +274,44 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
             "  from django.contrib.contenttypes.models import ContentType\n"
             "  from shell.models import Phone, Marker",
         )
+
+    def test_message_with_stdout_one_object(self):
+        class TestCommand(shell.Command):
+            def get_namespace(self):
+                return {"connection": connection}
+
+        with captured_stdout() as stdout:
+            TestCommand().get_and_report_namespace(verbosity=2)
+
+        cases = {
+            0: "",
+            1: "1 object imported automatically (use -v 2 for details).",
+            2: (
+                "1 object imported automatically, including:\n\n"
+                "  from django.utils.connection import connection"
+            ),
+        }
+        for verbosity, expected in cases.items():
+            with self.subTest(verbosity=verbosity):
+                with captured_stdout() as stdout:
+                    TestCommand().get_and_report_namespace(verbosity=verbosity)
+                    self.assertEqual(stdout.getvalue().strip(), expected)
+
+    def test_message_with_stdout_zero_objects(self):
+        class TestCommand(shell.Command):
+            def get_namespace(self):
+                return {}
+
+        cases = {
+            0: "",
+            1: "0 objects imported automatically.",
+            2: "0 objects imported automatically.",
+        }
+        for verbosity, expected in cases.items():
+            with self.subTest(verbosity=verbosity):
+                with captured_stdout() as stdout:
+                    TestCommand().get_and_report_namespace(verbosity=verbosity)
+                    self.assertEqual(stdout.getvalue().strip(), expected)
 
     @override_settings(INSTALLED_APPS=["shell", "django.contrib.contenttypes"])
     def test_message_with_stdout_listing_objects_with_isort(self):
