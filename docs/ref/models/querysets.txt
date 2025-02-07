@@ -2418,7 +2418,7 @@ are), and returns created objects as a list, in the same order as provided:
     ...     ]
     ... )
 
-This has a number of caveats though:
+This method is atomic, i.e., all batches of creation succeed or none. This has a number of caveats though:
 
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
@@ -2495,6 +2495,7 @@ updated:
     >>> Entry.objects.bulk_update(objs, ["headline"])
     2
 
+This method is atomic, i.e., all batches of creation succeed or none.
 :meth:`.QuerySet.update` is used to save the changes, so this is more efficient
 than iterating through the list of models and calling ``save()`` on each of
 them, but it has a few caveats:
