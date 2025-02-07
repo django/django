@@ -7,15 +7,10 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import CommandError, call_command
 from django.core.management.commands import shell
-from django.db import connection, models
+from django.db import connection
 from django.test import SimpleTestCase
-from django.test.utils import (
-    captured_stdin,
-    captured_stdout,
-    isolate_apps,
-    override_settings,
-)
-from django.urls.base import resolve, reverse
+from django.test.utils import captured_stdin, captured_stdout, override_settings
+from django.urls import resolve, reverse
 
 from .models import Marker, Phone
 
@@ -92,7 +87,7 @@ class ShellCommandTestCase(SimpleTestCase):
 
         self.assertEqual(
             mock_ipython.start_ipython.mock_calls,
-            [mock.call(argv=[], user_ns=cmd.get_and_report_namespace(**options))],
+            [mock.call(argv=[], user_ns=cmd.get_namespace(**options))],
         )
 
     @mock.patch("django.core.management.commands.shell.select.select")  # [1]
@@ -113,8 +108,7 @@ class ShellCommandTestCase(SimpleTestCase):
             cmd.bpython(options)
 
         self.assertEqual(
-            mock_bpython.embed.mock_calls,
-            [mock.call(cmd.get_and_report_namespace(**options))],
+            mock_bpython.embed.mock_calls, [mock.call(cmd.get_namespace(**options))]
         )
 
     @mock.patch("django.core.management.commands.shell.select.select")  # [1]
@@ -136,7 +130,7 @@ class ShellCommandTestCase(SimpleTestCase):
 
         self.assertEqual(
             mock_code.interact.mock_calls,
-            [mock.call(local=cmd.get_and_report_namespace(**options))],
+            [mock.call(local=cmd.get_namespace(**options))],
         )
 
     # [1] Patch select to prevent tests failing when the test suite is run
@@ -167,42 +161,35 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
             },
         )
 
-    @override_settings(INSTALLED_APPS=["basic", "shell"])
-    @isolate_apps("basic", "shell", kwarg_name="apps")
-    def test_get_namespace_precedence(self, apps):
-        class Article(models.Model):
-            class Meta:
-                app_label = "basic"
+    @override_settings(
+        INSTALLED_APPS=["model_forms", "contenttypes_tests", "forms_tests"]
+    )
+    def test_get_namespace_precedence(self):
+        # All of these apps define an `Article` model. The one defined first in
+        # INSTALLED_APPS, takes precedence.
+        import model_forms.models
 
-        winner_article = Article
-
-        class Article(models.Model):
-            class Meta:
-                app_label = "shell"
-
-        with mock.patch("django.apps.apps.get_models", return_value=apps.get_models()):
-            namespace = shell.Command().get_namespace()
-            self.assertEqual(namespace, {"Article": winner_article})
+        namespace = shell.Command().get_namespace()
+        self.assertIs(namespace.get("Article"), model_forms.models.Article)
 
     @override_settings(
         INSTALLED_APPS=["shell", "django.contrib.auth", "django.contrib.contenttypes"]
     )
     def test_get_namespace_overridden(self):
         class TestCommand(shell.Command):
-            def get_namespace(self):
-                from django.urls.base import resolve, reverse
-
-                return {
-                    **super().get_namespace(),
-                    "resolve": resolve,
-                    "reverse": reverse,
-                }
+            def get_auto_imports(self):
+                return super().get_auto_imports() + [
+                    "django.urls.reverse",
+                    "django.urls.resolve",
+                    "django.db.connection",
+                ]
 
         namespace = TestCommand().get_namespace()
 
         self.assertEqual(
             namespace,
             {
+                "connection": connection,
                 "resolve": resolve,
                 "reverse": reverse,
                 "Marker": Marker,
@@ -220,7 +207,7 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
     def test_no_imports_flag(self):
         for verbosity in (0, 1, 2, 3):
             with self.subTest(verbosity=verbosity), captured_stdout() as stdout:
-                namespace = shell.Command().get_and_report_namespace(
+                namespace = shell.Command().get_namespace(
                     verbosity=verbosity, no_imports=True
                 )
             self.assertEqual(namespace, {})
@@ -232,8 +219,8 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
     def test_verbosity_zero(self):
         with captured_stdout() as stdout:
             cmd = shell.Command()
-            namespace = cmd.get_and_report_namespace(verbosity=0)
-        self.assertEqual(namespace, cmd.get_namespace())
+            namespace = cmd.get_namespace(verbosity=0)
+        self.assertEqual(len(namespace), len(cmd.get_auto_imports()))
         self.assertEqual(stdout.getvalue().strip(), "")
 
     @override_settings(
@@ -242,8 +229,8 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
     def test_verbosity_one(self):
         with captured_stdout() as stdout:
             cmd = shell.Command()
-            namespace = cmd.get_and_report_namespace(verbosity=1)
-        self.assertEqual(namespace, cmd.get_namespace())
+            namespace = cmd.get_namespace(verbosity=1)
+        self.assertEqual(len(namespace), len(cmd.get_auto_imports()))
         self.assertEqual(
             stdout.getvalue().strip(),
             "6 objects imported automatically (use -v 2 for details).",
@@ -253,55 +240,51 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
     @mock.patch.dict(sys.modules, {"isort": None})
     def test_message_with_stdout_listing_objects_with_isort_not_installed(self):
         class TestCommand(shell.Command):
-            def get_namespace(self):
-                class MyClass:
-                    pass
-
-                constant = "constant"
-
-                return {
-                    **super().get_namespace(),
-                    "MyClass": MyClass,
-                    "constant": constant,
-                }
+            def get_auto_imports(self):
+                return super().get_auto_imports() + [
+                    "django.urls.reverse",
+                    "django.urls.resolve",
+                    "shell",
+                    "django",
+                ]
 
         with captured_stdout() as stdout:
-            TestCommand().get_and_report_namespace(verbosity=2)
+            TestCommand().get_namespace(verbosity=2)
 
         self.assertEqual(
             stdout.getvalue().strip(),
-            "5 objects imported automatically, including:\n\n"
+            "7 objects imported automatically:\n\n"
+            "  import shell\n"
+            "  import django\n"
             "  from django.contrib.contenttypes.models import ContentType\n"
-            "  from shell.models import Phone, Marker",
+            "  from shell.models import Phone, Marker\n"
+            "  from django.urls import reverse, resolve",
         )
 
     def test_message_with_stdout_one_object(self):
         class TestCommand(shell.Command):
-            def get_namespace(self):
-                return {"connection": connection}
+            def get_auto_imports(self):
+                return ["django.db.connection"]
 
         with captured_stdout() as stdout:
-            TestCommand().get_and_report_namespace(verbosity=2)
+            TestCommand().get_namespace(verbosity=2)
 
         cases = {
             0: "",
             1: "1 object imported automatically (use -v 2 for details).",
             2: (
-                "1 object imported automatically, including:\n\n"
-                "  from django.utils.connection import connection"
+                "1 object imported automatically:\n\n"
+                "  from django.db import connection"
             ),
         }
         for verbosity, expected in cases.items():
             with self.subTest(verbosity=verbosity):
                 with captured_stdout() as stdout:
-                    TestCommand().get_and_report_namespace(verbosity=verbosity)
+                    TestCommand().get_namespace(verbosity=verbosity)
                     self.assertEqual(stdout.getvalue().strip(), expected)
 
-    def test_message_with_stdout_zero_objects(self):
-        class TestCommand(shell.Command):
-            def get_namespace(self):
-                return {}
-
+    @override_settings(INSTALLED_APPS=[])
+    def test_message_with_stdout_no_installed_apps(self):
         cases = {
             0: "",
             1: "0 objects imported automatically.",
@@ -310,8 +293,20 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
         for verbosity, expected in cases.items():
             with self.subTest(verbosity=verbosity):
                 with captured_stdout() as stdout:
-                    TestCommand().get_and_report_namespace(verbosity=verbosity)
+                    shell.Command().get_namespace(verbosity=verbosity)
                     self.assertEqual(stdout.getvalue().strip(), expected)
+
+    def test_message_with_stdout_overriden_none_result(self):
+        class TestCommand(shell.Command):
+            def get_auto_imports(self):
+                return None
+
+        for verbosity in [0, 1, 2]:
+            with self.subTest(verbosity=verbosity):
+                with captured_stdout() as stdout:
+                    result = TestCommand().get_namespace(verbosity=verbosity)
+                    self.assertEqual(result, {})
+                    self.assertEqual(stdout.getvalue().strip(), "")
 
     @override_settings(INSTALLED_APPS=["shell", "django.contrib.contenttypes"])
     def test_message_with_stdout_listing_objects_with_isort(self):
@@ -322,27 +317,80 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
         mock_isort_code = mock.Mock(code=mock.MagicMock(return_value=sorted_imports))
 
         class TestCommand(shell.Command):
-            def get_namespace(self):
-                class MyClass:
-                    pass
-
-                constant = "constant"
-
-                return {
-                    **super().get_namespace(),
-                    "MyClass": MyClass,
-                    "constant": constant,
-                }
+            def get_auto_imports(self):
+                return super().get_auto_imports() + [
+                    "django.urls.reverse",
+                    "django.urls.resolve",
+                    "django",
+                ]
 
         with (
             mock.patch.dict(sys.modules, {"isort": mock_isort_code}),
             captured_stdout() as stdout,
         ):
-            TestCommand().get_and_report_namespace(verbosity=2)
+            TestCommand().get_namespace(verbosity=2)
 
         self.assertEqual(
             stdout.getvalue().strip(),
-            "5 objects imported automatically, including:\n\n"
-            "  from shell.models import Marker, Phone\n\n"
-            "  from django.contrib.contenttypes.models import ContentType",
+            "6 objects imported automatically:\n\n" + sorted_imports,
         )
+
+    def test_override_get_auto_imports(self):
+        class TestCommand(shell.Command):
+            def get_auto_imports(self):
+                return [
+                    "model_forms",
+                    "shell",
+                    "does.not.exist",
+                    "doesntexisteither",
+                ]
+
+        with captured_stdout() as stdout:
+            TestCommand().get_namespace(verbosity=2)
+
+        expected = (
+            "2 objects could not be automatically imported:\n\n"
+            "  does.not.exist\n"
+            "  doesntexisteither\n\n"
+            "2 objects imported automatically:\n\n"
+            "  import model_forms\n"
+            "  import shell\n\n"
+        )
+        self.assertEqual(stdout.getvalue(), expected)
+
+    def test_override_get_auto_imports_one_error(self):
+        class TestCommand(shell.Command):
+            def get_auto_imports(self):
+                return [
+                    "foo",
+                ]
+
+        expected = (
+            "1 object could not be automatically imported:\n\n  foo\n\n"
+            "0 objects imported automatically.\n\n"
+        )
+        for verbosity, expected in [(0, ""), (1, expected), (2, expected)]:
+            with self.subTest(verbosity=verbosity):
+                with captured_stdout() as stdout:
+                    TestCommand().get_namespace(verbosity=verbosity)
+                    self.assertEqual(stdout.getvalue(), expected)
+
+    def test_override_get_auto_imports_many_errors(self):
+        class TestCommand(shell.Command):
+            def get_auto_imports(self):
+                return [
+                    "does.not.exist",
+                    "doesntexisteither",
+                ]
+
+        expected = (
+            "2 objects could not be automatically imported:\n\n"
+            "  does.not.exist\n"
+            "  doesntexisteither\n\n"
+            "0 objects imported automatically.\n\n"
+        )
+        for verbosity, expected in [(0, ""), (1, expected), (2, expected)]:
+            with self.subTest(verbosity=verbosity):
+                with captured_stdout() as stdout:
+                    TestCommand().get_namespace(verbosity=verbosity)
+                    self.assertEqual(stdout.getvalue(), expected)
