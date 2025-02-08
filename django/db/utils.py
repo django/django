@@ -64,6 +64,9 @@ class DatabaseErrorWrapper:
         """
         self.wrapper = wrapper
 
+    def __del__(self):
+        del self.wrapper
+
     def __enter__(self):
         pass
 
