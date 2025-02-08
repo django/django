@@ -19,6 +19,9 @@ class BaseDatabaseIntrospection:
     def __init__(self, connection):
         self.connection = connection
 
+    def __del__(self):
+        del self.connection
+
     def get_field_type(self, data_type, description):
         """
         Hook for a database backend to use the cursor description to
