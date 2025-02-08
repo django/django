@@ -4,6 +4,9 @@ class BaseDatabaseValidation:
     def __init__(self, connection):
         self.connection = connection
 
+    def __del__(self):
+        del self.connection
+
     def check(self, **kwargs):
         return []
 

@@ -25,6 +25,9 @@ class BaseDatabaseCreation:
     def __init__(self, connection):
         self.connection = connection
 
+    def __del__(self):
+        del self.connection
+
     def _nodb_cursor(self):
         return self.connection._nodb_cursor()
 
