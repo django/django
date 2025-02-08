@@ -407,6 +407,9 @@ class BaseDatabaseFeatures:
     def __init__(self, connection):
         self.connection = connection
 
+    def __del__(self):
+        del self.connection
+
     @cached_property
     def supports_explaining_query_execution(self):
         """Does this backend support explaining query execution?"""
