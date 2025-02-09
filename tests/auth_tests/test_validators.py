@@ -273,6 +273,15 @@ class CommonPasswordValidatorTest(SimpleTestCase):
             CommonPasswordValidator().validate("godzilla")
         self.assertEqual(cm.exception.messages, [expected_error])
 
+    def test_common_hexed_codes(self):
+        expected_error = "This password is too common."
+        common_hexed_passwords = ["asdfjkl:", "&#2336:"]
+        for password in common_hexed_passwords:
+            with self.subTest(password=password):
+                with self.assertRaises(ValidationError) as cm:
+                    CommonPasswordValidator().validate(password)
+                self.assertEqual(cm.exception.messages, [expected_error])
+
     def test_validate_custom_list(self):
         path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "common-passwords-custom.txt"
