@@ -21,11 +21,11 @@ from django.views.decorators.common import no_append_slash
 from .forms import MediaActionForm
 from .models import (
     Actor,
+    Address,
     AdminOrderedAdminMethod,
     AdminOrderedCallable,
     AdminOrderedField,
     AdminOrderedModelMethod,
-    Address,
     Album,
     Answer,
     Answer2,
@@ -1113,9 +1113,10 @@ class CityAdmin(admin.ModelAdmin):
             "form_kwargs": {"initial": {"name": "overridden_name"}},
         }
 
+
 class AddressForm(forms.ModelForm):
     city = forms.ModelMultipleChoiceField(
-        queryset= City.objects.all(),
+        queryset=City.objects.all(),
         widget=admin.widgets.FilteredSelectMultiple("City", is_stacked=False),
     )
 
