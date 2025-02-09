@@ -6246,7 +6246,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         ).click()
         self.take_screenshot("selectbox-chosen-perms-some-selected")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_mulitple_selectbox_label(self):
         self.admin_login(
             username="super", password="secret", login_url=reverse("admin:index")

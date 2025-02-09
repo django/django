@@ -1075,7 +1075,7 @@ class CityInlineAdmin(admin.TabularInline):
     view_on_site = False
 
 
-class AddressForm(forms.ModelForm):
+class StateAdminForm(forms.ModelForm):
     nolabel_form_field = forms.BooleanField(required=False)
 
     class Meta:
@@ -1095,7 +1095,7 @@ class AddressForm(forms.ModelForm):
 
 class StateAdmin(admin.ModelAdmin):
     inlines = [CityInlineAdmin]
-    form = AddressForm
+    form = StateAdminForm
 
 
 class RestaurantInlineAdmin(admin.TabularInline):
