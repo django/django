@@ -87,7 +87,7 @@ class TupleLookupMixin:
                 Value(val, output_field=col.output_field)
                 for col, val in zip(self.lhs, self.rhs)
             ]
-            return Tuple(*args).as_sql(compiler, connection)
+            return compiler.compile(Tuple(*args))
         else:
             sql, params = compiler.compile(self.rhs)
             if not isinstance(self.rhs, ColPairs):
@@ -313,7 +313,7 @@ class TupleIn(TupleLookupMixin, In):
                 )
             )
 
-        return Tuple(*result).as_sql(compiler, connection)
+        return compiler.compile(Tuple(*result))
 
     def as_sql(self, compiler, connection):
         if not self.rhs_is_direct_value():
