@@ -6246,6 +6246,19 @@ class SeleniumTests(AdminSeleniumTestCase):
         ).click()
         self.take_screenshot("selectbox-chosen-perms-some-selected")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl"])
+    def test_mulitple_selectbox_label(self):
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+
+        with self.wait_page_loaded():
+            self.selenium.get(
+                self.live_server_url + reverse("admin:admin_views_address_add")
+            )
+
+        self.take_screenshot("label-multiple-selectbox")
+
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""

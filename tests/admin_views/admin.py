@@ -25,6 +25,7 @@ from .models import (
     AdminOrderedCallable,
     AdminOrderedField,
     AdminOrderedModelMethod,
+    Address,
     Album,
     Answer,
     Answer2,
@@ -1074,7 +1075,7 @@ class CityInlineAdmin(admin.TabularInline):
     view_on_site = False
 
 
-class StateAdminForm(forms.ModelForm):
+class AddressForm(forms.ModelForm):
     nolabel_form_field = forms.BooleanField(required=False)
 
     class Meta:
@@ -1094,7 +1095,7 @@ class StateAdminForm(forms.ModelForm):
 
 class StateAdmin(admin.ModelAdmin):
     inlines = [CityInlineAdmin]
-    form = StateAdminForm
+    form = AddressForm
 
 
 class RestaurantInlineAdmin(admin.TabularInline):
@@ -1111,6 +1112,17 @@ class CityAdmin(admin.ModelAdmin):
             **super().get_formset_kwargs(request, obj, inline, prefix),
             "form_kwargs": {"initial": {"name": "overridden_name"}},
         }
+
+class AddressForm(forms.ModelForm):
+    city = forms.ModelMultipleChoiceField(
+        queryset= City.objects.all(),
+        widget=admin.widgets.FilteredSelectMultiple("City", is_stacked=False),
+    )
+
+
+class AddressAdmin(admin.ModelAdmin):
+    model = Address
+    form = AddressForm
 
 
 class WorkerAdmin(admin.ModelAdmin):
@@ -1250,6 +1262,7 @@ site.register(UndeletableObject, UndeletableObjectAdmin)
 site.register(UnchangeableObject, UnchangeableObjectAdmin)
 site.register(State, StateAdmin)
 site.register(City, CityAdmin)
+site.register(Address, AddressAdmin)
 site.register(Restaurant, RestaurantAdmin)
 site.register(Worker, WorkerAdmin)
 site.register(FunkyTag, FunkyTagAdmin)
