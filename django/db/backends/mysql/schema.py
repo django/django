@@ -43,15 +43,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return "ALTER TABLE %(table)s DROP CONSTRAINT IF EXISTS %(name)s"
         return "ALTER TABLE %(table)s DROP CHECK %(name)s"
 
-    @property
-    def sql_rename_column(self):
-        is_mariadb = self.connection.mysql_is_mariadb
-        if is_mariadb and self.connection.mysql_version < (10, 5, 2):
-            # MariaDB < 10.5.2 doesn't support an
-            # "ALTER TABLE ... RENAME COLUMN" statement.
-            return "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
-        return super().sql_rename_column
-
     def quote_value(self, value):
         self.connection.ensure_connection()
         # MySQLdb escapes to string, PyMySQL to bytes.
@@ -241,16 +232,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
 
     def _field_db_check(self, field, field_db_params):
-        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            5,
-            2,
-        ):
+        if self.connection.mysql_is_mariadb:
             return super()._field_db_check(field, field_db_params)
-        # On MySQL and MariaDB < 10.5.2 (no support for
-        # "ALTER TABLE ... RENAME COLUMN" statements), check constraints with
-        # the column name as it requires explicit recreation when the column is
-        # renamed.
+        # On MySQL, check constraints with the column name as it requires
+        # explicit recreation when the column is renamed.
         return field_db_params["check"]
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
