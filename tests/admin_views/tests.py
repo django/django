@@ -58,6 +58,7 @@ from .models import (
     Book,
     Bookmark,
     Box,
+    CascadeRefCoverLetter,
     Category,
     Chapter,
     ChapterXtra1,
@@ -107,6 +108,7 @@ from .models import (
     Post,
     PrePopulatedPost,
     Promo,
+    ProtectRefCoverLetter,
     Question,
     ReadablePizza,
     ReadOnlyPizza,
@@ -3414,6 +3416,143 @@ class AdminViewPermissionsTest(TestCase):
             response,
             '<li class="success">The article “Fun &amp; games” was added successfully.'
             "</li>",
+            html=True,
+        )
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminBlankStringObjectDisplayTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="user",
+            password="secret",
+            is_staff=True,
+        )
+        cl_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(CoverLetter)
+        )
+        cls.user.user_permissions.add(*cl_permission)
+        cls.obj = CoverLetter.objects.create(author="   ")
+        cls.display_object_avoid_quote = str(b"\xc2\xa0\xc2\xa0\xc2\xa0", "utf-8")
+        cls.display_object = "“%s”" % cls.display_object_avoid_quote
+        cls.change_link = reverse(
+            "admin:admin_views_coverletter_change", args=(cls.obj.pk,)
+        )
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_breadcrumbs_with_blank_string_object(self):
+        base_breadcrumbs = (
+            '<div class="breadcrumbs">'
+            '<a href="/test_admin/admin/">Home</a>'
+            '&rsaquo; <a href="/test_admin/admin/admin_views/">Admin_Views</a>'
+            '&rsaquo; <a href="/test_admin/admin/admin_views/coverletter/">'
+        )
+        url = reverse("admin:admin_views_coverletter_change", args=(self.obj.pk,))
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            base_breadcrumbs
+            + "Cover letters</a>&rsaquo; %s</div>" % self.display_object,
+            html=True,
+        )
+        url = reverse("admin:admin_views_coverletter_delete", args=(self.obj.pk,))
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            base_breadcrumbs + 'Cover letters</a>&rsaquo; <a href="%s">%s</a>'
+            "&rsaquo; Delete</div>" % (self.change_link, self.display_object),
+            html=True,
+        )
+        url = reverse("admin:admin_views_coverletter_history", args=(self.obj.pk,))
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            base_breadcrumbs + 'Cover letters</a>&rsaquo; <a href="%s">%s</a>'
+            "&rsaquo; History</div>" % (self.change_link, self.display_object),
+            html=True,
+        )
+
+    def test_change_list_with_blank_string_object(self):
+        url = reverse("admin:admin_views_coverletter_changelist")
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            '<th class="field-__str__"><a href="%s">%s</a></th>'
+            % (self.change_link, self.display_object),
+            html=True,
+        )
+
+    def test_deleted_objects_with_blank_string_object(self):
+        url = reverse("admin:admin_views_coverletter_delete", args=(self.obj.pk,))
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            '<ul id="deleted-objects">'
+            '<li>Cover letter: <a href="%s">%s</a></li></ul>'
+            % (self.change_link, self.display_object),
+            html=True,
+        )
+
+    def test_delete_confirmation_message_with_blank_string_object(self):
+        url = reverse("admin:admin_views_coverletter_delete", args=(self.obj.pk,))
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            "<p>Are you sure you want to delete the cover letter “%s”?"
+            % self.display_object_avoid_quote,
+        )
+        forbidden_obj = CoverLetter.objects.create(author="   ")
+        CascadeRefCoverLetter.objects.create(coverletter=forbidden_obj)
+        url = reverse("admin:admin_views_coverletter_delete", args=(forbidden_obj.pk,))
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            "<p>Deleting the cover letter “%s” would result in"
+            % self.display_object_avoid_quote,
+        )
+        protected_obj = CoverLetter.objects.create(author="   ")
+        ProtectRefCoverLetter.objects.create(coverletter=protected_obj)
+        url = reverse("admin:admin_views_coverletter_delete", args=(protected_obj.pk,))
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            "<p>Deleting the cover letter “%s” would require deleting"
+            % self.display_object_avoid_quote,
+        )
+
+    def test_recentactions_with_blank_string_object(self):
+        LogEntry.objects.log_actions(
+            user_id=self.user.pk,
+            queryset=[self.obj],
+            action_flag=ADDITION,
+            change_message=[],
+            single_object=True,
+        )
+        LogEntry.objects.log_actions(
+            user_id=self.user.pk,
+            queryset=[self.obj],
+            action_flag=DELETION,
+            change_message=[],
+            single_object=True,
+        )
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(
+            response,
+            '<li class="addlink">'
+            '<span class="visually-hidden">Added:</span><a href="%s">%s</a>'
+            '<br><span class="mini quiet">Cover letter</span></li>'
+            % (self.change_link, self.display_object),
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<li class="deletelink">'
+            '<span class="visually-hidden">Deleted:</span>%s'
+            '<br><span class="mini quiet">Cover letter</span></li>'
+            % self.display_object,
             html=True,
         )
 
@@ -6882,6 +7021,77 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.assertGreater(len(object_tools), 0)
         self.take_screenshot("not-overwrap")
+
+    def test_blank_string_object_display_in_messages(self):
+        from selenium.webdriver.common.by import By
+
+        def _message_text_equal(state, expected_text):
+            message = self.selenium.find_element(
+                By.CSS_SELECTOR, "ul.messagelist li.%s" % state
+            )
+            self.assertEqual(message.text, expected_text)
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        # Add
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_coverletter_add")
+        )
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and continue editing"]'
+        ).click()
+        _message_text_equal(
+            "success",
+            "The cover letter “   ” was added successfully. "
+            "You may edit it again below.",
+        )
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and add another"]'
+        ).click()
+        _message_text_equal(
+            "success",
+            "The cover letter “   ” was changed successfully. "
+            "You may add another cover letter below.",
+        )
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        _message_text_equal("success", "The cover letter “   ” was added successfully.")
+        # Change
+        cl = CoverLetter.objects.create(author="   ")
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:admin_views_coverletter_change", args=(cl.pk,))
+        )
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and continue editing"]'
+        ).click()
+        _message_text_equal(
+            "success",
+            "The cover letter “   ” was changed successfully. "
+            "You may edit it again below.",
+        )
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and add another"]'
+        ).click()
+        _message_text_equal(
+            "success",
+            "The cover letter “   ” was changed successfully. "
+            "You may add another cover letter below.",
+        )
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        _message_text_equal(
+            "success",
+            "The cover letter “   ” was added successfully.",
+        )
+        # Delete
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:admin_views_coverletter_delete", args=(cl.pk,))
+        )
+        self.selenium.find_element(By.XPATH, '//input[@value="Yes, I’m sure"]').click()
+        _message_text_equal(
+            "success", "The cover letter “   ” was deleted successfully."
+        )
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
