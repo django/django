@@ -161,8 +161,12 @@ def get_deleted_objects(objs, request, admin_site):
                 return no_edit_link
 
             # Display a link to the admin page.
+            obj_display = display_for_value(str(obj), "-")
             return format_html(
-                '{}: <a href="{}">{}</a>', capfirst(opts.verbose_name), admin_url, obj
+                '{}: <a href="{}">{}</a>',
+                capfirst(opts.verbose_name),
+                admin_url,
+                obj_display,
             )
         else:
             # Don't display link to edit, because it either has no
@@ -426,6 +430,24 @@ def help_text_for_field(name, model):
     return help_text
 
 
+def convert_to_nbsp(value):
+    """
+    Convert leading and trailing spaces to non-breaking spaces
+    to preserve their visibility.
+    """
+    blank = "\xa0"
+    if not value.strip():
+        value = value.replace(" ", blank)
+    elif value.startswith(" ") or value.endswith(" "):
+        value_length = len(value)
+        left_space = value_length - len(value.lstrip())
+        right_space = value_length - len(value.rstrip())
+        left = blank * left_space
+        right = blank * right_space
+        value = left + value.strip() + right
+    return value
+
+
 def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
@@ -465,7 +487,7 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
         return display_for_value(value, empty_value_display)
 
 
-def display_for_value(value, empty_value_display, boolean=False):
+def display_for_value(value, empty_value_display, boolean=False, avoid_quote=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
     if boolean:
@@ -482,6 +504,11 @@ def display_for_value(value, empty_value_display, boolean=False):
         return formats.number_format(value)
     elif isinstance(value, (list, tuple)):
         return ", ".join(str(v) for v in value)
+    elif isinstance(value, str):
+        converted_value = convert_to_nbsp(value)
+        if value != converted_value and not avoid_quote:
+            return f"“{converted_value}”"
+        return converted_value
     else:
         return str(value)
 
