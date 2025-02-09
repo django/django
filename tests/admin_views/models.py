@@ -769,8 +769,22 @@ class FoodDelivery(models.Model):
         unique_together = (("driver", "restaurant"),)
 
 
+class CascadeRefCoverLetter(models.Model):
+    coverletter = models.ForeignKey("CoverLetter", on_delete=models.CASCADE)
+
+
+class ProtectRefCoverLetter(models.Model):
+    coverletter = models.ForeignKey("CoverLetter", on_delete=models.PROTECT)
+
+
 class CoverLetter(models.Model):
-    author = models.CharField(max_length=30)
+    class AllowInputBlankCharField(models.CharField):
+        def formfield(self, **kwargs):
+            defaults = {"strip": False}
+            defaults.update(kwargs)
+            return super().formfield(**defaults)
+
+    author = AllowInputBlankCharField(max_length=30, blank=True)
     date_written = models.DateField(null=True, blank=True)
 
     def __str__(self):

@@ -8,6 +8,7 @@ from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
     NestedObjects,
     build_q_object_from_lookup_parameters,
+    convert_to_nbsp,
     display_for_field,
     display_for_value,
     flatten,
@@ -312,6 +313,52 @@ class UtilsTests(SimpleTestCase):
             with self.subTest(empty_value=value):
                 display_value = display_for_value(value, self.empty_value)
                 self.assertEqual(display_value, self.empty_value)
+
+    def test_list_display_for_value_blank_str(self):
+        cases = [
+            ("   ", "“   ”", "   "),
+            ("     test", "“     test”", "     test"),
+            ("test       ", "“test       ”", "test       "),
+            ("  test  ", "“  test  ”", "  test  "),
+            (
+                "depth               charge.",
+                "depth               charge.",
+                "depth               charge.",
+            ),
+            (
+                "  Hello   my  name    is john.",
+                "“  Hello   my  name    is john.”",
+                "  Hello   my  name    is john.",
+            ),
+        ]
+        for value, expect_display_value, avoid_quote_value in cases:
+            with self.subTest(value=value):
+                display_value = display_for_value(value, self.empty_value)
+                self.assertEqual(display_value, expect_display_value)
+                display_value = display_for_value(
+                    value, self.empty_value, avoid_quote=True
+                )
+                self.assertEqual(display_value, avoid_quote_value)
+
+    def test_convert_to_nbsp(self):
+        cases = [
+            (" ", " "),
+            ("   ", "   "),
+            (" blue", " blue"),
+            ("yellow ", "yellow "),
+            ("dark    ", "dark    "),
+            ("          pink", "          pink"),
+            ("orange          ", "orange          "),
+            (" green ", " green "),
+            ("  red   ", "  red   "),
+            ("red green yellow", "red green yellow"),
+            (" red green yellow ", " red green yellow "),
+            ("blue  pink  orange", "blue  pink  orange"),
+            ("     b    l  u  e   ", "     b    l  u  e   "),
+        ]
+        for value, expect_value in cases:
+            with self.subTest(value=value):
+                self.assertEqual(expect_value, convert_to_nbsp(value))
 
     def test_label_for_field(self):
         """

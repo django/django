@@ -16,7 +16,7 @@ from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
 from django.utils.hashable import make_hashable
-from django.utils.html import format_html
+from django.utils.html import format_html, strip_tags
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import capfirst
 from django.utils.translation import ngettext
@@ -131,6 +131,8 @@ def get_deleted_objects(objs, request, admin_site):
     Return a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
     """
+    from django.contrib.admin.options import EMPTY_VALUE_STRING
+
     try:
         obj = objs[0]
     except IndexError:
@@ -164,8 +166,12 @@ def get_deleted_objects(objs, request, admin_site):
                 return no_edit_link
 
             # Display a link to the admin page.
+            obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
             return format_html(
-                '{}: <a href="{}">{}</a>', capfirst(opts.verbose_name), admin_url, obj
+                '{}: <a href="{}">{}</a>',
+                capfirst(opts.verbose_name),
+                admin_url,
+                obj_display,
             )
         else:
             # Don't display link to edit, because it either has no
@@ -422,6 +428,40 @@ def help_text_for_field(name, model):
     return help_text
 
 
+def convert_to_nbsp(value):
+    """
+    Converts spaces in a string to non-breaking spaces (nbsp)
+    for visual preservation.
+
+    Exactly leading and trailing spaces, as well as consecutive
+    spaces between words, are converted to non-breaking spaces.
+    """
+    result = ""
+    nbsp = "\xa0"
+    if not value.strip():
+        return value.replace(" ", nbsp)
+
+    value_length = len(value)
+    left_space_length = value_length - len(value.lstrip())
+    right_space_length = value_length - len(value.rstrip())
+    left = left_space_length * nbsp
+    right = right_space_length * nbsp
+    space_cnt = 0
+    for char in value.strip():
+        if char == " ":
+            space_cnt += 1
+        else:
+            # Consecutive spaces between words, replaced with nbsp
+            if space_cnt > 1:
+                result = result[:-space_cnt]
+                nbsps = space_cnt * nbsp
+                result += nbsps
+            space_cnt = 0
+        result += char
+    result = left + result + right
+    return result
+
+
 def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
@@ -463,7 +503,7 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
         return display_for_value(value, empty_value_display)
 
 
-def display_for_value(value, empty_value_display, boolean=False):
+def display_for_value(value, empty_value_display, boolean=False, avoid_quote=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
     if boolean:
@@ -480,6 +520,11 @@ def display_for_value(value, empty_value_display, boolean=False):
         return formats.number_format(value)
     elif isinstance(value, (list, tuple)):
         return ", ".join(str(v) for v in value)
+    elif strip_tags(value) == value and isinstance(value, str):
+        converted_value = convert_to_nbsp(value)
+        if value.strip() != value and not avoid_quote:
+            return f"“{converted_value}”"
+        return converted_value
     else:
         return str(value)
 
