@@ -2030,13 +2030,6 @@ that control how the relationship functions.
 
     .. note::
 
-        If you don't want multiple associations between the same instances, add
-        a :class:`~django.db.models.UniqueConstraint` including the from and to
-        fields. Django's automatically generated many-to-many tables include
-        such a constraint.
-
-    .. note::
-
         Recursive relationships using an intermediary model can't determine the
         reverse accessors names, as they would be the same. You need to set a
         :attr:`~ForeignKey.related_name` to at least one of them. If you'd
@@ -2045,7 +2038,9 @@ that control how the relationship functions.
 
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
-    created to hold the association. It has three fields to link the models.
+    created to hold the association. It has three fields to link the models, a
+    primary key and two foreign keys. There is a unique constraint on the two
+    foreign keys.
 
     If the source and target models differ, the following fields are
     generated:
