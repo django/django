@@ -2,7 +2,13 @@ import itertools
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models import Field
-from django.db.models.expressions import ColPairs, Func, ResolvedOuterRef, Value
+from django.db.models.expressions import (
+    ColPairs,
+    Func,
+    ResolvedOuterRef,
+    Subquery,
+    Value,
+)
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -301,7 +307,7 @@ class TupleIn(TupleLookupMixin, In):
             )
 
     def check_rhs_is_query(self):
-        if not isinstance(self.rhs, Query):
+        if not isinstance(self.rhs, (Query, Subquery)):
             lhs_str = self.get_lhs_str()
             rhs_cls = self.rhs.__class__.__name__
             raise ValueError(
