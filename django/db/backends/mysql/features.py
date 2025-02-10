@@ -11,6 +11,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allow_sliced_subqueries_with_in = False
     has_select_for_update = True
     has_select_for_update_nowait = True
+    has_select_for_update_skip_locked = True
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
@@ -26,6 +27,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_update_conflicts = True
+    can_rename_index = True
     delete_can_self_reference_subquery = False
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE test_procedure ()
@@ -65,7 +67,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
-            return (10, 5)
+            return (10, 6)
         else:
             return (8, 0, 11)
 
@@ -105,17 +107,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
             },
         }
-        if self.connection.mysql_is_mariadb and (
-            self.connection.mysql_version < (10, 5, 2)
-        ):
-            skips.update(
-                {
-                    "https://jira.mariadb.org/browse/MDEV-19598": {
-                        "schema.tests.SchemaTests."
-                        "test_alter_not_unique_field_to_primary_key",
-                    },
-                }
-            )
         if not self.supports_explain_analyze:
             skips.update(
                 {
@@ -223,12 +214,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.mysql_version >= (8, 0, 16)
 
     @cached_property
-    def has_select_for_update_skip_locked(self):
-        if self.connection.mysql_is_mariadb:
-            return self.connection.mysql_version >= (10, 6)
-        return True
-
-    @cached_property
     def has_select_for_update_of(self):
         return not self.connection.mysql_is_mariadb
 
@@ -299,12 +284,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_select_difference = property(
         operator.attrgetter("supports_select_intersection")
     )
-
-    @cached_property
-    def can_rename_index(self):
-        if self.connection.mysql_is_mariadb:
-            return self.connection.mysql_version >= (10, 5, 2)
-        return True
 
     @cached_property
     def supports_expression_defaults(self):

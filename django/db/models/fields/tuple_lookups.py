@@ -27,6 +27,17 @@ class Tuple(Func):
     def __iter__(self):
         return iter(self.source_expressions)
 
+    def as_sqlite(self, compiler, connection):
+        if connection.get_database_version() < (3, 37) and isinstance(
+            first_expr := self.source_expressions[0], Tuple
+        ):
+            first_expr = first_expr.copy()
+            first_expr.function = "VALUES"
+            return Tuple(first_expr, *self.source_expressions[1:]).as_sql(
+                compiler, connection
+            )
+        return self.as_sql(compiler, connection)
+
 
 class TupleLookupMixin:
     allows_composite_expressions = True
@@ -87,7 +98,7 @@ class TupleLookupMixin:
                 Value(val, output_field=col.output_field)
                 for col, val in zip(self.lhs, self.rhs)
             ]
-            return Tuple(*args).as_sql(compiler, connection)
+            return compiler.compile(Tuple(*args))
         else:
             sql, params = compiler.compile(self.rhs)
             if not isinstance(self.rhs, ColPairs):
@@ -96,9 +107,20 @@ class TupleLookupMixin:
                 )
             return "(%s)" % sql, params
 
+    def get_fallback_sql(self, compiler, connection):
+        raise NotImplementedError(
+            f"{self.__class__.__name__}.get_fallback_sql() must be implemented "
+            f"for backends that don't have the supports_tuple_lookups feature enabled."
+        )
+
+    def as_sql(self, compiler, connection):
+        if not connection.features.supports_tuple_lookups:
+            return self.get_fallback_sql(compiler, connection)
+        return super().as_sql(compiler, connection)
+
 
 class TupleExact(TupleLookupMixin, Exact):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) == (x, y, z) as SQL:
@@ -132,7 +154,7 @@ class TupleIsNull(TupleLookupMixin, IsNull):
 
 
 class TupleGreaterThan(TupleLookupMixin, GreaterThan):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) > (x, y, z) as SQL:
@@ -160,7 +182,7 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
 
 
 class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) >= (x, y, z) as SQL:
@@ -188,7 +210,7 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
 
 
 class TupleLessThan(TupleLookupMixin, LessThan):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) < (x, y, z) as SQL:
@@ -216,7 +238,7 @@ class TupleLessThan(TupleLookupMixin, LessThan):
 
 
 class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
-    def as_oracle(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) <= (x, y, z) as SQL:
@@ -313,19 +335,21 @@ class TupleIn(TupleLookupMixin, In):
                 )
             )
 
-        return Tuple(*result).as_sql(compiler, connection)
+        return compiler.compile(Tuple(*result))
 
-    def as_sql(self, compiler, connection):
-        if not self.rhs_is_direct_value():
-            return self.as_subquery(compiler, connection)
-        return super().as_sql(compiler, connection)
+    def as_subquery_sql(self, compiler, connection):
+        lhs = self.lhs
+        rhs = self.rhs
+        if isinstance(lhs, ColPairs):
+            rhs = rhs.clone()
+            rhs.set_values([source.name for source in lhs.sources])
+            lhs = Tuple(lhs)
+        return compiler.compile(In(lhs, rhs))
 
-    def as_sqlite(self, compiler, connection):
+    def get_fallback_sql(self, compiler, connection):
         rhs = self.rhs
         if not rhs:
             raise EmptyResultSet
-        if not self.rhs_is_direct_value():
-            return self.as_subquery(compiler, connection)
 
         # e.g.: (a, b, c) in [(x1, y1, z1), (x2, y2, z2)] as SQL:
         # WHERE (a = x1 AND b = y1 AND c = z1) OR (a = x2 AND b = y2 AND c = z2)
@@ -338,14 +362,10 @@ class TupleIn(TupleLookupMixin, In):
 
         return root.as_sql(compiler, connection)
 
-    def as_subquery(self, compiler, connection):
-        lhs = self.lhs
-        rhs = self.rhs
-        if isinstance(lhs, ColPairs):
-            rhs = rhs.clone()
-            rhs.set_values([source.name for source in lhs.sources])
-            lhs = Tuple(lhs)
-        return compiler.compile(In(lhs, rhs))
+    def as_sql(self, compiler, connection):
+        if not self.rhs_is_direct_value():
+            return self.as_subquery_sql(compiler, connection)
+        return super().as_sql(compiler, connection)
 
 
 tuple_lookups = {

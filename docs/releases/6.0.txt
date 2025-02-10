@@ -65,7 +65,8 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`.GEOSGeometry.hasm` property checks whether the geometry has
+  the M dimension.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -235,6 +236,12 @@ This section describes changes that may be needed in third-party database
 backends.
 
 * ...
+
+Dropped support for MariaDB 10.5
+--------------------------------
+
+Upstream support for MariaDB 10.5 ends in June 2025. Django 6.0 supports
+MariaDB 10.6 and higher.
 
 Dropped support for Python < 3.12
 ---------------------------------
