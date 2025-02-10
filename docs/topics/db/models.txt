@@ -503,9 +503,21 @@ something like this::
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
+        class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["person", "group"], name="unique_person_group"
+                )
+            ]
+
 When you set up the intermediary model, you explicitly specify foreign
 keys to the models that are involved in the many-to-many relationship. This
 explicit declaration defines how the two models are related.
+
+If you don't want multiple associations between the same instances, add a
+:class:`~django.db.models.UniqueConstraint` including the ``from`` and ``to``
+fields. Django's automatically generated many-to-many tables include such a
+constraint.
 
 There are a few restrictions on the intermediate model:
 
