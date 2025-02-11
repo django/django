@@ -517,7 +517,7 @@ Now you're ready to actually put the release out there. To do this:
 
    .. code-block:: shell
 
-       $ twine upload dist/*
+       $ twine upload --repository django dist/*
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball
