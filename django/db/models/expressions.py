@@ -2111,3 +2111,72 @@ class ValueRange(WindowFrame):
 
     def window_frame_start_end(self, connection, start, end):
         return connection.ops.window_frame_range_start_end(start, end)
+
+
+class RowTuple(ExpressionList):
+    template = "(%(expressions)s)"
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        # MySQL requires the ROW() function to be used for tuples in VALUES clauses.
+        if not connection.mysql_is_mariadb:
+            extra_context["template"] = "ROW(%(expressions)s)"
+        return self.as_sql(compiler, connection, **extra_context)
+
+    def __str__(self):
+        values = self.arg_joiner.join(str(arg) for arg in self.source_expressions)
+        return self.template % {"expressions": values}
+
+    def __getitem__(self, item):
+        return self.source_expressions[item]
+
+
+class RowTupleValues(ExpressionList):
+    template = "VALUES %(expressions)s"
+
+    def __init__(self, expression_list, pk_field, field_list, **extra):
+        expressions = (
+            (
+                RowTuple(*expressions)
+                if not isinstance(expressions, RowTuple)
+                else expressions
+            )
+            for expressions in expression_list
+        )
+        self.pk_field = pk_field
+        self.field_list = field_list
+        super().__init__(*expressions, **extra)
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        # MySQL doesn't support aliases in VALUES clauses. The workaround is to use a
+        # UNION as the first column
+        # SELECT 1 AS x ,2 AS y
+        # UNION VALUES (3,4),(5,6);
+        first_row = self.source_expressions.pop()
+
+        class MySQLJoiner:
+            def join(self, expressions):
+                return ", ".join(
+                    f"{col_sql} AS column{idx}"
+                    for idx, col_sql in enumerate(expressions, 1)
+                )
+
+        sql, params = first_row.as_sql(
+            compiler,
+            connection,
+            template="%(expressions)s",
+            **extra_context,
+            arg_joiner=MySQLJoiner(),
+        )
+        sql = f"SELECT {sql}"
+        if self.source_expressions:
+            rest_sql, rest_params = super().as_sql(
+                compiler, connection, **extra_context
+            )
+            sql += f" UNION {rest_sql}"
+            params += rest_params
+
+        return sql, params
+
+    def __str__(self):
+        values = self.arg_joiner.join(str(arg) for arg in self.source_expressions)
+        return self.template % {"expressions": values}

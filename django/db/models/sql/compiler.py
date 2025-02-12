@@ -2192,6 +2192,62 @@ class SQLUpdateCompiler(SQLCompiler):
         self.query.reset_refcounts(refcounts_before)
 
 
+class SQLBulkUpdateCompiler(SQLCompiler):
+    def execute_sql(self, result_type):
+        cursor = super().execute_sql(result_type)
+        if not cursor:
+            return 0
+        try:
+            return cursor.rowcount
+        finally:
+            cursor.close()
+
+    def get_update_clause(self, values):
+        qn = self.quote_name_unless_alias
+        return "UPDATE %s " % qn(self.query.base_table), tuple()
+
+    def get_subquery_from_clause(self, values):
+        values_sql, value_params = self.compile(values)
+        return "FROM (%s) AS subquery" % values_sql, tuple(value_params)
+
+    def get_set_sql_clause(self, values):
+        qn = self.quote_name_unless_alias
+        set_sql = []
+        for idx, field in enumerate(values.field_list, start=2):
+            name = field.column
+            set_sql.append(
+                "%s = %s.%s" % (qn(name), qn("subquery"), qn(f"column{idx}"))
+            )
+
+        return "SET %s" % ", ".join(set_sql), tuple()
+
+    def get_where_clause(self, values):
+        qn = self.quote_name_unless_alias
+        return (
+            f'WHERE {qn(values.pk_field.column)} = {qn("subquery")}.{qn("column1")}',
+            tuple(),
+        )
+
+    def as_sql(self, with_limits=True, with_col_aliases=False):
+        self.pre_sql_setup()
+
+        values = self.query.row_values.resolve_expression(
+            self.query, allow_joins=True, reuse=None
+        )
+
+        update_clause, update_params = self.get_update_clause(values)
+        set_clause, set_params = self.get_set_sql_clause(values)
+        from_clause, from_params = self.get_subquery_from_clause(values)
+        where_clause, where_params = self.get_where_clause(values)
+
+        result = [update_clause, set_clause]
+        if from_clause is not None:
+            result.append(from_clause)
+        result.append(where_clause)
+        params = update_params + set_params + from_params + where_params
+        return " ".join(result), tuple(params)
+
+
 class SQLAggregateCompiler(SQLCompiler):
     def as_sql(self):
         """

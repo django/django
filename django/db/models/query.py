@@ -23,7 +23,7 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, F, Value, When
+from django.db.models.expressions import Case, F, RowTuple, RowTupleValues, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
@@ -887,30 +887,72 @@ class QuerySet(AltersData):
         )
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         requires_casting = connection.features.requires_casted_case_in_updates
+        requires_casting_in_values = (
+            connection.features.requires_casted_case_in_values_updates
+        )
         batches = (objs[i : i + batch_size] for i in range(0, len(objs), batch_size))
         updates = []
+
+        has_related_fields = any(f.model is not self.model for f in fields)
+        has_field_references = False
         for batch_objs in batches:
-            update_kwargs = {}
-            for field in fields:
-                when_statements = []
-                for obj in batch_objs:
+            row_tuples = []
+            for obj in batch_objs:
+                values = [Value(getattr(obj, "pk"))]
+                for field in fields:
                     attr = getattr(obj, field.attname)
-                    if not hasattr(attr, "resolve_expression"):
+                    if hasattr(attr, "resolve_expression"):
+                        has_field_references = True
+                    else:
                         attr = Value(attr, output_field=field)
-                    when_statements.append(When(pk=obj.pk, then=attr))
-                case_statement = Case(*when_statements, output_field=field)
-                if requires_casting:
-                    case_statement = Cast(case_statement, output_field=field)
-                update_kwargs[field.attname] = case_statement
-            updates.append(([obj.pk for obj in batch_objs], update_kwargs))
+
+                    if requires_casting_in_values:
+                        attr = Cast(attr, output_field=field)
+                    values.append(attr)
+
+                row_tuples.append(RowTuple(*values))
+            updates.append(
+                RowTupleValues(
+                    row_tuples, pk_field=self.model._meta.pk, field_list=fields
+                )
+            )
+
         rows_updated = 0
-        queryset = self.using(self.db)
         with transaction.atomic(using=self.db, savepoint=False):
-            for pks, update_kwargs in updates:
-                rows_updated += queryset.filter(pk__in=pks).update(**update_kwargs)
+            for row_tuples in updates:
+                if has_field_references or has_related_fields:
+                    rows_updated += self._bulk_update_slow(
+                        row_tuples, requires_casting=requires_casting
+                    )
+                else:
+                    query = sql.BulkUpdateQuery(self.model, row_tuples=row_tuples)
+                    rows_updated += query.get_compiler(using=self.db).execute_sql(
+                        result_type=CURSOR
+                    )
         return rows_updated
 
     bulk_update.alters_data = True
+
+    def _bulk_update_slow(self, row_tuples, requires_casting=False):
+        pks = [
+            row_tuple.source_expressions[0].value
+            for row_tuple in row_tuples.source_expressions
+        ]
+        update_kwargs = {}
+        # Skip the ID column
+        for field_idx, field in enumerate(row_tuples.field_list, start=1):
+            when_statements = []
+            for row_tuple in row_tuples.source_expressions:
+                row_tuple: RowTuple
+                id_expression = row_tuple.source_expressions[0]
+                attr_expression = row_tuple.source_expressions[field_idx]
+                when_statements.append(When(pk=id_expression, then=attr_expression))
+            case_statement = Case(*when_statements, output_field=field)
+            if requires_casting:
+                case_statement = Cast(case_statement, output_field=field)
+            update_kwargs[field.attname] = case_statement
+
+        return self.filter(pk__in=pks).update(**update_kwargs)
 
     async def abulk_update(self, objs, fields, batch_size=None):
         return await sync_to_async(self.bulk_update)(
