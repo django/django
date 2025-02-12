@@ -20,6 +20,18 @@ class QueryStringTagTests(SimpleTestCase):
             "test_querystring_empty_get_params", context, expected=""
         )
 
+    @setup({"test_querystring_remove_all_params": "{% querystring a=None %}"})
+    def test_querystring_remove_all_params(self):
+        non_empty_context = RequestContext(self.request_factory.get("/?a=b"))
+        empty_context = RequestContext(self.request_factory.get("/"))
+        for context, expected in [(non_empty_context, "?"), (empty_context, "")]:
+            with self.subTest(expected=expected):
+                self.assertRenderEqual(
+                    "test_querystring_remove_all_params",
+                    context,
+                    expected,
+                )
+
     @setup({"test_querystring_non_empty_get_params": "{% querystring %}"})
     def test_querystring_non_empty_get_params(self):
         request = self.request_factory.get("/", {"a": "b"})

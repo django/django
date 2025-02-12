@@ -965,7 +965,7 @@ This tag requires a :class:`~django.http.QueryDict` instance, which defaults to
 :attr:`request.GET <django.http.HttpRequest.GET>` if none is provided.
 
 If the :class:`~django.http.QueryDict` is empty and no additional parameters
-are provided, an empty string is returned. A non-empty result includes a
+are provided, an empty string is returned. Otherwise, the result includes a
 leading ``"?"``.
 
 .. admonition:: Using ``request.GET`` as default
