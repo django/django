@@ -199,8 +199,6 @@ Minor features
 
 * :lookup:`coveredby` and :lookup:`covers` lookup are now supported on MySQL.
 
-* :lookup:`coveredby` lookup is now supported on MariaDB 11.7+.
-
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
