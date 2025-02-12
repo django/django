@@ -14,18 +14,19 @@ class EmailBackend(ConsoleEmailBackend):
 
         if provider is not None:
             # Being initialized from EMAIL_PROVIDERS.
-            if not file_path:
-                raise ImproperlyConfigured(
-                    f'"file_path" not specified'
-                    f' in EMAIL_PROVIDERS["{provider}"]["OPTIONS"].'
-                )
-            self.file_path = file_path
+            options = settings.EMAIL_PROVIDERS[provider].get("OPTIONS", {})
+            file_path = options.get("file_path")
         else:
             # RemovedInDjango70Warning: Not being initialized from EMAIL_PROVIDERS.
             # Check the deprecated EMAIL_FILE_PATH setting.
-            self.file_path = file_path or getattr(settings, "EMAIL_FILE_PATH", None)
+            file_path = file_path or getattr(settings, "EMAIL_FILE_PATH", None)
 
-        self.file_path = os.path.abspath(self.file_path)
+        if not file_path:
+            raise ImproperlyConfigured(
+                f'"file_path" not specified'
+                f' in EMAIL_PROVIDERS["{provider}"]["OPTIONS"].'
+            )
+        self.file_path = os.path.abspath(file_path)
         try:
             os.makedirs(self.file_path, exist_ok=True)
         except FileExistsError:

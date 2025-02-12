@@ -191,17 +191,6 @@ DATABASE_ROUTERS = []
 EMAIL_PROVIDERS = {
     "default": {
         "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-        "OPTIONS": {
-            "host": "localhost",
-            "port": 25,
-            "username": "",
-            "password": "",
-            "use_tls": False,
-            "use_ssl": False,
-            "ssl_certfile": None,
-            "ssl_keyfile": None,
-            "timeout": None,
-        },
     },
 }
 

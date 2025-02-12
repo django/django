@@ -1391,16 +1391,14 @@ Default::
     EMAIL_PROVIDERS = {
         "default": {
             "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-            "OPTIONS": {
-                "host": "localhost",
-                "port": 25,
-            },
         }
     }
 
 A dictionary containing the settings for all email providers to be used with
 Django. It is a nested dictionary whose contents map an email provider alias
-to a dictionary containing the options for an individual backend.
+to a dictionary containing a sub-dictionary ``OPTIONS`` to override the
+defaults of each individual backend. Check the backend's documentation for
+details.
 
 The :setting:`EMAIL_PROVIDERS` setting must configure a ``default`` provider;
 any number of additional providers may also be specified. When sending emails,
@@ -1531,12 +1529,10 @@ trailing space.
 ``EMAIL_USE_LOCALTIME``
 -----------------------
 
-.. deprecated:: 6.0
-
 Default: ``False``
 
-Whether to send the SMTP ``Date`` header of email messages in the local time
-zone (``True``) or in UTC (``False``).
+Whether to send the SMTP ``Date`` header of email messages in the server's
+local time zone (``True``) or in UTC (``False``).
 
 .. setting:: EMAIL_USE_TLS
 

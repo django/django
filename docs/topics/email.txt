@@ -113,7 +113,7 @@ are required.
 * ``provider``: A string used as alias for the preferred email provider. If
   unset the default provider is used.
 
-These parameters are deprecated and will be removed in Django-6.1:
+These parameters are deprecated and will be removed in Django-7.0:
 
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the

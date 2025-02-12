@@ -18,13 +18,14 @@ from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import LazyObject, empty
+from django.utils.module_loading import import_string
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 DEFAULT_EMAIL_PROVIDER_ALIAS = "default"
 
-# RemovedInDjango61Warning.
+# RemovedInDjango70Warning.
 DEPRECATED_EMAIL_SETTINGS = {
     "EMAIL_BACKEND",
     "EMAIL_HOST",
@@ -40,6 +41,7 @@ DEPRECATED_EMAIL_SETTINGS = {
 }
 
 
+# RemovedInDjango70Warning.
 def warn_about_deprecated_email_setting(deprecated_setting):
     assert deprecated_setting in DEPRECATED_EMAIL_SETTINGS
     if deprecated_setting == "EMAIL_BACKEND":
@@ -58,6 +60,7 @@ def warn_about_deprecated_email_setting(deprecated_setting):
     )
 
 
+# RemovedInDjango70Warning.
 class EmailImproperlyConfigured(ImproperlyConfigured):
     def __init__(self, property_name):
         super().__init__(f"{property_name} and EMAIL_PROVIDERS are mutually exclusive.")
@@ -118,17 +121,18 @@ class LazySettings(LazyObject):
             val = getattr(_wrapped, name)
         except AttributeError:
             # Special case for EMAIL_* settings. To avoid breaking existing third-party
-            # apps accessing the current Django settings. Can be removed in Django-7.
+            # apps accessing the current Django settings. RemovedInDjango70Warning.
             if name == "EMAIL_BACKEND":
                 return self.EMAIL_PROVIDERS["default"]["BACKEND"]
-            if name == "EMAIL_HOST_USER":
-                return self.EMAIL_PROVIDERS["default"]["OPTIONS"]["username"]
-            if name == "EMAIL_HOST_PASSWORD":
-                return self.EMAIL_PROVIDERS["default"]["OPTIONS"]["password"]
             if name in DEPRECATED_EMAIL_SETTINGS:
-                return self.EMAIL_PROVIDERS["default"]["OPTIONS"].get(
-                    f"{name[6:].lower()}"
+                backend = import_string(getattr(self, "EMAIL_BACKEND"))(
+                    provider="default"
                 )
+                if name == "EMAIL_HOST_USER":
+                    return backend.username
+                if name == "EMAIL_HOST_PASSWORD":
+                    return backend.password
+                return getattr(backend, f"{name[6:].lower()}")
             raise
 
         # Special case some settings which require further modification.
@@ -234,6 +238,8 @@ class Settings:
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
+
+        # RemovedInDjango70Warning.
         is_overridden_EMAIL_PROVIDERS = self.is_overridden("EMAIL_PROVIDERS")
         for deprecated_setting in DEPRECATED_EMAIL_SETTINGS:
             if self.is_overridden(deprecated_setting):
@@ -285,6 +291,8 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+
+        # RemovedInDjango70Warning.
         if name == "EMAIL_PROVIDERS" and any(
             self.is_overridden(f) for f in DEPRECATED_EMAIL_SETTINGS
         ):
@@ -293,6 +301,7 @@ class UserSettingsHolder:
             if self.is_overridden("EMAIL_PROVIDERS"):
                 raise EmailImproperlyConfigured(name)
             warn_about_deprecated_email_setting(name)
+
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

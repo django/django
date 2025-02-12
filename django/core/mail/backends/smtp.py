@@ -15,6 +15,7 @@ class EmailBackend(BaseEmailBackend):
     """
     A wrapper that manages the SMTP network connection.
     """
+
     DEFAULT_HOST = "localhost"
     DEFAULT_PORT = 25
 
@@ -38,7 +39,7 @@ class EmailBackend(BaseEmailBackend):
 
         if provider is not None:
             # Being initialized from EMAIL_PROVIDERS.
-            options = settings.EMAIL_PROVIDERS[provider]["OPTIONS"]
+            options = settings.EMAIL_PROVIDERS[provider].get("OPTIONS", {})
             self.host = host or options.get("host", self.DEFAULT_HOST)
             self.port = port or options.get("port", self.DEFAULT_PORT)
             self.username = options.get("username") if username is None else username
