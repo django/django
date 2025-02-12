@@ -375,8 +375,8 @@ Example::
 ``isvalid``
 -----------
 
-*Availability*: MariaDB, MySQL,
-`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
+*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__,
+Oracle, SpatiaLite
 
 Tests if the geometry is valid.
 
@@ -384,16 +384,12 @@ Example::
 
     Zipcode.objects.filter(poly__isvalid=True)
 
-===================================  ================================================================
-Backend                              SQL Equivalent
-===================================  ================================================================
-MariaDB, MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
-Oracle                               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
-===================================  ================================================================
-
-.. versionchanged:: 5.2
-
-    MariaDB 11.7+ support was added.
+==========================  ================================================================
+Backend                     SQL Equivalent
+==========================  ================================================================
+MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
+Oracle                      ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
+==========================  ================================================================
 
 .. fieldlookup:: overlaps
 
@@ -885,18 +881,14 @@ Example:
 
 .. class:: Collect(geo_field, filter=None)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__,
-MariaDB, MySQL, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__, MySQL,
+SpatiaLite
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :class:`Union`
 aggregate, except it can be several orders of magnitude faster than performing
 a union because it rolls up geometries into a collection or multi object, not
 caring about dissolving boundaries.
-
-.. versionchanged:: 5.2
-
-    MariaDB 11.7+ support was added.
 
 ``Extent``
 ~~~~~~~~~~
