@@ -274,7 +274,8 @@ class HttpResponseBase:
             if samesite.lower() not in ("lax", "none", "strict"):
                 raise ValueError('samesite must be "lax", "none", or "strict".')
             self.cookies[key]["samesite"] = samesite
-
+        return self
+    
     def setdefault(self, key, value):
         """Set a header unless it has already been set."""
         self.headers.setdefault(key, value)
