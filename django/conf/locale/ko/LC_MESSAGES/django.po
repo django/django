@@ -237,7 +237,7 @@ msgid "Malay"
 msgstr "말레이시아어"
 
 msgid "Burmese"
-msgstr "룩셈부르크어"
+msgstr "버마어"
 
 msgid "Norwegian Bokmål"
 msgstr "노르웨이어(보크몰)"
