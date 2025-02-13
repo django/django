@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import City, State
+from .models import City, Persona, State
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -60,10 +60,11 @@ class SeleniumTests(AdminSeleniumTestCase):
             password="secret",
             email="super@example.com",
         )
+        self.p = Persona.objects.create(name="some")
         for i in range(1, 1101):
             LogEntry.objects.log_actions(
                 self.superuser.pk,
-                [self.superuser],
+                [self.p],
                 CHANGE,
                 change_message=f"Changed something {i}",
                 single_object=True,
@@ -77,12 +78,11 @@ class SeleniumTests(AdminSeleniumTestCase):
     def test_pagination(self):
         from selenium.webdriver.common.by import By
 
-        user_history_url = reverse("admin:auth_user_history", args=(self.superuser.pk,))
-        self.selenium.get(self.live_server_url + user_history_url)
-
+        history_url = reverse("admin:admin_views_persona_history", args=(self.p.pk,))
+        self.selenium.get(self.live_server_url + history_url)
         paginator = self.selenium.find_element(By.CSS_SELECTOR, ".paginator")
         self.assertTrue(paginator.is_displayed())
-        self.assertIn("%s entries" % LogEntry.objects.count(), paginator.text)
+        self.assertIn("%s log entries" % LogEntry.objects.count(), paginator.text)
         self.assertIn(str(Paginator.ELLIPSIS), paginator.text)
         # The current page.
         current_page_link = self.selenium.find_element(
@@ -101,3 +101,20 @@ class SeleniumTests(AdminSeleniumTestCase):
         rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
         self.assertIn("Changed something 101", rows[0].text)
         self.assertIn("Changed something 200", rows[-1].text)
+
+    def test_custom_pagination(self):
+        from selenium.webdriver.common.by import By
+
+        history_url = reverse("admin7:admin_views_persona_history", args=(self.p.pk,))
+        self.selenium.get(self.live_server_url + history_url)
+        rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
+        self.assertIn("Changed something 200", rows[-1].text)
+        last_page_link = self.selenium.find_element(By.CSS_SELECTOR, ".end")
+        self.assertTrue(last_page_link.text, "6")
+        show_all_link = self.selenium.find_element(
+            By.CSS_SELECTOR, "#change-history p.paginator a.showall"
+        )
+        self.assertEqual(show_all_link.text, "Show all")
+        show_all_link.click()
+        rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
+        self.assertIn("Changed something 1100", rows[-1].text)

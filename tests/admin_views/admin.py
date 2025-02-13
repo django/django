@@ -377,6 +377,11 @@ class PersonaAdmin(admin.ModelAdmin):
     inlines = (FooAccountAdmin, BarAccountAdmin)
 
 
+class PersonaCustomPaginationAdmin(admin.ModelAdmin):
+    list_per_page = 200
+    list_max_show_all = 2000
+
+
 class SubscriberAdmin(admin.ModelAdmin):
     actions = ["mail_admin"]
     action_form = MediaActionForm
@@ -1338,6 +1343,7 @@ site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
 site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
+site7.register(Persona, PersonaCustomPaginationAdmin)
 site7.register(
     Pizza,
     filter_horizontal=["toppings"],
