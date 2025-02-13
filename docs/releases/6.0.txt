@@ -207,7 +207,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The new variable ``forloop.length`` is now available within a :ttag:`for`
+  loop.
 
 Tests
 ~~~~~

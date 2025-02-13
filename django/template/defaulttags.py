@@ -206,7 +206,10 @@ class ForNode(Node):
             unpack = num_loopvars > 1
             # Create a forloop value in the context.  We'll update counters on each
             # iteration just below.
-            loop_dict = context["forloop"] = {"parentloop": parentloop}
+            loop_dict = context["forloop"] = {
+                "parentloop": parentloop,
+                "length": len_values,
+            }
             for i, item in enumerate(values):
                 # Shortcuts for current loop iteration number.
                 loop_dict["counter0"] = i
