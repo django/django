@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime, timedelta
 
 from django import forms
@@ -15,6 +16,7 @@ from django.contrib.admin.options import (
     IncorrectLookupParameters,
     ShowFacets,
 )
+from django.contrib.admin.pagination import ALL_VAR, PAGE_VAR
 from django.contrib.admin.utils import (
     build_q_object_from_lookup_parameters,
     get_fields_from_path,
@@ -27,19 +29,17 @@ from django.core.exceptions import (
     ImproperlyConfigured,
     SuspiciousOperation,
 )
-from django.core.paginator import InvalidPage
 from django.db.models import F, Field, ManyToOneRel, OrderBy
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Combinable
 from django.urls import reverse
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.http import urlencode
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext
 
 # Changelist settings
-ALL_VAR = "all"
 ORDER_VAR = "o"
-PAGE_VAR = "p"
 SEARCH_VAR = "q"
 ERROR_FLAG = "e"
 
@@ -108,11 +108,6 @@ class ChangeList:
             for error in _search_form.errors.values():
                 messages.error(request, ", ".join(error))
         self.query = _search_form.cleaned_data.get(SEARCH_VAR) or ""
-        try:
-            self.page_num = int(request.GET.get(PAGE_VAR, 1))
-        except ValueError:
-            self.page_num = 1
-        self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
         self.add_facets = model_admin.show_facets is ShowFacets.ALWAYS or (
             model_admin.show_facets is ShowFacets.ALLOW and IS_FACETS_VAR in request.GET
@@ -293,12 +288,14 @@ class ChangeList:
         return "?%s" % urlencode(sorted(p.items()), doseq=True)
 
     def get_results(self, request):
-        paginator = self.model_admin.get_paginator(
-            request, self.queryset, self.list_per_page
+        pagination = self.model_admin.get_pagination_instance(
+            request,
+            self.model,
+            self.queryset,
+            self.list_per_page,
+            self.list_max_show_all,
+            self.model_admin,
         )
-        # Get the number of objects, with admin filters applied.
-        result_count = paginator.count
-
         # Get the total number of objects, with no admin filters applied.
         # Note this isn't necessarily the same as result_count in the case of
         # no filtering. Filters defined in list_filters may still apply some
@@ -307,19 +304,6 @@ class ChangeList:
             full_result_count = self.root_queryset.count()
         else:
             full_result_count = None
-        can_show_all = result_count <= self.list_max_show_all
-        multi_page = result_count > self.list_per_page
-
-        # Get the list of objects to display on this page.
-        if (self.show_all and can_show_all) or not multi_page:
-            result_list = self.queryset._clone()
-        else:
-            try:
-                result_list = paginator.page(self.page_num).object_list
-            except InvalidPage:
-                raise IncorrectLookupParameters
-
-        self.result_count = result_count
         self.show_full_result_count = self.model_admin.show_full_result_count
         # Admin actions are shown if there is at least one entry
         # or if entries are not counted because show_full_result_count is
@@ -328,10 +312,63 @@ class ChangeList:
             full_result_count
         )
         self.full_result_count = full_result_count
-        self.result_list = result_list
-        self.can_show_all = can_show_all
-        self.multi_page = multi_page
-        self.paginator = paginator
+        self.pagination = pagination
+        self.result_list = pagination.get_objects()
+        self.result_count = pagination.result_count
+
+    @property
+    def page_num(self):
+        warnings.warn(
+            "ChangeList().page_num attribute is deprecated. "
+            "Use pagination.page_num instead.",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        return self.pagination.page_num
+
+    @page_num.setter
+    def page_num(self, value):
+        self.pagination.page_num = value
+
+    @property
+    def show_all(self):
+        warnings.warn(
+            "ChangeList().show_all attribute is deprecated. "
+            "Use pagination.show_all instead.",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        return self.pagination.show_all
+
+    @property
+    def can_show_all(self):
+        warnings.warn(
+            "ChangeList().can_show_all attribute is deprecated. "
+            "Use pagination.can_show_all instead.",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        return self.pagination.can_show_all
+
+    @property
+    def multi_page(self):
+        warnings.warn(
+            "ChangeList().multi_page attribute is deprecated. "
+            "Use pagination.multi_page instead.",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        return self.pagination.multi_page
+
+    @property
+    def paginator(self):
+        warnings.warn(
+            "ChangeList().paginator attribute is deprecated. "
+            "Use pagination.paginator instead.",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        return self.pagination.paginator
 
     def _get_default_ordering(self):
         ordering = []

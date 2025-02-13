@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls %}
+{% load i18n admin_urls admin_list %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -34,23 +34,7 @@
         {% endfor %}
         </tbody>
     </table>
-    <nav class="paginator" aria-labelledby="pagination">
-      <h2 id="pagination" class="visually-hidden">{% blocktranslate with name=opts.verbose_name %}Pagination {{ name }} entries{% endblocktranslate %}</h2>
-      {% if pagination_required %}
-        <ul>
-        {% for i in page_range %}
-          {% if i == action_list.paginator.ELLIPSIS %}
-            <li>{{ action_list.paginator.ELLIPSIS }}</li>
-          {% elif i == action_list.number %}
-            <li><a role="button" href="" aria-current="page">{{ i }}</a></li>
-          {% else %}
-            <li><a role="button" href="?{{ page_var }}={{ i }}">{{ i }}</a></li>
-          {% endif %}
-        {% endfor %}
-        </ul>
-      {% endif %}
-      {{ action_list.paginator.count }} {% blocktranslate count counter=action_list.paginator.count %}entry{% plural %}entries{% endblocktranslate %}
-    </nav>
+    {% block pagination %}{% pagination pagination %}{% endblock %}
 {% else %}
     <p>{% translate 'This object doesn’t have a change history. It probably wasn’t added via this admin site.' %}</p>
 {% endif %}

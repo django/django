@@ -94,7 +94,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         current_page_link = aria_current_link[0]
         self.assertEqual(current_page_link.get_attribute("aria-current"), "page")
         self.assertEqual(current_page_link.get_attribute("href"), "")
-        self.assertIn("%s entries" % LogEntry.objects.count(), paginator.text)
+        self.assertIn("%s log entries" % LogEntry.objects.count(), paginator.text)
         self.assertIn(str(Paginator.ELLIPSIS), paginator.text)
         self.assertEqual(current_page_link.text, "1")
         # The last page.
@@ -109,3 +109,24 @@ class SeleniumTests(AdminSeleniumTestCase):
         rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
         self.assertIn("Changed something 101", rows[0].text)
         self.assertIn("Changed something 200", rows[-1].text)
+
+    def test_custom_pagination_attributes(self):
+        from selenium.webdriver.common.by import By
+
+        user_history_url = reverse(
+            "admin7:auth_user_history", args=(self.superuser.pk,)
+        )
+        self.selenium.get(self.live_server_url + user_history_url)
+
+        rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
+        self.assertIn("Changed something 1", rows[0].text)
+        self.assertIn("Changed something 50", rows[-1].text)
+        last_page_link = self.selenium.find_element(By.CSS_SELECTOR, ".end")
+        self.assertTrue(last_page_link.text, "22")
+        # Select Show all
+        show_all = self.selenium.find_element(By.CSS_SELECTOR, "p.paginator a.showall")
+        self.assertEqual(show_all.text, "Show all")
+        show_all.click()
+        rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
+        self.assertIn("Changed something 1", rows[0].text)
+        self.assertIn("Changed something 1100", rows[-1].text)
