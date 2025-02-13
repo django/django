@@ -202,7 +202,9 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The :ttag:`querystring` template tag now supports multiple positional
+  arguments, requiring mappings such as :class:`~django.http.QueryDict`
+  or ``dict``.
 
 Tests
 ~~~~~
