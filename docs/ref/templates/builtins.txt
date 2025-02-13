@@ -412,6 +412,10 @@ etc.). Read more about the lookup order of the dot operator in the
 
 The for loop sets a number of variables available within the loop:
 
+.. versionchanged:: 5.1.7
+
+    Added ``forloop.total``
+
 ==========================  ===============================================
 Variable                    Description
 ==========================  ===============================================
@@ -423,6 +427,7 @@ Variable                    Description
                             loop (0-indexed)
 ``forloop.first``           True if this is the first time through the loop
 ``forloop.last``            True if this is the last time through the loop
+``forloop.total``           The total number iterations of the loop
 ``forloop.parentloop``      For nested loops, this is the loop surrounding
                             the current one
 ==========================  ===============================================
