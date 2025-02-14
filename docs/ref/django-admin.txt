@@ -1067,9 +1067,15 @@ Starts the Python interactive interpreter.
 
 All models from installed apps are automatically imported into the shell
 environment. Models from apps listed earlier in :setting:`INSTALLED_APPS` take
-precedence. For a ``--verbosity`` of 2 or higher, the automatically imported
-objects will be listed. To disable automatic importing entirely, use the
-``--no-imports`` flag.
+precedence. The following common utilities are also imported::
+
+    from django.db import connection, reset_queries, models
+    from django.conf import settings
+    from django.utils import timezone
+
+For a ``--verbosity`` of 2 or higher, the automatically imported objects will
+be listed. To disable automatic importing entirely, use the ``--no-imports``
+flag.
 
 See the guide on :ref:`customizing this behavior
 <customizing-shell-auto-imports>` to add or remove automatic imports.
@@ -1077,6 +1083,11 @@ See the guide on :ref:`customizing this behavior
 .. versionchanged:: 5.2
 
     Automatic models import was added.
+
+.. versionchanged:: 6.0
+
+    Automatic imports of common utilities, such as ``django.conf.settings``,
+    were added.
 
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
