@@ -1451,7 +1451,7 @@ class ExceptionReportTestMixin:
         """
         Asserts that potentially sensitive info are displayed in the email report.
         """
-        with self.settings(ADMINS=[("Admin", "admin@fattie-breakie.com")]):
+        with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post("/some_url/", self.breakfast_data)
             if iscoroutinefunction(view):
@@ -1487,7 +1487,7 @@ class ExceptionReportTestMixin:
         """
         Asserts that certain sensitive info are not displayed in the email report.
         """
-        with self.settings(ADMINS=[("Admin", "admin@fattie-breakie.com")]):
+        with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post("/some_url/", self.breakfast_data)
             if iscoroutinefunction(view):
@@ -1530,7 +1530,7 @@ class ExceptionReportTestMixin:
         """
         Asserts that no variables or POST parameters are displayed in the email report.
         """
-        with self.settings(ADMINS=[("Admin", "admin@fattie-breakie.com")]):
+        with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post("/some_url/", self.breakfast_data)
             view(request)
