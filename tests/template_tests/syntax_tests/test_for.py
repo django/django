@@ -365,7 +365,8 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-total02": "{% for val in values reversed %}{{ forloop.total }}{% endfor %}"
+            "for-tag-total02": "{% for val in values reversed %}"
+            "{{ forloop.total }}{% endfor %}"
         }
     )
     def test_for_tag_total02(self):
@@ -376,7 +377,8 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-total03": "{% for val in values reversed %}{{ forloop.total }}{% endfor %}"
+            "for-tag-total03": "{% for val in values reversed %}"
+            "{{ forloop.total }}{% endfor %}"
         }
     )
     def test_for_tag_total03(self):
