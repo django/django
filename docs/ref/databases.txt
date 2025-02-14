@@ -231,7 +231,7 @@ configuration in :setting:`DATABASES`::
 Role
 ----
 
-If you need to use a different role for database connections than the role use
+If you need to use a different role for database connections than the role used
 to establish the connection, set it in the :setting:`OPTIONS` part of your
 database configuration in :setting:`DATABASES`::
 
