@@ -28,6 +28,9 @@ details on these changes.
 
 * The ``URLIZE_ASSUME_HTTPS`` transitional setting will be removed.
 
+* Support for setting the ``ADMINS`` or ``MANAGERS`` settings to a list of
+  (name, address) tuples will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
