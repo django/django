@@ -119,41 +119,68 @@ def send_mass_mail(
     return connection.send_messages(messages)
 
 
-def mail_admins(
-    subject, message, fail_silently=False, connection=None, html_message=None
+def _send_server_message(
+    *,
+    setting_name,
+    subject,
+    message,
+    html_message=None,
+    fail_silently=False,
+    connection=None,
 ):
-    """Send a message to the admins, as defined by the ADMINS setting."""
-    if not settings.ADMINS:
+    """
+    Internal helper for mail_admins() and mail_managers().
+
+    Send mail from SERVER_EMAIL to a list of recipients configured in the named
+    setting, prepending EMAIL_SUBJECT_PREFIX to the subject.
+
+    The setting value must be a list of 2-tuples consisting of (name, address).
+    (Tuples and lists may be used interchangeably.)
+
+    For historical reasons, the name portion is unused.
+    """
+    recipients = getattr(settings, setting_name)
+    if not recipients:
         return
-    if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in settings.ADMINS):
-        raise ValueError("The ADMINS setting must be a list of 2-tuples.")
+
+    if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in recipients):
+        raise ValueError(f"The {setting_name} setting must be a list of 2-tuples.")
+
     mail = EmailMultiAlternatives(
-        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
-        message,
-        settings.SERVER_EMAIL,
-        [a[1] for a in settings.ADMINS],
+        subject="%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        body=message,
+        from_email=settings.SERVER_EMAIL,
+        to=[a[1] for a in recipients],
         connection=connection,
     )
     if html_message:
         mail.attach_alternative(html_message, "text/html")
     mail.send(fail_silently=fail_silently)
+
+
+def mail_admins(
+    subject, message, fail_silently=False, connection=None, html_message=None
+):
+    """Send a message to the admins, as defined by the ADMINS setting."""
+    _send_server_message(
+        setting_name="ADMINS",
+        subject=subject,
+        message=message,
+        html_message=html_message,
+        fail_silently=fail_silently,
+        connection=connection,
+    )
 
 
 def mail_managers(
     subject, message, fail_silently=False, connection=None, html_message=None
 ):
     """Send a message to the managers, as defined by the MANAGERS setting."""
-    if not settings.MANAGERS:
-        return
-    if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in settings.MANAGERS):
-        raise ValueError("The MANAGERS setting must be a list of 2-tuples.")
-    mail = EmailMultiAlternatives(
-        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
-        message,
-        settings.SERVER_EMAIL,
-        [a[1] for a in settings.MANAGERS],
+    _send_server_message(
+        setting_name="MANAGERS",
+        subject=subject,
+        message=message,
+        html_message=html_message,
+        fail_silently=fail_silently,
         connection=connection,
     )
-    if html_message:
-        mail.attach_alternative(html_message, "text/html")
-    mail.send(fail_silently=fail_silently)
