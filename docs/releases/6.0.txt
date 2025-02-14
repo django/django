@@ -328,6 +328,11 @@ Miscellaneous
 
 * ``URLIZE_ASSUME_HTTPS`` transitional setting is deprecated.
 
+* Setting :setting:`ADMINS` or :setting:`MANAGERS` to a list of (name, address)
+  tuples is deprecated. Set to a list of email address strings instead. Django
+  never used the name portion. To include a name, format the address string as
+  ``'"Name" <address>'`` or use Python's :func:`email.utils.formataddr`.
+
 Features removed in 6.0
 =======================
 

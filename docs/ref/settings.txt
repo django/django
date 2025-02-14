@@ -52,9 +52,13 @@ A list of all the people who get code error notifications. When
 is configured in :setting:`LOGGING` (done by default), Django emails these
 people the details of exceptions raised in the request/response cycle.
 
-Each item in the list should be a tuple of (Full name, email address). Example::
+Each item in the list should be an email address string. Example::
 
-    [("John", "john@example.com"), ("Mary", "mary@example.com")]
+    ADMINS = ["john@example.com", '"Ng, Mary" <mary@example.com>']
+
+.. versionchanged:: 6.0
+
+    In older versions, required a list of (name, address) tuples.
 
 .. setting:: ALLOWED_HOSTS
 
@@ -2073,6 +2077,10 @@ Default: ``[]`` (Empty list)
 A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
+
+.. versionchanged:: 6.0
+
+    In older versions, required a list of (name, address) tuples.
 
 .. setting:: MEDIA_ROOT
 
