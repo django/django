@@ -1066,10 +1066,18 @@ Mails the email addresses specified in :setting:`ADMINS` using
 Starts the Python interactive interpreter.
 
 All models from installed apps are automatically imported into the shell
-environment. Models from apps listed earlier in :setting:`INSTALLED_APPS` take
-precedence. For a ``--verbosity`` of 2 or higher, the automatically imported
-objects will be listed. To disable automatic importing entirely, use the
-``--no-imports`` flag.
+environment as well as some common utilities. Models from apps listed earlier 
+in :setting:`INSTALLED_APPS` take precedence. For a ``--verbosity`` of 2 or 
+higher, the automatically imported objects will be listed. To disable 
+automatic importing entirely, use the``--no-imports`` flag.
+
+.. versionchanged:: 6.0
+
+    By default the following utility objects are imported:
+    
+    * ``from django.conf import settings``
+    * ``from django.db import connection, reset_queries, models``
+    * ``from django.utils import timezone``
 
 See the guide on :ref:`customizing this behaviour
 <customizing-shell-auto-imports>` to add or remove automatic imports.

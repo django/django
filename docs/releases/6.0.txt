@@ -166,7 +166,7 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added default automatic imports to the :djadmin:`shell`.
 
 Migrations
 ~~~~~~~~~~
