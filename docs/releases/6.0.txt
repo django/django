@@ -224,6 +224,9 @@ Management Commands
 * The :djadmin:`startproject` and :djadmin:`startapp` commands now create the
   custom target directory if it doesn't exist.
 
+* Common utilities, such as ``django.conf.settings``, are now automatically
+  imported to the :djadmin:`shell` by default.
+
 Migrations
 ~~~~~~~~~~
 

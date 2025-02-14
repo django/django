@@ -39,20 +39,29 @@ For example:
 
 The customization above adds :func:`~django.urls.resolve` and
 :func:`~django.urls.reverse` to the default namespace, which already includes
-all models from the apps listed in :setting:`INSTALLED_APPS`. These objects
-will be available in the ``shell`` without requiring a manual import.
+all models from the apps listed in :setting:`INSTALLED_APPS` plus what is 
+imported by default. These objects will be available in the ``shell`` without 
+requiring a manual import.
 
 Running this customized ``shell`` command with ``verbosity=2`` would show:
 
 .. console::
 
-    8 objects imported automatically:
-
+    13 objects imported automatically:
+	
+      from django.db import connection, reset_queries, models
+      from django.conf import settings
       from django.contrib.admin.models import LogEntry
       from django.contrib.auth.models import Group, Permission, User
       from django.contrib.contenttypes.models import ContentType
       from django.contrib.sessions.models import Session
       from django.urls import resolve, reverse
+      from django.utils import timezone
+
+.. versionchanged:: 6.0
+
+    Automatic imports of common utilities, such as ``django.conf.settings``,
+    were added.
 
 If an overridden ``shell`` command includes paths that cannot be imported,
 these errors are shown when ``verbosity`` is set to ``1`` or higher. Duplicate
