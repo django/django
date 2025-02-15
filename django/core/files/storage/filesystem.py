@@ -129,11 +129,11 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
                     )
                     # RemovedInDjango60Warning: when the deprecation ends, replace with:
                     # if self._allow_overwrite:
-                    #     open_flags = open_flags & ~os.O_EXCL
+                    #     open_flags = open_flags & ~os.O_EXCL | os.O_TRUNC
                     if self.OS_OPEN_FLAGS != open_flags:
                         open_flags = self.OS_OPEN_FLAGS
                     elif self._allow_overwrite:
-                        open_flags = open_flags & ~os.O_EXCL
+                        open_flags = open_flags & ~os.O_EXCL | os.O_TRUNC
                     fd = os.open(full_path, open_flags, 0o666)
                     _file = None
                     try:
