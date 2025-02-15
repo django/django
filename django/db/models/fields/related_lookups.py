@@ -84,21 +84,12 @@ class RelatedIn(In):
 
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, ColPairs):
-            from django.db.models.sql.where import SubqueryConstraint
-
             if self.rhs_is_direct_value():
                 values = [get_normalized_value(value, self.lhs) for value in self.rhs]
                 lookup = TupleIn(self.lhs, values)
-                return compiler.compile(lookup)
             else:
-                return compiler.compile(
-                    SubqueryConstraint(
-                        self.lhs.alias,
-                        [target.column for target in self.lhs.targets],
-                        [source.name for source in self.lhs.sources],
-                        self.rhs,
-                    ),
-                )
+                lookup = TupleIn(self.lhs, self.rhs)
+            return compiler.compile(lookup)
 
         return super().as_sql(compiler, connection)
 

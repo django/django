@@ -22,7 +22,6 @@ from django.db.models.sql.constants import (
     SINGLE,
 )
 from django.db.models.sql.query import Query, get_order_dir
-from django.db.models.sql.where import AND
 from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
@@ -1660,19 +1659,6 @@ class SQLCompiler:
             # unless the database doesn't support it.
             return list(result)
         return result
-
-    def as_subquery_condition(self, alias, columns, compiler):
-        qn = compiler.quote_name_unless_alias
-        qn2 = self.connection.ops.quote_name
-        query = self.query.clone()
-
-        for index, select_col in enumerate(query.select):
-            lhs_sql, lhs_params = self.compile(select_col)
-            rhs = "%s.%s" % (qn(alias), qn2(columns[index]))
-            query.where.add(RawSQL("%s = %s" % (lhs_sql, rhs), lhs_params), AND)
-
-        sql, params = query.as_sql(compiler, self.connection)
-        return "EXISTS %s" % sql, params
 
     def explain_query(self):
         result = list(self.execute_sql())
