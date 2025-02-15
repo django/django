@@ -113,7 +113,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
                         | getattr(os, "O_BINARY", 0)
                     )
                     if self._allow_overwrite:
-                        open_flags = open_flags & ~os.O_EXCL
+                        open_flags = open_flags & ~os.O_EXCL | os.O_TRUNC
                     fd = os.open(full_path, open_flags, 0o666)
                     _file = None
                     try:
