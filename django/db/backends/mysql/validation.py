@@ -1,6 +1,6 @@
-from django.core import checks
-from django.db.backends.base.validation import BaseDatabaseValidation
-from django.utils.version import get_docs_version
+from thibaud.core import checks
+from thibaud.db.backends.base.validation import BaseDatabaseValidation
+from thibaud.utils.version import get_docs_version
 
 
 class DatabaseValidation(BaseDatabaseValidation):
@@ -22,7 +22,7 @@ class DatabaseValidation(BaseDatabaseValidation):
                         "%s, such as data truncation upon insertion, by "
                         "escalating warnings into errors. It is strongly "
                         "recommended you activate it. See: "
-                        "https://docs.djangoproject.com/en/%s/ref/databases/"
+                        "https://docs.thibaudproject.com/en/%s/ref/databases/"
                         "#mysql-sql-mode"
                         % (
                             self.connection.display_name,
@@ -54,7 +54,7 @@ class DatabaseValidation(BaseDatabaseValidation):
                     "> 255." % self.connection.display_name,
                     obj=field,
                     hint=(
-                        "See: https://docs.djangoproject.com/en/%s/ref/"
+                        "See: https://docs.thibaudproject.com/en/%s/ref/"
                         "databases/#mysql-character-fields" % get_docs_version()
                     ),
                     id="mysql.W003",

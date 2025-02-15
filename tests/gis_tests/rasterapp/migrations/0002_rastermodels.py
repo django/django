@@ -1,6 +1,6 @@
-from django.contrib.gis.db import models
-from django.db import migrations
-from django.db.models import deletion
+from thibaud.contrib.gis.db import models
+from thibaud.db import migrations
+from thibaud.db.models import deletion
 
 
 class Migration(migrations.Migration):

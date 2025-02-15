@@ -1,7 +1,7 @@
 import unittest
 
-from django.db import connection
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from thibaud.db import connection
+from thibaud.test import TransactionTestCase, skipUnlessDBFeature
 
 from ..models import Person, Square
 

@@ -3,9 +3,9 @@ import types
 from collections import defaultdict
 from itertools import chain
 
-from django.apps import apps
-from django.conf import settings
-from django.core.checks import Error, Tags, Warning, register
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core.checks import Error, Tags, Warning, register
 
 
 @register(Tags.models)
@@ -94,7 +94,7 @@ def _check_lazy_references(apps, ignore=None):
     """
     Ensure all lazy (i.e. string) model references have been resolved.
 
-    Lazy references are used in various places throughout Django, primarily in
+    Lazy references are used in various places throughout Thibaud, primarily in
     related fields and model signals. Identify those common cases and provide
     more helpful error messages for them.
 
@@ -107,7 +107,7 @@ def _check_lazy_references(apps, ignore=None):
     if not pending_models:
         return []
 
-    from django.db.models import signals
+    from thibaud.db.models import signals
 
     model_signals = {
         signal: name
@@ -141,7 +141,7 @@ def _check_lazy_references(apps, ignore=None):
         return model_error
 
     # Here are several functions which return CheckMessage instances for the
-    # most common usages of lazy operations throughout Django. These functions
+    # most common usages of lazy operations throughout Thibaud. These functions
     # take the model that was being waited on as an (app_label, modelname)
     # pair, the original lazy function, and its positional and keyword args as
     # determined by extract_operation().
@@ -199,9 +199,9 @@ def _check_lazy_references(apps, ignore=None):
     # defined above. If a key maps to None, no error will be produced.
     # default_error() will be used for usages that don't appear in this dict.
     known_lazy = {
-        ("django.db.models.fields.related", "resolve_related_class"): field_error,
-        ("django.db.models.fields.related", "set_managed"): None,
-        ("django.dispatch.dispatcher", "connect"): signal_connect_error,
+        ("thibaud.db.models.fields.related", "resolve_related_class"): field_error,
+        ("thibaud.db.models.fields.related", "set_managed"): None,
+        ("thibaud.dispatch.dispatcher", "connect"): signal_connect_error,
     }
 
     def build_error(model_key, func, args, keywords):

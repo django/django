@@ -1,7 +1,7 @@
 import datetime
 
-from django.test import TestCase, override_settings
-from django.utils import timezone
+from thibaud.test import TestCase, override_settings
+from thibaud.utils import timezone
 
 from .models import Article, Category, Comment
 

@@ -1,11 +1,11 @@
-from django.contrib.gis import feeds
+from thibaud.contrib.gis import feeds
 
 from .models import City
 
 
 class TestGeoRSS1(feeds.Feed):
     link = "/city/"
-    title = "Test GeoDjango Cities"
+    title = "Test GeoThibaud Cities"
 
     def items(self):
         return City.objects.all()
@@ -55,7 +55,7 @@ class TestW3CGeo3(TestGeoRSS1):
     feed_type = feeds.W3CGeoFeed
 
     def item_geometry(self, item):
-        from django.contrib.gis.geos import Polygon
+        from thibaud.contrib.gis.geos import Polygon
 
         return Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
 

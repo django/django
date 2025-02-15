@@ -1,8 +1,8 @@
-from django.conf import settings
-from django.core.cache import caches
-from django.core.cache.backends.db import BaseDatabaseCache
-from django.core.management.base import BaseCommand, CommandError
-from django.db import (
+from thibaud.conf import settings
+from thibaud.core.cache import caches
+from thibaud.core.cache.backends.db import BaseDatabaseCache
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.db import (
     DEFAULT_DB_ALIAS,
     DatabaseError,
     connections,

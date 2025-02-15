@@ -1,8 +1,8 @@
 import datetime
 
-from django.utils.html import avoid_wrapping
-from django.utils.timezone import is_aware
-from django.utils.translation import gettext, ngettext_lazy
+from thibaud.utils.html import avoid_wrapping
+from thibaud.utils.timezone import is_aware
+from thibaud.utils.translation import gettext, ngettext_lazy
 
 TIME_STRINGS = {
     "year": ngettext_lazy("%(num)d year", "%(num)d years", "num"),

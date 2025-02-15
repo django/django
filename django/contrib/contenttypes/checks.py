@@ -1,7 +1,7 @@
 from itertools import chain
 
-from django.apps import apps
-from django.core.checks import Error
+from thibaud.apps import apps
+from thibaud.core.checks import Error
 
 
 def check_generic_foreign_keys(app_configs=None, **kwargs):

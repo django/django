@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 
-from django.contrib.gis.gdal import Driver, GDALException
+from thibaud.contrib.gis.gdal import Driver, GDALException
 
 valid_drivers = (
     # vector
@@ -54,8 +54,8 @@ class DriverTest(unittest.TestCase):
             dr = Driver(alias)
             self.assertEqual(full_name, str(dr))
 
-    @mock.patch("django.contrib.gis.gdal.driver.capi.get_driver_count")
-    @mock.patch("django.contrib.gis.gdal.driver.capi.register_all")
+    @mock.patch("thibaud.contrib.gis.gdal.driver.capi.get_driver_count")
+    @mock.patch("thibaud.contrib.gis.gdal.driver.capi.register_all")
     def test_registered(self, reg, count):
         """
         Prototypes are registered only if the driver count is zero.

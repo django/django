@@ -1,7 +1,7 @@
-from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin
-from django.urls import path
+from thibaud.contrib import admin
+from thibaud.contrib.auth import get_user_model
+from thibaud.contrib.auth.admin import UserAdmin
+from thibaud.urls import path
 
 site = admin.AdminSite(name="custom_user_admin")
 

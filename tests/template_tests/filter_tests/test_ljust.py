@@ -1,6 +1,6 @@
-from django.template.defaultfilters import ljust
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from thibaud.template.defaultfilters import ljust
+from thibaud.test import SimpleTestCase
+from thibaud.utils.safestring import mark_safe
 
 from ..utils import setup
 

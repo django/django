@@ -3,9 +3,9 @@ import unittest
 from functools import wraps
 from unittest import mock
 
-from django.conf import settings
-from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import Func
+from thibaud.conf import settings
+from thibaud.db import DEFAULT_DB_ALIAS, connection
+from thibaud.db.models import Func
 
 
 def skipUnlessGISLookup(*gis_lookups):

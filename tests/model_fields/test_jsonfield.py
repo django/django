@@ -2,11 +2,11 @@ import operator
 import uuid
 from unittest import mock
 
-from django import forms
-from django.core import serializers
-from django.core.exceptions import ValidationError
-from django.core.serializers.json import DjangoJSONEncoder
-from django.db import (
+from thibaud import forms
+from thibaud.core import serializers
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.serializers.json import ThibaudJSONEncoder
+from thibaud.db import (
     DataError,
     IntegrityError,
     NotSupportedError,
@@ -15,7 +15,7 @@ from django.db import (
     models,
     transaction,
 )
-from django.db.models import (
+from thibaud.db.models import (
     Count,
     ExpressionWrapper,
     F,
@@ -27,8 +27,8 @@ from django.db.models import (
     Transform,
     Value,
 )
-from django.db.models.expressions import RawSQL
-from django.db.models.fields.json import (
+from thibaud.db.models.expressions import RawSQL
+from thibaud.db.models.fields.json import (
     KT,
     HasKey,
     KeyTextTransform,
@@ -36,9 +36,9 @@ from django.db.models.fields.json import (
     KeyTransformFactory,
     KeyTransformTextLookupMixin,
 )
-from django.db.models.functions import Cast
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from thibaud.db.models.functions import Cast
+from thibaud.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from thibaud.test.utils import CaptureQueriesContext
 
 from .models import CustomJSONDecoder, JSONModel, NullableJSONModel, RelatedJSONModel
 
@@ -64,7 +64,7 @@ class JSONFieldTests(TestCase):
 
     def test_db_check_constraints(self):
         value = "{@!invalid json value 123 $!@#"
-        with mock.patch.object(DjangoJSONEncoder, "encode", return_value=value):
+        with mock.patch.object(ThibaudJSONEncoder, "encode", return_value=value):
             with self.assertRaises((IntegrityError, DataError, OperationalError)):
                 NullableJSONModel.objects.create(value_custom=value)
 
@@ -73,14 +73,14 @@ class TestMethods(SimpleTestCase):
     def test_deconstruct(self):
         field = models.JSONField()
         name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, "django.db.models.JSONField")
+        self.assertEqual(path, "thibaud.db.models.JSONField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {})
 
     def test_deconstruct_custom_encoder_decoder(self):
-        field = models.JSONField(encoder=DjangoJSONEncoder, decoder=CustomJSONDecoder)
+        field = models.JSONField(encoder=ThibaudJSONEncoder, decoder=CustomJSONDecoder)
         name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(kwargs["encoder"], DjangoJSONEncoder)
+        self.assertEqual(kwargs["encoder"], ThibaudJSONEncoder)
         self.assertEqual(kwargs["decoder"], CustomJSONDecoder)
 
     def test_get_transforms(self):
@@ -132,7 +132,7 @@ class TestValidation(SimpleTestCase):
     def test_invalid_encoder(self):
         msg = "The encoder parameter must be a callable object."
         with self.assertRaisesMessage(ValueError, msg):
-            models.JSONField(encoder=DjangoJSONEncoder())
+            models.JSONField(encoder=ThibaudJSONEncoder())
 
     def test_invalid_decoder(self):
         msg = "The decoder parameter must be a callable object."
@@ -147,7 +147,7 @@ class TestValidation(SimpleTestCase):
             field.clean({"uuid": value}, None)
 
     def test_custom_encoder(self):
-        field = models.JSONField(encoder=DjangoJSONEncoder)
+        field = models.JSONField(encoder=ThibaudJSONEncoder)
         value = uuid.UUID("{d85e2076-b67c-4ee7-8c3a-2bf5a2cc2475}")
         field.clean({"uuid": value}, None)
 
@@ -160,10 +160,10 @@ class TestFormField(SimpleTestCase):
 
     def test_formfield_custom_encoder_decoder(self):
         model_field = models.JSONField(
-            encoder=DjangoJSONEncoder, decoder=CustomJSONDecoder
+            encoder=ThibaudJSONEncoder, decoder=CustomJSONDecoder
         )
         form_field = model_field.formfield()
-        self.assertIs(form_field.encoder, DjangoJSONEncoder)
+        self.assertIs(form_field.encoder, ThibaudJSONEncoder)
         self.assertIs(form_field.decoder, CustomJSONDecoder)
 
 
@@ -195,10 +195,10 @@ class TestSerialization(SimpleTestCase):
 
     def test_xml_serialization(self):
         test_xml_data = (
-            '<django-objects version="1.0">'
+            '<thibaud-objects version="1.0">'
             '<object model="model_fields.nullablejsonmodel">'
             '<field name="value" type="JSONField">%s'
-            "</field></object></django-objects>"
+            "</field></object></thibaud-objects>"
         )
         for value, serialized in self.test_values:
             with self.subTest(value=value):

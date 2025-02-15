@@ -1,5 +1,5 @@
-from django.db import transaction
-from django.db.models import (
+from thibaud.db import transaction
+from thibaud.db.models import (
     CharField,
     F,
     Func,
@@ -11,17 +11,17 @@ from django.db.models import (
     Value,
     Window,
 )
-from django.db.models.fields.json import KeyTextTransform, KeyTransform
-from django.db.models.functions import Cast, Concat, LPad, Substr
-from django.test.utils import Approximate
-from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango61Warning
+from thibaud.db.models.fields.json import KeyTextTransform, KeyTransform
+from thibaud.db.models.functions import Cast, Concat, LPad, Substr
+from thibaud.test.utils import Approximate
+from thibaud.utils import timezone
+from thibaud.utils.deprecation import RemovedInThibaud61Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
 
 try:
-    from django.contrib.postgres.aggregates import (
+    from thibaud.contrib.postgres.aggregates import (
         ArrayAgg,
         BitAnd,
         BitOr,
@@ -43,7 +43,7 @@ try:
         StatAggregate,
         StringAgg,
     )
-    from django.contrib.postgres.fields import ArrayField
+    from thibaud.contrib.postgres.fields import ArrayField
 except ImportError:
     pass  # psycopg2 is not installed
 
@@ -151,7 +151,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
 
     def test_ordering_warns_of_deprecation(self):
         msg = "The ordering argument is deprecated. Use order_by instead."
-        with self.assertWarnsMessage(RemovedInDjango61Warning, msg) as ctx:
+        with self.assertWarnsMessage(RemovedInThibaud61Warning, msg) as ctx:
             values = AggregateTestModel.objects.aggregate(
                 arrayagg=ArrayAgg("integer_field", ordering=F("integer_field").desc())
             )
@@ -159,7 +159,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         self.assertEqual(ctx.filename, __file__)
 
     def test_ordering_and_order_by_causes_error(self):
-        with self.assertWarns(RemovedInDjango61Warning):
+        with self.assertWarns(RemovedInThibaud61Warning):
             with self.assertRaisesMessage(
                 TypeError,
                 "Cannot specify both order_by and ordering.",

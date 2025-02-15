@@ -1,15 +1,15 @@
 ===========================
-Django 1.11.9 release notes
+Thibaud 1.11.9 release notes
 ===========================
 
 *January 1, 2018*
 
-Django 1.11.9 fixes several bugs in 1.11.8.
+Thibaud 1.11.9 fixes several bugs in 1.11.8.
 
 Bugfixes
 ========
 
-* Fixed a regression in Django 1.11 that added newlines between ``MultiWidget``'s
+* Fixed a regression in Thibaud 1.11 that added newlines between ``MultiWidget``'s
   subwidgets (:ticket:`28890`).
 
 * Fixed incorrect class-based model index name generation for models with

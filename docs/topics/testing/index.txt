@@ -1,5 +1,5 @@
 =================
-Testing in Django
+Testing in Thibaud
 =================
 
 Automated testing is an extremely useful bug-killing tool for the modern
@@ -15,16 +15,16 @@ solve, or avoid, a number of problems:
 
 Testing a web application is a complex task, because a web application is made
 of several layers of logic -- from HTTP-level request handling, to form
-validation and processing, to template rendering. With Django's test-execution
+validation and processing, to template rendering. With Thibaud's test-execution
 framework and assorted utilities, you can simulate requests, insert test data,
 inspect your application's output and generally verify your code is doing what
 it should be doing.
 
-The preferred way to write tests in Django is using the :mod:`unittest` module
+The preferred way to write tests in Thibaud is using the :mod:`unittest` module
 built-in to the Python standard library. This is covered in detail in the
 :doc:`overview` document.
 
-You can also use any *other* Python test framework; Django provides an API and
+You can also use any *other* Python test framework; Thibaud provides an API and
 tools for that kind of integration. They are described in the
 :ref:`other-testing-frameworks` section of :doc:`advanced`.
 

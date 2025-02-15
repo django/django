@@ -1,40 +1,40 @@
 from datetime import datetime, timedelta
 
-from django import forms
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.admin import FieldListFilter
-from django.contrib.admin.exceptions import (
+from thibaud import forms
+from thibaud.conf import settings
+from thibaud.contrib import messages
+from thibaud.contrib.admin import FieldListFilter
+from thibaud.contrib.admin.exceptions import (
     DisallowedModelAdminLookup,
     DisallowedModelAdminToField,
 )
-from django.contrib.admin.options import (
+from thibaud.contrib.admin.options import (
     IS_FACETS_VAR,
     IS_POPUP_VAR,
     TO_FIELD_VAR,
     IncorrectLookupParameters,
     ShowFacets,
 )
-from django.contrib.admin.utils import (
+from thibaud.contrib.admin.utils import (
     build_q_object_from_lookup_parameters,
     get_fields_from_path,
     lookup_spawns_duplicates,
     prepare_lookup_value,
     quote,
 )
-from django.core.exceptions import (
+from thibaud.core.exceptions import (
     FieldDoesNotExist,
     ImproperlyConfigured,
     SuspiciousOperation,
 )
-from django.core.paginator import InvalidPage
-from django.db.models import F, Field, ManyToOneRel, OrderBy
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Combinable
-from django.urls import reverse
-from django.utils.http import urlencode
-from django.utils.timezone import make_aware
-from django.utils.translation import gettext
+from thibaud.core.paginator import InvalidPage
+from thibaud.db.models import F, Field, ManyToOneRel, OrderBy
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.expressions import Combinable
+from thibaud.urls import reverse
+from thibaud.utils.http import urlencode
+from thibaud.utils.timezone import make_aware
+from thibaud.utils.translation import gettext
 
 # Changelist settings
 ALL_VAR = "all"

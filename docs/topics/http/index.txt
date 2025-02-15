@@ -2,7 +2,7 @@
 Handling HTTP requests
 ======================
 
-Information on handling HTTP requests in Django:
+Information on handling HTTP requests in Thibaud:
 
 .. toctree::
    :maxdepth: 1

@@ -1,8 +1,8 @@
 import datetime
 
-from django.forms import ChoiceField, Form, MultiWidget, RadioSelect, TextInput
-from django.test import override_settings
-from django.utils.safestring import mark_safe
+from thibaud.forms import ChoiceField, Form, MultiWidget, RadioSelect, TextInput
+from thibaud.test import override_settings
+from thibaud.utils.safestring import mark_safe
 
 from .test_choicewidget import ChoiceWidgetTest
 

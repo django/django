@@ -5,19 +5,19 @@ from enum import Enum
 from graphlib import TopologicalSorter
 from itertools import chain
 
-from django.conf import settings
-from django.db import models
-from django.db.migrations import operations
-from django.db.migrations.migration import Migration
-from django.db.migrations.operations.models import AlterModelOptions
-from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.migrations.questioner import MigrationQuestioner
-from django.db.migrations.utils import (
+from thibaud.conf import settings
+from thibaud.db import models
+from thibaud.db.migrations import operations
+from thibaud.db.migrations.migration import Migration
+from thibaud.db.migrations.operations.models import AlterModelOptions
+from thibaud.db.migrations.optimizer import MigrationOptimizer
+from thibaud.db.migrations.questioner import MigrationQuestioner
+from thibaud.db.migrations.utils import (
     COMPILED_REGEX_TYPE,
     RegexObject,
     resolve_relation,
 )
-from django.utils.functional import cached_property
+from thibaud.utils.functional import cached_property
 
 
 class OperationDependency(

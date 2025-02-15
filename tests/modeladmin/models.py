@@ -1,5 +1,5 @@
-from django.contrib.auth.models import User
-from django.db import models
+from thibaud.contrib.auth.models import User
+from thibaud.db import models
 
 
 class Band(models.Model):

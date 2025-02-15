@@ -1,6 +1,6 @@
 """
-The GeoDjango GEOS module.  Please consult the GeoDjango documentation
-for more details: https://docs.djangoproject.com/en/dev/ref/contrib/gis/geos/
+The GeoThibaud GEOS module.  Please consult the GeoThibaud documentation
+for more details: https://docs.thibaudproject.com/en/dev/ref/contrib/gis/geos/
 """
 
 from .collections import (  # NOQA

@@ -2,7 +2,7 @@
 Full text search
 ================
 
-The database functions in the ``django.contrib.postgres.search`` module ease
+The database functions in the ``thibaud.contrib.postgres.search`` module ease
 the use of PostgreSQL's `full text search engine
 <https://www.postgresql.org/docs/current/textsearch.html>`_.
 
@@ -14,7 +14,7 @@ For the examples in this document, we'll use the models defined in
     For a high-level overview of searching, see the :doc:`topic documentation
     </topics/db/search>`.
 
-.. currentmodule:: django.contrib.postgres.search
+.. currentmodule:: thibaud.contrib.postgres.search
 
 The ``search`` lookup
 =====================
@@ -34,7 +34,7 @@ and a ``plainto_tsquery`` from the search term ``'Cheese'``, both using the
 default database search configuration. The results are obtained by matching the
 query and the vector.
 
-To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
+To use the ``search`` lookup, ``'thibaud.contrib.postgres'`` must be in your
 :setting:`INSTALLED_APPS`.
 
 ``SearchVector``
@@ -48,14 +48,14 @@ To query against both fields, use a ``SearchVector``:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchVector
+    >>> from thibaud.contrib.postgres.search import SearchVector
     >>> Entry.objects.annotate(
     ...     search=SearchVector("body_text", "blog__tagline"),
     ... ).filter(search="Cheese")
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
 
 The arguments to ``SearchVector`` can be any
-:class:`~django.db.models.Expression` or the name of a field. Multiple
+:class:`~thibaud.db.models.Expression` or the name of a field. Multiple
 arguments will be concatenated together using a space so that the search
 document includes them all.
 
@@ -96,7 +96,7 @@ Examples:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery
+    >>> from thibaud.contrib.postgres.search import SearchQuery
     >>> SearchQuery("red tomato")  # two keywords
     >>> SearchQuery("tomato red")  # same results as above
     >>> SearchQuery("red tomato", search_type="phrase")  # a phrase
@@ -110,7 +110,7 @@ Examples:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery
+    >>> from thibaud.contrib.postgres.search import SearchQuery
     >>> SearchQuery("meat") & SearchQuery("cheese")  # AND
     >>> SearchQuery("meat") | SearchQuery("cheese")  # OR
     >>> ~SearchQuery("meat")  # NOT
@@ -133,7 +133,7 @@ order by relevancy:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+    >>> from thibaud.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
     >>> vector = SearchVector("body_text")
     >>> query = SearchQuery("cheese")
     >>> Entry.objects.annotate(rank=SearchRank(vector, query)).order_by("-rank")
@@ -152,7 +152,7 @@ behaviors:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import Value
+    >>> from thibaud.db.models import Value
     >>> Entry.objects.annotate(
     ...     rank=SearchRank(
     ...         vector,
@@ -202,7 +202,7 @@ Usage example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchHeadline, SearchQuery
+    >>> from thibaud.contrib.postgres.search import SearchHeadline, SearchQuery
     >>> query = SearchQuery("red tomato")
     >>> entry = Entry.objects.annotate(
     ...     headline=SearchHeadline(
@@ -231,7 +231,7 @@ different language parsers and dictionaries as defined by the database:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery, SearchVector
+    >>> from thibaud.contrib.postgres.search import SearchQuery, SearchVector
     >>> Entry.objects.annotate(
     ...     search=SearchVector("body_text", config="french"),
     ... ).filter(search=SearchQuery("œuf", config="french"))
@@ -241,7 +241,7 @@ The value of ``config`` could also be stored in another column:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import F
+    >>> from thibaud.db.models import F
     >>> Entry.objects.annotate(
     ...     search=SearchVector("body_text", config=F("blog__language")),
     ... ).filter(search=SearchQuery("œuf", config=F("blog__language")))
@@ -257,7 +257,7 @@ of various vectors before you combine them:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+    >>> from thibaud.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
     >>> vector = SearchVector("body_text", weight="A") + SearchVector(
     ...     "blog__tagline", weight="B"
     ... )
@@ -286,8 +286,8 @@ than comparing the size of an integer, for example.
 
 In the event that all the fields you're querying on are contained within one
 particular model, you can create a functional
-:class:`GIN <django.contrib.postgres.indexes.GinIndex>` or
-:class:`GiST <django.contrib.postgres.indexes.GistIndex>` index which matches
+:class:`GIN <thibaud.contrib.postgres.indexes.GinIndex>` or
+:class:`GiST <thibaud.contrib.postgres.indexes.GistIndex>` index which matches
 the search vector you wish to use. For example::
 
     GinIndex(
@@ -328,7 +328,7 @@ lookups, you can use a couple of other expressions.
 To use them, you need to activate the `pg_trgm extension
 <https://www.postgresql.org/docs/current/pgtrgm.html>`_ on PostgreSQL. You can
 install it using the
-:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+:class:`~thibaud.contrib.postgres.operations.TrigramExtension` migration
 operation.
 
 ``TrigramSimilarity``
@@ -343,7 +343,7 @@ Usage example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import TrigramSimilarity
+    >>> from thibaud.contrib.postgres.search import TrigramSimilarity
     >>> Author.objects.create(name="Katy Stevens")
     >>> Author.objects.create(name="Stephen Keats")
     >>> test = "Katie Stephens"
@@ -366,7 +366,7 @@ Usage example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import TrigramWordSimilarity
+    >>> from thibaud.contrib.postgres.search import TrigramWordSimilarity
     >>> Author.objects.create(name="Katy Stevens")
     >>> Author.objects.create(name="Stephen Keats")
     >>> test = "Kat"
@@ -399,7 +399,7 @@ Usage example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import TrigramDistance
+    >>> from thibaud.contrib.postgres.search import TrigramDistance
     >>> Author.objects.create(name="Katy Stevens")
     >>> Author.objects.create(name="Stephen Keats")
     >>> test = "Katie Stephens"
@@ -422,7 +422,7 @@ Usage example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import TrigramWordDistance
+    >>> from thibaud.contrib.postgres.search import TrigramWordDistance
     >>> Author.objects.create(name="Katy Stevens")
     >>> Author.objects.create(name="Stephen Keats")
     >>> test = "Kat"

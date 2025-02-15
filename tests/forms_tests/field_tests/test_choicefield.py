@@ -1,7 +1,7 @@
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.forms import ChoiceField, Form
-from django.test import SimpleTestCase
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import models
+from thibaud.forms import ChoiceField, Form
+from thibaud.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
 

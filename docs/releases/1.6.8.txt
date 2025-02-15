@@ -1,10 +1,10 @@
 ==========================
-Django 1.6.8 release notes
+Thibaud 1.6.8 release notes
 ==========================
 
 *October 22, 2014*
 
-Django 1.6.8 fixes a couple regressions in the 1.6.6 security release.
+Thibaud 1.6.8 fixes a couple regressions in the 1.6.6 security release.
 
 Bugfixes
 ========

@@ -1,7 +1,7 @@
-from django.db import connection
-from django.db.models import F, Value
-from django.db.models.functions import Collate
-from django.test import TestCase
+from thibaud.db import connection
+from thibaud.db.models import F, Value
+from thibaud.db.models.functions import Collate
+from thibaud.test import TestCase
 
 from ..models import Author
 

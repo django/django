@@ -3,7 +3,7 @@ Syndication feed generation library -- used for generating RSS, etc.
 
 Sample usage:
 
->>> from django.utils import feedgenerator
+>>> from thibaud.utils import feedgenerator
 >>> feed = feedgenerator.Rss201rev2Feed(
 ...     title="Poynter E-Media Tidbits",
 ...     link="http://www.poynter.org/column.asp?id=31",
@@ -28,8 +28,8 @@ import mimetypes
 from io import StringIO
 from urllib.parse import urlparse
 
-from django.utils.encoding import iri_to_uri
-from django.utils.xmlutils import SimplerXMLGenerator
+from thibaud.utils.encoding import iri_to_uri
+from thibaud.utils.xmlutils import SimplerXMLGenerator
 
 
 def rfc2822_date(date):

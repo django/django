@@ -1,16 +1,16 @@
 from unittest import mock
 
-from django.contrib.auth import models
-from django.contrib.auth.mixins import (
+from thibaud.contrib.auth import models
+from thibaud.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
     UserPassesTestMixin,
 )
-from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase, TestCase
-from django.views.generic import View
+from thibaud.contrib.auth.models import AnonymousUser
+from thibaud.core.exceptions import PermissionDenied
+from thibaud.http import HttpResponse
+from thibaud.test import RequestFactory, SimpleTestCase, TestCase
+from thibaud.views.generic import View
 
 
 class AlwaysTrueMixin(UserPassesTestMixin):

@@ -1,10 +1,10 @@
 import itertools
 
-from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
-from django.core.management import BaseCommand
-from django.db import DEFAULT_DB_ALIAS, connections, router
-from django.db.models.deletion import Collector
+from thibaud.apps import apps
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core.management import BaseCommand
+from thibaud.db import DEFAULT_DB_ALIAS, connections, router
+from thibaud.db.models.deletion import Collector
 
 
 class Command(BaseCommand):
@@ -16,7 +16,7 @@ class Command(BaseCommand):
             "--no-input",
             action="store_false",
             dest="interactive",
-            help="Tells Django to NOT prompt the user for input of any kind.",
+            help="Tells Thibaud to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
             "--database",
@@ -83,7 +83,7 @@ class Command(BaseCommand):
                         "are:\n\n"
                         f"{content_type_display}\n\n"
                         "This list doesn't include any cascade deletions to data "
-                        "outside of Django\n"
+                        "outside of Thibaud\n"
                         "models (uncommon).\n\n"
                         "Are you sure you want to delete these content types?\n"
                         "If you're unsure, answer 'no'."

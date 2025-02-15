@@ -1,4 +1,4 @@
-from django.db.backends.base.client import BaseDatabaseClient
+from thibaud.db.backends.base.client import BaseDatabaseClient
 
 
 class DatabaseClient(BaseDatabaseClient):

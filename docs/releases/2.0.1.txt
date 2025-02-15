@@ -1,15 +1,15 @@
 ==========================
-Django 2.0.1 release notes
+Thibaud 2.0.1 release notes
 ==========================
 
 *January 1, 2018*
 
-Django 2.0.1 fixes several bugs in 2.0.
+Thibaud 2.0.1 fixes several bugs in 2.0.
 
 Bugfixes
 ========
 
-* Fixed a regression in Django 1.11 that added newlines between ``MultiWidget``'s
+* Fixed a regression in Thibaud 1.11 that added newlines between ``MultiWidget``'s
   subwidgets (:ticket:`28890`).
 
 * Fixed incorrect class-based model index name generation for models with

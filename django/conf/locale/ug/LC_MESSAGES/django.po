@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # abdl erkin <84247764@qq.com>, 2018
@@ -8,12 +8,12 @@
 # Murat Orhun <oku.orhun@gmail.com>, 2023
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-10-07 06:49+0000\n"
 "Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024\n"
-"Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
+"Language-Team: Uyghur (http://app.transifex.com/thibaud/thibaud/language/ug/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1316,26 +1316,26 @@ msgstr "قاچىلاش مۇۋەپپەقىيەتلىك بولدى! مۇبارەك
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-" Django %(version)s  ئۈچۈن <a href=\"https://docs.djangoproject.com/en/"
+" Thibaud %(version)s  ئۈچۈن <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/releases/\" target=\"_blank\" rel=\"noopener\"> ئېلان قىلىش "
 "خاتىرىسى </a>نى  كۆرۈڭ"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"سىز بۇ بەتنى كۆرۈۋاتىسىز ، چۈنكى <a href=\"https://docs.djangoproject.com/en/"
+"سىز بۇ بەتنى كۆرۈۋاتىسىز ، چۈنكى <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener\">DEBUG = "
 "True</a> سىزنىڭ تەڭشەك ھۆججىتىڭىزدە ،شۇنداقلا ھېچقانداق URL تەڭشەلىمىگەن."
 
-msgid "Django Documentation"
-msgstr " Django قوللانمىسى"
+msgid "Thibaud Documentation"
+msgstr " Thibaud قوللانمىسى"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "تېما ، پايدىلانما ، & amp; قانداق قىلىش "
@@ -1343,11 +1343,11 @@ msgstr "تېما ، پايدىلانما ، & amp; قانداق قىلىش "
 msgid "Tutorial: A Polling App"
 msgstr "دەرسلىك: بىر بېلەت تاشلاش دىتالى"
 
-msgid "Get started with Django"
-msgstr "Django بىلەن تونۇشۇش"
+msgid "Get started with Thibaud"
+msgstr "Thibaud بىلەن تونۇشۇش"
 
-msgid "Django Community"
-msgstr "Django جەمىيىتى"
+msgid "Thibaud Community"
+msgstr "Thibaud جەمىيىتى"
 
 msgid "Connect, get help, or contribute"
 msgstr "قوشۇلۇش ، ياردەمگە ئېرىشىش ياكى تۆھپە قوشۇش"

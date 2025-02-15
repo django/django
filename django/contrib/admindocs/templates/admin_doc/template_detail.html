@@ -4,7 +4,7 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
+&rsaquo; <a href="{% url 'thibaud-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
 &rsaquo; {% translate 'Templates' %}
 &rsaquo; {{ name }}
 </div>
@@ -23,5 +23,5 @@
 {% endfor %}
 </ol>
 
-<p><a href="{% url 'django-admindocs-docroot' %}">&lsaquo; {% translate 'Back to Documentation' %}</a></p>
+<p><a href="{% url 'thibaud-admindocs-docroot' %}">&lsaquo; {% translate 'Back to Documentation' %}</a></p>
 {% endblock %}

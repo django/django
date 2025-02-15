@@ -6,11 +6,11 @@
 
 from ctypes import byref, c_byte, c_double, c_uint
 
-from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.base import GEOSBase
-from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import CS_PTR
-from django.contrib.gis.shortcuts import numpy
+from thibaud.contrib.gis.geos import prototypes as capi
+from thibaud.contrib.gis.geos.base import GEOSBase
+from thibaud.contrib.gis.geos.error import GEOSException
+from thibaud.contrib.gis.geos.libgeos import CS_PTR
+from thibaud.contrib.gis.shortcuts import numpy
 
 
 class GEOSCoordSeq(GEOSBase):

@@ -2,7 +2,7 @@
 Database access optimization
 ============================
 
-Django's database layer provides various ways to help developers get the most
+Thibaud's database layer provides various ways to help developers get the most
 out of their databases. This document gathers together links to the relevant
 documentation, and adds various tips, organized under a number of headings that
 outline the steps to take when attempting to optimize your database usage.
@@ -14,7 +14,7 @@ As general programming practice, this goes without saying. Find out :ref:`what
 queries you are doing and what they are costing you <faq-see-raw-sql-queries>`.
 Use :meth:`.QuerySet.explain` to understand how specific ``QuerySet``\s are
 executed by your database. You may also want to use an external project like
-:pypi:`django-debug-toolbar`, or a tool that monitors your database directly.
+:pypi:`thibaud-debug-toolbar`, or a tool that monitors your database directly.
 
 Remember that you may be optimizing for speed or memory or both, depending on
 your requirements. Sometimes optimizing for one will be detrimental to the
@@ -37,12 +37,12 @@ Use standard DB optimization techniques
 
 * Indexes_. This is a number one priority, *after* you have determined from
   profiling what indexes should be added. Use
-  :attr:`Meta.indexes <django.db.models.Options.indexes>` or
-  :attr:`Field.db_index <django.db.models.Field.db_index>` to add these from
-  Django. Consider adding indexes to fields that you frequently query using
-  :meth:`~django.db.models.query.QuerySet.filter()`,
-  :meth:`~django.db.models.query.QuerySet.exclude()`,
-  :meth:`~django.db.models.query.QuerySet.order_by()`, etc. as indexes may help
+  :attr:`Meta.indexes <thibaud.db.models.Options.indexes>` or
+  :attr:`Field.db_index <thibaud.db.models.Field.db_index>` to add these from
+  Thibaud. Consider adding indexes to fields that you frequently query using
+  :meth:`~thibaud.db.models.query.QuerySet.filter()`,
+  :meth:`~thibaud.db.models.query.QuerySet.exclude()`,
+  :meth:`~thibaud.db.models.query.QuerySet.order_by()`, etc. as indexes may help
   to speed up lookups. Note that determining the best indexes is a complex
   database-dependent topic that will depend on your particular application.
   The overhead of maintaining an index may outweigh any gains in query speed.
@@ -52,7 +52,7 @@ Use standard DB optimization techniques
 * Appropriate use of field types.
 
 We will assume you have done the things listed above. The rest of this document
-focuses on how to use Django in such a way that you are not doing unnecessary
+focuses on how to use Thibaud in such a way that you are not doing unnecessary
 work. This document also does not address other optimization techniques that
 apply to all expensive operations, such as :doc:`general purpose caching
 </topics/cache>`.
@@ -102,7 +102,7 @@ distinction.
 
 Be careful with your own custom properties - it is up to you to implement
 caching when required, for example using the
-:class:`~django.utils.functional.cached_property` decorator.
+:class:`~thibaud.utils.functional.cached_property` decorator.
 
 Use the ``with`` template tag
 -----------------------------
@@ -115,7 +115,7 @@ Use ``iterator()``
 
 When you have a lot of objects, the caching behavior of the ``QuerySet`` can
 cause a large amount of memory to be used. In this case,
-:meth:`~django.db.models.query.QuerySet.iterator()` may help.
+:meth:`~thibaud.db.models.query.QuerySet.iterator()` may help.
 
 Use ``explain()``
 -----------------
@@ -133,7 +133,7 @@ For instance:
 * At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
   filtering in the database.
 
-* Use :class:`F expressions <django.db.models.F>` to filter
+* Use :class:`F expressions <thibaud.db.models.F>` to filter
   based on other fields within the same model.
 
 * Use :doc:`annotate to do aggregation in the database
@@ -145,23 +145,23 @@ Use ``RawSQL``
 --------------
 
 A less portable but more powerful method is the
-:class:`~django.db.models.expressions.RawSQL` expression, which allows some SQL
+:class:`~thibaud.db.models.expressions.RawSQL` expression, which allows some SQL
 to be explicitly added to the query. If that still isn't powerful enough:
 
 Use raw SQL
 -----------
 
 Write your own :doc:`custom SQL to retrieve data or populate models
-</topics/db/sql>`. Use ``django.db.connection.queries`` to find out what Django
+</topics/db/sql>`. Use ``thibaud.db.connection.queries`` to find out what Thibaud
 is writing for you and start from there.
 
 Retrieve individual objects using a unique, indexed column
 ==========================================================
 
 There are two reasons to use a column with
-:attr:`~django.db.models.Field.unique` or
-:attr:`~django.db.models.Field.db_index` when using
-:meth:`~django.db.models.query.QuerySet.get` to retrieve individual objects.
+:attr:`~thibaud.db.models.Field.unique` or
+:attr:`~thibaud.db.models.Field.db_index` when using
+:meth:`~thibaud.db.models.query.QuerySet.get` to retrieve individual objects.
 First, the query will be quicker because of the underlying database index.
 Also, the query could run much slower if multiple objects match the lookup;
 having a unique constraint on the column guarantees this will never happen.
@@ -208,8 +208,8 @@ queries, when only one was needed. So:
 Use ``QuerySet.select_related()`` and ``prefetch_related()``
 ------------------------------------------------------------
 
-Understand :meth:`~django.db.models.query.QuerySet.select_related` and
-:meth:`~django.db.models.query.QuerySet.prefetch_related` thoroughly, and use
+Understand :meth:`~thibaud.db.models.query.QuerySet.select_related` and
+:meth:`~thibaud.db.models.query.QuerySet.prefetch_related` thoroughly, and use
 them:
 
 * in :doc:`managers and default managers </topics/db/managers>` where
@@ -217,7 +217,7 @@ them:
   tricky so don't make assumptions.
 
 * in view code or other layers, possibly making use of
-  :func:`~django.db.models.prefetch_related_objects` where needed.
+  :func:`~thibaud.db.models.prefetch_related_objects` where needed.
 
 Don't retrieve things you don't need
 ====================================
@@ -227,7 +227,7 @@ Use ``QuerySet.values()`` and ``values_list()``
 
 When you only want a ``dict`` or ``list`` of values, and don't need ORM model
 objects, make appropriate usage of
-:meth:`~django.db.models.query.QuerySet.values()`.
+:meth:`~thibaud.db.models.query.QuerySet.values()`.
 These can be useful for replacing model objects in template code - as long as
 the dicts you supply have the same attributes as those used in the template,
 you are fine.
@@ -235,8 +235,8 @@ you are fine.
 Use ``QuerySet.defer()`` and ``only()``
 ---------------------------------------
 
-Use :meth:`~django.db.models.query.QuerySet.defer()` and
-:meth:`~django.db.models.query.QuerySet.only()` if there are database columns
+Use :meth:`~thibaud.db.models.query.QuerySet.defer()` and
+:meth:`~thibaud.db.models.query.QuerySet.only()` if there are database columns
 you know that you won't need (or won't need in most cases) to avoid loading
 them. Note that if you *do* use them, the ORM will have to go and get them in
 a separate query, making this a pessimization if you use it inappropriately.
@@ -347,9 +347,9 @@ Don't order results if you don't care
 
 Ordering is not free; each field to order by is an operation the database must
 perform. If a model has a default ordering (:attr:`Meta.ordering
-<django.db.models.Options.ordering>`) and you don't need it, remove
+<thibaud.db.models.Options.ordering>`) and you don't need it, remove
 it on a ``QuerySet`` by calling
-:meth:`~django.db.models.query.QuerySet.order_by()` with no parameters.
+:meth:`~thibaud.db.models.query.QuerySet.order_by()` with no parameters.
 
 Adding an index to your database may help to improve ordering performance.
 
@@ -362,7 +362,7 @@ Create in bulk
 --------------
 
 When creating objects, where possible, use the
-:meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
+:meth:`~thibaud.db.models.query.QuerySet.bulk_create()` method to reduce the
 number of SQL queries. For example::
 
     Entry.objects.bulk_create(
@@ -378,14 +378,14 @@ number of SQL queries. For example::
     Entry.objects.create(headline="This is only a test")
 
 Note that there are a number of :meth:`caveats to this method
-<django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
+<thibaud.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
 for your use case.
 
 Update in bulk
 --------------
 
 When updating objects, where possible, use the
-:meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
+:meth:`~thibaud.db.models.query.QuerySet.bulk_update()` method to reduce the
 number of SQL queries. Given a list or queryset of objects::
 
     entries = Entry.objects.bulk_create(
@@ -409,15 +409,15 @@ The following example::
     entries[1].save()
 
 Note that there are a number of :meth:`caveats to this method
-<django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
+<thibaud.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
 for your use case.
 
 Insert in bulk
 --------------
 
 When inserting objects into :class:`ManyToManyFields
-<django.db.models.ManyToManyField>`, use
-:meth:`~django.db.models.fields.related.RelatedManager.add` with multiple
+<thibaud.db.models.ManyToManyField>`, use
+:meth:`~thibaud.db.models.fields.related.RelatedManager.add` with multiple
 objects to reduce the number of SQL queries. For example::
 
     my_band.members.add(me, my_friend)
@@ -430,9 +430,9 @@ objects to reduce the number of SQL queries. For example::
 ...where ``Bands`` and ``Artists`` have a many-to-many relationship.
 
 When inserting different pairs of objects into
-:class:`~django.db.models.ManyToManyField` or when the custom
-:attr:`~django.db.models.ManyToManyField.through` table is defined, use
-:meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
+:class:`~thibaud.db.models.ManyToManyField` or when the custom
+:attr:`~thibaud.db.models.ManyToManyField.through` table is defined, use
+:meth:`~thibaud.db.models.query.QuerySet.bulk_create()` method to reduce the
 number of SQL queries. For example::
 
     PizzaToppingRelationship = Pizza.toppings.through
@@ -452,15 +452,15 @@ number of SQL queries. For example::
 
 ...where ``Pizza`` and ``Topping`` have a many-to-many relationship. Note that
 there are a number of :meth:`caveats to this method
-<django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
+<thibaud.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
 for your use case.
 
 Remove in bulk
 --------------
 
 When removing objects from :class:`ManyToManyFields
-<django.db.models.ManyToManyField>`, use
-:meth:`~django.db.models.fields.related.RelatedManager.remove` with multiple
+<thibaud.db.models.ManyToManyField>`, use
+:meth:`~thibaud.db.models.fields.related.RelatedManager.remove` with multiple
 objects to reduce the number of SQL queries. For example::
 
     my_band.members.remove(me, my_friend)
@@ -473,13 +473,13 @@ objects to reduce the number of SQL queries. For example::
 ...where ``Bands`` and ``Artists`` have a many-to-many relationship.
 
 When removing different pairs of objects from :class:`ManyToManyFields
-<django.db.models.ManyToManyField>`, use
-:meth:`~django.db.models.query.QuerySet.delete` on a
-:class:`~django.db.models.Q` expression with multiple
-:attr:`~django.db.models.ManyToManyField.through`  model instances to reduce
+<thibaud.db.models.ManyToManyField>`, use
+:meth:`~thibaud.db.models.query.QuerySet.delete` on a
+:class:`~thibaud.db.models.Q` expression with multiple
+:attr:`~thibaud.db.models.ManyToManyField.through`  model instances to reduce
 the number of SQL queries. For example::
 
-    from django.db.models import Q
+    from thibaud.db.models import Q
 
     PizzaToppingRelationship = Pizza.toppings.through
     PizzaToppingRelationship.objects.filter(

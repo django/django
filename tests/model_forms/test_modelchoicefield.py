@@ -1,11 +1,11 @@
 import datetime
 
-from django import forms
-from django.core.exceptions import ValidationError
-from django.forms.models import ModelChoiceIterator, ModelChoiceIteratorValue
-from django.forms.widgets import CheckboxSelectMultiple
-from django.template import Context, Template
-from django.test import TestCase
+from thibaud import forms
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms.models import ModelChoiceIterator, ModelChoiceIteratorValue
+from thibaud.forms.widgets import CheckboxSelectMultiple
+from thibaud.template import Context, Template
+from thibaud.test import TestCase
 
 from .models import Article, Author, Book, Category, ExplicitPK, Writer
 

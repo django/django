@@ -5,7 +5,7 @@ Upload handlers to test the upload API.
 import os
 from tempfile import NamedTemporaryFile
 
-from django.core.files.uploadhandler import (
+from thibaud.core.files.uploadhandler import (
     FileUploadHandler,
     StopUpload,
     TemporaryFileUploadHandler,

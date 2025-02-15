@@ -1,10 +1,10 @@
 import os
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.core.files.base import ContentFile
-from django.core.files.storage import FileSystemStorage, Storage
-from django.db.models import FileField
-from django.test import SimpleTestCase
+from thibaud.core.exceptions import SuspiciousFileOperation
+from thibaud.core.files.base import ContentFile
+from thibaud.core.files.storage import FileSystemStorage, Storage
+from thibaud.db.models import FileField
+from thibaud.test import SimpleTestCase
 
 
 class AWSS3Storage(Storage):

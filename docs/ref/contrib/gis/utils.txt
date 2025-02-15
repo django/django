@@ -1,11 +1,11 @@
 ===================
-GeoDjango Utilities
+GeoThibaud Utilities
 ===================
 
-.. module:: django.contrib.gis.utils
-    :synopsis: GeoDjango's collection of utilities.
+.. module:: thibaud.contrib.gis.utils
+    :synopsis: GeoThibaud's collection of utilities.
 
-The :mod:`django.contrib.gis.utils` module contains various utilities that are
+The :mod:`thibaud.contrib.gis.utils` module contains various utilities that are
 useful in creating geospatial web applications.
 
 .. toctree::

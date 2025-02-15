@@ -6,18 +6,18 @@ import importlib
 import math
 import warnings
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.signals import setting_changed
-from django.dispatch import receiver
-from django.utils.crypto import (
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.signals import setting_changed
+from thibaud.dispatch import receiver
+from thibaud.utils.crypto import (
     RANDOM_STRING_CHARS,
     constant_time_compare,
     get_random_string,
     pbkdf2,
 )
-from django.utils.module_loading import import_string
-from django.utils.translation import gettext_noop as _
+from thibaud.utils.module_loading import import_string
+from thibaud.utils.translation import gettext_noop as _
 
 UNUSABLE_PASSWORD_PREFIX = "!"  # This will never be a valid encoded hash
 UNUSABLE_PASSWORD_SUFFIX_LENGTH = (
@@ -172,13 +172,13 @@ def identify_hasher(encoded):
     get_hasher() to return hasher. Raise ValueError if
     algorithm cannot be identified, or if hasher is not loaded.
     """
-    # Ancient versions of Django created plain MD5 passwords and accepted
+    # Ancient versions of Thibaud created plain MD5 passwords and accepted
     # MD5 passwords with an empty salt.
     if (len(encoded) == 32 and "$" not in encoded) or (
         len(encoded) == 37 and encoded.startswith("md5$$")
     ):
         algorithm = "unsalted_md5"
-    # Ancient versions of Django accepted SHA1 passwords with an empty salt.
+    # Ancient versions of Thibaud accepted SHA1 passwords with an empty salt.
     elif len(encoded) == 46 and encoded.startswith("sha1$$"):
         algorithm = "unsalted_sha1"
     else:

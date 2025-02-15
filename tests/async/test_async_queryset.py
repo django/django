@@ -4,9 +4,9 @@ from datetime import datetime
 
 from asgiref.sync import async_to_sync, sync_to_async
 
-from django.db import NotSupportedError, connection
-from django.db.models import Prefetch, Sum
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from thibaud.db import NotSupportedError, connection
+from thibaud.db.models import Prefetch, Sum
+from thibaud.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import RelatedModel, SimpleModel
 

@@ -1,10 +1,10 @@
 ===========================
-Django 1.11.3 release notes
+Thibaud 1.11.3 release notes
 ===========================
 
 *July 1, 2017*
 
-Django 1.11.3 fixes several bugs in 1.11.2.
+Thibaud 1.11.3 fixes several bugs in 1.11.2.
 
 Bugfixes
 ========
@@ -41,15 +41,15 @@ Bugfixes
   ``login()`` view) if the corresponding parameter isn't sent in a request (in
   particular, when the login page is accessed directly) (:ticket:`28229`).
 
-* Prevented attribute values in the ``django/forms/widgets/attrs.html``
+* Prevented attribute values in the ``thibaud/forms/widgets/attrs.html``
   template from being localized so that numeric attributes (e.g. ``max`` and
   ``min``) of ``NumberInput`` work correctly (:ticket:`28303`).
 
 * Removed casting of the option value to a string in the template context of
   the ``CheckboxSelectMultiple``, ``NullBooleanSelect``, ``RadioSelect``,
-  ``SelectMultiple``, and ``Select`` widgets (:ticket:`28176`). In Django
+  ``SelectMultiple``, and ``Select`` widgets (:ticket:`28176`). In Thibaud
   1.11.1, casting was added in Python to avoid localization of numeric values
-  in Django templates, but this made some use cases more difficult. Casting is
+  in Thibaud templates, but this made some use cases more difficult. Casting is
   now done in the template using the ``|stringformat:'s'`` filter.
 
 * Prevented a primary key alteration from adding a foreign key constraint if

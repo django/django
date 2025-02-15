@@ -3,7 +3,7 @@ Field-like classes that aren't really fields. It's easier to use objects that
 have the same attributes as fields sometimes (avoids a lot of special casing).
 """
 
-from django.db.models import fields
+from thibaud.db.models import fields
 
 
 class OrderWrt(fields.IntegerField):

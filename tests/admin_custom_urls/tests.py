@@ -1,9 +1,9 @@
-from django.contrib.admin.utils import quote
-from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.auth.models import User
-from django.template.response import TemplateResponse
-from django.test import TestCase, override_settings
-from django.urls import reverse
+from thibaud.contrib.admin.utils import quote
+from thibaud.contrib.admin.views.main import IS_POPUP_VAR
+from thibaud.contrib.auth.models import User
+from thibaud.template.response import TemplateResponse
+from thibaud.test import TestCase, override_settings
+from thibaud.urls import reverse
 
 from .models import Action, Car, Person
 

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
@@ -19,12 +19,12 @@
 # Sajad Rahimi <rahimisajad@outlook.com>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2023-12-04 07:05+0000\n"
 "Last-Translator: ali salehi, 2023\n"
-"Language-Team: Persian (http://app.transifex.com/django/django/language/"
+"Language-Team: Persian (http://app.transifex.com/thibaud/thibaud/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -303,11 +303,11 @@ msgstr ""
 "برای حذف %(class_name)s %(instance)s لازم است اشیای حفاظت شدهٔ زیر هم حذف "
 "شوند: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "مدیریت وب‌گاه Django"
+msgid "Thibaud site admin"
+msgstr "مدیریت وب‌گاه Thibaud"
 
-msgid "Django administration"
-msgstr "مدیریت Django"
+msgid "Thibaud administration"
+msgstr "مدیریت Thibaud"
 
 msgid "Site administration"
 msgstr "مدیریت وب‌گاه"

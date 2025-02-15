@@ -3,16 +3,16 @@ import os
 import re
 from pathlib import Path
 
-from django.apps import apps
-from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.template import Context, Engine
-from django.urls import translate_url
-from django.utils.formats import get_format
-from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils.translation import check_for_language, get_language
-from django.utils.translation.trans_real import DjangoTranslation
-from django.views.generic import View
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from thibaud.template import Context, Engine
+from thibaud.urls import translate_url
+from thibaud.utils.formats import get_format
+from thibaud.utils.http import url_has_allowed_host_and_scheme
+from thibaud.utils.translation import check_for_language, get_language
+from thibaud.utils.translation.trans_real import ThibaudTranslation
+from thibaud.views.generic import View
 
 LANGUAGE_QUERY_PARAMETER = "language"
 
@@ -101,25 +101,25 @@ class JavaScriptCatalog(View):
 
     Receive the list of packages to check for translations in the `packages`
     kwarg either from the extra dictionary passed to the path() function or as
-    a plus-sign delimited string from the request. Default is 'django.conf'.
+    a plus-sign delimited string from the request. Default is 'thibaud.conf'.
 
     You can override the gettext domain for this view, but usually you don't
-    want to do that as JavaScript messages go to the djangojs domain. This
-    might be needed if you deliver your JavaScript source from Django templates.
+    want to do that as JavaScript messages go to the thibaudjs domain. This
+    might be needed if you deliver your JavaScript source from Thibaud templates.
     """
 
-    domain = "djangojs"
+    domain = "thibaudjs"
     packages = None
 
     def get(self, request, *args, **kwargs):
         locale = get_language()
         domain = kwargs.get("domain", self.domain)
         # If packages are not provided, default to all installed packages, as
-        # DjangoTranslation without localedirs harvests them all.
+        # ThibaudTranslation without localedirs harvests them all.
         packages = kwargs.get("packages", "")
         packages = packages.split("+") if packages else self.packages
         paths = self.get_paths(packages) if packages else None
-        self.translation = DjangoTranslation(locale, domain=domain, localedirs=paths)
+        self.translation = ThibaudTranslation(locale, domain=domain, localedirs=paths)
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
 

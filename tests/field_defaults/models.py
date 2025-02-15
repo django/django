@@ -2,7 +2,7 @@
 Callable defaults
 
 You can pass callable objects as the ``default`` parameter to a field. When
-the object is created without an explicit value passed in, Django will call
+the object is created without an explicit value passed in, Thibaud will call
 the method to determine the default value.
 
 This example uses ``datetime.datetime.now`` as the default for the ``pub_date``
@@ -12,9 +12,9 @@ field.
 from datetime import datetime
 from decimal import Decimal
 
-from django.db import models
-from django.db.models.functions import Coalesce, ExtractYear, Now, Pi
-from django.db.models.lookups import GreaterThan
+from thibaud.db import models
+from thibaud.db.models.functions import Coalesce, ExtractYear, Now, Pi
+from thibaud.db.models.lookups import GreaterThan
 
 
 class Article(models.Model):

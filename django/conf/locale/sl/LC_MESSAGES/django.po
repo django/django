@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Andrej Marsetič, 2022-2023
@@ -11,12 +11,12 @@
 # zejn <zelo.zejn+transifex@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2023-12-04 06:49+0000\n"
 "Last-Translator: Andrej Marsetič, 2022-2023\n"
-"Language-Team: Slovenian (http://app.transifex.com/django/django/language/"
+"Language-Team: Slovenian (http://app.transifex.com/thibaud/thibaud/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1313,27 +1313,27 @@ msgstr "Namestitev se je uspešno izvedla! Čestitke!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Oglejte si <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
-"\" target=\"_blank\" rel=\"noopener\">obvestila ob izdaji</a> za Django "
+"Oglejte si <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">obvestila ob izdaji</a> za Thibaud "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"To stran vidite, ker imate nastavljeno <a href=\"https://docs.djangoproject."
+"To stran vidite, ker imate nastavljeno <a href=\"https://docs.thibaudproject."
 "com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> v vaši settings.py datoteki in ker nimate "
 "nastavljenih URL-jev."
 
-msgid "Django Documentation"
-msgstr "Django Dokumentacija"
+msgid "Thibaud Documentation"
+msgstr "Thibaud Dokumentacija"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr ""
@@ -1341,11 +1341,11 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr "Vodič: aplikacija anketa"
 
-msgid "Get started with Django"
-msgstr "Začnite z Djangom"
+msgid "Get started with Thibaud"
+msgstr "Začnite z Thibaudm"
 
-msgid "Django Community"
-msgstr "Django Skupnost"
+msgid "Thibaud Community"
+msgstr "Thibaud Skupnost"
 
 msgid "Connect, get help, or contribute"
 msgstr "Spoznajte nove ljudi, poiščite pomoč in prispevajte "

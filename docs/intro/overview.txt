@@ -1,13 +1,13 @@
 ==================
-Django at a glance
+Thibaud at a glance
 ==================
 
-Because Django was developed in a fast-paced newsroom environment, it was
+Because Thibaud was developed in a fast-paced newsroom environment, it was
 designed to make common web development tasks fast and easy. Here's an informal
-overview of how to write a database-driven web app with Django.
+overview of how to write a database-driven web app with Thibaud.
 
 The goal of this document is to give you enough technical specifics to
-understand how Django works, but this isn't intended to be a tutorial or
+understand how Thibaud works, but this isn't intended to be a tutorial or
 reference -- but we've got both! When you're ready to start a project, you can
 :doc:`start with the tutorial </intro/tutorial01>` or :doc:`dive right into more
 detailed documentation </topics/index>`.
@@ -15,7 +15,7 @@ detailed documentation </topics/index>`.
 Design your model
 =================
 
-Although you can use Django without a database, it comes with an
+Although you can use Thibaud without a database, it comes with an
 `object-relational mapper`_ in which you describe your database layout in Python
 code.
 
@@ -28,7 +28,7 @@ database-schema problems. Here's a quick example:
 .. code-block:: python
     :caption: ``news/models.py``
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Reporter(models.Model):
@@ -50,7 +50,7 @@ database-schema problems. Here's a quick example:
 Install it
 ==========
 
-Next, run the Django command-line utilities to create the database tables
+Next, run the Thibaud command-line utilities to create the database tables
 automatically:
 
 .. console::
@@ -97,7 +97,7 @@ necessary:
     >>> r.full_name
     'John Smith'
 
-    # Django provides a rich database lookup API.
+    # Thibaud provides a rich database lookup API.
     >>> Reporter.objects.get(id=1)
     <Reporter: John Smith>
     >>> Reporter.objects.get(full_name__startswith="John")
@@ -112,13 +112,13 @@ necessary:
     # Create an article.
     >>> from datetime import date
     >>> a = Article(
-    ...     pub_date=date.today(), headline="Django is cool", content="Yeah.", reporter=r
+    ...     pub_date=date.today(), headline="Thibaud is cool", content="Yeah.", reporter=r
     ... )
     >>> a.save()
 
     # Now the article is in the database.
     >>> Article.objects.all()
-    <QuerySet [<Article: Django is cool>]>
+    <QuerySet [<Article: Thibaud is cool>]>
 
     # Article objects get API access to related Reporter objects.
     >>> r = a.reporter
@@ -127,13 +127,13 @@ necessary:
 
     # And vice versa: Reporter objects get API access to Article objects.
     >>> r.article_set.all()
-    <QuerySet [<Article: Django is cool>]>
+    <QuerySet [<Article: Thibaud is cool>]>
 
     # The API follows relationships as far as you need, performing efficient
     # JOINs for you behind the scenes.
     # This finds all articles by a reporter whose name starts with "John".
     >>> Article.objects.filter(reporter__full_name__startswith="John")
-    <QuerySet [<Article: Django is cool>]>
+    <QuerySet [<Article: Thibaud is cool>]>
 
     # Change an object by altering its attributes and calling save().
     >>> r.full_name = "Billy Goat"
@@ -145,7 +145,7 @@ necessary:
 A dynamic admin interface: it's not just scaffolding -- it's the whole house
 ============================================================================
 
-Once your models are defined, Django can automatically create a professional,
+Once your models are defined, Thibaud can automatically create a professional,
 production ready :doc:`administrative interface </ref/contrib/admin/index>` --
 a website that lets authenticated users add, change and delete objects. The
 only step required is to register your model in the admin site:
@@ -153,7 +153,7 @@ only step required is to register your model in the admin site:
 .. code-block:: python
     :caption: ``news/models.py``
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Article(models.Model):
@@ -165,7 +165,7 @@ only step required is to register your model in the admin site:
 .. code-block:: python
     :caption: ``news/admin.py``
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
     from . import models
 
@@ -175,7 +175,7 @@ The philosophy here is that your site is edited by a staff, or a client, or
 maybe just you -- and you don't want to have to deal with creating backend
 interfaces only to manage content.
 
-One typical workflow in creating Django apps is to create models and get the
+One typical workflow in creating Thibaud apps is to create models and get the
 admin sites up and running as fast as possible, so your staff (or clients) can
 start populating data. Then, develop the way data is presented to the public.
 
@@ -183,7 +183,7 @@ Design your URLs
 ================
 
 A clean, elegant URL scheme is an important detail in a high-quality web
-application. Django encourages beautiful URL design and doesn't put any cruft
+application. Thibaud encourages beautiful URL design and doesn't put any cruft
 in URLs, like ``.php`` or ``.asp``.
 
 To design URLs for an app, you create a Python module called a :doc:`URLconf
@@ -197,7 +197,7 @@ example above:
 .. code-block:: python
     :caption: ``news/urls.py``
 
-    from django.urls import path
+    from thibaud.urls import path
 
     from . import views
 
@@ -209,16 +209,16 @@ example above:
 
 The code above maps URL paths to Python callback functions ("views"). The path
 strings use parameter tags to "capture" values from the URLs. When a user
-requests a page, Django runs through each path, in order, and stops at the
-first one that matches the requested URL. (If none of them matches, Django
+requests a page, Thibaud runs through each path, in order, and stops at the
+first one that matches the requested URL. (If none of them matches, Thibaud
 calls a special-case 404 view.) This is blazingly fast, because the paths are
 compiled into regular expressions at load time.
 
-Once one of the URL patterns matches, Django calls the given view, which is a
+Once one of the URL patterns matches, Thibaud calls the given view, which is a
 Python function. Each view gets passed a request object -- which contains
 request metadata -- and the values captured in the pattern.
 
-For example, if a user requested the URL "/articles/2005/05/39323/", Django
+For example, if a user requested the URL "/articles/2005/05/39323/", Thibaud
 would call the function ``news.views.article_detail(request,
 year=2005, month=5, pk=39323)``.
 
@@ -226,8 +226,8 @@ Write your views
 ================
 
 Each view is responsible for doing one of two things: Returning an
-:class:`~django.http.HttpResponse` object containing the content for the
-requested page, or raising an exception such as :class:`~django.http.Http404`.
+:class:`~thibaud.http.HttpResponse` object containing the content for the
+requested page, or raising an exception such as :class:`~thibaud.http.Http404`.
 The rest is up to you.
 
 Generally, a view retrieves data according to the parameters, loads a template
@@ -237,7 +237,7 @@ and renders the template with the retrieved data. Here's an example view for
 .. code-block:: python
     :caption: ``news/views.py``
 
-    from django.shortcuts import render
+    from thibaud.shortcuts import render
 
     from .models import Article
 
@@ -247,7 +247,7 @@ and renders the template with the retrieved data. Here's an example view for
         context = {"year": year, "article_list": a_list}
         return render(request, "news/year_archive.html", context)
 
-This example uses Django's :doc:`template system </topics/templates>`, which has
+This example uses Thibaud's :doc:`template system </topics/templates>`, which has
 several powerful features but strives to stay simple enough for non-programmers
 to use.
 
@@ -256,15 +256,15 @@ Design your templates
 
 The code above loads the ``news/year_archive.html`` template.
 
-Django has a template search path, which allows you to minimize redundancy among
-templates. In your Django settings, you specify a list of directories to check
+Thibaud has a template search path, which allows you to minimize redundancy among
+templates. In your Thibaud settings, you specify a list of directories to check
 for templates with :setting:`DIRS <TEMPLATES-DIRS>`. If a template doesn't exist
 in the first directory, it checks the second, and so on.
 
 Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
     :caption: ``news/templates/news/year_archive.html``
 
     {% extends "base.html" %}
@@ -296,7 +296,7 @@ template filters <howto-writing-custom-template-filters>`. You can write
 :doc:`custom template tags </howto/custom-template-tags>`, which run custom
 Python code behind the scenes.
 
-Finally, Django uses the concept of "template inheritance". That's what the
+Finally, Thibaud uses the concept of "template inheritance". That's what the
 ``{% extends "base.html" %}`` does. It means "First load the template called
 'base', which has defined a bunch of blocks, and fill the blocks with the
 following blocks." In short, that lets you dramatically cut down on redundancy
@@ -305,7 +305,7 @@ in templates: each template has to define only what's unique to that template.
 Here's what the "base.html" template, including the use of :doc:`static files
 </howto/static-files/index>`, might look like:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
     :caption: ``templates/base.html``
 
     {% load static %}
@@ -324,22 +324,22 @@ and provides "holes" for child templates to fill. This means that a site redesig
 can be done by changing a single file -- the base template.
 
 It also lets you create multiple versions of a site, with different base
-templates, while reusing child templates. Django's creators have used this
+templates, while reusing child templates. Thibaud's creators have used this
 technique to create strikingly different mobile versions of sites by only
 creating a new base template.
 
-Note that you don't have to use Django's template system if you prefer another
-system. While Django's template system is particularly well-integrated with
-Django's model layer, nothing forces you to use it. For that matter, you don't
-have to use Django's database API, either. You can use another database
+Note that you don't have to use Thibaud's template system if you prefer another
+system. While Thibaud's template system is particularly well-integrated with
+Thibaud's model layer, nothing forces you to use it. For that matter, you don't
+have to use Thibaud's database API, either. You can use another database
 abstraction layer, you can read XML files, you can read files off disk, or
-anything you want. Each piece of Django -- models, views, templates -- is
+anything you want. Each piece of Thibaud -- models, views, templates -- is
 decoupled from the next.
 
 This is just the surface
 ========================
 
-This has been only a quick overview of Django's functionality. Some more useful
+This has been only a quick overview of Thibaud's functionality. Some more useful
 features:
 
 * A :doc:`caching framework </topics/cache>` that integrates with memcached
@@ -351,8 +351,8 @@ features:
 * More attractive automatically-generated admin features -- this overview
   barely scratched the surface.
 
-The next steps are for you to `download Django`_, read :doc:`the tutorial
+The next steps are for you to `download Thibaud`_, read :doc:`the tutorial
 </intro/tutorial01>` and join `the community`_. Thanks for your interest!
 
-.. _download Django: https://www.djangoproject.com/download/
-.. _the community: https://www.djangoproject.com/community/
+.. _download Thibaud: https://www.thibaudproject.com/download/
+.. _the community: https://www.thibaudproject.com/community/

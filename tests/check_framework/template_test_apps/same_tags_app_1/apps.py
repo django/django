@@ -1,4 +1,4 @@
-from django.apps import AppConfig
+from thibaud.apps import AppConfig
 
 
 class SameTagsApp1AppConfig(AppConfig):

@@ -10,7 +10,7 @@
  for spatial reference systems and their transformation.
 
  Example:
-  >>> from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
+  >>> from thibaud.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
   >>> wkt1, wkt2 = 'POINT(-90 30)', 'POLYGON((0 0, 5 0, 5 5, 0 5)'
   >>> pnt = OGRGeometry(wkt1)
   >>> print(pnt)
@@ -31,7 +31,7 @@
   MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248 29.99979788655764)
 
   The OGRGeomType class is to make it easy to specify an OGR geometry type:
-  >>> from django.contrib.gis.gdal import OGRGeomType
+  >>> from thibaud.contrib.gis.gdal import OGRGeomType
   >>> gt1 = OGRGeomType(3) # Using an integer for the type
   >>> gt2 = OGRGeomType('Polygon') # Using a string
   >>> gt3 = OGRGeomType('POLYGON') # It's case-insensitive
@@ -43,15 +43,15 @@ import sys
 from binascii import b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
-from django.contrib.gis.gdal.base import GDALBase
-from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import GDALException, SRSException
-from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.prototypes import geom as capi
-from django.contrib.gis.gdal.prototypes import srs as srs_api
-from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
-from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
-from django.utils.encoding import force_bytes
+from thibaud.contrib.gis.gdal.base import GDALBase
+from thibaud.contrib.gis.gdal.envelope import Envelope, OGREnvelope
+from thibaud.contrib.gis.gdal.error import GDALException, SRSException
+from thibaud.contrib.gis.gdal.geomtype import OGRGeomType
+from thibaud.contrib.gis.gdal.prototypes import geom as capi
+from thibaud.contrib.gis.gdal.prototypes import srs as srs_api
+from thibaud.contrib.gis.gdal.srs import CoordTransform, SpatialReference
+from thibaud.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
+from thibaud.utils.encoding import force_bytes
 
 
 # For more information, see the OGR C API source code:
@@ -355,7 +355,7 @@ class OGRGeometry(GDALBase):
 
     # #### Output Methods ####
     def _geos_ptr(self):
-        from django.contrib.gis.geos import GEOSGeometry
+        from thibaud.contrib.gis.geos import GEOSGeometry
 
         return GEOSGeometry._from_wkb(self.wkb)
 
@@ -363,11 +363,11 @@ class OGRGeometry(GDALBase):
     def geos(self):
         "Return a GEOSGeometry object from this OGRGeometry."
         if self.geos_support:
-            from django.contrib.gis.geos import GEOSGeometry
+            from thibaud.contrib.gis.geos import GEOSGeometry
 
             return GEOSGeometry(self._geos_ptr(), self.srid)
         else:
-            from django.contrib.gis.geos import GEOSException
+            from thibaud.contrib.gis.geos import GEOSException
 
             raise GEOSException(f"GEOS does not support {self.__class__.__qualname__}.")
 
@@ -584,7 +584,7 @@ class OGRGeometry(GDALBase):
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
     def _geos_ptr(self):
-        from django.contrib.gis import geos
+        from thibaud.contrib.gis import geos
 
         return geos.Point._create_empty() if self.empty else super()._geos_ptr()
 

@@ -1,8 +1,8 @@
-from django.core import checks
-from django.db import connection, models
-from django.db.models import F
-from django.test import TestCase, skipUnlessAnyDBFeature
-from django.test.utils import isolate_apps
+from thibaud.core import checks
+from thibaud.db import connection, models
+from thibaud.db.models import F
+from thibaud.test import TestCase, skipUnlessAnyDBFeature
+from thibaud.test.utils import isolate_apps
 
 
 @isolate_apps("composite_pk")

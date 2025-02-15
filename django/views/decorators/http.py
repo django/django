@@ -7,13 +7,13 @@ from functools import wraps
 
 from asgiref.sync import iscoroutinefunction
 
-from django.http import HttpResponseNotAllowed
-from django.middleware.http import ConditionalGetMiddleware
-from django.utils import timezone
-from django.utils.cache import get_conditional_response
-from django.utils.decorators import decorator_from_middleware
-from django.utils.http import http_date, quote_etag
-from django.utils.log import log_response
+from thibaud.http import HttpResponseNotAllowed
+from thibaud.middleware.http import ConditionalGetMiddleware
+from thibaud.utils import timezone
+from thibaud.utils.cache import get_conditional_response
+from thibaud.utils.decorators import decorator_from_middleware
+from thibaud.utils.http import http_date, quote_etag
+from thibaud.utils.log import log_response
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
 

@@ -1,16 +1,16 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2016
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
 "PO-Revision-Date: 2017-09-19 16:40+0000\n"
 "Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
-"Language-Team: Spanish (Venezuela) (http://www.transifex.com/django/django/"
+"Language-Team: Spanish (Venezuela) (http://www.transifex.com/thibaud/thibaud/"
 "language/es_VE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

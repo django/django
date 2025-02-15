@@ -1,15 +1,15 @@
 ====================================================
-The Django template language: for Python programmers
+The Thibaud template language: for Python programmers
 ====================================================
 
-.. currentmodule:: django.template
+.. currentmodule:: thibaud.template
 
-This document explains the Django template system from a technical
+This document explains the Thibaud template system from a technical
 perspective -- how it works and how to extend it. If you're looking for
 reference on the language syntax, see :doc:`/ref/templates/language`.
 
 It assumes an understanding of templates, contexts, variables, tags, and
-rendering. Start with the :ref:`introduction to the Django template language
+rendering. Start with the :ref:`introduction to the Thibaud template language
 <template-language-intro>` if you aren't familiar with these concepts.
 
 Overview
@@ -21,32 +21,32 @@ Using the template system in Python is a three-step process:
 2. You compile template code into a :class:`Template`.
 3. You render the template with a :class:`Context`.
 
-Django projects generally rely on the :ref:`high level, backend agnostic APIs
+Thibaud projects generally rely on the :ref:`high level, backend agnostic APIs
 <template-engines>` for each of these steps instead of the template system's
 lower level APIs:
 
-1. For each :class:`~django.template.backends.django.DjangoTemplates` backend
-   in the :setting:`TEMPLATES` setting, Django instantiates an
-   :class:`Engine`. :class:`~django.template.backends.django.DjangoTemplates`
+1. For each :class:`~thibaud.template.backends.thibaud.ThibaudTemplates` backend
+   in the :setting:`TEMPLATES` setting, Thibaud instantiates an
+   :class:`Engine`. :class:`~thibaud.template.backends.thibaud.ThibaudTemplates`
    wraps :class:`Engine` and adapts it to the common template backend API.
-2. The :mod:`django.template.loader` module provides functions such as
-   :func:`~django.template.loader.get_template` for loading templates. They
-   return a ``django.template.backends.django.Template`` which wraps the
-   actual :class:`django.template.Template`.
+2. The :mod:`thibaud.template.loader` module provides functions such as
+   :func:`~thibaud.template.loader.get_template` for loading templates. They
+   return a ``thibaud.template.backends.thibaud.Template`` which wraps the
+   actual :class:`thibaud.template.Template`.
 3. The ``Template`` obtained in the previous step has a
-   :meth:`~django.template.backends.base.Template.render` method which
+   :meth:`~thibaud.template.backends.base.Template.render` method which
    marshals a context and possibly a request into a :class:`Context` and
    delegates the rendering to the underlying :class:`Template`.
 
 Configuring an engine
 =====================
 
-If you are using the :class:`~django.template.backends.django.DjangoTemplates`
+If you are using the :class:`~thibaud.template.backends.thibaud.ThibaudTemplates`
 backend, this probably isn't the documentation you're looking for. An instance
 of the ``Engine`` class described below is accessible using the ``engine``
 attribute of that backend and any attribute defaults mentioned below are
 overridden by what's passed by
-:class:`~django.template.backends.django.DjangoTemplates`.
+:class:`~thibaud.template.backends.thibaud.ThibaudTemplates`.
 
 .. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True)
 
@@ -55,7 +55,7 @@ overridden by what's passed by
 
     * ``dirs`` is a list of directories where the engine should look for
       template source files. It is used to configure
-      :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`.
+      :class:`filesystem.Loader <thibaud.template.loaders.filesystem.Loader>`.
 
       It defaults to an empty list.
 
@@ -78,7 +78,7 @@ overridden by what's passed by
 
       It defaults to an empty list.
 
-      See :class:`~django.template.RequestContext` for more information.
+      See :class:`~thibaud.template.RequestContext` for more information.
 
     * ``debug`` is a boolean that turns on/off template debug mode. If it is
       ``True``, the template engine will store additional debug information
@@ -95,12 +95,12 @@ overridden by what's passed by
 
       It defaults to a list containing:
 
-      * ``'django.template.loaders.filesystem.Loader'``
-      * ``'django.template.loaders.app_directories.Loader'`` if and only if
+      * ``'thibaud.template.loaders.filesystem.Loader'``
+      * ``'thibaud.template.loaders.app_directories.Loader'`` if and only if
         ``app_dirs`` is ``True``.
 
       These loaders are then wrapped in
-      :class:`django.template.loaders.cached.Loader`.
+      :class:`thibaud.template.loaders.cached.Loader`.
 
       See :ref:`template-loaders` for details.
 
@@ -122,7 +122,7 @@ overridden by what's passed by
           Engine(
               libraries={
                   "myapp_tags": "path.to.myapp.tags",
-                  "admin.urls": "django.contrib.admin.templatetags.admin_urls",
+                  "admin.urls": "thibaud.contrib.admin.templatetags.admin_urls",
               },
           )
 
@@ -142,8 +142,8 @@ overridden by what's passed by
 .. staticmethod:: Engine.get_default()
 
     Returns the underlying :class:`Engine` from the first configured
-    :class:`~django.template.backends.django.DjangoTemplates` engine. Raises
-    :exc:`~django.core.exceptions.ImproperlyConfigured` if no engines are
+    :class:`~thibaud.template.backends.thibaud.ThibaudTemplates` engine. Raises
+    :exc:`~thibaud.core.exceptions.ImproperlyConfigured` if no engines are
     configured.
 
     It's required for preserving APIs that rely on a globally available,
@@ -170,18 +170,18 @@ The recommended way to create a :class:`Template` is by calling the factory
 methods of the :class:`Engine`: :meth:`~Engine.get_template`,
 :meth:`~Engine.select_template` and :meth:`~Engine.from_string`.
 
-In a Django project where the :setting:`TEMPLATES` setting defines a
-:class:`~django.template.backends.django.DjangoTemplates` engine, it's
+In a Thibaud project where the :setting:`TEMPLATES` setting defines a
+:class:`~thibaud.template.backends.thibaud.ThibaudTemplates` engine, it's
 possible to instantiate a :class:`Template` directly. If more than one
-:class:`~django.template.backends.django.DjangoTemplates` engine is defined,
+:class:`~thibaud.template.backends.thibaud.ThibaudTemplates` engine is defined,
 the first one will be used.
 
 .. class:: Template
 
-    This class lives at ``django.template.Template``. The constructor takes
+    This class lives at ``thibaud.template.Template``. The constructor takes
     one argument — the raw template code::
 
-        from django.template import Template
+        from thibaud.template import Template
 
         template = Template("My name is {{ my_name }}.")
 
@@ -203,7 +203,7 @@ different contexts.
 
 .. class:: Context(dict_=None, autoescape=True, use_l10n=None, use_tz=None)
 
-    The constructor of ``django.template.Context`` takes an optional argument —
+    The constructor of ``thibaud.template.Context`` takes an optional argument —
     a dictionary mapping variable names to variable values.
 
     Three optional keyword arguments can also be specified:
@@ -240,7 +240,7 @@ different contexts.
 
     .. code-block:: pycon
 
-        >>> from django.template import Context, Template
+        >>> from thibaud.template import Context, Template
         >>> template = Template("My name is {{ my_name }}.")
 
         >>> context = Context({"my_name": "Adrian"})
@@ -274,7 +274,7 @@ logic. Here are a few examples:
 
 .. code-block:: pycon
 
-    >>> from django.template import Context, Template
+    >>> from thibaud.template import Context, Template
     >>> t = Template("My name is {{ person.first_name }}.")
     >>> d = {"person": {"first_name": "Joe", "last_name": "Johnson"}}
     >>> t.render(Context(d))
@@ -342,10 +342,10 @@ straight lookups. Here are some things to keep in mind:
     >>> t.render(Context({"person": p}))
     "My name is ."
 
-  Note that :exc:`django.core.exceptions.ObjectDoesNotExist`, which is the
-  base class for all Django database API ``DoesNotExist`` exceptions, has
-  ``silent_variable_failure = True``. So if you're using Django templates
-  with Django model objects, any ``DoesNotExist`` exception will fail
+  Note that :exc:`thibaud.core.exceptions.ObjectDoesNotExist`, which is the
+  base class for all Thibaud database API ``DoesNotExist`` exceptions, has
+  ``silent_variable_failure = True``. So if you're using Thibaud templates
+  with Thibaud model objects, any ``DoesNotExist`` exception will fail
   silently.
 
 * A variable can only be called if it has no required arguments. Otherwise,
@@ -357,11 +357,11 @@ straight lookups. Here are some things to keep in mind:
 * There can be side effects when calling some variables, and it'd be either
   foolish or a security hole to allow the template system to access them.
 
-  A good example is the :meth:`~django.db.models.Model.delete` method on
-  each Django model object. The template system shouldn't be allowed to do
+  A good example is the :meth:`~thibaud.db.models.Model.delete` method on
+  each Thibaud model object. The template system shouldn't be allowed to do
   something like this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       I will now delete this valuable data. {{ data.delete }}
 
@@ -369,8 +369,8 @@ straight lookups. Here are some things to keep in mind:
   variable. The template system won't call a variable if it has
   ``alters_data=True`` set, and will instead replace the variable with
   ``string_if_invalid``, unconditionally.  The
-  dynamically-generated :meth:`~django.db.models.Model.delete` and
-  :meth:`~django.db.models.Model.save` methods on Django model objects get
+  dynamically-generated :meth:`~thibaud.db.models.Model.delete` and
+  :meth:`~thibaud.db.models.Model.save` methods on Thibaud model objects get
   ``alters_data=True`` automatically. Example::
 
     def sensitive_function(self):
@@ -413,7 +413,7 @@ replaced with the name of the invalid variable.
     While ``string_if_invalid`` can be a useful debugging tool, it is a bad
     idea to turn it on as a 'development default'.
 
-    Many templates, including some of Django's, rely upon the silence of the
+    Many templates, including some of Thibaud's, rely upon the silence of the
     template system when a nonexistent variable is encountered. If you assign a
     value other than ``''`` to ``string_if_invalid``, you will experience
     rendering problems with these templates and sites.
@@ -430,17 +430,17 @@ these variables resolve to the corresponding Python objects.
 Limitations with string literals
 --------------------------------
 
-Django's template language has no way to escape the characters used for its own
+Thibaud's template language has no way to escape the characters used for its own
 syntax. For example, the :ttag:`templatetag` tag is required if you need to
 output character sequences like ``{%`` and ``%}``.
 
 A similar issue exists if you want to include these sequences in template filter
-or tag arguments. For example, when parsing a block tag, Django's template
+or tag arguments. For example, when parsing a block tag, Thibaud's template
 parser looks for the first occurrence of ``%}`` after a ``{%``. This prevents
 the use of ``"%}"`` as a string literal. For example, a ``TemplateSyntaxError``
 will be raised for the following expressions:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
   {% include "template.html" tvar="Some string literal with %} in it." %}
 
@@ -449,7 +449,7 @@ will be raised for the following expressions:
 The same issue can be triggered by using a reserved sequence in filter
 arguments:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
   {{ some.variable|default:"}}" }}
 
@@ -468,7 +468,7 @@ dictionary syntax:
 
 .. code-block:: pycon
 
-    >>> from django.template import Context
+    >>> from thibaud.template import Context
     >>> c = Context({"foo": "bar"})
     >>> c["foo"]
     'bar'
@@ -497,7 +497,7 @@ dictionary syntax:
 
 A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
 If you ``pop()`` too much, it'll raise
-``django.template.ContextPopException``:
+``thibaud.template.ContextPopException``:
 
 .. code-block:: pycon
 
@@ -637,10 +637,10 @@ Using ``RequestContext``
 
 .. class:: RequestContext(request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True)
 
-Django comes with a special :class:`~django.template.Context` class,
-``django.template.RequestContext``, that acts slightly differently from the
-normal ``django.template.Context``. The first difference is that it takes an
-:class:`~django.http.HttpRequest` as its first argument. For example::
+Thibaud comes with a special :class:`~thibaud.template.Context` class,
+``thibaud.template.RequestContext``, that acts slightly differently from the
+normal ``thibaud.template.Context``. The first difference is that it takes an
+:class:`~thibaud.http.HttpRequest` as its first argument. For example::
 
     c = RequestContext(
         request,
@@ -660,13 +660,13 @@ settings file, the default template engine contains the following context
 processors::
 
     [
-        "django.template.context_processors.request",
-        "django.contrib.auth.context_processors.auth",
-        "django.contrib.messages.context_processors.messages",
+        "thibaud.template.context_processors.request",
+        "thibaud.contrib.auth.context_processors.auth",
+        "thibaud.contrib.messages.context_processors.messages",
     ]
 
 In addition to these, :class:`RequestContext` always enables
-``'django.template.context_processors.csrf'``.  This is a security related
+``'thibaud.template.context_processors.csrf'``.  This is a security related
 context processor required by the admin and other contrib apps, and, in case
 of accidental misconfiguration, it is deliberately hardcoded in and cannot be
 turned off in the ``context_processors`` option.
@@ -687,21 +687,21 @@ below.
     If you want context data to take priority over context processors, use the
     following pattern::
 
-        from django.template import RequestContext
+        from thibaud.template import RequestContext
 
         request_context = RequestContext(request)
         request_context.push({"my_name": "Adrian"})
 
-    Django does this to allow context data to override context processors in
-    APIs such as :func:`~django.shortcuts.render` and
-    :class:`~django.template.response.TemplateResponse`.
+    Thibaud does this to allow context data to override context processors in
+    APIs such as :func:`~thibaud.shortcuts.render` and
+    :class:`~thibaud.template.response.TemplateResponse`.
 
 Also, you can give :class:`RequestContext` a list of additional processors,
 using the optional, third positional argument, ``processors``. In this
 example, the :class:`RequestContext` instance gets an ``ip_address`` variable::
 
-    from django.http import HttpResponse
-    from django.template import RequestContext, Template
+    from thibaud.http import HttpResponse
+    from thibaud.template import RequestContext, Template
 
 
     def ip_address_processor(request):
@@ -726,9 +726,9 @@ Built-in template context processors
 
 Here's what each of the built-in processors does:
 
-.. currentmodule:: django.contrib.auth.context_processors
+.. currentmodule:: thibaud.contrib.auth.context_processors
 
-``django.contrib.auth.context_processors.auth``
+``thibaud.contrib.auth.context_processors.auth``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: auth(request)
@@ -741,12 +741,12 @@ variables:
   logged in).
 
 * ``perms`` -- An instance of
-  ``django.contrib.auth.context_processors.PermWrapper``, representing the
+  ``thibaud.contrib.auth.context_processors.PermWrapper``, representing the
   permissions that the currently logged-in user has.
 
-.. currentmodule:: django.template.context_processors
+.. currentmodule:: thibaud.template.context_processors
 
-``django.template.context_processors.debug``
+``thibaud.template.context_processors.debug``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: debug(request)
@@ -763,7 +763,7 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
   and how long it took. The list is in order by database alias and then by
   query. It's lazily generated on access.
 
-``django.template.context_processors.i18n``
+``thibaud.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: i18n(request)
@@ -781,13 +781,13 @@ variables:
 See :ref:`i18n template tags <i18n-template-tags>` for template tags that
 generate the same values.
 
-``django.template.context_processors.media``
+``thibaud.template.context_processors.media``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``MEDIA_URL``, providing the value of the :setting:`MEDIA_URL` setting.
 
-``django.template.context_processors.static``
+``thibaud.template.context_processors.static``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: static(request)
@@ -795,20 +795,20 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
 
-``django.template.context_processors.csrf``
+``thibaud.template.context_processors.csrf``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
 
-``django.template.context_processors.request``
+``thibaud.template.context_processors.request``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
-``request``, which is the current :class:`~django.http.HttpRequest`.
+``request``, which is the current :class:`~thibaud.http.HttpRequest`.
 
-``django.template.context_processors.tz``
+``thibaud.template.context_processors.tz``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: tz(request)
@@ -816,7 +816,7 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``TIME_ZONE``, providing the name of the currently active time zone.
 
-``django.contrib.messages.context_processors.messages``
+``thibaud.contrib.messages.context_processors.messages``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain these two
@@ -831,13 +831,13 @@ Writing your own context processors
 -----------------------------------
 
 A context processor has a simple interface: It's a Python function that takes
-one argument, an :class:`~django.http.HttpRequest` object, and returns a
+one argument, an :class:`~thibaud.http.HttpRequest` object, and returns a
 dictionary that gets added to the template context.
 
 For example, to add the :setting:`DEFAULT_FROM_EMAIL` setting to every
 context::
 
-    from django.conf import settings
+    from thibaud.conf import settings
 
 
     def from_email(request):
@@ -845,20 +845,20 @@ context::
             "DEFAULT_FROM_EMAIL": settings.DEFAULT_FROM_EMAIL,
         }
 
-Custom context processors can live anywhere in your code base. All Django
+Custom context processors can live anywhere in your code base. All Thibaud
 cares about is that your custom context processors are pointed to by the
 ``'context_processors'`` option in your :setting:`TEMPLATES` setting — or the
-``context_processors`` argument of :class:`~django.template.Engine` if you're
+``context_processors`` argument of :class:`~thibaud.template.Engine` if you're
 using it directly.
 
 Loading templates
 =================
 
 Generally, you'll store templates in files on your filesystem rather than
-using the low-level :class:`~django.template.Template` API yourself. Save
+using the low-level :class:`~thibaud.template.Template` API yourself. Save
 templates in a directory specified as a **template directory**.
 
-Django searches for template directories in a number of places, depending on
+Thibaud searches for template directories in a number of places, depending on
 your template loading settings (see "Loader types" below), but the most basic
 way of specifying template directories is by using the :setting:`DIRS
 <TEMPLATES-DIRS>` option.
@@ -866,15 +866,15 @@ way of specifying template directories is by using the :setting:`DIRS
 The :setting:`DIRS <TEMPLATES-DIRS>` option
 -------------------------------------------
 
-Tell Django what your template directories are by using the :setting:`DIRS
+Tell Thibaud what your template directories are by using the :setting:`DIRS
 <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting in your settings
-file — or the ``dirs`` argument of :class:`~django.template.Engine`. This
+file — or the ``dirs`` argument of :class:`~thibaud.template.Engine`. This
 should be set to a list of strings that contain full paths to your template
 directories::
 
     TEMPLATES = [
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "DIRS": [
                 "/home/html/templates/lawrence.com",
                 "/home/html/templates/default",
@@ -893,20 +893,20 @@ Note that these paths should use Unix-style forward slashes, even on Windows.
 Loader types
 ------------
 
-By default, Django uses a filesystem-based template loader, but Django comes
+By default, Thibaud uses a filesystem-based template loader, but Thibaud comes
 with a few other template loaders, which know how to load templates from other
 sources.
 
 Some of these other loaders are disabled by default, but you can activate them
-by adding a ``'loaders'`` option to your ``DjangoTemplates`` backend in the
+by adding a ``'loaders'`` option to your ``ThibaudTemplates`` backend in the
 :setting:`TEMPLATES` setting or passing a ``loaders`` argument to
-:class:`~django.template.Engine`. ``loaders`` should be a list of strings or
+:class:`~thibaud.template.Engine`. ``loaders`` should be a list of strings or
 tuples, where each represents a template loader class. Here are the template
-loaders that come with Django:
+loaders that come with Thibaud:
 
-.. currentmodule:: django.template.loaders
+.. currentmodule:: thibaud.template.loaders
 
-``django.template.loaders.filesystem.Loader``
+``thibaud.template.loaders.filesystem.Loader``
 
 .. class:: filesystem.Loader
 
@@ -918,7 +918,7 @@ loaders that come with Django:
 
         TEMPLATES = [
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "DIRS": [BASE_DIR / "templates"],
             }
         ]
@@ -928,11 +928,11 @@ loaders that come with Django:
 
         TEMPLATES = [
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "OPTIONS": {
                     "loaders": [
                         (
-                            "django.template.loaders.filesystem.Loader",
+                            "thibaud.template.loaders.filesystem.Loader",
                             [BASE_DIR / "templates"],
                         ),
                     ],
@@ -940,16 +940,16 @@ loaders that come with Django:
             }
         ]
 
-``django.template.loaders.app_directories.Loader``
+``thibaud.template.loaders.app_directories.Loader``
 
 .. class:: app_directories.Loader
 
-    Loads templates from Django apps on the filesystem. For each app in
+    Loads templates from Thibaud apps on the filesystem. For each app in
     :setting:`INSTALLED_APPS`, the loader looks for a ``templates``
-    subdirectory. If the directory exists, Django looks for templates in there.
+    subdirectory. If the directory exists, Thibaud looks for templates in there.
 
     This means you can store templates with your individual apps. This also
-    helps to distribute Django apps with default templates.
+    helps to distribute Thibaud apps with default templates.
 
     For example, for this setting::
 
@@ -964,12 +964,12 @@ loaders that come with Django:
     ... and will use the one it finds first.
 
     The order of :setting:`INSTALLED_APPS` is significant! For example, if you
-    want to customize the Django admin, you might choose to override the
-    standard ``admin/base_site.html`` template, from ``django.contrib.admin``,
+    want to customize the Thibaud admin, you might choose to override the
+    standard ``admin/base_site.html`` template, from ``thibaud.contrib.admin``,
     with your own ``admin/base_site.html`` in ``myproject.polls``. You must
     then make sure that your ``myproject.polls`` comes *before*
-    ``django.contrib.admin`` in :setting:`INSTALLED_APPS`, otherwise
-    ``django.contrib.admin``’s will be loaded first and yours will be ignored.
+    ``thibaud.contrib.admin`` in :setting:`INSTALLED_APPS`, otherwise
+    ``thibaud.contrib.admin``’s will be loaded first and yours will be ignored.
 
     Note that the loader performs an optimization when it first runs:
     it caches a list of which :setting:`INSTALLED_APPS` packages have a
@@ -980,16 +980,16 @@ loaders that come with Django:
 
         TEMPLATES = [
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "APP_DIRS": True,
             }
         ]
 
-``django.template.loaders.cached.Loader``
+``thibaud.template.loaders.cached.Loader``
 
 .. class:: cached.Loader
 
-    While the Django template system is quite fast, if it needs to read and
+    While the Thibaud template system is quite fast, if it needs to read and
     compile your templates every time they're rendered, the overhead from that
     can add up.
 
@@ -1007,15 +1007,15 @@ loaders that come with Django:
 
         TEMPLATES = [
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "DIRS": [BASE_DIR / "templates"],
                 "OPTIONS": {
                     "loaders": [
                         (
-                            "django.template.loaders.cached.Loader",
+                            "thibaud.template.loaders.cached.Loader",
                             [
-                                "django.template.loaders.filesystem.Loader",
-                                "django.template.loaders.app_directories.Loader",
+                                "thibaud.template.loaders.filesystem.Loader",
+                                "thibaud.template.loaders.app_directories.Loader",
                                 "path.to.custom.Loader",
                             ],
                         ),
@@ -1026,14 +1026,14 @@ loaders that come with Django:
 
     .. note::
 
-        All of the built-in Django template tags are safe to use with the
+        All of the built-in Thibaud template tags are safe to use with the
         cached loader, but if you're using custom template tags that come from
         third party packages, or that you wrote yourself, you should ensure
         that the ``Node`` implementation for each tag is thread-safe. For more
         information, see :ref:`template tag thread safety considerations
         <template_tag_thread_safety>`.
 
-``django.template.loaders.locmem.Loader``
+``thibaud.template.loaders.locmem.Loader``
 
 .. class:: locmem.Loader
 
@@ -1043,11 +1043,11 @@ loaders that come with Django:
 
         TEMPLATES = [
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "OPTIONS": {
                     "loaders": [
                         (
-                            "django.template.loaders.locmem.Loader",
+                            "thibaud.template.loaders.locmem.Loader",
                             {
                                 "index.html": "content here",
                             },
@@ -1059,19 +1059,19 @@ loaders that come with Django:
 
     This loader is disabled by default.
 
-Django uses the template loaders in order according to the ``'loaders'``
+Thibaud uses the template loaders in order according to the ``'loaders'``
 option. It uses each loader until a loader finds a match.
 
 .. _custom-template-loaders:
 
-.. currentmodule:: django.template.loaders.base
+.. currentmodule:: thibaud.template.loaders.base
 
 Custom loaders
 ==============
 
 It's possible to load templates from additional sources using custom template
 loaders. Custom ``Loader`` classes should inherit from
-``django.template.loaders.base.Loader`` and define the ``get_contents()`` and
+``thibaud.template.loaders.base.Loader`` and define the ``get_contents()`` and
 ``get_template_sources()`` methods.
 
 Loader methods
@@ -1084,7 +1084,7 @@ Loader methods
     .. method:: get_template_sources(template_name)
 
         A method that takes a ``template_name`` and yields
-        :class:`~django.template.base.Origin` instances for each possible
+        :class:`~thibaud.template.base.Origin` instances for each possible
         source.
 
         For example, the filesystem loader may receive ``'index.html'`` as a
@@ -1100,19 +1100,19 @@ Loader methods
     .. method:: get_contents(origin)
 
         Returns the contents for a template given a
-        :class:`~django.template.base.Origin` instance.
+        :class:`~thibaud.template.base.Origin` instance.
 
         This is where a filesystem loader would read contents from the
         filesystem, or a database loader would read from the database. If a
         matching template doesn't exist, this should raise a
-        :exc:`~django.template.TemplateDoesNotExist` error.
+        :exc:`~thibaud.template.TemplateDoesNotExist` error.
 
     .. method:: get_template(template_name, skip=None)
 
         Returns a ``Template`` object for a given ``template_name`` by looping
         through results from :meth:`get_template_sources` and calling
         :meth:`get_contents`. This returns the first matching template. If no
-        template is found, :exc:`~django.template.TemplateDoesNotExist` is
+        template is found, :exc:`~thibaud.template.TemplateDoesNotExist` is
         raised.
 
         The optional ``skip`` argument is a list of origins to ignore when
@@ -1125,10 +1125,10 @@ Loader methods
 
 .. admonition:: Building your own
 
-    For examples, read the :source:`source code for Django's built-in loaders
-    <django/template/loaders>`.
+    For examples, read the :source:`source code for Thibaud's built-in loaders
+    <thibaud/template/loaders>`.
 
-.. currentmodule:: django.template.base
+.. currentmodule:: thibaud.template.base
 
 Template origin
 ===============
@@ -1162,6 +1162,6 @@ they are loaded from.
         If the template is instantiated directly rather than through a
         template loader, this is ``None``.
 
-        :class:`django.template.loaders.cached.Loader` requires all of its
+        :class:`thibaud.template.loaders.cached.Loader` requires all of its
         wrapped loaders to set this attribute, typically by instantiating
         the ``Origin`` with ``loader=self``.

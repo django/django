@@ -1,10 +1,10 @@
 ===========================
-Django 2.2.25 release notes
+Thibaud 2.2.25 release notes
 ===========================
 
 *December 7, 2021*
 
-Django 2.2.25 fixes a security issue with severity "low" in 2.2.24.
+Thibaud 2.2.25 fixes a security issue with severity "low" in 2.2.24.
 
 CVE-2021-44420: Potential bypass of an upstream access control based on URL paths
 =================================================================================

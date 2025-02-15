@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Abel Radac <abelradac@gmail.com>, 2017
@@ -12,12 +12,12 @@
 # Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-17 02:13-0600\n"
 "PO-Revision-Date: 2023-04-25 06:49+0000\n"
 "Last-Translator: Bogdan Mateescu, 2018-2019,2021\n"
-"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
+"Language-Team: Romanian (http://www.transifex.com/thibaud/thibaud/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1285,27 +1285,27 @@ msgstr "Instalarea a funcționat cu succes! Felicitări!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Vezi <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">notele de lansare</a> pentru Django "
+"Vezi <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">notele de lansare</a> pentru Thibaud "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Vedeți această pagină deoarece <a href=\"https://docs.djangoproject.com/en/"
+"Vedeți această pagină deoarece <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> este în fișierul de setări și nu ați "
 "configurat niciun URL."
 
-msgid "Django Documentation"
-msgstr "Documentația Django"
+msgid "Thibaud Documentation"
+msgstr "Documentația Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr ""
@@ -1313,11 +1313,11 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr "Tutorial: O aplicație de votare"
 
-msgid "Get started with Django"
-msgstr "Începeți cu Django"
+msgid "Get started with Thibaud"
+msgstr "Începeți cu Thibaud"
 
-msgid "Django Community"
-msgstr "Comunitatea Django"
+msgid "Thibaud Community"
+msgstr "Comunitatea Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Conectați-vă, obțineți ajutor sau contribuiți"

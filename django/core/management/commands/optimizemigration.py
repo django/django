@@ -1,15 +1,15 @@
 import shutil
 import sys
 
-from django.apps import apps
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import run_formatters
-from django.db import migrations
-from django.db.migrations.exceptions import AmbiguityError
-from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.migrations.writer import MigrationWriter
-from django.utils.version import get_docs_version
+from thibaud.apps import apps
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.core.management.utils import run_formatters
+from thibaud.db import migrations
+from thibaud.db.migrations.exceptions import AmbiguityError
+from thibaud.db.migrations.loader import MigrationLoader
+from thibaud.db.migrations.optimizer import MigrationOptimizer
+from thibaud.db.migrations.writer import MigrationWriter
+from thibaud.utils.version import get_docs_version
 
 
 class Command(BaseCommand):
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                 raise CommandError(
                     "Migration will require manual porting but is already a squashed "
                     "migration.\nTransition to a normal migration first: "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/"
+                    "https://docs.thibaudproject.com/en/%s/topics/migrations/"
                     "#squashing-migrations" % get_docs_version()
                 )
             # Make a new migration with those operations.

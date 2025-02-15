@@ -2,34 +2,34 @@
 The contenttypes framework
 ==========================
 
-.. module:: django.contrib.contenttypes
+.. module:: thibaud.contrib.contenttypes
    :synopsis: Provides generic interface to installed models.
 
-Django includes a :mod:`~django.contrib.contenttypes` application that can
-track all of the models installed in your Django-powered project, providing a
+Thibaud includes a :mod:`~thibaud.contrib.contenttypes` application that can
+track all of the models installed in your Thibaud-powered project, providing a
 high-level, generic interface for working with your models.
 
 Overview
 ========
 
 At the heart of the contenttypes application is the
-:class:`~django.contrib.contenttypes.models.ContentType` model, which lives at
-``django.contrib.contenttypes.models.ContentType``. Instances of
-:class:`~django.contrib.contenttypes.models.ContentType` represent and store
+:class:`~thibaud.contrib.contenttypes.models.ContentType` model, which lives at
+``thibaud.contrib.contenttypes.models.ContentType``. Instances of
+:class:`~thibaud.contrib.contenttypes.models.ContentType` represent and store
 information about the models installed in your project, and new instances of
-:class:`~django.contrib.contenttypes.models.ContentType` are automatically
+:class:`~thibaud.contrib.contenttypes.models.ContentType` are automatically
 created whenever new models are installed.
 
-Instances of :class:`~django.contrib.contenttypes.models.ContentType` have
+Instances of :class:`~thibaud.contrib.contenttypes.models.ContentType` have
 methods for returning the model classes they represent and for querying objects
-from those models. :class:`~django.contrib.contenttypes.models.ContentType`
+from those models. :class:`~thibaud.contrib.contenttypes.models.ContentType`
 also has a :ref:`custom manager <custom-managers>` that adds methods for
-working with :class:`~django.contrib.contenttypes.models.ContentType` and for
-obtaining instances of :class:`~django.contrib.contenttypes.models.ContentType`
+working with :class:`~thibaud.contrib.contenttypes.models.ContentType` and for
+obtaining instances of :class:`~thibaud.contrib.contenttypes.models.ContentType`
 for a particular model.
 
 Relations between your models and
-:class:`~django.contrib.contenttypes.models.ContentType` can also be used to
+:class:`~thibaud.contrib.contenttypes.models.ContentType` can also be used to
 enable "generic" relationships between an instance of one of your
 models and instances of any model you have installed.
 
@@ -37,28 +37,28 @@ Installing the contenttypes framework
 =====================================
 
 The contenttypes framework is included in the default
-:setting:`INSTALLED_APPS` list created by ``django-admin startproject``,
+:setting:`INSTALLED_APPS` list created by ``thibaud-admin startproject``,
 but if you've removed it or if you manually set up your
 :setting:`INSTALLED_APPS` list, you can enable it by adding
-``'django.contrib.contenttypes'`` to your :setting:`INSTALLED_APPS` setting.
+``'thibaud.contrib.contenttypes'`` to your :setting:`INSTALLED_APPS` setting.
 
 It's generally a good idea to have the contenttypes framework
-installed; several of Django's other bundled applications require it:
+installed; several of Thibaud's other bundled applications require it:
 
 * The admin application uses it to log the history of each object
   added or changed through the admin interface.
 
-* Django's :mod:`authentication framework <django.contrib.auth>` uses it
+* Thibaud's :mod:`authentication framework <thibaud.contrib.auth>` uses it
   to tie user permissions to specific models.
 
-.. currentmodule:: django.contrib.contenttypes.models
+.. currentmodule:: thibaud.contrib.contenttypes.models
 
 The ``ContentType`` model
 =========================
 
 .. class:: ContentType
 
-    Each instance of :class:`~django.contrib.contenttypes.models.ContentType`
+    Each instance of :class:`~thibaud.contrib.contenttypes.models.ContentType`
     has two fields which, taken together, uniquely describe an installed
     model:
 
@@ -67,7 +67,7 @@ The ``ContentType`` model
         The name of the application the model is part of. This is taken from
         the :attr:`app_label` attribute of the model, and includes only the
         *last* part of the application's Python import path;
-        ``django.contrib.contenttypes``, for example, becomes an
+        ``thibaud.contrib.contenttypes``, for example, becomes an
         :attr:`app_label` of ``contenttypes``.
 
     .. attribute:: model
@@ -79,93 +79,93 @@ The ``ContentType`` model
     .. attribute:: name
 
         The human-readable name of the content type. This is taken from the
-        :attr:`verbose_name <django.db.models.Field.verbose_name>`
+        :attr:`verbose_name <thibaud.db.models.Field.verbose_name>`
         attribute of the model.
 
 Let's look at an example to see how this works. If you already have
-the :mod:`~django.contrib.contenttypes` application installed, and then add
-:mod:`the sites application <django.contrib.sites>` to your
+the :mod:`~thibaud.contrib.contenttypes` application installed, and then add
+:mod:`the sites application <thibaud.contrib.sites>` to your
 :setting:`INSTALLED_APPS` setting and run ``manage.py migrate`` to install it,
-the model :class:`django.contrib.sites.models.Site` will be installed into
+the model :class:`thibaud.contrib.sites.models.Site` will be installed into
 your database. Along with it a new instance of
-:class:`~django.contrib.contenttypes.models.ContentType` will be
+:class:`~thibaud.contrib.contenttypes.models.ContentType` will be
 created with the following values:
 
-* :attr:`~django.contrib.contenttypes.models.ContentType.app_label`
+* :attr:`~thibaud.contrib.contenttypes.models.ContentType.app_label`
   will be set to ``'sites'`` (the last part of the Python
-  path ``django.contrib.sites``).
+  path ``thibaud.contrib.sites``).
 
-* :attr:`~django.contrib.contenttypes.models.ContentType.model`
+* :attr:`~thibaud.contrib.contenttypes.models.ContentType.model`
   will be set to ``'site'``.
 
 Methods on ``ContentType`` instances
 ====================================
 
-Each :class:`~django.contrib.contenttypes.models.ContentType` instance has
+Each :class:`~thibaud.contrib.contenttypes.models.ContentType` instance has
 methods that allow you to get from a
-:class:`~django.contrib.contenttypes.models.ContentType` instance to the
+:class:`~thibaud.contrib.contenttypes.models.ContentType` instance to the
 model it represents, or to retrieve objects from that model:
 
 .. method:: ContentType.get_object_for_this_type(using=None, **kwargs)
 
     Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
-    model the :class:`~django.contrib.contenttypes.models.ContentType`
+    model the :class:`~thibaud.contrib.contenttypes.models.ContentType`
     represents, and does
-    :meth:`a get() lookup <django.db.models.query.QuerySet.get>`
+    :meth:`a get() lookup <thibaud.db.models.query.QuerySet.get>`
     on that model, returning the corresponding object. The ``using`` argument
     can be used to specify a different database than the default one.
 
 .. method:: ContentType.model_class()
 
     Returns the model class represented by this
-    :class:`~django.contrib.contenttypes.models.ContentType` instance.
+    :class:`~thibaud.contrib.contenttypes.models.ContentType` instance.
 
 For example, we could look up the
-:class:`~django.contrib.contenttypes.models.ContentType` for the
-:class:`~django.contrib.auth.models.User` model:
+:class:`~thibaud.contrib.contenttypes.models.ContentType` for the
+:class:`~thibaud.contrib.auth.models.User` model:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.contenttypes.models import ContentType
+    >>> from thibaud.contrib.contenttypes.models import ContentType
     >>> user_type = ContentType.objects.get(app_label="auth", model="user")
     >>> user_type
     <ContentType: user>
 
 And then use it to query for a particular
-:class:`~django.contrib.auth.models.User`, or to get access
+:class:`~thibaud.contrib.auth.models.User`, or to get access
 to the ``User`` model class:
 
 .. code-block:: pycon
 
     >>> user_type.model_class()
-    <class 'django.contrib.auth.models.User'>
+    <class 'thibaud.contrib.auth.models.User'>
     >>> user_type.get_object_for_this_type(username="Guido")
     <User: Guido>
 
 Together,
-:meth:`~django.contrib.contenttypes.models.ContentType.get_object_for_this_type`
-and :meth:`~django.contrib.contenttypes.models.ContentType.model_class` enable
+:meth:`~thibaud.contrib.contenttypes.models.ContentType.get_object_for_this_type`
+and :meth:`~thibaud.contrib.contenttypes.models.ContentType.model_class` enable
 two extremely important use cases:
 
 1. Using these methods, you can write high-level generic code that
    performs queries on any installed model -- instead of importing and
    using a single specific model class, you can pass an ``app_label`` and
    ``model`` into a
-   :class:`~django.contrib.contenttypes.models.ContentType` lookup at
+   :class:`~thibaud.contrib.contenttypes.models.ContentType` lookup at
    runtime, and then work with the model class or retrieve objects from it.
 
 2. You can relate another model to
-   :class:`~django.contrib.contenttypes.models.ContentType` as a way of
+   :class:`~thibaud.contrib.contenttypes.models.ContentType` as a way of
    tying instances of it to particular model classes, and use these methods
    to get access to those model classes.
 
-Several of Django's bundled applications make use of the latter technique.
+Several of Thibaud's bundled applications make use of the latter technique.
 For example,
-:class:`the permissions system <django.contrib.auth.models.Permission>` in
-Django's authentication framework uses a
-:class:`~django.contrib.auth.models.Permission` model with a foreign
-key to :class:`~django.contrib.contenttypes.models.ContentType`; this lets
-:class:`~django.contrib.auth.models.Permission` represent concepts like
+:class:`the permissions system <thibaud.contrib.auth.models.Permission>` in
+Thibaud's authentication framework uses a
+:class:`~thibaud.contrib.auth.models.Permission` model with a foreign
+key to :class:`~thibaud.contrib.contenttypes.models.ContentType`; this lets
+:class:`~thibaud.contrib.auth.models.Permission` represent concepts like
 "can add blog entry" or "can delete news story".
 
 The ``ContentTypeManager``
@@ -173,66 +173,66 @@ The ``ContentTypeManager``
 
 .. class:: ContentTypeManager
 
-    :class:`~django.contrib.contenttypes.models.ContentType` also has a custom
-    manager, :class:`~django.contrib.contenttypes.models.ContentTypeManager`,
+    :class:`~thibaud.contrib.contenttypes.models.ContentType` also has a custom
+    manager, :class:`~thibaud.contrib.contenttypes.models.ContentTypeManager`,
     which adds the following methods:
 
     .. method:: clear_cache()
 
         Clears an internal cache used by
-        :class:`~django.contrib.contenttypes.models.ContentType` to keep track
+        :class:`~thibaud.contrib.contenttypes.models.ContentType` to keep track
         of models for which it has created
-        :class:`~django.contrib.contenttypes.models.ContentType` instances. You
-        probably won't ever need to call this method yourself; Django will call
+        :class:`~thibaud.contrib.contenttypes.models.ContentType` instances. You
+        probably won't ever need to call this method yourself; Thibaud will call
         it automatically when it's needed.
 
     .. method:: get_for_id(id)
 
-        Lookup a :class:`~django.contrib.contenttypes.models.ContentType` by ID.
+        Lookup a :class:`~thibaud.contrib.contenttypes.models.ContentType` by ID.
         Since this method uses the same shared cache as
-        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`,
+        :meth:`~thibaud.contrib.contenttypes.models.ContentTypeManager.get_for_model`,
         it's preferred to use this method over the usual
         ``ContentType.objects.get(pk=id)``
 
     .. method:: get_for_model(model, for_concrete_model=True)
 
         Takes either a model class or an instance of a model, and returns the
-        :class:`~django.contrib.contenttypes.models.ContentType` instance
+        :class:`~thibaud.contrib.contenttypes.models.ContentType` instance
         representing that model. ``for_concrete_model=False`` allows fetching
-        the :class:`~django.contrib.contenttypes.models.ContentType` of a proxy
+        the :class:`~thibaud.contrib.contenttypes.models.ContentType` of a proxy
         model.
 
     .. method:: get_for_models(*models, for_concrete_models=True)
 
         Takes a variadic number of model classes, and returns a dictionary
         mapping the model classes to the
-        :class:`~django.contrib.contenttypes.models.ContentType` instances
+        :class:`~thibaud.contrib.contenttypes.models.ContentType` instances
         representing them. ``for_concrete_models=False`` allows fetching the
-        :class:`~django.contrib.contenttypes.models.ContentType` of proxy
+        :class:`~thibaud.contrib.contenttypes.models.ContentType` of proxy
         models.
 
     .. method:: get_by_natural_key(app_label, model)
 
-        Returns the :class:`~django.contrib.contenttypes.models.ContentType`
+        Returns the :class:`~thibaud.contrib.contenttypes.models.ContentType`
         instance uniquely identified by the given application label and model
         name. The primary purpose of this method is to allow
-        :class:`~django.contrib.contenttypes.models.ContentType` objects to be
+        :class:`~thibaud.contrib.contenttypes.models.ContentType` objects to be
         referenced via a :ref:`natural key<topics-serialization-natural-keys>`
         during deserialization.
 
 The :meth:`~ContentTypeManager.get_for_model()` method is especially
 useful when you know you need to work with a
-:class:`ContentType <django.contrib.contenttypes.models.ContentType>` but don't
+:class:`ContentType <thibaud.contrib.contenttypes.models.ContentType>` but don't
 want to go to the trouble of obtaining the model's metadata to perform a manual
 lookup:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.auth.models import User
+    >>> from thibaud.contrib.auth.models import User
     >>> ContentType.objects.get_for_model(User)
     <ContentType: user>
 
-.. module:: django.contrib.contenttypes.fields
+.. module:: thibaud.contrib.contenttypes.fields
 
 .. _generic-relations:
 
@@ -240,18 +240,18 @@ Generic relations
 =================
 
 Adding a foreign key from one of your own models to
-:class:`~django.contrib.contenttypes.models.ContentType` allows your model to
+:class:`~thibaud.contrib.contenttypes.models.ContentType` allows your model to
 effectively tie itself to another model class, as in the example of the
-:class:`~django.contrib.auth.models.Permission` model above. But it's possible
+:class:`~thibaud.contrib.auth.models.Permission` model above. But it's possible
 to go one step further and use
-:class:`~django.contrib.contenttypes.models.ContentType` to enable truly
+:class:`~thibaud.contrib.contenttypes.models.ContentType` to enable truly
 generic (sometimes called "polymorphic") relationships between models.
 
 For example, it could be used for a tagging system like so::
 
-    from django.contrib.contenttypes.fields import GenericForeignKey
-    from django.contrib.contenttypes.models import ContentType
-    from django.db import models
+    from thibaud.contrib.contenttypes.fields import GenericForeignKey
+    from thibaud.contrib.contenttypes.models import ContentType
+    from thibaud.db import models
 
 
     class TaggedItem(models.Model):
@@ -268,9 +268,9 @@ For example, it could be used for a tagging system like so::
                 models.Index(fields=["content_type", "object_id"]),
             ]
 
-A normal :class:`~django.db.models.ForeignKey` can only "point
+A normal :class:`~thibaud.db.models.ForeignKey` can only "point
 to" one other model, which means that if the ``TaggedItem`` model used a
-:class:`~django.db.models.ForeignKey` it would have to
+:class:`~thibaud.db.models.ForeignKey` it would have to
 choose one and only one model to store tags for. The contenttypes
 application provides a special field type (``GenericForeignKey``) which
 works around this and allows the relationship to be with any
@@ -279,30 +279,30 @@ model:
 .. class:: GenericForeignKey
 
     There are three parts to setting up a
-    :class:`~django.contrib.contenttypes.fields.GenericForeignKey`:
+    :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey`:
 
-    1. Give your model a :class:`~django.db.models.ForeignKey`
-       to :class:`~django.contrib.contenttypes.models.ContentType`. The usual
+    1. Give your model a :class:`~thibaud.db.models.ForeignKey`
+       to :class:`~thibaud.contrib.contenttypes.models.ContentType`. The usual
        name for this field is "content_type".
 
     2. Give your model a field that can store primary key values from the
        models you'll be relating to. For most models, this means a
-       :class:`~django.db.models.PositiveBigIntegerField`. The usual name
+       :class:`~thibaud.db.models.PositiveBigIntegerField`. The usual name
        for this field is "object_id".
 
     3. Give your model a
-       :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
+       :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey`, and
        pass it the names of the two fields described above. If these fields
        are named "content_type" and "object_id", you can omit this -- those
        are the default field names
-       :class:`~django.contrib.contenttypes.fields.GenericForeignKey` will
+       :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey` will
        look for.
 
-    Unlike for the :class:`~django.db.models.ForeignKey`, a database index is
+    Unlike for the :class:`~thibaud.db.models.ForeignKey`, a database index is
     *not* automatically created on the
-    :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, so it's
+    :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey`, so it's
     recommended that you use
-    :attr:`Meta.indexes <django.db.models.Options.indexes>` to add your own
+    :attr:`Meta.indexes <thibaud.db.models.Options.indexes>` to add your own
     multiple column index. This behavior :ticket:`may change <23435>` in the
     future.
 
@@ -310,24 +310,24 @@ model:
 
        If ``False``, the field will be able to reference proxy models. Default
        is ``True``. This mirrors the ``for_concrete_model`` argument to
-       :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
+       :meth:`~thibaud.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
 
 .. admonition:: Primary key type compatibility
 
    The "object_id" field doesn't have to be the same type as the
    primary key fields on the related models, but their primary key values
    must be coercible to the same type as the "object_id" field by its
-   :meth:`~django.db.models.Field.get_db_prep_value` method.
+   :meth:`~thibaud.db.models.Field.get_db_prep_value` method.
 
    For example, if you want to allow generic relations to models with either
-   :class:`~django.db.models.IntegerField` or
-   :class:`~django.db.models.CharField` primary key fields, you
-   can use :class:`~django.db.models.CharField` for the
+   :class:`~thibaud.db.models.IntegerField` or
+   :class:`~thibaud.db.models.CharField` primary key fields, you
+   can use :class:`~thibaud.db.models.CharField` for the
    "object_id" field on your model since integers can be coerced to
-   strings by :meth:`~django.db.models.Field.get_db_prep_value`.
+   strings by :meth:`~thibaud.db.models.Field.get_db_prep_value`.
 
    For maximum flexibility you can use a
-   :class:`~django.db.models.TextField` which doesn't have a
+   :class:`~thibaud.db.models.TextField` which doesn't have a
    maximum length defined, however this may incur significant performance
    penalties depending on your database backend.
 
@@ -338,21 +338,21 @@ model:
 .. admonition:: Serializing references to ``ContentType`` objects
 
    If you're serializing data (for example, when generating
-   :class:`~django.test.TransactionTestCase.fixtures`) from a model that implements
+   :class:`~thibaud.test.TransactionTestCase.fixtures`) from a model that implements
    generic relations, you should probably be using a natural key to uniquely
-   identify related :class:`~django.contrib.contenttypes.models.ContentType`
+   identify related :class:`~thibaud.contrib.contenttypes.models.ContentType`
    objects. See :ref:`natural keys<topics-serialization-natural-keys>` and
    :option:`dumpdata --natural-foreign` for more information.
 
 This will enable an API similar to the one used for a normal
-:class:`~django.db.models.ForeignKey`;
+:class:`~thibaud.db.models.ForeignKey`;
 each ``TaggedItem`` will have a ``content_object`` field that returns the
 object it's related to, and you can also assign to that field or use it when
 creating a ``TaggedItem``:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.auth.models import User
+    >>> from thibaud.contrib.auth.models import User
     >>> guido = User.objects.get(username="Guido")
     >>> t = TaggedItem(content_object=guido, tag="bdfl")
     >>> t.save()
@@ -368,10 +368,10 @@ remain set to their original values and the ``GenericForeignKey`` returns
     >>> guido.delete()
     >>> t.content_object  # returns None
 
-Due to the way :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+Due to the way :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
 and ``exclude()``, for example) via the database API. Because a
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey` isn't a
+:class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey` isn't a
 normal field object, these examples will *not* work:
 
 .. code-block:: pycon
@@ -381,8 +381,8 @@ normal field object, these examples will *not* work:
     # This will also fail
     >>> TaggedItem.objects.get(content_object=guido)
 
-Likewise, :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\s
-does not appear in :class:`~django.forms.ModelForm`\s.
+Likewise, :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey`\s
+does not appear in :class:`~thibaud.forms.ModelForm`\s.
 
 Reverse generic relations
 -------------------------
@@ -399,8 +399,8 @@ Reverse generic relations
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
 
-    from django.contrib.contenttypes.fields import GenericRelation
-    from django.db import models
+    from thibaud.contrib.contenttypes.fields import GenericRelation
+    from thibaud.db import models
 
 
     class Bookmark(models.Model):
@@ -412,14 +412,14 @@ be used to retrieve their associated ``TaggedItems``:
 
 .. code-block:: pycon
 
-    >>> b = Bookmark(url="https://www.djangoproject.com/")
+    >>> b = Bookmark(url="https://www.thibaudproject.com/")
     >>> b.save()
-    >>> t1 = TaggedItem(content_object=b, tag="django")
+    >>> t1 = TaggedItem(content_object=b, tag="thibaud")
     >>> t1.save()
     >>> t2 = TaggedItem(content_object=b, tag="python")
     >>> t2.save()
     >>> b.tags.all()
-    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
+    <QuerySet [<TaggedItem: thibaud>, <TaggedItem: python>]>
 
 You can also use ``add()``, ``create()``, or ``set()`` to create
 relationships:
@@ -431,10 +431,10 @@ relationships:
     >>> b.tags.create(tag="Web framework")
     <TaggedItem: Web framework>
     >>> b.tags.all()
-    <QuerySet [<TaggedItem: django>, <TaggedItem: python>, <TaggedItem: Web development>, <TaggedItem: Web framework>]>
+    <QuerySet [<TaggedItem: thibaud>, <TaggedItem: python>, <TaggedItem: Web development>, <TaggedItem: Web framework>]>
     >>> b.tags.set([t1, t3])
     >>> b.tags.all()
-    <QuerySet [<TaggedItem: django>, <TaggedItem: Web development>]>
+    <QuerySet [<TaggedItem: thibaud>, <TaggedItem: Web development>]>
 
 The ``remove()`` call will bulk delete the specified model objects:
 
@@ -442,9 +442,9 @@ The ``remove()`` call will bulk delete the specified model objects:
 
     >>> b.tags.remove(t3)
     >>> b.tags.all()
-    <QuerySet [<TaggedItem: django>]>
+    <QuerySet [<TaggedItem: thibaud>]>
     >>> TaggedItem.objects.all()
-    <QuerySet [<TaggedItem: django>]>
+    <QuerySet [<TaggedItem: thibaud>]>
 
 The ``clear()`` method can be used to bulk delete all related objects for an
 instance:
@@ -457,7 +457,7 @@ instance:
     >>> TaggedItem.objects.all()
     <QuerySet []>
 
-Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
+Defining :class:`~thibaud.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
 
     tags = GenericRelation(TaggedItem, related_query_name="bookmark")
@@ -467,24 +467,24 @@ from ``TaggedItem``:
 
 .. code-block:: pycon
 
-    >>> # Get all tags belonging to bookmarks containing `django` in the url
-    >>> TaggedItem.objects.filter(bookmark__url__contains="django")
-    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
+    >>> # Get all tags belonging to bookmarks containing `thibaud` in the url
+    >>> TaggedItem.objects.filter(bookmark__url__contains="thibaud")
+    <QuerySet [<TaggedItem: thibaud>, <TaggedItem: python>]>
 
 If you don't add the ``related_query_name``, you can do the same types of
 lookups manually:
 
 .. code-block:: pycon
 
-    >>> bookmarks = Bookmark.objects.filter(url__contains="django")
+    >>> bookmarks = Bookmark.objects.filter(url__contains="thibaud")
     >>> bookmark_type = ContentType.objects.get_for_model(Bookmark)
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id, object_id__in=bookmarks)
-    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
+    <QuerySet [<TaggedItem: thibaud>, <TaggedItem: python>]>
 
-Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+Just as :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey`
 accepts the names of the content-type and object-ID fields as
 arguments, so too does
-:class:`~django.contrib.contenttypes.fields.GenericRelation`;
+:class:`~thibaud.contrib.contenttypes.fields.GenericRelation`;
 if the model which has the generic foreign key is using non-default names
 for those fields, you must pass the names of the fields when setting up a
 :class:`.GenericRelation` to it. For example, if the ``TaggedItem`` model
@@ -499,25 +499,25 @@ referred to above used fields named ``content_type_fk`` and
     )
 
 Note also, that if you delete an object that has a
-:class:`~django.contrib.contenttypes.fields.GenericRelation`, any objects
-which have a :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+:class:`~thibaud.contrib.contenttypes.fields.GenericRelation`, any objects
+which have a :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey`
 pointing at it will be deleted as well. In the example above, this means that
 if a ``Bookmark`` object were deleted, any ``TaggedItem`` objects pointing at
 it would be deleted at the same time.
 
-Unlike :class:`~django.db.models.ForeignKey`,
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey` does not accept
-an :attr:`~django.db.models.ForeignKey.on_delete` argument to customize this
+Unlike :class:`~thibaud.db.models.ForeignKey`,
+:class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey` does not accept
+an :attr:`~thibaud.db.models.ForeignKey.on_delete` argument to customize this
 behavior; if desired, you can avoid the cascade-deletion by not using
-:class:`~django.contrib.contenttypes.fields.GenericRelation`, and alternate
-behavior can be provided via the :data:`~django.db.models.signals.pre_delete`
+:class:`~thibaud.contrib.contenttypes.fields.GenericRelation`, and alternate
+behavior can be provided via the :data:`~thibaud.db.models.signals.pre_delete`
 signal.
 
 Generic relations and aggregation
 ---------------------------------
 
-:doc:`Django's database aggregation API </topics/db/aggregation>` works with a
-:class:`~django.contrib.contenttypes.fields.GenericRelation`. For example, you
+:doc:`Thibaud's database aggregation API </topics/db/aggregation>` works with a
+:class:`~thibaud.contrib.contenttypes.fields.GenericRelation`. For example, you
 can find out how many tags all the bookmarks have:
 
 .. code-block:: pycon
@@ -525,43 +525,43 @@ can find out how many tags all the bookmarks have:
     >>> Bookmark.objects.aggregate(Count("tags"))
     {'tags__count': 3}
 
-.. module:: django.contrib.contenttypes.forms
+.. module:: thibaud.contrib.contenttypes.forms
 
 Generic relation in forms
 -------------------------
 
-The :mod:`django.contrib.contenttypes.forms` module provides:
+The :mod:`thibaud.contrib.contenttypes.forms` module provides:
 
 * :class:`BaseGenericInlineFormSet`
 * A formset factory, :func:`generic_inlineformset_factory`, for use with
-  :class:`~django.contrib.contenttypes.fields.GenericForeignKey`.
+  :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey`.
 
 .. class:: BaseGenericInlineFormSet
 
 .. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False, absolute_max=None, can_delete_extra=True)
 
     Returns a ``GenericInlineFormSet`` using
-    :func:`~django.forms.models.modelformset_factory`.
+    :func:`~thibaud.forms.models.modelformset_factory`.
 
     You must provide ``ct_field`` and ``fk_field`` if they are different from
     the defaults, ``content_type`` and ``object_id`` respectively. Other
     parameters are similar to those documented in
-    :func:`~django.forms.models.modelformset_factory` and
-    :func:`~django.forms.models.inlineformset_factory`.
+    :func:`~thibaud.forms.models.modelformset_factory` and
+    :func:`~thibaud.forms.models.inlineformset_factory`.
 
     The ``for_concrete_model`` argument corresponds to the
-    :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
+    :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
     argument on ``GenericForeignKey``.
 
-.. module:: django.contrib.contenttypes.admin
+.. module:: thibaud.contrib.contenttypes.admin
 
 Generic relations in admin
 --------------------------
 
-The :mod:`django.contrib.contenttypes.admin` module provides
-:class:`~django.contrib.contenttypes.admin.GenericTabularInline` and
-:class:`~django.contrib.contenttypes.admin.GenericStackedInline` (subclasses of
-:class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`)
+The :mod:`thibaud.contrib.contenttypes.admin` module provides
+:class:`~thibaud.contrib.contenttypes.admin.GenericTabularInline` and
+:class:`~thibaud.contrib.contenttypes.admin.GenericStackedInline` (subclasses of
+:class:`~thibaud.contrib.contenttypes.admin.GenericInlineModelAdmin`)
 
 These classes and functions enable the use of generic relations in forms
 and the admin. See the :doc:`model formset </topics/forms/modelforms>` and
@@ -570,15 +570,15 @@ information.
 
 .. class:: GenericInlineModelAdmin
 
-    The :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`
+    The :class:`~thibaud.contrib.contenttypes.admin.GenericInlineModelAdmin`
     class inherits all properties from an
-    :class:`~django.contrib.admin.InlineModelAdmin` class. However,
+    :class:`~thibaud.contrib.admin.InlineModelAdmin` class. However,
     it adds a couple of its own for working with the generic relation:
 
     .. attribute:: ct_field
 
         The name of the
-        :class:`~django.contrib.contenttypes.models.ContentType` foreign key
+        :class:`~thibaud.contrib.contenttypes.models.ContentType` foreign key
         field on the model. Defaults to ``content_type``.
 
     .. attribute:: ct_fk_field
@@ -592,7 +592,7 @@ information.
     Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
     layouts, respectively.
 
-.. module:: django.contrib.contenttypes.prefetch
+.. module:: thibaud.contrib.contenttypes.prefetch
 
 ``GenericPrefetch()``
 ---------------------
@@ -606,8 +606,8 @@ with non-homogeneous set of results.
 
 .. code-block:: pycon
 
-    >>> from django.contrib.contenttypes.prefetch import GenericPrefetch
-    >>> bookmark = Bookmark.objects.create(url="https://www.djangoproject.com/")
+    >>> from thibaud.contrib.contenttypes.prefetch import GenericPrefetch
+    >>> bookmark = Bookmark.objects.create(url="https://www.thibaudproject.com/")
     >>> animal = Animal.objects.create(name="lion", weight=100)
     >>> TaggedItem.objects.create(tag="great", content_object=bookmark)
     >>> TaggedItem.objects.create(tag="awesome", content_object=animal)

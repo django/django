@@ -1,13 +1,13 @@
 import oracledb
 
-from django.db.backends.oracle.introspection import DatabaseIntrospection
-from django.utils.functional import cached_property
+from thibaud.db.backends.oracle.introspection import DatabaseIntrospection
+from thibaud.utils.functional import cached_property
 
 
 class OracleIntrospection(DatabaseIntrospection):
     # Associating any OBJECTVAR instances with GeometryField. This won't work
     # right on Oracle objects that aren't MDSYS.SDO_GEOMETRY, but it is the
-    # only object type supported within Django anyways.
+    # only object type supported within Thibaud anyways.
     @cached_property
     def data_types_reverse(self):
         return {

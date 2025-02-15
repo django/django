@@ -1,7 +1,7 @@
 /*global URLify*/
 'use strict';
 {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $.fn.prepopulate = function(dependencies, maxLength, allowUnicode) {
         /*
             Depends on urlify.js

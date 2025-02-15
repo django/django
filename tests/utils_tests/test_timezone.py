@@ -2,8 +2,8 @@ import datetime
 import zoneinfo
 from unittest import mock
 
-from django.test import SimpleTestCase, override_settings
-from django.utils import timezone
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils import timezone
 
 PARIS_ZI = zoneinfo.ZoneInfo("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)  # Africa/Nairobi
@@ -39,7 +39,7 @@ class TimezoneTests(SimpleTestCase):
         with timezone.override(EAT):
             self.assertEqual(timezone.localdate(aware), datetime.date(2014, 12, 31))
 
-        with mock.patch("django.utils.timezone.now", return_value=aware):
+        with mock.patch("thibaud.utils.timezone.now", return_value=aware):
             self.assertEqual(
                 timezone.localdate(timezone=EAT), datetime.date(2014, 12, 31)
             )

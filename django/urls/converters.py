@@ -58,7 +58,7 @@ def register_converter(converter, type_name):
     REGISTERED_CONVERTERS[type_name] = converter()
     get_converters.cache_clear()
 
-    from django.urls.resolvers import _route_to_regex
+    from thibaud.urls.resolvers import _route_to_regex
 
     _route_to_regex.cache_clear()
 

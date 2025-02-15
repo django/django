@@ -7,15 +7,15 @@ import warnings
 from io import StringIO
 from unittest import mock
 
-from django.apps import apps
-from django.contrib.sites.models import Site
-from django.core import management
-from django.core.files.temp import NamedTemporaryFile
-from django.core.management import CommandError
-from django.core.management.commands.dumpdata import ProxyModelWarning
-from django.core.serializers.base import ProgressBar
-from django.db import IntegrityError, connection
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from thibaud.apps import apps
+from thibaud.contrib.sites.models import Site
+from thibaud.core import management
+from thibaud.core.files.temp import NamedTemporaryFile
+from thibaud.core.management import CommandError
+from thibaud.core.management.commands.dumpdata import ProxyModelWarning
+from thibaud.core.serializers.base import ProgressBar
+from thibaud.db import IntegrityError, connection
+from thibaud.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
     Article,
@@ -53,7 +53,7 @@ class TestCaseFixtureLoadingTests(TestCase):
         self.assertSequenceEqual(
             Article.objects.values_list("headline", flat=True),
             [
-                "Django conquers world!",
+                "Thibaud conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
             ],
@@ -254,7 +254,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self.assertSequenceEqual(
             Article.objects.values_list("headline", flat=True),
             [
-                "Django conquers world!",
+                "Thibaud conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
             ],
@@ -266,7 +266,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             Article.objects.values_list("headline", flat=True),
             [
                 "XML identified as leading cause of cancer",
-                "Django conquers world!",
+                "Thibaud conquers world!",
                 "Copyright is fine the way it is",
                 "Poker on TV is great!",
             ],
@@ -291,8 +291,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             [
                 '<Tag: <Article: Copyright is fine the way it is> tagged "copyright">',
                 '<Tag: <Article: Copyright is fine the way it is> tagged "legal">',
-                '<Tag: <Article: Django conquers world!> tagged "django">',
-                '<Tag: <Article: Django conquers world!> tagged "world domination">',
+                '<Tag: <Article: Thibaud conquers world!> tagged "thibaud">',
+                '<Tag: <Article: Thibaud conquers world!> tagged "world domination">',
             ],
             transform=repr,
             ordered=False,
@@ -303,7 +303,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self.assertQuerySetEqual(
             Visa.objects.all(),
             [
-                "<Visa: Django Reinhardt Can add user, Can change user, Can delete "
+                "<Visa: Thibaud Reinhardt Can add user, Can change user, Can delete "
                 "user>",
                 "<Visa: Stephane Grappelli Can add user>",
                 "<Visa: Prince >",
@@ -317,7 +317,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self.assertQuerySetEqual(
             Visa.objects.all(),
             [
-                "<Visa: Django Reinhardt Can add user, Can change user, Can delete "
+                "<Visa: Thibaud Reinhardt Can add user, Can change user, Can delete "
                 "user>",
                 "<Visa: Stephane Grappelli Can add user, Can delete user>",
                 '<Visa: Artist formerly known as "Prince" Can change user>',
@@ -331,7 +331,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             Article.objects.values_list("headline", flat=True),
             [
                 "XML identified as leading cause of cancer",
-                "Django conquers world!",
+                "Thibaud conquers world!",
                 "Copyright is fine the way it is",
                 "Poker on TV is great!",
             ],
@@ -349,7 +349,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ["fixtures.book"],
             '[{"pk": 1, "model": "fixtures.book", "fields": '
             '{"name": "Music for all ages", "authors": '
-            '[["Artist formerly known as \\"Prince\\""], ["Django Reinhardt"]]}}]',
+            '[["Artist formerly known as \\"Prince\\""], ["Thibaud Reinhardt"]]}}]',
             natural_foreign_keys=True,
         )
 
@@ -357,7 +357,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # with natural keys.
         self._dumpdata_assert(
             ["fixtures.person"],
-            '[{"fields": {"name": "Django Reinhardt"}, "model": "fixtures.person"}, '
+            '[{"fields": {"name": "Thibaud Reinhardt"}, "model": "fixtures.person"}, '
             '{"fields": {"name": "Stephane Grappelli"}, "model": "fixtures.person"}, '
             '{"fields": {"name": "Artist formerly known as \\"Prince\\""}, '
             '"model": "fixtures.person"}]',
@@ -376,7 +376,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '{"headline": "Copyright is fine the way it is", '
             '"pub_date": "2006-06-16T14:00:00"}}, '
             '{"pk": 4, "model": "fixtures.article", "fields": '
-            '{"headline": "Django conquers world!", '
+            '{"headline": "Thibaud conquers world!", '
             '"pub_date": "2006-06-16T15:00:00"}}, '
             '{"pk": 5, "model": "fixtures.article", "fields": '
             '{"headline": "XML identified as leading cause of cancer", '
@@ -388,19 +388,19 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '{"tagged_type": ["fixtures", "article"], "name": "legal", '
             '"tagged_id": 3}}, '
             '{"pk": 3, "model": "fixtures.tag", "fields": '
-            '{"tagged_type": ["fixtures", "article"], "name": "django", '
+            '{"tagged_type": ["fixtures", "article"], "name": "thibaud", '
             '"tagged_id": 4}}, '
             '{"pk": 4, "model": "fixtures.tag", "fields": '
             '{"tagged_type": ["fixtures", "article"], "name": "world domination", '
             '"tagged_id": 4}}, '
             '{"pk": 1, "model": "fixtures.person", '
-            '"fields": {"name": "Django Reinhardt"}}, '
+            '"fields": {"name": "Thibaud Reinhardt"}}, '
             '{"pk": 2, "model": "fixtures.person", '
             '"fields": {"name": "Stephane Grappelli"}}, '
             '{"pk": 3, "model": "fixtures.person", '
             '"fields": {"name": "Artist formerly known as \\"Prince\\""}}, '
             '{"pk": 1, "model": "fixtures.visa", '
-            '"fields": {"person": ["Django Reinhardt"], "permissions": '
+            '"fields": {"person": ["Thibaud Reinhardt"], "permissions": '
             '[["add_user", "auth", "user"], ["change_user", "auth", "user"], '
             '["delete_user", "auth", "user"]]}}, '
             '{"pk": 2, "model": "fixtures.visa", "fields": '
@@ -411,14 +411,14 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '[["change_user", "auth", "user"]]}}, '
             '{"pk": 1, "model": "fixtures.book", "fields": '
             '{"name": "Music for all ages", "authors": '
-            '[["Artist formerly known as \\"Prince\\""], ["Django Reinhardt"]]}}]',
+            '[["Artist formerly known as \\"Prince\\""], ["Thibaud Reinhardt"]]}}]',
             natural_foreign_keys=True,
         )
 
         # Dump the current contents of the database as an XML fixture
         self._dumpdata_assert(
             ["fixtures"],
-            '<?xml version="1.0" encoding="utf-8"?><django-objects version="1.0">'
+            '<?xml version="1.0" encoding="utf-8"?><thibaud-objects version="1.0">'
             '<object pk="1" model="fixtures.category">'
             '<field type="CharField" name="title">News Stories</field>'
             '<field type="TextField" name="description">Latest news stories</field>'
@@ -433,7 +433,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<field type="DateTimeField" name="pub_date">2006-06-16T14:00:00</field>'
             "</object>"
             '<object pk="4" model="fixtures.article">'
-            '<field type="CharField" name="headline">Django conquers world!</field>'
+            '<field type="CharField" name="headline">Thibaud conquers world!</field>'
             '<field type="DateTimeField" name="pub_date">2006-06-16T15:00:00</field>'
             "</object>"
             '<object pk="5" model="fixtures.article">'
@@ -455,7 +455,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             "</field>"
             '<field type="PositiveIntegerField" name="tagged_id">3</field></object>'
             '<object pk="3" model="fixtures.tag">'
-            '<field type="CharField" name="name">django</field>'
+            '<field type="CharField" name="name">thibaud</field>'
             '<field to="contenttypes.contenttype" name="tagged_type" '
             'rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural>'
             "</field>"
@@ -469,7 +469,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<field type="PositiveIntegerField" name="tagged_id">4</field>'
             "</object>"
             '<object pk="1" model="fixtures.person">'
-            '<field type="CharField" name="name">Django Reinhardt</field>'
+            '<field type="CharField" name="name">Thibaud Reinhardt</field>'
             "</object>"
             '<object pk="2" model="fixtures.person">'
             '<field type="CharField" name="name">Stephane Grappelli</field>'
@@ -480,7 +480,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             "</object>"
             '<object pk="1" model="fixtures.visa">'
             '<field to="fixtures.person" name="person" rel="ManyToOneRel">'
-            "<natural>Django Reinhardt</natural></field>"
+            "<natural>Thibaud Reinhardt</natural></field>"
             '<field to="auth.permission" name="permissions" rel="ManyToManyRel">'
             "<object><natural>add_user</natural><natural>auth</natural>"
             "<natural>user</natural></object><object><natural>change_user</natural>"
@@ -508,8 +508,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<field type="CharField" name="name">Music for all ages</field>'
             '<field to="fixtures.person" name="authors" rel="ManyToManyRel">'
             '<object><natural>Artist formerly known as "Prince"</natural></object>'
-            "<object><natural>Django Reinhardt</natural></object></field>"
-            "</object></django-objects>",
+            "<object><natural>Thibaud Reinhardt</natural></object></field>"
+            "</object></thibaud-objects>",
             format="xml",
             natural_foreign_keys=True,
         )
@@ -590,7 +590,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]'
             % spy1.pk,
         )
-        # Dump using Django's base manager. Should return all objects,
+        # Dump using Thibaud's base manager. Should return all objects,
         # even those normally filtered by the manager
         self._dumpdata_assert(
             ["fixtures.Spy"],
@@ -849,7 +849,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
         management.call_command("loaddata", "fixture4.json", verbosity=0)
-        self.assertEqual(Article.objects.get().headline, "Django pets kitten")
+        self.assertEqual(Article.objects.get().headline, "Thibaud pets kitten")
 
     def test_compressed_specified_loading(self):
         # Load fixture 5 (compressed), using format *and* compression specification
@@ -1032,7 +1032,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '{"pk": 2, "model": "fixtures.tag", "fields": '
             '{"tagged_type": ["fixtures", "article"], "name": "law", "tagged_id": 3}}, '
             '{"pk": 1, "model": "fixtures.person", "fields": '
-            '{"name": "Django Reinhardt"}}, '
+            '{"name": "Thibaud Reinhardt"}}, '
             '{"pk": 2, "model": "fixtures.person", "fields": '
             '{"name": "Stephane Grappelli"}}, '
             '{"pk": 3, "model": "fixtures.person", "fields": {"name": "Prince"}}]',
@@ -1042,7 +1042,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # Dump the current contents of the database as an XML fixture
         self._dumpdata_assert(
             ["fixtures"],
-            '<?xml version="1.0" encoding="utf-8"?><django-objects version="1.0">'
+            '<?xml version="1.0" encoding="utf-8"?><thibaud-objects version="1.0">'
             '<object pk="1" model="fixtures.category">'
             '<field type="CharField" name="title">News Stories</field>'
             '<field type="TextField" name="description">Latest news stories</field>'
@@ -1070,14 +1070,14 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<field type="PositiveIntegerField" name="tagged_id">3</field>'
             "</object>"
             '<object pk="1" model="fixtures.person">'
-            '<field type="CharField" name="name">Django Reinhardt</field>'
+            '<field type="CharField" name="name">Thibaud Reinhardt</field>'
             "</object>"
             '<object pk="2" model="fixtures.person">'
             '<field type="CharField" name="name">Stephane Grappelli</field>'
             "</object>"
             '<object pk="3" model="fixtures.person">'
             '<field type="CharField" name="name">Prince</field>'
-            "</object></django-objects>",
+            "</object></thibaud-objects>",
             format="xml",
             natural_foreign_keys=True,
         )
@@ -1127,7 +1127,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         fixture_xml = os.path.join(tests_dir, "fixtures", "fixture3.xml")
 
         with mock.patch(
-            "django.core.management.commands.loaddata.sys.stdin", open(fixture_json)
+            "thibaud.core.management.commands.loaddata.sys.stdin", open(fixture_json)
         ):
             management.call_command("loaddata", "--format=json", "-", verbosity=0)
             self.assertSequenceEqual(
@@ -1136,7 +1136,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             )
 
         with mock.patch(
-            "django.core.management.commands.loaddata.sys.stdin", open(fixture_xml)
+            "thibaud.core.management.commands.loaddata.sys.stdin", open(fixture_xml)
         ):
             management.call_command("loaddata", "--format=xml", "-", verbosity=0)
             self.assertSequenceEqual(
@@ -1163,8 +1163,8 @@ class NonexistentFixtureTests(TestCase):
                 "loaddata", "this_fixture_doesnt_exist", stdout=stdout_output
             )
 
-    @mock.patch("django.db.connection.enable_constraint_checking")
-    @mock.patch("django.db.connection.disable_constraint_checking")
+    @mock.patch("thibaud.db.connection.enable_constraint_checking")
+    @mock.patch("thibaud.db.connection.disable_constraint_checking")
     def test_nonexistent_fixture_no_constraint_checking(
         self, disable_constraint_checking, enable_constraint_checking
     ):
@@ -1185,7 +1185,7 @@ class NonexistentFixtureTests(TestCase):
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
     available_apps = [
         "fixtures",
-        "django.contrib.sites",
+        "thibaud.contrib.sites",
     ]
 
     @skipUnlessDBFeature("supports_forward_references")
@@ -1227,7 +1227,7 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
         self.assertSequenceEqual(
             Article.objects.values_list("headline", flat=True),
             [
-                "Django pets kitten",
+                "Thibaud pets kitten",
                 "Time to reform copyright",
                 "Poker has no place on ESPN",
             ],

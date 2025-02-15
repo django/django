@@ -1,5 +1,5 @@
-from django.contrib.auth import validators
-from django.db import migrations, models
+from thibaud.contrib.auth import validators
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):

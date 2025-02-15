@@ -13,15 +13,15 @@ Reusability matters
 ===================
 
 It's a lot of work to design, build, test and maintain a web application. Many
-Python and Django projects share common problems. Wouldn't it be great if we
+Python and Thibaud projects share common problems. Wouldn't it be great if we
 could save some of this repeated work?
 
 Reusability is the way of life in Python. `The Python Package Index (PyPI)
 <https://pypi.org/>`_ has a vast range of packages you can use in your own
-Python programs. Check out `Django Packages <https://djangopackages.org>`_ for
-existing reusable apps you could incorporate in your project. Django itself is
+Python programs. Check out `Thibaud Packages <https://thibaudpackages.org>`_ for
+existing reusable apps you could incorporate in your project. Thibaud itself is
 also a normal Python package. This means that you can take existing Python
-packages or Django apps and compose them into your own web project. You only
+packages or Thibaud apps and compose them into your own web project. You only
 need to write the parts that make your project unique.
 
 Let's say you were starting a new project that needed a polls app like the one
@@ -41,8 +41,8 @@ projects and ready to publish for others to install and use.
     bar``. For a directory (like ``polls``) to form a package, it must contain
     a special file ``__init__.py``, even if this file is empty.
 
-    A Django *application* is a Python package that is specifically intended
-    for use in a Django project. An application may use common Django
+    A Thibaud *application* is a Python package that is specifically intended
+    for use in a Thibaud project. An application may use common Thibaud
     conventions, such as having ``models``, ``tests``, ``urls``, and ``views``
     submodules.
 
@@ -57,7 +57,7 @@ After the previous tutorials, our project should look like this:
 
 .. code-block:: text
 
-    djangotutorial/
+    thibaudtutorial/
         manage.py
         mysite/
             __init__.py
@@ -90,14 +90,14 @@ After the previous tutorials, our project should look like this:
             admin/
                 base_site.html
 
-You created ``djangotutorial/templates`` in :doc:`Tutorial 7
+You created ``thibaudtutorial/templates`` in :doc:`Tutorial 7
 </intro/tutorial07>`, and ``polls/templates`` in
 :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps it is clearer why we chose
 to have separate template directories for the project and application:
 everything that is part of the polls application is in ``polls``. It makes the
 application self-contained and easier to drop into a new project.
 
-The ``polls`` directory could now be copied into a new Django project and
+The ``polls`` directory could now be copied into a new Thibaud project and
 immediately reused. It's not quite ready to be published though. For that, we
 need to package the app to make it easy for others to install.
 
@@ -111,62 +111,62 @@ this tutorial, we're going to use :pypi:`setuptools` to build our package. It's
 the recommended packaging tool (merged with the ``distribute`` fork). We'll
 also be using :pypi:`pip` to install and uninstall it. You should install these
 two packages now. If you need help, you can refer to :ref:`how to install
-Django with pip<installing-official-release>`. You can install ``setuptools``
+Thibaud with pip<installing-official-release>`. You can install ``setuptools``
 the same way.
 
 Packaging your app
 ==================
 
 Python *packaging* refers to preparing your app in a specific format that can
-be easily installed and used. Django itself is packaged very much like
+be easily installed and used. Thibaud itself is packaged very much like
 this. For a small app like polls, this process isn't too difficult.
 
-#. First, create a parent directory for the package, outside of your Django
-   project. Call this directory ``django-polls``.
+#. First, create a parent directory for the package, outside of your Thibaud
+   project. Call this directory ``thibaud-polls``.
 
    .. admonition::  Choosing a name for your app
 
        When choosing a name for your package, check PyPI to avoid naming
-       conflicts with existing packages. We recommend using a ``django-``
+       conflicts with existing packages. We recommend using a ``thibaud-``
        prefix for package names, to identify your package as specific to
-       Django, and a corresponding ``django_`` prefix for your module name. For
-       example, the ``django-ratelimit`` package contains the
-       ``django_ratelimit`` module.
+       Thibaud, and a corresponding ``thibaud_`` prefix for your module name. For
+       example, the ``thibaud-ratelimit`` package contains the
+       ``thibaud_ratelimit`` module.
 
        Application labels (that is, the final part of the dotted path to
        application packages) *must* be unique in :setting:`INSTALLED_APPS`.
-       Avoid using the same label as any of the Django :doc:`contrib packages
+       Avoid using the same label as any of the Thibaud :doc:`contrib packages
        </ref/contrib/index>`, for example ``auth``, ``admin``, or
        ``messages``.
 
-#. Move the ``polls`` directory into ``django-polls`` directory, and rename it
-   to ``django_polls``.
+#. Move the ``polls`` directory into ``thibaud-polls`` directory, and rename it
+   to ``thibaud_polls``.
 
-#. Edit ``django_polls/apps.py`` so that :attr:`~.AppConfig.name` refers to the
+#. Edit ``thibaud_polls/apps.py`` so that :attr:`~.AppConfig.name` refers to the
    new module name and add :attr:`~.AppConfig.label` to give a short name for
    the app:
 
    .. code-block:: python
-       :caption: ``django-polls/django_polls/apps.py``
+       :caption: ``thibaud-polls/thibaud_polls/apps.py``
 
-       from django.apps import AppConfig
+       from thibaud.apps import AppConfig
 
 
        class PollsConfig(AppConfig):
-           default_auto_field = "django.db.models.BigAutoField"
-           name = "django_polls"
+           default_auto_field = "thibaud.db.models.BigAutoField"
+           name = "thibaud_polls"
            label = "polls"
 
-#. Create a file ``django-polls/README.rst`` with the following contents:
+#. Create a file ``thibaud-polls/README.rst`` with the following contents:
 
    .. code-block:: rst
-       :caption: ``django-polls/README.rst``
+       :caption: ``thibaud-polls/README.rst``
 
        ============
-       django-polls
+       thibaud-polls
        ============
 
-       django-polls is a Django app to conduct web-based polls. For each
+       thibaud-polls is a Thibaud app to conduct web-based polls. For each
        question, visitors can choose between a fixed number of answers.
 
        Detailed documentation is in the "docs" directory.
@@ -178,12 +178,12 @@ this. For a small app like polls, this process isn't too difficult.
 
            INSTALLED_APPS = [
                ...,
-               "django_polls",
+               "thibaud_polls",
            ]
 
        2. Include the polls URLconf in your project urls.py like this::
 
-           path("polls/", include("django_polls.urls")),
+           path("polls/", include("thibaud_polls.urls")),
 
        3. Run ``python manage.py migrate`` to create the models.
 
@@ -191,9 +191,9 @@ this. For a small app like polls, this process isn't too difficult.
 
        5. Visit the ``/polls/`` URL to participate in the poll.
 
-#. Create a ``django-polls/LICENSE`` file. Choosing a license is beyond the
+#. Create a ``thibaud-polls/LICENSE`` file. Choosing a license is beyond the
    scope of this tutorial, but suffice it to say that code released publicly
-   without a license is *useless*. Django and many Django-compatible apps are
+   without a license is *useless*. Thibaud and many Thibaud-compatible apps are
    distributed under the BSD license; however, you're free to pick your own
    license. Just be aware that your licensing choice will affect who is able
    to use your code.
@@ -202,23 +202,23 @@ this. For a small app like polls, this process isn't too difficult.
    install the app. A full explanation of this file is beyond the scope of this
    tutorial, but the `Python Packaging User Guide
    <https://packaging.python.org/guides/writing-pyproject-toml/>`_ has a good
-   explanation. Create the ``django-polls/pyproject.toml`` file with the
+   explanation. Create the ``thibaud-polls/pyproject.toml`` file with the
    following contents:
 
    .. code-block:: toml
-       :caption: ``django-polls/pyproject.toml``
+       :caption: ``thibaud-polls/pyproject.toml``
 
        [build-system]
        requires = ["setuptools>=61.0"]
        build-backend = "setuptools.build_meta"
 
        [project]
-       name = "django-polls"
+       name = "thibaud-polls"
        version = "0.1"
        dependencies = [
-           "django>=X.Y",  # Replace "X.Y" as appropriate
+           "thibaud>=X.Y",  # Replace "X.Y" as appropriate
        ]
-       description = "A Django app to conduct web-based polls."
+       description = "A Thibaud app to conduct web-based polls."
        readme = "README.rst"
        requires-python = ">= 3.12"
        authors = [
@@ -226,8 +226,8 @@ this. For a small app like polls, this process isn't too difficult.
        ]
        classifiers = [
            "Environment :: Web Environment",
-           "Framework :: Django",
-           "Framework :: Django :: X.Y",  # Replace "X.Y" as appropriate
+           "Framework :: Thibaud",
+           "Framework :: Thibaud :: X.Y",  # Replace "X.Y" as appropriate
            "Intended Audience :: Developers",
            "License :: OSI Approved :: BSD License",
            "Operating System :: OS Independent",
@@ -246,27 +246,27 @@ this. For a small app like polls, this process isn't too difficult.
 #. Many common files and Python modules and packages are included in the
    package by default. To include additional files, we'll need to create a
    ``MANIFEST.in`` file. To include the templates and static files, create a
-   file ``django-polls/MANIFEST.in`` with the following contents:
+   file ``thibaud-polls/MANIFEST.in`` with the following contents:
 
    .. code-block:: text
-      :caption: ``django-polls/MANIFEST.in``
+      :caption: ``thibaud-polls/MANIFEST.in``
 
-      recursive-include django_polls/static *
-      recursive-include django_polls/templates *
+      recursive-include thibaud_polls/static *
+      recursive-include thibaud_polls/templates *
 
 #. It's optional, but recommended, to include detailed documentation with your
-   app. Create an empty directory ``django-polls/docs`` for future
+   app. Create an empty directory ``thibaud-polls/docs`` for future
    documentation.
 
    Note that the ``docs`` directory won't be included in your package unless
-   you add some files to it. Many Django apps also provide their documentation
+   you add some files to it. Many Thibaud apps also provide their documentation
    online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
 #. Check that the :pypi:`build` package is installed (``python -m pip install
    build``) and try building your package by running ``python -m build`` inside
-   ``django-polls``. This creates a directory called ``dist`` and builds your
-   new package into source and binary formats, ``django-polls-0.1.tar.gz`` and
-   ``django_polls-0.1-py3-none-any.whl``.
+   ``thibaud-polls``. This creates a directory called ``dist`` and builds your
+   new package into source and binary formats, ``thibaud-polls-0.1.tar.gz`` and
+   ``thibaud_polls-0.1-py3-none-any.whl``.
 
 For more information on packaging, see Python's `Tutorial on Packaging and
 Distributing Projects
@@ -276,11 +276,11 @@ Using your own package
 ======================
 
 Since we moved the ``polls`` directory out of the project, it's no longer
-working. We'll now fix this by installing our new ``django-polls`` package.
+working. We'll now fix this by installing our new ``thibaud-polls`` package.
 
 .. admonition:: Installing as a user library
 
-   The following steps install ``django-polls`` as a user library. Per-user
+   The following steps install ``thibaud-polls`` as a user library. Per-user
    installs have a lot of advantages over installing the package system-wide,
    such as being usable on systems where you don't have administrator access
    as well as preventing the package from affecting system services and other
@@ -295,19 +295,19 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
    .. code-block:: shell
 
-      python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
+      python -m pip install --user thibaud-polls/dist/thibaud-polls-0.1.tar.gz
 
 #. Update ``mysite/settings.py`` to point to the new module name::
 
     INSTALLED_APPS = [
-        "django_polls.apps.PollsConfig",
+        "thibaud_polls.apps.PollsConfig",
         ...,
     ]
 
 #. Update ``mysite/urls.py`` to point to the new module name::
 
     urlpatterns = [
-        path("polls/", include("django_polls.urls")),
+        path("polls/", include("thibaud_polls.urls")),
         ...,
     ]
 
@@ -316,7 +316,7 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 Publishing your app
 ===================
 
-Now that we've packaged and tested ``django-polls``, it's ready to share with
+Now that we've packaged and tested ``thibaud-polls``, it's ready to share with
 the world! If this wasn't just an example, you could now:
 
 * Email the package to a friend.
@@ -331,7 +331,7 @@ the world! If this wasn't just an example, you could now:
 Installing Python packages with a virtual environment
 =====================================================
 
-Earlier, we installed ``django-polls`` as a user library. This has some
+Earlier, we installed ``thibaud-polls`` as a user library. This has some
 disadvantages:
 
 * Modifying the user libraries can affect other Python software on your system.
@@ -339,7 +339,7 @@ disadvantages:
 * You won't be able to run multiple versions of this package (or others with
   the same name).
 
-Typically, these situations only arise once you're maintaining several Django
+Typically, these situations only arise once you're maintaining several Thibaud
 projects. When they do, the best solution is to use :doc:`venv
 <python:tutorial/venv>`. This tool allows you to maintain multiple isolated
 Python environments, each with its own copy of the libraries and package

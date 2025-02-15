@@ -22,7 +22,7 @@ class BaseDatabaseIntrospection:
     def get_field_type(self, data_type, description):
         """
         Hook for a database backend to use the cursor description to
-        match a Django field type to a database column.
+        match a Thibaud field type to a database column.
 
         For Oracle, the column data_type on its own is insufficient to
         distinguish between a FloatField and IntegerField, for example.
@@ -78,8 +78,8 @@ class BaseDatabaseIntrospection:
         )
 
     def get_migratable_models(self):
-        from django.apps import apps
-        from django.db import router
+        from thibaud.apps import apps
+        from thibaud.db import router
 
         return (
             model
@@ -88,9 +88,9 @@ class BaseDatabaseIntrospection:
             if model._meta.can_migrate(self.connection)
         )
 
-    def django_table_names(self, only_existing=False, include_views=True):
+    def thibaud_table_names(self, only_existing=False, include_views=True):
         """
-        Return a list of all table names that have associated Django models and
+        Return a list of all table names that have associated Thibaud models and
         are in INSTALLED_APPS.
 
         If only_existing is True, include only the tables in the database.

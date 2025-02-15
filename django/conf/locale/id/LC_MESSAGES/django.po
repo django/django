@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Adiyat Mubarak <adiyatmubarak@gmail.com>, 2017
@@ -14,12 +14,12 @@
 # Sutrisno Efendi <kangfend@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2013-04-25 06:49+0000\n"
 "Last-Translator: Bayu Satiyo <itsyuukunz@gmail.com>, 2024\n"
-"Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
+"Language-Team: Indonesian (http://app.transifex.com/thibaud/thibaud/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1301,26 +1301,26 @@ msgstr "Selamat! Instalasi berjalan lancar!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Lihat <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">catatan rilis</a> untuk Django %(version)s"
+"Lihat <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">catatan rilis</a> untuk Thibaud %(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Anda sedang melihat halaman ini karena <a href=\"https://docs.djangoproject."
+"Anda sedang melihat halaman ini karena <a href=\"https://docs.thibaudproject."
 "com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> berada di berkas pengaturan Anda dan Anda "
 "belum mengonfigurasi URL apa pun."
 
-msgid "Django Documentation"
-msgstr "Dokumentasi Django"
+msgid "Thibaud Documentation"
+msgstr "Dokumentasi Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Topik, referensi, &amp; cara pemakaian"
@@ -1328,11 +1328,11 @@ msgstr "Topik, referensi, &amp; cara pemakaian"
 msgid "Tutorial: A Polling App"
 msgstr "Tutorial: Sebuah Aplikasi Jajak Pendapat"
 
-msgid "Get started with Django"
-msgstr "Memulai dengan Django"
+msgid "Get started with Thibaud"
+msgstr "Memulai dengan Thibaud"
 
-msgid "Django Community"
-msgstr "Komunitas Django"
+msgid "Thibaud Community"
+msgstr "Komunitas Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Terhubung, minta bantuan, atau berkontribusi"

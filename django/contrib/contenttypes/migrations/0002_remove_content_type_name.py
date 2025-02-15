@@ -1,4 +1,4 @@
-from django.db import migrations, models
+from thibaud.db import migrations, models
 
 
 def add_legacy_name(apps, schema_editor):

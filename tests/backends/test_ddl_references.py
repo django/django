@@ -1,5 +1,5 @@
-from django.db import connection
-from django.db.backends.ddl_references import (
+from thibaud.db import connection
+from thibaud.db.backends.ddl_references import (
     Columns,
     Expressions,
     ForeignKeyName,
@@ -7,11 +7,11 @@ from django.db.backends.ddl_references import (
     Statement,
     Table,
 )
-from django.db.models import ExpressionList, F
-from django.db.models.functions import Upper
-from django.db.models.indexes import IndexExpression
-from django.db.models.sql import Query
-from django.test import SimpleTestCase, TransactionTestCase
+from thibaud.db.models import ExpressionList, F
+from thibaud.db.models.functions import Upper
+from thibaud.db.models.indexes import IndexExpression
+from thibaud.db.models.sql import Query
+from thibaud.test import SimpleTestCase, TransactionTestCase
 
 from .models import Person
 

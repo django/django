@@ -1,15 +1,15 @@
 from inspect import getattr_static, unwrap
 
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http import Http404, HttpResponse
-from django.template import TemplateDoesNotExist, loader
-from django.utils import feedgenerator
-from django.utils.encoding import iri_to_uri
-from django.utils.html import escape
-from django.utils.http import http_date
-from django.utils.timezone import get_default_timezone, is_naive, make_aware
-from django.utils.translation import get_language
+from thibaud.contrib.sites.shortcuts import get_current_site
+from thibaud.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from thibaud.http import Http404, HttpResponse
+from thibaud.template import TemplateDoesNotExist, loader
+from thibaud.utils import feedgenerator
+from thibaud.utils.encoding import iri_to_uri
+from thibaud.utils.html import escape
+from thibaud.utils.http import http_date
+from thibaud.utils.timezone import get_default_timezone, is_naive, make_aware
+from thibaud.utils.translation import get_language
 
 
 def add_domain(domain, url, secure=False):

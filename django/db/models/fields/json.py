@@ -1,17 +1,17 @@
 import json
 
-from django import forms
-from django.core import checks, exceptions
-from django.db import NotSupportedError, connections, router
-from django.db.models import expressions, lookups
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import TextField
-from django.db.models.lookups import (
+from thibaud import forms
+from thibaud.core import checks, exceptions
+from thibaud.db import NotSupportedError, connections, router
+from thibaud.db.models import expressions, lookups
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.fields import TextField
+from thibaud.db.models.lookups import (
     FieldGetDbPrepValueMixin,
     PostgresOperatorLookup,
     Transform,
 )
-from django.utils.translation import gettext_lazy as _
+from thibaud.utils.translation import gettext_lazy as _
 
 from . import Field
 from .mixins import CheckFieldDefaultMixin

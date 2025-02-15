@@ -8,16 +8,16 @@ import sys
 from pathlib import Path
 from unittest import mock
 
-from django.apps import apps
-from django.core.checks import Error, Tags, register
-from django.core.checks.registry import registry
-from django.core.management import CommandError, call_command
-from django.core.management.base import SystemCheckError
-from django.core.management.commands.makemigrations import (
+from thibaud.apps import apps
+from thibaud.core.checks import Error, Tags, register
+from thibaud.core.checks.registry import registry
+from thibaud.core.management import CommandError, call_command
+from thibaud.core.management.base import SystemCheckError
+from thibaud.core.management.commands.makemigrations import (
     Command as MakeMigrationsCommand,
 )
-from django.core.management.commands.migrate import Command as MigrateCommand
-from django.db import (
+from thibaud.core.management.commands.migrate import Command as MigrateCommand
+from thibaud.db import (
     ConnectionHandler,
     DatabaseError,
     OperationalError,
@@ -25,17 +25,17 @@ from django.db import (
     connections,
     models,
 )
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.db.backends.utils import truncate_name
-from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.migrations.exceptions import InconsistentMigrationHistory
-from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.recorder import MigrationRecorder
-from django.db.migrations.writer import MigrationWriter
-from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import captured_stdout, extend_sys_path, isolate_apps
-from django.utils import timezone
-from django.utils.version import get_docs_version
+from thibaud.db.backends.base.schema import BaseDatabaseSchemaEditor
+from thibaud.db.backends.utils import truncate_name
+from thibaud.db.migrations.autodetector import MigrationAutodetector
+from thibaud.db.migrations.exceptions import InconsistentMigrationHistory
+from thibaud.db.migrations.loader import MigrationLoader
+from thibaud.db.migrations.recorder import MigrationRecorder
+from thibaud.db.migrations.writer import MigrationWriter
+from thibaud.test import TestCase, override_settings, skipUnlessDBFeature
+from thibaud.test.utils import captured_stdout, extend_sys_path, isolate_apps
+from thibaud.utils import timezone
+from thibaud.utils.version import get_docs_version
 
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
@@ -101,11 +101,11 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
-    @mock.patch("django.core.management.base.BaseCommand.check")
+    @mock.patch("thibaud.core.management.base.BaseCommand.check")
     @override_settings(
         INSTALLED_APPS=[
-            "django.contrib.auth",
-            "django.contrib.contenttypes",
+            "thibaud.contrib.auth",
+            "thibaud.contrib.contenttypes",
             "migrations.migrations_test_apps.migrated_app",
         ]
     )
@@ -239,7 +239,7 @@ class MigrateTests(MigrationTestBase):
             # Run initial migration with an explicit --fake-initial
             out = io.StringIO()
             with mock.patch(
-                "django.core.management.color.supports_color", lambda *args: False
+                "thibaud.core.management.color.supports_color", lambda *args: False
             ):
                 call_command(
                     "migrate",
@@ -350,7 +350,7 @@ class MigrateTests(MigrationTestBase):
             call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
             out = io.StringIO()
             with mock.patch(
-                "django.core.management.color.supports_color", lambda *args: False
+                "thibaud.core.management.color.supports_color", lambda *args: False
             ):
                 call_command(
                     "migrate",
@@ -450,7 +450,7 @@ class MigrateTests(MigrationTestBase):
         """
         out = io.StringIO()
         with mock.patch(
-            "django.core.management.color.supports_color", lambda *args: True
+            "thibaud.core.management.color.supports_color", lambda *args: True
         ):
             call_command(
                 "showmigrations", format="list", stdout=out, verbosity=0, no_color=False
@@ -1139,19 +1139,19 @@ class MigrateTests(MigrationTestBase):
     def test_sqlmigrate_transaction_keywords_not_colorized(self):
         out = io.StringIO()
         with mock.patch(
-            "django.core.management.color.supports_color", lambda *args: True
+            "thibaud.core.management.color.supports_color", lambda *args: True
         ):
             call_command("sqlmigrate", "migrations", "0001", stdout=out, no_color=False)
         self.assertNotIn("\x1b", out.getvalue())
 
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_operations"},
-        INSTALLED_APPS=["django.contrib.auth"],
+        INSTALLED_APPS=["thibaud.contrib.auth"],
     )
     def test_sqlmigrate_system_checks_colorized(self):
         with (
             mock.patch(
-                "django.core.management.color.supports_color", lambda *args: True
+                "thibaud.core.management.color.supports_color", lambda *args: True
             ),
             self.assertRaisesMessage(SystemCheckError, "\x1b"),
         ):
@@ -1405,7 +1405,7 @@ class MigrateTests(MigrationTestBase):
         """
         With prune=True, references to migration files deleted from the
         migrations module (such as after being squashed) are removed from the
-        django_migrations table.
+        thibaud_migrations table.
         """
         recorder = MigrationRecorder(connection)
         recorder.record_applied("migrations", "0001_initial")
@@ -1603,7 +1603,7 @@ class MakeMigrationsTests(MigrationTestBase):
     def test_makemigrations_empty_connections(self):
         empty_connections = ConnectionHandler({"default": {}})
         with mock.patch(
-            "django.core.management.commands.makemigrations.connections",
+            "thibaud.core.management.commands.makemigrations.connections",
             new=empty_connections,
         ):
             # with no apps
@@ -1752,7 +1752,7 @@ class MakeMigrationsTests(MigrationTestBase):
         app.
         """
         msg = (
-            "Django can't create migrations for app 'migrations' because migrations "
+            "Thibaud can't create migrations for app 'migrations' because migrations "
             "have been disabled via the MIGRATION_MODULES setting."
         )
         with self.assertRaisesMessage(ValueError, msg):
@@ -1907,7 +1907,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIn(target_str, content)
         self.assertIn("Created new merge migration %s" % merge_file, out.getvalue())
 
-    @mock.patch("django.db.migrations.utils.datetime")
+    @mock.patch("thibaud.db.migrations.utils.datetime")
     def test_makemigrations_auto_merge_name(self, mock_datetime):
         mock_datetime.datetime.now.return_value = datetime.datetime(2016, 1, 2, 3, 4)
         with mock.patch("builtins.input", mock.Mock(return_value="y")):
@@ -1987,7 +1987,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIn(input_msg, output)
             self.assertIn("Please enter the default value as valid Python.", output)
             self.assertIn(
-                "The datetime and django.utils.timezone modules are "
+                "The datetime and thibaud.utils.timezone modules are "
                 "available, so it is possible to provide e.g. timezone.now as "
                 "a value",
                 output,
@@ -2065,7 +2065,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIn(input_msg, output)
             self.assertIn("Please enter the default value as valid Python.", output)
             self.assertIn(
-                "The datetime and django.utils.timezone modules are "
+                "The datetime and thibaud.utils.timezone modules are "
                 "available, so it is possible to provide e.g. timezone.now as "
                 "a value",
                 output,
@@ -2454,7 +2454,7 @@ class MakeMigrationsTests(MigrationTestBase):
         with mock.patch("builtins.input", mock.Mock(return_value="N")):
             out = io.StringIO()
             with mock.patch(
-                "django.core.management.color.supports_color", lambda *args: False
+                "thibaud.core.management.color.supports_color", lambda *args: False
             ):
                 call_command(
                     "makemigrations",
@@ -2586,7 +2586,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations prints the absolute path if os.path.relpath() raises a
         ValueError when it's impossible to obtain a relative path, e.g. on
-        Windows if Django is installed on a different drive than where the
+        Windows if Thibaud is installed on a different drive than where the
         migration files are created.
         """
         out = io.StringIO()
@@ -2616,7 +2616,7 @@ class MakeMigrationsTests(MigrationTestBase):
             "for database connection 'default': could not connect to server"
         )
         with mock.patch(
-            "django.db.migrations.loader.MigrationLoader.check_consistent_history",
+            "thibaud.db.migrations.loader.MigrationLoader.check_consistent_history",
             side_effect=OperationalError("could not connect to server"),
         ):
             with self.temporary_migration_module():
@@ -2626,7 +2626,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
     @mock.patch("builtins.input", return_value="1")
     @mock.patch(
-        "django.db.migrations.questioner.sys.stdin",
+        "thibaud.db.migrations.questioner.sys.stdin",
         mock.MagicMock(encoding=sys.getdefaultencoding()),
     )
     def test_makemigrations_auto_now_add_interactive(self, *args):
@@ -2722,7 +2722,7 @@ class MakeMigrationsTests(MigrationTestBase):
             f"Please choose how to proceed:\n"
             f" 1) Continue making this migration as the first step in writing "
             f"a manual migration to generate unique values described here: "
-            f"https://docs.djangoproject.com/en/{version}/howto/"
+            f"https://docs.thibaudproject.com/en/{version}/howto/"
             f"writing-migrations/#migrations-that-add-unique-fields.\n"
             f" 2) Quit and edit field options in models.py.\n"
         )
@@ -3328,13 +3328,13 @@ class AppLabelErrorTests(TestCase):
     """
     This class inherits TestCase because MigrationTestBase uses
     `available_apps = ['migrations']` which means that it's the only installed
-    app. 'django.contrib.auth' must be in INSTALLED_APPS for some of these
+    app. 'thibaud.contrib.auth' must be in INSTALLED_APPS for some of these
     tests.
     """
 
     nonexistent_app_error = "No installed app with label 'nonexistent_app'."
     did_you_mean_auth_error = (
-        "No installed app with label 'django.contrib.auth'. Did you mean 'auth'?"
+        "No installed app with label 'thibaud.contrib.auth'. Did you mean 'auth'?"
     )
 
     def test_makemigrations_nonexistent_app_label(self):
@@ -3346,7 +3346,7 @@ class AppLabelErrorTests(TestCase):
     def test_makemigrations_app_name_specified_as_label(self):
         err = io.StringIO()
         with self.assertRaises(SystemExit):
-            call_command("makemigrations", "django.contrib.auth", stderr=err)
+            call_command("makemigrations", "thibaud.contrib.auth", stderr=err)
         self.assertIn(self.did_you_mean_auth_error, err.getvalue())
 
     def test_migrate_nonexistent_app_label(self):
@@ -3355,7 +3355,7 @@ class AppLabelErrorTests(TestCase):
 
     def test_migrate_app_name_specified_as_label(self):
         with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
-            call_command("migrate", "django.contrib.auth")
+            call_command("migrate", "thibaud.contrib.auth")
 
     def test_showmigrations_nonexistent_app_label(self):
         err = io.StringIO()
@@ -3366,7 +3366,7 @@ class AppLabelErrorTests(TestCase):
     def test_showmigrations_app_name_specified_as_label(self):
         err = io.StringIO()
         with self.assertRaises(SystemExit):
-            call_command("showmigrations", "django.contrib.auth", stderr=err)
+            call_command("showmigrations", "thibaud.contrib.auth", stderr=err)
         self.assertIn(self.did_you_mean_auth_error, err.getvalue())
 
     def test_sqlmigrate_nonexistent_app_label(self):
@@ -3375,7 +3375,7 @@ class AppLabelErrorTests(TestCase):
 
     def test_sqlmigrate_app_name_specified_as_label(self):
         with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
-            call_command("sqlmigrate", "django.contrib.auth", "0002")
+            call_command("sqlmigrate", "thibaud.contrib.auth", "0002")
 
     def test_squashmigrations_nonexistent_app_label(self):
         with self.assertRaisesMessage(CommandError, self.nonexistent_app_error):
@@ -3383,7 +3383,7 @@ class AppLabelErrorTests(TestCase):
 
     def test_squashmigrations_app_name_specified_as_label(self):
         with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
-            call_command("squashmigrations", "django.contrib.auth", "0002")
+            call_command("squashmigrations", "thibaud.contrib.auth", "0002")
 
     def test_optimizemigration_nonexistent_app_label(self):
         with self.assertRaisesMessage(CommandError, self.nonexistent_app_error):
@@ -3391,7 +3391,7 @@ class AppLabelErrorTests(TestCase):
 
     def test_optimizemigration_app_name_specified_as_label(self):
         with self.assertRaisesMessage(CommandError, self.did_you_mean_auth_error):
-            call_command("optimizemigration", "django.contrib.auth", "0002")
+            call_command("optimizemigration", "thibaud.contrib.auth", "0002")
 
 
 class OptimizeMigrationTests(MigrationTestBase):
@@ -3509,7 +3509,7 @@ class OptimizeMigrationTests(MigrationTestBase):
             msg = (
                 f"Migration will require manual porting but is already a squashed "
                 f"migration.\nTransition to a normal migration first: "
-                f"https://docs.djangoproject.com/en/{version}/topics/migrations/"
+                f"https://docs.thibaudproject.com/en/{version}/topics/migrations/"
                 f"#squashing-migrations"
             )
             with self.assertRaisesMessage(CommandError, msg):

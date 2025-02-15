@@ -7,7 +7,7 @@ Time zones
 Overview
 ========
 
-When support for time zones is enabled, Django stores datetime information in
+When support for time zones is enabled, Thibaud stores datetime information in
 UTC in the database, uses time-zone-aware datetime objects internally, and
 converts them to the end user's time zone in forms. Templates will use the
 :ref:`default time zone <default-current-time-zone>`, but this can be updated
@@ -49,11 +49,11 @@ can be used to store time zone information, represented as an instance of a
 subclass of :class:`datetime.tzinfo`. When this attribute is set and describes
 an offset, a datetime object is **aware**. Otherwise, it's **naive**.
 
-You can use :func:`~django.utils.timezone.is_aware` and
-:func:`~django.utils.timezone.is_naive` to determine whether datetimes are
+You can use :func:`~thibaud.utils.timezone.is_aware` and
+:func:`~thibaud.utils.timezone.is_naive` to determine whether datetimes are
 aware or naive.
 
-When time zone support is disabled, Django uses naive datetime objects in local
+When time zone support is disabled, Thibaud uses naive datetime objects in local
 time. This is sufficient for many use cases. In this mode, to obtain the
 current time, you would write::
 
@@ -61,11 +61,11 @@ current time, you would write::
 
     now = datetime.datetime.now()
 
-When time zone support is enabled (:setting:`USE_TZ=True <USE_TZ>`), Django uses
+When time zone support is enabled (:setting:`USE_TZ=True <USE_TZ>`), Thibaud uses
 time-zone-aware datetime objects. If your code creates datetime objects, they
 should be aware too. In this mode, the example above becomes::
 
-    from django.utils import timezone
+    from thibaud.utils import timezone
 
     now = timezone.now()
 
@@ -84,7 +84,7 @@ should be aware too. In this mode, the example above becomes::
     However, as PostgreSQL's docs put it, this type "exhibits properties which
     lead to questionable usefulness".
 
-    Django only supports naive time objects and will raise an exception if you
+    Thibaud only supports naive time objects and will raise an exception if you
     attempt to save an aware time object, as a timezone for a time with no
     associated date does not make sense.
 
@@ -93,7 +93,7 @@ should be aware too. In this mode, the example above becomes::
 Interpretation of naive datetime objects
 ----------------------------------------
 
-When :setting:`USE_TZ` is ``True``, Django still accepts naive datetime
+When :setting:`USE_TZ` is ``True``, Thibaud still accepts naive datetime
 objects, in order to preserve backwards-compatibility. When the database layer
 receives one, it attempts to make it aware by interpreting it in the
 :ref:`default time zone <default-current-time-zone>` and raises a warning.
@@ -104,11 +104,11 @@ zone support is enabled. (See the :mod:`Using ZoneInfo section of the zoneinfo
 docs <zoneinfo>` for examples using the ``fold`` attribute to specify the
 offset that should apply to a datetime during a DST transition.)
 
-In practice, this is rarely an issue. Django gives you aware datetime objects
+In practice, this is rarely an issue. Thibaud gives you aware datetime objects
 in the models and forms, and most often, new datetime objects are created from
 existing ones through :class:`~datetime.timedelta` arithmetic. The only
 datetime that's often created in application code is the current time, and
-:func:`timezone.now() <django.utils.timezone.now>` automatically does the
+:func:`timezone.now() <thibaud.utils.timezone.now>` automatically does the
 right thing.
 
 .. _default-current-time-zone:
@@ -122,12 +122,12 @@ setting.
 The **current time zone** is the time zone that's used for rendering.
 
 You should set the current time zone to the end user's actual time zone with
-:func:`~django.utils.timezone.activate`. Otherwise, the default time zone is
+:func:`~thibaud.utils.timezone.activate`. Otherwise, the default time zone is
 used.
 
 .. note::
 
-    As explained in the documentation of :setting:`TIME_ZONE`, Django sets
+    As explained in the documentation of :setting:`TIME_ZONE`, Thibaud sets
     environment variables so that its process runs in the default time zone.
     This happens regardless of the value of :setting:`USE_TZ` and of the
     current time zone.
@@ -144,8 +144,8 @@ Selecting the current time zone
 
 The current time zone is the equivalent of the current :term:`locale <locale
 name>` for translations. However, there's no equivalent of the
-``Accept-Language`` HTTP header that Django could use to determine the user's
-time zone automatically. Instead, Django provides :ref:`time zone selection
+``Accept-Language`` HTTP header that Thibaud could use to determine the user's
+time zone automatically. Instead, Thibaud provides :ref:`time zone selection
 functions <time-zone-selection-functions>`. Use them to build the time zone
 selection logic that makes sense for you.
 
@@ -162,7 +162,7 @@ Add the following middleware to :setting:`MIDDLEWARE`::
 
     import zoneinfo
 
-    from django.utils import timezone
+    from thibaud.utils import timezone
 
 
     class TimezoneMiddleware:
@@ -170,7 +170,7 @@ Add the following middleware to :setting:`MIDDLEWARE`::
             self.get_response = get_response
 
         def __call__(self, request):
-            tzname = request.session.get("django_timezone")
+            tzname = request.session.get("thibaud_timezone")
             if tzname:
                 timezone.activate(zoneinfo.ZoneInfo(tzname))
             else:
@@ -179,7 +179,7 @@ Add the following middleware to :setting:`MIDDLEWARE`::
 
 Create a view that can set the current timezone::
 
-    from django.shortcuts import redirect, render
+    from thibaud.shortcuts import redirect, render
 
     # Prepare a map of common locations to timezone choices you wish to offer.
     common_timezones = {
@@ -191,14 +191,14 @@ Create a view that can set the current timezone::
 
     def set_timezone(request):
         if request.method == "POST":
-            request.session["django_timezone"] = request.POST["timezone"]
+            request.session["thibaud_timezone"] = request.POST["timezone"]
             return redirect("/")
         else:
             return render(request, "template.html", {"timezones": common_timezones})
 
 Include a form in ``template.html`` that will ``POST`` to this view:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load tz %}
     {% get_current_timezone as TIME_ZONE %}
@@ -218,7 +218,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
 Time zone aware input in forms
 ==============================
 
-When you enable time zone support, Django interprets datetimes entered in
+When you enable time zone support, Thibaud interprets datetimes entered in
 forms in the :ref:`current time zone <default-current-time-zone>` and returns
 aware datetime objects in ``cleaned_data``.
 
@@ -230,14 +230,14 @@ DST transition will be reported as invalid values.
 Time zone aware output in templates
 ===================================
 
-When you enable time zone support, Django converts aware datetime objects to
+When you enable time zone support, Thibaud converts aware datetime objects to
 the :ref:`current time zone <default-current-time-zone>` when they're rendered
 in templates. This behaves very much like :doc:`format localization
 </topics/i18n/formatting>`.
 
 .. warning::
 
-    Django doesn't convert naive datetime objects, because they could be
+    Thibaud doesn't convert naive datetime objects, because they could be
     ambiguous, and because your code should never produce naive datetimes when
     time zone support is enabled. However, you can force conversion with the
     template filters described below.
@@ -264,7 +264,7 @@ conversion.
 
 To activate or deactivate conversion for a template block, use:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load tz %}
 
@@ -289,7 +289,7 @@ To activate or deactivate conversion for a template block, use:
 Sets or unsets the current time zone in the contained block. When the current
 time zone is unset, the default time zone applies.
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load tz %}
 
@@ -309,12 +309,12 @@ time zone is unset, the default time zone applies.
 You can get the name of the current time zone using the
 ``get_current_timezone`` tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% get_current_timezone as TIME_ZONE %}
 
 Alternatively, you can activate the
-:func:`~django.template.context_processors.tz` context processor and
+:func:`~thibaud.template.context_processors.tz` context processor and
 use the ``TIME_ZONE`` context variable.
 
 Template filters
@@ -333,7 +333,7 @@ Forces conversion of a single value to the current time zone.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load tz %}
 
@@ -348,7 +348,7 @@ Forces conversion of a single value to UTC.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load tz %}
 
@@ -366,7 +366,7 @@ time zone name.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load tz %}
 
@@ -377,7 +377,7 @@ For example:
 Migration guide
 ===============
 
-Here's how to migrate a project that was started before Django supported time
+Here's how to migrate a project that was started before Thibaud supported time
 zones.
 
 Database
@@ -393,7 +393,7 @@ UTC on storage, and from UTC to the connection's time zone on retrieval.
 As a consequence, if you're using PostgreSQL, you can switch between ``USE_TZ
 = False`` and ``USE_TZ = True`` freely. The database connection's time zone
 will be set to :setting:`DATABASE-TIME_ZONE` or ``UTC`` respectively, so that
-Django obtains correct datetimes in all cases. You don't need to perform any
+Thibaud obtains correct datetimes in all cases. You don't need to perform any
 data conversions.
 
 .. admonition:: Time zone settings
@@ -414,25 +414,25 @@ Code
 
 The first step is to add :setting:`USE_TZ = True <USE_TZ>` to your settings
 file. At this point, things should mostly work. If you create naive datetime
-objects in your code, Django makes them aware when necessary.
+objects in your code, Thibaud makes them aware when necessary.
 
 However, these conversions may fail around DST transitions, which means you
 aren't getting the full benefits of time zone support yet. Also, you're likely
 to run into a few problems because it's impossible to compare a naive datetime
-with an aware datetime. Since Django now gives you aware datetimes, you'll get
+with an aware datetime. Since Thibaud now gives you aware datetimes, you'll get
 exceptions wherever you compare a datetime that comes from a model or a form
 with a naive datetime that you've created in your code.
 
 So the second step is to refactor your code wherever you instantiate datetime
 objects to make them aware. This can be done incrementally.
-:mod:`django.utils.timezone` defines some handy helpers for compatibility
-code: :func:`~django.utils.timezone.now`,
-:func:`~django.utils.timezone.is_aware`,
-:func:`~django.utils.timezone.is_naive`,
-:func:`~django.utils.timezone.make_aware`, and
-:func:`~django.utils.timezone.make_naive`.
+:mod:`thibaud.utils.timezone` defines some handy helpers for compatibility
+code: :func:`~thibaud.utils.timezone.now`,
+:func:`~thibaud.utils.timezone.is_aware`,
+:func:`~thibaud.utils.timezone.is_naive`,
+:func:`~thibaud.utils.timezone.make_aware`, and
+:func:`~thibaud.utils.timezone.make_naive`.
 
-Finally, in order to help you locate code that needs upgrading, Django raises
+Finally, in order to help you locate code that needs upgrading, Thibaud raises
 a warning when you attempt to save a naive datetime to the database:
 
 .. code-block:: pytb
@@ -449,7 +449,7 @@ traceback by adding the following to your settings file::
         "error",
         r"DateTimeField .* received a naive datetime",
         RuntimeWarning,
-        r"django\.db\.models\.fields",
+        r"thibaud\.db\.models\.fields",
     )
 
 Fixtures
@@ -463,11 +463,11 @@ While for a naive datetime, it isn't::
 
     "2011-09-01T13:20:30"
 
-For models with :class:`~django.db.models.DateTimeField`\ s, this difference
+For models with :class:`~thibaud.db.models.DateTimeField`\ s, this difference
 makes it impossible to write a fixture that works both with and without time
 zone support.
 
-Fixtures generated with ``USE_TZ = False``, or before Django 1.4, use the
+Fixtures generated with ``USE_TZ = False``, or before Thibaud 1.4, use the
 "naive" format. If your project contains such fixtures, after you enable time
 zone support, you'll see :exc:`RuntimeWarning`\ s when you load them. To get
 rid of the warnings, you must convert your fixtures to the "aware" format.
@@ -486,12 +486,12 @@ Setup
 
 #. **I don't need multiple time zones. Should I enable time zone support?**
 
-   Yes. When time zone support is enabled, Django uses a more accurate model
+   Yes. When time zone support is enabled, Thibaud uses a more accurate model
    of local time. This shields you from subtle and unreproducible bugs around
    daylight saving time (DST) transitions.
 
    When you enable time zone support, you'll encounter some errors because
-   you're using naive datetimes where Django expects aware datetimes. Such
+   you're using naive datetimes where Thibaud expects aware datetimes. Such
    errors show up when running tests. You'll quickly learn how to avoid invalid
    operations.
 
@@ -540,7 +540,7 @@ Setup
    time zone for this database in the :setting:`DATABASES` setting.
 
    This is useful for connecting to a database that doesn't support time zones
-   and that isn't managed by Django when :setting:`USE_TZ` is ``True``.
+   and that isn't managed by Thibaud when :setting:`USE_TZ` is ``True``.
 
 Troubleshooting
 ---------------
@@ -552,7 +552,7 @@ Troubleshooting
 
    .. code-block:: pycon
 
-       >>> from django.utils import timezone
+       >>> from thibaud.utils import timezone
        >>> aware = timezone.now()
        >>> naive = timezone.make_naive(aware)
        >>> naive == aware
@@ -563,7 +563,7 @@ Troubleshooting
    If you encounter this error, most likely your code is comparing these two
    things:
 
-   - a datetime provided by Django -- for instance, a value read from a form or
+   - a datetime provided by Thibaud -- for instance, a value read from a form or
      a model field. Since you enabled time zone support, it's aware.
    - a datetime generated by your code, which is naive (or you wouldn't be
      reading this).
@@ -573,7 +573,7 @@ Troubleshooting
 
    If you're writing a pluggable application that's expected to work
    independently of the value of :setting:`USE_TZ`, you may find
-   :func:`django.utils.timezone.now` useful. This function returns the current
+   :func:`thibaud.utils.timezone.now` useful. This function returns the current
    date and time as a naive datetime when ``USE_TZ = False`` and as an aware
    datetime when ``USE_TZ = True``. You can add or subtract
    :class:`datetime.timedelta` as needed.
@@ -642,7 +642,7 @@ Troubleshooting
 
    .. code-block:: pycon
 
-       >>> from django.utils import timezone
+       >>> from thibaud.utils import timezone
        >>> timezone.activate(zoneinfo.ZoneInfo("Asia/Singapore"))
        # For this example, we set the time zone to Singapore, but here's how
        # you would obtain the current time zone in the general case.
@@ -672,7 +672,7 @@ Usage
    .. code-block:: pycon
 
        >>> import zoneinfo
-       >>> from django.utils.dateparse import parse_datetime
+       >>> from thibaud.utils.dateparse import parse_datetime
        >>> naive = parse_datetime("2012-02-21 10:28:45")
        >>> naive.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
        datetime.datetime(2012, 2, 21, 10, 28, 45, tzinfo=zoneinfo.ZoneInfo(key='Europe/Helsinki'))
@@ -688,7 +688,7 @@ Usage
    Furthermore, Python knows how to compare aware datetimes, taking into
    account UTC offsets when necessary. It's much easier (and possibly faster)
    to write all your model and view code in UTC. So, in most circumstances,
-   the datetime in UTC returned by :func:`django.utils.timezone.now` will be
+   the datetime in UTC returned by :func:`thibaud.utils.timezone.now` will be
    sufficient.
 
    For the sake of completeness, though, if you really want the local time
@@ -696,7 +696,7 @@ Usage
 
    .. code-block:: pycon
 
-       >>> from django.utils import timezone
+       >>> from thibaud.utils import timezone
        >>> timezone.localtime(timezone.now())
        datetime.datetime(2012, 3, 3, 20, 10, 53, 873365, tzinfo=zoneinfo.ZoneInfo(key='Europe/Paris'))
 

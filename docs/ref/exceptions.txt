@@ -1,16 +1,16 @@
 =================
-Django Exceptions
+Thibaud Exceptions
 =================
 
-Django raises some of its own exceptions as well as standard Python exceptions.
+Thibaud raises some of its own exceptions as well as standard Python exceptions.
 
-Django Core Exceptions
+Thibaud Core Exceptions
 ======================
 
-.. module:: django.core.exceptions
-    :synopsis: Django core exceptions
+.. module:: thibaud.core.exceptions
+    :synopsis: Thibaud core exceptions
 
-Django core exception classes are defined in ``django.core.exceptions``.
+Thibaud core exception classes are defined in ``thibaud.core.exceptions``.
 
 ``AppRegistryNotReady``
 -----------------------
@@ -27,11 +27,11 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: ObjectDoesNotExist
 
     The base class for :exc:`Model.DoesNotExist
-    <django.db.models.Model.DoesNotExist>` exceptions. A ``try/except`` for
+    <thibaud.db.models.Model.DoesNotExist>` exceptions. A ``try/except`` for
     ``ObjectDoesNotExist`` will catch
-    :exc:`~django.db.models.Model.DoesNotExist` exceptions for all models.
+    :exc:`~thibaud.db.models.Model.DoesNotExist` exceptions for all models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()`.
+    See :meth:`~thibaud.db.models.query.QuerySet.get()`.
 
 ``EmptyResultSet``
 ------------------
@@ -39,7 +39,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: EmptyResultSet
 
     ``EmptyResultSet`` may be raised during query generation if a query won't
-    return any results. Most Django projects won't encounter this exception,
+    return any results. Most Thibaud projects won't encounter this exception,
     but it might be useful for implementing custom lookups and expressions.
 
 ``FullResultSet``
@@ -48,7 +48,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: FullResultSet
 
     ``FullResultSet`` may be raised during query generation if a query will
-    match everything. Most Django projects won't encounter this exception, but
+    match everything. Most Thibaud projects won't encounter this exception, but
     it might be useful for implementing custom lookups and expressions.
 
 ``FieldDoesNotExist``
@@ -66,12 +66,12 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: MultipleObjectsReturned
 
     The base class for :exc:`Model.MultipleObjectsReturned
-    <django.db.models.Model.MultipleObjectsReturned>` exceptions. A
+    <thibaud.db.models.Model.MultipleObjectsReturned>` exceptions. A
     ``try/except`` for ``MultipleObjectsReturned`` will catch
-    :exc:`~django.db.models.Model.MultipleObjectsReturned` exceptions for all
+    :exc:`~thibaud.db.models.Model.MultipleObjectsReturned` exceptions for all
     models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()`.
+    See :meth:`~thibaud.db.models.query.QuerySet.get()`.
 
 ``SuspiciousOperation``
 -----------------------
@@ -97,7 +97,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
     If a ``SuspiciousOperation`` exception reaches the ASGI/WSGI handler level
     it is logged at the ``Error`` level and results in
-    a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
+    a :class:`~thibaud.http.HttpResponseBadRequest`. See the :doc:`logging
     documentation </topics/logging/>` for more information.
 
 ``PermissionDenied``
@@ -114,7 +114,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: ViewDoesNotExist
 
     The :exc:`ViewDoesNotExist` exception is raised by
-    :mod:`django.urls` when a requested view does not exist.
+    :mod:`thibaud.urls` when a requested view does not exist.
 
 ``MiddlewareNotUsed``
 ---------------------
@@ -129,7 +129,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
 .. exception:: ImproperlyConfigured
 
-    The :exc:`ImproperlyConfigured` exception is raised when Django is
+    The :exc:`ImproperlyConfigured` exception is raised when Thibaud is
     somehow improperly configured -- for example, if a value in ``settings.py``
     is incorrect or unparseable.
 
@@ -180,7 +180,7 @@ list of errors.
     The :exc:`BadRequest` exception is raised when the request cannot be
     processed due to a client error. If a ``BadRequest`` exception reaches the
     ASGI/WSGI handler level it results in a
-    :class:`~django.http.HttpResponseBadRequest`.
+    :class:`~thibaud.http.HttpResponseBadRequest`.
 
 ``RequestAborted``
 ------------------
@@ -205,19 +205,19 @@ list of errors.
     The :exc:`SynchronousOnlyOperation` exception is raised when code that
     is only allowed in synchronous Python code is called from an asynchronous
     context (a thread with a running asynchronous event loop). These parts of
-    Django are generally heavily reliant on thread-safety to function and don't
+    Thibaud are generally heavily reliant on thread-safety to function and don't
     work correctly under coroutines sharing the same thread.
 
     If you are trying to call code that is synchronous-only from an
     asynchronous thread, then create a synchronous thread and call it in that.
     You can accomplish this is with :func:`asgiref.sync.sync_to_async`.
 
-.. currentmodule:: django.urls
+.. currentmodule:: thibaud.urls
 
 URL Resolver exceptions
 =======================
 
-URL Resolver exceptions are defined in ``django.urls``.
+URL Resolver exceptions are defined in ``thibaud.urls``.
 
 ``Resolver404``
 ---------------
@@ -225,26 +225,26 @@ URL Resolver exceptions are defined in ``django.urls``.
 .. exception:: Resolver404
 
     The :exc:`Resolver404` exception is raised by
-    :func:`~django.urls.resolve()` if the path passed to ``resolve()`` doesn't
-    map to a view. It's a subclass of :class:`django.http.Http404`.
+    :func:`~thibaud.urls.resolve()` if the path passed to ``resolve()`` doesn't
+    map to a view. It's a subclass of :class:`thibaud.http.Http404`.
 
 ``NoReverseMatch``
 ------------------
 
 .. exception:: NoReverseMatch
 
-    The :exc:`NoReverseMatch` exception is raised by :mod:`django.urls` when a
+    The :exc:`NoReverseMatch` exception is raised by :mod:`thibaud.urls` when a
     matching URL in your URLconf cannot be identified based on the parameters
     supplied.
 
-.. currentmodule:: django.db
+.. currentmodule:: thibaud.db
 
 Database Exceptions
 ===================
 
-Database exceptions may be imported from ``django.db``.
+Database exceptions may be imported from ``thibaud.db``.
 
-Django wraps the standard database exceptions so that your Django code has a
+Thibaud wraps the standard database exceptions so that your Thibaud code has a
 guaranteed common implementation of these classes.
 
 .. exception:: Error
@@ -257,7 +257,7 @@ guaranteed common implementation of these classes.
 .. exception:: ProgrammingError
 .. exception:: NotSupportedError
 
-The Django wrappers for database exceptions behave exactly the same as
+The Thibaud wrappers for database exceptions behave exactly the same as
 the underlying database exceptions. See :pep:`249`, the Python Database API
 Specification v2.0, for further information.
 
@@ -268,21 +268,21 @@ information provided.
 .. exception:: models.ProtectedError
 
 Raised to prevent deletion of referenced objects when using
-:attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
+:attr:`thibaud.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
 of :exc:`IntegrityError`.
 
 .. exception:: models.RestrictedError
 
 Raised to prevent deletion of referenced objects when using
-:attr:`django.db.models.RESTRICT`. :exc:`models.RestrictedError` is a subclass
+:attr:`thibaud.db.models.RESTRICT`. :exc:`models.RestrictedError` is a subclass
 of :exc:`IntegrityError`.
 
-.. currentmodule:: django.http
+.. currentmodule:: thibaud.http
 
 HTTP Exceptions
 ===============
 
-HTTP exceptions may be imported from ``django.http``.
+HTTP exceptions may be imported from ``thibaud.http``.
 
 ``UnreadablePostError``
 -----------------------
@@ -291,12 +291,12 @@ HTTP exceptions may be imported from ``django.http``.
 
     :exc:`UnreadablePostError` is raised when a user cancels an upload.
 
-.. currentmodule:: django.contrib.sessions.exceptions
+.. currentmodule:: thibaud.contrib.sessions.exceptions
 
 Sessions Exceptions
 ===================
 
-Sessions exceptions are defined in ``django.contrib.sessions.exceptions``.
+Sessions exceptions are defined in ``thibaud.contrib.sessions.exceptions``.
 
 ``SessionInterrupted``
 ----------------------
@@ -305,14 +305,14 @@ Sessions exceptions are defined in ``django.contrib.sessions.exceptions``.
 
     :exc:`SessionInterrupted` is raised when a session is destroyed in a
     concurrent request. It's a subclass of
-    :exc:`~django.core.exceptions.BadRequest`.
+    :exc:`~thibaud.core.exceptions.BadRequest`.
 
 Transaction Exceptions
 ======================
 
-.. currentmodule:: django.db.transaction
+.. currentmodule:: thibaud.db.transaction
 
-Transaction exceptions are defined in ``django.db.transaction``.
+Transaction exceptions are defined in ``thibaud.db.transaction``.
 
 ``TransactionManagementError``
 ------------------------------
@@ -322,12 +322,12 @@ Transaction exceptions are defined in ``django.db.transaction``.
     :exc:`TransactionManagementError` is raised for any and all problems
     related to database transactions.
 
-.. currentmodule:: django.test
+.. currentmodule:: thibaud.test
 
 Testing Framework Exceptions
 ============================
 
-Exceptions provided by the ``django.test`` package.
+Exceptions provided by the ``thibaud.test`` package.
 
 ``RedirectCycleError``
 ----------------------
@@ -340,5 +340,5 @@ Exceptions provided by the ``django.test`` package.
 Python Exceptions
 =================
 
-Django raises built-in Python exceptions when appropriate as well. See the
+Thibaud raises built-in Python exceptions when appropriate as well. See the
 Python documentation for further information on the :ref:`bltin-exceptions`.

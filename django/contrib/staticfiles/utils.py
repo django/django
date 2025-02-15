@@ -1,8 +1,8 @@
 import fnmatch
 import os
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
 
 
 def matches_patterns(path, patterns):

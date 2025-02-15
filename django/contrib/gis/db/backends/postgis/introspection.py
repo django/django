@@ -1,5 +1,5 @@
-from django.contrib.gis.gdal import OGRGeomType
-from django.db.backends.postgresql.introspection import DatabaseIntrospection
+from thibaud.contrib.gis.gdal import OGRGeomType
+from thibaud.db.backends.postgresql.introspection import DatabaseIntrospection
 
 
 class PostGISIntrospection(DatabaseIntrospection):
@@ -58,8 +58,8 @@ class PostGISIntrospection(DatabaseIntrospection):
                 )
             dim, srid, field_type = row
             # OGRGeomType does not require GDAL and makes it easy to convert
-            # from OGC geom type name to Django field.
-            field_type = OGRGeomType(field_type).django
+            # from OGC geom type name to Thibaud field.
+            field_type = OGRGeomType(field_type).thibaud
             # Getting any GeometryField keyword arguments that are not the default.
             field_params = {}
             if self.postgis_oid_lookup.get(description.type_code) == "geography":

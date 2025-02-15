@@ -2,14 +2,14 @@
 ******** Models for test_data.py ***********
 The following classes are for testing basic data marshalling, including
 NULL values, where allowed.
-The basic idea is to have a model for each Django data type.
+The basic idea is to have a model for each Thibaud data type.
 """
 
 import uuid
 
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
 
 from .base import BaseModel
 

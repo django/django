@@ -15,7 +15,7 @@ class PostgresIntegrationTests(PostgreSQLSimpleTestCase):
             [
                 sys.executable,
                 "-m",
-                "django",
+                "thibaud",
                 "check",
                 "--settings",
                 "integration_settings",

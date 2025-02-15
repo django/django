@@ -2,9 +2,9 @@ import os
 import shutil
 import tempfile
 
-from django import conf
-from django.test import SimpleTestCase
-from django.test.utils import extend_sys_path
+from thibaud import conf
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import extend_sys_path
 
 
 class TestStartProjectSettings(SimpleTestCase):

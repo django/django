@@ -1,10 +1,10 @@
 import re
 
-from django.contrib.auth.views import (
+from thibaud.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     PasswordResetConfirmView,
 )
-from django.test import Client
+from thibaud.test import Client
 
 
 def extract_token_from_url(url):

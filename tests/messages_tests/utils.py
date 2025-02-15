@@ -1,4 +1,4 @@
-from django.contrib.messages import Message
+from thibaud.contrib.messages import Message
 
 
 class DummyStorage:

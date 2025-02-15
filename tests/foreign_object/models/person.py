@@ -1,6 +1,6 @@
 import datetime
 
-from django.db import models
+from thibaud.db import models
 
 
 class Country(models.Model):

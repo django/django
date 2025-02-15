@@ -1,5 +1,5 @@
 ======================
-Testing GeoDjango apps
+Testing GeoThibaud apps
 ======================
 
 Included in this documentation are some additional notes and settings
@@ -22,7 +22,7 @@ Settings
 ``POSTGIS_VERSION``
 ~~~~~~~~~~~~~~~~~~~
 
-When GeoDjango's spatial backend initializes on PostGIS, it has to perform
+When GeoThibaud's spatial backend initializes on PostGIS, it has to perform
 an SQL query to determine the version in order to figure out what
 features are available. Advanced users wishing to prevent this additional
 query may set the version manually using a 3-tuple of integers specifying
@@ -36,7 +36,7 @@ Obtaining sufficient privileges
 
 Depending on your configuration, this section describes several methods to
 configure a database user with sufficient privileges to run tests for
-GeoDjango applications on PostgreSQL. If your
+GeoThibaud applications on PostgreSQL. If your
 :ref:`spatial database template <spatialdb_template>`
 was created like in the instructions, then your testing database user
 only needs to have the ability to create databases. In other configurations,
@@ -87,12 +87,12 @@ privileges to your database user.
 By default, the PostGIS installer on Windows includes a template
 spatial database entitled ``template_postgis``.
 
-.. _geodjango-tests:
+.. _geothibaud-tests:
 
-GeoDjango tests
+GeoThibaud tests
 ===============
 
-To have the GeoDjango tests executed when :ref:`running the Django test suite
+To have the GeoThibaud tests executed when :ref:`running the Thibaud test suite
 <running-unit-tests>` with ``runtests.py`` all of the databases in the settings
 file must be using one of the :ref:`spatial database backends
 <spatial-backends>`.
@@ -102,33 +102,33 @@ Example
 -------
 
 The following is an example bare-bones settings file with spatial backends
-that can be used to run the entire Django test suite, including those
-in :mod:`django.contrib.gis`::
+that can be used to run the entire Thibaud test suite, including those
+in :mod:`thibaud.contrib.gis`::
 
     DATABASES = {
         "default": {
-            "ENGINE": "django.contrib.gis.db.backends.postgis",
-            "NAME": "geodjango",
-            "USER": "geodjango",
+            "ENGINE": "thibaud.contrib.gis.db.backends.postgis",
+            "NAME": "geothibaud",
+            "USER": "geothibaud",
         },
         "other": {
-            "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "ENGINE": "thibaud.contrib.gis.db.backends.postgis",
             "NAME": "other",
-            "USER": "geodjango",
+            "USER": "geothibaud",
         },
     }
 
-    SECRET_KEY = "django_tests_secret_key"
+    SECRET_KEY = "thibaud_tests_secret_key"
 
 Assuming the settings above were in a ``postgis.py`` file in the same
-directory as ``runtests.py``, then all Django and GeoDjango tests would
+directory as ``runtests.py``, then all Thibaud and GeoThibaud tests would
 be performed when executing the command:
 
 .. code-block:: shell
 
     $ ./runtests.py --settings=postgis
 
-To run only the GeoDjango test suite, specify ``gis_tests``:
+To run only the GeoThibaud test suite, specify ``gis_tests``:
 
 .. code-block:: shell
 

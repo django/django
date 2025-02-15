@@ -1,4 +1,4 @@
-from django.contrib.gis.db import models
+from thibaud.contrib.gis.db import models
 
 
 class AllOGRFields(models.Model):

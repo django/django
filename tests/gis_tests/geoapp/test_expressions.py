@@ -1,8 +1,8 @@
-from django.contrib.gis.db.models import F, GeometryField, Value, functions
-from django.contrib.gis.geos import Point, Polygon
-from django.db import connection
-from django.db.models import Count, Min
-from django.test import TestCase, skipUnlessDBFeature
+from thibaud.contrib.gis.db.models import F, GeometryField, Value, functions
+from thibaud.contrib.gis.geos import Point, Polygon
+from thibaud.db import connection
+from thibaud.db.models import Count, Min
+from thibaud.test import TestCase, skipUnlessDBFeature
 
 from .models import City, ManyPointModel, MultiFields
 

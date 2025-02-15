@@ -1,6 +1,6 @@
-from django.db import models
-from django.db.models.fields.related import ForwardManyToOneDescriptor
-from django.utils.translation import get_language
+from thibaud.db import models
+from thibaud.db.models.fields.related import ForwardManyToOneDescriptor
+from thibaud.utils.translation import get_language
 
 
 class ArticleTranslationDescriptor(ForwardManyToOneDescriptor):

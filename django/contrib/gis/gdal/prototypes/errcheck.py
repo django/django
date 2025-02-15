@@ -5,8 +5,8 @@
 
 from ctypes import c_void_p, string_at
 
-from django.contrib.gis.gdal.error import GDALException, SRSException, check_err
-from django.contrib.gis.gdal.libgdal import lgdal
+from thibaud.contrib.gis.gdal.error import GDALException, SRSException, check_err
+from thibaud.contrib.gis.gdal.libgdal import lgdal
 
 
 # Helper routines for retrieving pointers and/or values from

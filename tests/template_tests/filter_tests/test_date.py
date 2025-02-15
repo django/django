@@ -1,8 +1,8 @@
 from datetime import datetime, time
 
-from django.template.defaultfilters import date
-from django.test import SimpleTestCase
-from django.utils import timezone, translation
+from thibaud.template.defaultfilters import date
+from thibaud.test import SimpleTestCase
+from thibaud.utils import timezone, translation
 
 from ..utils import setup
 from .timezone_utils import TimezoneTestCase

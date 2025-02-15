@@ -1,11 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
 
-from django import forms
-from django.conf import settings
-from django.contrib import admin
-from django.contrib.admin import helpers
-from django.contrib.admin.utils import (
+from thibaud import forms
+from thibaud.conf import settings
+from thibaud.contrib import admin
+from thibaud.contrib.admin import helpers
+from thibaud.contrib.admin.utils import (
     NestedObjects,
     build_q_object_from_lookup_parameters,
     display_for_field,
@@ -17,11 +17,11 @@ from django.contrib.admin.utils import (
     lookup_field,
     quote,
 )
-from django.core.validators import EMPTY_VALUES
-from django.db import DEFAULT_DB_ALIAS, models
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.utils.formats import localize
-from django.utils.safestring import mark_safe
+from thibaud.core.validators import EMPTY_VALUES
+from thibaud.db import DEFAULT_DB_ALIAS, models
+from thibaud.test import SimpleTestCase, TestCase, override_settings
+from thibaud.utils.formats import localize
+from thibaud.utils.safestring import mark_safe
 
 from .models import Article, Car, Count, Event, EventGuide, Location, Site, Vehicle
 

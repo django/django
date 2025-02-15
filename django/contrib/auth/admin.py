@@ -1,25 +1,25 @@
-from django.conf import settings
-from django.contrib import admin, messages
-from django.contrib.admin.options import IS_POPUP_VAR
-from django.contrib.admin.utils import unquote
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import (
+from thibaud.conf import settings
+from thibaud.contrib import admin, messages
+from thibaud.contrib.admin.options import IS_POPUP_VAR
+from thibaud.contrib.admin.utils import unquote
+from thibaud.contrib.auth import update_session_auth_hash
+from thibaud.contrib.auth.forms import (
     AdminPasswordChangeForm,
     AdminUserCreationForm,
     UserChangeForm,
 )
-from django.contrib.auth.models import Group, User
-from django.core.exceptions import PermissionDenied
-from django.db import router, transaction
-from django.http import Http404, HttpResponseRedirect
-from django.template.response import TemplateResponse
-from django.urls import path, reverse
-from django.utils.decorators import method_decorator
-from django.utils.html import escape
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.debug import sensitive_post_parameters
+from thibaud.contrib.auth.models import Group, User
+from thibaud.core.exceptions import PermissionDenied
+from thibaud.db import router, transaction
+from thibaud.http import Http404, HttpResponseRedirect
+from thibaud.template.response import TemplateResponse
+from thibaud.urls import path, reverse
+from thibaud.utils.decorators import method_decorator
+from thibaud.utils.html import escape
+from thibaud.utils.translation import gettext
+from thibaud.utils.translation import gettext_lazy as _
+from thibaud.views.decorators.csrf import csrf_protect
+from thibaud.views.decorators.debug import sensitive_post_parameters
 
 csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
@@ -134,7 +134,7 @@ class UserAdmin(admin.ModelAdmin):
                 # error message.
                 raise Http404(
                     'Your user does not have the "Change user" permission. In '
-                    "order to add users, Django requires that your user "
+                    "order to add users, Thibaud requires that your user "
                     'account have both the "Add user" and "Change user" '
                     "permissions set."
                 )

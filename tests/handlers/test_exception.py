@@ -1,6 +1,6 @@
-from django.core.handlers.wsgi import WSGIHandler
-from django.test import SimpleTestCase, override_settings
-from django.test.client import (
+from thibaud.core.handlers.wsgi import WSGIHandler
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.test.client import (
     BOUNDARY,
     MULTIPART_CONTENT,
     FakePayload,
@@ -37,7 +37,7 @@ class ExceptionHandlerTests(SimpleTestCase):
                 BOUNDARY,
                 {
                     "a.txt": "Hello World!",
-                    "b.txt": "Hello Django!",
+                    "b.txt": "Hello Thibaud!",
                     "c.txt": "Hello Python!",
                 },
             )

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Dimitris Glezos <glezos@transifex.com>, 2012
@@ -11,12 +11,12 @@
 # xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
 "PO-Revision-Date: 2021-12-23 17:57+0000\n"
 "Last-Translator: tinnguyen121221\n"
-"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"Language-Team: Vietnamese (http://www.transifex.com/thibaud/thibaud/language/"
 "vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -285,11 +285,11 @@ msgstr ""
 "Xóa %(class_name)s %(instance)s sẽ tự động xóa các đối tượng liên quan sau: "
 "%(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Trang web admin Django"
+msgid "Thibaud site admin"
+msgstr "Trang web admin Thibaud"
 
-msgid "Django administration"
-msgstr "Trang quản trị cho Django"
+msgid "Thibaud administration"
+msgstr "Trang quản trị cho Thibaud"
 
 msgid "Site administration"
 msgstr "Site quản trị hệ thống."

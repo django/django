@@ -1,8 +1,8 @@
 import copy
 import unittest
 
-from django.db.models.sql import AND, OR
-from django.utils.tree import Node
+from thibaud.db.models.sql import AND, OR
+from thibaud.utils.tree import Node
 
 
 class NodeTests(unittest.TestCase):

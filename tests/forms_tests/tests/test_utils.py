@@ -1,9 +1,9 @@
 import copy
 import json
 
-from django.core.exceptions import ValidationError
-from django.forms.renderers import DjangoTemplates
-from django.forms.utils import (
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms.renderers import ThibaudTemplates
+from thibaud.forms.utils import (
     ErrorDict,
     ErrorList,
     RenderableFieldMixin,
@@ -11,9 +11,9 @@ from django.forms.utils import (
     flatatt,
     pretty_name,
 )
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy
+from thibaud.test import SimpleTestCase
+from thibaud.utils.safestring import mark_safe
+from thibaud.utils.translation import gettext_lazy
 
 
 class FormsUtilsTestCase(SimpleTestCase):
@@ -181,7 +181,7 @@ class FormsUtilsTestCase(SimpleTestCase):
         self.assertEqual(e.as_data(), e_copy.as_data())
 
     def test_error_list_copy_attributes(self):
-        class CustomRenderer(DjangoTemplates):
+        class CustomRenderer(ThibaudTemplates):
             pass
 
         renderer = CustomRenderer()
@@ -214,7 +214,7 @@ class FormsUtilsTestCase(SimpleTestCase):
         self.assertEqual(e, e_deepcopy)
 
     def test_error_dict_copy_attributes(self):
-        class CustomRenderer(DjangoTemplates):
+        class CustomRenderer(ThibaudTemplates):
             pass
 
         renderer = CustomRenderer()

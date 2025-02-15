@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 
-from django.utils.lorem_ipsum import paragraph, paragraphs, sentence, words
+from thibaud.utils.lorem_ipsum import paragraph, paragraphs, sentence, words
 
 
 class LoremIpsumTests(unittest.TestCase):
@@ -34,7 +34,7 @@ class LoremIpsumTests(unittest.TestCase):
         """words(n) has n words when n is greater than len(WORDS)."""
         self.assertEqual(len(words(500).split()), 500)
 
-    @mock.patch("django.utils.lorem_ipsum.random.sample")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.sample")
     def test_not_common_words(self, mock_sample):
         """words(n, common=False) returns random words."""
         mock_sample.return_value = ["exercitationem", "perferendis"]
@@ -44,9 +44,9 @@ class LoremIpsumTests(unittest.TestCase):
         """A sentence starts with a capital letter."""
         self.assertTrue(sentence()[0].isupper())
 
-    @mock.patch("django.utils.lorem_ipsum.random.sample")
-    @mock.patch("django.utils.lorem_ipsum.random.choice")
-    @mock.patch("django.utils.lorem_ipsum.random.randint")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.sample")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.choice")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.randint")
     def test_sentence(self, mock_randint, mock_choice, mock_sample):
         """
         Sentences are built using some number of phrases and a set of words.
@@ -62,7 +62,7 @@ class LoremIpsumTests(unittest.TestCase):
             value, "Exercitationem perferendis, exercitationem perferendis?"
         )
 
-    @mock.patch("django.utils.lorem_ipsum.random.choice")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.choice")
     def test_sentence_ending(self, mock_choice):
         """Sentences end with a question mark or a period."""
         mock_choice.return_value = "?"
@@ -70,9 +70,9 @@ class LoremIpsumTests(unittest.TestCase):
         mock_choice.return_value = "."
         self.assertIn(sentence()[-1], ".")
 
-    @mock.patch("django.utils.lorem_ipsum.random.sample")
-    @mock.patch("django.utils.lorem_ipsum.random.choice")
-    @mock.patch("django.utils.lorem_ipsum.random.randint")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.sample")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.choice")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.randint")
     def test_paragraph(self, mock_paragraph_randint, mock_choice, mock_sample):
         """paragraph() generates a single paragraph."""
         # Make creating 2 sentences use 2 phrases.
@@ -89,9 +89,9 @@ class LoremIpsumTests(unittest.TestCase):
             ),
         )
 
-    @mock.patch("django.utils.lorem_ipsum.random.sample")
-    @mock.patch("django.utils.lorem_ipsum.random.choice")
-    @mock.patch("django.utils.lorem_ipsum.random.randint")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.sample")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.choice")
+    @mock.patch("thibaud.utils.lorem_ipsum.random.randint")
     def test_paragraphs_not_common(self, mock_randint, mock_choice, mock_sample):
         """
         paragraphs(1, common=False) generating one paragraph that's not the

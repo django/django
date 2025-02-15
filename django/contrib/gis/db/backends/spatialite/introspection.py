@@ -1,5 +1,5 @@
-from django.contrib.gis.gdal import OGRGeomType
-from django.db.backends.sqlite3.introspection import (
+from thibaud.contrib.gis.gdal import OGRGeomType
+from thibaud.db.backends.sqlite3.introspection import (
     DatabaseIntrospection,
     FlexibleFieldLookupDict,
 )
@@ -43,14 +43,14 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
                 )
 
             # OGRGeomType does not require GDAL and makes it easy to convert
-            # from OGC geom type name to Django field.
+            # from OGC geom type name to Thibaud field.
             ogr_type = row[2]
             if isinstance(ogr_type, int) and ogr_type > 1000:
                 # SpatiaLite uses SFSQL 1.2 offsets 1000 (Z), 2000 (M), and
                 # 3000 (ZM) to indicate the presence of higher dimensional
-                # coordinates (M not yet supported by Django).
+                # coordinates (M not yet supported by Thibaud).
                 ogr_type = ogr_type % 1000 + OGRGeomType.wkb25bit
-            field_type = OGRGeomType(ogr_type).django
+            field_type = OGRGeomType(ogr_type).thibaud
 
             # Getting any GeometryField keyword arguments that are not the default.
             dim = row[0]

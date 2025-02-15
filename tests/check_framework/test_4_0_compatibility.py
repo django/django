@@ -1,7 +1,7 @@
-from django.core.checks import Error
-from django.core.checks.compatibility.django_4_0 import check_csrf_trusted_origins
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from thibaud.core.checks import Error
+from thibaud.core.checks.compatibility.thibaud_4_0 import check_csrf_trusted_origins
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
 
 
 class CheckCSRFTrustedOrigins(SimpleTestCase):
@@ -11,7 +11,7 @@ class CheckCSRFTrustedOrigins(SimpleTestCase):
             check_csrf_trusted_origins(None),
             [
                 Error(
-                    "As of Django 4.0, the values in the CSRF_TRUSTED_ORIGINS "
+                    "As of Thibaud 4.0, the values in the CSRF_TRUSTED_ORIGINS "
                     "setting must start with a scheme (usually http:// or "
                     "https://) but found example.com. See the release notes for "
                     "details.",

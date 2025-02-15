@@ -2,7 +2,7 @@
 Built-in template tags and filters
 ==================================
 
-This document describes Django's built-in template tags and filters. It is
+This document describes Thibaud's built-in template tags and filters. It is
 recommended that you use the :doc:`automatic documentation
 </ref/contrib/admin/admindocs>`, if available, as this will also include
 documentation for any custom tags or filters installed.
@@ -23,7 +23,7 @@ inside the block. The block is closed with an ``endautoescape`` ending tag.
 
 Sample usage:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% autoescape on %}
         {{ body }}
@@ -43,7 +43,7 @@ Within the scope of disabled auto-escaping, chaining filters, including
 :tfilter:`escape`, may cause unexpected (but documented) results such as the
 following:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% autoescape off %}
         {{ my_list|join:", "|escape }}
@@ -59,7 +59,7 @@ escaping.
 In order to properly escape every element in a sequence, use the
 :tfilter:`escapeseq` filter:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% autoescape off %}
         {{ my_list|escapeseq|join:", " }}
@@ -84,7 +84,7 @@ useful when commenting out code for documenting why the code was disabled.
 
 Sample usage:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <p>Rendered text with {{ pub_date|date:"c" }}</p>
     {% comment "Optional note" %}
@@ -113,7 +113,7 @@ the first argument and produces it again.
 
 This tag is particularly useful in a loop:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for o in some_list %}
         <tr class="{% cycle 'row1' 'row2' %}">
@@ -129,7 +129,7 @@ You can use variables, too. For example, if you have two template variables,
 ``rowvalue1`` and ``rowvalue2``, you can alternate between their values like
 this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for o in some_list %}
         <tr class="{% cycle rowvalue1 rowvalue2 %}">
@@ -140,7 +140,7 @@ this:
 Variables included in the cycle will be escaped.  You can disable auto-escaping
 with:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for o in some_list %}
         <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
@@ -150,7 +150,7 @@ with:
 
 You can mix variables and strings:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for o in some_list %}
         <tr class="{% cycle 'row1' rowvalue2 'row3' %}">
@@ -162,7 +162,7 @@ In some cases you might want to refer to the current value of a cycle
 without advancing to the next value. To do this,
 give the ``{% cycle %}`` tag a name, using "as", like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% cycle 'row1' 'row2' as rowcolors %}
 
@@ -172,7 +172,7 @@ want to move the cycle to the next value independently of the original
 ``cycle`` tag, you can use another ``cycle`` tag and specify the name of the
 variable. So, the following template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <tr>
         <td class="{% cycle 'row1' 'row2' as rowcolors %}">...</td>
@@ -185,7 +185,7 @@ variable. So, the following template:
 
 would output:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <tr>
         <td class="row1">...</td>
@@ -208,7 +208,7 @@ use the value in a nested loop or an included template. If you only want
 to declare the cycle but not produce the first value, you can add a
 ``silent`` keyword as the last keyword in the tag. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for obj in some_list %}
         {% cycle 'row1' 'row2' as rowcolors silent %}
@@ -227,7 +227,7 @@ automatically applies to all subsequent uses of that specific cycle tag.
 The following template would output *nothing*, even though the second
 call to ``{% cycle %}`` doesn't specify ``silent``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
@@ -257,9 +257,9 @@ This tag can be used in two ways:
   ``"base.html"`` as the name of the parent template to extend.
 
 * ``{% extends variable %}`` uses the value of ``variable``. If the variable
-  evaluates to a string, Django will use that string as the name of the
+  evaluates to a string, Thibaud will use that string as the name of the
   parent template. If the variable evaluates to a ``Template`` object,
-  Django will use that object as the parent template.
+  Thibaud will use that object as the parent template.
 
 See :ref:`template-inheritance` for more information.
 
@@ -278,7 +278,7 @@ For example, assume the following directory structure:
 
 In ``template.html``, the following paths would be valid:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% extends "./base2.html" %}
     {% extends "../base1.html" %}
@@ -298,7 +298,7 @@ Note that the block includes *all* the text between the ``filter`` and
 
 Sample usage:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% filter force_escape|lower %}
         This text will be HTML-escaped, and will appear in all lowercase.
@@ -321,13 +321,13 @@ nothing if all the passed variables are "false".
 
 Sample usage:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% firstof var1 var2 var3 %}
 
 This is equivalent to:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if var1 %}
         {{ var1 }}
@@ -340,13 +340,13 @@ This is equivalent to:
 You can also use a literal string as a fallback value in case all
 passed variables are False:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% firstof var1 var2 var3 "fallback value" %}
 
 This tag auto-escapes variable values. You can disable auto-escaping with:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% autoescape off %}
         {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
@@ -354,7 +354,7 @@ This tag auto-escapes variable values. You can disable auto-escaping with:
 
 Or if only some variables should be escaped, you can use:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
@@ -370,7 +370,7 @@ Loops over each item in an array, making the item available in a context
 variable. For example, to display a list of athletes provided in
 ``athlete_list``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <ul>
     {% for athlete in athlete_list %}
@@ -386,7 +386,7 @@ in each sublist into individual variables. For example, if your context
 contains a list of (x,y) coordinates called ``points``, you could use the
 following to output the list of points:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for x, y in points %}
         There is a point at {{ x }},{{ y }}
@@ -396,7 +396,7 @@ This can also be useful if you need to access the items in a dictionary.
 For example, if your context contained a dictionary ``data``, the following
 would display the keys and values of the dictionary:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for key, value in data.items %}
         {{ key }}: {{ value }}
@@ -433,7 +433,7 @@ Variable                    Description
 The ``for`` tag can take an optional ``{% empty %}`` clause whose text is
 displayed if the given array is empty or could not be found:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <ul>
     {% for athlete in athlete_list %}
@@ -446,7 +446,7 @@ displayed if the given array is empty or could not be found:
 The above is equivalent to -- but shorter, cleaner, and possibly faster
 than -- the following:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <ul>
       {% if athlete_list %}
@@ -467,7 +467,7 @@ The ``{% if %}`` tag evaluates a variable, and if that variable is "true" (i.e.
 exists, is not empty, and is not a false boolean value) the contents of the
 block are output:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if athlete_list %}
         Number of athletes: {{ athlete_list|length }}
@@ -490,7 +490,7 @@ Boolean operators
 :ttag:`if` tags may use ``and``, ``or`` or ``not`` to test a number of
 variables or to negate a given variable:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if athlete_list and coach_list %}
         Both athletes and coaches are available.
@@ -515,7 +515,7 @@ variables or to negate a given variable:
 Use of both ``and`` and ``or`` clauses within the same tag is allowed, with
 ``and`` having higher precedence than ``or`` e.g.:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if athlete_list and coach_list or cheerleader_list %}
 
@@ -536,7 +536,7 @@ follows:
 
 Equality. Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if somevar == "x" %}
       This appears if variable somevar equals the string "x"
@@ -547,7 +547,7 @@ Equality. Example:
 
 Inequality. Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if somevar != "x" %}
       This appears if variable somevar does not equal the string "x",
@@ -559,7 +559,7 @@ Inequality. Example:
 
 Less than. Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if somevar < 100 %}
       This appears if variable somevar is less than 100.
@@ -570,7 +570,7 @@ Less than. Example:
 
 Greater than. Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if somevar > 0 %}
       This appears if variable somevar is greater than 0.
@@ -581,7 +581,7 @@ Greater than. Example:
 
 Less than or equal to. Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if somevar <= 100 %}
       This appears if variable somevar is less than 100 or equal to 100.
@@ -592,7 +592,7 @@ Less than or equal to. Example:
 
 Greater than or equal to. Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if somevar >= 1 %}
       This appears if variable somevar is greater than 1 or equal to 1.
@@ -605,7 +605,7 @@ Contained within. This operator is supported by many Python containers to test
 whether the given value is in the container. The following are some examples
 of how ``x in y`` will be interpreted:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if "bc" in "abcdef" %}
       This appears since "bc" is a substring of "abcdef"
@@ -631,7 +631,7 @@ Not contained within. This is the negation of the ``in`` operator.
 
 Object identity. Tests if two values are the same object. Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if somevar is True %}
       This appears if and only if somevar is True.
@@ -647,7 +647,7 @@ Object identity. Tests if two values are the same object. Example:
 Negated object identity. Tests if two values are not the same object. This is
 the negation of the ``is`` operator. Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if somevar is not True %}
       This appears if somevar is not True, or if somevar is not found in the
@@ -663,7 +663,7 @@ Filters
 
 You can also use filters in the :ttag:`if` expression. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if messages|length >= 100 %}
        You have lots of messages today!
@@ -686,7 +686,7 @@ operators, from lowest to highest, is as follows:
 (This follows Python exactly). So, for example, the following complex
 :ttag:`if` tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if a == b or c == d and e %}
 
@@ -703,13 +703,13 @@ know the precedence rules.
 The comparison operators cannot be 'chained' like in Python or in mathematical
 notation. For example, instead of using:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if a > b > c %}  (WRONG)
 
 you should use:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if a > b and b > c %}
 
@@ -727,7 +727,7 @@ uses.
    displays the content if it has changed. For example, this displays a list of
    days, only displaying the month if it changes:
 
-   .. code-block:: html+django
+   .. code-block:: html+thibaud
 
         <h1>Archive for {{ year }}</h1>
 
@@ -740,7 +740,7 @@ uses.
    For example, the following shows the date every time it changes, while
    showing the hour if either the hour or the date has changed:
 
-   .. code-block:: html+django
+   .. code-block:: html+thibaud
 
         {% for date in days %}
             {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
@@ -752,7 +752,7 @@ uses.
 The ``ifchanged`` tag can also take an optional ``{% else %}`` clause that
 will be displayed if the value has not changed:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
         {% for match in matches %}
             <div style="background-color:
@@ -777,7 +777,7 @@ in either single or double quotes.
 
 This example includes the contents of the template ``"foo/bar.html"``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% include "foo/bar.html" %}
 
@@ -788,7 +788,7 @@ as described in the :ttag:`extends` tag.
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% include template_name %}
 
@@ -797,7 +797,7 @@ context. This allows you to reference a compiled ``Template`` in your context.
 
 Additionally, the variable may be an iterable of template names, in which case
 the first that can be loaded will be used, as per
-:func:`~django.template.loader.select_template`.
+:func:`~thibaud.template.loader.select_template`.
 
 An included template is rendered within the context of the template that
 includes it. This example produces the output ``"Hello, John!"``:
@@ -807,19 +807,19 @@ includes it. This example produces the output ``"Hello, John!"``:
 
 * Template:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
     {% include "name_snippet.html" %}
 
 * The ``name_snippet.html`` template:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
     {{ greeting }}, {{ person|default:"friend" }}!
 
 You can pass additional context to the template using keyword arguments:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% include "name_snippet.html" with person="Jane" greeting="Hello" %}
 
@@ -827,7 +827,7 @@ If you want to render the context only with the variables provided (or even
 no variables at all), use the ``only`` option. No other variables are
 available to the included template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% include "name_snippet.html" with greeting="Hi" only %}
 
@@ -854,7 +854,7 @@ For example, the following template would load all the tags and filters
 registered in ``somelibrary`` and ``otherlibrary`` located in package
 ``package``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load somelibrary package.otherlibrary %}
 
@@ -862,7 +862,7 @@ You can also selectively load individual filters or tags from a library, using
 the ``from`` argument. In this example, the template tags/filters named ``foo``
 and ``bar`` will be loaded from ``somelibrary``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load foo bar from somelibrary %}
 
@@ -879,7 +879,7 @@ data in templates.
 
 Usage:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% lorem [count] [method] [random] %}
 
@@ -916,7 +916,7 @@ in the :tfilter:`date` filter section.
 
 Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     It is {% now "jS F Y H:i" %}
 
@@ -925,7 +925,7 @@ Note that you can backslash-escape a format string if you want to use the
 otherwise each is a format string that displays the year and the time,
 respectively:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     It is the {% now "jS \o\f F" %}
 
@@ -939,7 +939,7 @@ This would display as "It is the 4th of September".
     The predefined formats may vary depending on the current locale and
     if :doc:`/topics/i18n/formatting` is enabled, e.g.:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         It is {% now "SHORT_DATETIME_FORMAT" %}
 
@@ -947,7 +947,7 @@ You can also use the syntax ``{% now "Y" as current_year %}`` to store the
 output (as a string) inside a variable. This is useful if you want to use
 ``{% now %}`` inside a template tag like :ttag:`blocktranslate` for example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% now "Y" as current_year %}
     {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
@@ -959,17 +959,17 @@ output (as a string) inside a variable. This is useful if you want to use
 
 Outputs a URL-encoded formatted query string based on the provided parameters.
 
-This tag requires a :class:`~django.http.QueryDict` instance, which defaults to
-:attr:`request.GET <django.http.HttpRequest.GET>` if none is provided.
+This tag requires a :class:`~thibaud.http.QueryDict` instance, which defaults to
+:attr:`request.GET <thibaud.http.HttpRequest.GET>` if none is provided.
 
-If the :class:`~django.http.QueryDict` is empty and no additional parameters
+If the :class:`~thibaud.http.QueryDict` is empty and no additional parameters
 are provided, an empty string is returned. Otherwise, the result includes a
 leading ``"?"``.
 
 .. admonition:: Using ``request.GET`` as default
 
     To use ``request.GET`` as the default ``QueryDict`` instance, the
-    ``django.template.context_processors.request`` context processor should be
+    ``thibaud.template.context_processors.request`` context processor should be
     enabled. If it's not enabled, you must either explicitly pass the
     ``request`` object into the template context, or provide a ``QueryDict``
     instance to this tag.
@@ -977,14 +977,14 @@ leading ``"?"``.
 Basic usage
 ~~~~~~~~~~~
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% querystring %}
 
 Outputs the current query string verbatim. So if the query string is
 ``?color=green``, the output would be ``?color=green``.
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% querystring size="M" %}
 
@@ -994,7 +994,7 @@ Following the previous example, the output would be ``?color=green&size=M``.
 Custom QueryDict
 ~~~~~~~~~~~~~~~~
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% querystring my_query_dict %}
 
@@ -1005,7 +1005,7 @@ So if ``my_query_dict`` is ``<QueryDict: {'color': ['blue']}>``, this outputs
 Setting items
 ~~~~~~~~~~~~~
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% querystring color="red" size="S" %}
 
@@ -1017,7 +1017,7 @@ instance, if the current query string is ``?color=green``, the output will be
 Removing items
 ~~~~~~~~~~~~~~
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% querystring color=None %}
 
@@ -1028,7 +1028,7 @@ will be ``?size=M``.
 Handling lists
 ~~~~~~~~~~~~~~
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% querystring color=my_list %}
 
@@ -1044,14 +1044,14 @@ pages of results. For example, if the paginator is currently on page 3, and the
 current query string is ``?color=blue&size=M&page=3``, the following code would
 output ``?color=blue&size=M&page=4``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% querystring page=page.next_page_number %}
 
 You can also store the value in a variable. For example, if you need multiple
 links to the same page, define it as:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% querystring page=page.next_page_number as next_page %}
 
@@ -1096,7 +1096,7 @@ like this:
 You can use the ``{% regroup %}`` tag to group the list of cities by country.
 The following snippet of template code would accomplish this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% regroup cities by country as country_list %}
 
@@ -1129,7 +1129,7 @@ attribute and calling the result ``country_list``.
 Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
 you can also write the previous example as:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% regroup cities by country as country_list %}
 
@@ -1191,7 +1191,7 @@ data is ordered according to how you want to display it.
 Another solution is to sort the data in the template using the
 :tfilter:`dictsort` filter, if your data is in a list of dictionaries:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% regroup cities|dictsort:"country" by country as country_list %}
 
@@ -1203,16 +1203,16 @@ tag, including methods, attributes, dictionary keys and list items. For
 example, if the "country" field is a foreign key to a class with
 an attribute "description," you could use:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% regroup cities by country.description as country_list %}
 
 Or, if ``country`` is a field with ``choices``, it will have a
-:meth:`~django.db.models.Model.get_FOO_display` method available as an
+:meth:`~thibaud.db.models.Model.get_FOO_display` method available as an
 attribute, allowing  you to group on the display string rather than the
 ``choices`` key:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% regroup cities by get_country_display as country_list %}
 
@@ -1230,7 +1230,7 @@ encounter. Without arguments, ``{% resetcycle %}`` will reset the last
 
 Example usage:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for coach in coach_list %}
         <h1>{{ coach.name }}</h1>
@@ -1259,7 +1259,7 @@ would start with ``class="even"``.
 
 You can also reset named cycle tags:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for item in list %}
         <p class="{% cycle 'odd' 'even' as stripe %} {% cycle 'major' 'minor' 'minor' 'minor' 'minor' as tick %}">
@@ -1284,7 +1284,7 @@ characters and newlines.
 
 Example usage:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% spaceless %}
         <p>
@@ -1294,14 +1294,14 @@ Example usage:
 
 This example would return this HTML:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <p><a href="foo/">Foo</a></p>
 
 Only space between *tags* is removed -- not space between tags and text. In
 this example, the space around ``Hello`` won't be stripped:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% spaceless %}
         <strong>
@@ -1337,7 +1337,7 @@ Argument            Outputs
 
 Sample usage:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     The {% templatetag openblock %} characters open a block.
 
@@ -1351,12 +1351,12 @@ characters.
 
 Returns an absolute path reference (a URL without the domain name) matching a
 given view and optional parameters. Any special characters in the resulting
-path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
+path will be encoded using :func:`~thibaud.utils.encoding.iri_to_uri`.
 
 This is a way to output links without violating the DRY principle by having to
 hard-code URLs in your templates:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% url 'some-url-name' v1 v2 %}
 
@@ -1366,7 +1366,7 @@ optional and should be space-separated values that will be used as arguments in
 the URL. The example above shows passing positional arguments. Alternatively
 you may use keyword syntax:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% url 'some-url-name' arg1=v1 arg2=v2 %}
 
@@ -1390,20 +1390,20 @@ such as this:
 
 ...then, in a template, you can create a link to this view like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% url 'app-views-client' client.id %}
 
 The template tag will output the string ``/clients/client/123/``.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`~django.urls.NoReverseMatch` exception raised, which will cause your
+:exc:`~thibaud.urls.NoReverseMatch` exception raised, which will cause your
 site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% url 'some-url-name' arg arg2 as the_url %}
 
@@ -1415,7 +1415,7 @@ The scope of the variable created by the  ``as var`` syntax is the
 This ``{% url ... as var %}`` syntax will *not* cause an error if the view is
 missing. In practice you'll use this to link to views that are optional:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% url 'some-url-name' as the_url %}
     {% if the_url %}
@@ -1424,7 +1424,7 @@ missing. In practice you'll use this to link to views that are optional:
 
 If you'd like to retrieve a namespaced URL, specify the fully qualified name:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% url 'myapp:view-name' %}
 
@@ -1445,9 +1445,9 @@ by the context as to the current application.
 Stops the template engine from rendering the contents of this block tag.
 
 A common use is to allow a JavaScript template layer that collides with
-Django's syntax. For example:
+Thibaud's syntax. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% verbatim %}
         {{if dying}}Still alive.{{/if}}
@@ -1456,7 +1456,7 @@ Django's syntax. For example:
 You can also designate a specific closing tag, allowing the use of
 ``{% endverbatim %}`` as part of the unrendered contents:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% verbatim myblock %}
         Avoid template rendering via the {% verbatim %}{% endverbatim %} block.
@@ -1472,7 +1472,7 @@ value to a maximum value, and then applies that ratio to a constant.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <img src="bar.png" alt="Bar"
          height="10" width="{% widthratio this_value max_value max_width %}">
@@ -1484,7 +1484,7 @@ image in the above example will be 88 pixels wide
 In some cases you might want to capture the result of ``widthratio`` in a
 variable. It can be useful, for instance, in a :ttag:`blocktranslate` like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% widthratio this_value max_value max_width as width %}
     {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
@@ -1499,7 +1499,7 @@ an "expensive" method (e.g., one that hits the database) multiple times.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% with total=business.employees.count %}
         {{ total }} employee{{ total|pluralize }}
@@ -1510,7 +1510,7 @@ between the ``{% with %}`` and ``{% endwith %}`` tags.
 
 You can assign more than one context variable:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% with alpha=1 beta=2 %}
         ...
@@ -1533,7 +1533,7 @@ Adds the argument to the value.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|add:"2" }}
 
@@ -1546,7 +1546,7 @@ be an empty string.
 
 For example, if we have:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ first|add:second }}
 
@@ -1567,12 +1567,12 @@ Adds slashes before quotes. Useful for escaping strings in CSV, for example.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|addslashes }}
 
-If ``value`` is ``"I'm using Django"``, the output will be
-``"I\'m using Django"``.
+If ``value`` is ``"I'm using Thibaud"``, the output will be
+``"I\'m using Thibaud"``.
 
 .. templatefilter:: capfirst
 
@@ -1584,11 +1584,11 @@ a letter, this filter has no effect.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|capfirst }}
 
-If ``value`` is ``"django"``, the output will be ``"Django"``.
+If ``value`` is ``"thibaud"``, the output will be ``"Thibaud"``.
 
 .. templatefilter:: center
 
@@ -1599,11 +1599,11 @@ Centers the value in a field of a given width.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     "{{ value|center:"15" }}"
 
-If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
+If ``value`` is ``"Thibaud"``, the output will be ``"     Thibaud    "``.
 
 .. templatefilter:: cut
 
@@ -1614,7 +1614,7 @@ Removes all values of arg from the given string.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|cut:" " }}
 
@@ -1633,7 +1633,7 @@ Uses a similar format to PHP's `date()
 differences.
 
 .. note::
-    These format characters are not used in Django outside of templates. They
+    These format characters are not used in Thibaud outside of templates. They
     were designed to be compatible with PHP to ease transitioning for designers.
 
 .. _date-and-time-formatting-specifiers:
@@ -1727,7 +1727,7 @@ Format character  Description                               Example output
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|date:"D d M Y" }}
 
@@ -1743,17 +1743,17 @@ depending on the current locale.
 
 Assuming that :setting:`LANGUAGE_CODE` is, for example, ``"es"``, then for:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|date:"SHORT_DATE_FORMAT" }}
 
 the output would be the string ``"09/01/2008"`` (the ``"SHORT_DATE_FORMAT"``
-format specifier for the ``es`` locale as shipped with Django is ``"d/m/Y"``).
+format specifier for the ``es`` locale as shipped with Thibaud is ``"d/m/Y"``).
 
 When used without a format string, the ``DATE_FORMAT`` format specifier is
 used. Assuming the same settings as the previous example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|date }}
 
@@ -1765,7 +1765,7 @@ day and the timezone name, respectively.
 You can combine ``date`` with the :tfilter:`time` filter to render a full
 representation of a ``datetime`` value. E.g.:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|date:"D d M Y" }} {{ value|time:"H:i" }}
 
@@ -1779,7 +1779,7 @@ value.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|default:"nothing" }}
 
@@ -1798,7 +1798,7 @@ Use the :tfilter:`default` filter if you want to fallback for empty strings.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|default_if_none:"nothing" }}
 
@@ -1814,7 +1814,7 @@ the argument.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|dictsort:"name" }}
 
@@ -1840,7 +1840,7 @@ then the output would be:
 
 You can also do more complicated things like:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for book in books|dictsort:"author.age" %}
         * {{ book.title }} ({{ book.author.name }})
@@ -1858,7 +1858,7 @@ If ``books`` is:
 
 then the output would be:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     * Alice (Lewis)
     * 1984 (George)
@@ -1867,7 +1867,7 @@ then the output would be:
 ``dictsort`` can also order a list of lists (or any other object implementing
 ``__getitem__()``) by elements at specified index. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|dictsort:0 }}
 
@@ -1894,7 +1894,7 @@ then the output would be:
 You must pass the index as an integer rather than a string. The following
 produce empty output:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ values|dictsort:"0" }}
 
@@ -1918,7 +1918,7 @@ Returns ``True`` if the value is divisible by the argument.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|divisibleby:"3" }}
 
@@ -1944,7 +1944,7 @@ multiple escaping passes to be applied, use the :tfilter:`force_escape` filter.
 
 For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% autoescape off %}
         {{ title|escape }}
@@ -1978,7 +1978,7 @@ filter, rather than in embedded JavaScript.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <script>
     let myValue = '{{ value|escapejs }}'
@@ -1992,7 +1992,7 @@ Applies the :tfilter:`escape` filter to each element of a sequence. Useful in
 conjunction with other filters that operate on sequences, such as
 :tfilter:`join`. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% autoescape off %}
         {{ my_list|escapeseq|join:", " }}
@@ -2008,7 +2008,7 @@ Formats the value like a 'human-readable' file size (i.e. ``'13 KB'``,
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|filesizeformat }}
 
@@ -2018,7 +2018,7 @@ If ``value`` is 123456789, the output would be ``117.7 MB``.
 
     Strictly speaking, ``filesizeformat`` does not conform to the International
     System of Units which recommends using KiB, MiB, GiB, etc. when byte sizes
-    are calculated in powers of 1024 (which is the case here). Instead, Django
+    are calculated in powers of 1024 (which is the case here). Instead, Thibaud
     uses traditional unit names (KB, MB, GB, etc.) corresponding to names that
     are more commonly used.
 
@@ -2031,7 +2031,7 @@ Returns the first item in a list.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|first }}
 
@@ -2128,7 +2128,7 @@ the :tfilter:`escape` filter.
 For example, if you want to catch the ``<p>`` HTML elements created by
 the :tfilter:`linebreaks` filter:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% autoescape off %}
         {{ body|linebreaks|force_escape }}
@@ -2146,7 +2146,7 @@ than 1). Otherwise, output is always an integer.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|get_digit:"2" }}
 
@@ -2166,12 +2166,12 @@ It's safe to use this filter on a string that has already gone through the
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|iriencode }}
 
-If ``value`` is ``"?test=I ♥ Django"``, the output will be
-``"?test=I%20%E2%99%A5%20Django"``.
+If ``value`` is ``"?test=I ♥ Thibaud"``, the output will be
+``"?test=I%20%E2%99%A5%20Thibaud"``.
 
 .. templatefilter:: join
 
@@ -2182,7 +2182,7 @@ Joins a list with a string, like Python's ``str.join(list)``
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|join:" // " }}
 
@@ -2201,7 +2201,7 @@ for use with JavaScript.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|json_script:"hello-data" }}
 
@@ -2237,7 +2237,7 @@ Returns the last item in a list.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|last }}
 
@@ -2253,7 +2253,7 @@ Returns the length of the value. This works for both strings and lists.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|length }}
 
@@ -2273,7 +2273,7 @@ followed by a blank line becomes a paragraph break (``</p>``).
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|linebreaks }}
 
@@ -2290,7 +2290,7 @@ Converts all newlines in a piece of plain text to HTML line breaks
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|linebreaksbr }}
 
@@ -2306,13 +2306,13 @@ Displays text with line numbers.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|linenumbers }}
 
 If ``value`` is:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     one
     two
@@ -2320,7 +2320,7 @@ If ``value`` is:
 
 the output will be:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     1. one
     2. two
@@ -2337,11 +2337,11 @@ Left-aligns the value in a field of a given width.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     "{{ value|ljust:"10" }}"
 
-If ``value`` is ``Django``, the output will be ``"Django    "``.
+If ``value`` is ``Thibaud``, the output will be ``"Thibaud    "``.
 
 .. templatefilter:: lower
 
@@ -2352,7 +2352,7 @@ Converts a string into all lowercase.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|lower }}
 
@@ -2369,7 +2369,7 @@ For an integer, the argument is cast to a string before creating a list.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|make_list }}
 
@@ -2390,7 +2390,7 @@ any string.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|phone2numeric }}
 
@@ -2406,7 +2406,7 @@ length 1. By default, this suffix is ``'s'``.
 
 Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     You have {{ num_messages }} message{{ num_messages|pluralize }}.
 
@@ -2418,7 +2418,7 @@ suffix as a parameter to the filter.
 
 Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     You have {{ num_walruses }} walrus{{ num_walruses|pluralize:"es" }}.
 
@@ -2427,7 +2427,7 @@ singular and plural suffix, separated by a comma.
 
 Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
 
@@ -2449,7 +2449,7 @@ Returns a random item from the given list.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|random }}
 
@@ -2466,11 +2466,11 @@ Right-aligns the value in a field of a given width.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     "{{ value|rjust:"10" }}"
 
-If ``value`` is ``Django``, the output will be ``"    Django"``.
+If ``value`` is ``Thibaud``, the output will be ``"    Thibaud"``.
 
 .. templatefilter:: safe
 
@@ -2486,7 +2486,7 @@ autoescaping is off, this filter has no effect.
     make the contents unsafe again. For example, the following code
     prints the variable as is, unescaped:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {{ var|safe|escape }}
 
@@ -2499,7 +2499,7 @@ Applies the :tfilter:`safe` filter to each element of a sequence. Useful in
 conjunction with other filters that operate on sequences, such as
 :tfilter:`join`. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ some_list|safeseq|join:", " }}
 
@@ -2520,7 +2520,7 @@ introduction.
 
 Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ some_list|slice:":2" }}
 
@@ -2537,7 +2537,7 @@ leading and trailing whitespace.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|slugify }}
 
@@ -2554,7 +2554,7 @@ that the leading "%" is dropped.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|stringformat:"E" }}
 
@@ -2569,7 +2569,7 @@ Makes all possible efforts to strip all [X]HTML tags.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|striptags }}
 
@@ -2596,7 +2596,7 @@ is locale-dependent.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|time:"H:i" }}
 
@@ -2608,7 +2608,7 @@ Note that you can backslash-escape a format string if you want to use the
 otherwise each is a format string that displays the hour and the month,
 respectively:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|time:"H\h i\m" }}
 
@@ -2618,12 +2618,12 @@ Another example:
 
 Assuming that :setting:`LANGUAGE_CODE` is, for example, ``"de"``, then for:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|time:"TIME_FORMAT" }}
 
 the output will be the string ``"01:23"`` (The ``"TIME_FORMAT"`` format
-specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
+specifier for the ``de`` locale as shipped with Thibaud is ``"H:i"``).
 
 The ``time`` filter will only accept parameters in the format string that
 relate to the time of day, not the date. If you need to format a ``date``
@@ -2639,13 +2639,13 @@ accept the timezone-related :ref:`format specifiers
 When used without a format string, the ``TIME_FORMAT`` format specifier is
 used:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|time }}
 
 is the same as:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|time:"TIME_FORMAT" }}
 
@@ -2662,7 +2662,7 @@ For example, if ``blog_date`` is a date instance representing midnight on 1
 June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
 then the following would return "8 hours":
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ blog_date|timesince:comment_date }}
 
@@ -2685,7 +2685,7 @@ Takes an optional argument that is a variable containing the date to use as
 the comparison point (instead of *now*). If ``from_date`` contains 22 June
 2006, then the following will return "1 week":
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ conference_date|timeuntil:from_date }}
 
@@ -2705,7 +2705,7 @@ keep "trivial words" in lowercase.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|title }}
 
@@ -2723,7 +2723,7 @@ Truncated strings will end with a translatable ellipsis character ("…").
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|truncatechars:7 }}
 
@@ -2740,7 +2740,7 @@ are closed immediately after the truncation.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|truncatechars_html:7 }}
 
@@ -2766,7 +2766,7 @@ Truncates a string after a certain number of words.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|truncatewords:2 }}
 
@@ -2788,7 +2788,7 @@ when it is being passed HTML text.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|truncatewords_html:2 }}
 
@@ -2815,7 +2815,7 @@ The list is assumed to be in the proper format. For example, if ``var``
 contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
 ``{{ var|unordered_list }}`` would return:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <li>States
     <ul>
@@ -2838,7 +2838,7 @@ Converts a string into all uppercase.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|upper }}
 
@@ -2853,7 +2853,7 @@ Escapes a value for use in a URL.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|urlencode }}
 
@@ -2866,7 +2866,7 @@ be provided.
 If not provided, the '/' character is assumed safe. An empty string can be
 provided when *all* characters should be escaped. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|urlencode:"" }}
 
@@ -2881,12 +2881,12 @@ If ``value`` is ``"https://www.example.org/"``, the output will be
 Converts URLs and email addresses in text into clickable links.
 
 This template tag works on links prefixed with ``http://``, ``https://``, or
-``www.``. For example, ``https://djangocon.eu`` will get converted but
-``djangocon.eu`` won't.
+``www.``. For example, ``https://thibaudcon.eu`` will get converted but
+``thibaudcon.eu`` won't.
 
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
-``.org``). For example, ``djangoproject.com`` gets converted.
+``.org``). For example, ``thibaudproject.com`` gets converted.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.
@@ -2896,13 +2896,13 @@ to them.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|urlize }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
-``"Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproject.com</a>"``.
+If ``value`` is ``"Check out www.thibaudproject.com"``, the output will be
+``"Check out <a href="http://www.thibaudproject.com"
+rel="nofollow">www.thibaudproject.com</a>"``.
 
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
@@ -2911,7 +2911,7 @@ In addition to web links, ``urlize`` also converts email addresses into
 
 The ``urlize`` filter also takes an optional parameter ``autoescape``. If
 ``autoescape`` is ``True``, the link text and URLs will be escaped using
-Django's built-in :tfilter:`escape` filter. The default value for
+Thibaud's built-in :tfilter:`escape` filter. The default value for
 ``autoescape`` is ``True``.
 
 .. note::
@@ -2924,10 +2924,10 @@ Django's built-in :tfilter:`escape` filter. The default value for
 
     Using ``urlize`` or ``urlizetrunc`` can incur a performance penalty, which
     can become severe when applied to user controlled values such as content
-    stored in a :class:`~django.db.models.TextField`. You can use
+    stored in a :class:`~thibaud.db.models.TextField`. You can use
     :tfilter:`truncatechars` to add a limit to such inputs:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {{ value|truncatechars:500|urlize }}
 
@@ -2944,13 +2944,13 @@ including the ellipsis that's added if truncation is necessary.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|urlizetrunc:15 }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
-``'Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproj…</a>'``.
+If ``value`` is ``"Check out www.thibaudproject.com"``, the output would be
+``'Check out <a href="http://www.thibaudproject.com"
+rel="nofollow">www.thibaudproj…</a>'``.
 
 As with urlize_, this filter should only be applied to plain text.
 
@@ -2963,7 +2963,7 @@ Returns the number of words.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|wordcount }}
 
@@ -2980,13 +2980,13 @@ Wraps words at specified line length.
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|wordwrap:5 }}
 
 If ``value`` is ``Joel is a slug``, the output would be:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     Joel
     is a
@@ -3003,7 +3003,7 @@ returns one of those strings according to the value:
 
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ value|yesno:"yeah,no,maybe" }}
 
@@ -3021,7 +3021,7 @@ Value       Argument                Outputs
 Internationalization tags and filters
 =====================================
 
-Django provides template tags and filters to control each aspect of
+Thibaud provides template tags and filters to control each aspect of
 :doc:`internationalization </topics/i18n/index>` in templates. They allow for
 granular control of translations, formatting, and time zone conversions.
 
@@ -3055,14 +3055,14 @@ See :ref:`time-zones-in-templates`.
 Other tags and filters libraries
 ================================
 
-Django comes with a couple of other template-tag libraries that you have to
+Thibaud comes with a couple of other template-tag libraries that you have to
 enable explicitly in your :setting:`INSTALLED_APPS` setting and enable in your
 template with the :ttag:`{% load %}<load>` tag.
 
-``django.contrib.humanize``
+``thibaud.contrib.humanize``
 ---------------------------
 
-A set of Django template filters useful for adding a "human touch" to data. See
+A set of Thibaud template filters useful for adding a "human touch" to data. See
 :doc:`/ref/contrib/humanize`.
 
 ``static``
@@ -3073,12 +3073,12 @@ A set of Django template filters useful for adding a "human touch" to data. See
 ``static``
 ~~~~~~~~~~
 
-To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
-with a :ttag:`static` template tag. If the :mod:`django.contrib.staticfiles`
+To link to static files that are saved in :setting:`STATIC_ROOT` Thibaud ships
+with a :ttag:`static` template tag. If the :mod:`thibaud.contrib.staticfiles`
 app is installed, the tag will serve files using ``url()`` method of the
 storage specified by ``staticfiles`` in :setting:`STORAGES`. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load static %}
     <img src="{% static 'images/hi.jpg' %}" alt="Hi!">
@@ -3086,7 +3086,7 @@ storage specified by ``staticfiles`` in :setting:`STORAGES`. For example:
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load static %}
     <link rel="stylesheet" href="{% static user_stylesheet %}" media="screen">
@@ -3094,7 +3094,7 @@ It is also able to consume standard context variables, e.g. assuming a
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
@@ -3102,7 +3102,7 @@ slightly different call:
 
 .. admonition:: Using Jinja2 templates?
 
-    See :class:`~django.template.backends.jinja2.Jinja2` for information on
+    See :class:`~thibaud.template.backends.jinja2.Jinja2` for information on
     using the ``static`` tag with Jinja2.
 
 .. templatetag:: get_static_prefix
@@ -3114,7 +3114,7 @@ You should prefer the :ttag:`static` template tag, but if you need more control
 over exactly where and how :setting:`STATIC_URL` is injected into the template,
 you can use the :ttag:`get_static_prefix` template tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load static %}
     <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!">
@@ -3122,7 +3122,7 @@ you can use the :ttag:`get_static_prefix` template tag:
 There's also a second form you can use to avoid extra processing if you need
 the value multiple times:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load static %}
     {% get_static_prefix as STATIC_PREFIX %}
@@ -3138,7 +3138,7 @@ the value multiple times:
 Similar to the :ttag:`get_static_prefix`, ``get_media_prefix`` populates a
 template variable with the media prefix :setting:`MEDIA_URL`, e.g.:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load static %}
     <body data-media-url="{% get_media_prefix %}">

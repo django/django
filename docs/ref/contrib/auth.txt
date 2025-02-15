@@ -1,13 +1,13 @@
 =======================
-``django.contrib.auth``
+``thibaud.contrib.auth``
 =======================
 
-This document provides API reference material for the components of Django's
+This document provides API reference material for the components of Thibaud's
 authentication system. For more details on the usage of these components or
 how to customize authentication and authorization see the :doc:`authentication
 topic guide </topics/auth/index>`.
 
-.. currentmodule:: django.contrib.auth
+.. currentmodule:: thibaud.contrib.auth
 
 ``User`` model
 ==============
@@ -20,7 +20,7 @@ Fields
 .. class:: models.User
     :noindex:
 
-    :class:`~django.contrib.auth.models.User` objects have the following
+    :class:`~thibaud.contrib.auth.models.User` objects have the following
     fields:
 
     .. attribute:: username
@@ -34,22 +34,22 @@ Fields
 
     .. attribute:: first_name
 
-        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
+        Optional (:attr:`blank=True <thibaud.db.models.Field.blank>`). 150
         characters or fewer.
 
     .. attribute:: last_name
 
-        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
+        Optional (:attr:`blank=True <thibaud.db.models.Field.blank>`). 150
         characters or fewer.
 
     .. attribute:: email
 
-        Optional (:attr:`blank=True <django.db.models.Field.blank>`). Email
+        Optional (:attr:`blank=True <thibaud.db.models.Field.blank>`). Email
         address.
 
     .. attribute:: password
 
-        Required. A hash of, and metadata about, the password. (Django doesn't
+        Required. A hash of, and metadata about, the password. (Thibaud doesn't
         store the raw password.) Raw passwords can be arbitrarily long and can
         contain any character. The metadata in this field may mark the password
         as unusable. See the :doc:`password documentation
@@ -57,11 +57,11 @@ Fields
 
     .. attribute:: groups
 
-        Many-to-many relationship to :class:`~django.contrib.auth.models.Group`
+        Many-to-many relationship to :class:`~thibaud.contrib.auth.models.Group`
 
     .. attribute:: user_permissions
 
-        Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+        Many-to-many relationship to :class:`~thibaud.contrib.auth.models.Permission`
 
     .. attribute:: is_staff
 
@@ -77,17 +77,17 @@ Fields
         This doesn't necessarily control whether or not the user can log in.
         Authentication backends aren't required to check for the ``is_active``
         flag but the default backend
-        (:class:`~django.contrib.auth.backends.ModelBackend`) and the
-        :class:`~django.contrib.auth.backends.RemoteUserBackend` do. You can
-        use :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`
-        or :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
+        (:class:`~thibaud.contrib.auth.backends.ModelBackend`) and the
+        :class:`~thibaud.contrib.auth.backends.RemoteUserBackend` do. You can
+        use :class:`~thibaud.contrib.auth.backends.AllowAllUsersModelBackend`
+        or :class:`~thibaud.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
         if you want to allow inactive users to login. In this case, you'll also
         want to customize the
-        :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
-        :class:`~django.contrib.auth.views.LoginView` as it rejects inactive
+        :class:`~thibaud.contrib.auth.forms.AuthenticationForm` used by the
+        :class:`~thibaud.contrib.auth.views.LoginView` as it rejects inactive
         users. Be aware that the permission-checking methods such as
-        :meth:`~django.contrib.auth.models.User.has_perm` and the
-        authentication in the Django admin all return ``False`` for inactive
+        :meth:`~thibaud.contrib.auth.models.User.has_perm` and the
+        authentication in the Thibaud admin all return ``False`` for inactive
         users.
 
     .. attribute:: is_superuser
@@ -117,7 +117,7 @@ Attributes
         any permissions and doesn't check if the user is active or has a valid
         session. Even though normally you will check this attribute on
         ``request.user`` to find out whether it has been populated by the
-        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+        :class:`~thibaud.contrib.auth.middleware.AuthenticationMiddleware`
         (representing the currently logged-in user), you should know this
         attribute is ``True`` for any :class:`~models.User` instance.
 
@@ -126,7 +126,7 @@ Attributes
         Read-only attribute which is always ``False``. This is a way of
         differentiating :class:`~models.User` and :class:`~models.AnonymousUser`
         objects. Generally, you should prefer using
-        :attr:`~django.contrib.auth.models.User.is_authenticated` to this
+        :attr:`~thibaud.contrib.auth.models.User.is_authenticated` to this
         attribute.
 
 Methods
@@ -143,23 +143,23 @@ Methods
 
     .. method:: get_full_name()
 
-        Returns the :attr:`~django.contrib.auth.models.User.first_name` plus
-        the :attr:`~django.contrib.auth.models.User.last_name`, with a space in
+        Returns the :attr:`~thibaud.contrib.auth.models.User.first_name` plus
+        the :attr:`~thibaud.contrib.auth.models.User.last_name`, with a space in
         between.
 
     .. method:: get_short_name()
 
-        Returns the :attr:`~django.contrib.auth.models.User.first_name`.
+        Returns the :attr:`~thibaud.contrib.auth.models.User.first_name`.
 
     .. method:: set_password(raw_password)
 
         Sets the user's password to the given raw string, taking care of the
         password hashing. Doesn't save the
-        :class:`~django.contrib.auth.models.User` object.
+        :class:`~thibaud.contrib.auth.models.User` object.
 
         When the ``raw_password`` is ``None``, the password will be set to an
         unusable password, as if
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+        :meth:`~thibaud.contrib.auth.models.User.set_unusable_password()`
         were used.
 
     .. method:: check_password(raw_password)
@@ -174,11 +174,11 @@ Methods
     .. method:: set_unusable_password()
 
         Marks the user as having no password set by updating the metadata in
-        the :attr:`~django.contrib.auth.models.User.password` field. This isn't
+        the :attr:`~thibaud.contrib.auth.models.User.password` field. This isn't
         the same as having a blank string for a password.
-        :meth:`~django.contrib.auth.models.User.check_password()` for this user
+        :meth:`~thibaud.contrib.auth.models.User.check_password()` for this user
         will never return ``True``. Doesn't save the
-        :class:`~django.contrib.auth.models.User` object.
+        :class:`~thibaud.contrib.auth.models.User` object.
 
         You may need this if authentication for your application takes place
         against an existing external source such as an LDAP directory.
@@ -187,12 +187,12 @@ Methods
 
             Users having an unusable password will not able to request a
             password reset email via
-            :class:`~django.contrib.auth.views.PasswordResetView`.
+            :class:`~thibaud.contrib.auth.views.PasswordResetView`.
 
     .. method:: has_usable_password()
 
         Returns ``False`` if
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
+        :meth:`~thibaud.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
 
     .. method:: get_user_permissions(obj=None)
@@ -281,7 +281,7 @@ Methods
         *Asynchronous version*: ``ahas_module_perms()``
 
         Returns ``True`` if the user has any permissions in the given package
-        (the Django app label). If the user is inactive, this method will
+        (the Thibaud app label). If the user is inactive, this method will
         always return ``False``. For an active superuser, this method will
         always return ``True``.
 
@@ -291,42 +291,42 @@ Methods
 
     .. method:: email_user(subject, message, from_email=None, **kwargs)
 
-        Sends an email to the user. If ``from_email`` is ``None``, Django uses
+        Sends an email to the user. If ``from_email`` is ``None``, Thibaud uses
         the :setting:`DEFAULT_FROM_EMAIL`. Any ``**kwargs`` are passed to the
-        underlying :meth:`~django.core.mail.send_mail()` call.
+        underlying :meth:`~thibaud.core.mail.send_mail()` call.
 
 Manager methods
 ---------------
 
 .. class:: models.UserManager
 
-    The :class:`~django.contrib.auth.models.User` model has a custom manager
+    The :class:`~thibaud.contrib.auth.models.User` model has a custom manager
     that has the following helper methods (in addition to the methods provided
-    by :class:`~django.contrib.auth.models.BaseUserManager`):
+    by :class:`~thibaud.contrib.auth.models.BaseUserManager`):
 
     .. method:: create_user(username, email=None, password=None, **extra_fields)
     .. method:: acreate_user(username, email=None, password=None, **extra_fields)
 
         *Asynchronous version*: ``acreate_user()``
 
-        Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
+        Creates, saves and returns a :class:`~thibaud.contrib.auth.models.User`.
 
-        The :attr:`~django.contrib.auth.models.User.username` and
-        :attr:`~django.contrib.auth.models.User.password` are set as given. The
-        domain portion of :attr:`~django.contrib.auth.models.User.email` is
+        The :attr:`~thibaud.contrib.auth.models.User.username` and
+        :attr:`~thibaud.contrib.auth.models.User.password` are set as given. The
+        domain portion of :attr:`~thibaud.contrib.auth.models.User.email` is
         automatically converted to lowercase, and the returned
-        :class:`~django.contrib.auth.models.User` object will have
-        :attr:`~django.contrib.auth.models.User.is_active` set to ``True``.
+        :class:`~thibaud.contrib.auth.models.User` object will have
+        :attr:`~thibaud.contrib.auth.models.User.is_active` set to ``True``.
 
         If no password is provided,
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
+        :meth:`~thibaud.contrib.auth.models.User.set_unusable_password()` will
         be called.
 
-        If no email is provided, :attr:`~django.contrib.auth.models.User.email`
+        If no email is provided, :attr:`~thibaud.contrib.auth.models.User.email`
         will be set to an empty string.
 
         The ``extra_fields`` keyword arguments are passed through to the
-        :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
+        :class:`~thibaud.contrib.auth.models.User`’s ``__init__`` method to
         allow setting arbitrary fields on a :ref:`custom user model
         <auth-custom-user>`.
 
@@ -352,7 +352,7 @@ Manager methods
 
         Returns users that have the given permission ``perm`` either in the
         ``"<app label>.<permission codename>"`` format or as a
-        :class:`~django.contrib.auth.models.Permission` instance. Returns an
+        :class:`~thibaud.contrib.auth.models.Permission` instance. Returns an
         empty queryset if no users who have the ``perm`` found.
 
         If ``is_active`` is ``True`` (default), returns only active users, or
@@ -373,33 +373,33 @@ Manager methods
 
 .. class:: models.AnonymousUser
 
-    :class:`django.contrib.auth.models.AnonymousUser` is a class that
-    implements the :class:`django.contrib.auth.models.User` interface, with
+    :class:`thibaud.contrib.auth.models.AnonymousUser` is a class that
+    implements the :class:`thibaud.contrib.auth.models.User` interface, with
     these differences:
 
     * :ref:`id <automatic-primary-key-fields>` is always ``None``.
-    * :attr:`~django.contrib.auth.models.User.username` is always the empty
+    * :attr:`~thibaud.contrib.auth.models.User.username` is always the empty
       string.
-    * :meth:`~django.contrib.auth.models.User.get_username()` always returns
+    * :meth:`~thibaud.contrib.auth.models.User.get_username()` always returns
       the empty string.
-    * :attr:`~django.contrib.auth.models.User.is_anonymous` is ``True``
+    * :attr:`~thibaud.contrib.auth.models.User.is_anonymous` is ``True``
       instead of ``False``.
-    * :attr:`~django.contrib.auth.models.User.is_authenticated` is
+    * :attr:`~thibaud.contrib.auth.models.User.is_authenticated` is
       ``False`` instead of ``True``.
-    * :attr:`~django.contrib.auth.models.User.is_staff` and
-      :attr:`~django.contrib.auth.models.User.is_superuser` are always
+    * :attr:`~thibaud.contrib.auth.models.User.is_staff` and
+      :attr:`~thibaud.contrib.auth.models.User.is_superuser` are always
       ``False``.
-    * :attr:`~django.contrib.auth.models.User.is_active` is always ``False``.
-    * :attr:`~django.contrib.auth.models.User.groups` and
-      :attr:`~django.contrib.auth.models.User.user_permissions` are always
+    * :attr:`~thibaud.contrib.auth.models.User.is_active` is always ``False``.
+    * :attr:`~thibaud.contrib.auth.models.User.groups` and
+      :attr:`~thibaud.contrib.auth.models.User.user_permissions` are always
       empty.
-    * :meth:`~django.contrib.auth.models.User.set_password()`,
-      :meth:`~django.contrib.auth.models.User.check_password()`,
-      :meth:`~django.db.models.Model.save` and
-      :meth:`~django.db.models.Model.delete()` raise :exc:`NotImplementedError`.
+    * :meth:`~thibaud.contrib.auth.models.User.set_password()`,
+      :meth:`~thibaud.contrib.auth.models.User.check_password()`,
+      :meth:`~thibaud.db.models.Model.save` and
+      :meth:`~thibaud.db.models.Model.delete()` raise :exc:`NotImplementedError`.
 
 In practice, you probably won't need to use
-:class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
+:class:`~thibaud.contrib.auth.models.AnonymousUser` objects on your own, but
 they're used by web requests, as explained in the next section.
 
 ``Permission`` model
@@ -410,7 +410,7 @@ they're used by web requests, as explained in the next section.
 Fields
 ------
 
-:class:`~django.contrib.auth.models.Permission` objects have the following
+:class:`~thibaud.contrib.auth.models.Permission` objects have the following
 fields:
 
 .. class:: models.Permission
@@ -423,7 +423,7 @@ fields:
     .. attribute:: content_type
 
         Required. A foreign key to the
-        :class:`~django.contrib.contenttypes.models.ContentType` model.
+        :class:`~thibaud.contrib.contenttypes.models.ContentType` model.
 
     .. attribute:: codename
 
@@ -432,8 +432,8 @@ fields:
 Methods
 -------
 
-:class:`~django.contrib.auth.models.Permission` objects have the standard
-data-access methods like any other :doc:`Django model </ref/models/instances>`.
+:class:`~thibaud.contrib.auth.models.Permission` objects have the standard
+data-access methods like any other :doc:`Thibaud model </ref/models/instances>`.
 
 ``Group`` model
 ===============
@@ -443,7 +443,7 @@ data-access methods like any other :doc:`Django model </ref/models/instances>`.
 Fields
 ------
 
-:class:`~django.contrib.auth.models.Group` objects have the following fields:
+:class:`~thibaud.contrib.auth.models.Group` objects have the following fields:
 
 .. class:: models.Group
     :noindex:
@@ -455,7 +455,7 @@ Fields
 
     .. attribute:: permissions
 
-        Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
+        Many-to-many field to :class:`~thibaud.contrib.auth.models.Permission`::
 
             group.permissions.set([permission_list])
             group.permissions.add(permission, permission, ...)
@@ -480,7 +480,7 @@ Validators
 Login and logout signals
 ========================
 
-.. module:: django.contrib.auth.signals
+.. module:: thibaud.contrib.auth.signals
 
 The auth framework uses the following :doc:`signals </topics/signals>` that
 can be used for notification when a user logs in or out.
@@ -495,7 +495,7 @@ can be used for notification when a user logs in or out.
         The class of the user that just logged in.
 
     ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+        The current :class:`~thibaud.http.HttpRequest` instance.
 
     ``user``
         The user instance that just logged in.
@@ -509,7 +509,7 @@ can be used for notification when a user logs in or out.
         if the user was not authenticated.
 
     ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+        The current :class:`~thibaud.http.HttpRequest` instance.
 
     ``user``
         The user instance that just logged out or ``None`` if the
@@ -524,23 +524,23 @@ can be used for notification when a user logs in or out.
 
     ``credentials``
         A dictionary of keyword arguments containing the user credentials that were
-        passed to :func:`~django.contrib.auth.authenticate()` or your own custom
+        passed to :func:`~thibaud.contrib.auth.authenticate()` or your own custom
         authentication backend. Credentials matching a set of 'sensitive' patterns,
         (including password) will not be sent in the clear as part of the signal.
 
     ``request``
-        The :class:`~django.http.HttpRequest` object, if one was provided to
-        :func:`~django.contrib.auth.authenticate`.
+        The :class:`~thibaud.http.HttpRequest` object, if one was provided to
+        :func:`~thibaud.contrib.auth.authenticate`.
 
 .. _authentication-backends-reference:
 
 Authentication backends
 =======================
 
-.. module:: django.contrib.auth.backends
-   :synopsis: Django's built-in authentication backend classes.
+.. module:: thibaud.contrib.auth.backends
+   :synopsis: Thibaud's built-in authentication backend classes.
 
-This section details the authentication backends that come with Django. For
+This section details the authentication backends that come with Thibaud. For
 information on how to use them and how to write your own authentication
 backends, see the :ref:`Other authentication sources section
 <authentication-backends>` of the :doc:`User authentication guide
@@ -549,7 +549,7 @@ backends, see the :ref:`Other authentication sources section
 Available authentication backends
 ---------------------------------
 
-The following backends are available in :mod:`django.contrib.auth.backends`:
+The following backends are available in :mod:`thibaud.contrib.auth.backends`:
 
 .. class:: BaseBackend
 
@@ -604,16 +604,16 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: ModelBackend
 
-    This is the default authentication backend used by Django.  It
+    This is the default authentication backend used by Thibaud.  It
     authenticates using credentials consisting of a user identifier and
-    password.  For Django's default user model, the user identifier is the
+    password.  For Thibaud's default user model, the user identifier is the
     username, for custom user models it is the field specified by
     USERNAME_FIELD (see :doc:`Customizing Users and authentication
     </topics/auth/customizing>`).
 
     It also handles the default permissions model as defined for
-    :class:`~django.contrib.auth.models.User` and
-    :class:`~django.contrib.auth.models.PermissionsMixin`.
+    :class:`~thibaud.contrib.auth.models.User` and
+    :class:`~thibaud.contrib.auth.models.PermissionsMixin`.
 
     :meth:`has_perm`, :meth:`get_all_permissions`, :meth:`get_user_permissions`,
     and :meth:`get_group_permissions` allow an object to be passed as a
@@ -631,14 +631,14 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         Tries to authenticate ``username`` with ``password`` by calling
         :meth:`User.check_password
-        <django.contrib.auth.models.User.check_password>`. If no ``username``
+        <thibaud.contrib.auth.models.User.check_password>`. If no ``username``
         is provided, it tries to fetch a username from ``kwargs`` using the
         key :attr:`CustomUser.USERNAME_FIELD
-        <django.contrib.auth.models.CustomUser.USERNAME_FIELD>`. Returns an
+        <thibaud.contrib.auth.models.CustomUser.USERNAME_FIELD>`. Returns an
         authenticated user or ``None``.
 
-        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
-        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        ``request`` is an :class:`~thibaud.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~thibaud.contrib.auth.authenticate`
         (which passes it on to the backend).
 
         .. versionchanged:: 5.2
@@ -652,8 +652,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         Returns the set of permission strings the ``user_obj`` has from their
         own user permissions. Returns an empty set if
-        :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
-        :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
+        :attr:`~thibaud.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~thibaud.contrib.auth.models.CustomUser.is_active` is ``False``.
 
         .. versionchanged:: 5.2
 
@@ -666,8 +666,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         Returns the set of permission strings the ``user_obj`` has from the
         permissions of the groups they belong. Returns an empty set if
-        :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
-        :attr:`~django.contrib.auth.models.CustomUser.is_active`  is ``False``.
+        :attr:`~thibaud.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~thibaud.contrib.auth.models.CustomUser.is_active`  is ``False``.
 
         .. versionchanged:: 5.2
 
@@ -680,8 +680,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         Returns the set of permission strings the ``user_obj`` has, including both
         user permissions and group permissions. Returns an empty set if
-        :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
-        :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
+        :attr:`~thibaud.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~thibaud.contrib.auth.models.CustomUser.is_active` is ``False``.
 
         .. versionchanged:: 5.2
 
@@ -694,7 +694,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         Uses :meth:`get_all_permissions` to check if ``user_obj`` has the
         permission string ``perm``. Returns ``False`` if the user is not
-        :attr:`~django.contrib.auth.models.CustomUser.is_active`.
+        :attr:`~thibaud.contrib.auth.models.CustomUser.is_active`.
 
         .. versionchanged:: 5.2
 
@@ -715,19 +715,19 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     .. method:: user_can_authenticate()
 
         Returns whether the user is allowed to authenticate. To match the
-        behavior of :class:`~django.contrib.auth.forms.AuthenticationForm`
+        behavior of :class:`~thibaud.contrib.auth.forms.AuthenticationForm`
         which :meth:`prohibits inactive users from logging in
-        <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>`,
+        <thibaud.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>`,
         this method returns ``False`` for users with :attr:`is_active=False
-        <django.contrib.auth.models.User.is_active>`. Custom user models that
-        don't have an :attr:`~django.contrib.auth.models.CustomUser.is_active`
+        <thibaud.contrib.auth.models.User.is_active>`. Custom user models that
+        don't have an :attr:`~thibaud.contrib.auth.models.CustomUser.is_active`
         field are allowed.
 
     .. method:: with_perm(perm, is_active=True, include_superusers=True, obj=None)
 
         Returns all active users who have the permission ``perm`` either in
         the form of ``"<app label>.<permission codename>"`` or a
-        :class:`~django.contrib.auth.models.Permission` instance. Returns an
+        :class:`~thibaud.contrib.auth.models.Permission` instance. Returns an
         empty queryset if no users who have the ``perm`` found.
 
         If ``is_active`` is ``True`` (default), returns only active users, or
@@ -743,16 +743,16 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
 
     When using this backend, you'll likely want to customize the
-    :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
-    :class:`~django.contrib.auth.views.LoginView` by overriding the
-    :meth:`~django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
+    :class:`~thibaud.contrib.auth.forms.AuthenticationForm` used by the
+    :class:`~thibaud.contrib.auth.views.LoginView` by overriding the
+    :meth:`~thibaud.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
     method as it rejects inactive users.
 
 .. class:: RemoteUserBackend
 
-    Use this backend to take advantage of external-to-Django-handled
+    Use this backend to take advantage of external-to-Thibaud-handled
     authentication.  It authenticates using usernames passed in
-    :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
+    :attr:`request.META['REMOTE_USER'] <thibaud.http.HttpRequest.META>`.  See
     the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
     documentation.
 
@@ -778,8 +778,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         ``False`` and a ``User`` object with the given username is not found in
         the database.
 
-        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
-        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        ``request`` is an :class:`~thibaud.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~thibaud.contrib.auth.authenticate`
         (which passes it on to the backend).
 
         .. versionchanged:: 5.2
@@ -810,8 +810,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         ``False``) as a way of synchronizing attributes between the remote and
         the local systems.
 
-        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
-        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        ``request`` is an :class:`~thibaud.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~thibaud.contrib.auth.authenticate`
         (which passes it on to the backend).
 
         .. versionchanged:: 5.2
@@ -822,8 +822,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         Returns whether the user is allowed to authenticate. This method
         returns ``False`` for users with :attr:`is_active=False
-        <django.contrib.auth.models.User.is_active>`. Custom user models that
-        don't have an :attr:`~django.contrib.auth.models.CustomUser.is_active`
+        <thibaud.contrib.auth.models.User.is_active>`. Custom user models that
+        don't have an :attr:`~thibaud.contrib.auth.models.CustomUser.is_active`
         field are allowed.
 
 .. class:: AllowAllUsersRemoteUserBackend
@@ -835,7 +835,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 Utility functions
 =================
 
-.. currentmodule:: django.contrib.auth
+.. currentmodule:: thibaud.contrib.auth
 
 .. function:: get_user(request)
 .. function:: aget_user(request)
@@ -849,13 +849,13 @@ Utility functions
     :setting:`AUTHENTICATION_BACKENDS`. If so, it uses the backend's
     ``get_user()`` method to retrieve the user model instance and then verifies
     the session by calling the user model's
-    :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`
+    :meth:`~thibaud.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`
     method. If the verification fails and :setting:`SECRET_KEY_FALLBACKS` are
     provided, it verifies the session against each fallback key using
-    :meth:`~django.contrib.auth.models.AbstractBaseUser.\
+    :meth:`~thibaud.contrib.auth.models.AbstractBaseUser.\
     get_session_auth_fallback_hash`.
 
-    Returns an instance of :class:`~django.contrib.auth.models.AnonymousUser`
+    Returns an instance of :class:`~thibaud.contrib.auth.models.AnonymousUser`
     if the authentication backend stored in the session is no longer in
     :setting:`AUTHENTICATION_BACKENDS`, if a user isn't returned by the
     backend's ``get_user()`` method, or if the session auth hash doesn't

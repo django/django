@@ -9,16 +9,16 @@ from html import escape
 from html.parser import HTMLParser
 from io import BytesIO
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.utils.functional import (
+from thibaud.core.exceptions import SuspiciousFileOperation
+from thibaud.utils.functional import (
     SimpleLazyObject,
     cached_property,
     keep_lazy_text,
     lazy,
 )
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy, pgettext
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.translation import gettext as _
+from thibaud.utils.translation import gettext_lazy, pgettext
 
 
 @keep_lazy_text
@@ -108,7 +108,7 @@ class TruncateHTMLParser(HTMLParser):
 
     @cached_property
     def void_elements(self):
-        from django.utils.html import VOID_ELEMENTS
+        from thibaud.utils.html import VOID_ELEMENTS
 
         return VOID_ELEMENTS
 

@@ -2,7 +2,7 @@
 Models and databases
 ====================
 
-.. module:: django.db
+.. module:: thibaud.db
 
 A model is the single, definitive source of information about your data. It
 contains the essential fields and behaviors of the data you're storing.

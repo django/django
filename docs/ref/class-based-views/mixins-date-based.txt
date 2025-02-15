@@ -2,7 +2,7 @@
 Date-based mixins
 =================
 
-.. currentmodule:: django.views.generic.dates
+.. currentmodule:: thibaud.views.generic.dates
 
 .. note::
 
@@ -50,7 +50,7 @@ Date-based mixins
 
         Returns a date object containing the first day of the year after the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~thibaud.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -58,7 +58,7 @@ Date-based mixins
 
         Returns a date object containing the first day of the year before the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~thibaud.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -102,7 +102,7 @@ Date-based mixins
 
         Returns a date object containing the first day of the month after the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~thibaud.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -110,7 +110,7 @@ Date-based mixins
 
         Returns a date object containing the first day of the month before the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~thibaud.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -154,14 +154,14 @@ Date-based mixins
 
         Returns a date object containing the next valid day after the date
         provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~thibaud.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
     .. method:: get_previous_day(date)
 
         Returns a date object containing the previous valid day. This function
-        can also return ``None`` or raise an :class:`~django.http.Http404`
+        can also return ``None`` or raise an :class:`~thibaud.http.Http404`
         exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
@@ -208,7 +208,7 @@ Date-based mixins
 
         Returns a date object containing the first day of the week after the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~thibaud.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -216,7 +216,7 @@ Date-based mixins
 
         Returns a date object containing the first day of the week before the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~thibaud.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -273,7 +273,7 @@ Date-based mixins
 
     A base class that provides common behavior for all date-based views. There
     won't normally be a reason to instantiate
-    :class:`~django.views.generic.dates.BaseDateListView`; instantiate one of
+    :class:`~thibaud.views.generic.dates.BaseDateListView`; instantiate one of
     the subclasses instead.
 
     While this view (and its subclasses) are executing, ``self.object_list``
@@ -283,8 +283,8 @@ Date-based mixins
 
     **Mixins**
 
-    * :class:`~django.views.generic.dates.DateMixin`
-    * :class:`~django.views.generic.list.MultipleObjectMixin`
+    * :class:`~thibaud.views.generic.dates.DateMixin`
+    * :class:`~thibaud.views.generic.list.MultipleObjectMixin`
 
     **Methods and Attributes**
 
@@ -295,7 +295,7 @@ Date-based mixins
         will display an empty page instead of raising a 404.
 
         This is identical to
-        :attr:`django.views.generic.list.MultipleObjectMixin.allow_empty`,
+        :attr:`thibaud.views.generic.list.MultipleObjectMixin.allow_empty`,
         except for the default value, which is ``False``.
 
     .. attribute:: date_list_period
@@ -313,7 +313,7 @@ Date-based mixins
         ``object_list`` is the list of objects. ``extra_context`` is a
         dictionary of context data that will be added to any context data
         provided by the
-        :class:`~django.views.generic.list.MultipleObjectMixin`.
+        :class:`~thibaud.views.generic.list.MultipleObjectMixin`.
 
     .. method:: get_dated_queryset(**lookup)
 
@@ -334,4 +334,4 @@ Date-based mixins
         ``date_type`` isn't provided, the result of
         :meth:`~BaseDateListView.get_date_list_period` is used. ``date_type``
         and ``ordering`` are passed to
-        :meth:`QuerySet.dates()<django.db.models.query.QuerySet.dates>`.
+        :meth:`QuerySet.dates()<thibaud.db.models.query.QuerySet.dates>`.

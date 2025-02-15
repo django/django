@@ -1,7 +1,7 @@
 import logging
 
-from django.template import Engine, Variable, VariableDoesNotExist
-from django.test import SimpleTestCase
+from thibaud.template import Engine, Variable, VariableDoesNotExist
+from thibaud.test import SimpleTestCase
 
 
 class VariableResolveLoggingTests(SimpleTestCase):
@@ -30,7 +30,7 @@ class VariableResolveLoggingTests(SimpleTestCase):
             def __getitem__(self, item):
                 return self.__dict__[item]
 
-        with self.assertLogs("django.template", self.loglevel) as cm:
+        with self.assertLogs("thibaud.template", self.loglevel) as cm:
             Variable("article").resolve(TestObject())
 
         self.assertEqual(len(cm.records), 1)
@@ -44,7 +44,7 @@ class VariableResolveLoggingTests(SimpleTestCase):
         self.assertEqual(str(raised_exception), "Attribute does not exist.")
 
     def test_log_on_variable_does_not_exist_not_silent(self):
-        with self.assertLogs("django.template", self.loglevel) as cm:
+        with self.assertLogs("thibaud.template", self.loglevel) as cm:
             with self.assertRaises(VariableDoesNotExist):
                 Variable("article.author").resolve({"article": {"section": "News"}})
 
@@ -62,5 +62,5 @@ class VariableResolveLoggingTests(SimpleTestCase):
         )
 
     def test_no_log_when_variable_exists(self):
-        with self.assertNoLogs("django.template", self.loglevel):
+        with self.assertNoLogs("thibaud.template", self.loglevel):
             Variable("article.section").resolve({"article": {"section": "News"}})

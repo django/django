@@ -1,16 +1,16 @@
 import getpass
 
-from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
-from django.core.management.base import BaseCommand, CommandError
-from django.db import DEFAULT_DB_ALIAS, connections
+from thibaud.contrib.auth import get_user_model
+from thibaud.contrib.auth.password_validation import validate_password
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.db import DEFAULT_DB_ALIAS, connections
 
 UserModel = get_user_model()
 
 
 class Command(BaseCommand):
-    help = "Change a user's password for django.contrib.auth."
+    help = "Change a user's password for thibaud.contrib.auth."
     requires_migrations_checks = True
     requires_system_checks = []
 

@@ -7,22 +7,22 @@ Logging
 .. seealso::
 
     * :ref:`logging-how-to`
-    * :ref:`Django logging overview <logging-explanation>`
+    * :ref:`Thibaud logging overview <logging-explanation>`
 
-.. module:: django.utils.log
-   :synopsis: Logging tools for Django applications
+.. module:: thibaud.utils.log
+   :synopsis: Logging tools for Thibaud applications
 
-Django's logging module extends Python's builtin :mod:`logging`.
+Thibaud's logging module extends Python's builtin :mod:`logging`.
 
-Logging is configured as part of the general Django :func:`django.setup`
+Logging is configured as part of the general Thibaud :func:`thibaud.setup`
 function, so it's always available unless explicitly disabled.
 
 .. _default-logging-configuration:
 
-Django's default logging configuration
+Thibaud's default logging configuration
 ======================================
 
-By default, Django uses Python's :ref:`logging.config.dictConfig format
+By default, Thibaud uses Python's :ref:`logging.config.dictConfig format
 <logging-config-dictschema>`.
 
 Default logging conditions
@@ -32,22 +32,22 @@ The full set of default logging conditions are:
 
 When :setting:`DEBUG` is ``True``:
 
-* The ``django`` logger sends messages in the ``django`` hierarchy (except
-  ``django.server``) at the ``INFO`` level or higher to the console.
+* The ``thibaud`` logger sends messages in the ``thibaud`` hierarchy (except
+  ``thibaud.server``) at the ``INFO`` level or higher to the console.
 
 When :setting:`DEBUG` is ``False``:
 
-* The ``django`` logger sends messages in the ``django`` hierarchy (except
-  ``django.server``)  with ``ERROR`` or ``CRITICAL`` level to
+* The ``thibaud`` logger sends messages in the ``thibaud`` hierarchy (except
+  ``thibaud.server``)  with ``ERROR`` or ``CRITICAL`` level to
   :class:`AdminEmailHandler`.
 
 Independently of the value of :setting:`DEBUG`:
 
-* The :ref:`django-server-logger` logger sends messages at the ``INFO`` level
+* The :ref:`thibaud-server-logger` logger sends messages at the ``INFO`` level
   or higher to the console.
 
-All loggers except :ref:`django-server-logger` propagate logging to their
-parents, up to the root ``django`` logger. The ``console`` and ``mail_admins``
+All loggers except :ref:`thibaud-server-logger` propagate logging to their
+parents, up to the root ``thibaud`` logger. The ``console`` and ``mail_admins``
 handlers are attached to the root logger to provide the behavior described
 above.
 
@@ -59,24 +59,24 @@ to the console.
 Default logging definition
 --------------------------
 
-Django's default logging configuration inherits Python's defaults. It's
-available as ``django.utils.log.DEFAULT_LOGGING`` and defined in
-:source:`django/utils/log.py`::
+Thibaud's default logging configuration inherits Python's defaults. It's
+available as ``thibaud.utils.log.DEFAULT_LOGGING`` and defined in
+:source:`thibaud/utils/log.py`::
 
     {
         "version": 1,
         "disable_existing_loggers": False,
         "filters": {
             "require_debug_false": {
-                "()": "django.utils.log.RequireDebugFalse",
+                "()": "thibaud.utils.log.RequireDebugFalse",
             },
             "require_debug_true": {
-                "()": "django.utils.log.RequireDebugTrue",
+                "()": "thibaud.utils.log.RequireDebugTrue",
             },
         },
         "formatters": {
-            "django.server": {
-                "()": "django.utils.log.ServerFormatter",
+            "thibaud.server": {
+                "()": "thibaud.utils.log.ServerFormatter",
                 "format": "[{server_time}] {message}",
                 "style": "{",
             }
@@ -87,24 +87,24 @@ available as ``django.utils.log.DEFAULT_LOGGING`` and defined in
                 "filters": ["require_debug_true"],
                 "class": "logging.StreamHandler",
             },
-            "django.server": {
+            "thibaud.server": {
                 "level": "INFO",
                 "class": "logging.StreamHandler",
-                "formatter": "django.server",
+                "formatter": "thibaud.server",
             },
             "mail_admins": {
                 "level": "ERROR",
                 "filters": ["require_debug_false"],
-                "class": "django.utils.log.AdminEmailHandler",
+                "class": "thibaud.utils.log.AdminEmailHandler",
             },
         },
         "loggers": {
-            "django": {
+            "thibaud": {
                 "handlers": ["console", "mail_admins"],
                 "level": "INFO",
             },
-            "django.server": {
-                "handlers": ["django.server"],
+            "thibaud.server": {
+                "handlers": ["thibaud.server"],
                 "level": "INFO",
                 "propagate": False,
             },
@@ -114,35 +114,35 @@ available as ``django.utils.log.DEFAULT_LOGGING`` and defined in
 See :ref:`configuring-logging` on how to complement or replace this default
 logging configuration.
 
-Django logging extensions
+Thibaud logging extensions
 =========================
 
-Django provides a number of utilities to handle the particular requirements of
+Thibaud provides a number of utilities to handle the particular requirements of
 logging in a web server environment.
 
 Loggers
 -------
 
-Django provides several built-in loggers.
+Thibaud provides several built-in loggers.
 
-.. _django-logger:
+.. _thibaud-logger:
 
-``django``
+``thibaud``
 ~~~~~~~~~~
 
-The parent logger for messages in the ``django`` :ref:`named logger hierarchy
-<naming-loggers-hierarchy>`. Django does not post messages using this name.
+The parent logger for messages in the ``thibaud`` :ref:`named logger hierarchy
+<naming-loggers-hierarchy>`. Thibaud does not post messages using this name.
 Instead, it uses one of the loggers below.
 
-.. _django-request-logger:
+.. _thibaud-request-logger:
 
-``django.request``
+``thibaud.request``
 ~~~~~~~~~~~~~~~~~~
 
 Log messages related to the handling of requests. 5XX responses are
 raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
-messages. Requests that are logged to the ``django.security`` logger aren't
-logged to ``django.request``.
+messages. Requests that are logged to the ``thibaud.security`` logger aren't
+logged to ``thibaud.request``.
 
 Messages to this logger have the following extra context:
 
@@ -150,9 +150,9 @@ Messages to this logger have the following extra context:
 
 * ``request``: The request object that generated the logging message.
 
-.. _django-server-logger:
+.. _thibaud-server-logger:
 
-``django.server``
+``thibaud.server``
 ~~~~~~~~~~~~~~~~~
 
 Log messages related to the handling of requests received by the server invoked
@@ -166,18 +166,18 @@ Messages to this logger have the following extra context:
 
 * ``request``: The request object (a :py:class:`socket.socket`) that generated the logging message.
 
-.. _django-template-logger:
+.. _thibaud-template-logger:
 
-``django.template``
+``thibaud.template``
 ~~~~~~~~~~~~~~~~~~~
 
 Log messages related to the rendering of templates.
 
 * Missing context variables are logged as ``DEBUG`` messages.
 
-.. _django-db-logger:
+.. _thibaud-db-logger:
 
-``django.db.backends``
+``thibaud.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Messages relating to the interaction of code with the database. For example,
@@ -199,29 +199,29 @@ This logging does not include framework-level initialization (e.g.
 ``SET TIMEZONE``). Turn on query logging in your database if you wish to view
 all database queries.
 
-.. _django-utils-autoreloader-logger:
+.. _thibaud-utils-autoreloader-logger:
 
-``django.utils.autoreload``
+``thibaud.utils.autoreload``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Log messages related to automatic code reloading during the execution of the
-Django development server. This logger generates an ``INFO`` message upon
+Thibaud development server. This logger generates an ``INFO`` message upon
 detecting a modification in a source code file and may produce ``WARNING``
 messages during filesystem inspection and event subscription processes.
 
-.. _django-contrib-auth-logger:
+.. _thibaud-contrib-auth-logger:
 
-``django.contrib.auth``
+``thibaud.contrib.auth``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Log messages related to :doc:`contrib/auth`, particularly ``ERROR`` messages
-are generated when a :class:`~django.contrib.auth.forms.PasswordResetForm` is
+are generated when a :class:`~thibaud.contrib.auth.forms.PasswordResetForm` is
 successfully submitted but the password reset email cannot be delivered due to
 a mail sending exception.
 
-.. _django-contrib-gis-logger:
+.. _thibaud-contrib-gis-logger:
 
-``django.contrib.gis``
+``thibaud.contrib.gis``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Log messages related to :doc:`contrib/gis/index` at various points: during the
@@ -229,39 +229,39 @@ loading of external GeoSpatial libraries (GEOS, GDAL, etc.) and when reporting
 errors. Each ``ERROR`` log record includes the caught exception and relevant
 contextual data.
 
-.. _django-dispatch-logger:
+.. _thibaud-dispatch-logger:
 
-``django.dispatch``
+``thibaud.dispatch``
 ~~~~~~~~~~~~~~~~~~~
 
 This logger is used in :doc:`signals`, specifically within the
-:mod:`~django.dispatch.Signal` class, to report issues when dispatching a
+:mod:`~thibaud.dispatch.Signal` class, to report issues when dispatching a
 signal to a connected receiver. The ``ERROR`` log record includes the caught
 exception as ``exc_info`` and adds the following extra context:
 
 * ``receiver``: The name of the receiver.
 * ``err``: The exception that occurred when calling the receiver.
 
-.. _django-security-logger:
+.. _thibaud-security-logger:
 
-``django.security.*``
+``thibaud.security.*``
 ~~~~~~~~~~~~~~~~~~~~~
 
 The security loggers will receive messages on any occurrence of
-:exc:`~django.core.exceptions.SuspiciousOperation` and other security-related
+:exc:`~thibaud.core.exceptions.SuspiciousOperation` and other security-related
 errors. There is a sub-logger for each subtype of security error, including all
 ``SuspiciousOperation``\s. The level of the log event depends on where the
 exception is handled.  Most occurrences are logged as a warning, while
 any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
 error. For example, when an HTTP ``Host`` header is included in a request from
-a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
+a client that does not match :setting:`ALLOWED_HOSTS`, Thibaud will return a 400
 response, and an error message will be logged to the
-``django.security.DisallowedHost`` logger.
+``thibaud.security.DisallowedHost`` logger.
 
-These log events will reach the ``django`` logger by default, which mails error
+These log events will reach the ``thibaud`` logger by default, which mails error
 events to admins when ``DEBUG=False``. Requests resulting in a 400 response due
-to a ``SuspiciousOperation`` will not be logged to the ``django.request``
-logger, but only to the ``django.security`` logger.
+to a ``SuspiciousOperation`` will not be logged to the ``thibaud.request``
+logger, but only to the ``thibaud.security`` logger.
 
 To silence a particular type of ``SuspiciousOperation``, you can override that
 specific logger following this example::
@@ -274,7 +274,7 @@ specific logger following this example::
             },
         },
         "loggers": {
-            "django.security.DisallowedHost": {
+            "thibaud.security.DisallowedHost": {
                 "handlers": ["null"],
                 "propagate": False,
             },
@@ -282,35 +282,35 @@ specific logger following this example::
         # ...
     }
 
-Other ``django.security`` loggers not based on ``SuspiciousOperation`` are:
+Other ``thibaud.security`` loggers not based on ``SuspiciousOperation`` are:
 
-* ``django.security.csrf``: For :ref:`CSRF failures <csrf-rejected-requests>`.
+* ``thibaud.security.csrf``: For :ref:`CSRF failures <csrf-rejected-requests>`.
 
-``django.db.backends.schema``
+``thibaud.db.backends.schema``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Logs the SQL queries that are executed during schema changes to the database by
 the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
-queries executed by :class:`~django.db.migrations.operations.RunPython`.
+queries executed by :class:`~thibaud.db.migrations.operations.RunPython`.
 Messages to this logger have ``params`` and ``sql`` in their extra context (but
-unlike ``django.db.backends``, not duration). The values have the same meaning
-as explained in :ref:`django-db-logger`.
+unlike ``thibaud.db.backends``, not duration). The values have the same meaning
+as explained in :ref:`thibaud-db-logger`.
 
-.. _django-contrib-sessions-logger:
+.. _thibaud-contrib-sessions-logger:
 
-``django.contrib.sessions``
+``thibaud.contrib.sessions``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Log messages related to the :doc:`session framework</topics/http/sessions>`.
 
 * Non-fatal errors occurring when using the
-  :class:`django.contrib.sessions.backends.cached_db.SessionStore` engine are
+  :class:`thibaud.contrib.sessions.backends.cached_db.SessionStore` engine are
   logged as ``ERROR`` messages with the corresponding traceback.
 
 Handlers
 --------
 
-Django provides one log handler in addition to :mod:`those provided by the
+Thibaud provides one log handler in addition to :mod:`those provided by the
 Python logging module <python:logging.handlers>`.
 
 .. class:: AdminEmailHandler(include_html=False, email_backend=None, reporter_class=None)
@@ -331,12 +331,12 @@ Python logging module <python:logging.handlers>`.
     containing the full content of the debug web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
     configuration, include it in the handler definition for
-    ``django.utils.log.AdminEmailHandler``, like this::
+    ``thibaud.utils.log.AdminEmailHandler``, like this::
 
         "handlers": {
             "mail_admins": {
                 "level": "ERROR",
-                "class": "django.utils.log.AdminEmailHandler",
+                "class": "thibaud.utils.log.AdminEmailHandler",
                 "include_html": True,
             },
         }
@@ -351,8 +351,8 @@ Python logging module <python:logging.handlers>`.
         "handlers": {
             "mail_admins": {
                 "level": "ERROR",
-                "class": "django.utils.log.AdminEmailHandler",
-                "email_backend": "django.core.mail.backends.filebased.EmailBackend",
+                "class": "thibaud.utils.log.AdminEmailHandler",
+                "email_backend": "thibaud.core.mail.backends.filebased.EmailBackend",
             },
         }
 
@@ -360,14 +360,14 @@ Python logging module <python:logging.handlers>`.
     :setting:`EMAIL_BACKEND` will be used.
 
     The ``reporter_class`` argument of ``AdminEmailHandler`` allows providing
-    an ``django.views.debug.ExceptionReporter`` subclass to customize the
+    an ``thibaud.views.debug.ExceptionReporter`` subclass to customize the
     traceback text sent in the email body. You provide a string import path to
     the class you wish to use, like this::
 
         "handlers": {
             "mail_admins": {
                 "level": "ERROR",
-                "class": "django.utils.log.AdminEmailHandler",
+                "class": "thibaud.utils.log.AdminEmailHandler",
                 "include_html": True,
                 "reporter_class": "somepackage.error_reporter.CustomErrorReporter",
             },
@@ -376,13 +376,13 @@ Python logging module <python:logging.handlers>`.
     .. method:: send_mail(subject, message, *args, **kwargs)
 
         Sends emails to admin users. To customize this behavior, you can
-        subclass the :class:`~django.utils.log.AdminEmailHandler` class and
+        subclass the :class:`~thibaud.utils.log.AdminEmailHandler` class and
         override this method.
 
 Filters
 -------
 
-Django provides some log filters in addition to those provided by the Python
+Thibaud provides some log filters in addition to those provided by the Python
 logging module.
 
 .. class:: CallbackFilter(callback)
@@ -392,11 +392,11 @@ logging module.
     passes through the filter. Handling of that record will not proceed if the
     callback returns False.
 
-    For instance, to filter out :exc:`~django.http.UnreadablePostError`
+    For instance, to filter out :exc:`~thibaud.http.UnreadablePostError`
     (raised when a user cancels an upload) from the admin emails, you would
     create a filter function::
 
-        from django.http import UnreadablePostError
+        from thibaud.http import UnreadablePostError
 
 
         def skip_unreadable_post(record):
@@ -412,7 +412,7 @@ logging module.
             # ...
             "filters": {
                 "skip_unreadable_posts": {
-                    "()": "django.utils.log.CallbackFilter",
+                    "()": "thibaud.utils.log.CallbackFilter",
                     "callback": skip_unreadable_post,
                 },
             },
@@ -420,7 +420,7 @@ logging module.
                 "mail_admins": {
                     "level": "ERROR",
                     "filters": ["skip_unreadable_posts"],
-                    "class": "django.utils.log.AdminEmailHandler",
+                    "class": "thibaud.utils.log.AdminEmailHandler",
                 },
             },
             # ...
@@ -438,14 +438,14 @@ logging module.
             # ...
             "filters": {
                 "require_debug_false": {
-                    "()": "django.utils.log.RequireDebugFalse",
+                    "()": "thibaud.utils.log.RequireDebugFalse",
                 },
             },
             "handlers": {
                 "mail_admins": {
                     "level": "ERROR",
                     "filters": ["require_debug_false"],
-                    "class": "django.utils.log.AdminEmailHandler",
+                    "class": "thibaud.utils.log.AdminEmailHandler",
                 },
             },
             # ...

@@ -1,5 +1,5 @@
-from django.contrib.postgres.fields import ArrayField
-from django.db.models import Aggregate, BooleanField, JSONField, TextField, Value
+from thibaud.contrib.postgres.fields import ArrayField
+from thibaud.db.models import Aggregate, BooleanField, JSONField, TextField, Value
 
 from .mixins import OrderableAggMixin
 

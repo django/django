@@ -1,7 +1,7 @@
-from django.middleware.csrf import get_token
-from django.utils.functional import lazy
-from django.utils.html import format_html
-from django.utils.safestring import SafeString
+from thibaud.middleware.csrf import get_token
+from thibaud.utils.functional import lazy
+from thibaud.utils.html import format_html
+from thibaud.utils.safestring import SafeString
 
 
 def csrf_input(request):

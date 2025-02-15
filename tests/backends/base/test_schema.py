@@ -1,6 +1,6 @@
-from django.db import models
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.test import SimpleTestCase
+from thibaud.db import models
+from thibaud.db.backends.base.schema import BaseDatabaseSchemaEditor
+from thibaud.test import SimpleTestCase
 
 
 class SchemaEditorTests(SimpleTestCase):

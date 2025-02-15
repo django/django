@@ -1,9 +1,9 @@
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
-from django.http import Http404, HttpResponse
-from django.template import engines
-from django.template.response import TemplateResponse
-from django.utils.decorators import (
+from thibaud.http import Http404, HttpResponse
+from thibaud.template import engines
+from thibaud.template.response import TemplateResponse
+from thibaud.utils.decorators import (
     async_only_middleware,
     sync_and_async_middleware,
     sync_only_middleware,
@@ -62,7 +62,7 @@ class ProcessViewNoneMiddleware(BaseMiddleware):
 
 class ProcessViewTemplateResponseMiddleware(BaseMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
-        template = engines["django"].from_string(
+        template = engines["thibaud"].from_string(
             "Processed view {{ view }}{% for m in mw %}\n{{ m }}{% endfor %}"
         )
         return TemplateResponse(

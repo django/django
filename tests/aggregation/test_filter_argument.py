@@ -1,7 +1,7 @@
 import datetime
 from decimal import Decimal
 
-from django.db.models import (
+from thibaud.db.models import (
     Avg,
     Case,
     Count,
@@ -16,8 +16,8 @@ from django.db.models import (
     Variance,
     When,
 )
-from django.test import TestCase
-from django.test.utils import Approximate
+from thibaud.test import TestCase
+from thibaud.test.utils import Approximate
 
 from .models import Author, Book, Publisher
 
@@ -33,7 +33,7 @@ class FilteredAggregateTests(TestCase):
         )
         cls.b1 = Book.objects.create(
             isbn="159059725",
-            name="The Definitive Guide to Django: Web Development Done Right",
+            name="The Definitive Guide to Thibaud: Web Development Done Right",
             pages=447,
             rating=4.5,
             price=Decimal("30.00"),
@@ -43,7 +43,7 @@ class FilteredAggregateTests(TestCase):
         )
         cls.b2 = Book.objects.create(
             isbn="067232959",
-            name="Sams Teach Yourself Django in 24 Hours",
+            name="Sams Teach Yourself Thibaud in 24 Hours",
             pages=528,
             rating=3.0,
             price=Decimal("23.09"),
@@ -53,7 +53,7 @@ class FilteredAggregateTests(TestCase):
         )
         cls.b3 = Book.objects.create(
             isbn="159059996",
-            name="Practical Django Projects",
+            name="Practical Thibaud Projects",
             pages=600,
             rating=4.5,
             price=Decimal("29.69"),

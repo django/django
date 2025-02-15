@@ -1,7 +1,7 @@
-from django.db.models import CharField
-from django.db.models.functions import Lower
-from django.test import TestCase
-from django.test.utils import register_lookup
+from thibaud.db.models import CharField
+from thibaud.db.models.functions import Lower
+from thibaud.test import TestCase
+from thibaud.test.utils import register_lookup
 
 from ..models import Author
 

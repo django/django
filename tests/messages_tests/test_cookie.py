@@ -2,18 +2,18 @@ import json
 import random
 from unittest import TestCase
 
-from django.conf import settings
-from django.contrib.messages import Message, constants
-from django.contrib.messages.storage.cookie import (
+from thibaud.conf import settings
+from thibaud.contrib.messages import Message, constants
+from thibaud.contrib.messages.storage.cookie import (
     CookieStorage,
     MessageDecoder,
     MessageEncoder,
     bisect_keep_left,
     bisect_keep_right,
 )
-from django.test import SimpleTestCase, override_settings
-from django.utils.crypto import get_random_string
-from django.utils.safestring import SafeData, mark_safe
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils.crypto import get_random_string
+from thibaud.utils.safestring import SafeData, mark_safe
 
 from .base import BaseTests
 
@@ -187,11 +187,11 @@ class CookieTests(BaseTests, SimpleTestCase):
         retrieved from the message storage.
         """
         self.assertIsInstance(
-            self.encode_decode(mark_safe("<b>Hello Django!</b>")).message,
+            self.encode_decode(mark_safe("<b>Hello Thibaud!</b>")).message,
             SafeData,
         )
         self.assertNotIsInstance(
-            self.encode_decode("<b>Hello Django!</b>").message,
+            self.encode_decode("<b>Hello Thibaud!</b>").message,
             SafeData,
         )
 

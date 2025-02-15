@@ -3,16 +3,16 @@ import sys
 from io import StringIO
 from unittest import skipIf
 
-from django.apps import apps
-from django.core import checks
-from django.core.checks import Error, Warning
-from django.core.checks.messages import CheckMessage
-from django.core.checks.registry import CheckRegistry
-from django.core.management import call_command
-from django.core.management.base import CommandError
-from django.db import models
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps, override_settings, override_system_checks
+from thibaud.apps import apps
+from thibaud.core import checks
+from thibaud.core.checks import Error, Warning
+from thibaud.core.checks.messages import CheckMessage
+from thibaud.core.checks.registry import CheckRegistry
+from thibaud.core.management import call_command
+from thibaud.core.management.base import CommandError
+from thibaud.db import models
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import isolate_apps, override_settings, override_system_checks
 
 from .models import SimpleModel, my_check
 

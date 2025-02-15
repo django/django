@@ -1,10 +1,10 @@
 from unittest import mock
 
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
-from django.urls import path, reverse
+from thibaud.contrib import admin
+from thibaud.contrib.auth.admin import UserAdmin
+from thibaud.contrib.auth.models import User
+from thibaud.test import TestCase, override_settings
+from thibaud.urls import path, reverse
 
 
 class Router:
@@ -47,7 +47,7 @@ class MultiDatabaseTests(TestCase):
         # Reset the routers' state between each test.
         Router.target_db = None
 
-    @mock.patch("django.contrib.auth.admin.transaction")
+    @mock.patch("thibaud.contrib.auth.admin.transaction")
     def test_add_view(self, mock):
         for db in self.databases:
             with self.subTest(db_connection=db):
@@ -64,7 +64,7 @@ class MultiDatabaseTests(TestCase):
                 self.assertEqual(response.status_code, 302)
                 mock.atomic.assert_called_with(using=db)
 
-    @mock.patch("django.contrib.auth.admin.transaction")
+    @mock.patch("thibaud.contrib.auth.admin.transaction")
     def test_read_only_methods_add_view(self, mock):
         for db in self.databases:
             for method in self.READ_ONLY_METHODS:

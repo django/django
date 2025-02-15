@@ -1,11 +1,11 @@
 """
 These URL patterns are included in two different ways in the main urls.py, with
 an extra argument present in one case. Thus, there are two different ways for
-each name to resolve and Django must distinguish the possibilities based on the
+each name to resolve and Thibaud must distinguish the possibilities based on the
 argument list.
 """
 
-from django.urls import re_path
+from thibaud.urls import re_path
 
 from .views import empty_view
 

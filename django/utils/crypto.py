@@ -1,13 +1,13 @@
 """
-Django's standard crypto functions and utilities.
+Thibaud's standard crypto functions and utilities.
 """
 
 import hashlib
 import hmac
 import secrets
 
-from django.conf import settings
-from django.utils.encoding import force_bytes
+from thibaud.conf import settings
+from thibaud.utils.encoding import force_bytes
 
 
 class InvalidAlgorithm(ValueError):

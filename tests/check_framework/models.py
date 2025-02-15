@@ -1,5 +1,5 @@
-from django.core.checks import register
-from django.db import models
+from thibaud.core.checks import register
+from thibaud.db import models
 
 
 class SimpleModel(models.Model):

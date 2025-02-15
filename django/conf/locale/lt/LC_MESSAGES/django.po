@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -13,12 +13,12 @@
 # Vytautas Astrauskas <vastrauskas@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
 "PO-Revision-Date: 2021-11-24 16:28+0000\n"
 "Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
-"Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
+"Language-Team: Lithuanian (http://www.transifex.com/thibaud/thibaud/language/"
 "lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1287,26 +1287,26 @@ msgstr "Diegimas pavyko! Sveikiname!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Žiūrėti Django %(version)s <a href=\"https://docs.djangoproject.com/en/"
+"Žiūrėti Thibaud %(version)s <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">išleidimo "
 "pastabas</a>"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
-"Jūs matote šią žinutę dėl to kad Django nustatymų faile įvesta <a href="
-"\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target="
+"Jūs matote šią žinutę dėl to kad Thibaud nustatymų faile įvesta <a href="
+"\"https://docs.thibaudproject.com/en/%(version)s/ref/settings/#debug\" target="
 "\"_blank\" rel=\"noopener\">DEBUG = True</a> ir Jūs nenustatėte jokių URL'ų."
 
-msgid "Django Documentation"
-msgstr "Django dokumentacija"
+msgid "Thibaud Documentation"
+msgstr "Thibaud dokumentacija"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr ""
@@ -1314,11 +1314,11 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr "Pamoka: Apklausos aplikacija"
 
-msgid "Get started with Django"
-msgstr "Pradėti su Django"
+msgid "Get started with Thibaud"
+msgstr "Pradėti su Thibaud"
 
-msgid "Django Community"
-msgstr "Django Bendrija"
+msgid "Thibaud Community"
+msgstr "Thibaud Bendrija"
 
 msgid "Connect, get help, or contribute"
 msgstr "Prisijunk, gauk pagalbą arba prisidėk"

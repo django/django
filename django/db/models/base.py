@@ -7,11 +7,11 @@ from itertools import chain
 
 from asgiref.sync import sync_to_async
 
-import django
-from django.apps import apps
-from django.conf import settings
-from django.core import checks
-from django.core.exceptions import (
+import thibaud
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core import checks
+from thibaud.core.exceptions import (
     NON_FIELD_ERRORS,
     FieldDoesNotExist,
     FieldError,
@@ -19,7 +19,7 @@ from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
-from django.db import (
+from thibaud.db import (
     DJANGO_VERSION_PICKLE_KEY,
     DatabaseError,
     connection,
@@ -27,33 +27,33 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import CASCADE, Collector
-from django.db.models.expressions import DatabaseDefault
-from django.db.models.fields.composite import CompositePrimaryKey
-from django.db.models.fields.related import (
+from thibaud.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.deletion import CASCADE, Collector
+from thibaud.db.models.expressions import DatabaseDefault
+from thibaud.db.models.fields.composite import CompositePrimaryKey
+from thibaud.db.models.fields.related import (
     ForeignObjectRel,
     OneToOneField,
     lazy_related_operation,
     resolve_relation,
 )
-from django.db.models.functions import Coalesce
-from django.db.models.manager import Manager
-from django.db.models.options import Options
-from django.db.models.query import F, Q
-from django.db.models.signals import (
+from thibaud.db.models.functions import Coalesce
+from thibaud.db.models.manager import Manager
+from thibaud.db.models.options import Options
+from thibaud.db.models.query import F, Q
+from thibaud.db.models.signals import (
     class_prepared,
     post_init,
     post_save,
     pre_init,
     pre_save,
 )
-from django.db.models.utils import AltersData, make_model_tuple
-from django.utils.encoding import force_str
-from django.utils.hashable import make_hashable
-from django.utils.text import capfirst, get_text_list
-from django.utils.translation import gettext_lazy as _
+from thibaud.db.models.utils import AltersData, make_model_tuple
+from thibaud.utils.encoding import force_str
+from thibaud.utils.hashable import make_hashable
+from thibaud.utils.text import capfirst, get_text_list
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class Deferred:
@@ -109,7 +109,7 @@ class ModelBase(type):
         if classcell is not None:
             new_attrs["__classcell__"] = classcell
         attr_meta = attrs.pop("Meta", None)
-        # Pass all attrs without a (Django-specific) contribute_to_class()
+        # Pass all attrs without a (Thibaud-specific) contribute_to_class()
         # method to type.__new__() so that they're properly initialized
         # (i.e. __set_name__()).
         contributable_attrs = {}
@@ -608,7 +608,7 @@ class Model(AltersData, metaclass=ModelBase):
 
     def __reduce__(self):
         data = self.__getstate__()
-        data[DJANGO_VERSION_PICKLE_KEY] = django.__version__
+        data[DJANGO_VERSION_PICKLE_KEY] = thibaud.__version__
         class_id = self._meta.app_label, self._meta.object_name
         return model_unpickle, (class_id,), data
 
@@ -632,17 +632,17 @@ class Model(AltersData, metaclass=ModelBase):
     def __setstate__(self, state):
         pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
         if pickled_version:
-            if pickled_version != django.__version__:
+            if pickled_version != thibaud.__version__:
                 warnings.warn(
-                    "Pickled model instance's Django version %s does not "
+                    "Pickled model instance's Thibaud version %s does not "
                     "match the current version %s."
-                    % (pickled_version, django.__version__),
+                    % (pickled_version, thibaud.__version__),
                     RuntimeWarning,
                     stacklevel=2,
                 )
         else:
             warnings.warn(
-                "Pickled model instance's Django version is not specified.",
+                "Pickled model instance's Thibaud version is not specified.",
                 RuntimeWarning,
                 stacklevel=2,
             )
@@ -1702,7 +1702,7 @@ class Model(AltersData, metaclass=ModelBase):
                         f"Configure the DEFAULT_AUTO_FIELD setting or the "
                         f"{cls._meta.app_config.__class__.__qualname__}."
                         f"default_auto_field attribute to point to a subclass "
-                        f"of AutoField, e.g. 'django.db.models.BigAutoField'."
+                        f"of AutoField, e.g. 'thibaud.db.models.BigAutoField'."
                     ),
                     obj=cls,
                     id="models.W042",
@@ -2182,7 +2182,7 @@ class Model(AltersData, metaclass=ModelBase):
 
     @classmethod
     def _check_local_fields(cls, fields, option):
-        from django.db import models
+        from thibaud.db import models
 
         # In order to avoid hitting the relation tree prematurely, we use our
         # own fields_map instead of using get_field()

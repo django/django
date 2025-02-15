@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.urls import path
+from thibaud.contrib import admin
+from thibaud.urls import path
 
 urlpatterns = [
     # This is the same as in the default project template

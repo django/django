@@ -1,7 +1,7 @@
-from django.conf import settings
-from django.contrib.flatpages.views import flatpage
-from django.http import Http404
-from django.utils.deprecation import MiddlewareMixin
+from thibaud.conf import settings
+from thibaud.contrib.flatpages.views import flatpage
+from thibaud.http import Http404
+from thibaud.utils.deprecation import MiddlewareMixin
 
 
 class FlatpageFallbackMiddleware(MiddlewareMixin):

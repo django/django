@@ -1,13 +1,13 @@
 from io import IOBase
 
-from django.conf import settings
-from django.core import signals
-from django.core.handlers import base
-from django.http import HttpRequest, QueryDict, parse_cookie
-from django.urls import set_script_prefix
-from django.utils.encoding import repercent_broken_unicode
-from django.utils.functional import cached_property
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.conf import settings
+from thibaud.core import signals
+from thibaud.core.handlers import base
+from thibaud.http import HttpRequest, QueryDict, parse_cookie
+from thibaud.urls import set_script_prefix
+from thibaud.utils.encoding import repercent_broken_unicode
+from thibaud.utils.functional import cached_property
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 _slashes_re = _lazy_re_compile(rb"/+")
 
@@ -192,7 +192,7 @@ def get_bytes_from_wsgi(environ, key, default):
     """
     value = environ.get(key, default)
     # Non-ASCII values in the WSGI environ are arbitrarily decoded with
-    # ISO-8859-1. This is wrong for Django websites where UTF-8 is the default.
+    # ISO-8859-1. This is wrong for Thibaud websites where UTF-8 is the default.
     # Re-encode to recover the original bytestring.
     return value.encode("iso-8859-1")
 

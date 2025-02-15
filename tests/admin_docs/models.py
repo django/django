@@ -1,9 +1,9 @@
 """
-Models for testing various aspects of the django.contrib.admindocs app.
+Models for testing various aspects of the thibaud.contrib.admindocs app.
 """
 
-from django.db import models
-from django.utils.functional import cached_property
+from thibaud.db import models
+from thibaud.utils.functional import cached_property
 
 
 class Company(models.Model):

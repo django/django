@@ -4,7 +4,7 @@
 QUnit.module('admin.SelectFilter2');
 
 QUnit.test('init', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $('<form id="test"></form>').appendTo('#qunit-fixture');
     $('<label for="id_id">Test</label>').appendTo('#test');
     $('<div class="helptext">This is helpful.</div>').appendTo('#test');
@@ -34,7 +34,7 @@ QUnit.test('init', function(assert) {
 });
 
 QUnit.test('filtering available options', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
     $('<option value="1" title="Red">Red</option>').appendTo('#select');
     $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
@@ -57,7 +57,7 @@ QUnit.test('filtering available options', function(assert) {
 });
 
 QUnit.test('filtering selected options', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
     $('<option selected value="1" title="Red">Red</option>').appendTo('#select');
     $('<option selected value="2" title="Blue">Blue</option>').appendTo('#select');
@@ -80,7 +80,7 @@ QUnit.test('filtering selected options', function(assert) {
 });
 
 QUnit.test('filtering available options to nothing', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
     $('<option value="1" title="Red">Red</option>').appendTo('#select');
     $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
@@ -101,7 +101,7 @@ QUnit.test('filtering available options to nothing', function(assert) {
 });
 
 QUnit.test('filtering selected options to nothing', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
     $('<option selected value="1" title="Red">Red</option>').appendTo('#select');
     $('<option selected value="2" title="Blue">Blue</option>').appendTo('#select');
@@ -122,7 +122,7 @@ QUnit.test('filtering selected options to nothing', function(assert) {
 });
 
 QUnit.test('selecting option', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
     $('<option value="1" title="Red">Red</option>').appendTo('#select');
     $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
@@ -144,7 +144,7 @@ QUnit.test('selecting option', function(assert) {
 });
 
 QUnit.test('deselecting option', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
     $('<option selected value="1" title="Red">Red</option>').appendTo('#select');
     $('<option value="2" title="Blue">Blue</option>').appendTo('#select');

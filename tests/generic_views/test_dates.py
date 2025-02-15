@@ -1,9 +1,9 @@
 import datetime
 from unittest import mock
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import requires_tz_support
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.test import TestCase, override_settings, skipUnlessDBFeature
+from thibaud.test.utils import requires_tz_support
 
 from .models import Artist, Author, Book, BookSigning, Page
 
@@ -360,7 +360,7 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
             list(res.context["date_list"]), sorted(res.context["date_list"])
         )
 
-    @mock.patch("django.views.generic.list.MultipleObjectMixin.get_context_data")
+    @mock.patch("thibaud.views.generic.list.MultipleObjectMixin.get_context_data")
     def test_get_context_data_receives_extra_context(self, mock):
         """
         MultipleObjectMixin.get_context_data() receives the context set by

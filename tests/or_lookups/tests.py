@@ -1,8 +1,8 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import Q
-from django.test import TestCase
+from thibaud.db.models import Q
+from thibaud.test import TestCase
 
 from .models import Article
 

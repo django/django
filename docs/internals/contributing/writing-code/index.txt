@@ -2,13 +2,13 @@
 Contributing code
 =================
 
-So you'd like to write some code, documentation or tests to improve Django?
-There are several ways you can help Django's development.
+So you'd like to write some code, documentation or tests to improve Thibaud?
+There are several ways you can help Thibaud's development.
 
 Tutorials
 =========
 
-The Django tutorial contains a whole section that walks you step-by-step
+The Thibaud tutorial contains a whole section that walks you step-by-step
 through the contributing code process.
 
 .. toctree::
@@ -25,9 +25,9 @@ our documentation also contains useful guidance on specific topics:
 .. toctree::
    :maxdepth: 1
 
-   How to submit a patch to Django for new and/or fixed behavior <submitting-patches>
+   How to submit a patch to Thibaud for new and/or fixed behavior <submitting-patches>
    How to write and run tests </topics/testing/overview>
-   How to run Django's unit tests <unit-tests>
+   How to run Thibaud's unit tests <unit-tests>
    How to work with Git and GitHub <working-with-git>
 
 Related topics
@@ -48,4 +48,4 @@ recommended for those contributors looking to make a contribution.
 
 * Browse `easy pickings`_ tickets.
 
-.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
+.. _easy pickings: https://code.thibaudproject.com/query?status=!closed&easy=1

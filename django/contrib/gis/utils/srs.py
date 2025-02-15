@@ -1,5 +1,5 @@
-from django.contrib.gis.gdal import SpatialReference
-from django.db import DEFAULT_DB_ALIAS, connections
+from thibaud.contrib.gis.gdal import SpatialReference
+from thibaud.db import DEFAULT_DB_ALIAS, connections
 
 
 def add_srs_entry(
@@ -12,7 +12,7 @@ def add_srs_entry(
     is useful for adding spatial reference systems not included by default with
     the backend:
 
-    >>> from django.contrib.gis.utils import add_srs_entry
+    >>> from thibaud.contrib.gis.utils import add_srs_entry
     >>> add_srs_entry(3857)
 
     Keyword Arguments:
@@ -30,7 +30,7 @@ def add_srs_entry(
 
      database:
       The name of the database connection to use; the default is the value
-      of `django.db.DEFAULT_DB_ALIAS` (at the time of this writing, its value
+      of `thibaud.db.DEFAULT_DB_ALIAS` (at the time of this writing, its value
       is 'default').
     """
     database = database or DEFAULT_DB_ALIAS

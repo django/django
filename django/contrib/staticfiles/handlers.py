@@ -3,13 +3,13 @@ from urllib.request import url2pathname
 
 from asgiref.sync import sync_to_async
 
-from django.conf import settings
-from django.contrib.staticfiles import utils
-from django.contrib.staticfiles.views import serve
-from django.core.handlers.asgi import ASGIHandler
-from django.core.handlers.exception import response_for_exception
-from django.core.handlers.wsgi import WSGIHandler, get_path_info
-from django.http import Http404
+from thibaud.conf import settings
+from thibaud.contrib.staticfiles import utils
+from thibaud.contrib.staticfiles.views import serve
+from thibaud.core.handlers.asgi import ASGIHandler
+from thibaud.core.handlers.exception import response_for_exception
+from thibaud.core.handlers.wsgi import WSGIHandler, get_path_info
+from thibaud.http import Http404
 
 
 class StaticFilesHandlerMixin:
@@ -84,7 +84,7 @@ class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):
 class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):
     """
     ASGI application which wraps another and intercepts requests for static
-    files, passing them off to Django's static file serving.
+    files, passing them off to Thibaud's static file serving.
     """
 
     def __init__(self, application):

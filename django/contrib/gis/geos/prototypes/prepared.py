@@ -1,7 +1,7 @@
 from ctypes import c_byte
 
-from django.contrib.gis.geos.libgeos import GEOM_PTR, PREPGEOM_PTR, GEOSFuncFactory
-from django.contrib.gis.geos.prototypes.errcheck import check_predicate
+from thibaud.contrib.gis.geos.libgeos import GEOM_PTR, PREPGEOM_PTR, GEOSFuncFactory
+from thibaud.contrib.gis.geos.prototypes.errcheck import check_predicate
 
 # Prepared geometry constructor and destructors.
 geos_prepare = GEOSFuncFactory("GEOSPrepare", argtypes=[GEOM_PTR], restype=PREPGEOM_PTR)

@@ -1,5 +1,5 @@
-from django.http import HttpResponse
-from django.urls import include, path
+from thibaud.http import HttpResponse
+from thibaud.urls import include, path
 
 from . import admin, custom_has_permission_admin, customadmin, views
 from .test_autocomplete_view import site as autocomplete_site
@@ -10,7 +10,7 @@ def non_admin_view(request):
 
 
 urlpatterns = [
-    path("test_admin/admin/doc/", include("django.contrib.admindocs.urls")),
+    path("test_admin/admin/doc/", include("thibaud.contrib.admindocs.urls")),
     path("test_admin/admin/secure-view/", views.secure_view, name="secure_view"),
     path("test_admin/admin/secure-view2/", views.secure_view2, name="secure_view2"),
     path("test_admin/admin/", admin.site.urls),

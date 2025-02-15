@@ -1,5 +1,5 @@
 """
-This encapsulates the logic for displaying filters in the Django admin.
+This encapsulates the logic for displaying filters in the Thibaud admin.
 Filters are specified in models with the "list_filter" option.
 
 Each filter subclass knows how to display a filter for a field that passes a
@@ -8,19 +8,19 @@ certain test -- e.g. being a DateField or ForeignKey.
 
 import datetime
 
-from django.contrib.admin.exceptions import NotRegistered
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.utils import (
+from thibaud.contrib.admin.exceptions import NotRegistered
+from thibaud.contrib.admin.options import IncorrectLookupParameters
+from thibaud.contrib.admin.utils import (
     build_q_object_from_lookup_parameters,
     get_last_value_from_parameters,
     get_model_from_relation,
     prepare_lookup_value,
     reverse_field_path,
 )
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.db import models
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from thibaud.core.exceptions import ImproperlyConfigured, ValidationError
+from thibaud.db import models
+from thibaud.utils import timezone
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class ListFilter:
@@ -470,7 +470,7 @@ class DateFieldListFilter(FieldListFilter):
 
         now = timezone.now()
         # When time zone support is enabled, convert "now" to the user's time
-        # zone so Django's definition of "Today" matches what the user expects.
+        # zone so Thibaud's definition of "Today" matches what the user expects.
         if timezone.is_aware(now):
             now = timezone.localtime(now)
 

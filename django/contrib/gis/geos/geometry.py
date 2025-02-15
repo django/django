@@ -6,18 +6,18 @@
 import re
 from ctypes import addressof, byref, c_double
 
-from django.contrib.gis import gdal
-from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
-from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.base import GEOSBase
-from django.contrib.gis.geos.coordseq import GEOSCoordSeq
-from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import GEOM_PTR, geos_version_tuple
-from django.contrib.gis.geos.mutable_list import ListMixin
-from django.contrib.gis.geos.prepared import PreparedGeometry
-from django.contrib.gis.geos.prototypes.io import ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w
-from django.utils.deconstruct import deconstructible
-from django.utils.encoding import force_bytes, force_str
+from thibaud.contrib.gis import gdal
+from thibaud.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
+from thibaud.contrib.gis.geos import prototypes as capi
+from thibaud.contrib.gis.geos.base import GEOSBase
+from thibaud.contrib.gis.geos.coordseq import GEOSCoordSeq
+from thibaud.contrib.gis.geos.error import GEOSException
+from thibaud.contrib.gis.geos.libgeos import GEOM_PTR, geos_version_tuple
+from thibaud.contrib.gis.geos.mutable_list import ListMixin
+from thibaud.contrib.gis.geos.prepared import PreparedGeometry
+from thibaud.contrib.gis.geos.prototypes.io import ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w
+from thibaud.utils.deconstruct import deconstructible
+from thibaud.utils.encoding import force_bytes, force_str
 
 
 class GEOSGeometryBase(GEOSBase):
@@ -76,7 +76,7 @@ class GEOSGeometryBase(GEOSBase):
 
     def __deepcopy__(self, memodict):
         """
-        The `deepcopy` routine is used by the `Node` class of django.utils.tree;
+        The `deepcopy` routine is used by the `Node` class of thibaud.utils.tree;
         thus, the protocol routine needs to be implemented to return correct
         copies (clones) of these GEOS objects, which use C pointers.
         """

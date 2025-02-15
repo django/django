@@ -1,11 +1,11 @@
 from io import BytesIO
 from socketserver import ThreadingMixIn
 
-from django.core.handlers.wsgi import WSGIRequest
-from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
-from django.test import SimpleTestCase
-from django.test.client import RequestFactory
-from django.test.utils import captured_stderr
+from thibaud.core.handlers.wsgi import WSGIRequest
+from thibaud.core.servers.basehttp import WSGIRequestHandler, WSGIServer
+from thibaud.test import SimpleTestCase
+from thibaud.test.client import RequestFactory
+from thibaud.test.utils import captured_stderr
 
 
 class Stub(ThreadingMixIn):
@@ -38,13 +38,13 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         for level, status_codes in level_status_codes.items():
             for status_code in status_codes:
                 # The correct level gets the message.
-                with self.assertLogs("django.server", level.upper()) as cm:
+                with self.assertLogs("thibaud.server", level.upper()) as cm:
                     handler.log_message("GET %s %s", "A", str(status_code))
                 self.assertIn("GET A %d" % status_code, cm.output[0])
                 # Incorrect levels don't have any messages.
                 for wrong_level in level_status_codes:
                     if wrong_level != level:
-                        with self.assertLogs("django.server", "INFO") as cm:
+                        with self.assertLogs("thibaud.server", "INFO") as cm:
                             handler.log_message("GET %s %s", "A", str(status_code))
                         self.assertNotEqual(
                             cm.records[0].levelname, wrong_level.upper()
@@ -56,7 +56,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
 
         handler = WSGIRequestHandler(request, "192.168.0.2", None)
 
-        with self.assertLogs("django.server", "ERROR") as cm:
+        with self.assertLogs("thibaud.server", "ERROR") as cm:
             handler.log_message("GET %s %s", "\x16\x03", "4")
         self.assertEqual(
             "You're accessing the development server over HTTPS, "
@@ -99,7 +99,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         server = Stub(base_environ={}, get_app=lambda: test_app)
 
         # Prevent logging from appearing in test output.
-        with self.assertLogs("django.server", "INFO"):
+        with self.assertLogs("thibaud.server", "INFO"):
             # instantiating a handler runs the request as side effect
             WSGIRequestHandler(request, "192.168.0.2", server)
 
@@ -132,7 +132,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         server = Stub(base_environ={}, get_app=lambda: test_app)
 
         # Prevent logging from appearing in test output.
-        with self.assertLogs("django.server", "INFO"):
+        with self.assertLogs("thibaud.server", "INFO"):
             # Instantiating a handler runs the request as side effect.
             WSGIRequestHandler(request, "192.168.0.2", server)
 
@@ -148,7 +148,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         rfile.seek(0)
         wfile = UnclosableBytesIO()
 
-        with self.assertLogs("django.server", "INFO"):
+        with self.assertLogs("thibaud.server", "INFO"):
             WSGIRequestHandler(request, "192.168.0.2", server)
 
         wfile.seek(0)
@@ -187,7 +187,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         server = Stub(base_environ={}, get_app=lambda: test_app)
 
         # Prevent logging from appearing in test output.
-        with self.assertLogs("django.server", "INFO"):
+        with self.assertLogs("thibaud.server", "INFO"):
             # Instantiating a handler runs the request as side effect.
             WSGIRequestHandler(request, "192.168.0.2", server)
 
@@ -222,7 +222,7 @@ class WSGIServerTestCase(SimpleTestCase):
                         raise exception()
                     except Exception:
                         with captured_stderr() as err:
-                            with self.assertLogs("django.server", "INFO") as cm:
+                            with self.assertLogs("thibaud.server", "INFO") as cm:
                                 server.handle_error(request, client_address)
                         self.assertEqual(err.getvalue(), "")
                         self.assertEqual(cm.records[0].getMessage(), msg)

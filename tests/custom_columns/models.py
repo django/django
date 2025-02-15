@@ -15,7 +15,7 @@ from the default generated name, use the ``db_table`` parameter on the
 
 """
 
-from django.db import models
+from thibaud.db import models
 
 
 class Author(models.Model):

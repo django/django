@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2015
@@ -7,12 +7,12 @@
 # yun_man_ger <germanilyin@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-16 20:42+0100\n"
 "PO-Revision-Date: 2019-01-18 00:36+0000\n"
 "Last-Translator: Ramiro Morales\n"
-"Language-Team: Kazakh (http://www.transifex.com/django/django/language/kk/)\n"
+"Language-Team: Kazakh (http://www.transifex.com/thibaud/thibaud/language/kk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -280,10 +280,10 @@ msgid ""
 "protected related objects: %(related_objects)s"
 msgstr ""
 
-msgid "Django site admin"
+msgid "Thibaud site admin"
 msgstr "Даңғо сайтының әкімі"
 
-msgid "Django administration"
+msgid "Thibaud administration"
 msgstr "Даңғо әкімшілігі"
 
 msgid "Site administration"

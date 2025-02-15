@@ -1,19 +1,19 @@
 import datetime
 import posixpath
 
-from django import forms
-from django.core import checks
-from django.core.exceptions import FieldError
-from django.core.files.base import ContentFile, File
-from django.core.files.images import ImageFile
-from django.core.files.storage import Storage, default_storage
-from django.core.files.utils import validate_file_name
-from django.db.models import signals
-from django.db.models.expressions import DatabaseDefault
-from django.db.models.fields import Field
-from django.db.models.query_utils import DeferredAttribute
-from django.db.models.utils import AltersData
-from django.utils.translation import gettext_lazy as _
+from thibaud import forms
+from thibaud.core import checks
+from thibaud.core.exceptions import FieldError
+from thibaud.core.files.base import ContentFile, File
+from thibaud.core.files.images import ImageFile
+from thibaud.core.files.storage import Storage, default_storage
+from thibaud.core.files.utils import validate_file_name
+from thibaud.db.models import signals
+from thibaud.db.models.expressions import DatabaseDefault
+from thibaud.db.models.fields import Field
+from thibaud.db.models.query_utils import DeferredAttribute
+from thibaud.db.models.utils import AltersData
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class FieldFile(File, AltersData):

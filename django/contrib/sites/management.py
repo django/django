@@ -2,10 +2,10 @@
 Creates the default Site object.
 """
 
-from django.apps import apps as global_apps
-from django.conf import settings
-from django.core.management.color import no_style
-from django.db import DEFAULT_DB_ALIAS, connections, router
+from thibaud.apps import apps as global_apps
+from thibaud.conf import settings
+from thibaud.core.management.color import no_style
+from thibaud.db import DEFAULT_DB_ALIAS, connections, router
 
 
 def create_default_site(
@@ -25,7 +25,7 @@ def create_default_site(
         return
 
     if not Site.objects.using(using).exists():
-        # The default settings set SITE_ID = 1, and some tests in Django's test
+        # The default settings set SITE_ID = 1, and some tests in Thibaud's test
         # suite rely on this value. However, if database sequences are reused
         # (e.g. in the test suite after flush/syncdb), it isn't guaranteed that
         # the next id will be 1, so we coerce it. See #15573 and #16353. This

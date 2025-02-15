@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # arneatec <arneatec@gmail.com>, 2022-2024
@@ -11,12 +11,12 @@
 # Venelin Stoykov <vkstoykov@gmail.com>, 2015-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 07:05+0000\n"
 "Last-Translator: arneatec <arneatec@gmail.com>, 2022-2024\n"
-"Language-Team: Bulgarian (http://app.transifex.com/django/django/language/"
+"Language-Team: Bulgarian (http://app.transifex.com/thibaud/thibaud/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -288,11 +288,11 @@ msgstr ""
 "Изтриването на избраните %(class_name)s %(instance)s ще наложи изтриването "
 "на следните защитени и свързани обекти: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Django административен сайт"
+msgid "Thibaud site admin"
+msgstr "Thibaud административен сайт"
 
-msgid "Django administration"
-msgstr "Django администрация"
+msgid "Thibaud administration"
+msgstr "Thibaud администрация"
 
 msgid "Site administration"
 msgstr "Администрация на сайта"

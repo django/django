@@ -1,4 +1,4 @@
-from django.http import Http404
+from thibaud.http import Http404
 
 
 class Resolver404(Http404):

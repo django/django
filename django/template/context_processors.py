@@ -4,14 +4,14 @@ template context. Each function takes the request object as its only parameter
 and returns a dictionary to add to the context.
 
 These are referenced from the 'context_processors' option of the configuration
-of a DjangoTemplates backend and used by RequestContext.
+of a ThibaudTemplates backend and used by RequestContext.
 """
 
 import itertools
 
-from django.conf import settings
-from django.middleware.csrf import get_token
-from django.utils.functional import SimpleLazyObject, lazy
+from thibaud.conf import settings
+from thibaud.middleware.csrf import get_token
+from thibaud.utils.functional import SimpleLazyObject, lazy
 
 
 def csrf(request):
@@ -40,7 +40,7 @@ def debug(request):
     context_extras = {}
     if settings.DEBUG and request.META.get("REMOTE_ADDR") in settings.INTERNAL_IPS:
         context_extras["debug"] = True
-        from django.db import connections
+        from thibaud.db import connections
 
         # Return a lazy reference that computes connection.queries on access,
         # to ensure it contains queries triggered after this function runs.
@@ -56,7 +56,7 @@ def debug(request):
 
 
 def i18n(request):
-    from django.utils import translation
+    from thibaud.utils import translation
 
     return {
         "LANGUAGES": settings.LANGUAGES,
@@ -66,7 +66,7 @@ def i18n(request):
 
 
 def tz(request):
-    from django.utils import timezone
+    from thibaud.utils import timezone
 
     return {"TIME_ZONE": timezone.get_current_timezone_name()}
 

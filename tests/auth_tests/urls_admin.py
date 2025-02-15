@@ -2,11 +2,11 @@
 Test URLs for auth admins.
 """
 
-from django.contrib import admin
-from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.contrib.auth.models import Group, User
-from django.contrib.auth.urls import urlpatterns
-from django.urls import path
+from thibaud.contrib import admin
+from thibaud.contrib.auth.admin import GroupAdmin, UserAdmin
+from thibaud.contrib.auth.models import Group, User
+from thibaud.contrib.auth.urls import urlpatterns
+from thibaud.urls import path
 
 # Create a silo'd admin site for just the user/group admins.
 site = admin.AdminSite(name="auth_test_admin")

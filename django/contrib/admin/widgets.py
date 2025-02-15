@@ -1,22 +1,22 @@
 """
-Form Widget classes specific to the Django admin site.
+Form Widget classes specific to the Thibaud admin site.
 """
 
 import copy
 import json
 
-from django import forms
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
-from django.db.models import CASCADE, UUIDField
-from django.urls import reverse
-from django.urls.exceptions import NoReverseMatch
-from django.utils.html import smart_urlquote
-from django.utils.http import urlencode
-from django.utils.text import Truncator
-from django.utils.translation import get_language
-from django.utils.translation import gettext as _
+from thibaud import forms
+from thibaud.conf import settings
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.validators import URLValidator
+from thibaud.db.models import CASCADE, UUIDField
+from thibaud.urls import reverse
+from thibaud.urls.exceptions import NoReverseMatch
+from thibaud.utils.html import smart_urlquote
+from thibaud.utils.http import urlencode
+from thibaud.utils.text import Truncator
+from thibaud.utils.translation import get_language
+from thibaud.utils.translation import gettext as _
 
 
 class FilteredSelectMultiple(forms.SelectMultiple):
@@ -184,7 +184,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         return url_params_from_lookup_dict(limit_choices_to)
 
     def url_parameters(self):
-        from django.contrib.admin.views.main import TO_FIELD_VAR
+        from thibaud.contrib.admin.views.main import TO_FIELD_VAR
 
         params = self.base_url_parameters()
         params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
@@ -313,7 +313,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         )
 
     def get_context(self, name, value, attrs):
-        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
+        from thibaud.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
 
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
@@ -415,9 +415,9 @@ class AdminUUIDInputWidget(forms.TextInput):
         super().__init__(attrs={"class": "vUUIDField", **(attrs or {})})
 
 
-# Mapping of lowercase language codes [returned by Django's get_language()] to
+# Mapping of lowercase language codes [returned by Thibaud's get_language()] to
 # language codes supported by select2.
-# See django/contrib/admin/static/admin/js/vendor/select2/i18n/*
+# See thibaud/contrib/admin/static/admin/js/vendor/select2/i18n/*
 SELECT2_TRANSLATIONS = {
     x.lower(): x
     for x in [

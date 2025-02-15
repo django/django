@@ -1,11 +1,11 @@
 import unittest
 from decimal import Decimal
 
-from django.db import connection
-from django.db.models import DecimalField
-from django.db.models.functions import Pi, Round
-from django.test import TestCase
-from django.test.utils import register_lookup
+from thibaud.db import connection
+from thibaud.db.models import DecimalField
+from thibaud.db.models.functions import Pi, Round
+from thibaud.test import TestCase
+from thibaud.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 

@@ -1,12 +1,12 @@
-from django.http.cookie import SimpleCookie, parse_cookie
-from django.http.request import (
+from thibaud.http.cookie import SimpleCookie, parse_cookie
+from thibaud.http.request import (
     HttpHeaders,
     HttpRequest,
     QueryDict,
     RawPostDataException,
     UnreadablePostError,
 )
-from django.http.response import (
+from thibaud.http.response import (
     BadHeaderError,
     FileResponse,
     Http404,

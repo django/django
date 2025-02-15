@@ -1,10 +1,10 @@
 import unittest
 
-from django.core.management.color import no_style
-from django.db import connection
-from django.db.models.expressions import Col
-from django.db.models.functions import Cast
-from django.test import SimpleTestCase
+from thibaud.core.management.color import no_style
+from thibaud.db import connection
+from thibaud.db.models.expressions import Col
+from thibaud.db.models.functions import Cast
+from thibaud.test import SimpleTestCase
 
 from ..models import Author, Book, Person, Tag
 

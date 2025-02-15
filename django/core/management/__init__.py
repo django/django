@@ -12,18 +12,18 @@ from collections import defaultdict
 from difflib import get_close_matches
 from importlib import import_module
 
-import django
-from django.apps import apps
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management.base import (
+import thibaud
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.management.base import (
     BaseCommand,
     CommandError,
     CommandParser,
     handle_default_options,
 )
-from django.core.management.color import color_style
-from django.utils import autoreload
+from thibaud.core.management.color import color_style
+from thibaud.utils import autoreload
 
 
 def find_commands(management_dir):
@@ -54,7 +54,7 @@ def get_commands():
     """
     Return a dictionary mapping command names to their callback applications.
 
-    Look for a management.commands package in django.core, and in each
+    Look for a management.commands package in thibaud.core, and in each
     installed application -- if a commands package exists, register all
     commands in that package.
 
@@ -68,7 +68,7 @@ def get_commands():
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
-    commands = {name: "django.core" for name in find_commands(__path__[0])}
+    commands = {name: "thibaud.core" for name in find_commands(__path__[0])}
 
     if not settings.configured:
         return commands
@@ -95,7 +95,7 @@ def call_command(command_name, *args, **options):
         call_command('shell', plain=True)
         call_command('sqlmigrate', 'myapp')
 
-        from django.core.management.commands import flush
+        from thibaud.core.management.commands import flush
         cmd = flush.Command()
         call_command(cmd, verbosity=0, interactive=False)
         # Do something with cmd ...
@@ -196,14 +196,14 @@ def call_command(command_name, *args, **options):
 
 class ManagementUtility:
     """
-    Encapsulate the logic of the django-admin and manage.py utilities.
+    Encapsulate the logic of the thibaud-admin and manage.py utilities.
     """
 
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
         if self.prog_name == "__main__.py":
-            self.prog_name = "python -m django"
+            self.prog_name = "python -m thibaud"
         self.settings_exception = None
 
     def main_help_text(self, commands_only=False):
@@ -220,8 +220,8 @@ class ManagementUtility:
             ]
             commands_dict = defaultdict(lambda: [])
             for name, app in get_commands().items():
-                if app == "django.core":
-                    app = "django"
+                if app == "thibaud.core":
+                    app = "thibaud"
                 else:
                     app = app.rpartition(".")[-1]
                 commands_dict[app].append(name)
@@ -235,7 +235,7 @@ class ManagementUtility:
             if self.settings_exception is not None:
                 usage.append(
                     style.NOTICE(
-                        "Note that only Django core commands are listed "
+                        "Note that only Thibaud core commands are listed "
                         "as settings are not properly configured (error: %s)."
                         % self.settings_exception
                     )
@@ -247,7 +247,7 @@ class ManagementUtility:
         """
         Try to fetch the given subcommand, printing a message with the
         appropriate command called from the command line (usually
-        "django-admin" or "manage.py") if it can't be found.
+        "thibaud-admin" or "manage.py") if it can't be found.
         """
         # Get commands outside of try block to prevent swallowing exceptions
         commands = get_commands()
@@ -261,7 +261,7 @@ class ManagementUtility:
                 # informed about it.
                 settings.INSTALLED_APPS
             elif not settings.configured:
-                sys.stderr.write("No Django settings specified.\n")
+                sys.stderr.write("No Thibaud settings specified.\n")
             possible_matches = get_close_matches(subcommand, commands)
             sys.stderr.write("Unknown command: %r" % subcommand)
             if possible_matches:
@@ -391,7 +391,7 @@ class ManagementUtility:
             # flag on the command class because we haven't located it yet.
             if subcommand == "runserver" and "--noreload" not in self.argv:
                 try:
-                    autoreload.check_errors(django.setup)()
+                    autoreload.check_errors(thibaud.setup)()
                 except Exception:
                     # The exception will be raised later in the child process
                     # started by the autoreloader. Pretend it didn't happen by
@@ -405,15 +405,15 @@ class ManagementUtility:
                     # Changes here require manually testing as described in
                     # #27522.
                     _parser = self.fetch_command("runserver").create_parser(
-                        "django", "runserver"
+                        "thibaud", "runserver"
                     )
                     _options, _args = _parser.parse_known_args(self.argv[2:])
                     for _arg in _args:
                         self.argv.remove(_arg)
 
-            # In all other cases, django.setup() is required to succeed.
+            # In all other cases, thibaud.setup() is required to succeed.
             else:
-                django.setup()
+                thibaud.setup()
 
         self.autocomplete()
 
@@ -426,10 +426,10 @@ class ManagementUtility:
                 self.fetch_command(options.args[0]).print_help(
                     self.prog_name, options.args[0]
                 )
-        # Special-cases: We want 'django-admin --version' and
-        # 'django-admin --help' to work, for backwards compatibility.
+        # Special-cases: We want 'thibaud-admin --version' and
+        # 'thibaud-admin --help' to work, for backwards compatibility.
         elif subcommand == "version" or self.argv[1:] == ["--version"]:
-            sys.stdout.write(django.get_version() + "\n")
+            sys.stdout.write(thibaud.get_version() + "\n")
         elif self.argv[1:] in (["--help"], ["-h"]):
             sys.stdout.write(self.main_help_text() + "\n")
         else:

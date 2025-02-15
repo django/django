@@ -1,8 +1,8 @@
-from django.core.management.commands.inspectdb import Command as InspectDBCommand
+from thibaud.core.management.commands.inspectdb import Command as InspectDBCommand
 
 
 class Command(InspectDBCommand):
-    db_module = "django.contrib.gis.db"
+    db_module = "thibaud.contrib.gis.db"
 
     def get_field_type(self, connection, table_name, row):
         field_type, field_params, field_notes = super().get_field_type(

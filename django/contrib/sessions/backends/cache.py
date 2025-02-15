@@ -1,8 +1,8 @@
-from django.conf import settings
-from django.contrib.sessions.backends.base import CreateError, SessionBase, UpdateError
-from django.core.cache import caches
+from thibaud.conf import settings
+from thibaud.contrib.sessions.backends.base import CreateError, SessionBase, UpdateError
+from thibaud.core.cache import caches
 
-KEY_PREFIX = "django.contrib.sessions.cache"
+KEY_PREFIX = "thibaud.contrib.sessions.cache"
 
 
 class SessionStore(SessionBase):

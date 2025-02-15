@@ -1,12 +1,12 @@
 from copy import deepcopy
 from itertools import chain
 
-from django.core.checks import Error, Warning
-from django.core.checks.templates import check_templates
-from django.template import engines
-from django.template.backends.base import BaseEngine
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from thibaud.core.checks import Error, Warning
+from thibaud.core.checks.templates import check_templates
+from thibaud.template import engines
+from thibaud.template.backends.base import BaseEngine
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
 
 
 class ErrorEngine(BaseEngine):
@@ -33,14 +33,14 @@ class CheckTemplatesTests(SimpleTestCase):
 class CheckTemplateStringIfInvalidTest(SimpleTestCase):
     TEMPLATES_STRING_IF_INVALID = [
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "NAME": "backend_1",
             "OPTIONS": {
                 "string_if_invalid": False,
             },
         },
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "NAME": "backend_2",
             "OPTIONS": {
                 "string_if_invalid": 42,
@@ -96,9 +96,9 @@ class CheckTemplateStringIfInvalidTest(SimpleTestCase):
 
 
 class CheckTemplateTagLibrariesWithSameName(SimpleTestCase):
-    def get_settings(self, module_name, module_path, name="django"):
+    def get_settings(self, module_name, module_path, name="thibaud"):
         return {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "NAME": name,
             "OPTIONS": {
                 "libraries": {

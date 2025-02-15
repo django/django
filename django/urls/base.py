@@ -2,9 +2,9 @@ from urllib.parse import unquote, urlencode, urlsplit, urlunsplit
 
 from asgiref.local import Local
 
-from django.http import QueryDict
-from django.utils.functional import lazy
-from django.utils.translation import override
+from thibaud.http import QueryDict
+from thibaud.utils.functional import lazy
+from thibaud.utils.translation import override
 
 from .exceptions import NoReverseMatch, Resolver404
 from .resolvers import _get_cached_resolver, get_ns_resolver, get_resolver

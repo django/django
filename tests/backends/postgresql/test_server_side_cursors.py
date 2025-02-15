@@ -3,16 +3,16 @@ import unittest
 from collections import namedtuple
 from contextlib import contextmanager
 
-from django.db import connection, models
-from django.db.utils import ProgrammingError
-from django.test import TestCase
-from django.test.utils import garbage_collect
-from django.utils.version import PYPY
+from thibaud.db import connection, models
+from thibaud.db.utils import ProgrammingError
+from thibaud.test import TestCase
+from thibaud.test.utils import garbage_collect
+from thibaud.utils.version import PYPY
 
 from ..models import Person
 
 try:
-    from django.db.backends.postgresql.psycopg_any import is_psycopg3
+    from thibaud.db.backends.postgresql.psycopg_any import is_psycopg3
 except ImportError:
     is_psycopg3 = False
 
@@ -56,7 +56,7 @@ class ServerSideCursorsPostgres(TestCase):
         cursors = self.inspect_cursors()
         self.assertEqual(len(cursors), num_expected)
         for cursor in cursors:
-            self.assertIn("_django_curs_", cursor.name)
+            self.assertIn("_thibaud_curs_", cursor.name)
             self.assertFalse(cursor.is_scrollable)
             self.assertFalse(cursor.is_holdable)
             self.assertFalse(cursor.is_binary)

@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.contrib.sites.models import Site
+from thibaud.contrib import admin
+from thibaud.contrib.sites.models import Site
 
 
 @admin.register(Site)

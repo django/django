@@ -1,23 +1,23 @@
 from unittest import mock
 
-from django.conf.global_settings import PASSWORD_HASHERS
-from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.hashers import get_hasher
-from django.contrib.auth.models import (
+from thibaud.conf.global_settings import PASSWORD_HASHERS
+from thibaud.contrib.auth import get_user_model
+from thibaud.contrib.auth.backends import ModelBackend
+from thibaud.contrib.auth.base_user import AbstractBaseUser
+from thibaud.contrib.auth.hashers import get_hasher
+from thibaud.contrib.auth.models import (
     AnonymousUser,
     Group,
     Permission,
     User,
     UserManager,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.core import mail
-from django.db import connection, migrations
-from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.signals import post_save
-from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core import mail
+from thibaud.db import connection, migrations
+from thibaud.db.migrations.state import ModelState, ProjectState
+from thibaud.db.models.signals import post_save
+from thibaud.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
 
 from .models import CustomEmailField, IntegerUsernameUser
 
@@ -117,8 +117,8 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
 class UserManagerTestCase(TransactionTestCase):
     available_apps = [
         "auth_tests",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
+        "thibaud.contrib.auth",
+        "thibaud.contrib.contenttypes",
     ]
 
     def test_create_user(self):
@@ -294,7 +294,7 @@ class AbstractUserTestCase(TestCase):
         user = User.objects.create_user(username="user", password="foo")
         user.set_password("bar")
         with mock.patch(
-            "django.contrib.auth.password_validation.password_changed"
+            "thibaud.contrib.auth.password_validation.password_changed"
         ) as pw_changed:
             user.save()
             self.assertEqual(pw_changed.call_count, 1)
@@ -318,7 +318,7 @@ class AbstractUserTestCase(TestCase):
             # Upgrade the password iterations
             hasher.iterations = old_iterations + 1
             with mock.patch(
-                "django.contrib.auth.password_validation.password_changed"
+                "thibaud.contrib.auth.password_validation.password_changed"
             ) as pw_changed:
                 user.check_password("foo")
                 self.assertEqual(pw_changed.call_count, 0)
@@ -339,7 +339,7 @@ class AbstractUserTestCase(TestCase):
             # Upgrade the password iterations.
             hasher.iterations = old_iterations + 1
             with mock.patch(
-                "django.contrib.auth.password_validation.password_changed"
+                "thibaud.contrib.auth.password_validation.password_changed"
             ) as pw_changed:
                 self.assertIs(await user.acheck_password("foo"), True)
                 self.assertEqual(pw_changed.call_count, 0)
@@ -443,7 +443,7 @@ class UserWithPermTestCase(TestCase):
                     )
 
     @override_settings(
-        AUTHENTICATION_BACKENDS=["django.contrib.auth.backends.BaseBackend"]
+        AUTHENTICATION_BACKENDS=["thibaud.contrib.auth.backends.BaseBackend"]
     )
     def test_backend_without_with_perm(self):
         self.assertSequenceEqual(User.objects.with_perm("auth.test"), [])
@@ -490,7 +490,7 @@ class UserWithPermTestCase(TestCase):
     @override_settings(
         AUTHENTICATION_BACKENDS=[
             "auth_tests.test_models.CustomModelBackend",
-            "django.contrib.auth.backends.ModelBackend",
+            "thibaud.contrib.auth.backends.ModelBackend",
         ]
     )
     def test_multiple_backends(self):
@@ -563,7 +563,7 @@ class TestCreateSuperUserSignals(TestCase):
 
 
 class AnonymousUserTests(SimpleTestCase):
-    no_repr_msg = "Django doesn't provide a DB representation for AnonymousUser."
+    no_repr_msg = "Thibaud doesn't provide a DB representation for AnonymousUser."
 
     def setUp(self):
         self.user = AnonymousUser()

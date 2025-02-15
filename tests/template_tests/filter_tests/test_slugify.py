@@ -1,7 +1,7 @@
-from django.template.defaultfilters import slugify
-from django.test import SimpleTestCase
-from django.utils.functional import lazy
-from django.utils.safestring import mark_safe
+from thibaud.template.defaultfilters import slugify
+from thibaud.test import SimpleTestCase
+from thibaud.utils.functional import lazy
+from thibaud.utils.safestring import mark_safe
 
 from ..utils import setup
 

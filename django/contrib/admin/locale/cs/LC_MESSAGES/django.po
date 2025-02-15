@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,12 +12,12 @@
 # yedpodtrzitko <yed@vanyli.net>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-10-07 07:05+0000\n"
 "Last-Translator: Jan Papež <honyczek@centrum.cz>, 2024\n"
-"Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
+"Language-Team: Czech (http://app.transifex.com/thibaud/thibaud/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -294,11 +294,11 @@ msgstr ""
 "Odstranění položky \"%(instance)s\" typu %(class_name)s by vyžadovalo "
 "odstranění těchto souvisejících chráněných položek: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Správa webu Django"
+msgid "Thibaud site admin"
+msgstr "Správa webu Thibaud"
 
-msgid "Django administration"
-msgstr "Správa systému Django"
+msgid "Thibaud administration"
+msgstr "Správa systému Thibaud"
 
 msgid "Site administration"
 msgstr "Správa webu"

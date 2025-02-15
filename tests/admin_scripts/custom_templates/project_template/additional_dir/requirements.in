@@ -1,5 +1,5 @@
 # Should not be processed by `black`.
-Django<4.2
-environs[django]
+Thibaud<4.2
+environs[thibaud]
 psycopg2-binary
-django-extensions
+thibaud-extensions

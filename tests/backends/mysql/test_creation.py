@@ -3,10 +3,10 @@ import unittest
 from io import StringIO
 from unittest import mock
 
-from django.db import DatabaseError, connection
-from django.db.backends.base.creation import BaseDatabaseCreation
-from django.db.backends.mysql.creation import DatabaseCreation
-from django.test import SimpleTestCase
+from thibaud.db import DatabaseError, connection
+from thibaud.db.backends.base.creation import BaseDatabaseCreation
+from thibaud.db.backends.mysql.creation import DatabaseCreation
+from thibaud.test import SimpleTestCase
 
 
 @unittest.skipUnless(connection.vendor == "mysql", "MySQL tests")
@@ -66,7 +66,7 @@ class DatabaseCreationTests(SimpleTestCase):
                 "PASSWORD": "",
                 "PORT": "",
                 "HOST": "",
-                "ENGINE": "django.db.backends.mysql",
+                "ENGINE": "thibaud.db.backends.mysql",
                 "OPTIONS": {
                     "read_default_file": "my.cnf",
                 },

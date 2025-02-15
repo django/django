@@ -1,10 +1,10 @@
-from django.contrib.gis.geos import Point
-from django.test import SimpleTestCase, override_settings
+from thibaud.contrib.gis.geos import Point
+from thibaud.test import SimpleTestCase, override_settings
 
 from .models import City, site, site_gis, site_gis_custom
 
 
-@override_settings(ROOT_URLCONF="django.contrib.gis.tests.geoadmin.urls")
+@override_settings(ROOT_URLCONF="thibaud.contrib.gis.tests.geoadmin.urls")
 class GeoAdminTest(SimpleTestCase):
     admin_site = site  # ModelAdmin
 
@@ -12,7 +12,7 @@ class GeoAdminTest(SimpleTestCase):
         geoadmin = self.admin_site.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)({"point": ""})
         with self.assertRaisesMessage(AssertionError, "no logs"):
-            with self.assertLogs("django.contrib.gis", "ERROR"):
+            with self.assertLogs("thibaud.contrib.gis", "ERROR"):
                 output = str(form["point"])
         self.assertInHTML(
             '<textarea id="id_point" class="vSerializedField required" cols="150"'
@@ -23,7 +23,7 @@ class GeoAdminTest(SimpleTestCase):
     def test_widget_invalid_string(self):
         geoadmin = self.admin_site.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)({"point": "INVALID()"})
-        with self.assertLogs("django.contrib.gis", "ERROR") as cm:
+        with self.assertLogs("thibaud.contrib.gis", "ERROR") as cm:
             output = str(form["point"])
         self.assertInHTML(
             '<textarea id="id_point" class="vSerializedField required" cols="150"'

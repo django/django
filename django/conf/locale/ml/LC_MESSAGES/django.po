@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # c1007a0b890405f1fbddfacebc4c6ef7, 2013
@@ -13,12 +13,12 @@
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
 "PO-Revision-Date: 2021-11-24 16:29+0000\n"
 "Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
-"Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
+"Language-Team: Malayalam (http://www.transifex.com/thibaud/thibaud/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1243,19 +1243,19 @@ msgstr "ഇൻസ്ടാൾ ഭംഗിയായി നടന്നു! അ�
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
 
-msgid "Django Documentation"
+msgid "Thibaud Documentation"
 msgstr "ജാംഗോ ഡോക്യുമെന്റേഷൻ"
 
 msgid "Topics, references, &amp; how-to’s"
@@ -1264,10 +1264,10 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr "പരിശീലനം: ഒരു പോളിങ്ങ് ആപ്പ്"
 
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr "ജാംഗോയുമായി പരിചയത്തിലാവുക"
 
-msgid "Django Community"
+msgid "Thibaud Community"
 msgstr "ജാംഗോ കമ്യൂണിറ്റി"
 
 msgid "Connect, get help, or contribute"

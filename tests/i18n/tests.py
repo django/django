@@ -12,16 +12,16 @@ from unittest import mock, skipUnless
 
 from asgiref.local import Local
 
-from django import forms
-from django.apps import AppConfig
-from django.conf import settings
-from django.conf.locale import LANG_INFO
-from django.conf.urls.i18n import i18n_patterns
-from django.core.management.utils import find_command, popen_wrapper
-from django.template import Context, Template
-from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
-from django.utils import translation
-from django.utils.formats import (
+from thibaud import forms
+from thibaud.apps import AppConfig
+from thibaud.conf import settings
+from thibaud.conf.locale import LANG_INFO
+from thibaud.conf.urls.i18n import i18n_patterns
+from thibaud.core.management.utils import find_command, popen_wrapper
+from thibaud.template import Context, Template
+from thibaud.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from thibaud.utils import translation
+from thibaud.utils.formats import (
     date_format,
     get_format,
     iter_format_modules,
@@ -32,9 +32,9 @@ from django.utils.formats import (
     sanitize_strftime_format,
     time_format,
 )
-from django.utils.numberformat import format as nformat
-from django.utils.safestring import SafeString, mark_safe
-from django.utils.translation import (
+from thibaud.utils.numberformat import format as nformat
+from thibaud.utils.safestring import SafeString, mark_safe
+from thibaud.utils.translation import (
     activate,
     check_for_language,
     deactivate,
@@ -55,11 +55,11 @@ from django.utils.translation import (
     trans_null,
     trans_real,
 )
-from django.utils.translation.reloader import (
+from thibaud.utils.translation.reloader import (
     translation_file_changed,
     watch_for_translation_changes,
 )
-from django.utils.translation.trans_real import LANGUAGE_CODE_MAX_LENGTH
+from thibaud.utils.translation.trans_real import LANGUAGE_CODE_MAX_LENGTH
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
@@ -77,7 +77,7 @@ class AppModuleStub:
 
 @contextmanager
 def patch_formats(lang, **settings):
-    from django.utils.formats import _format_cache
+    from thibaud.utils.formats import _format_cache
 
     # Populate _format_cache with temporary values
     for key, value in settings.items():
@@ -119,7 +119,7 @@ class TranslationTests(SimpleTestCase):
     @translation.override("fr")
     def test_multiple_plurals_per_language(self):
         """
-        Normally, French has 2 plurals. As other/locale/fr/LC_MESSAGES/django.po
+        Normally, French has 2 plurals. As other/locale/fr/LC_MESSAGES/thibaud.po
         has a different plural equation with 3 plurals, this tests if those
         plural are honored.
         """
@@ -136,7 +136,7 @@ class TranslationTests(SimpleTestCase):
     def test_multiple_plurals_merge(self):
         def _create_translation_from_string(content):
             with tempfile.TemporaryDirectory() as dirname:
-                po_path = Path(dirname).joinpath("fr", "LC_MESSAGES", "django.po")
+                po_path = Path(dirname).joinpath("fr", "LC_MESSAGES", "thibaud.po")
                 po_path.parent.mkdir(parents=True)
                 po_path.write_text(content)
                 errors = popen_wrapper(
@@ -145,7 +145,7 @@ class TranslationTests(SimpleTestCase):
                 if errors:
                     self.fail(f"msgfmt compilation error: {errors}")
                 return gettext_module.translation(
-                    domain="django",
+                    domain="thibaud",
                     localedir=dirname,
                     languages=["fr"],
                 )
@@ -161,7 +161,7 @@ class TranslationTests(SimpleTestCase):
             'msgstr "Je perds"\n'
         )
         french.merge(catalog1)
-        # Merge a second translation file with plural forms from django.conf.
+        # Merge a second translation file with plural forms from thibaud.conf.
         catalog2 = _create_translation_from_string(
             'msgid ""\n'
             'msgstr ""\n'
@@ -1272,7 +1272,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_sanitize_separators(self):
         """
-        Tests django.utils.formats.sanitize_separators.
+        Tests thibaud.utils.formats.sanitize_separators.
         """
         # Non-strings are untouched
         self.assertEqual(sanitize_separators(123), 123)
@@ -1318,7 +1318,7 @@ class FormattingTests(SimpleTestCase):
         """
         # Importing some format modules so that we can compare the returned
         # modules with these expected modules
-        default_mod = import_module("django.conf.locale.de.formats")
+        default_mod = import_module("thibaud.conf.locale.de.formats")
         test_mod = import_module("i18n.other.locale.de.formats")
         test_mod2 = import_module("i18n.other2.locale.de.formats")
 
@@ -1349,8 +1349,8 @@ class FormattingTests(SimpleTestCase):
         Tests the iter_format_modules function always yields format modules in
         a stable and correct order in presence of both base ll and ll_CC formats.
         """
-        en_format_mod = import_module("django.conf.locale.en.formats")
-        en_gb_format_mod = import_module("django.conf.locale.en_GB.formats")
+        en_format_mod = import_module("thibaud.conf.locale.en.formats")
+        en_gb_format_mod = import_module("thibaud.conf.locale.en_GB.formats")
         self.assertEqual(
             list(iter_format_modules("en-gb")), [en_gb_format_mod, en_format_mod]
         )
@@ -1587,12 +1587,12 @@ class MiscTests(SimpleTestCase):
             ("pt", "pt"),
             ("es,de", "es"),
             ("es-a,de", "es"),
-            # There isn't a Django translation to a US variation of the Spanish
+            # There isn't a Thibaud translation to a US variation of the Spanish
             # language, a safe assumption. When the user sets it as the
             # preferred language, the main 'es' translation should be selected
             # instead.
             ("es-us", "es"),
-            # There isn't a main language (zh) translation of Django but there
+            # There isn't a main language (zh) translation of Thibaud but there
             # is a translation to variation (zh-hans) the user sets zh-hans as
             # the preferred language, it should be selected without falling
             # back nor ignoring it.
@@ -1619,7 +1619,7 @@ class MiscTests(SimpleTestCase):
     def test_support_for_deprecated_chinese_language_codes(self):
         """
         Some browsers (Firefox, IE, etc.) use deprecated language codes. As these
-        language codes will be removed in Django 1.9, these will be incorrectly
+        language codes will be removed in Thibaud 1.9, these will be incorrectly
         matched. For example zh-tw (traditional) will be interpreted as zh-hans
         (simplified), which is wrong. So we should also accept these deprecated
         language codes.
@@ -1672,13 +1672,13 @@ class MiscTests(SimpleTestCase):
         request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "es"
         self.assertEqual("es", g(request))
 
-        # There isn't a Django translation to a US variation of the Spanish
+        # There isn't a Thibaud translation to a US variation of the Spanish
         # language, a safe assumption. When the user sets it as the preferred
         # language, the main 'es' translation should be selected instead.
         request = self.rf.get("/")
         request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "es-us"
         self.assertEqual(g(request), "es")
-        # There isn't a main language (zh) translation of Django but there is a
+        # There isn't a main language (zh) translation of Thibaud but there is a
         # translation to variation (zh-hans) the user sets zh-hans as the
         # preferred language, it should be selected without falling back nor
         # ignoring it.
@@ -1838,7 +1838,7 @@ class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
             self.assertGettext("Date/time", "Datum/Zeit")
 
             with self.modify_settings(
-                INSTALLED_APPS={"remove": "django.contrib.admin.apps.SimpleAdminConfig"}
+                INSTALLED_APPS={"remove": "thibaud.contrib.admin.apps.SimpleAdminConfig"}
             ):
                 # Force refreshing translations.
                 activate("de")
@@ -1857,8 +1857,8 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
             self.assertGettext("Time", "LOCALE_PATHS")
 
 
-class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
-    def test_django_fallback(self):
+class ThibaudFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
+    def test_thibaud_fallback(self):
         self.assertEqual(gettext("Date/time"), "Datum/Zeit")
 
 
@@ -1931,8 +1931,8 @@ class TestLanguageInfo(SimpleTestCase):
         ("fr", "French"),
     ],
     MIDDLEWARE=[
-        "django.middleware.locale.LocaleMiddleware",
-        "django.middleware.common.CommonMiddleware",
+        "thibaud.middleware.locale.LocaleMiddleware",
+        "thibaud.middleware.common.CommonMiddleware",
     ],
     ROOT_URLCONF="i18n.urls",
 )
@@ -1953,8 +1953,8 @@ class LocaleMiddlewareTests(TestCase):
         ("fr", "French"),
     ],
     MIDDLEWARE=[
-        "django.middleware.locale.LocaleMiddleware",
-        "django.middleware.common.CommonMiddleware",
+        "thibaud.middleware.locale.LocaleMiddleware",
+        "thibaud.middleware.common.CommonMiddleware",
     ],
     ROOT_URLCONF="i18n.urls_default_unprefixed",
     LANGUAGE_CODE="en",
@@ -2010,8 +2010,8 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         ("pt-br", "Portuguese (Brazil)"),
     ],
     MIDDLEWARE=[
-        "django.middleware.locale.LocaleMiddleware",
-        "django.middleware.common.CommonMiddleware",
+        "thibaud.middleware.locale.LocaleMiddleware",
+        "thibaud.middleware.common.CommonMiddleware",
     ],
     ROOT_URLCONF="i18n.urls",
 )
@@ -2031,7 +2031,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language("en\x00"))
         self.assertFalse(check_for_language(None))
         self.assertFalse(check_for_language("be@ "))
-        # Specifying encoding is not supported (Django enforces UTF-8)
+        # Specifying encoding is not supported (Thibaud enforces UTF-8)
         self.assertFalse(check_for_language("tr-TR.UTF-8"))
         self.assertFalse(check_for_language("tr-TR.UTF8"))
         self.assertFalse(check_for_language("de-DE.utf-8"))
@@ -2100,10 +2100,10 @@ class TranslationFilesMissing(SimpleTestCase):
             activate("en")
 
 
-class NonDjangoLanguageTests(SimpleTestCase):
+class NonThibaudLanguageTests(SimpleTestCase):
     """
-    A language non present in default Django languages can still be
-    installed/used by a Django project.
+    A language non present in default Thibaud languages can still be
+    installed/used by a Thibaud project.
     """
 
     @override_settings(
@@ -2115,7 +2115,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
         LANGUAGE_CODE="xxx",
         LOCALE_PATHS=[os.path.join(here, "commands", "locale")],
     )
-    def test_non_django_language(self):
+    def test_non_thibaud_language(self):
         self.assertEqual(get_language(), "xxx")
         self.assertEqual(gettext("year"), "reay")
 
@@ -2125,13 +2125,13 @@ class NonDjangoLanguageTests(SimpleTestCase):
             os.makedirs(os.path.join(app_dir, "locale", "dummy_Lang", "LC_MESSAGES"))
             open(
                 os.path.join(
-                    app_dir, "locale", "dummy_Lang", "LC_MESSAGES", "django.mo"
+                    app_dir, "locale", "dummy_Lang", "LC_MESSAGES", "thibaud.mo"
                 ),
                 "w",
             ).close()
             app_config = AppConfig("dummy_app", AppModuleStub(__path__=[app_dir]))
             with mock.patch(
-                "django.apps.apps.get_app_configs", return_value=[app_config]
+                "thibaud.apps.apps.get_app_configs", return_value=[app_config]
             ):
                 self.assertIs(check_for_language("dummy-lang"), True)
 
@@ -2144,7 +2144,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
         ],
     )
     @translation.override("xyz")
-    def test_plural_non_django_language(self):
+    def test_plural_non_thibaud_language(self):
         self.assertEqual(get_language(), "xyz")
         self.assertEqual(ngettext("year", "years", 2), "years")
 
@@ -2176,9 +2176,9 @@ class WatchForTranslationChangesTests(SimpleTestCase):
         project_dir = Path(__file__).parent / "sampleproject" / "locale"
         mocked_sender.watch_dir.assert_any_call(project_dir, "**/*.mo")
 
-    def test_i18n_app_dirs_ignore_django_apps(self):
+    def test_i18n_app_dirs_ignore_thibaud_apps(self):
         mocked_sender = mock.MagicMock()
-        with self.settings(INSTALLED_APPS=["django.contrib.admin"]):
+        with self.settings(INSTALLED_APPS=["thibaud.contrib.admin"]):
             watch_for_translation_changes(mocked_sender)
         mocked_sender.watch_dir.assert_called_once_with(Path("locale"), "**/*.mo")
 

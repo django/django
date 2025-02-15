@@ -1,6 +1,6 @@
-from django.db import connection
-from django.db.backends.base.introspection import BaseDatabaseIntrospection
-from django.test import SimpleTestCase
+from thibaud.db import connection
+from thibaud.db.backends.base.introspection import BaseDatabaseIntrospection
+from thibaud.test import SimpleTestCase
 
 
 class SimpleDatabaseIntrospectionTests(SimpleTestCase):

@@ -2,11 +2,11 @@ import pkgutil
 import sys
 from importlib import import_module, reload
 
-from django.apps import apps
-from django.conf import settings
-from django.core.management import CommandError
-from django.db.migrations.graph import MigrationGraph
-from django.db.migrations.recorder import MigrationRecorder
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core.management import CommandError
+from thibaud.db.migrations.graph import MigrationGraph
+from thibaud.db.migrations.recorder import MigrationRecorder
 
 from .exceptions import (
     AmbiguityError,
@@ -28,8 +28,8 @@ class MigrationLoader:
 
     On initialization, this class will scan those directories, and open and
     read the Python files, looking for a class called Migration, which should
-    inherit from django.db.migrations.Migration. See
-    django.db.migrations.migration for what that looks like.
+    inherit from thibaud.db.migrations.Migration. See
+    thibaud.db.migrations.migration for what that looks like.
 
     Some migrations will be marked as "replacing" another set of migrations.
     These are loaded into a separate set of migrations away from the main ones.
@@ -327,7 +327,7 @@ class MigrationLoader:
                     tries = ", ".join("%s.%s" % c for c in candidates)
                     raise NodeNotFoundError(
                         "Migration {0} depends on nonexistent node ('{1}', '{2}'). "
-                        "Django tried to replace migration {1}.{2} with any of [{3}] "
+                        "Thibaud tried to replace migration {1}.{2} with any of [{3}] "
                         "but wasn't able to because some of the replaced migrations "
                         "are already applied.".format(
                             exc.origin, exc.node[0], exc.node[1], tries

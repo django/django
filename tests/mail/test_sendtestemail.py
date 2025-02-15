@@ -1,6 +1,6 @@
-from django.core import mail
-from django.core.management import CommandError, call_command
-from django.test import SimpleTestCase, override_settings
+from thibaud.core import mail
+from thibaud.core.management import CommandError, call_command
+from thibaud.test import SimpleTestCase, override_settings
 
 
 @override_settings(

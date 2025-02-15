@@ -5,10 +5,10 @@ import re
 import unicodedata
 from importlib import import_module
 
-from django.conf import settings
-from django.utils import dateformat, numberformat
-from django.utils.functional import lazy
-from django.utils.translation import check_for_language, get_language, to_locale
+from thibaud.conf import settings
+from thibaud.utils import dateformat, numberformat
+from thibaud.utils.functional import lazy
+from thibaud.utils.translation import check_for_language, get_language, to_locale
 
 # format_cache is a mapping from (format_type, lang) to the format string.
 # By using the cache, it is possible to avoid running get_format_modules
@@ -73,7 +73,7 @@ def iter_format_modules(lang, format_module_path=None):
             format_module_path = [format_module_path]
         for path in format_module_path:
             format_locations.append(path + ".%s")
-    format_locations.append("django.conf.locale.%s")
+    format_locations.append("thibaud.conf.locale.%s")
     locale = to_locale(lang)
     locales = [locale]
     if "_" in locale:

@@ -1,6 +1,6 @@
-from django.db.migrations.exceptions import CircularDependencyError, NodeNotFoundError
-from django.db.migrations.graph import DummyNode, MigrationGraph, Node
-from django.test import SimpleTestCase
+from thibaud.db.migrations.exceptions import CircularDependencyError, NodeNotFoundError
+from thibaud.db.migrations.graph import DummyNode, MigrationGraph, Node
+from thibaud.test import SimpleTestCase
 
 
 class GraphTests(SimpleTestCase):

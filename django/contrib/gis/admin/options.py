@@ -1,6 +1,6 @@
-from django.contrib.admin import ModelAdmin
-from django.contrib.gis.db import models
-from django.contrib.gis.forms import OSMWidget
+from thibaud.contrib.admin import ModelAdmin
+from thibaud.contrib.gis.db import models
+from thibaud.contrib.gis.forms import OSMWidget
 
 
 class GeoModelAdminMixin:

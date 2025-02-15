@@ -24,29 +24,29 @@
 <script src="{{ pathto('templatebuiltins.js', 1) }}"></script>
 <script>
 (function($) {
-    if (!django_template_builtins) {
+    if (!thibaud_template_builtins) {
        // templatebuiltins.js missing, do nothing.
        return;
     }
     $(document).ready(function() {
-        // Hyperlink Django template tags and filters
+        // Hyperlink Thibaud template tags and filters
         var base = "{{ pathto('ref/templates/builtins') }}";
         if (base == "#") {
             // Special case for builtins.html itself
             base = "";
         }
         // Tags are keywords, class '.k'
-        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+        $("div.highlight\\-html\\+thibaud span.k").each(function(i, elem) {
              var tagname = $(elem).text();
-             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+             if ($.inArray(tagname, thibaud_template_builtins.ttags) != -1) {
                  var fragment = tagname.replace(/_/, '-');
                  $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
              }
         });
         // Filters are functions, class '.nf'
-        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+        $("div.highlight\\-html\\+thibaud span.nf").each(function(i, elem) {
              var filtername = $(elem).text();
-             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+             if ($.inArray(filtername, thibaud_template_builtins.tfilters) != -1) {
                  var fragment = filtername.replace(/_/, '-');
                  $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
              }

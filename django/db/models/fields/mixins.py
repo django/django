@@ -1,5 +1,5 @@
-from django.core import checks
-from django.utils.functional import cached_property
+from thibaud.core import checks
+from thibaud.utils.functional import cached_property
 
 NOT_PROVIDED = object()
 

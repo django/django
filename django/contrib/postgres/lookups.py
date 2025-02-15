@@ -1,6 +1,6 @@
-from django.db.models import Transform
-from django.db.models.lookups import PostgresOperatorLookup
-from django.db.models.sql.query import Query
+from thibaud.db.models import Transform
+from thibaud.db.models.lookups import PostgresOperatorLookup
+from thibaud.db.models.sql.query import Query
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 

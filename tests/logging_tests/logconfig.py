@@ -1,8 +1,8 @@
 import logging
 
-from django.conf import settings
-from django.core.mail.backends.base import BaseEmailBackend
-from django.views.debug import ExceptionReporter
+from thibaud.conf import settings
+from thibaud.core.mail.backends.base import BaseEmailBackend
+from thibaud.views.debug import ExceptionReporter
 
 
 class MyHandler(logging.Handler):

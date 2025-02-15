@@ -1,5 +1,5 @@
-from django.template import Context, Engine
-from django.test import SimpleTestCase
+from thibaud.template import Context, Engine
+from thibaud.test import SimpleTestCase
 
 from ..utils import setup
 
@@ -333,7 +333,7 @@ class IfChangedTests(SimpleTestCase):
         engine = Engine(
             loaders=[
                 (
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "template": (
                             '{% for x in vars %}{% include "include" %}{% endfor %}'
@@ -351,7 +351,7 @@ class IfChangedTests(SimpleTestCase):
         engine = Engine(
             loaders=[
                 (
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "template": (
                             '{% for x in vars %}{% include "include" %}'

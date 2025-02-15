@@ -1,7 +1,7 @@
 from functools import partial
 
-from django.db.models.utils import make_model_tuple
-from django.dispatch import Signal
+from thibaud.db.models.utils import make_model_tuple
+from thibaud.dispatch import Signal
 
 class_prepared = Signal()
 
@@ -13,7 +13,7 @@ class ModelSignal(Signal):
     """
 
     def _lazy_method(self, method, apps, receiver, sender, **kwargs):
-        from django.db.models.options import Options
+        from thibaud.db.models.options import Options
 
         # This partial takes a single optional argument named "sender".
         partial_method = partial(method, receiver, **kwargs)

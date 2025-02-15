@@ -1,10 +1,10 @@
 import uuid
 from decimal import Decimal
 
-from django.apps import apps
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection
-from django.db.models import (
+from thibaud.apps import apps
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import IntegrityError, connection
+from thibaud.db.models import (
     CharField,
     F,
     FloatField,
@@ -12,9 +12,9 @@ from django.db.models import (
     IntegerField,
     Model,
 )
-from django.db.models.functions import Lower
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
+from thibaud.db.models.functions import Lower
+from thibaud.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from thibaud.test.utils import isolate_apps
 
 from .models import (
     Foo,
@@ -111,7 +111,7 @@ class BaseGeneratedFieldTests(SimpleTestCase):
             expression=F("a") + F("b"), output_field=IntegerField(), db_persist=True
         )
         _, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, "django.db.models.GeneratedField")
+        self.assertEqual(path, "thibaud.db.models.GeneratedField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs["db_persist"], True)
         self.assertEqual(kwargs["expression"], F("a") + F("b"))

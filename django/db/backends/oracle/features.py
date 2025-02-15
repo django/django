@@ -1,6 +1,6 @@
-from django.db import DatabaseError, InterfaceError
-from django.db.backends.base.features import BaseDatabaseFeatures
-from django.utils.functional import cached_property
+from thibaud.db import DatabaseError, InterfaceError
+from thibaud.db.backends.base.features import BaseDatabaseFeatures
+from thibaud.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -81,8 +81,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_json_field_contains = False
     supports_collation_on_textfield = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
-    django_test_expected_failures = {
-        # A bug in Django/oracledb with respect to string handling (#23843).
+    thibaud_test_expected_failures = {
+        # A bug in Thibaud/oracledb with respect to string handling (#23843).
         "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
         "annotations.tests.NonAggregateAnnotationTestCase."
         "test_custom_functions_can_ref_other_functions",
@@ -92,7 +92,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     )
 
     @cached_property
-    def django_test_skips(self):
+    def thibaud_test_skips(self):
         skips = {
             "Oracle doesn't support SHA224.": {
                 "db_functions.text.test_sha224.SHA224Tests.test_basic",

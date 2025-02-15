@@ -1,7 +1,7 @@
-from django.contrib import admin
-from django.contrib.auth.models import Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from thibaud.contrib import admin
+from thibaud.contrib.auth.models import Permission, User
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.test import TestCase
 
 from .models import Band
 

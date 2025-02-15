@@ -10,19 +10,19 @@ import string
 from collections import defaultdict
 from urllib.parse import urlsplit
 
-from django.conf import settings
-from django.core.exceptions import DisallowedHost, ImproperlyConfigured
-from django.http import HttpHeaders, UnreadablePostError
-from django.urls import get_callable
-from django.utils.cache import patch_vary_headers
-from django.utils.crypto import constant_time_compare, get_random_string
-from django.utils.deprecation import MiddlewareMixin
-from django.utils.functional import cached_property
-from django.utils.http import is_same_domain
-from django.utils.log import log_response
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.conf import settings
+from thibaud.core.exceptions import DisallowedHost, ImproperlyConfigured
+from thibaud.http import HttpHeaders, UnreadablePostError
+from thibaud.urls import get_callable
+from thibaud.utils.cache import patch_vary_headers
+from thibaud.utils.crypto import constant_time_compare, get_random_string
+from thibaud.utils.deprecation import MiddlewareMixin
+from thibaud.utils.functional import cached_property
+from thibaud.utils.http import is_same_domain
+from thibaud.utils.log import log_response
+from thibaud.utils.regex_helper import _lazy_re_compile
 
-logger = logging.getLogger("django.security.csrf")
+logger = logging.getLogger("thibaud.security.csrf")
 # This matches if any character is not in CSRF_ALLOWED_CHARS.
 invalid_token_chars_re = _lazy_re_compile("[^a-zA-Z0-9]")
 
@@ -245,7 +245,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 _check_token_format(csrf_secret)
         if csrf_secret is None:
             return None
-        # Django versions before 4.0 masked the secret before storing.
+        # Thibaud versions before 4.0 masked the secret before storing.
         if len(csrf_secret) == CSRF_TOKEN_LENGTH:
             csrf_secret = _unmask_cipher_token(csrf_secret)
         return csrf_secret

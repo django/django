@@ -2,7 +2,7 @@
 File handling
 =============
 
-.. module:: django.core.files
+.. module:: thibaud.core.files
    :synopsis: File handling and storage
 
 .. toctree::

@@ -3,7 +3,7 @@ from io import StringIO
 from unittest import mock
 from unittest.suite import _DebugResult
 
-from django.test import SimpleTestCase
+from thibaud.test import SimpleTestCase
 
 
 class ErrorTestCase(SimpleTestCase):

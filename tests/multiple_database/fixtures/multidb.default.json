@@ -17,7 +17,7 @@
         "pk": 2,
         "model": "multiple_database.book",
         "fields": {
-            "title": "Pro Django",
+            "title": "Pro Thibaud",
             "published": "2008-12-16",
             "authors": [["Marty Alchin"]],
             "editor": ["George Vilches"]

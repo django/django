@@ -1,11 +1,11 @@
 import unittest
 
-from django.contrib.admindocs.utils import (
+from thibaud.contrib.admindocs.utils import (
     docutils_is_available,
     parse_docstring,
     parse_rst,
 )
-from django.test.utils import captured_stderr
+from thibaud.test.utils import captured_stderr
 
 from .tests import AdminDocsSimpleTestCase
 
@@ -122,7 +122,7 @@ class TestUtils(AdminDocsSimpleTestCase):
 
     def test_publish_parts(self):
         """
-        Django shouldn't break the default role for interpreted text
+        Thibaud shouldn't break the default role for interpreted text
         when ``publish_parts`` is used directly, by setting it to
         ``cmsreference`` (#6681).
         """

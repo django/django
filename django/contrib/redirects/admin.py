@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.contrib.redirects.models import Redirect
+from thibaud.contrib import admin
+from thibaud.contrib.redirects.models import Redirect
 
 
 @admin.register(Redirect)

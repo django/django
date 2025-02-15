@@ -3,7 +3,7 @@ URL dispatcher
 ==============
 
 A clean, elegant URL scheme is an important detail in a high-quality web
-application. Django lets you design URLs however you want, with no framework
+application. Thibaud lets you design URLs however you want, with no framework
 limitations.
 
 See `Cool URIs don't change`_, by World Wide Web creator Tim Berners-Lee, for
@@ -22,47 +22,47 @@ This mapping can be as short or as long as needed. It can reference other
 mappings. And, because it's pure Python code, it can be constructed
 dynamically.
 
-Django also provides a way to translate URLs according to the active
+Thibaud also provides a way to translate URLs according to the active
 language. See the :ref:`internationalization documentation
 <url-internationalization>` for more information.
 
-.. _how-django-processes-a-request:
+.. _how-thibaud-processes-a-request:
 
-How Django processes a request
+How Thibaud processes a request
 ==============================
 
-When a user requests a page from your Django-powered site, this is the
+When a user requests a page from your Thibaud-powered site, this is the
 algorithm the system follows to determine which Python code to execute:
 
-#. Django determines the root URLconf module to use. Ordinarily,
+#. Thibaud determines the root URLconf module to use. Ordinarily,
    this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
-   ``HttpRequest`` object has a :attr:`~django.http.HttpRequest.urlconf`
+   ``HttpRequest`` object has a :attr:`~thibaud.http.HttpRequest.urlconf`
    attribute (set by middleware), its value will be used in place of the
    :setting:`ROOT_URLCONF` setting.
 
-#. Django loads that Python module and looks for the variable
+#. Thibaud loads that Python module and looks for the variable
    ``urlpatterns``. This should be a :term:`sequence` of
-   :func:`django.urls.path` and/or :func:`django.urls.re_path` instances.
+   :func:`thibaud.urls.path` and/or :func:`thibaud.urls.re_path` instances.
 
-#. Django runs through each URL pattern, in order, and stops at the first
+#. Thibaud runs through each URL pattern, in order, and stops at the first
    one that matches the requested URL, matching against
-   :attr:`~django.http.HttpRequest.path_info`.
+   :attr:`~thibaud.http.HttpRequest.path_info`.
 
-#. Once one of the URL patterns matches, Django imports and calls the given
+#. Once one of the URL patterns matches, Thibaud imports and calls the given
    view, which is a Python function (or a :doc:`class-based view
    </topics/class-based-views/index>`). The view gets passed the following
    arguments:
 
-   * An instance of :class:`~django.http.HttpRequest`.
+   * An instance of :class:`~thibaud.http.HttpRequest`.
    * If the matched URL pattern contained no named groups, then the
      matches from the regular expression are provided as positional arguments.
    * The keyword arguments are made up of any named parts matched by the
      path expression that are provided, overridden by any arguments specified
-     in the optional ``kwargs`` argument to :func:`django.urls.path` or
-     :func:`django.urls.re_path`.
+     in the optional ``kwargs`` argument to :func:`thibaud.urls.path` or
+     :func:`thibaud.urls.re_path`.
 
 #. If no URL pattern matches, or if an exception is raised during any
-   point in this process, Django invokes an appropriate
+   point in this process, Thibaud invokes an appropriate
    error-handling view. See `Error handling`_ below.
 
 Example
@@ -70,7 +70,7 @@ Example
 
 Here's a sample URLconf::
 
-    from django.urls import path
+    from thibaud.urls import path
 
     from . import views
 
@@ -95,21 +95,21 @@ Notes:
 Example requests:
 
 * A request to ``/articles/2005/03/`` would match the third entry in the
-  list. Django would call the function
+  list. Thibaud would call the function
   ``views.month_archive(request, year=2005, month=3)``.
 
 * ``/articles/2003/`` would match the first pattern in the list, not the
   second one, because the patterns are tested in order, and the first one
   is the first test to pass. Feel free to exploit the ordering to insert
-  special cases like this. Here, Django would call the function
+  special cases like this. Here, Thibaud would call the function
   ``views.special_case_2003(request)``
 
 * ``/articles/2003`` would not match any of these patterns, because each
   pattern requires that the URL end with a slash.
 
-* ``/articles/2003/03/building-a-django-site/`` would match the final
-  pattern. Django would call the function
-  ``views.article_detail(request, year=2003, month=3, slug="building-a-django-site")``.
+* ``/articles/2003/03/building-a-thibaud-site/`` would match the final
+  pattern. Thibaud would call the function
+  ``views.article_detail(request, year=2003, month=3, slug="building-a-thibaud-site")``.
 
 Path converters
 ===============
@@ -123,7 +123,7 @@ The following path converters are available by default:
 
 * ``slug`` - Matches any slug string consisting of ASCII letters or numbers,
   plus the hyphen and underscore characters. For example,
-  ``building-your-1st-django-site``.
+  ``building-your-1st-thibaud-site``.
 
 * ``uuid`` - Matches a formatted UUID. To prevent multiple URLs from mapping to
   the same page, dashes must be included and letters must be lowercase. For
@@ -154,8 +154,8 @@ A converter is a class that includes the following:
 * A ``to_url(self, value)`` method, which handles converting the Python type
   into a string to be used in the URL. It should raise ``ValueError`` if it
   can't convert the given value. A ``ValueError`` is interpreted as no match
-  and as a consequence :func:`~django.urls.reverse` will raise
-  :class:`~django.urls.NoReverseMatch` unless another URL pattern matches.
+  and as a consequence :func:`~thibaud.urls.reverse` will raise
+  :class:`~thibaud.urls.NoReverseMatch` unless another URL pattern matches.
 
 For example::
 
@@ -169,9 +169,9 @@ For example::
             return "%04d" % value
 
 Register custom converter classes in your URLconf using
-:func:`~django.urls.register_converter`::
+:func:`~thibaud.urls.register_converter`::
 
-    from django.urls import path, register_converter
+    from thibaud.urls import path, register_converter
 
     from . import converters, views
 
@@ -188,7 +188,7 @@ Using regular expressions
 
 If the paths and converters syntax isn't sufficient for defining your URL
 patterns, you can also use regular expressions. To do so, use
-:func:`~django.urls.re_path` instead of :func:`~django.urls.path`.
+:func:`~thibaud.urls.re_path` instead of :func:`~thibaud.urls.path`.
 
 In Python regular expressions, the syntax for named regular expression groups
 is ``(?P<name>pattern)``, where ``name`` is the name of the group and
@@ -196,7 +196,7 @@ is ``(?P<name>pattern)``, where ``name`` is the name of the group and
 
 Here's the example URLconf from earlier, rewritten using regular expressions::
 
-    from django.urls import path, re_path
+    from thibaud.urls import path, re_path
 
     from . import views
 
@@ -219,8 +219,8 @@ This accomplishes roughly the same thing as the previous example, except:
 * Each captured argument is sent to the view as a string, regardless of what
   sort of match the regular expression makes.
 
-When switching from using :func:`~django.urls.path` to
-:func:`~django.urls.re_path` or vice versa, it's particularly important to be
+When switching from using :func:`~thibaud.urls.path` to
+:func:`~thibaud.urls.re_path` or vice versa, it's particularly important to be
 aware that the type of the view arguments may change, and so you may need to
 adapt your views.
 
@@ -241,12 +241,12 @@ passed to the view function.
 Nested arguments
 ----------------
 
-Regular expressions allow nested arguments, and Django will resolve them and
-pass them to the view. When reversing, Django will try to fill in all outer
+Regular expressions allow nested arguments, and Thibaud will resolve them and
+pass them to the view. When reversing, Thibaud will try to fill in all outer
 captured arguments, ignoring any nested captured arguments. Consider the
 following URL patterns which optionally take a page argument::
 
-    from django.urls import re_path
+    from thibaud.urls import re_path
 
     urlpatterns = [
         re_path(r"^blog/(page-([0-9]+)/)?$", blog_articles),  # bad
@@ -297,7 +297,7 @@ A convenient trick is to specify default parameters for your views' arguments.
 Here's an example URLconf and view::
 
     # URLconf
-    from django.urls import path
+    from thibaud.urls import path
 
     from . import views
 
@@ -321,21 +321,21 @@ default argument for ``num``, ``1``. If the second pattern matches,
 Performance
 ===========
 
-Django processes regular expressions in the ``urlpatterns`` list which is
+Thibaud processes regular expressions in the ``urlpatterns`` list which is
 compiled the first time it's accessed. Subsequent requests use the cached
 configuration via the URL resolver.
 
 Syntax of the ``urlpatterns`` variable
 ======================================
 
-``urlpatterns`` should be a :term:`sequence` of :func:`~django.urls.path`
-and/or :func:`~django.urls.re_path` instances.
+``urlpatterns`` should be a :term:`sequence` of :func:`~thibaud.urls.path`
+and/or :func:`~thibaud.urls.re_path` instances.
 
 Error handling
 ==============
 
-When Django can't find a match for the requested URL, or when an exception is
-raised, Django invokes an error-handling view.
+When Thibaud can't find a match for the requested URL, or when an exception is
+raised, Thibaud invokes an error-handling view.
 
 The views to use for these cases are specified by four variables. Their
 default values should suffice for most projects, but further customization is
@@ -352,10 +352,10 @@ to the view that should be called to handle the error condition at hand.
 
 The variables are:
 
-* ``handler400`` -- See :data:`django.conf.urls.handler400`.
-* ``handler403`` -- See :data:`django.conf.urls.handler403`.
-* ``handler404`` -- See :data:`django.conf.urls.handler404`.
-* ``handler500`` -- See :data:`django.conf.urls.handler500`.
+* ``handler400`` -- See :data:`thibaud.conf.urls.handler400`.
+* ``handler403`` -- See :data:`thibaud.conf.urls.handler403`.
+* ``handler404`` -- See :data:`thibaud.conf.urls.handler404`.
+* ``handler500`` -- See :data:`thibaud.conf.urls.handler500`.
 
 .. _including-other-urlconfs:
 
@@ -365,10 +365,10 @@ Including other URLconfs
 At any point, your ``urlpatterns`` can "include" other URLconf modules. This
 essentially "roots" a set of URLs below other ones.
 
-For example, here's an excerpt of the URLconf for the `Django website`_
+For example, here's an excerpt of the URLconf for the `Thibaud website`_
 itself. It includes a number of other URLconfs::
 
-    from django.urls import include, path
+    from thibaud.urls import include, path
 
     urlpatterns = [
         # ... snip ...
@@ -377,14 +377,14 @@ itself. It includes a number of other URLconfs::
         # ... snip ...
     ]
 
-Whenever Django encounters :func:`~django.urls.include()`, it chops off
+Whenever Thibaud encounters :func:`~thibaud.urls.include()`, it chops off
 whatever part of the URL matched up to that point and sends the remaining
 string to the included URLconf for further processing.
 
 Another possibility is to include additional URL patterns by using a list of
-:func:`~django.urls.path` instances. For example, consider this URLconf::
+:func:`~thibaud.urls.path` instances. For example, consider this URLconf::
 
-    from django.urls import include, path
+    from thibaud.urls import include, path
 
     from apps.main import views as main_views
     from credit import views as credit_views
@@ -402,12 +402,12 @@ Another possibility is to include additional URL patterns by using a list of
     ]
 
 In this example, the ``/credit/reports/`` URL will be handled by the
-``credit_views.report()`` Django view.
+``credit_views.report()`` Thibaud view.
 
 This can be used to remove redundancy from URLconfs where a single pattern
 prefix is used repeatedly. For example, consider this URLconf::
 
-    from django.urls import path
+    from thibaud.urls import path
     from . import views
 
     urlpatterns = [
@@ -420,7 +420,7 @@ prefix is used repeatedly. For example, consider this URLconf::
 We can improve this by stating the common path prefix only once and grouping
 the suffixes that differ::
 
-    from django.urls import include, path
+    from thibaud.urls import include, path
     from . import views
 
     urlpatterns = [
@@ -437,7 +437,7 @@ the suffixes that differ::
         ),
     ]
 
-.. _`Django website`: https://www.djangoproject.com/
+.. _`Thibaud website`: https://www.thibaudproject.com/
 
 Captured parameters
 -------------------
@@ -446,14 +446,14 @@ An included URLconf receives any captured parameters from parent URLconfs, so
 the following example is valid::
 
     # In settings/urls/main.py
-    from django.urls import include, path
+    from thibaud.urls import include, path
 
     urlpatterns = [
         path("<username>/blog/", include("foo.urls.blog")),
     ]
 
     # In foo/urls/blog.py
-    from django.urls import path
+    from thibaud.urls import path
     from . import views
 
     urlpatterns = [
@@ -472,20 +472,20 @@ Passing extra options to view functions
 URLconfs have a hook that lets you pass extra arguments to your view functions,
 as a Python dictionary.
 
-The :func:`~django.urls.path` function can take an optional third argument
+The :func:`~thibaud.urls.path` function can take an optional third argument
 which should be a dictionary of extra keyword arguments to pass to the view
 function.
 
 For example::
 
-    from django.urls import path
+    from thibaud.urls import path
     from . import views
 
     urlpatterns = [
         path("blog/<int:year>/", views.year_archive, {"foo": "bar"}),
     ]
 
-In this example, for a request to ``/blog/2005/``, Django will call
+In this example, for a request to ``/blog/2005/``, Thibaud will call
 ``views.year_archive(request, year=2005, foo='bar')``.
 
 This technique is used in the
@@ -502,7 +502,7 @@ options to views.
 Passing extra options to ``include()``
 --------------------------------------
 
-Similarly, you can pass extra options to :func:`~django.urls.include` and
+Similarly, you can pass extra options to :func:`~thibaud.urls.include` and
 each line in the included URLconf will be passed the extra options.
 
 For example, these two URLconf sets are functionally identical:
@@ -510,14 +510,14 @@ For example, these two URLconf sets are functionally identical:
 Set one::
 
     # main.py
-    from django.urls import include, path
+    from thibaud.urls import include, path
 
     urlpatterns = [
         path("blog/", include("inner"), {"blog_id": 3}),
     ]
 
     # inner.py
-    from django.urls import path
+    from thibaud.urls import path
     from mysite import views
 
     urlpatterns = [
@@ -528,7 +528,7 @@ Set one::
 Set two::
 
     # main.py
-    from django.urls import include, path
+    from thibaud.urls import include, path
     from mysite import views
 
     urlpatterns = [
@@ -536,7 +536,7 @@ Set two::
     ]
 
     # inner.py
-    from django.urls import path
+    from thibaud.urls import path
 
     urlpatterns = [
         path("archive/", views.archive, {"blog_id": 3}),
@@ -551,7 +551,7 @@ every view in the included URLconf accepts the extra options you're passing.
 Reverse resolution of URLs
 ==========================
 
-A common need when working on a Django project is the possibility to obtain URLs
+A common need when working on a Thibaud project is the possibility to obtain URLs
 in their final forms either for embedding in generated content (views and assets
 URLs, URLs shown to the user, etc.) or for handling of the navigation flow on
 the server side (redirections, etc.)
@@ -570,37 +570,37 @@ identification (e.g. the name) of the view in charge of handling it. Other
 pieces of information that necessarily must participate in the lookup of the
 right URL are the types (positional, keyword) and values of the view arguments.
 
-Django provides a solution such that the URL mapper is the only repository of
+Thibaud provides a solution such that the URL mapper is the only repository of
 the URL design. You feed it with your URLconf and then it can be used in both
 directions:
 
-* Starting with a URL requested by the user/browser, it calls the right Django
+* Starting with a URL requested by the user/browser, it calls the right Thibaud
   view providing any arguments it might need with their values as extracted from
   the URL.
 
-* Starting with the identification of the corresponding Django view plus the
+* Starting with the identification of the corresponding Thibaud view plus the
   values of arguments that would be passed to it, obtain the associated URL.
 
 The first one is the usage we've been discussing in the previous sections. The
 second one is what is known as *reverse resolution of URLs*, *reverse URL
 matching*, *reverse URL lookup*, or simply *URL reversing*.
 
-Django provides tools for performing URL reversing that match the different
+Thibaud provides tools for performing URL reversing that match the different
 layers where URLs are needed:
 
 * In templates: Using the :ttag:`url` template tag.
 
-* In Python code: Using the :func:`~django.urls.reverse` function.
+* In Python code: Using the :func:`~thibaud.urls.reverse` function.
 
-* In higher level code related to handling of URLs of Django model instances:
-  The :meth:`~django.db.models.Model.get_absolute_url` method.
+* In higher level code related to handling of URLs of Thibaud model instances:
+  The :meth:`~thibaud.db.models.Model.get_absolute_url` method.
 
 Examples
 --------
 
 Consider again this URLconf entry::
 
-    from django.urls import path
+    from thibaud.urls import path
 
     from . import views
 
@@ -615,7 +615,7 @@ is ``/articles/<nnnn>/``.
 
 You can obtain these in template code by using:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <a href="{% url 'news-year-archive' 2012 %}">2012 Archive</a>
     {# Or with the year in a template context variable: #}
@@ -627,8 +627,8 @@ You can obtain these in template code by using:
 
 Or in Python code::
 
-    from django.http import HttpResponseRedirect
-    from django.urls import reverse
+    from thibaud.http import HttpResponseRedirect
+    from thibaud.urls import reverse
 
 
     def redirect_to_year(request):
@@ -644,7 +644,7 @@ change the entry in the URLconf.
 In some scenarios where views are of a generic nature, a many-to-one
 relationship might exist between URLs and views. For these cases the view name
 isn't a good enough identifier for it when comes the time of reversing
-URLs. Read the next section to know about the solution Django provides for this.
+URLs. Read the next section to know about the solution Thibaud provides for this.
 
 .. _naming-url-patterns:
 
@@ -658,7 +658,7 @@ characters you like. You are not restricted to valid Python names.
 When naming URL patterns, choose names that are unlikely to clash with other
 applications' choice of names. If you call your URL pattern ``comment``
 and another application does the same thing, the URL that
-:func:`~django.urls.reverse()` finds depends on whichever pattern is last in
+:func:`~thibaud.urls.reverse()` finds depends on whichever pattern is last in
 your project's ``urlpatterns`` list.
 
 Putting a prefix on your URL names, perhaps derived from the application
@@ -667,15 +667,15 @@ of collision.
 
 You can deliberately choose the *same URL name* as another application if you
 want to override a view. For example, a common use case is to override the
-:class:`~django.contrib.auth.views.LoginView`. Parts of Django and most
+:class:`~thibaud.contrib.auth.views.LoginView`. Parts of Thibaud and most
 third-party apps assume that this view has a URL pattern with the name
 ``login``. If you have a custom login view and give its URL the name ``login``,
-:func:`~django.urls.reverse()` will find your custom view as long as it's in
-``urlpatterns`` after ``django.contrib.auth.urls`` is included (if that's
+:func:`~thibaud.urls.reverse()` will find your custom view as long as it's in
+``urlpatterns`` after ``thibaud.contrib.auth.urls`` is included (if that's
 included at all).
 
 You may also use the same name for multiple URL patterns if they differ in
-their arguments. In addition to the URL name, :func:`~django.urls.reverse()`
+their arguments. In addition to the URL name, :func:`~thibaud.urls.reverse()`
 matches the number of arguments and the names of the keyword arguments. Path
 converters can also raise ``ValueError`` to indicate no match, see
 :ref:`registering-custom-path-converters` for details.
@@ -696,9 +696,9 @@ instances of an application are deployed. In other words, since multiple
 instances of a single application will share named URLs, namespaces provide a
 way to tell these named URLs apart.
 
-Django applications that make proper use of URL namespacing can be deployed
-more than once for a particular site. For example :mod:`django.contrib.admin`
-has an :class:`~django.contrib.admin.AdminSite` class which allows you to
+Thibaud applications that make proper use of URL namespacing can be deployed
+more than once for a particular site. For example :mod:`thibaud.contrib.admin`
+has an :class:`~thibaud.contrib.admin.AdminSite` class which allows you to
 :ref:`deploy more than one instance of the admin <multiple-admin-sites>`.  In a
 later example, we'll discuss the idea of deploying the polls application from
 the tutorial in two different locations so we can serve the same functionality
@@ -711,14 +711,14 @@ A URL namespace comes in two parts, both of which are strings:
   application namespace
     This describes the name of the application that is being deployed. Every
     instance of a single application will have the same application namespace.
-    For example, Django's admin application has the somewhat predictable
+    For example, Thibaud's admin application has the somewhat predictable
     application namespace of ``'admin'``.
 
   instance namespace
     This identifies a specific instance of an application. Instance namespaces
     should be unique across your entire project. However, an instance namespace
     can be the same as the application namespace. This is used to specify a
-    default instance of an application. For example, the default Django admin
+    default instance of an application. For example, the default Thibaud admin
     instance has an instance namespace of ``'admin'``.
 
 Namespaced URLs are specified using the ``':'`` operator. For example, the main
@@ -734,34 +734,34 @@ defined within the top-level namespace ``'sports'``.
 Reversing namespaced URLs
 -------------------------
 
-When given a namespaced URL (e.g. ``'polls:index'``) to resolve, Django splits
+When given a namespaced URL (e.g. ``'polls:index'``) to resolve, Thibaud splits
 the fully qualified name into parts and then tries the following lookup:
 
-#. First, Django looks for a matching :term:`application namespace` (in this
+#. First, Thibaud looks for a matching :term:`application namespace` (in this
    example, ``'polls'``). This will yield a list of instances of that
    application.
 
-#. If there is a current application defined, Django finds and returns the URL
+#. If there is a current application defined, Thibaud finds and returns the URL
    resolver for that instance. The current application can be specified with
-   the ``current_app`` argument to the :func:`~django.urls.reverse()`
+   the ``current_app`` argument to the :func:`~thibaud.urls.reverse()`
    function.
 
    The :ttag:`url` template tag uses the namespace of the currently resolved
    view as the current application in a
-   :class:`~django.template.RequestContext`. You can override this default by
+   :class:`~thibaud.template.RequestContext`. You can override this default by
    setting the current application on the :attr:`request.current_app
-   <django.http.HttpRequest.current_app>` attribute.
+   <thibaud.http.HttpRequest.current_app>` attribute.
 
-#. If there is no current application, Django looks for a default
+#. If there is no current application, Thibaud looks for a default
    application instance. The default application instance is the instance
    that has an :term:`instance namespace` matching the :term:`application
    namespace` (in this example, an instance of ``polls`` called ``'polls'``).
 
-#. If there is no default application instance, Django will pick the last
+#. If there is no default application instance, Thibaud will pick the last
    deployed instance of the application, whatever its instance name may be.
 
 #. If the provided namespace doesn't match an :term:`application namespace` in
-   step 1, Django will attempt a direct lookup of the namespace as an
+   step 1, Thibaud will attempt a direct lookup of the namespace as an
    :term:`instance namespace`.
 
 If there are nested namespaces, these steps are repeated for each part of the
@@ -780,7 +780,7 @@ displaying polls.
 .. code-block:: python
     :caption: ``urls.py``
 
-    from django.urls import include, path
+    from thibaud.urls import include, path
 
     urlpatterns = [
         path("author-polls/", include("polls.urls", namespace="author-polls")),
@@ -790,7 +790,7 @@ displaying polls.
 .. code-block:: python
     :caption: ``polls/urls.py``
 
-    from django.urls import path
+    from thibaud.urls import path
 
     from . import views
 
@@ -814,7 +814,7 @@ Using this setup, the following lookups are possible:
 
   and in the template:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
     {% url 'polls:index' %}
 
@@ -843,13 +843,13 @@ Application namespaces of included URLconfs can be specified in two ways.
 
 Firstly, you can set an ``app_name`` attribute in the included URLconf module,
 at the same level as the ``urlpatterns`` attribute. You have to pass the actual
-module, or a string reference to the module, to :func:`~django.urls.include`,
+module, or a string reference to the module, to :func:`~thibaud.urls.include`,
 not the list of ``urlpatterns`` itself.
 
 .. code-block:: python
     :caption: ``polls/urls.py``
 
-    from django.urls import path
+    from thibaud.urls import path
 
     from . import views
 
@@ -863,7 +863,7 @@ not the list of ``urlpatterns`` itself.
 .. code-block:: python
     :caption: ``urls.py``
 
-    from django.urls import include, path
+    from thibaud.urls import include, path
 
     urlpatterns = [
         path("polls/", include("polls.urls")),
@@ -872,8 +872,8 @@ not the list of ``urlpatterns`` itself.
 The URLs defined in ``polls.urls`` will have an application namespace ``polls``.
 
 Secondly, you can include an object that contains embedded namespace data. If
-you ``include()`` a list of :func:`~django.urls.path` or
-:func:`~django.urls.re_path` instances, the URLs contained in that object
+you ``include()`` a list of :func:`~thibaud.urls.path` or
+:func:`~thibaud.urls.re_path` instances, the URLs contained in that object
 will be added to the global namespace. However, you can also ``include()`` a
 2-tuple containing:
 
@@ -883,7 +883,7 @@ will be added to the global namespace. However, you can also ``include()`` a
 
 For example::
 
-    from django.urls import include, path
+    from thibaud.urls import include, path
 
     from . import views
 
@@ -903,6 +903,6 @@ This will include the nominated URL patterns into the given application
 namespace.
 
 The instance namespace can be specified using the ``namespace`` argument to
-:func:`~django.urls.include`. If the instance namespace is not specified,
+:func:`~thibaud.urls.include`. If the instance namespace is not specified,
 it will default to the included URLconf's application namespace. This means
 it will also be the default instance for that namespace.

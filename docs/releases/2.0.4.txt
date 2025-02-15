@@ -1,10 +1,10 @@
 ==========================
-Django 2.0.4 release notes
+Thibaud 2.0.4 release notes
 ==========================
 
 *April 2, 2018*
 
-Django 2.0.4 fixes several bugs in 2.0.3.
+Thibaud 2.0.4 fixes several bugs in 2.0.3.
 
 Bugfixes
 ========
@@ -22,13 +22,13 @@ Bugfixes
   ``UUIDField`` primary key and the reset URL contains an encoded primary key
   value that decodes to an invalid UUID (:ticket:`29206`).
 
-* Fixed a regression in Django 1.11.8 where combining two annotated
+* Fixed a regression in Thibaud 1.11.8 where combining two annotated
   ``values_list()`` querysets with ``union()``, ``difference()``, or
   ``intersection()`` crashed due to mismatching columns (:ticket:`29229`).
 
-* Fixed a regression in Django 1.11 where an empty choice could be initially
+* Fixed a regression in Thibaud 1.11 where an empty choice could be initially
   selected for the ``SelectMultiple`` and ``CheckboxSelectMultiple`` widgets
   (:ticket:`29273`).
 
-* Fixed a regression in Django 2.0 where ``OpenLayersWidget`` deserialization
+* Fixed a regression in Thibaud 2.0 where ``OpenLayersWidget`` deserialization
   ignored the widget map's SRID and assumed 4326 (WGS84) (:ticket:`29116`).

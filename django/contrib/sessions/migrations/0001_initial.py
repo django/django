@@ -1,5 +1,5 @@
-import django.contrib.sessions.models
-from django.db import migrations, models
+import thibaud.contrib.sessions.models
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -26,12 +26,12 @@ class Migration(migrations.Migration):
             ],
             options={
                 "abstract": False,
-                "db_table": "django_session",
+                "db_table": "thibaud_session",
                 "verbose_name": "session",
                 "verbose_name_plural": "sessions",
             },
             managers=[
-                ("objects", django.contrib.sessions.models.SessionManager()),
+                ("objects", thibaud.contrib.sessions.models.SessionManager()),
             ],
         ),
     ]

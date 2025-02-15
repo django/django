@@ -1,11 +1,11 @@
 import os
 import pathlib
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.core.files import File
-from django.core.files.utils import validate_file_name
-from django.utils.crypto import get_random_string
-from django.utils.text import get_valid_filename
+from thibaud.core.exceptions import SuspiciousFileOperation
+from thibaud.core.files import File
+from thibaud.core.files.utils import validate_file_name
+from thibaud.utils.crypto import get_random_string
+from thibaud.utils.text import get_valid_filename
 
 
 class Storage:

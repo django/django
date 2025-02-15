@@ -2,20 +2,20 @@
 ``SchemaEditor``
 ================
 
-.. module:: django.db.backends.base.schema
+.. module:: thibaud.db.backends.base.schema
 
 .. class:: BaseDatabaseSchemaEditor
 
-Django's migration system is split into two parts; the logic for calculating
-and storing what operations should be run (``django.db.migrations``), and the
+Thibaud's migration system is split into two parts; the logic for calculating
+and storing what operations should be run (``thibaud.db.migrations``), and the
 database abstraction layer that turns things like "create a model" or
 "delete a field" into SQL - which is the job of the ``SchemaEditor``.
 
 It's unlikely that you will want to interact directly with ``SchemaEditor`` as
-a normal developer using Django, but if you want to write your own migration
+a normal developer using Thibaud, but if you want to write your own migration
 system, or have more advanced needs, it's a lot nicer than writing SQL.
 
-Each database backend in Django supplies its own version of ``SchemaEditor``,
+Each database backend in Thibaud supplies its own version of ``SchemaEditor``,
 and it's always accessible via the ``connection.schema_editor()`` context
 manager::
 
@@ -30,11 +30,11 @@ the order you wish changes to be applied. Some possible operations or types
 of change are not possible on all databases - for example, MyISAM does not
 support foreign key constraints.
 
-If you are writing or maintaining a third-party database backend for Django,
+If you are writing or maintaining a third-party database backend for Thibaud,
 you will need to provide a ``SchemaEditor`` implementation in order to work with
-Django's migration functionality - however, as long as your database is
+Thibaud's migration functionality - however, as long as your database is
 relatively standard in its use of SQL and relational design, you should be able
-to subclass one of the built-in Django ``SchemaEditor`` classes and tweak the
+to subclass one of the built-in Thibaud ``SchemaEditor`` classes and tweak the
 syntax a little.
 
 Methods
@@ -105,7 +105,7 @@ Removes ``constraint`` from ``model``'s table.
 
 .. method:: BaseDatabaseSchemaEditor.alter_unique_together(model, old_unique_together, new_unique_together)
 
-Changes a model's :attr:`~django.db.models.Options.unique_together` value; this
+Changes a model's :attr:`~thibaud.db.models.Options.unique_together` value; this
 will add or remove unique constraints from the model's table until they match
 the new value.
 
@@ -174,17 +174,17 @@ remove the table created to track the relationship. If
 
 This transforms the field on the model from the old field to the new one. This
 includes changing the name of the column (the
-:attr:`~django.db.models.Field.db_column` attribute), changing the type of the
+:attr:`~thibaud.db.models.Field.db_column` attribute), changing the type of the
 field (if the field class changes), changing the ``NULL`` status of the field,
 adding or removing field-only unique constraints and indexes, changing primary
 key, and changing the destination of ``ForeignKey`` constraints.
 
 The most common transformation this cannot do is transforming a
-``ManyToManyField`` into a normal Field or vice-versa; Django cannot do this
+``ManyToManyField`` into a normal Field or vice-versa; Thibaud cannot do this
 without losing data, and so it will refuse to do it. Instead,
 :meth:`.remove_field` and :meth:`.add_field` should be called separately.
 
-If the database has the ``supports_combined_alters``, Django will try and
+If the database has the ``supports_combined_alters``, Thibaud will try and
 do as many of these in a single database call as possible; otherwise, it will
 issue a separate ALTER statement for each change, but will not issue ALTERs
 where no change is required.

@@ -4,17 +4,17 @@ import types
 
 from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
-from django.core.signals import request_finished
-from django.db import connections, transaction
-from django.urls import get_resolver, set_urlconf
-from django.utils.log import log_response
-from django.utils.module_loading import import_string
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
+from thibaud.core.signals import request_finished
+from thibaud.db import connections, transaction
+from thibaud.urls import get_resolver, set_urlconf
+from thibaud.utils.log import log_response
+from thibaud.utils.module_loading import import_string
 
 from .exception import convert_exception_to_response
 
-logger = logging.getLogger("django.request")
+logger = logging.getLogger("thibaud.request")
 
 
 class BaseHandler:

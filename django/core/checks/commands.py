@@ -1,9 +1,9 @@
-from django.core.checks import Error, Tags, register
+from thibaud.core.checks import Error, Tags, register
 
 
 @register(Tags.commands)
 def migrate_and_makemigrations_autodetector(**kwargs):
-    from django.core.management import get_commands, load_command_class
+    from thibaud.core.management import get_commands, load_command_class
 
     commands = get_commands()
 

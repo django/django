@@ -1,8 +1,8 @@
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.prefetch import GenericPrefetch
-from django.core.exceptions import FieldError
-from django.db.models import Q, prefetch_related_objects
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.contrib.contenttypes.prefetch import GenericPrefetch
+from thibaud.core.exceptions import FieldError
+from thibaud.db.models import Q, prefetch_related_objects
+from thibaud.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     AllowsNullGFK,

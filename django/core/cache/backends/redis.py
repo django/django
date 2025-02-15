@@ -4,9 +4,9 @@ import pickle
 import random
 import re
 
-from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
-from django.utils.functional import cached_property
-from django.utils.module_loading import import_string
+from thibaud.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from thibaud.utils.functional import cached_property
+from thibaud.utils.module_loading import import_string
 
 
 class RedisSerializer:

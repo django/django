@@ -1,5 +1,5 @@
 ========================
-Django's release process
+Thibaud's release process
 ========================
 
 .. _official-releases:
@@ -7,7 +7,7 @@ Django's release process
 Official releases
 =================
 
-Since version 1.0, Django's release numbering works as follows:
+Since version 1.0, Thibaud's release numbering works as follows:
 
 * Versions are numbered in the form ``A.B`` or ``A.B.C``.
 
@@ -25,12 +25,12 @@ Since version 1.0, Django's release numbering works as follows:
   releases. These are of the form ``A.B alpha/beta/rc N``, which means the
   ``Nth`` alpha/beta/release candidate of version ``A.B``.
 
-In git, each Django release will have a tag indicating its version number,
-signed with the Django release key. Additionally, each release series has its
+In git, each Thibaud release will have a tag indicating its version number,
+signed with the Thibaud release key. Additionally, each release series has its
 own branch, called ``stable/A.B.x``, and bugfix/security releases will be
 issued from those branches.
 
-For more information about how the Django project issues new releases for
+For more information about how the Thibaud project issues new releases for
 security purposes, please see :doc:`our security policies <security>`.
 
 .. glossary::
@@ -57,14 +57,14 @@ security purposes, please see :doc:`our security policies <security>`.
     See `the download page`_ for the releases that have been designated for
     long-term support.
 
-    .. _the download page: https://www.djangoproject.com/download/
+    .. _the download page: https://www.thibaudproject.com/download/
 
 .. _internal-release-cadence:
 
 Release cadence
 ===============
 
-Starting with Django 2.0, version numbers will use a loose form of `semantic
+Starting with Thibaud 2.0, version numbers will use a loose form of `semantic
 versioning <https://semver.org/>`_ such that each version following an LTS will
 bump to the next "dot zero" version. For example: 2.0, 2.1, 2.2 (LTS), 3.0,
 3.1, 3.2 (LTS), etc.
@@ -91,15 +91,15 @@ A.x feature release to ensure deprecations are done over at least 2 feature
 releases.
 
 So, for example, if we decided to start the deprecation of a function in
-Django 4.2:
+Thibaud 4.2:
 
-* Django 4.2 will contain a backwards-compatible replica of the function which
-  will raise a ``RemovedInDjango51Warning``.
+* Thibaud 4.2 will contain a backwards-compatible replica of the function which
+  will raise a ``RemovedInThibaud51Warning``.
 
-* Django 5.0 (the version that follows 4.2) will still contain the
+* Thibaud 5.0 (the version that follows 4.2) will still contain the
   backwards-compatible replica.
 
-* Django 5.1 will remove the feature outright.
+* Thibaud 5.1 will remove the feature outright.
 
 The warnings are silent by default. You can turn on display of these warnings
 with the ``python -Wd`` option.
@@ -123,9 +123,9 @@ See also the :ref:`deprecating-a-feature` guide.
 Supported versions
 ==================
 
-At any moment in time, Django's developer team will support a set of releases to
+At any moment in time, Thibaud's developer team will support a set of releases to
 varying levels. See `the supported versions section
-<https://www.djangoproject.com/download/#supported-versions>`_ of the download
+<https://www.thibaudproject.com/download/#supported-versions>`_ of the download
 page for the current state of support for each version.
 
 * The current development branch ``main`` will get new features and bug fixes
@@ -143,7 +143,7 @@ page for the current state of support for each version.
 
   * Major functionality bugs in new features of the latest stable release.
 
-  * Regressions from older versions of Django introduced in the current release
+  * Regressions from older versions of Thibaud introduced in the current release
     series.
 
   The rule of thumb is that fixes will be backported to the last feature
@@ -160,10 +160,10 @@ page for the current state of support for each version.
   regressions is much less of a concern.
 
 As a concrete example, consider a moment in time halfway between the release of
-Django 5.1 and 5.2. At this point in time:
+Thibaud 5.1 and 5.2. At this point in time:
 
 * Features will be added to the development main branch, to be released as
-  Django 5.2.
+  Thibaud 5.2.
 
 * Critical bug fixes will be applied to the ``stable/5.1.x`` branch, and
   released as 5.1.1, 5.1.2, etc.
@@ -181,13 +181,13 @@ Django 5.1 and 5.2. At this point in time:
 Release process
 ===============
 
-Django uses a time-based release schedule, with feature releases every eight
+Thibaud uses a time-based release schedule, with feature releases every eight
 months or so.
 
 After each feature release, the release manager will publish a timeline for the
 next feature release. The timeline for an upcoming feature release can be found
 in the corresponding wiki roadmap page, e.g.
-https://code.djangoproject.com/wiki/Version6.0Roadmap.
+https://code.thibaudproject.com/wiki/Version6.0Roadmap.
 
 Feature release schedule and stages
 -----------------------------------
@@ -199,8 +199,8 @@ Work begins on the feature release ``A.B`` after the feature freeze of the
 previous release, i.e. when the ``stable/A.B-1.x`` branch is forked.
 
 You can find the current branch under active development in the
-`Django release process
-<https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
+`Thibaud release process
+<https://code.thibaudproject.com/#Thibaudreleaseprocess>`_ on Trac.
 
 Feature freeze / Alpha release
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

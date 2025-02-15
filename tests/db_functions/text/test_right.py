@@ -1,7 +1,7 @@
-from django.db import connection
-from django.db.models import IntegerField, Value
-from django.db.models.functions import Length, Lower, Right
-from django.test import TestCase
+from thibaud.db import connection
+from thibaud.db.models import IntegerField, Value
+from thibaud.db.models.functions import Length, Lower, Right
+from thibaud.test import TestCase
 
 from ..models import Author
 

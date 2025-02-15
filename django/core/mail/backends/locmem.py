@@ -4,8 +4,8 @@ Backend for test environment.
 
 import copy
 
-from django.core import mail
-from django.core.mail.backends.base import BaseEmailBackend
+from thibaud.core import mail
+from thibaud.core.mail.backends.base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):

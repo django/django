@@ -1,6 +1,6 @@
-from django.contrib.admin.forms import AdminAuthenticationForm, AdminPasswordChangeForm
-from django.contrib.admin.helpers import ActionForm
-from django.core.exceptions import ValidationError
+from thibaud.contrib.admin.forms import AdminAuthenticationForm, AdminPasswordChangeForm
+from thibaud.contrib.admin.helpers import ActionForm
+from thibaud.core.exceptions import ValidationError
 
 
 class CustomAdminAuthenticationForm(AdminAuthenticationForm):

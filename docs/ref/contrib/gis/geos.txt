@@ -2,8 +2,8 @@
 GEOS API
 ========
 
-.. module:: django.contrib.gis.geos
-    :synopsis: GeoDjango's high-level interface to the GEOS library.
+.. module:: thibaud.contrib.gis.geos
+    :synopsis: GeoThibaud's high-level interface to the GEOS library.
 
 Background
 ==========
@@ -25,13 +25,13 @@ __ http://www.refractions.net/
 Features
 --------
 
-GeoDjango implements a high-level Python wrapper for the GEOS library, its
+GeoThibaud implements a high-level Python wrapper for the GEOS library, its
 features include:
 
 * A BSD-licensed interface to the GEOS geometry routines, implemented purely
   in Python using ``ctypes``.
-* Loosely-coupled to GeoDjango.  For example, :class:`GEOSGeometry` objects
-  may be used outside of a Django project/application.  In other words,
+* Loosely-coupled to GeoThibaud.  For example, :class:`GEOSGeometry` objects
+  may be used outside of a Thibaud project/application.  In other words,
   no need to have :envvar:`DJANGO_SETTINGS_MODULE` set or use a database, etc.
 * Mutability: :class:`GEOSGeometry` objects may be modified.
 * Cross-platform tested.
@@ -53,7 +53,7 @@ are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import GEOSGeometry
+    >>> from thibaud.contrib.gis.geos import GEOSGeometry
     >>> pnt = GEOSGeometry("POINT(5 23)")  # WKT
     >>> pnt = GEOSGeometry("010100000000000000000014400000000000003740")  # HEX
     >>> pnt = GEOSGeometry(
@@ -71,14 +71,14 @@ created by passing in the X and Y coordinates into its constructor:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import Point
+    >>> from thibaud.contrib.gis.geos import Point
     >>> pnt = Point(5, 23)
 
 All these constructors take the keyword argument ``srid``. For example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import GEOSGeometry, LineString, Point
+    >>> from thibaud.contrib.gis.geos import GEOSGeometry, LineString, Point
     >>> print(GEOSGeometry("POINT (0 0)", srid=4326))
     SRID=4326;POINT (0 0)
     >>> print(LineString((0, 0), (1, 1), srid=4326))
@@ -91,7 +91,7 @@ Finally, there is the :func:`fromfile` factory method which returns a
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import fromfile
+    >>> from thibaud.contrib.gis.geos import fromfile
     >>> pnt = fromfile("/path/to/pnt.wkt")
     >>> pnt = fromfile(open("/path/to/pnt.wkt"))
 
@@ -133,7 +133,7 @@ returns a coordinate tuple:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import LineString
+    >>> from thibaud.contrib.gis.geos import LineString
     >>> line = LineString((0, 0), (0, 50), (50, 50), (50, 0), (0, 0))
     >>> line[0]
     (0.0, 0.0)
@@ -145,7 +145,7 @@ Whereas indexing on a :class:`Polygon` will return the ring
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import Polygon
+    >>> from thibaud.contrib.gis.geos import Polygon
     >>> poly = Polygon(((0.0, 0.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (0.0, 0.0)))
     >>> poly[0]
     <LinearRing object at 0x1044395b0>
@@ -168,7 +168,7 @@ Geometries support set-like operators:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import LineString
+    >>> from thibaud.contrib.gis.geos import LineString
     >>> ls1 = LineString((0, 0), (2, 2))
     >>> ls2 = LineString((1, 1), (3, 3))
     >>> print(ls1 | ls2)  # equivalent to `ls1.union(ls2)`
@@ -189,7 +189,7 @@ Geometries support set-like operators:
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import LineString
+        >>> from thibaud.contrib.gis.geos import LineString
         >>> ls1 = LineString((0, 0), (1, 1))
         >>> ls2 = LineString((1, 1), (0, 0))
         >>> ls3 = LineString((1, 1), (0, 0), srid=4326)
@@ -222,7 +222,7 @@ The ``srid`` parameter, if given, is set as the SRID of the created geometry if
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import GEOSGeometry
+    >>> from thibaud.contrib.gis.geos import GEOSGeometry
     >>> GEOSGeometry("POINT EMPTY", srid=4326).ewkt
     'SRID=4326;POINT EMPTY'
     >>> GEOSGeometry("SRID=4326;POINT EMPTY", srid=4326).ewkt
@@ -405,7 +405,7 @@ another object.
 
 .. attribute:: GEOSGeometry.ogr
 
-    Returns an :class:`~django.contrib.gis.gdal.OGRGeometry` object
+    Returns an :class:`~thibaud.contrib.gis.gdal.OGRGeometry` object
     corresponding to the GEOS geometry.
 
 .. _wkb:
@@ -683,32 +683,32 @@ Other Properties & Methods
 
 .. attribute:: GEOSGeometry.srs
 
-    Returns a :class:`~django.contrib.gis.gdal.SpatialReference` object
+    Returns a :class:`~thibaud.contrib.gis.gdal.SpatialReference` object
     corresponding to the SRID of the geometry or ``None``.
 
 .. method:: GEOSGeometry.transform(ct, clone=False)
 
     Transforms the geometry according to the given coordinate transformation
     parameter (``ct``), which may be an integer SRID, spatial reference WKT
-    string, a PROJ string, a :class:`~django.contrib.gis.gdal.SpatialReference`
-    object, or a :class:`~django.contrib.gis.gdal.CoordTransform` object. By
+    string, a PROJ string, a :class:`~thibaud.contrib.gis.gdal.SpatialReference`
+    object, or a :class:`~thibaud.contrib.gis.gdal.CoordTransform` object. By
     default, the geometry is transformed in-place and nothing is returned.
     However if the ``clone`` keyword is set, then the geometry is not modified
     and a transformed clone of the geometry is returned instead.
 
     .. note::
 
-        Raises :class:`~django.contrib.gis.geos.GEOSException` if GDAL is not
+        Raises :class:`~thibaud.contrib.gis.geos.GEOSException` if GDAL is not
         available or if the geometry's SRID is ``None`` or less than 0. It
         doesn't impose any constraints on the geometry's SRID if called with a
-        :class:`~django.contrib.gis.gdal.CoordTransform` object.
+        :class:`~thibaud.contrib.gis.gdal.CoordTransform` object.
 
 .. method:: GEOSGeometry.make_valid()
 
     Returns a valid :class:`GEOSGeometry` equivalent, trying not to lose any of
     the input vertices. If the geometry is already valid, it is returned
     untouched. This is similar to the
-    :class:`~django.contrib.gis.db.models.functions.MakeValid` database
+    :class:`~thibaud.contrib.gis.db.models.functions.MakeValid` database
     function. Requires GEOS 3.8.
 
 .. method:: GEOSGeometry.normalize(clone=False)
@@ -933,7 +933,7 @@ For example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.geos import Point, Polygon
+    >>> from thibaud.contrib.gis.geos import Point, Polygon
     >>> poly = Polygon.from_bbox((0, 0, 5, 5))
     >>> prep_poly = poly.prepared
     >>> prep_poly.contains(Point(2.5, 2.5))
@@ -978,7 +978,7 @@ Geometry Factories
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import fromfile
+        >>> from thibaud.contrib.gis.geos import fromfile
         >>> g = fromfile("/home/bob/geom.wkt")
 
 .. function:: fromstr(string, srid=None)
@@ -996,7 +996,7 @@ Geometry Factories
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import fromstr
+        >>> from thibaud.contrib.gis.geos import fromstr
         >>> pnt = fromstr("POINT(-90.5 29.5)", srid=4326)
 
 I/O Objects
@@ -1014,7 +1014,7 @@ and/or WKT input given to their ``read(geom)`` method.
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import WKBReader
+        >>> from thibaud.contrib.gis.geos import WKBReader
         >>> wkb_r = WKBReader()
         >>> wkb_r.read("0101000000000000000000F03F000000000000F03F")
         <Point object at 0x103a88910>
@@ -1025,7 +1025,7 @@ and/or WKT input given to their ``read(geom)`` method.
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import WKTReader
+        >>> from thibaud.contrib.gis.geos import WKTReader
         >>> wkt_r = WKTReader()
         >>> wkt_r.read("POINT(1 1)")
         <Point object at 0x103a88b50>
@@ -1054,7 +1054,7 @@ include the SRID value (in other words, EWKB).
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import Point, WKBWriter
+        >>> from thibaud.contrib.gis.geos import Point, WKBWriter
         >>> pnt = Point(1, 1)
         >>> wkb_w = WKBWriter()
         >>> wkb_w.write(pnt)
@@ -1066,7 +1066,7 @@ include the SRID value (in other words, EWKB).
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import Point, WKBWriter
+        >>> from thibaud.contrib.gis.geos import Point, WKBWriter
         >>> pnt = Point(1, 1)
         >>> wkb_w = WKBWriter()
         >>> wkb_w.write_hex(pnt)
@@ -1088,7 +1088,7 @@ include the SRID value (in other words, EWKB).
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import Point, WKBWriter
+        >>> from thibaud.contrib.gis.geos import Point, WKBWriter
         >>> wkb_w = WKBWriter()
         >>> pnt = Point(1, 1)
         >>> wkb_w.write_hex(pnt)
@@ -1113,7 +1113,7 @@ include the SRID value (in other words, EWKB).
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import Point, WKBWriter
+        >>> from thibaud.contrib.gis.geos import Point, WKBWriter
         >>> wkb_w = WKBWriter()
         >>> wkb_w.outdim
         2
@@ -1131,7 +1131,7 @@ include the SRID value (in other words, EWKB).
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import Point, WKBWriter
+        >>> from thibaud.contrib.gis.geos import Point, WKBWriter
         >>> wkb_w = WKBWriter()
         >>> pnt = Point(1, 1, srid=4326)
         >>> wkb_w.write_hex(pnt)  # By default, no SRID included:
@@ -1152,7 +1152,7 @@ include the SRID value (in other words, EWKB).
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import Point, WKTWriter
+        >>> from thibaud.contrib.gis.geos import Point, WKTWriter
         >>> pnt = Point(1, 1)
         >>> wkt_w = WKTWriter()
         >>> wkt_w.write(pnt)
@@ -1169,7 +1169,7 @@ include the SRID value (in other words, EWKB).
 
     .. code-block:: pycon
 
-        >>> from django.contrib.gis.geos import Point, WKTWriter
+        >>> from thibaud.contrib.gis.geos import Point, WKTWriter
         >>> pnt = Point(1, 1)
         >>> wkt_w = WKTWriter()
         >>> wkt_w.trim
@@ -1185,7 +1185,7 @@ include the SRID value (in other words, EWKB).
     This property controls the rounding precision of coordinates;
     if set to ``None`` rounding is disabled.
 
-        >>> from django.contrib.gis.geos import Point, WKTWriter
+        >>> from thibaud.contrib.gis.geos import Point, WKTWriter
         >>> pnt = Point(1.44, 1.66)
         >>> wkt_w = WKTWriter()
         >>> print(wkt_w.precision)

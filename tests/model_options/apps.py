@@ -1,4 +1,4 @@
-from django.apps import AppConfig
+from thibaud.apps import AppConfig
 
 
 class ModelDefaultPKConfig(AppConfig):
@@ -7,12 +7,12 @@ class ModelDefaultPKConfig(AppConfig):
 
 class ModelPKConfig(AppConfig):
     name = "model_options"
-    default_auto_field = "django.db.models.SmallAutoField"
+    default_auto_field = "thibaud.db.models.SmallAutoField"
 
 
 class ModelPKNonAutoConfig(AppConfig):
     name = "model_options"
-    default_auto_field = "django.db.models.TextField"
+    default_auto_field = "thibaud.db.models.TextField"
 
 
 class ModelPKNoneConfig(AppConfig):
@@ -22,4 +22,4 @@ class ModelPKNoneConfig(AppConfig):
 
 class ModelPKNonexistentConfig(AppConfig):
     name = "model_options"
-    default_auto_field = "django.db.models.NonexistentAutoField"
+    default_auto_field = "thibaud.db.models.NonexistentAutoField"

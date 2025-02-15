@@ -1,10 +1,10 @@
 from operator import attrgetter
 
-from django.core.exceptions import FieldError, ValidationError
-from django.db import connection, models
-from django.db.models.query_utils import DeferredAttribute
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import CaptureQueriesContext, isolate_apps
+from thibaud.core.exceptions import FieldError, ValidationError
+from thibaud.db import connection, models
+from thibaud.db.models.query_utils import DeferredAttribute
+from thibaud.test import SimpleTestCase, TestCase
+from thibaud.test.utils import CaptureQueriesContext, isolate_apps
 
 from .models import (
     Base,
@@ -86,7 +86,7 @@ class ModelInheritanceTests(TestCase):
         post.attached_comment_set.create(content="Save $ on V1agr@", is_spam=True)
         post.attached_link_set.create(
             content="The web framework for perfections with deadlines.",
-            url="http://www.djangoproject.com/",
+            url="http://www.thibaudproject.com/",
         )
 
         # The Post model doesn't have an attribute called

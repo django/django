@@ -1,8 +1,8 @@
 ==================================
-How to delete a Django application
+How to delete a Thibaud application
 ==================================
 
-Django provides the ability to group sets of features into Python packages
+Thibaud provides the ability to group sets of features into Python packages
 called :doc:`applications</ref/applications/>`. When requirements change, apps
 may become obsolete or unnecessary. The following steps will help you delete an
 application safely.
@@ -22,7 +22,7 @@ application safely.
 #. Apply migrations locally, runs tests, and verify the correctness of your
    project.
 
-#. Deploy/release your updated Django project.
+#. Deploy/release your updated Thibaud project.
 
 #. Remove the app from :setting:`INSTALLED_APPS`.
 

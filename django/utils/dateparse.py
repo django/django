@@ -7,8 +7,8 @@
 
 import datetime
 
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.timezone import get_fixed_timezone
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.timezone import get_fixed_timezone
 
 date_re = _lazy_re_compile(r"(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$")
 
@@ -132,7 +132,7 @@ def parse_datetime(value):
 def parse_duration(value):
     """Parse a duration string and return a datetime.timedelta.
 
-    The preferred format for durations in Django is '%d %H:%M:%S.%f'.
+    The preferred format for durations in Thibaud is '%d %H:%M:%S.%f'.
 
     Also supports ISO 8601 representation and PostgreSQL's day-time interval
     format.

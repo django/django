@@ -1,11 +1,11 @@
 from decimal import Decimal
 
-from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
-from django.contrib.gis.db.models.sql import AreaField, DistanceField
-from django.contrib.gis.geos import GEOSGeometry
-from django.core.exceptions import FieldError
-from django.db import NotSupportedError
-from django.db.models import (
+from thibaud.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
+from thibaud.contrib.gis.db.models.sql import AreaField, DistanceField
+from thibaud.contrib.gis.geos import GEOSGeometry
+from thibaud.core.exceptions import FieldError
+from thibaud.db import NotSupportedError
+from thibaud.db.models import (
     BinaryField,
     BooleanField,
     FloatField,
@@ -15,8 +15,8 @@ from django.db.models import (
     Transform,
     Value,
 )
-from django.db.models.functions import Cast
-from django.utils.functional import cached_property
+from thibaud.db.models.functions import Cast
+from thibaud.utils.functional import cached_property
 
 NUMERIC_TYPES = (int, float, Decimal)
 

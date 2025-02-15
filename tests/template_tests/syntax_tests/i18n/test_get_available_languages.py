@@ -1,11 +1,11 @@
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
+from thibaud.template import TemplateSyntaxError
+from thibaud.test import SimpleTestCase
 
 from ...utils import setup
 
 
 class GetAvailableLanguagesTagTests(SimpleTestCase):
-    libraries = {"i18n": "django.templatetags.i18n"}
+    libraries = {"i18n": "thibaud.templatetags.i18n"}
 
     @setup(
         {

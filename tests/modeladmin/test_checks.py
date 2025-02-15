@@ -1,15 +1,15 @@
-from django import forms
-from django.contrib import admin
-from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
-from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
-from django.contrib.admin.sites import AdminSite
-from django.core.checks import Error
-from django.db import models
-from django.db.models import CASCADE, F, Field, ForeignKey, ManyToManyField, Model
-from django.db.models.functions import Upper
-from django.forms.models import BaseModelFormSet
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
+from thibaud import forms
+from thibaud.contrib import admin
+from thibaud.contrib.admin import BooleanFieldListFilter, SimpleListFilter
+from thibaud.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
+from thibaud.contrib.admin.sites import AdminSite
+from thibaud.core.checks import Error
+from thibaud.db import models
+from thibaud.db.models import CASCADE, F, Field, ForeignKey, ManyToManyField, Model
+from thibaud.db.models.functions import Upper
+from thibaud.forms.models import BaseModelFormSet
+from thibaud.test import TestCase, skipUnlessDBFeature
+from thibaud.test.utils import isolate_apps
 
 from .models import Band, Song, User, ValidationTestInlineModel, ValidationTestModel
 

@@ -1,5 +1,5 @@
-from django.db.models.functions import Random
-from django.test import TestCase
+from thibaud.db.models.functions import Random
+from thibaud.test import TestCase
 
 from ..models import FloatModel
 

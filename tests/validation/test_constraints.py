@@ -1,5 +1,5 @@
-from django.core.exceptions import ValidationError
-from django.test import TestCase, skipUnlessDBFeature
+from thibaud.core.exceptions import ValidationError
+from thibaud.test import TestCase, skipUnlessDBFeature
 
 from .models import (
     ChildProduct,

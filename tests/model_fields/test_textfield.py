@@ -1,6 +1,6 @@
-from django import forms
-from django.db import models
-from django.test import SimpleTestCase, TestCase
+from thibaud import forms
+from thibaud.db import models
+from thibaud.test import SimpleTestCase, TestCase
 
 from .models import Post
 

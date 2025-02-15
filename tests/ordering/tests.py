@@ -1,8 +1,8 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
-from django.db.models import (
+from thibaud.core.exceptions import FieldError
+from thibaud.db.models import (
     CharField,
     Count,
     DateTimeField,
@@ -13,8 +13,8 @@ from django.db.models import (
     Subquery,
     Value,
 )
-from django.db.models.functions import Length, Upper
-from django.test import TestCase
+from thibaud.db.models.functions import Length, Upper
+from thibaud.test import TestCase
 
 from .models import (
     Article,

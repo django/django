@@ -4,11 +4,11 @@ import smtplib
 import ssl
 import threading
 
-from django.conf import settings
-from django.core.mail.backends.base import BaseEmailBackend
-from django.core.mail.message import sanitize_address
-from django.core.mail.utils import DNS_NAME
-from django.utils.functional import cached_property
+from thibaud.conf import settings
+from thibaud.core.mail.backends.base import BaseEmailBackend
+from thibaud.core.mail.message import sanitize_address
+from thibaud.core.mail.utils import DNS_NAME
+from thibaud.utils.functional import cached_property
 
 
 class EmailBackend(BaseEmailBackend):

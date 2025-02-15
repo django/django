@@ -1,10 +1,10 @@
 import uuid
 
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.db.models.query import ModelIterable
-from django.utils.functional import cached_property
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
+from thibaud.db.models.query import ModelIterable
+from thibaud.utils.functional import cached_property
 
 
 class Author(models.Model):

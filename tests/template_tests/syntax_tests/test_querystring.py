@@ -1,6 +1,6 @@
-from django.http import QueryDict
-from django.template import RequestContext
-from django.test import RequestFactory, SimpleTestCase
+from thibaud.http import QueryDict
+from thibaud.template import RequestContext
+from thibaud.test import RequestFactory, SimpleTestCase
 
 from ..utils import setup
 

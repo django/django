@@ -28,7 +28,7 @@ import stat
 import tarfile
 import zipfile
 
-from django.core.exceptions import SuspiciousOperation
+from thibaud.core.exceptions import SuspiciousOperation
 
 
 class ArchiveException(Exception):

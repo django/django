@@ -1,6 +1,6 @@
 import unittest
 
-from django.utils import inspect
+from thibaud.utils import inspect
 
 
 class Person:

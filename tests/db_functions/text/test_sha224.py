@@ -1,10 +1,10 @@
 import unittest
 
-from django.db import NotSupportedError, connection
-from django.db.models import CharField
-from django.db.models.functions import SHA224
-from django.test import TestCase
-from django.test.utils import register_lookup
+from thibaud.db import NotSupportedError, connection
+from thibaud.db.models import CharField
+from thibaud.db.models.functions import SHA224
+from thibaud.test import TestCase
+from thibaud.test.utils import register_lookup
 
 from ..models import Author
 

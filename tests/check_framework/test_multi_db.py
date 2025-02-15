@@ -1,8 +1,8 @@
 from unittest import mock
 
-from django.db import connections, models
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps, override_settings
+from thibaud.db import connections, models
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import isolate_apps, override_settings
 
 
 class TestRouter:

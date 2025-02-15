@@ -1,7 +1,7 @@
 "Commonly-used date structures"
 
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy
+from thibaud.utils.translation import gettext_lazy as _
+from thibaud.utils.translation import pgettext_lazy
 
 WEEKDAYS = {
     0: _("Monday"),

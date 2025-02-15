@@ -2,14 +2,14 @@ import inspect
 import re
 import warnings
 
-from django.apps import apps as django_apps
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.middleware.csrf import rotate_token
-from django.utils.crypto import constant_time_compare
-from django.utils.deprecation import RemovedInDjango61Warning
-from django.utils.module_loading import import_string
-from django.views.decorators.debug import sensitive_variables
+from thibaud.apps import apps as thibaud_apps
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured, PermissionDenied
+from thibaud.middleware.csrf import rotate_token
+from thibaud.utils.crypto import constant_time_compare
+from thibaud.utils.deprecation import RemovedInThibaud61Warning
+from thibaud.utils.module_loading import import_string
+from thibaud.views.decorators.debug import sensitive_variables
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -156,19 +156,19 @@ def login(request, user, backend=None):
     have to reauthenticate on every request. Note that data set during
     the anonymous session is retained when the user logs in.
     """
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
+    # RemovedInThibaud61Warning: When the deprecation ends, replace with:
     # session_auth_hash = user.get_session_auth_hash()
     session_auth_hash = ""
-    # RemovedInDjango61Warning.
+    # RemovedInThibaud61Warning.
     if user is None:
         user = request.user
         warnings.warn(
             "Fallback to request.user when user is None will be removed.",
-            RemovedInDjango61Warning,
+            RemovedInThibaud61Warning,
             stacklevel=2,
         )
 
-    # RemovedInDjango61Warning.
+    # RemovedInThibaud61Warning.
     if hasattr(user, "get_session_auth_hash"):
         session_auth_hash = user.get_session_auth_hash()
 
@@ -199,18 +199,18 @@ def login(request, user, backend=None):
 
 async def alogin(request, user, backend=None):
     """See login()."""
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
+    # RemovedInThibaud61Warning: When the deprecation ends, replace with:
     # session_auth_hash = user.get_session_auth_hash()
     session_auth_hash = ""
-    # RemovedInDjango61Warning.
+    # RemovedInThibaud61Warning.
     if user is None:
         warnings.warn(
             "Fallback to request.user when user is None will be removed.",
-            RemovedInDjango61Warning,
+            RemovedInThibaud61Warning,
             stacklevel=2,
         )
         user = await request.auser()
-    # RemovedInDjango61Warning.
+    # RemovedInThibaud61Warning.
     if hasattr(user, "get_session_auth_hash"):
         session_auth_hash = user.get_session_auth_hash()
 
@@ -253,7 +253,7 @@ def logout(request):
     user_logged_out.send(sender=user.__class__, request=request, user=user)
     request.session.flush()
     if hasattr(request, "user"):
-        from django.contrib.auth.models import AnonymousUser
+        from thibaud.contrib.auth.models import AnonymousUser
 
         request.user = AnonymousUser()
 
@@ -270,7 +270,7 @@ async def alogout(request):
     await user_logged_out.asend(sender=user.__class__, request=request, user=user)
     await request.session.aflush()
     if hasattr(request, "user"):
-        from django.contrib.auth.models import AnonymousUser
+        from thibaud.contrib.auth.models import AnonymousUser
 
         request.user = AnonymousUser()
 
@@ -280,7 +280,7 @@ def get_user_model():
     Return the User model that is active in this project.
     """
     try:
-        return django_apps.get_model(settings.AUTH_USER_MODEL, require_ready=False)
+        return thibaud_apps.get_model(settings.AUTH_USER_MODEL, require_ready=False)
     except ValueError:
         raise ImproperlyConfigured(
             "AUTH_USER_MODEL must be of the form 'app_label.model_name'"

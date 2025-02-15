@@ -1,5 +1,5 @@
 """
-PostgreSQL database backend for Django.
+PostgreSQL database backend for Thibaud.
 
 Requires psycopg2 >= 2.9.9 or psycopg >= 3.1.12
 """
@@ -9,16 +9,16 @@ import threading
 import warnings
 from contextlib import contextmanager
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.db import DatabaseError as WrappedDatabaseError
-from django.db import connections
-from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
-from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
-from django.utils.asyncio import async_unsafe
-from django.utils.functional import cached_property
-from django.utils.safestring import SafeString
-from django.utils.version import get_version_tuple
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import DatabaseError as WrappedDatabaseError
+from thibaud.db import connections
+from thibaud.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
+from thibaud.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
+from thibaud.utils.asyncio import async_unsafe
+from thibaud.utils.functional import cached_property
+from thibaud.utils.safestring import SafeString
+from thibaud.utils.version import get_version_tuple
 
 try:
     try:
@@ -204,7 +204,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 ) from err
 
             connect_kwargs = self.get_connection_params()
-            # Ensure we run in autocommit, Django properly sets it later on.
+            # Ensure we run in autocommit, Thibaud properly sets it later on.
             connect_kwargs["autocommit"] = True
             enable_checks = self.settings_dict["CONN_HEALTH_CHECKS"]
             pool = ConnectionPool(
@@ -460,7 +460,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             task_ident = "sync"
         # Use that and the thread ident to get a unique name
         return self._cursor(
-            name="_django_curs_%d_%s_%d"
+            name="_thibaud_curs_%d_%s_%d"
             % (
                 # Avoid reusing name in other threads / tasks
                 threading.current_thread().ident,
@@ -486,7 +486,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.connection is None:
             return False
         try:
-            # Use a psycopg cursor directly, bypassing Django's utilities.
+            # Use a psycopg cursor directly, bypassing Thibaud's utilities.
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
         except Database.Error:
@@ -510,10 +510,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if cursor is not None:
                 raise
             warnings.warn(
-                "Normally Django will use a connection to the 'postgres' database "
+                "Normally Thibaud will use a connection to the 'postgres' database "
                 "to avoid running initialization queries against the production "
                 "database when it's not needed (for example, when running tests). "
-                "Django was unable to create a connection to the 'postgres' database "
+                "Thibaud was unable to create a connection to the 'postgres' database "
                 "and will use the first PostgreSQL database instead.",
                 RuntimeWarning,
             )

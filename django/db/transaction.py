@@ -1,6 +1,6 @@
 from contextlib import ContextDecorator, contextmanager
 
-from django.db import (
+from thibaud.db import (
     DEFAULT_DB_ALIAS,
     DatabaseError,
     Error,

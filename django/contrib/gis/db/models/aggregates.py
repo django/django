@@ -1,11 +1,11 @@
-from django.contrib.gis.db.models.fields import (
+from thibaud.contrib.gis.db.models.fields import (
     ExtentField,
     GeometryCollectionField,
     GeometryField,
     LineStringField,
 )
-from django.db.models import Aggregate, Func, Value
-from django.utils.functional import cached_property
+from thibaud.db.models import Aggregate, Func, Value
+from thibaud.utils.functional import cached_property
 
 __all__ = ["Collect", "Extent", "Extent3D", "MakeLine", "Union"]
 

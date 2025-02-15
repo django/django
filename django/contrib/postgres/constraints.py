@@ -1,13 +1,13 @@
 from types import NoneType
 
-from django.core.exceptions import ValidationError
-from django.db import DEFAULT_DB_ALIAS
-from django.db.backends.ddl_references import Expressions, Statement, Table
-from django.db.models import BaseConstraint, Deferrable, F, Q
-from django.db.models.expressions import Exists, ExpressionList
-from django.db.models.indexes import IndexExpression
-from django.db.models.lookups import PostgresOperatorLookup
-from django.db.models.sql import Query
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import DEFAULT_DB_ALIAS
+from thibaud.db.backends.ddl_references import Expressions, Statement, Table
+from thibaud.db.models import BaseConstraint, Deferrable, F, Q
+from thibaud.db.models.expressions import Exists, ExpressionList
+from thibaud.db.models.indexes import IndexExpression
+from thibaud.db.models.lookups import PostgresOperatorLookup
+from thibaud.db.models.sql import Query
 
 __all__ = ["ExclusionConstraint"]
 

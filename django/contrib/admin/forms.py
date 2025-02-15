@@ -1,6 +1,6 @@
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from thibaud.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from thibaud.core.exceptions import ValidationError
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class AdminAuthenticationForm(AuthenticationForm):

@@ -1,12 +1,12 @@
-from django import forms
-from django.core import exceptions
-from django.db.backends.postgresql.psycopg_any import (
+from thibaud import forms
+from thibaud.core import exceptions
+from thibaud.db.backends.postgresql.psycopg_any import (
     DateRange,
     DateTimeTZRange,
     NumericRange,
 )
-from django.forms.widgets import HiddenInput, MultiWidget
-from django.utils.translation import gettext_lazy as _
+from thibaud.forms.widgets import HiddenInput, MultiWidget
+from thibaud.utils.translation import gettext_lazy as _
 
 __all__ = [
     "BaseRangeField",

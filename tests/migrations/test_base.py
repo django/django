@@ -6,17 +6,17 @@ from importlib import import_module
 
 from user_commands.utils import AssertFormatterFailureCaughtContext
 
-from django.apps import apps
-from django.core.management import call_command
-from django.db import connection, connections, migrations, models
-from django.db.migrations.migration import Migration
-from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.migrations.recorder import MigrationRecorder
-from django.db.migrations.serializer import serializer_factory
-from django.db.migrations.state import ProjectState
-from django.test import SimpleTestCase, TransactionTestCase
-from django.test.utils import extend_sys_path
-from django.utils.module_loading import module_dir
+from thibaud.apps import apps
+from thibaud.core.management import call_command
+from thibaud.db import connection, connections, migrations, models
+from thibaud.db.migrations.migration import Migration
+from thibaud.db.migrations.optimizer import MigrationOptimizer
+from thibaud.db.migrations.recorder import MigrationRecorder
+from thibaud.db.migrations.serializer import serializer_factory
+from thibaud.db.migrations.state import ProjectState
+from thibaud.test import SimpleTestCase, TransactionTestCase
+from thibaud.test.utils import extend_sys_path
+from thibaud.utils.module_loading import module_dir
 
 
 class MigrationTestBase(TransactionTestCase):

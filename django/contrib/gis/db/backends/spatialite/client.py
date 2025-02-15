@@ -1,4 +1,4 @@
-from django.db.backends.sqlite3.client import DatabaseClient
+from thibaud.db.backends.sqlite3.client import DatabaseClient
 
 
 class SpatiaLiteClient(DatabaseClient):

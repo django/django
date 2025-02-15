@@ -4,9 +4,9 @@ from io import BytesIO
 from unittest import TestCase, mock
 from wsgiref import simple_server
 
-from django.core.servers.basehttp import get_internal_wsgi_application
-from django.core.signals import request_finished
-from django.test import RequestFactory, override_settings
+from thibaud.core.servers.basehttp import get_internal_wsgi_application
+from thibaud.core.signals import request_finished
+from thibaud.test import RequestFactory, override_settings
 
 from .views import FILE_RESPONSE_HOLDER
 

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 DATE_FORMAT = r"j \d\e F \d\e Y"
 TIME_FORMAT = "H:i"

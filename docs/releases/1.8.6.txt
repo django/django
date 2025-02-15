@@ -1,10 +1,10 @@
 ==========================
-Django 1.8.6 release notes
+Thibaud 1.8.6 release notes
 ==========================
 
 *November 4, 2015*
 
-Django 1.8.6 adds official support for Python 3.5 and fixes several bugs in
+Thibaud 1.8.6 adds official support for Python 3.5 and fixes several bugs in
 1.8.5.
 
 Bugfixes
@@ -42,7 +42,7 @@ Bugfixes
 * Fixed crash with ``contrib.postgres.forms.SplitArrayField`` and
   ``IntegerField`` on invalid value (:ticket:`25597`).
 
-* Added a helpful error message when Django and South migrations exist in the
+* Added a helpful error message when Thibaud and South migrations exist in the
   same directory (:ticket:`25618`).
 
 * Fixed a regression in ``URLValidator`` that allowed URLs with consecutive

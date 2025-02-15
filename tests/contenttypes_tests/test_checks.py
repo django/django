@@ -1,12 +1,12 @@
 from unittest import mock
 
-from django.contrib.contenttypes.checks import check_model_name_lengths
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.core import checks
-from django.db import models
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import isolate_apps
+from thibaud.contrib.contenttypes.checks import check_model_name_lengths
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core import checks
+from thibaud.db import models
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.test.utils import isolate_apps
 
 
 @isolate_apps("contenttypes_tests", attr_name="apps")
@@ -111,8 +111,8 @@ class GenericForeignKeyTests(SimpleTestCase):
 
     @override_settings(
         INSTALLED_APPS=[
-            "django.contrib.auth",
-            "django.contrib.contenttypes",
+            "thibaud.contrib.auth",
+            "thibaud.contrib.contenttypes",
             "contenttypes_tests",
         ]
     )

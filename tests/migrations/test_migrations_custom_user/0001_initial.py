@@ -1,5 +1,5 @@
-from django.conf import settings
-from django.db import migrations, models
+from thibaud.conf import settings
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):

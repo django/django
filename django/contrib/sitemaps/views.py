@@ -2,13 +2,13 @@ import datetime
 from dataclasses import dataclass
 from functools import wraps
 
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.paginator import EmptyPage, PageNotAnInteger
-from django.http import Http404
-from django.template.response import TemplateResponse
-from django.urls import reverse
-from django.utils import timezone
-from django.utils.http import http_date
+from thibaud.contrib.sites.shortcuts import get_current_site
+from thibaud.core.paginator import EmptyPage, PageNotAnInteger
+from thibaud.http import Http404
+from thibaud.template.response import TemplateResponse
+from thibaud.urls import reverse
+from thibaud.utils import timezone
+from thibaud.utils.http import http_date
 
 
 @dataclass
@@ -45,7 +45,7 @@ def index(
     sitemaps,
     template_name="sitemap_index.xml",
     content_type="application/xml",
-    sitemap_url_name="django.contrib.sitemaps.views.sitemap",
+    sitemap_url_name="thibaud.contrib.sitemaps.views.sitemap",
 ):
     req_protocol = request.scheme
     req_site = get_current_site(request)

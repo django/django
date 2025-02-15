@@ -1,6 +1,6 @@
 import re
 
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 # Regular expression for recognizing HEXEWKB and WKT.  A prophylactic measure
 # to prevent potentially malicious input from reaching the underlying C

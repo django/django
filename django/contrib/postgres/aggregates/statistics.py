@@ -1,4 +1,4 @@
-from django.db.models import Aggregate, FloatField, IntegerField
+from thibaud.db.models import Aggregate, FloatField, IntegerField
 
 __all__ = [
     "CovarPop",

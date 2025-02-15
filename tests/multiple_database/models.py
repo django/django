@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
 
 
 class Review(models.Model):

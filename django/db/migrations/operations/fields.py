@@ -1,6 +1,6 @@
-from django.db.migrations.utils import field_references
-from django.db.models import NOT_PROVIDED
-from django.utils.functional import cached_property
+from thibaud.db.migrations.utils import field_references
+from thibaud.db.models import NOT_PROVIDED
+from thibaud.utils.functional import cached_property
 
 from .base import Operation, OperationCategory
 

@@ -7,10 +7,10 @@ from contextlib import contextmanager
 from importlib import import_module
 from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
 
-from django.db import connections
-from django.test import SimpleTestCase
-from django.test.runner import DiscoverRunner, get_max_test_processes
-from django.test.utils import (
+from thibaud.db import connections
+from thibaud.test import SimpleTestCase
+from thibaud.test.runner import DiscoverRunner, get_max_test_processes
+from thibaud.test.utils import (
     NullTimeKeeper,
     TimeKeeper,
     captured_stderr,
@@ -186,22 +186,22 @@ class DiscoverRunnerTests(SimpleTestCase):
 
         self.assertEqual(count, 1)
 
-    def test_dotted_test_class_django_testcase(self):
+    def test_dotted_test_class_thibaud_testcase(self):
         count = (
             DiscoverRunner(verbosity=0)
             .build_suite(
-                ["test_runner_apps.sample.tests_sample.TestDjangoTestCase"],
+                ["test_runner_apps.sample.tests_sample.TestThibaudTestCase"],
             )
             .countTestCases()
         )
 
         self.assertEqual(count, 1)
 
-    def test_dotted_test_method_django_testcase(self):
+    def test_dotted_test_method_thibaud_testcase(self):
         count = (
             DiscoverRunner(verbosity=0)
             .build_suite(
-                ["test_runner_apps.sample.tests_sample.TestDjangoTestCase.test_sample"],
+                ["test_runner_apps.sample.tests_sample.TestThibaudTestCase.test_sample"],
             )
             .countTestCases()
         )
@@ -222,16 +222,16 @@ class DiscoverRunnerTests(SimpleTestCase):
 
     def test_name_patterns(self):
         all_test_1 = [
-            "DjangoCase1.test_1",
-            "DjangoCase2.test_1",
+            "ThibaudCase1.test_1",
+            "ThibaudCase2.test_1",
             "SimpleCase1.test_1",
             "SimpleCase2.test_1",
             "UnittestCase1.test_1",
             "UnittestCase2.test_1",
         ]
         all_test_2 = [
-            "DjangoCase1.test_2",
-            "DjangoCase2.test_2",
+            "ThibaudCase1.test_2",
+            "ThibaudCase2.test_2",
             "SimpleCase1.test_2",
             "SimpleCase2.test_2",
             "UnittestCase1.test_2",
@@ -349,8 +349,8 @@ class DiscoverRunnerTests(SimpleTestCase):
             )
             self.assertEqual(
                 suite._tests[0].__class__.__name__,
-                "TestDjangoTestCase",
-                msg="TestDjangoTestCase should be the first test case",
+                "TestThibaudTestCase",
+                msg="TestThibaudTestCase should be the first test case",
             )
             self.assertEqual(
                 suite._tests[1].__class__.__name__,
@@ -391,13 +391,13 @@ class DiscoverRunnerTests(SimpleTestCase):
         suite = runner.build_suite(test_labels=("test_runner_apps.simple",))
         suite = tuple(suite)
         self.assertIn(
-            "DjangoCase", suite[0].id(), msg="Test groups should not be reversed."
+            "ThibaudCase", suite[0].id(), msg="Test groups should not be reversed."
         )
         self.assertIn(
             "SimpleCase", suite[4].id(), msg="Test groups order should be preserved."
         )
         self.assertIn(
-            "DjangoCase2", suite[0].id(), msg="Django test cases should be reversed."
+            "ThibaudCase2", suite[0].id(), msg="Thibaud test cases should be reversed."
         )
         self.assertIn(
             "SimpleCase2", suite[4].id(), msg="Simple test cases should be reversed."
@@ -408,7 +408,7 @@ class DiscoverRunnerTests(SimpleTestCase):
             msg="Unittest test cases should be reversed.",
         )
         self.assertIn(
-            "test_2", suite[0].id(), msg="Methods of Django cases should be reversed."
+            "test_2", suite[0].id(), msg="Methods of Thibaud cases should be reversed."
         )
         self.assertIn(
             "test_2", suite[4].id(), msg="Methods of simple cases should be reversed."
@@ -533,7 +533,7 @@ class DiscoverRunnerTests(SimpleTestCase):
         with captured_stdout() as stdout:
             runner.build_suite(
                 [
-                    "test_runner_apps.sample.tests_sample.TestDjangoTestCase",
+                    "test_runner_apps.sample.tests_sample.TestThibaudTestCase",
                     "test_runner_apps.simple",
                 ]
             )
@@ -566,7 +566,7 @@ class DiscoverRunnerTests(SimpleTestCase):
         non-parallel tests.
         """
         runner = DiscoverRunner(parallel=8, verbosity=0)
-        suite = runner.build_suite(["test_runner_apps.simple.tests.DjangoCase1"])
+        suite = runner.build_suite(["test_runner_apps.simple.tests.ThibaudCase1"])
         self.assertEqual(runner.parallel, 1)
         self.assertIsInstance(suite, TestSuite)
 

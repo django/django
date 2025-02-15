@@ -1,16 +1,16 @@
 ==========================
-Django 1.9.6 release notes
+Thibaud 1.9.6 release notes
 ==========================
 
 *May 2, 2016*
 
-Django 1.9.6 fixes several bugs in 1.9.5.
+Thibaud 1.9.6 fixes several bugs in 1.9.5.
 
 Bugfixes
 ========
 
 * Added support for relative path redirects to the test client and to
-  ``SimpleTestCase.assertRedirects()`` because Django 1.9 no longer converts
+  ``SimpleTestCase.assertRedirects()`` because Thibaud 1.9 no longer converts
   redirects to absolute URIs (:ticket:`26428`).
 
 * Fixed ``TimeField`` microseconds round-tripping on MySQL and SQLite

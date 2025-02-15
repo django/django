@@ -1,14 +1,14 @@
 import json
 from datetime import datetime
 
-from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
-from django.contrib.admin.utils import quote
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase, override_settings
-from django.urls import reverse
-from django.utils import translation
-from django.utils.html import escape
+from thibaud.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
+from thibaud.contrib.admin.utils import quote
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.test import TestCase, override_settings
+from thibaud.urls import reverse
+from thibaud.utils import translation
+from thibaud.utils.html import escape
 
 from .models import Article, ArticleProxy, Car, Site
 
@@ -95,7 +95,7 @@ class LogEntryTests(TestCase):
             self.assertEqual(logentry.get_change_message(), "Ajout.")
 
     def test_logentry_change_message_not_json(self):
-        """LogEntry.change_message was a string before Django 1.10."""
+        """LogEntry.change_message was a string before Thibaud 1.10."""
         logentry = LogEntry(change_message="non-JSON string")
         self.assertEqual(logentry.get_change_message(), logentry.change_message)
 

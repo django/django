@@ -1,9 +1,9 @@
-from django.core.exceptions import FieldError, FullResultSet
-from django.db.models.expressions import Col
-from django.db.models.sql.compiler import SQLAggregateCompiler, SQLCompiler
-from django.db.models.sql.compiler import SQLDeleteCompiler as BaseSQLDeleteCompiler
-from django.db.models.sql.compiler import SQLInsertCompiler
-from django.db.models.sql.compiler import SQLUpdateCompiler as BaseSQLUpdateCompiler
+from thibaud.core.exceptions import FieldError, FullResultSet
+from thibaud.db.models.expressions import Col
+from thibaud.db.models.sql.compiler import SQLAggregateCompiler, SQLCompiler
+from thibaud.db.models.sql.compiler import SQLDeleteCompiler as BaseSQLDeleteCompiler
+from thibaud.db.models.sql.compiler import SQLInsertCompiler
+from thibaud.db.models.sql.compiler import SQLUpdateCompiler as BaseSQLUpdateCompiler
 
 __all__ = [
     "SQLAggregateCompiler",

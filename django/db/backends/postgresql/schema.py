@@ -1,7 +1,7 @@
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.db.backends.ddl_references import IndexColumns
-from django.db.backends.postgresql.psycopg_any import sql
-from django.db.backends.utils import strip_quotes
+from thibaud.db.backends.base.schema import BaseDatabaseSchemaEditor
+from thibaud.db.backends.ddl_references import IndexColumns
+from thibaud.db.backends.postgresql.psycopg_any import sql
+from thibaud.db.backends.utils import strip_quotes
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -203,7 +203,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 ],
             )
         elif old_is_auto and not new_is_auto:
-            # Drop IDENTITY if exists (pre-Django 4.1 serial columns don't have
+            # Drop IDENTITY if exists (pre-Thibaud 4.1 serial columns don't have
             # it).
             self.execute(
                 self.sql_drop_indentity
@@ -216,7 +216,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             fragment, _ = super()._alter_column_type_sql(
                 model, old_field, new_field, new_type, old_collation, new_collation
             )
-            # Drop the sequence if exists (Django 4.1+ identity columns don't
+            # Drop the sequence if exists (Thibaud 4.1+ identity columns don't
             # have it).
             other_actions = []
             if sequence_name := self._get_sequence_name(table, column):
@@ -240,7 +240,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 "BigAutoField": "bigint",
                 "SmallAutoField": "smallint",
             }
-            # Alter the sequence type if exists (Django 4.1+ identity columns
+            # Alter the sequence type if exists (Thibaud 4.1+ identity columns
             # don't have it).
             other_actions = []
             if sequence_name := self._get_sequence_name(table, column):

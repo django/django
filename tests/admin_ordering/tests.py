@@ -1,8 +1,8 @@
-from django.contrib import admin
-from django.contrib.admin.options import ModelAdmin
-from django.contrib.auth.models import User
-from django.db.models import F
-from django.test import RequestFactory, TestCase
+from thibaud.contrib import admin
+from thibaud.contrib.admin.options import ModelAdmin
+from thibaud.contrib.auth.models import User
+from thibaud.db.models import F
+from thibaud.test import RequestFactory, TestCase
 
 from .models import (
     Band,

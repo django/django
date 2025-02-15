@@ -2,7 +2,7 @@
 Conditional Expressions
 =======================
 
-.. currentmodule:: django.db.models.expressions
+.. currentmodule:: thibaud.db.models.expressions
 
 Conditional expressions let you use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic within filters, annotations, aggregations, and updates. A
@@ -15,7 +15,7 @@ The conditional expression classes
 
 We'll be using the following model in the subsequent examples::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Client(models.Model):
@@ -42,18 +42,18 @@ We'll be using the following model in the subsequent examples::
 
 A ``When()`` object is used to encapsulate a condition and its result for use
 in the conditional expression. Using a ``When()`` object is similar to using
-the :meth:`~django.db.models.query.QuerySet.filter` method. The condition can
+the :meth:`~thibaud.db.models.query.QuerySet.filter` method. The condition can
 be specified using :ref:`field lookups <field-lookups>`,
-:class:`~django.db.models.Q` objects, or :class:`~django.db.models.Expression`
+:class:`~thibaud.db.models.Q` objects, or :class:`~thibaud.db.models.Expression`
 objects that have an ``output_field`` that is a
-:class:`~django.db.models.BooleanField`. The result is provided using the
+:class:`~thibaud.db.models.BooleanField`. The result is provided using the
 ``then`` keyword.
 
 Some examples:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import F, Q, When
+    >>> from thibaud.db.models import F, Q, When
     >>> # String arguments refer to fields; the following two examples are equivalent:
     >>> When(account_type=Client.GOLD, then="name")
     >>> When(account_type=Client.GOLD, then=F("name"))
@@ -67,7 +67,7 @@ Some examples:
     >>> # Complex conditions can be created using Q objects
     >>> When(Q(name__startswith="John") | Q(name__startswith="Paul"), then="name")
     >>> # Condition can be created using boolean expressions.
-    >>> from django.db.models import Exists, OuterRef
+    >>> from thibaud.db.models import Exists, OuterRef
     >>> non_unique_account_type = (
     ...     Client.objects.filter(
     ...         account_type=OuterRef("account_type"),
@@ -77,7 +77,7 @@ Some examples:
     ... )
     >>> When(Exists(non_unique_account_type), then=Value("non unique"))
     >>> # Condition can be created using lookup expressions.
-    >>> from django.db.models.lookups import GreaterThan, LessThan
+    >>> from thibaud.db.models.lookups import GreaterThan, LessThan
     >>> When(
     ...     GreaterThan(F("registered_on"), date(2014, 1, 1))
     ...     & LessThan(F("registered_on"), date(2015, 1, 1)),
@@ -90,7 +90,7 @@ Keep in mind that each of these values can be an expression.
 
     Since the ``then`` keyword argument is reserved for the result of the
     ``When()``, there is a potential conflict if a
-    :class:`~django.db.models.Model` has a field named ``then``. This can be
+    :class:`~thibaud.db.models.Model` has a field named ``then``. This can be
     resolved in two ways:
 
     .. code-block:: pycon
@@ -115,7 +115,7 @@ An example:
 
     >>>
     >>> from datetime import date, timedelta
-    >>> from django.db.models import Case, Value, When
+    >>> from thibaud.db.models import Case, Value, When
     >>> Client.objects.create(
     ...     name="Jane Doe",
     ...     account_type=Client.REGULAR,
@@ -199,7 +199,7 @@ Conditional update
 
 Let's say we want to change the ``account_type`` for our clients to match
 their registration dates. We can do this using a conditional expression and the
-:meth:`~django.db.models.query.QuerySet.update` method:
+:meth:`~thibaud.db.models.query.QuerySet.update` method:
 
 .. code-block:: pycon
 
@@ -238,7 +238,7 @@ functions <aggregation-functions>` to achieve this:
     ...     name="Jane Porter", account_type=Client.PLATINUM, registered_on=date.today()
     ... )
     >>> # Get counts for each value of account_type
-    >>> from django.db.models import Count
+    >>> from thibaud.db.models import Count
     >>> Client.objects.aggregate(
     ...     regular=Count("pk", filter=Q(account_type=Client.REGULAR)),
     ...     gold=Count("pk", filter=Q(account_type=Client.GOLD)),

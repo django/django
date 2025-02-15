@@ -1,17 +1,17 @@
 ==========================
-Django 4.2.7 release notes
+Thibaud 4.2.7 release notes
 ==========================
 
 *November 1, 2023*
 
-Django 4.2.7 fixes a security issue with severity "moderate" and several bugs
+Thibaud 4.2.7 fixes a security issue with severity "moderate" and several bugs
 in 4.2.6.
 
 CVE-2023-46695: Potential denial of service vulnerability in ``UsernameField`` on Windows
 =========================================================================================
 
 The :func:`NFKC normalization <python:unicodedata.normalize>` is slow on
-Windows. As a consequence, ``django.contrib.auth.forms.UsernameField`` was
+Windows. As a consequence, ``thibaud.contrib.auth.forms.UsernameField`` was
 subject to a potential denial of service attack via certain inputs with a very
 large number of Unicode characters.
 
@@ -22,10 +22,10 @@ validation anyway.
 Bugfixes
 ========
 
-* Fixed a regression in Django 4.2 that caused a crash of
+* Fixed a regression in Thibaud 4.2 that caused a crash of
   ``QuerySet.aggregate()`` with aggregates referencing expressions containing
   subqueries (:ticket:`34798`).
 
-* Restored, following a regression in Django 4.2, creating
+* Restored, following a regression in Thibaud 4.2, creating
   ``varchar/text_pattern_ops`` indexes on ``CharField`` and ``TextField`` with
   deterministic collations on PostgreSQL (:ticket:`34932`).

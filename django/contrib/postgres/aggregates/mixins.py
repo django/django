@@ -1,19 +1,19 @@
 import warnings
 
-from django.core.exceptions import FullResultSet
-from django.db.models.expressions import OrderByList
-from django.utils.deprecation import RemovedInDjango61Warning
+from thibaud.core.exceptions import FullResultSet
+from thibaud.db.models.expressions import OrderByList
+from thibaud.utils.deprecation import RemovedInThibaud61Warning
 
 
 class OrderableAggMixin:
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
+    # RemovedInThibaud61Warning: When the deprecation ends, replace with:
     # def __init__(self, *expressions, order_by=(), **extra):
     def __init__(self, *expressions, ordering=(), order_by=(), **extra):
-        # RemovedInDjango61Warning.
+        # RemovedInThibaud61Warning.
         if ordering:
             warnings.warn(
                 "The ordering argument is deprecated. Use order_by instead.",
-                category=RemovedInDjango61Warning,
+                category=RemovedInThibaud61Warning,
                 stacklevel=2,
             )
             if order_by:

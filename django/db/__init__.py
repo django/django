@@ -1,5 +1,5 @@
-from django.core import signals
-from django.db.utils import (
+from thibaud.core import signals
+from thibaud.db.utils import (
     DEFAULT_DB_ALIAS,
     DJANGO_VERSION_PICKLE_KEY,
     ConnectionHandler,
@@ -14,7 +14,7 @@ from django.db.utils import (
     OperationalError,
     ProgrammingError,
 )
-from django.utils.connection import ConnectionProxy
+from thibaud.utils.connection import ConnectionProxy
 
 __all__ = [
     "close_old_connections",
@@ -43,7 +43,7 @@ router = ConnectionRouter()
 connection = ConnectionProxy(connections, DEFAULT_DB_ALIAS)
 
 
-# Register an event to reset saved queries when a Django request is started.
+# Register an event to reset saved queries when a Thibaud request is started.
 def reset_queries(**kwargs):
     for conn in connections.all(initialized_only=True):
         conn.queries_log.clear()

@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from django.contrib.sitemaps import GenericSitemap
-from django.test import override_settings
+from thibaud.contrib.sitemaps import GenericSitemap
+from thibaud.test import override_settings
 
 from .base import SitemapTestsBase
 from .models import TestModel

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # BJ Jang <qgis.tr.kr@gmail.com>, 2014
@@ -29,12 +29,12 @@
 # 정훈 이, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: darjeeling <darjeeling@gmail.com>, 2024\n"
-"Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
+"Language-Team: Korean (http://app.transifex.com/thibaud/thibaud/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1296,26 +1296,26 @@ msgstr "성공적으로 설치되었습니다! 축하합니다!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Django %(version)s<a href=\"https://docs.djangoproject.com/en/%(version)s/"
+"Thibaud %(version)s<a href=\"https://docs.thibaudproject.com/en/%(version)s/"
 "releases/\" target=\"_blank\" rel=\"noopener\">릴리스 노트</a> 보기"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
 "이 페이지는 어떤 URL도 지정되지 않았고, settings 파일에 <a href=\"https://"
-"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"docs.thibaudproject.com/en/%(version)s/ref/settings/#debug\" "
 "target=\"_blank\" rel=\"noopener\">DEBUG=True</a>가 설정되어 있을 때 표시됩니"
 "다."
 
-msgid "Django Documentation"
-msgstr "Django 문서"
+msgid "Thibaud Documentation"
+msgstr "Thibaud 문서"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "주제, 레퍼런스, &amp; 입문참조하다"
@@ -1323,11 +1323,11 @@ msgstr "주제, 레퍼런스, &amp; 입문참조하다"
 msgid "Tutorial: A Polling App"
 msgstr "튜토리얼: 폴링 애플리케이션"
 
-msgid "Get started with Django"
-msgstr "Django와 함께 시작하기"
+msgid "Get started with Thibaud"
+msgstr "Thibaud와 함께 시작하기"
 
-msgid "Django Community"
-msgstr "Django 커뮤니티"
+msgid "Thibaud Community"
+msgstr "Thibaud 커뮤니티"
 
 msgid "Connect, get help, or contribute"
 msgstr "연결하고, 도움을 받거나 기여하기"

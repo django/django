@@ -1,13 +1,13 @@
-from django.core.cache import cache
-from django.template import Context, Engine, TemplateSyntaxError
-from django.test import SimpleTestCase, override_settings
+from thibaud.core.cache import cache
+from thibaud.template import Context, Engine, TemplateSyntaxError
+from thibaud.test import SimpleTestCase, override_settings
 
 from ..utils import setup
 
 
 class CacheTagTests(SimpleTestCase):
     libraries = {
-        "cache": "django.templatetags.cache",
+        "cache": "thibaud.templatetags.cache",
         "custom": "template_tests.templatetags.custom",
     }
 
@@ -163,7 +163,7 @@ class CacheTagTests(SimpleTestCase):
 class CacheTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.engine = Engine(libraries={"cache": "django.templatetags.cache"})
+        cls.engine = Engine(libraries={"cache": "thibaud.templatetags.cache"})
         super().setUpClass()
 
     def test_cache_regression_20130(self):
@@ -176,11 +176,11 @@ class CacheTests(SimpleTestCase):
     @override_settings(
         CACHES={
             "default": {
-                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "default",
             },
             "template_fragments": {
-                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "fragments",
             },
         }

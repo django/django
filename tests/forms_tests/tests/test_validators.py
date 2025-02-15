@@ -2,10 +2,10 @@ import re
 import types
 from unittest import TestCase
 
-from django import forms
-from django.core import validators
-from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
+from thibaud import forms
+from thibaud.core import validators
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.files.uploadedfile import SimpleUploadedFile
 
 
 class TestFieldWithValidators(TestCase):

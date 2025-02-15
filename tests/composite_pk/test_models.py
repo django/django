@@ -1,6 +1,6 @@
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from django.test import TestCase
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core.exceptions import ValidationError
+from thibaud.test import TestCase
 
 from .models import Comment, Tenant, Token, User
 

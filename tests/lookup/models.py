@@ -4,8 +4,8 @@ The lookup API
 This demonstrates features of the database API.
 """
 
-from django.db import models
-from django.db.models.lookups import IsNull
+from thibaud.db import models
+from thibaud.db.models.lookups import IsNull
 
 
 class Alarm(models.Model):

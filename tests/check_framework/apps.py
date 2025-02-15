@@ -1,4 +1,4 @@
-from django.apps import AppConfig
+from thibaud.apps import AppConfig
 
 
 class CheckDefaultPKConfig(AppConfig):
@@ -7,4 +7,4 @@ class CheckDefaultPKConfig(AppConfig):
 
 class CheckPKConfig(AppConfig):
     name = "check_framework"
-    default_auto_field = "django.db.models.BigAutoField"
+    default_auto_field = "thibaud.db.models.BigAutoField"

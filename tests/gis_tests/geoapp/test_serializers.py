@@ -1,8 +1,8 @@
 import json
 
-from django.contrib.gis.geos import LinearRing, Point, Polygon
-from django.core import serializers
-from django.test import TestCase
+from thibaud.contrib.gis.geos import LinearRing, Point, Polygon
+from thibaud.core import serializers
+from thibaud.test import TestCase
 
 from .models import City, MultiFields, PennsylvaniaCity
 
@@ -66,7 +66,7 @@ class GeoJSONSerializerTests(TestCase):
 
     def test_id_field_option(self):
         """
-        By default Django uses the pk of the object as the id for a feature.
+        By default Thibaud uses the pk of the object as the id for a feature.
         The 'id_field' option can be used to specify a different field to use
         as the id.
         """

@@ -1,7 +1,7 @@
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
-from django.utils.deprecation import MiddlewareMixin
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import HttpResponse
+from thibaud.utils.deprecation import MiddlewareMixin
 
 from .utils import get_view_name
 
@@ -22,7 +22,7 @@ class XViewMiddleware(MiddlewareMixin):
             raise ImproperlyConfigured(
                 "The XView middleware requires authentication middleware to "
                 "be installed. Edit your MIDDLEWARE setting to insert "
-                "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+                "'thibaud.contrib.auth.middleware.AuthenticationMiddleware'."
             )
         if request.method == "HEAD" and (
             request.META.get("REMOTE_ADDR") in settings.INTERNAL_IPS

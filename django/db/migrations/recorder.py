@@ -1,7 +1,7 @@
-from django.apps.registry import Apps
-from django.db import DatabaseError, models
-from django.utils.functional import classproperty
-from django.utils.timezone import now
+from thibaud.apps.registry import Apps
+from thibaud.db import DatabaseError, models
+from thibaud.utils.functional import classproperty
+from thibaud.utils.timezone import now
 
 from .exceptions import MigrationSchemaMissing
 
@@ -37,7 +37,7 @@ class MigrationRecorder:
                 class Meta:
                     apps = Apps()
                     app_label = "migrations"
-                    db_table = "django_migrations"
+                    db_table = "thibaud_migrations"
 
                 def __str__(self):
                     return "Migration %s for %s" % (self.name, self.app)
@@ -54,7 +54,7 @@ class MigrationRecorder:
         return self.Migration.objects.using(self.connection.alias)
 
     def has_table(self):
-        """Return True if the django_migrations table exists."""
+        """Return True if the thibaud_migrations table exists."""
         # If the migrations table has already been confirmed to exist, don't
         # recheck it's existence.
         if self._has_table:
@@ -78,7 +78,7 @@ class MigrationRecorder:
                 editor.create_model(self.Migration)
         except DatabaseError as exc:
             raise MigrationSchemaMissing(
-                "Unable to create the django_migrations table (%s)" % exc
+                "Unable to create the thibaud_migrations table (%s)" % exc
             )
 
     def applied_migrations(self):
@@ -92,7 +92,7 @@ class MigrationRecorder:
                 for migration in self.migration_qs
             }
         else:
-            # If the django_migrations table doesn't exist, then no migrations
+            # If the thibaud_migrations table doesn't exist, then no migrations
             # are applied.
             return {}
 

@@ -7,26 +7,26 @@ import types
 import warnings
 from pathlib import Path
 
-from django.conf import settings
-from django.http import Http404, HttpResponse, HttpResponseNotFound
-from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import pprint
-from django.urls import resolve
-from django.utils import timezone
-from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_str
-from django.utils.module_loading import import_string
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.version import get_docs_version
-from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
+from thibaud.conf import settings
+from thibaud.http import Http404, HttpResponse, HttpResponseNotFound
+from thibaud.template import Context, Engine, TemplateDoesNotExist
+from thibaud.template.defaultfilters import pprint
+from thibaud.urls import resolve
+from thibaud.utils import timezone
+from thibaud.utils.datastructures import MultiValueDict
+from thibaud.utils.encoding import force_str
+from thibaud.utils.module_loading import import_string
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.version import get_docs_version
+from thibaud.views.decorators.debug import coroutine_functions_to_sensitive_variables
 
-# Minimal Django templates engine to render the error templates
+# Minimal Thibaud templates engine to render the error templates
 # regardless of the project's TEMPLATES setting. Templates are
 # read directly from the filesystem so that the error handler
 # works even if the template loader is broken.
 DEBUG_ENGINE = Engine(
     debug=True,
-    libraries={"i18n": "django.templatetags.i18n"},
+    libraries={"i18n": "thibaud.templatetags.i18n"},
 )
 
 
@@ -371,7 +371,7 @@ class ExceptionReporter:
                     "ascii",
                     errors="replace",
                 )
-        from django import get_version
+        from thibaud import get_version
 
         if self.request is None:
             user_str = None
@@ -398,7 +398,7 @@ class ExceptionReporter:
             "sys_executable": sys.executable,
             "sys_version_info": "%d.%d.%d" % sys.version_info[0:3],
             "server_time": timezone.now(),
-            "django_version_info": get_version(),
+            "thibaud_version_info": get_version(),
             "sys_path": sys.path,
             "template_info": self.template_info,
             "template_does_not_exist": self.template_does_not_exist,
@@ -584,7 +584,7 @@ class ExceptionReporter:
                 "exc_cause": exc_cause,
                 "exc_cause_explicit": exc_cause_explicit,
                 "tb": tb,
-                "type": "django" if module_name.startswith("django.") else "user",
+                "type": "thibaud" if module_name.startswith("thibaud.") else "user",
                 "filename": filename,
                 "function": function,
                 "lineno": lineno + 1,

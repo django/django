@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 # 
 # Translators:
 # Aleksa Cukovic` <aleksacukovic1@gmail.com>, 2020
@@ -8,12 +8,12 @@
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: Igor Jerosimić, 2019-2021,2023-2024\n"
-"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/language/sr@latin/)\n"
+"Language-Team: Serbian (Latin) (http://app.transifex.com/thibaud/thibaud/language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1600,21 +1600,21 @@ msgstr "Instalacija je prošla uspešno. Čestitke!"
 #: views/templates/default_urlconf.html:206
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
-msgstr "Pogledajte <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">napomene uz izdanje</a> za Đango %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
+msgstr "Pogledajte <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">napomene uz izdanje</a> za Đango %(version)s"
 
 #: views/templates/default_urlconf.html:221
 #, python-format
 msgid ""
 "You are seeing this page because <a "
-"href=\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"href=\"https://docs.thibaudproject.com/en/%(version)s/ref/settings/#debug\" "
 "target=\"_blank\" rel=\"noopener\">DEBUG=True</a> is in your settings file "
 "and you have not configured any URLs."
-msgstr "Ova strana je prikazana jer je <a href=\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener\">DEBUG=True</a> u vašim podešavanjima i niste konfigurisali nijedan URL."
+msgstr "Ova strana je prikazana jer je <a href=\"https://docs.thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener\">DEBUG=True</a> u vašim podešavanjima i niste konfigurisali nijedan URL."
 
 #: views/templates/default_urlconf.html:229
-msgid "Django Documentation"
+msgid "Thibaud Documentation"
 msgstr "Đango dokumentacija"
 
 #: views/templates/default_urlconf.html:230
@@ -1626,11 +1626,11 @@ msgid "Tutorial: A Polling App"
 msgstr "Uputstvo: aplikacija za glasanje"
 
 #: views/templates/default_urlconf.html:239
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr "Počnite sa Đangom"
 
 #: views/templates/default_urlconf.html:247
-msgid "Django Community"
+msgid "Thibaud Community"
 msgstr "Đango zajednica"
 
 #: views/templates/default_urlconf.html:248

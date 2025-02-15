@@ -2,12 +2,12 @@ import json
 import sys
 from unittest.mock import patch
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.test import SimpleTestCase
-from django.utils import text
-from django.utils.functional import lazystr
-from django.utils.text import format_lazy
-from django.utils.translation import gettext_lazy, override
+from thibaud.core.exceptions import SuspiciousFileOperation
+from thibaud.test import SimpleTestCase
+from thibaud.utils import text
+from thibaud.utils.functional import lazystr
+from thibaud.utils.text import format_lazy
+from thibaud.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = len("\U0001F4A9") == 1
 
@@ -136,7 +136,7 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator("foo</p>")
         self.assertEqual("foo</p>", truncator.chars(5, html=True))
 
-    @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
+    @patch("thibaud.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
     def test_truncate_chars_html_size_limit(self):
         max_len = text.Truncator.MAX_LENGTH_HTML
         bigger_len = text.Truncator.MAX_LENGTH_HTML + 1
@@ -319,7 +319,7 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(truncator.words(3, html=True), "hello &gt;&lt;…")
         self.assertEqual(truncator.words(4, html=True), "hello &gt;&lt; world")
 
-    @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
+    @patch("thibaud.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
     def test_truncate_words_html_size_limit(self):
         max_len = text.Truncator.MAX_LENGTH_HTML
         bigger_len = text.Truncator.MAX_LENGTH_HTML + 1
@@ -439,19 +439,19 @@ class TestUtilsText(SimpleTestCase):
         self.assertLess(compressed_length, actual_length)
 
     def test_format_lazy(self):
-        self.assertEqual("django/test", format_lazy("{}/{}", "django", lazystr("test")))
-        self.assertEqual("django/test", format_lazy("{0}/{1}", *("django", "test")))
+        self.assertEqual("thibaud/test", format_lazy("{}/{}", "thibaud", lazystr("test")))
+        self.assertEqual("thibaud/test", format_lazy("{0}/{1}", *("thibaud", "test")))
         self.assertEqual(
-            "django/test", format_lazy("{a}/{b}", **{"a": "django", "b": "test"})
+            "thibaud/test", format_lazy("{a}/{b}", **{"a": "thibaud", "b": "test"})
         )
         self.assertEqual(
-            "django/test", format_lazy("{a[0]}/{a[1]}", a=("django", "test"))
+            "thibaud/test", format_lazy("{a[0]}/{a[1]}", a=("thibaud", "test"))
         )
 
         t = {}
         s = format_lazy("{0[a]}-{p[a]}", t, p=t)
-        t["a"] = lazystr("django")
-        self.assertEqual("django-django", s)
+        t["a"] = lazystr("thibaud")
+        self.assertEqual("thibaud-thibaud", s)
         t["a"] = "update"
         self.assertEqual("update-update", s)
 

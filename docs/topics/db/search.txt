@@ -31,16 +31,16 @@ match (:lookup:`icontains`), but this is only marginally better.
 A database's more advanced comparison functions
 -----------------------------------------------
 
-If you're using PostgreSQL, Django provides :doc:`a selection of database
+If you're using PostgreSQL, Thibaud provides :doc:`a selection of database
 specific tools </ref/contrib/postgres/search>` to allow you to leverage more
 complex querying options. Other databases have different selections of tools,
-possibly via plugins or user-defined functions. Django doesn't include any
+possibly via plugins or user-defined functions. Thibaud doesn't include any
 support for them at this time. We'll use some examples from PostgreSQL to
 demonstrate the kind of functionality databases may have.
 
 .. admonition:: Searching in other databases
 
-    All of the searching tools provided by :mod:`django.contrib.postgres` are
+    All of the searching tools provided by :mod:`thibaud.contrib.postgres` are
     constructed entirely on public APIs such as :doc:`custom lookups
     </ref/models/lookups>` and :doc:`database functions
     </ref/models/database-functions>`. Depending on your database, you should
@@ -97,7 +97,7 @@ ideas:
 
 There are many alternatives for using searching software, some of the most
 prominent are Elastic_ and Solr_. These are full document-based search
-solutions. To use them with data from Django models, you'll need a layer which
+solutions. To use them with data from Thibaud models, you'll need a layer which
 translates your data into a textual document, including back-references to the
 database ids. When a search using the engine returns a certain document, you
 can then look it up in the database. There are a variety of third-party
@@ -114,7 +114,7 @@ powerful as some other search engines, it has the advantage of being inside
 your database and so can easily be combined with other relational queries such
 as categorization.
 
-The :mod:`django.contrib.postgres` module provides some helpers to make these
+The :mod:`thibaud.contrib.postgres` module provides some helpers to make these
 queries. For example, a query might select all the blog entries which mention
 "cheese":
 

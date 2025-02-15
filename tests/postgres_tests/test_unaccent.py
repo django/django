@@ -1,4 +1,4 @@
-from django.db import connection
+from thibaud.db import connection
 
 from . import PostgreSQLTestCase
 from .models import CharFieldModel, TextFieldModel

@@ -2,7 +2,7 @@
 Installing Geospatial libraries
 ===============================
 
-GeoDjango uses and/or provides interfaces for the following open source
+GeoThibaud uses and/or provides interfaces for the following open source
 geospatial libraries:
 
 ========================  ====================================  ================================  =================================================
@@ -17,7 +17,7 @@ Program                   Description                           Required        
 ========================  ====================================  ================================  =================================================
 
 Note that older or more recent versions of these libraries *may* also work
-totally fine with GeoDjango. Your mileage may vary.
+totally fine with GeoThibaud. Your mileage may vary.
 
 ..
     Libs release dates:
@@ -52,9 +52,9 @@ totally fine with GeoDjango. Your mileage may vary.
 
 .. note::
 
-    The GeoDjango interfaces to GEOS, GDAL, and GeoIP may be used
-    independently of Django.  In other words, no database or settings file
-    required -- import them as normal from :mod:`django.contrib.gis`.
+    The GeoThibaud interfaces to GEOS, GDAL, and GeoIP may be used
+    independently of Thibaud.  In other words, no database or settings file
+    required -- import them as normal from :mod:`thibaud.contrib.gis`.
 
 .. _PROJ: https://proj.org/
 __ https://postgis.net/
@@ -103,7 +103,7 @@ GEOS
 ----
 
 GEOS is a C++ library for performing geometric operations, and is the default
-internal geometry representation used by GeoDjango (it's behind the "lazy"
+internal geometry representation used by GeoThibaud (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
@@ -137,7 +137,7 @@ Troubleshooting
 Can't find GEOS library
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-When GeoDjango can't find GEOS, this error is raised:
+When GeoThibaud can't find GEOS, this error is raised:
 
 .. code-block:: text
 
@@ -155,7 +155,7 @@ If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binut
 
 If your GEOS library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GEOS_LIBRARY_PATH`
-setting may be added to your Django settings file with the full path to the
+setting may be added to your Thibaud settings file with the full path to the
 GEOS C library.  For example:
 
 .. code-block:: shell
@@ -229,7 +229,7 @@ GDAL
 ----
 
 `GDAL`__ is an excellent open source geospatial library that has support for
-reading most vector and raster spatial data formats.  Currently, GeoDjango only
+reading most vector and raster spatial data formats.  Currently, GeoThibaud only
 supports :doc:`GDAL's vector data <../gdal>` capabilities [#]_.
 :ref:`geosbuild` and :ref:`proj4` should be installed prior to building GDAL.
 
@@ -271,7 +271,7 @@ Troubleshooting
 Can't find GDAL library
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-When GeoDjango can't find the GDAL library, configure your :ref:`libsettings`
+When GeoThibaud can't find the GDAL library, configure your :ref:`libsettings`
 *or* set :ref:`gdallibrarypath` in your settings.
 
 .. _gdallibrarypath:
@@ -281,7 +281,7 @@ When GeoDjango can't find the GDAL library, configure your :ref:`libsettings`
 
 If your GDAL library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GDAL_LIBRARY_PATH`
-setting may be added to your Django settings file with the full path to
+setting may be added to your Thibaud settings file with the full path to
 the GDAL library.  For example:
 
 .. code-block:: shell
@@ -296,6 +296,6 @@ the GDAL library.  For example:
        grid file only included in the extra datum shifting files. It is easier
        to install the shifting files now, then to have debug a problem caused
        by their absence later.
-.. [#] Specifically, GeoDjango provides support for the `OGR
+.. [#] Specifically, GeoThibaud provides support for the `OGR
        <https://gdal.org/user/vector_data_model.html>`_ library, a component of
        GDAL.

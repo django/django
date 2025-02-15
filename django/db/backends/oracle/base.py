@@ -1,5 +1,5 @@
 """
-Oracle database backend for Django.
+Oracle database backend for Thibaud.
 
 Requires oracledb: https://oracle.github.io/python-oracledb/
 """
@@ -10,15 +10,15 @@ import os
 import platform
 from contextlib import contextmanager
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.db import IntegrityError
-from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.utils import debug_transaction
-from django.utils.asyncio import async_unsafe
-from django.utils.encoding import force_bytes, force_str
-from django.utils.functional import cached_property
-from django.utils.version import get_version_tuple
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import IntegrityError
+from thibaud.db.backends.base.base import BaseDatabaseWrapper
+from thibaud.db.backends.utils import debug_transaction
+from thibaud.utils.asyncio import async_unsafe
+from thibaud.utils.encoding import force_bytes, force_str
+from thibaud.utils.functional import cached_property
+from thibaud.utils.version import get_version_tuple
 
 try:
     import oracledb as Database
@@ -82,7 +82,7 @@ def wrap_oracle_errors():
         #            or:
         #            'ORA-00001: unique constraint (DJANGOTEST.DEFERRABLE_
         #               PINK_CONSTRAINT) violated
-        # Convert that case to Django's IntegrityError exception.
+        # Convert that case to Thibaud's IntegrityError exception.
         x = e.args[0]
         if (
             hasattr(x, "code")
@@ -481,7 +481,7 @@ class VariableWrapper:
 
 class FormatStylePlaceholderCursor:
     """
-    Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var"
+    Thibaud uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var"
     style. This fixes it -- but note that if you want to use a literal "%s" in
     a query, you'll need to use "%%s".
     """

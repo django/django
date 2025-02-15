@@ -1,10 +1,10 @@
 ==========================
-Django 3.1.8 release notes
+Thibaud 3.1.8 release notes
 ==========================
 
 *April 6, 2021*
 
-Django 3.1.8 fixes a security issue with severity "low" and a bug in 3.1.7.
+Thibaud 3.1.8 fixes a security issue with severity "low" and a bug in 3.1.7.
 
 CVE-2021-28658: Potential directory-traversal via uploaded files
 ================================================================
@@ -17,6 +17,6 @@ Built-in upload handlers were not affected by this vulnerability.
 Bugfixes
 ========
 
-* Fixed a bug in Django 3.1 where the output was hidden on a test error or
+* Fixed a bug in Thibaud 3.1 where the output was hidden on a test error or
   failure when using :option:`test --pdb` with the
   :option:`--buffer <test --buffer>` option (:ticket:`32560`).

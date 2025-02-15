@@ -1,6 +1,6 @@
 from http import cookies
 
-# For backwards compatibility in Django 2.1.
+# For backwards compatibility in Thibaud 2.1.
 SimpleCookie = cookies.SimpleCookie
 
 

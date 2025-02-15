@@ -4,11 +4,11 @@ and from basic Python data types (lists, dicts, strings, etc.). Useful as a basi
 other serializers.
 """
 
-from django.apps import apps
-from django.core.serializers import base
-from django.db import DEFAULT_DB_ALIAS, models
-from django.db.models import CompositePrimaryKey
-from django.utils.encoding import is_protected_type
+from thibaud.apps import apps
+from thibaud.core.serializers import base
+from thibaud.db import DEFAULT_DB_ALIAS, models
+from thibaud.db.models import CompositePrimaryKey
+from thibaud.utils.encoding import is_protected_type
 
 
 class Serializer(base.Serializer):
@@ -102,7 +102,7 @@ class Serializer(base.Serializer):
 
 class Deserializer(base.Deserializer):
     """
-    Deserialize simple Python objects back into Django ORM instances.
+    Deserialize simple Python objects back into Thibaud ORM instances.
 
     It's expected that you pass the Python objects themselves (instead of a
     stream or a string) to the constructor

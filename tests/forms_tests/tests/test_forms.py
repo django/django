@@ -3,10 +3,10 @@ import datetime
 import json
 import uuid
 
-from django.core.exceptions import NON_FIELD_ERRORS
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.validators import MaxValueValidator, RegexValidator
-from django.forms import (
+from thibaud.core.exceptions import NON_FIELD_ERRORS
+from thibaud.core.files.uploadedfile import SimpleUploadedFile
+from thibaud.core.validators import MaxValueValidator, RegexValidator
+from thibaud.forms import (
     BooleanField,
     BoundField,
     CharField,
@@ -38,14 +38,14 @@ from django.forms import (
     TimeField,
     ValidationError,
 )
-from django.forms.renderers import DjangoTemplates, get_default_renderer
-from django.forms.utils import ErrorDict, ErrorList
-from django.http import QueryDict
-from django.template import Context, Template
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
-from django.utils.datastructures import MultiValueDict
-from django.utils.safestring import mark_safe
+from thibaud.forms.renderers import ThibaudTemplates, get_default_renderer
+from thibaud.forms.utils import ErrorDict, ErrorList
+from thibaud.http import QueryDict
+from thibaud.template import Context, Template
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
+from thibaud.utils.datastructures import MultiValueDict
+from thibaud.utils.safestring import mark_safe
 
 from . import jinja2_tests
 
@@ -469,7 +469,7 @@ aria-describedby="id_birthday_error">
 
     def test_auto_id(self):
         # "auto_id" tells the Form to add an "id" attribute to each form
-        # element. If it's a string that contains '%s', Django will use that as
+        # element. If it's a string that contains '%s', Thibaud will use that as
         # a format string into which the field's name will be inserted. It will
         # also put a <label> around the human-readable labels for a field.
         p = Person(auto_id="%s_id")
@@ -693,7 +693,7 @@ aria-describedby="id_birthday_error">
 <option value="J">Java</option>
 </select>""",
         )
-        f = FrameworkForm({"name": "Django", "language": "P"}, auto_id=False)
+        f = FrameworkForm({"name": "Thibaud", "language": "P"}, auto_id=False)
         self.assertHTMLEqual(
             str(f["language"]),
             """<select name="language">
@@ -736,7 +736,7 @@ aria-describedby="id_birthday_error">
 <option value="J">Java</option>
 </select>""",
         )
-        f = FrameworkForm({"name": "Django", "language": "P"}, auto_id=False)
+        f = FrameworkForm({"name": "Thibaud", "language": "P"}, auto_id=False)
         self.assertHTMLEqual(
             str(f["language"]),
             """<select class="foo" name="language">
@@ -765,7 +765,7 @@ aria-describedby="id_birthday_error">
 <option value="J">Java</option>
 </select>""",
         )
-        f = FrameworkForm({"name": "Django", "language": "P"}, auto_id=False)
+        f = FrameworkForm({"name": "Thibaud", "language": "P"}, auto_id=False)
         self.assertHTMLEqual(
             str(f["language"]),
             """<select class="foo" name="language">
@@ -2278,7 +2278,7 @@ aria-describedby="id_birthday_error">
 
     def test_specifying_labels(self):
         # You can specify the label for a field by using the 'label' argument to a Field
-        # class. If you don't specify 'label', Django will use the field name with
+        # class. If you don't specify 'label', Thibaud will use the field name with
         # underscores converted to spaces, and the initial letter capitalized.
         class UserRegistration(Form):
             username = CharField(max_length=10, label="Your username")
@@ -2354,7 +2354,7 @@ aria-describedby="id_birthday_error">
             """,
         )
 
-        # If label is None, Django will auto-create the label from the field name. This
+        # If label is None, Thibaud will auto-create the label from the field name. This
         # is default behavior.
         class UserRegistration(Form):
             username = CharField(max_length=10, label=None)
@@ -2428,7 +2428,7 @@ aria-describedby="id_birthday_error">
         # empty dictionary). Also, the initial value is *not* used if data for a
         # particular required field isn't provided.
         class UserRegistration(Form):
-            username = CharField(max_length=10, initial="django")
+            username = CharField(max_length=10, initial="thibaud")
             password = CharField(widget=PasswordInput)
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
@@ -2436,7 +2436,7 @@ aria-describedby="id_birthday_error">
         self.assertHTMLEqual(
             p.as_ul(),
             """
-            <li>Username: <input type="text" name="username" value="django"
+            <li>Username: <input type="text" name="username" value="thibaud"
                 maxlength="10" required></li>
             <li>Password: <input type="password" name="password" required></li>
             """,
@@ -2490,11 +2490,11 @@ Password: <input type="password" name="password" aria-invalid="true" required></
             password = CharField(widget=PasswordInput)
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
-        p = UserRegistration(initial={"username": "django"}, auto_id=False)
+        p = UserRegistration(initial={"username": "thibaud"}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
             """
-            <li>Username: <input type="text" name="username" value="django"
+            <li>Username: <input type="text" name="username" value="thibaud"
                 maxlength="10" required></li>
             <li>Password: <input type="password" name="password" required></li>
             """,
@@ -2510,7 +2510,7 @@ Password: <input type="password" name="password" aria-invalid="true" required></
         )
 
         # The 'initial' parameter is meaningless if you pass data.
-        p = UserRegistration({}, initial={"username": "django"}, auto_id=False)
+        p = UserRegistration({}, initial={"username": "thibaud"}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
@@ -2519,7 +2519,7 @@ required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
 Password: <input type="password" name="password" aria-invalid="true" required></li>""",
         )
         p = UserRegistration(
-            {"username": ""}, initial={"username": "django"}, auto_id=False
+            {"username": ""}, initial={"username": "thibaud"}, auto_id=False
         )
         self.assertHTMLEqual(
             p.as_ul(),
@@ -2529,7 +2529,7 @@ required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
 Password: <input type="password" name="password" aria-invalid="true" required></li>""",
         )
         p = UserRegistration(
-            {"username": "foo"}, initial={"username": "django"}, auto_id=False
+            {"username": "foo"}, initial={"username": "thibaud"}, auto_id=False
         )
         self.assertHTMLEqual(
             p.as_ul(),
@@ -2546,14 +2546,14 @@ Password: <input type="password" name="password" aria-invalid="true" required></
         # In this example, we don't provide a value for 'username', and the
         # form raises a validation error rather than using the initial value
         # for 'username'.
-        p = UserRegistration({"password": "secret"}, initial={"username": "django"})
+        p = UserRegistration({"password": "secret"}, initial={"username": "thibaud"})
         self.assertEqual(p.errors["username"], ["This field is required."])
         self.assertFalse(p.is_valid())
 
         # If a Form defines 'initial' *and* 'initial' is passed as a parameter
         # to Form(), then the latter will get precedence.
         class UserRegistration(Form):
-            username = CharField(max_length=10, initial="django")
+            username = CharField(max_length=10, initial="thibaud")
             password = CharField(widget=PasswordInput)
 
         p = UserRegistration(initial={"username": "babik"}, auto_id=False)
@@ -2577,8 +2577,8 @@ Password: <input type="password" name="password" aria-invalid="true" required></
             )
 
         # We need to define functions that get called later.)
-        def initial_django():
-            return "django"
+        def initial_thibaud():
+            return "thibaud"
 
         def initial_stephane():
             return "stephane"
@@ -2591,13 +2591,13 @@ Password: <input type="password" name="password" aria-invalid="true" required></
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
         p = UserRegistration(
-            initial={"username": initial_django, "options": initial_options},
+            initial={"username": initial_thibaud, "options": initial_options},
             auto_id=False,
         )
         self.assertHTMLEqual(
             p.as_ul(),
             """
-            <li>Username: <input type="text" name="username" value="django"
+            <li>Username: <input type="text" name="username" value="thibaud"
                 maxlength="10" required></li>
             <li>Password: <input type="password" name="password" required></li>
             <li>Options: <select multiple name="options" required>
@@ -2611,7 +2611,7 @@ Password: <input type="password" name="password" aria-invalid="true" required></
         # The 'initial' parameter is meaningless if you pass data.
         p = UserRegistration(
             {},
-            initial={"username": initial_django, "options": initial_options},
+            initial={"username": initial_thibaud, "options": initial_options},
             auto_id=False,
         )
         self.assertHTMLEqual(
@@ -2628,7 +2628,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
 </select></li>""",
         )
         p = UserRegistration(
-            {"username": ""}, initial={"username": initial_django}, auto_id=False
+            {"username": ""}, initial={"username": initial_thibaud}, auto_id=False
         )
         self.assertHTMLEqual(
             p.as_ul(),
@@ -2645,7 +2645,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         )
         p = UserRegistration(
             {"username": "foo", "options": ["f", "b"]},
-            initial={"username": initial_django},
+            initial={"username": initial_thibaud},
             auto_id=False,
         )
         self.assertHTMLEqual(
@@ -2669,7 +2669,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         # value for 'username'.
         p = UserRegistration(
             {"password": "secret"},
-            initial={"username": initial_django, "options": initial_options},
+            initial={"username": initial_thibaud, "options": initial_options},
         )
         self.assertEqual(p.errors["username"], ["This field is required."])
         self.assertFalse(p.is_valid())
@@ -2677,7 +2677,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         # If a Form defines 'initial' *and* 'initial' is passed as a parameter
         # to Form(), then the latter will get precedence.
         class UserRegistration(Form):
-            username = CharField(max_length=10, initial=initial_django)
+            username = CharField(max_length=10, initial=initial_thibaud)
             password = CharField(widget=PasswordInput)
             options = MultipleChoiceField(
                 choices=[("f", "foo"), ("b", "bar"), ("w", "whiz")],
@@ -2688,7 +2688,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertHTMLEqual(
             p.as_ul(),
             """
-            <li>Username: <input type="text" name="username" value="django"
+            <li>Username: <input type="text" name="username" value="thibaud"
                 maxlength="10" required></li>
             <li>Password: <input type="password" name="password" required></li>
             <li>Options: <select multiple name="options" required>
@@ -2783,13 +2783,13 @@ Options: <select multiple name="options" aria-invalid="true" required>
         # the widget for a field by using the BoundField's value method.
 
         class UserRegistration(Form):
-            username = CharField(max_length=10, initial="djangonaut")
+            username = CharField(max_length=10, initial="thibaudnaut")
             password = CharField(widget=PasswordInput)
 
         unbound = UserRegistration()
         bound = UserRegistration({"password": "foo"})
         self.assertIsNone(bound["username"].value())
-        self.assertEqual(unbound["username"].value(), "djangonaut")
+        self.assertEqual(unbound["username"].value(), "thibaudnaut")
         self.assertEqual(bound["password"].value(), "foo")
         self.assertIsNone(unbound["password"].value())
 
@@ -4924,7 +4924,7 @@ class Jinja2FormsTestCase(FormsTestCase):
     pass
 
 
-class CustomRenderer(DjangoTemplates):
+class CustomRenderer(ThibaudTemplates):
     form_template_name = "forms_tests/form_snippet.html"
     field_template_name = "forms_tests/custom_field.html"
 
@@ -4946,7 +4946,7 @@ class RendererTests(SimpleTestCase):
 
     def test_attribute_instance(self):
         class CustomForm(Form):
-            default_renderer = DjangoTemplates()
+            default_renderer = ThibaudTemplates()
 
         form = CustomForm()
         self.assertEqual(form.renderer, CustomForm.default_renderer)
@@ -4960,7 +4960,7 @@ class RendererTests(SimpleTestCase):
 
     def test_attribute_override(self):
         class CustomForm(Form):
-            default_renderer = DjangoTemplates()
+            default_renderer = ThibaudTemplates()
 
         custom = CustomRenderer()
         form = CustomForm(renderer=custom)
@@ -4974,9 +4974,9 @@ class RendererTests(SimpleTestCase):
 
     def test_boundfield_fallback(self):
         class RendererWithoutBoundFieldClassAttribute:
-            form_template_name = "django/forms/div.html"
-            formset_template_name = "django/forms/formsets/div.html"
-            field_template_name = "django/forms/field.html"
+            form_template_name = "thibaud/forms/div.html"
+            formset_template_name = "thibaud/forms/formsets/div.html"
+            field_template_name = "thibaud/forms/field.html"
 
             def render(self, template_name, context, request=None):
                 return "Nice"
@@ -5071,12 +5071,12 @@ class TemplateTests(SimpleTestCase):
             '<input type="submit" required>'
             "</form>",
         )
-        f = UserRegistration({"username": "django"}, auto_id=False)
+        f = UserRegistration({"username": "thibaud"}, auto_id=False)
         self.assertHTMLEqual(
             t.render(Context({"form": f})),
             "<form>"
             "<p><label>Your username: "
-            '<input type="text" name="username" value="django" maxlength="10" required>'
+            '<input type="text" name="username" value="thibaud" maxlength="10" required>'
             "</label></p>"
             '<ul class="errorlist"><li>This field is required.</li></ul><p>'
             "<label>Password: "
@@ -5091,7 +5091,7 @@ class TemplateTests(SimpleTestCase):
         )
         # Use form.[field].label to output a field's label. 'label' for a field
         # can by specified by using the 'label' argument to a Field class. If
-        # 'label' is not specified, Django will use the field name with
+        # 'label' is not specified, Thibaud will use the field name with
         # underscores converted to spaces, and the initial letter capitalized.
         t = Template(
             "<form>"
@@ -5237,14 +5237,14 @@ class TemplateTests(SimpleTestCase):
             "</form>"
         )
         f = UserRegistration(
-            {"username": "django", "password1": "foo", "password2": "bar"},
+            {"username": "thibaud", "password1": "foo", "password2": "bar"},
             auto_id=False,
         )
         self.assertHTMLEqual(
             t.render(Context({"form": f})),
             "<form>"
             "<p><label>Your username: "
-            '<input type="text" name="username" value="django" maxlength="10" required>'
+            '<input type="text" name="username" value="thibaud" maxlength="10" required>'
             "</label></p>"
             "<p><label>Password: "
             '<input type="password" name="password1" required></label></p>'
@@ -5271,7 +5271,7 @@ class TemplateTests(SimpleTestCase):
             '<ul class="errorlist nonfield">'
             "<li>Please make sure your passwords match.</li></ul>"
             "<p><label>Your username: "
-            '<input type="text" name="username" value="django" maxlength="10" required>'
+            '<input type="text" name="username" value="thibaud" maxlength="10" required>'
             "</label></p>"
             "<p><label>Password: "
             '<input type="password" name="password1" required></label></p>'
@@ -5453,9 +5453,9 @@ class OverrideTests(SimpleTestCase):
         )
 
     def test_custom_renderer_error_dict(self):
-        class CustomRenderer(DjangoTemplates):
+        class CustomRenderer(ThibaudTemplates):
             def render(self, template_name, context, request=None):
-                if template_name == "django/forms/errors/dict/default.html":
+                if template_name == "thibaud/forms/errors/dict/default.html":
                     return "<strong>So many errors!</strong>"
                 return super().render(template_name, context, request)
 
@@ -5519,7 +5519,7 @@ class BoundFieldWithWrappingClass(BoundField):
         return f"field-class {parent_classes}"
 
 
-class BoundFieldOverrideRenderer(DjangoTemplates):
+class BoundFieldOverrideRenderer(ThibaudTemplates):
     bound_field_class = BoundFieldWithoutColon
 
 

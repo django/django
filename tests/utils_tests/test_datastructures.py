@@ -1,13 +1,13 @@
 """
-Tests for stuff in django.utils.datastructures.
+Tests for stuff in thibaud.utils.datastructures.
 """
 
 import collections.abc
 import copy
 import pickle
 
-from django.test import SimpleTestCase
-from django.utils.datastructures import (
+from thibaud.test import SimpleTestCase
+from thibaud.utils.datastructures import (
     CaseInsensitiveMapping,
     DictWrapper,
     ImmutableList,

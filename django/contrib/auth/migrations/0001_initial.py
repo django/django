@@ -1,7 +1,7 @@
-import django.contrib.auth.models
-from django.contrib.auth import validators
-from django.db import migrations, models
-from django.utils import timezone
+import thibaud.contrib.auth.models
+from thibaud.contrib.auth import validators
+from thibaud.db import migrations, models
+from thibaud.utils import timezone
 
 
 class Migration(migrations.Migration):
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "permissions",
             },
             managers=[
-                ("objects", django.contrib.auth.models.PermissionManager()),
+                ("objects", thibaud.contrib.auth.models.PermissionManager()),
             ],
         ),
         migrations.CreateModel(
@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "groups",
             },
             managers=[
-                ("objects", django.contrib.auth.models.GroupManager()),
+                ("objects", thibaud.contrib.auth.models.GroupManager()),
             ],
         ),
         migrations.CreateModel(
@@ -198,7 +198,7 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "users",
             },
             managers=[
-                ("objects", django.contrib.auth.models.UserManager()),
+                ("objects", thibaud.contrib.auth.models.UserManager()),
             ],
         ),
     ]

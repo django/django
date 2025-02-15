@@ -1,7 +1,7 @@
-from django.apps import apps
-from django.conf import settings
-from django.db import connection
-from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.db import connection
+from thibaud.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models.tablespaces import (
     Article,

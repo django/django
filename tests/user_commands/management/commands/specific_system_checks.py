@@ -1,5 +1,5 @@
-from django.core.checks import Tags
-from django.core.management.base import BaseCommand
+from thibaud.core.checks import Tags
+from thibaud.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

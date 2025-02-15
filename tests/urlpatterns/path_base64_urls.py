@@ -1,4 +1,4 @@
-from django.urls import include, path, register_converter
+from thibaud.urls import include, path, register_converter
 
 from . import converters, views
 

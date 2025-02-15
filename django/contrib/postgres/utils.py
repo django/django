@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.utils.functional import SimpleLazyObject
-from django.utils.text import format_lazy
+from thibaud.core.exceptions import ValidationError
+from thibaud.utils.functional import SimpleLazyObject
+from thibaud.utils.text import format_lazy
 
 
 def prefix_validation_error(error, prefix, code, params):

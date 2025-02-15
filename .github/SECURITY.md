@@ -1,3 +1,3 @@
-# Django Security Policies
+# Thibaud Security Policies
 
-Please see https://www.djangoproject.com/security/.
+Please see https://www.thibaudproject.com/security/.

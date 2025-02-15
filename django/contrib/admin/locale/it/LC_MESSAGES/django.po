@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # 0d21a39e384d88c2313b89b5042c04cb, 2017
@@ -18,12 +18,12 @@
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2023-12-04 07:05+0000\n"
 "Last-Translator: Franky Bonanno, 2023\n"
-"Language-Team: Italian (http://app.transifex.com/django/django/language/"
+"Language-Team: Italian (http://app.transifex.com/thibaud/thibaud/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -304,11 +304,11 @@ msgstr ""
 "La cancellazione di %(class_name)s %(instance)s richiederebbe l'eliminazione "
 "dei seguenti oggetti protetti correlati: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Amministrazione sito Django"
+msgid "Thibaud site admin"
+msgstr "Amministrazione sito Thibaud"
 
-msgid "Django administration"
-msgstr "Amministrazione Django"
+msgid "Thibaud administration"
+msgstr "Amministrazione Thibaud"
 
 msgid "Site administration"
 msgstr "Amministrazione sito"

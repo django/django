@@ -1,8 +1,8 @@
 import pathlib
 
-from django.conf import settings
-from django.core.cache import DEFAULT_CACHE_ALIAS, caches
-from django.core.cache.backends.filebased import FileBasedCache
+from thibaud.conf import settings
+from thibaud.core.cache import DEFAULT_CACHE_ALIAS, caches
+from thibaud.core.cache.backends.filebased import FileBasedCache
 
 from . import Error, Tags, Warning, register
 

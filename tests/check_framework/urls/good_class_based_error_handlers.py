@@ -1,4 +1,4 @@
-from django.views.generic import View
+from thibaud.views.generic import View
 
 urlpatterns = []
 

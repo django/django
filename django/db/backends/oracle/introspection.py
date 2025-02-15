@@ -2,10 +2,10 @@ from collections import namedtuple
 
 import oracledb
 
-from django.db import models
-from django.db.backends.base.introspection import BaseDatabaseIntrospection
-from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
-from django.db.backends.base.introspection import TableInfo as BaseTableInfo
+from thibaud.db import models
+from thibaud.db.backends.base.introspection import BaseDatabaseIntrospection
+from thibaud.db.backends.base.introspection import FieldInfo as BaseFieldInfo
+from thibaud.db.backends.base.introspection import TableInfo as BaseTableInfo
 
 FieldInfo = namedtuple(
     "FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json", "comment")
@@ -16,7 +16,7 @@ TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     cache_bust_counter = 1
 
-    # Maps type objects to Django Field types.
+    # Maps type objects to Thibaud Field types.
     data_types_reverse = {
         oracledb.DB_TYPE_DATE: "DateField",
         oracledb.DB_TYPE_BINARY_DOUBLE: "FloatField",

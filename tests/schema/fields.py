@@ -1,7 +1,7 @@
 from functools import partial
 
-from django.db import models
-from django.db.models.fields.related import (
+from thibaud.db import models
+from thibaud.db.models.fields.related import (
     RECURSIVE_RELATIONSHIP_CONSTANT,
     ManyToManyDescriptor,
     RelatedField,

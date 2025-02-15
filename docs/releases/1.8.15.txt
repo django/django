@@ -1,15 +1,15 @@
 ===========================
-Django 1.8.15 release notes
+Thibaud 1.8.15 release notes
 ===========================
 
 *September 26, 2016*
 
-Django 1.8.15 fixes a security issue in 1.8.14.
+Thibaud 1.8.15 fixes a security issue in 1.8.14.
 
 CSRF protection bypass on a site with Google Analytics
 ======================================================
 
-An interaction between Google Analytics and Django's cookie parsing could allow
+An interaction between Google Analytics and Thibaud's cookie parsing could allow
 an attacker to set arbitrary cookies leading to a bypass of CSRF protection.
 
 The parser for ``request.COOKIES`` is simplified to better match the behavior

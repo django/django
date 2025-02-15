@@ -1,16 +1,16 @@
 ===========================
-Django 3.2.22 release notes
+Thibaud 3.2.22 release notes
 ===========================
 
 *October 4, 2023*
 
-Django 3.2.22 fixes a security issue with severity "moderate" in 3.2.21.
+Thibaud 3.2.22 fixes a security issue with severity "moderate" in 3.2.21.
 
-CVE-2023-43665: Denial-of-service possibility in ``django.utils.text.Truncator``
+CVE-2023-43665: Denial-of-service possibility in ``thibaud.utils.text.Truncator``
 ================================================================================
 
 Following the fix for :cve:`2019-14232`, the regular expressions used in the
-implementation of ``django.utils.text.Truncator``'s ``chars()`` and ``words()``
+implementation of ``thibaud.utils.text.Truncator``'s ``chars()`` and ``words()``
 methods (with ``html=True``) were revised and improved. However, these regular
 expressions still exhibited linear backtracking complexity, so when given a
 very long, potentially malformed HTML input, the evaluation would still be

@@ -1,9 +1,9 @@
-from django.db.backends.sqlite3._functions import (
+from thibaud.db.backends.sqlite3._functions import (
     _sqlite_date_trunc,
     _sqlite_datetime_trunc,
     _sqlite_time_trunc,
 )
-from django.test import SimpleTestCase
+from thibaud.test import SimpleTestCase
 
 
 class FunctionTests(SimpleTestCase):

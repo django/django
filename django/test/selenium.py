@@ -4,11 +4,11 @@ from contextlib import contextmanager
 from functools import wraps
 from pathlib import Path
 
-from django.conf import settings
-from django.test import LiveServerTestCase, override_settings, tag
-from django.utils.functional import classproperty
-from django.utils.module_loading import import_string
-from django.utils.text import capfirst
+from thibaud.conf import settings
+from thibaud.test import LiveServerTestCase, override_settings, tag
+from thibaud.utils.functional import classproperty
+from thibaud.utils.module_loading import import_string
+from thibaud.utils.text import capfirst
 
 
 class SeleniumTestCaseBase(type(LiveServerTestCase)):

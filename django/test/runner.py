@@ -18,17 +18,17 @@ from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
 
-import django
-from django.core.management import call_command
-from django.db import connections
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import NullTimeKeeper, TimeKeeper, iter_test_cases
-from django.test.utils import setup_databases as _setup_databases
-from django.test.utils import setup_test_environment
-from django.test.utils import teardown_databases as _teardown_databases
-from django.test.utils import teardown_test_environment
-from django.utils.datastructures import OrderedSet
-from django.utils.version import PY313
+import thibaud
+from thibaud.core.management import call_command
+from thibaud.db import connections
+from thibaud.test import SimpleTestCase, TestCase
+from thibaud.test.utils import NullTimeKeeper, TimeKeeper, iter_test_cases
+from thibaud.test.utils import setup_databases as _setup_databases
+from thibaud.test.utils import setup_test_environment
+from thibaud.test.utils import teardown_databases as _teardown_databases
+from thibaud.test.utils import teardown_test_environment
+from thibaud.utils.datastructures import OrderedSet
+from thibaud.utils.version import PY313
 
 try:
     import ipdb as pdb
@@ -43,7 +43,7 @@ except ImportError:
 
 class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
-        self.logger = logging.getLogger("django.db.backends")
+        self.logger = logging.getLogger("thibaud.db.backends")
         self.logger.setLevel(logging.DEBUG)
         self.debug_sql_stream = None
         super().__init__(stream, descriptions, verbosity)
@@ -436,7 +436,7 @@ def _init_worker(
             if process_setup_args is None:
                 process_setup_args = ()
             process_setup(*process_setup_args)
-        django.setup()
+        thibaud.setup()
         setup_test_environment(debug=debug_mode)
 
     db_aliases = used_aliases if used_aliases is not None else connections
@@ -657,7 +657,7 @@ class Shuffler:
 
 
 class DiscoverRunner:
-    """A Django test runner that uses unittest2 test discovery."""
+    """A Thibaud test runner that uses unittest2 test discovery."""
 
     test_suite = unittest.TestSuite
     parallel_test_suite = ParallelTestSuite

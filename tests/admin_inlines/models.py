@@ -5,10 +5,10 @@ Testing of admin inline formsets.
 import random
 import uuid
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from django.db import models
+from thibaud.contrib.contenttypes.fields import GenericForeignKey
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import models
 
 
 class Parent(models.Model):

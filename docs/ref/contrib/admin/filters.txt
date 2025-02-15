@@ -4,7 +4,7 @@
 ``ModelAdmin`` List Filters
 ===========================
 
-.. currentmodule:: django.contrib.admin
+.. currentmodule:: thibaud.contrib.admin
 
 ``ModelAdmin`` classes can define list filters that appear in the right sidebar
 of the change list page of the admin, as illustrated in the following
@@ -16,9 +16,9 @@ To activate per-field filtering, set :attr:`ModelAdmin.list_filter` to a list
 or tuple of elements, where each element is one of the following types:
 
 - A field name.
-- A subclass of ``django.contrib.admin.SimpleListFilter``.
+- A subclass of ``thibaud.contrib.admin.SimpleListFilter``.
 - A 2-tuple containing a field name and a subclass of
-  ``django.contrib.admin.FieldListFilter``.
+  ``thibaud.contrib.admin.FieldListFilter``.
 
 See the examples below for discussion of each of these options for defining
 ``list_filter``.
@@ -45,14 +45,14 @@ Using a ``SimpleListFilter``
 ============================
 
 For custom filtering, you can define your own list filter by subclassing
-``django.contrib.admin.SimpleListFilter``. You need to provide the ``title``
+``thibaud.contrib.admin.SimpleListFilter``. You need to provide the ``title``
 and ``parameter_name`` attributes, and override the ``lookups`` and
 ``queryset`` methods, e.g.::
 
     from datetime import date
 
-    from django.contrib import admin
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.contrib import admin
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     class DecadeBornListFilter(admin.SimpleListFilter):
@@ -141,7 +141,7 @@ Using a field name and an explicit ``FieldListFilter``
 Finally, if you wish to specify an explicit filter type to use with a field you
 may provide a ``list_filter`` item as a 2-tuple, where the first element is a
 field name and the second element is a class inheriting from
-``django.contrib.admin.FieldListFilter``, for example::
+``thibaud.contrib.admin.FieldListFilter``, for example::
 
     class PersonAdmin(admin.ModelAdmin):
         list_filter = [
@@ -197,7 +197,7 @@ the separator::
 
 .. note::
 
-    The :class:`~django.contrib.contenttypes.fields.GenericForeignKey` field is
+    The :class:`~thibaud.contrib.contenttypes.fields.GenericForeignKey` field is
     not supported.
 
 List filters typically appear only if the filter has more than one choice. A
@@ -208,7 +208,7 @@ It is possible to specify a custom template for rendering a list filter::
     class FilterWithCustomTemplate(admin.SimpleListFilter):
         template = "custom_template.html"
 
-See the default template provided by Django (``admin/filter.html``) for a
+See the default template provided by Thibaud (``admin/filter.html``) for a
 concrete example.
 
 .. _facet-filters:

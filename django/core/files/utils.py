@@ -1,7 +1,7 @@
 import os
 import pathlib
 
-from django.core.exceptions import SuspiciousFileOperation
+from thibaud.core.exceptions import SuspiciousFileOperation
 
 
 def validate_file_name(name, allow_relative_path=False):

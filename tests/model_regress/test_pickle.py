@@ -1,18 +1,18 @@
 import pickle
 
-import django
-from django.db import DJANGO_VERSION_PICKLE_KEY, models
-from django.test import SimpleTestCase
+import thibaud
+from thibaud.db import DJANGO_VERSION_PICKLE_KEY, models
+from thibaud.test import SimpleTestCase
 
 
 class ModelPickleTests(SimpleTestCase):
-    def test_missing_django_version_unpickling(self):
+    def test_missing_thibaud_version_unpickling(self):
         """
         #21430 -- Verifies a warning is raised for models that are
-        unpickled without a Django version
+        unpickled without a Thibaud version
         """
 
-        class MissingDjangoVersion(models.Model):
+        class MissingThibaudVersion(models.Model):
             title = models.CharField(max_length=10)
 
             def __reduce__(self):
@@ -21,18 +21,18 @@ class ModelPickleTests(SimpleTestCase):
                 del data[DJANGO_VERSION_PICKLE_KEY]
                 return reduce_list
 
-        p = MissingDjangoVersion(title="FooBar")
-        msg = "Pickled model instance's Django version is not specified."
+        p = MissingThibaudVersion(title="FooBar")
+        msg = "Pickled model instance's Thibaud version is not specified."
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
 
     def test_unsupported_unpickle(self):
         """
         #21430 -- Verifies a warning is raised for models that are
-        unpickled with a different Django version than the current
+        unpickled with a different Thibaud version than the current
         """
 
-        class DifferentDjangoVersion(models.Model):
+        class DifferentThibaudVersion(models.Model):
             title = models.CharField(max_length=10)
 
             def __reduce__(self):
@@ -41,10 +41,10 @@ class ModelPickleTests(SimpleTestCase):
                 data[DJANGO_VERSION_PICKLE_KEY] = "1.0"
                 return reduce_list
 
-        p = DifferentDjangoVersion(title="FooBar")
+        p = DifferentThibaudVersion(title="FooBar")
         msg = (
-            "Pickled model instance's Django version 1.0 does not match the "
-            "current version %s." % django.__version__
+            "Pickled model instance's Thibaud version 1.0 does not match the "
+            "current version %s." % thibaud.__version__
         )
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))

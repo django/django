@@ -1,6 +1,6 @@
-from django.http import HttpRequest
-from django.template.context_processors import csrf
-from django.test import SimpleTestCase
+from thibaud.http import HttpRequest
+from thibaud.template.context_processors import csrf
+from thibaud.test import SimpleTestCase
 
 from .tests import CsrfFunctionTestMixin
 

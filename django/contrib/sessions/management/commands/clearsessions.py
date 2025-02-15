@@ -1,7 +1,7 @@
 from importlib import import_module
 
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from thibaud.conf import settings
+from thibaud.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):

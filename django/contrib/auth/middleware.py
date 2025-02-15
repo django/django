@@ -3,15 +3,15 @@ from urllib.parse import urlsplit
 
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
-from django.conf import settings
-from django.contrib import auth
-from django.contrib.auth import REDIRECT_FIELD_NAME, load_backend
-from django.contrib.auth.backends import RemoteUserBackend
-from django.contrib.auth.views import redirect_to_login
-from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import resolve_url
-from django.utils.deprecation import MiddlewareMixin
-from django.utils.functional import SimpleLazyObject
+from thibaud.conf import settings
+from thibaud.contrib import auth
+from thibaud.contrib.auth import REDIRECT_FIELD_NAME, load_backend
+from thibaud.contrib.auth.backends import RemoteUserBackend
+from thibaud.contrib.auth.views import redirect_to_login
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.shortcuts import resolve_url
+from thibaud.utils.deprecation import MiddlewareMixin
+from thibaud.utils.functional import SimpleLazyObject
 
 
 def get_user(request):
@@ -30,11 +30,11 @@ class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if not hasattr(request, "session"):
             raise ImproperlyConfigured(
-                "The Django authentication middleware requires session "
+                "The Thibaud authentication middleware requires session "
                 "middleware to be installed. Edit your MIDDLEWARE setting to "
                 "insert "
-                "'django.contrib.sessions.middleware.SessionMiddleware' before "
-                "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+                "'thibaud.contrib.sessions.middleware.SessionMiddleware' before "
+                "'thibaud.contrib.auth.middleware.AuthenticationMiddleware'."
             )
         request.user = SimpleLazyObject(lambda: get_user(request))
         request.auser = partial(auser, request)
@@ -63,7 +63,7 @@ class LoginRequiredMiddleware(MiddlewareMixin):
         if not login_url:
             raise ImproperlyConfigured(
                 "No login URL to redirect to. Define settings.LOGIN_URL or "
-                "provide a login_url via the 'django.contrib.auth.decorators."
+                "provide a login_url via the 'thibaud.contrib.auth.decorators."
                 "login_required' decorator."
             )
         return str(login_url)
@@ -131,10 +131,10 @@ class RemoteUserMiddleware:
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, "user"):
             raise ImproperlyConfigured(
-                "The Django remote user auth middleware requires the"
+                "The Thibaud remote user auth middleware requires the"
                 " authentication middleware to be installed.  Edit your"
                 " MIDDLEWARE setting to insert"
-                " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
+                " 'thibaud.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class."
             )
         try:
@@ -171,10 +171,10 @@ class RemoteUserMiddleware:
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, "user"):
             raise ImproperlyConfigured(
-                "The Django remote user auth middleware requires the"
+                "The Thibaud remote user auth middleware requires the"
                 " authentication middleware to be installed.  Edit your"
                 " MIDDLEWARE setting to insert"
-                " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
+                " 'thibaud.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class."
             )
         try:
@@ -265,7 +265,7 @@ class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     the ``request.META`` key is not found in the request. Useful for
     setups when the external authentication is only expected to happen
     on some "logon" URL and the rest of the application wants to use
-    Django's authentication mechanism.
+    Thibaud's authentication mechanism.
     """
 
     force_logout_if_no_header = False

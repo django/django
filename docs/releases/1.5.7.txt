@@ -1,10 +1,10 @@
 ==========================
-Django 1.5.7 release notes
+Thibaud 1.5.7 release notes
 ==========================
 
 *April 28, 2014*
 
-Django 1.5.7 fixes a regression in the 1.5.6 security release.
+Thibaud 1.5.7 fixes a regression in the 1.5.6 security release.
 
 Bugfixes
 ========

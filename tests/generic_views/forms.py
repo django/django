@@ -1,4 +1,4 @@
-from django import forms
+from thibaud import forms
 
 from .models import Author
 

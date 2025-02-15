@@ -1,13 +1,13 @@
 import os
 
-from django.apps import apps
-from django.contrib.staticfiles.finders import get_finders
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.checks import Tags
-from django.core.files.storage import FileSystemStorage
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management.color import no_style
-from django.utils.functional import cached_property
+from thibaud.apps import apps
+from thibaud.contrib.staticfiles.finders import get_finders
+from thibaud.contrib.staticfiles.storage import staticfiles_storage
+from thibaud.core.checks import Tags
+from thibaud.core.files.storage import FileSystemStorage
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.core.management.color import no_style
+from thibaud.utils.functional import cached_property
 
 
 class Command(BaseCommand):

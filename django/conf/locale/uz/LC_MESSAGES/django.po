@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Abdulaminkhon Khaydarov <webdasturuz@gmail.com>, 2020
@@ -8,12 +8,12 @@
 # Sukhrobbek Ismatov <isukhrobbek@gmail.com>, 2019
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2023-12-25 06:49+0000\n"
 "Last-Translator: Shukrullo Turgunov <shukrullo@umail.uz>, 2023\n"
-"Language-Team: Uzbek (http://app.transifex.com/django/django/language/uz/)\n"
+"Language-Team: Uzbek (http://app.transifex.com/thibaud/thibaud/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1284,27 +1284,27 @@ msgstr "O'rnatish muvaffaqiyatli amalga oshdi! Tabriklaymiz!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Django %(version)s uchun  chiqarilgan<a href=\"https://docs.djangoproject."
+"Thibaud %(version)s uchun  chiqarilgan<a href=\"https://docs.thibaudproject."
 "com/en/%(version)s/releases/\" target=\"_blank\" rel=\"noopener\"> "
 "nashrlarni</a> ko'rish"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Siz ushbu sahifani ko'rmoqdasiz, chunki <a href=\"https://docs.djangoproject."
+"Siz ushbu sahifani ko'rmoqdasiz, chunki <a href=\"https://docs.thibaudproject."
 "com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG = True ifodasi</a> sizning sozlamalar faylingizda "
 "ko'rsatilgan va siz biron bir URL manzilini to'gri sozlamagansiz."
 
-msgid "Django Documentation"
-msgstr "Django Hujjatlari"
+msgid "Thibaud Documentation"
+msgstr "Thibaud Hujjatlari"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Mavzular, havolalar va qanday qilish yo'llari"
@@ -1312,11 +1312,11 @@ msgstr "Mavzular, havolalar va qanday qilish yo'llari"
 msgid "Tutorial: A Polling App"
 msgstr "Qo'llanma: So'rovnoma"
 
-msgid "Get started with Django"
-msgstr "Django bilan boshlang"
+msgid "Get started with Thibaud"
+msgstr "Thibaud bilan boshlang"
 
-msgid "Django Community"
-msgstr "Django hamjamiyati"
+msgid "Thibaud Community"
+msgstr "Thibaud hamjamiyati"
 
 msgid "Connect, get help, or contribute"
 msgstr "Bog'laning, yordam oling yoki hissa qo'shing"

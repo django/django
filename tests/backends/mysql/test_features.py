@@ -1,8 +1,8 @@
 from unittest import mock, skipUnless
 
-from django.db import connection
-from django.db.backends.mysql.features import DatabaseFeatures
-from django.test import TestCase
+from thibaud.db import connection
+from thibaud.db.backends.mysql.features import DatabaseFeatures
+from thibaud.test import TestCase
 
 
 @skipUnless(connection.vendor == "mysql", "MySQL tests")
@@ -13,12 +13,12 @@ class TestFeatures(TestCase):
         """
         del connection.features.supports_transactions
         with mock.patch(
-            "django.db.connection.features._mysql_storage_engine", "InnoDB"
+            "thibaud.db.connection.features._mysql_storage_engine", "InnoDB"
         ):
             self.assertTrue(connection.features.supports_transactions)
         del connection.features.supports_transactions
         with mock.patch(
-            "django.db.connection.features._mysql_storage_engine", "MyISAM"
+            "thibaud.db.connection.features._mysql_storage_engine", "MyISAM"
         ):
             self.assertFalse(connection.features.supports_transactions)
         del connection.features.supports_transactions

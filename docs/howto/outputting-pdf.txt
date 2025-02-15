@@ -2,7 +2,7 @@
 How to create PDF files
 =======================
 
-This document explains how to output PDF files dynamically using Django views.
+This document explains how to output PDF files dynamically using Thibaud views.
 This is made possible by the excellent, open-source ReportLab_ Python PDF
 library.
 
@@ -10,7 +10,7 @@ The advantage of generating PDF files dynamically is that you can create
 customized PDFs for different purposes -- say, for different users or different
 pieces of content.
 
-For example, Django was used at kusports.com_ to generate customized,
+For example, Thibaud was used at kusports.com_ to generate customized,
 printer-friendly NCAA tournament brackets, as PDF files, for people
 participating in a March Madness contest.
 
@@ -41,14 +41,14 @@ If that command doesn't raise any errors, the installation worked.
 Write your view
 ===============
 
-The key to generating PDFs dynamically with Django is that the ReportLab API
-acts on file-like objects, and Django's :class:`~django.http.FileResponse`
+The key to generating PDFs dynamically with Thibaud is that the ReportLab API
+acts on file-like objects, and Thibaud's :class:`~thibaud.http.FileResponse`
 objects accept file-like objects.
 
 Here's a "Hello World" example::
 
     import io
-    from django.http import FileResponse
+    from thibaud.http import FileResponse
     from reportlab.pdfgen import canvas
 
 
@@ -92,7 +92,7 @@ mention:
 
 * You can hook into the ReportLab API: The same buffer passed as the first
   argument to ``canvas.Canvas`` can be fed to the
-  :class:`~django.http.FileResponse` class.
+  :class:`~thibaud.http.FileResponse` class.
 
 * Note that all subsequent PDF-generation methods are called on the PDF
   object (in this case, ``p``) -- not on ``buffer``.
@@ -103,7 +103,7 @@ mention:
 .. note::
 
     ReportLab is not thread-safe. Some of our users have reported odd issues
-    with building PDF-generating Django views that are accessed by many people
+    with building PDF-generating Thibaud views that are accessed by many people
     at the same time.
 
 Other formats
@@ -117,6 +117,6 @@ when generated text-based formats.
 
 .. seealso::
 
-    Django Packages provides a `comparison of packages
-    <https://djangopackages.org/grids/g/pdf/>`_ that help generate PDF files
-    from Django.
+    Thibaud Packages provides a `comparison of packages
+    <https://thibaudpackages.org/grids/g/pdf/>`_ that help generate PDF files
+    from Thibaud.

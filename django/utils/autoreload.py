@@ -14,19 +14,19 @@ from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
 
-import django
-from django.apps import apps
-from django.core.signals import request_finished
-from django.dispatch import Signal
-from django.utils.functional import cached_property
-from django.utils.version import get_version_tuple
+import thibaud
+from thibaud.apps import apps
+from thibaud.core.signals import request_finished
+from thibaud.dispatch import Signal
+from thibaud.utils.functional import cached_property
+from thibaud.utils.version import get_version_tuple
 
 autoreload_started = Signal()
 file_changed = Signal()
 
 DJANGO_AUTORELOAD_ENV = "RUN_MAIN"
 
-logger = logging.getLogger("django.utils.autoreload")
+logger = logging.getLogger("thibaud.utils.autoreload")
 
 # If an error is raised while importing a file, it's not placed in sys.modules.
 # This means that any future modifications aren't caught. Keep a list of these
@@ -46,14 +46,14 @@ except ImportError:
     pywatchman = None
 
 
-def is_django_module(module):
-    """Return True if the given module is nested under Django."""
-    return module.__name__.startswith("django.")
+def is_thibaud_module(module):
+    """Return True if the given module is nested under Thibaud."""
+    return module.__name__.startswith("thibaud.")
 
 
-def is_django_path(path):
-    """Return True if the given file path is nested under Django."""
-    return Path(django.__file__).parent in Path(path).parents
+def is_thibaud_path(path):
+    """Return True if the given file path is nested under Thibaud."""
+    return Path(thibaud.__file__).parent in Path(path).parents
 
 
 def check_errors(fn):
@@ -308,9 +308,9 @@ class BaseReloader:
                 for pattern in patterns:
                     yield from directory.glob(pattern)
 
-    def wait_for_apps_ready(self, app_reg, django_main_thread):
+    def wait_for_apps_ready(self, app_reg, thibaud_main_thread):
         """
-        Wait until Django reports that the apps have been loaded. If the given
+        Wait until Thibaud reports that the apps have been loaded. If the given
         thread has terminated before the apps are ready, then a SyntaxError or
         other non-recoverable error has been raised. In that case, stop waiting
         for the apps_ready event and continue processing.
@@ -319,17 +319,17 @@ class BaseReloader:
         triggered, or False if the thread is terminated while waiting for the
         event.
         """
-        while django_main_thread.is_alive():
+        while thibaud_main_thread.is_alive():
             if app_reg.ready_event.wait(timeout=0.1):
                 return True
         else:
-            logger.debug("Main Django thread has terminated before apps are ready.")
+            logger.debug("Main Thibaud thread has terminated before apps are ready.")
             return False
 
-    def run(self, django_main_thread):
+    def run(self, thibaud_main_thread):
         logger.debug("Waiting for apps ready_event.")
-        self.wait_for_apps_ready(apps, django_main_thread)
-        from django.urls import get_resolver
+        self.wait_for_apps_ready(apps, thibaud_main_thread)
+        from thibaud.urls import get_resolver
 
         # Prevent a race condition where URL modules aren't loaded when the
         # reloader starts by accessing the urlconf_module property.
@@ -646,18 +646,18 @@ def get_reloader():
     return WatchmanReloader()
 
 
-def start_django(reloader, main_func, *args, **kwargs):
+def start_thibaud(reloader, main_func, *args, **kwargs):
     ensure_echo_on()
 
     main_func = check_errors(main_func)
-    django_main_thread = threading.Thread(
-        target=main_func, args=args, kwargs=kwargs, name="django-main-thread"
+    thibaud_main_thread = threading.Thread(
+        target=main_func, args=args, kwargs=kwargs, name="thibaud-main-thread"
     )
-    django_main_thread.daemon = True
-    django_main_thread.start()
+    thibaud_main_thread.daemon = True
+    thibaud_main_thread.start()
 
     while not reloader.should_stop:
-        reloader.run(django_main_thread)
+        reloader.run(thibaud_main_thread)
 
 
 def run_with_reloader(main_func, *args, **kwargs):
@@ -668,7 +668,7 @@ def run_with_reloader(main_func, *args, **kwargs):
             logger.info(
                 "Watching for file changes with %s", reloader.__class__.__name__
             )
-            start_django(reloader, main_func, *args, **kwargs)
+            start_thibaud(reloader, main_func, *args, **kwargs)
         else:
             exit_code = restart_with_reloader()
             sys.exit(exit_code)

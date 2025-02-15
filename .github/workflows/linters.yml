@@ -51,7 +51,7 @@ jobs:
         uses: liskin/gh-problem-matcher-wrap@e7b7beaaafa52524748b31a381160759d68d61fb
         with:
           linters: isort
-          run: isort --check --diff django tests scripts
+          run: isort --check --diff thibaud tests scripts
 
   black:
     runs-on: ubuntu-latest

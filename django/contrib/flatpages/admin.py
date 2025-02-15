@@ -1,7 +1,7 @@
-from django.contrib import admin
-from django.contrib.flatpages.forms import FlatpageForm
-from django.contrib.flatpages.models import FlatPage
-from django.utils.translation import gettext_lazy as _
+from thibaud.contrib import admin
+from thibaud.contrib.flatpages.forms import FlatpageForm
+from thibaud.contrib.flatpages.models import FlatPage
+from thibaud.utils.translation import gettext_lazy as _
 
 
 @admin.register(FlatPage)

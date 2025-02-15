@@ -9,14 +9,14 @@ import os
 import pathlib
 from urllib.parse import urljoin
 
-from django.conf import settings
-from django.core.files.base import ContentFile
-from django.core.signals import setting_changed
-from django.utils._os import safe_join
-from django.utils.deconstruct import deconstructible
-from django.utils.encoding import filepath_to_uri
-from django.utils.functional import cached_property
-from django.utils.timezone import now
+from thibaud.conf import settings
+from thibaud.core.files.base import ContentFile
+from thibaud.core.signals import setting_changed
+from thibaud.utils._os import safe_join
+from thibaud.utils.deconstruct import deconstructible
+from thibaud.utils.encoding import filepath_to_uri
+from thibaud.utils.functional import cached_property
+from thibaud.utils.timezone import now
 
 from .base import Storage
 from .mixins import StorageSettingsMixin
@@ -164,7 +164,7 @@ class InMemoryDirNode(TimingMixin):
             del self._children[name]
 
 
-@deconstructible(path="django.core.files.storage.InMemoryStorage")
+@deconstructible(path="thibaud.core.files.storage.InMemoryStorage")
 class InMemoryStorage(Storage, StorageSettingsMixin):
     """A storage saving files in memory."""
 

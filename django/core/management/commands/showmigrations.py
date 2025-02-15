@@ -1,10 +1,10 @@
 import sys
 
-from django.apps import apps
-from django.core.management.base import BaseCommand
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.recorder import MigrationRecorder
+from thibaud.apps import apps
+from thibaud.core.management.base import BaseCommand
+from thibaud.db import DEFAULT_DB_ALIAS, connections
+from thibaud.db.migrations.loader import MigrationLoader
+from thibaud.db.migrations.recorder import MigrationRecorder
 
 
 class Command(BaseCommand):

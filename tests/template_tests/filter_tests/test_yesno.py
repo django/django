@@ -1,5 +1,5 @@
-from django.template.defaultfilters import yesno
-from django.test import SimpleTestCase
+from thibaud.template.defaultfilters import yesno
+from thibaud.test import SimpleTestCase
 
 from ..utils import setup
 

@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
-from django.test.utils import override_settings
+from thibaud.conf import settings
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.auth.tokens import PasswordResetTokenGenerator
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.test import TestCase
+from thibaud.test.utils import override_settings
 
 from .models import CustomEmailField
 

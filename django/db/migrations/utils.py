@@ -2,7 +2,7 @@ import datetime
 import re
 from collections import namedtuple
 
-from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
+from thibaud.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 
 FieldReference = namedtuple("FieldReference", "to through")
 

@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from thibaud.urls import path, re_path
 
 from .views import empty_view
 

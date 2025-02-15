@@ -1,13 +1,13 @@
 import json
 
-from django.contrib.postgres import lookups
-from django.contrib.postgres.forms import SimpleArrayField
-from django.contrib.postgres.validators import ArrayMaxLengthValidator
-from django.core import checks, exceptions
-from django.db.models import Field, Func, IntegerField, Transform, Value
-from django.db.models.fields.mixins import CheckFieldDefaultMixin
-from django.db.models.lookups import Exact, In
-from django.utils.translation import gettext_lazy as _
+from thibaud.contrib.postgres import lookups
+from thibaud.contrib.postgres.forms import SimpleArrayField
+from thibaud.contrib.postgres.validators import ArrayMaxLengthValidator
+from thibaud.core import checks, exceptions
+from thibaud.db.models import Field, Func, IntegerField, Transform, Value
+from thibaud.db.models.fields.mixins import CheckFieldDefaultMixin
+from thibaud.db.models.lookups import Exact, In
+from thibaud.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
 from .utils import AttributeSetter
@@ -132,8 +132,8 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        if path == "django.contrib.postgres.fields.array.ArrayField":
-            path = "django.contrib.postgres.fields.ArrayField"
+        if path == "thibaud.contrib.postgres.fields.array.ArrayField":
+            path = "thibaud.contrib.postgres.fields.ArrayField"
         kwargs.update(
             {
                 "base_field": self.base_field.clone(),

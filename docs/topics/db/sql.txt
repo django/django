@@ -2,9 +2,9 @@
 Performing raw SQL queries
 ==========================
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
-Django gives you two ways of performing raw SQL queries: you can use
+Thibaud gives you two ways of performing raw SQL queries: you can use
 :meth:`Manager.raw()` to `perform raw queries and return model instances`__, or
 you can avoid the model layer entirely and `execute custom SQL directly`__.
 
@@ -13,7 +13,7 @@ __ `executing custom SQL directly`_
 
 .. admonition:: Explore the ORM before using raw SQL!
 
-    The Django ORM provides many tools to express queries without writing raw
+    The Thibaud ORM provides many tools to express queries without writing raw
     SQL. For example:
 
     * The :doc:`QuerySet API </ref/models/querysets>` is extensive.
@@ -45,8 +45,8 @@ return model instances:
 .. method:: Manager.raw(raw_query, params=(), translations=None)
 
 This method takes a raw SQL query, executes it, and returns a
-``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
-can be iterated over like a normal :class:`~django.db.models.query.QuerySet` to
+``thibaud.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
+can be iterated over like a normal :class:`~thibaud.db.models.query.QuerySet` to
 provide object instances.
 
 This is best illustrated with an example. Suppose you have the following model::
@@ -74,7 +74,7 @@ make it very powerful.
 
     Where did the name of the ``Person`` table come from in that example?
 
-    By default, Django figures out a database table name by joining the
+    By default, Thibaud figures out a database table name by joining the
     model's "app label" -- the name you used in ``manage.py startapp`` -- to
     the model's class name, with an underscore between them. In the example
     we've assumed that the ``Person`` model lives in an app named ``myapp``,
@@ -87,7 +87,7 @@ make it very powerful.
 .. warning::
 
     No checking is done on the SQL statement that is passed in to ``.raw()``.
-    Django expects that the statement will return a set of rows from the
+    Thibaud expects that the statement will return a set of rows from the
     database, but does nothing to enforce that. If the query does not
     return rows, a (possibly cryptic) error will result.
 
@@ -170,7 +170,7 @@ Fields may also be left out:
     >>> people = Person.objects.raw("SELECT id, first_name FROM myapp_person")
 
 The ``Person`` objects returned by this query will be deferred model instances
-(see :meth:`~django.db.models.query.QuerySet.defer()`). This means that the
+(see :meth:`~thibaud.db.models.query.QuerySet.defer()`). This means that the
 fields that are omitted from the query will be loaded on demand. For example:
 
 .. code-block:: pycon
@@ -190,9 +190,9 @@ queries. Only the first names were retrieved by the ``raw()`` query -- the
 last names were both retrieved on demand when they were printed.
 
 There is only one field that you can't leave out - the primary key
-field. Django uses the primary key to identify model instances, so it
+field. Thibaud uses the primary key to identify model instances, so it
 must always be included in a raw query. A
-:class:`~django.core.exceptions.FieldDoesNotExist` exception will be raised if
+:class:`~thibaud.core.exceptions.FieldDoesNotExist` exception will be raised if
 you forget to include the primary key.
 
 Adding annotations
@@ -280,7 +280,7 @@ perform queries that don't map cleanly to models, or directly execute
 In these cases, you can always access the database directly, routing around
 the model layer entirely.
 
-The object ``django.db.connection`` represents the default database
+The object ``thibaud.db.connection`` represents the default database
 connection. To use the database connection, call ``connection.cursor()`` to
 get a cursor object. Then, call ``cursor.execute(sql, [params])`` to execute
 the SQL and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return the
@@ -288,7 +288,7 @@ resulting rows.
 
 For example::
 
-    from django.db import connection
+    from thibaud.db import connection
 
 
     def my_custom_sql(self):
@@ -309,12 +309,12 @@ double them in the case you are passing parameters::
      cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' AND id = %s", [self.id])
 
 If you are using :doc:`more than one database </topics/db/multi-db>`, you can
-use ``django.db.connections`` to obtain the connection (and cursor) for a
-specific database. ``django.db.connections`` is a dictionary-like
+use ``thibaud.db.connections`` to obtain the connection (and cursor) for a
+specific database. ``thibaud.db.connections`` is a dictionary-like
 object that allows you to retrieve a specific connection using its
 alias::
 
-    from django.db import connections
+    from thibaud.db import connections
 
     with connections["my_db_alias"].cursor() as cursor:
         # Your code here
@@ -386,7 +386,7 @@ If you're not familiar with the Python DB-API, note that the SQL statement in
 parameters directly within the SQL. If you use this technique, the underlying
 database library will automatically escape your parameters as necessary.
 
-Also note that Django expects the ``"%s"`` placeholder, *not* the ``"?"``
+Also note that Thibaud expects the ``"%s"`` placeholder, *not* the ``"?"``
 placeholder, which is used by the SQLite Python bindings. This is for the sake
 of consistency and sanity.
 
@@ -410,7 +410,7 @@ Calling stored procedures
 
     Calls a database stored procedure with the given name. A sequence
     (``params``) or dictionary (``kparams``) of input parameters may be
-    provided. Most databases don't support ``kparams``. Of Django's built-in
+    provided. Most databases don't support ``kparams``. Of Thibaud's built-in
     backends, only Oracle supports it.
 
     For example, given this stored procedure in an Oracle database:

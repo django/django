@@ -83,7 +83,7 @@ QUnit.test('String.strptime', function(assert) {
     assert.equal(secondParsedDate.getUTCMonth(), 1);
     assert.equal(secondParsedDate.getUTCFullYear(), 1988);
 
-    const format = django.get_format('DATE_INPUT_FORMATS')[0];
+    const format = thibaud.get_format('DATE_INPUT_FORMATS')[0];
     const thirdParsedDate = '1983-11-20'.strptime(format);
 
     assert.equal(thirdParsedDate.getUTCDate(), 20);

@@ -10,14 +10,14 @@
 
 import re
 
-from django.contrib.gis.db import models
-from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
-from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
-from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
-from django.contrib.gis.geos.prototypes.io import wkb_r
-from django.contrib.gis.measure import Distance
-from django.db.backends.oracle.operations import DatabaseOperations
+from thibaud.contrib.gis.db import models
+from thibaud.contrib.gis.db.backends.base.operations import BaseSpatialOperations
+from thibaud.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
+from thibaud.contrib.gis.db.backends.utils import SpatialOperator
+from thibaud.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
+from thibaud.contrib.gis.geos.prototypes.io import wkb_r
+from thibaud.contrib.gis.measure import Distance
+from thibaud.db.backends.oracle.operations import DatabaseOperations
 
 DEFAULT_TOLERANCE = "0.05"
 
@@ -210,12 +210,12 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        from django.contrib.gis.db.backends.oracle.models import OracleGeometryColumns
+        from thibaud.contrib.gis.db.backends.oracle.models import OracleGeometryColumns
 
         return OracleGeometryColumns
 
     def spatial_ref_sys(self):
-        from django.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys
+        from thibaud.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys
 
         return OracleSpatialRefSys
 

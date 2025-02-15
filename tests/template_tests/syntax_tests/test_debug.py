@@ -1,5 +1,5 @@
-from django.contrib.auth.models import Group
-from django.test import SimpleTestCase, override_settings
+from thibaud.contrib.auth.models import Group
+from thibaud.test import SimpleTestCase, override_settings
 
 from ..utils import setup
 
@@ -16,7 +16,7 @@ class DebugTests(SimpleTestCase):
     def test_modules(self):
         output = self.engine.render_to_string("modules", {})
         self.assertIn(
-            "&#x27;django&#x27;: &lt;module &#x27;django&#x27; ",
+            "&#x27;thibaud&#x27;: &lt;module &#x27;thibaud&#x27; ",
             output,
         )
 

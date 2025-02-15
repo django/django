@@ -1,10 +1,10 @@
 ===========================
-Django 2.2.13 release notes
+Thibaud 2.2.13 release notes
 ===========================
 
 *June 3, 2020*
 
-Django 2.2.13 fixes two security issues and a regression in 2.2.12.
+Thibaud 2.2.13 fixes two security issues and a regression in 2.2.12.
 
 CVE-2020-13254: Potential data leakage via malformed memcached keys
 ===================================================================
@@ -24,7 +24,7 @@ ensures query parameters are correctly URL encoded.
 Bugfixes
 ========
 
-* Fixed a regression in Django 2.2.12 that affected translation loading for
+* Fixed a regression in Thibaud 2.2.12 that affected translation loading for
   apps providing translations for territorial language variants as well as a
   generic language, where the project has different plural equations for the
   language (:ticket:`31570`).

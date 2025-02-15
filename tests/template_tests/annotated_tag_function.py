@@ -1,4 +1,4 @@
-from django import template
+from thibaud import template
 
 register = template.Library()
 

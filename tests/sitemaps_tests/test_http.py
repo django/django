@@ -1,12 +1,12 @@
 import os
 from datetime import date
 
-from django.contrib.sitemaps import Sitemap
-from django.contrib.sites.models import Site
-from django.core.exceptions import ImproperlyConfigured
-from django.test import modify_settings, override_settings
-from django.utils import translation
-from django.utils.formats import localize
+from thibaud.contrib.sitemaps import Sitemap
+from thibaud.contrib.sites.models import Site
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.test import modify_settings, override_settings
+from thibaud.utils import translation
+from thibaud.utils.formats import localize
 
 from .base import SitemapTestsBase
 from .models import I18nTestModel, TestModel
@@ -59,7 +59,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
             }
         ]
@@ -131,7 +131,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
             }
         ]
@@ -255,7 +255,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             self.assertContains(response, "<priority>0.5</priority>")
             self.assertContains(response, "<lastmod>%s</lastmod>" % date.today())
 
-    @modify_settings(INSTALLED_APPS={"remove": "django.contrib.sites"})
+    @modify_settings(INSTALLED_APPS={"remove": "thibaud.contrib.sites"})
     def test_requestsite_sitemap(self):
         # Hitting the flatpages sitemap without the sites framework installed
         # doesn't raise an exception.
@@ -279,7 +279,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         with self.assertRaisesMessage(ImproperlyConfigured, self.use_sitemap_err_msg):
             Sitemap().get_urls()
 
-    @modify_settings(INSTALLED_APPS={"remove": "django.contrib.sites"})
+    @modify_settings(INSTALLED_APPS={"remove": "thibaud.contrib.sites"})
     def test_sitemap_get_urls_no_site_2(self):
         """
         Check we get ImproperlyConfigured when we don't pass a site object to
@@ -335,7 +335,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         A simple i18n sitemap index can be rendered, without logging variable
         lookup errors.
         """
-        with self.assertNoLogs("django.template", "DEBUG"):
+        with self.assertNoLogs("thibaud.template", "DEBUG"):
             response = self.client.get("/simple/i18n.xml")
         expected_content = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'

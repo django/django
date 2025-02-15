@@ -1,9 +1,9 @@
-from django.core.exceptions import ImproperlyConfigured
-from django.core.paginator import InvalidPage, Paginator
-from django.db.models import QuerySet
-from django.http import Http404
-from django.utils.translation import gettext as _
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.paginator import InvalidPage, Paginator
+from thibaud.db.models import QuerySet
+from thibaud.http import Http404
+from thibaud.utils.translation import gettext as _
+from thibaud.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 
 class MultipleObjectMixin(ContextMixin):

@@ -1,8 +1,8 @@
-from django.db import NotSupportedError
-from django.db.models.expressions import Func, Value
-from django.db.models.fields import TextField
-from django.db.models.fields.json import JSONField
-from django.db.models.functions import Cast
+from thibaud.db import NotSupportedError
+from thibaud.db.models.expressions import Func, Value
+from thibaud.db.models.fields import TextField
+from thibaud.db.models.fields.json import JSONField
+from thibaud.db.models.functions import Cast
 
 
 class JSONArray(Func):

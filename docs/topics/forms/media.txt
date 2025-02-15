@@ -2,7 +2,7 @@
 Form Assets (the ``Media`` class)
 =================================
 
-.. currentmodule:: django.forms
+.. currentmodule:: thibaud.forms
 
 Rendering an attractive and easy-to-use web form requires more than just
 HTML - it also requires CSS stylesheets, and if you want to use fancy widgets,
@@ -10,36 +10,36 @@ you may also need to include some JavaScript on each page. The exact
 combination of CSS and JavaScript that is required for any given page will
 depend upon the widgets that are in use on that page.
 
-This is where asset definitions come in. Django allows you to
+This is where asset definitions come in. Thibaud allows you to
 associate different files -- like stylesheets and scripts -- with the
 forms and widgets that require those assets. For example, if you want
 to use a calendar to render DateFields, you can define a custom
 Calendar widget. This widget can then be associated with the CSS and
 JavaScript that is required to render the calendar. When the Calendar
-widget is used on a form, Django is able to identify the CSS and
+widget is used on a form, Thibaud is able to identify the CSS and
 JavaScript files that are required, and provide the list of file names
 in a form suitable for inclusion on your web page.
 
-.. admonition:: Assets and Django Admin
+.. admonition:: Assets and Thibaud Admin
 
-    The Django Admin application defines a number of customized
+    The Thibaud Admin application defines a number of customized
     widgets for calendars, filtered selections, and so on. These
-    widgets define asset requirements, and the Django Admin uses the
-    custom widgets in place of the Django defaults. The Admin
+    widgets define asset requirements, and the Thibaud Admin uses the
+    custom widgets in place of the Thibaud defaults. The Admin
     templates will only include those files that are required to
     render the widgets on any given page.
 
-    If you like the widgets that the Django Admin application uses,
+    If you like the widgets that the Thibaud Admin application uses,
     feel free to use them in your own application! They're all stored
-    in ``django.contrib.admin.widgets``.
+    in ``thibaud.contrib.admin.widgets``.
 
 .. admonition:: Which JavaScript toolkit?
 
     Many JavaScript toolkits exist, and many of them include widgets (such
     as calendar widgets) that can be used to enhance your application.
-    Django has deliberately avoided blessing any one JavaScript toolkit.
+    Thibaud has deliberately avoided blessing any one JavaScript toolkit.
     Each toolkit has its own relative strengths and weaknesses - use
-    whichever toolkit suits your requirements. Django is able to integrate
+    whichever toolkit suits your requirements. Thibaud is able to integrate
     with any JavaScript toolkit.
 
 .. _assets-as-a-static-definition:
@@ -53,7 +53,7 @@ inner class define the requirements.
 
 Here's an example::
 
-    from django import forms
+    from thibaud import forms
 
 
     class CalendarWidget(forms.TextInput):
@@ -119,7 +119,7 @@ requirements::
 
 If this last CSS definition were to be rendered, it would become the following HTML:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <link href="https://static.example.com/pretty.css" media="screen" rel="stylesheet">
     <link href="https://static.example.com/lo_res.css" media="tv,projector" rel="stylesheet">
@@ -240,14 +240,14 @@ String paths used to specify assets can be either relative or absolute. If a
 path starts with ``/``, ``http://`` or ``https://``, it will be
 interpreted as an absolute path, and left as-is. All other paths will
 be prepended with the value of the appropriate prefix. If the
-:mod:`django.contrib.staticfiles` app is installed, it will be used to serve
+:mod:`thibaud.contrib.staticfiles` app is installed, it will be used to serve
 assets.
 
-Whether or not you use :mod:`django.contrib.staticfiles`,  the
+Whether or not you use :mod:`thibaud.contrib.staticfiles`,  the
 :setting:`STATIC_URL` and :setting:`STATIC_ROOT` settings are required to
 render a complete web page.
 
-To find the appropriate prefix to use, Django will check if the
+To find the appropriate prefix to use, Thibaud will check if the
 :setting:`STATIC_URL` setting is not ``None`` and automatically fall back
 to using :setting:`MEDIA_URL`. For example, if the :setting:`MEDIA_URL` for
 your site was ``'https://uploads.example.com/'`` and :setting:`STATIC_URL`
@@ -255,7 +255,7 @@ was ``None``:
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
@@ -280,8 +280,8 @@ But if :setting:`STATIC_URL` is ``'https://static.example.com/'``:
     <script src="https://static.example.com/animations.js"></script>
     <script src="https://othersite.com/actions.js"></script>
 
-Or if :mod:`~django.contrib.staticfiles` is configured using the
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`:
+Or if :mod:`~thibaud.contrib.staticfiles` is configured using the
+:class:`~thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage`:
 
 .. code-block:: pycon
 
@@ -313,7 +313,7 @@ Furthermore, these allow you to pass custom HTML attributes::
 If this Media definition were to be rendered, it would become the following
 HTML:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <script src="https://cdn.example.com/something.min.js"
             crossorigin="anonymous"
@@ -364,7 +364,7 @@ specified by both:
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
@@ -400,7 +400,7 @@ For example:
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         js = ["jQuery.js", "calendar.js", "noConflict.js"]
@@ -436,7 +436,7 @@ are part of the form:
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
     >>> class ContactForm(forms.Form):
     ...     date = DateField(widget=CalendarWidget)
     ...     name = CharField(max_length=40, widget=OtherWidget)

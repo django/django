@@ -5,11 +5,11 @@ Multiple object mixins
 ``MultipleObjectMixin``
 =======================
 
-.. class:: django.views.generic.list.MultipleObjectMixin
+.. class:: thibaud.views.generic.list.MultipleObjectMixin
 
     A mixin that can be used to display a list of objects.
 
-    If ``paginate_by`` is specified, Django will paginate the results returned
+    If ``paginate_by`` is specified, Thibaud will paginate the results returned
     by this. You can specify the page number in the URL in one of two ways:
 
     * Use the ``page`` parameter in the URLconf. For example, this is what
@@ -45,7 +45,7 @@ Multiple object mixins
 
     **Extends**
 
-    * :class:`django.views.generic.base.ContextMixin`
+    * :class:`thibaud.views.generic.base.ContextMixin`
 
     **Methods and Attributes**
 
@@ -72,14 +72,14 @@ Multiple object mixins
 
             ``queryset`` is a class attribute with a *mutable* value so care
             must be taken when using it directly. Before using it, either call
-            its :meth:`~django.db.models.query.QuerySet.all` method or
+            its :meth:`~thibaud.db.models.query.QuerySet.all` method or
             retrieve it with :meth:`get_queryset` which takes care of the
             cloning behind the scenes.
 
     .. attribute:: ordering
 
         A string or list of strings specifying the ordering to apply to the ``queryset``.
-        Valid values are the same as those for :meth:`~django.db.models.query.QuerySet.order_by`.
+        Valid values are the same as those for :meth:`~thibaud.db.models.query.QuerySet.order_by`.
 
     .. attribute:: paginate_by
 
@@ -106,9 +106,9 @@ Multiple object mixins
     .. attribute:: paginator_class
 
        The paginator class to be used for pagination. By default,
-       :class:`django.core.paginator.Paginator` is used. If the custom paginator
+       :class:`thibaud.core.paginator.Paginator` is used. If the custom paginator
        class doesn't have the same constructor interface as
-       :class:`django.core.paginator.Paginator`, you will also need to
+       :class:`thibaud.core.paginator.Paginator`, you will also need to
        provide an implementation for :meth:`get_paginator`.
 
     .. attribute:: context_object_name
@@ -164,7 +164,7 @@ Multiple object mixins
 
         Return the context variable name that will be used to contain
         the list of data that this view is manipulating. If
-        ``object_list`` is a queryset of Django objects and
+        ``object_list`` is a queryset of Thibaud objects and
         :attr:`context_object_name` is not set,
         the context name will be the ``model_name`` of the model that
         the queryset is composed from, with postfix ``'_list'``
@@ -187,28 +187,28 @@ Multiple object mixins
       pages.
 
     * ``paginator``: An instance of
-      :class:`django.core.paginator.Paginator`. If the page is not
+      :class:`thibaud.core.paginator.Paginator`. If the page is not
       paginated, this context variable will be ``None``.
 
     * ``page_obj``: An instance of
-      :class:`django.core.paginator.Page`. If the page is not paginated,
+      :class:`thibaud.core.paginator.Page`. If the page is not paginated,
       this context variable will be ``None``.
 
 
 ``MultipleObjectTemplateResponseMixin``
 =======================================
 
-.. class:: django.views.generic.list.MultipleObjectTemplateResponseMixin
+.. class:: thibaud.views.generic.list.MultipleObjectTemplateResponseMixin
 
     A mixin class that performs template-based response rendering for views
     that operate upon a list of object instances. Requires that the view it is
     mixed with provides ``self.object_list``, the list of object instances that
     the view is operating on. ``self.object_list`` may be, but is not required
-    to be, a :class:`~django.db.models.query.QuerySet`.
+    to be, a :class:`~thibaud.db.models.query.QuerySet`.
 
     **Extends**
 
-    * :class:`~django.views.generic.base.TemplateResponseMixin`
+    * :class:`~thibaud.views.generic.base.TemplateResponseMixin`
 
     **Methods and Attributes**
 

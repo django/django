@@ -1,5 +1,5 @@
-from django.contrib import messages
-from django.test import RequestFactory, SimpleTestCase
+from thibaud.contrib import messages
+from thibaud.test import RequestFactory, SimpleTestCase
 
 from .utils import DummyStorage
 
@@ -28,7 +28,7 @@ class ApiTests(SimpleTestCase):
     def test_middleware_missing(self):
         msg = (
             "You cannot add messages without installing "
-            "django.contrib.messages.middleware.MessageMiddleware"
+            "thibaud.contrib.messages.middleware.MessageMiddleware"
         )
         with self.assertRaisesMessage(messages.MessageFailure, msg):
             messages.add_message(self.request, messages.DEBUG, "some message")
@@ -55,7 +55,7 @@ class CustomRequest:
 class CustomRequestApiTests(ApiTests):
     """
     add_message() should use ducktyping to allow request wrappers such as the
-    one in Django REST framework.
+    one in Thibaud REST framework.
     """
 
     def setUp(self):

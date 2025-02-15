@@ -1,14 +1,14 @@
 ==========================
-Django 1.6.2 release notes
+Thibaud 1.6.2 release notes
 ==========================
 
 *February 6, 2014*
 
-This is Django 1.6.2, a bugfix release for Django 1.6. Django 1.6.2 fixes
+This is Thibaud 1.6.2, a bugfix release for Thibaud 1.6. Thibaud 1.6.2 fixes
 several bugs in 1.6.1:
 
 * Prevented the base geometry object of a prepared geometry to be garbage
-  collected, which could lead to crash Django
+  collected, which could lead to crash Thibaud
   (:ticket:`21662`).
 
 * Fixed a crash when executing the :djadmin:`changepassword` command when the
@@ -26,12 +26,12 @@ several bugs in 1.6.1:
 
 * Fixed an issue where when
   ``settings.DATABASES['default']['AUTOCOMMIT'] = False``, the connection
-  wasn't in autocommit mode but Django pretended it was.
+  wasn't in autocommit mode but Thibaud pretended it was.
 
 * Fixed a regression in multiple-table inheritance ``exclude()`` queries
   (:ticket:`21787`).
 
-* Added missing items to ``django.utils.timezone.__all__``
+* Added missing items to ``thibaud.utils.timezone.__all__``
   (:ticket:`21880`).
 
 * Fixed a field misalignment issue with ``select_related()`` and model
@@ -45,8 +45,8 @@ several bugs in 1.6.1:
   (:ticket:`19884`).
 
 * Fixed an issue where lazy objects weren't actually marked as safe when passed
-  through :func:`~django.utils.safestring.mark_safe` and could end up being
+  through :func:`~thibaud.utils.safestring.mark_safe` and could end up being
   double-escaped (:ticket:`21882`).
 
-Additionally, Django's vendored version of six, ``django.utils.six`` has been
+Additionally, Thibaud's vendored version of six, ``thibaud.utils.six`` has been
 upgraded to the latest release (1.5.2).

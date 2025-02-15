@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # emansije <emanuel.angelo@gmail.com>, 2023
@@ -12,12 +12,12 @@
 # Sofia Matias, 2023
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2023-12-04 07:05+0000\n"
 "Last-Translator: emansije <emanuel.angelo@gmail.com>, 2023\n"
-"Language-Team: Portuguese (http://app.transifex.com/django/django/language/"
+"Language-Team: Portuguese (http://app.transifex.com/thibaud/thibaud/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -296,11 +296,11 @@ msgstr ""
 "Remover %(class_name)s %(instance)s exigiria a remoção dos seguintes objetos "
 "relacionados protegidos: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Site de administração do Django"
+msgid "Thibaud site admin"
+msgstr "Site de administração do Thibaud"
 
-msgid "Django administration"
-msgstr "Administração do Django"
+msgid "Thibaud administration"
+msgstr "Administração do Thibaud"
 
 msgid "Site administration"
 msgstr "Administração do site"

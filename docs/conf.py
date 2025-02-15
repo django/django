@@ -1,4 +1,4 @@
-# Django documentation build configuration file, created by
+# Thibaud documentation build configuration file, created by
 # sphinx-quickstart on Thu Mar 27 09:06:53 2008.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -24,7 +24,7 @@ from sphinx import version_info as sphinx_version
 # https://groups.google.com/g/sphinx-dev/c/MtRf64eGtv4/discussion
 sys.setrecursionlimit(2000)
 
-# Make sure we get the version of this copy of Django
+# Make sure we get the version of this copy of Thibaud
 sys.path.insert(1, dirname(dirname(abspath(__file__))))
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -44,7 +44,7 @@ needs_sphinx = "4.5.0"
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-    "djangodocs",
+    "thibauddocs",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
@@ -65,10 +65,10 @@ linkcheck_ignore = [
     r"^https?://(?:[^/.]+\.)*(?:example|invalid|localhost|test)(?::\d+)?/",
     # Pages that are inaccessible because they require authentication.
     r"^https://github\.com/[^/]+/[^/]+/fork",
-    r"^https://code\.djangoproject\.com/github/login",
-    r"^https://code\.djangoproject\.com/newticket",
-    r"^https://(?:code|www)\.djangoproject\.com/admin/",
-    r"^https://www\.djangoproject\.com/community/add/blogs/",
+    r"^https://code\.thibaudproject\.com/github/login",
+    r"^https://code\.thibaudproject\.com/newticket",
+    r"^https://(?:code|www)\.thibaudproject\.com/admin/",
+    r"^https://www\.thibaudproject\.com/community/add/blogs/",
     r"^https://www\.google\.com/webmasters/tools/ping",
     r"^https://search\.google\.com/search-console/welcome",
     # Fragments used to dynamically switch content or populate fields.
@@ -109,8 +109,8 @@ root_doc = "contents"
 toc_object_entries = False
 
 # General substitutions.
-project = "Django"
-copyright = "Django Software Foundation and contributors"
+project = "Thibaud"
+copyright = "Thibaud Software Foundation and contributors"
 
 
 # The version info for the project you're documenting, acts as replacement for
@@ -121,29 +121,29 @@ copyright = "Django Software Foundation and contributors"
 version = "6.0"
 # The full version, including alpha/beta/rc tags.
 try:
-    from django import VERSION, get_version
+    from thibaud import VERSION, get_version
 except ImportError:
     release = version
 else:
 
-    def django_release():
+    def thibaud_release():
         pep440ver = get_version()
         if VERSION[3:5] == ("alpha", 0) and "dev" not in pep440ver:
             return pep440ver + ".dev"
         return pep440ver
 
-    release = django_release()
+    release = thibaud_release()
 
-# The "development version" of Django
-django_next_version = "6.0"
+# The "development version" of Thibaud
+thibaud_next_version = "6.0"
 
 extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-%s"),
-    "commit": ("https://github.com/django/django/commit/%s", "%s"),
+    "commit": ("https://github.com/thibaud/thibaud/commit/%s", "%s"),
     "pypi": ("https://pypi.org/project/%s/", "%s"),
     # A file or directory. GitHub redirects from blob to tree if needed.
-    "source": ("https://github.com/django/django/blob/main/%s", "%s"),
-    "ticket": ("https://code.djangoproject.com/ticket/%s", "#%s"),
+    "source": ("https://github.com/thibaud/thibaud/blob/main/%s", "%s"),
+    "ticket": ("https://code.thibaudproject.com/ticket/%s", "#%s"),
 }
 
 if sphinx_version < (8, 1):
@@ -201,7 +201,7 @@ suppress_warnings = ["app.add_directive"]
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "djangodocs"
+html_theme = "thibauddocs"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -273,16 +273,16 @@ html_additional_pages = {}
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "Djangodoc"
+htmlhelp_basename = "Thibauddoc"
 
-modindex_common_prefix = ["django."]
+modindex_common_prefix = ["thibaud."]
 
 # Appended to every page
 rst_epilog = """
-.. |django-users| replace:: :ref:`django-users <django-users-mailing-list>`
-.. |django-developers| replace:: :ref:`django-developers <django-developers-mailing-list>`
-.. |django-announce| replace:: :ref:`django-announce <django-announce-mailing-list>`
-.. |django-updates| replace:: :ref:`django-updates <django-updates-mailing-list>`
+.. |thibaud-users| replace:: :ref:`thibaud-users <thibaud-users-mailing-list>`
+.. |thibaud-developers| replace:: :ref:`thibaud-developers <thibaud-developers-mailing-list>`
+.. |thibaud-announce| replace:: :ref:`thibaud-announce <thibaud-announce-mailing-list>`
+.. |thibaud-updates| replace:: :ref:`thibaud-updates <thibaud-updates-mailing-list>`
 """  # NOQA
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -316,9 +316,9 @@ latex_elements = {
 latex_documents = [
     (
         "contents",
-        "django.tex",
-        "Django Documentation",
-        "Django Software Foundation",
+        "thibaud.tex",
+        "Thibaud Documentation",
+        "Thibaud Software Foundation",
         "manual",
     ),
 ]
@@ -350,10 +350,10 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (
-        "ref/django-admin",
-        "django-admin",
-        "Utility script for the Django web framework",
-        ["Django Software Foundation"],
+        "ref/thibaud-admin",
+        "thibaud-admin",
+        "Utility script for the Thibaud web framework",
+        ["Thibaud Software Foundation"],
         1,
     )
 ]
@@ -366,11 +366,11 @@ man_pages = [
 texinfo_documents = [
     (
         root_doc,
-        "django",
+        "thibaud",
         "",
         "",
-        "Django",
-        "Documentation of the Django framework",
+        "Thibaud",
+        "Documentation of the Thibaud framework",
         "Web development",
         False,
     )
@@ -381,18 +381,18 @@ texinfo_documents = [
 
 # Bibliographic Dublin Core info.
 epub_title = project
-epub_author = "Django Software Foundation"
-epub_publisher = "Django Software Foundation"
+epub_author = "Thibaud Software Foundation"
+epub_publisher = "Thibaud Software Foundation"
 epub_copyright = copyright
 
 # The basename for the epub file. It defaults to the project name.
-# epub_basename = 'Django'
+# epub_basename = 'Thibaud'
 
 # The HTML theme for the epub output. Since the default themes are not optimized
 # for small screen space, using the same theme for HTML and epub output is
 # usually not wise. This defaults to 'epub', a theme designed to save visual
 # space.
-epub_theme = "djangodocs-epub"
+epub_theme = "thibauddocs-epub"
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
@@ -449,5 +449,5 @@ epub_cover = ("", "epub-cover.html")
 linkcode_resolve = functools.partial(
     github_links.github_linkcode_resolve,
     version=version,
-    next_version=django_next_version,
+    next_version=thibaud_next_version,
 )

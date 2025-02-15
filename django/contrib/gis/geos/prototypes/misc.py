@@ -5,9 +5,9 @@
 
 from ctypes import POINTER, c_double, c_int
 
-from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
-from django.contrib.gis.geos.prototypes.errcheck import check_dbl, check_string
-from django.contrib.gis.geos.prototypes.geom import geos_char_p
+from thibaud.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
+from thibaud.contrib.gis.geos.prototypes.errcheck import check_dbl, check_string
+from thibaud.contrib.gis.geos.prototypes.geom import geos_char_p
 
 __all__ = ["geos_area", "geos_distance", "geos_length", "geos_isvalidreason"]
 

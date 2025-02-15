@@ -1,7 +1,7 @@
-from django.core.exceptions import FieldError
-from django.db import connection
-from django.db.models import F
-from django.test import TestCase
+from thibaud.core.exceptions import FieldError
+from thibaud.db import connection
+from thibaud.db.models import F
+from thibaud.test import TestCase
 
 from .models import Comment, Tenant, TimeStamped, Token, User
 

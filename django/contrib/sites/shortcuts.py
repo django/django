@@ -1,4 +1,4 @@
-from django.apps import apps
+from thibaud.apps import apps
 
 from .requests import RequestSite
 
@@ -9,8 +9,8 @@ def get_current_site(request):
     ``Site`` object or a ``RequestSite`` object based on the request.
     """
     # Import is inside the function because its point is to avoid importing the
-    # Site models when django.contrib.sites isn't installed.
-    if apps.is_installed("django.contrib.sites"):
+    # Site models when thibaud.contrib.sites isn't installed.
+    if apps.is_installed("thibaud.contrib.sites"):
         from .models import Site
 
         return Site.objects.get_current(request)

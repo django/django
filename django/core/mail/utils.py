@@ -4,7 +4,7 @@ Email message and email sending related helper functions.
 
 import socket
 
-from django.utils.encoding import punycode
+from thibaud.utils.encoding import punycode
 
 
 # Cache the hostname, but do it lazily: socket.getfqdn() can take a couple of

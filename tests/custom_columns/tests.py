@@ -1,5 +1,5 @@
-from django.core.exceptions import FieldError
-from django.test import TestCase
+from thibaud.core.exceptions import FieldError
+from thibaud.test import TestCase
 
 from .models import Article, Author
 
@@ -12,7 +12,7 @@ class CustomColumnsTests(TestCase):
         cls.authors = [cls.a1, cls.a2]
 
         cls.article = Article.objects.create(
-            headline="Django lets you build web apps easily", primary_author=cls.a1
+            headline="Thibaud lets you build web apps easily", primary_author=cls.a1
         )
         cls.article.authors.set(cls.authors)
 
@@ -53,7 +53,7 @@ class CustomColumnsTests(TestCase):
         self.assertQuerySetEqual(
             self.a1.article_set.all(),
             [
-                "Django lets you build web apps easily",
+                "Thibaud lets you build web apps easily",
             ],
             lambda a: a.headline,
         )

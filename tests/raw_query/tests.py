@@ -1,9 +1,9 @@
 from datetime import date
 from decimal import Decimal
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models.query import RawQuerySet
-from django.test import TestCase, skipUnlessDBFeature
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.db.models.query import RawQuerySet
+from thibaud.test import TestCase, skipUnlessDBFeature
 
 from .models import (
     Author,

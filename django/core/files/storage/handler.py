@@ -1,7 +1,7 @@
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import cached_property
-from django.utils.module_loading import import_string
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.utils.functional import cached_property
+from thibaud.utils.module_loading import import_string
 
 
 class InvalidStorageError(ImproperlyConfigured):

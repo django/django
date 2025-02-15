@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from time import sleep
 
-from django.contrib.postgres.functions import RandomUUID, TransactionNow
+from thibaud.contrib.postgres.functions import RandomUUID, TransactionNow
 
 from . import PostgreSQLTestCase
 from .models import NowTestModel, UUIDTestModel

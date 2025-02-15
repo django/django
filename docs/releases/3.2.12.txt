@@ -1,10 +1,10 @@
 ===========================
-Django 3.2.12 release notes
+Thibaud 3.2.12 release notes
 ===========================
 
 *February 1, 2022*
 
-Django 3.2.12 fixes two security issues with severity "medium" in 3.2.11.
+Thibaud 3.2.12 fixes two security issues with severity "medium" in 3.2.11.
 
 CVE-2022-22818: Possible XSS via ``{% debug %}`` template tag
 =============================================================

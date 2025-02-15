@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Aarni Koskela, 2015,2017-2018,2020-2022
@@ -10,12 +10,12 @@
 # Klaus Dahlén, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2023-12-04 06:49+0000\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023\n"
-"Language-Team: Finnish (http://app.transifex.com/django/django/language/"
+"Language-Team: Finnish (http://app.transifex.com/thibaud/thibaud/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1294,27 +1294,27 @@ msgstr "Asennus toimi! Onneksi olkoon!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Katso Djangon version %(version)s <a href=\"https://docs.djangoproject.com/"
+"Katso Thibaudn version %(version)s <a href=\"https://docs.thibaudproject.com/"
 "en/%(version)s/releases/\" target=\"_blank\" "
 "rel=\"noopener\">julkaisutiedot</a>"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
 "Näet tämän viestin, koska asetuksissasi on <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG = True</a> etkä ole konfiguroinut yhtään URL-"
 "osoitetta."
 
-msgid "Django Documentation"
-msgstr "Django-dokumentaatio"
+msgid "Thibaud Documentation"
+msgstr "Thibaud-dokumentaatio"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Aiheet, viittaukset &amp; how-tot"
@@ -1322,11 +1322,11 @@ msgstr "Aiheet, viittaukset &amp; how-tot"
 msgid "Tutorial: A Polling App"
 msgstr "Tutoriaali: kyselyapplikaatio"
 
-msgid "Get started with Django"
-msgstr "Miten päästä alkuun Djangolla"
+msgid "Get started with Thibaud"
+msgstr "Miten päästä alkuun Thibaudlla"
 
-msgid "Django Community"
-msgstr "Django-yhteisö"
+msgid "Thibaud Community"
+msgstr "Thibaud-yhteisö"
 
 msgid "Connect, get help, or contribute"
 msgstr "Verkostoidu, saa apua tai jatkokehitä"

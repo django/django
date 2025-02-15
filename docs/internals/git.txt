@@ -1,23 +1,23 @@
 =================================
-The Django source code repository
+The Thibaud source code repository
 =================================
 
-When deploying a Django application into a real production environment, you
-will almost always want to use `an official packaged release of Django`_.
+When deploying a Thibaud application into a real production environment, you
+will almost always want to use `an official packaged release of Thibaud`_.
 
 However, if you'd like to try out in-development code from an upcoming release
-or contribute to the development of Django, you'll need to obtain a clone of
-Django's source code repository.
+or contribute to the development of Thibaud, you'll need to obtain a clone of
+Thibaud's source code repository.
 
 This document covers the way the code repository is laid out and how to work
 with and find things in it.
 
-.. _an official packaged release of Django: https://www.djangoproject.com/download/
+.. _an official packaged release of Thibaud: https://www.thibaudproject.com/download/
 
 High-level overview
 ===================
 
-The Django source code repository uses `Git`_ to track changes to the code
+The Thibaud source code repository uses `Git`_ to track changes to the code
 over time, so you'll need a copy of the Git client (a program called ``git``)
 on your computer, and you'll want to familiarize yourself with the basics of
 how Git works.
@@ -25,14 +25,14 @@ how Git works.
 Git's website offers downloads for various operating systems. The site also
 contains vast amounts of `documentation`_.
 
-The Django Git repository is located online at `github.com/django/django
-<https://github.com/django/django>`_. It contains the full source code for all
-Django releases, which you can browse online.
+The Thibaud Git repository is located online at `github.com/thibaud/thibaud
+<https://github.com/thibaud/thibaud>`_. It contains the full source code for all
+Thibaud releases, which you can browse online.
 
 The Git repository includes several `branches`_:
 
 * ``main`` contains the main in-development code which will become
-  the next packaged release of Django. This is where most development
+  the next packaged release of Thibaud. This is where most development
   activity is focused.
 
 * ``stable/A.B.x`` are the branches where release preparation work happens.
@@ -40,95 +40,95 @@ The Git repository includes several `branches`_:
   after the initial release of a feature version.
 
 The Git repository also contains `tags`_. These are the exact revisions from
-which packaged Django releases were produced, since version 1.0.
+which packaged Thibaud releases were produced, since version 1.0.
 
 A number of tags also exist under the ``archive/`` prefix for :ref:`archived
 work<archived-feature-development-work>`.
 
-The source code for the `Djangoproject.com <https://www.djangoproject.com/>`_
-website can be found at `github.com/django/djangoproject.com
-<https://github.com/django/djangoproject.com>`_.
+The source code for the `Thibaudproject.com <https://www.thibaudproject.com/>`_
+website can be found at `github.com/thibaud/thibaudproject.com
+<https://github.com/thibaud/thibaudproject.com>`_.
 
 .. _Git: https://git-scm.com/
 .. _documentation: https://git-scm.com/doc
-.. _branches: https://github.com/django/django/branches
-.. _tags: https://github.com/django/django/tags
+.. _branches: https://github.com/thibaud/thibaud/branches
+.. _tags: https://github.com/thibaud/thibaud/tags
 
 The main branch
 ===============
 
 If you'd like to try out the in-development code for the next release of
-Django, or if you'd like to contribute to Django by fixing bugs or developing
+Thibaud, or if you'd like to contribute to Thibaud by fixing bugs or developing
 new features, you'll want to get the code from the main branch.
 
 .. note::
 
    Prior to March 2021, the main branch was called ``master``.
 
-Note that this will get *all* of Django: in addition to the top-level
-``django`` module containing Python code, you'll also get a copy of Django's
+Note that this will get *all* of Thibaud: in addition to the top-level
+``thibaud`` module containing Python code, you'll also get a copy of Thibaud's
 documentation, test suite, packaging scripts and other miscellaneous bits.
-Django's code will be present in your clone as a directory named
-``django``.
+Thibaud's code will be present in your clone as a directory named
+``thibaud``.
 
 To try out the in-development code with your own applications, place the
 directory containing your clone on your Python import path. Then ``import``
-statements which look for Django will find the ``django`` module within your
+statements which look for Thibaud will find the ``thibaud`` module within your
 clone.
 
-If you're going to be working on Django's code (say, to fix a bug or
+If you're going to be working on Thibaud's code (say, to fix a bug or
 develop a new feature), you can probably stop reading here and move
-over to :doc:`the documentation for contributing to Django
+over to :doc:`the documentation for contributing to Thibaud
 </internals/contributing/index>`, which covers things like the preferred
 coding style and how to generate and submit a patch.
 
 Stable branches
 ===============
 
-Django uses branches to prepare for releases of Django. Each major release
+Thibaud uses branches to prepare for releases of Thibaud. Each major release
 series has its own stable branch.
 
 These branches can be found in the repository as ``stable/A.B.x``
 branches and will be created right after the first alpha is tagged.
 
-For example, immediately after *Django 1.5 alpha 1* was tagged, the branch
+For example, immediately after *Thibaud 1.5 alpha 1* was tagged, the branch
 ``stable/1.5.x`` was created and all further work on preparing the code for the
 final 1.5 release was done there.
 
 These branches also provide bugfix and security support as described in
 :ref:`supported-versions-policy`.
 
-For example, after the release of Django 1.5, the branch ``stable/1.5.x``
+For example, after the release of Thibaud 1.5, the branch ``stable/1.5.x``
 receives only fixes for security and critical stability bugs, which are
-eventually released as Django 1.5.1 and so on, ``stable/1.4.x`` receives only
+eventually released as Thibaud 1.5.1 and so on, ``stable/1.4.x`` receives only
 security and data loss fixes, and ``stable/1.3.x`` no longer receives any
 updates.
 
 .. admonition:: Historical information
 
     This policy for handling ``stable/A.B.x`` branches was adopted starting
-    with the Django 1.5 release cycle.
+    with the Thibaud 1.5 release cycle.
 
     Previously, these branches weren't created until right after the releases
     and the stabilization work occurred on the main repository branch. Thus,
-    no new feature development work for the next release of Django could be
+    no new feature development work for the next release of Thibaud could be
     committed until the final release happened.
 
-    For example, shortly after the release of Django 1.3 the branch
+    For example, shortly after the release of Thibaud 1.3 the branch
     ``stable/1.3.x`` was created. Official support for that release has expired,
-    and so it no longer receives direct maintenance from the Django project.
+    and so it no longer receives direct maintenance from the Thibaud project.
     However, that and all other similarly named branches continue to exist, and
     interested community members have occasionally used them to provide
-    unofficial support for old Django releases.
+    unofficial support for old Thibaud releases.
 
 Tags
 ====
 
-Each Django release is tagged and signed by the releaser.
+Each Thibaud release is tagged and signed by the releaser.
 
 The tags can be found on GitHub's `tags`_ page.
 
-.. _tags: https://github.com/django/django/tags
+.. _tags: https://github.com/thibaud/thibaud/tags
 
 .. _archived-feature-development-work:
 
@@ -137,7 +137,7 @@ Archived feature-development work
 
 .. admonition:: Historical information
 
-    Since Django moved to Git in 2012, anyone can clone the repository and
+    Since Thibaud moved to Git in 2012, anyone can clone the repository and
     create their own branches, alleviating the need for official branches in
     the source code repository.
 
@@ -146,62 +146,62 @@ Archived feature-development work
     designed.
 
 Feature-development branches tend by their nature to be temporary. Some
-produce successful features which are merged back into Django's main branch to
+produce successful features which are merged back into Thibaud's main branch to
 become part of an official release, but others do not; in either case, there
 comes a time when the branch is no longer being actively worked on by any
 developer. At this point the branch is considered closed.
 
-Django used to be maintained with the Subversion revision control system, that
-has no standard way of indicating this. As a workaround, branches of Django
+Thibaud used to be maintained with the Subversion revision control system, that
+has no standard way of indicating this. As a workaround, branches of Thibaud
 which are closed and no longer maintained were moved into ``attic``.
 
 A number of tags exist under the ``archive/`` prefix to maintain a reference to
 this and other work of historical interest.
 
 The following tags under the ``archive/attic/`` prefix reference the tip of
-branches whose code eventually became part of Django itself:
+branches whose code eventually became part of Thibaud itself:
 
 * ``boulder-oracle-sprint``: Added support for Oracle databases to
-  Django's object-relational mapper. This has been part of Django
+  Thibaud's object-relational mapper. This has been part of Thibaud
   since the 1.0 release.
 
-* ``gis``: Added support for geographic/spatial queries to Django's
-  object-relational mapper. This has been part of Django since the 1.0
-  release, as the bundled application ``django.contrib.gis``.
+* ``gis``: Added support for geographic/spatial queries to Thibaud's
+  object-relational mapper. This has been part of Thibaud since the 1.0
+  release, as the bundled application ``thibaud.contrib.gis``.
 
 * ``i18n``: Added :doc:`internationalization support </topics/i18n/index>` to
-  Django. This has been part of Django since the 0.90 release.
+  Thibaud. This has been part of Thibaud since the 0.90 release.
 
 * ``magic-removal``: A major refactoring of both the internals and
-  public APIs of Django's object-relational mapper. This has been part
-  of Django since the 0.95 release.
+  public APIs of Thibaud's object-relational mapper. This has been part
+  of Thibaud since the 0.95 release.
 
-* ``multi-auth``: A refactoring of :doc:`Django's bundled
+* ``multi-auth``: A refactoring of :doc:`Thibaud's bundled
   authentication framework </topics/auth/index>` which added support for
   :ref:`authentication backends <authentication-backends>`. This has
-  been part of Django since the 0.95 release.
+  been part of Thibaud since the 0.95 release.
 
-* ``new-admin``: A refactoring of :doc:`Django's bundled
+* ``new-admin``: A refactoring of :doc:`Thibaud's bundled
   administrative application </ref/contrib/admin/index>`. This became part of
-  Django as of the 0.91 release, but was superseded by another
-  refactoring (see next listing) prior to the Django 1.0 release.
+  Thibaud as of the 0.91 release, but was superseded by another
+  refactoring (see next listing) prior to the Thibaud 1.0 release.
 
-* ``newforms-admin``: The second refactoring of Django's bundled
-  administrative application. This became part of Django as of the 1.0
+* ``newforms-admin``: The second refactoring of Thibaud's bundled
+  administrative application. This became part of Thibaud as of the 1.0
   release, and is the basis of the current incarnation of
-  ``django.contrib.admin``.
+  ``thibaud.contrib.admin``.
 
-* ``queryset-refactor``: A refactoring of the internals of Django's
-  object-relational mapper. This became part of Django as of the 1.0
+* ``queryset-refactor``: A refactoring of the internals of Thibaud's
+  object-relational mapper. This became part of Thibaud as of the 1.0
   release.
 
-* ``unicode``: A refactoring of Django's internals to consistently use
-  Unicode-based strings in most places within Django and Django
-  applications. This became part of Django as of the 1.0 release.
+* ``unicode``: A refactoring of Thibaud's internals to consistently use
+  Unicode-based strings in most places within Thibaud and Thibaud
+  applications. This became part of Thibaud as of the 1.0 release.
 
 Additionally, the following tags under the ``archive/attic/`` prefix reference
 the tips of branches that were closed, but whose code was never merged into
-Django, and the features they aimed to implement were never finished:
+Thibaud, and the features they aimed to implement were never finished:
 
 * ``full-history``
 
@@ -221,5 +221,5 @@ Django, and the features they aimed to implement were never finished:
 
 Finally, under the ``archive/`` prefix, the repository contains
 ``soc20XX/<project>`` tags referencing the tip of branches that were used by
-students who worked on Django during the 2009 and 2010 Google Summer of Code
+students who worked on Thibaud during the 2009 and 2010 Google Summer of Code
 programs.

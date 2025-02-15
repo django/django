@@ -1,11 +1,11 @@
 import unittest
 
-from django.core.exceptions import FieldError
-from django.db import IntegrityError, connection, transaction
-from django.db.models import Case, CharField, Count, F, IntegerField, Max, When
-from django.db.models.functions import Abs, Concat, Lower
-from django.test import TestCase
-from django.test.utils import register_lookup
+from thibaud.core.exceptions import FieldError
+from thibaud.db import IntegrityError, connection, transaction
+from thibaud.db.models import Case, CharField, Count, F, IntegerField, Max, When
+from thibaud.db.models.functions import Abs, Concat, Lower
+from thibaud.test import TestCase
+from thibaud.test.utils import register_lookup
 
 from .models import (
     A,
@@ -159,7 +159,7 @@ class AdvancedTests(TestCase):
     def test_update_m2m_field(self):
         msg = (
             "Cannot update model field "
-            "<django.db.models.fields.related.ManyToManyField: m2m_foo> "
+            "<thibaud.db.models.fields.related.ManyToManyField: m2m_foo> "
             "(only non-relations and foreign keys permitted)."
         )
         with self.assertRaisesMessage(FieldError, msg):

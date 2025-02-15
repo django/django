@@ -1,18 +1,18 @@
-from django.apps import AppConfig
-from django.contrib.contenttypes.checks import (
+from thibaud.apps import AppConfig
+from thibaud.contrib.contenttypes.checks import (
     check_generic_foreign_keys,
     check_model_name_lengths,
 )
-from django.core import checks
-from django.db.models.signals import post_migrate, pre_migrate
-from django.utils.translation import gettext_lazy as _
+from thibaud.core import checks
+from thibaud.db.models.signals import post_migrate, pre_migrate
+from thibaud.utils.translation import gettext_lazy as _
 
 from .management import create_contenttypes, inject_rename_contenttypes_operations
 
 
 class ContentTypesConfig(AppConfig):
-    default_auto_field = "django.db.models.AutoField"
-    name = "django.contrib.contenttypes"
+    default_auto_field = "thibaud.db.models.AutoField"
+    name = "thibaud.contrib.contenttypes"
     verbose_name = _("Content Types")
 
     def ready(self):

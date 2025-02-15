@@ -1,8 +1,8 @@
 from contextlib import contextmanager
 from unittest import mock, skipUnless
 
-from django.conf.global_settings import PASSWORD_HASHERS
-from django.contrib.auth.hashers import (
+from thibaud.conf.global_settings import PASSWORD_HASHERS
+from thibaud.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX,
     UNUSABLE_PASSWORD_SUFFIX_LENGTH,
     BasePasswordHasher,
@@ -19,8 +19,8 @@ from django.contrib.auth.hashers import (
     is_password_usable,
     make_password,
 )
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
 
 try:
     import bcrypt
@@ -105,7 +105,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"]
+        PASSWORD_HASHERS=["thibaud.contrib.auth.hashers.MD5PasswordHasher"]
     )
     def test_md5(self):
         encoded = make_password("lètmein", "seasalt", "md5")
@@ -153,7 +153,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     @skipUnless(bcrypt, "bcrypt not installed")
     @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.BCryptPasswordHasher"]
+        PASSWORD_HASHERS=["thibaud.contrib.auth.hashers.BCryptPasswordHasher"]
     )
     def test_bcrypt(self):
         encoded = make_password("lètmein", hasher="bcrypt")
@@ -171,7 +171,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     @skipUnless(bcrypt, "bcrypt not installed")
     @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.BCryptPasswordHasher"]
+        PASSWORD_HASHERS=["thibaud.contrib.auth.hashers.BCryptPasswordHasher"]
     )
     def test_bcrypt_upgrade(self):
         hasher = get_hasher("bcrypt")
@@ -206,7 +206,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     @skipUnless(bcrypt, "bcrypt not installed")
     @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.BCryptPasswordHasher"]
+        PASSWORD_HASHERS=["thibaud.contrib.auth.hashers.BCryptPasswordHasher"]
     )
     def test_bcrypt_harden_runtime(self):
         hasher = get_hasher("bcrypt")
@@ -305,9 +305,9 @@ class TestUtilsHashPass(SimpleTestCase):
 
     @override_settings(
         PASSWORD_HASHERS=[
-            "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-            "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
-            "django.contrib.auth.hashers.MD5PasswordHasher",
+            "thibaud.contrib.auth.hashers.PBKDF2PasswordHasher",
+            "thibaud.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+            "thibaud.contrib.auth.hashers.MD5PasswordHasher",
         ],
     )
     def test_upgrade(self):
@@ -335,9 +335,9 @@ class TestUtilsHashPass(SimpleTestCase):
 
     @override_settings(
         PASSWORD_HASHERS=[
-            "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-            "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
-            "django.contrib.auth.hashers.MD5PasswordHasher",
+            "thibaud.contrib.auth.hashers.PBKDF2PasswordHasher",
+            "thibaud.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+            "thibaud.contrib.auth.hashers.MD5PasswordHasher",
         ],
     )
     def test_no_upgrade_on_incorrect_pass(self):
@@ -430,7 +430,7 @@ class TestUtilsHashPass(SimpleTestCase):
         # updated to the new iteration count.
         with self.settings(
             PASSWORD_HASHERS=[
-                "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+                "thibaud.contrib.auth.hashers.PBKDF2PasswordHasher",
                 "auth_tests.test_hashers.PBKDF2SingleIterationHasher",
             ]
         ):
@@ -458,14 +458,14 @@ class TestUtilsHashPass(SimpleTestCase):
         hasher = get_hasher("default")
         with (
             mock.patch(
-                "django.contrib.auth.hashers.identify_hasher",
+                "thibaud.contrib.auth.hashers.identify_hasher",
                 side_effect=hasher_side_effect,
             ) as mock_identify_hasher,
             mock.patch(
-                "django.contrib.auth.hashers.make_password"
+                "thibaud.contrib.auth.hashers.make_password"
             ) as mock_make_password,
             mock.patch(
-                "django.contrib.auth.hashers.get_random_string",
+                "thibaud.contrib.auth.hashers.get_random_string",
                 side_effect=lambda size: "x" * size,
             ),
             mock.patch.object(hasher, "verify"),

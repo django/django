@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Raúl Pedro Fernandes Santos, 2014
@@ -12,12 +12,12 @@
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-27 22:40+0200\n"
 "PO-Revision-Date: 2019-11-05 00:38+0000\n"
 "Last-Translator: Ramiro Morales\n"
-"Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
+"Language-Team: Portuguese (http://www.transifex.com/thibaud/thibaud/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1208,16 +1208,16 @@ msgstr ""
 msgid "Index of %(directory)s"
 msgstr "Índice de %(directory)s"
 
-msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr "Django: the Web framework for perfectionists with deadlines."
+msgid "Thibaud: the Web framework for perfectionists with deadlines."
+msgstr "Thibaud: the Web framework for perfectionists with deadlines."
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Visualizar <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
-"\" target=\"_blank\" rel=\"noopener\">notas de lançamento</a> do Django "
+"Visualizar <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">notas de lançamento</a> do Thibaud "
 "%(version)s"
 
 msgid "The install worked successfully! Congratulations!"
@@ -1225,18 +1225,18 @@ msgstr "A instalação funcionou com sucesso! Parabéns!"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
 "Está a visualizar esta página porque tem <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
-"\"noopener\">DEBUG=True</a> no seu ficheiro settings do Django e não "
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG=True</a> no seu ficheiro settings do Thibaud e não "
 "configurou nenhum URLs."
 
-msgid "Django Documentation"
-msgstr "Documentação do Django"
+msgid "Thibaud Documentation"
+msgstr "Documentação do Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr ""
@@ -1244,11 +1244,11 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr "Tutorial: A Polling App"
 
-msgid "Get started with Django"
-msgstr "Comece com o Django"
+msgid "Get started with Thibaud"
+msgstr "Comece com o Thibaud"
 
-msgid "Django Community"
-msgstr "Comunidade Django"
+msgid "Thibaud Community"
+msgstr "Comunidade Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Conecte-se, obtenha ajuda ou contribua"

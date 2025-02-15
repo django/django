@@ -1,6 +1,6 @@
-from django import test
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.db import models
+from thibaud import test
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.db import models
 
 from .models import AllFieldsModel
 

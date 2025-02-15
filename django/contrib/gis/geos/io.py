@@ -4,8 +4,8 @@ objects.  Specifically, this has Python implementations of WKB/WKT
 reader and writer classes.
 """
 
-from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos.prototypes.io import (
+from thibaud.contrib.gis.geos.geometry import GEOSGeometry
+from thibaud.contrib.gis.geos.prototypes.io import (
     WKBWriter,
     WKTWriter,
     _WKBReader,

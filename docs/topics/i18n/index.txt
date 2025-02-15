@@ -17,11 +17,11 @@ The goal of internationalization and localization is to allow a single web
 application to offer its content in languages and formats tailored to the
 audience.
 
-Django has full support for :doc:`translation of text
+Thibaud has full support for :doc:`translation of text
 </topics/i18n/translation>`, :doc:`formatting of dates, times and numbers
 </topics/i18n/formatting>`, and :doc:`time zones </topics/i18n/timezones>`.
 
-Essentially, Django does two things:
+Essentially, Thibaud does two things:
 
 * It allows developers and template authors to specify which parts of their apps
   should be translated or formatted for local languages and cultures.
@@ -56,7 +56,7 @@ More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikip
 
     Translation is controlled by the :setting:`USE_I18N` setting. However, it
     involves internationalization and localization. The name of the setting is
-    an unfortunate result of Django's history.
+    an unfortunate result of Thibaud's history.
 
 Here are some other terms that will help us to handle a common language:
 

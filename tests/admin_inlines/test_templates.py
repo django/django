@@ -1,7 +1,7 @@
 import json
 
-from django.template.loader import render_to_string
-from django.test import SimpleTestCase
+from thibaud.template.loader import render_to_string
+from thibaud.test import SimpleTestCase
 
 
 class TestTemplates(SimpleTestCase):

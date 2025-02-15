@@ -6,8 +6,8 @@ related data structures.
 from ctypes import POINTER, c_bool, c_char_p, c_double, c_int, c_void_p
 from functools import partial
 
-from django.contrib.gis.gdal.libgdal import std_call
-from django.contrib.gis.gdal.prototypes.generation import (
+from thibaud.contrib.gis.gdal.libgdal import std_call
+from thibaud.contrib.gis.gdal.prototypes.generation import (
     chararray_output,
     const_string_output,
     double_output,

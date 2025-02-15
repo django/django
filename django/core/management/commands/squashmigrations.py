@@ -1,15 +1,15 @@
 import os
 import shutil
 
-from django.apps import apps
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import run_formatters
-from django.db import migrations
-from django.db.migrations.loader import AmbiguityError, MigrationLoader
-from django.db.migrations.migration import SwappableTuple
-from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.migrations.writer import MigrationWriter
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.core.management.utils import run_formatters
+from thibaud.db import migrations
+from thibaud.db.migrations.loader import AmbiguityError, MigrationLoader
+from thibaud.db.migrations.migration import SwappableTuple
+from thibaud.db.migrations.optimizer import MigrationOptimizer
+from thibaud.db.migrations.writer import MigrationWriter
 
 
 class Command(BaseCommand):
@@ -45,7 +45,7 @@ class Command(BaseCommand):
             "--no-input",
             action="store_false",
             dest="interactive",
-            help="Tells Django to NOT prompt the user for input of any kind.",
+            help="Tells Thibaud to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
             "--squashed-name",

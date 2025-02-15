@@ -1,9 +1,9 @@
 from unittest import mock
 
-from django.template import TemplateDoesNotExist
-from django.test import Client, RequestFactory, SimpleTestCase, override_settings
-from django.utils.translation import override
-from django.views.csrf import CSRF_FAILURE_TEMPLATE_NAME, csrf_failure
+from thibaud.template import TemplateDoesNotExist
+from thibaud.test import Client, RequestFactory, SimpleTestCase, override_settings
+from thibaud.utils.translation import override
+from thibaud.views.csrf import CSRF_FAILURE_TEMPLATE_NAME, csrf_failure
 
 
 @override_settings(ROOT_URLCONF="view_tests.urls")
@@ -15,9 +15,9 @@ class CsrfViewTests(SimpleTestCase):
     @override_settings(
         USE_I18N=True,
         MIDDLEWARE=[
-            "django.middleware.locale.LocaleMiddleware",
-            "django.middleware.common.CommonMiddleware",
-            "django.middleware.csrf.CsrfViewMiddleware",
+            "thibaud.middleware.locale.LocaleMiddleware",
+            "thibaud.middleware.common.CommonMiddleware",
+            "thibaud.middleware.csrf.CsrfViewMiddleware",
         ],
     )
     def test_translation(self):
@@ -82,7 +82,7 @@ class CsrfViewTests(SimpleTestCase):
         )
 
     @override_settings(TEMPLATES=[])
-    def test_no_django_template_engine(self):
+    def test_no_thibaud_template_engine(self):
         """
         The CSRF view doesn't depend on the TEMPLATES configuration (#24388).
         """
@@ -92,11 +92,11 @@ class CsrfViewTests(SimpleTestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "OPTIONS": {
                     "loaders": [
                         (
-                            "django.template.loaders.locmem.Loader",
+                            "thibaud.template.loaders.locmem.Loader",
                             {
                                 CSRF_FAILURE_TEMPLATE_NAME: (
                                     "Test template for CSRF failure"
@@ -127,20 +127,20 @@ class CsrfViewTests(SimpleTestCase):
         be opened as utf-8 charset as is the default specified on template
         engines.
         """
-        from django.views.csrf import Path
+        from thibaud.views.csrf import Path
 
         with mock.patch.object(Path, "open") as m:
             csrf_failure(mock.MagicMock(), mock.Mock())
             m.assert_called_once_with(encoding="utf-8")
 
     @override_settings(DEBUG=True)
-    @mock.patch("django.views.csrf.get_docs_version", return_value="4.2")
+    @mock.patch("thibaud.views.csrf.get_docs_version", return_value="4.2")
     def test_doc_links(self, mocked_get_complete_version):
         response = self.client.post("/")
         self.assertContains(response, "Forbidden", status_code=403)
         self.assertNotContains(
-            response, "https://docs.djangoproject.com/en/dev/", status_code=403
+            response, "https://docs.thibaudproject.com/en/dev/", status_code=403
         )
         self.assertContains(
-            response, "https://docs.djangoproject.com/en/4.2/", status_code=403
+            response, "https://docs.thibaudproject.com/en/4.2/", status_code=403
         )

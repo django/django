@@ -1,5 +1,5 @@
-from django.urls import path
-from django.views.generic import TemplateView
+from thibaud.urls import path
+from thibaud.views.generic import TemplateView
 
 view = TemplateView.as_view(template_name="dummy.html")
 

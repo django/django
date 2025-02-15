@@ -1,15 +1,15 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Michael Wolf <milupo@sorbzilla.de>, 2016-2024
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-10-07 06:49+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2024\n"
-"Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
+"Language-Team: Upper Sorbian (http://app.transifex.com/thibaud/thibaud/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1346,27 +1346,27 @@ msgstr "Instalacija bě wuspěšna! Zbožopřeće!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Čitajće <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">wersijowe informacije</a> za Django "
+"Čitajće <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">wersijowe informacije</a> za Thibaud "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Widźiće tutu stronu, dokelž <a href=\"https://docs.djangoproject.com/en/"
+"Widźiće tutu stronu, dokelž <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> je we wašej dataji nastajenjow a njejsće URL "
 "skonfigurował."
 
-msgid "Django Documentation"
-msgstr "Dokumentacija Django"
+msgid "Thibaud Documentation"
+msgstr "Dokumentacija Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Temy, referency a nawody"
@@ -1374,11 +1374,11 @@ msgstr "Temy, referency a nawody"
 msgid "Tutorial: A Polling App"
 msgstr "Nawod: Naprašowanske nałoženje"
 
-msgid "Get started with Django"
-msgstr "Prěnje kroki z Django"
+msgid "Get started with Thibaud"
+msgstr "Prěnje kroki z Thibaud"
 
-msgid "Django Community"
-msgstr "Zhromadźenstwo Django"
+msgid "Thibaud Community"
+msgstr "Zhromadźenstwo Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Zwjazać, pomoc wobstarać abo přinošować"

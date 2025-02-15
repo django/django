@@ -1,25 +1,25 @@
 ============================
-The Django template language
+The Thibaud template language
 ============================
 
-This document explains the language syntax of the Django template system. If
+This document explains the language syntax of the Thibaud template system. If
 you're looking for a more technical perspective on how it works and how to
 extend it, see :doc:`/ref/templates/api`.
 
-Django's template language is designed to strike a balance between power and
+Thibaud's template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
 you have any exposure to other text-based template languages, such as Smarty_
-or Jinja2_, you should feel right at home with Django's templates.
+or Jinja2_, you should feel right at home with Thibaud's templates.
 
 .. admonition:: Philosophy
 
     If you have a background in programming, or if you're used to languages
     which mix programming code directly into HTML, you'll want to bear in
-    mind that the Django template system is not simply Python embedded into
+    mind that the Thibaud template system is not simply Python embedded into
     HTML. This is by design: the template system is meant to express
     presentation, not program logic.
 
-    The Django template system provides tags which function similarly to some
+    The Thibaud template system provides tags which function similarly to some
     programming constructs -- an :ttag:`if` tag for boolean tests, a :ttag:`for`
     tag for looping, etc. -- but these are not simply executed as the
     corresponding Python code, and the template system will not execute
@@ -27,7 +27,7 @@ or Jinja2_, you should feel right at home with Django's templates.
     are supported by default (although you can add :doc:`your own extensions
     </howto/custom-template-tags>` to the template language as needed).
 
-.. _`The Django template language: For Python programmers`: ../templates_python/
+.. _`The Thibaud template language: For Python programmers`: ../templates_python/
 .. _Smarty: https://www.smarty.net/
 .. _Jinja2: https://palletsprojects.com/p/jinja/
 
@@ -43,7 +43,7 @@ template is evaluated, and **tags**, which control the logic of the template.
 Below is a minimal template that illustrates a few basics. Each element will be
 explained later in this document.
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% extends "base_generic.html" %}
 
@@ -65,7 +65,7 @@ explained later in this document.
 .. admonition:: Philosophy
 
     Why use a text-based template instead of an XML-based one (like Zope's
-    TAL)? We wanted Django's template language to be usable for more than
+    TAL)? We wanted Thibaud's template language to be usable for more than
     just XML/HTML templates. You can use the template language for any
     text-based format such as emails, JavaScript and CSV.
 
@@ -100,7 +100,7 @@ Use a dot (``.``) to access attributes of a variable.
     override dictionary lookup. For example, consider the following code snippet
     that attempts to loop over a ``collections.defaultdict``:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {% for k, v in defaultdict.items %}
             Do something with k and v here...
@@ -144,7 +144,7 @@ variable.
 Filter arguments that contain spaces must be quoted; for example, to join a
 list with commas and spaces you'd use ``{{ list|join:", " }}``.
 
-Django provides about sixty built-in template filters. You can read all about
+Thibaud provides about sixty built-in template filters. You can read all about
 them in the :ref:`built-in filter reference <ref-templates-builtins-filters>`.
 To give you a taste of what's available, here are some of the more commonly
 used template filters:
@@ -153,7 +153,7 @@ used template filters:
     If a variable is false or empty, use given default. Otherwise, use the
     value of the variable. For example:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {{ value|default:"nothing" }}
 
@@ -164,7 +164,7 @@ used template filters:
     Returns the length of the value. This works for both strings and lists.
     For example:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {{ value|length }}
 
@@ -174,7 +174,7 @@ used template filters:
     Formats the value like a "human-readable" file size (i.e. ``'13 KB'``,
     ``'4.1 MB'``, ``'102 bytes'``, etc.). For example:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {{ value|filesizeformat }}
 
@@ -188,7 +188,7 @@ You can also create your own custom template filters; see
 
 .. seealso::
 
-    Django's admin interface can include a complete reference of all template
+    Thibaud's admin interface can include a complete reference of all template
     tags and filters available for a given site. See
     :doc:`/ref/contrib/admin/admindocs`.
 
@@ -202,7 +202,7 @@ some load external information into the template to be used by later variables.
 Some tags require beginning and ending tags (i.e. ``{% tag %} ... tag contents
 ... {% endtag %}``).
 
-Django ships with about two dozen built-in template tags. You can read all about
+Thibaud ships with about two dozen built-in template tags. You can read all about
 them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`. To give
 you a taste of what's available, here are some of the more commonly used
 tags:
@@ -211,7 +211,7 @@ tags:
     Loop over each item in an array.  For example, to display a list of athletes
     provided in ``athlete_list``:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <ul>
         {% for athlete in athlete_list %}
@@ -223,7 +223,7 @@ tags:
     Evaluates a variable, and if that variable is "true" the contents of the
     block are displayed:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {% if athlete_list %}
             Number of athletes: {{ athlete_list|length }}
@@ -241,7 +241,7 @@ tags:
 
     You can also use filters and various operators in the :ttag:`if` tag:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {% if athlete_list|length > 1 %}
            Team: {% for athlete in athlete_list %} ... {% endfor %}
@@ -265,7 +265,7 @@ You can also create your own custom template tags; see
 
 .. seealso::
 
-    Django's admin interface can include a complete reference of all template
+    Thibaud's admin interface can include a complete reference of all template
     tags and filters available for a given site. See
     :doc:`/ref/contrib/admin/admindocs`.
 
@@ -278,13 +278,13 @@ To comment-out part of a line in a template, use the comment syntax: ``{# #}``.
 
 For example, this template would render as ``'hello'``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {# greeting #}hello
 
 A comment can contain any template code, invalid or not. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {# {% if foo %}bar{% else %} #}
 
@@ -297,14 +297,14 @@ multiline portion of the template, see the :ttag:`comment` tag.
 Template inheritance
 ====================
 
-The most powerful -- and thus the most complex -- part of Django's template
+The most powerful -- and thus the most complex -- part of Thibaud's template
 engine is template inheritance. Template inheritance allows you to build a base
 "skeleton" template that contains all the common elements of your site and
 defines **blocks** that child templates can override.
 
 Let's look at template inheritance by starting with an example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <!DOCTYPE html>
     <html lang="en">
@@ -339,7 +339,7 @@ engine that a child template may override those portions of the template.
 
 A child template might look like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% extends "base.html" %}
 
@@ -361,7 +361,7 @@ in ``base.html`` and replace those blocks with the contents of the child
 template. Depending on the value of ``blog_entries``, the output might look
 like:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <!DOCTYPE html>
     <html lang="en">
@@ -440,7 +440,7 @@ Here are some tips for working with inheritance:
   tag ``as`` syntax can't be used inside the block. For example, this template
   doesn't render anything:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% translate "Title" as title %}
       {% block content %}{{ title }}{% endblock %}
@@ -448,7 +448,7 @@ Here are some tips for working with inheritance:
 * For extra readability, you can optionally give a *name* to your
   ``{% endblock %}`` tag. For example:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% block content %}
       ...
@@ -462,7 +462,7 @@ Here are some tips for working with inheritance:
   tags. For example, this template will *always* override the content of the
   ``title`` block:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% if change_title %}
           {% block title %}Hello!{% endblock title %}
@@ -485,20 +485,20 @@ When generating HTML from templates, there's always a risk that a variable will
 include characters that affect the resulting HTML. For example, consider this
 template fragment:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     Hello, {{ name }}
 
 At first, this seems like a harmless way to display a user's name, but consider
 what would happen if the user entered their name as this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <script>alert('hello')</script>
 
 With this name value, the template would be rendered as:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     Hello, <script>alert('hello')</script>
 
@@ -512,7 +512,7 @@ Similarly, what if the name contained a ``'<'`` symbol, like this?
 
 That would result in a rendered template like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     Hello, <b>username
 
@@ -528,14 +528,14 @@ To avoid this problem, you have two options:
 * One, you can make sure to run each untrusted variable through the
   :tfilter:`escape` filter (documented below), which converts potentially
   harmful HTML characters to unharmful ones. This was the default solution
-  in Django for its first few years, but the problem is that it puts the
+  in Thibaud for its first few years, but the problem is that it puts the
   onus on *you*, the developer / template author, to ensure you're escaping
   everything. It's easy to forget to escape data.
 
-* Two, you can take advantage of Django's automatic HTML escaping. The
+* Two, you can take advantage of Thibaud's automatic HTML escaping. The
   remainder of this section describes how auto-escaping works.
 
-By default in Django, every template automatically escapes the output
+By default in Thibaud, every template automatically escapes the output
 of every variable tag. Specifically, these five characters are
 escaped:
 
@@ -545,7 +545,7 @@ escaped:
 * ``"`` (double quote) is converted to ``&quot;``
 * ``&`` is converted to ``&amp;``
 
-Again, we stress that this behavior is on by default. If you're using Django's
+Again, we stress that this behavior is on by default. If you're using Thibaud's
 template system, you're protected.
 
 .. _Cross Site Scripting: https://en.wikipedia.org/wiki/Cross-site_scripting
@@ -560,7 +560,7 @@ Why would you want to turn it off? Because sometimes, template variables
 contain data that you *intend* to be rendered as raw HTML, in which case you
 don't want their contents to be escaped. For example, you might store a blob of
 HTML in your database and want to embed that directly into your template. Or,
-you might be using Django's template system to produce text that is *not* HTML
+you might be using Thibaud's template system to produce text that is *not* HTML
 -- like an email message, for instance.
 
 For individual variables
@@ -569,7 +569,7 @@ For individual variables
 To disable auto-escaping for an individual variable, use the :tfilter:`safe`
 filter:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     This will be escaped: {{ data }}
     This will not be escaped: {{ data|safe }}
@@ -578,7 +578,7 @@ Think of *safe* as shorthand for *safe from further escaping* or *can be
 safely interpreted as HTML*. In this example, if ``data`` contains ``'<b>'``,
 the output will be:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     This will be escaped: &lt;b&gt;
     This will not be escaped: <b>
@@ -589,7 +589,7 @@ For template blocks
 To control auto-escaping for a template, wrap the template (or a particular
 section of the template) in the :ttag:`autoescape` tag, like so:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% autoescape off %}
         Hello {{ name }}
@@ -599,7 +599,7 @@ The :ttag:`autoescape` tag takes either ``on`` or ``off`` as its argument. At
 times, you might want to force auto-escaping when it would otherwise be
 disabled. Here is an example template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     Auto-escaping is on by default. Hello {{ name }}
 
@@ -616,7 +616,7 @@ The auto-escaping tag passes its effect onto templates that extend the
 current one as well as templates included via the :ttag:`include` tag,
 just like all block tags. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
     :caption: ``base.html``
 
     {% autoescape off %}
@@ -625,7 +625,7 @@ just like all block tags. For example:
     {% endblock %}
     {% endautoescape %}
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
     :caption: ``child.html``
 
     {% extends "base.html" %}
@@ -636,7 +636,7 @@ Because auto-escaping is turned off in the base template, it will also be
 turned off in the child template, resulting in the following rendered
 HTML when the ``greeting`` variable contains the string ``<b>Hello!</b>``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <h1>This &amp; that</h1>
     <b>Hello!</b>
@@ -662,7 +662,7 @@ String literals and automatic escaping
 
 As we mentioned earlier, filter arguments can be strings:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ data|default:"This is a string literal." }}
 
@@ -674,13 +674,13 @@ escaped when the template is written.
 
 This means you would write :
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ data|default:"3 &lt; 2" }}
 
 ...rather than:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ data|default:"3 < 2" }}  {# Bad! Don't do this. #}
 
@@ -695,13 +695,13 @@ Accessing method calls
 
 Most method calls attached to objects are also available from within templates.
 This means that templates have access to much more than just class attributes
-(like field names) and variables passed in from views. For example, the Django
+(like field names) and variables passed in from views. For example, the Thibaud
 ORM provides the :ref:`"entry_set"<topics-db-queries-related>` syntax for
 finding a collection of objects related on a foreign key. Therefore, given
 a model called "comment" with a foreign key relationship to a model called
 "task" you can loop through all comments attached to a given task like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for comment in task.comment_set.all %}
         {{ comment }}
@@ -711,7 +711,7 @@ Similarly, :doc:`QuerySets</ref/models/querysets>` provide a ``count()`` method
 to count the number of objects they contain. Therefore, you can obtain a count
 of all comments related to the current task with:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ task.comment_set.all.count }}
 
@@ -724,12 +724,12 @@ You can also access methods you've explicitly defined on your own models:
         def foo(self):
             return "bar"
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
     :caption: ``template.html``
 
     {{ task.foo }}
 
-Because Django intentionally limits the amount of logic processing available
+Because Thibaud intentionally limits the amount of logic processing available
 in the template language, it is not possible to pass arguments to method calls
 accessed from within templates. Data should be calculated in views, then passed
 to templates for display.
@@ -741,10 +741,10 @@ Custom tag and filter libraries
 
 Certain applications provide custom tag and filter libraries. To access them in
 a template, ensure the application is in :setting:`INSTALLED_APPS` (we'd add
-``'django.contrib.humanize'`` for this example), and then use the :ttag:`load`
+``'thibaud.contrib.humanize'`` for this example), and then use the :ttag:`load`
 tag in a template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load humanize %}
 
@@ -752,13 +752,13 @@ tag in a template:
 
 In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which then
 makes the ``intcomma`` filter available for use. If you've enabled
-:mod:`django.contrib.admindocs`, you can consult the documentation area in your
+:mod:`thibaud.contrib.admindocs`, you can consult the documentation area in your
 admin to find the list of custom libraries in your installation.
 
 The :ttag:`load` tag can take multiple library names, separated by spaces.
 Example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load humanize i18n %}
 

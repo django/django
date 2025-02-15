@@ -1,6 +1,6 @@
-from django.template import Context, Engine
-from django.template.base import TextNode, VariableNode
-from django.test import SimpleTestCase
+from thibaud.template import Context, Engine
+from thibaud.template.base import TextNode, VariableNode
+from thibaud.test import SimpleTestCase
 
 
 class NodelistTest(SimpleTestCase):

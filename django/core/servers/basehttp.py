@@ -3,7 +3,7 @@ HTTP server that implements the Python WSGI protocol (PEP 333, rev 1.21).
 
 Based on wsgiref.simple_server which is part of the standard library since 2.5.
 
-This is a simple server for use in testing or debugging Django apps. It hasn't
+This is a simple server for use in testing or debugging Thibaud apps. It hasn't
 been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 """
 
@@ -14,15 +14,15 @@ import sys
 from collections import deque
 from wsgiref import simple_server
 
-from django.core.exceptions import ImproperlyConfigured
-from django.core.handlers.wsgi import LimitedStream
-from django.core.wsgi import get_wsgi_application
-from django.db import connections
-from django.utils.module_loading import import_string
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.handlers.wsgi import LimitedStream
+from thibaud.core.wsgi import get_wsgi_application
+from thibaud.db import connections
+from thibaud.utils.module_loading import import_string
 
 __all__ = ("WSGIServer", "WSGIRequestHandler")
 
-logger = logging.getLogger("django.server")
+logger = logging.getLogger("thibaud.server")
 
 
 def get_internal_wsgi_application():
@@ -32,13 +32,13 @@ def get_internal_wsgi_application():
     this will be the ``application`` object in ``projectname/wsgi.py``.
 
     This function, and the ``WSGI_APPLICATION`` setting itself, are only useful
-    for Django's internal server (runserver); external WSGI servers should just
+    for Thibaud's internal server (runserver); external WSGI servers should just
     be configured to point to the correct application object directly.
 
     If settings.WSGI_APPLICATION is not set (is ``None``), return
-    whatever ``django.core.wsgi.get_wsgi_application`` returns.
+    whatever ``thibaud.core.wsgi.get_wsgi_application`` returns.
     """
-    from django.conf import settings
+    from thibaud.conf import settings
 
     app_path = getattr(settings, "WSGI_APPLICATION")
     if app_path is None:

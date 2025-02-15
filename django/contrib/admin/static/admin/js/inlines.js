@@ -1,6 +1,6 @@
 /*global DateTimeShortcuts, SelectFilter*/
 /**
- * Django admin inlines
+ * Thibaud admin inlines
  *
  * Based on jQuery Formset 1.1
  * @author Stanislaus Madueke (stan DOT madueke AT gmail DOT com)
@@ -10,14 +10,14 @@
  * All rights reserved.
  *
  * Spiced up with Code from Zain Memon's GSoC project 2009
- * and modified for Django by Jannis Leidel, Travis Swicegood and Julien Phalip.
+ * and modified for Thibaud by Jannis Leidel, Travis Swicegood and Julien Phalip.
  *
  * Licensed under the New BSD License
  * See: https://opensource.org/licenses/bsd-license.php
  */
 'use strict';
 {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $.fn.formset = function(opts) {
         const options = $.extend({}, $.fn.formset.defaults, opts);
         const $this = $(this);
@@ -197,7 +197,7 @@
 
     /* Setup plugin defaults */
     $.fn.formset.defaults = {
-        prefix: "form", // The form prefix for your django formset
+        prefix: "form", // The form prefix for your thibaud formset
         addText: "add another", // Text for the add link
         deleteText: "remove", // Text for the delete link
         addCssClass: "add-row", // CSS class applied to the add link

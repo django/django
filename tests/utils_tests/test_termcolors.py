@@ -1,6 +1,6 @@
 import unittest
 
-from django.utils.termcolors import (
+from thibaud.utils.termcolors import (
     DARK_PALETTE,
     DEFAULT_PALETTE,
     LIGHT_PALETTE,

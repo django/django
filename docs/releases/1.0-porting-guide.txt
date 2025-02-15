@@ -1,8 +1,8 @@
 =========================================
-Porting your apps from Django 0.96 to 1.0
+Porting your apps from Thibaud 0.96 to 1.0
 =========================================
 
-Django 1.0 breaks compatibility with 0.96 in some areas.
+Thibaud 1.0 breaks compatibility with 0.96 in some areas.
 
 This guide will help you port 0.96 projects and apps to 1.0. The first part of
 this document includes the common changes needed to run with 1.0. If after going
@@ -24,7 +24,7 @@ need to make.
 Use Unicode
 -----------
 
-Change string literals (``'foo'``) into Unicode literals (``u'foo'``). Django
+Change string literals (``'foo'``) into Unicode literals (``u'foo'``). Thibaud
 now uses Unicode strings throughout. In most places, raw strings will continue
 to work, but updating to use Unicode literals will prevent some obscure
 problems.
@@ -74,11 +74,11 @@ see `the admin`_ below for more details.
 
 .. seealso::
 
-    A contributor to djangosnippets__ has written a script that'll `scan your
+    A contributor to thibaudsnippets__ has written a script that'll `scan your
     models.py and generate a corresponding admin.py`__.
 
-    __ https://djangosnippets.org/
-    __ https://djangosnippets.org/snippets/603/
+    __ https://thibaudsnippets.org/
+    __ https://thibaudsnippets.org/snippets/603/
 
 Example
 ~~~~~~~
@@ -110,7 +110,7 @@ New (1.0) ``models.py``::
 
 New (1.0) ``admin.py``::
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
     from models import Author
 
 
@@ -124,10 +124,10 @@ New (1.0) ``admin.py``::
 The Admin
 ---------
 
-One of the biggest changes in 1.0 is the new admin. The Django administrative
-interface (``django.contrib.admin``) has been completely refactored; admin
+One of the biggest changes in 1.0 is the new admin. The Thibaud administrative
+interface (``thibaud.contrib.admin``) has been completely refactored; admin
 definitions are now completely decoupled from model definitions, the framework
-has been rewritten to use Django's new form-handling library and redesigned with
+has been rewritten to use Thibaud's new form-handling library and redesigned with
 extensibility and customization in mind.
 
 Practically, this means you'll need to rewrite all of your ``class Admin``
@@ -213,7 +213,7 @@ New (1.0)::
     * The new admin comes with a ton of new features; you can read about them in
       the :doc:`admin documentation </ref/contrib/admin/index>`.
 
-    __ https://code.djangoproject.com/wiki/NewformsAdminBranch
+    __ https://code.thibaudproject.com/wiki/NewformsAdminBranch
 
 URLs
 ----
@@ -225,20 +225,20 @@ If you're using the admin site, you need to update your root ``urls.py``.
 
 Old (0.96) ``urls.py``::
 
-    from django.conf.urls.defaults import *
+    from thibaud.conf.urls.defaults import *
 
     urlpatterns = patterns(
         "",
-        (r"^admin/", include("django.contrib.admin.urls")),
+        (r"^admin/", include("thibaud.contrib.admin.urls")),
         # ... the rest of your URLs here ...
     )
 
 New (1.0) ``urls.py``::
 
-    from django.conf.urls.defaults import *
+    from thibaud.conf.urls.defaults import *
 
     # The next two lines enable the admin and load each admin.py file:
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
     admin.autodiscover()
 
@@ -251,10 +251,10 @@ New (1.0) ``urls.py``::
 Views
 -----
 
-Use ``django.forms`` instead of ``newforms``
+Use ``thibaud.forms`` instead of ``newforms``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Replace ``django.newforms`` with ``django.forms`` -- Django 1.0 renamed the
+Replace ``thibaud.newforms`` with ``thibaud.forms`` -- Thibaud 1.0 renamed the
 ``newforms`` module (introduced in 0.96) to plain old ``forms``. The
 ``oldforms`` module was also removed.
 
@@ -264,14 +264,14 @@ statements.
 
 Old::
 
-    from django import newforms as forms
+    from thibaud import newforms as forms
 
 New::
 
-    from django import forms
+    from thibaud import forms
 
-If you're using the old forms system (formerly known as ``django.forms`` and
-``django.oldforms``), you'll have to rewrite your forms. A good place to start
+If you're using the old forms system (formerly known as ``thibaud.forms`` and
+``thibaud.oldforms``), you'll have to rewrite your forms. A good place to start
 is the :doc:`forms documentation </topics/forms/index>`
 
 Handle uploaded files using the new API
@@ -279,7 +279,7 @@ Handle uploaded files using the new API
 
 Replace use of uploaded files -- that is, entries in ``request.FILES`` -- as
 simple dictionaries with the new
-:class:`~django.core.files.uploadedfile.UploadedFile`. The old dictionary
+:class:`~thibaud.core.files.uploadedfile.UploadedFile`. The old dictionary
 syntax no longer works.
 
 Thus, in a view like::
@@ -301,11 +301,11 @@ Old (0.96)            New (1.0)
 Work with file fields using the new API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The internal implementation of :class:`django.db.models.FileField` have changed.
+The internal implementation of :class:`thibaud.db.models.FileField` have changed.
 A visible result of this is that the way you access special attributes (URL,
 filename, image size, etc.) of these model fields has changed. You will need to
 make the following changes, assuming your model's
-:class:`~django.db.models.FileField` is called ``myfile``:
+:class:`~thibaud.db.models.FileField` is called ``myfile``:
 
 =================================== ========================
 Old (0.96)                           New (1.0)
@@ -319,14 +319,14 @@ Old (0.96)                           New (1.0)
 =================================== ========================
 
 Note that the ``width`` and ``height`` attributes only make sense for
-:class:`~django.db.models.ImageField` fields. More details can be found in the
+:class:`~thibaud.db.models.ImageField` fields. More details can be found in the
 :doc:`model API </ref/models/fields>` documentation.
 
 Use ``Paginator`` instead of ``ObjectPaginator``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``ObjectPaginator`` in 0.96 has been removed and replaced with an improved
-version, :class:`django.core.paginator.Paginator`.
+version, :class:`thibaud.core.paginator.Paginator`.
 
 Templates
 ---------
@@ -340,7 +340,7 @@ every variable. To learn more, see :ref:`automatic-html-escaping`.
 To disable auto-escaping for an individual variable, use the :tfilter:`safe`
 filter:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
       This will be escaped: {{ data }}
       This will not be escaped: {{ data|safe }}
@@ -348,7 +348,7 @@ filter:
 To disable auto-escaping for an entire template, wrap the template (or just a
 particular section of the template) in the :ttag:`autoescape` tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
       {% autoescape off %}
          ... unescaped template content here ...
@@ -367,15 +367,15 @@ Signals
 * Add ``**kwargs`` to any registered signal handlers.
 
 * Connect, disconnect, and send signals via methods on the
-  :class:`~django.dispatch.Signal` object instead of through module methods in
-  ``django.dispatch.dispatcher``.
+  :class:`~thibaud.dispatch.Signal` object instead of through module methods in
+  ``thibaud.dispatch.dispatcher``.
 
 * Remove any use of the ``Anonymous`` and ``Any`` sender options; they no longer
   exist. You can still receive signals sent by any sender by using
   ``sender=None``
 
 * Make any custom signals you've declared into instances of
-  :class:`django.dispatch.Signal` instead of anonymous objects.
+  :class:`thibaud.dispatch.Signal` instead of anonymous objects.
 
 Here's quick summary of the code changes you'll need to make:
 
@@ -383,7 +383,7 @@ Here's quick summary of the code changes you'll need to make:
 Old (0.96)                                         New (1.0)
 =================================================  ======================================
 ``def callback(sender)``                           ``def callback(sender, **kwargs)``
-``sig = object()``                                 ``sig = django.dispatch.Signal()``
+``sig = object()``                                 ``sig = thibaud.dispatch.Signal()``
 ``dispatcher.connect(callback, sig)``              ``sig.connect(callback)``
 ``dispatcher.send(sig, sender)``                   ``sig.send(sender)``
 ``dispatcher.connect(callback, sig, sender=Any)``  ``sig.connect(callback, sender=None)``
@@ -392,7 +392,7 @@ Old (0.96)                                         New (1.0)
 Comments
 --------
 
-If you were using Django 0.96's ``django.contrib.comments`` app, you'll need to
+If you were using Thibaud 0.96's ``thibaud.contrib.comments`` app, you'll need to
 upgrade to the new comments app introduced in 1.0. See the upgrade guide
 for details.
 
@@ -411,8 +411,8 @@ Local flavors
 U.S. local flavor
 ~~~~~~~~~~~~~~~~~
 
-``django.contrib.localflavor.usa`` has been renamed to
-``django.contrib.localflavor.us``. This change was made to match the naming
+``thibaud.contrib.localflavor.usa`` has been renamed to
+``thibaud.contrib.localflavor.us``. This change was made to match the naming
 scheme of other local flavors. To migrate your code, all you need to do is
 change the imports.
 
@@ -442,23 +442,23 @@ Better exceptions
 ~~~~~~~~~~~~~~~~~
 
 The old :exc:`EnvironmentError` has split into an
-:exc:`ImportError` when Django fails to find the settings module
+:exc:`ImportError` when Thibaud fails to find the settings module
 and a :exc:`RuntimeError` when you try to reconfigure settings
 after having already used them.
 
 :setting:`LOGIN_URL` has moved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :setting:`LOGIN_URL` constant moved from ``django.contrib.auth`` into the
-``settings`` module. Instead of using ``from django.contrib.auth import
+The :setting:`LOGIN_URL` constant moved from ``thibaud.contrib.auth`` into the
+``settings`` module. Instead of using ``from thibaud.contrib.auth import
 LOGIN_URL`` refer to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
 :setting:`APPEND_SLASH` behavior has been updated
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In 0.96, if a URL didn't end in a slash or have a period in the final
-component of its path, and :setting:`APPEND_SLASH` was True, Django would
-redirect to the same URL, but with a slash appended to the end. Now, Django
+component of its path, and :setting:`APPEND_SLASH` was True, Thibaud would
+redirect to the same URL, but with a slash appended to the end. Now, Thibaud
 checks to see whether the pattern without the trailing slash would be matched
 by something in your URL patterns. If so, no redirection takes place, because
 it is assumed you deliberately wanted to catch that pattern.
@@ -479,7 +479,7 @@ Smaller model changes
 Different exception from ``get()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Managers now return a :exc:`~django.core.exceptions.MultipleObjectsReturned`
+Managers now return a :exc:`~thibaud.core.exceptions.MultipleObjectsReturned`
 exception instead of :exc:`AssertionError`:
 
 Old (0.96)::
@@ -545,7 +545,7 @@ database column types for ``DecimalField`` are the same as for the old
 If you're using SQLite, you need to force the database to view the
 appropriate columns as decimal types, rather than floats. To do this, you'll
 need to reload your data. Do this after you have made the change to using
-``DecimalField`` in your code and updated the Django code.
+``DecimalField`` in your code and updated the Thibaud code.
 
 .. warning::
 
@@ -574,9 +574,9 @@ Notes:
    lose the data for the application(s) in question. Say yes; we'll restore
    this data in the third step.
 
-3. ``DecimalField`` is not used in any of the apps shipped with Django prior
+3. ``DecimalField`` is not used in any of the apps shipped with Thibaud prior
    to this change being made, so you do not need to worry about performing
-   this procedure for any of the standard Django models.
+   this procedure for any of the standard Thibaud models.
 
 If something goes wrong in the above process, just copy your backed up
 database file over the original file and start again.
@@ -584,7 +584,7 @@ database file over the original file and start again.
 Internationalization
 --------------------
 
-:func:`django.views.i18n.set_language` now requires a POST request
+:func:`thibaud.views.i18n.set_language` now requires a POST request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Previously, a GET request was used. The old behavior meant that state (the
@@ -605,7 +605,7 @@ If you were previously relying on ``_()`` always being present, you should now
 explicitly import ``ugettext`` or ``ugettext_lazy``, if appropriate, and alias
 it to ``_`` yourself::
 
-    from django.utils.translation import ugettext as _
+    from thibaud.utils.translation import ugettext as _
 
 HTTP request/response objects
 -----------------------------
@@ -629,8 +629,8 @@ receive (``request.GET`` or ``request.POST``); relying on the combined
 Accessing ``HTTPResponse`` headers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``django.http.HttpResponse.headers`` has been renamed to ``_headers`` and
-:class:`~django.http.HttpResponse` now supports containment checking directly.
+``thibaud.http.HttpResponse.headers`` has been renamed to ``_headers`` and
+:class:`~thibaud.http.HttpResponse` now supports containment checking directly.
 So use ``if header in response:`` instead of ``if header in response.headers:``.
 
 Generic relations
@@ -640,17 +640,17 @@ Generic relations have been moved out of core
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The generic relation classes -- ``GenericForeignKey`` and ``GenericRelation``
--- have moved into the :mod:`django.contrib.contenttypes` module.
+-- have moved into the :mod:`thibaud.contrib.contenttypes` module.
 
 Testing
 -------
 
-:meth:`django.test.Client.login` has changed
+:meth:`thibaud.test.Client.login` has changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Old (0.96)::
 
-    from django.test import Client
+    from thibaud.test import Client
 
     c = Client()
     c.login("/path/to/login", "myuser", "mypassword")
@@ -666,20 +666,20 @@ Management commands
 Running management commands from your code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:mod:`django.core.management` has been greatly refactored.
+:mod:`thibaud.core.management` has been greatly refactored.
 
 Calls to management services in your code now need to use
 ``call_command``. For example, if you have some test code that calls flush and
 load_data::
 
-      from django.core import management
+      from thibaud.core import management
 
       management.flush(verbosity=0, interactive=False)
       management.load_data(["test_data"], verbosity=0)
 
 ...you'll need to change this code to read::
 
-      from django.core import management
+      from thibaud.core import management
 
       management.call_command("flush", verbosity=0, interactive=False)
       management.call_command("loaddata", "test_data", verbosity=0)
@@ -687,18 +687,18 @@ load_data::
 Subcommands must now precede options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``django-admin.py`` and ``manage.py`` now require subcommands to precede
+``thibaud-admin.py`` and ``manage.py`` now require subcommands to precede
 options. So:
 
 .. code-block:: console
 
-      $ django-admin.py --settings=foo.bar runserver
+      $ thibaud-admin.py --settings=foo.bar runserver
 
 ...no longer works and should be changed to:
 
 .. code-block:: console
 
-      $ django-admin.py runserver --settings=foo.bar
+      $ thibaud-admin.py runserver --settings=foo.bar
 
 Syndication
 -----------
@@ -718,16 +718,16 @@ Data structures
 ``SortedDictFromList`` is gone
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``django.newforms.forms.SortedDictFromList`` was removed.
-``django.utils.datastructures.SortedDict`` can now be instantiated with
+``thibaud.newforms.forms.SortedDictFromList`` was removed.
+``thibaud.utils.datastructures.SortedDict`` can now be instantiated with
 a sequence of tuples.
 
 To update your code:
 
-1. Use ``django.utils.datastructures.SortedDict`` wherever you were
-   using ``django.newforms.forms.SortedDictFromList``.
+1. Use ``thibaud.utils.datastructures.SortedDict`` wherever you were
+   using ``thibaud.newforms.forms.SortedDictFromList``.
 
-2. Because ``django.utils.datastructures.SortedDict.copy`` doesn't
+2. Because ``thibaud.utils.datastructures.SortedDict.copy`` doesn't
    return a deepcopy as ``SortedDictFromList.copy()`` did, you will need
    to update your code if you were relying on a deepcopy. Do this by using
    ``copy.deepcopy`` directly.
@@ -740,7 +740,7 @@ Database backend functions have been renamed
 
 Almost *all* of the database backend-level functions have been renamed and/or
 relocated. None of these were documented, but you'll need to change your code
-if you're using any of these functions, all of which are in :mod:`django.db`:
+if you're using any of these functions, all of which are in :mod:`thibaud.db`:
 
 =======================================  ===================================================
 Old (0.96)                               New (1.0)

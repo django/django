@@ -2,20 +2,20 @@ from pathlib import Path
 
 from asgiref.local import Local
 
-from django.apps import apps
-from django.utils.autoreload import is_django_module
+from thibaud.apps import apps
+from thibaud.utils.autoreload import is_thibaud_module
 
 
 def watch_for_translation_changes(sender, **kwargs):
     """Register file watchers for .mo files in potential locale paths."""
-    from django.conf import settings
+    from thibaud.conf import settings
 
     if settings.USE_I18N:
         directories = [Path("locale")]
         directories.extend(
             Path(config.path) / "locale"
             for config in apps.get_app_configs()
-            if not is_django_module(config.module)
+            if not is_thibaud_module(config.module)
         )
         directories.extend(Path(p) for p in settings.LOCALE_PATHS)
         for path in directories:
@@ -27,7 +27,7 @@ def translation_file_changed(sender, file_path, **kwargs):
     if file_path.suffix == ".mo":
         import gettext
 
-        from django.utils.translation import trans_real
+        from thibaud.utils.translation import trans_real
 
         gettext._translations = {}
         trans_real._translations = {}

@@ -2,10 +2,10 @@ import math
 from decimal import Decimal
 from unittest import mock
 
-from django.core import validators
-from django.core.exceptions import ValidationError
-from django.db import connection, models
-from django.test import TestCase
+from thibaud.core import validators
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import connection, models
+from thibaud.test import TestCase
 
 from .models import BigD, Foo
 

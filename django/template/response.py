@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from thibaud.http import HttpResponse
 
 from .loader import get_template, select_template
 
@@ -34,7 +34,7 @@ class SimpleTemplateResponse(HttpResponse):
         # about requests, like TemplateResponse. It's defined in the base class
         # to minimize code duplication.
         # It's called self._request because self.request gets overwritten by
-        # django.test.client.Client. Unlike template_name and context_data,
+        # thibaud.test.client.Client. Unlike template_name and context_data,
         # _request should not be considered part of the public API.
         self._request = None
 

@@ -1,7 +1,7 @@
 import oracledb
 
-from django.contrib.gis.db.backends.base.adapter import WKTAdapter
-from django.contrib.gis.geos import GeometryCollection, Polygon
+from thibaud.contrib.gis.db.backends.base.adapter import WKTAdapter
+from thibaud.contrib.gis.geos import GeometryCollection, Polygon
 
 
 class OracleSpatialAdapter(WKTAdapter):

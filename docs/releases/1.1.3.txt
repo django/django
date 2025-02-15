@@ -1,16 +1,16 @@
 ==========================
-Django 1.1.3 release notes
+Thibaud 1.1.3 release notes
 ==========================
 
-Welcome to Django 1.1.3!
+Welcome to Thibaud 1.1.3!
 
-This is the third "bugfix" release in the Django 1.1 series,
-improving the stability and performance of the Django 1.1 codebase.
+This is the third "bugfix" release in the Thibaud 1.1 series,
+improving the stability and performance of the Thibaud 1.1 codebase.
 
-With one exception, Django 1.1.3 maintains backwards compatibility
-with Django 1.1.2. It also contains a number of fixes and other
-improvements. Django 1.1.2 is a recommended upgrade for any
-development or deployment currently using or targeting Django 1.1.
+With one exception, Thibaud 1.1.3 maintains backwards compatibility
+with Thibaud 1.1.2. It also contains a number of fixes and other
+improvements. Thibaud 1.1.2 is a recommended upgrade for any
+development or deployment currently using or targeting Thibaud 1.1.
 
 For full details on the new features, backwards incompatibilities, and
 deprecated features in the 1.1 branch, see the :doc:`/releases/1.1`.
@@ -21,7 +21,7 @@ Backwards incompatible changes
 Restricted filters in admin interface
 -------------------------------------
 
-The Django administrative interface, ``django.contrib.admin``, supports
+The Thibaud administrative interface, ``thibaud.contrib.admin``, supports
 filtering of displayed lists of objects by fields on the corresponding
 models, including across database-level relationships. This is
 implemented by passing lookup arguments in the querystring portion of
@@ -39,10 +39,10 @@ access to information outside of an admin user's permissions; for
 example, an attacker with access to the admin and sufficient knowledge
 of model structure and relations could construct query strings which --
 with repeated use of regular-expression lookups supported by the
-Django database API -- expose sensitive information such as users'
+Thibaud database API -- expose sensitive information such as users'
 password hashes.
 
-To remedy this, ``django.contrib.admin`` will now validate that
+To remedy this, ``thibaud.contrib.admin`` will now validate that
 querystring lookup arguments either specify only fields on the model
 being viewed, or cross relations which have been explicitly
 allowed by the application developer using the preexisting

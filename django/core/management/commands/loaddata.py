@@ -7,14 +7,14 @@ import warnings
 import zipfile
 from itertools import product
 
-from django.apps import apps
-from django.conf import settings
-from django.core import serializers
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management.color import no_style
-from django.core.management.utils import parse_apps_and_model_labels
-from django.db import (
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core import serializers
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.core.management.color import no_style
+from thibaud.core.management.utils import parse_apps_and_model_labels
+from thibaud.db import (
     DEFAULT_DB_ALIAS,
     DatabaseError,
     IntegrityError,
@@ -22,7 +22,7 @@ from django.db import (
     router,
     transaction,
 )
-from django.utils.functional import cached_property
+from thibaud.utils.functional import cached_property
 
 try:
     import bz2
@@ -105,7 +105,7 @@ class Command(BaseCommand):
         # Close the DB connection -- unless we're still in a transaction. This
         # is required as a workaround for an edge case in MySQL: if the same
         # connection is used to create tables, load data, and query, the query
-        # can return incorrect results. See Django #7572, MySQL #37735.
+        # can return incorrect results. See Thibaud #7572, MySQL #37735.
         if transaction.get_autocommit(self.using):
             connections[self.using].close()
 
@@ -148,7 +148,7 @@ class Command(BaseCommand):
 
         self.serialization_formats = serializers.get_public_serializer_formats()
 
-        # Django's test suite repeatedly tries to load initial_data fixtures
+        # Thibaud's test suite repeatedly tries to load initial_data fixtures
         # from apps that don't have any fixtures. Because disabling constraint
         # checks can be expensive on some database (especially MSSQL), bail
         # out early if no fixtures are found.

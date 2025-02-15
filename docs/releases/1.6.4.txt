@@ -1,16 +1,16 @@
 ==========================
-Django 1.6.4 release notes
+Thibaud 1.6.4 release notes
 ==========================
 
 *April 28, 2014*
 
-Django 1.6.4 fixes several bugs in 1.6.3.
+Thibaud 1.6.4 fixes several bugs in 1.6.3.
 
 Bugfixes
 ========
 
-* Added backwards compatibility support for the :mod:`django.contrib.messages`
-  cookie format of Django 1.4 and earlier to facilitate upgrading to 1.6 from
+* Added backwards compatibility support for the :mod:`thibaud.contrib.messages`
+  cookie format of Thibaud 1.4 and earlier to facilitate upgrading to 1.6 from
   1.4 (:ticket:`22426`).
 
 * Restored the ability to ``reverse()`` views created using

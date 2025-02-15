@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # lanbla <lanlinwen@buaa.edu.cn>, 2021
@@ -33,12 +33,12 @@
 # Ronald White <tkliuxing@me.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 07:05+0000\n"
 "Last-Translator: 千百度, 2024\n"
-"Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
+"Language-Team: Chinese (China) (http://app.transifex.com/thibaud/thibaud/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -298,11 +298,11 @@ msgstr ""
 "删除 %(class_name)s %(instance)s 将需要删除以下受保护的相关对象: "
 "%(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Django 站点管理员"
+msgid "Thibaud site admin"
+msgstr "Thibaud 站点管理员"
 
-msgid "Django administration"
-msgstr "Django 管理"
+msgid "Thibaud administration"
+msgstr "Thibaud 管理"
 
 msgid "Site administration"
 msgstr "站点管理"

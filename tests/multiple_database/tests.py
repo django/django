@@ -4,13 +4,13 @@ from io import StringIO
 from operator import attrgetter
 from unittest.mock import Mock
 
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
-from django.core import management
-from django.db import DEFAULT_DB_ALIAS, router, transaction
-from django.db.models import signals
-from django.db.utils import ConnectionRouter
-from django.test import SimpleTestCase, TestCase, override_settings
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core import management
+from thibaud.db import DEFAULT_DB_ALIAS, router, transaction
+from thibaud.db.models import signals
+from thibaud.db.utils import ConnectionRouter
+from thibaud.test import SimpleTestCase, TestCase, override_settings
 
 from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter
@@ -32,7 +32,7 @@ class QueryTestCase(TestCase):
     def test_default_creation(self):
         "Objects created on the default database don't leak onto other databases"
         # Create a book on the default database using create()
-        Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
+        Book.objects.create(title="Pro Thibaud", published=datetime.date(2008, 12, 16))
 
         # Create a book on the default database using a save
         dive = Book()
@@ -42,13 +42,13 @@ class QueryTestCase(TestCase):
 
         # Book exists on the default database, but not on other database
         try:
-            Book.objects.get(title="Pro Django")
-            Book.objects.using("default").get(title="Pro Django")
+            Book.objects.get(title="Pro Thibaud")
+            Book.objects.using("default").get(title="Pro Thibaud")
         except Book.DoesNotExist:
-            self.fail('"Pro Django" should exist on default database')
+            self.fail('"Pro Thibaud" should exist on default database')
 
         with self.assertRaises(Book.DoesNotExist):
-            Book.objects.using("other").get(title="Pro Django")
+            Book.objects.using("other").get(title="Pro Thibaud")
 
         try:
             Book.objects.get(title="Dive into Python")
@@ -63,7 +63,7 @@ class QueryTestCase(TestCase):
         "Objects created on another database don't leak onto the default database"
         # Create a book on the second database
         Book.objects.using("other").create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         # Create a book on the default database using a save
@@ -74,14 +74,14 @@ class QueryTestCase(TestCase):
 
         # Book exists on the default database, but not on other database
         try:
-            Book.objects.using("other").get(title="Pro Django")
+            Book.objects.using("other").get(title="Pro Thibaud")
         except Book.DoesNotExist:
-            self.fail('"Pro Django" should exist on other database')
+            self.fail('"Pro Thibaud" should exist on other database')
 
         with self.assertRaises(Book.DoesNotExist):
-            Book.objects.get(title="Pro Django")
+            Book.objects.get(title="Pro Thibaud")
         with self.assertRaises(Book.DoesNotExist):
-            Book.objects.using("default").get(title="Pro Django")
+            Book.objects.using("default").get(title="Pro Thibaud")
 
         try:
             Book.objects.using("other").get(title="Dive into Python")
@@ -156,7 +156,7 @@ class QueryTestCase(TestCase):
         "M2M fields are constrained to a single database"
         # Create a book and author on the default database
         pro = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         marty = Person.objects.create(name="Marty Alchin")
@@ -184,7 +184,7 @@ class QueryTestCase(TestCase):
                 .filter(authors__name="Marty Alchin")
                 .values_list("title", flat=True)
             ),
-            ["Pro Django"],
+            ["Pro Thibaud"],
         )
         self.assertEqual(
             list(
@@ -422,7 +422,7 @@ class QueryTestCase(TestCase):
         "Operations that involve sharing M2M objects across databases raise an error"
         # Create a book and author on the default database
         pro = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         marty = Person.objects.create(name="Marty Alchin")
@@ -535,7 +535,7 @@ class QueryTestCase(TestCase):
         "FK fields are constrained to a single database"
         # Create a book and author on the default database
         pro = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         george = Person.objects.create(name="George Vilches")
@@ -553,7 +553,7 @@ class QueryTestCase(TestCase):
         dive.editor = chris
         dive.save()
 
-        pro = Book.objects.using("default").get(title="Pro Django")
+        pro = Book.objects.using("default").get(title="Pro Thibaud")
         self.assertEqual(pro.editor.name, "George Vilches")
 
         dive = Book.objects.using("other").get(title="Dive into Python")
@@ -563,7 +563,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(
             list(
                 Person.objects.using("default")
-                .filter(edited__title="Pro Django")
+                .filter(edited__title="Pro Thibaud")
                 .values_list("name", flat=True)
             ),
             ["George Vilches"],
@@ -571,7 +571,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(
             list(
                 Person.objects.using("other")
-                .filter(edited__title="Pro Django")
+                .filter(edited__title="Pro Thibaud")
                 .values_list("name", flat=True)
             ),
             [],
@@ -717,7 +717,7 @@ class QueryTestCase(TestCase):
         "Operations that involve sharing FK objects across databases raise an error"
         # Create a book and author on the default database
         pro = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         marty = Person.objects.create(name="Marty Alchin")
 
@@ -960,7 +960,7 @@ class QueryTestCase(TestCase):
         "Generic fields are constrained to a single database"
         # Create a book and author on the default database
         pro = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         review1 = Review.objects.create(source="Python Monthly", content_object=pro)
 
@@ -974,7 +974,7 @@ class QueryTestCase(TestCase):
         )
 
         review1 = Review.objects.using("default").get(source="Python Monthly")
-        self.assertEqual(review1.content_object.title, "Pro Django")
+        self.assertEqual(review1.content_object.title, "Pro Thibaud")
 
         review2 = Review.objects.using("other").get(source="Python Weekly")
         self.assertEqual(review2.content_object.title, "Dive into Python")
@@ -1103,7 +1103,7 @@ class QueryTestCase(TestCase):
         """
         # Create a book and author on the default database
         pro = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         review1 = Review.objects.create(source="Python Monthly", content_object=pro)
 
@@ -1211,7 +1211,7 @@ class QueryTestCase(TestCase):
 
     def test_ordering(self):
         "get_next_by_XXX commands stick to a single database"
-        Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
+        Book.objects.create(title="Pro Thibaud", published=datetime.date(2008, 12, 16))
         dive = Book.objects.using("other").create(
             title="Dive into Python", published=datetime.date(2009, 5, 4)
         )
@@ -1442,7 +1442,7 @@ class RouterTestCase(TestCase):
     def test_database_routing(self):
         marty = Person.objects.using("default").create(name="Marty Alchin")
         pro = Book.objects.using("default").create(
-            title="Pro Django",
+            title="Pro Thibaud",
             published=datetime.date(2008, 12, 16),
             editor=marty,
         )
@@ -1454,14 +1454,14 @@ class RouterTestCase(TestCase):
         )
 
         # An update query will be routed to the default database
-        Book.objects.filter(title="Pro Django").update(pages=200)
+        Book.objects.filter(title="Pro Thibaud").update(pages=200)
 
         with self.assertRaises(Book.DoesNotExist):
             # By default, the get query will be directed to 'other'
-            Book.objects.get(title="Pro Django")
+            Book.objects.get(title="Pro Thibaud")
 
         # But the same query issued explicitly at a database will work.
-        pro = Book.objects.using("default").get(title="Pro Django")
+        pro = Book.objects.using("default").get(title="Pro Thibaud")
 
         # The update worked.
         self.assertEqual(pro.pages, 200)
@@ -1481,7 +1481,7 @@ class RouterTestCase(TestCase):
         # get_or_create is a special case. The get needs to be targeted at
         # the write database in order to avoid potential transaction
         # consistency problems
-        book, created = Book.objects.get_or_create(title="Pro Django")
+        book, created = Book.objects.get_or_create(title="Pro Thibaud")
         self.assertFalse(created)
 
         book, created = Book.objects.get_or_create(
@@ -1520,7 +1520,7 @@ class RouterTestCase(TestCase):
         "Foreign keys can cross databases if they two databases have a common source"
         # Create a book and author on the default database
         pro = Book.objects.using("default").create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         marty = Person.objects.using("default").create(name="Marty Alchin")
@@ -1645,7 +1645,7 @@ class RouterTestCase(TestCase):
         "M2M relations can cross databases if the database share a source"
         # Create books and authors on the inverse to the usual database
         pro = Book.objects.using("other").create(
-            pk=1, title="Pro Django", published=datetime.date(2008, 12, 16)
+            pk=1, title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
@@ -1774,7 +1774,7 @@ class RouterTestCase(TestCase):
         "Generic Key operations can span databases if they share a source"
         # Create a book and author on the default database
         pro = Book.objects.using("default").create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         review1 = Review.objects.using("default").create(
@@ -1848,7 +1848,7 @@ class RouterTestCase(TestCase):
     def test_m2m_managers(self):
         "M2M relations are represented by managers, and can be controlled like managers"
         pro = Book.objects.using("other").create(
-            pk=1, title="Pro Django", published=datetime.date(2008, 12, 16)
+            pk=1, title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
@@ -1869,7 +1869,7 @@ class RouterTestCase(TestCase):
         marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
         Book.objects.using("other").create(
             pk=1,
-            title="Pro Django",
+            title="Pro Thibaud",
             published=datetime.date(2008, 12, 16),
             editor=marty,
         )
@@ -1883,7 +1883,7 @@ class RouterTestCase(TestCase):
         controlled like managers.
         """
         pro = Book.objects.using("other").create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         Review.objects.using("other").create(
@@ -2010,12 +2010,12 @@ class FixtureTestCase(TestCase):
     @override_settings(DATABASE_ROUTERS=[AntiPetRouter()])
     def test_fixture_loading(self):
         "Multi-db fixtures are loaded correctly"
-        # "Pro Django" exists on the default database, but not on other database
-        Book.objects.get(title="Pro Django")
-        Book.objects.using("default").get(title="Pro Django")
+        # "Pro Thibaud" exists on the default database, but not on other database
+        Book.objects.get(title="Pro Thibaud")
+        Book.objects.using("default").get(title="Pro Thibaud")
 
         with self.assertRaises(Book.DoesNotExist):
-            Book.objects.using("other").get(title="Pro Django")
+            Book.objects.using("other").get(title="Pro Thibaud")
 
         # "Dive into Python" exists on the default database, but not on other database
         Book.objects.using("other").get(title="Dive into Python")
@@ -2026,9 +2026,9 @@ class FixtureTestCase(TestCase):
             Book.objects.using("default").get(title="Dive into Python")
 
         # "Definitive Guide" exists on the both databases
-        Book.objects.get(title="The Definitive Guide to Django")
-        Book.objects.using("default").get(title="The Definitive Guide to Django")
-        Book.objects.using("other").get(title="The Definitive Guide to Django")
+        Book.objects.get(title="The Definitive Guide to Thibaud")
+        Book.objects.using("default").get(title="The Definitive Guide to Thibaud")
+        Book.objects.using("other").get(title="The Definitive Guide to Thibaud")
 
     @override_settings(DATABASE_ROUTERS=[AntiPetRouter()])
     def test_pseudo_empty_fixtures(self):
@@ -2129,7 +2129,7 @@ class SignalTests(TestCase):
 
         # Create the models that will be used for the tests
         b = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         p = Person.objects.create(name="Marty Alchin")
 
@@ -2188,7 +2188,7 @@ class RouterAttributeErrorTestCase(TestCase):
     def test_attribute_error_read(self):
         "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         with self.override_router():
             with self.assertRaises(AttributeError):
@@ -2206,7 +2206,7 @@ class RouterAttributeErrorTestCase(TestCase):
     def test_attribute_error_delete(self):
         "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         p = Person.objects.create(name="Marty Alchin")
         b.authors.set([p])
@@ -2218,7 +2218,7 @@ class RouterAttributeErrorTestCase(TestCase):
     def test_attribute_error_m2m(self):
         "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         p = Person.objects.create(name="Marty Alchin")
         with self.override_router():
@@ -2240,7 +2240,7 @@ class RouterModelArgumentTestCase(TestCase):
 
     def test_m2m_collection(self):
         b = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
 
         p = Person.objects.create(name="Marty Alchin")
@@ -2271,8 +2271,8 @@ class MigrateTestCase(TestCase):
     # Limit memory usage when calling 'migrate'.
     available_apps = [
         "multiple_database",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
+        "thibaud.contrib.auth",
+        "thibaud.contrib.contenttypes",
     ]
     databases = {"default", "other"}
 
@@ -2369,7 +2369,7 @@ class RouteForWriteTestCase(TestCase):
     def test_m2m_add(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         with self.assertRaises(RouterUsed) as cm:
             with self.override_router():
@@ -2382,7 +2382,7 @@ class RouteForWriteTestCase(TestCase):
     def test_m2m_clear(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
@@ -2396,7 +2396,7 @@ class RouteForWriteTestCase(TestCase):
     def test_m2m_delete(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
@@ -2410,7 +2410,7 @@ class RouteForWriteTestCase(TestCase):
     def test_m2m_get_or_create(self):
         Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         with self.assertRaises(RouterUsed) as cm:
             with self.override_router():
@@ -2423,7 +2423,7 @@ class RouteForWriteTestCase(TestCase):
     def test_m2m_remove(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
@@ -2437,7 +2437,7 @@ class RouteForWriteTestCase(TestCase):
     def test_m2m_update(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
@@ -2451,7 +2451,7 @@ class RouteForWriteTestCase(TestCase):
     def test_reverse_m2m_add(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         with self.assertRaises(RouterUsed) as cm:
             with self.override_router():
@@ -2464,7 +2464,7 @@ class RouteForWriteTestCase(TestCase):
     def test_reverse_m2m_clear(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
@@ -2478,7 +2478,7 @@ class RouteForWriteTestCase(TestCase):
     def test_reverse_m2m_delete(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
@@ -2491,7 +2491,7 @@ class RouteForWriteTestCase(TestCase):
 
     def test_reverse_m2m_get_or_create(self):
         auth = Person.objects.create(name="Someone")
-        Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
+        Book.objects.create(title="Pro Thibaud", published=datetime.date(2008, 12, 16))
         with self.assertRaises(RouterUsed) as cm:
             with self.override_router():
                 auth.book_set.get_or_create(
@@ -2505,7 +2505,7 @@ class RouteForWriteTestCase(TestCase):
     def test_reverse_m2m_remove(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
@@ -2519,7 +2519,7 @@ class RouteForWriteTestCase(TestCase):
     def test_reverse_m2m_update(self):
         auth = Person.objects.create(name="Someone")
         book = Book.objects.create(
-            title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Thibaud", published=datetime.date(2008, 12, 16)
         )
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:

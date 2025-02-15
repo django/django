@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Fery Setiawan <gembelweb@gmail.com>, 2015-2018,2024
@@ -9,12 +9,12 @@
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-17 02:13-0600\n"
 "PO-Revision-Date: 2024-08-07 09:22+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2018,2024\n"
-"Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
+"Language-Team: Indonesian (http://app.transifex.com/thibaud/thibaud/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

@@ -1,9 +1,9 @@
 from functools import update_wrapper
 
-from django.contrib import admin
-from django.db import models
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from thibaud.contrib import admin
+from thibaud.db import models
+from thibaud.http import HttpResponseRedirect
+from thibaud.urls import reverse
 
 
 class Action(models.Model):
@@ -33,7 +33,7 @@ class ActionAdmin(admin.ModelAdmin):
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs
         # list.  Remove the existing one(s) first
-        from django.urls import re_path
+        from thibaud.urls import re_path
 
         def wrap(view):
             def wrapper(*args, **kwargs):

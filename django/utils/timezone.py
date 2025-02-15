@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone, tzinfo
 
 from asgiref.local import Local
 
-from django.conf import settings
+from thibaud.conf import settings
 
 __all__ = [
     "get_fixed_timezone",
@@ -104,7 +104,7 @@ def deactivate():
     """
     Unset the time zone for the current thread.
 
-    Django will then use the time zone defined by settings.TIME_ZONE.
+    Thibaud will then use the time zone defined by settings.TIME_ZONE.
     """
     if hasattr(_active, "value"):
         del _active.value
@@ -114,12 +114,12 @@ class override(ContextDecorator):
     """
     Temporarily set the time zone for the current thread.
 
-    This is a context manager that uses django.utils.timezone.activate()
+    This is a context manager that uses thibaud.utils.timezone.activate()
     to set the timezone on entry and restores the previously active timezone
     on exit.
 
     The ``timezone`` argument must be an instance of a ``tzinfo`` subclass, a
-    time zone name, or ``None``. If it is ``None``, Django enables the default
+    time zone name, or ``None``. If it is ``None``, Thibaud enables the default
     time zone.
     """
 

@@ -1,6 +1,6 @@
 import unittest
 
-from django.contrib.gis.gdal import GDAL_VERSION, gdal_full_version, gdal_version
+from thibaud.contrib.gis.gdal import GDAL_VERSION, gdal_full_version, gdal_version
 
 
 class GDALTest(unittest.TestCase):

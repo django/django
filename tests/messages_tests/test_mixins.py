@@ -1,6 +1,6 @@
-from django.core.signing import b64_decode
-from django.test import TestCase, override_settings
-from django.urls import reverse
+from thibaud.core.signing import b64_decode
+from thibaud.test import TestCase, override_settings
+from thibaud.urls import reverse
 
 from .models import SomeObject
 from .urls import ContactFormViewWithMsg, DeleteFormViewWithMsg

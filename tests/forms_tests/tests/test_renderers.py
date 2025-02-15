@@ -1,13 +1,13 @@
 import os
 import unittest
 
-from django.forms.renderers import (
+from thibaud.forms.renderers import (
     BaseRenderer,
-    DjangoTemplates,
+    ThibaudTemplates,
     Jinja2,
     TemplatesSetting,
 )
-from django.test import SimpleTestCase
+from thibaud.test import SimpleTestCase
 
 try:
     import jinja2
@@ -41,8 +41,8 @@ class BaseTemplateRendererTests(SimpleTestCase):
             BaseRenderer().get_template("")
 
 
-class DjangoTemplatesTests(SharedTests, SimpleTestCase):
-    renderer = DjangoTemplates
+class ThibaudTemplatesTests(SharedTests, SimpleTestCase):
+    renderer = ThibaudTemplates
 
 
 @unittest.skipIf(jinja2 is None, "jinja2 required")

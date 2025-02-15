@@ -1,12 +1,12 @@
-from django.conf import settings
-from django.contrib.flatpages.forms import FlatpageForm
-from django.contrib.flatpages.models import FlatPage
-from django.contrib.sites.models import Site
-from django.test import TestCase, modify_settings, override_settings
-from django.utils import translation
+from thibaud.conf import settings
+from thibaud.contrib.flatpages.forms import FlatpageForm
+from thibaud.contrib.flatpages.models import FlatPage
+from thibaud.contrib.sites.models import Site
+from thibaud.test import TestCase, modify_settings, override_settings
+from thibaud.utils import translation
 
 
-@modify_settings(INSTALLED_APPS={"append": ["django.contrib.flatpages"]})
+@modify_settings(INSTALLED_APPS={"append": ["thibaud.contrib.flatpages"]})
 @override_settings(SITE_ID=1)
 class FlatpageAdminFormTests(TestCase):
     @classmethod
@@ -65,7 +65,7 @@ class FlatpageAdminFormTests(TestCase):
             self.assertEqual(form.errors["url"], ["URL is missing a leading slash."])
 
     @override_settings(
-        APPEND_SLASH=True, MIDDLEWARE=["django.middleware.common.CommonMiddleware"]
+        APPEND_SLASH=True, MIDDLEWARE=["thibaud.middleware.common.CommonMiddleware"]
     )
     def test_flatpage_requires_trailing_slash_with_append_slash(self):
         form = FlatpageForm(data=dict(url="/no_trailing_slash", **self.form_data))
@@ -79,7 +79,7 @@ class FlatpageAdminFormTests(TestCase):
             self.assertEqual(form.errors["url"], ["URL is missing a trailing slash."])
 
     @override_settings(
-        APPEND_SLASH=False, MIDDLEWARE=["django.middleware.common.CommonMiddleware"]
+        APPEND_SLASH=False, MIDDLEWARE=["thibaud.middleware.common.CommonMiddleware"]
     )
     def test_flatpage_doesnt_requires_trailing_slash_without_append_slash(self):
         form = FlatpageForm(data=dict(url="/no_trailing_slash", **self.form_data))

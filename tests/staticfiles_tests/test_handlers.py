@@ -1,6 +1,6 @@
-from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
-from django.core.handlers.asgi import ASGIHandler
-from django.test import AsyncRequestFactory
+from thibaud.contrib.staticfiles.handlers import ASGIStaticFilesHandler
+from thibaud.core.handlers.asgi import ASGIHandler
+from thibaud.test import AsyncRequestFactory
 
 from .cases import StaticFilesTestCase
 

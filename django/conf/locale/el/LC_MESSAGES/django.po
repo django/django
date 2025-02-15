@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Apostolis Bessas <mpessas+txc@transifex.com>, 2013
@@ -16,12 +16,12 @@
 # Yorgos Pagles <y.pagles@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
 "PO-Revision-Date: 2021-11-18 21:19+0000\n"
 "Last-Translator: Transifex Bot <>\n"
-"Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
+"Language-Team: Greek (http://www.transifex.com/thibaud/thibaud/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1294,27 +1294,27 @@ msgstr "Η εγκατάσταση δούλεψε με επιτυχία! Συγχ
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Δείτε τις <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"Δείτε τις <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/"
 "\" target=\"_blank\" rel=\"noopener\">σημειώσεις κυκλοφορίας</a> για το "
-"Django %(version)s"
+"Thibaud %(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
-"Βλέπετε αυτό το μήνυμα επειδή έχετε <a href=\"https://docs.djangoproject.com/"
+"Βλέπετε αυτό το μήνυμα επειδή έχετε <a href=\"https://docs.thibaudproject.com/"
 "en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> στο αρχείο settings και δεν έχετε ρυθμίσει κανένα URL στο "
 "αρχείο urls.py. Στρωθείτε στην δουλειά!"
 
-msgid "Django Documentation"
-msgstr "Εγχειρίδιο Django"
+msgid "Thibaud Documentation"
+msgstr "Εγχειρίδιο Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Θέματα, αναφορές &amp; \"πως να...\""
@@ -1322,11 +1322,11 @@ msgstr "Θέματα, αναφορές &amp; \"πως να...\""
 msgid "Tutorial: A Polling App"
 msgstr "Εγχειρίδιο: Ένα App Ψηφοφορίας"
 
-msgid "Get started with Django"
-msgstr "Ξεκινήστε με το Django"
+msgid "Get started with Thibaud"
+msgstr "Ξεκινήστε με το Thibaud"
 
-msgid "Django Community"
-msgstr "Κοινότητα Django"
+msgid "Thibaud Community"
+msgstr "Κοινότητα Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Συνδεθείτε, λάβετε βοήθεια, ή συνεισφέρετε"

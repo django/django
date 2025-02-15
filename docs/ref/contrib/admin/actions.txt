@@ -2,28 +2,28 @@
 Admin actions
 =============
 
-.. currentmodule:: django.contrib.admin
+.. currentmodule:: thibaud.contrib.admin
 
-The basic workflow of Django's admin is, in a nutshell, "select an object,
+The basic workflow of Thibaud's admin is, in a nutshell, "select an object,
 then change it." This works well for a majority of use cases. However, if you
 need to make the same change to many objects at once, this workflow can be
 quite tedious.
 
-In these cases, Django's admin lets you write and register "actions" --
+In these cases, Thibaud's admin lets you write and register "actions" --
 functions that get called with a list of objects selected on the change list
 page.
 
 If you look at any change list in the admin, you'll see this feature in
-action; Django ships with a "delete selected objects" action available to all
-models. For example, here's the user module from Django's built-in
-:mod:`django.contrib.auth` app:
+action; Thibaud ships with a "delete selected objects" action available to all
+models. For example, here's the user module from Thibaud's built-in
+:mod:`thibaud.contrib.auth` app:
 
 .. image:: _images/admin-actions.png
 
 .. warning::
 
     The "delete selected objects" action uses :meth:`QuerySet.delete()
-    <django.db.models.query.QuerySet.delete>` for efficiency reasons, which
+    <thibaud.db.models.query.QuerySet.delete>` for efficiency reasons, which
     has an important caveat: your model's ``delete()`` method will not be
     called.
 
@@ -45,7 +45,7 @@ The easiest way to explain actions is by example, so let's dive in.
 A common use case for admin actions is the bulk updating of a model. Imagine a
 news application with an ``Article`` model::
 
-    from django.db import models
+    from thibaud.db import models
 
     STATUS_CHOICES = {
         "d": "Draft",
@@ -76,8 +76,8 @@ triggered from the admin. Action functions are regular functions that take
 three arguments:
 
 * The current :class:`ModelAdmin`
-* An :class:`~django.http.HttpRequest` representing the current request,
-* A :class:`~django.db.models.query.QuerySet` containing the set of
+* An :class:`~thibaud.http.HttpRequest` representing the current request,
+* A :class:`~thibaud.db.models.query.QuerySet` containing the set of
   objects selected by the user.
 
 Our publish-these-articles function won't need the :class:`ModelAdmin` or the
@@ -101,10 +101,10 @@ more optional-but-useful step and give the action a "nice" title in the admin.
 By default, this action would appear in the action list as "Make published" --
 the function name, with underscores replaced by spaces. That's fine, but we
 can provide a better, more human-friendly name by using the
-:func:`~django.contrib.admin.action` decorator on the ``make_published``
+:func:`~thibaud.contrib.admin.action` decorator on the ``make_published``
 function::
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
     ...
 
@@ -116,8 +116,8 @@ function::
 .. note::
 
     This might look familiar; the admin's
-    :attr:`~django.contrib.admin.ModelAdmin.list_display` option uses a similar
-    technique with the :func:`~django.contrib.admin.display` decorator to
+    :attr:`~thibaud.contrib.admin.ModelAdmin.list_display` option uses a similar
+    technique with the :func:`~thibaud.contrib.admin.display` decorator to
     provide human-readable descriptions for callback functions registered
     there, too.
 
@@ -128,7 +128,7 @@ Next, we'll need to inform our :class:`ModelAdmin` of the action. This works
 just like any other configuration option. So, the complete ``admin.py`` with
 the action and its registration would look like::
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
     from myapp.models import Article
 
 
@@ -159,7 +159,7 @@ Handling errors in actions
 If there are foreseeable error conditions that may occur while running your
 action, you should gracefully inform the user of the problem. This means
 handling exceptions and using
-:meth:`django.contrib.admin.ModelAdmin.message_user` to display a user friendly
+:meth:`thibaud.contrib.admin.ModelAdmin.message_user` to display a user friendly
 description of the problem in the response.
 
 Advanced action techniques
@@ -201,8 +201,8 @@ provided by the admin.
 For example, we can use ``self`` to flash a message to the user informing them
 that the action was successful::
 
-    from django.contrib import messages
-    from django.utils.translation import ngettext
+    from thibaud.contrib import messages
+    from thibaud.utils.translation import ngettext
 
 
     class ArticleAdmin(admin.ModelAdmin):
@@ -234,13 +234,13 @@ original change list page. However, some actions, especially more complex ones,
 will need to return intermediate pages. For example, the built-in delete action
 asks for confirmation before deleting the selected objects.
 
-To provide an intermediary page, return an :class:`~django.http.HttpResponse`
+To provide an intermediary page, return an :class:`~thibaud.http.HttpResponse`
 (or subclass) from your action. For example, you might write an export function
-that uses Django's :doc:`serialization functions </topics/serialization>` to
+that uses Thibaud's :doc:`serialization functions </topics/serialization>` to
 dump some selected objects as JSON::
 
-    from django.core import serializers
-    from django.http import HttpResponse
+    from thibaud.core import serializers
+    from thibaud.http import HttpResponse
 
 
     def export_as_json(modeladmin, request, queryset):
@@ -250,7 +250,7 @@ dump some selected objects as JSON::
 
 Generally, something like the above isn't considered a great idea. Most of the
 time, the best practice will be to return an
-:class:`~django.http.HttpResponseRedirect` and redirect the user to a view
+:class:`~thibaud.http.HttpResponseRedirect` and redirect the user to a view
 you've written, passing the list of selected objects in the GET query string.
 This allows you to provide complex interaction logic on the intermediary
 pages. For example, if you wanted to provide a more complete export function,
@@ -258,8 +258,8 @@ you'd want to let the user choose a format, and possibly a list of fields to
 include in the export. The best thing to do would be to write a small action
 that redirects to your custom export view::
 
-    from django.contrib.contenttypes.models import ContentType
-    from django.http import HttpResponseRedirect
+    from thibaud.contrib.contenttypes.models import ContentType
+    from thibaud.http import HttpResponseRedirect
 
 
     def export_selected_objects(modeladmin, request, queryset):
@@ -291,7 +291,7 @@ Making actions available site-wide
     make an action globally available using :meth:`AdminSite.add_action()`. For
     example::
 
-        from django.contrib import admin
+        from thibaud.contrib import admin
 
         admin.site.add_action(export_selected_objects)
 
@@ -389,7 +389,7 @@ Setting permissions for actions
 -------------------------------
 
 Actions may limit their availability to users with specific permissions by
-wrapping the action function with the :func:`~django.contrib.admin.action`
+wrapping the action function with the :func:`~thibaud.contrib.admin.action`
 decorator and passing the ``permissions`` argument::
 
     @admin.action(permissions=["change"])
@@ -414,8 +414,8 @@ You can specify any other value as long as you implement a corresponding
 
 For example::
 
-    from django.contrib import admin
-    from django.contrib.auth import get_permission_codename
+    from thibaud.contrib import admin
+    from thibaud.contrib.auth import get_permission_codename
 
 
     class ArticleAdmin(admin.ModelAdmin):
@@ -438,7 +438,7 @@ The ``action`` decorator
 
     This decorator can be used for setting specific attributes on custom action
     functions that can be used with
-    :attr:`~django.contrib.admin.ModelAdmin.actions`::
+    :attr:`~thibaud.contrib.admin.ModelAdmin.actions`::
 
         @admin.action(
             permissions=["publish"],
@@ -469,5 +469,5 @@ The ``action`` decorator
 
     Action descriptions are %-formatted and may contain ``'%(verbose_name)s'``
     and ``'%(verbose_name_plural)s'`` placeholders, which are replaced,
-    respectively, by the model's :attr:`~django.db.models.Options.verbose_name`
-    and :attr:`~django.db.models.Options.verbose_name_plural`.
+    respectively, by the model's :attr:`~thibaud.db.models.Options.verbose_name`
+    and :attr:`~thibaud.db.models.Options.verbose_name_plural`.

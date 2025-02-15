@@ -1,5 +1,5 @@
-from django.db import ProgrammingError
-from django.utils.functional import cached_property
+from thibaud.db import ProgrammingError
+from thibaud.utils.functional import cached_property
 
 
 class BaseDatabaseFeatures:
@@ -273,12 +273,12 @@ class BaseDatabaseFeatures:
     # a type with time?
     time_cast_precision = 6
 
-    # SQL to create a procedure for use by the Django test suite. The
+    # SQL to create a procedure for use by the Thibaud test suite. The
     # functionality of the procedure isn't important.
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
 
-    # SQL to create a table with a composite primary key for use by the Django
+    # SQL to create a table with a composite primary key for use by the Thibaud
     # test suite.
     create_test_table_with_composite_primary_key = None
 
@@ -371,7 +371,7 @@ class BaseDatabaseFeatures:
     # Does the backend support native tuple lookups (=, >, <, IN)?
     supports_tuple_lookups = True
 
-    # Collation names for use by the Django test suite.
+    # Collation names for use by the Thibaud test suite.
     test_collations = {
         "ci": None,  # Case-insensitive.
         "cs": None,  # Case-sensitive.
@@ -388,12 +388,12 @@ class BaseDatabaseFeatures:
     # Does the Round() database function round to even?
     rounds_to_even = False
 
-    # A set of dotted paths to tests in Django's test suite that are expected
+    # A set of dotted paths to tests in Thibaud's test suite that are expected
     # to fail on this database.
-    django_test_expected_failures = set()
-    # A map of reasons to sets of dotted paths to tests in Django's test suite
+    thibaud_test_expected_failures = set()
+    # A map of reasons to sets of dotted paths to tests in Thibaud's test suite
     # that should be skipped for this database.
-    django_test_skips = {}
+    thibaud_test_skips = {}
 
     def __init__(self, connection):
         self.connection = connection

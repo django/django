@@ -1,8 +1,8 @@
 import re
 
-from django.core import validators
-from django.utils.deconstruct import deconstructible
-from django.utils.translation import gettext_lazy as _
+from thibaud.core import validators
+from thibaud.utils.deconstruct import deconstructible
+from thibaud.utils.translation import gettext_lazy as _
 
 
 @deconstructible

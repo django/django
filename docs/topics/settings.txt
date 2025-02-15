@@ -1,8 +1,8 @@
 ===============
-Django settings
+Thibaud settings
 ===============
 
-A Django settings file contains all the configuration of your Django
+A Thibaud settings file contains all the configuration of your Thibaud
 installation. This document explains how settings work and which settings are
 available.
 
@@ -32,14 +32,14 @@ Because a settings file is a Python module, the following apply:
 
 * It can import values from other settings files.
 
-.. _django-settings-module:
+.. _thibaud-settings-module:
 
 Designating the settings
 ========================
 
 .. envvar:: DJANGO_SETTINGS_MODULE
 
-When you use Django, you have to tell it which settings you're using. Do this
+When you use Thibaud, you have to tell it which settings you're using. Do this
 by using an environment variable, :envvar:`DJANGO_SETTINGS_MODULE`.
 
 The value of :envvar:`DJANGO_SETTINGS_MODULE` should be in Python path syntax,
@@ -47,10 +47,10 @@ e.g. ``mysite.settings``. Note that the settings module should be on the
 Python :py:data:`sys.path`.
 
 
-The ``django-admin`` utility
+The ``thibaud-admin`` utility
 ----------------------------
 
-When using :doc:`django-admin </ref/django-admin>`, you can either set the
+When using :doc:`thibaud-admin </ref/thibaud-admin>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
 you run the utility.
 
@@ -59,22 +59,22 @@ Example (Unix Bash shell):
 .. code-block:: shell
 
     export DJANGO_SETTINGS_MODULE=mysite.settings
-    django-admin runserver
+    thibaud-admin runserver
 
 Example (Windows shell):
 
 .. code-block:: doscon
 
     set DJANGO_SETTINGS_MODULE=mysite.settings
-    django-admin runserver
+    thibaud-admin runserver
 
 Use the ``--settings`` command-line argument to specify the settings manually:
 
 .. code-block:: shell
 
-    django-admin runserver --settings=mysite.settings
+    thibaud-admin runserver --settings=mysite.settings
 
-.. _django-admin: ../django-admin/
+.. _thibaud-admin: ../thibaud-admin/
 
 On the server (``mod_wsgi``)
 ----------------------------
@@ -86,18 +86,18 @@ application what settings file to use. Do that with ``os.environ``::
 
     os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
 
-Read the :doc:`Django mod_wsgi documentation
+Read the :doc:`Thibaud mod_wsgi documentation
 </howto/deployment/wsgi/modwsgi>` for more information and other common
-elements to a Django WSGI application.
+elements to a Thibaud WSGI application.
 
 Default settings
 ================
 
-A Django settings file doesn't have to define any settings if it doesn't need
+A Thibaud settings file doesn't have to define any settings if it doesn't need
 to. Each setting has a sensible default value. These defaults live in the
-module :source:`django/conf/global_settings.py`.
+module :source:`thibaud/conf/global_settings.py`.
 
-Here's the algorithm Django uses in compiling settings:
+Here's the algorithm Thibaud uses in compiling settings:
 
 * Load settings from ``global_settings.py``.
 * Load settings from the specified settings file, overriding the global
@@ -110,29 +110,29 @@ Seeing which settings you've changed
 ------------------------------------
 
 The command ``python manage.py diffsettings`` displays differences between the
-current settings file and Django's default settings.
+current settings file and Thibaud's default settings.
 
 For more, see the :djadmin:`diffsettings` documentation.
 
 Using settings in Python code
 =============================
 
-In your Django apps, use settings by importing the object
-``django.conf.settings``. Example::
+In your Thibaud apps, use settings by importing the object
+``thibaud.conf.settings``. Example::
 
-    from django.conf import settings
+    from thibaud.conf import settings
 
     if settings.DEBUG:
         # Do something
         ...
 
-Note that ``django.conf.settings`` isn't a module -- it's an object. So
+Note that ``thibaud.conf.settings`` isn't a module -- it's an object. So
 importing individual settings is not possible::
 
-    from django.conf.settings import DEBUG  # This won't work.
+    from thibaud.conf.settings import DEBUG  # This won't work.
 
 Also note that your code should *not* import from either ``global_settings`` or
-your own settings file. ``django.conf.settings`` abstracts the concepts of
+your own settings file. ``thibaud.conf.settings`` abstracts the concepts of
 default settings and site-specific settings; it presents a single interface.
 It also decouples the code that uses settings from the location of your
 settings.
@@ -143,7 +143,7 @@ Altering settings at runtime
 You shouldn't alter settings in your applications at runtime. For example,
 don't do this in a view::
 
-    from django.conf import settings
+    from thibaud.conf import settings
 
     settings.DEBUG = True  # Don't do this!
 
@@ -166,15 +166,15 @@ Creating your own settings
 ==========================
 
 There's nothing stopping you from creating your own settings, for your own
-Django apps, but follow these guidelines:
+Thibaud apps, but follow these guidelines:
 
 * Setting names must be all uppercase.
 * Don't reinvent an already-existing setting.
 
-For settings that are sequences, Django itself uses lists, but this is only
+For settings that are sequences, Thibaud itself uses lists, but this is only
 a convention.
 
-.. _settings-without-django-settings-module:
+.. _settings-without-thibaud-settings-module:
 
 Using settings without setting :envvar:`DJANGO_SETTINGS_MODULE`
 ===============================================================
@@ -184,14 +184,14 @@ environment variable. For example, if you're using the template system by
 itself, you likely don't want to have to set up an environment variable
 pointing to a settings module.
 
-In these cases, you can configure Django's settings manually. Do this by
+In these cases, you can configure Thibaud's settings manually. Do this by
 calling:
 
-.. function:: django.conf.settings.configure(default_settings, **settings)
+.. function:: thibaud.conf.settings.configure(default_settings, **settings)
 
 Example::
 
-    from django.conf import settings
+    from thibaud.conf import settings
 
     settings.configure(DEBUG=True)
 
@@ -199,13 +199,13 @@ Pass ``configure()`` as many keyword arguments as you'd like, with each keyword
 argument representing a setting and its value. Each argument name should be all
 uppercase, with the same name as the settings described above. If a particular
 setting is not passed to ``configure()`` and is needed at some later point,
-Django will use the default setting value.
+Thibaud will use the default setting value.
 
-Configuring Django in this fashion is mostly necessary -- and, indeed,
+Configuring Thibaud in this fashion is mostly necessary -- and, indeed,
 recommended -- when you're using a piece of the framework inside a larger
 application.
 
-Consequently, when configured via ``settings.configure()``, Django will not
+Consequently, when configured via ``settings.configure()``, Thibaud will not
 make any modifications to the process environment variables (see the
 documentation of :setting:`TIME_ZONE` for why this would normally occur). It's
 assumed that you're already in full control of your environment in these
@@ -215,7 +215,7 @@ Custom default settings
 -----------------------
 
 If you'd like default values to come from somewhere other than
-``django.conf.global_settings``, you can pass in a module or class that
+``thibaud.conf.global_settings``, you can pass in a module or class that
 provides the default settings as the ``default_settings`` argument (or as the
 first positional argument) in the call to ``configure()``.
 
@@ -223,7 +223,7 @@ In this example, default settings are taken from ``myapp_defaults``, and the
 :setting:`DEBUG` setting is set to ``True``, regardless of its value in
 ``myapp_defaults``::
 
-    from django.conf import settings
+    from thibaud.conf import settings
     from myapp import myapp_defaults
 
     settings.configure(default_settings=myapp_defaults, DEBUG=True)
@@ -234,11 +234,11 @@ is equivalent::
     settings.configure(myapp_defaults, DEBUG=True)
 
 Normally, you will not need to override the defaults in this fashion. The
-Django defaults are sufficiently tame that you can safely use them. Be aware
-that if you do pass in a new default module, it entirely *replaces* the Django
+Thibaud defaults are sufficiently tame that you can safely use them. Be aware
+that if you do pass in a new default module, it entirely *replaces* the Thibaud
 defaults, so you must specify a value for every possible setting that might be
 used in the code you are importing. Check in
-``django.conf.settings.global_settings`` for the full list.
+``thibaud.conf.settings.global_settings`` for the full list.
 
 Either ``configure()`` or :envvar:`DJANGO_SETTINGS_MODULE` is required
 ----------------------------------------------------------------------
@@ -248,19 +248,19 @@ variable, you *must* call ``configure()`` at some point before using any code
 that reads settings.
 
 If you don't set :envvar:`DJANGO_SETTINGS_MODULE` and don't call
-``configure()``, Django will raise an ``ImportError`` exception the first time
+``configure()``, Thibaud will raise an ``ImportError`` exception the first time
 a setting is accessed.
 
 If you set :envvar:`DJANGO_SETTINGS_MODULE`, access settings values somehow,
-*then* call ``configure()``, Django will raise a ``RuntimeError`` indicating
+*then* call ``configure()``, Thibaud will raise a ``RuntimeError`` indicating
 that settings have already been configured. There is a property for this
 purpose:
 
-.. attribute:: django.conf.settings.configured
+.. attribute:: thibaud.conf.settings.configured
 
 For example::
 
-    from django.conf import settings
+    from thibaud.conf import settings
 
     if not settings.configured:
         settings.configure(myapp_defaults, DEBUG=True)
@@ -271,43 +271,43 @@ Also, it's an error to call ``configure()`` more than once, or to call
 It boils down to this: Use exactly one of either ``configure()`` or
 :envvar:`DJANGO_SETTINGS_MODULE`. Not both, and not neither.
 
-Calling ``django.setup()`` is required for "standalone" Django usage
+Calling ``thibaud.setup()`` is required for "standalone" Thibaud usage
 --------------------------------------------------------------------
 
-If you're using components of Django "standalone" -- for example, writing a
-Python script which loads some Django templates and renders them, or uses the
+If you're using components of Thibaud "standalone" -- for example, writing a
+Python script which loads some Thibaud templates and renders them, or uses the
 ORM to fetch some data -- there's one more step you'll need in addition to
 configuring settings.
 
 After you've either set :envvar:`DJANGO_SETTINGS_MODULE` or called
-``configure()``, you'll need to call :func:`django.setup()` to load your
-settings and populate Django's application registry. For example::
+``configure()``, you'll need to call :func:`thibaud.setup()` to load your
+settings and populate Thibaud's application registry. For example::
 
-    import django
-    from django.conf import settings
+    import thibaud
+    from thibaud.conf import settings
     from myapp import myapp_defaults
 
     settings.configure(default_settings=myapp_defaults, DEBUG=True)
-    django.setup()
+    thibaud.setup()
 
-    # Now this script or any imported module can use any part of Django it needs.
+    # Now this script or any imported module can use any part of Thibaud it needs.
     from myapp import models
 
-Note that calling ``django.setup()`` is only necessary if your code is truly
-standalone. When invoked by your web server, or through :doc:`django-admin
-</ref/django-admin>`, Django will handle this for you.
+Note that calling ``thibaud.setup()`` is only necessary if your code is truly
+standalone. When invoked by your web server, or through :doc:`thibaud-admin
+</ref/thibaud-admin>`, Thibaud will handle this for you.
 
-.. admonition:: ``django.setup()`` may only be called once.
+.. admonition:: ``thibaud.setup()`` may only be called once.
 
     Therefore, avoid putting reusable application logic in standalone scripts
     so that you have to import from the script elsewhere in your application.
-    If you can't avoid that, put the call to ``django.setup()`` inside an
+    If you can't avoid that, put the call to ``thibaud.setup()`` inside an
     ``if`` block::
 
         if __name__ == "__main__":
-            import django
+            import thibaud
 
-            django.setup()
+            thibaud.setup()
 
 .. seealso::
 

@@ -8,8 +8,8 @@ from urllib.parse import quote, unquote
 from urllib.parse import urlencode as original_urlencode
 from urllib.parse import urlsplit
 
-from django.utils.datastructures import MultiValueDict
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.datastructures import MultiValueDict
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 # Based on RFC 9110 Appendix A.
 ETAG_MATCH = _lazy_re_compile(
@@ -249,7 +249,7 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     scheme, as opposed to 'http' and 'https' with the default, ``False``.
 
     Note: "True" doesn't entail that a URL is "safe". It may still be e.g.
-    quoted incorrectly. Ensure to also use django.utils.encoding.iri_to_uri()
+    quoted incorrectly. Ensure to also use thibaud.utils.encoding.iri_to_uri()
     on the path component of untrusted URLs.
     """
     if url is not None:

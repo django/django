@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # gudmundur <inactive+gudmundur@transifex.com>, 2012
@@ -8,12 +8,12 @@
 # Thordur Sigurdsson <thordur@ja.is>, 2016,2018
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:49+0200\n"
 "PO-Revision-Date: 2018-05-18 03:49+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
-"Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
+"Language-Team: Icelandic (http://www.transifex.com/thibaud/thibaud/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

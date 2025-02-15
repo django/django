@@ -1,4 +1,4 @@
-from django.core.exceptions import BadRequest, SuspiciousOperation
+from thibaud.core.exceptions import BadRequest, SuspiciousOperation
 
 
 class InvalidSessionKey(SuspiciousOperation):

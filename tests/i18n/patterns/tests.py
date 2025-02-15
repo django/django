@@ -1,15 +1,15 @@
 import os
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse, HttpResponsePermanentRedirect
-from django.middleware.locale import LocaleMiddleware
-from django.template import Context, Template
-from django.test import SimpleTestCase, override_settings
-from django.test.client import RequestFactory
-from django.test.utils import override_script_prefix
-from django.urls import clear_url_caches, resolve, reverse, translate_url
-from django.utils import translation
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import HttpResponse, HttpResponsePermanentRedirect
+from thibaud.middleware.locale import LocaleMiddleware
+from thibaud.template import Context, Template
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.test.client import RequestFactory
+from thibaud.test.utils import override_script_prefix
+from thibaud.urls import clear_url_caches, resolve, reverse, translate_url
+from thibaud.utils import translation
 
 
 class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
@@ -28,17 +28,17 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         ("pt-br", "Brazilian Portuguese"),
     ],
     MIDDLEWARE=[
-        "django.middleware.locale.LocaleMiddleware",
-        "django.middleware.common.CommonMiddleware",
+        "thibaud.middleware.locale.LocaleMiddleware",
+        "thibaud.middleware.common.CommonMiddleware",
     ],
     ROOT_URLCONF="i18n.patterns.urls.default",
     TEMPLATES=[
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.i18n",
+                    "thibaud.template.context_processors.i18n",
                 ],
             },
         }
@@ -313,7 +313,7 @@ class URLRedirectTests(URLTestCaseBase):
     @override_settings(
         MIDDLEWARE=[
             "i18n.patterns.tests.PermanentRedirectLocaleMiddleWare",
-            "django.middleware.common.CommonMiddleware",
+            "thibaud.middleware.common.CommonMiddleware",
         ],
     )
     def test_custom_redirect_class(self):

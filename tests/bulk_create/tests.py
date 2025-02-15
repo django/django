@@ -1,23 +1,23 @@
 from math import ceil
 from operator import attrgetter
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db import (
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.db import (
     IntegrityError,
     NotSupportedError,
     OperationalError,
     ProgrammingError,
     connection,
 )
-from django.db.models import FileField, Value
-from django.db.models.functions import Lower, Now
-from django.test import (
+from thibaud.db.models import FileField, Value
+from thibaud.db.models.functions import Lower, Now
+from thibaud.test import (
     TestCase,
     override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils import timezone
+from thibaud.utils import timezone
 
 from .models import (
     BigAutoFieldModel,

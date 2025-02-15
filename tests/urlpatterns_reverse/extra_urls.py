@@ -2,7 +2,7 @@
 Some extra URL patterns that are included at the top level.
 """
 
-from django.urls import include, path, re_path
+from thibaud.urls import include, path, re_path
 
 from .views import empty_view
 

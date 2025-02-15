@@ -7,7 +7,7 @@ and many "secondary" ``Category`` objects.
 Set ``related_name`` to designate what the reverse relationship is called.
 """
 
-from django.db import models
+from thibaud.db import models
 
 
 class Category(models.Model):

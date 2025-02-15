@@ -1,11 +1,11 @@
 import pickle
 import unittest
 
-from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.validators import validate_image_file_extension
-from django.forms import FileField, FileInput
-from django.test import SimpleTestCase
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.files.uploadedfile import SimpleUploadedFile
+from thibaud.core.validators import validate_image_file_extension
+from thibaud.forms import FileField, FileInput
+from thibaud.test import SimpleTestCase
 
 try:
     from PIL import Image  # NOQA

@@ -5,11 +5,11 @@ from importlib import import_module
 
 import sqlparse
 
-from django.conf import settings
-from django.db import NotSupportedError, transaction
-from django.db.models.expressions import Col
-from django.utils import timezone
-from django.utils.encoding import force_str
+from thibaud.conf import settings
+from thibaud.db import NotSupportedError, transaction
+from thibaud.db.models.expressions import Col
+from thibaud.utils import timezone
+from thibaud.utils.encoding import force_str
 
 
 class BaseDatabaseOperations:
@@ -18,7 +18,7 @@ class BaseDatabaseOperations:
     performs ordering or calculates the ID of a recently-inserted row.
     """
 
-    compiler_module = "django.db.models.sql.compiler"
+    compiler_module = "thibaud.db.models.sql.compiler"
 
     # Integer field safe ranges by `internal_type` as documented
     # in docs/ref/models/fields.txt.
@@ -430,7 +430,7 @@ class BaseDatabaseOperations:
         themselves).
 
         The `style` argument is a Style object as returned by either
-        color_style() or no_style() in django.core.management.color.
+        color_style() or no_style() in thibaud.core.management.color.
 
         If `reset_sequences` is True, the list includes SQL statements required
         to reset the sequences.
@@ -459,7 +459,7 @@ class BaseDatabaseOperations:
         passed in `sequences`.
 
         The `style` argument is a Style object as returned by either
-        color_style() or no_style() in django.core.management.color.
+        color_style() or no_style() in thibaud.core.management.color.
         """
         return []
 
@@ -469,7 +469,7 @@ class BaseDatabaseOperations:
         the given models.
 
         The `style` argument is a Style object as returned by either
-        color_style() or no_style() in django.core.management.color.
+        color_style() or no_style() in thibaud.core.management.color.
         """
         return []  # No sequence reset required by default.
 
@@ -558,7 +558,7 @@ class BaseDatabaseOperations:
         if value is None:
             return None
         if timezone.is_aware(value):
-            raise ValueError("Django does not support timezone-aware times.")
+            raise ValueError("Thibaud does not support timezone-aware times.")
         return str(value)
 
     def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):

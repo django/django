@@ -2,9 +2,9 @@
 Validators
 ==========
 
-.. module:: django.contrib.postgres.validators
+.. module:: thibaud.contrib.postgres.validators
 
-These validators are available from the ``django.contrib.postgres.validators``
+These validators are available from the ``thibaud.contrib.postgres.validators``
 module.
 
 ``KeysValidator``

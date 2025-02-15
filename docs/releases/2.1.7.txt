@@ -1,10 +1,10 @@
 ==========================
-Django 2.1.7 release notes
+Thibaud 2.1.7 release notes
 ==========================
 
 *February 11, 2019*
 
-Django 2.1.7 fixes a packaging error in 2.1.6.
+Thibaud 2.1.7 fixes a packaging error in 2.1.6.
 
 Bugfixes
 ========

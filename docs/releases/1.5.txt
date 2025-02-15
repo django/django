@@ -1,14 +1,14 @@
 ========================
-Django 1.5 release notes
+Thibaud 1.5 release notes
 ========================
 
 *February 26, 2013*
 
-Welcome to Django 1.5!
+Welcome to Thibaud 1.5!
 
 These release notes cover the :ref:`new features <whats-new-1.5>`, as well as
 some :ref:`backwards incompatible changes <backwards-incompatible-1.5>` you'll
-want to be aware of when upgrading from Django 1.4 or older versions. We've
+want to be aware of when upgrading from Thibaud 1.4 or older versions. We've
 also dropped some features, which are detailed in :ref:`our deprecation plan
 <deprecation-removed-in-1.5>`, and we've :ref:`begun the deprecation process
 for some features <deprecated-features-1.5>`.
@@ -16,113 +16,113 @@ for some features <deprecated-features-1.5>`.
 Overview
 ========
 
-The biggest new feature in Django 1.5 is the `configurable User model`_. Before
-Django 1.5, applications that wanted to use Django's auth framework
-(:mod:`django.contrib.auth`) were forced to use Django's definition of a "user".
-In Django 1.5, you can now swap out the ``User`` model for one that you write
+The biggest new feature in Thibaud 1.5 is the `configurable User model`_. Before
+Thibaud 1.5, applications that wanted to use Thibaud's auth framework
+(:mod:`thibaud.contrib.auth`) were forced to use Thibaud's definition of a "user".
+In Thibaud 1.5, you can now swap out the ``User`` model for one that you write
 yourself. This could be a simple extension to the existing ``User`` model -- for
 example, you could add a Twitter or Facebook ID field -- or you could completely
 replace the ``User`` with one totally customized for your site.
 
-Django 1.5 is also the first release with `Python 3 support`_! We're labeling
+Thibaud 1.5 is also the first release with `Python 3 support`_! We're labeling
 this support "experimental" because we don't yet consider it production-ready,
 but everything's in place for you to start porting your apps to Python 3.
-Our next release, Django 1.6, will support Python 3 without reservations.
+Our next release, Thibaud 1.6, will support Python 3 without reservations.
 
-Other notable new features in Django 1.5 include:
+Other notable new features in Thibaud 1.5 include:
 
 * `Support for saving a subset of model's fields`_ -
-  :meth:`Model.save() <django.db.models.Model.save()>` now accepts an
+  :meth:`Model.save() <thibaud.db.models.Model.save()>` now accepts an
   ``update_fields`` argument, letting you specify which fields are
   written back to the database when you call ``save()``. This can help
   in high-concurrency operations, and can improve performance.
 
 * Better `support for streaming responses <#explicit-streaming-responses>`_ via
-  the new  :class:`~django.http.StreamingHttpResponse` response class.
+  the new  :class:`~thibaud.http.StreamingHttpResponse` response class.
 
-* `GeoDjango`_ now supports PostGIS 2.0.
+* `GeoThibaud`_ now supports PostGIS 2.0.
 
-* ... and more; `see below <#what-s-new-in-django-1-5>`_.
+* ... and more; `see below <#what-s-new-in-thibaud-1-5>`_.
 
 Wherever possible we try to introduce new features in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>`.
-However, as with previous releases, Django 1.5 ships with some minor
+However, as with previous releases, Thibaud 1.5 ships with some minor
 :ref:`backwards incompatible changes <backwards-incompatible-1.5>`; people
-upgrading from previous versions of Django should read that list carefully.
+upgrading from previous versions of Thibaud should read that list carefully.
 
 One deprecated feature worth noting is the shift to "new-style" :ttag:`url` tag.
-Prior to Django 1.3, syntax like ``{% url myview %}`` was interpreted
-incorrectly (Django considered ``"myview"`` to be a literal name of a view, not
-a template variable named ``myview``). Django 1.3 and above introduced the
+Prior to Thibaud 1.3, syntax like ``{% url myview %}`` was interpreted
+incorrectly (Thibaud considered ``"myview"`` to be a literal name of a view, not
+a template variable named ``myview``). Thibaud 1.3 and above introduced the
 ``{% load url from future %}`` syntax to bring in the corrected behavior where
 ``myview`` was seen as a variable.
 
 The upshot of this is that if you are not using ``{% load url from future %}``
 in your templates, you'll need to change tags like ``{% url myview %}`` to
 ``{% url "myview" %}``. If you *were* using ``{% load url from future %}`` you
-can simply remove that line under Django 1.5
+can simply remove that line under Thibaud 1.5
 
 Python compatibility
 ====================
 
-Django 1.5 requires Python 2.6.5 or above, though we **highly recommend**
+Thibaud 1.5 requires Python 2.6.5 or above, though we **highly recommend**
 Python 2.7.3 or above. Support for Python 2.5 and below has been dropped.
 
-This change should affect only a small number of Django users, as most
+This change should affect only a small number of Thibaud users, as most
 operating-system vendors today are shipping Python 2.6 or newer as their default
 version. If you're still using Python 2.5, however, you'll need to stick to
-Django 1.4 until you can upgrade your Python version. Per :doc:`our support
-policy </internals/release-process>`, Django 1.4 will continue to receive
-security support until the release of Django 1.6.
+Thibaud 1.4 until you can upgrade your Python version. Per :doc:`our support
+policy </internals/release-process>`, Thibaud 1.4 will continue to receive
+security support until the release of Thibaud 1.6.
 
-Django 1.5 does not run on a Jython final release, because Jython's latest
+Thibaud 1.5 does not run on a Jython final release, because Jython's latest
 release doesn't currently support Python 2.6. However, Jython currently does
-offer an alpha release featuring 2.7 support, and Django 1.5 supports that alpha
+offer an alpha release featuring 2.7 support, and Thibaud 1.5 supports that alpha
 release.
 
 Python 3 support
 ----------------
 
-Django 1.5 introduces support for Python 3 - specifically, Python
+Thibaud 1.5 introduces support for Python 3 - specifically, Python
 3.2 and above. This comes in the form of a **single** codebase; you don't
-need to install a different version of Django on Python 3. This means that
+need to install a different version of Thibaud on Python 3. This means that
 you can write applications targeted for just Python 2, just Python 3, or single
 applications that support both platforms.
 
 However, we're labeling this support "experimental" for now: although it's
 received extensive testing via our automated test suite, it's received very
 little real-world testing. We've done our best to eliminate bugs, but we can't
-be sure we covered all possible uses of Django.
+be sure we covered all possible uses of Thibaud.
 
-Some features of Django aren't available because they depend on third-party
+Some features of Thibaud aren't available because they depend on third-party
 software that hasn't been ported to Python 3 yet, including:
 
 - the MySQL database backend (depends on MySQLdb)
-- :class:`~django.db.models.ImageField` (depends on PIL)
-- :class:`~django.test.LiveServerTestCase` (depends on Selenium WebDriver)
+- :class:`~thibaud.db.models.ImageField` (depends on PIL)
+- :class:`~thibaud.test.LiveServerTestCase` (depends on Selenium WebDriver)
 
-Further, Django's more than a web framework; it's an ecosystem of pluggable
+Further, Thibaud's more than a web framework; it's an ecosystem of pluggable
 components. At this point, very few third-party applications have been ported
 to Python 3, so it's unlikely that a real-world application will have all its
 dependencies satisfied under Python 3.
 
-Thus, we're recommending that Django 1.5 not be used in production under Python
+Thus, we're recommending that Thibaud 1.5 not be used in production under Python
 3. Instead, use this opportunity to begin porting applications to Python 3. If
 you're an author of a pluggable component, we encourage you to start porting
 now.
 
 We plan to offer first-class, production-ready support for Python 3 in our next
-release, Django 1.6.
+release, Thibaud 1.6.
 
 .. _whats-new-1.5:
 
-What's new in Django 1.5
+What's new in Thibaud 1.5
 ========================
 
 Configurable User model
 -----------------------
 
-In Django 1.5, you can now use your own model as the store for user-related
+In Thibaud 1.5, you can now use your own model as the store for user-related
 data. If your project needs a username with more than 30 characters, or if
 you want to store user's names in a format other than first name/last name,
 or you want to put custom profile information onto your User object, you can
@@ -139,7 +139,7 @@ more details.
 Support for saving a subset of model's fields
 ---------------------------------------------
 
-The method :meth:`Model.save() <django.db.models.Model.save()>` has a new
+The method :meth:`Model.save() <thibaud.db.models.Model.save()>` has a new
 keyword argument ``update_fields``. By using this argument it is possible to
 save only a select list of model's fields. This can be useful for performance
 reasons or when trying to avoid overwriting concurrent changes.
@@ -148,7 +148,7 @@ Deferred instances (those loaded by ``.only()`` or ``.defer()``) will
 automatically save just the loaded fields. If any field is set manually after
 load, that field will also get updated on save.
 
-See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
+See the :meth:`Model.save() <thibaud.db.models.Model.save()>` documentation for
 more details.
 
 Caching of related model instances
@@ -164,7 +164,7 @@ previously loaded. For example, with the tutorial's models:
     >>> first_choice.poll is first_poll
     True
 
-In Django 1.5, the third line no longer triggers a new SQL query to fetch
+In Thibaud 1.5, the third line no longer triggers a new SQL query to fetch
 ``first_choice.poll``; it was set by the second line.
 
 For one-to-one relationships, both sides can be cached. For many-to-one
@@ -176,35 +176,35 @@ is particularly helpful in combination with ``prefetch_related``.
 Explicit support for streaming responses
 ----------------------------------------
 
-Before Django 1.5, it was possible to create a streaming response by passing
-an iterator to :class:`~django.http.HttpResponse`. But this was unreliable:
-any middleware that accessed the :attr:`~django.http.HttpResponse.content`
+Before Thibaud 1.5, it was possible to create a streaming response by passing
+an iterator to :class:`~thibaud.http.HttpResponse`. But this was unreliable:
+any middleware that accessed the :attr:`~thibaud.http.HttpResponse.content`
 attribute would consume the iterator prematurely.
 
 You can now explicitly generate a streaming response with the new
-:class:`~django.http.StreamingHttpResponse` class. This class exposes a
-:class:`~django.http.StreamingHttpResponse.streaming_content` attribute which
+:class:`~thibaud.http.StreamingHttpResponse` class. This class exposes a
+:class:`~thibaud.http.StreamingHttpResponse.streaming_content` attribute which
 is an iterator.
 
-Since :class:`~django.http.StreamingHttpResponse` does not have a ``content``
+Since :class:`~thibaud.http.StreamingHttpResponse` does not have a ``content``
 attribute, middleware that needs access to the response content must test for
 streaming responses and behave accordingly.
 
 ``{% verbatim %}`` template tag
 -------------------------------
 
-To make it easier to deal with JavaScript templates which collide with Django's
+To make it easier to deal with JavaScript templates which collide with Thibaud's
 syntax, you can now use the :ttag:`verbatim` block tag to avoid parsing the
 tag's content.
 
 Retrieval of ``ContentType`` instances associated with proxy models
 -------------------------------------------------------------------
 
-The methods :meth:`ContentTypeManager.get_for_model() <django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>`
-and :meth:`ContentTypeManager.get_for_models() <django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>`
+The methods :meth:`ContentTypeManager.get_for_model() <thibaud.contrib.contenttypes.models.ContentTypeManager.get_for_model()>`
+and :meth:`ContentTypeManager.get_for_models() <thibaud.contrib.contenttypes.models.ContentTypeManager.get_for_models()>`
 have a new keyword argument – respectively ``for_concrete_model`` and ``for_concrete_models``.
 By passing ``False`` using this argument it is now possible to retrieve the
-:class:`ContentType <django.contrib.contenttypes.models.ContentType>`
+:class:`ContentType <thibaud.contrib.contenttypes.models.ContentType>`
 associated with proxy models.
 
 New ``view`` variable in class-based views context
@@ -214,17 +214,17 @@ In all :doc:`generic class-based views </topics/class-based-views/index>`
 (or any class-based view inheriting from ``ContextMixin``), the context dictionary
 contains a ``view`` variable that points to the ``View`` instance.
 
-GeoDjango
+GeoThibaud
 ---------
 
-* :class:`~django.contrib.gis.geos.LineString` and
-  :class:`~django.contrib.gis.geos.MultiLineString` GEOS objects now support the
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.interpolate()` and
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
+* :class:`~thibaud.contrib.gis.geos.LineString` and
+  :class:`~thibaud.contrib.gis.geos.MultiLineString` GEOS objects now support the
+  :meth:`~thibaud.contrib.gis.geos.GEOSGeometry.interpolate()` and
+  :meth:`~thibaud.contrib.gis.geos.GEOSGeometry.project()` methods
   (so-called linear referencing).
 
 * The ``wkb`` and ``hex`` properties of
-  :class:`~django.contrib.gis.geos.GEOSGeometry` objects preserve the Z
+  :class:`~thibaud.contrib.gis.geos.GEOSGeometry` objects preserve the Z
   dimension.
 
 * Support for PostGIS 2.0 has been added and support for GDAL < 1.5 has been
@@ -237,24 +237,24 @@ Additions to the docs include a revamped :doc:`Tutorial 3</intro/tutorial03>`
 and a new :doc:`tutorial on testing</intro/tutorial05>`. A new section,
 "Advanced Tutorials", offers :doc:`How to write reusable apps
 </intro/reusable-apps>` as well as a step-by-step guide for new contributors in
-:doc:`Writing your first patch for Django </intro/contributing>`.
+:doc:`Writing your first patch for Thibaud </intro/contributing>`.
 
 Minor features
 --------------
 
-Django 1.5 also includes several smaller improvements worth noting:
+Thibaud 1.5 also includes several smaller improvements worth noting:
 
 * The template engine now interprets ``True``, ``False`` and ``None`` as the
   corresponding Python objects.
 
-* :mod:`django.utils.timezone` provides a helper for converting aware
-  datetimes between time zones. See :func:`~django.utils.timezone.localtime`.
+* :mod:`thibaud.utils.timezone` provides a helper for converting aware
+  datetimes between time zones. See :func:`~thibaud.utils.timezone.localtime`.
 
 * The generic views support OPTIONS requests.
 
 * Management commands do not raise ``SystemExit`` any more when called by code
-  from :func:`~django.core.management.call_command`. Any exception raised by
-  the command (mostly :exc:`~django.core.management.CommandError`) is
+  from :func:`~thibaud.core.management.call_command`. Any exception raised by
+  the command (mostly :exc:`~thibaud.core.management.CommandError`) is
   propagated.
 
   Moreover, when you output errors or messages in your custom commands, you
@@ -274,7 +274,7 @@ Django 1.5 also includes several smaller improvements worth noting:
 * In the admin, you can now filter users by groups which they are members of.
 
 * :meth:`QuerySet.bulk_create()
-  <django.db.models.query.QuerySet.bulk_create>` now has a batch_size
+  <thibaud.db.models.query.QuerySet.bulk_create>` now has a batch_size
   argument. By default the batch_size is unlimited except for SQLite where
   single batch is limited so that 999 parameters per query isn't exceeded.
 
@@ -282,43 +282,43 @@ Django 1.5 also includes several smaller improvements worth noting:
   accept view function names and
   :ref:`named URL patterns <naming-url-patterns>`. This allows you to reduce
   configuration duplication. More information can be found in the
-  :func:`~django.contrib.auth.decorators.login_required` documentation.
+  :func:`~thibaud.contrib.auth.decorators.login_required` documentation.
 
-* Django now provides a mod_wsgi :doc:`auth handler
+* Thibaud now provides a mod_wsgi :doc:`auth handler
   </howto/deployment/wsgi/apache-auth>`.
 
-* The :meth:`QuerySet.delete() <django.db.models.query.QuerySet.delete>`
-  and :meth:`Model.delete() <django.db.models.Model.delete()>` can now take
+* The :meth:`QuerySet.delete() <thibaud.db.models.query.QuerySet.delete>`
+  and :meth:`Model.delete() <thibaud.db.models.Model.delete()>` can now take
   fast-path in some cases. The fast-path allows for less queries and less
   objects fetched into memory. See :meth:`QuerySet.delete()
-  <django.db.models.query.QuerySet.delete>` for details.
+  <thibaud.db.models.query.QuerySet.delete>` for details.
 
 * An instance of ``ResolverMatch`` is stored on the request as
   ``resolver_match``.
 
-* By default, all logging messages reaching the ``django`` logger when
+* By default, all logging messages reaching the ``thibaud`` logger when
   :setting:`DEBUG` is ``True`` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
-* When using :class:`~django.template.RequestContext`, it is now possible to
+* When using :class:`~thibaud.template.RequestContext`, it is now possible to
   look up permissions by using ``{% if 'someapp.someperm' in perms %}``
   in templates.
 
 * It's not required any more to have ``404.html`` and ``500.html`` templates in
-  the root templates directory. Django will output some basic error messages for
+  the root templates directory. Thibaud will output some basic error messages for
   both situations when those templates are not found. It's still recommended as
   good practice to provide those templates in order to present pretty error
   pages to the user.
 
-* :mod:`django.contrib.auth` provides a new signal that is emitted
+* :mod:`thibaud.contrib.auth` provides a new signal that is emitted
   whenever a user fails to login successfully. See
-  :data:`~django.contrib.auth.signals.user_login_failed`
+  :data:`~thibaud.contrib.auth.signals.user_login_failed`
 
 * The new :option:`loaddata --ignorenonexistent` option ignore data for fields
   that no longer exist.
 
-* :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
-  :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
+* :meth:`~thibaud.test.SimpleTestCase.assertXMLEqual` and
+  :meth:`~thibaud.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
   you to test equality for XML content at a semantic level, without caring for
   syntax differences (spaces, attribute order, etc.).
 
@@ -331,20 +331,20 @@ Django 1.5 also includes several smaller improvements worth noting:
 * Multi-column indexes can now be created on models. Read the
   ``index_together`` documentation for more information.
 
-* During Django's logging configuration verbose Deprecation warnings are
+* During Thibaud's logging configuration verbose Deprecation warnings are
   enabled and warnings are captured into the logging system. Logged warnings
   are routed through the ``console`` logging handler, which by default requires
   :setting:`DEBUG` to be True for output to be generated. The result is that
   DeprecationWarnings should be printed to the console in development
   environments the way they have been in Python versions < 2.7.
 
-* The API for :meth:`django.contrib.admin.ModelAdmin.message_user` method has
+* The API for :meth:`thibaud.contrib.admin.ModelAdmin.message_user` method has
   been modified to accept additional arguments adding capabilities similar to
-  :func:`django.contrib.messages.add_message`. This is useful for generating
+  :func:`thibaud.contrib.messages.add_message`. This is useful for generating
   error messages from admin actions.
 
 * The admin's list filters can now be customized per-request thanks to the new
-  :meth:`django.contrib.admin.ModelAdmin.get_list_filter` method.
+  :meth:`thibaud.contrib.admin.ModelAdmin.get_list_filter` method.
 
 .. _backwards-incompatible-1.5:
 
@@ -365,8 +365,8 @@ Backwards incompatible changes in 1.5
 The new :setting:`ALLOWED_HOSTS` setting validates the request's ``Host``
 header and protects against host-poisoning attacks. This setting is now
 required whenever :setting:`DEBUG` is ``False``, or else
-:meth:`django.http.HttpRequest.get_host()` will raise
-:exc:`~django.core.exceptions.SuspiciousOperation`. For more details see the
+:meth:`thibaud.http.HttpRequest.get_host()` will raise
+:exc:`~thibaud.core.exceptions.SuspiciousOperation`. For more details see the
 :setting:`full documentation<ALLOWED_HOSTS>` for the new setting.
 
 Managers on abstract models
@@ -388,7 +388,7 @@ Context in year archive class-based views
 -----------------------------------------
 
 For consistency with the other date-based generic views,
-:class:`~django.views.generic.dates.YearArchiveView` now passes ``year`` in
+:class:`~thibaud.views.generic.dates.YearArchiveView` now passes ``year`` in
 the context as a :class:`datetime.date` rather than a string.  If you are
 using ``{{ year }}`` in your templates, you must replace it with ``{{
 year|date:"Y" }}``.
@@ -399,44 +399,44 @@ calculated according to ``allow_empty`` and ``allow_future``.
 Context in year and month archive class-based views
 ---------------------------------------------------
 
-:class:`~django.views.generic.dates.YearArchiveView` and
-:class:`~django.views.generic.dates.MonthArchiveView` were documented to
+:class:`~thibaud.views.generic.dates.YearArchiveView` and
+:class:`~thibaud.views.generic.dates.MonthArchiveView` were documented to
 provide a ``date_list`` sorted in ascending order in the context, like their
 function-based predecessors, but it actually was in descending order. In 1.5,
 the documented order was restored. You may want to add (or remove) the
 ``reversed`` keyword when you're iterating on ``date_list`` in a template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for date in date_list reversed %}
 
-:class:`~django.views.generic.dates.ArchiveIndexView` still provides a
+:class:`~thibaud.views.generic.dates.ArchiveIndexView` still provides a
 ``date_list`` in descending order.
 
 Context in TemplateView
 -----------------------
 
 For consistency with the design of the other generic views,
-:class:`~django.views.generic.base.TemplateView` no longer passes a ``params``
+:class:`~thibaud.views.generic.base.TemplateView` no longer passes a ``params``
 dictionary into the context, instead passing the variables from the URLconf
 directly into the context.
 
 Non-form data in HTTP requests
 ------------------------------
 
-:attr:`request.POST <django.http.HttpRequest.POST>` will no longer include data
+:attr:`request.POST <thibaud.http.HttpRequest.POST>` will no longer include data
 posted via HTTP requests with non form-specific content-types in the header.
 In prior versions, data posted with content-types other than
 :mimetype:`multipart/form-data` or
 :mimetype:`application/x-www-form-urlencoded` would still end up represented in
-the :attr:`request.POST <django.http.HttpRequest.POST>` attribute. Developers
+the :attr:`request.POST <thibaud.http.HttpRequest.POST>` attribute. Developers
 wishing to access the raw POST data for these cases, should use the
-:attr:`request.body <django.http.HttpRequest.body>` attribute instead.
+:attr:`request.body <thibaud.http.HttpRequest.body>` attribute instead.
 
-:data:`~django.core.signals.request_finished` signal
+:data:`~thibaud.core.signals.request_finished` signal
 ----------------------------------------------------
 
-Django used to send the :data:`~django.core.signals.request_finished` signal
+Thibaud used to send the :data:`~thibaud.core.signals.request_finished` signal
 as soon as the view function returned a response. This interacted badly with
 :ref:`streaming responses <httpresponse-streaming>` that delay content
 generation.
@@ -459,13 +459,13 @@ OPTIONS, PUT and DELETE requests in the test client
 
 Unlike GET and POST, these HTTP methods aren't implemented by web browsers.
 Rather, they're used in APIs, which transfer data in various formats such as
-JSON or XML. Since such requests may contain arbitrary data, Django doesn't
+JSON or XML. Since such requests may contain arbitrary data, Thibaud doesn't
 attempt to decode their body.
 
 However, the test client used to build a query string for OPTIONS and DELETE
 requests like for GET, and a request body for PUT requests like for POST. This
-encoding was arbitrary and inconsistent with Django's behavior when it
-receives the requests, so it was removed in Django 1.5.
+encoding was arbitrary and inconsistent with Thibaud's behavior when it
+receives the requests, so it was removed in Thibaud 1.5.
 
 If you were using the ``data`` parameter in an OPTIONS or a DELETE request,
 you must convert it to a query string and append it to the ``path`` parameter.
@@ -479,26 +479,26 @@ client and set the ``content_type`` argument.
 System version of ``simplejson`` no longer used
 -----------------------------------------------
 
-:ref:`As explained below <simplejson-deprecation>`, Django 1.5 deprecates
-``django.utils.simplejson`` in favor of Python 2.6's built-in :mod:`json`
+:ref:`As explained below <simplejson-deprecation>`, Thibaud 1.5 deprecates
+``thibaud.utils.simplejson`` in favor of Python 2.6's built-in :mod:`json`
 module. In theory, this change is harmless. Unfortunately, because of
 incompatibilities between versions of ``simplejson``, it may trigger errors
 in some circumstances.
 
-JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
+JSON-related features in Thibaud 1.4 always used ``thibaud.utils.simplejson``.
 This module was actually:
 
 - A system version of ``simplejson``, if one was available (i.e. ``import
-  simplejson`` works), if it was more recent than Django's built-in copy or it
+  simplejson`` works), if it was more recent than Thibaud's built-in copy or it
   had the C speedups, or
 - The :mod:`json` module from the standard library, if it was available (i.e.
   Python 2.6 or greater), or
 - A built-in copy of version 2.0.7 of ``simplejson``.
 
-In Django 1.5, those features use Python's :mod:`json` module, which is based
+In Thibaud 1.5, those features use Python's :mod:`json` module, which is based
 on version 2.0.9 of ``simplejson``.
 
-There are no known incompatibilities between Django's copy of version 2.0.7 and
+There are no known incompatibilities between Thibaud's copy of version 2.0.7 and
 Python's copy of version 2.0.9. However, there are some incompatibilities
 between other versions of ``simplejson``:
 
@@ -512,12 +512,12 @@ More information on these incompatibilities is available in
 :ticket:`ticket #18023 <18023#comment:10>`.
 
 The net result is that, if you have installed ``simplejson`` and your code
-uses Django's serialization internals directly -- for instance
-``django.core.serializers.json.DjangoJSONEncoder``, the switch from
+uses Thibaud's serialization internals directly -- for instance
+``thibaud.core.serializers.json.ThibaudJSONEncoder``, the switch from
 ``simplejson`` to :mod:`json` could break your code. (In general, changes to
 internals aren't documented; we're making an exception here.)
 
-At this point, the maintainers of Django believe that using :mod:`json` from
+At this point, the maintainers of Thibaud believe that using :mod:`json` from
 the standard library offers the strongest guarantee of backwards-compatibility.
 They recommend to use it from now on.
 
@@ -528,16 +528,16 @@ If you have written a :ref:`custom password hasher <auth_password_storage>`,
 your ``encode()``, ``verify()`` or ``safe_summary()`` methods should accept
 Unicode parameters (``password``, ``salt`` or ``encoded``). If any of the
 hashing methods need bytestrings, you can use the
-:func:`~django.utils.encoding.force_bytes` utility to encode the strings.
+:func:`~thibaud.utils.encoding.force_bytes` utility to encode the strings.
 
 Validation of previous_page_number and next_page_number
 -------------------------------------------------------
 
 When using :doc:`object pagination </topics/pagination>`,
 the ``previous_page_number()`` and ``next_page_number()`` methods of the
-:class:`~django.core.paginator.Page` object did not check if the returned
+:class:`~thibaud.core.paginator.Page` object did not check if the returned
 number was inside the existing page range.
-It does check it now and raises an :exc:`~django.core.paginator.InvalidPage`
+It does check it now and raises an :exc:`~thibaud.core.paginator.InvalidPage`
 exception when the number is either too low or too high.
 
 Behavior of autocommit database option on PostgreSQL changed
@@ -552,16 +552,16 @@ you are using PostgreSQL together with the autocommit option.
 Session not saved on 500 responses
 ----------------------------------
 
-Django's session middleware will skip saving the session data if the
+Thibaud's session middleware will skip saving the session data if the
 response's status code is 500.
 
 Email checks on failed admin login
 ----------------------------------
 
-Prior to Django 1.5, if you attempted to log into the admin interface and
+Prior to Thibaud 1.5, if you attempted to log into the admin interface and
 mistakenly used your email address instead of your username, the admin
 interface would provide a warning advising that your email address was
-not your username. In Django 1.5, the introduction of
+not your username. In Thibaud 1.5, the introduction of
 :ref:`custom user models <auth-custom-user>` has required the removal of this
 warning. This doesn't change the login behavior of the admin site; it only
 affects the warning message that is displayed under one particular mode of
@@ -573,29 +573,29 @@ Changes in tests execution
 Some changes have been introduced in the execution of tests that might be
 backward-incompatible for some testing setups:
 
-Database flushing in ``django.test.TransactionTestCase``
+Database flushing in ``thibaud.test.TransactionTestCase``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Previously, the test database was truncated *before* each test run in a
-:class:`~django.test.TransactionTestCase`.
+:class:`~thibaud.test.TransactionTestCase`.
 
 In order to be able to run unit tests in any order and to make sure they are
-always isolated from each other, :class:`~django.test.TransactionTestCase` will
+always isolated from each other, :class:`~thibaud.test.TransactionTestCase` will
 now reset the database *after* each test run instead.
 
 No more implicit DB sequences reset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:class:`~django.test.TransactionTestCase` tests used to reset primary key
+:class:`~thibaud.test.TransactionTestCase` tests used to reset primary key
 sequences automatically together with the database flushing actions described
 above.
 
 This has been changed so no sequences are implicitly reset. This can cause
-:class:`~django.test.TransactionTestCase` tests that depend on hard-coded
+:class:`~thibaud.test.TransactionTestCase` tests that depend on hard-coded
 primary key values to break.
 
-The new :attr:`~django.test.TransactionTestCase.reset_sequences` attribute can
-be used to force the old behavior for :class:`~django.test.TransactionTestCase`
+The new :attr:`~thibaud.test.TransactionTestCase.reset_sequences` attribute can
+be used to force the old behavior for :class:`~thibaud.test.TransactionTestCase`
 that might need it.
 
 Ordering of tests
@@ -605,15 +605,15 @@ In order to make sure all ``TestCase`` code starts with a clean database,
 tests are now executed in the following order:
 
 * First, all unit tests (including :class:`unittest.TestCase`,
-  :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
-  :class:`~django.test.TransactionTestCase`) are run with no particular ordering
+  :class:`~thibaud.test.SimpleTestCase`, :class:`~thibaud.test.TestCase` and
+  :class:`~thibaud.test.TransactionTestCase`) are run with no particular ordering
   guaranteed nor enforced among them.
 
 * Then any other tests (e.g. doctests) that may alter the database without
   restoring it to its original state are run.
 
 This should not cause any problems unless you have existing doctests which
-assume a :class:`~django.test.TransactionTestCase` executed earlier left some
+assume a :class:`~thibaud.test.TransactionTestCase` executed earlier left some
 database state behind or unit tests that rely on some form of state being
 preserved after the execution of other tests. Such tests are already very
 fragile, and must now be changed to be able to run independently.
@@ -621,19 +621,19 @@ fragile, and must now be changed to be able to run independently.
 ``cleaned_data`` dictionary kept for invalid forms
 --------------------------------------------------
 
-The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
+The :attr:`~thibaud.forms.Form.cleaned_data` dictionary is now always present
 after form validation. When the form doesn't validate, it contains only the
 fields that passed validation. You should test the success of the validation
-with the :meth:`~django.forms.Form.is_valid()` method and not with the
-presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
+with the :meth:`~thibaud.forms.Form.is_valid()` method and not with the
+presence or absence of the :attr:`~thibaud.forms.Form.cleaned_data` attribute
 on the form.
 
 Behavior of ``syncdb`` with multiple databases
 ----------------------------------------------
 
 ``syncdb`` now queries the database routers to determine if content
-types (when :mod:`~django.contrib.contenttypes` is enabled) and permissions
-(when :mod:`~django.contrib.auth` is enabled) should be created in the target
+types (when :mod:`~thibaud.contrib.contenttypes` is enabled) and permissions
+(when :mod:`~thibaud.contrib.auth` is enabled) should be created in the target
 database. Previously, it created them in the default database, even when
 another database was specified with the ``--database`` option.
 
@@ -649,7 +649,7 @@ In order to prevent exposure to denial-of-service attacks related to external
 entity references and entity expansion, the XML model deserializer now refuses
 to parse XML documents containing a DTD (DOCTYPE definition). Since the XML
 serializer does not output a DTD, this will not impact typical usage, only
-cases where custom-created XML documents are passed to Django's model
+cases where custom-created XML documents are passed to Thibaud's model
 deserializer.
 
 Formsets default ``max_num``
@@ -664,29 +664,29 @@ forms. This limit can be raised by explicitly setting a higher value for
 Miscellaneous
 -------------
 
-* :class:`django.forms.ModelMultipleChoiceField` now returns an empty
+* :class:`thibaud.forms.ModelMultipleChoiceField` now returns an empty
   ``QuerySet`` as the empty value instead of an empty list.
 
-* :func:`~django.utils.http.int_to_base36` properly raises a
+* :func:`~thibaud.utils.http.int_to_base36` properly raises a
   :exc:`TypeError` instead of :exc:`ValueError` for non-integer inputs.
 
 * The ``slugify`` template filter is now available as a standard Python
-  function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
-  available at ``django.utils.html.remove_tags()``.
+  function at :func:`thibaud.utils.text.slugify`. Similarly, ``remove_tags`` is
+  available at ``thibaud.utils.html.remove_tags()``.
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
   needs. The new default value is ``0o666`` (octal) and the current umask value
   is first masked out.
 
-* The :class:`F expressions <django.db.models.F>` supported bitwise operators by
+* The :class:`F expressions <thibaud.db.models.F>` supported bitwise operators by
   ``&`` and ``|``. These operators are now available using ``.bitand()`` and
   ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be
   consistent with :ref:`Q() expressions <complex-lookups-with-q>` and
   ``QuerySet`` combining where the operators are used as boolean AND and OR
   operators.
 
-* In a ``filter()`` call, when :class:`F expressions <django.db.models.F>`
+* In a ``filter()`` call, when :class:`F expressions <thibaud.db.models.F>`
   contained lookups spanning multi-valued relations, they didn't always reuse
   the same relations as other lookups along the same chain. This was changed,
   and now F() expressions will always use the same relations as other lookups
@@ -702,29 +702,29 @@ Miscellaneous
   templates still contain that line you must remove it.
 
 * Because of an implementation oversight, it was possible to use
-  :doc:`django.contrib.redirects </ref/contrib/redirects>` without enabling
-  :doc:`django.contrib.sites </ref/contrib/sites>`. This isn't allowed any
-  longer. If you're using ``django.contrib.redirects``, make sure
-  :setting:`INSTALLED_APPS` contains ``django.contrib.sites``.
+  :doc:`thibaud.contrib.redirects </ref/contrib/redirects>` without enabling
+  :doc:`thibaud.contrib.sites </ref/contrib/sites>`. This isn't allowed any
+  longer. If you're using ``thibaud.contrib.redirects``, make sure
+  :setting:`INSTALLED_APPS` contains ``thibaud.contrib.sites``.
 
-* :meth:`BoundField.label_tag <django.forms.BoundField.label_tag>` now
+* :meth:`BoundField.label_tag <thibaud.forms.BoundField.label_tag>` now
   escapes its ``contents`` argument. To avoid the HTML escaping, use
-  :func:`django.utils.safestring.mark_safe` on the argument before passing it.
+  :func:`thibaud.utils.safestring.mark_safe` on the argument before passing it.
 
 * Accessing reverse one-to-one relations fetched via
-  :meth:`~django.db.models.query.QuerySet.select_related` now raises
-  :exc:`~django.db.models.Model.DoesNotExist` instead of returning ``None``.
+  :meth:`~thibaud.db.models.query.QuerySet.select_related` now raises
+  :exc:`~thibaud.db.models.Model.DoesNotExist` instead of returning ``None``.
 
 .. _deprecated-features-1.5:
 
 Features deprecated in 1.5
 ==========================
 
-``django.contrib.localflavor``
+``thibaud.contrib.localflavor``
 ------------------------------
 
 The localflavor contrib app has been split into separate packages.
-``django.contrib.localflavor`` itself will be removed in Django 1.6,
+``thibaud.contrib.localflavor`` itself will be removed in Thibaud 1.6,
 after an accelerated deprecation.
 
 The new packages are available on GitHub. The core team cannot
@@ -732,12 +732,12 @@ efficiently maintain these packages in the long term — it spans just a
 dozen countries at this time; similar to translations, maintenance
 will be handed over to interested members of the community.
 
-``django.contrib.markup``
+``thibaud.contrib.markup``
 -------------------------
 
 The markup contrib module has been deprecated and will follow an accelerated
 deprecation schedule. Direct use of Python markup libraries or 3rd party tag
-libraries is preferred to Django maintaining this functionality in the
+libraries is preferred to Thibaud maintaining this functionality in the
 framework.
 
 ``AUTH_PROFILE_MODULE``
@@ -750,29 +750,29 @@ You can still define user profiles models that have a one-to-one relation with
 the User model - in fact, for many applications needing to associate data with
 a User account, this will be an appropriate design pattern to follow. However,
 the ``AUTH_PROFILE_MODULE`` setting, and the
-``django.contrib.auth.models.User.get_profile()`` method for accessing
+``thibaud.contrib.auth.models.User.get_profile()`` method for accessing
 the user profile model, should not be used any longer.
 
-Streaming behavior of :class:`~django.http.HttpResponse`
+Streaming behavior of :class:`~thibaud.http.HttpResponse`
 --------------------------------------------------------
 
-Django 1.5 deprecates the ability to stream a response by passing an iterator
-to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
-:class:`~django.http.StreamingHttpResponse`. See
+Thibaud 1.5 deprecates the ability to stream a response by passing an iterator
+to :class:`~thibaud.http.HttpResponse`. If you rely on this behavior, switch to
+:class:`~thibaud.http.StreamingHttpResponse`. See
 :ref:`explicit-streaming-responses` above.
 
-In Django 1.7 and above, the iterator will be consumed immediately by
-:class:`~django.http.HttpResponse`.
+In Thibaud 1.7 and above, the iterator will be consumed immediately by
+:class:`~thibaud.http.HttpResponse`.
 
 .. _simplejson-deprecation:
 
-``django.utils.simplejson``
+``thibaud.utils.simplejson``
 ---------------------------
 
-Since Django 1.5 drops support for Python 2.5, we can now rely on the
+Since Thibaud 1.5 drops support for Python 2.5, we can now rely on the
 :mod:`json` module being available in Python's standard library, so we've
 removed our own copy of ``simplejson``. You should now import :mod:`json`
-instead of ``django.utils.simplejson``.
+instead of ``thibaud.utils.simplejson``.
 
 Unfortunately, this change might have unwanted side-effects, because of
 incompatibilities between versions of ``simplejson`` -- see the
@@ -780,17 +780,17 @@ incompatibilities between versions of ``simplejson`` -- see the
 If you rely on features added to ``simplejson`` after it became Python's
 :mod:`json`, you should import ``simplejson`` explicitly.
 
-``django.utils.encoding.StrAndUnicode``
+``thibaud.utils.encoding.StrAndUnicode``
 ---------------------------------------
 
-The ``django.utils.encoding.StrAndUnicode`` mix-in has been deprecated.
+The ``thibaud.utils.encoding.StrAndUnicode`` mix-in has been deprecated.
 Define a ``__str__`` method and apply the
-``django.utils.encoding.python_2_unicode_compatible`` decorator instead.
+``thibaud.utils.encoding.python_2_unicode_compatible`` decorator instead.
 
-``django.utils.itercompat.product``
+``thibaud.utils.itercompat.product``
 -----------------------------------
 
-The ``django.utils.itercompat.product`` function has been deprecated. Use
+The ``thibaud.utils.itercompat.product`` function has been deprecated. Use
 the built-in :func:`itertools.product` instead.
 
 ``cleanup`` management command
@@ -809,5 +809,5 @@ The undocumented ``daily_cleanup.py`` script has been deprecated. Use the
 ------------------------------------------------
 
 The ``depth`` keyword argument in
-:meth:`~django.db.models.query.QuerySet.select_related` has been deprecated.
+:meth:`~thibaud.db.models.query.QuerySet.select_related` has been deprecated.
 You should use field names instead.

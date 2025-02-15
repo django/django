@@ -1,5 +1,5 @@
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
 
 from .. import Error, Tags, Warning, register
 
@@ -19,7 +19,7 @@ REFERRER_POLICY_VALUES = {
     "unsafe-url",
 }
 
-SECRET_KEY_INSECURE_PREFIX = "django-insecure-"
+SECRET_KEY_INSECURE_PREFIX = "thibaud-insecure-"
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 
@@ -27,13 +27,13 @@ SECRET_KEY_WARNING_MSG = (
     f"Your %s has less than {SECRET_KEY_MIN_LENGTH} characters, less than "
     f"{SECRET_KEY_MIN_UNIQUE_CHARACTERS} unique characters, or it's prefixed "
     f"with '{SECRET_KEY_INSECURE_PREFIX}' indicating that it was generated "
-    f"automatically by Django. Please generate a long and random value, "
-    f"otherwise many of Django's security-critical features will be "
+    f"automatically by Thibaud. Please generate a long and random value, "
+    f"otherwise many of Thibaud's security-critical features will be "
     f"vulnerable to attack."
 )
 
 W001 = Warning(
-    "You do not have 'django.middleware.security.SecurityMiddleware' "
+    "You do not have 'thibaud.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
     "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_REFERRER_POLICY, "
     "SECURE_CROSS_ORIGIN_OPENER_POLICY, and SECURE_SSL_REDIRECT settings will "
@@ -43,7 +43,7 @@ W001 = Warning(
 
 W002 = Warning(
     "You do not have "
-    "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
+    "'thibaud.middleware.clickjacking.XFrameOptionsMiddleware' in your "
     "MIDDLEWARE, so your pages will not be served with an "
     "'x-frame-options' header. Unless there is a good reason for your "
     "site to be served in a frame, you should consider enabling this "
@@ -99,7 +99,7 @@ W018 = Warning(
 
 W019 = Warning(
     "You have "
-    "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
+    "'thibaud.middleware.clickjacking.XFrameOptionsMiddleware' in your "
     "MIDDLEWARE, but X_FRAME_OPTIONS is not set to 'DENY'. "
     "Unless there is a good reason for your site to serve other parts of "
     "itself in a frame, you should change it to 'DENY'.",
@@ -143,12 +143,12 @@ W025 = Warning(SECRET_KEY_WARNING_MSG, id="security.W025")
 
 
 def _security_middleware():
-    return "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE
+    return "thibaud.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE
 
 
 def _xframe_middleware():
     return (
-        "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE
+        "thibaud.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE
     )
 
 

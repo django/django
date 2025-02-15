@@ -1,5 +1,5 @@
-from django.core.management.base import AppCommand
-from django.db import DEFAULT_DB_ALIAS, connections
+from thibaud.core.management.base import AppCommand
+from thibaud.db import DEFAULT_DB_ALIAS, connections
 
 
 class Command(AppCommand):

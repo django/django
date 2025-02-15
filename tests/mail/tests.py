@@ -18,8 +18,8 @@ from ssl import SSLError
 from textwrap import dedent
 from unittest import mock, skipUnless
 
-from django.core import mail
-from django.core.mail import (
+from thibaud.core import mail
+from thibaud.core.mail import (
     DNS_NAME,
     BadHeaderError,
     EmailAlternative,
@@ -31,11 +31,11 @@ from django.core.mail import (
     send_mail,
     send_mass_mail,
 )
-from django.core.mail.backends import console, dummy, filebased, locmem, smtp
-from django.core.mail.message import sanitize_address
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import requires_tz_support
-from django.utils.translation import gettext_lazy
+from thibaud.core.mail.backends import console, dummy, filebased, locmem, smtp
+from thibaud.core.mail.message import sanitize_address
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.test.utils import requires_tz_support
+from thibaud.utils.translation import gettext_lazy
 
 try:
     from aiosmtpd.controller import Controller
@@ -113,22 +113,22 @@ class MailTestsMixin:
                 "First string doesn't end with the second.",
             )
 
-    def get_raw_attachments(self, django_message):
+    def get_raw_attachments(self, thibaud_message):
         """
         Return a list of the raw attachment parts in the MIME message generated
-        by serializing django_message and reparsing the result.
+        by serializing thibaud_message and reparsing the result.
 
         This returns only "top-level" attachments. It will not descend into
         message/* attached emails to find nested attachments.
         """
-        msg_bytes = django_message.message().as_bytes()
+        msg_bytes = thibaud_message.message().as_bytes()
         message = message_from_bytes(msg_bytes)
         return list(message.iter_attachments())
 
-    def get_decoded_attachments(self, django_message):
+    def get_decoded_attachments(self, thibaud_message):
         """
         Return a list of decoded attachments resulting from serializing
-        django_message and reparsing the result.
+        thibaud_message and reparsing the result.
 
         Each attachment is returned as an EmailAttachment named tuple with
         fields filename, content, and mimetype. The content will be decoded
@@ -140,7 +140,7 @@ class MailTestsMixin:
                 attachment.get_content(),
                 attachment.get_content_type(),
             )
-            for attachment in self.get_raw_attachments(django_message)
+            for attachment in self.get_raw_attachments(thibaud_message)
         ]
 
     def get_message_structure(self, message, level=0):
@@ -179,7 +179,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(message["From"], "from@example.com")
         self.assertEqual(message["To"], "to@example.com")
 
-    @mock.patch("django.core.mail.message.MIMEText.set_payload")
+    @mock.patch("thibaud.core.mail.message.MIMEText.set_payload")
     def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
         """Line length check should encode the payload supporting `surrogateescape`.
 
@@ -974,10 +974,10 @@ class MailTests(MailTestsMixin, SimpleTestCase):
     def test_attach_rfc822_message(self):
         """
         EmailMessage.attach() docs: "If you specify a mimetype of message/rfc822,
-        it will also accept django.core.mail.EmailMessage and email.message.Message."
+        it will also accept thibaud.core.mail.EmailMessage and email.message.Message."
         """
-        # django.core.mail.EmailMessage
-        django_email = EmailMessage("child subject", "child body")
+        # thibaud.core.mail.EmailMessage
+        thibaud_email = EmailMessage("child subject", "child body")
         # email.message.Message
         py_message = PyMessage()
         py_message["Subject"] = "child subject"
@@ -988,7 +988,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         py_email_message.set_content("child body")
 
         cases = [
-            django_email,
+            thibaud_email,
             py_message,
             py_email_message,
             # Should also allow message serialized as str or bytes.
@@ -1073,25 +1073,25 @@ class MailTests(MailTestsMixin, SimpleTestCase):
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
         self.assertIsInstance(
-            mail.get_connection("django.core.mail.backends.smtp.EmailBackend"),
+            mail.get_connection("thibaud.core.mail.backends.smtp.EmailBackend"),
             smtp.EmailBackend,
         )
         self.assertIsInstance(
-            mail.get_connection("django.core.mail.backends.locmem.EmailBackend"),
+            mail.get_connection("thibaud.core.mail.backends.locmem.EmailBackend"),
             locmem.EmailBackend,
         )
         self.assertIsInstance(
-            mail.get_connection("django.core.mail.backends.dummy.EmailBackend"),
+            mail.get_connection("thibaud.core.mail.backends.dummy.EmailBackend"),
             dummy.EmailBackend,
         )
         self.assertIsInstance(
-            mail.get_connection("django.core.mail.backends.console.EmailBackend"),
+            mail.get_connection("thibaud.core.mail.backends.console.EmailBackend"),
             console.EmailBackend,
         )
         with tempfile.TemporaryDirectory() as tmp_dir:
             self.assertIsInstance(
                 mail.get_connection(
-                    "django.core.mail.backends.filebased.EmailBackend",
+                    "thibaud.core.mail.backends.filebased.EmailBackend",
                     file_path=tmp_dir,
                 ),
                 filebased.EmailBackend,
@@ -1100,12 +1100,12 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         msg = " not object"
         with self.assertRaisesMessage(TypeError, msg):
             mail.get_connection(
-                "django.core.mail.backends.filebased.EmailBackend", file_path=object()
+                "thibaud.core.mail.backends.filebased.EmailBackend", file_path=object()
             )
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
-        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        EMAIL_BACKEND="thibaud.core.mail.backends.locmem.EmailBackend",
         ADMINS=[("nobody", "nobody@example.com")],
         MANAGERS=[("nobody", "nobody@example.com")],
     )
@@ -1143,13 +1143,13 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         mail_admins("Admin message", "Content", connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "[Django] Admin message")
+        self.assertEqual(connection.test_outbox[0].subject, "[Thibaud] Admin message")
 
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         mail_managers("Manager message", "Content", connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "[Django] Manager message")
+        self.assertEqual(connection.test_outbox[0].subject, "[Thibaud] Manager message")
 
     def test_dont_mangle_from_in_body(self):
         # Regression for #13433 - Make sure that EmailMessage doesn't mangle
@@ -1603,9 +1603,9 @@ class MailTimeZoneTests(MailTestsMixin, SimpleTestCase):
 
 class PythonGlobalState(SimpleTestCase):
     """
-    Tests for #12422 -- Django smarts (#2472/#11212) with charset of utf-8 text
+    Tests for #12422 -- Thibaud smarts (#2472/#11212) with charset of utf-8 text
     parts shouldn't pollute global email Python package charset registry when
-    django.mail.message is imported.
+    thibaud.mail.message is imported.
     """
 
     def test_utf8(self):
@@ -1771,7 +1771,7 @@ class BaseEmailBackendTests(MailTestsMixin):
         mail_managers("Subject", "Content", html_message="HTML Content")
         message = self.get_the_message()
 
-        self.assertEqual(message.get("subject"), "[Django] Subject")
+        self.assertEqual(message.get("subject"), "[Thibaud] Subject")
         self.assertEqual(message.get_all("to"), ["nobody@example.com"])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
@@ -1786,7 +1786,7 @@ class BaseEmailBackendTests(MailTestsMixin):
         mail_admins("Subject", "Content", html_message="HTML Content")
         message = self.get_the_message()
 
-        self.assertEqual(message.get("subject"), "[Django] Subject")
+        self.assertEqual(message.get("subject"), "[Thibaud] Subject")
         self.assertEqual(message.get_all("to"), ["nobody@example.com"])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
@@ -1806,12 +1806,12 @@ class BaseEmailBackendTests(MailTestsMixin):
         """
         mail_managers(gettext_lazy("Subject"), "Content")
         message = self.get_the_message()
-        self.assertEqual(message.get("subject"), "[Django] Subject")
+        self.assertEqual(message.get("subject"), "[Thibaud] Subject")
 
         self.flush_mailbox()
         mail_admins(gettext_lazy("Subject"), "Content")
         message = self.get_the_message()
-        self.assertEqual(message.get("subject"), "[Django] Subject")
+        self.assertEqual(message.get("subject"), "[Thibaud] Subject")
 
     @override_settings(ADMINS=[], MANAGERS=[])
     def test_empty_admins(self):
@@ -1894,20 +1894,20 @@ class BaseEmailBackendTests(MailTestsMixin):
         """
         Regression test for #15042
         """
-        self.assertTrue(send_mail("Subject", "Content", "tester", ["django"]))
+        self.assertTrue(send_mail("Subject", "Content", "tester", ["thibaud"]))
         message = self.get_the_message()
         self.assertEqual(message.get("from"), "tester")
-        self.assertEqual(message.get("to"), "django")
+        self.assertEqual(message.get("to"), "thibaud")
 
     def test_lazy_addresses(self):
         """
         Email sending should support lazy email addresses (#24416).
         """
         _ = gettext_lazy
-        self.assertTrue(send_mail("Subject", "Content", _("tester"), [_("django")]))
+        self.assertTrue(send_mail("Subject", "Content", _("tester"), [_("thibaud")]))
         message = self.get_the_message()
         self.assertEqual(message.get("from"), "tester")
-        self.assertEqual(message.get("to"), "django")
+        self.assertEqual(message.get("to"), "thibaud")
 
         self.flush_mailbox()
         m = EmailMessage(
@@ -1957,7 +1957,7 @@ class BaseEmailBackendTests(MailTestsMixin):
 
 
 class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = "django.core.mail.backends.locmem.EmailBackend"
+    email_backend = "thibaud.core.mail.backends.locmem.EmailBackend"
 
     def get_mailbox_content(self):
         # Reparse as modern messages to work with shared BaseEmailBackendTests.
@@ -2003,7 +2003,7 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
 
 class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = "django.core.mail.backends.filebased.EmailBackend"
+    email_backend = "thibaud.core.mail.backends.filebased.EmailBackend"
 
     def setUp(self):
         super().setUp()
@@ -2072,7 +2072,7 @@ class FileBackendPathLibTests(FileBackendTests):
 
 
 class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = "django.core.mail.backends.console.EmailBackend"
+    email_backend = "thibaud.core.mail.backends.console.EmailBackend"
 
     def setUp(self):
         super().setUp()
@@ -2098,7 +2098,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         """
         s = StringIO()
         connection = mail.get_connection(
-            "django.core.mail.backends.console.EmailBackend", stream=s
+            "thibaud.core.mail.backends.console.EmailBackend", stream=s
         )
         send_mail(
             "Subject",
@@ -2184,7 +2184,7 @@ class SMTPBackendTestsBase(SimpleTestCase):
 
 @skipUnless(HAS_AIOSMTPD, "No aiosmtpd library detected.")
 class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
-    email_backend = "django.core.mail.backends.smtp.EmailBackend"
+    email_backend = "thibaud.core.mail.backends.smtp.EmailBackend"
 
     def setUp(self):
         super().setUp()
@@ -2341,7 +2341,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_connection_timeout_default(self):
         """The connection's timeout value is None by default."""
-        connection = mail.get_connection("django.core.mail.backends.smtp.EmailBackend")
+        connection = mail.get_connection("thibaud.core.mail.backends.smtp.EmailBackend")
         self.assertIsNone(connection.timeout)
 
     def test_connection_timeout_custom(self):
@@ -2462,7 +2462,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
             bcc=["monitor@discussão.example.org"],
             headers={
                 "From": "Gestor de listas <lists@discussão.example.org>",
-                "To": "Discussão Django <django@discussão.example.org>",
+                "To": "Discussão Thibaud <thibaud@discussão.example.org>",
             },
         )
         backend = smtp.EmailBackend()
@@ -2478,7 +2478,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         """
         SMTP backend should not downgrade IDNA 2008 to IDNA 2003.
 
-        Django does not currently handle IDNA 2008 encoding, but should retain
+        Thibaud does not currently handle IDNA 2008 encoding, but should retain
         it for addresses that have been pre-encoded.
         """
         # Test all four EmailMessage attrs accessed by the SMTP email backend.

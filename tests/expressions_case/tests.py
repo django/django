@@ -4,9 +4,9 @@ from decimal import Decimal
 from operator import attrgetter, itemgetter
 from uuid import UUID
 
-from django.core.exceptions import FieldError
-from django.db import connection
-from django.db.models import (
+from thibaud.core.exceptions import FieldError
+from thibaud.db import connection
+from thibaud.db.models import (
     BinaryField,
     BooleanField,
     Case,
@@ -23,7 +23,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.test import SimpleTestCase, TestCase
+from thibaud.test import SimpleTestCase, TestCase
 
 from .models import CaseTestModel, Client, FKCaseTestModel, O2OCaseTestModel
 

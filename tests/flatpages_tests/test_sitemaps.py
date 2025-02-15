@@ -1,7 +1,7 @@
-from django.apps import apps
-from django.contrib.sites.models import Site
-from django.test import TestCase
-from django.test.utils import modify_settings, override_settings
+from thibaud.apps import apps
+from thibaud.contrib.sites.models import Site
+from thibaud.test import TestCase
+from thibaud.test.utils import modify_settings, override_settings
 
 
 @override_settings(
@@ -10,7 +10,7 @@ from django.test.utils import modify_settings, override_settings
 )
 @modify_settings(
     INSTALLED_APPS={
-        "append": ["django.contrib.sitemaps", "django.contrib.flatpages"],
+        "append": ["thibaud.contrib.sitemaps", "thibaud.contrib.flatpages"],
     },
 )
 class FlatpagesSitemapTests(TestCase):

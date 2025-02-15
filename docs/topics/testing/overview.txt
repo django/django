@@ -2,8 +2,8 @@
 Writing and running tests
 =========================
 
-.. module:: django.test
-   :synopsis: Testing tools for Django applications.
+.. module:: thibaud.test
+   :synopsis: Testing tools for Thibaud applications.
 
 .. seealso::
 
@@ -12,19 +12,19 @@ Writing and running tests
     </topics/testing/advanced>`.
 
 This document is split into two primary sections. First, we explain how to write
-tests with Django. Then, we explain how to run them.
+tests with Thibaud. Then, we explain how to run them.
 
 Writing tests
 =============
 
-Django's unit tests use a Python standard library module: :mod:`unittest`. This
+Thibaud's unit tests use a Python standard library module: :mod:`unittest`. This
 module defines tests using a class-based approach.
 
-Here is an example which subclasses from :class:`django.test.TestCase`,
+Here is an example which subclasses from :class:`thibaud.test.TestCase`,
 which is a subclass of :class:`unittest.TestCase` that runs each test inside a
 transaction to provide isolation::
 
-    from django.test import TestCase
+    from thibaud.test import TestCase
     from myapp.models import Animal
 
 
@@ -63,7 +63,7 @@ For more details about :mod:`unittest`, see the Python documentation.
 
     If your tests rely on database access such as creating or querying models,
     be sure to create your test classes as subclasses of
-    :class:`django.test.TestCase` rather than :class:`unittest.TestCase`.
+    :class:`thibaud.test.TestCase` rather than :class:`unittest.TestCase`.
 
     Using :class:`unittest.TestCase` avoids the cost of running each test in a
     transaction and flushing the database, but if your tests interact with
@@ -139,7 +139,7 @@ be reported, and any test databases created by the run will not be destroyed.
 
     It's a good idea to run your tests with Python warnings enabled:
     ``python -Wa manage.py test``. The ``-Wa`` flag tells Python to
-    display deprecation warnings. Django, like many other Python libraries,
+    display deprecation warnings. Thibaud, like many other Python libraries,
     uses these warnings to flag when features are going away. It also might
     flag areas in your code that aren't strictly wrong but could benefit
     from a better implementation.
@@ -208,7 +208,7 @@ with ability to share the database between threads.
     your code* anyway - rewrite your code so that it doesn't do this.
 
     This also applies to customized implementations of
-    :meth:`~django.apps.AppConfig.ready()`.
+    :meth:`~thibaud.apps.AppConfig.ready()`.
 
 .. seealso::
 
@@ -220,13 +220,13 @@ Order in which tests are executed
 ---------------------------------
 
 In order to guarantee that all ``TestCase`` code starts with a clean database,
-the Django test runner reorders tests in the following way:
+the Thibaud test runner reorders tests in the following way:
 
-* All :class:`~django.test.TestCase` subclasses are run first.
+* All :class:`~thibaud.test.TestCase` subclasses are run first.
 
-* Then, all other Django-based tests (test case classes based on
-  :class:`~django.test.SimpleTestCase`, including
-  :class:`~django.test.TransactionTestCase`) are run with no particular
+* Then, all other Thibaud-based tests (test case classes based on
+  :class:`~thibaud.test.SimpleTestCase`, including
+  :class:`~thibaud.test.TransactionTestCase`) are run with no particular
   ordering guaranteed nor enforced among them.
 
 * Then any other :class:`unittest.TestCase` tests (including doctests) that may
@@ -236,7 +236,7 @@ the Django test runner reorders tests in the following way:
 
     The new ordering of tests may reveal unexpected dependencies on test case
     ordering. This is the case with doctests that relied on state left in the
-    database by a given :class:`~django.test.TransactionTestCase` test, they
+    database by a given :class:`~thibaud.test.TransactionTestCase` test, they
     must be updated to be able to run independently.
 
 .. note::
@@ -259,9 +259,9 @@ tests and not in ``TransactionTestCase`` tests, and additionally only on
 backends where transactions are supported (the most important exception being
 MyISAM). This is also true for tests which rely on ``TransactionTestCase``
 such as :class:`LiveServerTestCase` and
-:class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`.
+:class:`~thibaud.contrib.staticfiles.testing.StaticLiveServerTestCase`.
 
-Django can reload that data for you on a per-testcase basis by
+Thibaud can reload that data for you on a per-testcase basis by
 setting the ``serialized_rollback`` option to ``True`` in the body of the
 ``TestCase`` or ``TransactionTestCase``, but note that this will slow down
 that test suite by approximately 3x.
@@ -277,7 +277,7 @@ those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
 
 To prevent serialized data from being loaded twice, setting
 ``serialized_rollback=True`` disables the
-:data:`~django.db.models.signals.post_migrate` signal when flushing the test
+:data:`~thibaud.db.models.signals.post_migrate` signal when flushing the test
 database.
 
 .. versionchanged:: 5.2
@@ -289,7 +289,7 @@ Other test conditions
 ---------------------
 
 Regardless of the value of the :setting:`DEBUG` setting in your configuration
-file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
+file, all Thibaud tests run with :setting:`DEBUG`\=False. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 
@@ -314,7 +314,7 @@ prepares itself. You can control the level of detail of these messages with the
 This tells you that the test runner is creating a test database, as described
 in the previous section.
 
-Once the test database has been created, Django will run your tests.
+Once the test database has been created, Thibaud will run your tests.
 If everything goes well, you'll see something like this:
 
 .. code-block:: shell
@@ -371,7 +371,7 @@ many users in your tests, you may want to use a custom settings file and set
 the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
 
     PASSWORD_HASHERS = [
-        "django.contrib.auth.hashers.MD5PasswordHasher",
+        "thibaud.contrib.auth.hashers.MD5PasswordHasher",
     ]
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
@@ -387,6 +387,6 @@ time to run tests.
 Avoiding disk access for media files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`~django.core.files.storage.InMemoryStorage` is a convenient way to
+The :class:`~thibaud.core.files.storage.InMemoryStorage` is a convenient way to
 prevent disk access for media files. All data is kept in memory, then it gets
 discarded after tests run.

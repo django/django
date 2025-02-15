@@ -6,9 +6,9 @@ from pathlib import Path
 from unittest import mock
 from urllib.parse import quote, quote_plus
 
-from django.test import SimpleTestCase
-from django.utils.encoding import (
-    DjangoUnicodeDecodeError,
+from thibaud.test import SimpleTestCase
+from thibaud.utils.encoding import (
+    ThibaudUnicodeDecodeError,
     escape_uri_path,
     filepath_to_uri,
     force_bytes,
@@ -20,9 +20,9 @@ from django.utils.encoding import (
     smart_str,
     uri_to_iri,
 )
-from django.utils.functional import SimpleLazyObject
-from django.utils.translation import gettext_lazy
-from django.utils.version import PYPY
+from thibaud.utils.functional import SimpleLazyObject
+from thibaud.utils.translation import gettext_lazy
+from thibaud.utils.version import PYPY
 
 
 class TestEncodingUtils(SimpleTestCase):
@@ -43,13 +43,13 @@ class TestEncodingUtils(SimpleTestCase):
         s = SimpleLazyObject(lambda: "x")
         self.assertIs(type(force_str(s)), str)
 
-    def test_force_str_DjangoUnicodeDecodeError(self):
+    def test_force_str_ThibaudUnicodeDecodeError(self):
         reason = "unexpected end of data" if PYPY else "invalid start byte"
         msg = (
             f"'utf-8' codec can't decode byte 0xff in position 0: {reason}. "
             "You passed in b'\\xff' (<class 'bytes'>)"
         )
-        with self.assertRaisesMessage(DjangoUnicodeDecodeError, msg):
+        with self.assertRaisesMessage(ThibaudUnicodeDecodeError, msg):
             force_str(b"\xff")
 
     def test_force_bytes_exception(self):
@@ -132,7 +132,7 @@ class TestEncodingUtils(SimpleTestCase):
             decoded_paths.append(inspect.currentframe().f_back.f_locals["path"])
             return quote(*args, **kwargs)
 
-        with mock.patch("django.utils.encoding.quote", mock_quote):
+        with mock.patch("thibaud.utils.encoding.quote", mock_quote):
             self.assertEqual(repercent_broken_unicode(data), b"test%FCtest%FCtest%FC")
 
         # decode() is called on smaller fragment of the path each time.

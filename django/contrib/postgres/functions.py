@@ -1,4 +1,4 @@
-from django.db.models import DateTimeField, Func, UUIDField
+from thibaud.db.models import DateTimeField, Func, UUIDField
 
 
 class RandomUUID(Func):

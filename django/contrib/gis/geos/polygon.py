@@ -1,7 +1,7 @@
-from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos.libgeos import GEOM_PTR
-from django.contrib.gis.geos.linestring import LinearRing
+from thibaud.contrib.gis.geos import prototypes as capi
+from thibaud.contrib.gis.geos.geometry import GEOSGeometry
+from thibaud.contrib.gis.geos.libgeos import GEOM_PTR
+from thibaud.contrib.gis.geos.linestring import LinearRing
 
 
 class Polygon(GEOSGeometry):
@@ -15,7 +15,7 @@ class Polygon(GEOSGeometry):
 
         Examples of initialization, where shell, hole1, and hole2 are
         valid LinearRing geometries:
-        >>> from django.contrib.gis.geos import LinearRing, Polygon
+        >>> from thibaud.contrib.gis.geos import LinearRing, Polygon
         >>> shell = hole1 = hole2 = LinearRing()
         >>> poly = Polygon(shell, hole1, hole2)
         >>> poly = Polygon(shell, (hole1, hole2))

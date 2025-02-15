@@ -5,15 +5,15 @@ from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django.conf import settings
-from django.core import mail
-from django.core.exceptions import DisallowedHost, PermissionDenied, SuspiciousOperation
-from django.core.files.temp import NamedTemporaryFile
-from django.core.management import color
-from django.http.multipartparser import MultiPartParserError
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin
-from django.utils.log import (
+from thibaud.conf import settings
+from thibaud.core import mail
+from thibaud.core.exceptions import DisallowedHost, PermissionDenied, SuspiciousOperation
+from thibaud.core.files.temp import NamedTemporaryFile
+from thibaud.core.management import color
+from thibaud.http.multipartparser import MultiPartParserError
+from thibaud.test import RequestFactory, SimpleTestCase, override_settings
+from thibaud.test.utils import LoggingCaptureMixin
+from thibaud.utils.log import (
     DEFAULT_LOGGING,
     AdminEmailHandler,
     CallbackFilter,
@@ -21,7 +21,7 @@ from django.utils.log import (
     RequireDebugTrue,
     ServerFormatter,
 )
-from django.views.debug import ExceptionReporter
+from thibaud.views.debug import ExceptionReporter
 
 from . import views
 from .logconfig import MyEmailBackend
@@ -64,9 +64,9 @@ class SetupDefaultLoggingMixin:
 class DefaultLoggingTests(
     SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase
 ):
-    def test_django_logger(self):
+    def test_thibaud_logger(self):
         """
-        The 'django' base logger only output anything when DEBUG=True.
+        The 'thibaud' base logger only output anything when DEBUG=True.
         """
         self.logger.error("Hey, this is an error.")
         self.assertEqual(self.logger_output.getvalue(), "")
@@ -76,24 +76,24 @@ class DefaultLoggingTests(
             self.assertEqual(self.logger_output.getvalue(), "Hey, this is an error.\n")
 
     @override_settings(DEBUG=True)
-    def test_django_logger_warning(self):
+    def test_thibaud_logger_warning(self):
         self.logger.warning("warning")
         self.assertEqual(self.logger_output.getvalue(), "warning\n")
 
     @override_settings(DEBUG=True)
-    def test_django_logger_info(self):
+    def test_thibaud_logger_info(self):
         self.logger.info("info")
         self.assertEqual(self.logger_output.getvalue(), "info\n")
 
     @override_settings(DEBUG=True)
-    def test_django_logger_debug(self):
+    def test_thibaud_logger_debug(self):
         self.logger.debug("debug")
         self.assertEqual(self.logger_output.getvalue(), "")
 
 
 class LoggingAssertionMixin:
     def assertLogsRequest(
-        self, url, level, msg, status_code, logger="django.request", exc_class=None
+        self, url, level, msg, status_code, logger="thibaud.request", exc_class=None
     ):
         with self.assertLogs(logger, level) as cm:
             try:
@@ -190,8 +190,8 @@ class HandlerLoggingTests(
     USE_I18N=True,
     LANGUAGES=[("en", "English")],
     MIDDLEWARE=[
-        "django.middleware.locale.LocaleMiddleware",
-        "django.middleware.common.CommonMiddleware",
+        "thibaud.middleware.locale.LocaleMiddleware",
+        "thibaud.middleware.common.CommonMiddleware",
     ],
     ROOT_URLCONF="logging_tests.urls_i18n",
 )
@@ -233,7 +233,7 @@ class CallbackFilterTest(SimpleTestCase):
 
 
 class AdminEmailHandlerTest(SimpleTestCase):
-    logger = logging.getLogger("django")
+    logger = logging.getLogger("thibaud")
     request_factory = RequestFactory()
 
     def get_admin_email_handler(self, logger):
@@ -389,7 +389,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertEqual(msg.to, ["admin@example.com"])
-        self.assertEqual(msg.subject, "[Django] ERROR (EXTERNAL IP): message")
+        self.assertEqual(msg.subject, "[Thibaud] ERROR (EXTERNAL IP): message")
         self.assertIn("Report at %s" % url_path, msg.body)
 
     @override_settings(
@@ -465,7 +465,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         handler.emit(record)
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
-        self.assertEqual(msg.subject, "[Django] ERROR: message")
+        self.assertEqual(msg.subject, "[Thibaud] ERROR: message")
         self.assertEqual(len(msg.alternatives), 1)
         body_html = str(msg.alternatives[0].content)
         self.assertIn('<div id="traceback">', body_html)
@@ -527,11 +527,11 @@ dictConfig.called = False
 
 class SetupConfigureLogging(SimpleTestCase):
     """
-    Calling django.setup() initializes the logging configuration.
+    Calling thibaud.setup() initializes the logging configuration.
     """
 
     def test_configure_initializes_logging(self):
-        from django import setup
+        from thibaud import setup
 
         try:
             with override_settings(
@@ -552,7 +552,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
             level="ERROR",
             msg="dubious",
             status_code=400,
-            logger="django.security.SuspiciousOperation",
+            logger="thibaud.security.SuspiciousOperation",
             exc_class=SuspiciousOperation,
         )
 
@@ -562,7 +562,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
             level="ERROR",
             msg="dubious",
             status_code=400,
-            logger="django.security.DisallowedHost",
+            logger="thibaud.security.DisallowedHost",
             exc_class=DisallowedHost,
         )
 
@@ -644,23 +644,23 @@ class LogFormattersTests(SimpleTestCase):
     def test_server_formatter_default_format(self):
         server_time = "2016-09-25 10:20:30"
         log_msg = "log message"
-        logger = logging.getLogger("django.server")
+        logger = logging.getLogger("thibaud.server")
 
         @contextmanager
-        def patch_django_server_logger():
+        def patch_thibaud_server_logger():
             old_stream = logger.handlers[0].stream
             new_stream = StringIO()
             logger.handlers[0].stream = new_stream
             yield new_stream
             logger.handlers[0].stream = old_stream
 
-        with patch_django_server_logger() as logger_output:
+        with patch_thibaud_server_logger() as logger_output:
             logger.info(log_msg, extra={"server_time": server_time})
             self.assertEqual(
                 "[%s] %s\n" % (server_time, log_msg), logger_output.getvalue()
             )
 
-        with patch_django_server_logger() as logger_output:
+        with patch_thibaud_server_logger() as logger_output:
             logger.info(log_msg)
             self.assertRegex(
                 logger_output.getvalue(), r"^\[[/:,\w\s\d]+\] %s\n" % log_msg

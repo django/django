@@ -5,7 +5,7 @@ ORM.
 
 import copy
 
-from django.utils.hashable import make_hashable
+from thibaud.utils.hashable import make_hashable
 
 
 class Node:
@@ -29,7 +29,7 @@ class Node:
     def create(cls, children=None, connector=None, negated=False):
         """
         Create a new instance using Node() instead of __init__() as some
-        subclasses, e.g. django.db.models.query_utils.Q, may implement a custom
+        subclasses, e.g. thibaud.db.models.query_utils.Q, may implement a custom
         __init__() with a signature that conflicts with the one defined in
         Node.__init__().
         """

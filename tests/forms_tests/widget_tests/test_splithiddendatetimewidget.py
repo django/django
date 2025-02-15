@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from django.forms import Form, SplitDateTimeField, SplitHiddenDateTimeWidget
-from django.utils import translation
+from thibaud.forms import Form, SplitDateTimeField, SplitHiddenDateTimeWidget
+from thibaud.utils import translation
 
 from .base import WidgetTest
 

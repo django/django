@@ -1,4 +1,4 @@
-django.dispatch was originally forked from PyDispatcher.
+thibaud.dispatch was originally forked from PyDispatcher.
 
 PyDispatcher License:
 

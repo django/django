@@ -1,5 +1,5 @@
-from django.contrib.messages.api import get_messages
-from django.contrib.messages.constants import DEFAULT_LEVELS
+from thibaud.contrib.messages.api import get_messages
+from thibaud.contrib.messages.constants import DEFAULT_LEVELS
 
 
 def messages(request):

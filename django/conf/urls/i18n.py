@@ -1,8 +1,8 @@
 import functools
 
-from django.conf import settings
-from django.urls import LocalePrefixPattern, URLResolver, get_resolver, path
-from django.views.i18n import set_language
+from thibaud.conf import settings
+from thibaud.urls import LocalePrefixPattern, URLResolver, get_resolver, path
+from thibaud.views.i18n import set_language
 
 
 def i18n_patterns(*urls, prefix_default_language=True):

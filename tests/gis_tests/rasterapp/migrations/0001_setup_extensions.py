@@ -1,7 +1,7 @@
-from django.db import connection, migrations
+from thibaud.db import connection, migrations
 
 if connection.features.supports_raster:
-    from django.contrib.postgres.operations import CreateExtension
+    from thibaud.contrib.postgres.operations import CreateExtension
 
     class Migration(migrations.Migration):
         operations = [

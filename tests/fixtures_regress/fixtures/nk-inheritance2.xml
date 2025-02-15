@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<thibaud-objects version="1.0">
     <object pk="2" model="fixtures_regress.parent">
         <field type="CharField" name="name">james</field>
     </object>
@@ -20,4 +20,4 @@
             </object>
         </field>
     </object>
-</django-objects>
+</thibaud-objects>

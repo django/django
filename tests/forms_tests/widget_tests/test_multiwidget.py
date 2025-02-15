@@ -1,7 +1,7 @@
 import copy
 from datetime import datetime
 
-from django.forms import (
+from thibaud.forms import (
     CharField,
     FileInput,
     Form,

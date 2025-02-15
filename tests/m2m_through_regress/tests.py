@@ -1,8 +1,8 @@
 from io import StringIO
 
-from django.contrib.auth.models import User
-from django.core import management
-from django.test import TestCase
+from thibaud.contrib.auth.models import User
+from thibaud.core import management
+from thibaud.test import TestCase
 
 from .models import Car, CarDriver, Driver, Group, Membership, Person, UserMembership
 
@@ -100,7 +100,7 @@ class M2MThroughSerializationTestCase(TestCase):
             out.getvalue().strip(),
             """
 <?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<thibaud-objects version="1.0">
   <object pk="%(m_pk)s" model="%(app_label)s.membership">
     <field to="%(app_label)s.person" name="person" rel="ManyToOneRel">%(p_pk)s</field>
     <field to="%(app_label)s.group" name="group" rel="ManyToOneRel">%(g_pk)s</field>
@@ -112,7 +112,7 @@ class M2MThroughSerializationTestCase(TestCase):
   <object pk="%(g_pk)s" model="%(app_label)s.group">
     <field type="CharField" name="name">Roll</field>
   </object>
-</django-objects>
+</thibaud-objects>
         """.strip()
             % pks,
         )

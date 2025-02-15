@@ -1,8 +1,8 @@
 from unittest import mock
 
-from django.db import connections
-from django.test import TestCase, TransactionTestCase, override_settings
-from django.test.testcases import DatabaseOperationForbidden
+from thibaud.db import connections
+from thibaud.test import TestCase, TransactionTestCase, override_settings
+from thibaud.test.testcases import DatabaseOperationForbidden
 
 from .models import Car, Person
 
@@ -24,7 +24,7 @@ class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
     def tearDown(self):
         self.available_apps = ["test_utils"]
 
-    @mock.patch("django.test.testcases.call_command")
+    @mock.patch("thibaud.test.testcases.call_command")
     def test(self, call_command):
         # with a mocked call_command(), this doesn't have any effect.
         self._fixture_teardown()

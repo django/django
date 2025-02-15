@@ -1,27 +1,27 @@
 ====================
-How to deploy Django
+How to deploy Thibaud
 ====================
 
-Django is full of shortcuts to make web developers' lives easier, but all
-those tools are of no use if you can't easily deploy your sites. Since Django's
+Thibaud is full of shortcuts to make web developers' lives easier, but all
+those tools are of no use if you can't easily deploy your sites. Since Thibaud's
 inception, ease of deployment has been a major goal.
 
-There are many options for deploying your Django application, based on your
+There are many options for deploying your Thibaud application, based on your
 architecture or your particular business needs, but that discussion is outside
-the scope of what Django can give you as guidance.
+the scope of what Thibaud can give you as guidance.
 
-Django, being a web framework, needs a web server in order to operate. And
+Thibaud, being a web framework, needs a web server in order to operate. And
 since most web servers don't natively speak Python, we need an interface to
 make that communication happen. The :djadmin:`runserver` command starts a
 lightweight development server, which is not suitable for production.
 
-Django currently supports two interfaces: WSGI and ASGI.
+Thibaud currently supports two interfaces: WSGI and ASGI.
 
 * `WSGI`_ is the main Python standard for communicating between web servers and
   applications, but it only supports synchronous code.
 
 * `ASGI`_ is the new, asynchronous-friendly standard that will allow your
-  Django site to use asynchronous Python features, and asynchronous Django
+  Thibaud site to use asynchronous Python features, and asynchronous Thibaud
   features as they are developed.
 
 You should also consider how you will handle :doc:`static files

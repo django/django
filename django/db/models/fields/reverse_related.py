@@ -9,9 +9,9 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
-from django.core import exceptions
-from django.utils.functional import cached_property
-from django.utils.hashable import make_hashable
+from thibaud.core import exceptions
+from thibaud.utils.functional import cached_property
+from thibaud.utils.hashable import make_hashable
 
 from . import BLANK_CHOICE_DASH
 from .mixins import FieldCacheMixin
@@ -31,7 +31,7 @@ class ForeignObjectRel(FieldCacheMixin):
     editable = False
     is_relation = True
 
-    # Reverse relations are always nullable (Django can't enforce that a
+    # Reverse relations are always nullable (Thibaud can't enforce that a
     # foreign key on the related model points to this model).
     null = True
     empty_strings_allowed = False
@@ -180,7 +180,7 @@ class ForeignObjectRel(FieldCacheMixin):
         Return choices with a default blank choices included, for use
         as <select> choices for this field.
 
-        Analog of django.db.models.fields.Field.get_choices(), provided
+        Analog of thibaud.db.models.fields.Field.get_choices(), provided
         initially for utilization by RelatedFieldListFilter.
         """
         limit_choices_to = limit_choices_to or self.limit_choices_to

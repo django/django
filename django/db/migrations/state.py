@@ -3,20 +3,20 @@ from collections import defaultdict
 from contextlib import contextmanager
 from functools import partial
 
-from django.apps import AppConfig
-from django.apps.registry import Apps
-from django.apps.registry import apps as global_apps
-from django.conf import settings
-from django.core.exceptions import FieldDoesNotExist
-from django.db import models
-from django.db.migrations.utils import field_is_referenced, get_references
-from django.db.models import NOT_PROVIDED
-from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
-from django.db.models.options import DEFAULT_NAMES, normalize_together
-from django.db.models.utils import make_model_tuple
-from django.utils.functional import cached_property
-from django.utils.module_loading import import_string
-from django.utils.version import get_docs_version
+from thibaud.apps import AppConfig
+from thibaud.apps.registry import Apps
+from thibaud.apps.registry import apps as global_apps
+from thibaud.conf import settings
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.db import models
+from thibaud.db.migrations.utils import field_is_referenced, get_references
+from thibaud.db.models import NOT_PROVIDED
+from thibaud.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
+from thibaud.db.models.options import DEFAULT_NAMES, normalize_together
+from thibaud.db.models.utils import make_model_tuple
+from thibaud.utils.functional import cached_property
+from thibaud.utils.module_loading import import_string
+from thibaud.utils.version import get_docs_version
 
 from .exceptions import InvalidBasesError
 from .utils import resolve_relation
@@ -642,7 +642,7 @@ class StateApps(Apps):
         super().__init__(app_configs)
 
         # These locks get in the way of copying as implemented in clone(),
-        # which is called whenever Django duplicates a StateApps before
+        # which is called whenever Thibaud duplicates a StateApps before
         # updating it.
         self._lock = None
         self.ready_event = None
@@ -650,7 +650,7 @@ class StateApps(Apps):
         self.render_multiple([*models.values(), *self.real_models])
 
         # There shouldn't be any operations pending at this point.
-        from django.core.checks.model_checks import _check_lazy_references
+        from thibaud.core.checks.model_checks import _check_lazy_references
 
         ignore = (
             {make_model_tuple(settings.AUTH_USER_MODEL)} if ignore_swappable else set()
@@ -693,7 +693,7 @@ class StateApps(Apps):
                         "Cannot resolve bases for %r\nThis can happen if you are "
                         "inheriting models from an app with migrations (e.g. "
                         "contrib.auth)\n in an app with no migrations; see "
-                        "https://docs.djangoproject.com/en/%s/topics/migrations/"
+                        "https://docs.thibaudproject.com/en/%s/topics/migrations/"
                         "#dependencies for more"
                         % (new_unrendered_models, get_docs_version())
                     )
@@ -733,7 +733,7 @@ class StateApps(Apps):
 
 class ModelState:
     """
-    Represent a Django Model. Don't use the actual Model class as it's not
+    Represent a Thibaud Model. Don't use the actual Model class as it's not
     designed to have its options changed - instead, mutate this one and then
     render it into a Model as required.
 

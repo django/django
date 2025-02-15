@@ -1,10 +1,10 @@
 ==========================
-Django 4.0.2 release notes
+Thibaud 4.0.2 release notes
 ==========================
 
 *February 1, 2022*
 
-Django 4.0.2 fixes two security issues with severity "medium" and several bugs
+Thibaud 4.0.2 fixes two security issues with severity "medium" and several bugs
 in 4.0.1. Also, the latest string translations from Transifex are incorporated,
 with a special mention for Bulgarian (fully translated).
 
@@ -27,32 +27,32 @@ parsing files.
 Bugfixes
 ========
 
-* Fixed a bug in Django 4.0 where ``TestCase.captureOnCommitCallbacks()`` could
+* Fixed a bug in Thibaud 4.0 where ``TestCase.captureOnCommitCallbacks()`` could
   execute callbacks multiple times (:ticket:`33410`).
 
-* Fixed a regression in Django 4.0 where ``help_text`` was HTML-escaped in
+* Fixed a regression in Thibaud 4.0 where ``help_text`` was HTML-escaped in
   automatically-generated forms (:ticket:`33419`).
 
-* Fixed a regression in Django 4.0 that caused displaying an incorrect name for
+* Fixed a regression in Thibaud 4.0 that caused displaying an incorrect name for
   class-based views on the technical 404 debug page (:ticket:`33425`).
 
-* Fixed a regression in Django 4.0 that caused an incorrect ``repr`` of
+* Fixed a regression in Thibaud 4.0 that caused an incorrect ``repr`` of
   ``ResolverMatch`` for class-based views (:ticket:`33426`).
 
-* Fixed a regression in Django 4.0 that caused a crash of ``makemigrations`` on
+* Fixed a regression in Thibaud 4.0 that caused a crash of ``makemigrations`` on
   models without ``Meta.order_with_respect_to`` but with a field named
   ``_order`` (:ticket:`33449`).
 
-* Fixed a regression in Django 4.0 that caused incorrect
+* Fixed a regression in Thibaud 4.0 that caused incorrect
   :attr:`.ModelAdmin.radio_fields` layout in the admin (:ticket:`33407`).
 
-* Fixed a duplicate operation regression in Django 4.0 that caused a migration
+* Fixed a duplicate operation regression in Thibaud 4.0 that caused a migration
   crash when altering a primary key type for a concrete parent model referenced
   by a foreign key (:ticket:`33462`).
 
-* Fixed a bug in Django 4.0 that caused a crash of ``QuerySet.aggregate()``
+* Fixed a bug in Thibaud 4.0 that caused a crash of ``QuerySet.aggregate()``
   after ``annotate()`` on an aggregate function with a
   :ref:`default <aggregate-default>` (:ticket:`33468`).
 
-* Fixed a regression in Django 4.0 that caused a crash of ``makemigrations``
+* Fixed a regression in Thibaud 4.0 that caused a crash of ``makemigrations``
   when renaming a field of a renamed model (:ticket:`33480`).

@@ -1,7 +1,7 @@
 import unittest
 
-from django.db import connection
-from django.test import TestCase
+from thibaud.db import connection
+from thibaud.test import TestCase
 
 from ..models import Person
 

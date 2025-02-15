@@ -1,5 +1,5 @@
-from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.ptr import CPointerBase
+from thibaud.contrib.gis.geos.error import GEOSException
+from thibaud.contrib.gis.ptr import CPointerBase
 
 
 class GEOSBase(CPointerBase):

@@ -1,9 +1,9 @@
 from collections import defaultdict
 
-from django.apps import apps
-from django.db import models
-from django.db.models import Q
-from django.utils.translation import gettext_lazy as _
+from thibaud.apps import apps
+from thibaud.db import models
+from thibaud.db.models import Q
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class ContentTypeManager(models.Manager):
@@ -139,7 +139,7 @@ class ContentType(models.Model):
     class Meta:
         verbose_name = _("content type")
         verbose_name_plural = _("content types")
-        db_table = "django_content_type"
+        db_table = "thibaud_content_type"
         unique_together = [["app_label", "model"]]
 
     def __str__(self):

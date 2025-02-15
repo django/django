@@ -2,8 +2,8 @@ from functools import wraps
 
 from asgiref.sync import iscoroutinefunction
 
-from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.utils.decorators import decorator_from_middleware
+from thibaud.middleware.csrf import CsrfViewMiddleware, get_token
+from thibaud.utils.decorators import decorator_from_middleware
 
 csrf_protect = decorator_from_middleware(CsrfViewMiddleware)
 csrf_protect.__name__ = "csrf_protect"

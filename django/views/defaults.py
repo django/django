@@ -1,13 +1,13 @@
 from urllib.parse import quote
 
-from django.http import (
+from thibaud.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseNotFound,
     HttpResponseServerError,
 )
-from django.template import Context, Engine, TemplateDoesNotExist, loader
-from django.views.decorators.csrf import requires_csrf_token
+from thibaud.template import Context, Engine, TemplateDoesNotExist, loader
+from thibaud.views.decorators.csrf import requires_csrf_token
 
 ERROR_404_TEMPLATE_NAME = "404.html"
 ERROR_403_TEMPLATE_NAME = "403.html"

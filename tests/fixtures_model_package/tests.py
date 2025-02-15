@@ -1,6 +1,6 @@
-from django.core import management
-from django.core.management import CommandError
-from django.test import TestCase
+from thibaud.core import management
+from thibaud.core.management import CommandError
+from thibaud.test import TestCase
 
 from .models import Article
 
@@ -13,7 +13,7 @@ class SampleTestCase(TestCase):
         self.assertQuerySetEqual(
             Article.objects.all(),
             [
-                "Django conquers world!",
+                "Thibaud conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
             ],
@@ -41,7 +41,7 @@ class FixtureTestCase(TestCase):
         self.assertQuerySetEqual(
             Article.objects.all(),
             [
-                "Django conquers world!",
+                "Thibaud conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
             ],
@@ -57,7 +57,7 @@ class FixtureTestCase(TestCase):
         self.assertQuerySetEqual(
             Article.objects.all(),
             [
-                "Django conquers world!",
+                "Thibaud conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
             ],

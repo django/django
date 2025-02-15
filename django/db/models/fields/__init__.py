@@ -8,33 +8,33 @@ from base64 import b64decode, b64encode
 from collections.abc import Iterable
 from functools import partialmethod, total_ordering
 
-from django import forms
-from django.apps import apps
-from django.conf import settings
-from django.core import checks, exceptions, validators
-from django.db import connection, connections, router
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
-from django.db.utils import NotSupportedError
-from django.utils import timezone
-from django.utils.choices import (
+from thibaud import forms
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core import checks, exceptions, validators
+from thibaud.db import connection, connections, router
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
+from thibaud.db.utils import NotSupportedError
+from thibaud.utils import timezone
+from thibaud.utils.choices import (
     BlankChoiceIterator,
     CallableChoiceIterator,
     flatten_choices,
     normalize_choices,
 )
-from django.utils.datastructures import DictWrapper
-from django.utils.dateparse import (
+from thibaud.utils.datastructures import DictWrapper
+from thibaud.utils.dateparse import (
     parse_date,
     parse_datetime,
     parse_duration,
     parse_time,
 )
-from django.utils.duration import duration_microseconds, duration_string
-from django.utils.functional import Promise, cached_property
-from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
-from django.utils.text import capfirst
-from django.utils.translation import gettext_lazy as _
+from thibaud.utils.duration import duration_microseconds, duration_string
+from thibaud.utils.functional import Promise, cached_property
+from thibaud.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
+from thibaud.utils.text import capfirst
+from thibaud.utils.translation import gettext_lazy as _
 
 __all__ = [
     "AutoField",
@@ -125,7 +125,7 @@ class Field(RegisterLookupMixin):
     empty_values = list(validators.EMPTY_VALUES)
 
     # These track each time a Field instance is created. Used to retain order.
-    # The auto_creation_counter is used for fields that Django implicitly
+    # The auto_creation_counter is used for fields that Thibaud implicitly
     # creates, creation_counter is used for all user-specified fields.
     creation_counter = 0
     auto_creation_counter = -1
@@ -388,7 +388,7 @@ class Field(RegisterLookupMixin):
         ]
 
     def _check_db_default(self, databases=None, **kwargs):
-        from django.db.models.expressions import Value
+        from thibaud.db.models.expressions import Value
 
         if (
             not self.has_db_default()
@@ -541,7 +541,7 @@ class Field(RegisterLookupMixin):
             output_field is None or output_field == self
         ):
             return self.cached_col
-        from django.db.models.expressions import Col
+        from thibaud.db.models.expressions import Col
 
         return Col(alias, self, output_field)
 
@@ -555,7 +555,7 @@ class Field(RegisterLookupMixin):
 
     @cached_property
     def cached_col(self):
-        from django.db.models.expressions import Col
+        from thibaud.db.models.expressions import Col
 
         return Col(self.model._meta.db_table, self)
 
@@ -563,7 +563,7 @@ class Field(RegisterLookupMixin):
         """
         Custom format for select clauses. For example, GIS columns need to be
         selected as AsText(table.col) on MySQL as the table.col data can't be
-        used by Django.
+        used by Thibaud.
         """
         return sql, params
 
@@ -574,7 +574,7 @@ class Field(RegisterLookupMixin):
          * The name of the field on the model, if contribute_to_class() has
            been run.
          * The import path of the field, including the class, e.g.
-           django.db.models.IntegerField. This should be the most portable
+           thibaud.db.models.IntegerField. This should be the most portable
            version, so less specific may be better.
          * A list of positional arguments.
          * A dict of keyword arguments.
@@ -644,22 +644,22 @@ class Field(RegisterLookupMixin):
             else:
                 if value is not default:
                     keywords[name] = value
-        # Work out path - we shorten it for known Django core fields
+        # Work out path - we shorten it for known Thibaud core fields
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
-        if path.startswith("django.db.models.fields.related"):
-            path = path.replace("django.db.models.fields.related", "django.db.models")
-        elif path.startswith("django.db.models.fields.files"):
-            path = path.replace("django.db.models.fields.files", "django.db.models")
-        elif path.startswith("django.db.models.fields.generated"):
-            path = path.replace("django.db.models.fields.generated", "django.db.models")
-        elif path.startswith("django.db.models.fields.json"):
-            path = path.replace("django.db.models.fields.json", "django.db.models")
-        elif path.startswith("django.db.models.fields.proxy"):
-            path = path.replace("django.db.models.fields.proxy", "django.db.models")
-        elif path.startswith("django.db.models.fields.composite"):
-            path = path.replace("django.db.models.fields.composite", "django.db.models")
-        elif path.startswith("django.db.models.fields"):
-            path = path.replace("django.db.models.fields", "django.db.models")
+        if path.startswith("thibaud.db.models.fields.related"):
+            path = path.replace("thibaud.db.models.fields.related", "thibaud.db.models")
+        elif path.startswith("thibaud.db.models.fields.files"):
+            path = path.replace("thibaud.db.models.fields.files", "thibaud.db.models")
+        elif path.startswith("thibaud.db.models.fields.generated"):
+            path = path.replace("thibaud.db.models.fields.generated", "thibaud.db.models")
+        elif path.startswith("thibaud.db.models.fields.json"):
+            path = path.replace("thibaud.db.models.fields.json", "thibaud.db.models")
+        elif path.startswith("thibaud.db.models.fields.proxy"):
+            path = path.replace("thibaud.db.models.fields.proxy", "thibaud.db.models")
+        elif path.startswith("thibaud.db.models.fields.composite"):
+            path = path.replace("thibaud.db.models.fields.composite", "thibaud.db.models")
+        elif path.startswith("thibaud.db.models.fields"):
+            path = path.replace("thibaud.db.models.fields", "thibaud.db.models")
         # Return basic info - other fields should override this.
         return (self.name, path, [], keywords)
 
@@ -758,7 +758,7 @@ class Field(RegisterLookupMixin):
     def to_python(self, value):
         """
         Convert the input value into the expected Python data type, raising
-        django.core.exceptions.ValidationError if the data can't be converted.
+        thibaud.core.exceptions.ValidationError if the data can't be converted.
         Return the converted value. Subclasses should override this.
         """
         return value
@@ -864,14 +864,14 @@ class Field(RegisterLookupMixin):
         # "internal type".
         #
         # A Field class can implement the get_internal_type() method to specify
-        # which *preexisting* Django Field class it's most similar to -- i.e.,
+        # which *preexisting* Thibaud Field class it's most similar to -- i.e.,
         # a custom field might be represented by a TEXT column type, which is
-        # the same as the TextField Django field type, which means the custom
+        # the same as the TextField Thibaud field type, which means the custom
         # field's get_internal_type() returns 'TextField'.
         #
         # But the limitation of the get_internal_type() / data_types approach
         # is that it cannot handle database column types that aren't already
-        # mapped to one of the built-in Django field types. In this case, you
+        # mapped to one of the built-in Thibaud field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
         data = self.db_type_parameters(connection)
@@ -931,7 +931,7 @@ class Field(RegisterLookupMixin):
 
     @property
     def db_returning(self):
-        """Private API intended only to be used by Django itself."""
+        """Private API intended only to be used by Thibaud itself."""
         return (
             self.has_db_default() and connection.features.can_return_columns_from_insert
         )
@@ -1031,7 +1031,7 @@ class Field(RegisterLookupMixin):
             return lambda: self.default
 
         if self.has_db_default():
-            from django.db.models.expressions import DatabaseDefault
+            from thibaud.db.models.expressions import DatabaseDefault
 
             return lambda: DatabaseDefault(
                 self._db_default_expression, output_field=self
@@ -1049,7 +1049,7 @@ class Field(RegisterLookupMixin):
     def _db_default_expression(self):
         db_default = self.db_default
         if self.has_db_default() and not hasattr(db_default, "resolve_expression"):
-            from django.db.models.expressions import Value
+            from thibaud.db.models.expressions import Value
 
             db_default = Value(db_default, self)
         return db_default
@@ -1099,7 +1099,7 @@ class Field(RegisterLookupMixin):
         setattr(instance, self.name, data)
 
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
-        """Return a django.forms.Field instance for this field."""
+        """Return a thibaud.forms.Field instance for this field."""
         defaults = {
             "required": not self.blank,
             "label": capfirst(self.verbose_name),
@@ -1316,7 +1316,7 @@ class CharField(Field):
         return name, path, args, kwargs
 
     def slice_expression(self, expression, start, length):
-        from django.db.models.functions import Substr
+        from thibaud.db.models.functions import Substr
 
         return Substr(expression, start, length)
 
@@ -1411,7 +1411,7 @@ class DateTimeCheckMixin:
                         "It seems you set a fixed date / time / datetime "
                         "value as default for this field. This may not be "
                         "what you want. If you want to have the current date "
-                        "as default, use `django.utils.timezone.now`"
+                        "as default, use `thibaud.utils.timezone.now`"
                     ),
                     obj=self,
                     id="fields.W161",
@@ -2514,7 +2514,7 @@ class TextField(Field):
         return name, path, args, kwargs
 
     def slice_expression(self, expression, start, length):
-        from django.db.models.functions import Substr
+        from thibaud.db.models.functions import Substr
 
         return Substr(expression, start, length)
 
@@ -2842,7 +2842,7 @@ class AutoFieldMeta(type):
     create a non-integer automatically-generated field using column defaults
     stored in the database.
 
-    In many areas Django also relies on using isinstance() to check for an
+    In many areas Thibaud also relies on using isinstance() to check for an
     automatically-generated field as a subclass of AutoField. A new flag needs
     to be implemented on Field to be used instead.
 

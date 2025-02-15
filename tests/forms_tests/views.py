@@ -1,7 +1,7 @@
-from django import forms
-from django.http import HttpResponse
-from django.template import Context, Template
-from django.views.generic.edit import UpdateView
+from thibaud import forms
+from thibaud.http import HttpResponse
+from thibaud.template import Context, Template
+from thibaud.views.generic.edit import UpdateView
 
 from .models import Article
 

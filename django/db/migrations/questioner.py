@@ -3,11 +3,11 @@ import importlib
 import os
 import sys
 
-from django.apps import apps
-from django.core.management.base import OutputWrapper
-from django.db.models import NOT_PROVIDED
-from django.utils import timezone
-from django.utils.version import get_docs_version
+from thibaud.apps import apps
+from thibaud.core.management.base import OutputWrapper
+from thibaud.db.models import NOT_PROVIDED
+from thibaud.utils import timezone
+from thibaud.utils.version import get_docs_version
 
 from .loader import MigrationLoader
 
@@ -140,7 +140,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 f"provide another value."
             )
         self.prompt_output.write(
-            "The datetime and django.utils.timezone modules are available, so "
+            "The datetime and thibaud.utils.timezone modules are available, so "
             "it is possible to provide e.g. timezone.now as a value."
         )
         self.prompt_output.write("Type 'exit' to exit this prompt")
@@ -284,7 +284,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                     f"Continue making this migration as the first step in "
                     f"writing a manual migration to generate unique values "
                     f"described here: "
-                    f"https://docs.djangoproject.com/en/{version}/howto/"
+                    f"https://docs.thibaudproject.com/en/{version}/howto/"
                     f"writing-migrations/#migrations-that-add-unique-fields.",
                     "Quit and edit field options in models.py.",
                 ],

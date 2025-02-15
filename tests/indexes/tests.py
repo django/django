@@ -1,18 +1,18 @@
 import datetime
 from unittest import skipUnless
 
-from django.conf import settings
-from django.db import connection
-from django.db.models import CASCADE, CharField, ForeignKey, Index, Q
-from django.db.models.functions import Lower
-from django.test import (
+from thibaud.conf import settings
+from thibaud.db import connection
+from thibaud.db.models import CASCADE, CharField, ForeignKey, Index, Q
+from thibaud.db.models.functions import Lower
+from thibaud.test import (
     TestCase,
     TransactionTestCase,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import override_settings
-from django.utils import timezone
+from thibaud.test.utils import override_settings
+from thibaud.utils import timezone
 
 from .models import Article, ArticleTranslation, IndexedArticle2
 

@@ -12,21 +12,21 @@ from urllib.parse import unquote_to_bytes, urljoin, urlsplit
 
 from asgiref.sync import sync_to_async
 
-from django.conf import settings
-from django.core.handlers.asgi import ASGIRequest
-from django.core.handlers.base import BaseHandler
-from django.core.handlers.wsgi import LimitedStream, WSGIRequest
-from django.core.serializers.json import DjangoJSONEncoder
-from django.core.signals import got_request_exception, request_finished, request_started
-from django.db import close_old_connections
-from django.http import HttpHeaders, HttpRequest, QueryDict, SimpleCookie
-from django.test import signals
-from django.test.utils import ContextList
-from django.urls import resolve
-from django.utils.encoding import force_bytes
-from django.utils.functional import SimpleLazyObject
-from django.utils.http import urlencode
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.conf import settings
+from thibaud.core.handlers.asgi import ASGIRequest
+from thibaud.core.handlers.base import BaseHandler
+from thibaud.core.handlers.wsgi import LimitedStream, WSGIRequest
+from thibaud.core.serializers.json import ThibaudJSONEncoder
+from thibaud.core.signals import got_request_exception, request_finished, request_started
+from thibaud.db import close_old_connections
+from thibaud.http import HttpHeaders, HttpRequest, QueryDict, SimpleCookie
+from thibaud.test import signals
+from thibaud.test.utils import ContextList
+from thibaud.urls import resolve
+from thibaud.utils.encoding import force_bytes
+from thibaud.utils.functional import SimpleLazyObject
+from thibaud.utils.http import urlencode
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 __all__ = (
     "AsyncClient",
@@ -384,7 +384,7 @@ class RequestFactory:
     def __init__(
         self,
         *,
-        json_encoder=DjangoJSONEncoder,
+        json_encoder=ThibaudJSONEncoder,
         headers=None,
         query_params=None,
         **defaults,
@@ -830,7 +830,7 @@ class ClientMixin:
         Return True if login is possible or False if the provided credentials
         are incorrect.
         """
-        from django.contrib.auth import authenticate
+        from thibaud.contrib.auth import authenticate
 
         user = authenticate(**credentials)
         if user:
@@ -840,7 +840,7 @@ class ClientMixin:
 
     async def alogin(self, **credentials):
         """See login()."""
-        from django.contrib.auth import aauthenticate
+        from thibaud.contrib.auth import aauthenticate
 
         user = await aauthenticate(**credentials)
         if user:
@@ -861,7 +861,7 @@ class ClientMixin:
         await self._alogin(user, backend)
 
     def _get_backend(self):
-        from django.contrib.auth import load_backend
+        from thibaud.contrib.auth import load_backend
 
         for backend_path in settings.AUTHENTICATION_BACKENDS:
             backend = load_backend(backend_path)
@@ -869,7 +869,7 @@ class ClientMixin:
                 return backend_path
 
     def _login(self, user, backend=None):
-        from django.contrib.auth import login
+        from thibaud.contrib.auth import login
 
         # Create a fake request to store login details.
         request = HttpRequest()
@@ -884,7 +884,7 @@ class ClientMixin:
         self._set_login_cookies(request)
 
     async def _alogin(self, user, backend=None):
-        from django.contrib.auth import alogin
+        from thibaud.contrib.auth import alogin
 
         # Create a fake request to store login details.
         request = HttpRequest()
@@ -915,7 +915,7 @@ class ClientMixin:
 
     def logout(self):
         """Log out the user by removing the cookies and session object."""
-        from django.contrib.auth import get_user, logout
+        from thibaud.contrib.auth import get_user, logout
 
         request = HttpRequest()
         if self.session:
@@ -929,7 +929,7 @@ class ClientMixin:
 
     async def alogout(self):
         """See logout()."""
-        from django.contrib.auth import aget_user, alogout
+        from thibaud.contrib.auth import aget_user, alogout
 
         request = HttpRequest()
         session = await self.asession()

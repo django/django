@@ -1,8 +1,8 @@
-from django import template
-from django.template.base import TextNode
-from django.template.defaultfilters import stringfilter
-from django.utils.html import escape, format_html
-from django.utils.safestring import mark_safe
+from thibaud import template
+from thibaud.template.base import TextNode
+from thibaud.template.defaultfilters import stringfilter
+from thibaud.utils.html import escape, format_html
+from thibaud.utils.safestring import mark_safe
 
 register = template.Library()
 

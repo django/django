@@ -1,5 +1,5 @@
-from django.db.models import F
-from django.test import TestCase
+from thibaud.db.models import F
+from thibaud.test import TestCase
 
 from .models import Comment, Tenant, User
 

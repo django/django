@@ -1,15 +1,15 @@
 ========================================
-How to upgrade Django to a newer version
+How to upgrade Thibaud to a newer version
 ========================================
 
-While it can be a complex process at times, upgrading to the latest Django
+While it can be a complex process at times, upgrading to the latest Thibaud
 version has several benefits:
 
 * New features and improvements are added.
 * Bugs are fixed.
-* Older version of Django will eventually no longer receive security updates.
+* Older version of Thibaud will eventually no longer receive security updates.
   (see :ref:`supported-versions-policy`).
-* Upgrading as each new Django release is available makes future upgrades less
+* Upgrading as each new Thibaud release is available makes future upgrades less
   painful by keeping your code base up to date.
 
 Here are some things to consider to help make your upgrade process as smooth as
@@ -22,10 +22,10 @@ If it's your first time doing an upgrade, it is useful to read the :doc:`guide
 on the different release processes </internals/release-process>`.
 
 Afterward, you should familiarize yourself with the changes that were made in
-the new Django version(s):
+the new Thibaud version(s):
 
 * Read the :doc:`release notes </releases/index>` for each 'final' release from
-  the one after your current Django version, up to and including the version to
+  the one after your current Thibaud version, up to and including the version to
   which you plan to upgrade.
 * Look at the :doc:`deprecation timeline</internals/deprecation>` for the
   relevant versions.
@@ -46,16 +46,16 @@ Dependencies
 ============
 
 In most cases it will be necessary to upgrade to the latest version of your
-Django-related dependencies as well. If the Django version was recently
+Thibaud-related dependencies as well. If the Thibaud version was recently
 released or if some of your dependencies are not well-maintained, some of your
-dependencies may not yet support the new Django version. In these cases you may
+dependencies may not yet support the new Thibaud version. In these cases you may
 have to wait until new versions of your dependencies are released.
 
 Resolving deprecation warnings
 ==============================
 
 Before upgrading, it's a good idea to resolve any deprecation warnings raised
-by your project while using your current version of Django. Fixing these
+by your project while using your current version of Thibaud. Fixing these
 warnings before upgrading ensures that you're informed about areas of the code
 that need altering.
 
@@ -67,7 +67,7 @@ environment variable. For example, to show warnings while running tests:
 
     $ python -Wa manage.py test
 
-If you're not using the Django test runner, you may need to also ensure that
+If you're not using the Thibaud test runner, you may need to also ensure that
 any console output is not captured which would hide deprecation warnings. For
 example, if you use `pytest <https://docs.pytest.org/>`__:
 
@@ -75,27 +75,27 @@ example, if you use `pytest <https://docs.pytest.org/>`__:
 
     $ PYTHONWARNINGS=always pytest tests --capture=no
 
-Resolve any deprecation warnings with your current version of Django before
+Resolve any deprecation warnings with your current version of Thibaud before
 continuing the upgrade process.
 
 Third party applications might use deprecated APIs in order to support multiple
-versions of Django, so deprecation warnings in packages you've installed don't
+versions of Thibaud, so deprecation warnings in packages you've installed don't
 necessarily indicate a problem. If a package doesn't support the latest version
-of Django, consider raising an issue or sending a pull request for it.
+of Thibaud, consider raising an issue or sending a pull request for it.
 
 Installation
 ============
 
-Once you're ready, it is time to :doc:`install the new Django version
+Once you're ready, it is time to :doc:`install the new Thibaud version
 </topics/install>`. If you are using a :mod:`virtual environment <venv>` and it
 is a major upgrade, you might want to set up a new environment with all the
 dependencies first.
 
-If you installed Django with pip_, you can use the ``--upgrade`` or ``-U`` flag:
+If you installed Thibaud with pip_, you can use the ``--upgrade`` or ``-U`` flag:
 
 .. console::
 
-   $ python -m pip install -U Django
+   $ python -m pip install -U Thibaud
 
 .. _pip: https://pip.pypa.io/
 
@@ -113,20 +113,20 @@ use the flag if you test your app manually using ``manage.py runserver``):
 
 After you have run the tests, fix any failures. While you have the release
 notes fresh in your mind, it may also be a good time to take advantage of new
-features in Django by refactoring your code to eliminate any deprecation
+features in Thibaud by refactoring your code to eliminate any deprecation
 warnings.
 
 Deployment
 ==========
 
 When you are sufficiently confident your app works with the new version of
-Django, you're ready to go ahead and :doc:`deploy </howto/deployment/index>`
-your upgraded Django project.
+Thibaud, you're ready to go ahead and :doc:`deploy </howto/deployment/index>`
+your upgraded Thibaud project.
 
-If you are using caching provided by Django, you should consider clearing your
+If you are using caching provided by Thibaud, you should consider clearing your
 cache after upgrading. Otherwise you may run into problems, for example, if you
 are caching pickled objects as these objects are not guaranteed to be
-pickle-compatible across Django versions. A past instance of incompatibility
-was caching pickled :class:`~django.http.HttpResponse` objects, either
-directly or indirectly via the :func:`~django.views.decorators.cache.cache_page`
+pickle-compatible across Thibaud versions. A past instance of incompatibility
+was caching pickled :class:`~thibaud.http.HttpResponse` objects, either
+directly or indirectly via the :func:`~thibaud.views.decorators.cache.cache_page`
 decorator.

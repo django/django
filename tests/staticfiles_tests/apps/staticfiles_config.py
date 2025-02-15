@@ -1,4 +1,4 @@
-from django.contrib.staticfiles.apps import StaticFilesConfig
+from thibaud.contrib.staticfiles.apps import StaticFilesConfig
 
 
 class IgnorePatternsAppConfig(StaticFilesConfig):

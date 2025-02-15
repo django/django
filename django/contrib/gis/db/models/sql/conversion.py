@@ -5,8 +5,8 @@ database.
 
 from decimal import Decimal
 
-from django.contrib.gis.measure import Area, Distance
-from django.db import models
+from thibaud.contrib.gis.measure import Area, Distance
+from thibaud.db import models
 
 
 class AreaField(models.FloatField):

@@ -18,10 +18,10 @@ jobs:
           pr-message: |
             Hello! Thank you for your contribution 💪
 
-            As it's your first contribution be sure to check out the [patch review checklist](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/submitting-patches/#patch-review-checklist).
+            As it's your first contribution be sure to check out the [patch review checklist](https://docs.thibaudproject.com/en/dev/internals/contributing/writing-code/submitting-patches/#patch-review-checklist).
 
-            If you're fixing a ticket [from Trac](https://code.djangoproject.com/) make sure to set the _"Has patch"_ flag and include a link to this PR in the ticket!
+            If you're fixing a ticket [from Trac](https://code.thibaudproject.com/) make sure to set the _"Has patch"_ flag and include a link to this PR in the ticket!
 
-            If you have any design or process questions then you can ask in the [Django forum](https://forum.djangoproject.com/c/internals/5).
+            If you have any design or process questions then you can ask in the [Thibaud forum](https://forum.thibaudproject.com/c/internals/5).
 
             Welcome aboard ⛵️!

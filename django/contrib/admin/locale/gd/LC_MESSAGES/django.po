@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # GunChleoc, 2015-2017,2021
@@ -6,12 +6,12 @@
 # GunChleoc, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
 "PO-Revision-Date: 2021-10-27 12:57+0000\n"
 "Last-Translator: GunChleoc\n"
-"Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
+"Language-Team: Gaelic, Scottish (http://www.transifex.com/thibaud/thibaud/"
 "language/gd/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -292,11 +292,11 @@ msgstr ""
 "Gus %(class_name)s %(instance)s a sguabadh às, bhiodh againn ris na h-"
 "oibseactan dàimheach dìonta seo a sguabadh às cuideachd: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Rianachd làraich Django"
+msgid "Thibaud site admin"
+msgstr "Rianachd làraich Thibaud"
 
-msgid "Django administration"
-msgstr "Rianachd Django"
+msgid "Thibaud administration"
+msgstr "Rianachd Thibaud"
 
 msgid "Site administration"
 msgstr "Rianachd na làraich"

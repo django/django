@@ -1,5 +1,5 @@
-from django.forms import Form, MultipleChoiceField, MultipleHiddenInput
-from django.utils.datastructures import MultiValueDict
+from thibaud.forms import Form, MultipleChoiceField, MultipleHiddenInput
+from thibaud.utils.datastructures import MultiValueDict
 
 from .base import WidgetTest
 

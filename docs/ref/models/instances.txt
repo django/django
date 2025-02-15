@@ -2,7 +2,7 @@
 Model instance reference
 ========================
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
 This document describes the details of the ``Model`` API. It builds on the
 material presented in the :doc:`model </topics/db/models>` and :doc:`database
@@ -36,7 +36,7 @@ need to :meth:`~Model.save()`.
 
     #. Add a classmethod on the model class::
 
-        from django.db import models
+        from thibaud.db import models
 
 
         class Book(models.Model):
@@ -83,7 +83,7 @@ is loaded from, ``field_names`` contains the names of all loaded fields, and
 fields are present, then ``values`` are guaranteed to be in the order
 ``__init__()`` expects them. That is, the instance can be created by
 ``cls(*values)``. If any fields are deferred, they won't appear in
-``field_names``. In that case, assign a value of ``django.db.models.DEFERRED``
+``field_names``. In that case, assign a value of ``thibaud.db.models.DEFERRED``
 to each of the missing fields.
 
 In addition to creating the new model, the ``from_db()`` method must set the
@@ -92,7 +92,7 @@ In addition to creating the new model, the ``from_db()`` method must set the
 Below is an example showing how to record the initial values of fields that
 are loaded from the database::
 
-    from django.db.models import DEFERRED
+    from thibaud.db.models import DEFERRED
 
 
     @classmethod
@@ -157,7 +157,7 @@ following is done:
 
 Only fields of the model are reloaded from the database. Other
 database-dependent values such as annotations aren't reloaded. Any
-:func:`@cached_property <django.utils.functional.cached_property>` attributes
+:func:`@cached_property <thibaud.utils.functional.cached_property>` attributes
 aren't cleared either.
 
 The reloading happens from the database the instance was loaded from, or from
@@ -198,7 +198,7 @@ all of the instance's fields when a deferred field is reloaded::
             super().refresh_from_db(using, fields, **kwargs)
 
 The ``from_queryset`` argument allows using a different queryset than the one
-created from :attr:`~django.db.models.Model._base_manager`. It gives you more
+created from :attr:`~thibaud.db.models.Model._base_manager`. It gives you more
 control over how the model is reloaded. For example, when your model uses soft
 deletion you can make ``refresh_from_db()`` to take this into account::
 
@@ -234,25 +234,25 @@ There are four steps involved in validating a model:
 All four steps are performed when you call a model's :meth:`~Model.full_clean`
 method.
 
-When you use a :class:`~django.forms.ModelForm`, the call to
-:meth:`~django.forms.Form.is_valid()` will perform these validation steps for
+When you use a :class:`~thibaud.forms.ModelForm`, the call to
+:meth:`~thibaud.forms.Form.is_valid()` will perform these validation steps for
 all the fields that are included on the form. See the :doc:`ModelForm
 documentation </topics/forms/modelforms>` for more information. You should only
 need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
-:class:`~django.forms.ModelForm` that require validation.
+:class:`~thibaud.forms.ModelForm` that require validation.
 
 .. method:: Model.full_clean(exclude=None, validate_unique=True, validate_constraints=True)
 
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`,
 :meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``),  and
 :meth:`Model.validate_constraints()` (if ``validate_constraints`` is ``True``)
-in that order and raises a :exc:`~django.core.exceptions.ValidationError` that
+in that order and raises a :exc:`~thibaud.core.exceptions.ValidationError` that
 has a ``message_dict`` attribute containing errors from all four stages.
 
 The optional ``exclude`` argument can be used to provide a ``set`` of field
 names that can be excluded from validation and cleaning.
-:class:`~django.forms.ModelForm` uses this argument to exclude fields that
+:class:`~thibaud.forms.ModelForm` uses this argument to exclude fields that
 aren't present on your form from being validated since any errors raised could
 not be corrected by the user.
 
@@ -261,7 +261,7 @@ your model's :meth:`~Model.save()` method. You'll need to call it manually
 when you want to run one-step model validation for your own manually created
 models. For example::
 
-    from django.core.exceptions import ValidationError
+    from thibaud.core.exceptions import ValidationError
 
     try:
         article.full_clean()
@@ -276,7 +276,7 @@ The first step ``full_clean()`` performs is to clean each individual field.
 
 This method will validate all fields on your model. The optional ``exclude``
 argument lets you provide a ``set`` of field names to exclude from validation.
-It will raise a :exc:`~django.core.exceptions.ValidationError` if any fields
+It will raise a :exc:`~thibaud.core.exceptions.ValidationError` if any fields
 fail validation.
 
 The second step ``full_clean()`` performs is to call :meth:`Model.clean()`.
@@ -290,9 +290,9 @@ automatically provide a value for a field, or to do validation that requires
 access to more than a single field::
 
     import datetime
-    from django.core.exceptions import ValidationError
-    from django.db import models
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.core.exceptions import ValidationError
+    from thibaud.db import models
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     class Article(models.Model):
@@ -309,13 +309,13 @@ access to more than a single field::
 Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
 method is not invoked when you call your model's :meth:`~Model.save()` method.
 
-In the above example, the :exc:`~django.core.exceptions.ValidationError`
+In the above example, the :exc:`~thibaud.core.exceptions.ValidationError`
 exception raised by ``Model.clean()`` was instantiated with a string, so it
 will be stored in a special error dictionary key,
-:data:`~django.core.exceptions.NON_FIELD_ERRORS`. This key is used for errors
+:data:`~thibaud.core.exceptions.NON_FIELD_ERRORS`. This key is used for errors
 that are tied to the entire model instead of to a specific field::
 
-    from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+    from thibaud.core.exceptions import NON_FIELD_ERRORS, ValidationError
 
     try:
         article.full_clean()
@@ -323,7 +323,7 @@ that are tied to the entire model instead of to a specific field::
         non_field_errors = e.message_dict[NON_FIELD_ERRORS]
 
 To assign exceptions to a specific field, instantiate the
-:exc:`~django.core.exceptions.ValidationError` with a dictionary, where the
+:exc:`~thibaud.core.exceptions.ValidationError` with a dictionary, where the
 keys are the field names. We could update the previous example to assign the
 error to the ``pub_date`` field::
 
@@ -359,7 +359,7 @@ Then, ``full_clean()`` will check unique constraints on your model.
     excluded field.
 
     To work around this dilemma, instead override :meth:`Model.clean_fields()
-    <django.db.models.Model.clean_fields>` as it receives the list of fields
+    <thibaud.db.models.Model.clean_fields>` as it receives the list of fields
     that are excluded from validation. For example::
 
         class Article(models.Model):
@@ -387,17 +387,17 @@ This method is similar to :meth:`~Model.clean_fields`, but validates
 uniqueness constraints defined via :attr:`.Field.unique`,
 :attr:`.Field.unique_for_date`, :attr:`.Field.unique_for_month`,
 :attr:`.Field.unique_for_year`, or :attr:`Meta.unique_together
-<django.db.models.Options.unique_together>` on your model instead of individual
+<thibaud.db.models.Options.unique_together>` on your model instead of individual
 field values. The optional ``exclude`` argument allows you to provide a ``set``
 of field names to exclude from validation. It will raise a
-:exc:`~django.core.exceptions.ValidationError` if any fields fail validation.
+:exc:`~thibaud.core.exceptions.ValidationError` if any fields fail validation.
 
-:class:`~django.db.models.UniqueConstraint`\s defined in the
-:attr:`Meta.constraints <django.db.models.Options.constraints>` are validated
+:class:`~thibaud.db.models.UniqueConstraint`\s defined in the
+:attr:`Meta.constraints <thibaud.db.models.Options.constraints>` are validated
 by :meth:`Model.validate_constraints`.
 
 Note that if you provide an ``exclude`` argument to ``validate_unique()``, any
-:attr:`~django.db.models.Options.unique_together` constraint involving one of
+:attr:`~thibaud.db.models.Options.unique_together` constraint involving one of
 the fields you provided will not be checked.
 
 Finally, ``full_clean()`` will check any other constraints on your model.
@@ -405,10 +405,10 @@ Finally, ``full_clean()`` will check any other constraints on your model.
 .. method:: Model.validate_constraints(exclude=None)
 
 This method validates all constraints defined in
-:attr:`Meta.constraints <django.db.models.Options.constraints>`. The
+:attr:`Meta.constraints <thibaud.db.models.Options.constraints>`. The
 optional ``exclude`` argument allows you to provide a ``set`` of field names to
 exclude from validation. It will raise a
-:exc:`~django.core.exceptions.ValidationError` if any constraints fail
+:exc:`~thibaud.core.exceptions.ValidationError` if any constraints fail
 validation.
 
 Saving objects
@@ -433,7 +433,7 @@ The model save process also has some subtleties; see the sections below.
 Auto-incrementing primary keys
 ------------------------------
 
-If a model has an :class:`~django.db.models.AutoField` — an auto-incrementing
+If a model has an :class:`~thibaud.db.models.AutoField` — an auto-incrementing
 primary key — then that auto-incremented value will be calculated and saved as
 an attribute on your object the first time you call ``save()``:
 
@@ -445,11 +445,11 @@ an attribute on your object the first time you call ``save()``:
     >>> b2.id  # Returns the ID of your new object.
 
 There's no way to tell what the value of an ID will be before you call
-``save()``, because that value is calculated by your database, not by Django.
+``save()``, because that value is calculated by your database, not by Thibaud.
 
-For convenience, each model has an :class:`~django.db.models.AutoField` named
+For convenience, each model has an :class:`~thibaud.db.models.AutoField` named
 ``id`` by default unless you explicitly specify ``primary_key=True`` on a field
-in your model. See the documentation for :class:`~django.db.models.AutoField`
+in your model. See the documentation for :class:`~thibaud.db.models.AutoField`
 for more details.
 
 The ``pk`` property
@@ -457,7 +457,7 @@ The ``pk`` property
 
 .. attribute:: Model.pk
 
-Regardless of whether you define a primary key field yourself, or let Django
+Regardless of whether you define a primary key field yourself, or let Thibaud
 supply one for you, each model will have a property called ``pk``. It behaves
 like a normal attribute on the model, but is actually an alias for whichever
 field or fields compose the primary key for the model. You can read and set
@@ -472,7 +472,7 @@ correct fields in the model.
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a model has an :class:`~django.db.models.AutoField` but you want to define a
+If a model has an :class:`~thibaud.db.models.AutoField` but you want to define a
 new object's ID explicitly when saving, define it explicitly before saving,
 rather than relying on the auto-assignment of the ID:
 
@@ -485,7 +485,7 @@ rather than relying on the auto-assignment of the ID:
 
 If you assign auto-primary-key values manually, make sure not to use an
 already-existing primary-key value! If you create a new object with an explicit
-primary-key value that already exists in the database, Django will assume you're
+primary-key value that already exists in the database, Thibaud will assume you're
 changing the existing record rather than creating a new one.
 
 Given the above ``'Cheddar Talk'`` blog example, this example would override the
@@ -494,7 +494,7 @@ previous record in the database::
     b4 = Blog(id=3, name="Not Cheddar", tagline="Anything but cheese.")
     b4.save()  # Overrides the previous blog with ID=3!
 
-See `How Django knows to UPDATE vs. INSERT`_, below, for the reason this
+See `How Thibaud knows to UPDATE vs. INSERT`_, below, for the reason this
 happens.
 
 Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
@@ -506,28 +506,28 @@ need to be updated; see :ref:`manually-specified-autoincrement-pk`.
 What happens when you save?
 ---------------------------
 
-When you save an object, Django performs the following steps:
+When you save an object, Thibaud performs the following steps:
 
-#. **Emit a pre-save signal.** The :data:`~django.db.models.signals.pre_save`
+#. **Emit a pre-save signal.** The :data:`~thibaud.db.models.signals.pre_save`
    signal is sent, allowing any functions listening for that signal to do
    something.
 
 #. **Preprocess the data.** Each field's
-   :meth:`~django.db.models.Field.pre_save` method is called to perform any
+   :meth:`~thibaud.db.models.Field.pre_save` method is called to perform any
    automated data modification that's needed. For example, the date/time fields
    override ``pre_save()`` to implement
-   :attr:`~django.db.models.DateField.auto_now_add` and
-   :attr:`~django.db.models.DateField.auto_now`.
+   :attr:`~thibaud.db.models.DateField.auto_now_add` and
+   :attr:`~thibaud.db.models.DateField.auto_now`.
 
 #. **Prepare the data for the database.** Each field's
-   :meth:`~django.db.models.Field.get_db_prep_save` method is asked to provide
+   :meth:`~thibaud.db.models.Field.get_db_prep_save` method is asked to provide
    its current value in a data type that can be written to the database.
 
    Most fields don't require data preparation. Simple data types, such as
    integers and strings, are 'ready to write' as a Python object. However, more
    complex data types often require some modification.
 
-   For example, :class:`~django.db.models.DateField` fields use a Python
+   For example, :class:`~thibaud.db.models.DateField` fields use a Python
    ``datetime`` object to store data. Databases don't store ``datetime``
    objects, so the field value must be converted into an ISO-compliant date
    string for insertion into the database.
@@ -535,45 +535,45 @@ When you save an object, Django performs the following steps:
 #. **Insert the data into the database.** The preprocessed, prepared data is
    composed into an SQL statement for insertion into the database.
 
-#. **Emit a post-save signal.** The :data:`~django.db.models.signals.post_save`
+#. **Emit a post-save signal.** The :data:`~thibaud.db.models.signals.post_save`
    signal is sent, allowing any functions listening for that signal to do
    something.
 
-How Django knows to UPDATE vs. INSERT
+How Thibaud knows to UPDATE vs. INSERT
 -------------------------------------
 
-You may have noticed Django database objects use the same ``save()`` method
-for creating and changing objects. Django abstracts the need to use ``INSERT``
+You may have noticed Thibaud database objects use the same ``save()`` method
+for creating and changing objects. Thibaud abstracts the need to use ``INSERT``
 or ``UPDATE`` SQL statements. Specifically, when you call ``save()`` and the
 object's primary key attribute does **not** define a
-:attr:`~django.db.models.Field.default` or
-:attr:`~django.db.models.Field.db_default`, Django follows this algorithm:
+:attr:`~thibaud.db.models.Field.default` or
+:attr:`~thibaud.db.models.Field.db_default`, Thibaud follows this algorithm:
 
 * If the object's primary key attribute is set to anything except ``None``,
-  Django executes an ``UPDATE``.
+  Thibaud executes an ``UPDATE``.
 * If the object's primary key attribute is *not* set or if the ``UPDATE``
   didn't update anything (e.g. if primary key is set to a value that doesn't
-  exist in the database), Django executes an ``INSERT``.
+  exist in the database), Thibaud executes an ``INSERT``.
 
 If the object's primary key attribute defines a
-:attr:`~django.db.models.Field.default` or
-:attr:`~django.db.models.Field.db_default` then Django executes an ``UPDATE``
+:attr:`~thibaud.db.models.Field.default` or
+:attr:`~thibaud.db.models.Field.db_default` then Thibaud executes an ``UPDATE``
 if it is an existing model instance and primary key is set to a value that
-exists in the database. Otherwise, Django executes an ``INSERT``.
+exists in the database. Otherwise, Thibaud executes an ``INSERT``.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 
-In Django 1.5 and earlier, Django did a ``SELECT`` when the primary key
-attribute was set. If the ``SELECT`` found a row, then Django did an ``UPDATE``,
+In Thibaud 1.5 and earlier, Thibaud did a ``SELECT`` when the primary key
+attribute was set. If the ``SELECT`` found a row, then Thibaud did an ``UPDATE``,
 otherwise it did an ``INSERT``. The old algorithm results in one more query in
 the ``UPDATE`` case. There are some rare cases where the database doesn't
 report that a row was updated even if the database contains a row for the
 object's primary key value. An example is the PostgreSQL ``ON UPDATE`` trigger
 which returns ``NULL``. In such cases it is possible to revert to the old
-algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+algorithm by setting the :attr:`~thibaud.db.models.Options.select_on_save`
 option to ``True``.
 
 .. _ref-models-force-insert:
@@ -601,7 +601,7 @@ You can pass ``force_insert=(models.Model,)`` to force an ``INSERT`` statement
 for all parents. By default, ``force_insert=True`` only forces the insertion of
 a new row for the current model.
 
-It should be very rare that you'll need to use these parameters. Django will
+It should be very rare that you'll need to use these parameters. Thibaud will
 almost always do the right thing and trying to override that will lead to
 errors that are difficult to track down. This feature is for advanced use
 only.
@@ -629,20 +629,20 @@ the value of 11 will be written back to the database.
 The process can be made robust, :ref:`avoiding a race condition
 <avoiding-race-conditions-using-f>`, as well as slightly faster by expressing
 the update relative to the original field value, rather than as an explicit
-assignment of a new value. Django provides :class:`F expressions
-<django.db.models.F>` for performing this kind of relative update. Using
-:class:`F expressions <django.db.models.F>`, the previous example is expressed
+assignment of a new value. Thibaud provides :class:`F expressions
+<thibaud.db.models.F>` for performing this kind of relative update. Using
+:class:`F expressions <thibaud.db.models.F>`, the previous example is expressed
 as:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import F
+    >>> from thibaud.db.models import F
     >>> product = Product.objects.get(name="Venezuelan Beaver Cheese")
     >>> product.number_sold = F("number_sold") + 1
     >>> product.save()
 
 For more details, see the documentation on :class:`F expressions
-<django.db.models.F>` and their :ref:`use in update queries
+<thibaud.db.models.F>` and their :ref:`use in update queries
 <topics-db-queries-update>`.
 
 .. _ref-models-update-fields:
@@ -666,8 +666,8 @@ perform an update on all fields.
 Specifying ``update_fields`` will force an update.
 
 When saving a model fetched through deferred model loading
-(:meth:`~django.db.models.query.QuerySet.only()` or
-:meth:`~django.db.models.query.QuerySet.defer()`) only the fields loaded
+(:meth:`~thibaud.db.models.query.QuerySet.only()` or
+:meth:`~thibaud.db.models.query.QuerySet.defer()`) only the fields loaded
 from the DB will get updated. In effect there is an automatic
 ``update_fields`` in this case. If you assign or change any deferred field
 value, the field will be added to the updated fields.
@@ -675,7 +675,7 @@ value, the field will be added to the updated fields.
 .. admonition:: ``Field.pre_save()`` and ``update_fields``
 
     If ``update_fields`` is passed in, only the
-    :meth:`~django.db.models.Field.pre_save` methods of the ``update_fields``
+    :meth:`~thibaud.db.models.Field.pre_save` methods of the ``update_fields``
     are called. For example, this means that date/time fields with
     ``auto_now=True`` will not be updated unless they are included in the
     ``update_fields``.
@@ -713,15 +713,15 @@ the data that's currently in the database.
 
 .. admonition:: You can't share pickles between versions
 
-    Pickles of models are only valid for the version of Django that
-    was used to generate them. If you generate a pickle using Django
+    Pickles of models are only valid for the version of Thibaud that
+    was used to generate them. If you generate a pickle using Thibaud
     version N, there is no guarantee that pickle will be readable with
-    Django version N+1. Pickles should not be used as part of a long-term
+    Thibaud version N+1. Pickles should not be used as part of a long-term
     archival strategy.
 
     Since pickle compatibility errors can be difficult to diagnose, such as
     silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
-    unpickle a model in a Django version that is different than the one in
+    unpickle a model in a Thibaud version that is different than the one in
     which it was pickled.
 
 .. _model-instance-methods:
@@ -737,14 +737,14 @@ A few object methods have special purposes.
 .. method:: Model.__str__()
 
 The ``__str__()`` method is called whenever you call ``str()`` on an object.
-Django uses ``str(obj)`` in a number of places. Most notably, to display an
-object in the Django admin site and as the value inserted into a template when
+Thibaud uses ``str(obj)`` in a number of places. Most notably, to display an
+object in the Thibaud admin site and as the value inserted into a template when
 it displays an object. Thus, you should always return a nice, human-readable
 representation of the model from the ``__str__()`` method.
 
 For example::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Person(models.Model):
@@ -767,7 +767,7 @@ non-proxy parent; for all other models it's simply the model's class.
 
 For example::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class MyModel(models.Model):
@@ -813,7 +813,7 @@ forbidden in Python.
 
 .. method:: Model.get_absolute_url()
 
-Define a ``get_absolute_url()`` method to tell Django how to calculate the
+Define a ``get_absolute_url()`` method to tell Thibaud how to calculate the
 canonical URL for an object. To callers, this method should appear to return a
 string that can be used to refer to the object over HTTP.
 
@@ -823,22 +823,22 @@ For example::
         return "/people/%i/" % self.id
 
 While this code is correct and simple, it may not be the most portable way to
-to write this kind of method. The :func:`~django.urls.reverse` function is
+to write this kind of method. The :func:`~thibaud.urls.reverse` function is
 usually the best approach.
 
 For example::
 
     def get_absolute_url(self):
-        from django.urls import reverse
+        from thibaud.urls import reverse
 
         return reverse("people-detail", kwargs={"pk": self.pk})
 
-One place Django uses ``get_absolute_url()`` is in the admin app. If an object
+One place Thibaud uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
 that will jump you directly to the object's public view, as given by
 ``get_absolute_url()``.
 
-Similarly, a couple of other bits of Django, such as the :doc:`syndication feed
+Similarly, a couple of other bits of Thibaud, such as the :doc:`syndication feed
 framework </ref/contrib/syndication>`, use ``get_absolute_url()`` when it is
 defined. If it makes sense for your model's instances to each have a unique
 URL, you should define ``get_absolute_url()``.
@@ -859,14 +859,14 @@ URL, you should define ``get_absolute_url()``.
 It's good practice to use ``get_absolute_url()`` in templates, instead of
 hard-coding your objects' URLs. For example, this template code is bad:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <!-- BAD template code. Avoid! -->
     <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
 This template code is much better:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
@@ -882,7 +882,7 @@ track down every place that the URL might be created. Specify it once, in
 
     Code and templates calling ``get_absolute_url()`` should be able to use the
     result directly without any further processing. You may wish to use the
-    ``django.utils.encoding.iri_to_uri()`` function to help with this if you
+    ``thibaud.utils.encoding.iri_to_uri()`` function to help with this if you
     are using strings containing characters outside the ASCII range.
 
 Extra instance methods
@@ -893,13 +893,13 @@ might have some of the following methods:
 
 .. method:: Model.get_FOO_display()
 
-For every field that has :attr:`~django.db.models.Field.choices` set, the
+For every field that has :attr:`~thibaud.db.models.Field.choices` set, the
 object will have a ``get_FOO_display()`` method, where ``FOO`` is the name of
 the field. This method returns the "human-readable" value of the field.
 
 For example::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Person(models.Model):
@@ -923,12 +923,12 @@ For example::
 .. method:: Model.get_next_by_FOO(**kwargs)
 .. method:: Model.get_previous_by_FOO(**kwargs)
 
-For every :class:`~django.db.models.DateField` and
-:class:`~django.db.models.DateTimeField` that does not have :attr:`null=True
-<django.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
+For every :class:`~thibaud.db.models.DateField` and
+:class:`~thibaud.db.models.DateTimeField` that does not have :attr:`null=True
+<thibaud.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
 ``get_previous_by_FOO()`` methods, where ``FOO`` is the name of the field. This
 returns the next and previous object with respect to the date field, raising
-a :exc:`~django.db.models.Model.DoesNotExist` exception when appropriate.
+a :exc:`~thibaud.db.models.Model.DoesNotExist` exception when appropriate.
 
 Both of these methods will perform their queries using the default
 manager for the model. If you need to emulate filtering used by a

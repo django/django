@@ -1,6 +1,6 @@
-import django.contrib.admin.models
-from django.conf import settings
-from django.db import migrations, models
+import thibaud.contrib.admin.models
+from thibaud.conf import settings
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -63,13 +63,13 @@ class Migration(migrations.Migration):
             ],
             options={
                 "ordering": ["-action_time"],
-                "db_table": "django_admin_log",
+                "db_table": "thibaud_admin_log",
                 "verbose_name": "log entry",
                 "verbose_name_plural": "log entries",
             },
             bases=(models.Model,),
             managers=[
-                ("objects", django.contrib.admin.models.LogEntryManager()),
+                ("objects", thibaud.contrib.admin.models.LogEntryManager()),
             ],
         ),
     ]

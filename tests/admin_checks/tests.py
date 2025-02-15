@@ -1,13 +1,13 @@
-from django import forms
-from django.contrib import admin
-from django.contrib.admin import AdminSite
-from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.contenttypes.admin import GenericStackedInline
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.core import checks
-from django.test import SimpleTestCase, override_settings
+from thibaud import forms
+from thibaud.contrib import admin
+from thibaud.contrib.admin import AdminSite
+from thibaud.contrib.auth.backends import ModelBackend
+from thibaud.contrib.auth.middleware import AuthenticationMiddleware
+from thibaud.contrib.contenttypes.admin import GenericStackedInline
+from thibaud.contrib.messages.middleware import MessageMiddleware
+from thibaud.contrib.sessions.middleware import SessionMiddleware
+from thibaud.core import checks
+from thibaud.test import SimpleTestCase, override_settings
 
 from .models import Album, Author, Book, City, Influence, Song, State, TwoAlbumFKAndAnE
 
@@ -62,10 +62,10 @@ class SessionMiddlewareSubclass(SessionMiddleware):
 @override_settings(
     SILENCED_SYSTEM_CHECKS=["fields.W342"],  # ForeignKey(unique=True)
     INSTALLED_APPS=[
-        "django.contrib.admin",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
-        "django.contrib.messages",
+        "thibaud.contrib.admin",
+        "thibaud.contrib.auth",
+        "thibaud.contrib.contenttypes",
+        "thibaud.contrib.messages",
         "admin_checks",
     ],
 )
@@ -81,22 +81,22 @@ class SystemChecksTestCase(SimpleTestCase):
         finally:
             admin.site.unregister(Song)
 
-    @override_settings(INSTALLED_APPS=["django.contrib.admin"])
+    @override_settings(INSTALLED_APPS=["thibaud.contrib.admin"])
     def test_apps_dependencies(self):
         errors = admin.checks.check_dependencies()
         expected = [
             checks.Error(
-                "'django.contrib.contenttypes' must be in "
+                "'thibaud.contrib.contenttypes' must be in "
                 "INSTALLED_APPS in order to use the admin application.",
                 id="admin.E401",
             ),
             checks.Error(
-                "'django.contrib.auth' must be in INSTALLED_APPS in order "
+                "'thibaud.contrib.auth' must be in INSTALLED_APPS in order "
                 "to use the admin application.",
                 id="admin.E405",
             ),
             checks.Error(
-                "'django.contrib.messages' must be in INSTALLED_APPS in order "
+                "'thibaud.contrib.messages' must be in INSTALLED_APPS in order "
                 "to use the admin application.",
                 id="admin.E406",
             ),
@@ -109,7 +109,7 @@ class SystemChecksTestCase(SimpleTestCase):
             admin.checks.check_dependencies(),
             [
                 checks.Error(
-                    "A 'django.template.backends.django.DjangoTemplates' "
+                    "A 'thibaud.template.backends.thibaud.ThibaudTemplates' "
                     "instance must be configured in TEMPLATES in order to use "
                     "the admin application.",
                     id="admin.E403",
@@ -120,7 +120,7 @@ class SystemChecksTestCase(SimpleTestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "DIRS": [],
                 "APP_DIRS": True,
                 "OPTIONS": {
@@ -132,27 +132,27 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_context_processor_dependencies(self):
         expected = [
             checks.Error(
-                "'django.contrib.auth.context_processors.auth' must be "
-                "enabled in DjangoTemplates (TEMPLATES) if using the default "
+                "'thibaud.contrib.auth.context_processors.auth' must be "
+                "enabled in ThibaudTemplates (TEMPLATES) if using the default "
                 "auth backend in order to use the admin application.",
                 id="admin.E402",
             ),
             checks.Error(
-                "'django.contrib.messages.context_processors.messages' must "
-                "be enabled in DjangoTemplates (TEMPLATES) in order to use "
+                "'thibaud.contrib.messages.context_processors.messages' must "
+                "be enabled in ThibaudTemplates (TEMPLATES) in order to use "
                 "the admin application.",
                 id="admin.E404",
             ),
             checks.Warning(
-                "'django.template.context_processors.request' must be enabled "
-                "in DjangoTemplates (TEMPLATES) in order to use the admin "
+                "'thibaud.template.context_processors.request' must be enabled "
+                "in ThibaudTemplates (TEMPLATES) in order to use the admin "
                 "navigation sidebar.",
                 id="admin.W411",
             ),
         ]
         self.assertEqual(admin.checks.check_dependencies(), expected)
         # The first error doesn't happen if
-        # 'django.contrib.auth.backends.ModelBackend' isn't in
+        # 'thibaud.contrib.auth.backends.ModelBackend' isn't in
         # AUTHENTICATION_BACKENDS.
         with self.settings(AUTHENTICATION_BACKENDS=[]):
             self.assertEqual(admin.checks.check_dependencies(), expected[1:])
@@ -161,13 +161,13 @@ class SystemChecksTestCase(SimpleTestCase):
         AUTHENTICATION_BACKENDS=["admin_checks.tests.ModelBackendSubclass"],
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "DIRS": [],
                 "APP_DIRS": True,
                 "OPTIONS": {
                     "context_processors": [
-                        "django.template.context_processors.request",
-                        "django.contrib.messages.context_processors.messages",
+                        "thibaud.template.context_processors.request",
+                        "thibaud.contrib.messages.context_processors.messages",
                     ],
                 },
             }
@@ -178,8 +178,8 @@ class SystemChecksTestCase(SimpleTestCase):
             admin.checks.check_dependencies(),
             [
                 checks.Error(
-                    "'django.contrib.auth.context_processors.auth' must be "
-                    "enabled in DjangoTemplates (TEMPLATES) if using the default "
+                    "'thibaud.contrib.auth.context_processors.auth' must be "
+                    "enabled in ThibaudTemplates (TEMPLATES) if using the default "
                     "auth backend in order to use the admin application.",
                     id="admin.E402",
                 ),
@@ -189,19 +189,19 @@ class SystemChecksTestCase(SimpleTestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.dummy.TemplateStrings",
+                "BACKEND": "thibaud.template.backends.dummy.TemplateStrings",
                 "DIRS": [],
                 "APP_DIRS": True,
             },
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "DIRS": [],
                 "APP_DIRS": True,
                 "OPTIONS": {
                     "context_processors": [
-                        "django.template.context_processors.request",
-                        "django.contrib.auth.context_processors.auth",
-                        "django.contrib.messages.context_processors.messages",
+                        "thibaud.template.context_processors.request",
+                        "thibaud.contrib.auth.context_processors.auth",
+                        "thibaud.contrib.messages.context_processors.messages",
                     ],
                 },
             },
@@ -215,23 +215,23 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = admin.checks.check_dependencies()
         expected = [
             checks.Error(
-                "'django.contrib.auth.middleware.AuthenticationMiddleware' "
+                "'thibaud.contrib.auth.middleware.AuthenticationMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
                 id="admin.E408",
             ),
             checks.Error(
-                "'django.contrib.messages.middleware.MessageMiddleware' "
+                "'thibaud.contrib.messages.middleware.MessageMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
                 id="admin.E409",
             ),
             checks.Error(
-                "'django.contrib.sessions.middleware.SessionMiddleware' "
+                "'thibaud.contrib.sessions.middleware.SessionMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
                 hint=(
                     "Insert "
-                    "'django.contrib.sessions.middleware.SessionMiddleware' "
+                    "'thibaud.contrib.sessions.middleware.SessionMiddleware' "
                     "before "
-                    "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+                    "'thibaud.contrib.auth.middleware.AuthenticationMiddleware'."
                 ),
                 id="admin.E410",
             ),
@@ -250,10 +250,10 @@ class SystemChecksTestCase(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
-            "django.contrib.does.not.Exist",
-            "django.contrib.auth.middleware.AuthenticationMiddleware",
-            "django.contrib.messages.middleware.MessageMiddleware",
-            "django.contrib.sessions.middleware.SessionMiddleware",
+            "thibaud.contrib.does.not.Exist",
+            "thibaud.contrib.auth.middleware.AuthenticationMiddleware",
+            "thibaud.contrib.messages.middleware.MessageMiddleware",
+            "thibaud.contrib.sessions.middleware.SessionMiddleware",
         ]
     )
     def test_admin_check_ignores_import_error_in_middleware(self):

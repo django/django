@@ -1,8 +1,8 @@
 import functools
 
-from django.template import Library
-from django.template.base import Node
-from django.test import SimpleTestCase
+from thibaud.template import Library
+from thibaud.template.base import Node
+from thibaud.test import SimpleTestCase
 
 
 class FilterRegistrationTests(SimpleTestCase):

@@ -1,7 +1,7 @@
 from ctypes import POINTER, c_char_p, c_int, c_ubyte, c_uint
 
-from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
-from django.contrib.gis.geos.prototypes.errcheck import (
+from thibaud.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
+from thibaud.contrib.gis.geos.prototypes.errcheck import (
     check_geom,
     check_minus_one,
     check_string,

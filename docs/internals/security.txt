@@ -1,12 +1,12 @@
 ==========================
-Django's security policies
+Thibaud's security policies
 ==========================
 
-Django's development team is strongly committed to responsible
+Thibaud's development team is strongly committed to responsible
 reporting and disclosure of security-related issues. As such, we've
 adopted and follow a set of policies which conform to that ideal and
 are geared toward allowing us to deliver timely security updates to
-the official distribution of Django, as well as to third-party
+the official distribution of Thibaud, as well as to third-party
 distributions.
 
 .. _reporting-security-issues:
@@ -15,16 +15,16 @@ Reporting security issues
 =========================
 
 **Short version: please report security issues by emailing
-security@djangoproject.com**.
+security@thibaudproject.com**.
 
-Most normal bugs in Django are reported to `our public Trac instance`_, but
+Most normal bugs in Thibaud are reported to `our public Trac instance`_, but
 due to the sensitive nature of security issues, we ask that they **not** be
 publicly reported in this fashion.
 
-Instead, if you believe you've found something in Django which has security
+Instead, if you believe you've found something in Thibaud which has security
 implications, please send a description of the issue via email to
-``security@djangoproject.com``. Mail sent to that address reaches the `security
-team <https://www.djangoproject.com/foundation/teams/#security-team>`_.
+``security@thibaudproject.com``. Mail sent to that address reaches the `security
+team <https://www.thibaudproject.com/foundation/teams/#security-team>`_.
 
 Once you've submitted an issue via email, you should receive an acknowledgment
 from a member of the security team within 48 hours, and depending on the
@@ -33,29 +33,29 @@ action to be taken, you may receive further followup emails.
 .. admonition:: Sending encrypted reports
 
     If you want to send an encrypted email (*optional*), the public key ID for
-    ``security@djangoproject.com`` is ``0xfcb84b8d1d17f80b``, and this public
+    ``security@thibaudproject.com`` is ``0xfcb84b8d1d17f80b``, and this public
     key is available from most commonly-used keyservers.
 
-.. _our public Trac instance: https://code.djangoproject.com/query
+.. _our public Trac instance: https://code.thibaudproject.com/query
 
 .. _security-report-evaluation:
 
-How does Django evaluate a report
+How does Thibaud evaluate a report
 =================================
 
 These are criteria used by the security team when evaluating whether a report
 requires a security release:
 
 * The vulnerability is within a :ref:`supported version <security-support>` of
-  Django.
+  Thibaud.
 
 * The vulnerability does not depend on manual actions that rely on code
-  external to Django. This includes actions performed by a project's developer
-  or maintainer using developer tools or the Django CLI. For example, attacks
+  external to Thibaud. This includes actions performed by a project's developer
+  or maintainer using developer tools or the Thibaud CLI. For example, attacks
   that require running management commands with uncommon or insecure options
   do not qualify.
 
-* The vulnerability applies to a production-grade Django application. This
+* The vulnerability applies to a production-grade Thibaud application. This
   means the following scenarios do not require a security release:
 
   * Exploits that only affect local development, for example when using
@@ -75,7 +75,7 @@ vulnerability within a popular third-party package. These reports should come
 from the package maintainers.
 
 If you are unsure whether your finding meets these criteria, please still report
-it :ref:`privately by emailing security@djangoproject.com
+it :ref:`privately by emailing security@thibaudproject.com
 <reporting-security-issues>`. The security team will review your report and
 recommend the correct course of action.
 
@@ -84,19 +84,19 @@ recommend the correct course of action.
 Supported versions
 ==================
 
-At any given time, the Django team provides official security support
-for several versions of Django:
+At any given time, the Thibaud team provides official security support
+for several versions of Thibaud:
 
 * The `main development branch`_, hosted on GitHub, which will become the
-  next major release of Django, receives security support. Security issues that
+  next major release of Thibaud, receives security support. Security issues that
   only affect the main development branch and not any stable released versions
   are fixed in public without going through the :ref:`disclosure process
   <security-disclosure>`.
 
-* The two most recent Django release series receive security
+* The two most recent Thibaud release series receive security
   support. For example, during the development cycle leading to the
-  release of Django 1.5, support will be provided for Django 1.4 and
-  Django 1.3. Upon the release of Django 1.5, Django 1.3's security
+  release of Thibaud 1.5, support will be provided for Thibaud 1.4 and
+  Thibaud 1.3. Upon the release of Thibaud 1.5, Thibaud 1.3's security
   support will end.
 
 * :term:`Long-term support release`\s will receive security updates for a
@@ -104,15 +104,15 @@ for several versions of Django:
 
 When new releases are issued for security reasons, the accompanying
 notice will include a list of affected versions. This list is
-comprised solely of *supported* versions of Django: older versions may
+comprised solely of *supported* versions of Thibaud: older versions may
 also be affected, but we do not investigate to determine that, and
 will not issue patches or new releases for those versions.
 
-.. _main development branch: https://github.com/django/django/
+.. _main development branch: https://github.com/thibaud/thibaud/
 
 .. _security-disclosure:
 
-How Django discloses security issues
+How Thibaud discloses security issues
 ====================================
 
 Our process for taking a security issue from private discussion to
@@ -120,10 +120,10 @@ public disclosure involves multiple steps.
 
 Approximately one week before public disclosure, we send two notifications:
 
-First, we notify |django-announce| of the date and approximate time of the
+First, we notify |thibaud-announce| of the date and approximate time of the
 upcoming security release, as well as the severity of the issues. This is to
 aid organizations that need to ensure they have staff available to handle
-triaging our announcement and upgrade Django as needed. Severity levels are:
+triaging our announcement and upgrade Thibaud as needed. Severity levels are:
 
 * **High**
 
@@ -146,36 +146,36 @@ triaging our announcement and upgrade Django as needed. Severity levels are:
 
 Second, we notify a list of :ref:`people and organizations
 <security-notifications>`, primarily composed of operating-system vendors and
-other distributors of Django. This email is signed with the PGP key of someone
-from `Django's release team`_ and consists of:
+other distributors of Thibaud. This email is signed with the PGP key of someone
+from `Thibaud's release team`_ and consists of:
 
-* A full description of the issue and the affected versions of Django.
+* A full description of the issue and the affected versions of Thibaud.
 
 * The steps we will be taking to remedy the issue.
 
-* The patch(es), if any, that will be applied to Django.
+* The patch(es), if any, that will be applied to Thibaud.
 
-* The date on which the Django team will apply these patches, issue
+* The date on which the Thibaud team will apply these patches, issue
   new releases and publicly disclose the issue.
 
 On the day of disclosure, we will take the following steps:
 
-#. Apply the relevant patch(es) to Django's codebase.
+#. Apply the relevant patch(es) to Thibaud's codebase.
 
 #. Issue the relevant release(s), by placing new packages on the :pypi:`Python
-   Package Index <Django>` and on the `djangoproject.com website
-   <https://www.djangoproject.com/download/>`_, and tagging the new release(s)
-   in Django's git repository.
+   Package Index <Thibaud>` and on the `thibaudproject.com website
+   <https://www.thibaudproject.com/download/>`_, and tagging the new release(s)
+   in Thibaud's git repository.
 
-#. Post a public entry on `the official Django development blog`_,
+#. Post a public entry on `the official Thibaud development blog`_,
    describing the issue and its resolution in detail, pointing to the
    relevant patches and new releases, and crediting the reporter of
    the issue (if the reporter wishes to be publicly identified).
 
-#. Post a notice to the |django-announce| and oss-security@lists.openwall.com
+#. Post a notice to the |thibaud-announce| and oss-security@lists.openwall.com
    mailing lists that links to the blog post.
 
-.. _the official Django development blog: https://www.djangoproject.com/weblog/
+.. _the official Thibaud development blog: https://www.thibaudproject.com/weblog/
 
 If a reported issue is believed to be particularly time-sensitive --
 due to a known exploit in the wild, for example -- the time between
@@ -188,10 +188,10 @@ may privately contact and discuss those issues with the appropriate
 maintainers, and coordinate our own disclosure and resolution with
 theirs.
 
-The Django team also maintains an :doc:`archive of security issues
-disclosed in Django</releases/security>`.
+The Thibaud team also maintains an :doc:`archive of security issues
+disclosed in Thibaud</releases/security>`.
 
-.. _Django's release team: https://www.djangoproject.com/foundation/teams/#releasers-team
+.. _Thibaud's release team: https://www.thibaudproject.com/foundation/teams/#releasers-team
 
 .. _security-notifications:
 
@@ -204,16 +204,16 @@ notification of security issues is not and will not be made public.
 We also aim to keep this list as small as effectively possible, in
 order to better manage the flow of confidential information prior to
 disclosure. As such, our notification list is *not* simply a list of
-users of Django, and being a user of Django is not sufficient reason
+users of Thibaud, and being a user of Thibaud is not sufficient reason
 to be placed on the notification list.
 
 In broad terms, recipients of security notifications fall into three
 groups:
 
-1. Operating-system vendors and other distributors of Django who
+1. Operating-system vendors and other distributors of Thibaud who
    provide a suitably-generic (i.e., *not* an individual's personal
    email address) contact address for reporting issues with their
-   Django package, or for general security reporting. In either case,
+   Thibaud package, or for general security reporting. In either case,
    such addresses **must not** forward to public mailing lists or bug
    trackers. Addresses which forward to the private email of an
    individual maintainer or security-response contact are acceptable,
@@ -225,10 +225,10 @@ groups:
    on these notifications.
 
 3. On a case-by-case basis, other entities who, in the judgment of the
-   Django development team, need to be made aware of a pending
+   Thibaud development team, need to be made aware of a pending
    security issue. Typically, membership in this group will consist of
    some of the largest and/or most likely to be severely impacted
-   known users or distributors of Django, and will require a
+   known users or distributors of Thibaud, and will require a
    demonstrated ability to responsibly receive, keep confidential and
    act on these notifications.
 
@@ -242,8 +242,8 @@ Requesting notifications
 
 If you believe that you, or an organization you are authorized to
 represent, fall into one of the groups listed above, you can ask to be
-added to Django's notification list by emailing
-``security@djangoproject.com``. Please use the subject line "Security
+added to Thibaud's notification list by emailing
+``security@thibaudproject.com``. Please use the subject line "Security
 notification request".
 
 Your request **must** include the following information:
@@ -256,8 +256,8 @@ Your request **must** include the following information:
 
 * A detailed explanation of why you are requesting security notifications.
   Again, please keep in mind that this is *not* simply a list for users of
-  Django, and the overwhelming majority of users should subscribe to
-  |django-announce| to receive advanced notice of when a security release will
+  Thibaud, and the overwhelming majority of users should subscribe to
+  |thibaud-announce| to receive advanced notice of when a security release will
   happen, without the details of the issues, rather than request detailed
   notifications.
 
@@ -273,13 +273,13 @@ Your request **must** include the following information:
   which can be used to verify email received from you and encrypt
   email sent to you, as needed.
 
-Once submitted, your request will be considered by the Django
+Once submitted, your request will be considered by the Thibaud
 development team; you will receive a reply notifying you of the result
 of your request within 30 days.
 
 Please also bear in mind that for any individual or organization,
 receiving security notifications is a privilege granted at the sole
-discretion of the Django development team, and that this privilege can
+discretion of the Thibaud development team, and that this privilege can
 be revoked at any time, with or without explanation.
 
 .. admonition:: Provide all required information

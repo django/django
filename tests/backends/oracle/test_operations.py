@@ -1,8 +1,8 @@
 import unittest
 
-from django.core.management.color import no_style
-from django.db import connection, models
-from django.test import TransactionTestCase
+from thibaud.core.management.color import no_style
+from thibaud.db import connection, models
+from thibaud.test import TransactionTestCase
 
 from ..models import Person, Tag
 

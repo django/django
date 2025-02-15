@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020-2021
@@ -7,12 +7,12 @@
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2020
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: Resul <resulsaparov@gmail.com>, 2022-2024\n"
-"Language-Team: Turkmen (http://app.transifex.com/django/django/language/"
+"Language-Team: Turkmen (http://app.transifex.com/thibaud/thibaud/language/"
 "tk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1300,26 +1300,26 @@ msgstr "Üstünlikli guruldy! Gutlaýarys!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Django %(version)s üçin <a href=\"https://docs.djangoproject.com/en/"
+"Thibaud %(version)s üçin <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">goýberiş "
 "belliklerini</a> görüň"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
 "Bu sahypany görýärsiňiz, sebäbi sazlamalar faýlyňyzda <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> we hiç hili URL düzmediňiz."
 
-msgid "Django Documentation"
-msgstr "Django resminamalary"
+msgid "Thibaud Documentation"
+msgstr "Thibaud resminamalary"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Mowzuklar, salgylanmalar, &amp; how-to-lar"
@@ -1327,11 +1327,11 @@ msgstr "Mowzuklar, salgylanmalar, &amp; how-to-lar"
 msgid "Tutorial: A Polling App"
 msgstr "Gollanma: Ses beriş programmasy"
 
-msgid "Get started with Django"
-msgstr "Django bilen başlaň"
+msgid "Get started with Thibaud"
+msgstr "Thibaud bilen başlaň"
 
-msgid "Django Community"
-msgstr "Django jemgyýeti"
+msgid "Thibaud Community"
+msgstr "Thibaud jemgyýeti"
 
 msgid "Connect, get help, or contribute"
 msgstr "Birikiň, kömek alyň ýa-da goşant goşuň"

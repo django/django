@@ -1,4 +1,4 @@
-from django.db.backends.base.features import BaseDatabaseFeatures
+from thibaud.db.backends.base.features import BaseDatabaseFeatures
 
 
 class DummyDatabaseFeatures(BaseDatabaseFeatures):

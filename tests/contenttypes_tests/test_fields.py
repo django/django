@@ -1,10 +1,10 @@
 import json
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.prefetch import GenericPrefetch
-from django.db import models
-from django.test import TestCase
-from django.test.utils import isolate_apps
+from thibaud.contrib.contenttypes.fields import GenericForeignKey
+from thibaud.contrib.contenttypes.prefetch import GenericPrefetch
+from thibaud.db import models
+from thibaud.test import TestCase
+from thibaud.test.utils import isolate_apps
 
 from .models import Answer, Post, Question
 

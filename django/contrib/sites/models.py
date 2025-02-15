@@ -1,10 +1,10 @@
 import string
 
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.db import models
-from django.db.models.signals import pre_delete, pre_save
-from django.http.request import split_domain_port
-from django.utils.translation import gettext_lazy as _
+from thibaud.core.exceptions import ImproperlyConfigured, ValidationError
+from thibaud.db import models
+from thibaud.db.models.signals import pre_delete, pre_save
+from thibaud.http.request import split_domain_port
+from thibaud.utils.translation import gettext_lazy as _
 
 SITE_CACHE = {}
 
@@ -52,7 +52,7 @@ class SiteManager(models.Manager):
         request.get_host(). The ``Site`` object is cached the first time it's
         retrieved from the database.
         """
-        from django.conf import settings
+        from thibaud.conf import settings
 
         if getattr(settings, "SITE_ID", ""):
             site_id = settings.SITE_ID
@@ -61,7 +61,7 @@ class SiteManager(models.Manager):
             return self._get_site_by_request(request)
 
         raise ImproperlyConfigured(
-            'You\'re using the Django "sites framework" without having '
+            'You\'re using the Thibaud "sites framework" without having '
             "set the SITE_ID setting. Create a site in your database and "
             "set the SITE_ID setting or pass a request to "
             "Site.objects.get_current() to fix this error."
@@ -88,7 +88,7 @@ class Site(models.Model):
     objects = SiteManager()
 
     class Meta:
-        db_table = "django_site"
+        db_table = "thibaud_site"
         verbose_name = _("site")
         verbose_name_plural = _("sites")
         ordering = ["domain"]

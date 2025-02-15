@@ -1,6 +1,6 @@
 """
 Base classes for writing management commands (named commands which can
-be executed through ``django-admin`` or ``manage.py``).
+be executed through ``thibaud-admin`` or ``manage.py``).
 """
 
 import argparse
@@ -10,11 +10,11 @@ from argparse import ArgumentParser, HelpFormatter
 from functools import partial
 from io import TextIOBase
 
-import django
-from django.core import checks
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management.color import color_style, no_style
-from django.db import DEFAULT_DB_ALIAS, connections
+import thibaud
+from thibaud.core import checks
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.management.color import color_style, no_style
+from thibaud.db import DEFAULT_DB_ALIAS, connections
 
 ALL_CHECKS = "__all__"
 
@@ -99,7 +99,7 @@ def no_translations(handle_func):
     """Decorator that forces a command to run with translations deactivated."""
 
     def wrapper(*args, **kwargs):
-        from django.utils import translation
+        from thibaud.utils import translation
 
         saved_locale = translation.get_language()
         translation.deactivate_all()
@@ -113,7 +113,7 @@ def no_translations(handle_func):
     return wrapper
 
 
-class DjangoHelpFormatter(HelpFormatter):
+class ThibaudHelpFormatter(HelpFormatter):
     """
     Customized formatter so that command-specific arguments appear in the
     --help output before arguments common to all commands.
@@ -198,7 +198,7 @@ class BaseCommand:
     the command-parsing and -execution behavior, the normal flow works
     as follows:
 
-    1. ``django-admin`` or ``manage.py`` loads the command class
+    1. ``thibaud-admin`` or ``manage.py`` loads the command class
        and calls its ``run_from_argv()`` method.
 
     2. The ``run_from_argv()`` method calls ``create_parser()`` to get
@@ -289,18 +289,18 @@ class BaseCommand:
 
     def get_version(self):
         """
-        Return the Django version, which should be correct for all built-in
-        Django commands. User-supplied commands can override this method to
+        Return the Thibaud version, which should be correct for all built-in
+        Thibaud commands. User-supplied commands can override this method to
         return their own version.
         """
-        return django.get_version()
+        return thibaud.get_version()
 
     def create_parser(self, prog_name, subcommand, **kwargs):
         """
         Create and return the ``ArgumentParser`` which will be used to
         parse the arguments to this command.
         """
-        kwargs.setdefault("formatter_class", DjangoHelpFormatter)
+        kwargs.setdefault("formatter_class", ThibaudHelpFormatter)
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
@@ -341,7 +341,7 @@ class BaseCommand:
             "--pythonpath",
             help=(
                 "A directory to add to the Python path, e.g. "
-                '"/home/djangoprojects/myproject".'
+                '"/home/thibaudprojects/myproject".'
             ),
         )
         self.add_base_argument(
@@ -399,7 +399,7 @@ class BaseCommand:
     def run_from_argv(self, argv):
         """
         Set up any environment changes requested (e.g., Python path
-        and Django settings), then run this command. If the
+        and Thibaud settings), then run this command. If the
         command raises a ``CommandError``, intercept it and print it sensibly
         to stderr. If the ``--traceback`` option is present or the raised
         ``Exception`` is not ``CommandError``, raise it.
@@ -484,7 +484,7 @@ class BaseCommand:
         databases=None,
     ):
         """
-        Use the system check framework to validate entire Django project.
+        Use the system check framework to validate entire Thibaud project.
         Raise CommandError for any serious message (error or critical errors).
         If there are only light messages (like warnings), print them to stderr
         and don't raise an exception.
@@ -581,7 +581,7 @@ class BaseCommand:
         Print a warning if the set of migrations on disk don't match the
         migrations in the database.
         """
-        from django.db.migrations.executor import MigrationExecutor
+        from thibaud.db.migrations.executor import MigrationExecutor
 
         try:
             executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
@@ -639,7 +639,7 @@ class AppCommand(BaseCommand):
         )
 
     def handle(self, *app_labels, **options):
-        from django.apps import apps
+        from thibaud.apps import apps
 
         try:
             app_configs = [apps.get_app_config(app_label) for app_label in app_labels]

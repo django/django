@@ -3,10 +3,10 @@ import sys
 import time
 import unittest
 
-from django.core.files.base import ContentFile
-from django.core.files.storage import InMemoryStorage
-from django.core.files.uploadedfile import TemporaryUploadedFile
-from django.test import SimpleTestCase, override_settings
+from thibaud.core.files.base import ContentFile
+from thibaud.core.files.storage import InMemoryStorage
+from thibaud.core.files.uploadedfile import TemporaryUploadedFile
+from thibaud.test import SimpleTestCase, override_settings
 
 
 class MemoryStorageIOTests(unittest.TestCase):
@@ -233,7 +233,7 @@ class InMemoryStorageTests(SimpleTestCase):
     def test_deconstruction(self):
         storage = InMemoryStorage()
         path, args, kwargs = storage.deconstruct()
-        self.assertEqual(path, "django.core.files.storage.InMemoryStorage")
+        self.assertEqual(path, "thibaud.core.files.storage.InMemoryStorage")
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {})
 

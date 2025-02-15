@@ -1,9 +1,9 @@
-from django.apps import apps
-from django.contrib.auth import authenticate, signals
-from django.contrib.auth.models import User
-from django.core.exceptions import FieldDoesNotExist
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
+from thibaud.apps import apps
+from thibaud.contrib.auth import authenticate, signals
+from thibaud.contrib.auth.models import User
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.test import TestCase, override_settings
+from thibaud.test.client import RequestFactory
 
 from .models import MinimalUser, UserWithDisabledLastLoginField
 

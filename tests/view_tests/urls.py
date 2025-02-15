@@ -1,10 +1,10 @@
 import os
 from functools import partial
 
-from django.conf.urls.i18n import i18n_patterns
-from django.urls import include, path, re_path
-from django.utils.translation import gettext_lazy as _
-from django.views import defaults, i18n, static
+from thibaud.conf.urls.i18n import i18n_patterns
+from thibaud.urls import include, path, re_path
+from thibaud.utils.translation import gettext_lazy as _
+from thibaud.views import defaults, i18n, static
 
 from . import views
 
@@ -29,7 +29,7 @@ urlpatterns = [
     path("classbased404/", views.Http404View.as_view()),
     path("classbased500/", views.Raises500View.as_view()),
     # i18n views
-    path("i18n/", include("django.conf.urls.i18n")),
+    path("i18n/", include("thibaud.conf.urls.i18n")),
     path("jsi18n/", i18n.JavaScriptCatalog.as_view(packages=["view_tests"])),
     path("jsi18n_no_packages/", i18n.JavaScriptCatalog.as_view()),
     path("jsi18n/app1/", i18n.JavaScriptCatalog.as_view(packages=["view_tests.app1"])),
@@ -49,7 +49,7 @@ urlpatterns = [
     ),
     path(
         "jsi18n_admin/",
-        i18n.JavaScriptCatalog.as_view(packages=["django.contrib.admin", "view_tests"]),
+        i18n.JavaScriptCatalog.as_view(packages=["thibaud.contrib.admin", "view_tests"]),
     ),
     path("jsi18n_template/", views.jsi18n),
     path("jsi18n_multi_catalogs/", views.jsi18n_multi_catalogs),

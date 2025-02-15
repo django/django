@@ -1,4 +1,4 @@
-from django.db.models import CharField, EmailField, TextField
+from thibaud.db.models import CharField, EmailField, TextField
 
 __all__ = ["CICharField", "CIEmailField", "CITextField"]
 
@@ -6,7 +6,7 @@ __all__ = ["CICharField", "CIEmailField", "CITextField"]
 class CICharField(CharField):
     system_check_removed_details = {
         "msg": (
-            "django.contrib.postgres.fields.CICharField is removed except for support "
+            "thibaud.contrib.postgres.fields.CICharField is removed except for support "
             "in historical migrations."
         ),
         "hint": (
@@ -20,7 +20,7 @@ class CICharField(CharField):
 class CIEmailField(EmailField):
     system_check_removed_details = {
         "msg": (
-            "django.contrib.postgres.fields.CIEmailField is removed except for support "
+            "thibaud.contrib.postgres.fields.CIEmailField is removed except for support "
             "in historical migrations."
         ),
         "hint": (
@@ -34,7 +34,7 @@ class CIEmailField(EmailField):
 class CITextField(TextField):
     system_check_removed_details = {
         "msg": (
-            "django.contrib.postgres.fields.CITextField is removed except for support "
+            "thibaud.contrib.postgres.fields.CITextField is removed except for support "
             "in historical migrations."
         ),
         "hint": (

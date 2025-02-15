@@ -1,4 +1,4 @@
-from django.db import migrations, models
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "ordering": ["url"],
-                "db_table": "django_flatpage",
+                "db_table": "thibaud_flatpage",
                 "verbose_name": "flat page",
                 "verbose_name_plural": "flat pages",
             },

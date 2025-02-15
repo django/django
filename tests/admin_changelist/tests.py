@@ -1,12 +1,12 @@
 import datetime
 from unittest import mock
 
-from django.contrib import admin
-from django.contrib.admin.models import LogEntry
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.templatetags.admin_list import pagination
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.views.main import (
+from thibaud.contrib import admin
+from thibaud.contrib.admin.models import LogEntry
+from thibaud.contrib.admin.options import IncorrectLookupParameters
+from thibaud.contrib.admin.templatetags.admin_list import pagination
+from thibaud.contrib.admin.tests import AdminSeleniumTestCase
+from thibaud.contrib.admin.views.main import (
     ALL_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
@@ -15,18 +15,18 @@ from django.contrib.admin.views.main import (
     SEARCH_VAR,
     TO_FIELD_VAR,
 )
-from django.contrib.auth.models import User
-from django.contrib.messages.storage.cookie import CookieStorage
-from django.db import DatabaseError, connection, models
-from django.db.models import F, Field, IntegerField
-from django.db.models.functions import Upper
-from django.db.models.lookups import Contains, Exact
-from django.template import Context, Template, TemplateSyntaxError
-from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.client import RequestFactory
-from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
-from django.urls import reverse
-from django.utils import formats
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.messages.storage.cookie import CookieStorage
+from thibaud.db import DatabaseError, connection, models
+from thibaud.db.models import F, Field, IntegerField
+from thibaud.db.models.functions import Upper
+from thibaud.db.models.lookups import Contains, Exact
+from thibaud.template import Context, Template, TemplateSyntaxError
+from thibaud.test import TestCase, override_settings, skipUnlessDBFeature
+from thibaud.test.client import RequestFactory
+from thibaud.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
+from thibaud.urls import reverse
+from thibaud.utils import formats
 
 from .admin import (
     BandAdmin,
@@ -478,7 +478,7 @@ class ChangeListTests(TestCase):
             "_save": "Save",
         }
         with mock.patch(
-            "django.contrib.admin.ModelAdmin.log_change", side_effect=DatabaseError
+            "thibaud.contrib.admin.ModelAdmin.log_change", side_effect=DatabaseError
         ):
             with self.assertRaises(DatabaseError):
                 self.client.post(changelist_url, data)
@@ -491,7 +491,7 @@ class ChangeListTests(TestCase):
         self.assertEqual(b.speed, 2)
 
         with mock.patch(
-            "django.contrib.admin.ModelAdmin.log_change",
+            "thibaud.contrib.admin.ModelAdmin.log_change",
             side_effect=[None, DatabaseError],
         ):
             with self.assertRaises(DatabaseError):

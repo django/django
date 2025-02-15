@@ -1,7 +1,7 @@
-from django.db.models import Q
-from django.http import Http404
-from django.shortcuts import aget_list_or_404, aget_object_or_404
-from django.test import TestCase
+from thibaud.db.models import Q
+from thibaud.http import Http404
+from thibaud.shortcuts import aget_list_or_404, aget_object_or_404
+from thibaud.test import TestCase
 
 from .models import RelatedModel, SimpleModel
 

@@ -10,18 +10,18 @@ import binascii
 import collections
 import html
 
-from django.conf import settings
-from django.core.exceptions import (
+from thibaud.conf import settings
+from thibaud.core.exceptions import (
     RequestDataTooBig,
     SuspiciousMultipartForm,
     TooManyFieldsSent,
     TooManyFilesSent,
 )
-from django.core.files.uploadhandler import SkipFile, StopFutureHandlers, StopUpload
-from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_str
-from django.utils.http import parse_header_parameters
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.core.files.uploadhandler import SkipFile, StopFutureHandlers, StopUpload
+from thibaud.utils.datastructures import MultiValueDict
+from thibaud.utils.encoding import force_str
+from thibaud.utils.http import parse_header_parameters
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 __all__ = ("MultiPartParser", "MultiPartParserError", "InputStreamExhausted")
 
@@ -60,7 +60,7 @@ class MultiPartParser:
         Initialize the MultiPartParser object.
 
         :META:
-            The standard ``META`` dictionary in Django request objects.
+            The standard ``META`` dictionary in Thibaud request objects.
         :input_data:
             The raw post data, as a file-like object.
         :upload_handlers:
@@ -137,7 +137,7 @@ class MultiPartParser:
 
         Return a tuple containing the POST and FILES dictionary, respectively.
         """
-        from django.http import QueryDict
+        from thibaud.http import QueryDict
 
         encoding = self._encoding
         handlers = self._upload_handlers
@@ -528,7 +528,7 @@ class LazyStream:
             raise SuspiciousMultipartForm(
                 "The multipart parser got stuck, which shouldn't happen with"
                 " normal uploaded files. Check for malicious upload activity;"
-                " if there is none, report this to the Django developers."
+                " if there is none, report this to the Thibaud developers."
             )
 
 

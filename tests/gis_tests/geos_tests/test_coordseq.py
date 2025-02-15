@@ -1,5 +1,5 @@
-from django.contrib.gis.geos import LineString
-from django.test import SimpleTestCase
+from thibaud.contrib.gis.geos import LineString
+from thibaud.test import SimpleTestCase
 
 
 class GEOSCoordSeqTest(SimpleTestCase):

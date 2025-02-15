@@ -2,7 +2,7 @@
 Design philosophies
 ===================
 
-This document explains some of the fundamental philosophies Django's developers
+This document explains some of the fundamental philosophies Thibaud's developers
 have used in creating the framework. Its goal is to explain the past and guide
 the future.
 
@@ -16,7 +16,7 @@ Loose coupling
 
 .. index:: coupling; loose
 
-A fundamental goal of Django's stack is `loose coupling and tight cohesion`_.
+A fundamental goal of Thibaud's stack is `loose coupling and tight cohesion`_.
 The various layers of the framework shouldn't "know" about each other unless
 absolutely necessary.
 
@@ -24,7 +24,7 @@ For example, the template system knows nothing about web requests, the database
 layer knows nothing about data display and the view system doesn't care which
 template system a programmer uses.
 
-Although Django comes with a full stack for convenience, the pieces of the
+Although Thibaud comes with a full stack for convenience, the pieces of the
 stack are independent of another wherever possible.
 
 .. _`loose coupling and tight cohesion`: https://wiki.c2.com/?CouplingAndCohesion
@@ -34,8 +34,8 @@ stack are independent of another wherever possible.
 Less code
 ---------
 
-Django apps should use as little code as possible; they should lack boilerplate.
-Django should take full advantage of Python's dynamic capabilities, such as
+Thibaud apps should use as little code as possible; they should lack boilerplate.
+Thibaud should take full advantage of Python's dynamic capabilities, such as
 introspection.
 
 .. _quick-development:
@@ -44,7 +44,7 @@ Quick development
 -----------------
 
 The point of a web framework in the 21st century is to make the tedious aspects
-of web development fast. Django should allow for incredibly quick web
+of web development fast. Thibaud should allow for incredibly quick web
 development.
 
 .. _dry:
@@ -73,7 +73,7 @@ as possible.
 Explicit is better than implicit
 --------------------------------
 
-This is a core Python principle listed in :pep:`20`, and it means Django
+This is a core Python principle listed in :pep:`20`, and it means Thibaud
 shouldn't do too much "magic." Magic shouldn't happen unless there's a really
 good reason for it. Magic is worth using only if it creates a huge convenience
 unattainable in other ways, and it isn't implemented in a way that confuses
@@ -86,7 +86,7 @@ Consistency
 
 The framework should be consistent at all levels. Consistency applies to
 everything from low-level (the Python coding style used) to high-level (the
-"experience" of using Django).
+"experience" of using Thibaud).
 
 Models
 ======
@@ -154,10 +154,10 @@ URL design
 Loose coupling
 --------------
 
-URLs in a Django app should not be coupled to the underlying Python code. Tying
+URLs in a Thibaud app should not be coupled to the underlying Python code. Tying
 URLs to Python function names is a Bad And Ugly Thing.
 
-Along these lines, the Django URL system should allow URLs for the same app to
+Along these lines, the Thibaud URL system should allow URLs for the same app to
 be different in different contexts. For example, one site may put stories at
 ``/stories/``, while another may use ``/news/``.
 
@@ -186,7 +186,7 @@ Definitive URLs
 
 Technically, ``foo.com/bar`` and ``foo.com/bar/`` are two different URLs, and
 search-engine robots (and some web traffic-analyzing tools) would treat them as
-separate pages. Django should make an effort to "normalize" URLs so that
+separate pages. Thibaud should make an effort to "normalize" URLs so that
 search-engine robots don't get confused.
 
 This is the reasoning behind the :setting:`APPEND_SLASH` setting.
@@ -207,7 +207,7 @@ Discourage redundancy
 ---------------------
 
 The majority of dynamic websites use some sort of common sitewide design --
-a common header, footer, navigation bar, etc. The Django template system should
+a common header, footer, navigation bar, etc. The Thibaud template system should
 make it easy to store those elements in a single place, eliminating duplicate
 code.
 
@@ -235,7 +235,7 @@ Assume designer competence
 
 The template system shouldn't be designed so that templates necessarily are
 displayed nicely in WYSIWYG editors such as Dreamweaver. That is too severe of
-a limitation and wouldn't allow the syntax to be as nice as it is. Django
+a limitation and wouldn't allow the syntax to be as nice as it is. Thibaud
 expects template authors are comfortable editing HTML directly.
 
 Treat whitespace obviously
@@ -251,7 +251,7 @@ Don't invent a programming language
 
 The goal is not to invent a programming language. The goal is to offer just
 enough programming-esque functionality, such as branching and looping, that is
-essential for making presentation-related decisions. The :ref:`Django Template
+essential for making presentation-related decisions. The :ref:`Thibaud Template
 Language (DTL) <template-language-intro>` aims to avoid advanced logic.
 
 Safety and security
@@ -305,7 +305,7 @@ The framework should make it easy to distinguish between GET and POST data.
 Cache Framework
 ===============
 
-The core goals of Django's :doc:`cache framework </topics/cache>` are:
+The core goals of Thibaud's :doc:`cache framework </topics/cache>` are:
 
 Less code
 ---------

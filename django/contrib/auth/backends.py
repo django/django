@@ -1,8 +1,8 @@
 from asgiref.sync import sync_to_async
 
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
-from django.db.models import Exists, OuterRef, Q
+from thibaud.contrib.auth import get_user_model
+from thibaud.contrib.auth.models import Permission
+from thibaud.db.models import Exists, OuterRef, Q
 
 UserModel = get_user_model()
 
@@ -251,7 +251,7 @@ class RemoteUserBackend(ModelBackend):
     """
     This backend is to be used in conjunction with the ``RemoteUserMiddleware``
     found in the middleware module of this package, and is used when the server
-    is handling authentication outside of Django.
+    is handling authentication outside of Thibaud.
 
     By default, the ``authenticate`` method creates ``User`` objects for
     usernames that don't already exist in the database.  Subclasses can disable

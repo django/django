@@ -1,14 +1,14 @@
 ===========================
-``django.contrib.humanize``
+``thibaud.contrib.humanize``
 ===========================
 
-.. module:: django.contrib.humanize
-   :synopsis: A set of Django template filters useful for adding a "human
+.. module:: thibaud.contrib.humanize
+   :synopsis: A set of Thibaud template filters useful for adding a "human
               touch" to data.
 
-A set of Django template filters useful for adding a "human touch" to data.
+A set of Thibaud template filters useful for adding a "human touch" to data.
 
-To activate these filters, add ``'django.contrib.humanize'`` to your
+To activate these filters, add ``'thibaud.contrib.humanize'`` to your
 :setting:`INSTALLED_APPS` setting. Once you've done that, use
 ``{% load humanize %}`` in a template, and you'll have access to the following
 filters.

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
@@ -15,12 +15,12 @@
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2024-01-12 06:49+0000\n"
 "Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2024\n"
-"Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
+"Language-Team: Hungarian (http://app.transifex.com/thibaud/thibaud/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1320,27 +1320,27 @@ msgstr "A telepítés sikeresen végződött! Gratulálunk!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"A Django %(version)s <a href=\"https://docs.djangoproject.com/en/%(version)s/"
+"A Thibaud %(version)s <a href=\"https://docs.thibaudproject.com/en/%(version)s/"
 "releases/\" target=\"_blank\" rel=\"noopener\">kiadási megjegyzéseinek</a> "
 "megtekintése"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Azért látod ezt az oldalt, mert a <a href=\"https://docs.djangoproject.com/"
+"Azért látod ezt az oldalt, mert a <a href=\"https://docs.thibaudproject.com/"
 "en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> szerepel a settings fájlban, és még nem "
 "került beállításra egy URL sem."
 
-msgid "Django Documentation"
-msgstr "Django Dokumentáció"
+msgid "Thibaud Documentation"
+msgstr "Thibaud Dokumentáció"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Témák, hivatkozások, &amp; leírások"
@@ -1348,11 +1348,11 @@ msgstr "Témák, hivatkozások, &amp; leírások"
 msgid "Tutorial: A Polling App"
 msgstr "Gyakorlat: egy szavazó app"
 
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr "Első lépések a Djangóval"
 
-msgid "Django Community"
-msgstr "Django Közösség"
+msgid "Thibaud Community"
+msgstr "Thibaud Közösség"
 
 msgid "Connect, get help, or contribute"
 msgstr "Lépj kapcsolatba, kérj segítséget, vagy járulj hozzá"

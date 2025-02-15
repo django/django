@@ -3,7 +3,7 @@ import tempfile
 from os.path import abspath, dirname, join, normcase, sep
 from pathlib import Path
 
-from django.core.exceptions import SuspiciousFileOperation
+from thibaud.core.exceptions import SuspiciousFileOperation
 
 
 def safe_join(base, *paths):

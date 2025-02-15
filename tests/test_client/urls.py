@@ -1,6 +1,6 @@
-from django.contrib.auth import views as auth_views
-from django.urls import path
-from django.views.generic import RedirectView
+from thibaud.contrib.auth import views as auth_views
+from thibaud.urls import path
+from thibaud.views.generic import RedirectView
 
 from . import views
 
@@ -67,7 +67,7 @@ urlpatterns = [
     path("mail_sending_view/", views.mail_sending_view),
     path("mass_mail_sending_view/", views.mass_mail_sending_view),
     path("nesting_exception_view/", views.nesting_exception_view),
-    path("django_project_redirect/", views.django_project_redirect),
+    path("thibaud_project_redirect/", views.thibaud_project_redirect),
     path(
         "no_trailing_slash_external_redirect/",
         views.no_trailing_slash_external_redirect,

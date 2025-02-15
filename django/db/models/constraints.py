@@ -1,17 +1,17 @@
 from enum import Enum
 from types import NoneType
 
-from django.core import checks
-from django.core.exceptions import FieldDoesNotExist, FieldError, ValidationError
-from django.db import connections
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Exists, ExpressionList, F, RawSQL
-from django.db.models.indexes import IndexExpression
-from django.db.models.lookups import Exact, IsNull
-from django.db.models.query_utils import Q
-from django.db.models.sql.query import Query
-from django.db.utils import DEFAULT_DB_ALIAS
-from django.utils.translation import gettext_lazy as _
+from thibaud.core import checks
+from thibaud.core.exceptions import FieldDoesNotExist, FieldError, ValidationError
+from thibaud.db import connections
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.expressions import Exists, ExpressionList, F, RawSQL
+from thibaud.db.models.indexes import IndexExpression
+from thibaud.db.models.lookups import Exact, IsNull
+from thibaud.db.models.query_utils import Q
+from thibaud.db.models.sql.query import Query
+from thibaud.db.utils import DEFAULT_DB_ALIAS
+from thibaud.utils.translation import gettext_lazy as _
 
 __all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"]
 
@@ -70,7 +70,7 @@ class BaseConstraint:
         return []
 
     def _check_references(self, model, references):
-        from django.db.models.fields.composite import CompositePrimaryKey
+        from thibaud.db.models.fields.composite import CompositePrimaryKey
 
         errors = []
         fields = set()
@@ -111,7 +111,7 @@ class BaseConstraint:
 
     def deconstruct(self):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
-        path = path.replace("django.db.models.constraints", "django.db.models")
+        path = path.replace("thibaud.db.models.constraints", "thibaud.db.models")
         kwargs = {"name": self.name}
         if (
             self.violation_error_message is not None
@@ -295,7 +295,7 @@ class UniqueConstraint(BaseConstraint):
         if expressions and opclasses:
             raise ValueError(
                 "UniqueConstraint.opclasses cannot be used with expressions. "
-                "Use django.contrib.postgres.indexes.OpClass() instead."
+                "Use thibaud.contrib.postgres.indexes.OpClass() instead."
             )
         if not isinstance(deferrable, (NoneType, Deferrable)):
             raise TypeError(

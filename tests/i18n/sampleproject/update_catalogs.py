@@ -15,8 +15,8 @@ extraction, interpolation, or both.
 How this script helps:
  * Add {% translate "Two %% Three %%%" %} and blocktranslate equivalent to templates.
  * Run this script.
- * Test extraction - verify the new msgid in sampleproject's django.po.
- * Add a translation to sampleproject's django.po.
+ * Test extraction - verify the new msgid in sampleproject's thibaud.po.
+ * Add a translation to sampleproject's thibaud.po.
  * Run this script.
  * Test interpolation - verify templatetag rendering, test each in a template
    that is rendered using an activated language from sampleproject's locale.
@@ -36,7 +36,7 @@ sys.path.append(os.path.abspath(os.path.join(proj_dir, "..", "..", "..")))
 
 def update_translation_catalogs():
     """Run makemessages and compilemessages in sampleproject."""
-    from django.core.management import call_command
+    from thibaud.core.management import call_command
 
     prev_cwd = os.getcwd()
 
@@ -45,7 +45,7 @@ def update_translation_catalogs():
     call_command("compilemessages")
 
     # keep the diff friendly - remove 'POT-Creation-Date'
-    pofile = os.path.join(proj_dir, "locale", "fr", "LC_MESSAGES", "django.po")
+    pofile = os.path.join(proj_dir, "locale", "fr", "LC_MESSAGES", "thibaud.po")
 
     with open(pofile) as f:
         content = f.read()

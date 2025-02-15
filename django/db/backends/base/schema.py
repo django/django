@@ -2,9 +2,9 @@ import logging
 import operator
 from datetime import datetime
 
-from django.conf import settings
-from django.core.exceptions import FieldError
-from django.db.backends.ddl_references import (
+from thibaud.conf import settings
+from thibaud.core.exceptions import FieldError
+from thibaud.db.backends.ddl_references import (
     Columns,
     Expressions,
     ForeignKeyName,
@@ -12,14 +12,14 @@ from django.db.backends.ddl_references import (
     Statement,
     Table,
 )
-from django.db.backends.utils import names_digest, split_identifier, truncate_name
-from django.db.models import Deferrable, Index
-from django.db.models.fields.composite import CompositePrimaryKey
-from django.db.models.sql import Query
-from django.db.transaction import TransactionManagementError, atomic
-from django.utils import timezone
+from thibaud.db.backends.utils import names_digest, split_identifier, truncate_name
+from thibaud.db.models import Deferrable, Index
+from thibaud.db.models.fields.composite import CompositePrimaryKey
+from thibaud.db.models.sql import Query
+from thibaud.db.transaction import TransactionManagementError, atomic
+from thibaud.utils import timezone
 
-logger = logging.getLogger("django.db.backends.schema")
+logger = logging.getLogger("thibaud.db.backends.schema")
 
 
 def _is_relevant_relation(relation, altered_field):
@@ -433,7 +433,7 @@ class BaseDatabaseSchemaEditor:
 
     def db_default_sql(self, field):
         """Return the sql and params for the field's database default."""
-        from django.db.models.expressions import Value
+        from thibaud.db.models.expressions import Value
 
         db_default = field._db_default_expression
         sql = (
@@ -1285,7 +1285,7 @@ class BaseDatabaseSchemaEditor:
                 self._create_check_sql(model, constraint_name, new_db_params["check"])
             )
         # Drop the default if we need to
-        # (Django usually does not use in-database defaults)
+        # (Thibaud usually does not use in-database defaults)
         if needs_database_default:
             changes_sql, params = self._alter_column_default_sql(
                 model, old_field, new_field, drop=True

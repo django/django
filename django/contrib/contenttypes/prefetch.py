@@ -1,5 +1,5 @@
-from django.db.models import Prefetch
-from django.db.models.query import ModelIterable, RawQuerySet
+from thibaud.db.models import Prefetch
+from thibaud.db.models.query import ModelIterable, RawQuerySet
 
 
 class GenericPrefetch(Prefetch):

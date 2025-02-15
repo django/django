@@ -3,8 +3,8 @@ Testing some internals of the template processing.
 These are *not* examples to be copied in user code.
 """
 
-from django.template import Library, TemplateSyntaxError
-from django.template.base import (
+from thibaud.template import Library, TemplateSyntaxError
+from thibaud.template.base import (
     FilterExpression,
     Lexer,
     Parser,
@@ -12,8 +12,8 @@ from django.template.base import (
     TokenType,
     Variable,
 )
-from django.template.defaultfilters import register as filter_library
-from django.test import SimpleTestCase
+from thibaud.template.defaultfilters import register as filter_library
+from thibaud.test import SimpleTestCase
 
 
 class ParserTests(SimpleTestCase):

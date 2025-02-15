@@ -1,8 +1,8 @@
 import re
 
-from django.conf import settings
-from django.http import HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
+from thibaud.conf import settings
+from thibaud.http import HttpResponsePermanentRedirect
+from thibaud.utils.deprecation import MiddlewareMixin
 
 
 class SecurityMiddleware(MiddlewareMixin):

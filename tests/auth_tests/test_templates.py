@@ -1,18 +1,18 @@
 from datetime import date
 
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.auth.views import (
+from thibaud.contrib.auth import authenticate
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.auth.tokens import PasswordResetTokenGenerator
+from thibaud.contrib.auth.views import (
     PasswordChangeDoneView,
     PasswordChangeView,
     PasswordResetCompleteView,
     PasswordResetDoneView,
     PasswordResetView,
 )
-from django.test import RequestFactory, TestCase, override_settings
-from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode
+from thibaud.test import RequestFactory, TestCase, override_settings
+from thibaud.urls import reverse
+from thibaud.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
 from .models import CustomUser
@@ -33,20 +33,20 @@ class AuthTemplateTests(TestCase):
     def test_password_reset_view(self):
         response = PasswordResetView.as_view(success_url="dummy/")(self.request)
         self.assertContains(
-            response, "<title>Password reset | Django site admin</title>"
+            response, "<title>Password reset | Thibaud site admin</title>"
         )
         self.assertContains(response, "<h1>Password reset</h1>")
 
     def test_password_reset_view_error_title(self):
         response = self.client.post(reverse("password_reset"), {})
         self.assertContains(
-            response, "<title>Error: Password reset | Django site admin</title>"
+            response, "<title>Error: Password reset | Thibaud site admin</title>"
         )
 
     def test_password_reset_done_view(self):
         response = PasswordResetDoneView.as_view()(self.request)
         self.assertContains(
-            response, "<title>Password reset sent | Django site admin</title>"
+            response, "<title>Password reset sent | Thibaud site admin</title>"
         )
         self.assertContains(response, "<h1>Password reset sent</h1>")
 
@@ -58,7 +58,7 @@ class AuthTemplateTests(TestCase):
         )
         response = client.get(url)
         self.assertContains(
-            response, "<title>Password reset unsuccessful | Django site admin</title>"
+            response, "<title>Password reset unsuccessful | Thibaud site admin</title>"
         )
         self.assertContains(response, "<h1>Password reset unsuccessful</h1>")
 
@@ -73,7 +73,7 @@ class AuthTemplateTests(TestCase):
         )
         response = client.get(url)
         self.assertContains(
-            response, "<title>Enter new password | Django site admin</title>"
+            response, "<title>Enter new password | Thibaud site admin</title>"
         )
         self.assertContains(response, "<h1>Enter new password</h1>")
         # The username is added to the password reset confirmation form to help
@@ -93,7 +93,7 @@ class AuthTemplateTests(TestCase):
         )
         response = client.post(url, {})
         self.assertContains(
-            response, "<title>Error: Enter new password | Django site admin</title>"
+            response, "<title>Error: Enter new password | Thibaud site admin</title>"
         )
 
     @override_settings(AUTH_USER_MODEL="auth_tests.CustomUser")
@@ -113,7 +113,7 @@ class AuthTemplateTests(TestCase):
         response = client.get(url)
         self.assertContains(
             response,
-            "<title>Enter new password | Django site admin</title>",
+            "<title>Enter new password | Thibaud site admin</title>",
         )
         self.assertContains(response, "<h1>Enter new password</h1>")
         # The username field is added to the password reset confirmation form
@@ -126,20 +126,20 @@ class AuthTemplateTests(TestCase):
     def test_password_reset_complete_view(self):
         response = PasswordResetCompleteView.as_view()(self.request)
         self.assertContains(
-            response, "<title>Password reset complete | Django site admin</title>"
+            response, "<title>Password reset complete | Thibaud site admin</title>"
         )
         self.assertContains(response, "<h1>Password reset complete</h1>")
 
     def test_password_reset_change_view(self):
         response = PasswordChangeView.as_view(success_url="dummy/")(self.request)
         self.assertContains(
-            response, "<title>Password change | Django site admin</title>"
+            response, "<title>Password change | Thibaud site admin</title>"
         )
         self.assertContains(response, "<h1>Password change</h1>")
 
     def test_password_change_done_view(self):
         response = PasswordChangeDoneView.as_view()(self.request)
         self.assertContains(
-            response, "<title>Password change successful | Django site admin</title>"
+            response, "<title>Password change successful | Thibaud site admin</title>"
         )
         self.assertContains(response, "<h1>Password change successful</h1>")

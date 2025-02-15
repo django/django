@@ -10,7 +10,7 @@ In this example, a ``Category`` is related to itself. That is, each
 Set ``related_name`` to designate what the reverse relationship is called.
 """
 
-from django.db import models
+from thibaud.db import models
 
 
 class Category(models.Model):

@@ -6,12 +6,12 @@ import zipfile
 from pathlib import Path
 from unittest import mock
 
-from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster, SpatialReference
-from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.gdal.raster.band import GDALBand
-from django.contrib.gis.shortcuts import numpy
-from django.core.files.temp import NamedTemporaryFile
-from django.test import SimpleTestCase
+from thibaud.contrib.gis.gdal import GDAL_VERSION, GDALRaster, SpatialReference
+from thibaud.contrib.gis.gdal.error import GDALException
+from thibaud.contrib.gis.gdal.raster.band import GDALBand
+from thibaud.contrib.gis.shortcuts import numpy
+from thibaud.core.files.temp import NamedTemporaryFile
+from thibaud.test import SimpleTestCase
 
 from ..data.rasters.textrasters import JSON_RASTER
 
@@ -354,7 +354,7 @@ class GDALRasterTests(SimpleTestCase):
         )
         # Set metadata on raster and on a band.
         metadata = {
-            "DEFAULT": {"OWNER": "Django", "VERSION": "1.0", "AREA_OR_POINT": "Point"},
+            "DEFAULT": {"OWNER": "Thibaud", "VERSION": "1.0", "AREA_OR_POINT": "Point"},
         }
         source.metadata = metadata
         source.bands[0].metadata = metadata

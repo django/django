@@ -1,10 +1,10 @@
 ===========================
-Django 1.10.5 release notes
+Thibaud 1.10.5 release notes
 ===========================
 
 *January 4, 2017*
 
-Django 1.10.5 fixes several bugs in 1.10.4.
+Thibaud 1.10.5 fixes several bugs in 1.10.4.
 
 Bugfixes
 ========

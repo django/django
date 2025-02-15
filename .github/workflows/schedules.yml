@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: schedules
     name: Trigger Full Build
-    # Only trigger on the main Django repository
-    if: (github.event_name == 'schedule' && github.repository == 'django/django') || (github.event_name != 'schedule')
+    # Only trigger on the main Thibaud repository
+    if: (github.event_name == 'schedule' && github.repository == 'thibaud/thibaud') || (github.event_name != 'schedule')
     strategy:
       matrix:
         branch:

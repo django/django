@@ -1,4 +1,4 @@
-from django.contrib.gis.sitemaps import KMLSitemap, KMZSitemap
+from thibaud.contrib.gis.sitemaps import KMLSitemap, KMZSitemap
 
 from .models import City, Country
 

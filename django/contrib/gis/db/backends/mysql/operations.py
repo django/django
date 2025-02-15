@@ -1,12 +1,12 @@
-from django.contrib.gis.db import models
-from django.contrib.gis.db.backends.base.adapter import WKTAdapter
-from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
-from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.geos.geometry import GEOSGeometryBase
-from django.contrib.gis.geos.prototypes.io import wkb_r
-from django.contrib.gis.measure import Distance
-from django.db.backends.mysql.operations import DatabaseOperations
-from django.utils.functional import cached_property
+from thibaud.contrib.gis.db import models
+from thibaud.contrib.gis.db.backends.base.adapter import WKTAdapter
+from thibaud.contrib.gis.db.backends.base.operations import BaseSpatialOperations
+from thibaud.contrib.gis.db.backends.utils import SpatialOperator
+from thibaud.contrib.gis.geos.geometry import GEOSGeometryBase
+from thibaud.contrib.gis.geos.prototypes.io import wkb_r
+from thibaud.contrib.gis.measure import Distance
+from thibaud.db.backends.mysql.operations import DatabaseOperations
+from thibaud.utils.functional import cached_property
 
 
 class MySQLOperations(BaseSpatialOperations, DatabaseOperations):

@@ -4,17 +4,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: Thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-05 20:25-0300\n"
 "PO-Revision-Date: 2010-02-22 00:14-0300\n"
 "Last-Translator: Translator <translator@example.com>\n"
-"Language-Team: Django-I18N <team@example.com>\n"
+"Language-Team: Thibaud-I18N <team@example.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #: path/file.py:1
-msgid "This file has a UTF-8 BOM an should be rejected by the Django makemessages command."
+msgid "This file has a UTF-8 BOM an should be rejected by the Thibaud makemessages command."
 msgstr ""

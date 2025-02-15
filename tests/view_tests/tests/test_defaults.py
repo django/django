@@ -1,11 +1,11 @@
 import datetime
 
-from django.contrib.sites.models import Site
-from django.http import Http404
-from django.template import TemplateDoesNotExist
-from django.test import RequestFactory, TestCase
-from django.test.utils import override_settings
-from django.views.defaults import (
+from thibaud.contrib.sites.models import Site
+from thibaud.http import Http404
+from thibaud.template import TemplateDoesNotExist
+from thibaud.test import RequestFactory, TestCase
+from thibaud.test.utils import override_settings
+from thibaud.views.defaults import (
     bad_request,
     page_not_found,
     permission_denied,
@@ -17,7 +17,7 @@ from ..models import Article, Author, UrlArticle
 
 @override_settings(ROOT_URLCONF="view_tests.urls")
 class DefaultsTests(TestCase):
-    """Test django views in django/views/defaults.py"""
+    """Test thibaud views in thibaud/views/defaults.py"""
 
     nonexistent_urls = [
         "/nonexistent_url/",  # this is in urls.py
@@ -68,11 +68,11 @@ class DefaultsTests(TestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "OPTIONS": {
                     "loaders": [
                         (
-                            "django.template.loaders.locmem.Loader",
+                            "thibaud.template.loaders.locmem.Loader",
                             {
                                 "404.html": "{{ csrf_token }}",
                             },
@@ -105,11 +105,11 @@ class DefaultsTests(TestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "OPTIONS": {
                     "loaders": [
                         (
-                            "django.template.loaders.locmem.Loader",
+                            "thibaud.template.loaders.locmem.Loader",
                             {
                                 "400.html": (
                                     "This is a test template for a 400 error "
@@ -128,11 +128,11 @@ class DefaultsTests(TestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "OPTIONS": {
                     "loaders": [
                         (
-                            "django.template.loaders.locmem.Loader",
+                            "thibaud.template.loaders.locmem.Loader",
                             {
                                 "404.html": (
                                     "This is a test template for a 404 error "

@@ -1,19 +1,19 @@
 """
-Tests for Django's bundled context processors.
+Tests for Thibaud's bundled context processors.
 """
 
-from django.test import SimpleTestCase, TestCase, override_settings
+from thibaud.test import SimpleTestCase, TestCase, override_settings
 
 
 @override_settings(
     ROOT_URLCONF="context_processors.urls",
     TEMPLATES=[
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.request",
+                    "thibaud.template.context_processors.request",
                 ],
             },
         }
@@ -21,7 +21,7 @@ from django.test import SimpleTestCase, TestCase, override_settings
 )
 class RequestContextProcessorTests(SimpleTestCase):
     """
-    Tests for the ``django.template.context_processors.request`` processor.
+    Tests for the ``thibaud.template.context_processors.request`` processor.
     """
 
     def test_request_attributes(self):
@@ -55,11 +55,11 @@ class RequestContextProcessorTests(SimpleTestCase):
     ROOT_URLCONF="context_processors.urls",
     TEMPLATES=[
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.debug",
+                    "thibaud.template.context_processors.debug",
                 ],
             },
         }
@@ -67,7 +67,7 @@ class RequestContextProcessorTests(SimpleTestCase):
 )
 class DebugContextProcessorTests(TestCase):
     """
-    Tests for the ``django.template.context_processors.debug`` processor.
+    Tests for the ``thibaud.template.context_processors.debug`` processor.
     """
 
     databases = {"default", "other"}

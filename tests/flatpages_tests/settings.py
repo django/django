@@ -2,10 +2,10 @@ import os
 
 FLATPAGES_TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
         "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
         "OPTIONS": {
-            "context_processors": ("django.contrib.auth.context_processors.auth",),
+            "context_processors": ("thibaud.contrib.auth.context_processors.auth",),
         },
     }
 ]

@@ -1,8 +1,8 @@
-from django.core.exceptions import ImproperlyConfigured
-from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
-from django.core.signals import request_finished, request_started
-from django.db import close_old_connections, connection
-from django.test import (
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
+from thibaud.core.signals import request_finished, request_started
+from thibaud.db import close_old_connections, connection
+from thibaud.test import (
     AsyncRequestFactory,
     RequestFactory,
     SimpleTestCase,

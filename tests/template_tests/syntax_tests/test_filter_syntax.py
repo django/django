@@ -1,5 +1,5 @@
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
+from thibaud.template import TemplateSyntaxError
+from thibaud.test import SimpleTestCase
 
 from ..utils import SomeClass, SomeOtherException, UTF8Class, setup
 
@@ -11,7 +11,7 @@ class FilterSyntaxTests(SimpleTestCase):
         Basic filter usage
         """
         output = self.engine.render_to_string(
-            "filter-syntax01", {"var": "Django is the greatest!"}
+            "filter-syntax01", {"var": "Thibaud is the greatest!"}
         )
         self.assertEqual(output, "DJANGO IS THE GREATEST!")
 
@@ -21,9 +21,9 @@ class FilterSyntaxTests(SimpleTestCase):
         Chained filters
         """
         output = self.engine.render_to_string(
-            "filter-syntax02", {"var": "Django is the greatest!"}
+            "filter-syntax02", {"var": "Thibaud is the greatest!"}
         )
-        self.assertEqual(output, "django is the greatest!")
+        self.assertEqual(output, "thibaud is the greatest!")
 
     @setup({"filter-syntax03": "{{ var |upper }}"})
     def test_filter_syntax03(self):
@@ -31,7 +31,7 @@ class FilterSyntaxTests(SimpleTestCase):
         Allow spaces before the filter pipe
         """
         output = self.engine.render_to_string(
-            "filter-syntax03", {"var": "Django is the greatest!"}
+            "filter-syntax03", {"var": "Thibaud is the greatest!"}
         )
         self.assertEqual(output, "DJANGO IS THE GREATEST!")
 
@@ -41,7 +41,7 @@ class FilterSyntaxTests(SimpleTestCase):
         Allow spaces after the filter pipe
         """
         output = self.engine.render_to_string(
-            "filter-syntax04", {"var": "Django is the greatest!"}
+            "filter-syntax04", {"var": "Thibaud is the greatest!"}
         )
         self.assertEqual(output, "DJANGO IS THE GREATEST!")
 

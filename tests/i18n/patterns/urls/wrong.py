@@ -1,6 +1,6 @@
-from django.conf.urls.i18n import i18n_patterns
-from django.urls import include, re_path
-from django.utils.translation import gettext_lazy as _
+from thibaud.conf.urls.i18n import i18n_patterns
+from thibaud.urls import include, re_path
+from thibaud.utils.translation import gettext_lazy as _
 
 urlpatterns = i18n_patterns(
     re_path(

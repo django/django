@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # alkuma <alok.kumar@gmail.com>, 2013
@@ -9,12 +9,12 @@
 # Vaarun Sinha, 2022
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-17 05:10-0500\n"
 "PO-Revision-Date: 2022-07-25 07:05+0000\n"
 "Last-Translator: Vaarun Sinha\n"
-"Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
+"Language-Team: Hindi (http://www.transifex.com/thibaud/thibaud/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -275,10 +275,10 @@ msgid ""
 "protected related objects: %(related_objects)s"
 msgstr ""
 
-msgid "Django site admin"
+msgid "Thibaud site admin"
 msgstr "ज्याँगो साइट प्रशासन"
 
-msgid "Django administration"
+msgid "Thibaud administration"
 msgstr "ज्याँगो प्रशासन"
 
 msgid "Site administration"

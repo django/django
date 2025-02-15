@@ -15,7 +15,7 @@ jobs:
       - name: Checkout Benchmark Repo
         uses: actions/checkout@v4
         with:
-          repository: django/django-asv
+          repository: thibaud/thibaud-asv
           path: "."
       - name: Setup Miniforge
         uses: conda-incubator/setup-miniconda@v3
@@ -24,11 +24,11 @@ jobs:
           activate-environment: asv-bench
       - name: Install Requirements
         run: pip install -r requirements.txt
-      - name: Cache Django
+      - name: Cache Thibaud
         uses: actions/cache@v3
         with:
-          path: Django/*
-          key: Django
+          path: Thibaud/*
+          key: Thibaud
       - name: Run Benchmarks
         shell: bash -l {0}
         run: |-

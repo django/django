@@ -3,8 +3,8 @@ from functools import partial, reduce
 from itertools import chain
 from operator import attrgetter, or_
 
-from django.db import IntegrityError, connections, models, transaction
-from django.db.models import query_utils, signals, sql
+from thibaud.db import IntegrityError, connections, models, transaction
+from thibaud.db.models import query_utils, signals, sql
 
 
 class ProtectedError(IntegrityError):
@@ -62,7 +62,7 @@ def SET(value):
 
         set_on_delete.lazy_sub_objs = True
 
-    set_on_delete.deconstruct = lambda: ("django.db.models.SET", (value,), {})
+    set_on_delete.deconstruct = lambda: ("thibaud.db.models.SET", (value,), {})
     return set_on_delete
 
 

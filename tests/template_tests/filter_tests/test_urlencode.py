@@ -1,5 +1,5 @@
-from django.template.defaultfilters import urlencode
-from django.test import SimpleTestCase
+from thibaud.template.defaultfilters import urlencode
+from thibaud.test import SimpleTestCase
 
 from ..utils import setup
 

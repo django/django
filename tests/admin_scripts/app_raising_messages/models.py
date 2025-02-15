@@ -1,5 +1,5 @@
-from django.core import checks
-from django.db import models
+from thibaud.core import checks
+from thibaud.db import models
 
 
 class ModelRaisingMessages(models.Model):

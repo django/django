@@ -3,11 +3,11 @@ Built-in class-based generic views
 ==================================
 
 Writing web applications can be monotonous, because we repeat certain patterns
-again and again. Django tries to take away some of that monotony at the model
+again and again. Thibaud tries to take away some of that monotony at the model
 and template layers, but web developers also experience this boredom at the view
 level.
 
-Django's *generic views* were developed to ease that pain. They take certain
+Thibaud's *generic views* were developed to ease that pain. They take certain
 common idioms and patterns found in view development and abstract them so that
 you can quickly write common views of data without having to write too much
 code.
@@ -16,7 +16,7 @@ We can recognize certain common tasks, like displaying a list of objects, and
 write code that displays a list of *any* object. Then the model in question can
 be passed as an extra argument to the URLconf.
 
-Django ships with generic views to do the following:
+Thibaud ships with generic views to do the following:
 
 * Display list and detail pages for a single object. If we were creating an
   application to manage conferences then a ``TalkListView`` and a
@@ -39,7 +39,7 @@ Extending generic views
 There's no question that using generic views can speed up development
 substantially. In most projects, however, there comes a moment when the
 generic views no longer suffice. Indeed, the most common question asked by new
-Django developers is how to make generic views handle a wider array of
+Thibaud developers is how to make generic views handle a wider array of
 situations.
 
 This is one of the reasons generic views were redesigned for the 1.3 release -
@@ -60,9 +60,9 @@ or you could write your own as needed.
 Generic views of objects
 ========================
 
-:class:`~django.views.generic.base.TemplateView` certainly is useful, but
-Django's generic views really shine when it comes to presenting views of your
-database content. Because it's such a common task, Django comes with a handful
+:class:`~thibaud.views.generic.base.TemplateView` certainly is useful, but
+Thibaud's generic views really shine when it comes to presenting views of your
+database content. Because it's such a common task, Thibaud comes with a handful
 of built-in generic views to help generate list and detail views of objects.
 
 Let's start by looking at some examples of showing a list of objects or an
@@ -71,7 +71,7 @@ individual object.
 We'll be using these models::
 
     # models.py
-    from django.db import models
+    from thibaud.db import models
 
 
     class Publisher(models.Model):
@@ -108,7 +108,7 @@ We'll be using these models::
 Now we need to define a view::
 
     # views.py
-    from django.views.generic import ListView
+    from thibaud.views.generic import ListView
     from books.models import Publisher
 
 
@@ -118,7 +118,7 @@ Now we need to define a view::
 Finally hook that view into your urls::
 
     # urls.py
-    from django.urls import path
+    from thibaud.urls import path
     from books.views import PublisherListView
 
     urlpatterns = [
@@ -128,14 +128,14 @@ Finally hook that view into your urls::
 That's all the Python code we need to write. We still need to write a template,
 however. We could explicitly tell the view which template to use by adding a
 ``template_name`` attribute to the view, but in the absence of an explicit
-template Django will infer one from the object's name. In this case, the
+template Thibaud will infer one from the object's name. In this case, the
 inferred template will be ``"books/publisher_list.html"`` -- the "books" part
 comes from the name of the app that defines the model, while the "publisher"
 bit is the lowercased version of the model's name.
 
 .. note::
 
-    Thus, when (for example) the ``APP_DIRS`` option of a ``DjangoTemplates``
+    Thus, when (for example) the ``APP_DIRS`` option of a ``ThibaudTemplates``
     backend is set to True in :setting:`TEMPLATES`, a template location could
     be: /path/to/project/books/templates/books/publisher_list.html
 
@@ -143,7 +143,7 @@ This template will be rendered against a context containing a variable called
 ``object_list`` that contains all the publisher objects. A template might look
 like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% extends "base.html" %}
 
@@ -172,7 +172,7 @@ isn't all that "friendly" to template authors: they have to "just know" that
 they're dealing with publishers here.
 
 Well, if you're dealing with a model object, this is already done for you. When
-you are dealing with an object or queryset, Django is able to populate the
+you are dealing with an object or queryset, Thibaud is able to populate the
 context using the lowercased version of the model class' name. This is provided
 in addition to the default ``object_list`` entry, but contains exactly the same
 data, i.e. ``publisher_list``.
@@ -182,7 +182,7 @@ context variable. The ``context_object_name`` attribute on a generic view
 specifies the context variable to use::
 
     # views.py
-    from django.views.generic import ListView
+    from thibaud.views.generic import ListView
     from books.models import Publisher
 
 
@@ -201,16 +201,16 @@ Adding extra context
 
 Often you need to present some extra information beyond that provided by the
 generic view. For example, think of showing a list of all the books on each
-publisher detail page. The :class:`~django.views.generic.detail.DetailView`
+publisher detail page. The :class:`~thibaud.views.generic.detail.DetailView`
 generic view provides the publisher to the context, but how do we get
 additional information in that template?
 
-The answer is to subclass :class:`~django.views.generic.detail.DetailView`
+The answer is to subclass :class:`~thibaud.views.generic.detail.DetailView`
 and provide your own implementation of the ``get_context_data`` method.
 The default implementation adds the object being displayed to the template, but
 you can override it to send more::
 
-    from django.views.generic import DetailView
+    from thibaud.views.generic import DetailView
     from books.models import Book, Publisher
 
 
@@ -238,7 +238,7 @@ you can override it to send more::
 
     Another consideration is that the context data from class-based generic
     views will override data provided by context processors; see
-    :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data` for
+    :meth:`~thibaud.views.generic.detail.SingleObjectMixin.get_context_data` for
     an example.
 
 .. _generic-views-list-subsets:
@@ -254,7 +254,7 @@ objects. However, the ``model`` argument is not the only way to
 specify the objects that the view will operate upon -- you can also
 specify the list of objects using the ``queryset`` argument::
 
-    from django.views.generic import DetailView
+    from thibaud.views.generic import DetailView
     from books.models import Publisher
 
 
@@ -266,14 +266,14 @@ Specifying ``model = Publisher`` is shorthand for saying ``queryset =
 Publisher.objects.all()``. However, by using ``queryset`` to define a filtered
 list of objects you can be more specific about the objects that will be visible
 in the view (see :doc:`/topics/db/queries` for more information about
-:class:`~django.db.models.query.QuerySet` objects, and see the
+:class:`~thibaud.db.models.query.QuerySet` objects, and see the
 :doc:`class-based views reference </ref/class-based-views/index>` for the
 complete details).
 
 To pick an example, we might want to order a list of books by publication date,
 with the most recent first::
 
-    from django.views.generic import ListView
+    from thibaud.views.generic import ListView
     from books.models import Book
 
 
@@ -285,7 +285,7 @@ That's a pretty minimal example, but it illustrates the idea nicely. You'll
 usually want to do more than just reorder objects. If you want to present a
 list of books by a particular publisher, you can use the same technique::
 
-    from django.views.generic import ListView
+    from thibaud.views.generic import ListView
     from books.models import Book
 
 
@@ -321,7 +321,7 @@ what if we wanted to write a view that displayed all the books by some arbitrary
 publisher?
 
 Handily, the ``ListView`` has a
-:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` method we
+:meth:`~thibaud.views.generic.list.MultipleObjectMixin.get_queryset` method we
 can override. By default, it returns the value of the ``queryset`` attribute,
 but we can use it to add more logic.
 
@@ -333,7 +333,7 @@ various useful things are stored on ``self``; as well as the request
 Here, we have a URLconf with a single captured group::
 
     # urls.py
-    from django.urls import path
+    from thibaud.urls import path
     from books.views import PublisherBookListView
 
     urlpatterns = [
@@ -343,8 +343,8 @@ Here, we have a URLconf with a single captured group::
 Next, we'll write the ``PublisherBookListView`` view itself::
 
     # views.py
-    from django.shortcuts import get_object_or_404
-    from django.views.generic import ListView
+    from thibaud.shortcuts import get_object_or_404
+    from thibaud.views.generic import ListView
     from books.models import Book, Publisher
 
 
@@ -385,7 +385,7 @@ Imagine we had a ``last_accessed`` field on our ``Author`` model that we were
 using to keep track of the last time anybody looked at that author::
 
     # models.py
-    from django.db import models
+    from thibaud.db import models
 
 
     class Author(models.Model):
@@ -401,7 +401,7 @@ once again we could write a custom view to keep that field updated.
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::
 
-    from django.urls import path
+    from thibaud.urls import path
     from books.views import AuthorDetailView
 
     urlpatterns = [
@@ -412,8 +412,8 @@ custom view::
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we override it and wrap the call::
 
-    from django.utils import timezone
-    from django.views.generic import DetailView
+    from thibaud.utils import timezone
+    from thibaud.views.generic import DetailView
     from books.models import Author
 
 
@@ -434,5 +434,5 @@ object -- so we override it and wrap the call::
     filter the queryset.
 
     If you want to call the group something else, you can set
-    :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+    :attr:`~thibaud.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
     on the view.

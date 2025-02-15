@@ -1,9 +1,9 @@
 from asgiref.sync import iscoroutinefunction
 
-from django.conf import settings
-from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase
-from django.views.decorators.csrf import (
+from thibaud.conf import settings
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.test import SimpleTestCase
+from thibaud.views.decorators.csrf import (
     csrf_exempt,
     csrf_protect,
     ensure_csrf_cookie,
@@ -48,7 +48,7 @@ class CsrfProtectTests(CsrfTestMixin, SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIs(request.csrf_processing_done, True)
 
-        with self.assertLogs("django.security.csrf", "WARNING"):
+        with self.assertLogs("thibaud.security.csrf", "WARNING"):
             request = self.get_request(token=None)
             response = sync_view(request)
             self.assertEqual(response.status_code, 403)
@@ -63,7 +63,7 @@ class CsrfProtectTests(CsrfTestMixin, SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIs(request.csrf_processing_done, True)
 
-        with self.assertLogs("django.security.csrf", "WARNING"):
+        with self.assertLogs("thibaud.security.csrf", "WARNING"):
             request = self.get_request(token=None)
             response = await async_view(request)
             self.assertEqual(response.status_code, 403)
@@ -94,7 +94,7 @@ class RequiresCsrfTokenTests(CsrfTestMixin, SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIs(request.csrf_processing_done, True)
 
-        with self.assertNoLogs("django.security.csrf", "WARNING"):
+        with self.assertNoLogs("thibaud.security.csrf", "WARNING"):
             request = self.get_request(token=None)
             response = sync_view(request)
             self.assertEqual(response.status_code, 200)
@@ -109,7 +109,7 @@ class RequiresCsrfTokenTests(CsrfTestMixin, SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIs(request.csrf_processing_done, True)
 
-        with self.assertNoLogs("django.security.csrf", "WARNING"):
+        with self.assertNoLogs("thibaud.security.csrf", "WARNING"):
             request = self.get_request(token=None)
             response = await async_view(request)
             self.assertEqual(response.status_code, 200)
@@ -140,7 +140,7 @@ class EnsureCsrfCookieTests(CsrfTestMixin, SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIs(request.csrf_processing_done, True)
 
-        with self.assertNoLogs("django.security.csrf", "WARNING"):
+        with self.assertNoLogs("thibaud.security.csrf", "WARNING"):
             request = self.get_request(token=None)
             response = sync_view(request)
             self.assertEqual(response.status_code, 200)
@@ -155,7 +155,7 @@ class EnsureCsrfCookieTests(CsrfTestMixin, SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIs(request.csrf_processing_done, True)
 
-        with self.assertNoLogs("django.security.csrf", "WARNING"):
+        with self.assertNoLogs("thibaud.security.csrf", "WARNING"):
             request = self.get_request(token=None)
             response = await async_view(request)
             self.assertEqual(response.status_code, 200)

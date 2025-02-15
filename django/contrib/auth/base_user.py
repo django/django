@@ -1,21 +1,21 @@
 """
-This module allows importing AbstractBaseUser even when django.contrib.auth is
+This module allows importing AbstractBaseUser even when thibaud.contrib.auth is
 not in INSTALLED_APPS.
 """
 
 import unicodedata
 
-from django.conf import settings
-from django.contrib.auth import password_validation
-from django.contrib.auth.hashers import (
+from thibaud.conf import settings
+from thibaud.contrib.auth import password_validation
+from thibaud.contrib.auth.hashers import (
     acheck_password,
     check_password,
     is_password_usable,
     make_password,
 )
-from django.db import models
-from django.utils.crypto import salted_hmac
-from django.utils.translation import gettext_lazy as _
+from thibaud.db import models
+from thibaud.utils.crypto import salted_hmac
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class BaseUserManager(models.Manager):
@@ -140,7 +140,7 @@ class AbstractBaseUser(models.Model):
             yield self._get_session_auth_hash(secret=fallback_secret)
 
     def _get_session_auth_hash(self, secret=None):
-        key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
+        key_salt = "thibaud.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
         return salted_hmac(
             key_salt,
             self.password,

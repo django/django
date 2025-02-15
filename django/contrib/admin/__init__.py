@@ -1,5 +1,5 @@
-from django.contrib.admin.decorators import action, display, register
-from django.contrib.admin.filters import (
+from thibaud.contrib.admin.decorators import action, display, register
+from thibaud.contrib.admin.filters import (
     AllValuesFieldListFilter,
     BooleanFieldListFilter,
     ChoicesFieldListFilter,
@@ -11,7 +11,7 @@ from django.contrib.admin.filters import (
     RelatedOnlyFieldListFilter,
     SimpleListFilter,
 )
-from django.contrib.admin.options import (
+from thibaud.contrib.admin.options import (
     HORIZONTAL,
     VERTICAL,
     ModelAdmin,
@@ -19,8 +19,8 @@ from django.contrib.admin.options import (
     StackedInline,
     TabularInline,
 )
-from django.contrib.admin.sites import AdminSite, site
-from django.utils.module_loading import autodiscover_modules
+from thibaud.contrib.admin.sites import AdminSite, site
+from thibaud.utils.module_loading import autodiscover_modules
 
 __all__ = [
     "action",

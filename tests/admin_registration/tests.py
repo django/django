@@ -1,9 +1,9 @@
-from django.contrib import admin
-from django.contrib.admin.decorators import register
-from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
-from django.contrib.admin.sites import site
-from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase
+from thibaud.contrib import admin
+from thibaud.contrib.admin.decorators import register
+from thibaud.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
+from thibaud.contrib.admin.sites import site
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.test import SimpleTestCase
 
 from .models import Guest, Location, Person, Place, Traveler
 

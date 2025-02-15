@@ -1,6 +1,6 @@
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.template import Context, Template
+from thibaud.http import HttpResponse
+from thibaud.shortcuts import get_object_or_404
+from thibaud.template import Context, Template
 
 from .models import Person
 

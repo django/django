@@ -2,21 +2,21 @@ import unittest
 
 from forms_tests.widget_tests.base import WidgetTest
 
-from django.db import connection
-from django.test import SimpleTestCase, TestCase, modify_settings
-from django.utils.functional import cached_property
+from thibaud.db import connection
+from thibaud.test import SimpleTestCase, TestCase, modify_settings
+from thibaud.utils.functional import cached_property
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests")
 # To register type handlers and locate the widget's template.
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
+@modify_settings(INSTALLED_APPS={"append": "thibaud.contrib.postgres"})
 class PostgreSQLSimpleTestCase(SimpleTestCase):
     pass
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests")
 # To register type handlers and locate the widget's template.
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
+@modify_settings(INSTALLED_APPS={"append": "thibaud.contrib.postgres"})
 class PostgreSQLTestCase(TestCase):
     @cached_property
     def default_text_search_config(self):
@@ -32,6 +32,6 @@ class PostgreSQLTestCase(TestCase):
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests")
 # To locate the widget's template.
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
+@modify_settings(INSTALLED_APPS={"append": "thibaud.contrib.postgres"})
 class PostgreSQLWidgetTestCase(WidgetTest, PostgreSQLSimpleTestCase):
     pass

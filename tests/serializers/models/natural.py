@@ -2,7 +2,7 @@
 
 import uuid
 
-from django.db import models
+from thibaud.db import models
 
 
 class NaturalKeyAnchorManager(models.Manager):

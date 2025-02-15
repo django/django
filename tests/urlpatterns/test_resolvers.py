@@ -1,7 +1,7 @@
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
-from django.urls.resolvers import RegexPattern, RoutePattern, get_resolver
-from django.utils.translation import gettext_lazy as _
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
+from thibaud.urls.resolvers import RegexPattern, RoutePattern, get_resolver
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class RegexPatternTests(SimpleTestCase):

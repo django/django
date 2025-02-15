@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2020
@@ -11,12 +11,12 @@
 # xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-19 20:23+0200\n"
 "PO-Revision-Date: 2020-07-14 21:42+0000\n"
 "Last-Translator: Transifex Bot <>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"Language-Team: Vietnamese (http://www.transifex.com/thibaud/thibaud/language/"
 "vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1195,13 +1195,13 @@ msgstr ""
 msgid "Index of %(directory)s"
 msgstr "Index của %(directory)s"
 
-msgid "Django: the Web framework for perfectionists with deadlines."
+msgid "Thibaud: the Web framework for perfectionists with deadlines."
 msgstr ""
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
 
 msgid "The install worked successfully! Congratulations!"
@@ -1209,13 +1209,13 @@ msgstr ""
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
 
-msgid "Django Documentation"
+msgid "Thibaud Documentation"
 msgstr ""
 
 msgid "Topics, references, &amp; how-to’s"
@@ -1224,10 +1224,10 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr ""
 
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr ""
 
-msgid "Django Community"
+msgid "Thibaud Community"
 msgstr ""
 
 msgid "Connect, get help, or contribute"

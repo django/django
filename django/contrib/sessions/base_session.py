@@ -1,10 +1,10 @@
 """
 This module allows importing AbstractBaseSession even
-when django.contrib.sessions is not in INSTALLED_APPS.
+when thibaud.contrib.sessions is not in INSTALLED_APPS.
 """
 
-from django.db import models
-from django.utils.translation import gettext_lazy as _
+from thibaud.db import models
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class BaseSessionManager(models.Manager):

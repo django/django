@@ -5,37 +5,37 @@ from importlib import import_module
 from unittest import mock
 from urllib.parse import quote, urljoin
 
-from django.apps import apps
-from django.conf import settings
-from django.contrib.admin.models import LogEntry
-from django.contrib.auth import BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY
-from django.contrib.auth.forms import (
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.contrib.admin.models import LogEntry
+from thibaud.contrib.auth import BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY
+from thibaud.contrib.auth.forms import (
     AuthenticationForm,
     PasswordChangeForm,
     SetPasswordForm,
 )
-from django.contrib.auth.models import Permission, User
-from django.contrib.auth.views import (
+from thibaud.contrib.auth.models import Permission, User
+from thibaud.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     LoginView,
     RedirectURLMixin,
     logout_then_login,
     redirect_to_login,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.messages import Message
-from django.contrib.messages.test import MessagesTestMixin
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.contrib.sites.requests import RequestSite
-from django.core import mail
-from django.core.exceptions import ImproperlyConfigured
-from django.db import connection
-from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.test import Client, TestCase, modify_settings, override_settings
-from django.test.client import RedirectCycleError
-from django.urls import NoReverseMatch, reverse, reverse_lazy
-from django.utils.http import urlsafe_base64_encode
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.contrib.messages import Message
+from thibaud.contrib.messages.test import MessagesTestMixin
+from thibaud.contrib.sessions.middleware import SessionMiddleware
+from thibaud.contrib.sites.requests import RequestSite
+from thibaud.core import mail
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import connection
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.middleware.csrf import CsrfViewMiddleware, get_token
+from thibaud.test import Client, TestCase, modify_settings, override_settings
+from thibaud.test.client import RedirectCycleError
+from thibaud.urls import NoReverseMatch, reverse, reverse_lazy
+from thibaud.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
 from .models import CustomUser, CustomUserCompositePrimaryKey, UUIDUser
@@ -98,7 +98,7 @@ class AuthViewsTestCase(TestCase):
         self.assertIn(str(error), form_errors)
 
 
-@override_settings(ROOT_URLCONF="django.contrib.auth.urls")
+@override_settings(ROOT_URLCONF="thibaud.contrib.auth.urls")
 class AuthViewNamedURLTests(AuthViewsTestCase):
     def test_named_urls(self):
         "Named URLs should be reversible"
@@ -211,7 +211,7 @@ class PasswordResetTest(AuthViewsTestCase):
         # produce a meaningful reset URL, we need to be certain that the
         # HTTP_HOST header isn't poisoned. This is done as a check when get_host()
         # is invoked, but we check here as a practical consequence.
-        with self.assertLogs("django.security.DisallowedHost", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedHost", "ERROR"):
             response = self.client.post(
                 "/password_reset/",
                 {"email": "staffmember@example.com"},
@@ -224,7 +224,7 @@ class PasswordResetTest(AuthViewsTestCase):
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host_admin_site(self):
         "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
-        with self.assertLogs("django.security.DisallowedHost", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedHost", "ERROR"):
             response = self.client.post(
                 "/admin_password_reset/",
                 {"email": "staffmember@example.com"},
@@ -398,13 +398,13 @@ class PasswordResetTest(AuthViewsTestCase):
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[
-            "django.contrib.auth.backends.ModelBackend",
-            "django.contrib.auth.backends.AllowAllUsersModelBackend",
+            "thibaud.contrib.auth.backends.ModelBackend",
+            "thibaud.contrib.auth.backends.AllowAllUsersModelBackend",
         ]
     )
     def test_confirm_login_post_reset_custom_backend(self):
         # This backend is specified in the URL pattern.
-        backend = "django.contrib.auth.backends.AllowAllUsersModelBackend"
+        backend = "thibaud.contrib.auth.backends.AllowAllUsersModelBackend"
         url, path = self._test_confirm_start()
         path = path.replace("/reset/", "/reset/post_reset_login_custom_backend/")
         response = self.client.post(
@@ -473,7 +473,7 @@ class PasswordResetTest(AuthViewsTestCase):
             self.client.get("/reset/missing_parameters/")
 
     @modify_settings(
-        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+        MIDDLEWARE={"append": "thibaud.contrib.auth.middleware.LoginRequiredMiddleware"}
     )
     def test_access_under_login_required_middleware(self):
         reset_urls = [
@@ -697,7 +697,7 @@ class ChangePasswordTest(AuthViewsTestCase):
         )
 
     @modify_settings(
-        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+        MIDDLEWARE={"append": "thibaud.contrib.auth.middleware.LoginRequiredMiddleware"}
     )
     def test_access_under_login_required_middleware(self):
         response = self.client.post(
@@ -755,7 +755,7 @@ class LoginTest(AuthViewsTestCase):
     def test_current_site_in_context_after_login(self):
         response = self.client.get(reverse("login"))
         self.assertEqual(response.status_code, 200)
-        if apps.is_installed("django.contrib.sites"):
+        if apps.is_installed("thibaud.contrib.sites"):
             Site = apps.get_model("sites.Site")
             site = Site.objects.get_current()
             self.assertEqual(response.context["site"], site)
@@ -930,7 +930,7 @@ class LoginTest(AuthViewsTestCase):
 
     def test_login_session_without_hash_session_key(self):
         """
-        Session without django.contrib.auth.HASH_SESSION_KEY should login
+        Session without thibaud.contrib.auth.HASH_SESSION_KEY should login
         without an exception.
         """
         user = User.objects.get(username="testclient")
@@ -972,7 +972,7 @@ class LoginTest(AuthViewsTestCase):
         self.assertRedirects(response, "/test/", fetch_redirect_response=False)
 
     @modify_settings(
-        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+        MIDDLEWARE={"append": "thibaud.contrib.auth.middleware.LoginRequiredMiddleware"}
     )
     def test_access_under_login_required_middleware(self):
         response = self.client.get(reverse("login"))
@@ -1430,7 +1430,7 @@ class LogoutTest(AuthViewsTestCase):
         self.confirm_logged_out()
 
     @modify_settings(
-        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+        MIDDLEWARE={"append": "thibaud.contrib.auth.middleware.LoginRequiredMiddleware"}
     )
     def test_access_under_login_required_middleware(self):
         response = self.client.post("/logout/")
@@ -1455,7 +1455,7 @@ def get_perm(Model, perm):
 # isn't updated after password change (#21649)
 @override_settings(
     ROOT_URLCONF="auth_tests.urls_admin",
-    PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"],
+    PASSWORD_HASHERS=["thibaud.contrib.auth.hashers.MD5PasswordHasher"],
 )
 class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
     @classmethod
@@ -1495,7 +1495,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
     # repeated password__startswith queries.
     def test_changelist_disallows_password_lookups(self):
         # A lookup that tries to filter on password isn't OK
-        with self.assertLogs("django.security.DisallowedModelAdminLookup", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedModelAdminLookup", "ERROR"):
             response = self.client.get(
                 reverse("auth_test_admin:auth_user_changelist")
                 + "?password__startswith=sha1$"
@@ -1681,7 +1681,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch("django.contrib.auth.admin.UserAdmin.has_change_permission")
+    @mock.patch("thibaud.contrib.auth.admin.UserAdmin.has_change_permission")
     def test_user_change_password_passes_user_to_has_change_permission(
         self, has_change_permission
     ):

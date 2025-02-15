@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from itertools import chain
 
-from django.utils.inspect import func_accepts_kwargs
+from thibaud.utils.inspect import func_accepts_kwargs
 
 
 class Tags:

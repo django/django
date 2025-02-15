@@ -1,5 +1,5 @@
 """
-This is the Django template system.
+This is the Thibaud template system.
 
 How it works:
 
@@ -35,7 +35,7 @@ will be raised if the template doesn't have proper syntax.
 
 Sample code:
 
->>> from django import template
+>>> from thibaud import template
 >>> s = '<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
 >>> t = template.Template(s)
 
@@ -55,14 +55,14 @@ import logging
 import re
 from enum import Enum
 
-from django.template.context import BaseContext
-from django.utils.formats import localize
-from django.utils.html import conditional_escape
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import SafeData, SafeString, mark_safe
-from django.utils.text import get_text_list, smart_split, unescape_string_literal
-from django.utils.timezone import template_localtime
-from django.utils.translation import gettext_lazy, pgettext_lazy
+from thibaud.template.context import BaseContext
+from thibaud.utils.formats import localize
+from thibaud.utils.html import conditional_escape
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.safestring import SafeData, SafeString, mark_safe
+from thibaud.utils.text import get_text_list, smart_split, unescape_string_literal
+from thibaud.utils.timezone import template_localtime
+from thibaud.utils.translation import gettext_lazy, pgettext_lazy
 
 from .exceptions import TemplateSyntaxError
 
@@ -88,7 +88,7 @@ UNKNOWN_SOURCE = "<unknown source>"
 # than instantiating SimpleLazyObject with _lazy_re_compile().
 tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
-logger = logging.getLogger("django.template")
+logger = logging.getLogger("thibaud.template")
 
 
 class TokenType(Enum):
@@ -138,7 +138,7 @@ class Origin:
 class Template:
     def __init__(self, template_string, origin=None, name=None, engine=None):
         # If Template is instantiated directly rather than from an Engine and
-        # exactly one Django template engine is configured, use that engine.
+        # exactly one Thibaud template engine is configured, use that engine.
         # This is required to preserve backwards-compatibility for direct use
         # e.g. Template('...').render(Context({...}))
         if engine is None:
@@ -443,7 +443,7 @@ class Parser:
 
         # Custom template tags may store additional data on the parser that
         # will be made available on the template instance. Library authors
-        # should use a key to namespace any added data. The 'django' namespace
+        # should use a key to namespace any added data. The 'thibaud' namespace
         # is reserved for internal use.
         self.extra_data = {}
 

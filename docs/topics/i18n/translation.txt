@@ -2,39 +2,39 @@
 Translation
 ===========
 
-.. currentmodule:: django.utils.translation
+.. currentmodule:: thibaud.utils.translation
 
 Overview
 ========
 
-In order to make a Django project translatable, you have to add a minimal
+In order to make a Thibaud project translatable, you have to add a minimal
 number of hooks to your Python code and templates. These hooks are called
-:term:`translation strings <translation string>`. They tell Django: "This text
+:term:`translation strings <translation string>`. They tell Thibaud: "This text
 should be translated into the end user's language, if a translation for this
 text is available in that language." It's your responsibility to mark
 translatable strings; the system can only translate strings it knows about.
 
-Django then provides utilities to extract the translation strings into a
+Thibaud then provides utilities to extract the translation strings into a
 :term:`message file`. This file is a convenient way for translators to provide
 the equivalent of the translation strings in the target language. Once the
 translators have filled in the message file, it must be compiled. This process
 relies on the GNU gettext toolset.
 
-Once this is done, Django takes care of translating web apps on the fly in each
+Once this is done, Thibaud takes care of translating web apps on the fly in each
 available language, according to users' language preferences.
 
-Django's internationalization hooks are on by default, and that means there's a
+Thibaud's internationalization hooks are on by default, and that means there's a
 bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
-:setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
+:setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Thibaud will
 make some optimizations so as not to load the internationalization machinery.
 
 .. note::
 
     Make sure you've activated translation for your project (the fastest way is
     to check if :setting:`MIDDLEWARE` includes
-    :mod:`django.middleware.locale.LocaleMiddleware`). If you haven't yet,
-    see :ref:`how-django-discovers-language-preference`.
+    :mod:`thibaud.middleware.locale.LocaleMiddleware`). If you haven't yet,
+    see :ref:`how-thibaud-discovers-language-preference`.
 
 Internationalization: in Python code
 ====================================
@@ -43,15 +43,15 @@ Standard translation
 --------------------
 
 Specify a translation string by using the function
-:func:`~django.utils.translation.gettext`. It's convention to import this
+:func:`~thibaud.utils.translation.gettext`. It's convention to import this
 as a shorter alias, ``_``, to save typing.
 
 .. note::
     Python's standard library ``gettext`` module installs ``_()`` into the
-    global namespace, as an alias for ``gettext()``. In Django, we have chosen
+    global namespace, as an alias for ``gettext()``. In Thibaud, we have chosen
     not to follow this practice, for a couple of reasons:
 
-    #. Sometimes, you should use :func:`~django.utils.translation.gettext_lazy`
+    #. Sometimes, you should use :func:`~thibaud.utils.translation.gettext_lazy`
        as the default translation method for a particular file. Without ``_()``
        in the global namespace, the developer has to think about which is the
        most appropriate translation function.
@@ -66,14 +66,14 @@ as a shorter alias, ``_``, to save typing.
     Because of how ``xgettext`` (used by :djadmin:`makemessages`) works, only
     functions that take a single string argument can be imported as ``_``:
 
-    * :func:`~django.utils.translation.gettext`
-    * :func:`~django.utils.translation.gettext_lazy`
+    * :func:`~thibaud.utils.translation.gettext`
+    * :func:`~thibaud.utils.translation.gettext_lazy`
 
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
-    from django.http import HttpResponse
-    from django.utils.translation import gettext as _
+    from thibaud.http import HttpResponse
+    from thibaud.utils.translation import gettext as _
 
 
     def my_view(request):
@@ -83,8 +83,8 @@ string::
 You could code this without using the alias. This example is identical to the
 previous one::
 
-    from django.http import HttpResponse
-    from django.utils.translation import gettext
+    from thibaud.http import HttpResponse
+    from thibaud.utils.translation import gettext
 
 
     def my_view(request):
@@ -107,8 +107,8 @@ Translation works on variables. Again, here's an identical example::
         return HttpResponse(output)
 
 (The caveat with using variables or computed values, as in the previous two
-examples, is that Django's translation-string-detecting utility,
-:djadmin:`django-admin makemessages <makemessages>`, won't be able to find
+examples, is that Thibaud's translation-string-detecting utility,
+:djadmin:`thibaud-admin makemessages <makemessages>`, won't be able to find
 these strings. More on :djadmin:`makemessages` later.)
 
 The strings you pass to ``_()`` or ``gettext()`` can take placeholders,
@@ -129,7 +129,7 @@ have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
 
 Since string extraction is done by the ``xgettext`` command, only syntaxes
-supported by ``gettext`` are supported by Django. In particular, Python
+supported by ``gettext`` are supported by Thibaud. In particular, Python
 :py:ref:`f-strings <f-strings>` are not yet supported by ``xgettext``, and
 JavaScript template strings need ``gettext`` 0.21+.
 
@@ -166,7 +166,7 @@ more details.
 Marking strings as no-op
 ------------------------
 
-Use the function :func:`django.utils.translation.gettext_noop()` to mark a
+Use the function :func:`thibaud.utils.translation.gettext_noop()` to mark a
 string as a translation string without translating it. The string is later
 translated from a variable.
 
@@ -178,13 +178,13 @@ such as when the string is presented to the user.
 Pluralization
 -------------
 
-Use the function :func:`django.utils.translation.ngettext()` to specify
+Use the function :func:`thibaud.utils.translation.ngettext()` to specify
 pluralized messages.
 
 ``ngettext()`` takes three arguments: the singular translation string, the
 plural translation string and the number of objects.
 
-This function is useful when you need your Django application to be localizable
+This function is useful when you need your Thibaud application to be localizable
 to languages where the number and complexity of `plural forms
 <https://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
 greater than the two forms used in English ('object' for the singular and
@@ -193,8 +193,8 @@ of its value.)
 
 For example::
 
-    from django.http import HttpResponse
-    from django.utils.translation import ngettext
+    from thibaud.http import HttpResponse
+    from thibaud.utils.translation import ngettext
 
 
     def hello_world(request, count):
@@ -214,7 +214,7 @@ Note that pluralization is complicated and works differently in each language.
 Comparing ``count`` to 1 isn't always the correct rule. This code looks
 sophisticated, but will produce incorrect results for some languages::
 
-    from django.utils.translation import ngettext
+    from thibaud.utils.translation import ngettext
     from myapp.models import Report
 
     count = Report.objects.count()
@@ -261,7 +261,7 @@ In a case like this, consider something like the following::
             "plural_name": Report._meta.verbose_name_plural,
         }
 
-    You would get an error when running :djadmin:`django-admin
+    You would get an error when running :djadmin:`thibaud-admin
     compilemessages <compilemessages>`:
 
     .. code-block:: pytb
@@ -276,8 +276,8 @@ Contextual markers
 Sometimes words have several meanings, such as ``"May"`` in English, which
 refers to a month name and to a verb. To enable translators to translate
 these words correctly in different contexts, you can use the
-:func:`django.utils.translation.pgettext()` function, or the
-:func:`django.utils.translation.npgettext()` function if the string needs
+:func:`thibaud.utils.translation.pgettext()` function, or the
+:func:`thibaud.utils.translation.npgettext()` function if the string needs
 pluralization. Both take a context string as the first variable.
 
 In the resulting ``.po`` file, the string will then appear as often as there are
@@ -287,14 +287,14 @@ each of them.
 
 For example::
 
-    from django.utils.translation import pgettext
+    from thibaud.utils.translation import pgettext
 
     month = pgettext("month name", "May")
 
 or::
 
-    from django.db import models
-    from django.utils.translation import pgettext_lazy
+    from thibaud.db import models
+    from thibaud.utils.translation import pgettext_lazy
 
 
     class MyThing(models.Model):
@@ -319,7 +319,7 @@ Lazy translation
 ----------------
 
 Use the lazy versions of translation functions in
-:mod:`django.utils.translation` (easily recognizable by the ``lazy`` suffix in
+:mod:`thibaud.utils.translation` (easily recognizable by the ``lazy`` suffix in
 their names) to translate strings lazily -- when the value is accessed rather
 than when they're called.
 
@@ -331,7 +331,7 @@ This is essential when calls to these functions are located in code paths that
 are executed at module load time.
 
 This is something that can easily happen when defining models, forms and
-model forms, because Django implements these such that their fields are
+model forms, because Thibaud implements these such that their fields are
 actually class-level attributes. For that reason, make sure to use lazy
 translations in the following cases:
 
@@ -341,17 +341,17 @@ Model fields and relationships ``verbose_name`` and ``help_text`` option values
 For example, to translate the help text of the *name* field in the following
 model, do the following::
 
-    from django.db import models
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.db import models
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_("This is the help text"))
 
-You can mark names of :class:`~django.db.models.ForeignKey`,
-:class:`~django.db.models.ManyToManyField` or
-:class:`~django.db.models.OneToOneField` relationship as translatable by using
-their :attr:`~django.db.models.Options.verbose_name` options::
+You can mark names of :class:`~thibaud.db.models.ForeignKey`,
+:class:`~thibaud.db.models.ManyToManyField` or
+:class:`~thibaud.db.models.OneToOneField` relationship as translatable by using
+their :attr:`~thibaud.db.models.Options.verbose_name` options::
 
     class MyThing(models.Model):
         kind = models.ForeignKey(
@@ -361,21 +361,21 @@ their :attr:`~django.db.models.Options.verbose_name` options::
             verbose_name=_("kind"),
         )
 
-Just like you would do in :attr:`~django.db.models.Options.verbose_name` you
-should provide a lowercase verbose name text for the relation as Django will
+Just like you would do in :attr:`~thibaud.db.models.Options.verbose_name` you
+should provide a lowercase verbose name text for the relation as Thibaud will
 automatically titlecase it when required.
 
 Model verbose names values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is recommended to always provide explicit
-:attr:`~django.db.models.Options.verbose_name` and
-:attr:`~django.db.models.Options.verbose_name_plural` options rather than
+:attr:`~thibaud.db.models.Options.verbose_name` and
+:attr:`~thibaud.db.models.Options.verbose_name_plural` options rather than
 relying on the fallback English-centric and somewhat naïve determination of
-verbose names Django performs by looking at the model's class name::
+verbose names Thibaud performs by looking at the model's class name::
 
-    from django.db import models
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.db import models
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     class MyThing(models.Model):
@@ -388,13 +388,13 @@ verbose names Django performs by looking at the model's class name::
 Model methods ``description`` argument to the ``@display`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For model methods, you can provide translations to Django and the admin site
-with the ``description`` argument to the :func:`~django.contrib.admin.display`
+For model methods, you can provide translations to Thibaud and the admin site
+with the ``description`` argument to the :func:`~thibaud.contrib.admin.display`
 decorator::
 
-    from django.contrib import admin
-    from django.db import models
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.contrib import admin
+    from thibaud.db import models
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     class MyThing(models.Model):
@@ -413,23 +413,23 @@ Working with lazy translation objects
 -------------------------------------
 
 The result of a ``gettext_lazy()`` call can be used wherever you would use a
-string (a :class:`str` object) in other Django code, but it may not work with
+string (a :class:`str` object) in other Thibaud code, but it may not work with
 arbitrary Python code. For example, the following won't work because the
 :pypi:`requests` library doesn't handle ``gettext_lazy`` objects::
 
-    body = gettext_lazy("I \u2764 Django")  # (Unicode :heart:)
+    body = gettext_lazy("I \u2764 Thibaud")  # (Unicode :heart:)
     requests.post("https://example.com/send", data={"body": body})
 
 You can avoid such problems by casting ``gettext_lazy()`` objects to text
-strings before passing them to non-Django code::
+strings before passing them to non-Thibaud code::
 
     requests.post("https://example.com/send", data={"body": str(body)})
 
 If you don't like the long ``gettext_lazy`` name, you can alias it as ``_``
 (underscore), like so::
 
-    from django.db import models
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.db import models
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     class MyThing(models.Model):
@@ -453,9 +453,9 @@ definition. Therefore, you are authorized to pass a key name instead of an
 integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
 
-    from django import forms
-    from django.core.exceptions import ValidationError
-    from django.utils.translation import ngettext_lazy
+    from thibaud import forms
+    from thibaud.core.exceptions import ValidationError
+    from thibaud.utils.translation import ngettext_lazy
 
 
     class MyForm(forms.Form):
@@ -491,12 +491,12 @@ Formatting strings: ``format_lazy()``
 Python's :meth:`str.format()` method will not work when either the
 ``format_string`` or any of the arguments to :meth:`str.format()`
 contains lazy translation objects. Instead, you can use
-:func:`django.utils.text.format_lazy()`, which creates a lazy object
+:func:`thibaud.utils.text.format_lazy()`, which creates a lazy object
 that runs the ``str.format()`` method only when the result is included
 in a string. For example::
 
-    from django.utils.text import format_lazy
-    from django.utils.translation import gettext_lazy
+    from thibaud.utils.text import format_lazy
+    from thibaud.utils.translation import gettext_lazy
 
     ...
     name = gettext_lazy("John Lennon")
@@ -514,8 +514,8 @@ For any other case where you would like to delay the translation, but have to
 pass the translatable string as argument to another function, you can wrap
 this function inside a lazy call yourself. For example::
 
-    from django.utils.functional import lazy
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.utils.functional import lazy
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     def to_lower(string):
@@ -538,7 +538,7 @@ languages:
 
 .. code-block:: pycon
 
-    >>> from django.utils.translation import activate, get_language_info
+    >>> from thibaud.utils.translation import activate, get_language_info
     >>> activate("fr")
     >>> li = get_language_info("de")
     >>> print(li["name"], li["name_local"], li["name_translated"], li["bidi"])
@@ -549,7 +549,7 @@ dictionary contain the name of the language in English, in the language
 itself, and in your current active language respectively.  The ``bidi``
 attribute is True only for bi-directional languages.
 
-The source of the language information is the ``django.conf.locale`` module.
+The source of the language information is the ``thibaud.conf.locale`` module.
 Similar access to this information is available for template code. See below.
 
 .. _specifying-translation-strings-in-template-code:
@@ -557,7 +557,7 @@ Similar access to this information is available for template code. See below.
 Internationalization: in template code
 ======================================
 
-Translations in :doc:`Django templates </ref/templates/language>` uses two template
+Translations in :doc:`Thibaud templates </ref/templates/language>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
 As with all template tags, this tag needs to be loaded in all templates which
@@ -580,7 +580,7 @@ have already loaded the ``i18n`` tag.
 The ``{% translate %}`` template tag translates either a constant string
 (enclosed in single or double quotes) or variable content:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <title>{% translate "This is the title." %}</title>
     <title>{% translate myvar %}</title>
@@ -589,12 +589,12 @@ If the ``noop`` option is present, variable lookup still takes place but the
 translation is skipped. This is useful when "stubbing out" content that will
 require translation in the future:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <title>{% translate "myvar" noop %}</title>
 
 Internally, inline translations use a
-:func:`~django.utils.translation.gettext` call.
+:func:`~thibaud.utils.translation.gettext` call.
 
 In case a template var (``myvar`` above) is passed to the tag, the tag will
 first resolve such variable to a string at run-time and then look up that
@@ -607,7 +607,7 @@ It's not possible to mix a template variable inside a string within
 If you'd like to retrieve a translated string without displaying it, you can
 use the following syntax:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% translate "This is the title" as the_title %}
 
@@ -618,7 +618,7 @@ In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
 filters:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% translate "starting point" as start %}
     {% translate "end point" as end %}
@@ -636,7 +636,7 @@ filters:
 ``{% translate %}`` also supports :ref:`contextual markers<contextual-markers>`
 using the ``context`` keyword:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% translate "May" context "month name" %}
 
@@ -650,7 +650,7 @@ Contrarily to the :ttag:`translate` tag, the ``blocktranslate`` tag allows you
 to mark complex sentences consisting of literals and variable content for
 translation by making use of placeholders:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% blocktranslate %}This string will have {{ value }} inside.{% endblocktranslate %}
 
@@ -658,7 +658,7 @@ To translate a template expression -- say, accessing object attributes or
 using template filters -- you need to bind the expression to a local variable
 for use within the translation block. Examples:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% blocktranslate with amount=article.price %}
     That will cost $ {{ amount }}.
@@ -670,7 +670,7 @@ for use within the translation block. Examples:
 
 You can use multiple expressions inside a single ``blocktranslate`` tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% blocktranslate with book_t=book|title author_t=author|title %}
     This is {{ book_t }} by {{ author_t }}
@@ -684,7 +684,7 @@ not allowed inside a ``blocktranslate`` tag.
 
 If resolving one of the block arguments fails, ``blocktranslate`` will fall
 back to the default language by deactivating the currently active language
-temporarily with the :func:`~django.utils.translation.deactivate_all`
+temporarily with the :func:`~thibaud.utils.translation.deactivate_all`
 function.
 
 This tag also provides for pluralization. To use it:
@@ -698,7 +698,7 @@ This tag also provides for pluralization. To use it:
 
 An example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% blocktranslate count counter=list|length %}
     There is only one {{ name }} object.
@@ -708,7 +708,7 @@ An example:
 
 A more complex example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% blocktranslate with amount=article.price count years=i.length %}
     That will cost $ {{ amount }} per year.
@@ -725,7 +725,7 @@ apply.
 Reverse URL lookups cannot be carried out within the ``blocktranslate`` and
 should be retrieved (and stored) beforehand:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% url 'path.to.view' arg arg2 as the_url %}
     {% blocktranslate %}
@@ -735,7 +735,7 @@ should be retrieved (and stored) beforehand:
 If you'd like to retrieve a translated string without displaying it, you can
 use the following syntax:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% blocktranslate asvar the_title %}The title is {{ title }}.{% endblocktranslate %}
     <title>{{ the_title }}</title>
@@ -748,7 +748,7 @@ filters.
 ``{% blocktranslate %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% blocktranslate with name=user.username context "greeting" %}Hi {{ name }}{% endblocktranslate %}
 
@@ -763,7 +763,7 @@ process easier.
 
 For instance, the following ``{% blocktranslate %}`` tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% blocktranslate trimmed %}
       First sentence.
@@ -780,7 +780,7 @@ String literals passed to tags and filters
 You can translate string literals passed as arguments to tags and filters
 by using the familiar ``_()`` syntax:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% some_tag _("Page not found") value|yesno:_("yes,no") %}
 
@@ -804,7 +804,7 @@ Just like with :ref:`Python code <translator-comments>`, these notes for
 translators can be specified using comments, either with the :ttag:`comment`
 tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% comment %}Translators: View verb{% endcomment %}
     {% translate "View" %}
@@ -815,7 +815,7 @@ tag:
 
 or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-comments>`:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {# Translators: Label of a button that triggers search #}
     <button type="submit">{% translate "Go" %}</button>
@@ -860,7 +860,7 @@ Switching language in templates
 If you want to select a language within a template, you can use the
 ``language`` template tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load i18n %}
 
@@ -900,7 +900,7 @@ language name (translated into the currently active locale).
 
 ``{% get_current_language as LANGUAGE_CODE %}`` returns the current user's
 preferred language as a string. Example: ``en-us``. See
-:ref:`how-django-discovers-language-preference`.
+:ref:`how-thibaud-discovers-language-preference`.
 
 .. templatetag:: get_current_language_bidi
 
@@ -917,7 +917,7 @@ German, etc.
 ``i18n`` context processor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you enable the :class:`django.template.context_processors.i18n` context
+If you enable the :class:`thibaud.template.context_processors.i18n` context
 processor, then each ``RequestContext`` will have access to ``LANGUAGES``,
 ``LANGUAGE_CODE``, and ``LANGUAGE_BIDI`` as defined above.
 
@@ -930,14 +930,14 @@ You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
 use the ``{% get_language_info %}`` tag:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% get_language_info for LANGUAGE_CODE as lang %}
     {% get_language_info for "pl" as lang %}
 
 You can then access the information:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     Language code: {{ lang.code }}<br>
     Name of language: {{ lang.name_local }}<br>
@@ -967,7 +967,7 @@ If you do this in your view:
 
 you can iterate over those languages in the template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
   {% get_language_info_list for available_languages as langs %}
   {% for lang in langs %} ... {% endfor %}
@@ -1000,7 +1000,7 @@ Adding translations to JavaScript poses some problems:
 * The translation catalogs for JavaScript should be kept as small as
   possible.
 
-Django provides an integrated solution for these problems: It passes the
+Thibaud provides an integrated solution for these problems: It passes the
 translations into JavaScript, so you can call ``gettext``, etc., from within
 JavaScript.
 
@@ -1011,7 +1011,7 @@ which generates a JavaScript code library with functions that mimic the
 The ``JavaScriptCatalog`` view
 ------------------------------
 
-.. module:: django.views.i18n
+.. module:: thibaud.views.i18n
 
 .. class:: JavaScriptCatalog
 
@@ -1023,11 +1023,11 @@ The ``JavaScriptCatalog`` view
     .. attribute:: domain
 
         Translation domain containing strings to add in the view output.
-        Defaults to ``'djangojs'``.
+        Defaults to ``'thibaudjs'``.
 
     .. attribute:: packages
 
-        A list of :attr:`application names <django.apps.AppConfig.name>` among
+        A list of :attr:`application names <thibaud.apps.AppConfig.name>` among
         installed applications. Those apps should contain a ``locale``
         directory. All those catalogs plus all catalogs found in
         :setting:`LOCALE_PATHS` (which are always included) are merged into one
@@ -1037,7 +1037,7 @@ The ``JavaScriptCatalog`` view
 
     **Example with default values**::
 
-        from django.views.i18n import JavaScriptCatalog
+        from thibaud.views.i18n import JavaScriptCatalog
 
         urlpatterns = [
             path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
@@ -1053,13 +1053,13 @@ The ``JavaScriptCatalog`` view
             ),
         ]
 
-    If your root URLconf uses :func:`~django.conf.urls.i18n.i18n_patterns`,
+    If your root URLconf uses :func:`~thibaud.conf.urls.i18n.i18n_patterns`,
     ``JavaScriptCatalog`` must also be wrapped by ``i18n_patterns()`` for the
     catalog to be correctly generated.
 
     **Example with** ``i18n_patterns()``::
 
-        from django.conf.urls.i18n import i18n_patterns
+        from thibaud.conf.urls.i18n import i18n_patterns
 
         urlpatterns = i18n_patterns(
             path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
@@ -1079,7 +1079,7 @@ Using the JavaScript translation catalog
 
 To use the catalog, pull in the dynamically generated script like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <script src="{% url 'javascript-catalog' %}"></script>
 
@@ -1210,7 +1210,7 @@ in the future.
 ~~~~~~~~~~~~
 
 The ``pgettext`` function behaves like the Python variant
-(:func:`~django.utils.translation.pgettext()`), providing a contextually
+(:func:`~thibaud.utils.translation.pgettext()`), providing a contextually
 translated word::
 
     document.write(pgettext("month name", "May"))
@@ -1219,7 +1219,7 @@ translated word::
 ~~~~~~~~~~~~~
 
 The ``npgettext`` function also behaves like the Python variant
-(:func:`~django.utils.translation.npgettext()`), providing a **pluralized**
+(:func:`~thibaud.utils.translation.npgettext()`), providing a **pluralized**
 contextually translated word:
 
 .. code-block:: javascript
@@ -1262,9 +1262,9 @@ The ``JSONCatalog`` view
 
     In order to use another client-side library to handle translations, you may
     want to take advantage of the ``JSONCatalog`` view. It's similar to
-    :class:`~django.views.i18n.JavaScriptCatalog` but returns a JSON response.
+    :class:`~thibaud.views.i18n.JavaScriptCatalog` but returns a JSON response.
 
-    See the documentation for :class:`~django.views.i18n.JavaScriptCatalog`
+    See the documentation for :class:`~thibaud.views.i18n.JavaScriptCatalog`
     to learn about possible values and use of the ``domain`` and ``packages``
     attributes.
 
@@ -1292,13 +1292,13 @@ on every request. Since its output is constant, at least for a given version
 of a site, it's a good candidate for caching.
 
 Server-side caching will reduce CPU load. It's easily implemented with the
-:func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
+:func:`~thibaud.views.decorators.cache.cache_page` decorator. To trigger cache
 invalidation when your translations change, provide a version-dependent key
 prefix, as shown in the example below, or map the view at a version-dependent
 URL::
 
-    from django.views.decorators.cache import cache_page
-    from django.views.i18n import JavaScriptCatalog
+    from thibaud.views.decorators.cache import cache_page
+    from thibaud.views.i18n import JavaScriptCatalog
 
     # The value returned by get_version() must change when translations change.
     urlpatterns = [
@@ -1312,14 +1312,14 @@ URL::
     ]
 
 Client-side caching will save bandwidth and make your site load faster. If
-you're using ETags (:class:`~django.middleware.http.ConditionalGetMiddleware`),
+you're using ETags (:class:`~thibaud.middleware.http.ConditionalGetMiddleware`),
 you're already covered. Otherwise, you can apply :ref:`conditional decorators
 <conditional-decorators>`. In the following example, the cache is invalidated
 whenever you restart your application server::
 
-    from django.utils import timezone
-    from django.views.decorators.http import last_modified
-    from django.views.i18n import JavaScriptCatalog
+    from thibaud.utils import timezone
+    from thibaud.views.decorators.http import last_modified
+    from thibaud.views.i18n import JavaScriptCatalog
 
     last_modified_date = timezone.now()
 
@@ -1335,29 +1335,29 @@ whenever you restart your application server::
 
 You can even pre-generate the JavaScript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented
-in :pypi:`django-statici18n`.
+in :pypi:`thibaud-statici18n`.
 
 .. _url-internationalization:
 
 Internationalization: in URL patterns
 =====================================
 
-.. module:: django.conf.urls.i18n
+.. module:: thibaud.conf.urls.i18n
 
-Django provides two mechanisms to internationalize URL patterns:
+Thibaud provides two mechanisms to internationalize URL patterns:
 
 * Adding the language prefix to the root of the URL patterns to make it
-  possible for :class:`~django.middleware.locale.LocaleMiddleware` to detect
+  possible for :class:`~thibaud.middleware.locale.LocaleMiddleware` to detect
   the language to activate from the requested URL.
 
 * Making URL patterns themselves translatable via the
-  :func:`django.utils.translation.gettext_lazy()` function.
+  :func:`thibaud.utils.translation.gettext_lazy()` function.
 
 .. warning::
 
     Using either one of these features requires that an active language be set
     for each request; in other words, you need to have
-    :class:`django.middleware.locale.LocaleMiddleware` in your
+    :class:`thibaud.middleware.locale.LocaleMiddleware` in your
     :setting:`MIDDLEWARE` setting.
 
 Language prefix in URL patterns
@@ -1365,9 +1365,9 @@ Language prefix in URL patterns
 
 .. function:: i18n_patterns(*urls, prefix_default_language=True)
 
-This function can be used in a root URLconf and Django will automatically
+This function can be used in a root URLconf and Thibaud will automatically
 prepend the current active language code to all URL patterns defined within
-:func:`~django.conf.urls.i18n.i18n_patterns`.
+:func:`~thibaud.conf.urls.i18n.i18n_patterns`.
 
 Setting ``prefix_default_language`` to ``False`` removes the prefix from the
 default language (:setting:`LANGUAGE_CODE`). This can be useful when adding
@@ -1375,8 +1375,8 @@ translations to existing site so that the current URLs won't change.
 
 Example URL patterns::
 
-    from django.conf.urls.i18n import i18n_patterns
-    from django.urls import include, path
+    from thibaud.conf.urls.i18n import i18n_patterns
+    from thibaud.urls import include, path
 
     from about import views as about_views
     from news import views as news_views
@@ -1400,14 +1400,14 @@ Example URL patterns::
         path("news/", include(news_patterns, namespace="news")),
     )
 
-After defining these URL patterns, Django will automatically add the
+After defining these URL patterns, Thibaud will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
 function. Example:
 
 .. code-block:: pycon
 
-    >>> from django.urls import reverse
-    >>> from django.utils.translation import activate
+    >>> from thibaud.urls import reverse
+    >>> from thibaud.utils.translation import activate
 
     >>> activate("en")
     >>> reverse("sitemap-xml")
@@ -1434,9 +1434,9 @@ will be:
 
 .. warning::
 
-    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in a root
+    :func:`~thibaud.conf.urls.i18n.i18n_patterns` is only allowed in a root
     URLconf. Using it within an included URLconf will throw an
-    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+    :exc:`~thibaud.core.exceptions.ImproperlyConfigured` exception.
 
 .. warning::
 
@@ -1449,11 +1449,11 @@ Translating URL patterns
 ------------------------
 
 URL patterns can also be marked translatable using the
-:func:`~django.utils.translation.gettext_lazy` function. Example::
+:func:`~thibaud.utils.translation.gettext_lazy` function. Example::
 
-    from django.conf.urls.i18n import i18n_patterns
-    from django.urls import include, path
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.conf.urls.i18n import i18n_patterns
+    from thibaud.urls import include, path
+    from thibaud.utils.translation import gettext_lazy as _
 
     from about import views as about_views
     from news import views as news_views
@@ -1477,13 +1477,13 @@ URL patterns can also be marked translatable using the
         path(_("news/"), include(news_patterns, namespace="news")),
     )
 
-After you've created the translations, the :func:`~django.urls.reverse`
+After you've created the translations, the :func:`~thibaud.urls.reverse`
 function will return the URL in the active language. Example:
 
 .. code-block:: pycon
 
-    >>> from django.urls import reverse
-    >>> from django.utils.translation import activate
+    >>> from thibaud.urls import reverse
+    >>> from thibaud.utils.translation import activate
 
     >>> activate("en")
     >>> reverse("news:category", kwargs={"slug": "recent"})
@@ -1497,7 +1497,7 @@ function will return the URL in the active language. Example:
 
     In most cases, it's best to use translated URLs only within a language code
     prefixed block of patterns (using
-    :func:`~django.conf.urls.i18n.i18n_patterns`), to avoid the possibility
+    :func:`~thibaud.conf.urls.i18n.i18n_patterns`), to avoid the possibility
     that a carelessly translated URL causes a collision with a non-translated
     URL pattern.
 
@@ -1510,7 +1510,7 @@ If localized URLs get reversed in templates they always use the current
 language. To link to a URL in another language use the :ttag:`language`
 template tag. It enables the given language in the enclosed template section:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load i18n %}
 
@@ -1542,7 +1542,7 @@ file is a plain-text file, representing a single language, that contains all
 available translation strings and how they should be represented in the given
 language. Message files have a ``.po`` file extension.
 
-Django comes with a tool, :djadmin:`django-admin makemessages
+Thibaud comes with a tool, :djadmin:`thibaud-admin makemessages
 <makemessages>`, that automates the creation and upkeep of these files.
 
 .. admonition:: Gettext utilities
@@ -1557,7 +1557,7 @@ To create or update a message file, run this command:
 
 .. code-block:: shell
 
-    django-admin makemessages -l de
+    thibaud-admin makemessages -l de
 
 ...where ``de`` is the :term:`locale name` for the message file you want to
 create. For example, ``pt_BR`` for Brazilian Portuguese, ``de_AT`` for Austrian
@@ -1565,16 +1565,16 @@ German or ``id`` for Indonesian.
 
 The script should be run from one of two places:
 
-* The root directory of your Django project (the one that contains
+* The root directory of your Thibaud project (the one that contains
   ``manage.py``).
-* The root directory of one of your Django apps.
+* The root directory of one of your Thibaud apps.
 
 The script runs over your project source tree or your application source tree
 and pulls out all strings marked for translation (see
-:ref:`how-django-discovers-translations` and be sure :setting:`LOCALE_PATHS`
+:ref:`how-thibaud-discovers-translations` and be sure :setting:`LOCALE_PATHS`
 is configured correctly). It creates (or updates) a message file in the
 directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the file will be
-``locale/de/LC_MESSAGES/django.po``.
+``locale/de/LC_MESSAGES/thibaud.po``.
 
 When you run ``makemessages`` from the root directory of your project, the
 extracted strings will be automatically distributed to the proper message files.
@@ -1584,27 +1584,27 @@ from a file of an app without any ``locale`` directory will either go in a
 message file under the directory listed first in :setting:`LOCALE_PATHS` or
 will generate an error if :setting:`LOCALE_PATHS` is empty.
 
-By default :djadmin:`django-admin makemessages <makemessages>` examines every
+By default :djadmin:`thibaud-admin makemessages <makemessages>` examines every
 file that has the ``.html``, ``.txt`` or ``.py`` file extension. If you want to
 override that default, use the :option:`--extension <makemessages --extension>`
 or ``-e`` option to specify the file extensions to examine:
 
 .. code-block:: shell
 
-    django-admin makemessages -l de -e txt
+    thibaud-admin makemessages -l de -e txt
 
 Separate multiple extensions with commas and/or use ``-e`` or ``--extension``
 multiple times:
 
 .. code-block:: shell
 
-    django-admin makemessages -l de -e html,txt -e xml
+    thibaud-admin makemessages -l de -e html,txt -e xml
 
 .. warning::
 
     When :ref:`creating message files from JavaScript source code
     <creating-message-files-from-js-code>` you need to use the special
-    ``djangojs`` domain, **not** ``-e js``.
+    ``thibaudjs`` domain, **not** ``-e js``.
 
 .. admonition:: Using Jinja2 templates?
 
@@ -1640,7 +1640,7 @@ multiple times:
     If you don't have the ``gettext`` utilities installed,
     :djadmin:`makemessages` will create empty files. If that's the case, either
     install the ``gettext`` utilities or copy the English message file
-    (``locale/en/LC_MESSAGES/django.po``) if available and use it as a starting
+    (``locale/en/LC_MESSAGES/thibaud.po``) if available and use it as a starting
     point, which is an empty translation file.
 
 .. admonition:: Working on Windows?
@@ -1654,12 +1654,12 @@ maintainer's contact information, but the bulk of the file is a list of
 **messages** -- mappings between translation strings and the actual translated
 text for the particular language.
 
-For example, if your Django app contained a translation string for the text
+For example, if your Thibaud app contained a translation string for the text
 ``"Welcome to my site."``, like so::
 
     _("Welcome to my site.")
 
-...then :djadmin:`django-admin makemessages <makemessages>` will have created
+...then :djadmin:`thibaud-admin makemessages <makemessages>` will have created
 a ``.po`` file containing the following snippet -- a message:
 
 .. code-block:: po
@@ -1688,10 +1688,10 @@ otherwise, they'll be tacked together without whitespace!
 .. admonition:: Mind your charset
 
     Due to the way the ``gettext`` tools work internally and because we want to
-    allow non-ASCII source strings in Django's core and your applications, you
+    allow non-ASCII source strings in Thibaud's core and your applications, you
     **must** use UTF-8 as the encoding for your ``.po`` files (the default when
     ``.po`` files are created).  This means that everybody will be using the
-    same encoding, which is important when Django processes the ``.po`` files.
+    same encoding, which is important when Thibaud processes the ``.po`` files.
 
 .. admonition:: Fuzzy entries
 
@@ -1705,36 +1705,36 @@ update all message files for **all** languages, run this:
 
 .. code-block:: shell
 
-    django-admin makemessages -a
+    thibaud-admin makemessages -a
 
 Compiling message files
 -----------------------
 
 After you create your message file -- and each time you make changes to it --
 you'll need to compile it into a more efficient form, for use by ``gettext``. Do
-this with the :djadmin:`django-admin compilemessages <compilemessages>`
+this with the :djadmin:`thibaud-admin compilemessages <compilemessages>`
 utility.
 
 This tool runs over all available ``.po`` files and creates ``.mo`` files, which
 are binary files optimized for use by ``gettext``. In the same directory from
-which you ran :djadmin:`django-admin makemessages <makemessages>`, run
-:djadmin:`django-admin compilemessages <compilemessages>` like this:
+which you ran :djadmin:`thibaud-admin makemessages <makemessages>`, run
+:djadmin:`thibaud-admin compilemessages <compilemessages>` like this:
 
 .. code-block:: shell
 
-   django-admin compilemessages
+   thibaud-admin compilemessages
 
 That's it. Your translations are ready for use.
 
 .. admonition:: Working on Windows?
 
    If you're using Windows and need to install the GNU gettext utilities so
-   :djadmin:`django-admin compilemessages <compilemessages>` works see
+   :djadmin:`thibaud-admin compilemessages <compilemessages>` works see
    :ref:`gettext_on_windows` for more information.
 
 .. admonition:: ``.po`` files: Encoding and BOM usage.
 
-   Django only supports ``.po`` files encoded in UTF-8 and without any BOM
+   Thibaud only supports ``.po`` files encoded in UTF-8 and without any BOM
    (Byte Order Mark) so if your text editor adds such marks to the beginning of
    files by default then you will need to reconfigure it.
 
@@ -1743,7 +1743,7 @@ Troubleshooting: ``gettext()`` incorrectly detects ``python-format`` in strings 
 
 In some cases, such as strings with a percent sign followed by a space and a
 :ref:`string conversion type <old-string-formatting>` (e.g.
-``_("10% interest")``), :func:`~django.utils.translation.gettext` incorrectly
+``_("10% interest")``), :func:`~thibaud.utils.translation.gettext` incorrectly
 flags strings with ``python-format``.
 
 If you try to compile message files with incorrectly flagged strings, you'll
@@ -1754,7 +1754,7 @@ unlike 'msgid'``.
 To workaround this, you can escape percent signs by adding a second percent
 sign::
 
-    from django.utils.translation import gettext as _
+    from thibaud.utils.translation import gettext as _
 
     output = _("10%% interest")
 
@@ -1769,19 +1769,19 @@ literals::
 Creating message files from JavaScript source code
 --------------------------------------------------
 
-You create and update the message files the same way as the other Django message
-files -- with the :djadmin:`django-admin makemessages <makemessages>` tool.
+You create and update the message files the same way as the other Thibaud message
+files -- with the :djadmin:`thibaud-admin makemessages <makemessages>` tool.
 The only difference is you need to explicitly specify what in gettext parlance
-is known as a domain in this case the ``djangojs`` domain, by providing a ``-d
-djangojs`` parameter, like this:
+is known as a domain in this case the ``thibaudjs`` domain, by providing a ``-d
+thibaudjs`` parameter, like this:
 
 .. code-block:: shell
 
-    django-admin makemessages -d djangojs -l de
+    thibaud-admin makemessages -d thibaudjs -l de
 
 This would create or update the message file for JavaScript for German. After
-updating message files, run :djadmin:`django-admin compilemessages
-<compilemessages>` the same way as you do with normal Django message files.
+updating message files, run :djadmin:`thibaud-admin compilemessages
+<compilemessages>` the same way as you do with normal Thibaud message files.
 
 .. _gettext_on_windows:
 
@@ -1795,7 +1795,7 @@ to test or compile a changed message file, download `a precompiled binary
 installer <https://mlocati.github.io/articles/gettext-iconv-windows.html>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
-the ``xgettext --version`` command works properly. Do not attempt to use Django
+the ``xgettext --version`` command works properly. Do not attempt to use Thibaud
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
 "``xgettext.exe`` has generated errors and will be closed by Windows".
@@ -1809,7 +1809,7 @@ If you want to pass additional parameters to ``xgettext``, you need to create a
 custom :djadmin:`makemessages` command and override its ``xgettext_options``
 attribute::
 
-    from django.core.management.commands import makemessages
+    from thibaud.core.management.commands import makemessages
 
 
     class Command(makemessages.Command):
@@ -1818,7 +1818,7 @@ attribute::
 If you need more flexibility, you could also add a new argument to your custom
 :djadmin:`makemessages` command::
 
-    from django.core.management.commands import makemessages
+    from thibaud.core.management.commands import makemessages
 
 
     class Command(makemessages.Command):
@@ -1846,36 +1846,36 @@ Miscellaneous
 The ``set_language`` redirect view
 ----------------------------------
 
-.. currentmodule:: django.views.i18n
+.. currentmodule:: thibaud.views.i18n
 
 .. function:: set_language(request)
 
-As a convenience, Django comes with a view, :func:`django.views.i18n.set_language`,
+As a convenience, Thibaud comes with a view, :func:`thibaud.views.i18n.set_language`,
 that sets a user's language preference and redirects to a given URL or, by default,
 back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
 
-    path("i18n/", include("django.conf.urls.i18n")),
+    path("i18n/", include("thibaud.conf.urls.i18n")),
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 
 .. warning::
 
     Make sure that you don't include the above URL within
-    :func:`~django.conf.urls.i18n.i18n_patterns` - it needs to be
+    :func:`~thibaud.conf.urls.i18n.i18n_patterns` - it needs to be
     language-independent itself to work correctly.
 
 The view expects to be called via the ``POST`` method, with a ``language``
 parameter set in request. If session support is enabled, the view saves the
 language choice in the user's session. It also saves the language choice in a
-cookie that is named ``django_language`` by default. (The name can be changed
+cookie that is named ``thibaud_language`` by default. (The name can be changed
 through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
 
-After setting the language choice, Django looks for a ``next`` parameter in the
-``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
+After setting the language choice, Thibaud looks for a ``next`` parameter in the
+``POST`` or ``GET`` data. If that is found and Thibaud considers it to be a safe
 URL (i.e. it doesn't point to a different host and uses a safe scheme), a
-redirect to that URL will be performed. Otherwise, Django may fall back to
+redirect to that URL will be performed. Otherwise, Thibaud may fall back to
 redirecting the user to the URL from the ``Referer`` header or, if it is not
 set, to ``/``, depending on the nature of the request:
 
@@ -1888,7 +1888,7 @@ set, to ``/``, depending on the nature of the request:
 
 Here's example HTML template code:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% load i18n %}
 
@@ -1907,7 +1907,7 @@ Here's example HTML template code:
         <input type="submit" value="Go">
     </form>
 
-In this example, Django looks up the URL of the page to which the user will be
+In this example, Thibaud looks up the URL of the page to which the user will be
 redirected in the ``redirect_to`` context variable.
 
 .. _explicitly-setting-the-active-language:
@@ -1917,31 +1917,31 @@ Explicitly setting the active language
 
 You may want to set the active language for the current session explicitly. Perhaps
 a user's language preference is retrieved from another system, for example.
-You've already been introduced to :func:`django.utils.translation.activate()`. That
+You've already been introduced to :func:`thibaud.utils.translation.activate()`. That
 applies to the current thread only. To persist the language for the entire
 session in a cookie, set the :setting:`LANGUAGE_COOKIE_NAME` cookie on the
 response::
 
-    from django.conf import settings
-    from django.http import HttpResponse
-    from django.utils import translation
+    from thibaud.conf import settings
+    from thibaud.http import HttpResponse
+    from thibaud.utils import translation
 
     user_language = "fr"
     translation.activate(user_language)
     response = HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
 
-You would typically want to use both: :func:`django.utils.translation.activate()`
+You would typically want to use both: :func:`thibaud.utils.translation.activate()`
 changes the language for this thread, and setting the cookie makes this
 preference persist in future requests.
 
 Using translations outside views and templates
 ----------------------------------------------
 
-While Django provides a rich set of i18n tools for use in views and templates,
-it does not restrict the usage to Django-specific code. The Django translation
+While Thibaud provides a rich set of i18n tools for use in views and templates,
+it does not restrict the usage to Thibaud-specific code. The Thibaud translation
 mechanisms can be used to translate arbitrary texts to any language that is
-supported by Django (as long as an appropriate translation catalog exists, of
+supported by Thibaud (as long as an appropriate translation catalog exists, of
 course). You can load a translation catalog, activate it and translate text to
 language of your choice, but remember to switch back to original language, as
 activating a translation catalog is done on per-thread basis and such change
@@ -1949,7 +1949,7 @@ will affect code running in the same thread.
 
 For example::
 
-    from django.utils import translation
+    from thibaud.utils import translation
 
 
     def welcome_translated(language):
@@ -1965,17 +1965,17 @@ Calling this function with the value ``'de'`` will give you ``"Willkommen"``,
 regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
 
 Functions of particular interest are
-:func:`django.utils.translation.get_language()` which returns the language used
-in the current thread, :func:`django.utils.translation.activate()` which
+:func:`thibaud.utils.translation.get_language()` which returns the language used
+in the current thread, :func:`thibaud.utils.translation.activate()` which
 activates a translation catalog for the current thread, and
-:func:`django.utils.translation.check_for_language()`
-which checks if the given language is supported by Django.
+:func:`thibaud.utils.translation.check_for_language()`
+which checks if the given language is supported by Thibaud.
 
 To help write more concise code, there is also a context manager
-:func:`django.utils.translation.override()` that stores the current language on
+:func:`thibaud.utils.translation.override()` that stores the current language on
 enter and restores it on exit. With it, the above example becomes::
 
-    from django.utils import translation
+    from thibaud.utils import translation
 
 
     def welcome_translated(language):
@@ -1998,43 +1998,43 @@ A number of settings can be used to adjust language cookie options:
 Implementation notes
 ====================
 
-.. _specialties-of-django-i18n:
+.. _specialties-of-thibaud-i18n:
 
-Specialties of Django translation
+Specialties of Thibaud translation
 ---------------------------------
 
-Django's translation machinery uses the standard ``gettext`` module that comes
+Thibaud's translation machinery uses the standard ``gettext`` module that comes
 with Python. If you know ``gettext``, you might note these specialties in the
-way Django does translation:
+way Thibaud does translation:
 
-* The string domain is ``django`` or ``djangojs``. This string domain is
+* The string domain is ``thibaud`` or ``thibaudjs``. This string domain is
   used to differentiate between different programs that store their data
   in a common message-file library (usually ``/usr/share/locale/``). The
-  ``django`` domain is used for Python and template translation strings
-  and is loaded into the global translation catalogs. The ``djangojs``
+  ``thibaud`` domain is used for Python and template translation strings
+  and is loaded into the global translation catalogs. The ``thibaudjs``
   domain is only used for JavaScript translation catalogs to make sure
   that those are as small as possible.
-* Django doesn't use ``xgettext`` alone. It uses Python wrappers around
+* Thibaud doesn't use ``xgettext`` alone. It uses Python wrappers around
   ``xgettext`` and ``msgfmt``. This is mostly for convenience.
 
-.. _how-django-discovers-language-preference:
+.. _how-thibaud-discovers-language-preference:
 
-How Django discovers language preference
+How Thibaud discovers language preference
 ----------------------------------------
 
 Once you've prepared your translations -- or, if you want to use the
-translations that come with Django -- you'll need to activate translation for
+translations that come with Thibaud -- you'll need to activate translation for
 your app.
 
-Behind the scenes, Django has a very flexible model of deciding which language
+Behind the scenes, Thibaud has a very flexible model of deciding which language
 should be used -- installation-wide, for a particular user, or both.
 
 To set an installation-wide language preference, set :setting:`LANGUAGE_CODE`.
-Django uses this language as the default translation -- the final attempt if no
+Thibaud uses this language as the default translation -- the final attempt if no
 better matching translation is found through one of the methods employed by the
 locale middleware (see below).
 
-If all you want is to run Django with your native language all you need to do
+If all you want is to run Thibaud with your native language all you need to do
 is set :setting:`LANGUAGE_CODE` and make sure the corresponding :term:`message
 files <message file>` and their compiled versions (``.mo``) exist.
 
@@ -2043,7 +2043,7 @@ prefer, then you also need to use the ``LocaleMiddleware``.
 ``LocaleMiddleware`` enables language selection based on data from the request.
 It customizes content for each user.
 
-To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
+To use ``LocaleMiddleware``, add ``'thibaud.middleware.locale.LocaleMiddleware'``
 to your :setting:`MIDDLEWARE` setting. Because middleware order matters, follow
 these guidelines:
 
@@ -2057,9 +2057,9 @@ these guidelines:
 For example, your :setting:`MIDDLEWARE` might look like this::
 
     MIDDLEWARE = [
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.locale.LocaleMiddleware",
-        "django.middleware.common.CommonMiddleware",
+        "thibaud.contrib.sessions.middleware.SessionMiddleware",
+        "thibaud.middleware.locale.LocaleMiddleware",
+        "thibaud.middleware.common.CommonMiddleware",
     ]
 
 (For more on middleware, see the :doc:`middleware documentation
@@ -2076,11 +2076,11 @@ following this algorithm:
 * Failing that, it looks for a cookie.
 
   The name of the cookie used is set by the :setting:`LANGUAGE_COOKIE_NAME`
-  setting. (The default name is ``django_language``.)
+  setting. (The default name is ``thibaud_language``.)
 
 * Failing that, it looks at the ``Accept-Language`` HTTP header. This
   header is sent by your browser and tells the server which language(s) you
-  prefer, in order by priority. Django tries each language in the header
+  prefer, in order by priority. Thibaud tries each language in the header
   until it finds one with available translations.
 
 * Failing that, it uses the global :setting:`LANGUAGE_CODE` setting.
@@ -2094,8 +2094,8 @@ Notes:
   Brazilian Portuguese is ``pt-br``.
 
 * If a base language is available but the sublanguage specified is not,
-  Django uses the base language. For example, if a user specifies ``de-at``
-  (Austrian German) but Django only has ``de`` available, Django uses
+  Thibaud uses the base language. For example, if a user specifies ``de-at``
+  (Austrian German) but Thibaud only has ``de`` available, Thibaud uses
   ``de``.
 
 * Only languages listed in the :setting:`LANGUAGES` setting can be selected.
@@ -2114,12 +2114,12 @@ Notes:
 
 * If you define a custom :setting:`LANGUAGES` setting, as explained in the
   previous bullet, you can mark the language names as translation strings
-  -- but use :func:`~django.utils.translation.gettext_lazy` instead of
-  :func:`~django.utils.translation.gettext` to avoid a circular import.
+  -- but use :func:`~thibaud.utils.translation.gettext_lazy` instead of
+  :func:`~thibaud.utils.translation.gettext` to avoid a circular import.
 
   Here's a sample settings file::
 
-      from django.utils.translation import gettext_lazy as _
+      from thibaud.utils.translation import gettext_lazy as _
 
       LANGUAGES = [
           ("de", _("German")),
@@ -2128,10 +2128,10 @@ Notes:
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
-:class:`~django.http.HttpRequest`. Feel free to read this value in your view
+:class:`~thibaud.http.HttpRequest`. Feel free to read this value in your view
 code. Here's an example::
 
-    from django.http import HttpResponse
+    from thibaud.http import HttpResponse
 
 
     def hello_world(request, count):
@@ -2149,12 +2149,12 @@ in ``request.LANGUAGE_CODE``.
 .. _session: ../sessions/
 .. _request object: ../request_response/#httprequest-objects
 
-.. _how-django-discovers-translations:
+.. _how-thibaud-discovers-translations:
 
-How Django discovers translations
+How Thibaud discovers translations
 ---------------------------------
 
-At runtime, Django builds an in-memory unified catalog of literals-translations.
+At runtime, Thibaud builds an in-memory unified catalog of literals-translations.
 To achieve this it looks for translations by following this algorithm regarding
 the order in which it examines the different file paths to load the compiled
 :term:`message files <message file>` (``.mo``) and the precedence of multiple
@@ -2166,7 +2166,7 @@ translations for the same literal:
 #. Then, it looks for and uses if it exists a ``locale`` directory in each
    of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
    appearing first have higher precedence than the ones appearing later.
-#. Finally, the Django-provided base translation in :source:`django/conf/locale`
+#. Finally, the Thibaud-provided base translation in :source:`thibaud/conf/locale`
    is used as a fallback.
 
 .. seealso::
@@ -2193,22 +2193,22 @@ message file specific to the project you are composing. The choice is yours.
 All message file repositories are structured the same way. They are:
 
 * All paths listed in :setting:`LOCALE_PATHS` in your settings file are
-  searched for ``<language>/LC_MESSAGES/django.(po|mo)``
-* ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
-* ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
+  searched for ``<language>/LC_MESSAGES/thibaud.(po|mo)``
+* ``$APPPATH/locale/<language>/LC_MESSAGES/thibaud.(po|mo)``
+* ``$PYTHONPATH/thibaud/conf/locale/<language>/LC_MESSAGES/thibaud.(po|mo)``
 
-To create message files, you use the :djadmin:`django-admin makemessages <makemessages>`
-tool. And you use :djadmin:`django-admin compilemessages <compilemessages>`
+To create message files, you use the :djadmin:`thibaud-admin makemessages <makemessages>`
+tool. And you use :djadmin:`thibaud-admin compilemessages <compilemessages>`
 to produce the binary ``.mo`` files that are used by ``gettext``.
 
-You can also run :djadmin:`django-admin compilemessages
+You can also run :djadmin:`thibaud-admin compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all
 the directories in your :setting:`LOCALE_PATHS` setting.
 
 Using a non-English base language
 ---------------------------------
 
-Django makes the general assumption that the original strings in a translatable
+Thibaud makes the general assumption that the original strings in a translatable
 project are written in English. You can choose another language, but you must be
 aware of certain limitations:
 

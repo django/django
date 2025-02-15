@@ -1,8 +1,8 @@
-from django.db import connection
-from django.db.models import CharField, Value
-from django.db.models.functions import Length, Reverse, Trim
-from django.test import TestCase
-from django.test.utils import register_lookup
+from thibaud.db import connection
+from thibaud.db.models import CharField, Value
+from thibaud.db.models.functions import Length, Reverse, Trim
+from thibaud.test import TestCase
+from thibaud.test.utils import register_lookup
 
 from ..models import Author
 

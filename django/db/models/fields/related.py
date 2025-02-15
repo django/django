@@ -2,19 +2,19 @@ import functools
 import inspect
 from functools import partial
 
-from django import forms
-from django.apps import apps
-from django.conf import SettingsReference, settings
-from django.core import checks, exceptions
-from django.db import connection, router
-from django.db.backends import utils
-from django.db.models import Q
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
-from django.db.models.query_utils import PathInfo
-from django.db.models.utils import make_model_tuple
-from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from thibaud import forms
+from thibaud.apps import apps
+from thibaud.conf import SettingsReference, settings
+from thibaud.core import checks, exceptions
+from thibaud.db import connection, router
+from thibaud.db.backends import utils
+from thibaud.db.models import Q
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from thibaud.db.models.query_utils import PathInfo
+from thibaud.db.models.utils import make_model_tuple
+from thibaud.utils.functional import cached_property
+from thibaud.utils.translation import gettext_lazy as _
 
 from . import Field
 from .mixins import FieldCacheMixin
@@ -227,7 +227,7 @@ class RelatedField(FieldCacheMixin, Field):
 
     def _check_clashes(self):
         """Check accessor and reverse query name clashes."""
-        from django.db.models.base import ModelBase
+        from thibaud.db.models.base import ModelBase
 
         errors = []
         opts = self.model._meta
@@ -605,7 +605,7 @@ class ForeignObject(RelatedField):
         return errors
 
     def _check_to_fields_composite_pk(self):
-        from django.db.models.fields.composite import CompositePrimaryKey
+        from thibaud.db.models.fields.composite import CompositePrimaryKey
 
         # Skip nonexistent models.
         if isinstance(self.remote_field.model, str):
@@ -1282,7 +1282,7 @@ class OneToOneField(ForeignKey):
 
 
 def create_many_to_many_intermediary_model(field, klass):
-    from django.db import models
+    from thibaud.db import models
 
     def set_managed(model, related, through):
         through._meta.managed = model._meta.managed or related._meta.managed
@@ -1478,7 +1478,7 @@ class ManyToManyField(RelatedField):
         return warnings
 
     def _check_relationship_model(self, from_model=None, **kwargs):
-        from django.db.models.fields.composite import CompositePrimaryKey
+        from thibaud.db.models.fields.composite import CompositePrimaryKey
 
         if hasattr(self.remote_field.through, "_meta"):
             qualified_model_name = "%s.%s" % (
@@ -1545,12 +1545,12 @@ class ManyToManyField(RelatedField):
                             "The model is used as an intermediate model by "
                             "'%s', but it has more than two foreign keys "
                             "to '%s', which is ambiguous. You must specify "
-                            "which two foreign keys Django should use via the "
+                            "which two foreign keys Thibaud should use via the "
                             "through_fields keyword argument."
                             % (self, from_model_name),
                             hint=(
                                 "Use through_fields to specify which two foreign keys "
-                                "Django should use."
+                                "Thibaud should use."
                             ),
                             obj=self.remote_field.through,
                             id="fields.E333",
@@ -1575,7 +1575,7 @@ class ManyToManyField(RelatedField):
                                 "The model is used as an intermediate model by "
                                 "'%s', but it has more than one foreign key "
                                 "from '%s', which is ambiguous. You must specify "
-                                "which foreign key Django should use via the "
+                                "which foreign key Thibaud should use via the "
                                 "through_fields keyword argument."
                             )
                             % (self, from_model_name),
@@ -1598,7 +1598,7 @@ class ManyToManyField(RelatedField):
                             "The model is used as an intermediate model by "
                             "'%s', but it has more than one foreign key "
                             "to '%s', which is ambiguous. You must specify "
-                            "which foreign key Django should use via the "
+                            "which foreign key Thibaud should use via the "
                             "through_fields keyword argument." % (self, to_model_name),
                             hint=(
                                 "If you want to create a recursive relationship, "
@@ -1940,7 +1940,7 @@ class ManyToManyField(RelatedField):
             self.remote_field.related_name = "%s_rel_+" % name
         elif self.remote_field.hidden:
             # If the backwards relation is disabled, replace the original
-            # related_name with one generated from the m2m field name. Django
+            # related_name with one generated from the m2m field name. Thibaud
             # still uses backwards relations internally and we need to avoid
             # clashes between multiple m2m fields with related_name == '+'.
             self.remote_field.related_name = "_%s_%s_%s_+" % (

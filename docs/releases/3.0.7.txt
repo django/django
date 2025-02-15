@@ -1,10 +1,10 @@
 ==========================
-Django 3.0.7 release notes
+Thibaud 3.0.7 release notes
 ==========================
 
 *June 3, 2020*
 
-Django 3.0.7 fixes two security issues and several bugs in 3.0.6.
+Thibaud 3.0.7 fixes two security issues and several bugs in 3.0.6.
 
 CVE-2020-13254: Potential data leakage via malformed memcached keys
 ===================================================================
@@ -24,24 +24,24 @@ ensures query parameters are correctly URL encoded.
 Bugfixes
 ========
 
-* Fixed a regression in Django 3.0 by restoring the ability to use field
+* Fixed a regression in Thibaud 3.0 by restoring the ability to use field
   lookups in ``Meta.ordering`` (:ticket:`31538`).
 
-* Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
+* Fixed a regression in Thibaud 3.0 where ``QuerySet.values()`` and
   ``values_list()`` crashed if a queryset contained an aggregation and a
   subquery annotation (:ticket:`31566`).
 
-* Fixed a regression in Django 3.0 where aggregates used wrong annotations when
+* Fixed a regression in Thibaud 3.0 where aggregates used wrong annotations when
   a queryset has multiple subqueries annotations (:ticket:`31568`).
 
-* Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
+* Fixed a regression in Thibaud 3.0 where ``QuerySet.values()`` and
   ``values_list()`` crashed if a queryset contained an aggregation and an
   ``Exists()`` annotation on Oracle (:ticket:`31584`).
 
-* Fixed a regression in Django 3.0 where all resolved ``Subquery()``
+* Fixed a regression in Thibaud 3.0 where all resolved ``Subquery()``
   expressions were considered equal (:ticket:`31607`).
 
-* Fixed a regression in Django 3.0.5 that affected translation loading for apps
+* Fixed a regression in Thibaud 3.0.5 that affected translation loading for apps
   providing translations for territorial language variants as well as a generic
   language, where the project has different plural equations for the language
   (:ticket:`31570`).

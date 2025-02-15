@@ -3,8 +3,8 @@
 # It is also provided as a convenience to those who want to deploy these URLs
 # elsewhere.
 
-from django.contrib.auth import views
-from django.urls import path
+from thibaud.contrib.auth import views
+from thibaud.urls import path
 
 urlpatterns = [
     path("login/", views.LoginView.as_view(), name="login"),

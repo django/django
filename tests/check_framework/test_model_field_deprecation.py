@@ -1,7 +1,7 @@
-from django.core import checks
-from django.db import models
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps
+from thibaud.core import checks
+from thibaud.db import models
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import isolate_apps
 
 
 @isolate_apps("check_framework")

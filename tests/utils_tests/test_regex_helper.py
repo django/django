@@ -1,8 +1,8 @@
 import re
 import unittest
 
-from django.test import SimpleTestCase
-from django.utils import regex_helper
+from thibaud.test import SimpleTestCase
+from thibaud.utils import regex_helper
 
 
 class NormalizeTests(unittest.TestCase):

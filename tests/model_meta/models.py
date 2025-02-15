@@ -1,7 +1,7 @@
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.utils.translation import gettext_lazy as _
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class Relation(models.Model):

@@ -1,23 +1,23 @@
 import math
 from decimal import Decimal
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db import IntegrityError, connection, migrations, models, transaction
-from django.db.migrations.migration import Migration
-from django.db.migrations.operations.base import Operation
-from django.db.migrations.operations.fields import FieldOperation
-from django.db.migrations.state import ModelState, ProjectState
-from django.db.models import F
-from django.db.models.expressions import Value
-from django.db.models.functions import Abs, Concat, Pi
-from django.db.transaction import atomic
-from django.test import (
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.db import IntegrityError, connection, migrations, models, transaction
+from thibaud.db.migrations.migration import Migration
+from thibaud.db.migrations.operations.base import Operation
+from thibaud.db.migrations.operations.fields import FieldOperation
+from thibaud.db.migrations.state import ModelState, ProjectState
+from thibaud.db.models import F
+from thibaud.db.models.expressions import Value
+from thibaud.db.models.functions import Abs, Concat, Pi
+from thibaud.db.transaction import atomic
+from thibaud.test import (
     SimpleTestCase,
     override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext
+from thibaud.test.utils import CaptureQueriesContext
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import OperationTestBase
@@ -142,7 +142,7 @@ class OperationTests(OperationTestBase):
                 ),
             )
         message = (
-            "Found duplicate value <class 'django.db.models.base.Model'> in "
+            "Found duplicate value <class 'thibaud.db.models.base.Model'> in "
             "CreateModel bases argument."
         )
         with self.assertRaisesMessage(ValueError, message):
@@ -5430,14 +5430,14 @@ class OperationTests(OperationTestBase):
             "INSERT INTO i_love_ponies (id, special_thing) "
             "VALUES (1, 'i love ponies'); -- this is magic!\n"
             "INSERT INTO i_love_ponies (id, special_thing) "
-            "VALUES (2, 'i love django');\n"
+            "VALUES (2, 'i love thibaud');\n"
             "UPDATE i_love_ponies SET special_thing = 'Ponies' "
             "WHERE special_thing LIKE '%%ponies';"
-            "UPDATE i_love_ponies SET special_thing = 'Django' "
-            "WHERE special_thing LIKE '%django';",
+            "UPDATE i_love_ponies SET special_thing = 'Thibaud' "
+            "WHERE special_thing LIKE '%thibaud';",
             # Run delete queries to test for parameter substitution failure
             # reported in #23426
-            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%Django%';"
+            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%Thibaud%';"
             "DELETE FROM i_love_ponies WHERE special_thing LIKE '%%Ponies%%';"
             "DROP TABLE i_love_ponies",
             state_operations=[
@@ -5473,7 +5473,7 @@ class OperationTests(OperationTestBase):
             cursor.execute("SELECT COUNT(*) FROM i_love_ponies")
             self.assertEqual(cursor.fetchall()[0][0], 2)
             cursor.execute(
-                "SELECT COUNT(*) FROM i_love_ponies WHERE special_thing = 'Django'"
+                "SELECT COUNT(*) FROM i_love_ponies WHERE special_thing = 'Thibaud'"
             )
             self.assertEqual(cursor.fetchall()[0][0], 1)
             cursor.execute(
@@ -5512,7 +5512,7 @@ class OperationTests(OperationTestBase):
         param_operation = migrations.RunSQL(
             # forwards
             (
-                "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'Django');",
+                "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'Thibaud');",
                 [
                     "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, %s);",
                     ["Ponies"],
@@ -5527,7 +5527,7 @@ class OperationTests(OperationTestBase):
             ),
             # backwards
             [
-                "DELETE FROM i_love_ponies WHERE special_thing = 'Django';",
+                "DELETE FROM i_love_ponies WHERE special_thing = 'Thibaud';",
                 ["DELETE FROM i_love_ponies WHERE special_thing = 'Ponies';", None],
                 (
                     "DELETE FROM i_love_ponies WHERE id = %s OR special_thing = %s;",
@@ -6038,8 +6038,8 @@ class OperationTests(OperationTestBase):
             Article = models.get_model("test_article", "Article")
             Blog = models.get_model("test_blog", "Blog")
             blog2 = Blog.objects.create(name="Frameworks", id=target_value)
-            Article.objects.create(name="Django", blog=blog2)
-            Article.objects.create(id=target_value, name="Django2", blog=blog2)
+            Article.objects.create(name="Thibaud", blog=blog2)
+            Article.objects.create(id=target_value, name="Thibaud2", blog=blog2)
 
         create_blog = migrations.CreateModel(
             "Blog",

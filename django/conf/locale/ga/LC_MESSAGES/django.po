@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Aindriú Mac Giolla Eoin, 2024
@@ -12,12 +12,12 @@
 # Séamus Ó Cúile <seamus.ocuile@oegaillimh.ie>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-10-07 06:49+0000\n"
 "Last-Translator: Aindriú Mac Giolla Eoin, 2024\n"
-"Language-Team: Irish (http://app.transifex.com/django/django/language/ga/)\n"
+"Language-Team: Irish (http://app.transifex.com/thibaud/thibaud/language/ga/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1388,27 +1388,27 @@ msgstr "D'éirigh leis an suiteáil! Comhghairdeachas!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Féach ar <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">nótaí scaoilte</a> le haghaidh Django "
+"Féach ar <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">nótaí scaoilte</a> le haghaidh Thibaud "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
 "Tá an leathanach seo á fheiceáil agat toisc go bhfuil <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> i do chomhad socruithe agus nach bhfuil aon "
 "URL cumraithe agat."
 
-msgid "Django Documentation"
-msgstr "Doiciméadú Django"
+msgid "Thibaud Documentation"
+msgstr "Doiciméadú Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Ábhair, tagairtí, &amp; conas atá"
@@ -1416,11 +1416,11 @@ msgstr "Ábhair, tagairtí, &amp; conas atá"
 msgid "Tutorial: A Polling App"
 msgstr "Teagaisc: A Vótaíocht Aip"
 
-msgid "Get started with Django"
-msgstr "Tosaigh le Django"
+msgid "Get started with Thibaud"
+msgstr "Tosaigh le Thibaud"
 
-msgid "Django Community"
-msgstr "Pobal Django"
+msgid "Thibaud Community"
+msgstr "Pobal Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Ceangail, faigh cúnamh, nó ranníoc"

@@ -2,15 +2,15 @@
 Sending email
 =============
 
-.. module:: django.core.mail
+.. module:: thibaud.core.mail
    :synopsis: Helpers to easily send email.
 
 Although Python provides a mail sending interface via the :mod:`smtplib`
-module, Django provides a couple of light wrappers over it. These wrappers are
+module, Thibaud provides a couple of light wrappers over it. These wrappers are
 provided to make sending email extra quick, to help test email sending during
 development, and to provide support for platforms that can't use SMTP.
 
-The code lives in the ``django.core.mail`` module.
+The code lives in the ``thibaud.core.mail`` module.
 
 Quick examples
 ==============
@@ -18,7 +18,7 @@ Quick examples
 Use :func:`send_mail` for straightforward email sending. For example, to send a
 plain text message::
 
-    from django.core.mail import send_mail
+    from thibaud.core.mail import send_mail
 
     send_mail(
         "Subject here",
@@ -33,8 +33,8 @@ When additional email sending functionality is needed, use
 a multipart email that includes both HTML and plain text versions with a
 specific template and custom headers, you can use the following approach::
 
-    from django.core.mail import EmailMultiAlternatives
-    from django.template.loader import render_to_string
+    from thibaud.core.mail import EmailMultiAlternatives
+    from thibaud.template.loader import render_to_string
 
     # First, render the plain text content.
     text_content = render_to_string(
@@ -70,7 +70,7 @@ a secure connection is used.
 
 .. note::
 
-    The character set of email sent with ``django.core.mail`` will be set to
+    The character set of email sent with ``thibaud.core.mail`` will be set to
     the value of your :setting:`DEFAULT_CHARSET` setting.
 
 ``send_mail()``
@@ -78,14 +78,14 @@ a secure connection is used.
 
 .. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
-In most cases, you can send email using ``django.core.mail.send_mail()``.
+In most cases, you can send email using ``thibaud.core.mail.send_mail()``.
 
 The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
 are required.
 
 * ``subject``: A string.
 * ``message``: A string.
-* ``from_email``: A string. If ``None``, Django will use the value of the
+* ``from_email``: A string. If ``None``, Thibaud will use the value of the
   :setting:`DEFAULT_FROM_EMAIL` setting.
 * ``recipient_list``: A list of strings, each an email address. Each
   member of ``recipient_list`` will see the other recipients in the "To:"
@@ -95,10 +95,10 @@ are required.
   docs for a list of possible exceptions, all of which are subclasses of
   :exc:`~smtplib.SMTPException`.
 * ``auth_user``: The optional username to use to authenticate to the SMTP
-  server. If this isn't provided, Django will use the value of the
+  server. If this isn't provided, Thibaud will use the value of the
   :setting:`EMAIL_HOST_USER` setting.
 * ``auth_password``: The optional password to use to authenticate to the
-  SMTP server. If this isn't provided, Django will use the value of the
+  SMTP server. If this isn't provided, Thibaud will use the value of the
   :setting:`EMAIL_HOST_PASSWORD` setting.
 * ``connection``: The optional email backend to use to send the mail.
   If unspecified, an instance of the default backend will be used.
@@ -117,17 +117,17 @@ can be ``0`` or ``1`` since it can only send one message).
 
 .. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
-``django.core.mail.send_mass_mail()`` is intended to handle mass emailing.
+``thibaud.core.mail.send_mass_mail()`` is intended to handle mass emailing.
 
 ``datatuple`` is a tuple in which each element is in this format::
 
     (subject, message, from_email, recipient_list)
 
 ``fail_silently``, ``auth_user`` and ``auth_password`` have the same functions
-as in :meth:`~django.core.mail.send_mail()`.
+as in :meth:`~thibaud.core.mail.send_mail()`.
 
 Each separate element of ``datatuple`` results in a separate email message.
-As in :meth:`~django.core.mail.send_mail()`, recipients in the same
+As in :meth:`~thibaud.core.mail.send_mail()`, recipients in the same
 ``recipient_list`` will all see the other addresses in the email messages'
 "To:" field.
 
@@ -154,23 +154,23 @@ The return value will be the number of successfully delivered messages.
 ``send_mass_mail()`` vs. ``send_mail()``
 ----------------------------------------
 
-The main difference between :meth:`~django.core.mail.send_mass_mail()` and
-:meth:`~django.core.mail.send_mail()` is that
-:meth:`~django.core.mail.send_mail()` opens a connection to the mail server
-each time it's executed, while :meth:`~django.core.mail.send_mass_mail()` uses
+The main difference between :meth:`~thibaud.core.mail.send_mass_mail()` and
+:meth:`~thibaud.core.mail.send_mail()` is that
+:meth:`~thibaud.core.mail.send_mail()` opens a connection to the mail server
+each time it's executed, while :meth:`~thibaud.core.mail.send_mass_mail()` uses
 a single connection for all of its messages. This makes
-:meth:`~django.core.mail.send_mass_mail()` slightly more efficient.
+:meth:`~thibaud.core.mail.send_mass_mail()` slightly more efficient.
 
 ``mail_admins()``
 =================
 
 .. function:: mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
 
-``django.core.mail.mail_admins()`` is a shortcut for sending an email to the
+``thibaud.core.mail.mail_admins()`` is a shortcut for sending an email to the
 site admins, as defined in the :setting:`ADMINS` setting.
 
 ``mail_admins()`` prefixes the subject with the value of the
-:setting:`EMAIL_SUBJECT_PREFIX` setting, which is ``"[Django] "`` by default.
+:setting:`EMAIL_SUBJECT_PREFIX` setting, which is ``"[Thibaud] "`` by default.
 
 The "From:" header of the email will be the value of the
 :setting:`SERVER_EMAIL` setting.
@@ -187,7 +187,7 @@ If ``html_message`` is provided, the resulting email will be a
 
 .. function:: mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
 
-``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
+``thibaud.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an email to the site managers, as defined in the :setting:`MANAGERS`
 setting.
 
@@ -220,11 +220,11 @@ Preventing header injection
 email headers to control the "To:" and "From:" in email messages that your
 scripts generate.
 
-The Django email functions outlined above all protect against header injection
+The Thibaud email functions outlined above all protect against header injection
 by forbidding newlines in header values. If any ``subject``, ``from_email`` or
 ``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
-the email function (e.g. :meth:`~django.core.mail.send_mail()`) will raise
-``django.core.mail.BadHeaderError`` (a subclass of ``ValueError``) and, hence,
+the email function (e.g. :meth:`~thibaud.core.mail.send_mail()`) will raise
+``thibaud.core.mail.BadHeaderError`` (a subclass of ``ValueError``) and, hence,
 will not send the email. It's your responsibility to validate all data before
 passing it to the email functions.
 
@@ -235,8 +235,8 @@ Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
-    from django.core.mail import BadHeaderError, send_mail
-    from django.http import HttpResponse, HttpResponseRedirect
+    from thibaud.core.mail import BadHeaderError, send_mail
+    from thibaud.http import HttpResponse, HttpResponseRedirect
 
 
     def send_email(request):
@@ -261,29 +261,29 @@ from the request's POST data, sends that to admin@example.com and redirects to
 The ``EmailMessage`` class
 ==========================
 
-Django's :meth:`~django.core.mail.send_mail()` and
-:meth:`~django.core.mail.send_mass_mail()` functions are actually thin
-wrappers that make use of the :class:`~django.core.mail.EmailMessage` class.
+Thibaud's :meth:`~thibaud.core.mail.send_mail()` and
+:meth:`~thibaud.core.mail.send_mass_mail()` functions are actually thin
+wrappers that make use of the :class:`~thibaud.core.mail.EmailMessage` class.
 
-Not all features of the :class:`~django.core.mail.EmailMessage` class are
-available through the :meth:`~django.core.mail.send_mail()` and related
+Not all features of the :class:`~thibaud.core.mail.EmailMessage` class are
+available through the :meth:`~thibaud.core.mail.send_mail()` and related
 wrapper functions. If you wish to use advanced features, such as BCC'ed
 recipients, file attachments, or multi-part email, you'll need to create
-:class:`~django.core.mail.EmailMessage` instances directly.
+:class:`~thibaud.core.mail.EmailMessage` instances directly.
 
 .. note::
-    This is a design feature. :meth:`~django.core.mail.send_mail()` and
-    related functions were originally the only interface Django provided.
+    This is a design feature. :meth:`~thibaud.core.mail.send_mail()` and
+    related functions were originally the only interface Thibaud provided.
     However, the list of parameters they accepted was slowly growing over
     time. It made sense to move to a more object-oriented design for email
     messages and retain the original functions only for backwards
     compatibility.
 
-:class:`~django.core.mail.EmailMessage` is responsible for creating the email
+:class:`~thibaud.core.mail.EmailMessage` is responsible for creating the email
 message itself. The :ref:`email backend <topic-email-backends>` is then
 responsible for sending the email.
 
-For convenience, :class:`~django.core.mail.EmailMessage` provides a ``send()``
+For convenience, :class:`~thibaud.core.mail.EmailMessage` provides a ``send()``
 method for sending a single email. If you need to send multiple messages, the
 email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
@@ -293,7 +293,7 @@ email backend API :ref:`provides an alternative
 
 .. class:: EmailMessage
 
-The :class:`~django.core.mail.EmailMessage` class is initialized with the
+The :class:`~thibaud.core.mail.EmailMessage` class is initialized with the
 following parameters (in the given order, if positional arguments are used).
 All parameters are optional and can be set at any time prior to calling the
 ``send()`` method.
@@ -319,12 +319,12 @@ All parameters are optional and can be set at any time prior to calling the
 
 * ``attachments``: A list of attachments to put on the message. These can
   be instances of :class:`~email.mime.base.MIMEBase` or
-  :class:`~django.core.mail.EmailAttachment`, or a tuple with attributes
+  :class:`~thibaud.core.mail.EmailAttachment`, or a tuple with attributes
   ``(filename, content, mimetype)``.
 
   .. versionchanged:: 5.2
 
-    Support for :class:`~django.core.mail.EmailAttachment` items of
+    Support for :class:`~thibaud.core.mail.EmailAttachment` items of
     ``attachments`` were added.
 
 * ``headers``: A dictionary of extra headers to put on the message. The
@@ -340,7 +340,7 @@ All parameters are optional and can be set at any time prior to calling the
 
 For example::
 
-    from django.core.mail import EmailMessage
+    from thibaud.core.mail import EmailMessage
 
     email = EmailMessage(
         "Hello",
@@ -362,11 +362,11 @@ The class has the following methods:
   recipients will not raise an exception. It will return ``1`` if the message
   was sent successfully, otherwise ``0``.
 
-* ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
+* ``message()`` constructs a ``thibaud.core.mail.SafeMIMEText`` object (a
   subclass of Python's :class:`~email.mime.text.MIMEText` class) or a
-  ``django.core.mail.SafeMIMEMultipart`` object holding the message to be
+  ``thibaud.core.mail.SafeMIMEMultipart`` object holding the message to be
   sent. If you ever need to extend the
-  :class:`~django.core.mail.EmailMessage` class, you'll probably want to
+  :class:`~thibaud.core.mail.EmailMessage` class, you'll probably want to
   override this method to put the content you want into the MIME object.
 
 * ``recipients()`` returns a list of all the recipients of the message,
@@ -396,7 +396,7 @@ The class has the following methods:
        message.attach("design.png", img_data, "image/png")
 
     If you specify a ``mimetype`` of :mimetype:`message/rfc822`, it will also
-    accept :class:`django.core.mail.EmailMessage` and
+    accept :class:`thibaud.core.mail.EmailMessage` and
     :py:class:`email.message.Message`.
 
     For a ``mimetype`` starting with :mimetype:`text/`, content is expected to
@@ -441,8 +441,8 @@ Sending multiple content versions
 
 It can be useful to include multiple versions of the content in an email; the
 classic example is to send both text and HTML versions of a message. With
-Django's email library, you can do this using the
-:class:`~django.core.mail.EmailMultiAlternatives` class.
+Thibaud's email library, you can do this using the
+:class:`~thibaud.core.mail.EmailMultiAlternatives` class.
 
 .. class:: EmailMultiAlternatives
 
@@ -453,7 +453,7 @@ Django's email library, you can do this using the
 
     .. attribute:: alternatives
 
-        A list of :class:`~django.core.mail.EmailAlternative` named tuples. This
+        A list of :class:`~thibaud.core.mail.EmailAlternative` named tuples. This
         is particularly useful in tests::
 
             self.assertEqual(len(msg.alternatives), 1)
@@ -466,7 +466,7 @@ Django's email library, you can do this using the
         .. versionchanged:: 5.2
 
             In older versions, ``alternatives`` was a list of regular tuples,
-            as opposed to :class:`~django.core.mail.EmailAlternative` named
+            as opposed to :class:`~thibaud.core.mail.EmailAlternative` named
             tuples.
 
     .. method:: attach_alternative(content, mimetype)
@@ -475,7 +475,7 @@ Django's email library, you can do this using the
 
         For example, to send a text and HTML combination, you could write::
 
-            from django.core.mail import EmailMultiAlternatives
+            from thibaud.core.mail import EmailMultiAlternatives
 
             subject = "hello"
             from_email = "from@example.com"
@@ -521,12 +521,12 @@ Updating the default content type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, the MIME type of the ``body`` parameter in an
-:class:`~django.core.mail.EmailMessage` is ``"text/plain"``. It is good
+:class:`~thibaud.core.mail.EmailMessage` is ``"text/plain"``. It is good
 practice to leave this alone, because it guarantees that any recipient will be
 able to read the email, regardless of their mail client. However, if you are
 confident that your recipients can handle an alternative content type, you can
 use the ``content_subtype`` attribute on the
-:class:`~django.core.mail.EmailMessage` class to change the main content type.
+:class:`~thibaud.core.mail.EmailMessage` class to change the main content type.
 The major type will always be ``"text"``, but you can change the
 subtype. For example::
 
@@ -548,7 +548,7 @@ The email backend class has the following methods:
 * ``close()`` closes the current email-sending connection.
 
 * ``send_messages(email_messages)`` sends a list of
-  :class:`~django.core.mail.EmailMessage` objects. If the connection is
+  :class:`~thibaud.core.mail.EmailMessage` objects. If the connection is
   not open, this call will implicitly open the connection, and close the
   connection afterward. If the connection is already open, it will be
   left open after mail has been sent.
@@ -556,7 +556,7 @@ The email backend class has the following methods:
 It can also be used as a context manager, which will automatically call
 ``open()`` and ``close()`` as needed::
 
-    from django.core import mail
+    from thibaud.core import mail
 
     with mail.get_connection() as connection:
         mail.EmailMessage(
@@ -577,10 +577,10 @@ It can also be used as a context manager, which will automatically call
 Obtaining an instance of an email backend
 -----------------------------------------
 
-The :meth:`get_connection` function in ``django.core.mail`` returns an
+The :meth:`get_connection` function in ``thibaud.core.mail`` returns an
 instance of the email backend that you can use.
 
-.. currentmodule:: django.core.mail
+.. currentmodule:: thibaud.core.mail
 
 .. function:: get_connection(backend=None, fail_silently=False, *args, **kwargs)
 
@@ -595,7 +595,7 @@ will be silently ignored.
 All other arguments are passed directly to the constructor of the
 email backend.
 
-Django ships with several email sending backends. With the exception of the
+Thibaud ships with several email sending backends. With the exception of the
 SMTP backend (which is the default), these backends are only useful during
 testing and development. If you have special email sending requirements, you
 can :ref:`write your own email backend <topic-custom-email-backend>`.
@@ -622,10 +622,10 @@ SMTP backend
     * ``ssl_keyfile``: :setting:`EMAIL_SSL_KEYFILE`
     * ``ssl_certfile``: :setting:`EMAIL_SSL_CERTFILE`
 
-    The SMTP backend is the default configuration inherited by Django. If you
+    The SMTP backend is the default configuration inherited by Thibaud. If you
     want to specify it explicitly, put the following in your settings::
 
-        EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+        EMAIL_BACKEND = "thibaud.core.mail.backends.smtp.EmailBackend"
 
     If unspecified, the default ``timeout`` will be the one provided by
     :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
@@ -642,7 +642,7 @@ providing the ``stream`` keyword argument when constructing the connection.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    EMAIL_BACKEND = "thibaud.core.mail.backends.console.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -656,11 +656,11 @@ The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
 written is either taken from the :setting:`EMAIL_FILE_PATH` setting or from
 the ``file_path`` keyword when creating a connection with
-:meth:`~django.core.mail.get_connection`.
+:meth:`~thibaud.core.mail.get_connection`.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_BACKEND = "thibaud.core.mail.backends.filebased.EmailBackend"
     EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
 
 This backend is not intended for use in production -- it is provided as a
@@ -672,19 +672,19 @@ In-memory backend
 ~~~~~~~~~~~~~~~~~
 
 The ``'locmem'`` backend stores messages in a special attribute of the
-``django.core.mail`` module. The ``outbox`` attribute is created when the
+``thibaud.core.mail`` module. The ``outbox`` attribute is created when the
 first message is sent. It's a list with an
-:class:`~django.core.mail.EmailMessage` instance for each message that would
+:class:`~thibaud.core.mail.EmailMessage` instance for each message that would
 be sent.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+  EMAIL_BACKEND = "thibaud.core.mail.backends.locmem.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
 
-Django's test runner :ref:`automatically uses this backend for testing
+Thibaud's test runner :ref:`automatically uses this backend for testing
 <topics-testing-email>`.
 
 .. _topic-email-dummy-backend:
@@ -695,7 +695,7 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
+   EMAIL_BACKEND = "thibaud.core.mail.backends.dummy.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -710,9 +710,9 @@ backend. The :setting:`EMAIL_BACKEND` setting in your settings file is then
 the Python import path for your backend class.
 
 Custom email backends should subclass ``BaseEmailBackend`` that is located in
-the ``django.core.mail.backends.base`` module. A custom email backend must
+the ``thibaud.core.mail.backends.base`` module. A custom email backend must
 implement the ``send_messages(email_messages)`` method. This method receives a
-list of :class:`~django.core.mail.EmailMessage` instances and returns the
+list of :class:`~thibaud.core.mail.EmailMessage` instances and returns the
 number of successfully delivered messages. If your backend has any concept of
 a persistent session or connection, you should also implement the ``open()``
 and ``close()`` methods. Refer to ``smtp.EmailBackend`` for a reference
@@ -736,11 +736,11 @@ using that single connection. As a consequence, any :class:`connection
 <EmailMessage>` set on an individual message is ignored.
 
 For example, if you have a function called ``get_notification_email()`` that
-returns a list of :class:`~django.core.mail.EmailMessage` objects representing
+returns a list of :class:`~thibaud.core.mail.EmailMessage` objects representing
 some periodic email you wish to send out, you could send these emails using
 a single call to send_messages::
 
-    from django.core import mail
+    from thibaud.core import mail
 
     connection = mail.get_connection()  # Use default email connection
     messages = get_notification_email()
@@ -754,7 +754,7 @@ email backend to manually control the connection. ``send_messages()`` will not
 manually open or close the connection if it is already open, so if you
 manually open the connection, you can control when it is closed. For example::
 
-    from django.core import mail
+    from thibaud.core import mail
 
     connection = mail.get_connection()
 
@@ -795,7 +795,7 @@ manually open the connection, you can control when it is closed. For example::
 Configuring email for development
 =================================
 
-There are times when you do not want Django to send emails at
+There are times when you do not want Thibaud to send emails at
 all. For example, while developing a website, you probably don't want
 to send out thousands of emails -- but you may want to validate that
 emails will be sent to the right people under the right conditions,

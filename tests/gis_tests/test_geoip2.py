@@ -3,15 +3,15 @@ import itertools
 import pathlib
 from unittest import mock, skipUnless
 
-from django.conf import settings
-from django.contrib.gis.geoip2 import HAS_GEOIP2
-from django.contrib.gis.geos import GEOSGeometry
-from django.test import SimpleTestCase, override_settings
+from thibaud.conf import settings
+from thibaud.contrib.gis.geoip2 import HAS_GEOIP2
+from thibaud.contrib.gis.geos import GEOSGeometry
+from thibaud.test import SimpleTestCase, override_settings
 
 if HAS_GEOIP2:
     import geoip2
 
-    from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
+    from thibaud.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 
 
 def build_geoip_path(*parts):

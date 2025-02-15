@@ -1,8 +1,8 @@
 import inspect
 from collections import Counter
 
-from django.conf import settings
-from django.core.exceptions import ViewDoesNotExist
+from thibaud.conf import settings
+from thibaud.core.exceptions import ViewDoesNotExist
 
 from . import Error, Tags, Warning, register
 
@@ -10,7 +10,7 @@ from . import Error, Tags, Warning, register
 @register(Tags.urls)
 def check_url_config(app_configs, **kwargs):
     if getattr(settings, "ROOT_URLCONF", None):
-        from django.urls import get_resolver
+        from thibaud.urls import get_resolver
 
         resolver = get_resolver()
         return check_resolver(resolver)
@@ -38,7 +38,7 @@ def check_url_namespaces_unique(app_configs, **kwargs):
     if not getattr(settings, "ROOT_URLCONF", None):
         return []
 
-    from django.urls import get_resolver
+    from thibaud.urls import get_resolver
 
     resolver = get_resolver()
     all_namespaces = _load_all_namespaces(resolver)
@@ -124,7 +124,7 @@ def check_custom_error_handlers(app_configs, **kwargs):
     if not getattr(settings, "ROOT_URLCONF", None):
         return []
 
-    from django.urls import get_resolver
+    from thibaud.urls import get_resolver
 
     resolver = get_resolver()
 

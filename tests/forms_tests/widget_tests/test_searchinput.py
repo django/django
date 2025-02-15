@@ -1,4 +1,4 @@
-from django.forms import SearchInput
+from thibaud.forms import SearchInput
 
 from .base import WidgetTest
 

@@ -1,6 +1,6 @@
-from django.contrib.sites.managers import CurrentSiteManager
-from django.contrib.sites.models import Site
-from django.db import models
+from thibaud.contrib.sites.managers import CurrentSiteManager
+from thibaud.contrib.sites.models import Site
+from thibaud.db import models
 
 
 class AbstractArticle(models.Model):

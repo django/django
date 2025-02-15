@@ -1,7 +1,7 @@
 """Database functions that do comparisons or type conversions."""
 
-from django.db.models.expressions import Func, Value
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.db.models.expressions import Func, Value
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 
 class Cast(Func):

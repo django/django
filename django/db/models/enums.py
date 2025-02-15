@@ -2,7 +2,7 @@ import enum
 from enum import EnumType, IntEnum, StrEnum
 from enum import property as enum_property
 
-from django.utils.functional import Promise
+from thibaud.utils.functional import Promise
 
 __all__ = ["Choices", "IntegerChoices", "TextChoices"]
 

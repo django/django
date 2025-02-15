@@ -1,10 +1,10 @@
-from django.http import HttpResponse
-from django.middleware.csrf import get_token, rotate_token
-from django.template import Context, RequestContext, Template
-from django.template.context_processors import csrf
-from django.utils.decorators import decorator_from_middleware
-from django.utils.deprecation import MiddlewareMixin
-from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from thibaud.http import HttpResponse
+from thibaud.middleware.csrf import get_token, rotate_token
+from thibaud.template import Context, RequestContext, Template
+from thibaud.template.context_processors import csrf
+from thibaud.utils.decorators import decorator_from_middleware
+from thibaud.utils.deprecation import MiddlewareMixin
+from thibaud.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 
 
 class TestingHttpResponse(HttpResponse):

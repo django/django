@@ -3,7 +3,7 @@
 
 QUnit.module('admin.inlines: tabular formsets', {
     beforeEach: function() {
-        const $ = django.jQuery;
+        const $ = thibaud.jQuery;
         const that = this;
         this.addText = 'Add another';
 
@@ -55,7 +55,7 @@ QUnit.test('add/remove form events', function(assert) {
 });
 
 QUnit.test('existing add button', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     $('#qunit-fixture').empty(); // Clear the table added in beforeEach
     $('#qunit-fixture').append($('#tabular-formset').text());
     this.table = $('table.inline');
@@ -75,7 +75,7 @@ QUnit.test('existing add button', function(assert) {
 
 QUnit.module('admin.inlines: tabular formsets with validation errors', {
     beforeEach: function() {
-        const $ = django.jQuery;
+        const $ = thibaud.jQuery;
 
         $('#qunit-fixture').append($('#tabular-formset-with-validation-error').text());
         this.table = $('table.inline');
@@ -110,7 +110,7 @@ QUnit.test('dynamic template has nothing', function(assert) {
 });
 
 QUnit.test('removing a form-row also removed related row with non-field errors', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     assert.ok(this.table.find('.row-form-errors').length);
     const tr = this.inlineRows.slice(1, 2);
     const trWithErrors = tr.prev();
@@ -122,7 +122,7 @@ QUnit.test('removing a form-row also removed related row with non-field errors',
 
 QUnit.module('admin.inlines: tabular formsets with max_num', {
     beforeEach: function() {
-        const $ = django.jQuery;
+        const $ = thibaud.jQuery;
         $('#qunit-fixture').append($('#tabular-formset-with-validation-error').text());
         this.table = $('table.inline');
         this.maxNum = $('input.id_second-MAX_NUM_FORMS');
@@ -140,7 +140,7 @@ QUnit.test('does not show the add button if already at max_num', function(assert
 });
 
 QUnit.test('make addButton visible again', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     const addButton = this.table.find('tr.add_row > td > a');
     const removeButton = this.table.find('tr.form-row:first').find('a.inline-deletelink');
     removeButton.trigger($.Event( "click", { target: removeButton } ));
@@ -150,7 +150,7 @@ QUnit.test('make addButton visible again', function(assert) {
 
 QUnit.module('admin.inlines: tabular formsets with min_num', {
     beforeEach: function() {
-        const $ = django.jQuery;
+        const $ = thibaud.jQuery;
         $('#qunit-fixture').append($('#tabular-formset-with-validation-error').text());
         this.table = $('table.inline');
         this.minNum = $('input#id_second-MIN_NUM_FORMS');
@@ -167,7 +167,7 @@ QUnit.test('does not show the remove buttons if already at min_num', function(as
 });
 
 QUnit.test('make removeButtons visible again', function(assert) {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     const addButton = this.table.find('tr.add-row > td > a');
     addButton.trigger($.Event( "click", { target: addButton } ));
     assert.equal(this.table.find('.inline-deletelink:visible').length, 2);

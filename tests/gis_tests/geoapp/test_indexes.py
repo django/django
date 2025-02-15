@@ -1,8 +1,8 @@
-from django.contrib.gis.db import models
-from django.db import connection
-from django.db.models import Index
-from django.test import TransactionTestCase
-from django.test.utils import isolate_apps
+from thibaud.contrib.gis.db import models
+from thibaud.db import connection
+from thibaud.db.models import Index
+from thibaud.test import TransactionTestCase
+from thibaud.test.utils import isolate_apps
 
 from .models import City
 
@@ -50,7 +50,7 @@ class SchemaIndexesTests(TransactionTestCase):
 
             class Meta:
                 app_label = "geoapp"
-                db_table = 'django_schema"."geoapp_schema_city'
+                db_table = 'thibaud_schema"."geoapp_schema_city'
 
         index = Index(fields=["point"])
         editor = connection.schema_editor()

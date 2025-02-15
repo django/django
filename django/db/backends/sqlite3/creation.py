@@ -5,8 +5,8 @@ import sqlite3
 import sys
 from pathlib import Path
 
-from django.db import NotSupportedError
-from django.db.backends.base.creation import BaseDatabaseCreation
+from thibaud.db import NotSupportedError
+from thibaud.db.backends.base.creation import BaseDatabaseCreation
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -130,7 +130,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def setup_worker_connection(self, _worker_id):
         settings_dict = self.get_test_db_clone_settings(_worker_id)
         # connection.settings_dict must be updated in place for changes to be
-        # reflected in django.db.connections. Otherwise new threads would
+        # reflected in thibaud.db.connections. Otherwise new threads would
         # connect to the default database instead of the appropriate clone.
         start_method = multiprocessing.get_start_method()
         if start_method == "fork":

@@ -3,9 +3,9 @@ from test_sqlite import *  # NOQA
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "thibaud.db.backends.postgresql",
         "USER": "user",
-        "NAME": "django",
+        "NAME": "thibaud",
         "PASSWORD": "postgres",
         "HOST": "localhost",
         "PORT": 5432,
@@ -14,9 +14,9 @@ DATABASES = {
         },
     },
     "other": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "thibaud.db.backends.postgresql",
         "USER": "user",
-        "NAME": "django2",
+        "NAME": "thibaud2",
         "PASSWORD": "postgres",
         "HOST": "localhost",
         "PORT": 5432,

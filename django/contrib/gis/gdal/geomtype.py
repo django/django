@@ -1,4 +1,4 @@
-from django.contrib.gis.gdal.error import GDALException
+from thibaud.contrib.gis.gdal.error import GDALException
 
 
 class OGRGeomType:
@@ -126,8 +126,8 @@ class OGRGeomType:
         return self._types[self.num]
 
     @property
-    def django(self):
-        "Return the Django GeometryField for this OGR Type."
+    def thibaud(self):
+        "Return the Thibaud GeometryField for this OGR Type."
         s = self.name.replace("25D", "")
         if s in ("LinearRing", "None"):
             return None

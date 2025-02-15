@@ -1,11 +1,11 @@
 from pathlib import Path
 from unittest import mock
 
-from django.conf import DEFAULT_STORAGE_ALIAS, STATICFILES_STORAGE_ALIAS, settings
-from django.contrib.staticfiles.checks import E005, check_finders, check_storages
-from django.contrib.staticfiles.finders import BaseFinder, get_finder
-from django.core.checks import Error, Warning
-from django.test import SimpleTestCase, override_settings
+from thibaud.conf import DEFAULT_STORAGE_ALIAS, STATICFILES_STORAGE_ALIAS, settings
+from thibaud.contrib.staticfiles.checks import E005, check_finders, check_storages
+from thibaud.contrib.staticfiles.finders import BaseFinder, get_finder
+from thibaud.core.checks import Error, Warning
+from thibaud.test import SimpleTestCase, override_settings
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -47,7 +47,7 @@ class FindersCheckTests(CollectionTestCase):
 
             return [Finder1(), Finder2(), Finder3(), Finder4()]
 
-        with mock.patch("django.contrib.staticfiles.checks.get_finders", get_finders):
+        with mock.patch("thibaud.contrib.staticfiles.checks.get_finders", get_finders):
             errors = check_finders(None)
             self.assertEqual(errors, [error1, error2, error3])
 
@@ -130,7 +130,7 @@ class FindersCheckTests(CollectionTestCase):
                 ],
             )
             # Nonexistent directories are skipped.
-            finder = get_finder("django.contrib.staticfiles.finders.FileSystemFinder")
+            finder = get_finder("thibaud.contrib.staticfiles.finders.FileSystemFinder")
             self.assertEqual(list(finder.list(None)), [])
 
 
@@ -143,7 +143,7 @@ class StoragesCheckTests(SimpleTestCase):
     @override_settings(
         STORAGES={
             DEFAULT_STORAGE_ALIAS: {
-                "BACKEND": "django.core.files.storage.FileSystemStorage",
+                "BACKEND": "thibaud.core.files.storage.FileSystemStorage",
             },
             "example": {
                 "BACKEND": "ignore.me",
@@ -157,7 +157,7 @@ class StoragesCheckTests(SimpleTestCase):
     @override_settings(
         STORAGES={
             STATICFILES_STORAGE_ALIAS: {
-                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+                "BACKEND": "thibaud.contrib.staticfiles.storage.StaticFilesStorage",
             },
         }
     )

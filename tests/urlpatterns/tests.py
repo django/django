@@ -1,10 +1,10 @@
 import string
 import uuid
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
-from django.urls import (
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
+from thibaud.urls import (
     NoReverseMatch,
     Resolver404,
     path,
@@ -13,8 +13,8 @@ from django.urls import (
     resolve,
     reverse,
 )
-from django.urls.converters import REGISTERED_CONVERTERS, IntConverter
-from django.views import View
+from thibaud.urls.converters import REGISTERED_CONVERTERS, IntConverter
+from thibaud.views import View
 
 from .converters import Base64Converter, DynamicConverter
 from .views import empty_view

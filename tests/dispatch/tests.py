@@ -1,9 +1,9 @@
 import weakref
 from types import TracebackType
 
-from django.dispatch import Signal, receiver
-from django.test import SimpleTestCase
-from django.test.utils import garbage_collect, override_settings
+from thibaud.dispatch import Signal, receiver
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import garbage_collect, override_settings
 
 
 def receiver_1_arg(val, **kwargs):
@@ -157,7 +157,7 @@ class DispatcherTests(SimpleTestCase):
 
         a_signal.connect(fails)
         try:
-            with self.assertLogs("django.dispatch", "ERROR") as cm:
+            with self.assertLogs("thibaud.dispatch", "ERROR") as cm:
                 result = a_signal.send_robust(sender=self, val="test")
             err = result[0][1]
             self.assertIsInstance(err, ValueError)

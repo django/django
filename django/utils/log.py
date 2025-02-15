@@ -2,15 +2,15 @@ import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
 from copy import copy
 
-from django.conf import settings
-from django.core import mail
-from django.core.mail import get_connection
-from django.core.management.color import color_style
-from django.utils.module_loading import import_string
+from thibaud.conf import settings
+from thibaud.core import mail
+from thibaud.core.mail import get_connection
+from thibaud.core.management.color import color_style
+from thibaud.utils.module_loading import import_string
 
-request_logger = logging.getLogger("django.request")
+request_logger = logging.getLogger("thibaud.request")
 
-# Default logging for Django. This sends an email to the site admins on every
+# Default logging for Thibaud. This sends an email to the site admins on every
 # HTTP 500 error. Depending on DEBUG, all other log records are either sent to
 # the console (DEBUG=True) or discarded (DEBUG=False) by means of the
 # require_debug_true filter. This configuration is quoted in
@@ -20,15 +20,15 @@ DEFAULT_LOGGING = {
     "disable_existing_loggers": False,
     "filters": {
         "require_debug_false": {
-            "()": "django.utils.log.RequireDebugFalse",
+            "()": "thibaud.utils.log.RequireDebugFalse",
         },
         "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
+            "()": "thibaud.utils.log.RequireDebugTrue",
         },
     },
     "formatters": {
-        "django.server": {
-            "()": "django.utils.log.ServerFormatter",
+        "thibaud.server": {
+            "()": "thibaud.utils.log.ServerFormatter",
             "format": "[{server_time}] {message}",
             "style": "{",
         }
@@ -39,24 +39,24 @@ DEFAULT_LOGGING = {
             "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
         },
-        "django.server": {
+        "thibaud.server": {
             "level": "INFO",
             "class": "logging.StreamHandler",
-            "formatter": "django.server",
+            "formatter": "thibaud.server",
         },
         "mail_admins": {
             "level": "ERROR",
             "filters": ["require_debug_false"],
-            "class": "django.utils.log.AdminEmailHandler",
+            "class": "thibaud.utils.log.AdminEmailHandler",
         },
     },
     "loggers": {
-        "django": {
+        "thibaud": {
             "handlers": ["console", "mail_admins"],
             "level": "INFO",
         },
-        "django.server": {
-            "handlers": ["django.server"],
+        "thibaud.server": {
+            "handlers": ["thibaud.server"],
             "level": "INFO",
             "propagate": False,
         },

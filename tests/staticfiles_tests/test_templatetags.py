@@ -1,5 +1,5 @@
-from django.conf import STATICFILES_STORAGE_ALIAS
-from django.test import override_settings
+from thibaud.conf import STATICFILES_STORAGE_ALIAS
+from thibaud.test import override_settings
 
 from .cases import StaticFilesTestCase
 

@@ -2,9 +2,9 @@ import unittest
 from contextlib import contextmanager
 from unittest import mock
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import NotSupportedError, connection
-from django.test import TestCase, override_settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import NotSupportedError, connection
+from thibaud.test import TestCase, override_settings
 
 
 @contextmanager

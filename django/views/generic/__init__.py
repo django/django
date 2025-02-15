@@ -1,5 +1,5 @@
-from django.views.generic.base import RedirectView, TemplateView, View
-from django.views.generic.dates import (
+from thibaud.views.generic.base import RedirectView, TemplateView, View
+from thibaud.views.generic.dates import (
     ArchiveIndexView,
     DateDetailView,
     DayArchiveView,
@@ -8,9 +8,9 @@ from django.views.generic.dates import (
     WeekArchiveView,
     YearArchiveView,
 )
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
-from django.views.generic.list import ListView
+from thibaud.views.generic.detail import DetailView
+from thibaud.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from thibaud.views.generic.list import ListView
 
 __all__ = [
     "View",

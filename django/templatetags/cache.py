@@ -1,6 +1,6 @@
-from django.core.cache import InvalidCacheBackendError, caches
-from django.core.cache.utils import make_template_fragment_key
-from django.template import Library, Node, TemplateSyntaxError, VariableDoesNotExist
+from thibaud.core.cache import InvalidCacheBackendError, caches
+from thibaud.core.cache.utils import make_template_fragment_key
+from thibaud.template import Library, Node, TemplateSyntaxError, VariableDoesNotExist
 
 register = Library()
 

@@ -1,5 +1,5 @@
-import django.contrib.postgres.fields
-from django.db import migrations, models
+import thibaud.contrib.postgres.fields
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -20,14 +20,14 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "char",
-                    django.contrib.postgres.fields.ArrayField(
+                    thibaud.contrib.postgres.fields.ArrayField(
                         models.CharField(max_length=10), db_index=True, size=100
                     ),
                 ),
                 ("char2", models.CharField(max_length=11, db_index=True)),
                 (
                     "text",
-                    django.contrib.postgres.fields.ArrayField(
+                    thibaud.contrib.postgres.fields.ArrayField(
                         models.TextField(), db_index=True
                     ),
                 ),

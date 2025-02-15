@@ -1,8 +1,8 @@
-from django.apps import AppConfig
-from django.utils.translation import gettext_lazy as _
+from thibaud.apps import AppConfig
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class SiteMapsConfig(AppConfig):
-    default_auto_field = "django.db.models.AutoField"
-    name = "django.contrib.sitemaps"
+    default_auto_field = "thibaud.db.models.AutoField"
+    name = "thibaud.contrib.sitemaps"
     verbose_name = _("Site Maps")

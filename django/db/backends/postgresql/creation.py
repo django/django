@@ -1,9 +1,9 @@
 import sys
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.base.creation import BaseDatabaseCreation
-from django.db.backends.postgresql.psycopg_any import errors
-from django.db.backends.utils import strip_quotes
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db.backends.base.creation import BaseDatabaseCreation
+from thibaud.db.backends.postgresql.psycopg_any import errors
+from thibaud.db.backends.utils import strip_quotes
 
 
 class DatabaseCreation(BaseDatabaseCreation):

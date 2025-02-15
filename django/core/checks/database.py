@@ -1,4 +1,4 @@
-from django.db import connections
+from thibaud.db import connections
 
 from . import Tags, register
 

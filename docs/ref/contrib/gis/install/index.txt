@@ -1,12 +1,12 @@
 ======================
-GeoDjango Installation
+GeoThibaud Installation
 ======================
 
 Overview
 ========
-In general, GeoDjango installation requires:
+In general, GeoThibaud installation requires:
 
-#. :ref:`Python and Django <django>`
+#. :ref:`Python and Thibaud <thibaud>`
 #. :ref:`spatial_database`
 #. :doc:`geolibs`
 
@@ -19,7 +19,7 @@ instructions are available for:
 
 .. admonition:: Use the Source
 
-    Because GeoDjango takes advantage of the latest in the open source geospatial
+    Because GeoThibaud takes advantage of the latest in the open source geospatial
     software technology, recent versions of the libraries are necessary.
     If binary packages aren't available for your platform, installation from
     source may be required. When compiling the libraries from source, please
@@ -28,12 +28,12 @@ instructions are available for:
 Requirements
 ============
 
-.. _django:
+.. _thibaud:
 
-Python and Django
+Python and Thibaud
 -----------------
 
-Because GeoDjango is included with Django, please refer to Django's
+Because GeoThibaud is included with Thibaud, please refer to Thibaud's
 :ref:`installation instructions <installing-official-release>` for details on
 how to install.
 
@@ -49,7 +49,7 @@ spatial databases currently supported.
     PostGIS is recommended, because it is the most mature and feature-rich
     open source spatial database.
 
-The geospatial libraries required for a GeoDjango installation depends
+The geospatial libraries required for a GeoThibaud installation depends
 on the spatial database used.  The following lists the library requirements,
 supported versions, and any notes for each of the supported database backends:
 
@@ -93,11 +93,11 @@ Database installation
 Set the :setting:`ENGINE <DATABASE-ENGINE>` setting to one of the :ref:`spatial
 backends <spatial-backends>`.
 
-Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
+Add ``thibaud.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------
 
-Like other Django contrib applications, you will *only* need to add
-:mod:`django.contrib.gis` to :setting:`INSTALLED_APPS` in your settings.
+Like other Thibaud contrib applications, you will *only* need to add
+:mod:`thibaud.contrib.gis` to :setting:`INSTALLED_APPS` in your settings.
 This is so that the ``gis`` templates can be located -- if not done, then
 features such as the geographic admin or KML sitemaps will not function properly.
 
@@ -107,20 +107,20 @@ Troubleshooting
 If you can't find the solution to your problem here then participate in the
 community!  You can:
 
-* Ask your question on the `GeoDjango`__ forum.
-* File a ticket on the `Django trac`__ if you think there's a bug.  Make
+* Ask your question on the `GeoThibaud`__ forum.
+* File a ticket on the `Thibaud trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ https://forum.djangoproject.com/c/internals/geodjango/13
-__ https://code.djangoproject.com/newticket
+__ https://forum.thibaudproject.com/c/internals/geothibaud/13
+__ https://code.thibaudproject.com/newticket
 
 .. _libsettings:
 
 Library environment settings
 ----------------------------
 
-By far, the most common problem when installing GeoDjango is that the
+By far, the most common problem when installing GeoThibaud is that the
 external shared libraries (e.g., for GEOS and GDAL) cannot be located. [#]_
 Typically, the cause of this problem is that the operating system isn't aware
 of the directory where the libraries built from source were installed.
@@ -169,7 +169,7 @@ modifying the system library path:
 Install ``binutils``
 ~~~~~~~~~~~~~~~~~~~~
 
-GeoDjango uses the ``find_library`` function (from the ``ctypes.util`` Python
+GeoThibaud uses the ``find_library`` function (from the ``ctypes.util`` Python
 module) to discover libraries.  The ``find_library`` routine uses a program
 called ``objdump`` (part of the ``binutils`` package) to verify a shared
 library on GNU/Linux systems.  Thus, if ``binutils`` is not installed on your
@@ -198,7 +198,7 @@ macOS
 -----
 
 Because of the variety of packaging systems available for macOS, users have
-several different options for installing GeoDjango. These options are:
+several different options for installing GeoThibaud. These options are:
 
 * :ref:`postgresapp` (easiest and recommended)
 * :ref:`homebrew`
@@ -258,7 +258,7 @@ Homebrew
 ~~~~~~~~
 
 `Homebrew`__ provides "recipes" for building binaries and packages from source.
-It provides recipes for the GeoDjango prerequisites on Macintosh computers
+It provides recipes for the GeoThibaud prerequisites on Macintosh computers
 running macOS. Because Homebrew still builds the software from source, `Xcode`_
 is required.
 
@@ -279,20 +279,20 @@ __ https://brew.sh/
 Fink
 ^^^^
 
-`Kurt Schwehr`__ has been gracious enough to create GeoDjango packages for users
+`Kurt Schwehr`__ has been gracious enough to create GeoThibaud packages for users
 of the `Fink`__ package system. `Different packages are available`__ (starting
-with ``django-gis``), depending on which version of Python you want to use.
+with ``thibaud-gis``), depending on which version of Python you want to use.
 
 __ https://schwehr.blogspot.com/
 __ https://www.finkproject.org/
-__ https://pdb.finkproject.org/pdb/browse.php?summary=django-gis
+__ https://pdb.finkproject.org/pdb/browse.php?summary=thibaud-gis
 
 .. _macports:
 
 MacPorts
 ~~~~~~~~
 
-`MacPorts`__ may be used to install GeoDjango prerequisites on computers
+`MacPorts`__ may be used to install GeoThibaud prerequisites on computers
 running macOS.  Because MacPorts still builds the software from source,
 `Xcode`_ is required.
 
@@ -331,7 +331,7 @@ Windows
 -------
 
 Proceed through the following sections sequentially in order to install
-GeoDjango on Windows. In this tutorial we will install 64 bit versions of each
+GeoThibaud on Windows. In this tutorial we will install 64 bit versions of each
 application.
 
 Python
@@ -391,10 +391,10 @@ OSGeo4W
 ~~~~~~~
 
 The `OSGeo4W installer`_ helps to install the PROJ, GDAL, and GEOS libraries
-required by GeoDjango. First, download the `OSGeo4W installer`_, and
+required by GeoThibaud. First, download the `OSGeo4W installer`_, and
 run it. Select :menuselection:`Express Web-GIS Install` and click next.  In the
 'Select Packages' list, ensure that GDAL is selected. If any other packages are
-enabled by default, they are not required by GeoDjango and may be unchecked
+enabled by default, they are not required by GeoThibaud and may be unchecked
 safely. After clicking next and accepting the license agreements, the packages
 will be automatically downloaded and installed, after which you may exit the
 installer.
@@ -404,7 +404,7 @@ installer.
 Modify Windows environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to use GeoDjango, you will need to add your OSGeo4W
+In order to use GeoThibaud, you will need to add your OSGeo4W
 directories to your Windows system ``Path``, as well as create ``GDAL_DATA``
 and ``PROJ_LIB`` environment variables.  The following set of commands,
 executable with ``cmd.exe``, will set this up. Restart your device
@@ -432,10 +432,10 @@ once this is complete for new environment variables to be recognized:
     If you customized the OSGeo4W installation directories, then you will need
     to modify the ``OSGEO4W_ROOT`` variables accordingly.
 
-Install Django and set up database
+Install Thibaud and set up database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:ref:`Install Django <installing-official-release>` on your system. It is
+:ref:`Install Thibaud <installing-official-release>` on your system. It is
 recommended that you create a :doc:`virtual environment
 <python:tutorial/venv>` for each project you create.
 
@@ -451,5 +451,5 @@ virtual environment:
     ...\> py -m pip install psycopg
 
 .. rubric:: Footnotes
-.. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from
+.. [#] GeoThibaud uses the :func:`~ctypes.util.find_library` routine from
        ``ctypes.util`` to locate shared libraries.

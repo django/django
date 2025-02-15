@@ -2,11 +2,11 @@ import re
 from io import StringIO
 from unittest import mock, skipUnless
 
-from django.core.management import call_command
-from django.core.management.commands import inspectdb
-from django.db import connection
-from django.db.backends.base.introspection import TableInfo
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from thibaud.core.management import call_command
+from thibaud.core.management.commands import inspectdb
+from thibaud.db import connection
+from thibaud.db.backends.base.introspection import TableInfo
+from thibaud.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import PeopleMoreData, test_collation
 
@@ -39,10 +39,10 @@ class InspectDBTestCase(TestCase):
             "inspectdb has examined a table that should have been filtered out."
         )
         # contrib.contenttypes is one of the apps always installed when running
-        # the Django test suite, check that one of its tables hasn't been
+        # the Thibaud test suite, check that one of its tables hasn't been
         # inspected
         self.assertNotIn(
-            "class DjangoContentType(models.Model):", out.getvalue(), msg=error_message
+            "class ThibaudContentType(models.Model):", out.getvalue(), msg=error_message
         )
 
     def test_table_option(self):
@@ -72,7 +72,7 @@ class InspectDBTestCase(TestCase):
         return assertFieldType
 
     def test_field_types(self):
-        """Test introspection of various Django field types"""
+        """Test introspection of various Thibaud field types"""
         assertFieldType = self.make_field_type_asserter()
         introspected_field_types = connection.features.introspected_field_types
         char_field_type = introspected_field_types["CharField"]
@@ -192,7 +192,7 @@ class InspectDBTestCase(TestCase):
         self.assertIn("char_field = models.CharField()", output)
 
     def test_number_field_types(self):
-        """Test introspection of various Django field types"""
+        """Test introspection of various Thibaud field types"""
         assertFieldType = self.make_field_type_asserter()
         introspected_field_types = connection.features.introspected_field_types
 
@@ -449,7 +449,7 @@ class InspectDBTestCase(TestCase):
         """
         out = StringIO()
         with mock.patch(
-            "django.db.connection.introspection.data_types_reverse."
+            "thibaud.db.connection.introspection.data_types_reverse."
             "base_data_types_reverse",
             {
                 "text": "myfields.TextField",
@@ -468,7 +468,7 @@ class InspectDBTestCase(TestCase):
         """
         out = StringIO()
         with mock.patch(
-            "django.db.connection.introspection.get_table_list",
+            "thibaud.db.connection.introspection.get_table_list",
             return_value=[TableInfo(name="nonexistent", type="t")],
         ):
             call_command("inspectdb", stdout=out)

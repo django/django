@@ -1,7 +1,7 @@
-from django.template.defaultfilters import striptags
-from django.test import SimpleTestCase
-from django.utils.functional import lazystr
-from django.utils.safestring import mark_safe
+from thibaud.template.defaultfilters import striptags
+from thibaud.test import SimpleTestCase
+from thibaud.utils.functional import lazystr
+from thibaud.utils.safestring import mark_safe
 
 from ..utils import setup
 

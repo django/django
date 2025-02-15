@@ -1,5 +1,5 @@
-from django.contrib.gis.db import models
-from django.db import connection, migrations
+from thibaud.contrib.gis.db import models
+from thibaud.db import connection, migrations
 
 ops = [
     migrations.CreateModel(

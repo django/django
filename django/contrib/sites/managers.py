@@ -1,7 +1,7 @@
-from django.conf import settings
-from django.core import checks
-from django.core.exceptions import FieldDoesNotExist
-from django.db import models
+from thibaud.conf import settings
+from thibaud.core import checks
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.db import models
 
 
 class CurrentSiteManager(models.Manager):

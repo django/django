@@ -3,8 +3,8 @@ import unittest
 from io import StringIO
 from unittest import mock
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import (
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import (
     DEFAULT_DB_ALIAS,
     DatabaseError,
     NotSupportedError,
@@ -12,11 +12,11 @@ from django.db import (
     connection,
     connections,
 )
-from django.db.backends.base.base import BaseDatabaseWrapper
-from django.test import TestCase, override_settings
+from thibaud.db.backends.base.base import BaseDatabaseWrapper
+from thibaud.test import TestCase, override_settings
 
 try:
-    from django.db.backends.postgresql.psycopg_any import errors, is_psycopg3
+    from thibaud.db.backends.postgresql.psycopg_any import errors, is_psycopg3
 except ImportError:
     is_psycopg3 = False
 
@@ -55,15 +55,15 @@ class Tests(TestCase):
 
         # Now assume the 'postgres' db isn't available
         msg = (
-            "Normally Django will use a connection to the 'postgres' database "
+            "Normally Thibaud will use a connection to the 'postgres' database "
             "to avoid running initialization queries against the production "
             "database when it's not needed (for example, when running tests). "
-            "Django was unable to create a connection to the 'postgres' "
+            "Thibaud was unable to create a connection to the 'postgres' "
             "database and will use the first PostgreSQL database instead."
         )
         with self.assertWarnsMessage(RuntimeWarning, msg):
             with mock.patch(
-                "django.db.backends.base.base.BaseDatabaseWrapper.connect",
+                "thibaud.db.backends.base.base.BaseDatabaseWrapper.connect",
                 side_effect=mocked_connect,
                 autospec=True,
             ):
@@ -84,7 +84,7 @@ class Tests(TestCase):
         # Cursor is yielded only for the first PostgreSQL database.
         with self.assertWarnsMessage(RuntimeWarning, msg):
             with mock.patch(
-                "django.db.backends.base.base.BaseDatabaseWrapper.connect",
+                "thibaud.db.backends.base.base.BaseDatabaseWrapper.connect",
                 side_effect=mocked_connect,
                 autospec=True,
             ):
@@ -108,20 +108,20 @@ class Tests(TestCase):
             return [test_connection]
 
         msg = (
-            "Normally Django will use a connection to the 'postgres' database "
+            "Normally Thibaud will use a connection to the 'postgres' database "
             "to avoid running initialization queries against the production "
             "database when it's not needed (for example, when running tests). "
-            "Django was unable to create a connection to the 'postgres' "
+            "Thibaud was unable to create a connection to the 'postgres' "
             "database and will use the first PostgreSQL database instead."
         )
         with self.assertWarnsMessage(RuntimeWarning, msg):
             mocker_connections_all = mock.patch(
-                "django.utils.connection.BaseConnectionHandler.all",
+                "thibaud.utils.connection.BaseConnectionHandler.all",
                 side_effect=mocked_all,
                 autospec=True,
             )
             mocker_connect = mock.patch(
-                "django.db.backends.base.base.BaseDatabaseWrapper.connect",
+                "thibaud.db.backends.base.base.BaseDatabaseWrapper.connect",
                 side_effect=mocked_connect,
                 autospec=True,
             )
@@ -136,7 +136,7 @@ class Tests(TestCase):
                 raise DatabaseError("exception")
 
     def test_database_name_too_long(self):
-        from django.db.backends.postgresql.base import DatabaseWrapper
+        from thibaud.db.backends.postgresql.base import DatabaseWrapper
 
         settings = connection.settings_dict.copy()
         max_name_length = connection.ops.max_name_length()
@@ -150,7 +150,7 @@ class Tests(TestCase):
             DatabaseWrapper(settings).get_connection_params()
 
     def test_database_name_empty(self):
-        from django.db.backends.postgresql.base import DatabaseWrapper
+        from thibaud.db.backends.postgresql.base import DatabaseWrapper
 
         settings = connection.settings_dict.copy()
         settings["NAME"] = ""
@@ -162,7 +162,7 @@ class Tests(TestCase):
             DatabaseWrapper(settings).get_connection_params()
 
     def test_service_name(self):
-        from django.db.backends.postgresql.base import DatabaseWrapper
+        from thibaud.db.backends.postgresql.base import DatabaseWrapper
 
         settings = connection.settings_dict.copy()
         settings["OPTIONS"] = {"service": "my_service"}
@@ -173,11 +173,11 @@ class Tests(TestCase):
 
     def test_service_name_default_db(self):
         # None is used to connect to the default 'postgres' db.
-        from django.db.backends.postgresql.base import DatabaseWrapper
+        from thibaud.db.backends.postgresql.base import DatabaseWrapper
 
         settings = connection.settings_dict.copy()
         settings["NAME"] = None
-        settings["OPTIONS"] = {"service": "django_test"}
+        settings["OPTIONS"] = {"service": "thibaud_test"}
         params = DatabaseWrapper(settings).get_connection_params()
         self.assertEqual(params["dbname"], "postgres")
         self.assertNotIn("service", params)
@@ -358,12 +358,12 @@ class Tests(TestCase):
         The transaction level can be configured with
         DATABASES ['OPTIONS']['isolation_level'].
         """
-        from django.db.backends.postgresql.psycopg_any import IsolationLevel
+        from thibaud.db.backends.postgresql.psycopg_any import IsolationLevel
 
-        # Since this is a django.test.TestCase, a transaction is in progress
+        # Since this is a thibaud.test.TestCase, a transaction is in progress
         # and the isolation level isn't reported as 0. This test assumes that
         # PostgreSQL is configured with the default isolation level.
-        # Check the level on the psycopg connection, not the Django wrapper.
+        # Check the level on the psycopg connection, not the Thibaud wrapper.
         self.assertIsNone(connection.connection.isolation_level)
 
         new_connection = no_pool_connection()
@@ -373,7 +373,7 @@ class Tests(TestCase):
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
-            # Check the level on the psycopg connection, not the Django wrapper.
+            # Check the level on the psycopg connection, not the Thibaud wrapper.
             self.assertEqual(
                 new_connection.connection.isolation_level,
                 IsolationLevel.SERIALIZABLE,
@@ -398,7 +398,7 @@ class Tests(TestCase):
         ["OPTIONS"]["assume_role"].
         """
         try:
-            custom_role = "django_nonexistent_role"
+            custom_role = "thibaud_nonexistent_role"
             new_connection = no_pool_connection()
             new_connection.settings_dict["OPTIONS"]["assume_role"] = custom_role
             msg = f'role "{custom_role}" does not exist'
@@ -413,7 +413,7 @@ class Tests(TestCase):
         The server-side parameters binding role can be enabled with DATABASES
         ["OPTIONS"]["server_side_binding"].
         """
-        from django.db.backends.postgresql.base import ServerBindingCursor
+        from thibaud.db.backends.postgresql.base import ServerBindingCursor
 
         new_connection = no_pool_connection()
         new_connection.settings_dict["OPTIONS"]["server_side_binding"] = True
@@ -431,7 +431,7 @@ class Tests(TestCase):
         A custom cursor factory can be configured with DATABASES["options"]
         ["cursor_factory"].
         """
-        from django.db.backends.postgresql.base import Cursor
+        from thibaud.db.backends.postgresql.base import Cursor
 
         class MyCursor(Cursor):
             pass
@@ -481,7 +481,7 @@ class Tests(TestCase):
         self.assertEqual(a[0], b[0])
 
     def test_lookup_cast(self):
-        from django.db.backends.postgresql.operations import DatabaseOperations
+        from thibaud.db.backends.postgresql.operations import DatabaseOperations
 
         do = DatabaseOperations(connection=None)
         lookups = (
@@ -500,7 +500,7 @@ class Tests(TestCase):
                 self.assertIn("::text", do.lookup_cast(lookup))
 
     def test_lookup_cast_isnull_noop(self):
-        from django.db.backends.postgresql.operations import DatabaseOperations
+        from thibaud.db.backends.postgresql.operations import DatabaseOperations
 
         do = DatabaseOperations(connection=None)
         # Using __isnull lookup doesn't require casting.
@@ -514,7 +514,7 @@ class Tests(TestCase):
                 self.assertEqual(do.lookup_cast("isnull", field_type), "%s")
 
     def test_correct_extraction_psycopg_version(self):
-        from django.db.backends.postgresql.base import Database, psycopg_version
+        from thibaud.db.backends.postgresql.base import Database, psycopg_version
 
         with mock.patch.object(Database, "__version__", "4.2.1 (dt dec pq3 ext lo64)"):
             self.assertEqual(psycopg_version(), (4, 2, 1))
@@ -527,19 +527,19 @@ class Tests(TestCase):
     @unittest.skipIf(is_psycopg3, "psycopg2 specific test")
     def test_copy_to_expert_cursors(self):
         out = StringIO()
-        copy_expert_sql = "COPY django_session TO STDOUT (FORMAT CSV, HEADER)"
+        copy_expert_sql = "COPY thibaud_session TO STDOUT (FORMAT CSV, HEADER)"
         with connection.cursor() as cursor:
             cursor.copy_expert(copy_expert_sql, out)
-            cursor.copy_to(out, "django_session")
+            cursor.copy_to(out, "thibaud_session")
         self.assertEqual(
             [q["sql"] for q in connection.queries],
-            [copy_expert_sql, "COPY django_session TO STDOUT"],
+            [copy_expert_sql, "COPY thibaud_session TO STDOUT"],
         )
 
     @override_settings(DEBUG=True)
     @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
     def test_copy_cursors(self):
-        copy_sql = "COPY django_session TO STDOUT (FORMAT CSV, HEADER)"
+        copy_sql = "COPY thibaud_session TO STDOUT (FORMAT CSV, HEADER)"
         with connection.cursor() as cursor:
             with cursor.copy(copy_sql) as copy:
                 for row in copy:
@@ -569,7 +569,7 @@ class Tests(TestCase):
             new_connection.close()
 
     def test_bypass_timezone_configuration(self):
-        from django.db.backends.postgresql.base import DatabaseWrapper
+        from thibaud.db.backends.postgresql.base import DatabaseWrapper
 
         class CustomDatabaseWrapper(DatabaseWrapper):
             def _configure_timezone(self, connection):
@@ -597,7 +597,7 @@ class Tests(TestCase):
                 self.assertIs(Wrapper(settings)._configure_connection(conn), commit)
 
     def test_bypass_role_configuration(self):
-        from django.db.backends.postgresql.base import DatabaseWrapper
+        from thibaud.db.backends.postgresql.base import DatabaseWrapper
 
         class CustomDatabaseWrapper(DatabaseWrapper):
             def _configure_role(self, connection):
@@ -608,7 +608,7 @@ class Tests(TestCase):
         new_connection.connect()
 
         settings = new_connection.settings_dict.copy()
-        settings["OPTIONS"]["assume_role"] = "django_nonexistent_role"
+        settings["OPTIONS"]["assume_role"] = "thibaud_nonexistent_role"
         conn = new_connection.connection
         self.assertIs(
             CustomDatabaseWrapper(settings)._configure_connection(conn), False

@@ -2,20 +2,20 @@
 Model index reference
 =====================
 
-.. module:: django.db.models.indexes
+.. module:: thibaud.db.models.indexes
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
 Index classes ease creating database indexes. They can be added using the
-:attr:`Meta.indexes <django.db.models.Options.indexes>` option. This document
+:attr:`Meta.indexes <thibaud.db.models.Options.indexes>` option. This document
 explains the API references of :class:`Index` which includes the `index
 options`_.
 
 .. admonition:: Referencing built-in indexes
 
-    Indexes are defined in ``django.db.models.indexes``, but for convenience
-    they're imported into :mod:`django.db.models`. The standard convention is
-    to use ``from django.db import models`` and refer to the indexes as
+    Indexes are defined in ``thibaud.db.models.indexes``, but for convenience
+    they're imported into :mod:`thibaud.db.models`. The standard convention is
+    to use ``from thibaud.db import models`` and refer to the indexes as
     ``models.<IndexClass>``.
 
 ``Index`` options
@@ -52,16 +52,16 @@ and the ``weight`` rounded to the nearest integer.
 .. admonition:: Restrictions on Oracle
 
     Oracle requires functions referenced in an index to be marked as
-    ``DETERMINISTIC``. Django doesn't validate this but Oracle will error. This
+    ``DETERMINISTIC``. Thibaud doesn't validate this but Oracle will error. This
     means that functions such as
-    :class:`Random() <django.db.models.functions.Random>` aren't accepted.
+    :class:`Random() <thibaud.db.models.functions.Random>` aren't accepted.
 
 .. admonition:: Restrictions on PostgreSQL
 
     PostgreSQL requires functions and operators referenced in an index to be
-    marked as ``IMMUTABLE``. Django doesn't validate this but PostgreSQL will
+    marked as ``IMMUTABLE``. Thibaud doesn't validate this but PostgreSQL will
     error. This means that functions such as
-    :class:`Concat() <django.db.models.functions.Concat>` aren't accepted.
+    :class:`Concat() <thibaud.db.models.functions.Concat>` aren't accepted.
 
 .. admonition:: MySQL and MariaDB
 
@@ -92,7 +92,7 @@ For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 
 .. attribute:: Index.name
 
-The name of the index. If ``name`` isn't provided Django will auto-generate a
+The name of the index. If ``name`` isn't provided Thibaud will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
 
@@ -100,7 +100,7 @@ than 30 characters and shouldn't start with a number (0-9) or underscore (_).
 
     You must always specify a unique name for an index. As such, you
     cannot normally specify a partial index on an abstract base class, since
-    the :attr:`Meta.indexes <django.db.models.Options.indexes>` option is
+    the :attr:`Meta.indexes <thibaud.db.models.Options.indexes>` option is
     inherited by subclasses, with exactly the same values for the attributes
     (including ``name``) each time. To work around name collisions, part of the
     name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
@@ -119,14 +119,14 @@ index is created in the ``db_tablespace`` of the field.
 
 If :attr:`.Field.db_tablespace` isn't specified (or if the index uses multiple
 fields), the index is created in tablespace specified in the
-:attr:`~django.db.models.Options.db_tablespace` option inside the model's
+:attr:`~thibaud.db.models.Options.db_tablespace` option inside the model's
 ``class Meta``. If neither of those tablespaces are set, the index is created
 in the same tablespace as the table.
 
 .. seealso::
 
     For a list of PostgreSQL-specific indexes, see
-    :mod:`django.contrib.postgres.indexes`.
+    :mod:`thibaud.contrib.postgres.indexes`.
 
 ``opclasses``
 -------------
@@ -153,7 +153,7 @@ opclasses=['jsonb_path_ops'])`` creates a gin index on ``jsonfield`` using
 
 If the table is very large and your queries mostly target a subset of rows,
 it may be useful to restrict an index to that subset. Specify a condition as a
-:class:`~django.db.models.Q`. For example, ``condition=Q(pages__gt=400)``
+:class:`~thibaud.db.models.Q`. For example, ``condition=Q(pages__gt=400)``
 indexes records with more than 400 pages.
 
 :attr:`Index.name` is required when using ``condition``.
@@ -161,13 +161,13 @@ indexes records with more than 400 pages.
 .. admonition:: Restrictions on PostgreSQL
 
     PostgreSQL requires functions referenced in the condition to be marked as
-    IMMUTABLE. Django doesn't validate this but PostgreSQL will error. This
+    IMMUTABLE. Thibaud doesn't validate this but PostgreSQL will error. This
     means that functions such as :ref:`date-functions` and
-    :class:`~django.db.models.functions.Concat` aren't accepted. If you store
-    dates in :class:`~django.db.models.DateTimeField`, comparison to
+    :class:`~thibaud.db.models.functions.Concat` aren't accepted. If you store
+    dates in :class:`~thibaud.db.models.DateTimeField`, comparison to
     :class:`~datetime.datetime` objects may require the ``tzinfo`` argument
     to be provided because otherwise the comparison could result in a mutable
-    function due to the casting Django does for :ref:`lookups <field-lookups>`.
+    function due to the casting Thibaud does for :ref:`lookups <field-lookups>`.
 
 .. admonition:: Restrictions on SQLite
 
@@ -178,7 +178,7 @@ indexes records with more than 400 pages.
 
     Oracle does not support partial indexes. Instead, partial indexes can be
     emulated by using functional indexes together with
-    :class:`~django.db.models.expressions.Case` expressions.
+    :class:`~thibaud.db.models.expressions.Case` expressions.
 
 .. admonition:: MySQL and MariaDB
 
@@ -215,8 +215,8 @@ See the PostgreSQL documentation for more details about `covering indexes`_.
 .. admonition:: Restrictions on PostgreSQL
 
     PostgreSQL supports covering B-Tree and :class:`GiST indexes
-    <django.contrib.postgres.indexes.GistIndex>`. PostgreSQL 14+ also supports
+    <thibaud.contrib.postgres.indexes.GistIndex>`. PostgreSQL 14+ also supports
     covering :class:`SP-GiST indexes
-    <django.contrib.postgres.indexes.SpGistIndex>`.
+    <thibaud.contrib.postgres.indexes.SpGistIndex>`.
 
 .. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

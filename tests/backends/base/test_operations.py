@@ -1,18 +1,18 @@
 import decimal
 
-from django.core.management.color import no_style
-from django.db import NotSupportedError, connection, transaction
-from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import DurationField
-from django.db.models.expressions import Col
-from django.test import (
+from thibaud.core.management.color import no_style
+from thibaud.db import NotSupportedError, connection, transaction
+from thibaud.db.backends.base.operations import BaseDatabaseOperations
+from thibaud.db.models import DurationField
+from thibaud.db.models.expressions import Col
+from thibaud.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
     override_settings,
     skipIfDBFeature,
 )
-from django.utils import timezone
+from thibaud.utils import timezone
 
 from ..models import Author, Book
 
@@ -90,7 +90,7 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         self.assertIsNone(self.ops.adapt_datetimefield_value(None))
 
     def test_adapt_timefield_value(self):
-        msg = "Django does not support timezone-aware times."
+        msg = "Thibaud does not support timezone-aware times."
         with self.assertRaisesMessage(ValueError, msg):
             self.ops.adapt_timefield_value(timezone.make_aware(timezone.now()))
 

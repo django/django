@@ -2,33 +2,33 @@ import threading
 
 from asgiref.sync import async_to_sync, iscoroutinefunction
 
-from django.contrib.admindocs.middleware import XViewMiddleware
-from django.contrib.auth.middleware import (
+from thibaud.contrib.admindocs.middleware import XViewMiddleware
+from thibaud.contrib.auth.middleware import (
     AuthenticationMiddleware,
     LoginRequiredMiddleware,
 )
-from django.contrib.flatpages.middleware import FlatpageFallbackMiddleware
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.redirects.middleware import RedirectFallbackMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.contrib.sites.middleware import CurrentSiteMiddleware
-from django.db import connection
-from django.http.request import HttpRequest
-from django.http.response import HttpResponse
-from django.middleware.cache import (
+from thibaud.contrib.flatpages.middleware import FlatpageFallbackMiddleware
+from thibaud.contrib.messages.middleware import MessageMiddleware
+from thibaud.contrib.redirects.middleware import RedirectFallbackMiddleware
+from thibaud.contrib.sessions.middleware import SessionMiddleware
+from thibaud.contrib.sites.middleware import CurrentSiteMiddleware
+from thibaud.db import connection
+from thibaud.http.request import HttpRequest
+from thibaud.http.response import HttpResponse
+from thibaud.middleware.cache import (
     CacheMiddleware,
     FetchFromCacheMiddleware,
     UpdateCacheMiddleware,
 )
-from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.middleware.common import BrokenLinkEmailsMiddleware, CommonMiddleware
-from django.middleware.csrf import CsrfViewMiddleware
-from django.middleware.gzip import GZipMiddleware
-from django.middleware.http import ConditionalGetMiddleware
-from django.middleware.locale import LocaleMiddleware
-from django.middleware.security import SecurityMiddleware
-from django.test import SimpleTestCase
-from django.utils.deprecation import MiddlewareMixin
+from thibaud.middleware.clickjacking import XFrameOptionsMiddleware
+from thibaud.middleware.common import BrokenLinkEmailsMiddleware, CommonMiddleware
+from thibaud.middleware.csrf import CsrfViewMiddleware
+from thibaud.middleware.gzip import GZipMiddleware
+from thibaud.middleware.http import ConditionalGetMiddleware
+from thibaud.middleware.locale import LocaleMiddleware
+from thibaud.middleware.security import SecurityMiddleware
+from thibaud.test import SimpleTestCase
+from thibaud.utils.deprecation import MiddlewareMixin
 
 
 class MiddlewareMixinTests(SimpleTestCase):

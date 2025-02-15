@@ -1,5 +1,5 @@
 =====================================
-Writing your first Django app, part 4
+Writing your first Thibaud app, part 4
 =====================================
 
 This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off. We're
@@ -17,7 +17,7 @@ Write a minimal form
 Let's update our poll detail template ("polls/detail.html") from the last
 tutorial, so that the template contains an HTML ``<form>`` element:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
     :caption: ``polls/templates/polls/detail.html``
 
     <form action="{% url 'polls:vote' question.id %}" method="post">
@@ -47,19 +47,19 @@ A quick rundown:
   ``method="get"``) is very important, because the act of submitting this
   form will alter data server-side. Whenever you create a form that alters
   data server-side, use ``method="post"``. This tip isn't specific to
-  Django; it's good web development practice in general.
+  Thibaud; it's good web development practice in general.
 
 * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
   through its loop
 
 * Since we're creating a POST form (which can have the effect of modifying
   data), we need to worry about Cross Site Request Forgeries.
-  Thankfully, you don't have to worry too hard, because Django comes with a
+  Thankfully, you don't have to worry too hard, because Thibaud comes with a
   helpful system for protecting against it. In short, all POST forms that are
   targeted at internal URLs should use the :ttag:`{% csrf_token %}<csrf_token>`
   template tag.
 
-Now, let's create a Django view that handles the submitted data and does
+Now, let's create a Thibaud view that handles the submitted data and does
 something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
 created a URLconf for the polls application that includes this line:
 
@@ -74,10 +74,10 @@ create a real version. Add the following to ``polls/views.py``:
 .. code-block:: python
     :caption: ``polls/views.py``
 
-    from django.db.models import F
-    from django.http import HttpResponse, HttpResponseRedirect
-    from django.shortcuts import get_object_or_404, render
-    from django.urls import reverse
+    from thibaud.db.models import F
+    from thibaud.http import HttpResponse, HttpResponseRedirect
+    from thibaud.shortcuts import get_object_or_404, render
+    from thibaud.urls import reverse
 
     from .models import Choice, Question
 
@@ -107,16 +107,16 @@ create a real version. Add the following to ``polls/views.py``:
 
 This code includes a few things we haven't covered yet in this tutorial:
 
-* :attr:`request.POST <django.http.HttpRequest.POST>` is a dictionary-like
+* :attr:`request.POST <thibaud.http.HttpRequest.POST>` is a dictionary-like
   object that lets you access submitted data by key name. In this case,
   ``request.POST['choice']`` returns the ID of the selected choice, as a
-  string. :attr:`request.POST <django.http.HttpRequest.POST>` values are
+  string. :attr:`request.POST <thibaud.http.HttpRequest.POST>` values are
   always strings.
 
-  Note that Django also provides :attr:`request.GET
-  <django.http.HttpRequest.GET>` for accessing GET data in the same way --
+  Note that Thibaud also provides :attr:`request.GET
+  <thibaud.http.HttpRequest.GET>` for accessing GET data in the same way --
   but we're explicitly using :attr:`request.POST
-  <django.http.HttpRequest.POST>` in our code, to ensure that data is only
+  <thibaud.http.HttpRequest.POST>` in our code, to ensure that data is only
   altered via a POST call.
 
 * ``request.POST['choice']`` will raise :exc:`KeyError` if
@@ -128,24 +128,24 @@ This code includes a few things we haven't covered yet in this tutorial:
   <avoiding-race-conditions-using-f>` to increase the vote count by 1.
 
 * After incrementing the choice count, the code returns an
-  :class:`~django.http.HttpResponseRedirect` rather than a normal
-  :class:`~django.http.HttpResponse`.
-  :class:`~django.http.HttpResponseRedirect` takes a single argument: the
+  :class:`~thibaud.http.HttpResponseRedirect` rather than a normal
+  :class:`~thibaud.http.HttpResponse`.
+  :class:`~thibaud.http.HttpResponseRedirect` takes a single argument: the
   URL to which the user will be redirected (see the following point for how
   we construct the URL in this case).
 
   As the Python comment above points out, you should always return an
-  :class:`~django.http.HttpResponseRedirect` after successfully dealing with
-  POST data. This tip isn't specific to Django; it's good web development
+  :class:`~thibaud.http.HttpResponseRedirect` after successfully dealing with
+  POST data. This tip isn't specific to Thibaud; it's good web development
   practice in general.
 
-* We are using the :func:`~django.urls.reverse` function in the
-  :class:`~django.http.HttpResponseRedirect` constructor in this example.
+* We are using the :func:`~thibaud.urls.reverse` function in the
+  :class:`~thibaud.http.HttpResponseRedirect` constructor in this example.
   This function helps avoid having to hardcode a URL in the view function.
   It is given the name of the view that we want to pass control to and the
   variable portion of the URL pattern that points to that view. In this
   case, using the URLconf we set up in :doc:`Tutorial 3 </intro/tutorial03>`,
-  this :func:`~django.urls.reverse` call will return a string like
+  this :func:`~thibaud.urls.reverse` call will return a string like
   ::
 
     "/polls/3/results/"
@@ -154,8 +154,8 @@ This code includes a few things we haven't covered yet in this tutorial:
   then call the ``'results'`` view to display the final page.
 
 As mentioned in :doc:`Tutorial 3 </intro/tutorial03>`, ``request`` is an
-:class:`~django.http.HttpRequest` object. For more on
-:class:`~django.http.HttpRequest` objects, see the :doc:`request and
+:class:`~thibaud.http.HttpRequest` object. For more on
+:class:`~thibaud.http.HttpRequest` objects, see the :doc:`request and
 response documentation </ref/request-response>`.
 
 After somebody votes in a question, the ``vote()`` view redirects to the results
@@ -164,7 +164,7 @@ page for the question. Let's write that view:
 .. code-block:: python
     :caption: ``polls/views.py``
 
-    from django.shortcuts import get_object_or_404, render
+    from thibaud.shortcuts import get_object_or_404, render
 
 
     def results(request, question_id):
@@ -177,7 +177,7 @@ redundancy later.
 
 Now, create a ``polls/results.html`` template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
     :caption: ``polls/templates/polls/results.html``
 
     <h1>{{ question.question_text }}</h1>
@@ -203,13 +203,13 @@ view, which displays a list of polls, is similar.
 
 These views represent a common case of basic web development: getting data from
 the database according to a parameter passed in the URL, loading a template and
-returning the rendered template. Because this is so common, Django provides a
+returning the rendered template. Because this is so common, Thibaud provides a
 shortcut, called the "generic views" system.
 
 Generic views abstract common patterns to the point where you don't even need to
 write Python code to write an app. For example, the
-:class:`~django.views.generic.list.ListView` and
-:class:`~django.views.generic.detail.DetailView` generic views
+:class:`~thibaud.views.generic.list.ListView` and
+:class:`~thibaud.views.generic.detail.DetailView` generic views
 abstract the concepts of "display a list of objects" and
 "display a detail page for a particular type of object" respectively.
 
@@ -221,13 +221,13 @@ We will:
 
 #. Delete some of the old, unneeded views.
 
-#. Introduce new views based on Django's generic views.
+#. Introduce new views based on Thibaud's generic views.
 
 Read on for details.
 
 .. admonition:: Why the code-shuffle?
 
-    Generally, when writing a Django app, you'll evaluate whether generic views
+    Generally, when writing a Thibaud app, you'll evaluate whether generic views
     are a good fit for your problem, and you'll use them from the beginning,
     rather than refactoring your code halfway through. But this tutorial
     intentionally has focused on writing the views "the hard way" until now, to
@@ -243,7 +243,7 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 .. code-block:: python
     :caption: ``polls/urls.py``
 
-    from django.urls import path
+    from thibaud.urls import path
 
     from . import views
 
@@ -258,7 +258,7 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 Note that the name of the matched pattern in the path strings of the second and
 third patterns has changed from ``<question_id>`` to ``<pk>``. This is
 necessary because we'll use the
-:class:`~django.views.generic.detail.DetailView` generic view to replace our
+:class:`~thibaud.views.generic.detail.DetailView` generic view to replace our
 ``detail()`` and ``results()`` views, and it expects the primary key value
 captured from the URL to be called ``"pk"``.
 
@@ -266,17 +266,17 @@ Amend views
 -----------
 
 Next, we're going to remove our old ``index``, ``detail``, and ``results``
-views and use Django's generic views instead. To do so, open the
+views and use Thibaud's generic views instead. To do so, open the
 ``polls/views.py`` file and change it like so:
 
 .. code-block:: python
     :caption: ``polls/views.py``
 
-    from django.db.models import F
-    from django.http import HttpResponseRedirect
-    from django.shortcuts import get_object_or_404, render
-    from django.urls import reverse
-    from django.views import generic
+    from thibaud.db.models import F
+    from thibaud.http import HttpResponseRedirect
+    from thibaud.shortcuts import get_object_or_404, render
+    from thibaud.urls import reverse
+    from thibaud.views import generic
 
     from .models import Choice, Question
 
@@ -307,35 +307,35 @@ views and use Django's generic views instead. To do so, open the
 Each generic view needs to know what model it will be acting upon. This is
 provided using either the ``model`` attribute (in this example, ``model =
 Question`` for  ``DetailView`` and ``ResultsView``) or by defining the
-:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` method (as
+:meth:`~thibaud.views.generic.list.MultipleObjectMixin.get_queryset` method (as
 shown in ``IndexView``).
 
-By default, the :class:`~django.views.generic.detail.DetailView` generic
+By default, the :class:`~thibaud.views.generic.detail.DetailView` generic
 view uses a template called ``<app name>/<model name>_detail.html``.
 In our case, it would use the template ``"polls/question_detail.html"``. The
-``template_name`` attribute is used to tell Django to use a specific
+``template_name`` attribute is used to tell Thibaud to use a specific
 template name instead of the autogenerated default template name. We
 also specify the ``template_name`` for the ``results`` list view --
 this ensures that the results view and the detail view have a
 different appearance when rendered, even though they're both a
-:class:`~django.views.generic.detail.DetailView` behind the scenes.
+:class:`~thibaud.views.generic.detail.DetailView` behind the scenes.
 
-Similarly, the :class:`~django.views.generic.list.ListView` generic
+Similarly, the :class:`~thibaud.views.generic.list.ListView` generic
 view uses a default template called ``<app name>/<model
 name>_list.html``; we use ``template_name`` to tell
-:class:`~django.views.generic.list.ListView` to use our existing
+:class:`~thibaud.views.generic.list.ListView` to use our existing
 ``"polls/index.html"`` template.
 
 In previous parts of the tutorial, the templates have been provided
 with a context that contains the ``question`` and ``latest_question_list``
 context variables. For ``DetailView`` the ``question`` variable is provided
-automatically -- since we're using a Django model (``Question``), Django
+automatically -- since we're using a Thibaud model (``Question``), Thibaud
 is able to determine an appropriate name for the context variable.
 However, for ListView, the automatically generated context variable is
 ``question_list``. To override this we provide the ``context_object_name``
 attribute, specifying that we want to use ``latest_question_list`` instead.
 As an alternative approach, you could change your templates to match
-the new default context variables -- but it's a lot easier to tell Django to
+the new default context variables -- but it's a lot easier to tell Thibaud to
 use the variable you want.
 
 Run the server, and use your new polling app based on generic views.

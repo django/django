@@ -1,6 +1,6 @@
-from django.contrib.postgres.fields import ArrayField
-from django.db.models import Subquery
-from django.utils.functional import cached_property
+from thibaud.contrib.postgres.fields import ArrayField
+from thibaud.db.models import Subquery
+from thibaud.utils.functional import cached_property
 
 
 class ArraySubquery(Subquery):

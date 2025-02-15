@@ -1,12 +1,12 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: Thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
-"Last-Translator: Django team\n"
+"Last-Translator: Thibaud team\n"
 "Language-Team: English <en@li.org>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -338,11 +338,11 @@ msgid ""
 msgstr ""
 
 #: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:3
-msgid "Django site admin"
+msgid "Thibaud site admin"
 msgstr ""
 
 #: contrib/admin/sites.py:42 contrib/admin/templates/admin/base_site.html:6
-msgid "Django administration"
+msgid "Thibaud administration"
 msgstr ""
 
 #: contrib/admin/sites.py:45

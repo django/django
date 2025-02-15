@@ -1,6 +1,6 @@
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import BaseUserManager
-from django.db import models
+from thibaud.contrib.auth.base_user import AbstractBaseUser
+from thibaud.contrib.auth.models import BaseUserManager
+from thibaud.db import models
 
 
 class CustomEmailFieldUserManager(BaseUserManager):

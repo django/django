@@ -1,12 +1,12 @@
-from django.apps import apps
-from django.core import checks
-from django.core.checks.registry import registry
-from django.core.management.base import BaseCommand, CommandError
-from django.db import connections
+from thibaud.apps import apps
+from thibaud.core import checks
+from thibaud.core.checks.registry import registry
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.db import connections
 
 
 class Command(BaseCommand):
-    help = "Checks the entire Django project for potential problems."
+    help = "Checks the entire Thibaud project for potential problems."
 
     requires_system_checks = []
 

@@ -5,11 +5,11 @@ import pickle
 import unittest
 import uuid
 
-from django.core.exceptions import DisallowedRedirect
-from django.core.serializers.json import DjangoJSONEncoder
-from django.core.signals import request_finished
-from django.db import close_old_connections
-from django.http import (
+from thibaud.core.exceptions import DisallowedRedirect
+from thibaud.core.serializers.json import ThibaudJSONEncoder
+from thibaud.core.signals import request_finished
+from thibaud.db import close_old_connections
+from thibaud.http import (
     BadHeaderError,
     HttpResponse,
     HttpResponseNotAllowed,
@@ -22,8 +22,8 @@ from django.http import (
     StreamingHttpResponse,
     parse_cookie,
 )
-from django.test import SimpleTestCase
-from django.utils.functional import lazystr
+from thibaud.test import SimpleTestCase
+from thibaud.utils.functional import lazystr
 
 
 class QueryDictTests(SimpleTestCase):
@@ -675,11 +675,11 @@ class JsonResponseTests(SimpleTestCase):
         self.assertEqual(json.loads(response.text), str(u))
 
     def test_json_response_custom_encoder(self):
-        class CustomDjangoJSONEncoder(DjangoJSONEncoder):
+        class CustomThibaudJSONEncoder(ThibaudJSONEncoder):
             def encode(self, o):
                 return json.dumps({"foo": "bar"})
 
-        response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
+        response = JsonResponse({}, encoder=CustomThibaudJSONEncoder)
         self.assertEqual(json.loads(response.text), {"foo": "bar"})
 
     def test_json_response_passing_arguments_to_json_dumps(self):
@@ -921,7 +921,7 @@ class CookieTests(unittest.TestCase):
         # Chunks without an equals sign appear as unnamed values per
         # https://bugzilla.mozilla.org/show_bug.cgi?id=169091
         self.assertIn(
-            "django_language", parse_cookie("abc=def; unnamed; django_language=en")
+            "thibaud_language", parse_cookie("abc=def; unnamed; thibaud_language=en")
         )
         # Even a double quote may be an unnamed value.
         self.assertEqual(parse_cookie('a=b; "; c=d'), {"a": "b", "": '"', "c": "d"})

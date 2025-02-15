@@ -1,7 +1,7 @@
-from django.template import RequestContext, TemplateSyntaxError
-from django.template.defaulttags import URLNode
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.urls import NoReverseMatch, resolve
+from thibaud.template import RequestContext, TemplateSyntaxError
+from thibaud.template.defaulttags import URLNode
+from thibaud.test import RequestFactory, SimpleTestCase, override_settings
+from thibaud.urls import NoReverseMatch, resolve
 
 from ..utils import setup
 

@@ -1,10 +1,10 @@
 ==========================
-Django 1.9.2 release notes
+Thibaud 1.9.2 release notes
 ==========================
 
 *February 1, 2016*
 
-Django 1.9.2 fixes a security regression in 1.9 and several bugs in 1.9.1. It
+Thibaud 1.9.2 fixes a security regression in 1.9 and several bugs in 1.9.1. It
 also makes a small backwards incompatible change that hopefully doesn't affect
 any users.
 
@@ -13,19 +13,19 @@ Security issue: User with "change" but not "add" permission can create objects f
 
 If a ``ModelAdmin`` uses ``save_as=True`` (not the default), the admin
 provides an option when editing objects to "Save as new". A regression in
-Django 1.9 prevented that form submission from raising a "Permission Denied"
+Thibaud 1.9 prevented that form submission from raising a "Permission Denied"
 error for users without the "add" permission.
 
 Backwards incompatible change: ``.py-tpl`` files rewritten in project/app templates
 ===================================================================================
 
-The addition of some Django template language syntax to the default app
-template in Django 1.9 means those files now have some invalid Python syntax.
+The addition of some Thibaud template language syntax to the default app
+template in Thibaud 1.9 means those files now have some invalid Python syntax.
 This causes difficulties for packaging systems that unconditionally
 byte-compile ``*.py`` files.
 
 To remedy this, a ``.py-tpl`` suffix is now used for the project and app
-template files included in Django. The ``.py-tpl`` suffix is replaced with
+template files included in Thibaud. The ``.py-tpl`` suffix is replaced with
 ``.py`` by the ``startproject`` and ``startapp`` commands. For example, a
 template with the filename ``manage.py-tpl`` will be created as ``manage.py``.
 
@@ -87,12 +87,12 @@ Bugfixes
 
 * Restored the ability for testing and debugging tools to determine the
   template from which a node came from, even during template inheritance or
-  inclusion. Prior to Django 1.9, debugging tools could access the template
+  inclusion. Prior to Thibaud 1.9, debugging tools could access the template
   origin from the node via ``Node.token.source[0]``. This was an undocumented,
   private API. The origin is now available directly on each node using the
   ``Node.origin`` attribute (:ticket:`25848`).
 
-* Fixed a regression in Django 1.8.5 that broke copying a ``SimpleLazyObject``
+* Fixed a regression in Thibaud 1.8.5 that broke copying a ``SimpleLazyObject``
   with ``copy.copy()`` (:ticket:`26122`).
 
 * Always included ``geometry_field`` in the GeoJSON serializer output regardless

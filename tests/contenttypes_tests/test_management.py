@@ -1,11 +1,11 @@
 from unittest import mock
 
-from django.apps.registry import Apps, apps
-from django.contrib.contenttypes import management as contenttypes_management
-from django.contrib.contenttypes.models import ContentType
-from django.core.management import call_command
-from django.test import TestCase, modify_settings
-from django.test.utils import captured_stdout
+from thibaud.apps.registry import Apps, apps
+from thibaud.contrib.contenttypes import management as contenttypes_management
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core.management import call_command
+from thibaud.test import TestCase, modify_settings
+from thibaud.test.utils import captured_stdout
 
 from .models import ModelWithNullFKToSite, Post
 
@@ -17,7 +17,7 @@ class RemoveStaleContentTypesTests(TestCase):
         "contenttypes_tests",
         "empty_models",
         "no_models",
-        "django.contrib.contenttypes",
+        "thibaud.contrib.contenttypes",
     ]
 
     @classmethod

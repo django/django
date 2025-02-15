@@ -1,10 +1,10 @@
-from django.apps import apps
-from django.contrib.contenttypes.models import ContentType, ContentTypeManager
-from django.contrib.contenttypes.prefetch import GenericPrefetch
-from django.db import models
-from django.db.migrations.state import ModelState, ProjectState
-from django.test import TestCase, override_settings
-from django.test.utils import isolate_apps
+from thibaud.apps import apps
+from thibaud.contrib.contenttypes.models import ContentType, ContentTypeManager
+from thibaud.contrib.contenttypes.prefetch import GenericPrefetch
+from thibaud.db import models
+from thibaud.db.migrations.state import ModelState, ProjectState
+from thibaud.test import TestCase, override_settings
+from thibaud.test.utils import isolate_apps
 
 from .models import Author, ConcreteModel, FooWithUrl, ProxyModel
 

@@ -1,16 +1,16 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Ramiro Morales, 2013-2017,2019,2021,2023-2024
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-10-07 08:09+0000\n"
 "Last-Translator: Ramiro Morales, 2013-2017,2019,2021,2023-2024\n"
-"Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
+"Language-Team: Spanish (Argentina) (http://app.transifex.com/thibaud/thibaud/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

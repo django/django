@@ -4,15 +4,15 @@ import uuid
 from functools import lru_cache
 from itertools import chain
 
-from django.conf import settings
-from django.core.exceptions import FieldError
-from django.db import DatabaseError, NotSupportedError, models
-from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models.constants import OnConflict
-from django.db.models.expressions import Col
-from django.utils import timezone
-from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.functional import cached_property
+from thibaud.conf import settings
+from thibaud.core.exceptions import FieldError
+from thibaud.db import DatabaseError, NotSupportedError, models
+from thibaud.db.backends.base.operations import BaseDatabaseOperations
+from thibaud.db.models.constants import OnConflict
+from thibaud.db.models.expressions import Col
+from thibaud.utils import timezone
+from thibaud.utils.dateparse import parse_date, parse_datetime, parse_time
+from thibaud.utils.functional import cached_property
 
 from .base import Database
 
@@ -83,11 +83,11 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def date_extract_sql(self, lookup_type, sql, params):
         """
-        Support EXTRACT with a user-defined function django_date_extract()
+        Support EXTRACT with a user-defined function thibaud_date_extract()
         that's registered in connect(). Use single quotes because this is a
         string and could otherwise cause a collision with a field name.
         """
-        return f"django_date_extract(%s, {sql})", (lookup_type.lower(), *params)
+        return f"thibaud_date_extract(%s, {sql})", (lookup_type.lower(), *params)
 
     def fetch_returned_insert_rows(self, cursor):
         """
@@ -101,14 +101,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         return sql
 
     def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
-        return f"django_date_trunc(%s, {sql}, %s, %s)", (
+        return f"thibaud_date_trunc(%s, {sql}, %s, %s)", (
             lookup_type.lower(),
             *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
     def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
-        return f"django_time_trunc(%s, {sql}, %s, %s)", (
+        return f"thibaud_time_trunc(%s, {sql}, %s, %s)", (
             lookup_type.lower(),
             *params,
             *self._convert_tznames_to_sql(tzname),
@@ -120,33 +120,33 @@ class DatabaseOperations(BaseDatabaseOperations):
         return None, None
 
     def datetime_cast_date_sql(self, sql, params, tzname):
-        return f"django_datetime_cast_date({sql}, %s, %s)", (
+        return f"thibaud_datetime_cast_date({sql}, %s, %s)", (
             *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_cast_time_sql(self, sql, params, tzname):
-        return f"django_datetime_cast_time({sql}, %s, %s)", (
+        return f"thibaud_datetime_cast_time({sql}, %s, %s)", (
             *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_extract_sql(self, lookup_type, sql, params, tzname):
-        return f"django_datetime_extract(%s, {sql}, %s, %s)", (
+        return f"thibaud_datetime_extract(%s, {sql}, %s, %s)", (
             lookup_type.lower(),
             *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
-        return f"django_datetime_trunc(%s, {sql}, %s, %s)", (
+        return f"thibaud_datetime_trunc(%s, {sql}, %s, %s)", (
             lookup_type.lower(),
             *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
     def time_extract_sql(self, lookup_type, sql, params):
-        return f"django_time_extract(%s, {sql})", (lookup_type.lower(), *params)
+        return f"thibaud_time_extract(%s, {sql})", (lookup_type.lower(), *params)
 
     def pk_default_value(self):
         return "NULL"
@@ -169,7 +169,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return results
 
         sql = "SELECT " + ", ".join(["QUOTE(?)"] * len(params))
-        # Bypass Django's wrappers and use the underlying sqlite3 connection
+        # Bypass Thibaud's wrappers and use the underlying sqlite3 connection
         # to avoid logging this query - it would trigger infinite recursion.
         cursor = self.connection.connection.cursor()
         # Native sqlite3 cursors cannot be used as context managers.
@@ -226,7 +226,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     @cached_property
     def _references_graph(self):
         # 512 is large enough to fit the ~330 tables (as of this writing) in
-        # Django's test suite.
+        # Thibaud's test suite.
         return lru_cache(maxsize=512)(self.__references_graph)
 
     def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
@@ -378,7 +378,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         fn_params = ["'%s'" % connector] + sub_expressions
         if len(fn_params) > 3:
             raise ValueError("Too many params for timedelta operations.")
-        return "django_format_dtdelta(%s)" % ", ".join(fn_params)
+        return "thibaud_format_dtdelta(%s)" % ", ".join(fn_params)
 
     def integer_field_range(self, internal_type):
         # SQLite doesn't enforce any integer constraints, but sqlite3 supports
@@ -396,8 +396,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         rhs_sql, rhs_params = rhs
         params = (*lhs_params, *rhs_params)
         if internal_type == "TimeField":
-            return "django_time_diff(%s, %s)" % (lhs_sql, rhs_sql), params
-        return "django_timestamp_diff(%s, %s)" % (lhs_sql, rhs_sql), params
+            return "thibaud_time_diff(%s, %s)" % (lhs_sql, rhs_sql), params
+        return "thibaud_timestamp_diff(%s, %s)" % (lhs_sql, rhs_sql), params
 
     def insert_statement(self, on_conflict=None):
         if on_conflict == OnConflict.IGNORE:

@@ -1,10 +1,10 @@
 from unittest import mock
 
-from django.core.checks import Error
-from django.core.checks import Warning as DjangoWarning
-from django.db import connection, models
-from django.test.testcases import SimpleTestCase
-from django.test.utils import isolate_apps, modify_settings, override_settings
+from thibaud.core.checks import Error
+from thibaud.core.checks import Warning as ThibaudWarning
+from thibaud.db import connection, models
+from thibaud.test.testcases import SimpleTestCase
+from thibaud.test.utils import isolate_apps, modify_settings, override_settings
 
 
 @isolate_apps("invalid_models_tests")
@@ -119,17 +119,17 @@ class RelativeFieldTests(SimpleTestCase):
         self.assertEqual(
             ModelM2M.check(),
             [
-                DjangoWarning(
+                ThibaudWarning(
                     "null has no effect on ManyToManyField.",
                     obj=field,
                     id="fields.W340",
                 ),
-                DjangoWarning(
+                ThibaudWarning(
                     "ManyToManyField does not support validators.",
                     obj=field,
                     id="fields.W341",
                 ),
-                DjangoWarning(
+                ThibaudWarning(
                     "db_comment has no effect on ManyToManyField.",
                     obj=field,
                     id="fields.W346",
@@ -145,7 +145,7 @@ class RelativeFieldTests(SimpleTestCase):
         self.assertEqual(
             ModelM2M.check(),
             [
-                DjangoWarning(
+                ThibaudWarning(
                     "related_name has no effect on ManyToManyField with "
                     'a symmetrical relationship, e.g. to "self".',
                     obj=field,
@@ -176,7 +176,7 @@ class RelativeFieldTests(SimpleTestCase):
                     "The model is used as an intermediate model by "
                     "'invalid_models_tests.Group.field', but it has more than one "
                     "foreign key from 'Group', which is ambiguous. You must "
-                    "specify which foreign key Django should use via the "
+                    "specify which foreign key Thibaud should use via the "
                     "through_fields keyword argument.",
                     hint=(
                         "If you want to create a recursive relationship, use "
@@ -215,7 +215,7 @@ class RelativeFieldTests(SimpleTestCase):
                     "The model is used as an intermediate model by "
                     "'invalid_models_tests.Group.field', but it has more than one "
                     "foreign key to 'Person', which is ambiguous. You must specify "
-                    "which foreign key Django should use via the through_fields "
+                    "which foreign key Thibaud should use via the through_fields "
                     "keyword argument.",
                     hint=(
                         "If you want to create a recursive relationship, use "
@@ -365,10 +365,10 @@ class RelativeFieldTests(SimpleTestCase):
                     "The model is used as an intermediate model by "
                     "'invalid_models_tests.Person.friends', but it has more than two "
                     "foreign keys to 'Person', which is ambiguous. You must specify "
-                    "which two foreign keys Django should use via the through_fields "
+                    "which two foreign keys Thibaud should use via the through_fields "
                     "keyword argument.",
                     hint=(
-                        "Use through_fields to specify which two foreign keys Django "
+                        "Use through_fields to specify which two foreign keys Thibaud "
                         "should use."
                     ),
                     obj=InvalidRelationship,

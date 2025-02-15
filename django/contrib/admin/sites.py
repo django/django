@@ -1,46 +1,46 @@
 from functools import update_wrapper
 from weakref import WeakSet
 
-from django.apps import apps
-from django.conf import settings
-from django.contrib.admin import ModelAdmin, actions
-from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
-from django.contrib.admin.views.autocomplete import AutocompleteJsonView
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth.decorators import login_not_required
-from django.core.exceptions import ImproperlyConfigured
-from django.db.models.base import ModelBase
-from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
-from django.template.response import TemplateResponse
-from django.urls import NoReverseMatch, Resolver404, resolve, reverse, reverse_lazy
-from django.utils.decorators import method_decorator
-from django.utils.functional import LazyObject
-from django.utils.module_loading import import_string
-from django.utils.text import capfirst
-from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
-from django.views.decorators.cache import never_cache
-from django.views.decorators.common import no_append_slash
-from django.views.decorators.csrf import csrf_protect
-from django.views.i18n import JavaScriptCatalog
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.contrib.admin import ModelAdmin, actions
+from thibaud.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
+from thibaud.contrib.admin.views.autocomplete import AutocompleteJsonView
+from thibaud.contrib.auth import REDIRECT_FIELD_NAME
+from thibaud.contrib.auth.decorators import login_not_required
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db.models.base import ModelBase
+from thibaud.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
+from thibaud.template.response import TemplateResponse
+from thibaud.urls import NoReverseMatch, Resolver404, resolve, reverse, reverse_lazy
+from thibaud.utils.decorators import method_decorator
+from thibaud.utils.functional import LazyObject
+from thibaud.utils.module_loading import import_string
+from thibaud.utils.text import capfirst
+from thibaud.utils.translation import gettext as _
+from thibaud.utils.translation import gettext_lazy
+from thibaud.views.decorators.cache import never_cache
+from thibaud.views.decorators.common import no_append_slash
+from thibaud.views.decorators.csrf import csrf_protect
+from thibaud.views.i18n import JavaScriptCatalog
 
 all_sites = WeakSet()
 
 
 class AdminSite:
     """
-    An AdminSite object encapsulates an instance of the Django admin application, ready
+    An AdminSite object encapsulates an instance of the Thibaud admin application, ready
     to be hooked in to your URLconf. Models are registered with the AdminSite using the
-    register() method, and the get_urls() method can then be used to access Django view
+    register() method, and the get_urls() method can then be used to access Thibaud view
     functions that present a full admin interface for the collection of registered
     models.
     """
 
     # Text to put at the end of each page's <title>.
-    site_title = gettext_lazy("Django site admin")
+    site_title = gettext_lazy("Thibaud site admin")
 
     # Text to put in each page's <div id="site-name">.
-    site_header = gettext_lazy("Django administration")
+    site_header = gettext_lazy("Thibaud administration")
 
     # Text to put at the top of the admin index page.
     index_title = gettext_lazy("Site administration")
@@ -218,7 +218,7 @@ class AdminSite:
             class MyAdminSite(AdminSite):
 
                 def get_urls(self):
-                    from django.urls import path
+                    from thibaud.urls import path
 
                     urls = super().get_urls()
                     urls += [
@@ -236,9 +236,9 @@ class AdminSite:
                 if request.path == reverse("admin:logout", current_app=self.name):
                     index_path = reverse("admin:index", current_app=self.name)
                     return HttpResponseRedirect(index_path)
-                # Inner import to prevent django.contrib.admin (app) from
-                # importing django.contrib.auth.models.User (unrelated model).
-                from django.contrib.auth.views import redirect_to_login
+                # Inner import to prevent thibaud.contrib.admin (app) from
+                # importing thibaud.contrib.auth.models.User (unrelated model).
+                from thibaud.contrib.auth.views import redirect_to_login
 
                 return redirect_to_login(
                     request.get_full_path(),
@@ -257,9 +257,9 @@ class AdminSite:
     def get_urls(self):
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
-        # and django.contrib.contenttypes.views imports ContentType.
-        from django.contrib.contenttypes import views as contenttype_views
-        from django.urls import include, path, re_path
+        # and thibaud.contrib.contenttypes.views imports ContentType.
+        from thibaud.contrib.contenttypes import views as contenttype_views
+        from thibaud.urls import include, path, re_path
 
         def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
@@ -351,8 +351,8 @@ class AdminSite:
         """
         Handle the "change password" task -- both form display and validation.
         """
-        from django.contrib.admin.forms import AdminPasswordChangeForm
-        from django.contrib.auth.views import PasswordChangeView
+        from thibaud.contrib.admin.forms import AdminPasswordChangeForm
+        from thibaud.contrib.auth.views import PasswordChangeView
 
         url = reverse("admin:password_change_done", current_app=self.name)
         defaults = {
@@ -369,7 +369,7 @@ class AdminSite:
         """
         Display the "success" page after a password change.
         """
-        from django.contrib.auth.views import PasswordChangeDoneView
+        from thibaud.contrib.auth.views import PasswordChangeDoneView
 
         defaults = {
             "extra_context": {**self.each_context(request), **(extra_context or {})},
@@ -381,12 +381,12 @@ class AdminSite:
 
     def i18n_javascript(self, request, extra_context=None):
         """
-        Display the i18n JavaScript that the Django admin requires.
+        Display the i18n JavaScript that the Thibaud admin requires.
 
         `extra_context` is unused but present for consistency with the other
         admin views.
         """
-        return JavaScriptCatalog.as_view(packages=["django.contrib.admin"])(request)
+        return JavaScriptCatalog.as_view(packages=["thibaud.contrib.admin"])(request)
 
     def logout(self, request, extra_context=None):
         """
@@ -394,7 +394,7 @@ class AdminSite:
 
         This should *not* assume the user is already logged in.
         """
-        from django.contrib.auth.views import LogoutView
+        from thibaud.contrib.auth.views import LogoutView
 
         defaults = {
             "extra_context": {
@@ -423,9 +423,9 @@ class AdminSite:
 
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
-        # and django.contrib.admin.forms eventually imports User.
-        from django.contrib.admin.forms import AdminAuthenticationForm
-        from django.contrib.auth.views import LoginView
+        # and thibaud.contrib.admin.forms eventually imports User.
+        from thibaud.contrib.admin.forms import AdminAuthenticationForm
+        from thibaud.contrib.auth.views import LoginView
 
         context = {
             **self.each_context(request),
@@ -601,7 +601,7 @@ class AdminSite:
         )
 
     def get_log_entries(self, request):
-        from django.contrib.admin.models import LogEntry
+        from thibaud.contrib.admin.models import LogEntry
 
         return LogEntry.objects.select_related("content_type", "user")
 

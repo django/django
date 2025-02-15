@@ -2,14 +2,14 @@
 Built-in, globally-available admin actions.
 """
 
-from django.contrib import messages
-from django.contrib.admin import helpers
-from django.contrib.admin.decorators import action
-from django.contrib.admin.utils import model_ngettext
-from django.core.exceptions import PermissionDenied
-from django.template.response import TemplateResponse
-from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
+from thibaud.contrib import messages
+from thibaud.contrib.admin import helpers
+from thibaud.contrib.admin.decorators import action
+from thibaud.contrib.admin.utils import model_ngettext
+from thibaud.core.exceptions import PermissionDenied
+from thibaud.template.response import TemplateResponse
+from thibaud.utils.translation import gettext as _
+from thibaud.utils.translation import gettext_lazy
 
 
 @action(

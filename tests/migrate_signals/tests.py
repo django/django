@@ -1,10 +1,10 @@
 from io import StringIO
 
-from django.apps import apps
-from django.core import management
-from django.db import migrations
-from django.db.models import signals
-from django.test import TransactionTestCase, override_settings
+from thibaud.apps import apps
+from thibaud.core import management
+from thibaud.db import migrations
+from thibaud.db.models import signals
+from thibaud.test import TransactionTestCase, override_settings
 
 APP_CONFIG = apps.get_app_config("migrate_signals")
 SIGNAL_ARGS = [

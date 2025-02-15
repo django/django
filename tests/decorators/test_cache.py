@@ -2,10 +2,10 @@ from unittest import mock
 
 from asgiref.sync import iscoroutinefunction
 
-from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_control, cache_page, never_cache
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.test import SimpleTestCase
+from thibaud.utils.decorators import method_decorator
+from thibaud.views.decorators.cache import cache_control, cache_page, never_cache
 
 
 class HttpRequestProxy:

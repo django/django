@@ -1,23 +1,23 @@
 'use strict';
 {
     const globals = this;
-    const django = globals.django;
+    const thibaud = globals.thibaud;
 
-    django.pluralidx = function(count) { return (count === 1) ? 0 : 1; };
+    thibaud.pluralidx = function(count) { return (count === 1) ? 0 : 1; };
 
     /* gettext identity library */
 
-    django.gettext = function(msgid) { return msgid; };
-    django.ngettext = function(singular, plural, count) {
+    thibaud.gettext = function(msgid) { return msgid; };
+    thibaud.ngettext = function(singular, plural, count) {
         return (count === 1) ? singular : plural;
     };
-    django.gettext_noop = function(msgid) { return msgid; };
-    django.pgettext = function(context, msgid) { return msgid; };
-    django.npgettext = function(context, singular, plural, count) {
+    thibaud.gettext_noop = function(msgid) { return msgid; };
+    thibaud.pgettext = function(context, msgid) { return msgid; };
+    thibaud.npgettext = function(context, singular, plural, count) {
         return (count === 1) ? singular : plural;
     };
 
-    django.interpolate = function(fmt, obj, named) {
+    thibaud.interpolate = function(fmt, obj, named) {
         if (named) {
             return fmt.replace(/%\(\w+\)s/g, function(match) {
                 return String(obj[match.slice(2, -2)]);
@@ -31,7 +31,7 @@
 
     /* formatting library */
 
-    django.formats = {
+    thibaud.formats = {
         "DATETIME_FORMAT": "N j, Y, P",
         "DATETIME_INPUT_FORMATS": [
             "%Y-%m-%d %H:%M:%S",
@@ -69,8 +69,8 @@
         "YEAR_MONTH_FORMAT": "F Y"
     };
 
-    django.get_format = function(format_type) {
-        const value = django.formats[format_type];
+    thibaud.get_format = function(format_type) {
+        const value = thibaud.formats[format_type];
         if (typeof value === 'undefined') {
             return format_type;
         } else {
@@ -79,12 +79,12 @@
     };
 
     /* add to global namespace */
-    globals.pluralidx = django.pluralidx;
-    globals.gettext = django.gettext;
-    globals.ngettext = django.ngettext;
-    globals.gettext_noop = django.gettext_noop;
-    globals.pgettext = django.pgettext;
-    globals.npgettext = django.npgettext;
-    globals.interpolate = django.interpolate;
-    globals.get_format = django.get_format;
+    globals.pluralidx = thibaud.pluralidx;
+    globals.gettext = thibaud.gettext;
+    globals.ngettext = thibaud.ngettext;
+    globals.gettext_noop = thibaud.gettext_noop;
+    globals.pgettext = thibaud.pgettext;
+    globals.npgettext = thibaud.npgettext;
+    globals.interpolate = thibaud.interpolate;
+    globals.get_format = thibaud.get_format;
 };

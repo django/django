@@ -3,37 +3,37 @@ from importlib import import_module
 from inspect import cleandoc
 from pathlib import Path
 
-from django.apps import apps
-from django.contrib import admin
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.admindocs import utils
-from django.contrib.admindocs.utils import (
+from thibaud.apps import apps
+from thibaud.contrib import admin
+from thibaud.contrib.admin.views.decorators import staff_member_required
+from thibaud.contrib.admindocs import utils
+from thibaud.contrib.admindocs.utils import (
     remove_non_capturing_groups,
     replace_metacharacters,
     replace_named_groups,
     replace_unnamed_groups,
 )
-from django.contrib.auth import get_permission_codename
-from django.core.exceptions import (
+from thibaud.contrib.auth import get_permission_codename
+from thibaud.core.exceptions import (
     ImproperlyConfigured,
     PermissionDenied,
     ViewDoesNotExist,
 )
-from django.db import models
-from django.http import Http404
-from django.template.engine import Engine
-from django.urls import get_mod_func, get_resolver, get_urlconf
-from django.utils._os import safe_join
-from django.utils.decorators import method_decorator
-from django.utils.functional import cached_property
-from django.utils.inspect import (
+from thibaud.db import models
+from thibaud.http import Http404
+from thibaud.template.engine import Engine
+from thibaud.urls import get_mod_func, get_resolver, get_urlconf
+from thibaud.utils._os import safe_join
+from thibaud.utils.decorators import method_decorator
+from thibaud.utils.functional import cached_property
+from thibaud.utils.inspect import (
     func_accepts_kwargs,
     func_accepts_var_args,
     get_func_full_args,
     method_has_no_args,
 )
-from django.utils.translation import gettext as _
-from django.views.generic import TemplateView
+from thibaud.utils.translation import gettext as _
+from thibaud.views.generic import TemplateView
 
 from .utils import get_view_name, strip_p_tags
 

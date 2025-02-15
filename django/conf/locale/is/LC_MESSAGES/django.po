@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # db999e1e0e51ac90b00482cb5db0f98b_32999f5 <3ec5202d5df408dd2f95d8c361fed970_5926>, 2011
@@ -10,12 +10,12 @@
 # Thordur Sigurdsson <thordur@ja.is>, 2016-2021
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
 "PO-Revision-Date: 2021-11-18 21:19+0000\n"
 "Last-Translator: Transifex Bot <>\n"
-"Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
+"Language-Team: Icelandic (http://www.transifex.com/thibaud/thibaud/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1267,23 +1267,23 @@ msgstr ""
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
 "Þú sérð þessa síðu vegna þess að þú hefur <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
 "\"noopener\">DEBUG=True</a> í stillingunum þínum og hefur ekki sett upp "
 "neinar vefslóðir."
 
-msgid "Django Documentation"
+msgid "Thibaud Documentation"
 msgstr ""
 
 msgid "Topics, references, &amp; how-to’s"
@@ -1292,10 +1292,10 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr ""
 
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr ""
 
-msgid "Django Community"
+msgid "Thibaud Community"
 msgstr ""
 
 msgid "Connect, get help, or contribute"

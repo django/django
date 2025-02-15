@@ -1,11 +1,11 @@
 import time
 
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import require_jinja2
-from django.urls import resolve
-from django.views.generic import RedirectView, TemplateView, View
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import HttpResponse
+from thibaud.test import RequestFactory, SimpleTestCase, override_settings
+from thibaud.test.utils import require_jinja2
+from thibaud.urls import resolve
+from thibaud.views.generic import RedirectView, TemplateView, View
 
 from . import views
 
@@ -357,7 +357,7 @@ class TemplateViewTest(SimpleTestCase):
         view = TemplateView.as_view(template_name="generic_views/using.html")
         self.assertEqual(view(request).render().content, b"DTL\n")
         view = TemplateView.as_view(
-            template_name="generic_views/using.html", template_engine="django"
+            template_name="generic_views/using.html", template_engine="thibaud"
         )
         self.assertEqual(view(request).render().content, b"DTL\n")
         view = TemplateView.as_view(

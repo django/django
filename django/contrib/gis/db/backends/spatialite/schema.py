@@ -1,5 +1,5 @@
-from django.db import DatabaseError
-from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
+from thibaud.db import DatabaseError
+from thibaud.db.backends.sqlite3.schema import DatabaseSchemaEditor
 
 
 class SpatialiteSchemaEditor(DatabaseSchemaEditor):
@@ -37,7 +37,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         return self.connection.ops.geo_quote_name(name)
 
     def column_sql(self, model, field, include_default=False):
-        from django.contrib.gis.db.models import GeometryField
+        from thibaud.contrib.gis.db.models import GeometryField
 
         if not isinstance(field, GeometryField):
             return super().column_sql(model, field, include_default)
@@ -89,7 +89,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         self.geometry_sql = []
 
     def delete_model(self, model, **kwargs):
-        from django.contrib.gis.db.models import GeometryField
+        from thibaud.contrib.gis.db.models import GeometryField
 
         # Drop spatial metadata (dropping the table does not automatically remove them)
         for field in model._meta.local_fields:
@@ -110,7 +110,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         super().delete_model(model, **kwargs)
 
     def add_field(self, model, field):
-        from django.contrib.gis.db.models import GeometryField
+        from thibaud.contrib.gis.db.models import GeometryField
 
         if isinstance(field, GeometryField):
             # Populate self.geometry_sql
@@ -122,7 +122,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
             super().add_field(model, field)
 
     def remove_field(self, model, field):
-        from django.contrib.gis.db.models import GeometryField
+        from thibaud.contrib.gis.db.models import GeometryField
 
         # NOTE: If the field is a geometry field, the table is just recreated,
         # the parent's remove_field can't be used cause it will skip the
@@ -135,7 +135,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
             super().remove_field(model, field)
 
     def alter_db_table(self, model, old_db_table, new_db_table):
-        from django.contrib.gis.db.models import GeometryField
+        from thibaud.contrib.gis.db.models import GeometryField
 
         if old_db_table == new_db_table or (
             self.connection.features.ignores_table_name_case

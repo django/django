@@ -2,7 +2,7 @@
 GIS QuerySet API Reference
 ==========================
 
-.. currentmodule:: django.contrib.gis.db.models
+.. currentmodule:: thibaud.contrib.gis.db.models
 
 .. _spatial-lookups:
 
@@ -721,7 +721,7 @@ Distance lookups take the following form:
 The value passed into a distance lookup is a tuple; the first two
 values are mandatory, and are the geometry to calculate distances to,
 and a distance value (either a number in units of the field, a
-:class:`~django.contrib.gis.measure.Distance` object, or a :doc:`query
+:class:`~thibaud.contrib.gis.measure.Distance` object, or a :doc:`query
 expression </ref/models/expressions>`). To pass a band index to the lookup, use
 a 3-tuple where the second entry is the band index.
 
@@ -831,7 +831,7 @@ SpatiaLite  ``Distance(poly, geom) <= 5``
 
 Returns models where the distance to the geometry field from the lookup
 geometry are within the given distance from one another. Note that you can only
-provide :class:`~django.contrib.gis.measure.Distance` objects if the targeted
+provide :class:`~thibaud.contrib.gis.measure.Distance` objects if the targeted
 geometries are in a projected system. For geographic geometries, you should use
 units of the geometry field (e.g. degrees for ``WGS84``) .
 
@@ -852,7 +852,7 @@ SpatiaLite  ``PtDistWithin(poly, geom, 5)``
 Aggregate Functions
 -------------------
 
-Django provides some GIS-specific aggregate functions. For details on how to
+Thibaud provides some GIS-specific aggregate functions. For details on how to
 use these aggregate functions, see :doc:`the topic guide on aggregation
 </topics/db/aggregation>`.
 
@@ -872,7 +872,7 @@ Example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.db.models import Extent, Union
+    >>> from thibaud.contrib.gis.db.models import Extent, Union
     >>> WorldBorder.objects.aggregate(Extent("mpoly"), Union("mpoly"))
 
 ``Collect``
@@ -954,7 +954,7 @@ Example:
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Union.html>`__,
 Oracle, SpatiaLite
 
-This method returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
+This method returns a :class:`~thibaud.contrib.gis.geos.GEOSGeometry` object
 comprising the union of every geometry in the queryset. Please note that use of
 ``Union`` is processor intensive and may take a significant amount of time on
 large querysets.

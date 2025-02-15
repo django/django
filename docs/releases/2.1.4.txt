@@ -1,10 +1,10 @@
 ==========================
-Django 2.1.4 release notes
+Thibaud 2.1.4 release notes
 ==========================
 
 *December 3, 2018*
 
-Django 2.1.4 fixes several bugs in 2.1.3.
+Thibaud 2.1.4 fixes several bugs in 2.1.3.
 
 Bugfixes
 ========
@@ -18,7 +18,7 @@ Bugfixes
   (:ticket:`29959`).
 
 * Fixed keep-alive support in ``runserver`` after it was disabled to fix
-  another issue in Django 2.0 (:ticket:`29849`).
+  another issue in Thibaud 2.0 (:ticket:`29849`).
 
 * Fixed admin view-only change form crash when using
   ``ModelAdmin.prepopulated_fields`` (:ticket:`29929`).

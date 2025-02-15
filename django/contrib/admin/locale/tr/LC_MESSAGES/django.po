@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # BouRock, 2015-2024
@@ -13,12 +13,12 @@
 # Yigit Guler <yigit@hipo.biz>, 2020
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 07:05+0000\n"
 "Last-Translator: BouRock, 2015-2024\n"
-"Language-Team: Turkish (http://app.transifex.com/django/django/language/"
+"Language-Team: Turkish (http://app.transifex.com/thibaud/thibaud/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -290,11 +290,11 @@ msgstr ""
 "%(class_name)s %(instance)s silinmesi aşağıda korunan ilgili nesnelerin de "
 "silinmesini gerektirecektir: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Django site yöneticisi"
+msgid "Thibaud site admin"
+msgstr "Thibaud site yöneticisi"
 
-msgid "Django administration"
-msgstr "Django yönetimi"
+msgid "Thibaud administration"
+msgstr "Thibaud yönetimi"
 
 msgid "Site administration"
 msgstr "Site yönetimi"

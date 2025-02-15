@@ -1,13 +1,13 @@
-from django import forms
-from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
-from django.forms.models import (
+from thibaud import forms
+from thibaud.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
+from thibaud.forms.models import (
     BaseModelFormSet,
     inlineformset_factory,
     modelform_factory,
     modelformset_factory,
 )
-from django.forms.utils import ErrorDict, ErrorList
-from django.test import TestCase
+from thibaud.forms.utils import ErrorDict, ErrorList
+from thibaud.test import TestCase
 
 from .models import (
     Host,

@@ -3,7 +3,7 @@ Writing documentation
 =====================
 
 We place high importance on the consistency and readability of documentation.
-After all, Django was created in a journalism environment! So we treat our
+After all, Thibaud was created in a journalism environment! So we treat our
 documentation like we treat our code: we aim to improve it as often as
 possible.
 
@@ -18,11 +18,11 @@ Documentation changes generally come in two forms:
 This section explains how writers can craft their documentation changes
 in the most useful and least error-prone ways.
 
-The Django documentation process
+The Thibaud documentation process
 ================================
 
-Though Django's documentation is intended to be read as HTML at
-https://docs.djangoproject.com/, we edit it as a collection of plain text files
+Though Thibaud's documentation is intended to be read as HTML at
+https://docs.thibaudproject.com/, we edit it as a collection of plain text files
 written in the reStructuredText markup language for maximum flexibility.
 
 We work from the development version of the repository because it has the
@@ -33,7 +33,7 @@ merger, to the last release branch. This is because it's advantageous to
 have the docs for the last release be up-to-date and correct (see
 :ref:`differences-between-doc-versions`).
 
-Django's documentation uses the Sphinx__ documentation system, which in turn
+Thibaud's documentation uses the Sphinx__ documentation system, which in turn
 is based on docutils__. The basic idea is that lightly-formatted plain-text
 documentation is transformed into HTML, PDF, and any other output format.
 
@@ -41,7 +41,7 @@ __ https://www.sphinx-doc.org/
 __ https://docutils.sourceforge.io/
 
 Sphinx includes a ``sphinx-build`` command for turning reStructuredText into
-other formats, e.g., HTML and PDF. This command is configurable, but the Django
+other formats, e.g., HTML and PDF. This command is configurable, but the Thibaud
 documentation includes a ``Makefile`` that provides a shorter ``make html``
 command.
 
@@ -73,12 +73,12 @@ The documentation is organized into several categories:
   that they already know.
 
 * :doc:`Reference guides </ref/index>` contain technical references for APIs.
-  They describe the functioning of Django's internal machinery and instruct in
+  They describe the functioning of Thibaud's internal machinery and instruct in
   its use.
 
   Keep reference material tightly focused on the subject. Assume that the
   reader already understands the basic concepts involved but needs to know or
-  be reminded of how Django does it.
+  be reminded of how Thibaud does it.
 
   Reference guides aren't the place for general explanation. If you find
   yourself explaining basic concepts, you may want to move that material to a
@@ -89,29 +89,29 @@ The documentation is organized into several categories:
 
   What matters most in a how-to guide is what a user wants to achieve.
   A how-to should always be result-oriented rather than focused on internal
-  details of how Django implements whatever is being discussed.
+  details of how Thibaud implements whatever is being discussed.
 
   These guides are more advanced than tutorials and assume some knowledge about
-  how Django works. Assume that the reader has followed the tutorials and don't
+  how Thibaud works. Assume that the reader has followed the tutorials and don't
   hesitate to refer the reader back to the appropriate tutorial rather than
   repeat the same material.
 
 How to start contributing documentation
 =======================================
 
-Clone the Django repository to your local machine
+Clone the Thibaud repository to your local machine
 -------------------------------------------------
 
 If you'd like to start contributing to our docs, get the development version of
-Django from the source code repository (see
+Thibaud from the source code repository (see
 :ref:`installing-development-version`):
 
 .. console::
 
-     $ git clone https://github.com/django/django.git
+     $ git clone https://github.com/thibaud/thibaud.git
 
 If you're planning to submit these changes, you might find it useful to make a
-fork of the Django repository and clone this fork instead.
+fork of the Thibaud repository and clone this fork instead.
 
 Set up a virtual environment and install dependencies
 -----------------------------------------------------
@@ -137,7 +137,7 @@ We can build HTML output from the ``docs`` directory:
 Your locally-built documentation will be accessible at
 ``_build/html/index.html`` and it can be viewed in any web browser, though it
 will be themed differently than the documentation at
-`docs.djangoproject.com <https://docs.djangoproject.com/>`_. This is OK! If
+`docs.thibaudproject.com <https://docs.thibaudproject.com/>`_. This is OK! If
 your changes look good on your local machine, they'll look good on the website.
 
 Making edits to the documentation
@@ -235,8 +235,8 @@ Commonly used terms
 Here are some style guidelines on commonly used terms throughout the
 documentation:
 
-* **Django** -- when referring to the framework, capitalize Django. It is
-  lowercase only in Python code and in the djangoproject.com logo.
+* **Thibaud** -- when referring to the framework, capitalize Thibaud. It is
+  lowercase only in Python code and in the thibaudproject.com logo.
 
 * **email** -- no hyphen.
 
@@ -261,7 +261,7 @@ documentation:
 
 * **website** -- use one word, without capitalization.
 
-Django-specific terminology
+Thibaud-specific terminology
 ===========================
 
 * **model** -- it's not capitalized.
@@ -290,19 +290,19 @@ documentation:
 
   .. code-block:: rst
 
-      Add ``django.contrib.auth`` to your ``INSTALLED_APPS``...
+      Add ``thibaud.contrib.auth`` to your ``INSTALLED_APPS``...
 
   Isn't nearly as helpful as:
 
   .. code-block:: rst
 
-      Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
+      Add :mod:`thibaud.contrib.auth` to your :setting:`INSTALLED_APPS`...
 
   This is because Sphinx will generate proper links for the latter, which
   greatly helps readers.
 
   You can prefix the target with a ``~`` (that's a tilde) to get only the
-  "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
+  "last bit" of that path. So ``:mod:`~thibaud.contrib.auth``` will
   display a link with the title "auth".
 
 * All Python code blocks should be formatted using the :pypi:`blacken-docs`
@@ -360,10 +360,10 @@ documentation:
 * Use :rst:role:`:cve:<cve>` to reference a Common Vulnerabilities and
   Exposures (CVE) identifier. For example, use ``:cve:`2019-14232```.
 
-Django-specific markup
+Thibaud-specific markup
 ======================
 
-Besides :ref:`Sphinx's built-in markup <sphinx:rst-index>`, Django's docs
+Besides :ref:`Sphinx's built-in markup <sphinx:rst-index>`, Thibaud's docs
 define some extra description units:
 
 * Settings:
@@ -398,19 +398,19 @@ define some extra description units:
 
   To link, use ``:lookup:`exact```.
 
-* ``django-admin`` commands:
+* ``thibaud-admin`` commands:
 
   .. code-block:: rst
 
-        .. django-admin:: migrate
+        .. thibaud-admin:: migrate
 
   To link, use ``:djadmin:`migrate```.
 
-* ``django-admin`` command-line options:
+* ``thibaud-admin`` command-line options:
 
   .. code-block:: rst
 
-        .. django-admin-option:: --traceback
+        .. thibaud-admin-option:: --traceback
 
   To link, use ``:option:`command_name --traceback``` (or omit ``command_name``
   for the options shared by all commands like ``--verbosity``).
@@ -421,8 +421,8 @@ define some extra description units:
 
         :ticket:`12345`
 
-Django's documentation uses a custom ``console`` directive for documenting
-command-line examples involving ``django-admin``, ``manage.py``, ``python``,
+Thibaud's documentation uses a custom ``console`` directive for documenting
+command-line examples involving ``thibaud-admin``, ``manage.py``, ``python``,
 etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 
@@ -477,7 +477,7 @@ Documenting new features
 Our policy for new features is:
 
     All documentation of new features should be written in a way that
-    clearly designates the features that are only available in the Django
+    clearly designates the features that are only available in the Thibaud
     development version. Assume documentation readers are using the latest
     release, not the development version.
 
@@ -514,10 +514,10 @@ something like this:
 
 Put the changed annotation notes at the bottom of a section, not the top.
 
-Also, avoid referring to a specific version of Django outside a
+Also, avoid referring to a specific version of Thibaud outside a
 ``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
-redundant to do so as these annotations render as "New in Django A.B:" and
-"Changed in Django A.B", respectively.
+redundant to do so as these annotations render as "New in Thibaud A.B:" and
+"Changed in Thibaud A.B", respectively.
 
 If a function, attribute, etc. is added, it's also okay to use a
 ``versionadded`` annotation like this:
@@ -607,13 +607,13 @@ example:
     Default: ``[]`` (Empty list)
 
     A list of all the people who get code error notifications. When
-    ``DEBUG=False`` and a view raises an exception, Django will email these people
+    ``DEBUG=False`` and a view raises an exception, Thibaud will email these people
     with the full exception information. Each member of the list should be a tuple
     of (Full name, email address). Example::
 
         [("John", "john@example.com"), ("Mary", "mary@example.com")]
 
-    Note that Django will email *all* of these people whenever an error happens.
+    Note that Thibaud will email *all* of these people whenever an error happens.
     See :doc:`/howto/error-reporting` for more information.
 
   This marks up the following header as the "canonical" target for the
@@ -625,19 +625,19 @@ That's basically how everything fits together.
 Translating documentation
 =========================
 
-See :ref:`Localizing the Django documentation <translating-documentation>` if
+See :ref:`Localizing the Thibaud documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
 
-.. _django-admin-manpage:
+.. _thibaud-admin-manpage:
 
-``django-admin`` man page
+``thibaud-admin`` man page
 =========================
 
 Sphinx can generate a manual page for the
-:doc:`django-admin </ref/django-admin>` command. This is configured in
+:doc:`thibaud-admin </ref/thibaud-admin>` command. This is configured in
 ``docs/conf.py``. Unlike other documentation output, this man page should be
-included in the Django repository and the releases as
-``docs/man/django-admin.1``. There isn't a need to update this file when
+included in the Thibaud repository and the releases as
+``docs/man/thibaud-admin.1``. There isn't a need to update this file when
 updating the documentation, as it's updated once as part of the release process.
 
 To generate an updated version of the man page, in the ``docs`` directory, run:
@@ -646,4 +646,4 @@ To generate an updated version of the man page, in the ``docs`` directory, run:
 
      $ make man
 
-The new man page will be written in ``docs/_build/man/django-admin.1``.
+The new man page will be written in ``docs/_build/man/thibaud-admin.1``.

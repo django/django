@@ -1,7 +1,7 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
-# The *_FORMAT strings use the Django date format syntax,
-# see https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# The *_FORMAT strings use the Thibaud date format syntax,
+# see https://docs.thibaudproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = "Y년 n월 j일"
 TIME_FORMAT = "A g:i"
 DATETIME_FORMAT = "Y년 n월 j일 g:i A"

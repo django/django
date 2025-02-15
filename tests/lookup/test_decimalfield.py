@@ -1,5 +1,5 @@
-from django.db.models import F, Sum
-from django.test import TestCase
+from thibaud.db.models import F, Sum
+from thibaud.test import TestCase
 
 from .models import Product, Stock
 

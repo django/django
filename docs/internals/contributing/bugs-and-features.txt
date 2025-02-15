@@ -5,26 +5,26 @@ Reporting bugs and requesting features
 .. Important::
 
     Please report security issues **only** to
-    security@djangoproject.com.  This is a private list only open to
-    long-time, highly trusted Django developers, and its archives are
+    security@thibaudproject.com.  This is a private list only open to
+    long-time, highly trusted Thibaud developers, and its archives are
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
 
 Otherwise, before reporting a bug or requesting a new feature on the
-`ticket tracker <https://code.djangoproject.com/>`_, consider these points:
+`ticket tracker <https://code.thibaudproject.com/>`_, consider these points:
 
 * Check that someone hasn't already filed the bug or feature request by
   `searching`_ or running `custom queries`_ in the ticket tracker.
 
 * Don't use the ticket system to ask support questions. Use the
-  |django-users| list or the `Django Discord server`_ for that.
+  |thibaud-users| list or the `Thibaud Discord server`_ for that.
 
 * Don't reopen issues that have been marked "wontfix" without finding consensus
-  to do so on the `Django Forum`_ or |django-developers| list.
+  to do so on the `Thibaud Forum`_ or |thibaud-developers| list.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
-  discussion to the `Django Forum`_ or |django-developers| list.
+  discussion to the `Thibaud Forum`_ or |thibaud-developers| list.
 
 .. _reporting-bugs:
 
@@ -39,7 +39,7 @@ particular:
 * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might
   be a well-known question.
 
-* **Do** ask on |django-users| or the `Django Discord server`_ *first* if
+* **Do** ask on |thibaud-users| or the `Thibaud Discord server`_ *first* if
   you're not sure if what you're seeing is a bug.
 
 * **Do** write complete, reproducible, specific bug reports. You must
@@ -49,8 +49,8 @@ particular:
   small test case is the best way to report a bug, as it gives us a
   helpful way to confirm the bug quickly.
 
-* **Don't** post to |django-developers| only to announce that you have filed a
-  bug report. All the tickets are mailed to another list, |django-updates|,
+* **Don't** post to |thibaud-developers| only to announce that you have filed a
+  bug report. All the tickets are mailed to another list, |thibaud-updates|,
   which is tracked by developers and interested community members; we see them
   as they are filed.
 
@@ -71,7 +71,7 @@ are a few additional guidelines to follow:
   capturing a *brief* screencast. If your software permits it, capture only
   the relevant area of the screen.
 
-* If you're offering a patch that changes the look or behavior of Django's
+* If you're offering a patch that changes the look or behavior of Thibaud's
   UI, you **must** attach before *and* after screenshots/screencasts.
   Tickets lacking these are difficult for triagers to assess quickly.
 
@@ -85,19 +85,19 @@ are a few additional guidelines to follow:
 Requesting features
 ===================
 
-We're always trying to make Django better, and your feature requests are a key
+We're always trying to make Thibaud better, and your feature requests are a key
 part of that. Here are some tips on how to make a request most effectively:
 
-* Make sure the feature actually requires changes in Django's core. If your
+* Make sure the feature actually requires changes in Thibaud's core. If your
   idea can be developed as an independent application or module — for
   instance, you want to support another database engine — we'll probably
   suggest that you develop it independently. Then, if your project gathers
-  sufficient community support, we may consider it for inclusion in Django.
+  sufficient community support, we may consider it for inclusion in Thibaud.
 
-* First request the feature on the `Django Forum`_ or |django-developers| list,
+* First request the feature on the `Thibaud Forum`_ or |thibaud-developers| list,
   not in the ticket tracker. It'll get read more closely if it's on the mailing
   list. This is even more important for large-scale feature requests. We like
-  to discuss any big changes to Django's core before actually working on them.
+  to discuss any big changes to Thibaud's core before actually working on them.
 
 * Describe clearly and concisely what the missing feature is and how you'd
   like to see it implemented. Include example code (non-functional is OK)
@@ -118,7 +118,7 @@ Requesting performance optimizations
 Reports of a performance regression, or suggested performance optimizations,
 should provide benchmarks and commands for the ticket triager to reproduce.
 
-See the :ref:`django-asv-benchmarks` for more details of Django's existing
+See the :ref:`thibaud-asv-benchmarks` for more details of Thibaud's existing
 benchmarks.
 
 .. _how-we-make-decisions:
@@ -127,7 +127,7 @@ How we make decisions
 =====================
 
 Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on |django-developers| or the Django Forum about a feature.
+have informal votes on |thibaud-developers| or the Thibaud Forum about a feature.
 In these votes we follow the voting style invented by Apache and used on Python
 itself, where votes are given as +1, +0, -0, or -1.
 Roughly translated, these votes mean:
@@ -162,9 +162,9 @@ Since this process allows any steering council member to veto a proposal, a
 convert that "-1" into at least a "+0".
 
 Votes on technical matters should be announced and held in public on the
-|django-developers| mailing list or on the `Django Forum`_.
+|thibaud-developers| mailing list or on the `Thibaud Forum`_.
 
-.. _searching: https://code.djangoproject.com/search
-.. _custom queries: https://code.djangoproject.com/query
-.. _Django Forum: https://forum.djangoproject.com/
-.. _Django Discord server: https://chat.djangoproject.com
+.. _searching: https://code.thibaudproject.com/search
+.. _custom queries: https://code.thibaudproject.com/query
+.. _Thibaud Forum: https://forum.thibaudproject.com/
+.. _Thibaud Discord server: https://chat.thibaudproject.com

@@ -1,7 +1,7 @@
-from django.db import connection
-from django.db.models import Value
-from django.db.models.functions import Length, Repeat
-from django.test import TestCase
+from thibaud.db import connection
+from thibaud.db.models import Value
+from thibaud.db.models.functions import Length, Repeat
+from thibaud.test import TestCase
 
 from ..models import Author
 

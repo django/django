@@ -2,9 +2,9 @@
 Generic date views
 ==================
 
-.. module:: django.views.generic.dates
+.. module:: thibaud.views.generic.dates
 
-Date-based generic views, provided in :mod:`django.views.generic.dates`, are
+Date-based generic views, provided in :mod:`thibaud.views.generic.dates`, are
 views for displaying drilldown pages for date-based data.
 
 .. note::
@@ -12,8 +12,8 @@ views for displaying drilldown pages for date-based data.
     Some of the examples on this page assume that an ``Article`` model has been
     defined as follows in ``myapp/models.py``::
 
-        from django.db import models
-        from django.urls import reverse
+        from thibaud.db import models
+        from thibaud.urls import reverse
 
 
         class Article(models.Model):
@@ -34,22 +34,22 @@ views for displaying drilldown pages for date-based data.
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseArchiveIndexView`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.dates.BaseArchiveIndexView`
+    * :class:`thibaud.views.generic.dates.BaseDateListView`
+    * :class:`thibaud.views.generic.list.MultipleObjectMixin`
+    * :class:`thibaud.views.generic.dates.DateMixin`
+    * :class:`thibaud.views.generic.base.View`
 
     **Context**
 
     In addition to the context provided by
-    :class:`django.views.generic.list.MultipleObjectMixin` (via
-    :class:`django.views.generic.dates.BaseDateListView`), the template's
+    :class:`thibaud.views.generic.list.MultipleObjectMixin` (via
+    :class:`thibaud.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+    * ``date_list``: A :meth:`QuerySet <thibaud.db.models.query.QuerySet.dates>`
       object containing all years that have objects available according to
       ``queryset``, represented as :class:`datetime.datetime` objects, in
       descending order.
@@ -64,8 +64,8 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.urls import path
-        from django.views.generic.dates import ArchiveIndexView
+        from thibaud.urls import path
+        from thibaud.views.generic.dates import ArchiveIndexView
 
         from myapp.models import Article
 
@@ -79,7 +79,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/article_archive.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <ul>
             {% for article in latest %}
@@ -100,14 +100,14 @@ views for displaying drilldown pages for date-based data.
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseYearArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.dates.BaseYearArchiveView`
+    * :class:`thibaud.views.generic.dates.YearMixin`
+    * :class:`thibaud.views.generic.dates.BaseDateListView`
+    * :class:`thibaud.views.generic.list.MultipleObjectMixin`
+    * :class:`thibaud.views.generic.dates.DateMixin`
+    * :class:`thibaud.views.generic.base.View`
 
     .. attribute:: make_object_list
 
@@ -125,11 +125,11 @@ views for displaying drilldown pages for date-based data.
     **Context**
 
     In addition to the context provided by
-    :class:`django.views.generic.list.MultipleObjectMixin` (via
-    :class:`django.views.generic.dates.BaseDateListView`), the template's
+    :class:`thibaud.views.generic.list.MultipleObjectMixin` (via
+    :class:`thibaud.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+    * ``date_list``: A :meth:`QuerySet <thibaud.db.models.query.QuerySet.dates>`
       object containing all months that have objects available according to
       ``queryset``, represented as :class:`datetime.datetime` objects, in
       ascending order.
@@ -153,7 +153,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import YearArchiveView
+        from thibaud.views.generic.dates import YearArchiveView
 
         from myapp.models import Article
 
@@ -166,7 +166,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.urls import path
+        from thibaud.urls import path
 
         from myapp.views import ArticleYearArchiveView
 
@@ -176,7 +176,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/article_archive_year.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <ul>
             {% for date in date_list %}
@@ -204,24 +204,24 @@ views for displaying drilldown pages for date-based data.
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseMonthArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.dates.BaseMonthArchiveView`
+    * :class:`thibaud.views.generic.dates.YearMixin`
+    * :class:`thibaud.views.generic.dates.MonthMixin`
+    * :class:`thibaud.views.generic.dates.BaseDateListView`
+    * :class:`thibaud.views.generic.list.MultipleObjectMixin`
+    * :class:`thibaud.views.generic.dates.DateMixin`
+    * :class:`thibaud.views.generic.base.View`
 
     **Context**
 
     In addition to the context provided by
-    :class:`~django.views.generic.list.MultipleObjectMixin` (via
-    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    :class:`~thibaud.views.generic.list.MultipleObjectMixin` (via
+    :class:`~thibaud.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+    * ``date_list``: A :meth:`QuerySet <thibaud.db.models.query.QuerySet.dates>`
       object containing all days that have objects available in the given month,
       according to ``queryset``, represented as :class:`datetime.datetime`
       objects, in ascending order.
@@ -245,7 +245,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import MonthArchiveView
+        from thibaud.views.generic.dates import MonthArchiveView
 
         from myapp.models import Article
 
@@ -257,7 +257,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.urls import path
+        from thibaud.urls import path
 
         from myapp.views import ArticleMonthArchiveView
 
@@ -278,7 +278,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/article_archive_month.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <ul>
             {% for article in object_list %}
@@ -306,21 +306,21 @@ views for displaying drilldown pages for date-based data.
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseWeekArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.WeekMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.dates.BaseWeekArchiveView`
+    * :class:`thibaud.views.generic.dates.YearMixin`
+    * :class:`thibaud.views.generic.dates.WeekMixin`
+    * :class:`thibaud.views.generic.dates.BaseDateListView`
+    * :class:`thibaud.views.generic.list.MultipleObjectMixin`
+    * :class:`thibaud.views.generic.dates.DateMixin`
+    * :class:`thibaud.views.generic.base.View`
 
     **Context**
 
     In addition to the context provided by
-    :class:`~django.views.generic.list.MultipleObjectMixin` (via
-    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    :class:`~thibaud.views.generic.list.MultipleObjectMixin` (via
+    :class:`~thibaud.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
     * ``week``: A :class:`~datetime.date` object
@@ -353,7 +353,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import WeekArchiveView
+        from thibaud.views.generic.dates import WeekArchiveView
 
         from myapp.models import Article
 
@@ -366,7 +366,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.urls import path
+        from thibaud.urls import path
 
         from myapp.views import ArticleWeekArchiveView
 
@@ -381,7 +381,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/article_archive_week.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <h1>Week {{ week|date:'W' }}</h1>
 
@@ -422,22 +422,22 @@ views for displaying drilldown pages for date-based data.
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseDayArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.DayMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.dates.BaseDayArchiveView`
+    * :class:`thibaud.views.generic.dates.YearMixin`
+    * :class:`thibaud.views.generic.dates.MonthMixin`
+    * :class:`thibaud.views.generic.dates.DayMixin`
+    * :class:`thibaud.views.generic.dates.BaseDateListView`
+    * :class:`thibaud.views.generic.list.MultipleObjectMixin`
+    * :class:`thibaud.views.generic.dates.DateMixin`
+    * :class:`thibaud.views.generic.base.View`
 
     **Context**
 
     In addition to the context provided by
-    :class:`~django.views.generic.list.MultipleObjectMixin` (via
-    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    :class:`~thibaud.views.generic.list.MultipleObjectMixin` (via
+    :class:`~thibaud.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
     * ``day``: A :class:`~datetime.date` object
@@ -469,7 +469,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import DayArchiveView
+        from thibaud.views.generic.dates import DayArchiveView
 
         from myapp.models import Article
 
@@ -481,7 +481,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.urls import path
+        from thibaud.urls import path
 
         from myapp.views import ArticleDayArchiveView
 
@@ -496,7 +496,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/article_archive_day.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <h1>{{ day }}</h1>
 
@@ -522,22 +522,22 @@ views for displaying drilldown pages for date-based data.
 .. class:: TodayArchiveView
 
     A day archive page showing all objects for *today*. This is exactly the
-    same as :class:`django.views.generic.dates.DayArchiveView`, except today's
+    same as :class:`thibaud.views.generic.dates.DayArchiveView`, except today's
     date is used instead of the ``year``/``month``/``day`` arguments.
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseTodayArchiveView`
-    * :class:`django.views.generic.dates.BaseDayArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.DayMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.dates.BaseTodayArchiveView`
+    * :class:`thibaud.views.generic.dates.BaseDayArchiveView`
+    * :class:`thibaud.views.generic.dates.YearMixin`
+    * :class:`thibaud.views.generic.dates.MonthMixin`
+    * :class:`thibaud.views.generic.dates.DayMixin`
+    * :class:`thibaud.views.generic.dates.BaseDateListView`
+    * :class:`thibaud.views.generic.list.MultipleObjectMixin`
+    * :class:`thibaud.views.generic.dates.DateMixin`
+    * :class:`thibaud.views.generic.base.View`
 
     **Notes**
 
@@ -545,7 +545,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import TodayArchiveView
+        from thibaud.views.generic.dates import TodayArchiveView
 
         from myapp.models import Article
 
@@ -557,7 +557,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.urls import path
+        from thibaud.urls import path
 
         from myapp.views import ArticleTodayArchiveView
 
@@ -583,16 +583,16 @@ views for displaying drilldown pages for date-based data.
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseDateDetailView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.DayMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.dates.BaseDateDetailView`
+    * :class:`thibaud.views.generic.dates.YearMixin`
+    * :class:`thibaud.views.generic.dates.MonthMixin`
+    * :class:`thibaud.views.generic.dates.DayMixin`
+    * :class:`thibaud.views.generic.dates.DateMixin`
+    * :class:`thibaud.views.generic.detail.BaseDetailView`
+    * :class:`thibaud.views.generic.detail.SingleObjectMixin`
+    * :class:`thibaud.views.generic.base.View`
 
     **Context**
 
@@ -605,8 +605,8 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.urls import path
-        from django.views.generic.dates import DateDetailView
+        from thibaud.urls import path
+        from thibaud.views.generic.dates import DateDetailView
 
         urlpatterns = [
             path(
@@ -618,7 +618,7 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/article_detail.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <h1>{{ object.title }}</h1>
 
@@ -626,9 +626,9 @@ views for displaying drilldown pages for date-based data.
 
     All of the generic views listed above have matching ``Base`` views that
     only differ in that they do not include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    :class:`~thibaud.views.generic.list.MultipleObjectTemplateResponseMixin`
     (for the archive views) or
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    :class:`~thibaud.views.generic.detail.SingleObjectTemplateResponseMixin`
     (for the :class:`DateDetailView`):
 
     .. class:: BaseArchiveIndexView

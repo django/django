@@ -1,5 +1,5 @@
-from django.db import models
-from django.utils import timezone
+from thibaud.db import models
+from thibaud.utils import timezone
 
 
 class Article(models.Model):

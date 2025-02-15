@@ -1,5 +1,5 @@
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.db import models
+from thibaud.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from thibaud.db import models
 
 
 class UserManager(BaseUserManager):

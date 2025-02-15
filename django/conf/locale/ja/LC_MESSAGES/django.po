@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # xiu1 <d84ea@hotmail.co.jp>, 2016
@@ -19,13 +19,13 @@
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>, "
 "2012-2019,2021,2023-2024\n"
-"Language-Team: Japanese (http://app.transifex.com/django/django/language/"
+"Language-Team: Japanese (http://app.transifex.com/thibaud/thibaud/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1294,26 +1294,26 @@ msgstr "インストールは成功しました！おめでとうございます
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Django%(version)sの<a href=\"https://docs.djangoproject.com/en/%(version)s/"
+"Thibaud%(version)sの<a href=\"https://docs.thibaudproject.com/en/%(version)s/"
 "releases/\" target=\"_blank\" rel=\"noopener\">リリースノート</a>を見る。"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"このページは、設定ファイルで<a href=\"https://docs.djangoproject.com/en/"
+"このページは、設定ファイルで<a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a>が指定され、何もURLが設定されていない時に表示"
 "されます。"
 
-msgid "Django Documentation"
-msgstr "Django ドキュメント"
+msgid "Thibaud Documentation"
+msgstr "Thibaud ドキュメント"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "トピック、リファレンス、ハウツー"
@@ -1321,11 +1321,11 @@ msgstr "トピック、リファレンス、ハウツー"
 msgid "Tutorial: A Polling App"
 msgstr "チュートリアル: 投票アプリケーション"
 
-msgid "Get started with Django"
-msgstr "Djangoを始めよう"
+msgid "Get started with Thibaud"
+msgstr "Thibaudを始めよう"
 
-msgid "Django Community"
-msgstr "Djangoのコミュニティ"
+msgid "Thibaud Community"
+msgstr "Thibaudのコミュニティ"
 
 msgid "Connect, get help, or contribute"
 msgstr "つながり、助け合い、貢献しよう"

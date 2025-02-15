@@ -2,7 +2,7 @@
 Cross Site Request Forgery protection
 =====================================
 
-.. module:: django.middleware.csrf
+.. module:: thibaud.middleware.csrf
    :synopsis: Protects against Cross Site Request Forgeries
 
 The CSRF middleware and template tag provides easy-to-use protection against
@@ -31,7 +31,7 @@ The CSRF protection is based on the following things:
    access to.
 
    ``CsrfViewMiddleware`` sends this cookie with the response whenever
-   ``django.middleware.csrf.get_token()`` is called. It can also send it in
+   ``thibaud.middleware.csrf.get_token()`` is called. It can also send it in
    other cases. For security reasons, the value of the secret is changed each
    time a user logs in.
 
@@ -131,7 +131,7 @@ idea, and these vulnerabilities cannot easily be fixed with current browsers.
 Utilities
 =========
 
-.. module:: django.views.decorators.csrf
+.. module:: thibaud.views.decorators.csrf
 
 The examples below assume you are using function-based views. If you
 are working with class-based views, you can refer to :ref:`Decorating
@@ -142,8 +142,8 @@ class-based views<decorating-class-based-views>`.
     This decorator marks a view as being exempt from the protection ensured by
     the middleware. Example::
 
-        from django.http import HttpResponse
-        from django.views.decorators.csrf import csrf_exempt
+        from thibaud.http import HttpResponse
+        from thibaud.views.decorators.csrf import csrf_exempt
 
 
         @csrf_exempt
@@ -153,12 +153,12 @@ class-based views<decorating-class-based-views>`.
 .. function:: csrf_protect(view)
 
     Decorator that provides the protection of
-    :class:`~django.middleware.csrf.CsrfViewMiddleware` to a view.
+    :class:`~thibaud.middleware.csrf.CsrfViewMiddleware` to a view.
 
     Usage::
 
-        from django.shortcuts import render
-        from django.views.decorators.csrf import csrf_protect
+        from thibaud.shortcuts import render
+        from thibaud.views.decorators.csrf import csrf_protect
 
 
         @csrf_protect
@@ -177,8 +177,8 @@ class-based views<decorating-class-based-views>`.
 
     Example::
 
-        from django.shortcuts import render
-        from django.views.decorators.csrf import requires_csrf_token
+        from thibaud.shortcuts import render
+        from thibaud.views.decorators.csrf import requires_csrf_token
 
 
         @requires_csrf_token
@@ -194,7 +194,7 @@ class-based views<decorating-class-based-views>`.
 Settings
 ========
 
-A number of settings can be used to control Django's CSRF behavior:
+A number of settings can be used to control Thibaud's CSRF behavior:
 
 * :setting:`CSRF_COOKIE_AGE`
 * :setting:`CSRF_COOKIE_DOMAIN`
@@ -223,7 +223,7 @@ Some security audit tools flag this as a problem but as mentioned before, an
 attacker cannot steal a user's browser's CSRF cookie. "Stealing" or modifying
 *your own* token using Firebug, Chrome dev tools, etc. isn't a vulnerability.
 
-Is it a problem that Django's CSRF protection isn't linked to a session by default?
+Is it a problem that Thibaud's CSRF protection isn't linked to a session by default?
 -----------------------------------------------------------------------------------
 
 No, this is by design. Not linking CSRF protection to a session allows using

@@ -2,10 +2,10 @@ from datetime import datetime
 from decimal import Decimal
 from math import pi
 
-from django.core.exceptions import ValidationError
-from django.db import connection
-from django.db.models import Case, F, FloatField, Value, When
-from django.db.models.expressions import (
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import connection
+from thibaud.db.models import Case, F, FloatField, Value, When
+from thibaud.db.models.expressions import (
     Expression,
     ExpressionList,
     ExpressionWrapper,
@@ -13,16 +13,16 @@ from django.db.models.expressions import (
     OrderByList,
     RawSQL,
 )
-from django.db.models.functions import Collate
-from django.db.models.lookups import GreaterThan
-from django.test import (
+from thibaud.db.models.functions import Collate
+from thibaud.db.models.lookups import GreaterThan
+from thibaud.test import (
     SimpleTestCase,
     TestCase,
     override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils import timezone
+from thibaud.utils import timezone
 
 from .models import (
     Article,
@@ -101,7 +101,7 @@ class DefaultTests(TestCase):
         obj1 = DBDefaultsPK.objects.create()
         if not connection.features.can_return_columns_from_insert:
             # refresh_from_db() cannot be used because that needs the pk to
-            # already be known to Django.
+            # already be known to Thibaud.
             obj1 = DBDefaultsPK.objects.get(pk="en")
         self.assertEqual(obj1.pk, "en")
         self.assertEqual(obj1.language_code, "en")
@@ -120,7 +120,7 @@ class DefaultTests(TestCase):
         parent2 = DBDefaultsPK.objects.create()
         if not connection.features.can_return_columns_from_insert:
             # refresh_from_db() cannot be used because that needs the pk to
-            # already be known to Django.
+            # already be known to Thibaud.
             parent2 = DBDefaultsPK.objects.get(pk="en")
         child2 = DBDefaultsFK.objects.create(language_code=parent2)
         self.assertEqual(child2.language_code, parent2)

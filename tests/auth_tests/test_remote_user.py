@@ -1,12 +1,12 @@
 from datetime import datetime, timezone
 
-from django.conf import settings
-from django.contrib.auth import aauthenticate, authenticate
-from django.contrib.auth.backends import RemoteUserBackend
-from django.contrib.auth.middleware import RemoteUserMiddleware
-from django.contrib.auth.models import User
-from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
-from django.test import (
+from thibaud.conf import settings
+from thibaud.contrib.auth import aauthenticate, authenticate
+from thibaud.contrib.auth.backends import RemoteUserBackend
+from thibaud.contrib.auth.middleware import RemoteUserMiddleware
+from thibaud.contrib.auth.models import User
+from thibaud.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
+from thibaud.test import (
     AsyncClient,
     Client,
     TestCase,
@@ -17,8 +17,8 @@ from django.test import (
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
 class RemoteUserTest(TestCase):
-    middleware = "django.contrib.auth.middleware.RemoteUserMiddleware"
-    backend = "django.contrib.auth.backends.RemoteUserBackend"
+    middleware = "thibaud.contrib.auth.middleware.RemoteUserMiddleware"
+    backend = "thibaud.contrib.auth.backends.RemoteUserBackend"
     header = "REMOTE_USER"
     email_header = "REMOTE_EMAIL"
 
@@ -88,8 +88,8 @@ class RemoteUserTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertIn(b"CSRF verification failed.", response.content)
 
-        # This request will call django.contrib.auth.login() which will call
-        # django.middleware.csrf.rotate_token() thus changing the value of
+        # This request will call thibaud.contrib.auth.login() which will call
+        # thibaud.middleware.csrf.rotate_token() thus changing the value of
         # request.META['CSRF_COOKIE'] from the user submitted value set by
         # CsrfViewMiddleware.process_request() to the new csrftoken value set
         # by rotate_token(). Csrf validation should still pass when the view is
@@ -113,8 +113,8 @@ class RemoteUserTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertIn(b"CSRF verification failed.", response.content)
 
-        # This request will call django.contrib.auth.alogin() which will call
-        # django.middleware.csrf.rotate_token() thus changing the value of
+        # This request will call thibaud.contrib.auth.alogin() which will call
+        # thibaud.middleware.csrf.rotate_token() thus changing the value of
         # request.META['CSRF_COOKIE'] from the user submitted value set by
         # CsrfViewMiddleware.process_request() to the new csrftoken value set
         # by rotate_token(). Csrf validation should still pass when the view is
@@ -350,7 +350,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
 class AllowAllUsersRemoteUserBackendTest(RemoteUserTest):
     """Backend that allows inactive users."""
 
-    backend = "django.contrib.auth.backends.AllowAllUsersRemoteUserBackend"
+    backend = "thibaud.contrib.auth.backends.AllowAllUsersRemoteUserBackend"
 
     def test_inactive_user(self):
         user = User.objects.create(username="knownuser", is_active=False)
@@ -458,7 +458,7 @@ class PersistentRemoteUserTest(RemoteUserTest):
     subsequent calls do not contain the header value.
     """
 
-    middleware = "django.contrib.auth.middleware.PersistentRemoteUserMiddleware"
+    middleware = "thibaud.contrib.auth.middleware.PersistentRemoteUserMiddleware"
     require_header = False
 
     def test_header_disappears(self):

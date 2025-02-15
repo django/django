@@ -1,15 +1,15 @@
 ===================
-GeoDjango Model API
+GeoThibaud Model API
 ===================
 
-.. module:: django.contrib.gis.db.models
-    :synopsis: GeoDjango model and field API.
+.. module:: thibaud.contrib.gis.db.models
+    :synopsis: GeoThibaud model and field API.
 
-This document explores the details of the GeoDjango Model API.  Throughout this
+This document explores the details of the GeoThibaud Model API.  Throughout this
 section, we'll be using the following geographic model of a `ZIP code`__ and
 of a `Digital Elevation Model`__ as our examples::
 
-    from django.contrib.gis.db import models
+    from thibaud.contrib.gis.db import models
 
 
     class Zipcode(models.Model):
@@ -43,56 +43,56 @@ The base class for geometry fields.
 
 .. class:: PointField
 
-Stores a :class:`~django.contrib.gis.geos.Point`.
+Stores a :class:`~thibaud.contrib.gis.geos.Point`.
 
 ``LineStringField``
 -------------------
 
 .. class:: LineStringField
 
-Stores a :class:`~django.contrib.gis.geos.LineString`.
+Stores a :class:`~thibaud.contrib.gis.geos.LineString`.
 
 ``PolygonField``
 ----------------
 
 .. class:: PolygonField
 
-Stores a :class:`~django.contrib.gis.geos.Polygon`.
+Stores a :class:`~thibaud.contrib.gis.geos.Polygon`.
 
 ``MultiPointField``
 -------------------
 
 .. class:: MultiPointField
 
-Stores a :class:`~django.contrib.gis.geos.MultiPoint`.
+Stores a :class:`~thibaud.contrib.gis.geos.MultiPoint`.
 
 ``MultiLineStringField``
 ------------------------
 
 .. class:: MultiLineStringField
 
-Stores a :class:`~django.contrib.gis.geos.MultiLineString`.
+Stores a :class:`~thibaud.contrib.gis.geos.MultiLineString`.
 
 ``MultiPolygonField``
 ---------------------
 
 .. class:: MultiPolygonField
 
-Stores a :class:`~django.contrib.gis.geos.MultiPolygon`.
+Stores a :class:`~thibaud.contrib.gis.geos.MultiPolygon`.
 
 ``GeometryCollectionField``
 ---------------------------
 
 .. class:: GeometryCollectionField
 
-Stores a :class:`~django.contrib.gis.geos.GeometryCollection`.
+Stores a :class:`~thibaud.contrib.gis.geos.GeometryCollection`.
 
 ``RasterField``
 ---------------
 
 .. class:: RasterField
 
-Stores a :class:`~django.contrib.gis.gdal.GDALRaster`.
+Stores a :class:`~thibaud.contrib.gis.gdal.GDALRaster`.
 
 ``RasterField`` is currently only implemented for the PostGIS backend.
 
@@ -100,7 +100,7 @@ Spatial Field Options
 =====================
 
 In addition to the regular :ref:`common-model-field-options` available for
-Django model fields, spatial fields have the following additional options.
+Thibaud model fields, spatial fields have the following additional options.
 All are optional.
 
 ``srid``
@@ -158,7 +158,7 @@ calculations.
 
 Additional Resources:
 
-* `spatialreference.org`__: A Django-powered database of spatial reference
+* `spatialreference.org`__: A Thibaud-powered database of spatial reference
   systems.
 * `The State Plane Coordinate System`__: A website covering the various
   projection systems used in the United States.  Much of the U.S. spatial
@@ -250,11 +250,11 @@ available for geography columns:
 
 If you need to use a spatial lookup or aggregate that doesn't support the
 geography type as input, you can use the
-:class:`~django.db.models.functions.Cast` database function to convert the
+:class:`~thibaud.db.models.functions.Cast` database function to convert the
 geography column to a geometry type in the query::
 
-    from django.contrib.gis.db.models import PointField
-    from django.db.models.functions import Cast
+    from thibaud.contrib.gis.db.models import PointField
+    from thibaud.db.models.functions import Cast
 
     Zipcode.objects.annotate(geom=Cast("geography_field", PointField())).filter(
         geom__within=poly

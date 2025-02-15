@@ -3,20 +3,20 @@ How to create CSV output
 ========================
 
 This document explains how to output CSV (Comma Separated Values) dynamically
-using Django views. To do this, you can either use the Python CSV library or the
-Django template system.
+using Thibaud views. To do this, you can either use the Python CSV library or the
+Thibaud template system.
 
 Using the Python CSV library
 ============================
 
-Python comes with a CSV library, :mod:`csv`. The key to using it with Django is
+Python comes with a CSV library, :mod:`csv`. The key to using it with Thibaud is
 that the :mod:`csv` module's CSV-creation capability acts on file-like objects,
-and Django's :class:`~django.http.HttpResponse` objects are file-like objects.
+and Thibaud's :class:`~thibaud.http.HttpResponse` objects are file-like objects.
 
 Here's an example::
 
     import csv
-    from django.http import HttpResponse
+    from thibaud.http import HttpResponse
 
 
     def some_view(request):
@@ -46,7 +46,7 @@ mention:
 
 * You can hook into the CSV-generation API by passing ``response`` as the first
   argument to ``csv.writer``. The ``csv.writer`` function expects a file-like
-  object, and :class:`~django.http.HttpResponse` objects fit the bill.
+  object, and :class:`~thibaud.http.HttpResponse` objects fit the bill.
 
 * For each row in your CSV file, call ``writer.writerow``, passing it an
   :term:`iterable`.
@@ -61,7 +61,7 @@ Streaming large CSV files
 -------------------------
 
 When dealing with views that generate very large responses, you might want to
-consider using Django's :class:`~django.http.StreamingHttpResponse` instead.
+consider using Thibaud's :class:`~thibaud.http.StreamingHttpResponse` instead.
 For example, by streaming a file that takes a long time to generate you can
 avoid a load balancer dropping a connection that might have otherwise timed out
 while the server was generating the response.
@@ -71,7 +71,7 @@ the assembly and transmission of a large CSV file::
 
     import csv
 
-    from django.http import StreamingHttpResponse
+    from thibaud.http import StreamingHttpResponse
 
 
     class Echo:
@@ -101,7 +101,7 @@ the assembly and transmission of a large CSV file::
 Using the template system
 =========================
 
-Alternatively, you can use the :doc:`Django template system </topics/templates>`
+Alternatively, you can use the :doc:`Thibaud template system </topics/templates>`
 to generate CSV. This is lower-level than using the convenient Python :mod:`csv`
 module, but the solution is presented here for completeness.
 
@@ -110,8 +110,8 @@ template output the commas in a :ttag:`for` loop.
 
 Here's an example, which generates the same CSV file as above::
 
-    from django.http import HttpResponse
-    from django.template import loader
+    from thibaud.http import HttpResponse
+    from thibaud.template import loader
 
 
     def some_view(request):
@@ -139,7 +139,7 @@ such as the ``content_type='text/csv'`` -- is the same.
 
 Then, create the template ``my_template_name.txt``, with this template code:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}", "{{ row.3|addslashes }}", "{{ row.4|addslashes }}"
     {% endfor %}

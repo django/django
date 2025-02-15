@@ -1,4 +1,4 @@
-from django.forms import *  # NOQA
+from thibaud.forms import *  # NOQA
 
 from .fields import (  # NOQA
     GeometryCollectionField,

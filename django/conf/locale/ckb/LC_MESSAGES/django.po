@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Bawar Jalal, 2021
@@ -8,12 +8,12 @@
 # Swara <swara09@gmail.com>, 2022-2024
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: Swara <swara09@gmail.com>, 2022-2024\n"
-"Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
+"Language-Team: Central Kurdish (http://app.transifex.com/thibaud/thibaud/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1294,26 +1294,26 @@ msgstr "دامەزراندن بەسەرکەوتوویی کاریکرد! پیرۆ
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"سەیری <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"سەیری <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">تێبینیەکانی بڵاوکردنەوە</a> بکە بۆ جانگۆی "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"ئەم لاپەڕەیە دەبینیت چونکە <a href=\"https://docs.djangoproject.com/en/"
+"ئەم لاپەڕەیە دەبینیت چونکە <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> لەناو پەڕگەی ڕێکخستنەکانتە و بۆ هیچ URLێک "
 "ڕێکنەخراوە."
 
-msgid "Django Documentation"
+msgid "Thibaud Documentation"
 msgstr "بەڵگەنامەکردنی جانگۆ"
 
 msgid "Topics, references, &amp; how-to’s"
@@ -1322,10 +1322,10 @@ msgstr "بابەتەکان, سەرچاوەکان, &amp; چۆنێتی"
 msgid "Tutorial: A Polling App"
 msgstr "فێرکاریی: ئاپێکی ڕاپرسی"
 
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr "دەستپێبکە لەگەڵ جانگۆ"
 
-msgid "Django Community"
+msgid "Thibaud Community"
 msgstr "کۆمەڵگەی جانگۆ"
 
 msgid "Connect, get help, or contribute"

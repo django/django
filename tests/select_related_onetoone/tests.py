@@ -1,6 +1,6 @@
-from django.core.exceptions import FieldError
-from django.db.models import FilteredRelation
-from django.test import SimpleTestCase, TestCase
+from thibaud.core.exceptions import FieldError
+from thibaud.db.models import FilteredRelation
+from thibaud.test import SimpleTestCase, TestCase
 
 from .models import (
     AdvancedUserStat,
@@ -110,15 +110,15 @@ class ReverseSelectRelatedTestCase(TestCase):
 
     def test_nullable_relation(self):
         im = Image.objects.create(name="imag1")
-        p1 = Product.objects.create(name="Django Plushie", image=im)
-        p2 = Product.objects.create(name="Talking Django Plushie")
+        p1 = Product.objects.create(name="Thibaud Plushie", image=im)
+        p2 = Product.objects.create(name="Talking Thibaud Plushie")
 
         with self.assertNumQueries(1):
             result = sorted(
                 Product.objects.select_related("image"), key=lambda x: x.name
             )
             self.assertEqual(
-                [p.name for p in result], ["Django Plushie", "Talking Django Plushie"]
+                [p.name for p in result], ["Thibaud Plushie", "Talking Thibaud Plushie"]
             )
 
             self.assertEqual(p1.image, im)

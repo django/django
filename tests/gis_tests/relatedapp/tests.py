@@ -1,10 +1,10 @@
-from django.contrib.gis.db.models import Collect, Count, Extent, F, MakeLine, Q, Union
-from django.contrib.gis.db.models.functions import Centroid
-from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
-from django.db import NotSupportedError, connection
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import override_settings
-from django.utils import timezone
+from thibaud.contrib.gis.db.models import Collect, Count, Extent, F, MakeLine, Q, Union
+from thibaud.contrib.gis.db.models.functions import Centroid
+from thibaud.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
+from thibaud.db import NotSupportedError, connection
+from thibaud.test import TestCase, skipUnlessDBFeature
+from thibaud.test.utils import override_settings
+from thibaud.utils import timezone
 
 from .models import Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel
 

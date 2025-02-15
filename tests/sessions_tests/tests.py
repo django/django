@@ -9,33 +9,33 @@ from http import cookies
 from pathlib import Path
 from unittest import mock
 
-from django.conf import settings
-from django.contrib.sessions.backends.base import SessionBase, UpdateError
-from django.contrib.sessions.backends.cache import SessionStore as CacheSession
-from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
-from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
-from django.contrib.sessions.backends.file import SessionStore as FileSession
-from django.contrib.sessions.backends.signed_cookies import (
+from thibaud.conf import settings
+from thibaud.contrib.sessions.backends.base import SessionBase, UpdateError
+from thibaud.contrib.sessions.backends.cache import SessionStore as CacheSession
+from thibaud.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
+from thibaud.contrib.sessions.backends.db import SessionStore as DatabaseSession
+from thibaud.contrib.sessions.backends.file import SessionStore as FileSession
+from thibaud.contrib.sessions.backends.signed_cookies import (
     SessionStore as CookieSession,
 )
-from django.contrib.sessions.exceptions import InvalidSessionKey, SessionInterrupted
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.contrib.sessions.models import Session
-from django.contrib.sessions.serializers import JSONSerializer
-from django.core import management
-from django.core.cache import caches
-from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core.exceptions import ImproperlyConfigured
-from django.core.signing import TimestampSigner
-from django.http import HttpResponse
-from django.test import (
+from thibaud.contrib.sessions.exceptions import InvalidSessionKey, SessionInterrupted
+from thibaud.contrib.sessions.middleware import SessionMiddleware
+from thibaud.contrib.sessions.models import Session
+from thibaud.contrib.sessions.serializers import JSONSerializer
+from thibaud.core import management
+from thibaud.core.cache import caches
+from thibaud.core.cache.backends.base import InvalidCacheBackendError
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.signing import TimestampSigner
+from thibaud.http import HttpResponse
+from thibaud.test import (
     RequestFactory,
     SimpleTestCase,
     TestCase,
     ignore_warnings,
     override_settings,
 )
-from django.utils import timezone
+from thibaud.utils import timezone
 
 from .models import SessionStore as CustomDatabaseSession
 
@@ -549,7 +549,7 @@ class SessionTestsMixin:
         for encoded in tests:
             with self.subTest(encoded=encoded):
                 with self.assertLogs(
-                    "django.security.SuspiciousSession", "WARNING"
+                    "thibaud.security.SuspiciousSession", "WARNING"
                 ) as cm:
                     self.assertEqual(self.session.decode(encoded), {})
                 # The failed decode is logged.
@@ -662,7 +662,7 @@ class SessionTestsMixin:
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
     backend = DatabaseSession
-    session_engine = "django.contrib.sessions.backends.db"
+    session_engine = "thibaud.contrib.sessions.backends.db"
 
     @property
     def model(self):
@@ -815,7 +815,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
             self.assertIs(self.session.exists(self.session.session_key), True)
 
     # Some backends might issue a warning
-    @ignore_warnings(module="django.core.cache.backends.base")
+    @ignore_warnings(module="thibaud.core.cache.backends.base")
     def test_load_overlong_key(self):
         self.session._session_key = (string.ascii_letters + string.digits) * 20
         self.assertEqual(self.session.load(), {})
@@ -834,7 +834,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
         session = self.backend()
         session["key"] = "val"
 
-        with self.assertLogs("django.contrib.sessions", "ERROR") as cm:
+        with self.assertLogs("thibaud.contrib.sessions", "ERROR") as cm:
             session.save()
 
         # A proper ERROR log message was recorded.
@@ -850,7 +850,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
         session = self.backend()
         await session.aset("key", "val")
 
-        with self.assertLogs("django.contrib.sessions", "ERROR") as cm:
+        with self.assertLogs("thibaud.contrib.sessions", "ERROR") as cm:
             await session.asave()
 
         # A proper ERROR log message was recorded.
@@ -907,7 +907,7 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
             self.backend()._key_to_file("a/b/c")
 
     @override_settings(
-        SESSION_ENGINE="django.contrib.sessions.backends.file",
+        SESSION_ENGINE="thibaud.contrib.sessions.backends.file",
         SESSION_COOKIE_AGE=0,
     )
     def test_clearsessions_command(self):
@@ -963,7 +963,7 @@ class CacheSessionTests(SessionTestsMixin, SimpleTestCase):
     backend = CacheSession
 
     # Some backends might issue a warning
-    @ignore_warnings(module="django.core.cache.backends.base")
+    @ignore_warnings(module="thibaud.core.cache.backends.base")
     def test_load_overlong_key(self):
         self.session._session_key = (string.ascii_letters + string.digits) * 20
         self.assertEqual(self.session.load(), {})
@@ -975,10 +975,10 @@ class CacheSessionTests(SessionTestsMixin, SimpleTestCase):
     @override_settings(
         CACHES={
             "default": {
-                "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+                "BACKEND": "thibaud.core.cache.backends.dummy.DummyCache",
             },
             "sessions": {
-                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "session",
             },
         },
@@ -1258,7 +1258,7 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
         # by creating a new session
         self.assertEqual(self.session.serializer, JSONSerializer)
         self.session.save()
-        with mock.patch("django.core.signing.loads", side_effect=ValueError):
+        with mock.patch("thibaud.core.signing.loads", side_effect=ValueError):
             self.session.load()
 
     @unittest.skip(

@@ -23,7 +23,7 @@ You can also provide data using :ref:`fixtures <fixtures-explanation>`,
 however, this data isn't loaded automatically, except if you use
 :attr:`.TransactionTestCase.fixtures`.
 
-A fixture is a collection of data that Django knows how to import into a
+A fixture is a collection of data that Thibaud knows how to import into a
 database. The most straightforward way of creating a fixture if you've already
 got some data is to use the :djadmin:`manage.py dumpdata <dumpdata>` command.
 Or, you can write fixtures by hand; fixtures can be written as JSON, XML or YAML
@@ -81,16 +81,16 @@ from the fixture and reloaded into the database. Note this means that if you
 change one of the rows created by a fixture and then run :djadmin:`loaddata`
 again, you'll wipe out any changes you've made.
 
-Tell Django where to look for fixture files
+Tell Thibaud where to look for fixture files
 -------------------------------------------
 
-By default, Django looks for fixtures in the ``fixtures`` directory inside each
+By default, Thibaud looks for fixtures in the ``fixtures`` directory inside each
 app, so the command ``loaddata sample`` will find the file
 ``my_app/fixtures/sample.json``. This works with relative paths as well, so
 ``loaddata my_app/sample`` will find the file
 ``my_app/fixtures/my_app/sample.json``.
 
-Django also looks for fixtures in the list of directories provided in the
+Thibaud also looks for fixtures in the list of directories provided in the
 :setting:`FIXTURE_DIRS` setting.
 
 To completely prevent default search from happening, use an absolute path to
@@ -98,7 +98,7 @@ specify the location of your fixture file, e.g. ``loaddata /path/to/sample``.
 
 .. admonition:: Namespace your fixture files
 
-    Django will use the first fixture file it finds whose name matches, so if
+    Thibaud will use the first fixture file it finds whose name matches, so if
     you have fixture files with the same name in different applications, you
     will be unable to distinguish between them in your ``loaddata`` commands.
     The easiest way to avoid this problem is by *namespacing* your fixture

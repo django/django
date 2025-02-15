@@ -2,15 +2,15 @@
 Migration Operations
 ====================
 
-.. module:: django.db.migrations.operations
+.. module:: thibaud.db.migrations.operations
 
 Migration files are composed of one or more ``Operation``\s, objects that
 declaratively record what the migration should do to your database.
 
-Django also uses these ``Operation`` objects to work out what your models
+Thibaud also uses these ``Operation`` objects to work out what your models
 looked like historically, and to calculate what changes you've made to
 your models since the last migration so it can automatically write
-your migrations; that's why they're declarative, as it means Django can
+your migrations; that's why they're declarative, as it means Thibaud can
 easily load them all into memory and run through them without touching
 the database to work out what your project should look like.
 
@@ -25,8 +25,8 @@ that manually adding schema-altering operations can confuse the migration
 autodetector and make resulting runs of :djadmin:`makemigrations` output
 incorrect code.
 
-All of the core Django operations are available from the
-``django.db.migrations.operations`` module.
+All of the core Thibaud operations are available from the
+``thibaud.db.migrations.operations`` module.
 
 For introductory material, see the :doc:`migrations topic guide
 </topics/migrations>`.
@@ -85,7 +85,7 @@ lose any data in the old table.
 
 .. class:: AlterModelTable(name, table)
 
-Changes the model's table name (the :attr:`~django.db.models.Options.db_table`
+Changes the model's table name (the :attr:`~thibaud.db.models.Options.db_table`
 option on the ``Meta`` subclass).
 
 ``AlterModelTableComment``
@@ -94,7 +94,7 @@ option on the ``Meta`` subclass).
 .. class:: AlterModelTableComment(name, table_comment)
 
 Changes the model's table comment (the
-:attr:`~django.db.models.Options.db_table_comment` option on the ``Meta``
+:attr:`~thibaud.db.models.Options.db_table_comment` option on the ``Meta``
 subclass).
 
 ``AlterUniqueTogether``
@@ -103,7 +103,7 @@ subclass).
 .. class:: AlterUniqueTogether(name, unique_together)
 
 Changes the model's set of unique constraints (the
-:attr:`~django.db.models.Options.unique_together` option on the ``Meta``
+:attr:`~thibaud.db.models.Options.unique_together` option on the ``Meta``
 subclass).
 
 ``AlterIndexTogether``
@@ -116,12 +116,12 @@ Changes the model's set of custom indexes (the ``index_together`` option on the
 
 .. warning::
 
-    ``AlterIndexTogether`` is officially supported only for pre-Django 4.2
+    ``AlterIndexTogether`` is officially supported only for pre-Thibaud 4.2
     migration files. For backward compatibility reasons, it's still part of the
     public API, and there's no plan to deprecate or remove it, but it should
     not be used for new migrations. Use
-    :class:`~django.db.migrations.operations.AddIndex` and
-    :class:`~django.db.migrations.operations.RemoveIndex` operations instead.
+    :class:`~thibaud.db.migrations.operations.AddIndex` and
+    :class:`~thibaud.db.migrations.operations.RemoveIndex` operations instead.
 
 ``AlterOrderWithRespectTo``
 ---------------------------
@@ -129,7 +129,7 @@ Changes the model's set of custom indexes (the ``index_together`` option on the
 .. class:: AlterOrderWithRespectTo(name, order_with_respect_to)
 
 Makes or deletes the ``_order`` column needed for the
-:attr:`~django.db.models.Options.order_with_respect_to` option on the ``Meta``
+:attr:`~thibaud.db.models.Options.order_with_respect_to` option on the ``Meta``
 subclass.
 
 ``AlterModelOptions``
@@ -164,8 +164,8 @@ value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
 a default value to put into existing rows. It does not affect the behavior
-of setting defaults in the database directly - Django never sets database
-defaults and always applies them in the Django ORM code.
+of setting defaults in the database directly - Thibaud never sets database
+defaults and always applies them in the Thibaud ORM code.
 
 .. warning::
 
@@ -211,16 +211,16 @@ default value, the operation is irreversible.
 .. class:: AlterField(model_name, name, field, preserve_default=True)
 
 Alters a field's definition, including changes to its type,
-:attr:`~django.db.models.Field.null`, :attr:`~django.db.models.Field.unique`,
-:attr:`~django.db.models.Field.db_column` and other field attributes.
+:attr:`~thibaud.db.models.Field.null`, :attr:`~thibaud.db.models.Field.unique`,
+:attr:`~thibaud.db.models.Field.db_column` and other field attributes.
 
 The ``preserve_default`` argument indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is altering a nullable field to a non-nullable one and
 needs a default value to put into existing rows. It does not affect the
-behavior of setting defaults in the database directly - Django never sets
-database defaults and always applies them in the Django ORM code.
+behavior of setting defaults in the database directly - Thibaud never sets
+database defaults and always applies them in the Thibaud ORM code.
 
 Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
@@ -231,7 +231,7 @@ field like ``models.IntegerField()`` on most databases.
 
 .. class:: RenameField(model_name, old_name, new_name)
 
-Changes a field's name (and, unless :attr:`~django.db.models.Field.db_column`
+Changes a field's name (and, unless :attr:`~thibaud.db.models.Field.db_column`
 is set, its column name).
 
 ``AddIndex``
@@ -240,7 +240,7 @@ is set, its column name).
 .. class:: AddIndex(model_name, index)
 
 Creates an index in the database table for the model with ``model_name``.
-``index`` is an instance of the :class:`~django.db.models.Index` class.
+``index`` is an instance of the :class:`~thibaud.db.models.Index` class.
 
 ``RemoveIndex``
 ---------------
@@ -257,7 +257,7 @@ Removes the index named ``name`` from the model with ``model_name``.
 Renames an index in the database table for the model with ``model_name``.
 Exactly one of ``old_name`` and ``old_fields`` can be provided. ``old_fields``
 is an iterable of the strings, often corresponding to fields of
-``index_together`` (pre-Django 5.1 option).
+``index_together`` (pre-Thibaud 5.1 option).
 
 On databases that don't support an index renaming statement (SQLite), the
 operation will drop and recreate the index, which can be expensive.
@@ -296,17 +296,17 @@ Special Operations
 .. class:: RunSQL(sql, reverse_sql=None, state_operations=None, hints=None, elidable=False)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
-features of database backends that Django doesn't support directly.
+features of database backends that Thibaud doesn't support directly.
 
 ``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on
-the database. On most database backends (all but PostgreSQL), Django will
+the database. On most database backends (all but PostgreSQL), Thibaud will
 split the SQL into individual statements prior to executing them.
 
 .. warning::
 
     On PostgreSQL and SQLite, only use ``BEGIN`` or ``COMMIT`` in your SQL in
     :ref:`non-atomic migrations <non-atomic-migrations>`, to avoid breaking
-    Django's transaction state.
+    Thibaud's transaction state.
 
 You can also pass a list of strings or 2-tuples. The latter is used for passing
 queries and parameters in the same way as :ref:`cursor.execute()
@@ -370,10 +370,10 @@ be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
 Runs custom Python code in a historical context. ``code`` (and ``reverse_code``
 if supplied) should be callable objects that accept two arguments; the first is
-an instance of ``django.apps.registry.Apps`` containing historical models that
+an instance of ``thibaud.apps.registry.Apps`` containing historical models that
 match the operation's place in the project history, and the second is an
 instance of :class:`SchemaEditor
-<django.db.backends.base.schema.BaseDatabaseSchemaEditor>`.
+<thibaud.db.backends.base.schema.BaseDatabaseSchemaEditor>`.
 
 The ``reverse_code`` argument is called when unapplying migrations. This
 callable should undo what is done in the ``code`` callable so that the
@@ -392,7 +392,7 @@ You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and pass it to ``RunPython``. Here's an example of
 using ``RunPython`` to create some initial objects on a ``Country`` model::
 
-    from django.db import migrations
+    from thibaud.db import migrations
 
 
     def forwards_func(apps, schema_editor):
@@ -430,7 +430,7 @@ custom data updates and alterations, and anything else you need access to an
 ORM and/or Python code for.
 
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
-either doing it outside the scope of the Django model system (e.g. triggers)
+either doing it outside the scope of the Thibaud model system (e.g. triggers)
 or that you use :class:`SeparateDatabaseAndState` to add in operations that will
 reflect your changes to the model state - otherwise, the versioned ORM and
 the autodetector will stop working correctly.
@@ -449,7 +449,7 @@ in the same migration or you may hit errors like ``OperationalError: cannot
 ALTER TABLE "mytable" because it has pending trigger events``.
 
 If you have a different database and aren't sure if it supports DDL
-transactions, check the ``django.db.connection.features.can_rollback_ddl``
+transactions, check the ``thibaud.db.connection.features.can_rollback_ddl``
 attribute.
 
 If the ``RunPython`` operation is part of a :ref:`non-atomic migration
@@ -483,7 +483,7 @@ It accepts two lists of operations. When asked to apply state, it will use the
 ``state_operations`` argument). When asked to apply changes to the database, it
 will use the ``database_operations`` list.
 
-If the actual state of the database and Django's view of the state get out of
+If the actual state of the database and Thibaud's view of the state get out of
 sync, this can break the migration framework, even leading to data loss. It's
 worth exercising caution and checking your database and state operations
 carefully. You can use :djadmin:`sqlmigrate` and :djadmin:`dbshell` to check
@@ -497,7 +497,7 @@ For an example using ``SeparateDatabaseAndState``, see
 Operation category
 ==================
 
-.. currentmodule:: django.db.migrations.operations.base
+.. currentmodule:: thibaud.db.migrations.operations.base
 
 .. class:: OperationCategory
 
@@ -534,10 +534,10 @@ Writing your own
 ================
 
 Operations have a relatively simple API, and they're designed so that you can
-easily write your own to supplement the built-in Django ones. The basic
+easily write your own to supplement the built-in Thibaud ones. The basic
 structure of an ``Operation`` looks like this::
 
-    from django.db.migrations.operations.base import Operation
+    from thibaud.db.migrations.operations.base import Operation
 
 
     class MyCustomOperation(Operation):
@@ -545,7 +545,7 @@ structure of an ``Operation`` looks like this::
         # sqlmigrate; if true, it will be run and the SQL collected for its output.
         reduces_to_sql = False
 
-        # If this is False, Django will refuse to reverse past this operation.
+        # If this is False, Thibaud will refuse to reverse past this operation.
         reversible = False
 
         # This categorizes the operation. The corresponding symbol will be
@@ -559,7 +559,7 @@ structure of an ``Operation`` looks like this::
 
         def state_forwards(self, app_label, state):
             # The Operation should take the 'state' parameter (an instance of
-            # django.db.migrations.state.ProjectState) and mutate it to match
+            # thibaud.db.migrations.state.ProjectState) and mutate it to match
             # any schema changes that have occurred.
             pass
 
@@ -583,7 +583,7 @@ structure of an ``Operation`` looks like this::
             return "custom_operation_%s_%s" % (self.arg1, self.arg2)
 
 You can take this template and work from it, though we suggest looking at the
-built-in Django operations in ``django.db.migrations.operations`` - they cover
+built-in Thibaud operations in ``thibaud.db.migrations.operations`` - they cover
 a lot of the example usage of semi-internal aspects of the migration framework
 like ``ProjectState`` and the patterns used to get historical models, as well
 as ``ModelState`` and the patterns used to mutate historical models in
@@ -619,19 +619,19 @@ Some things to note:
 
 .. warning::
 
-    For performance reasons, the :class:`~django.db.models.Field` instances in
+    For performance reasons, the :class:`~thibaud.db.models.Field` instances in
     ``ModelState.fields`` are reused across migrations. You must never change
     the attributes on these instances. If you need to mutate a field in
     ``state_forwards()``, you must remove the old instance from
     ``ModelState.fields`` and add a new instance in its place. The same is true
-    for the :class:`~django.db.models.Manager` instances in
+    for the :class:`~thibaud.db.models.Manager` instances in
     ``ModelState.managers``.
 
 As an example, let's make an operation that loads PostgreSQL extensions (which
 contain some of PostgreSQL's more exciting features). Since there's no model
 state changes, all it does is run one command::
 
-    from django.db.migrations.operations.base import Operation
+    from thibaud.db.migrations.operations.base import Operation
 
 
     class LoadExtension(Operation):

@@ -1,7 +1,7 @@
-from django.core.exceptions import ValidationError
-from django.forms import GenericIPAddressField
-from django.test import SimpleTestCase
-from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms import GenericIPAddressField
+from thibaud.test import SimpleTestCase
+from thibaud.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH
 
 
 class GenericIPAddressFieldTest(SimpleTestCase):
@@ -13,7 +13,7 @@ class GenericIPAddressFieldTest(SimpleTestCase):
 
     def test_generic_ipaddress_as_generic(self):
         # The edge cases of the IPv6 validation code are not deeply tested
-        # here, they are covered in the tests for django.utils.ipv6
+        # here, they are covered in the tests for thibaud.utils.ipv6
         f = GenericIPAddressField()
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean("")

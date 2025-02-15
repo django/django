@@ -2,16 +2,16 @@ import sys
 import time
 from importlib import import_module
 
-from django.apps import apps
-from django.core.management.base import BaseCommand, CommandError, no_translations
-from django.core.management.sql import emit_post_migrate_signal, emit_pre_migrate_signal
-from django.db import DEFAULT_DB_ALIAS, connections, router
-from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.migrations.executor import MigrationExecutor
-from django.db.migrations.loader import AmbiguityError
-from django.db.migrations.state import ModelState, ProjectState
-from django.utils.module_loading import module_has_submodule
-from django.utils.text import Truncator
+from thibaud.apps import apps
+from thibaud.core.management.base import BaseCommand, CommandError, no_translations
+from thibaud.core.management.sql import emit_post_migrate_signal, emit_pre_migrate_signal
+from thibaud.db import DEFAULT_DB_ALIAS, connections, router
+from thibaud.db.migrations.autodetector import MigrationAutodetector
+from thibaud.db.migrations.executor import MigrationExecutor
+from thibaud.db.migrations.loader import AmbiguityError
+from thibaud.db.migrations.state import ModelState, ProjectState
+from thibaud.utils.module_loading import module_has_submodule
+from thibaud.utils.text import Truncator
 
 
 class Command(BaseCommand):
@@ -37,7 +37,7 @@ class Command(BaseCommand):
             "--no-input",
             action="store_false",
             dest="interactive",
-            help="Tells Django to NOT prompt the user for input of any kind.",
+            help="Tells Thibaud to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
             "--database",
@@ -59,7 +59,7 @@ class Command(BaseCommand):
             help=(
                 "Detect if tables already exist and fake-apply initial migrations if "
                 "so. Make sure that the current database schema matches your initial "
-                "migration before using this flag. Django will only check for an "
+                "migration before using this flag. Thibaud will only check for an "
                 "existing table name."
             ),
         )
@@ -86,7 +86,7 @@ class Command(BaseCommand):
             "--prune",
             action="store_true",
             dest="prune",
-            help="Delete nonexistent migrations from the django_migrations table.",
+            help="Delete nonexistent migrations from the thibaud_migrations table.",
         )
 
     def get_check_kwargs(self, options):

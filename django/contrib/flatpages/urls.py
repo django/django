@@ -1,6 +1,6 @@
-from django.contrib.flatpages import views
-from django.urls import path
+from thibaud.contrib.flatpages import views
+from thibaud.urls import path
 
 urlpatterns = [
-    path("<path:url>", views.flatpage, name="django.contrib.flatpages.views.flatpage"),
+    path("<path:url>", views.flatpage, name="thibaud.contrib.flatpages.views.flatpage"),
 ]

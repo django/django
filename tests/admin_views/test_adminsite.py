@@ -1,9 +1,9 @@
-from django.contrib import admin
-from django.contrib.admin.actions import delete_selected
-from django.contrib.auth.models import User
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.client import RequestFactory
-from django.urls import path, reverse
+from thibaud.contrib import admin
+from thibaud.contrib.admin.actions import delete_selected
+from thibaud.contrib.auth.models import User
+from thibaud.test import SimpleTestCase, TestCase, override_settings
+from thibaud.test.client import RequestFactory
+from thibaud.urls import path, reverse
 
 from .models import Article
 
@@ -49,8 +49,8 @@ class SiteEachContextTest(TestCase):
 
     def test_each_context(self):
         ctx = self.ctx
-        self.assertEqual(ctx["site_header"], "Django administration")
-        self.assertEqual(ctx["site_title"], "Django site admin")
+        self.assertEqual(ctx["site_header"], "Thibaud administration")
+        self.assertEqual(ctx["site_title"], "Thibaud site admin")
         self.assertEqual(ctx["site_url"], "/")
         self.assertIs(ctx["has_permission"], True)
 

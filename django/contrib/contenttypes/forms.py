@@ -1,7 +1,7 @@
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.forms import ModelForm, modelformset_factory
-from django.forms.models import BaseModelFormSet
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
+from thibaud.forms import ModelForm, modelformset_factory
+from thibaud.forms.models import BaseModelFormSet
 
 
 class BaseGenericInlineFormSet(BaseModelFormSet):

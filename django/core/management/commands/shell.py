@@ -5,10 +5,10 @@ import traceback
 from collections import defaultdict
 from importlib import import_module
 
-from django.apps import apps
-from django.core.management import BaseCommand, CommandError
-from django.utils.datastructures import OrderedSet
-from django.utils.module_loading import import_string as import_dotted_path
+from thibaud.apps import apps
+from thibaud.core.management import BaseCommand, CommandError
+from thibaud.utils.datastructures import OrderedSet
+from thibaud.utils.module_loading import import_string as import_dotted_path
 
 
 class Command(BaseCommand):
@@ -48,7 +48,7 @@ class Command(BaseCommand):
             "-c",
             "--command",
             help=(
-                "Instead of opening an interactive shell, run a command as Django and "
+                "Instead of opening an interactive shell, run a command as Thibaud and "
                 "exit."
             ),
         )
@@ -130,12 +130,12 @@ class Command(BaseCommand):
         For example, for an unchanged INSTALLED_APPS, this method returns:
 
         [
-            "django.contrib.sessions.models.Session",
-            "django.contrib.contenttypes.models.ContentType",
-            "django.contrib.auth.models.User",
-            "django.contrib.auth.models.Group",
-            "django.contrib.auth.models.Permission",
-            "django.contrib.admin.models.LogEntry",
+            "thibaud.contrib.sessions.models.Session",
+            "thibaud.contrib.contenttypes.models.ContentType",
+            "thibaud.contrib.auth.models.User",
+            "thibaud.contrib.auth.models.Group",
+            "thibaud.contrib.auth.models.Permission",
+            "thibaud.contrib.admin.models.LogEntry",
         ]
 
         """

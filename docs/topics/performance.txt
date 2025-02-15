@@ -3,7 +3,7 @@ Performance and optimization
 ============================
 
 This document provides an overview of techniques and tools that can help get
-your Django code running more efficiently - faster, and using fewer system
+your Thibaud code running more efficiently - faster, and using fewer system
 resources.
 
 Introduction
@@ -52,10 +52,10 @@ Performance benchmarking
 It's no good just guessing or assuming where the inefficiencies lie in your
 code.
 
-Django tools
+Thibaud tools
 ~~~~~~~~~~~~
 
-:pypi:`django-debug-toolbar` is a very handy tool that provides insights into
+:pypi:`thibaud-debug-toolbar` is a very handy tool that provides insights into
 what your code is doing and how much time it spends doing it. In particular it
 can show you all the SQL queries your page is generating, and how long each one
 has taken.
@@ -72,10 +72,10 @@ in effect simulating the experience of an actual user.
 
 These can't report on the internals of your code, but can provide a useful
 insight into your site's overall performance, including aspects that can't be
-adequately measured from within Django environment.
+adequately measured from within Thibaud environment.
 
 There are also several paid-for services that perform a similar analysis,
-including some that are Django-aware and can integrate with your codebase to
+including some that are Thibaud-aware and can integrate with your codebase to
 profile its performance far more comprehensively.
 
 Get things right from the start
@@ -94,7 +94,7 @@ useful guidelines is:
 Work at the appropriate level
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django offers many different ways of approaching things, but just because it's
+Thibaud offers many different ways of approaching things, but just because it's
 possible to do something in a certain way doesn't mean that it's the most
 appropriate way to do it. For example, you might find that you could calculate
 the same thing - the number of items in a collection, perhaps - in a
@@ -116,10 +116,10 @@ do them faster than the template language can::
     # of the Python objects
     len(my_bicycles)
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <!--
-    Django template filter
+    Thibaud template filter
     slower still, because it will have to count them in Python anyway,
     and because of template language overheads
     -->
@@ -149,18 +149,18 @@ Often it is expensive (that is, resource-hungry and slow) to compute a value,
 so there can be huge benefit in saving the value to a quickly accessible cache,
 ready for the next time it's required.
 
-It's a sufficiently significant and powerful technique that Django includes a
+It's a sufficiently significant and powerful technique that Thibaud includes a
 comprehensive caching framework, as well as other smaller pieces of caching
 functionality.
 
 :doc:`The caching framework </topics/cache>`
 --------------------------------------------
 
-Django's :doc:`caching framework </topics/cache>` offers very significant
+Thibaud's :doc:`caching framework </topics/cache>` offers very significant
 opportunities for performance gains, by saving dynamic content so that it
 doesn't need to be calculated for each request.
 
-For convenience, Django offers different levels of cache granularity: you can
+For convenience, Thibaud offers different levels of cache granularity: you can
 cache the output of specific views, or only the pieces that are difficult to
 produce, or even an entire site.
 
@@ -168,19 +168,19 @@ Implementing caching should not be regarded as an alternative to improving code
 that's performing poorly because it has been written badly. It's one of the
 final steps toward producing well-performing code, not a shortcut.
 
-:class:`~django.utils.functional.cached_property`
+:class:`~thibaud.utils.functional.cached_property`
 -------------------------------------------------
 
 It's common to have to call a class instance's method more than once. If
 that function is expensive, then doing so can be wasteful.
 
-Using the :class:`~django.utils.functional.cached_property` decorator saves the
+Using the :class:`~thibaud.utils.functional.cached_property` decorator saves the
 value returned by a property; the next time the function is called on that
 instance, it will return the saved value rather than re-computing it. Note that
 this only works on methods that take ``self`` as their only argument and that
 it changes the method to a property.
 
-Certain Django components also have their own caching functionality; these are
+Certain Thibaud components also have their own caching functionality; these are
 discussed below in the sections related to those components.
 
 Understanding laziness
@@ -208,10 +208,10 @@ Python provides a number of tools for lazy evaluation, particularly through the
 reading up on laziness in Python to discover opportunities for making use of
 lazy patterns in your code.
 
-Laziness in Django
+Laziness in Thibaud
 ------------------
 
-Django is itself quite lazy. A good example of this can be found in the
+Thibaud is itself quite lazy. A good example of this can be found in the
 evaluation of ``QuerySets``. :ref:`QuerySets are lazy <querysets-are-lazy>`.
 Thus a ``QuerySet`` can be created, passed around and combined with other
 ``QuerySets``, without actually incurring any trips to the database to fetch
@@ -223,7 +223,7 @@ QuerySet <when-querysets-are-evaluated>`. Avoiding the premature evaluation of
 a ``QuerySet`` can save making an expensive and unnecessary trip to the
 database.
 
-Django also offers a :meth:`~django.utils.functional.keep_lazy` decorator.
+Thibaud also offers a :meth:`~thibaud.utils.functional.keep_lazy` decorator.
 This allows a function that has been called with a lazy argument to behave
 lazily itself, only being evaluated when it needs to be. Thus the lazy argument
 - which could be an expensive one - will not be called upon for evaluation
@@ -235,7 +235,7 @@ Databases
 Database optimization
 ---------------------
 
-Django's database layer provides various ways to help developers get the best
+Thibaud's database layer provides various ways to help developers get the best
 performance from their databases. The :doc:`database optimization documentation
 </topics/db/optimization>` gathers together links to the relevant
 documentation and adds various tips that outline the steps to take when
@@ -255,23 +255,23 @@ HTTP performance
 Middleware
 ----------
 
-Django comes with a few helpful pieces of :doc:`middleware </ref/middleware>`
+Thibaud comes with a few helpful pieces of :doc:`middleware </ref/middleware>`
 that can help optimize your site's performance. They include:
 
-:class:`~django.middleware.http.ConditionalGetMiddleware`
+:class:`~thibaud.middleware.http.ConditionalGetMiddleware`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Adds support for modern browsers to conditionally GET responses based on the
 ``ETag`` and ``Last-Modified`` headers. It also calculates and sets an ETag if
 needed.
 
-:class:`~django.middleware.gzip.GZipMiddleware`
+:class:`~thibaud.middleware.gzip.GZipMiddleware`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Compresses responses for all modern browsers, saving bandwidth and transfer
 time. Note that GZipMiddleware is currently considered a security risk, and is
 vulnerable to attacks that nullify the protection provided by TLS/SSL. See the
-warning in :class:`~django.middleware.gzip.GZipMiddleware` for more information.
+warning in :class:`~thibaud.middleware.gzip.GZipMiddleware` for more information.
 
 Sessions
 --------
@@ -290,13 +290,13 @@ Static files
 Static files, which by definition are not dynamic, make an excellent target for
 optimization gains.
 
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+:class:`~thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By taking advantage of web browsers' caching abilities, you can
 eliminate network hits entirely for a given file after the initial download.
 
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends a
+:class:`~thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends a
 content-dependent tag to the filenames of :doc:`static files
 </ref/contrib/staticfiles>` to make it safe for browsers to cache them
 long-term without missing future changes - when a file changes, so will the
@@ -305,7 +305,7 @@ tag, so browsers will reload the asset automatically.
 "Minification"
 ~~~~~~~~~~~~~~
 
-Several third-party Django tools and packages provide the ability to "minify"
+Several third-party Thibaud tools and packages provide the ability to "minify"
 HTML, CSS, and JavaScript. They remove unnecessary whitespace, newlines, and
 comments, and shorten variable names, and thus reduce the size of the documents
 that your site publishes.
@@ -323,7 +323,7 @@ The cached template loader
 --------------------------
 
 Enabling the :class:`cached template loader
-<django.template.loaders.cached.Loader>` often improves performance
+<thibaud.template.loaders.cached.Loader>` often improves performance
 drastically, as it avoids compiling each template every time it needs to be
 rendered.
 
@@ -334,7 +334,7 @@ It can sometimes be worth checking whether different and better-performing
 versions of the software that you're using are available.
 
 These techniques are targeted at more advanced users who want to push the
-boundaries of performance of an already well-optimized Django site.
+boundaries of performance of an already well-optimized Thibaud site.
 
 However, they are not magic solutions to performance problems, and they're
 unlikely to bring better than marginal gains to sites that don't already do the
@@ -355,7 +355,7 @@ efficient, but the maintainers can't anticipate every possible use-case - so
 while being aware that newer versions are likely to perform better, don't
 assume that they always will.
 
-This is true of Django itself. Successive releases have offered a number of
+This is true of Thibaud itself. Successive releases have offered a number of
 improvements across the system, but you should still check the real-world
 performance of your application, because in some cases you may find that
 changes mean it performs worse rather than better.
@@ -370,18 +370,18 @@ better too - but measure, rather than assume.
     in a new release and that these benefits are far more significant than any
     performance you might win or lose.
 
-Alternatives to Django's template language
+Alternatives to Thibaud's template language
 ------------------------------------------
 
-For nearly all cases, Django's built-in template language is perfectly
-adequate. However, if the bottlenecks in your Django project seem to lie in the
+For nearly all cases, Thibaud's built-in template language is perfectly
+adequate. However, if the bottlenecks in your Thibaud project seem to lie in the
 template system and you have exhausted other opportunities to remedy this, a
 third-party alternative may be the answer.
 
 Jinja2_ can offer performance improvements, particularly when it comes to
 speed.
 
-Alternative template systems vary in the extent to which they share Django's
+Alternative template systems vary in the extent to which they share Thibaud's
 templating language.
 
 .. note::
@@ -398,7 +398,7 @@ Alternative software implementations
 It may be worth checking whether Python software you're using has been
 provided in a different implementation that can execute the same code faster.
 
-However: most performance problems in well-written Django sites aren't at the
+However: most performance problems in well-written Thibaud sites aren't at the
 Python execution level, but rather in inefficient database querying, caching,
 and templates. If you're relying on poorly-written Python code, your
 performance problems are unlikely to be solved by having it execute faster.
@@ -419,7 +419,7 @@ performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
 <https://www.pypy.org/compat.html>`_ with existing Python APIs and libraries.
-Django is compatible with versions of PyPy corresponding to the supported
+Thibaud is compatible with versions of PyPy corresponding to the supported
 Python versions, but you will need to check the compatibility of other
 libraries you rely on.
 

@@ -1,14 +1,14 @@
-from django.apps import AppConfig
-from django.core import serializers
-from django.utils.translation import gettext_lazy as _
+from thibaud.apps import AppConfig
+from thibaud.core import serializers
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class GISConfig(AppConfig):
-    default_auto_field = "django.db.models.AutoField"
-    name = "django.contrib.gis"
+    default_auto_field = "thibaud.db.models.AutoField"
+    name = "thibaud.contrib.gis"
     verbose_name = _("GIS")
 
     def ready(self):
         serializers.BUILTIN_SERIALIZERS.setdefault(
-            "geojson", "django.contrib.gis.serializers.geojson"
+            "geojson", "thibaud.contrib.gis.serializers.geojson"
         )

@@ -15,9 +15,9 @@ from functools import wraps
 from pathlib import Path
 from unittest import mock, skipIf
 
-from django.conf import settings
-from django.core import management, signals
-from django.core.cache import (
+from thibaud.conf import settings
+from thibaud.core import management, signals
+from thibaud.core.cache import (
     DEFAULT_CACHE_ALIAS,
     CacheHandler,
     CacheKeyWarning,
@@ -25,43 +25,43 @@ from django.core.cache import (
     cache,
     caches,
 )
-from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core.cache.backends.redis import RedisCacheClient
-from django.core.cache.utils import make_template_fragment_key
-from django.db import close_old_connections, connection, connections
-from django.db.backends.utils import CursorWrapper
-from django.http import (
+from thibaud.core.cache.backends.base import InvalidCacheBackendError
+from thibaud.core.cache.backends.redis import RedisCacheClient
+from thibaud.core.cache.utils import make_template_fragment_key
+from thibaud.db import close_old_connections, connection, connections
+from thibaud.db.backends.utils import CursorWrapper
+from thibaud.http import (
     HttpRequest,
     HttpResponse,
     HttpResponseNotModified,
     StreamingHttpResponse,
 )
-from django.middleware.cache import (
+from thibaud.middleware.cache import (
     CacheMiddleware,
     FetchFromCacheMiddleware,
     UpdateCacheMiddleware,
 )
-from django.middleware.csrf import CsrfViewMiddleware
-from django.template import engines
-from django.template.context_processors import csrf
-from django.template.response import TemplateResponse
-from django.test import (
+from thibaud.middleware.csrf import CsrfViewMiddleware
+from thibaud.template import engines
+from thibaud.template.context_processors import csrf
+from thibaud.template.response import TemplateResponse
+from thibaud.test import (
     RequestFactory,
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
     override_settings,
 )
-from django.test.signals import setting_changed
-from django.test.utils import CaptureQueriesContext
-from django.utils import timezone, translation
-from django.utils.cache import (
+from thibaud.test.signals import setting_changed
+from thibaud.test.utils import CaptureQueriesContext
+from thibaud.utils import timezone, translation
+from thibaud.utils.cache import (
     get_cache_key,
     learn_cache_key,
     patch_cache_control,
     patch_vary_headers,
 )
-from django.views.decorators.cache import cache_control, cache_page
+from thibaud.views.decorators.cache import cache_control, cache_page
 
 from .models import Poll, expensive_calculation
 
@@ -112,7 +112,7 @@ def retry(retries=3, delay=1):
 @override_settings(
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+            "BACKEND": "thibaud.core.cache.backends.dummy.DummyCache",
         }
     }
 )
@@ -1165,7 +1165,7 @@ class BaseCacheTests:
 
 @override_settings(
     CACHES=caches_setting_for_tests(
-        BACKEND="django.core.cache.backends.db.DatabaseCache",
+        BACKEND="thibaud.core.cache.backends.db.DatabaseCache",
         # Spaces are used in the table name to ensure quoting/escaping is working
         LOCATION="test cache table",
     )
@@ -1239,7 +1239,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 return self.cursor.rowcount
 
         cache.set_many({"a": 1, "b": 2})
-        with mock.patch("django.db.backends.utils.CursorWrapper", MockedCursorWrapper):
+        with mock.patch("thibaud.db.backends.utils.CursorWrapper", MockedCursorWrapper):
             self.assertIs(cache.delete("a"), True)
 
     def test_zero_cull(self):
@@ -1255,7 +1255,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     @override_settings(
         CACHES=caches_setting_for_tests(
-            BACKEND="django.core.cache.backends.db.DatabaseCache",
+            BACKEND="thibaud.core.cache.backends.db.DatabaseCache",
             # Use another table name to avoid the 'table already exists' message.
             LOCATION="createcachetable_dry_run_mode",
         )
@@ -1300,17 +1300,17 @@ class DBCacheRouter:
     """A router that puts the cache table on the 'other' database."""
 
     def db_for_read(self, model, **hints):
-        if model._meta.app_label == "django_cache":
+        if model._meta.app_label == "thibaud_cache":
             return "other"
         return None
 
     def db_for_write(self, model, **hints):
-        if model._meta.app_label == "django_cache":
+        if model._meta.app_label == "thibaud_cache":
             return "other"
         return None
 
     def allow_migrate(self, db, app_label, **hints):
-        if app_label == "django_cache":
+        if app_label == "thibaud_cache":
             return db == "other"
         return None
 
@@ -1318,7 +1318,7 @@ class DBCacheRouter:
 @override_settings(
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "BACKEND": "thibaud.core.cache.backends.db.DatabaseCache",
             "LOCATION": "my_cache_table",
         },
     },
@@ -1355,7 +1355,7 @@ class PicklingSideEffect:
 
 limit_locmem_entries = override_settings(
     CACHES=caches_setting_for_tests(
-        BACKEND="django.core.cache.backends.locmem.LocMemCache",
+        BACKEND="thibaud.core.cache.backends.locmem.LocMemCache",
         OPTIONS={"MAX_ENTRIES": 9},
     )
 )
@@ -1363,7 +1363,7 @@ limit_locmem_entries = override_settings(
 
 @override_settings(
     CACHES=caches_setting_for_tests(
-        BACKEND="django.core.cache.backends.locmem.LocMemCache",
+        BACKEND="thibaud.core.cache.backends.locmem.LocMemCache",
     )
 )
 class LocMemCacheTests(BaseCacheTests, TestCase):
@@ -1386,9 +1386,9 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
 
     @override_settings(
         CACHES={
-            "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+            "default": {"BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache"},
             "other": {
-                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "other",
             },
         }
@@ -1471,16 +1471,16 @@ for _cache_params in settings.CACHES.values():
     configured_caches[_cache_params["BACKEND"]] = _cache_params
 
 PyLibMCCache_params = configured_caches.get(
-    "django.core.cache.backends.memcached.PyLibMCCache"
+    "thibaud.core.cache.backends.memcached.PyLibMCCache"
 )
 PyMemcacheCache_params = configured_caches.get(
-    "django.core.cache.backends.memcached.PyMemcacheCache"
+    "thibaud.core.cache.backends.memcached.PyMemcacheCache"
 )
 
 # The memcached backends don't support cull-related options like `MAX_ENTRIES`.
 memcached_excluded_caches = {"cull", "zero_cull"}
 
-RedisCache_params = configured_caches.get("django.core.cache.backends.redis.RedisCache")
+RedisCache_params = configured_caches.get("thibaud.core.cache.backends.redis.RedisCache")
 
 # The redis backend does not support cull-related options like `MAX_ENTRIES`.
 redis_excluded_caches = {"cull", "zero_cull"}
@@ -1693,7 +1693,7 @@ class PyMemcacheCacheTests(BaseMemcachedTests, TestCase):
 
 @override_settings(
     CACHES=caches_setting_for_tests(
-        BACKEND="django.core.cache.backends.filebased.FileBasedCache",
+        BACKEND="thibaud.core.cache.backends.filebased.FileBasedCache",
     )
 )
 class FileBasedCacheTests(BaseCacheTests, TestCase):
@@ -1802,8 +1802,8 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
 
         mocked_time = ManualTickingTime()
         with (
-            mock.patch("django.core.cache.backends.filebased.time", new=mocked_time),
-            mock.patch("django.core.cache.backends.base.time", new=mocked_time),
+            mock.patch("thibaud.core.cache.backends.filebased.time", new=mocked_time),
+            mock.patch("thibaud.core.cache.backends.base.time", new=mocked_time),
             mock.patch("cache.tests.time", new=mocked_time),
         ):
             super().test_touch()
@@ -1830,7 +1830,7 @@ class RedisCacheTests(BaseCacheTests, TestCase):
     def test_incr_write_connection(self):
         cache.set("number", 42)
         with mock.patch(
-            "django.core.cache.backends.redis.RedisCacheClient.get_client"
+            "thibaud.core.cache.backends.redis.RedisCacheClient.get_client"
         ) as mocked_get_client:
             cache.incr("number")
             self.assertEqual(mocked_get_client.call_args.kwargs, {"write": True})
@@ -1954,7 +1954,7 @@ class CacheClosingTests(SimpleTestCase):
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
     "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "unique-snowflake",
     }
 }
@@ -1981,7 +1981,7 @@ class DefaultNonExpiringCacheKeyTests(SimpleTestCase):
         """The default expiration time of a cache key is 5 minutes.
 
         This value is defined in
-        django.core.cache.backends.base.BaseCache.__init__().
+        thibaud.core.cache.backends.base.BaseCache.__init__().
         """
         self.assertEqual(300, self.DEFAULT_TIMEOUT)
 
@@ -2033,14 +2033,14 @@ class DefaultNonExpiringCacheKeyTests(SimpleTestCase):
     CACHE_MIDDLEWARE_SECONDS=1,
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
         },
     },
     USE_I18N=False,
     ALLOWED_HOSTS=[".example.com"],
 )
 class CacheUtils(SimpleTestCase):
-    """TestCase for django.utils.cache functions."""
+    """TestCase for thibaud.utils.cache functions."""
 
     host = "www.example.com"
     path = "/cache/test/"
@@ -2212,7 +2212,7 @@ class CacheUtils(SimpleTestCase):
 @override_settings(
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
             "KEY_PREFIX": "cacheprefix",
         },
     },
@@ -2226,7 +2226,7 @@ class PrefixedCacheUtils(CacheUtils):
     CACHE_MIDDLEWARE_KEY_PREFIX="test",
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
         },
     },
 )
@@ -2274,7 +2274,7 @@ class CacheHEADTest(SimpleTestCase):
     CACHE_MIDDLEWARE_KEY_PREFIX="settingsprefix",
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
         },
     },
     LANGUAGES=[
@@ -2492,7 +2492,7 @@ class CacheI18nTest(SimpleTestCase):
 @override_settings(
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
             "KEY_PREFIX": "cacheprefix",
         },
     },
@@ -2515,10 +2515,10 @@ def csrf_view(request):
     CACHE_MIDDLEWARE_SECONDS=30,
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
         },
         "other": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
             "LOCATION": "other",
             "TIMEOUT": "1",
         },
@@ -2559,7 +2559,7 @@ class CacheMiddlewareTest(SimpleTestCase):
             as_view_decorator.cache_timeout, 30
         )  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, "")
-        # Value of DEFAULT_CACHE_ALIAS from django.core.cache
+        # Value of DEFAULT_CACHE_ALIAS from thibaud.core.cache
         self.assertEqual(as_view_decorator.cache_alias, "default")
         self.assertEqual(as_view_decorator.cache, self.default_cache)
 
@@ -2735,7 +2735,7 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def test_sensitive_cookie_not_cached(self):
         """
-        Django must prevent caching of responses that set a user-specific (and
+        Thibaud must prevent caching of responses that set a user-specific (and
         maybe security sensitive) cookie in response to a cookie-less request.
         """
         request = self.factory.get("/view/")
@@ -2814,7 +2814,7 @@ class CacheMiddlewareTest(SimpleTestCase):
     CACHE_MIDDLEWARE_SECONDS=1,
     CACHES={
         "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
         },
     },
     USE_I18N=False,
@@ -2866,7 +2866,7 @@ class TestWithTemplateResponse(SimpleTestCase):
         )
         for initial_vary, newheaders, resulting_vary in headers:
             with self.subTest(initial_vary=initial_vary, newheaders=newheaders):
-                template = engines["django"].from_string("This is a test")
+                template = engines["thibaud"].from_string("This is a test")
                 response = TemplateResponse(HttpRequest(), template)
                 if initial_vary is not None:
                     response.headers["Vary"] = initial_vary
@@ -2875,7 +2875,7 @@ class TestWithTemplateResponse(SimpleTestCase):
 
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
-        template = engines["django"].from_string("This is a test")
+        template = engines["thibaud"].from_string("This is a test")
         response = TemplateResponse(HttpRequest(), template)
         key_prefix = "localprefix"
         # Expect None if no headers have been set yet.
@@ -2898,7 +2898,7 @@ class TestWithTemplateResponse(SimpleTestCase):
 
     def test_get_cache_key_with_query(self):
         request = self.factory.get(self.path, {"test": 1})
-        template = engines["django"].from_string("This is a test")
+        template = engines["thibaud"].from_string("This is a test")
         response = TemplateResponse(HttpRequest(), template)
         # Expect None if no headers have been set yet.
         self.assertIsNone(get_cache_key(request))
@@ -2980,13 +2980,13 @@ class CacheHandlerTest(SimpleTestCase):
         test_caches = CacheHandler(
             {
                 "invalid_backend": {
-                    "BACKEND": "django.nonexistent.NonexistentBackend",
+                    "BACKEND": "thibaud.nonexistent.NonexistentBackend",
                 },
             }
         )
         msg = (
-            "Could not find backend 'django.nonexistent.NonexistentBackend': "
-            "No module named 'django.nonexistent'"
+            "Could not find backend 'thibaud.nonexistent.NonexistentBackend': "
+            "No module named 'thibaud.nonexistent'"
         )
         with self.assertRaisesMessage(InvalidCacheBackendError, msg):
             test_caches["invalid_backend"]
@@ -2995,10 +2995,10 @@ class CacheHandlerTest(SimpleTestCase):
         test_caches = CacheHandler(
             {
                 "cache_1": {
-                    "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+                    "BACKEND": "thibaud.core.cache.backends.dummy.DummyCache",
                 },
                 "cache_2": {
-                    "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+                    "BACKEND": "thibaud.core.cache.backends.dummy.DummyCache",
                 },
             }
         )

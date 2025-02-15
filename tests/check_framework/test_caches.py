@@ -1,25 +1,25 @@
 import pathlib
 
-from django.core.checks import Warning
-from django.core.checks.caches import (
+from thibaud.core.checks import Warning
+from thibaud.core.checks.caches import (
     E001,
     check_cache_location_not_exposed,
     check_default_cache_is_configured,
     check_file_based_cache_is_absolute,
 )
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
 
 
 class CheckCacheSettingsAppDirsTest(SimpleTestCase):
     VALID_CACHES_CONFIGURATION = {
         "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
         },
     }
     INVALID_CACHES_CONFIGURATION = {
         "other": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
         },
     }
 
@@ -49,7 +49,7 @@ class CheckCacheLocationTest(SimpleTestCase):
         return {
             "CACHES": {
                 "default": {
-                    "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+                    "BACKEND": "thibaud.core.cache.backends.filebased.FileBasedCache",
                     "LOCATION": cache_path,
                 },
             },
@@ -140,7 +140,7 @@ class CheckCacheAbsolutePath(SimpleTestCase):
         with self.settings(
             CACHES={
                 "default": {
-                    "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+                    "BACKEND": "thibaud.core.cache.backends.filebased.FileBasedCache",
                     "LOCATION": pathlib.Path.cwd() / "cache",
                 },
             }
@@ -151,7 +151,7 @@ class CheckCacheAbsolutePath(SimpleTestCase):
         with self.settings(
             CACHES={
                 "default": {
-                    "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+                    "BACKEND": "thibaud.core.cache.backends.filebased.FileBasedCache",
                     "LOCATION": "cache",
                 },
             }

@@ -1,25 +1,25 @@
 ========================
-Django 1.2 release notes
+Thibaud 1.2 release notes
 ========================
 
 *May 17, 2010.*
 
-Welcome to Django 1.2!
+Welcome to Thibaud 1.2!
 
-Nearly a year in the making, Django 1.2 packs an impressive list of :ref:`new
+Nearly a year in the making, Thibaud 1.2 packs an impressive list of :ref:`new
 features <whats-new-1.2>` and lots of bug fixes. These release notes cover
 the new features, as well as important changes you'll want to be aware of when
-upgrading from Django 1.1 or older versions.
+upgrading from Thibaud 1.1 or older versions.
 
 Overview
 ========
 
-Django 1.2 introduces several large, important new features, including:
+Thibaud 1.2 introduces several large, important new features, including:
 
 * Support for :ref:`multiple database connections
-  <support-for-multiple-databases>` in a single Django instance.
+  <support-for-multiple-databases>` in a single Thibaud instance.
 
-* `Model validation`_ inspired by Django's form validation.
+* `Model validation`_ inspired by Thibaud's form validation.
 
 * Vastly :ref:`improved protection against Cross-Site Request Forgery
   <improved-csrf-protection>` (CSRF).
@@ -41,10 +41,10 @@ These are just the highlights; full details and a complete list of features
 
 .. seealso::
 
-    `Django Advent`_ covered the release of Django 1.2 with a series of
+    `Thibaud Advent`_ covered the release of Thibaud 1.2 with a series of
     articles and tutorials that cover some of the new features in depth.
 
-.. _django advent: https://github.com/djangoadvent/djangoadvent-articles
+.. _thibaud advent: https://github.com/thibaudadvent/thibaudadvent-articles
 
 Wherever possible these features have been introduced in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
@@ -57,13 +57,13 @@ backwards-incompatible. The big changes are:
 
 * The new CSRF protection framework is not backwards-compatible with
   the old system. Users of the old system will not be affected until
-  the old system is removed in Django 1.4.
+  the old system is removed in Thibaud 1.4.
 
   However, upgrading to the new CSRF protection framework requires a few
   important backwards-incompatible changes, detailed in `CSRF Protection`_,
   below.
 
-* Authors of custom :class:`~django.db.models.Field` subclasses should be
+* Authors of custom :class:`~thibaud.db.models.Field` subclasses should be
   aware that a number of methods have had a change in prototype, detailed
   under `get_db_prep_*() methods on Field`_, below.
 
@@ -72,15 +72,15 @@ backwards-incompatible. The big changes are:
   should ensure that their code follows the new rules for `stateful template
   tags`_
 
-* The :func:`~django.contrib.auth.decorators.user_passes_test`,
-  :func:`~django.contrib.auth.decorators.login_required`, and
-  :func:`~django.contrib.auth.decorators.permission_required`, decorators
-  from :mod:`django.contrib.auth` only apply to functions and no longer
+* The :func:`~thibaud.contrib.auth.decorators.user_passes_test`,
+  :func:`~thibaud.contrib.auth.decorators.login_required`, and
+  :func:`~thibaud.contrib.auth.decorators.permission_required`, decorators
+  from :mod:`thibaud.contrib.auth` only apply to functions and no longer
   work on methods. There's a simple one-line fix :ref:`detailed below
   <user-passes-test-login-required-permission-required>`.
 
 Again, these are just the big features that will affect the most users. Users
-upgrading from previous versions of Django are heavily encouraged to consult
+upgrading from previous versions of Thibaud are heavily encouraged to consult
 the complete list of :ref:`backwards-incompatible changes
 <backwards-incompatible-changes-1.2>` and the list of :ref:`deprecated
 features <deprecated-features-1.2>`.
@@ -88,29 +88,29 @@ features <deprecated-features-1.2>`.
 Python compatibility
 ====================
 
-While not a new feature, it's important to note that Django 1.2
+While not a new feature, it's important to note that Thibaud 1.2
 introduces the first shift in our Python compatibility policy since
-Django's initial public debut. Previous Django releases were tested
-and supported on 2.x Python versions from 2.3 up; Django 1.2, however,
+Thibaud's initial public debut. Previous Thibaud releases were tested
+and supported on 2.x Python versions from 2.3 up; Thibaud 1.2, however,
 drops official support for Python 2.3. As such, the minimum Python
-version required for Django is now 2.4, and Django is tested and
+version required for Thibaud is now 2.4, and Thibaud is tested and
 supported on Python 2.4, 2.5 and 2.6, and will be supported on the
 as-yet-unreleased Python 2.7.
 
-This change should affect only a small number of Django users, as most
+This change should affect only a small number of Thibaud users, as most
 operating-system vendors today are shipping Python 2.4 or newer as
 their default version. If you're still using Python 2.3, however,
-you'll need to stick to Django 1.1 until you can upgrade; per
-:doc:`our support policy </internals/release-process>`, Django 1.1 will
-continue to receive security support until the release of Django 1.3.
+you'll need to stick to Thibaud 1.1 until you can upgrade; per
+:doc:`our support policy </internals/release-process>`, Thibaud 1.1 will
+continue to receive security support until the release of Thibaud 1.3.
 
-A roadmap for Django's overall 2.x Python support, and eventual
+A roadmap for Thibaud's overall 2.x Python support, and eventual
 transition to Python 3.x, is currently being developed, and will be
-announced prior to the release of Django 1.3.
+announced prior to the release of Thibaud 1.3.
 
 .. _whats-new-1.2:
 
-What's new in Django 1.2
+What's new in Thibaud 1.2
 ========================
 
 .. _support-for-multiple-databases:
@@ -118,8 +118,8 @@ What's new in Django 1.2
 Support for multiple databases
 ------------------------------
 
-Django 1.2 adds the ability to use :doc:`more than one database
-</topics/db/multi-db>` in your Django project. Queries can be issued at a
+Thibaud 1.2 adds the ability to use :doc:`more than one database
+</topics/db/multi-db>` in your Thibaud project. Queries can be issued at a
 specific database with the ``using()`` method on ``QuerySet`` objects.
 Individual objects can be saved to a specific database by providing a ``using``
 argument when you call ``save()``.
@@ -139,7 +139,7 @@ perform any validation of the instance's data.
 Improved CSRF protection
 ------------------------
 
-Django now has much improved protection against :doc:`Cross-Site Request Forgery
+Thibaud now has much improved protection against :doc:`Cross-Site Request Forgery
 (CSRF) attacks</ref/csrf>`. This type of attack occurs when a malicious
 website contains a link, a form button or some JavaScript that is intended to
 perform some action on your website, using the credentials of a logged-in user
@@ -152,7 +152,7 @@ with someone else's credentials, is also covered.
 Messages framework
 ------------------
 
-Django now includes a robust and configurable :doc:`messages framework
+Thibaud now includes a robust and configurable :doc:`messages framework
 </ref/contrib/messages>` with built-in support for cookie- and session-based
 messaging, for both anonymous and authenticated clients. The messages framework
 replaces the deprecated user message API and allows you to temporarily store
@@ -165,7 +165,7 @@ Object-level permissions
 A foundation for specifying permissions at the per-object level has been added.
 Although there is no implementation of this in core, a custom authentication
 backend can provide this implementation and it will be used by
-:class:`django.contrib.auth.models.User`. See the :doc:`authentication docs
+:class:`thibaud.contrib.auth.models.User`. See the :doc:`authentication docs
 </topics/auth/index>` for more information.
 
 Permissions for anonymous users
@@ -183,22 +183,22 @@ docs </topics/auth/index>` for more details.
 Relaxed requirements for usernames
 ----------------------------------
 
-The built-in :class:`~django.contrib.auth.models.User` model's
-:attr:`~django.contrib.auth.models.User.username` field now allows a wider range
+The built-in :class:`~thibaud.contrib.auth.models.User` model's
+:attr:`~thibaud.contrib.auth.models.User.username` field now allows a wider range
 of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
 
 Email backends
 --------------
 
-You can now :ref:`configure the way that Django sends email
+You can now :ref:`configure the way that Thibaud sends email
 <topic-email-backends>`. Instead of using SMTP to send all email, you
 can now choose a configurable email backend to send messages. If your
 hosting provider uses a sandbox or some other non-SMTP technique for
 sending mail, you can now construct an email backend that will allow
-Django's standard :doc:`mail sending methods</topics/email>` to use
+Thibaud's standard :doc:`mail sending methods</topics/email>` to use
 those facilities.
 
-This also makes it easier to debug mail sending. Django ships with
+This also makes it easier to debug mail sending. Thibaud ships with
 backend implementations that allow you to send email to a
 :ref:`file<topic-email-file-backend>`, to the
 :ref:`console<topic-email-console-backend>`, or to
@@ -213,7 +213,7 @@ email to be :ref:`thrown away<topic-email-dummy-backend>`.
 The :ttag:`if` tag has been upgraded to be much more powerful. First, we've
 added support for comparison operators. No longer will you have to type:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% ifnotequal a b %}
      ...
@@ -221,7 +221,7 @@ added support for comparison operators. No longer will you have to type:
 
 You can now do this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if a != b %}
      ...
@@ -236,7 +236,7 @@ to ``and``, ``or`` and ``not``, which were already supported.
 
 Also, filters may now be used in the ``if`` expression. For example:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
       <div
         {% if user.email|lower == message.recipient|lower %}
@@ -247,38 +247,38 @@ Also, filters may now be used in the ``if`` expression. For example:
 Template caching
 ----------------
 
-In previous versions of Django, every time you rendered a template, it
-would be reloaded from disk. In Django 1.2, you can use a :ref:`cached
+In previous versions of Thibaud, every time you rendered a template, it
+would be reloaded from disk. In Thibaud 1.2, you can use a :ref:`cached
 template loader <template-loaders>` to load templates once, then
 cache the result for every subsequent render. This can lead to a
 significant performance improvement if your templates are broken into
 lots of smaller subtemplates (using the ``{% extends %}`` or ``{%
 include %}`` tags).
 
-As a side effect, it is now much easier to support non-Django template
+As a side effect, it is now much easier to support non-Thibaud template
 languages.
 
 Class-based template loaders
 ----------------------------
 
 As part of the changes made to introduce `Template caching`_  and following
-a general trend in Django, the template loaders API has been modified
+a general trend in Thibaud, the template loaders API has been modified
 to use template loading mechanisms that are encapsulated in Python classes as
-opposed to functions, the only method available until Django 1.1.
+opposed to functions, the only method available until Thibaud 1.1.
 
-All the template loaders :ref:`shipped with Django <template-loaders>` have
+All the template loaders :ref:`shipped with Thibaud <template-loaders>` have
 been ported to the new API but they still implement the function-based API and
 the template core machinery still accepts function-based loaders (builtin or
 third party) so there is no immediate need to modify your ``TEMPLATE_LOADERS``
 setting in existing projects, things will keep working if you leave it
-untouched up to and including the Django 1.3 release.
+untouched up to and including the Thibaud 1.3 release.
 
 If you have developed your own custom template loaders we suggest to consider
 porting them to a class-based implementation because the code for backwards
 compatibility with function-based loaders starts its deprecation process in
-Django 1.2 and will be removed in Django 1.4.  There is a description of the
+Thibaud 1.2 and will be removed in Thibaud 1.4.  There is a description of the
 API these loader classes must implement in the template API reference and you
-can also examine the source code of the loaders shipped with Django.
+can also examine the source code of the loaders shipped with Thibaud.
 
 Natural keys in fixtures
 ------------------------
@@ -292,8 +292,8 @@ objects whose primary key value may not be predictable or known.
 Fast failure for tests
 ----------------------
 
-Both the :djadmin:`test` subcommand of ``django-admin.py`` and the
-``runtests.py`` script used to run Django's own test suite now support a
+Both the :djadmin:`test` subcommand of ``thibaud-admin.py`` and the
+``runtests.py`` script used to run Thibaud's own test suite now support a
 ``--failfast`` option. When specified, this option causes the test runner to
 exit after encountering a failure instead of continuing with the test run. In
 addition, the handling of ``Ctrl-C`` during a test run has been improved to
@@ -303,21 +303,21 @@ were run before the interruption.
 ``BigIntegerField``
 -------------------
 
-Models can now use a 64-bit :class:`~django.db.models.BigIntegerField` type.
+Models can now use a 64-bit :class:`~thibaud.db.models.BigIntegerField` type.
 
 Improved localization
 ---------------------
 
-Django's :doc:`internationalization framework </topics/i18n/index>` has been expanded
+Thibaud's :doc:`internationalization framework </topics/i18n/index>` has been expanded
 with locale-aware formatting and form processing. That means, if enabled, dates
 and numbers on templates will be displayed using the format specified for the
-current locale. Django will also use localized formats when parsing data in
+current locale. Thibaud will also use localized formats when parsing data in
 forms. See :doc:`/topics/i18n/formatting` for more details.
 
 ``readonly_fields`` in ``ModelAdmin``
 -------------------------------------
 
-:attr:`django.contrib.admin.ModelAdmin.readonly_fields` has been added to
+:attr:`thibaud.contrib.admin.ModelAdmin.readonly_fields` has been added to
 enable non-editable fields in add/change pages for models and inlines. Field
 and calculated values can be displayed alongside editable fields.
 
@@ -325,7 +325,7 @@ Customizable syntax highlighting
 --------------------------------
 
 You can now use a :envvar:`DJANGO_COLORS` environment variable to modify or
-disable the colors used by ``django-admin.py`` to provide :ref:`syntax
+disable the colors used by ``thibaud-admin.py`` to provide :ref:`syntax
 highlighting <syntax-coloring>`.
 
 Syndication feeds as views
@@ -338,28 +338,28 @@ view, feeds views are passed a ``request`` object, so you can do anything you
 would normally do with a view, like user based access control, or making a feed
 a named URL.
 
-GeoDjango
+GeoThibaud
 ---------
 
-The most significant new feature for :doc:`GeoDjango </ref/contrib/gis/index>`
+The most significant new feature for :doc:`GeoThibaud </ref/contrib/gis/index>`
 in 1.2 is support for multiple spatial databases.  As a result,
 the following :ref:`spatial database backends <spatial-backends>`
 are now included:
 
-* ``django.contrib.gis.db.backends.postgis``
-* ``django.contrib.gis.db.backends.mysql``
-* ``django.contrib.gis.db.backends.oracle``
-* ``django.contrib.gis.db.backends.spatialite``
+* ``thibaud.contrib.gis.db.backends.postgis``
+* ``thibaud.contrib.gis.db.backends.mysql``
+* ``thibaud.contrib.gis.db.backends.oracle``
+* ``thibaud.contrib.gis.db.backends.spatialite``
 
-GeoDjango now supports the rich capabilities added in the PostGIS 1.5 release.
+GeoThibaud now supports the rich capabilities added in the PostGIS 1.5 release.
 New features include support for the :ref:`geography type <geography-type>`
 and enabling of :ref:`distance queries <distance-queries>`
 with non-point geometries on geographic coordinate systems.
 
 Support for 3D geometry fields was added, and may be enabled
-by setting the :attr:`~django.contrib.gis.db.models.GeometryField.dim`
-keyword to 3 in your :class:`~django.contrib.gis.db.models.GeometryField`.
-The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
+by setting the :attr:`~thibaud.contrib.gis.db.models.GeometryField.dim`
+keyword to 3 in your :class:`~thibaud.contrib.gis.db.models.GeometryField`.
+The :class:`~thibaud.contrib.gis.db.models.Extent3D` aggregate
 and ``extent3d()`` ``GeoQuerySet`` method were added as a part of this feature.
 
 The ``force_rhr()``, ``reverse_geom()``, and ``geohash()`` ``GeoQuerySet``
@@ -369,11 +369,11 @@ The GEOS interface was updated to use thread-safe C library functions when
 available on the platform.
 
 The GDAL interface now allows the user to set a
-:attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on the features returned
-when iterating over a :class:`~django.contrib.gis.gdal.Layer`.
+:attr:`~thibaud.contrib.gis.gdal.Layer.spatial_filter` on the features returned
+when iterating over a :class:`~thibaud.contrib.gis.gdal.Layer`.
 
-Finally, :doc:`GeoDjango's documentation </ref/contrib/gis/index>` is now
-included with Django's and is no longer hosted separately at ``geodjango.org``.
+Finally, :doc:`GeoThibaud's documentation </ref/contrib/gis/index>` is now
+included with Thibaud's and is no longer hosted separately at ``geothibaud.org``.
 
 .. _1.2-js-assisted-inlines:
 
@@ -407,7 +407,7 @@ Backwards-incompatible changes in 1.2
 Wherever possible the new features above have been introduced in a
 backwards-compatible manner per :doc:`our API stability policy
 </misc/api-stability>` policy. This means that practically all existing
-code which worked with Django 1.1 will continue to work with Django
+code which worked with Thibaud 1.1 will continue to work with Thibaud
 1.2; such code will, however, begin issuing warnings (see below for
 details).
 
@@ -423,7 +423,7 @@ We've made large changes to the way CSRF protection works, detailed in
 should be aware of:
 
 * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated and
-  will be removed completely in Django 1.4, in favor of a template tag that
+  will be removed completely in Thibaud 1.4, in favor of a template tag that
   should be inserted into forms.
 
 * All contrib apps use a ``csrf_protect`` decorator to protect the view. This
@@ -433,8 +433,8 @@ should be aware of:
 
   .. admonition:: Documentation removed
 
-     The upgrade notes have been removed in current Django docs. Please refer
-     to the docs for Django 1.3 or older to find these instructions.
+     The upgrade notes have been removed in current Thibaud docs. Please refer
+     to the docs for Thibaud 1.3 or older to find these instructions.
 
 * ``CsrfViewMiddleware`` is included in ``MIDDLEWARE_CLASSES`` by
   default. This turns on CSRF protection by default, so views that accept
@@ -443,12 +443,12 @@ should be aware of:
 
 * All of the CSRF has moved from contrib to core (with backwards
   compatible imports in the old locations, which are deprecated and
-  will cease to be supported in Django 1.4).
+  will cease to be supported in Thibaud 1.4).
 
 ``get_db_prep_*()`` methods on ``Field``
 ----------------------------------------
 
-Prior to Django 1.2, a custom ``Field`` had the option of defining
+Prior to Thibaud 1.2, a custom ``Field`` had the option of defining
 several functions to support conversion of Python values into
 database-compatible values. A custom field might look something like::
 
@@ -498,7 +498,7 @@ an unprepared (i.e., ``prepared=False``) value is provided to the
 We've provided conversion functions that will transparently
 convert functions adhering to the old prototype into functions
 compatible with the new prototype. However, these conversion functions
-will be removed in Django 1.4, so you should upgrade your ``Field``
+will be removed in Thibaud 1.4, so you should upgrade your ``Field``
 definitions to use the new prototype as soon as possible.
 
 If your ``get_db_prep_*()`` methods made no use of the database
@@ -514,10 +514,10 @@ Stateful template tags
 
 Template tags that store rendering state on their ``Node`` subclass
 have always been vulnerable to thread-safety and other issues; as of
-Django 1.2, however, they may also cause problems when used with the
+Thibaud 1.2, however, they may also cause problems when used with the
 new :ref:`cached template loader<template-loaders>`.
 
-All of the built-in Django template tags are safe to use with the cached
+All of the built-in Thibaud template tags are safe to use with the cached
 loader, but if you're using custom template tags that come from third
 party packages, or from your own code, you should ensure that the
 ``Node`` implementation for each tag is thread-safe. For more
@@ -525,12 +525,12 @@ information, see
 :ref:`template tag thread safety considerations<template_tag_thread_safety>`.
 
 You may also need to update your templates if you were relying on the
-implementation of Django's template tags *not* being thread safe. The
+implementation of Thibaud's template tags *not* being thread safe. The
 :ttag:`cycle` tag is the most likely to be affected in this way,
 especially when used in conjunction with the :ttag:`include` tag.
 Consider the following template fragment:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% for object in object_list %}
         {% include "subtemplate.html" %}
@@ -538,17 +538,17 @@ Consider the following template fragment:
 
 with a ``subtemplate.html`` that reads:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% cycle 'even' 'odd' %}
 
-Using the non-thread-safe, pre-Django 1.2 renderer, this would output:
+Using the non-thread-safe, pre-Thibaud 1.2 renderer, this would output:
 
 .. code-block:: text
 
     even odd even odd ...
 
-Using the thread-safe Django 1.2 renderer, you will instead get:
+Using the thread-safe Thibaud 1.2 renderer, you will instead get:
 
 .. code-block:: text
 
@@ -565,7 +565,7 @@ is thread safe, this leakage no longer occurs.
 ``user_passes_test``, ``login_required`` and ``permission_required``
 --------------------------------------------------------------------
 
-``django.contrib.auth.decorators`` provides the decorators
+``thibaud.contrib.auth.decorators`` provides the decorators
 ``login_required``, ``permission_required`` and
 ``user_passes_test``. Previously it was possible to use these
 decorators both on functions (where the first argument is 'request')
@@ -577,7 +577,7 @@ work.
 
 For this reason, the 'auto adapt' behavior has been removed, and if
 you are using these decorators on methods, you will need to manually
-apply :func:`django.utils.decorators.method_decorator` to convert the
+apply :func:`thibaud.utils.decorators.method_decorator` to convert the
 decorator to one that works with methods. For example, you would
 change code from this::
 
@@ -588,7 +588,7 @@ change code from this::
 
 to this::
 
-    from django.utils.decorators import method_decorator
+    from thibaud.utils.decorators import method_decorator
 
 
     class MyClass(object):
@@ -598,7 +598,7 @@ to this::
 
 or::
 
-    from django.utils.decorators import method_decorator
+    from thibaud.utils.decorators import method_decorator
 
     login_required_m = method_decorator(login_required)
 
@@ -629,7 +629,7 @@ new keyword and so is not a valid variable name in this tag.
 ``LazyObject`` is an undocumented-but-often-used utility class used for lazily
 wrapping other objects of unknown type.
 
-In Django 1.1 and earlier, it handled introspection in a non-standard way,
+In Thibaud 1.1 and earlier, it handled introspection in a non-standard way,
 depending on wrapped objects implementing a public method named
 ``get_all_members()``. Since this could easily lead to name clashes, it has been
 changed to use the standard Python introspection method, involving
@@ -658,7 +658,7 @@ versions earlier than 2.6, add the following code to the class::
 Historically, the ``__dict__`` attribute of a model instance has only contained
 attributes corresponding to the fields on a model.
 
-In order to support multiple database configurations, Django 1.2 has
+In order to support multiple database configurations, Thibaud 1.2 has
 added a ``_state`` attribute to object instances. This attribute will
 appear in ``__dict__`` for a model instance. If your code relies on
 iterating over ``__dict__`` to obtain a list of fields, you must now
@@ -698,10 +698,10 @@ you need an unmodified instance of your model, you should pass a copy to the
 ``BooleanField`` on MySQL
 --------------------------
 
-In previous versions of Django, a model's ``BooleanField`` under MySQL
+In previous versions of Thibaud, a model's ``BooleanField`` under MySQL
 would return its value as either ``1`` or ``0``, instead of ``True``
 or ``False``; for most people this wasn't a problem because ``bool``
-is a subclass of ``int`` in Python. In Django 1.2, however,
+is a subclass of ``int`` in Python. In Thibaud 1.2, however,
 ``BooleanField`` on MySQL correctly returns a real ``bool``.  The only
 time this should ever be an issue is if you were expecting the
 ``repr`` of a ``BooleanField`` to print ``1`` or ``0``.
@@ -711,11 +711,11 @@ Changes to the interpretation of ``max_num`` in FormSets
 
 As part of enhancements made to the handling of FormSets, the default
 value and interpretation of the ``max_num`` parameter to the
-:ref:`django.forms.formsets.formset_factory() <formsets-max-num>` and
-:ref:`django.forms.models.modelformset_factory()
+:ref:`thibaud.forms.formsets.formset_factory() <formsets-max-num>` and
+:ref:`thibaud.forms.models.modelformset_factory()
 <model-formsets-max-num>` functions has changed slightly. This
 change also affects the way the
-:attr:`~django.contrib.admin.InlineModelAdmin.max_num` argument is used for
+:attr:`~thibaud.contrib.admin.InlineModelAdmin.max_num` argument is used for
 inline admin objects.
 
 Previously, the default value for ``max_num`` was ``0`` (zero).
@@ -744,7 +744,7 @@ will need to update your FormSet and/or admin definitions.
 ------------
 
 An undocumented regular expression for validating email addresses has been moved
-from ``django.form.fields`` to ``django.core.validators``. You will need to
+from ``thibaud.form.fields`` to ``thibaud.core.validators``. You will need to
 update your imports if you are using it.
 
 .. _deprecated-features-1.2:
@@ -752,22 +752,22 @@ update your imports if you are using it.
 Features deprecated in 1.2
 ==========================
 
-Finally, Django 1.2 deprecates some features from earlier releases.
+Finally, Thibaud 1.2 deprecates some features from earlier releases.
 These features are still supported, but will be gradually phased out
 over the next few release cycles.
 
 Code taking advantage of any of the features below will raise a
-``PendingDeprecationWarning`` in Django 1.2. This warning will be
+``PendingDeprecationWarning`` in Thibaud 1.2. This warning will be
 silent by default, but may be turned on using Python's :mod:`warnings`
 module, or by running Python with a ``-Wd`` or ``-Wall`` flag.
 
-In Django 1.3, these warnings will become a ``DeprecationWarning``,
-which is *not* silent. In Django 1.4 support for these features will
+In Thibaud 1.3, these warnings will become a ``DeprecationWarning``,
+which is *not* silent. In Thibaud 1.4 support for these features will
 be removed entirely.
 
 .. seealso::
 
-    For more details, see the documentation :doc:`Django's release process
+    For more details, see the documentation :doc:`Thibaud's release process
     </internals/release-process>` and our :doc:`deprecation timeline
     </internals/deprecation>`.`
 
@@ -776,13 +776,13 @@ be removed entirely.
 Specifying databases
 --------------------
 
-Prior to Django 1.2, Django used a number of settings to control
-access to a single database. Django 1.2 introduces support for
+Prior to Thibaud 1.2, Thibaud used a number of settings to control
+access to a single database. Thibaud 1.2 introduces support for
 multiple databases, and as a result the way you define database
 settings has changed.
 
-Any existing Django settings file will continue to work as expected
-until Django 1.4. Until then, old-style database settings will be
+Any existing Thibaud settings file will continue to work as expected
+until Thibaud 1.4. Until then, old-style database settings will be
 automatically translated to the new-style format.
 
 In the old-style (pre 1.2) format, you had a number of ``DATABASE_``
@@ -802,7 +802,7 @@ shortened. The previous sample settings would now look like this::
     DATABASES = {
         "default": {
             "NAME": "test_db",
-            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "ENGINE": "thibaud.db.backends.postgresql_psycopg2",
             "USER": "myusername",
             "PASSWORD": "s3krit",
         }
@@ -828,10 +828,10 @@ This affects the following settings:
 These changes are also required if you have manually created a database
 connection using ``DatabaseWrapper()`` from your database backend of choice.
 
-In addition to the change in structure, Django 1.2 removes the special
+In addition to the change in structure, Thibaud 1.2 removes the special
 handling for the built-in database backends. All database backends
 must now be specified by a fully qualified module name (i.e.,
-``django.db.backends.postgresql_psycopg2``, rather than just
+``thibaud.db.backends.postgresql_psycopg2``, rather than just
 ``postgresql_psycopg2``).
 
 ``postgresql`` database backend
@@ -845,7 +845,7 @@ If you are currently using the ``postgresql`` backend, you should
 migrate to using the ``postgresql_psycopg2`` backend. To update your
 code, install the ``psycopg2`` library and change the
 :setting:`ENGINE <DATABASE-ENGINE>` setting to use
-``django.db.backends.postgresql_psycopg2``.
+``thibaud.db.backends.postgresql_psycopg2``.
 
 CSRF response-rewriting middleware
 ----------------------------------
@@ -853,7 +853,7 @@ CSRF response-rewriting middleware
 ``CsrfResponseMiddleware``, the middleware that automatically inserted
 CSRF tokens into ``POST`` forms in outgoing pages, has been deprecated
 in favor of a template tag method (see above), and will be removed
-completely in Django 1.4. ``CsrfMiddleware``, which includes the
+completely in Thibaud 1.4. ``CsrfMiddleware``, which includes the
 functionality of ``CsrfResponseMiddleware`` and
 ``CsrfViewMiddleware``, has likewise been deprecated.
 
@@ -862,8 +862,8 @@ imports are deprecated, as described in the upgrading notes.
 
 .. admonition:: Documentation removed
 
-   The upgrade notes have been removed in current Django docs. Please refer
-   to the docs for Django 1.3 or older to find these instructions.
+   The upgrade notes have been removed in current Thibaud docs. Please refer
+   to the docs for Thibaud 1.3 or older to find these instructions.
 
 ``SMTPConnection``
 ------------------
@@ -872,16 +872,16 @@ The ``SMTPConnection`` class has been deprecated in favor of a generic
 email backend API. Old code that explicitly instantiated an instance
 of an SMTPConnection::
 
-    from django.core.mail import SMTPConnection
+    from thibaud.core.mail import SMTPConnection
 
     connection = SMTPConnection()
     messages = get_notification_email()
     connection.send_messages(messages)
 
-...should now call :meth:`~django.core.mail.get_connection()` to
+...should now call :meth:`~thibaud.core.mail.get_connection()` to
 instantiate a generic email connection::
 
-    from django.core.mail import get_connection
+    from thibaud.core.mail import get_connection
 
     connection = get_connection()
     messages = get_notification_email()
@@ -892,25 +892,25 @@ may not return an SMTP connection. If you explicitly require an SMTP
 connection with which to send email, you can explicitly request an
 SMTP connection::
 
-    from django.core.mail import get_connection
+    from thibaud.core.mail import get_connection
 
-    connection = get_connection("django.core.mail.backends.smtp.EmailBackend")
+    connection = get_connection("thibaud.core.mail.backends.smtp.EmailBackend")
     messages = get_notification_email()
     connection.send_messages(messages)
 
 If your call to construct an instance of ``SMTPConnection`` required
 additional arguments, those arguments can be passed to the
-:meth:`~django.core.mail.get_connection()` call::
+:meth:`~thibaud.core.mail.get_connection()` call::
 
     connection = get_connection(
-        "django.core.mail.backends.smtp.EmailBackend", hostname="localhost", port=1234
+        "thibaud.core.mail.backends.smtp.EmailBackend", hostname="localhost", port=1234
     )
 
 User Messages API
 -----------------
 
 The API for storing messages in the user ``Message`` model (via
-``user.message_set.create``) is now deprecated and will be removed in Django
+``user.message_set.create``) is now deprecated and will be removed in Thibaud
 1.4 according to the standard :doc:`release process </internals/release-process>`.
 
 To upgrade your code, you need to replace any instances of this::
@@ -919,7 +919,7 @@ To upgrade your code, you need to replace any instances of this::
 
 ...with the following::
 
-    from django.contrib import messages
+    from thibaud.contrib import messages
 
     messages.add_message(request, messages.INFO, "a message")
 
@@ -931,7 +931,7 @@ following::
 
 ...with::
 
-    from django.contrib import messages
+    from thibaud.contrib import messages
 
     for message in messages.get_messages(request):
         ...
@@ -943,21 +943,21 @@ update your code to use the new API immediately.
 Date format helper functions
 ----------------------------
 
-``django.utils.translation.get_date_formats()`` and
-``django.utils.translation.get_partial_date_formats()`` have been deprecated
-in favor of the appropriate calls to ``django.utils.formats.get_format()``,
+``thibaud.utils.translation.get_date_formats()`` and
+``thibaud.utils.translation.get_partial_date_formats()`` have been deprecated
+in favor of the appropriate calls to ``thibaud.utils.formats.get_format()``,
 which is locale-aware when ``USE_L10N`` is set to ``True``, and falls
 back to default settings if set to ``False``.
 
 To get the different date formats, instead of writing this::
 
-    from django.utils.translation import get_date_formats
+    from thibaud.utils.translation import get_date_formats
 
     date_format, datetime_format, time_format = get_date_formats()
 
 ...use::
 
-    from django.utils import formats
+    from thibaud.utils import formats
 
     date_format = formats.get_format("DATE_FORMAT")
     datetime_format = formats.get_format("DATETIME_FORMAT")
@@ -965,41 +965,41 @@ To get the different date formats, instead of writing this::
 
 Or, when directly formatting a date value::
 
-    from django.utils import formats
+    from thibaud.utils import formats
 
     value_formatted = formats.date_format(value, "DATETIME_FORMAT")
 
-The same applies to the globals found in ``django.forms.fields``:
+The same applies to the globals found in ``thibaud.forms.fields``:
 
 * ``DEFAULT_DATE_INPUT_FORMATS``
 * ``DEFAULT_TIME_INPUT_FORMATS``
 * ``DEFAULT_DATETIME_INPUT_FORMATS``
 
-Use ``django.utils.formats.get_format()`` to get the appropriate formats.
+Use ``thibaud.utils.formats.get_format()`` to get the appropriate formats.
 
 Function-based test runners
 ---------------------------
 
-Django 1.2 changes the test runner tools to use a class-based
+Thibaud 1.2 changes the test runner tools to use a class-based
 approach. Old style function-based test runners will still work, but
 should be updated to use the new :ref:`class-based runners
 <topics-testing-test_runner>`.
 
 .. _1.2-updating-feeds:
 
-``Feed`` in ``django.contrib.syndication.feeds``
+``Feed`` in ``thibaud.contrib.syndication.feeds``
 ------------------------------------------------
 
-The ``django.contrib.syndication.feeds.Feed`` class has been
-replaced by the :class:`django.contrib.syndication.views.Feed` class.
+The ``thibaud.contrib.syndication.feeds.Feed`` class has been
+replaced by the :class:`thibaud.contrib.syndication.views.Feed` class.
 The old ``feeds.Feed`` class is deprecated, and will be removed in
-Django 1.4.
+Thibaud 1.4.
 
 The new class has an almost identical API, but allows instances to be
 used as views. For example, consider the use of the old framework in
 the following :doc:`URLconf </topics/http/urls>`::
 
-    from django.conf.urls.defaults import *
+    from thibaud.conf.urls.defaults import *
     from myproject.feeds import LatestEntries, LatestEntriesByCategory
 
     feeds = {
@@ -1012,7 +1012,7 @@ the following :doc:`URLconf </topics/http/urls>`::
         # ...
         (
             r"^feeds/(?P<url>.*)/$",
-            "django.contrib.syndication.views.feed",
+            "thibaud.contrib.syndication.views.feed",
             {"feed_dict": feeds},
         ),
         # ...
@@ -1020,7 +1020,7 @@ the following :doc:`URLconf </topics/http/urls>`::
 
 Using the new Feed class, these feeds can be deployed directly as views::
 
-    from django.conf.urls.defaults import *
+    from thibaud.conf.urls.defaults import *
     from myproject.feeds import LatestEntries, LatestEntriesByCategory
 
     urlpatterns = patterns(
@@ -1033,8 +1033,8 @@ Using the new Feed class, these feeds can be deployed directly as views::
 
 If you currently use the ``feed()`` view, the ``LatestEntries`` class would
 often not need to be modified apart from subclassing the new
-:class:`~django.contrib.syndication.views.Feed` class. The exception is if
-Django was automatically working out the name of the template to use to render
+:class:`~thibaud.contrib.syndication.views.Feed` class. The exception is if
+Thibaud was automatically working out the name of the template to use to render
 the feed's description and title elements (if you were not specifying the
 ``title_template`` and ``description_template`` attributes). You should ensure
 that you always specify ``title_template`` and ``description_template``
@@ -1042,12 +1042,12 @@ attributes, or provide ``item_title()`` and ``item_description()`` methods.
 
 However, ``LatestEntriesByCategory`` uses the ``get_object()`` method
 with the ``bits`` argument to specify a specific category to show. In
-the new :class:`~django.contrib.syndication.views.Feed` class,
+the new :class:`~thibaud.contrib.syndication.views.Feed` class,
 ``get_object()`` method takes a ``request`` and arguments from the
 URL, so it would look like this::
 
-    from django.contrib.syndication.views import Feed
-    from django.shortcuts import get_object_or_404
+    from thibaud.contrib.syndication.views import Feed
+    from thibaud.shortcuts import get_object_or_404
     from myproject.models import Category
 
 
@@ -1080,23 +1080,23 @@ documentation </ref/contrib/syndication>`.
 Technical message IDs
 ---------------------
 
-Up to version 1.1 Django used technical message IDs
+Up to version 1.1 Thibaud used technical message IDs
 to provide localizers the possibility to translate date and time formats. They
 were translatable :term:`translation strings <translation string>` that could
 be recognized because they were all upper case (for example
 :setting:`DATETIME_FORMAT`, :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`).
 They have been deprecated in favor of the new :doc:`/topics/i18n/formatting`
 infrastructure that allows localizers to specify that information in a
-``formats.py`` file in the corresponding ``django/conf/locale/<locale name>/``
+``formats.py`` file in the corresponding ``thibaud/conf/locale/<locale name>/``
 directory.
 
-GeoDjango
+GeoThibaud
 ---------
 
-To allow support for multiple databases, the GeoDjango database internals were
+To allow support for multiple databases, the GeoThibaud database internals were
 changed substantially.  The largest backwards-incompatible change is that
-the module ``django.contrib.gis.db.backend`` was renamed to
-:mod:`django.contrib.gis.db.backends`, where the full-fledged
+the module ``thibaud.contrib.gis.db.backend`` was renamed to
+:mod:`thibaud.contrib.gis.db.backends`, where the full-fledged
 :ref:`spatial database backends <spatial-backends>` now exist.  The
 following sections provide information on the most-popular APIs that
 were affected by these changes.
@@ -1105,35 +1105,35 @@ were affected by these changes.
 ~~~~~~~~~~~~~~~~~~
 
 Prior to the creation of the separate spatial backends, the
-``django.contrib.gis.db.backend.SpatialBackend`` object was
+``thibaud.contrib.gis.db.backend.SpatialBackend`` object was
 provided as an abstraction to introspect on the capabilities of
 the spatial database.  All of the attributes and routines provided by
 ``SpatialBackend`` are now a part of the ``ops`` attribute of the
 database backend.
 
-The old module ``django.contrib.gis.db.backend`` is still provided
+The old module ``thibaud.contrib.gis.db.backend`` is still provided
 for backwards-compatibility access to a ``SpatialBackend`` object,
 which is just an alias to the ``ops`` module of the
 *default* spatial database connection.
 
 Users that were relying on undocumented modules and objects
-within ``django.contrib.gis.db.backend``, rather the abstractions
+within ``thibaud.contrib.gis.db.backend``, rather the abstractions
 provided by ``SpatialBackend``, are required to modify their code.
 For example, the following import which would work in 1.1 and
 below::
 
-    from django.contrib.gis.db.backend.postgis import PostGISAdaptor
+    from thibaud.contrib.gis.db.backend.postgis import PostGISAdaptor
 
 Would need to be changed::
 
-    from django.db import connection
+    from thibaud.db import connection
 
     PostGISAdaptor = connection.ops.Adapter
 
 ``SpatialRefSys`` and ``GeometryColumns`` models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In previous versions of GeoDjango, :mod:`django.contrib.gis.db.models`
+In previous versions of GeoThibaud, :mod:`thibaud.contrib.gis.db.models`
 had ``SpatialRefSys`` and ``GeometryColumns`` models for querying
 the OGC spatial metadata tables ``spatial_ref_sys`` and ``geometry_columns``,
 respectively.
@@ -1152,7 +1152,7 @@ is using a supported spatial database backend.
 
     .. code-block:: pycon
 
-        >>> from django.db.models import get_app, get_models
+        >>> from thibaud.db.models import get_app, get_models
         >>> get_models(get_app("gis"))
         []
 
@@ -1161,7 +1161,7 @@ for your spatial database use the methods provided by the spatial backend:
 
     .. code-block:: pycon
 
-     >>> from django.db import connections
+     >>> from thibaud.db import connections
      >>> SpatialRefSys = connections["my_spatialite"].ops.spatial_ref_sys()
      >>> GeometryColumns = connections["my_postgis"].ops.geometry_columns()
 
@@ -1185,6 +1185,6 @@ replaced by the more common language code ``nb``.
 Function-based template loaders
 -------------------------------
 
-Django 1.2 changes the template loading mechanism to use a class-based
+Thibaud 1.2 changes the template loading mechanism to use a class-based
 approach. Old style function-based template loaders will still work, but should
 be updated to use the new class-based template loaders.

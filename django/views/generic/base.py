@@ -2,20 +2,20 @@ import logging
 
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
-from django.core.exceptions import ImproperlyConfigured
-from django.http import (
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import (
     HttpResponse,
     HttpResponseGone,
     HttpResponseNotAllowed,
     HttpResponsePermanentRedirect,
     HttpResponseRedirect,
 )
-from django.template.response import TemplateResponse
-from django.urls import reverse
-from django.utils.decorators import classonlymethod
-from django.utils.functional import classproperty
+from thibaud.template.response import TemplateResponse
+from thibaud.urls import reverse
+from thibaud.utils.decorators import classonlymethod
+from thibaud.utils.functional import classproperty
 
-logger = logging.getLogger("django.request")
+logger = logging.getLogger("thibaud.request")
 
 
 class ContextMixin:

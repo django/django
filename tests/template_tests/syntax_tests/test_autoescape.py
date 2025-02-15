@@ -1,6 +1,6 @@
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from thibaud.template import TemplateSyntaxError
+from thibaud.test import SimpleTestCase
+from thibaud.utils.safestring import mark_safe
 
 from ..utils import SafeClass, UnsafeClass, setup
 

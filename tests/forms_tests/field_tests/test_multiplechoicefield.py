@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.forms import MultipleChoiceField
-from django.test import SimpleTestCase
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms import MultipleChoiceField
+from thibaud.test import SimpleTestCase
 
 
 class MultipleChoiceFieldTest(SimpleTestCase):

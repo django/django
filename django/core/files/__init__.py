@@ -1,3 +1,3 @@
-from django.core.files.base import File
+from thibaud.core.files.base import File
 
 __all__ = ["File"]

@@ -5,4 +5,4 @@
  * namespace (i.e. this preserves pre-existing values for both window.$ and
  * window.jQuery).
  */
-window.django = {jQuery: jQuery.noConflict(true)};
+window.thibaud = {jQuery: jQuery.noConflict(true)};

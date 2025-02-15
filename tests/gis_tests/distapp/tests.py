@@ -1,4 +1,4 @@
-from django.contrib.gis.db.models.functions import (
+from thibaud.contrib.gis.db.models.functions import (
     Area,
     Distance,
     Length,
@@ -6,10 +6,10 @@ from django.contrib.gis.db.models.functions import (
     Transform,
     Union,
 )
-from django.contrib.gis.geos import GEOSGeometry, LineString, Point
-from django.contrib.gis.measure import D  # alias for Distance
-from django.db import NotSupportedError, connection
-from django.db.models import (
+from thibaud.contrib.gis.geos import GEOSGeometry, LineString, Point
+from thibaud.contrib.gis.measure import D  # alias for Distance
+from thibaud.db import NotSupportedError, connection
+from thibaud.db.models import (
     Case,
     Count,
     Exists,
@@ -20,7 +20,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from thibaud.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
 from .models import (
@@ -221,7 +221,7 @@ class DistanceTest(TestCase):
         gq2 = Q(point__distance_gte=(wollongong.point, d2))
         qs1 = AustraliaCity.objects.exclude(name="Wollongong").filter(gq1 | gq2)
 
-        # Geodetic distance lookup but telling GeoDjango to use `distance_spheroid`
+        # Geodetic distance lookup but telling GeoThibaud to use `distance_spheroid`
         # instead (we should get the same results b/c accuracy variance won't matter
         # in this test case).
         querysets = [qs1]

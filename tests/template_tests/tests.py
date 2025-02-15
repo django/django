@@ -1,10 +1,10 @@
 import sys
 
-from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
-from django.template.base import UNKNOWN_SOURCE
-from django.test import SimpleTestCase, override_settings
-from django.urls import NoReverseMatch
-from django.utils import translation
+from thibaud.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
+from thibaud.template.base import UNKNOWN_SOURCE
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.urls import NoReverseMatch
+from thibaud.utils import translation
 
 
 class TemplateTestMixin:
@@ -194,7 +194,7 @@ class TemplateTestMixin:
 
     def test_extends_generic_template(self):
         """
-        #24338 -- Allow extending django.template.backends.django.Template
+        #24338 -- Allow extending thibaud.template.backends.thibaud.Template
         objects.
         """
         engine = self._engine()

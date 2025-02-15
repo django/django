@@ -2,10 +2,10 @@
 Measurement Objects
 ===================
 
-.. module:: django.contrib.gis.measure
-    :synopsis: GeoDjango's distance and area measurement objects.
+.. module:: thibaud.contrib.gis.measure
+    :synopsis: GeoThibaud's distance and area measurement objects.
 
-The :mod:`django.contrib.gis.measure` module contains objects that allow
+The :mod:`thibaud.contrib.gis.measure` module contains objects that allow
 for convenient representation of distance and area units of measure. [#]_
 Specifically, it implements two objects, :class:`Distance` and
 :class:`Area` -- both of which may be accessed via the
@@ -20,7 +20,7 @@ instantiated in units of kilometers (``km``) and miles (``mi``):
 
 .. code-block:: pycon
 
-    >>> from django.contrib.gis.measure import D, Distance
+    >>> from thibaud.contrib.gis.measure import D, Distance
     >>> d1 = Distance(km=5)
     >>> print(d1)
     5.0 km

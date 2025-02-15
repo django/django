@@ -1,10 +1,10 @@
 from contextlib import contextmanager
 
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import modify_settings
-from django.test.selenium import SeleniumTestCase
-from django.utils.deprecation import MiddlewareMixin
-from django.utils.translation import gettext as _
+from thibaud.contrib.staticfiles.testing import StaticLiveServerTestCase
+from thibaud.test import modify_settings
+from thibaud.test.selenium import SeleniumTestCase
+from thibaud.utils.deprecation import MiddlewareMixin
+from thibaud.utils.translation import gettext as _
 
 # Make unittest ignore frames in this module when reporting failures.
 __unittest = True
@@ -18,14 +18,14 @@ class CSPMiddleware(MiddlewareMixin):
         return response
 
 
-@modify_settings(MIDDLEWARE={"append": "django.contrib.admin.tests.CSPMiddleware"})
+@modify_settings(MIDDLEWARE={"append": "thibaud.contrib.admin.tests.CSPMiddleware"})
 class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
     available_apps = [
-        "django.contrib.admin",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
-        "django.contrib.sessions",
-        "django.contrib.sites",
+        "thibaud.contrib.admin",
+        "thibaud.contrib.auth",
+        "thibaud.contrib.contenttypes",
+        "thibaud.contrib.sessions",
+        "thibaud.contrib.sites",
     ]
 
     def wait_until(self, callback, timeout=10):

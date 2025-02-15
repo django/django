@@ -1,5 +1,5 @@
-from django.template import Library, Node, TemplateSyntaxError
-from django.utils import formats
+from thibaud.template import Library, Node, TemplateSyntaxError
+from thibaud.utils import formats
 
 register = Library()
 

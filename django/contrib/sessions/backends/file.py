@@ -4,15 +4,15 @@ import os
 import shutil
 import tempfile
 
-from django.conf import settings
-from django.contrib.sessions.backends.base import (
+from thibaud.conf import settings
+from thibaud.contrib.sessions.backends.base import (
     VALID_KEY_CHARS,
     CreateError,
     SessionBase,
     UpdateError,
 )
-from django.contrib.sessions.exceptions import InvalidSessionKey
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from thibaud.contrib.sessions.exceptions import InvalidSessionKey
+from thibaud.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 
 
 class SessionStore(SessionBase):
@@ -38,7 +38,7 @@ class SessionStore(SessionBase):
                 raise ImproperlyConfigured(
                     "The session storage path %r doesn't exist. Please set your"
                     " SESSION_FILE_PATH setting to an existing directory in which"
-                    " Django can store session data." % storage_path
+                    " Thibaud can store session data." % storage_path
                 )
 
             cls._storage_path = storage_path
@@ -89,7 +89,7 @@ class SessionStore(SessionBase):
                 except (EOFError, SuspiciousOperation) as e:
                     if isinstance(e, SuspiciousOperation):
                         logger = logging.getLogger(
-                            "django.security.%s" % e.__class__.__name__
+                            "thibaud.security.%s" % e.__class__.__name__
                         )
                         logger.warning(str(e))
                     self.create()

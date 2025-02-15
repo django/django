@@ -27,39 +27,39 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "DJANGO-ADMIN" "1" "January 15, 2025" "5.2" "Django"
+.TH "DJANGO-ADMIN" "1" "January 15, 2025" "5.2" "Thibaud"
 .SH NAME
-django-admin \- Utility script for the Django web framework
+thibaud-admin \- Utility script for the Thibaud web framework
 .sp
-\fBdjango\-admin\fP is Django\(aqs command\-line utility for administrative tasks.
+\fBthibaud\-admin\fP is Thibaud\(aqs command\-line utility for administrative tasks.
 This document outlines all it can do.
 .sp
-In addition, \fBmanage.py\fP is automatically created in each Django project. It
-does the same thing as \fBdjango\-admin\fP but also sets the
+In addition, \fBmanage.py\fP is automatically created in each Thibaud project. It
+does the same thing as \fBthibaud\-admin\fP but also sets the
 \fI\%DJANGO_SETTINGS_MODULE\fP environment variable so that it points to your
 project\(aqs \fBsettings.py\fP file.
 .sp
-The \fBdjango\-admin\fP script should be on your system path if you installed
-Django via \fBpip\fP\&. If it\(aqs not in your path, ensure you have your virtual
+The \fBthibaud\-admin\fP script should be on your system path if you installed
+Thibaud via \fBpip\fP\&. If it\(aqs not in your path, ensure you have your virtual
 environment activated.
 .sp
-Generally, when working on a single Django project, it\(aqs easier to use
-\fBmanage.py\fP than \fBdjango\-admin\fP\&. If you need to switch between multiple
-Django settings files, use \fBdjango\-admin\fP with
+Generally, when working on a single Thibaud project, it\(aqs easier to use
+\fBmanage.py\fP than \fBthibaud\-admin\fP\&. If you need to switch between multiple
+Thibaud settings files, use \fBthibaud\-admin\fP with
 \fI\%DJANGO_SETTINGS_MODULE\fP or the \fI\%\-\-settings\fP command line
 option.
 .sp
-The command\-line examples throughout this document use \fBdjango\-admin\fP to
-be consistent, but any example can use \fBmanage.py\fP or \fBpython \-m django\fP
+The command\-line examples throughout this document use \fBthibaud\-admin\fP to
+be consistent, but any example can use \fBmanage.py\fP or \fBpython \-m thibaud\fP
 just as well.
 .SH USAGE
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .EX
-$ django\-admin <command> [options]
+$ thibaud\-admin <command> [options]
 $ manage.py <command> [options]
-$ python \-m django <command> [options]
+$ python \-m thibaud <command> [options]
 .EE
 .UNINDENT
 .UNINDENT
@@ -70,16 +70,16 @@ for the given command.
 .SS Getting runtime help
 .INDENT 0.0
 .TP
-.B django\-admin help
+.B thibaud\-admin help
 .UNINDENT
 .sp
-Run \fBdjango\-admin help\fP to display usage information and a list of the
+Run \fBthibaud\-admin help\fP to display usage information and a list of the
 commands provided by each application.
 .sp
-Run \fBdjango\-admin help \-\-commands\fP to display a list of all available
+Run \fBthibaud\-admin help \-\-commands\fP to display a list of all available
 commands.
 .sp
-Run \fBdjango\-admin help <command>\fP to display a description of the given
+Run \fBthibaud\-admin help <command>\fP to display a description of the given
 command and a list of its available options.
 .SS App names
 .sp
@@ -89,10 +89,10 @@ contains the string \fB\(aqmysite.blog\(aq\fP, the app name is \fBblog\fP\&.
 .SS Determining the version
 .INDENT 0.0
 .TP
-.B django\-admin version
+.B thibaud\-admin version
 .UNINDENT
 .sp
-Run \fBdjango\-admin version\fP to display the current Django version.
+Run \fBthibaud\-admin version\fP to display the current Thibaud version.
 .sp
 The output follows the schema described in \X'tty: link https://peps.python.org/pep-0440/'\fI\%PEP 440\fP\X'tty: link':
 .INDENT 0.0
@@ -108,16 +108,16 @@ The output follows the schema described in \X'tty: link https://peps.python.org/
 .SS Displaying debug output
 .sp
 Use \fI\%\-\-verbosity\fP, where it is supported, to specify the amount of
-notification and debug information that \fBdjango\-admin\fP prints to the console.
+notification and debug information that \fBthibaud\-admin\fP prints to the console.
 .SH AVAILABLE COMMANDS
 .SS \fBcheck\fP
 .INDENT 0.0
 .TP
-.B django\-admin check [app_label [app_label ...]]
+.B thibaud\-admin check [app_label [app_label ...]]
 .UNINDENT
 .sp
 Uses the \fI\%system check framework\fP to inspect the entire
-Django project for common problems.
+Thibaud project for common problems.
 .sp
 By default, all apps will be checked. You can check a subset of apps by
 providing a list of app labels as arguments:
@@ -125,7 +125,7 @@ providing a list of app labels as arguments:
 .INDENT 3.5
 .sp
 .EX
-django\-admin check auth admin myapp
+thibaud\-admin check auth admin myapp
 .EE
 .UNINDENT
 .UNINDENT
@@ -142,7 +142,7 @@ For example, to perform only models and compatibility checks, run:
 .INDENT 3.5
 .sp
 .EX
-django\-admin check \-\-tag models \-\-tag compatibility
+thibaud\-admin check \-\-tag models \-\-tag compatibility
 .EE
 .UNINDENT
 .UNINDENT
@@ -156,7 +156,7 @@ Specifies the database to run checks requiring database access:
 .INDENT 3.5
 .sp
 .EX
-django\-admin check \-\-database default \-\-database other
+thibaud\-admin check \-\-database default \-\-database other
 .EE
 .UNINDENT
 .UNINDENT
@@ -184,7 +184,7 @@ variable, or by passing the \fB\-\-settings\fP option:
 .INDENT 3.5
 .sp
 .EX
-django\-admin check \-\-deploy \-\-settings=production_settings
+thibaud\-admin check \-\-deploy \-\-settings=production_settings
 .EE
 .UNINDENT
 .UNINDENT
@@ -202,7 +202,7 @@ status. Default is \fBERROR\fP\&.
 .SS \fBcompilemessages\fP
 .INDENT 0.0
 .TP
-.B django\-admin compilemessages
+.B thibaud\-admin compilemessages
 .UNINDENT
 .sp
 Compiles \fB\&.po\fP files created by \fI\%makemessages\fP to \fB\&.mo\fP files for
@@ -232,14 +232,14 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin compilemessages \-\-locale=pt_BR
-django\-admin compilemessages \-\-locale=pt_BR \-\-locale=fr \-f
-django\-admin compilemessages \-l pt_BR
-django\-admin compilemessages \-l pt_BR \-l fr \-\-use\-fuzzy
-django\-admin compilemessages \-\-exclude=pt_BR
-django\-admin compilemessages \-\-exclude=pt_BR \-\-exclude=fr
-django\-admin compilemessages \-x pt_BR
-django\-admin compilemessages \-x pt_BR \-x fr
+thibaud\-admin compilemessages \-\-locale=pt_BR
+thibaud\-admin compilemessages \-\-locale=pt_BR \-\-locale=fr \-f
+thibaud\-admin compilemessages \-l pt_BR
+thibaud\-admin compilemessages \-l pt_BR \-l fr \-\-use\-fuzzy
+thibaud\-admin compilemessages \-\-exclude=pt_BR
+thibaud\-admin compilemessages \-\-exclude=pt_BR \-\-exclude=fr
+thibaud\-admin compilemessages \-x pt_BR
+thibaud\-admin compilemessages \-x pt_BR \-x fr
 .EE
 .UNINDENT
 .UNINDENT
@@ -256,18 +256,18 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin compilemessages \-\-ignore=cache \-\-ignore=outdated/*/locale
+thibaud\-admin compilemessages \-\-ignore=cache \-\-ignore=outdated/*/locale
 .EE
 .UNINDENT
 .UNINDENT
 .SS \fBcreatecachetable\fP
 .INDENT 0.0
 .TP
-.B django\-admin createcachetable
+.B thibaud\-admin createcachetable
 .UNINDENT
 .sp
 Creates the cache tables for use with the database cache backend using the
-information from your settings file. See \fI\%Django\(aqs cache framework\fP for more
+information from your settings file. See \fI\%Thibaud\(aqs cache framework\fP for more
 information.
 .INDENT 0.0
 .TP
@@ -286,7 +286,7 @@ customize it or use the migrations framework.
 .SS \fBdbshell\fP
 .INDENT 0.0
 .TP
-.B django\-admin dbshell
+.B thibaud\-admin dbshell
 .UNINDENT
 .sp
 Runs the command\-line client for the database engine specified in your
@@ -325,7 +325,7 @@ command\(aqs \fB\-c\fP flag to execute a raw SQL query directly:
 .INDENT 3.5
 .sp
 .EX
-$ django\-admin dbshell \-\- \-c \(aqselect current_user\(aq
+$ thibaud\-admin dbshell \-\- \-c \(aqselect current_user\(aq
  current_user
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-
  postgres
@@ -339,11 +339,11 @@ On MySQL/MariaDB, you can do this with the \fBmysql\fP command\(aqs \fB\-e\fP fl
 .INDENT 3.5
 .sp
 .EX
-$ django\-admin dbshell \-\- \-e \(dqselect user()\(dq
+$ thibaud\-admin dbshell \-\- \-e \(dqselect user()\(dq
 +\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
 | user()               |
 +\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
-| djangonaut@localhost |
+| thibaudnaut@localhost |
 +\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
 .EE
 .UNINDENT
@@ -360,10 +360,10 @@ command\-line client, e.g. \fB\(aqisolation_level\(aq\fP\&.
 .SS \fBdiffsettings\fP
 .INDENT 0.0
 .TP
-.B django\-admin diffsettings
+.B thibaud\-admin diffsettings
 .UNINDENT
 .sp
-Displays differences between the current settings file and Django\(aqs default
+Displays differences between the current settings file and Thibaud\(aqs default
 settings (or another settings file specified by \fI\%\-\-default\fP).
 .sp
 Settings that don\(aqt appear in the defaults are followed by \fB\(dq###\(dq\fP\&. For
@@ -375,7 +375,7 @@ example, the default settings don\(aqt define \fI\%ROOT_URLCONF\fP, so
 .B \-\-all
 .UNINDENT
 .sp
-Displays all settings, even if they have Django\(aqs default value. Such settings
+Displays all settings, even if they have Thibaud\(aqs default value. Such settings
 are prefixed by \fB\(dq###\(dq\fP\&.
 .INDENT 0.0
 .TP
@@ -383,7 +383,7 @@ are prefixed by \fB\(dq###\(dq\fP\&.
 .UNINDENT
 .sp
 The settings module to compare the current settings against. Leave empty to
-compare against Django\(aqs default settings.
+compare against Thibaud\(aqs default settings.
 .INDENT 0.0
 .TP
 .B \-\-output {hash,unified}
@@ -397,7 +397,7 @@ plus sign.
 .SS \fBdumpdata\fP
 .INDENT 0.0
 .TP
-.B django\-admin dumpdata [app_label[.ModelName] [app_label[.ModelName] ...]]
+.B thibaud\-admin dumpdata [app_label[.ModelName] [app_label[.ModelName] ...]]
 .UNINDENT
 .sp
 Outputs to standard output all data in the database associated with the named
@@ -421,7 +421,7 @@ objects will be dumped.
 .B \-\-all, \-a
 .UNINDENT
 .sp
-Uses Django\(aqs base manager, dumping records which might otherwise be filtered
+Uses Thibaud\(aqs base manager, dumping records which might otherwise be filtered
 or modified by a custom manager.
 .INDENT 0.0
 .TP
@@ -453,7 +453,7 @@ once:
 .INDENT 3.5
 .sp
 .EX
-django\-admin dumpdata \-\-exclude=auth \-\-exclude=contenttypes
+thibaud\-admin dumpdata \-\-exclude=auth \-\-exclude=contenttypes
 .EE
 .UNINDENT
 .UNINDENT
@@ -508,14 +508,14 @@ For example, to output the data as a compressed JSON file:
 .INDENT 3.5
 .sp
 .EX
-django\-admin dumpdata \-o mydata.json.gz
+thibaud\-admin dumpdata \-o mydata.json.gz
 .EE
 .UNINDENT
 .UNINDENT
 .SS \fBflush\fP
 .INDENT 0.0
 .TP
-.B django\-admin flush
+.B thibaud\-admin flush
 .UNINDENT
 .sp
 Removes all data from the database and re\-executes any post\-synchronization
@@ -538,11 +538,11 @@ Specifies the database to flush. Defaults to \fBdefault\fP\&.
 .SS \fBinspectdb\fP
 .INDENT 0.0
 .TP
-.B django\-admin inspectdb [table [table ...]]
+.B thibaud\-admin inspectdb [table [table ...]]
 .UNINDENT
 .sp
 Introspects the database tables in the database pointed\-to by the
-\fI\%NAME\fP setting and outputs a Django model module (a \fBmodels.py\fP
+\fI\%NAME\fP setting and outputs a Thibaud model module (a \fBmodels.py\fP
 file) to standard output.
 .sp
 You may choose what tables or views to inspect by passing their names as
@@ -550,7 +550,7 @@ arguments. If no arguments are provided, models are created for views only if
 the \fI\%\-\-include\-views\fP option is used. Models for partition tables are
 created on PostgreSQL if the \fI\%\-\-include\-partitions\fP option is used.
 .sp
-Use this if you have a legacy database with which you\(aqd like to use Django.
+Use this if you have a legacy database with which you\(aqd like to use Thibaud.
 The script will inspect the database and create a model for each table within
 it.
 .sp
@@ -563,7 +563,7 @@ If \fBinspectdb\fP cannot map a column\(aqs type to a model field type, it\(aqll
 use \fBTextField\fP and will insert the Python comment
 \fB\(aqThis field type is a guess.\(aq\fP next to the field in the generated
 model. The recognized fields may depend on apps listed in
-\fI\%INSTALLED_APPS\fP\&. For example, \fI\%django.contrib.postgres\fP adds
+\fI\%INSTALLED_APPS\fP\&. For example, \fI\%thibaud.contrib.postgres\fP adds
 recognition for several PostgreSQL\-specific field types.
 .IP \(bu 2
 If the database column name is a Python reserved word (such as
@@ -581,14 +581,14 @@ you run it, you\(aqll want to look over the generated models yourself to make
 customizations. In particular, you\(aqll need to rearrange models\(aq order, so that
 models that refer to other models are ordered properly.
 .sp
-Django doesn\(aqt create database defaults when a
+Thibaud doesn\(aqt create database defaults when a
 \fI\%default\fP is specified on a model field.
 Similarly, database defaults aren\(aqt translated to model field defaults or
 detected in any fashion by \fBinspectdb\fP\&.
 .sp
 By default, \fBinspectdb\fP creates unmanaged models. That is, \fBmanaged = False\fP
-in the model\(aqs \fBMeta\fP class tells Django not to manage each table\(aqs creation,
-modification, and deletion. If you do want to allow Django to manage the
+in the model\(aqs \fBMeta\fP class tells Thibaud not to manage each table\(aqs creation,
+modification, and deletion. If you do want to allow Thibaud to manage the
 table\(aqs lifecycle, you\(aqll need to change the
 \fI\%managed\fP option to \fBTrue\fP (or remove
 it because \fBTrue\fP is its default value).
@@ -633,7 +633,7 @@ If this option is provided, models are also created for database views.
 .SS \fBloaddata\fP
 .INDENT 0.0
 .TP
-.B django\-admin loaddata fixture [fixture ...]
+.B thibaud\-admin loaddata fixture [fixture ...]
 .UNINDENT
 .sp
 Searches for and loads the contents of the named
@@ -681,7 +681,7 @@ example:
 .INDENT 3.5
 .sp
 .EX
-django\-admin loaddata \-\-format=json \-
+thibaud\-admin loaddata \-\-format=json \-
 .EE
 .UNINDENT
 .UNINDENT
@@ -696,7 +696,7 @@ For example:
 .INDENT 3.5
 .sp
 .EX
-django\-admin dumpdata \-\-format=json \-\-database=test app_label.ModelName | django\-admin loaddata \-\-format=json \-\-database=prod \-
+thibaud\-admin dumpdata \-\-format=json \-\-database=test app_label.ModelName | thibaud\-admin loaddata \-\-format=json \-\-database=prod \-
 .EE
 .UNINDENT
 .UNINDENT
@@ -712,12 +712,12 @@ For more detail about fixtures see the \fI\%Fixtures\fP topic.
 .SS \fBmakemessages\fP
 .INDENT 0.0
 .TP
-.B django\-admin makemessages
+.B thibaud\-admin makemessages
 .UNINDENT
 .sp
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
-conf/locale (in the Django tree) or locale (for project and application)
+conf/locale (in the Thibaud tree) or locale (for project and application)
 directory. After making changes to the messages files you need to compile them
 with \fI\%compilemessages\fP for use with the builtin gettext support. See
 the \fI\%i18n documentation\fP for details.
@@ -737,14 +737,14 @@ Updates the message files for all available languages.
 .UNINDENT
 .sp
 Specifies a list of file extensions to examine (default: \fBhtml\fP, \fBtxt\fP,
-\fBpy\fP or \fBjs\fP if \fI\%\-\-domain\fP is \fBdjangojs\fP).
+\fBpy\fP or \fBjs\fP if \fI\%\-\-domain\fP is \fBthibaudjs\fP).
 .sp
 Example usage:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .EX
-django\-admin makemessages \-\-locale=de \-\-extension xhtml
+thibaud\-admin makemessages \-\-locale=de \-\-extension xhtml
 .EE
 .UNINDENT
 .UNINDENT
@@ -755,7 +755,7 @@ multiple times:
 .INDENT 3.5
 .sp
 .EX
-django\-admin makemessages \-\-locale=de \-\-extension=html,txt \-\-extension xml
+thibaud\-admin makemessages \-\-locale=de \-\-extension=html,txt \-\-extension xml
 .EE
 .UNINDENT
 .UNINDENT
@@ -778,14 +778,14 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin makemessages \-\-locale=pt_BR
-django\-admin makemessages \-\-locale=pt_BR \-\-locale=fr
-django\-admin makemessages \-l pt_BR
-django\-admin makemessages \-l pt_BR \-l fr
-django\-admin makemessages \-\-exclude=pt_BR
-django\-admin makemessages \-\-exclude=pt_BR \-\-exclude=fr
-django\-admin makemessages \-x pt_BR
-django\-admin makemessages \-x pt_BR \-x fr
+thibaud\-admin makemessages \-\-locale=pt_BR
+thibaud\-admin makemessages \-\-locale=pt_BR \-\-locale=fr
+thibaud\-admin makemessages \-l pt_BR
+thibaud\-admin makemessages \-l pt_BR \-l fr
+thibaud\-admin makemessages \-\-exclude=pt_BR
+thibaud\-admin makemessages \-\-exclude=pt_BR \-\-exclude=fr
+thibaud\-admin makemessages \-x pt_BR
+thibaud\-admin makemessages \-x pt_BR \-x fr
 .EE
 .UNINDENT
 .UNINDENT
@@ -797,9 +797,9 @@ django\-admin makemessages \-x pt_BR \-x fr
 Specifies the domain of the messages files. Supported options are:
 .INDENT 0.0
 .IP \(bu 2
-\fBdjango\fP for all \fB*.py\fP, \fB*.html\fP and \fB*.txt\fP files (default)
+\fBthibaud\fP for all \fB*.py\fP, \fB*.html\fP and \fB*.txt\fP files (default)
 .IP \(bu 2
-\fBdjangojs\fP for \fB*.js\fP files
+\fBthibaudjs\fP for \fB*.js\fP files
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -813,7 +813,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin makemessages \-\-locale=de \-\-symlinks
+thibaud\-admin makemessages \-\-locale=de \-\-symlinks
 .EE
 .UNINDENT
 .UNINDENT
@@ -832,7 +832,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin makemessages \-\-locale=en_US \-\-ignore=apps/* \-\-ignore=secret/*.html
+thibaud\-admin makemessages \-\-locale=en_US \-\-ignore=apps/* \-\-ignore=secret/*.html
 .EE
 .UNINDENT
 .UNINDENT
@@ -899,7 +899,7 @@ the keywords that \fI\%makemessages\fP passes to \fBxgettext\fP\&.
 .SS \fBmakemigrations\fP
 .INDENT 0.0
 .TP
-.B django\-admin makemigrations [app_label [app_label ...]]
+.B thibaud\-admin makemigrations [app_label [app_label ...]]
 .UNINDENT
 .sp
 Creates new migrations based on the changes detected to your models.
@@ -954,7 +954,7 @@ name must be a valid Python \X'tty: link https://docs.python.org/3/reference/lex
 .B \-\-no\-header
 .UNINDENT
 .sp
-Generate migration files without Django version and timestamp header.
+Generate migration files without Thibaud version and timestamp header.
 .INDENT 0.0
 .TP
 .B \-\-check
@@ -982,7 +982,7 @@ previous name, set it using \fB\-\-name\fP\&.
 .SS \fBmigrate\fP
 .INDENT 0.0
 .TP
-.B django\-admin migrate [app_label] [migration_name]
+.B thibaud\-admin migrate [app_label] [migration_name]
 .UNINDENT
 .sp
 Synchronizes the database state with the current set of models and migrations.
@@ -1039,7 +1039,7 @@ run correctly.
 .B \-\-fake\-initial
 .UNINDENT
 .sp
-Allows Django to skip an app\(aqs initial migration if all database tables with
+Allows Thibaud to skip an app\(aqs initial migration if all database tables with
 the names of all models created by all
 \fI\%CreateModel\fP operations in that
 migration already exist. This option is intended for use when first running
@@ -1081,13 +1081,13 @@ detected.
 .B \-\-prune
 .UNINDENT
 .sp
-Deletes nonexistent migrations from the \fBdjango_migrations\fP table. This is
+Deletes nonexistent migrations from the \fBthibaud_migrations\fP table. This is
 useful when migration files replaced by a squashed migration have been removed.
 See \fI\%Squashing migrations\fP for more details.
 .SS \fBoptimizemigration\fP
 .INDENT 0.0
 .TP
-.B django\-admin optimizemigration app_label migration_name
+.B thibaud\-admin optimizemigration app_label migration_name
 .UNINDENT
 .sp
 Optimizes the operations for the named migration and overrides the existing
@@ -1104,7 +1104,7 @@ optimized.
 .SS \fBrunserver\fP
 .INDENT 0.0
 .TP
-.B django\-admin runserver [addrport]
+.B thibaud\-admin runserver [addrport]
 .UNINDENT
 .sp
 Starts a lightweight development web server on the local machine. By default,
@@ -1125,7 +1125,7 @@ DO NOT USE THIS SERVER IN A PRODUCTION SETTING.
 .sp
 This lightweight development server has not gone through security audits or
 performance tests, hence is unsuitable for production. Making this server
-able to handle a production environment is outside the scope of Django.
+able to handle a production environment is outside the scope of Thibaud.
 .UNINDENT
 .UNINDENT
 .sp
@@ -1138,7 +1138,7 @@ If you\(aqre using Linux or MacOS and install both \X'tty: link https://pypi.org
 \X'tty: link https://facebook.github.io/watchman/'\fI\%Watchman\fP\X'tty: link' service, kernel signals will be used to autoreload the server
 (rather than polling file modification timestamps each second). This offers
 better performance on large projects, reduced response time after code changes,
-more robust change detection, and a reduction in power usage. Django supports
+more robust change detection, and a reduction in power usage. Thibaud supports
 \fBpywatchman\fP 1.2.0 and higher.
 .INDENT 0.0
 .INDENT 3.5
@@ -1164,13 +1164,13 @@ by setting the \fI\%DJANGO_WATCHMAN_TIMEOUT\fP environment variable.
 .UNINDENT
 .sp
 When you start the server, and each time you change Python code while the
-server is running, the system check framework will check your entire Django
+server is running, the system check framework will check your entire Thibaud
 project for some common errors (see the \fI\%check\fP command). If any
 errors are found, they will be printed to standard output. You can use the
 \fB\-\-skip\-checks\fP option to skip running system checks.
 .sp
 You can run as many concurrent servers as you want, as long as they\(aqre on
-separate ports by executing \fBdjango\-admin runserver\fP more than once.
+separate ports by executing \fBthibaud\-admin runserver\fP more than once.
 .sp
 Note that the default IP address, \fB127.0.0.1\fP, is not accessible from other
 machines on your network. To make your development server viewable to other
@@ -1187,7 +1187,7 @@ If the \fI\%staticfiles\fP contrib app is enabled
 with its own \fI\%runserver\fP command.
 .sp
 Logging of each request and response of the server is sent to the
-\fI\%django.server\fP logger.
+\fI\%thibaud.server\fP logger.
 .INDENT 0.0
 .TP
 .B \-\-noreload
@@ -1224,7 +1224,7 @@ suitable for production:
 .sp
 .EX
 WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
-For more information on production servers see: https://docs.djangoproject.com/en/|version|/howto/deployment/
+For more information on production servers see: https://docs.thibaudproject.com/en/|version|/howto/deployment/
 .EE
 .UNINDENT
 .UNINDENT
@@ -1237,7 +1237,7 @@ Port 8000 on IP address \fB127.0.0.1\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver
+thibaud\-admin runserver
 .EE
 .UNINDENT
 .UNINDENT
@@ -1247,7 +1247,7 @@ Port 8000 on IP address \fB1.2.3.4\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver 1.2.3.4:8000
+thibaud\-admin runserver 1.2.3.4:8000
 .EE
 .UNINDENT
 .UNINDENT
@@ -1257,7 +1257,7 @@ Port 7000 on IP address \fB127.0.0.1\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver 7000
+thibaud\-admin runserver 7000
 .EE
 .UNINDENT
 .UNINDENT
@@ -1267,7 +1267,7 @@ Port 7000 on IP address \fB1.2.3.4\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver 1.2.3.4:7000
+thibaud\-admin runserver 1.2.3.4:7000
 .EE
 .UNINDENT
 .UNINDENT
@@ -1277,7 +1277,7 @@ Port 8000 on IPv6 address \fB::1\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver \-6
+thibaud\-admin runserver \-6
 .EE
 .UNINDENT
 .UNINDENT
@@ -1287,7 +1287,7 @@ Port 7000 on IPv6 address \fB::1\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver \-6 7000
+thibaud\-admin runserver \-6 7000
 .EE
 .UNINDENT
 .UNINDENT
@@ -1297,7 +1297,7 @@ Port 7000 on IPv6 address \fB2001:0db8:1234:5678::9\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver [2001:0db8:1234:5678::9]:7000
+thibaud\-admin runserver [2001:0db8:1234:5678::9]:7000
 .EE
 .UNINDENT
 .UNINDENT
@@ -1307,7 +1307,7 @@ Port 8000 on IPv4 address of host \fBlocalhost\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver localhost:8000
+thibaud\-admin runserver localhost:8000
 .EE
 .UNINDENT
 .UNINDENT
@@ -1317,7 +1317,7 @@ Port 8000 on IPv6 address of host \fBlocalhost\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver \-6 localhost:8000
+thibaud\-admin runserver \-6 localhost:8000
 .EE
 .UNINDENT
 .UNINDENT
@@ -1325,26 +1325,26 @@ django\-admin runserver \-6 localhost:8000
 .sp
 By default, the development server doesn\(aqt serve any static files for your site
 (such as CSS files, images, things under \fI\%MEDIA_URL\fP and so forth). If
-you want to configure Django to serve static media, read
+you want to configure Thibaud to serve static media, read
 \fI\%How to manage static files (e.g. images, JavaScript, CSS)\fP\&.
 .SS Serving with ASGI in development
 .sp
-Django\(aqs \fBrunserver\fP command provides a WSGI server. In order to run under
+Thibaud\(aqs \fBrunserver\fP command provides a WSGI server. In order to run under
 ASGI you will need to use an \fI\%ASGI server\fP\&.
-The Django Daphne project provides \fI\%Integration with runserver\fP that you can use.
+The Thibaud Daphne project provides \fI\%Integration with runserver\fP that you can use.
 .SS \fBsendtestemail\fP
 .INDENT 0.0
 .TP
-.B django\-admin sendtestemail [email [email ...]]
+.B thibaud\-admin sendtestemail [email [email ...]]
 .UNINDENT
 .sp
-Sends a test email (to confirm email sending through Django is working) to the
+Sends a test email (to confirm email sending through Thibaud is working) to the
 recipient(s) specified. For example:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .EX
-django\-admin sendtestemail foo@example.com bar@example.com
+thibaud\-admin sendtestemail foo@example.com bar@example.com
 .EE
 .UNINDENT
 .UNINDENT
@@ -1368,7 +1368,7 @@ Mails the email addresses specified in \fI\%ADMINS\fP using
 .SS \fBshell\fP
 .INDENT 0.0
 .TP
-.B django\-admin shell
+.B thibaud\-admin shell
 .UNINDENT
 .sp
 Starts the Python interactive interpreter.
@@ -1388,7 +1388,7 @@ Automatic models import was added.
 .B \-\-interface {ipython,bpython,python}, \-i {ipython,bpython,python}
 .UNINDENT
 .sp
-Specifies the shell to use. By default, Django will use \X'tty: link https://ipython.org/'\fI\%IPython\fP\X'tty: link' or \X'tty: link https://bpython-interpreter.org/'\fI\%bpython\fP\X'tty: link' if
+Specifies the shell to use. By default, Thibaud will use \X'tty: link https://ipython.org/'\fI\%IPython\fP\X'tty: link' or \X'tty: link https://bpython-interpreter.org/'\fI\%bpython\fP\X'tty: link' if
 either is installed. If both are installed, specify which one you want like so:
 .sp
 IPython:
@@ -1396,7 +1396,7 @@ IPython:
 .INDENT 3.5
 .sp
 .EX
-django\-admin shell \-i ipython
+thibaud\-admin shell \-i ipython
 .EE
 .UNINDENT
 .UNINDENT
@@ -1406,7 +1406,7 @@ bpython:
 .INDENT 3.5
 .sp
 .EX
-django\-admin shell \-i bpython
+thibaud\-admin shell \-i bpython
 .EE
 .UNINDENT
 .UNINDENT
@@ -1417,7 +1417,7 @@ Python interpreter, use \fBpython\fP as the interface name, like so:
 .INDENT 3.5
 .sp
 .EX
-django\-admin shell \-i python
+thibaud\-admin shell \-i python
 .EE
 .UNINDENT
 .UNINDENT
@@ -1434,12 +1434,12 @@ variable or the \fB~/.pythonrc.py\fP script is read.
 .B \-\-command COMMAND, \-c COMMAND
 .UNINDENT
 .sp
-Lets you pass a command as a string to execute it as Django, like so:
+Lets you pass a command as a string to execute it as Thibaud, like so:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .EX
-django\-admin shell \-\-command=\(dqimport django; print(django.__version__)\(dq
+thibaud\-admin shell \-\-command=\(dqimport thibaud; print(thibaud.__version__)\(dq
 .EE
 .UNINDENT
 .UNINDENT
@@ -1449,9 +1449,9 @@ You can also pass code in on standard input to execute it. For example:
 .INDENT 3.5
 .sp
 .EX
-$ django\-admin shell <<EOF
-> import django
-> print(django.__version__)
+$ thibaud\-admin shell <<EOF
+> import thibaud
+> print(thibaud.__version__)
 > EOF
 .EE
 .UNINDENT
@@ -1462,7 +1462,7 @@ On Windows, the REPL is output due to implementation limits of
 .SS \fBshowmigrations\fP
 .INDENT 0.0
 .TP
-.B django\-admin showmigrations [app_label [app_label ...]]
+.B thibaud\-admin showmigrations [app_label [app_label ...]]
 .UNINDENT
 .sp
 Shows all migrations in a project. You can choose from one of two formats:
@@ -1471,7 +1471,7 @@ Shows all migrations in a project. You can choose from one of two formats:
 .B \-\-list, \-l
 .UNINDENT
 .sp
-Lists all of the apps Django knows about, the migrations available for each
+Lists all of the apps Thibaud knows about, the migrations available for each
 app, and whether or not each migration is applied (marked by an \fB[X]\fP next to
 the migration name). For a \fB\-\-verbosity\fP of 2 and above, the applied
 datetimes are also shown.
@@ -1485,7 +1485,7 @@ This is the default output format.
 .B \-\-plan, \-p
 .UNINDENT
 .sp
-Shows the migration plan Django will follow to apply migrations. Like
+Shows the migration plan Thibaud will follow to apply migrations. Like
 \fB\-\-list\fP, applied migrations are marked by an \fB[X]\fP\&. For a \fB\-\-verbosity\fP
 of 2 and above, all dependencies of a migration will also be shown.
 .sp
@@ -1500,7 +1500,7 @@ Specifies the database to examine. Defaults to \fBdefault\fP\&.
 .SS \fBsqlflush\fP
 .INDENT 0.0
 .TP
-.B django\-admin sqlflush
+.B thibaud\-admin sqlflush
 .UNINDENT
 .sp
 Prints the SQL statements that would be executed for the \fI\%flush\fP
@@ -1514,7 +1514,7 @@ Specifies the database for which to print the SQL. Defaults to \fBdefault\fP\&.
 .SS \fBsqlmigrate\fP
 .INDENT 0.0
 .TP
-.B django\-admin sqlmigrate app_label migration_name
+.B thibaud\-admin sqlmigrate app_label migration_name
 .UNINDENT
 .sp
 Prints the SQL for the named migration. This requires an active database
@@ -1538,7 +1538,7 @@ Specifies the database for which to generate the SQL. Defaults to \fBdefault\fP\
 .SS \fBsqlsequencereset\fP
 .INDENT 0.0
 .TP
-.B django\-admin sqlsequencereset app_label [app_label ...]
+.B thibaud\-admin sqlsequencereset app_label [app_label ...]
 .UNINDENT
 .sp
 Prints the SQL statements for resetting sequences for the given app name(s).
@@ -1557,7 +1557,7 @@ Specifies the database for which to print the SQL. Defaults to \fBdefault\fP\&.
 .SS \fBsquashmigrations\fP
 .INDENT 0.0
 .TP
-.B django\-admin squashmigrations app_label [start_migration_name] migration_name
+.B thibaud\-admin squashmigrations app_label [start_migration_name] migration_name
 .UNINDENT
 .sp
 Squashes the migrations for \fBapp_label\fP up to and including \fBmigration_name\fP
@@ -1565,19 +1565,19 @@ down into fewer migrations, if possible. The resulting squashed migrations
 can live alongside the unsquashed ones safely. For more information,
 please read \fI\%Squashing migrations\fP\&.
 .sp
-When \fBstart_migration_name\fP is given, Django will only include migrations
+When \fBstart_migration_name\fP is given, Thibaud will only include migrations
 starting from and including this migration. This helps to mitigate the
 squashing limitation of \fI\%RunPython\fP and
-\fI\%django.db.migrations.operations.RunSQL\fP migration operations.
+\fI\%thibaud.db.migrations.operations.RunSQL\fP migration operations.
 .INDENT 0.0
 .TP
 .B \-\-no\-optimize
 .UNINDENT
 .sp
-Disables the optimizer when generating a squashed migration. By default, Django
+Disables the optimizer when generating a squashed migration. By default, Thibaud
 will try to optimize the operations in your migrations to reduce the size of
 the resulting file. Use this option if this process is failing or creating
-incorrect migrations, though please also file a Django bug report about the
+incorrect migrations, though please also file a Thibaud bug report about the
 behavior, as optimization is meant to be safe.
 .INDENT 0.0
 .TP
@@ -1597,21 +1597,21 @@ first and last migration, with \fB_squashed_\fP in between.
 .B \-\-no\-header
 .UNINDENT
 .sp
-Generate squashed migration file without Django version and timestamp header.
+Generate squashed migration file without Thibaud version and timestamp header.
 .SS \fBstartapp\fP
 .INDENT 0.0
 .TP
-.B django\-admin startapp name [directory]
+.B thibaud\-admin startapp name [directory]
 .UNINDENT
 .sp
-Creates a Django app directory structure for the given app name in the current
+Creates a Thibaud app directory structure for the given app name in the current
 directory or the given destination.
 .sp
-By default, \X'tty: link https://github.com/django/django/blob/main/django/conf/app_template'\fI\%the new directory\fP\X'tty: link' contains a
+By default, \X'tty: link https://github.com/thibaud/thibaud/blob/main/thibaud/conf/app_template'\fI\%the new directory\fP\X'tty: link' contains a
 \fBmodels.py\fP file and other app template files. If only the app name is given,
 the app directory will be created in the current working directory.
 .sp
-If the optional destination is provided, Django will use that existing
+If the optional destination is provided, Thibaud will use that existing
 directory rather than creating a new one. You can use \(aq.\(aq to denote the current
 working directory.
 .sp
@@ -1620,7 +1620,7 @@ For example:
 .INDENT 3.5
 .sp
 .EX
-django\-admin startapp myapp /Users/jezdez/Code/myapp
+thibaud\-admin startapp myapp /Users/jezdez/Code/myapp
 .EE
 .UNINDENT
 .UNINDENT
@@ -1640,12 +1640,12 @@ creating the \fBmyapp\fP app:
 .INDENT 3.5
 .sp
 .EX
-django\-admin startapp \-\-template=/Users/jezdez/Code/my_app_template myapp
+thibaud\-admin startapp \-\-template=/Users/jezdez/Code/my_app_template myapp
 .EE
 .UNINDENT
 .UNINDENT
 .sp
-Django will also accept URLs (\fBhttp\fP, \fBhttps\fP, \fBftp\fP) to compressed
+Thibaud will also accept URLs (\fBhttp\fP, \fBhttps\fP, \fBftp\fP) to compressed
 archives with the app template files, downloading and extracting them on the
 fly.
 .sp
@@ -1655,7 +1655,7 @@ zip files, you can use a URL like:
 .INDENT 3.5
 .sp
 .EX
-django\-admin startapp \-\-template=https://github.com/githubuser/django\-app\-template/archive/main.zip myapp
+thibaud\-admin startapp \-\-template=https://github.com/githubuser/thibaud\-app\-template/archive/main.zip myapp
 .EE
 .UNINDENT
 .UNINDENT
@@ -1698,14 +1698,14 @@ options)
 .IP \(bu 2
 \fBdocs_version\fP \-\- the version of the documentation: \fB\(aqdev\(aq\fP or \fB\(aq1.x\(aq\fP
 .IP \(bu 2
-\fBdjango_version\fP \-\- the version of Django, e.g. \fB\(aq2.0.3\(aq\fP
+\fBthibaud_version\fP \-\- the version of Thibaud, e.g. \fB\(aq2.0.3\(aq\fP
 .UNINDENT
 .sp
 \fBWARNING:\fP
 .INDENT 0.0
 .INDENT 3.5
-When the app template files are rendered with the Django template
-engine (by default all \fB*.py\fP files), Django will also replace all
+When the app template files are rendered with the Thibaud template
+engine (by default all \fB*.py\fP files), Thibaud will also replace all
 stray template variables contained. For example, if one of the Python files
 contains a docstring explaining a particular feature related
 to template rendering, it might result in an incorrect example.
@@ -1713,7 +1713,7 @@ to template rendering, it might result in an incorrect example.
 To work around this problem, you can use the \fI\%templatetag\fP
 template tag to \(dqescape\(dq the various parts of the template syntax.
 .sp
-In addition, to allow Python template files that contain Django template
+In addition, to allow Python template files that contain Thibaud template
 language syntax while also preventing packaging systems from trying to
 byte\-compile invalid \fB*.py\fP files, template files ending with \fB\&.py\-tpl\fP
 will be renamed to \fB\&.py\fP\&.
@@ -1729,20 +1729,20 @@ part of your project, and this means that such code will be trusted
 as much as any app you install, or code you write yourself.
 Further, even rendering the templates is, effectively, executing
 code that was provided as input to the management command. The
-Django template language may provide wide access into the system,
+Thibaud template language may provide wide access into the system,
 so make sure any custom template you use is worthy of your trust.
 .UNINDENT
 .UNINDENT
 .SS \fBstartproject\fP
 .INDENT 0.0
 .TP
-.B django\-admin startproject name [directory]
+.B thibaud\-admin startproject name [directory]
 .UNINDENT
 .sp
-Creates a Django project directory structure for the given project name in
+Creates a Thibaud project directory structure for the given project name in
 the current directory or the given destination.
 .sp
-By default, \X'tty: link https://github.com/django/django/blob/main/django/conf/project_template'\fI\%the new directory\fP\X'tty: link' contains
+By default, \X'tty: link https://github.com/thibaud/thibaud/blob/main/thibaud/conf/project_template'\fI\%the new directory\fP\X'tty: link' contains
 \fBmanage.py\fP and a project package (containing a \fBsettings.py\fP and other
 files).
 .sp
@@ -1750,7 +1750,7 @@ If only the project name is given, both the project directory and project
 package will be named \fB<projectname>\fP and the project directory
 will be created in the current working directory.
 .sp
-If the optional destination is provided, Django will use that existing
+If the optional destination is provided, Thibaud will use that existing
 directory as the project directory, and create \fBmanage.py\fP and the project
 package within it. Use \(aq.\(aq to denote the current working directory.
 .sp
@@ -1759,7 +1759,7 @@ For example:
 .INDENT 3.5
 .sp
 .EX
-django\-admin startproject myproject /Users/jezdez/Code/myproject_repo
+thibaud\-admin startproject myproject /Users/jezdez/Code/myproject_repo
 .EE
 .UNINDENT
 .UNINDENT
@@ -1808,7 +1808,7 @@ supported options)
 .IP \(bu 2
 \fBdocs_version\fP \-\- the version of the documentation: \fB\(aqdev\(aq\fP or \fB\(aq1.x\(aq\fP
 .IP \(bu 2
-\fBdjango_version\fP \-\- the version of Django, e.g. \fB\(aq2.0.3\(aq\fP
+\fBthibaud_version\fP \-\- the version of Thibaud, e.g. \fB\(aq2.0.3\(aq\fP
 .UNINDENT
 .sp
 Please also see the \fI\%rendering warning\fP and
@@ -1817,10 +1817,10 @@ Please also see the \fI\%rendering warning\fP and
 .SS \fBtest\fP
 .INDENT 0.0
 .TP
-.B django\-admin test [test_label [test_label ...]]
+.B thibaud\-admin test [test_label [test_label ...]]
 .UNINDENT
 .sp
-Runs tests for all installed apps. See \fI\%Testing in Django\fP for more
+Runs tests for all installed apps. See \fI\%Testing in Thibaud\fP for more
 information.
 .INDENT 0.0
 .TP
@@ -1868,7 +1868,7 @@ Randomizes the order of tests before running them. This can help detect tests
 that aren\(aqt properly isolated. The test order generated by this option is a
 deterministic function of the integer seed given. When no seed is passed, a
 seed is chosen randomly and printed to the console. To repeat a particular test
-order, pass a seed. The test orders generated by this option preserve Django\(aqs
+order, pass a seed. The test orders generated by this option preserve Thibaud\(aqs
 \fI\%guarantees on test order\fP\&. They also keep tests grouped
 by test case class.
 .sp
@@ -1918,9 +1918,9 @@ override this by passing the desired number of processes, e.g.
 \fB\-\-parallel 4\fP, or by setting the \fI\%DJANGO_TEST_PROCESSES\fP environment
 variable.
 .sp
-Django distributes test cases — \X'tty: link https://docs.python.org/3/library/unittest.html#unittest.TestCase'\fI\%unittest.TestCase\fP\X'tty: link' subclasses — to
+Thibaud distributes test cases — \X'tty: link https://docs.python.org/3/library/unittest.html#unittest.TestCase'\fI\%unittest.TestCase\fP\X'tty: link' subclasses — to
 subprocesses. If there are fewer test case classes than configured processes,
-Django will reduce the number of processes accordingly.
+Thibaud will reduce the number of processes accordingly.
 .sp
 Each process gets its own database. You must ensure that different test case
 classes don\(aqt access the same resources. For instance, test case classes that
@@ -1956,7 +1956,7 @@ don\(aqt.
 \fBWARNING:\fP
 .INDENT 0.0
 .INDENT 3.5
-When test parallelization is enabled and a test fails, Django may be
+When test parallelization is enabled and a test fails, Thibaud may be
 unable to display the exception traceback. This can make debugging
 difficult. If you encounter this problem, run the affected test without
 parallelization to see the traceback of the failure.
@@ -2008,7 +2008,7 @@ as \X'tty: link https://docs.python.org/3/library/unittest.html#cmdoption-unitte
 .B \-\-no\-faulthandler
 .UNINDENT
 .sp
-Django automatically calls \X'tty: link https://docs.python.org/3/library/faulthandler.html#faulthandler.enable'\fI\%faulthandler.enable()\fP\X'tty: link' when starting the
+Thibaud automatically calls \X'tty: link https://docs.python.org/3/library/faulthandler.html#faulthandler.enable'\fI\%faulthandler.enable()\fP\X'tty: link' when starting the
 tests, which allows it to print a traceback if the interpreter crashes. Pass
 \fB\-\-no\-faulthandler\fP to disable this behavior.
 .INDENT 0.0
@@ -2033,10 +2033,10 @@ This feature is only available for Python 3.12 and later.
 .SS \fBtestserver\fP
 .INDENT 0.0
 .TP
-.B django\-admin testserver [fixture [fixture ...]]
+.B thibaud\-admin testserver [fixture [fixture ...]]
 .UNINDENT
 .sp
-Runs a Django development server (as in \fI\%runserver\fP) using data from
+Runs a Thibaud development server (as in \fI\%runserver\fP) using data from
 the given fixture(s).
 .sp
 For example, this command:
@@ -2044,7 +2044,7 @@ For example, this command:
 .INDENT 3.5
 .sp
 .EX
-django\-admin testserver mydata.json
+thibaud\-admin testserver mydata.json
 .EE
 .UNINDENT
 .UNINDENT
@@ -2057,7 +2057,7 @@ Create a test database, as described in \fI\%The test database\fP\&.
 Populate the test database with fixture data from the given fixtures.
 (For more on fixtures, see the documentation for \fI\%loaddata\fP above.)
 .IP 3. 3
-Runs the Django development server (as in \fI\%runserver\fP), pointed at
+Runs the Thibaud development server (as in \fI\%runserver\fP), pointed at
 this newly created test database instead of your production database.
 .UNINDENT
 .sp
@@ -2068,7 +2068,7 @@ When you\(aqre writing \fI\%unit tests\fP of how your views
 act with certain fixture data, you can use \fBtestserver\fP to interact with
 the views in a web browser, manually.
 .IP \(bu 2
-Let\(aqs say you\(aqre developing your Django application and have a \(dqpristine\(dq
+Let\(aqs say you\(aqre developing your Thibaud application and have a \(dqpristine\(dq
 copy of a database that you\(aqd like to interact with. You can dump your
 database to a \fI\%fixture\fP (using the
 \fI\%dumpdata\fP command, explained above), then use \fBtestserver\fP to run
@@ -2096,8 +2096,8 @@ To run the test server on port 7000 with \fBfixture1\fP and \fBfixture2\fP:
 .INDENT 3.5
 .sp
 .EX
-django\-admin testserver \-\-addrport 7000 fixture1 fixture2
-django\-admin testserver fixture1 fixture2 \-\-addrport 7000
+thibaud\-admin testserver \-\-addrport 7000 fixture1 fixture2
+thibaud\-admin testserver fixture1 fixture2 \-\-addrport 7000
 .EE
 .UNINDENT
 .UNINDENT
@@ -2111,7 +2111,7 @@ To run on 1.2.3.4:7000 with a \fBtest\fP fixture:
 .INDENT 3.5
 .sp
 .EX
-django\-admin testserver \-\-addrport 1.2.3.4:7000 test
+thibaud\-admin testserver \-\-addrport 1.2.3.4:7000 test
 .EE
 .UNINDENT
 .UNINDENT
@@ -2124,18 +2124,18 @@ Suppresses all user prompts. A typical prompt is a warning about deleting an
 existing test database.
 .SH COMMANDS PROVIDED BY APPLICATIONS
 .sp
-Some commands are only available when the \fBdjango.contrib\fP application that
+Some commands are only available when the \fBthibaud.contrib\fP application that
 \fI\%implements\fP them has been
 \fI\%enabled\fP\&. This section describes them grouped by
 their application.
-.SS \fBdjango.contrib.auth\fP
+.SS \fBthibaud.contrib.auth\fP
 .SS \fBchangepassword\fP
 .INDENT 0.0
 .TP
-.B django\-admin changepassword [<username>]
+.B thibaud\-admin changepassword [<username>]
 .UNINDENT
 .sp
-This command is only available if Django\(aqs \fI\%authentication system\fP (\fBdjango.contrib.auth\fP) is installed.
+This command is only available if Thibaud\(aqs \fI\%authentication system\fP (\fBthibaud.contrib.auth\fP) is installed.
 .sp
 Allows changing a user\(aqs password. It prompts you to enter a new password twice
 for the given user. If the entries are identical, this immediately becomes the
@@ -2153,21 +2153,21 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin changepassword ringo
+thibaud\-admin changepassword ringo
 .EE
 .UNINDENT
 .UNINDENT
 .SS \fBcreatesuperuser\fP
 .INDENT 0.0
 .TP
-.B django\-admin createsuperuser
+.B thibaud\-admin createsuperuser
 .UNINDENT
 .INDENT 0.0
 .TP
 .B DJANGO_SUPERUSER_PASSWORD
 .UNINDENT
 .sp
-This command is only available if Django\(aqs \fI\%authentication system\fP (\fBdjango.contrib.auth\fP) is installed.
+This command is only available if Thibaud\(aqs \fI\%authentication system\fP (\fBthibaud.contrib.auth\fP) is installed.
 .sp
 Creates a superuser account (a user who has all permissions). This is
 useful if you need to create an initial superuser account or if you need to
@@ -2220,14 +2220,14 @@ it could be useful if you have a \fBForeignKey\fP in
 \fI\%REQUIRED_FIELDS\fP and want to
 allow creating an instance instead of entering the primary key of an existing
 instance.
-.SS \fBdjango.contrib.contenttypes\fP
+.SS \fBthibaud.contrib.contenttypes\fP
 .SS \fBremove_stale_contenttypes\fP
 .INDENT 0.0
 .TP
-.B django\-admin remove_stale_contenttypes
+.B thibaud\-admin remove_stale_contenttypes
 .UNINDENT
 .sp
-This command is only available if Django\(aqs \fI\%contenttypes app\fP (\fI\%django.contrib.contenttypes\fP) is installed.
+This command is only available if Thibaud\(aqs \fI\%contenttypes app\fP (\fI\%thibaud.contrib.contenttypes\fP) is installed.
 .sp
 Deletes stale content types (from deleted models) in your database. Any objects
 that depend on the deleted content types will also be deleted. A list of
@@ -2246,32 +2246,32 @@ Specifies the database to use. Defaults to \fBdefault\fP\&.
 .sp
 Deletes stale content types including ones from previously installed apps that
 have been removed from \fI\%INSTALLED_APPS\fP\&. Defaults to \fBFalse\fP\&.
-.SS \fBdjango.contrib.gis\fP
+.SS \fBthibaud.contrib.gis\fP
 .SS \fBogrinspect\fP
 .sp
-This command is only available if \fI\%GeoDjango\fP
-(\fBdjango.contrib.gis\fP) is installed.
+This command is only available if \fI\%GeoThibaud\fP
+(\fBthibaud.contrib.gis\fP) is installed.
 .sp
-Please refer to its \fI\%description\fP in the GeoDjango
+Please refer to its \fI\%description\fP in the GeoThibaud
 documentation.
-.SS \fBdjango.contrib.sessions\fP
+.SS \fBthibaud.contrib.sessions\fP
 .SS \fBclearsessions\fP
 .INDENT 0.0
 .TP
-.B django\-admin clearsessions
+.B thibaud\-admin clearsessions
 .UNINDENT
 .sp
 Can be run as a cron job or directly to clean out expired sessions.
-.SS \fBdjango.contrib.staticfiles\fP
+.SS \fBthibaud.contrib.staticfiles\fP
 .SS \fBcollectstatic\fP
 .sp
-This command is only available if the \fI\%static files application\fP (\fBdjango.contrib.staticfiles\fP) is installed.
+This command is only available if the \fI\%static files application\fP (\fBthibaud.contrib.staticfiles\fP) is installed.
 .sp
 Please refer to its \fI\%description\fP in the
 \fI\%staticfiles\fP documentation.
 .SS \fBfindstatic\fP
 .sp
-This command is only available if the \fI\%static files application\fP (\fBdjango.contrib.staticfiles\fP) is installed.
+This command is only available if the \fI\%static files application\fP (\fBthibaud.contrib.staticfiles\fP) is installed.
 .sp
 Please refer to its \fI\%description\fP in the \fI\%staticfiles\fP documentation.
 .SH DEFAULT OPTIONS
@@ -2284,7 +2284,7 @@ allows for the following options by default:
 .UNINDENT
 .sp
 Adds the given filesystem path to the Python \X'tty: link https://docs.python.org/3/library/sys.html#sys.path'\fI\%sys.path\fP\X'tty: link' module
-attribute. If this isn\(aqt provided, \fBdjango\-admin\fP will use the
+attribute. If this isn\(aqt provided, \fBthibaud\-admin\fP will use the
 \X'tty: link https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH'\fI\%PYTHONPATH\fP\X'tty: link' environment variable.
 .sp
 This option is unnecessary in \fBmanage.py\fP, because it takes care of setting
@@ -2295,7 +2295,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin migrate \-\-pythonpath=\(aq/home/djangoprojects/myproject\(aq
+thibaud\-admin migrate \-\-pythonpath=\(aq/home/thibaudprojects/myproject\(aq
 .EE
 .UNINDENT
 .UNINDENT
@@ -2306,7 +2306,7 @@ django\-admin migrate \-\-pythonpath=\(aq/home/djangoprojects/myproject\(aq
 .sp
 Specifies the settings module to use. The settings module should be in Python
 package syntax, e.g. \fBmysite.settings\fP\&. If this isn\(aqt provided,
-\fBdjango\-admin\fP will use the \fI\%DJANGO_SETTINGS_MODULE\fP environment
+\fBthibaud\-admin\fP will use the \fI\%DJANGO_SETTINGS_MODULE\fP environment
 variable.
 .sp
 This option is unnecessary in \fBmanage.py\fP, because it uses
@@ -2317,7 +2317,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin migrate \-\-settings=mysite.settings
+thibaud\-admin migrate \-\-settings=mysite.settings
 .EE
 .UNINDENT
 .UNINDENT
@@ -2327,7 +2327,7 @@ django\-admin migrate \-\-settings=mysite.settings
 .UNINDENT
 .sp
 Displays a full stack trace when a \fI\%CommandError\fP
-is raised. By default, \fBdjango\-admin\fP will show an error message when a
+is raised. By default, \fBthibaud\-admin\fP will show an error message when a
 \fBCommandError\fP occurs and a full stack trace for any other exception.
 .sp
 This option is ignored by \fI\%runserver\fP\&.
@@ -2337,7 +2337,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin migrate \-\-traceback
+thibaud\-admin migrate \-\-traceback
 .EE
 .UNINDENT
 .UNINDENT
@@ -2366,7 +2366,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin migrate \-\-verbosity 2
+thibaud\-admin migrate \-\-verbosity 2
 .EE
 .UNINDENT
 .UNINDENT
@@ -2384,7 +2384,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin runserver \-\-no\-color
+thibaud\-admin runserver \-\-no\-color
 .EE
 .UNINDENT
 .UNINDENT
@@ -2411,7 +2411,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin migrate \-\-skip\-checks
+thibaud\-admin migrate \-\-skip\-checks
 .EE
 .UNINDENT
 .UNINDENT
@@ -2422,7 +2422,7 @@ django\-admin migrate \-\-skip\-checks
 .B DJANGO_COLORS
 .UNINDENT
 .sp
-The \fBdjango\-admin\fP / \fBmanage.py\fP commands will use pretty
+The \fBthibaud\-admin\fP / \fBmanage.py\fP commands will use pretty
 color\-coded output if your terminal supports ANSI\-colored output. It
 won\(aqt use the color codes if you\(aqre piping the command\(aqs output to
 another program unless the \fI\%\-\-force\-color\fP option is used.
@@ -2438,7 +2438,7 @@ two third\-party libraries are needed:
 .INDENT 0.0
 .IP \(bu 2
 Install \X'tty: link https://pypi.org/project/colorama/'\fI\%colorama\fP\X'tty: link', a Python package that translates ANSI color codes
-into Windows API calls. Django commands will detect its presence and will
+into Windows API calls. Thibaud commands will detect its presence and will
 make use of its services to color output just like on Unix\-based platforms.
 \fBcolorama\fP can be installed via pip:
 .INDENT 2.0
@@ -2451,17 +2451,17 @@ make use of its services to color output just like on Unix\-based platforms.
 .UNINDENT
 .IP \(bu 2
 Install \X'tty: link http://adoxa.altervista.org/ansicon/'\fI\%ANSICON\fP\X'tty: link', a third\-party tool that allows \fBcmd.exe\fP to process
-ANSI color codes. Django commands will detect its presence and will make use
+ANSI color codes. Thibaud commands will detect its presence and will make use
 of its services to color output just like on Unix\-based platforms.
 .UNINDENT
 .sp
 Other modern terminal environments on Windows, that support terminal colors,
-but which are not automatically detected as supported by Django, may \(dqfake\(dq the
+but which are not automatically detected as supported by Thibaud, may \(dqfake\(dq the
 installation of \fBANSICON\fP by setting the appropriate environmental variable,
 \fBANSICON=\(dqon\(dq\fP\&.
 .SS Custom colors
 .sp
-The colors used for syntax highlighting can be customized. Django
+The colors used for syntax highlighting can be customized. Thibaud
 ships with three color palettes:
 .INDENT 0.0
 .IP \(bu 2
@@ -2487,7 +2487,7 @@ export DJANGO_COLORS=\(dqlight\(dq
 .UNINDENT
 .UNINDENT
 .sp
-You can also customize the colors that are used. Django specifies a
+You can also customize the colors that are used. Thibaud specifies a
 number of roles in which color is used:
 .INDENT 0.0
 .IP \(bu 2
@@ -2608,13 +2608,13 @@ would specify the use of all the colors in the light color palette,
 overridden as specified.
 .SS Bash completion
 .sp
-If you use the Bash shell, consider installing the Django bash completion
-script, which lives in \X'tty: link https://github.com/django/django/blob/main/extras/django_bash_completion'\fI\%extras/django_bash_completion\fP\X'tty: link' in the Django source
-distribution. It enables tab\-completion of \fBdjango\-admin\fP and
+If you use the Bash shell, consider installing the Thibaud bash completion
+script, which lives in \X'tty: link https://github.com/thibaud/thibaud/blob/main/extras/thibaud_bash_completion'\fI\%extras/thibaud_bash_completion\fP\X'tty: link' in the Thibaud source
+distribution. It enables tab\-completion of \fBthibaud\-admin\fP and
 \fBmanage.py\fP commands, so you can, for instance...
 .INDENT 0.0
 .IP \(bu 2
-Type \fBdjango\-admin\fP\&.
+Type \fBthibaud\-admin\fP\&.
 .IP \(bu 2
 Press [TAB] to see all available options.
 .IP \(bu 2
@@ -2622,7 +2622,7 @@ Type \fBsql\fP, then [TAB], to see all available options whose names start
 with \fBsql\fP\&.
 .UNINDENT
 .sp
-See \fI\%How to create custom django\-admin commands\fP for how to add customized actions.
+See \fI\%How to create custom thibaud\-admin commands\fP for how to add customized actions.
 .SS Black formatting
 .sp
 The Python files created by \fI\%startproject\fP, \fI\%startapp\fP,
@@ -2636,7 +2636,7 @@ current project, you can set the \fBPATH\fP explicitly:
 .INDENT 3.5
 .sp
 .EX
-PATH=path/to/venv/bin django\-admin makemigrations
+PATH=path/to/venv/bin thibaud\-admin makemigrations
 .EE
 .UNINDENT
 .UNINDENT
@@ -2646,13 +2646,13 @@ For commands using \fBstdout\fP you can pipe the output to \fBblack\fP if needed
 .INDENT 3.5
 .sp
 .EX
-django\-admin inspectdb | black \-
+thibaud\-admin inspectdb | black \-
 .EE
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
-.B django.core.management.call_command(name, *args, **options)
+.B thibaud.core.management.call_command(name, *args, **options)
 .UNINDENT
 .sp
 To call a management command from code use \fBcall_command()\fP\&.
@@ -2679,8 +2679,8 @@ Examples:
 .INDENT 3.5
 .sp
 .EX
-from django.core import management
-from django.core.management.commands import loaddata
+from thibaud.core import management
+from thibaud.core.management.commands import loaddata
 
 management.call_command(\(dqflush\(dq, verbosity=0, interactive=False)
 management.call_command(\(dqloaddata\(dq, \(dqtest_data\(dq, verbosity=0)
@@ -2711,7 +2711,7 @@ management.call_command(\(dqdumpdata\(dq, use_natural_foreign_keys=True)
 .UNINDENT
 .sp
 Some command options have different names when using \fBcall_command()\fP instead
-of \fBdjango\-admin\fP or \fBmanage.py\fP\&. For example, \fBdjango\-admin
+of \fBthibaud\-admin\fP or \fBmanage.py\fP\&. For example, \fBthibaud\-admin
 createsuperuser \-\-no\-input\fP translates to \fBcall_command(\(aqcreatesuperuser\(aq,
 interactive=False)\fP\&. To find what keyword argument name to use for
 \fBcall_command()\fP, check the command\(aqs source code for the \fBdest\fP argument
@@ -2743,8 +2743,8 @@ with open(\(dq/path/to/command_output\(dq, \(dqw\(dq) as f:
 .UNINDENT
 .UNINDENT
 .SH AUTHOR
-Django Software Foundation
+Thibaud Software Foundation
 .SH COPYRIGHT
-Django Software Foundation and contributors
+Thibaud Software Foundation and contributors
 .\" Generated by docutils manpage writer.
 .

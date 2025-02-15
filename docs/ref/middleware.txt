@@ -2,10 +2,10 @@
 Middleware
 ==========
 
-.. module:: django.middleware
-   :synopsis: Django's built-in middleware classes.
+.. module:: thibaud.middleware
+   :synopsis: Thibaud's built-in middleware classes.
 
-This document explains all middleware components that come with Django. For
+This document explains all middleware components that come with Thibaud. For
 information on how to use them and how to write your own middleware, see
 the :doc:`middleware usage guide </topics/http/middleware>`.
 
@@ -15,28 +15,28 @@ Available middleware
 Cache middleware
 ----------------
 
-.. module:: django.middleware.cache
+.. module:: thibaud.middleware.cache
    :synopsis: Middleware for the site-wide cache.
 
 .. class:: UpdateCacheMiddleware
 
 .. class:: FetchFromCacheMiddleware
 
-Enable the site-wide cache. If these are enabled, each Django-powered page will
+Enable the site-wide cache. If these are enabled, each Thibaud-powered page will
 be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
 defines. See the :doc:`cache documentation </topics/cache>`.
 
 "Common" middleware
 -------------------
 
-.. module:: django.middleware.common
+.. module:: thibaud.middleware.common
    :synopsis: Middleware adding "common" conveniences for perfectionists.
 
 .. class:: CommonMiddleware
 
     .. attribute:: response_redirect_class
 
-        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
+        Defaults to :class:`~thibaud.http.HttpResponsePermanentRedirect`. Subclass
         ``CommonMiddleware`` and override the attribute to customize the redirects
         issued by the middleware.
 
@@ -51,7 +51,7 @@ Adds a few conveniences for perfectionists:
   If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
   with a slash, and it is not found in the URLconf, then a new URL is
   formed by appending a slash at the end. If this new URL is found in the
-  URLconf, then Django redirects the request to this new URL. Otherwise,
+  URLconf, then Thibaud redirects the request to this new URL. Otherwise,
   the initial URL is processed as usual.
 
   For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if
@@ -68,10 +68,10 @@ Adds a few conveniences for perfectionists:
   normalize URLs.
 
   If necessary, individual views may be excluded from the ``APPEND_SLASH``
-  behavior using the :func:`~django.views.decorators.common.no_append_slash`
+  behavior using the :func:`~thibaud.views.decorators.common.no_append_slash`
   decorator::
 
-    from django.views.decorators.common import no_append_slash
+    from thibaud.views.decorators.common import no_append_slash
 
 
     @no_append_slash
@@ -89,7 +89,7 @@ Adds a few conveniences for perfectionists:
 GZip middleware
 ---------------
 
-.. module:: django.middleware.gzip
+.. module:: thibaud.middleware.gzip
    :synopsis: Middleware to serve GZipped content for performance.
 
 .. class:: GZipMiddleware
@@ -106,7 +106,7 @@ GZip middleware
     ``GZipMiddleware``) are used on a website, the site may become exposed to a
     number of possible attacks.
 
-    To mitigate attacks, Django implements a technique called *Heal The Breach
+    To mitigate attacks, Thibaud implements a technique called *Heal The Breach
     (HTB)*. It adds up to 100 bytes (see
     :attr:`.max_random_bytes`) of random bytes to each response
     to make the attacks less effective.
@@ -118,7 +118,7 @@ GZip middleware
     .. _breachattack.com: https://www.breachattack.com/
     .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
 
-The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
+The ``thibaud.middleware.gzip.GZipMiddleware`` compresses content for browsers
 that understand GZip compression (all modern browsers).
 
 This middleware should be placed before any other middleware that need to
@@ -137,12 +137,12 @@ If the response has an ``ETag`` header, the ETag is made weak to comply with
 :rfc:`9110#section-8.8.1`.
 
 You can apply GZip compression to individual views using the
-:func:`~django.views.decorators.gzip.gzip_page()` decorator.
+:func:`~thibaud.views.decorators.gzip.gzip_page()` decorator.
 
 Conditional GET middleware
 --------------------------
 
-.. module:: django.middleware.http
+.. module:: thibaud.middleware.http
    :synopsis: Middleware handling advanced HTTP features.
 
 .. class:: ConditionalGetMiddleware
@@ -151,22 +151,22 @@ Handles conditional GET operations. If the response doesn't have an ``ETag``
 header, the middleware adds one if needed. If the response has an ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpResponseNotModified`.
+:class:`~thibaud.http.HttpResponseNotModified`.
 
 You can handle conditional GET operations with individual views using the
-:func:`~django.views.decorators.http.conditional_page()` decorator.
+:func:`~thibaud.views.decorators.http.conditional_page()` decorator.
 
 Locale middleware
 -----------------
 
-.. module:: django.middleware.locale
+.. module:: thibaud.middleware.locale
    :synopsis: Middleware to enable language selection based on the request.
 
 .. class:: LocaleMiddleware
 
     .. attribute:: LocaleMiddleware.response_redirect_class
 
-        Defaults to :class:`~django.http.HttpResponseRedirect`. Subclass
+        Defaults to :class:`~thibaud.http.HttpResponseRedirect`. Subclass
         ``LocaleMiddleware`` and override the attribute to customize the
         redirects issued by the middleware.
 
@@ -177,7 +177,7 @@ content for each user. See the :doc:`internationalization documentation
 Message middleware
 ------------------
 
-.. module:: django.contrib.messages.middleware
+.. module:: thibaud.contrib.messages.middleware
    :synopsis: Message middleware.
 
 .. class:: MessageMiddleware
@@ -190,19 +190,19 @@ Enables cookie- and session-based message support. See the
 Security middleware
 -------------------
 
-.. module:: django.middleware.security
+.. module:: thibaud.middleware.security
     :synopsis: Security middleware.
 
 .. warning::
     If your deployment situation allows, it's usually a good idea to have your
     front-end web server perform the functionality provided by the
     ``SecurityMiddleware``. That way, if there are requests that aren't served
-    by Django (such as static media or user-uploaded files), they will have
-    the same protections as requests to your Django application.
+    by Thibaud (such as static media or user-uploaded files), they will have
+    the same protections as requests to your Thibaud application.
 
 .. class:: SecurityMiddleware
 
-The ``django.middleware.security.SecurityMiddleware`` provides several security
+The ``thibaud.middleware.security.SecurityMiddleware`` provides several security
 enhancements to the request/response cycle. Each one can be independently
 enabled or disabled with a setting.
 
@@ -262,7 +262,7 @@ If you wish to submit your site to the `browser preload list`_, set the
 .. note::
     If you are deployed behind a load-balancer or reverse-proxy server, and the
     ``Strict-Transport-Security`` header is not being added to your responses,
-    it may be because Django doesn't realize that it's on a secure connection;
+    it may be because Thibaud doesn't realize that it's on a secure connection;
     you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
 __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
@@ -311,7 +311,7 @@ for:
   served via HTTPS, but the page being linked to is not served via HTTPS.
 
 .. warning::
-    When your site is served via HTTPS, :ref:`Django's CSRF protection system
+    When your site is served via HTTPS, :ref:`Thibaud's CSRF protection system
     <how-csrf-works>` requires the ``Referer`` header to be present, so
     completely disabling the ``Referer`` header will interfere with CSRF
     protection. To gain most of the benefits of disabling ``Referer`` headers
@@ -420,11 +420,11 @@ the `X-Content-Type-Options: nosniff`__ header.  ``SecurityMiddleware`` will
 do this for all responses if the :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting
 is ``True``.
 
-Note that in most deployment situations where Django isn't involved in serving
+Note that in most deployment situations where Thibaud isn't involved in serving
 user-uploaded files, this setting won't help you. For example, if your
 :setting:`MEDIA_URL` is served directly by your front-end web server (nginx,
 Apache, etc.) then you'd want to set this header there. On the other hand, if
-you are using Django to do something like require authorization in order to
+you are using Thibaud to do something like require authorization in order to
 download files and you cannot set the header using your web server, this
 setting will be useful.
 
@@ -446,7 +446,7 @@ connections to HTTPS.
 .. note::
 
     For performance reasons, it's preferable to do these redirects outside of
-    Django, in a front-end load balancer or reverse-proxy server such as
+    Thibaud, in a front-end load balancer or reverse-proxy server such as
     `nginx`_. :setting:`SECURE_SSL_REDIRECT` is intended for the deployment
     situations where this isn't an option.
 
@@ -459,7 +459,7 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
 
 .. note::
     If you are deployed behind a load-balancer or reverse-proxy server and
-    Django can't seem to tell when a request actually is already secure, you
+    Thibaud can't seem to tell when a request actually is already secure, you
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
 .. _nginx: https://nginx.org/
@@ -467,7 +467,7 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
 Session middleware
 ------------------
 
-.. module:: django.contrib.sessions.middleware
+.. module:: thibaud.contrib.sessions.middleware
    :synopsis: Session middleware.
 
 .. class:: SessionMiddleware
@@ -478,7 +478,7 @@ Enables session support. See the :doc:`session documentation
 Site middleware
 ---------------
 
-.. module:: django.contrib.sites.middleware
+.. module:: thibaud.contrib.sites.middleware
   :synopsis: Site middleware.
 
 .. class:: CurrentSiteMiddleware
@@ -489,7 +489,7 @@ Adds the ``site`` attribute representing the current site to every incoming
 Authentication middleware
 -------------------------
 
-.. module:: django.contrib.auth.middleware
+.. module:: thibaud.contrib.auth.middleware
   :synopsis: Authentication middleware.
 
 .. class:: AuthenticationMiddleware
@@ -511,7 +511,7 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 
         Returns the URL that unauthenticated requests will be redirected to. This
         result is either the ``login_url`` set on the
-        :func:`~django.contrib.auth.decorators.login_required` decorator (if not
+        :func:`~thibaud.contrib.auth.decorators.login_required` decorator (if not
         ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
     .. method:: get_redirect_field_name()
@@ -519,41 +519,41 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
         Returns the name of the query parameter that contains the URL the user
         should be redirected to after a successful login. This result is either
         the ``redirect_field_name`` set on the
-        :func:`~.django.contrib.auth.decorators.login_required` decorator (if not
+        :func:`~.thibaud.contrib.auth.decorators.login_required` decorator (if not
         ``None``), or :attr:`redirect_field_name`. If ``None`` is returned, a query
         parameter won't be added.
 
 Redirects all unauthenticated requests to a login page, except for views
-excluded with :func:`~.django.contrib.auth.decorators.login_not_required`. The
+excluded with :func:`~.thibaud.contrib.auth.decorators.login_not_required`. The
 login page defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`, but can be
 customized.
 
 Enable this middleware by adding it to the :setting:`MIDDLEWARE` setting
-**after** :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`::
+**after** :class:`~thibaud.contrib.auth.middleware.AuthenticationMiddleware`::
 
     MIDDLEWARE = [
         "...",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        "thibaud.contrib.auth.middleware.AuthenticationMiddleware",
+        "thibaud.contrib.auth.middleware.LoginRequiredMiddleware",
         "...",
     ]
 
 Make a view public, allowing unauthenticated requests, with
-:func:`~.django.contrib.auth.decorators.login_not_required`. For example::
+:func:`~.thibaud.contrib.auth.decorators.login_not_required`. For example::
 
-       from django.contrib.auth.decorators import login_not_required
+       from thibaud.contrib.auth.decorators import login_not_required
 
 
        @login_not_required
        def contact_us(request): ...
 
 Customize the login URL or field name for authenticated views with the
-:func:`~.django.contrib.auth.decorators.login_required` decorator to set
+:func:`~.thibaud.contrib.auth.decorators.login_required` decorator to set
 ``login_url`` or ``redirect_field_name`` respectively. For example::
 
-    from django.contrib.auth.decorators import login_required
-    from django.utils.decorators import method_decorator
-    from django.views.generic import View
+    from thibaud.contrib.auth.decorators import login_required
+    from thibaud.utils.decorators import method_decorator
+    from thibaud.views.generic import View
 
 
     @login_required(login_url="/books/login/", redirect_field_name="redirect_to")
@@ -587,7 +587,7 @@ details.
 CSRF protection middleware
 --------------------------
 
-.. currentmodule:: django.middleware.csrf
+.. currentmodule:: thibaud.middleware.csrf
 
 .. class:: CsrfViewMiddleware
 
@@ -596,12 +596,12 @@ fields to POST forms and checking requests for the correct value. See the
 :doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
 
 You can add Cross Site Request Forgery protection to individual views using the
-:func:`~django.views.decorators.csrf.csrf_protect()` decorator.
+:func:`~thibaud.views.decorators.csrf.csrf_protect()` decorator.
 
 ``X-Frame-Options`` middleware
 ------------------------------
 
-.. currentmodule:: django.middleware.clickjacking
+.. currentmodule:: thibaud.middleware.clickjacking
 
 .. class:: XFrameOptionsMiddleware
 
@@ -612,34 +612,34 @@ Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickj
 Middleware ordering
 ===================
 
-Here are some hints about the ordering of various Django middleware classes:
+Here are some hints about the ordering of various Thibaud middleware classes:
 
-#. :class:`~django.middleware.security.SecurityMiddleware`
+#. :class:`~thibaud.middleware.security.SecurityMiddleware`
 
    It should go near the top of the list if you're going to turn on the SSL
    redirect as that avoids running through a bunch of other unnecessary
    middleware.
 
-#. :class:`~django.middleware.cache.UpdateCacheMiddleware`
+#. :class:`~thibaud.middleware.cache.UpdateCacheMiddleware`
 
    Before those that modify the ``Vary`` header (``SessionMiddleware``,
    ``GZipMiddleware``, ``LocaleMiddleware``).
 
-#. :class:`~django.middleware.gzip.GZipMiddleware`
+#. :class:`~thibaud.middleware.gzip.GZipMiddleware`
 
    Before any middleware that may change or use the response body.
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
-#. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
+#. :class:`~thibaud.contrib.sessions.middleware.SessionMiddleware`
 
    Before any middleware that may raise an exception to trigger an error
-   view (such as :exc:`~django.core.exceptions.PermissionDenied`) if you're
+   view (such as :exc:`~thibaud.core.exceptions.PermissionDenied`) if you're
    using :setting:`CSRF_USE_SESSIONS`.
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
-#. :class:`~django.middleware.http.ConditionalGetMiddleware`
+#. :class:`~thibaud.middleware.http.ConditionalGetMiddleware`
 
    Before any middleware that may change the response (it sets the ``ETag``
    header).
@@ -647,12 +647,12 @@ Here are some hints about the ordering of various Django middleware classes:
    After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
    contents.
 
-#. :class:`~django.middleware.locale.LocaleMiddleware`
+#. :class:`~thibaud.middleware.locale.LocaleMiddleware`
 
    One of the topmost, after ``SessionMiddleware`` (uses session data) and
    ``UpdateCacheMiddleware`` (modifies ``Vary`` header).
 
-#. :class:`~django.middleware.common.CommonMiddleware`
+#. :class:`~thibaud.middleware.common.CommonMiddleware`
 
    Before any middleware that may change the response (it sets the
    ``Content-Length`` header). A middleware that appears before
@@ -663,38 +663,38 @@ Here are some hints about the ordering of various Django middleware classes:
 
    After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
 
-#. :class:`~django.middleware.csrf.CsrfViewMiddleware`
+#. :class:`~thibaud.middleware.csrf.CsrfViewMiddleware`
 
    Before any view middleware that assumes that CSRF attacks have been dealt
    with.
 
-   Before :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`, or any
+   Before :class:`~thibaud.contrib.auth.middleware.RemoteUserMiddleware`, or any
    other authentication middleware that may perform a login, and hence rotate
    the CSRF token, before calling down the middleware chain.
 
    After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
 
-#. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+#. :class:`~thibaud.contrib.auth.middleware.AuthenticationMiddleware`
 
    After ``SessionMiddleware``: uses session storage.
 
-#. :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
+#. :class:`~thibaud.contrib.auth.middleware.LoginRequiredMiddleware`
 
    After ``AuthenticationMiddleware``: uses user object.
 
-#. :class:`~django.contrib.messages.middleware.MessageMiddleware`
+#. :class:`~thibaud.contrib.messages.middleware.MessageMiddleware`
 
    After ``SessionMiddleware``: can use session-based storage.
 
-#. :class:`~django.middleware.cache.FetchFromCacheMiddleware`
+#. :class:`~thibaud.middleware.cache.FetchFromCacheMiddleware`
 
    After any middleware that modifies the ``Vary`` header: that header is used
    to pick a value for the cache hash-key.
 
-#. :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+#. :class:`~thibaud.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
 
    Should be near the bottom as it's a last-resort type of middleware.
 
-#. :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+#. :class:`~thibaud.contrib.redirects.middleware.RedirectFallbackMiddleware`
 
    Should be near the bottom as it's a last-resort type of middleware.

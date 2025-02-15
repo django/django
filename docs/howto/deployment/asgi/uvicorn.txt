@@ -1,5 +1,5 @@
 ==============================
-How to use Django with Uvicorn
+How to use Thibaud with Uvicorn
 ==============================
 
 Uvicorn_ is an ASGI server based on ``uvloop`` and ``httptools``, with an
@@ -14,7 +14,7 @@ You can install Uvicorn with ``pip``:
 
     python -m pip install uvicorn
 
-Running Django in Uvicorn
+Running Thibaud in Uvicorn
 =========================
 
 When Uvicorn is installed, a ``uvicorn`` command is available which runs ASGI
@@ -22,7 +22,7 @@ applications. Uvicorn needs to be called with the location of a module
 containing an ASGI application object, followed by what the application is
 called (separated by a colon).
 
-For a typical Django project, invoking Uvicorn would look like:
+For a typical Thibaud project, invoking Uvicorn would look like:
 
 .. code-block:: shell
 
@@ -37,7 +37,7 @@ time a file is changed on disk.
 
 For more advanced usage, please read the `Uvicorn documentation <Uvicorn_>`_.
 
-Deploying Django using Uvicorn and Gunicorn
+Deploying Thibaud using Uvicorn and Gunicorn
 ===========================================
 
 Gunicorn_ is a robust web server that implements process monitoring and automatic

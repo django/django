@@ -1,12 +1,12 @@
 import copy
 from decimal import Decimal
 
-from django.apps.registry import Apps
-from django.db import NotSupportedError
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.db.backends.ddl_references import Statement
-from django.db.backends.utils import strip_quotes
-from django.db.models import CompositePrimaryKey, UniqueConstraint
+from thibaud.apps.registry import Apps
+from thibaud.db import NotSupportedError
+from thibaud.db.backends.base.schema import BaseDatabaseSchemaEditor
+from thibaud.db.backends.ddl_references import Statement
+from thibaud.db.backends.utils import strip_quotes
+from thibaud.db.models import CompositePrimaryKey, UniqueConstraint
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -298,7 +298,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def add_field(self, model, field):
         """Create a field on a model."""
-        from django.db.models.expressions import Value
+        from thibaud.db.models.expressions import Value
 
         # Special-case implicit M2M tables.
         if field.many_to_many and field.remote_field.through._meta.auto_created:

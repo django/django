@@ -1,9 +1,9 @@
-from django.core.management.templates import TemplateCommand
+from thibaud.core.management.templates import TemplateCommand
 
 
 class Command(TemplateCommand):
     help = (
-        "Creates a Django app directory structure for the given app name in "
+        "Creates a Thibaud app directory structure for the given app name in "
         "the current directory or optionally in the given directory."
     )
     missing_args_message = "You must provide an application name."

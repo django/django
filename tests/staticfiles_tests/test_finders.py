@@ -1,10 +1,10 @@
 import os
 
-from django.conf import settings
-from django.contrib.staticfiles import finders, storage
-from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase, override_settings
-from django.utils.deprecation import RemovedInDjango61Warning
+from thibaud.conf import settings
+from thibaud.contrib.staticfiles import finders, storage
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils.deprecation import RemovedInThibaud61Warning
 
 from .cases import StaticFilesTestCase
 from .settings import TEST_ROOT
@@ -37,7 +37,7 @@ class TestFinders:
 
     def test_find_all_deprecated_param(self):
         src, dst = self.find_all
-        with self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx:
+        with self.assertWarnsMessage(RemovedInThibaud61Warning, DEPRECATION_MSG) as ctx:
             found = self.finder.find(src, all=True)
             found = [os.path.normcase(f) for f in found]
             dst = [os.path.normcase(d) for d in dst]
@@ -51,7 +51,7 @@ class TestFinders:
             "argument 'find_all'"
         )
         with (
-            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx,
+            self.assertWarnsMessage(RemovedInThibaud61Warning, DEPRECATION_MSG) as ctx,
             self.assertRaisesMessage(TypeError, msg),
         ):
             self.finder.find(src, find_all=True, all=True)
@@ -64,7 +64,7 @@ class TestFinders:
             "argument 'wrong'"
         )
         with (
-            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx,
+            self.assertWarnsMessage(RemovedInThibaud61Warning, DEPRECATION_MSG) as ctx,
             self.assertRaisesMessage(TypeError, msg),
         ):
             self.finder.find(src, all=True, wrong=1)
@@ -123,7 +123,7 @@ class TestDefaultStorageFinder(TestFinders, StaticFilesTestCase):
 
 
 @override_settings(
-    STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+    STATICFILES_FINDERS=["thibaud.contrib.staticfiles.finders.FileSystemFinder"],
     STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "documents")],
 )
 class TestMiscFinder(SimpleTestCase):
@@ -133,13 +133,13 @@ class TestMiscFinder(SimpleTestCase):
 
     def test_get_finder(self):
         self.assertIsInstance(
-            finders.get_finder("django.contrib.staticfiles.finders.FileSystemFinder"),
+            finders.get_finder("thibaud.contrib.staticfiles.finders.FileSystemFinder"),
             finders.FileSystemFinder,
         )
 
     def test_get_finder_bad_classname(self):
         with self.assertRaises(ImportError):
-            finders.get_finder("django.contrib.staticfiles.finders.FooBarFinder")
+            finders.get_finder("thibaud.contrib.staticfiles.finders.FooBarFinder")
 
     def test_get_finder_bad_module(self):
         with self.assertRaises(ImportError):
@@ -148,7 +148,7 @@ class TestMiscFinder(SimpleTestCase):
     def test_cache(self):
         finders.get_finder.cache_clear()
         for n in range(10):
-            finders.get_finder("django.contrib.staticfiles.finders.FileSystemFinder")
+            finders.get_finder("thibaud.contrib.staticfiles.finders.FileSystemFinder")
         cache_info = finders.get_finder.cache_info()
         self.assertEqual(cache_info.hits, 9)
         self.assertEqual(cache_info.currsize, 1)
@@ -168,7 +168,7 @@ class TestMiscFinder(SimpleTestCase):
         )
 
     def test_searched_locations_deprecated_all(self):
-        with self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx:
+        with self.assertWarnsMessage(RemovedInThibaud61Warning, DEPRECATION_MSG) as ctx:
             finders.find("spam", all=True)
             self.assertEqual(
                 finders.searched_locations,
@@ -179,7 +179,7 @@ class TestMiscFinder(SimpleTestCase):
     def test_searched_locations_conflicting_params(self):
         msg = "find() got multiple values for argument 'find_all'"
         with (
-            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx,
+            self.assertWarnsMessage(RemovedInThibaud61Warning, DEPRECATION_MSG) as ctx,
             self.assertRaisesMessage(TypeError, msg),
         ):
             finders.find("spam", find_all=True, all=True)
@@ -188,7 +188,7 @@ class TestMiscFinder(SimpleTestCase):
     def test_searched_locations_unexpected_params(self):
         msg = "find() got an unexpected keyword argument 'wrong'"
         with (
-            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG) as ctx,
+            self.assertWarnsMessage(RemovedInThibaud61Warning, DEPRECATION_MSG) as ctx,
             self.assertRaisesMessage(TypeError, msg),
         ):
             finders.find("spam", all=True, wrong=1)
@@ -204,7 +204,7 @@ class TestMiscFinder(SimpleTestCase):
     def test_location_empty(self):
         msg = (
             "The storage backend of the staticfiles finder "
-            "<class 'django.contrib.staticfiles.finders.DefaultStorageFinder'> "
+            "<class 'thibaud.contrib.staticfiles.finders.DefaultStorageFinder'> "
             "doesn't have a valid location."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):

@@ -6,14 +6,14 @@ import getpass
 import os
 import sys
 
-from django.contrib.auth import get_user_model
-from django.contrib.auth.management import get_default_username
-from django.contrib.auth.password_validation import validate_password
-from django.core import exceptions
-from django.core.management.base import BaseCommand, CommandError
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.utils.functional import cached_property
-from django.utils.text import capfirst
+from thibaud.contrib.auth import get_user_model
+from thibaud.contrib.auth.management import get_default_username
+from thibaud.contrib.auth.password_validation import validate_password
+from thibaud.core import exceptions
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.db import DEFAULT_DB_ALIAS, connections
+from thibaud.utils.functional import cached_property
+from thibaud.utils.text import capfirst
 
 
 class NotRunningInTTYException(Exception):
@@ -46,7 +46,7 @@ class Command(BaseCommand):
             action="store_false",
             dest="interactive",
             help=(
-                "Tells Django to NOT prompt the user for input of any kind. "
+                "Tells Thibaud to NOT prompt the user for input of any kind. "
                 "You must use --%s with --noinput, along with an option for "
                 "any other required field. Superusers created with --noinput will "
                 "not be able to log in until they're given a valid password."

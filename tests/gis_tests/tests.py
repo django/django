@@ -1,11 +1,11 @@
 import unittest
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import ProgrammingError
-from django.db.backends.base.base import NO_DB_ALIAS
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import ProgrammingError
+from thibaud.db.backends.base.base import NO_DB_ALIAS
 
 try:
-    from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
+    from thibaud.contrib.gis.db.backends.postgis.operations import PostGISOperations
 
     HAS_POSTGRES = True
 except ImportError:
@@ -89,10 +89,10 @@ class TestPostGISVersionCheck(unittest.TestCase):
 @unittest.skipUnless(HAS_POSTGRES, "PostGIS-specific tests.")
 class TestPostGISBackend(unittest.TestCase):
     def test_non_db_connection_classes(self):
-        from django.contrib.gis.db.backends.postgis.base import DatabaseWrapper
-        from django.db.backends.postgresql.features import DatabaseFeatures
-        from django.db.backends.postgresql.introspection import DatabaseIntrospection
-        from django.db.backends.postgresql.operations import DatabaseOperations
+        from thibaud.contrib.gis.db.backends.postgis.base import DatabaseWrapper
+        from thibaud.db.backends.postgresql.features import DatabaseFeatures
+        from thibaud.db.backends.postgresql.introspection import DatabaseIntrospection
+        from thibaud.db.backends.postgresql.operations import DatabaseOperations
 
         wrapper = DatabaseWrapper(settings_dict={}, alias=NO_DB_ALIAS)
         # PostGIS-specific stuff is not initialized for non-db connections.

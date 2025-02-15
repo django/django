@@ -2,9 +2,9 @@ import asyncio
 import threading
 import time
 
-from django.http import FileResponse, HttpResponse, StreamingHttpResponse
-from django.urls import path
-from django.views.decorators.csrf import csrf_exempt
+from thibaud.http import FileResponse, HttpResponse, StreamingHttpResponse
+from thibaud.urls import path
+from thibaud.views.decorators.csrf import csrf_exempt
 
 
 def hello(request):

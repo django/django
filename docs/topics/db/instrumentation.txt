@@ -2,7 +2,7 @@
 Database instrumentation
 ========================
 
-To help you understand and control the queries issued by your code, Django
+To help you understand and control the queries issued by your code, Thibaud
 provides a hook for installing wrapper functions around the execution of
 database queries. For example, wrappers can count queries, measure query
 duration, log queries, or even prevent query execution (e.g. to make sure that
@@ -25,8 +25,8 @@ could look like this::
 
 And it would be used in a view to block queries from the template like so::
 
-    from django.db import connection
-    from django.shortcuts import render
+    from thibaud.db import connection
+    from thibaud.shortcuts import render
 
 
     def my_view(request):
@@ -87,7 +87,7 @@ For a more complete example, a query logger could look like this::
 
 To use this, you would create a logger object and install it as a wrapper::
 
-    from django.db import connection
+    from thibaud.db import connection
 
     ql = QueryLogger()
     with connection.execute_wrapper(ql):
@@ -95,7 +95,7 @@ To use this, you would create a logger object and install it as a wrapper::
     # Now we can print the log.
     print(ql.queries)
 
-.. currentmodule:: django.db.backends.base.DatabaseWrapper
+.. currentmodule:: thibaud.db.backends.base.DatabaseWrapper
 
 ``connection.execute_wrapper()``
 --------------------------------

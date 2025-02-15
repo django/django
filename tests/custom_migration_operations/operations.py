@@ -1,4 +1,4 @@
-from django.db.migrations.operations.base import Operation
+from thibaud.db.migrations.operations.base import Operation
 
 
 class TestOperation(Operation):

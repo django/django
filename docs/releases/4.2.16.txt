@@ -1,13 +1,13 @@
 ===========================
-Django 4.2.16 release notes
+Thibaud 4.2.16 release notes
 ===========================
 
 *September 3, 2024*
 
-Django 4.2.16 fixes one security issue with severity "moderate" and one
+Thibaud 4.2.16 fixes one security issue with severity "moderate" and one
 security issue with severity "low" in 4.2.15.
 
-CVE-2024-45230: Potential denial-of-service vulnerability in ``django.utils.html.urlize()``
+CVE-2024-45230: Potential denial-of-service vulnerability in ``thibaud.utils.html.urlize()``
 ===========================================================================================
 
 :tfilter:`urlize` and :tfilter:`urlizetrunc` were subject to a potential
@@ -18,9 +18,9 @@ CVE-2024-45231: Potential user email enumeration via response status on password
 ======================================================================================
 
 Due to unhandled email sending failures, the
-:class:`~django.contrib.auth.forms.PasswordResetForm` class allowed remote
+:class:`~thibaud.contrib.auth.forms.PasswordResetForm` class allowed remote
 attackers to enumerate user emails by issuing password reset requests and
 observing the outcomes.
 
 To mitigate this risk, exceptions occurring during password reset email sending
-are now handled and logged using the :ref:`django-contrib-auth-logger` logger.
+are now handled and logged using the :ref:`thibaud-contrib-auth-logger` logger.

@@ -2,7 +2,7 @@
 Uploaded Files and Upload Handlers
 ==================================
 
-.. module:: django.core.files.uploadedfile
+.. module:: thibaud.core.files.uploadedfile
    :synopsis: Classes representing uploaded files.
 
 Uploaded files
@@ -11,7 +11,7 @@ Uploaded files
 .. class:: UploadedFile
 
 During file uploads, the actual file data is stored in :attr:`request.FILES
-<django.http.HttpRequest.FILES>`. Each entry in this dictionary is an
+<thibaud.http.HttpRequest.FILES>`. Each entry in this dictionary is an
 ``UploadedFile`` object (or a subclass) -- a wrapper around an uploaded file.
 You'll usually use one of these methods to access the uploaded content:
 
@@ -86,7 +86,7 @@ Subclasses of ``UploadedFile`` include:
 
     A file uploaded to a temporary location (i.e. stream-to-disk). This class
     is used by the
-    :class:`~django.core.files.uploadhandler.TemporaryFileUploadHandler`. In
+    :class:`~thibaud.core.files.uploadhandler.TemporaryFileUploadHandler`. In
     addition to the methods from :class:`UploadedFile`, it has one additional
     method:
 
@@ -97,18 +97,18 @@ Subclasses of ``UploadedFile`` include:
 .. class:: InMemoryUploadedFile
 
     A file uploaded into memory (i.e. stream-to-memory). This class is used
-    by the :class:`~django.core.files.uploadhandler.MemoryFileUploadHandler`.
+    by the :class:`~thibaud.core.files.uploadhandler.MemoryFileUploadHandler`.
 
 Built-in upload handlers
 ========================
 
-.. module:: django.core.files.uploadhandler
-   :synopsis: Django's handlers for file uploads.
+.. module:: thibaud.core.files.uploadhandler
+   :synopsis: Thibaud's handlers for file uploads.
 
 Together the :class:`MemoryFileUploadHandler` and
-:class:`TemporaryFileUploadHandler` provide Django's default file upload
+:class:`TemporaryFileUploadHandler` provide Thibaud's default file upload
 behavior of reading small files into memory and large ones onto disk. They
-are located in ``django.core.files.uploadhandler``.
+are located in ``thibaud.core.files.uploadhandler``.
 
 .. class:: MemoryFileUploadHandler
 
@@ -117,7 +117,7 @@ File upload handler to stream uploads into memory (used for small files).
 .. class:: TemporaryFileUploadHandler
 
 Upload handler that streams data into a temporary file using
-:class:`~django.core.files.uploadedfile.TemporaryUploadedFile`.
+:class:`~thibaud.core.files.uploadedfile.TemporaryUploadedFile`.
 
 .. _custom_upload_handlers:
 
@@ -127,7 +127,7 @@ Writing custom upload handlers
 .. class:: FileUploadHandler
 
 All file upload handlers should be subclasses of
-``django.core.files.uploadhandler.FileUploadHandler``. You can define upload
+``thibaud.core.files.uploadhandler.FileUploadHandler``. You can define upload
 handlers wherever you wish.
 
 Required methods
@@ -172,13 +172,13 @@ attributes:
 
 .. attribute:: FileUploadHandler.chunk_size
 
-    Size, in bytes, of the "chunks" Django should store into memory and feed
+    Size, in bytes, of the "chunks" Thibaud should store into memory and feed
     into the handler. That is, this attribute controls the size of chunks
     fed into ``FileUploadHandler.receive_data_chunk``.
 
     For maximum performance the chunk sizes should be divisible by ``4`` and
     should not exceed 2 GB (2\ :sup:`31` bytes) in size. When there are
-    multiple chunk sizes provided by multiple handlers, Django will use the
+    multiple chunk sizes provided by multiple handlers, Thibaud will use the
     smallest chunk size defined by any handler.
 
     The default is 64*2\ :sup:`10` bytes, or 64 KB.
@@ -203,7 +203,7 @@ attributes:
 
     ``content_type_extra`` is extra information about the file from the
     ``content-type`` header. See :attr:`UploadedFile.content_type_extra
-    <django.core.files.uploadedfile.UploadedFile.content_type_extra>`.
+    <thibaud.core.files.uploadedfile.UploadedFile.content_type_extra>`.
 
     This method may raise a ``StopFutureHandlers`` exception to prevent
     future handlers from handling this file.

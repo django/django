@@ -1,11 +1,11 @@
 =========
-GeoDjango
+GeoThibaud
 =========
 
-.. module:: django.contrib.gis
-    :synopsis: Geographic Information System (GIS) extensions for Django
+.. module:: thibaud.contrib.gis
+    :synopsis: Geographic Information System (GIS) extensions for Thibaud
 
-GeoDjango intends to be a world-class geographic web framework. Its goal is to
+GeoThibaud intends to be a world-class geographic web framework. Its goal is to
 make it as easy as possible to build GIS web applications and harness the power
 of spatially enabled data.
 

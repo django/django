@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Antonis Christofides <antonis@antonischristofides.com>, 2021
@@ -12,12 +12,12 @@
 # Yorgos Pagles <y.pagles@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
 "PO-Revision-Date: 2021-03-30 03:21+0000\n"
 "Last-Translator: Antonis Christofides <antonis@antonischristofides.com>\n"
-"Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
+"Language-Team: Greek (http://www.transifex.com/thibaud/thibaud/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -293,11 +293,11 @@ msgstr ""
 "διαγραφή των παρακάτω προστατευόμενων συσχετισμένων αντικειμένων: "
 "%(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Ιστότοπος διαχείρισης Django"
+msgid "Thibaud site admin"
+msgstr "Ιστότοπος διαχείρισης Thibaud"
 
-msgid "Django administration"
-msgstr "Διαχείριση Django"
+msgid "Thibaud administration"
+msgstr "Διαχείριση Thibaud"
 
 msgid "Site administration"
 msgstr "Διαχείριση του ιστότοπου"

@@ -2,17 +2,17 @@
 Related objects reference
 =========================
 
-.. currentmodule:: django.db.models.fields.related
+.. currentmodule:: thibaud.db.models.fields.related
 
 .. class:: RelatedManager
 
     A "related manager" is a manager used in a one-to-many or many-to-many
     related context. This happens in two cases:
 
-    * The "other side" of a :class:`~django.db.models.ForeignKey` relation.
+    * The "other side" of a :class:`~thibaud.db.models.ForeignKey` relation.
       That is::
 
-            from django.db import models
+            from thibaud.db import models
 
 
             class Blog(models.Model):
@@ -26,7 +26,7 @@ Related objects reference
       In the above example, the methods below will be available on
       the manager ``blog.entry_set``.
 
-    * Both sides of a :class:`~django.db.models.ManyToManyField` relation
+    * Both sides of a :class:`~thibaud.db.models.ManyToManyField` relation
       ::
 
             class Topping(models.Model):
@@ -56,8 +56,8 @@ Related objects reference
             >>> b.entry_set.add(e)  # Associates Entry e with Blog b.
 
         In the example above, in the case of a
-        :class:`~django.db.models.ForeignKey` relationship,
-        :meth:`QuerySet.update() <django.db.models.query.QuerySet.update>`
+        :class:`~thibaud.db.models.ForeignKey` relationship,
+        :meth:`QuerySet.update() <thibaud.db.models.query.QuerySet.update>`
         is used to perform the update. This requires the objects to already be
         saved.
 
@@ -67,9 +67,9 @@ Related objects reference
         Using ``add()`` with a many-to-many relationship, however, will not
         call any ``save()`` methods (the ``bulk`` argument doesn't exist), but
         rather create the relationships using :meth:`QuerySet.bulk_create()
-        <django.db.models.query.QuerySet.bulk_create>`. If you need to execute
+        <thibaud.db.models.query.QuerySet.bulk_create>`. If you need to execute
         some custom logic when a relationship is created, listen to the
-        :data:`~django.db.models.signals.m2m_changed` signal, which will
+        :data:`~thibaud.db.models.signals.m2m_changed` signal, which will
         trigger ``pre_add`` and ``post_add`` actions.
 
         Using ``add()`` on a relation that already exists won't duplicate the
@@ -111,7 +111,7 @@ Related objects reference
 
         Note that there's no need to specify the keyword argument of the model
         that defines the relationship. In the above example, we don't pass the
-        parameter ``blog`` to ``create()``. Django figures out that the new
+        parameter ``blog`` to ``create()``. Thibaud figures out that the new
         ``Entry`` object's ``blog`` field should be set to ``b``.
 
         Use the ``through_defaults`` argument to specify values for the new
@@ -135,30 +135,30 @@ Related objects reference
         Similar to :meth:`add()`, ``e.save()`` is called in the example above
         to perform the update. Using ``remove()`` with a many-to-many
         relationship, however, will delete the relationships using
-        :meth:`QuerySet.delete()<django.db.models.query.QuerySet.delete>` which
+        :meth:`QuerySet.delete()<thibaud.db.models.query.QuerySet.delete>` which
         means no model ``save()`` methods are called; listen to the
-        :data:`~django.db.models.signals.m2m_changed` signal if you wish to
+        :data:`~thibaud.db.models.signals.m2m_changed` signal if you wish to
         execute custom code when a relationship is deleted.
 
         For many-to-many relationships ``remove()`` accepts either model
         instances or field values, normally primary keys, as the ``*objs``
         argument.
 
-        For :class:`~django.db.models.ForeignKey` objects, this method only
+        For :class:`~thibaud.db.models.ForeignKey` objects, this method only
         exists if ``null=True``. If the related field can't be set to ``None``
         (``NULL``), then an object can't be removed from a relation without
         being added to another. In the above example, removing ``e`` from
         ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because
-        the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
+        the ``blog`` :class:`~thibaud.db.models.ForeignKey` doesn't have
         ``null=True``, this is invalid.
 
-        For :class:`~django.db.models.ForeignKey` objects, this method accepts
+        For :class:`~thibaud.db.models.ForeignKey` objects, this method accepts
         a ``bulk`` argument to control how to perform the operation.
         If ``True`` (the default), ``QuerySet.update()`` is used.
         If ``bulk=False``, the ``save()`` method of each individual model
         instance is called instead. This triggers the
-        :data:`~django.db.models.signals.pre_save` and
-        :data:`~django.db.models.signals.post_save` signals and comes at the
+        :data:`~thibaud.db.models.signals.pre_save` and
+        :data:`~thibaud.db.models.signals.post_save` signals and comes at the
         expense of performance.
 
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
@@ -180,7 +180,7 @@ Related objects reference
         them.
 
         Just like ``remove()``, ``clear()`` is only available on
-        :class:`~django.db.models.ForeignKey`\s where ``null=True`` and it also
+        :class:`~thibaud.db.models.ForeignKey`\s where ``null=True`` and it also
         accepts the ``bulk`` keyword argument.
 
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
@@ -204,7 +204,7 @@ Related objects reference
         If ``clear=True``, the ``clear()`` method is called instead and the
         whole set is added at once.
 
-        For :class:`~django.db.models.ForeignKey` objects, the ``bulk``
+        For :class:`~thibaud.db.models.ForeignKey` objects, the ``bulk``
         argument is passed on to :meth:`add` and :meth:`remove`.
 
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
@@ -232,7 +232,7 @@ Related objects reference
        related fields. In other words, there is no need to call
        ``save()``/``asave()`` on either end of the relationship.
 
-       If you use :meth:`~django.db.models.query.QuerySet.prefetch_related`,
+       If you use :meth:`~thibaud.db.models.query.QuerySet.prefetch_related`,
        the ``add()``, ``aadd()``, ``remove()``, ``aremove()``, ``clear()``,
        ``aclear()``, ``set()``, and ``aset()`` methods clear the prefetched
        cache.

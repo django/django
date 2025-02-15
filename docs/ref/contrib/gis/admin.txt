@@ -1,9 +1,9 @@
 ======================
-GeoDjango's admin site
+GeoThibaud's admin site
 ======================
 
-.. module:: django.contrib.gis.admin
-    :synopsis: GeoDjango's extensions to the admin site.
+.. module:: thibaud.contrib.gis.admin
+    :synopsis: GeoThibaud's extensions to the admin site.
 
 ``GISModelAdmin``
 =================
@@ -13,8 +13,8 @@ GeoDjango's admin site
     .. attribute:: gis_widget
 
         The widget class to be used for
-        :class:`~django.contrib.gis.db.models.GeometryField`. Defaults to
-        :class:`~django.contrib.gis.forms.widgets.OSMWidget`.
+        :class:`~thibaud.contrib.gis.db.models.GeometryField`. Defaults to
+        :class:`~thibaud.contrib.gis.forms.widgets.OSMWidget`.
 
     .. attribute:: gis_widget_kwargs
 

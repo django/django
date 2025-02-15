@@ -2,10 +2,10 @@
 A custom AdminSite for AdminViewPermissionsTest.test_login_has_permission().
 """
 
-from django.contrib import admin
-from django.contrib.auth import get_permission_codename
-from django.contrib.auth.forms import AuthenticationForm
-from django.core.exceptions import ValidationError
+from thibaud.contrib import admin
+from thibaud.contrib.auth import get_permission_codename
+from thibaud.contrib.auth.forms import AuthenticationForm
+from thibaud.core.exceptions import ValidationError
 
 from . import admin as base_admin
 from . import models

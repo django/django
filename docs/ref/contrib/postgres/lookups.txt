@@ -16,14 +16,14 @@ dedicated PostgreSQL extension. A trigram lookup is given an expression and
 returns results that have a similarity measurement greater than the current
 similarity threshold.
 
-To use it, add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
+To use it, add ``'thibaud.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
 and activate the `pg_trgm extension`_ on PostgreSQL. You can install the
 extension using the
-:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+:class:`~thibaud.contrib.postgres.operations.TrigramExtension` migration
 operation.
 
 The ``trigram_similar`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`:
+:class:`~thibaud.db.models.CharField` and :class:`~thibaud.db.models.TextField`:
 
 .. code-block:: pycon
 
@@ -42,14 +42,14 @@ between the parameter and any substring of the field. A trigram word lookup is
 given an expression and returns results that have a word similarity measurement
 greater than the current similarity threshold.
 
-To use it, add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
+To use it, add ``'thibaud.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
 and activate the `pg_trgm extension`_ on PostgreSQL. You can install the
 extension using the
-:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+:class:`~thibaud.contrib.postgres.operations.TrigramExtension` migration
 operation.
 
 The ``trigram_word_similar`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`:
+:class:`~thibaud.db.models.CharField` and :class:`~thibaud.db.models.TextField`:
 
 .. code-block:: pycon
 
@@ -64,14 +64,14 @@ The ``trigram_word_similar`` lookup can be used on
 Similar to :lookup:`trigram_word_similar`, except that it forces extent
 boundaries to match word boundaries.
 
-To use it, add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
+To use it, add ``'thibaud.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
 and activate the `pg_trgm extension`_ on PostgreSQL. You can install the
 extension using the
-:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+:class:`~thibaud.contrib.postgres.operations.TrigramExtension` migration
 operation.
 
 The ``trigram_strict_word_similar`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`.
+:class:`~thibaud.db.models.CharField` and :class:`~thibaud.db.models.TextField`.
 
 .. _`pg_trgm extension`: https://www.postgresql.org/docs/current/pgtrgm.html
 
@@ -83,17 +83,17 @@ The ``trigram_strict_word_similar`` lookup can be used on
 The ``unaccent`` lookup allows you to perform accent-insensitive lookups using
 a dedicated PostgreSQL extension.
 
-This lookup is implemented using :class:`~django.db.models.Transform`, so it
+This lookup is implemented using :class:`~thibaud.db.models.Transform`, so it
 can be chained with other lookup functions. To use it, you need to add
-``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS` and activate
+``'thibaud.contrib.postgres'`` in your :setting:`INSTALLED_APPS` and activate
 the `unaccent extension on PostgreSQL`_. The
-:class:`~django.contrib.postgres.operations.UnaccentExtension` migration
+:class:`~thibaud.contrib.postgres.operations.UnaccentExtension` migration
 operation is available if you want to perform this activation using migrations).
 
 .. _unaccent extension on PostgreSQL: https://www.postgresql.org/docs/current/unaccent.html
 
 The ``unaccent`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`:
+:class:`~thibaud.db.models.CharField` and :class:`~thibaud.db.models.TextField`:
 
 .. code-block:: pycon
 

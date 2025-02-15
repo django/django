@@ -1,26 +1,26 @@
 from datetime import date
 
-from django import forms
-from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
-from django.contrib.admin.options import (
+from thibaud import forms
+from thibaud.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
+from thibaud.contrib.admin.options import (
     HORIZONTAL,
     VERTICAL,
     ModelAdmin,
     TabularInline,
     get_content_type_for_model,
 )
-from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import (
+from thibaud.contrib.admin.sites import AdminSite
+from thibaud.contrib.admin.widgets import (
     AdminDateWidget,
     AdminRadioSelect,
     AutocompleteSelect,
     AutocompleteSelectMultiple,
 )
-from django.contrib.auth.models import User
-from django.db import models
-from django.forms.widgets import Select
-from django.test import RequestFactory, SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
+from thibaud.contrib.auth.models import User
+from thibaud.db import models
+from thibaud.forms.widgets import Select
+from thibaud.test import RequestFactory, SimpleTestCase, TestCase
+from thibaud.test.utils import isolate_apps
 
 from .models import Band, Concert, Song
 

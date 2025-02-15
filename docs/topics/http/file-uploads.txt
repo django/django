@@ -2,10 +2,10 @@
 File Uploads
 ============
 
-.. currentmodule:: django.core.files.uploadedfile
+.. currentmodule:: thibaud.core.files.uploadedfile
 
-When Django handles a file upload, the file data ends up placed in
-:attr:`request.FILES <django.http.HttpRequest.FILES>` (for more on the
+When Thibaud handles a file upload, the file data ends up placed in
+:attr:`request.FILES <thibaud.http.HttpRequest.FILES>` (for more on the
 ``request`` object see the documentation for :doc:`request and response objects
 </ref/request-response>`). This document explains how files are stored on disk
 and in memory, and how to customize the default behavior.
@@ -19,12 +19,12 @@ and in memory, and how to customize the default behavior.
 Basic file uploads
 ==================
 
-Consider a form containing a :class:`~django.forms.FileField`:
+Consider a form containing a :class:`~thibaud.forms.FileField`:
 
 .. code-block:: python
     :caption: ``forms.py``
 
-    from django import forms
+    from thibaud import forms
 
 
     class UploadFileForm(forms.Form):
@@ -32,13 +32,13 @@ Consider a form containing a :class:`~django.forms.FileField`:
         file = forms.FileField()
 
 A view handling this form will receive the file data in
-:attr:`request.FILES <django.http.HttpRequest.FILES>`, which is a dictionary
-containing a key for each :class:`~django.forms.FileField` (or
-:class:`~django.forms.ImageField`, or other :class:`~django.forms.FileField`
+:attr:`request.FILES <thibaud.http.HttpRequest.FILES>`, which is a dictionary
+containing a key for each :class:`~thibaud.forms.FileField` (or
+:class:`~thibaud.forms.ImageField`, or other :class:`~thibaud.forms.FileField`
 subclass) in the form. So the data from the above form would
 be accessible as ``request.FILES['file']``.
 
-Note that :attr:`request.FILES <django.http.HttpRequest.FILES>` will only
+Note that :attr:`request.FILES <thibaud.http.HttpRequest.FILES>` will only
 contain data if the request method was ``POST``, at least one file field was
 actually posted, and the ``<form>`` that posted the request has the attribute
 ``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
@@ -49,8 +49,8 @@ described in :ref:`binding-uploaded-files`. This would look something like:
 .. code-block:: python
     :caption: ``views.py``
 
-    from django.http import HttpResponseRedirect
-    from django.shortcuts import render
+    from thibaud.http import HttpResponseRedirect
+    from thibaud.shortcuts import render
     from .forms import UploadFileForm
 
     # Imaginary function to handle an uploaded file.
@@ -67,7 +67,7 @@ described in :ref:`binding-uploaded-files`. This would look something like:
             form = UploadFileForm()
         return render(request, "upload.html", {"form": form})
 
-Notice that we have to pass :attr:`request.FILES <django.http.HttpRequest.FILES>`
+Notice that we have to pass :attr:`request.FILES <thibaud.http.HttpRequest.FILES>`
 into the form's constructor; this is how file data gets bound into a form.
 
 Here's a common way you might handle an uploaded file::
@@ -86,15 +86,15 @@ objects; see :class:`UploadedFile` for a complete reference.
 Handling uploaded files with a model
 ------------------------------------
 
-If you're saving a file on a :class:`~django.db.models.Model` with a
-:class:`~django.db.models.FileField`, using a :class:`~django.forms.ModelForm`
+If you're saving a file on a :class:`~thibaud.db.models.Model` with a
+:class:`~thibaud.db.models.FileField`, using a :class:`~thibaud.forms.ModelForm`
 makes this process much easier. The file object will be saved to the location
-specified by the :attr:`~django.db.models.FileField.upload_to` argument of the
-corresponding :class:`~django.db.models.FileField` when calling
+specified by the :attr:`~thibaud.db.models.FileField.upload_to` argument of the
+corresponding :class:`~thibaud.db.models.FileField` when calling
 ``form.save()``::
 
-    from django.http import HttpResponseRedirect
-    from django.shortcuts import render
+    from thibaud.http import HttpResponseRedirect
+    from thibaud.shortcuts import render
     from .forms import ModelFormWithFileField
 
 
@@ -110,11 +110,11 @@ corresponding :class:`~django.db.models.FileField` when calling
         return render(request, "upload.html", {"form": form})
 
 If you are constructing an object manually, you can assign the file object from
-:attr:`request.FILES <django.http.HttpRequest.FILES>` to the file field in the
+:attr:`request.FILES <thibaud.http.HttpRequest.FILES>` to the file field in the
 model::
 
-    from django.http import HttpResponseRedirect
-    from django.shortcuts import render
+    from thibaud.http import HttpResponseRedirect
+    from thibaud.shortcuts import render
     from .forms import UploadFileForm
     from .models import ModelWithFileField
 
@@ -131,11 +131,11 @@ model::
         return render(request, "upload.html", {"form": form})
 
 If you are constructing an object manually outside of a request, you can assign
-a :class:`~django.core.files.File` like object to the
-:class:`~django.db.models.FileField`::
+a :class:`~thibaud.core.files.File` like object to the
+:class:`~thibaud.db.models.FileField`::
 
-    from django.core.management.base import BaseCommand
-    from django.core.files.base import ContentFile
+    from thibaud.core.management.base import BaseCommand
+    from thibaud.core.files.base import ContentFile
 
 
     class MyCommand(BaseCommand):
@@ -163,13 +163,13 @@ below for an example.
 
 .. admonition:: Multiple file field
 
-    Django is likely to have a proper multiple file field support at some point
+    Thibaud is likely to have a proper multiple file field support at some point
     in the future.
 
 .. code-block:: python
     :caption: ``forms.py``
 
-    from django import forms
+    from thibaud import forms
 
 
     class MultipleFileInput(forms.ClearableFileInput):
@@ -194,13 +194,13 @@ below for an example.
         file_field = MultipleFileField()
 
 Then override the ``form_valid()`` method of your
-:class:`~django.views.generic.edit.FormView` subclass to handle multiple file
+:class:`~thibaud.views.generic.edit.FormView` subclass to handle multiple file
 uploads:
 
 .. code-block:: python
     :caption: ``views.py``
 
-    from django.views.generic.edit import FormView
+    from thibaud.views.generic.edit import FormView
     from .forms import FileFieldForm
 
 
@@ -225,23 +225,23 @@ uploads:
 Upload Handlers
 ===============
 
-.. currentmodule:: django.core.files.uploadhandler
+.. currentmodule:: thibaud.core.files.uploadhandler
 
-When a user uploads a file, Django passes off the file data to an *upload
+When a user uploads a file, Thibaud passes off the file data to an *upload
 handler* -- a small class that handles file data as it gets uploaded. Upload
 handlers are initially defined in the :setting:`FILE_UPLOAD_HANDLERS` setting,
 which defaults to::
 
     [
-        "django.core.files.uploadhandler.MemoryFileUploadHandler",
-        "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+        "thibaud.core.files.uploadhandler.MemoryFileUploadHandler",
+        "thibaud.core.files.uploadhandler.TemporaryFileUploadHandler",
     ]
 
 Together :class:`MemoryFileUploadHandler` and
-:class:`TemporaryFileUploadHandler` provide Django's default file upload
+:class:`TemporaryFileUploadHandler` provide Thibaud's default file upload
 behavior of reading small files into memory and large ones onto disk.
 
-You can write custom handlers that customize how Django handles files. You
+You can write custom handlers that customize how Thibaud handles files. You
 could, for example, use custom handlers to enforce user-level quotas, compress
 data on the fly, render progress bars, and even send data to another storage
 location directly without storing it locally. See :ref:`custom_upload_handlers`
@@ -252,15 +252,15 @@ Where uploaded data is stored
 
 Before you save uploaded files, the data needs to be stored somewhere.
 
-By default, if an uploaded file is smaller than 2.5 megabytes, Django will hold
+By default, if an uploaded file is smaller than 2.5 megabytes, Thibaud will hold
 the entire contents of the upload in memory. This means that saving the file
 involves only a read from memory and a write to disk and thus is very fast.
 
-However, if an uploaded file is too large, Django will write the uploaded file
+However, if an uploaded file is too large, Thibaud will write the uploaded file
 to a temporary file stored in your system's temporary directory. On a Unix-like
-platform this means you can expect Django to generate a file called something
+platform this means you can expect Thibaud to generate a file called something
 like ``/tmp/tmpzfp6I6.upload``. If an upload is large enough, you can watch this
-file grow in size as Django streams the data onto disk.
+file grow in size as Thibaud streams the data onto disk.
 
 These specifics -- 2.5 megabytes; ``/tmp``; etc. -- are "reasonable defaults"
 which can be customized as described in the next section.
@@ -268,7 +268,7 @@ which can be customized as described in the next section.
 Changing upload handler behavior
 --------------------------------
 
-There are a few settings which control Django's file upload behavior. See
+There are a few settings which control Thibaud's file upload behavior. See
 :ref:`File Upload Settings <file-upload-settings>` for details.
 
 .. _modifying_upload_handlers_on_the_fly:
@@ -303,23 +303,23 @@ list::
     ``request.POST`` or ``request.FILES`` -- it doesn't make sense to
     change upload handlers after upload handling has already
     started. If you try to modify ``request.upload_handlers`` after
-    reading from ``request.POST`` or ``request.FILES`` Django will
+    reading from ``request.POST`` or ``request.FILES`` Thibaud will
     throw an error.
 
     Thus, you should always modify uploading handlers as early in your view as
     possible.
 
     Also, ``request.POST`` is accessed by
-    :class:`~django.middleware.csrf.CsrfViewMiddleware` which is enabled by
+    :class:`~thibaud.middleware.csrf.CsrfViewMiddleware` which is enabled by
     default. This means you will need to use
-    :func:`~django.views.decorators.csrf.csrf_exempt` on your view to allow you
+    :func:`~thibaud.views.decorators.csrf.csrf_exempt` on your view to allow you
     to change the upload handlers.  You will then need to use
-    :func:`~django.views.decorators.csrf.csrf_protect` on the function that
+    :func:`~thibaud.views.decorators.csrf.csrf_protect` on the function that
     actually processes the request.  Note that this means that the handlers may
     start receiving the file upload before the CSRF checks have been done.
     Example code::
 
-        from django.views.decorators.csrf import csrf_exempt, csrf_protect
+        from thibaud.views.decorators.csrf import csrf_exempt, csrf_protect
 
 
         @csrf_exempt
@@ -334,14 +334,14 @@ list::
             ...
 
     If you are using a class-based view, you will need to use
-    :func:`~django.views.decorators.csrf.csrf_exempt` on its
-    :meth:`~django.views.generic.base.View.dispatch` method and
-    :func:`~django.views.decorators.csrf.csrf_protect` on the method that
+    :func:`~thibaud.views.decorators.csrf.csrf_exempt` on its
+    :meth:`~thibaud.views.generic.base.View.dispatch` method and
+    :func:`~thibaud.views.decorators.csrf.csrf_protect` on the method that
     actually processes the request. Example code::
 
-        from django.utils.decorators import method_decorator
-        from django.views import View
-        from django.views.decorators.csrf import csrf_exempt, csrf_protect
+        from thibaud.utils.decorators import method_decorator
+        from thibaud.views import View
+        from thibaud.views.decorators.csrf import csrf_exempt, csrf_protect
 
 
         @method_decorator(csrf_exempt, name="dispatch")

@@ -4,11 +4,11 @@ from datetime import datetime, timedelta
 
 from asgiref.sync import sync_to_async
 
-from django.conf import settings
-from django.core import signing
-from django.utils import timezone
-from django.utils.crypto import get_random_string
-from django.utils.module_loading import import_string
+from thibaud.conf import settings
+from thibaud.core import signing
+from thibaud.utils import timezone
+from thibaud.utils.crypto import get_random_string
+from thibaud.utils.module_loading import import_string
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -26,7 +26,7 @@ class CreateError(Exception):
 
 class UpdateError(Exception):
     """
-    Occurs if Django tries to update a session that was deleted.
+    Occurs if Thibaud tries to update a session that was deleted.
     """
 
     pass
@@ -68,7 +68,7 @@ class SessionBase:
 
     @property
     def key_salt(self):
-        return "django.contrib.sessions." + self.__class__.__qualname__
+        return "thibaud.contrib.sessions." + self.__class__.__qualname__
 
     def get(self, key, default=None):
         return self._session.get(key, default)
@@ -134,7 +134,7 @@ class SessionBase:
                 session_data, salt=self.key_salt, serializer=self.serializer
             )
         except signing.BadSignature:
-            logger = logging.getLogger("django.security.SuspiciousSession")
+            logger = logging.getLogger("thibaud.security.SuspiciousSession")
             logger.warning("Session data corrupted")
         except Exception:
             # ValueError, unpickling exceptions. If any of these happen, just

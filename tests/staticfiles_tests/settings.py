@@ -14,12 +14,12 @@ TEST_SETTINGS = {
         Path(TEST_ROOT) / "project" / "pathlib",
     ],
     "STATICFILES_FINDERS": [
-        "django.contrib.staticfiles.finders.FileSystemFinder",
-        "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-        "django.contrib.staticfiles.finders.DefaultStorageFinder",
+        "thibaud.contrib.staticfiles.finders.FileSystemFinder",
+        "thibaud.contrib.staticfiles.finders.AppDirectoriesFinder",
+        "thibaud.contrib.staticfiles.finders.DefaultStorageFinder",
     ],
     "INSTALLED_APPS": [
-        "django.contrib.staticfiles",
+        "thibaud.contrib.staticfiles",
         "staticfiles_tests",
         "staticfiles_tests.apps.test",
         "staticfiles_tests.apps.no_label",

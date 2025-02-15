@@ -1,4 +1,4 @@
-from django.db.models import (
+from thibaud.db.models import (
     CharField,
     Expression,
     Field,
@@ -8,8 +8,8 @@ from django.db.models import (
     TextField,
     Value,
 )
-from django.db.models.expressions import CombinedExpression, register_combinable_fields
-from django.db.models.functions import Cast, Coalesce
+from thibaud.db.models.expressions import CombinedExpression, register_combinable_fields
+from thibaud.db.models.functions import Cast, Coalesce
 
 
 class SearchVectorExact(Lookup):
@@ -171,7 +171,7 @@ class SearchQueryCombinable:
 
     # On Combinable, these are not implemented to reduce confusion with Q. In
     # this case we are actually (ab)using them to do logical combination so
-    # it's consistent with other usage in Django.
+    # it's consistent with other usage in Thibaud.
     def __or__(self, other):
         return self._combine(other, self.BITOR, False)
 

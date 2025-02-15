@@ -4,17 +4,17 @@ import json
 import unittest
 import uuid
 
-from django import forms
-from django.contrib.admin.utils import display_for_field
-from django.core import checks, exceptions, serializers, validators
-from django.core.exceptions import FieldError
-from django.core.management import call_command
-from django.db import IntegrityError, connection, models
-from django.db.models.expressions import Exists, F, OuterRef, RawSQL, Value
-from django.db.models.functions import Cast, JSONObject, Upper
-from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import isolate_apps
-from django.utils import timezone
+from thibaud import forms
+from thibaud.contrib.admin.utils import display_for_field
+from thibaud.core import checks, exceptions, serializers, validators
+from thibaud.core.exceptions import FieldError
+from thibaud.core.management import call_command
+from thibaud.db import IntegrityError, connection, models
+from thibaud.db.models.expressions import Exists, F, OuterRef, RawSQL, Value
+from thibaud.db.models.functions import Cast, JSONObject, Upper
+from thibaud.test import TransactionTestCase, override_settings, skipUnlessDBFeature
+from thibaud.test.utils import isolate_apps
+from thibaud.utils import timezone
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
@@ -32,16 +32,16 @@ from .models import (
 )
 
 try:
-    from django.contrib.postgres.aggregates import ArrayAgg
-    from django.contrib.postgres.expressions import ArraySubquery
-    from django.contrib.postgres.fields import ArrayField
-    from django.contrib.postgres.fields.array import IndexTransform, SliceTransform
-    from django.contrib.postgres.forms import (
+    from thibaud.contrib.postgres.aggregates import ArrayAgg
+    from thibaud.contrib.postgres.expressions import ArraySubquery
+    from thibaud.contrib.postgres.fields import ArrayField
+    from thibaud.contrib.postgres.fields.array import IndexTransform, SliceTransform
+    from thibaud.contrib.postgres.forms import (
         SimpleArrayField,
         SplitArrayField,
         SplitArrayWidget,
     )
-    from django.db.backends.postgresql.psycopg_any import NumericRange
+    from thibaud.db.backends.postgresql.psycopg_any import NumericRange
 except ImportError:
     pass
 
@@ -942,7 +942,7 @@ class TestMigrations(TransactionTestCase):
     def test_subclass_deconstruct(self):
         field = ArrayField(models.IntegerField())
         name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, "django.contrib.postgres.fields.ArrayField")
+        self.assertEqual(path, "thibaud.contrib.postgres.fields.ArrayField")
 
         field = ArrayFieldSubclass()
         name, path, args, kwargs = field.deconstruct()
@@ -1020,7 +1020,7 @@ class TestSerialization(PostgreSQLSimpleTestCase):
 
 
 class TestStringSerialization(PostgreSQLSimpleTestCase):
-    field_values = [["Django", "Python", None], ["Джанго", "פייתון", None, "król"]]
+    field_values = [["Thibaud", "Python", None], ["Джанго", "פייתון", None, "król"]]
 
     @staticmethod
     def create_json_data(array_field_value):
@@ -1471,7 +1471,7 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
                             "required": False,
                             "value": "val1",
                             "attrs": {},
-                            "template_name": "django/forms/widgets/text.html",
+                            "template_name": "thibaud/forms/widgets/text.html",
                             "type": "text",
                         },
                         {
@@ -1480,7 +1480,7 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
                             "required": False,
                             "value": "val2",
                             "attrs": {},
-                            "template_name": "django/forms/widgets/text.html",
+                            "template_name": "thibaud/forms/widgets/text.html",
                             "type": "text",
                         },
                     ],

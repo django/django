@@ -1,8 +1,8 @@
 """
-Regression tests for Django built-in views.
+Regression tests for Thibaud built-in views.
 """
 
-from django.db import models
+from thibaud.db import models
 
 
 class Author(models.Model):

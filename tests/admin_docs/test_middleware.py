@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
-from django.test import override_settings
+from thibaud.contrib.auth.models import User
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.test import override_settings
 
 from .tests import AdminDocsTestCase, TestDataMixin
 
@@ -54,7 +54,7 @@ class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
         msg = (
             "The XView middleware requires authentication middleware to be "
             "installed. Edit your MIDDLEWARE setting to insert "
-            "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+            "'thibaud.contrib.auth.middleware.AuthenticationMiddleware'."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.head("/xview/func/")

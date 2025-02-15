@@ -1,7 +1,7 @@
-from django.template.defaultfilters import escape
-from django.test import SimpleTestCase
-from django.utils.functional import Promise, lazy
-from django.utils.safestring import mark_safe
+from thibaud.template.defaultfilters import escape
+from thibaud.test import SimpleTestCase
+from thibaud.utils.functional import Promise, lazy
+from thibaud.utils.safestring import mark_safe
 
 from ..utils import setup
 

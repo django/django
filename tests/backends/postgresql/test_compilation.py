@@ -1,8 +1,8 @@
 import unittest
 
-from django.db import connection
-from django.db.models.expressions import RawSQL
-from django.test import TestCase
+from thibaud.db import connection
+from thibaud.db.models.expressions import RawSQL
+from thibaud.test import TestCase
 
 from ..models import Square
 

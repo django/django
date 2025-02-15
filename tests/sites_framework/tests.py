@@ -1,10 +1,10 @@
-from django.conf import settings
-from django.contrib.sites.managers import CurrentSiteManager
-from django.contrib.sites.models import Site
-from django.core import checks
-from django.db import models
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
+from thibaud.conf import settings
+from thibaud.contrib.sites.managers import CurrentSiteManager
+from thibaud.contrib.sites.models import Site
+from thibaud.core import checks
+from thibaud.db import models
+from thibaud.test import SimpleTestCase, TestCase
+from thibaud.test.utils import isolate_apps
 
 from .models import CustomArticle, ExclusiveArticle, SyndicatedArticle
 

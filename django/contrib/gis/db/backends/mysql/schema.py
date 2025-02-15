@@ -1,10 +1,10 @@
 import logging
 
-from django.contrib.gis.db.models import GeometryField
-from django.db import OperationalError
-from django.db.backends.mysql.schema import DatabaseSchemaEditor
+from thibaud.contrib.gis.db.models import GeometryField
+from thibaud.db import OperationalError
+from thibaud.db.backends.mysql.schema import DatabaseSchemaEditor
 
-logger = logging.getLogger("django.contrib.gis")
+logger = logging.getLogger("thibaud.contrib.gis")
 
 
 class MySQLGISSchemaEditor(DatabaseSchemaEditor):

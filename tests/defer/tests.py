@@ -1,5 +1,5 @@
-from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.test import SimpleTestCase, TestCase
+from thibaud.core.exceptions import FieldDoesNotExist, FieldError
+from thibaud.test import SimpleTestCase, TestCase
 
 from .models import (
     BigChild,

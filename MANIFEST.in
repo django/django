@@ -7,7 +7,7 @@ include MANIFEST.in
 include package.json
 include tox.ini
 include *.rst
-graft django
+graft thibaud
 graft docs
 graft extras
 graft js_tests

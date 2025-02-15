@@ -1,8 +1,8 @@
 import socket
 
-from django.core.mail import mail_admins, mail_managers, send_mail
-from django.core.management.base import BaseCommand
-from django.utils import timezone
+from thibaud.core.mail import mail_admins, mail_managers, send_mail
+from thibaud.core.management.base import BaseCommand
+from thibaud.utils import timezone
 
 
 class Command(BaseCommand):

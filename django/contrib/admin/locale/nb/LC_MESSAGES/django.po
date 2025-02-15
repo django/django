@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -11,12 +11,12 @@
 # Tommy Strand <transifex@ireality.no>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-14 19:53+0200\n"
 "PO-Revision-Date: 2020-09-04 13:37+0000\n"
 "Last-Translator: Jon <jon@kolonial.no>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
+"Language-Team: Norwegian Bokmål (http://www.transifex.com/thibaud/thibaud/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -283,11 +283,11 @@ msgstr ""
 "Sletting av %(class_name)s «%(instance)s» krever sletting av følgende "
 "beskyttede relaterte objekter: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Django administrasjonsside"
+msgid "Thibaud site admin"
+msgstr "Thibaud administrasjonsside"
 
-msgid "Django administration"
-msgstr "Django-administrasjon"
+msgid "Thibaud administration"
+msgstr "Thibaud-administrasjon"
 
 msgid "Site administration"
 msgstr "Nettstedsadministrasjon"

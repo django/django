@@ -5,7 +5,7 @@ than using a new table of their own. This allows them to act as simple proxies,
 providing a modified interface to the data from the base class.
 """
 
-from django.db import models
+from thibaud.db import models
 
 # A couple of managers for testing managing overriding in proxy model cases.
 

@@ -1,9 +1,9 @@
-from django.contrib.gis.db.models.fields import BaseSpatialField
-from django.contrib.gis.measure import Distance
-from django.db import NotSupportedError
-from django.db.models import Expression, Lookup, Transform
-from django.db.models.sql.query import Query
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.contrib.gis.db.models.fields import BaseSpatialField
+from thibaud.contrib.gis.measure import Distance
+from thibaud.db import NotSupportedError
+from thibaud.db.models import Expression, Lookup, Transform
+from thibaud.db.models.sql.query import Query
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 
 class RasterBandTransform(Transform):

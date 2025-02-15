@@ -3,7 +3,7 @@ from functools import wraps
 
 from asgiref.sync import iscoroutinefunction
 
-from django.http import HttpRequest
+from thibaud.http import HttpRequest
 
 coroutine_functions_to_sensitive_variables = {}
 

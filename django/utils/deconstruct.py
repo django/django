@@ -1,6 +1,6 @@
 from importlib import import_module
 
-from django.utils.version import get_docs_version
+from thibaud.utils.version import get_docs_version
 
 
 def deconstructible(*args, path=None):
@@ -38,7 +38,7 @@ def deconstructible(*args, path=None):
                     "classes. Please move the object into the main module "
                     "body to use migrations.\n"
                     "For more information, see "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/"
+                    "https://docs.thibaudproject.com/en/%s/topics/migrations/"
                     "#serializing-values" % (name, module_name, get_docs_version())
                 )
             return (

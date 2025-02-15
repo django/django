@@ -5,13 +5,13 @@ import socket
 import sys
 from datetime import datetime
 
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-from django.core.servers.basehttp import WSGIServer, get_internal_wsgi_application, run
-from django.db import connections
-from django.utils import autoreload
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.version import get_docs_version
+from thibaud.conf import settings
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.core.servers.basehttp import WSGIServer, get_internal_wsgi_application, run
+from thibaud.db import connections
+from thibaud.utils import autoreload
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.version import get_docs_version
 
 naiveip_re = _lazy_re_compile(
     r"""^(?:
@@ -45,19 +45,19 @@ class Command(BaseCommand):
             "-6",
             action="store_true",
             dest="use_ipv6",
-            help="Tells Django to use an IPv6 address.",
+            help="Tells Thibaud to use an IPv6 address.",
         )
         parser.add_argument(
             "--nothreading",
             action="store_false",
             dest="use_threading",
-            help="Tells Django to NOT use threading.",
+            help="Tells Thibaud to NOT use threading.",
         )
         parser.add_argument(
             "--noreload",
             action="store_false",
             dest="use_reloader",
-            help="Tells Django to NOT use the auto-reloader.",
+            help="Tells Thibaud to NOT use the auto-reloader.",
         )
 
     def execute(self, *args, **options):
@@ -183,7 +183,7 @@ class Command(BaseCommand):
         version = self.get_version()
         print(
             f"{now}\n"
-            f"Django version {version}, using settings {settings.SETTINGS_MODULE!r}\n"
+            f"Thibaud version {version}, using settings {settings.SETTINGS_MODULE!r}\n"
             f"Starting development server at {self.protocol}://{addr}:{server_port}/\n"
             f"Quit the server with {quit_command}.",
             file=self.stdout,
@@ -195,7 +195,7 @@ class Command(BaseCommand):
                     "WARNING: This is a development server. Do not use it in a "
                     "production setting. Use a production WSGI or ASGI server "
                     "instead.\nFor more information on production servers see: "
-                    f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+                    f"https://docs.thibaudproject.com/en/{docs_version}/howto/"
                     "deployment/"
                 )
             )

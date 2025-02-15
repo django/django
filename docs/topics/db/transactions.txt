@@ -2,26 +2,26 @@
 Database transactions
 =====================
 
-.. module:: django.db.transaction
+.. module:: thibaud.db.transaction
 
-Django gives you a few ways to control how database transactions are managed.
+Thibaud gives you a few ways to control how database transactions are managed.
 
 Managing database transactions
 ==============================
 
-Django's default transaction behavior
+Thibaud's default transaction behavior
 -------------------------------------
 
-Django's default behavior is to run in autocommit mode. Each query is
+Thibaud's default behavior is to run in autocommit mode. Each query is
 immediately committed to the database, unless a transaction is active.
 :ref:`See below for details <autocommit-details>`.
 
-Django uses transactions or savepoints automatically to guarantee the
+Thibaud uses transactions or savepoints automatically to guarantee the
 integrity of ORM operations that require multiple queries, especially
 :ref:`delete() <topics-db-queries-delete>` and :ref:`update()
 <topics-db-queries-update>` queries.
 
-Django's :class:`~django.test.TestCase` class also wraps each test in a
+Thibaud's :class:`~thibaud.test.TestCase` class also wraps each test in a
 transaction for performance reasons.
 
 .. _tying-transactions-to-http-requests:
@@ -34,9 +34,9 @@ transaction. Set :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>` to
 ``True`` in the configuration of each database for which you want to enable
 this behavior.
 
-It works like this. Before calling a view function, Django starts a
-transaction. If the response is produced without problems, Django commits the
-transaction. If the view produces an exception, Django rolls back the
+It works like this. Before calling a view function, Thibaud starts a
+transaction. If the response is produced without problems, Thibaud commits the
+transaction. If the view produces an exception, Thibaud rolls back the
 transaction.
 
 You may perform subtransactions using savepoints in your view code, typically
@@ -52,7 +52,7 @@ either all or none of the changes will be committed.
 
 .. admonition:: Per-request transactions and streaming responses
 
-    When a view returns a :class:`~django.http.StreamingHttpResponse`, reading
+    When a view returns a :class:`~thibaud.http.StreamingHttpResponse`, reading
     the contents of the response will often execute code to generate the
     content. Since the view has already returned, such code runs outside of
     the transaction.
@@ -76,7 +76,7 @@ still possible to prevent views from running in a transaction.
     This decorator will negate the effect of :setting:`ATOMIC_REQUESTS
     <DATABASE-ATOMIC_REQUESTS>` for a given view::
 
-        from django.db import transaction
+        from thibaud.db import transaction
 
 
         @transaction.non_atomic_requests
@@ -93,7 +93,7 @@ still possible to prevent views from running in a transaction.
 Controlling transactions explicitly
 -----------------------------------
 
-Django provides a single API to control database transactions.
+Thibaud provides a single API to control database transactions.
 
 .. function:: atomic(using=None, savepoint=True, durable=False)
 
@@ -115,7 +115,7 @@ Django provides a single API to control database transactions.
 
     ``atomic`` is usable both as a :py:term:`decorator`::
 
-        from django.db import transaction
+        from thibaud.db import transaction
 
 
         @transaction.atomic
@@ -125,11 +125,11 @@ Django provides a single API to control database transactions.
 
     and as a :py:term:`context manager`::
 
-        from django.db import transaction
+        from thibaud.db import transaction
 
 
         def viewfunc(request):
-            # This code executes in autocommit mode (Django's default).
+            # This code executes in autocommit mode (Thibaud's default).
             do_stuff()
 
             with transaction.atomic():
@@ -139,7 +139,7 @@ Django provides a single API to control database transactions.
     Wrapping ``atomic`` in a try/except block allows for natural handling of
     integrity errors::
 
-        from django.db import IntegrityError, transaction
+        from thibaud.db import IntegrityError, transaction
 
 
         @transaction.atomic
@@ -164,18 +164,18 @@ Django provides a single API to control database transactions.
 
     .. admonition:: Avoid catching exceptions inside ``atomic``!
 
-        When exiting an ``atomic`` block, Django looks at whether it's exited
+        When exiting an ``atomic`` block, Thibaud looks at whether it's exited
         normally or with an exception to determine whether to commit or roll
         back. If you catch and handle exceptions inside an ``atomic`` block,
-        you may hide from Django the fact that a problem has happened. This
+        you may hide from Thibaud the fact that a problem has happened. This
         can result in unexpected behavior.
 
-        This is mostly a concern for :exc:`~django.db.DatabaseError` and its
-        subclasses such as :exc:`~django.db.IntegrityError`. After such an
-        error, the transaction is broken and Django will perform a rollback at
+        This is mostly a concern for :exc:`~thibaud.db.DatabaseError` and its
+        subclasses such as :exc:`~thibaud.db.IntegrityError`. After such an
+        error, the transaction is broken and Thibaud will perform a rollback at
         the end of the ``atomic`` block. If you attempt to run database
-        queries before the rollback happens, Django will raise a
-        :class:`~django.db.transaction.TransactionManagementError`. You may
+        queries before the rollback happens, Thibaud will raise a
+        :class:`~thibaud.db.transaction.TransactionManagementError`. You may
         also encounter this behavior when an ORM-related signal handler raises
         an exception.
 
@@ -184,7 +184,7 @@ Django provides a single API to control database transactions.
         purpose. This pattern has another advantage: it delimits explicitly
         which operations will be rolled back if an exception occurs.
 
-        If you catch exceptions raised by raw SQL queries, Django's behavior
+        If you catch exceptions raised by raw SQL queries, Thibaud's behavior
         is unspecified and database-dependent.
 
     .. admonition:: You may need to manually revert app state when rolling back a transaction.
@@ -197,7 +197,7 @@ Django provides a single API to control database transactions.
         ensures that the ``if obj.active`` check at the end uses the correct
         value if updating ``active`` to ``True`` fails in the transaction::
 
-            from django.db import DatabaseError, transaction
+            from thibaud.db import DatabaseError, transaction
 
             obj = MyModel(active=False)
             obj.active = True
@@ -222,10 +222,10 @@ Django provides a single API to control database transactions.
     connection within an ``atomic`` block will raise an exception.
 
     ``atomic`` takes a ``using`` argument which should be the name of a
-    database. If this argument isn't provided, Django uses the ``"default"``
+    database. If this argument isn't provided, Thibaud uses the ``"default"``
     database.
 
-    Under the hood, Django's transaction management code:
+    Under the hood, Thibaud's transaction management code:
 
     - opens a transaction when entering the outermost ``atomic`` block;
     - creates a savepoint when entering an inner ``atomic`` block;
@@ -233,7 +233,7 @@ Django provides a single API to control database transactions.
     - commits or rolls back the transaction when exiting the outermost block.
 
     You can disable the creation of savepoints for inner blocks by setting the
-    ``savepoint`` argument to ``False``. If an exception occurs, Django will
+    ``savepoint`` argument to ``False``. If an exception occurs, Thibaud will
     perform the rollback when exiting the first parent block with a savepoint
     if there is one, and the outermost block otherwise. Atomicity is still
     guaranteed by the outer transaction. This option should only be used if
@@ -248,14 +248,14 @@ Django provides a single API to control database transactions.
     Open transactions have a performance cost for your database server. To
     minimize this overhead, keep your transactions as short as possible. This
     is especially important if you're using :func:`atomic` in long-running
-    processes, outside of Django's request / response cycle.
+    processes, outside of Thibaud's request / response cycle.
 
 Autocommit
 ==========
 
 .. _autocommit-details:
 
-Why Django uses autocommit
+Why Thibaud uses autocommit
 --------------------------
 
 In the SQL standards, each SQL query starts a transaction, unless one is
@@ -270,7 +270,7 @@ transaction, but the transaction also gets automatically committed or rolled
 back, depending on whether the query succeeded.
 
 :pep:`249`, the Python Database API Specification v2.0, requires autocommit to
-be initially turned off. Django overrides this default and turns autocommit
+be initially turned off. Thibaud overrides this default and turns autocommit
 on.
 
 To avoid this, you can :ref:`deactivate the transaction management
@@ -281,14 +281,14 @@ To avoid this, you can :ref:`deactivate the transaction management
 Deactivating transaction management
 -----------------------------------
 
-You can totally disable Django's transaction management for a given database
+You can totally disable Thibaud's transaction management for a given database
 by setting :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` to ``False`` in its
-configuration. If you do this, Django won't enable autocommit, and won't
+configuration. If you do this, Thibaud won't enable autocommit, and won't
 perform any commits. You'll get the regular behavior of the underlying
 database library.
 
 This requires you to commit explicitly every transaction, even those started
-by Django or by third-party libraries. Thus, this is best used in situations
+by Thibaud or by third-party libraries. Thus, this is best used in situations
 where you want to run your own transaction-controlling middleware or do
 something really strange.
 
@@ -308,7 +308,7 @@ the open transaction is successfully committed:
 
 Pass a function, or any callable, to :func:`on_commit`::
 
-    from django.db import transaction
+    from thibaud.db import transaction
 
 
     def send_welcome_email(): ...
@@ -335,7 +335,7 @@ the callback will be executed immediately.
 It's sometimes useful to register callbacks that can fail. Passing
 ``robust=True`` allows the next callbacks to be executed even if the current
 one throws an exception. All errors derived from Python's ``Exception`` class
-are caught and logged to the ``django.db.backends.base`` logger.
+are caught and logged to the ``thibaud.db.backends.base`` logger.
 
 You can use :meth:`.TestCase.captureOnCommitCallbacks` to test callbacks
 registered with :func:`on_commit`.
@@ -419,7 +419,7 @@ error.
 Use in tests
 ------------
 
-Django's :class:`~django.test.TestCase` class wraps each test in a transaction
+Thibaud's :class:`~thibaud.test.TestCase` class wraps each test in a transaction
 and rolls back that transaction after each test, in order to provide test
 isolation. This means that no transaction is ever actually committed, thus your
 :func:`on_commit` callbacks will never be run.
@@ -430,11 +430,11 @@ You can overcome this limitation by using
 or emulate the transaction committing by calling them.
 
 Another way to overcome the limitation is to use
-:class:`~django.test.TransactionTestCase` instead of
-:class:`~django.test.TestCase`. This will mean your transactions are committed,
+:class:`~thibaud.test.TransactionTestCase` instead of
+:class:`~thibaud.test.TestCase`. This will mean your transactions are committed,
 and the callbacks will run. However
-:class:`~django.test.TransactionTestCase` flushes the database between tests,
-which is significantly slower than :class:`~django.test.TestCase`\'s isolation.
+:class:`~thibaud.test.TransactionTestCase` flushes the database between tests,
+which is significantly slower than :class:`~thibaud.test.TestCase`\'s isolation.
 
 Why no rollback hook?
 ---------------------
@@ -468,7 +468,7 @@ Low-level APIs
 Autocommit
 ----------
 
-Django provides an API in the :mod:`django.db.transaction` module to manage the
+Thibaud provides an API in the :mod:`thibaud.db.transaction` module to manage the
 autocommit state of each database connection.
 
 .. function:: get_autocommit(using=None)
@@ -476,20 +476,20 @@ autocommit state of each database connection.
 .. function:: set_autocommit(autocommit, using=None)
 
 These functions take a ``using`` argument which should be the name of a
-database. If it isn't provided, Django uses the ``"default"`` database.
+database. If it isn't provided, Thibaud uses the ``"default"`` database.
 
 Autocommit is initially turned on. If you turn it off, it's your
 responsibility to restore it.
 
 Once you turn autocommit off, you get the default behavior of your database
-adapter, and Django won't help you. Although that behavior is specified in
+adapter, and Thibaud won't help you. Although that behavior is specified in
 :pep:`249`, implementations of adapters aren't always consistent with one
 another. Review the documentation of the adapter you're using carefully.
 
 You must ensure that no transaction is active, usually by issuing a
 :func:`commit` or a :func:`rollback`, before turning autocommit back on.
 
-Django will refuse to turn autocommit off when an :func:`atomic` block is
+Thibaud will refuse to turn autocommit off when an :func:`atomic` block is
 active, because that would break atomicity.
 
 Transactions
@@ -499,21 +499,21 @@ A transaction is an atomic set of database queries. Even if your program
 crashes, the database guarantees that either all the changes will be applied,
 or none of them.
 
-Django doesn't provide an API to start a transaction. The expected way to
+Thibaud doesn't provide an API to start a transaction. The expected way to
 start a transaction is to disable autocommit with :func:`set_autocommit`.
 
 Once you're in a transaction, you can choose either to apply the changes
 you've performed until this point with :func:`commit`, or to cancel them with
-:func:`rollback`. These functions are defined in :mod:`django.db.transaction`.
+:func:`rollback`. These functions are defined in :mod:`thibaud.db.transaction`.
 
 .. function:: commit(using=None)
 
 .. function:: rollback(using=None)
 
 These functions take a ``using`` argument which should be the name of a
-database. If it isn't provided, Django uses the ``"default"`` database.
+database. If it isn't provided, Thibaud uses the ``"default"`` database.
 
-Django will refuse to commit or to rollback when an :func:`atomic` block is
+Thibaud will refuse to commit or to rollback when an :func:`atomic` block is
 active, because that would break atomicity.
 
 .. _topics-db-transactions-savepoints:
@@ -528,7 +528,7 @@ storage engine) backends. Other backends provide the savepoint functions, but
 they're empty operations -- they don't actually do anything.
 
 Savepoints aren't especially useful if you are using autocommit, the default
-behavior of Django. However, once you open a transaction with :func:`atomic`,
+behavior of Thibaud. However, once you open a transaction with :func:`atomic`,
 you build up a series of database operations awaiting a commit or rollback. If
 you issue a rollback, the entire transaction is rolled back. Savepoints
 provide the ability to perform a fine-grained rollback, rather than the full
@@ -543,7 +543,7 @@ Each of these functions takes a ``using`` argument which should be the name of
 a database for which the behavior applies.  If no ``using`` argument is
 provided then the ``"default"`` database is used.
 
-Savepoints are controlled by three functions in :mod:`django.db.transaction`:
+Savepoints are controlled by three functions in :mod:`thibaud.db.transaction`:
 
 .. function:: savepoint(using=None)
 
@@ -570,7 +570,7 @@ In addition, there's a utility function:
 
 The following example demonstrates the use of savepoints::
 
-    from django.db import transaction
+    from thibaud.db import transaction
 
 
     # open a transaction
@@ -639,9 +639,9 @@ depends on your MySQL version and the table types you're using. (By
 peculiarities are outside the scope of this article, but the MySQL site has
 `information on MySQL transactions`_.
 
-If your MySQL setup does *not* support transactions, then Django will always
+If your MySQL setup does *not* support transactions, then Thibaud will always
 function in autocommit mode: statements will be executed and committed as soon
-as they're called. If your MySQL setup *does* support transactions, Django
+as they're called. If your MySQL setup *does* support transactions, Thibaud
 will handle transactions as explained in this document.
 
 .. _information on MySQL transactions: https://dev.mysql.com/doc/refman/en/sql-transactional-statements.html
@@ -652,7 +652,7 @@ Handling exceptions within PostgreSQL transactions
 .. note::
 
     This section is relevant only if you're implementing your own transaction
-    management. This problem cannot occur in Django's default mode and
+    management. This problem cannot occur in Thibaud's default mode and
     :func:`atomic` handles it automatically.
 
 Inside a transaction, when a call to a PostgreSQL cursor raises an exception

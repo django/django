@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0.0,<69.3.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "Django"
+name = "Thibaud"
 dynamic = ["version"]
 requires-python = ">= 3.12"
 dependencies = [
@@ -12,7 +12,7 @@ dependencies = [
     "tzdata; sys_platform == 'win32'",
 ]
 authors = [
-  {name = "Django Software Foundation", email = "foundation@djangoproject.com"},
+  {name = "Thibaud Software Foundation", email = "foundation@thibaudproject.com"},
 ]
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 readme = "README.rst"
@@ -20,7 +20,7 @@ license = {text = "BSD-3-Clause"}
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Environment :: Web Environment",
-    "Framework :: Django",
+    "Framework :: Thibaud",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
@@ -41,15 +41,15 @@ argon2 = ["argon2-cffi>=23.1.0"]
 bcrypt = ["bcrypt>=4.1.1"]
 
 [project.scripts]
-django-admin = "django.core.management:execute_from_command_line"
+thibaud-admin = "thibaud.core.management:execute_from_command_line"
 
 [project.urls]
-Homepage = "https://www.djangoproject.com/"
-Documentation = "https://docs.djangoproject.com/"
-"Release notes" = "https://docs.djangoproject.com/en/stable/releases/"
-Funding = "https://www.djangoproject.com/fundraising/"
-Source = "https://github.com/django/django"
-Tracker = "https://code.djangoproject.com/"
+Homepage = "https://www.thibaudproject.com/"
+Documentation = "https://docs.thibaudproject.com/"
+"Release notes" = "https://docs.thibaudproject.com/en/stable/releases/"
+Funding = "https://www.thibaudproject.com/fundraising/"
+Source = "https://github.com/thibaud/thibaud"
+Tracker = "https://code.thibaudproject.com/"
 
 [tool.black]
 target-version = ["py312"]
@@ -58,10 +58,10 @@ force-exclude = "tests/test_runner_apps/tagged/tests_syntax_error.py"
 [tool.isort]
 profile = "black"
 default_section = "THIRDPARTY"
-known_first_party = "django"
+known_first_party = "thibaud"
 
 [tool.setuptools.dynamic]
-version = {attr = "django.__version__"}
+version = {attr = "thibaud.__version__"}
 
 [tool.setuptools.packages.find]
-include = ["django*"]
+include = ["thibaud*"]

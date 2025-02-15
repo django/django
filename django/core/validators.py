@@ -4,12 +4,12 @@ import re
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from django.core.exceptions import ValidationError
-from django.utils.deconstruct import deconstructible
-from django.utils.ipv6 import is_valid_ipv6_address
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext_lazy
+from thibaud.core.exceptions import ValidationError
+from thibaud.utils.deconstruct import deconstructible
+from thibaud.utils.ipv6 import is_valid_ipv6_address
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.translation import gettext_lazy as _
+from thibaud.utils.translation import ngettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, "", [], (), {})

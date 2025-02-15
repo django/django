@@ -8,7 +8,7 @@ into a spatial database. :ref:`geosbuild`, :ref:`proj4` and
 might also need additional libraries, see `PostGIS requirements`_.
 
 The `psycopg`_ or `psycopg2`_ module is required for use as the database
-adapter when using GeoDjango with PostGIS.
+adapter when using GeoThibaud with PostGIS.
 
 On Debian/Ubuntu, you are advised to install the following packages:
 ``postgresql-x``, ``postgresql-x-postgis-3``, ``postgresql-server-dev-x``,
@@ -43,8 +43,8 @@ The database user must be a superuser in order to run
 ``CREATE EXTENSION postgis;``. The command is run during the :djadmin:`migrate`
 process. An alternative is to use a migration operation in your project::
 
-    from django.contrib.postgres.operations import CreateExtension
-    from django.db import migrations
+    from thibaud.contrib.postgres.operations import CreateExtension
+    from thibaud.db import migrations
 
 
     class Migration(migrations.Migration):
@@ -52,10 +52,10 @@ process. An alternative is to use a migration operation in your project::
 
 If you plan to use PostGIS raster functionality, you should also activate the
 ``postgis_raster`` extension. You can install the extension using the
-:class:`~django.contrib.postgres.operations.CreateExtension` migration
+:class:`~thibaud.contrib.postgres.operations.CreateExtension` migration
 operation, or directly by running ``CREATE EXTENSION postgis_raster;``.
 
-GeoDjango does not currently leverage any `PostGIS topology functionality`__.
+GeoThibaud does not currently leverage any `PostGIS topology functionality`__.
 If you plan to use those features at some point, you can also install the
 ``postgis_topology`` extension by issuing ``CREATE EXTENSION
 postgis_topology;``.
@@ -68,10 +68,10 @@ Managing the database
 To administer the database, you can either use the pgAdmin III program
 (:menuselection:`Start --> PostgreSQL X --> pgAdmin III`) or the SQL Shell
 (:menuselection:`Start --> PostgreSQL X --> SQL Shell`). For example, to create
-a ``geodjango`` spatial database and user, the following may be executed from
+a ``geothibaud`` spatial database and user, the following may be executed from
 the SQL Shell as the ``postgres`` user:
 
 .. code-block:: psql
 
-    postgres# CREATE USER geodjango PASSWORD 'my_passwd';
-    postgres# CREATE DATABASE geodjango OWNER geodjango;
+    postgres# CREATE USER geothibaud PASSWORD 'my_passwd';
+    postgres# CREATE DATABASE geothibaud OWNER geothibaud;

@@ -6,10 +6,10 @@ How to configure and use logging
 
 .. seealso::
 
-    * :ref:`Django logging reference <logging-ref>`
-    * :ref:`Django logging overview <logging-explanation>`
+    * :ref:`Thibaud logging reference <logging-ref>`
+    * :ref:`Thibaud logging overview <logging-explanation>`
 
-Django provides a working :ref:`default logging configuration
+Thibaud provides a working :ref:`default logging configuration
 <default-logging-configuration>` that is readily extended.
 
 Make a basic logging call
@@ -19,7 +19,7 @@ To send a log message from within your code, you place a logging call into it.
 
 .. admonition:: Don't be tempted to use logging calls in ``settings.py``.
 
-    The way that Django logging is configured as part of the ``setup()``
+    The way that Thibaud logging is configured as part of the ``setup()``
     function means that logging calls placed in ``settings.py`` may not work as
     expected, because *logging will not be set up at that point*. To explore
     logging, use a view function as suggested in the example below.
@@ -44,7 +44,7 @@ And then in a function, for example in a view, send a record to the logger::
             logger.warning("Platform is running at risk")
 
 When this code is executed, a :py:class:`~logging.LogRecord` containing that
-message will be sent to the logger. If you're using Django's default logging
+message will be sent to the logger. If you're using Thibaud's default logging
 configuration, the message will appear in the console.
 
 The ``WARNING`` level used in the example above is one of several
@@ -61,7 +61,7 @@ The ``WARNING`` level used in the example above is one of several
 Customize logging configuration
 ===============================
 
-Although Django's logging configuration works out of the box, you can control
+Although Thibaud's logging configuration works out of the box, you can control
 exactly how your logs are sent to various destinations - to log files, external
 services, email and so on - with some additional configuration.
 
@@ -74,13 +74,13 @@ You can configure:
 * formatters, to convert :class:`~logging.LogRecord` objects to a string or
   other form for consumption by human beings or another system
 
-There are various ways of configuring logging. In Django, the
+There are various ways of configuring logging. In Thibaud, the
 :setting:`LOGGING` setting is most commonly used. The setting uses the
 :ref:`dictConfig format <logging-config-dictschema>`, and extends the
 :ref:`default logging configuration <default-logging-definition>`.
 
 See :ref:`configuring-logging` for an explanation of how your custom settings
-are merged with Django's defaults.
+are merged with Thibaud's defaults.
 
 See the :mod:`Python logging documentation <python:logging.config>` for
 details of other ways of configuring logging. For the sake of simplicity, this
@@ -128,7 +128,7 @@ file ``general.log`` (at the project root):
 
 Different handler classes take different configuration options. For more
 information on available handler classes, see the
-:class:`~django.utils.log.AdminEmailHandler` provided by Django and the various
+:class:`~thibaud.utils.log.AdminEmailHandler` provided by Thibaud and the various
 :py:mod:`handler classes <logging.handlers>` provided by Python.
 
 Logging levels can also be set on the handlers (by default, they accept log

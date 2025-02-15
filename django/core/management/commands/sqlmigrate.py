@@ -1,7 +1,7 @@
-from django.apps import apps
-from django.core.management.base import BaseCommand, CommandError
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.loader import AmbiguityError, MigrationLoader
+from thibaud.apps import apps
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.db import DEFAULT_DB_ALIAS, connections
+from thibaud.db.migrations.loader import AmbiguityError, MigrationLoader
 
 
 class Command(BaseCommand):

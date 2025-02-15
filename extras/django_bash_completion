@@ -1,5 +1,5 @@
 # #############################################################################
-# This bash script adds tab-completion feature to django-admin and manage.py.
+# This bash script adds tab-completion feature to thibaud-admin and manage.py.
 #
 # Testing it out without installing
 # =================================
@@ -7,7 +7,7 @@
 # To test out the completion without "installing" this, just run this file
 # directly, like so:
 #
-#     . ~/path/to/django_bash_completion
+#     . ~/path/to/thibaud_bash_completion
 #
 # Note: There's a dot ('.') at the beginning of that command.
 #
@@ -19,7 +19,7 @@
 #
 # To install this, point to this file from your .bash_profile, like so:
 #
-#     . ~/path/to/django_bash_completion
+#     . ~/path/to/thibaud_bash_completion
 #
 # Do the same in your .bashrc if .bashrc doesn't invoke .bash_profile.
 #
@@ -30,21 +30,21 @@
 #
 # To uninstall, just remove the line from your .bash_profile and .bashrc.
 
-_django_completion()
+_thibaud_completion()
 {
     COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
                    COMP_CWORD=$COMP_CWORD \
                    DJANGO_AUTO_COMPLETE=1 $1 ) )
 }
-complete -F _django_completion -o default manage.py django-admin
+complete -F _thibaud_completion -o default manage.py thibaud-admin
 
-_python_django_completion()
+_python_thibaud_completion()
 {
     if [[ ${COMP_CWORD} -ge 2 ]]; then
         local PYTHON_EXE=${COMP_WORDS[0]##*/}
         if echo "$PYTHON_EXE" | grep -qE "python([3-9]\.[0-9])?"; then
             local PYTHON_SCRIPT=${COMP_WORDS[1]##*/}
-            if echo "$PYTHON_SCRIPT" | grep -qE "manage\.py|django-admin"; then
+            if echo "$PYTHON_SCRIPT" | grep -qE "manage\.py|thibaud-admin"; then
                 COMPREPLY=( $( COMP_WORDS=( "${COMP_WORDS[*]:1}" )
                                COMP_CWORD=$(( COMP_CWORD-1 ))
                                DJANGO_AUTO_COMPLETE=1 ${COMP_WORDS[*]} ) )
@@ -66,5 +66,5 @@ else
     pythons=python
 fi
 
-complete -F _python_django_completion -o default $pythons
+complete -F _python_thibaud_completion -o default $pythons
 unset pythons

@@ -1,7 +1,7 @@
-from django.template.defaultfilters import unordered_list
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy
+from thibaud.template.defaultfilters import unordered_list
+from thibaud.test import SimpleTestCase
+from thibaud.utils.safestring import mark_safe
+from thibaud.utils.translation import gettext_lazy
 
 from ..utils import setup
 

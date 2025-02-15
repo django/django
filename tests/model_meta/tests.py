@@ -1,9 +1,9 @@
-from django.apps import apps
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models import CharField, Field, ForeignObjectRel, ManyToManyField
-from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
-from django.test import SimpleTestCase, override_settings
+from thibaud.apps import apps
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.db.models import CharField, Field, ForeignObjectRel, ManyToManyField
+from thibaud.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
+from thibaud.test import SimpleTestCase, override_settings
 
 from .models import (
     AbstractPerson,

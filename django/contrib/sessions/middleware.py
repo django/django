@@ -1,12 +1,12 @@
 import time
 from importlib import import_module
 
-from django.conf import settings
-from django.contrib.sessions.backends.base import UpdateError
-from django.contrib.sessions.exceptions import SessionInterrupted
-from django.utils.cache import patch_vary_headers
-from django.utils.deprecation import MiddlewareMixin
-from django.utils.http import http_date
+from thibaud.conf import settings
+from thibaud.contrib.sessions.backends.base import UpdateError
+from thibaud.contrib.sessions.exceptions import SessionInterrupted
+from thibaud.utils.cache import patch_vary_headers
+from thibaud.utils.deprecation import MiddlewareMixin
+from thibaud.utils.http import http_date
 
 
 class SessionMiddleware(MiddlewareMixin):

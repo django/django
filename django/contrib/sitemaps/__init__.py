@@ -1,8 +1,8 @@
-from django.apps import apps as django_apps
-from django.conf import settings
-from django.core import paginator
-from django.core.exceptions import ImproperlyConfigured
-from django.utils import translation
+from thibaud.apps import apps as thibaud_apps
+from thibaud.conf import settings
+from thibaud.core import paginator
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.utils import translation
 
 
 class Sitemap:
@@ -85,8 +85,8 @@ class Sitemap:
     def get_domain(self, site=None):
         # Determine domain
         if site is None:
-            if django_apps.is_installed("django.contrib.sites"):
-                Site = django_apps.get_model("sites.Site")
+            if thibaud_apps.is_installed("thibaud.contrib.sites"):
+                Site = thibaud_apps.get_model("sites.Site")
                 try:
                     site = Site.objects.get_current()
                 except Site.DoesNotExist:

@@ -1,16 +1,16 @@
 ==========================
-Django 1.2.4 release notes
+Thibaud 1.2.4 release notes
 ==========================
 
-Welcome to Django 1.2.4!
+Welcome to Thibaud 1.2.4!
 
-This is the fourth "bugfix" release in the Django 1.2 series,
-improving the stability and performance of the Django 1.2 codebase.
+This is the fourth "bugfix" release in the Thibaud 1.2 series,
+improving the stability and performance of the Thibaud 1.2 codebase.
 
-With one exception, Django 1.2.4 maintains backwards compatibility
-with Django 1.2.3. It also contains a number of fixes and other
-improvements. Django 1.2.4 is a recommended upgrade for any
-development or deployment currently using or targeting Django 1.2.
+With one exception, Thibaud 1.2.4 maintains backwards compatibility
+with Thibaud 1.2.3. It also contains a number of fixes and other
+improvements. Thibaud 1.2.4 is a recommended upgrade for any
+development or deployment currently using or targeting Thibaud 1.2.
 
 For full details on the new features, backwards incompatibilities, and
 deprecated features in the 1.2 branch, see the :doc:`/releases/1.2`.
@@ -21,7 +21,7 @@ Backwards incompatible changes
 Restricted filters in admin interface
 -------------------------------------
 
-The Django administrative interface, ``django.contrib.admin``, supports
+The Thibaud administrative interface, ``thibaud.contrib.admin``, supports
 filtering of displayed lists of objects by fields on the corresponding
 models, including across database-level relationships. This is
 implemented by passing lookup arguments in the querystring portion of
@@ -39,10 +39,10 @@ access to information outside of an admin user's permissions; for
 example, an attacker with access to the admin and sufficient knowledge
 of model structure and relations could construct query strings which --
 with repeated use of regular-expression lookups supported by the
-Django database API -- expose sensitive information such as users'
+Thibaud database API -- expose sensitive information such as users'
 password hashes.
 
-To remedy this, ``django.contrib.admin`` will now validate that
+To remedy this, ``thibaud.contrib.admin`` will now validate that
 querystring lookup arguments either specify only fields on the model
 being viewed, or cross relations which have been explicitly
 allowed by the application developer using the preexisting
@@ -53,9 +53,9 @@ One new feature
 ===============
 
 Ordinarily, a point release would not include new features, but in the
-case of Django 1.2.4, we have made an exception to this rule.
+case of Thibaud 1.2.4, we have made an exception to this rule.
 
-One of the bugs fixed in Django 1.2.4 involves a set of
+One of the bugs fixed in Thibaud 1.2.4 involves a set of
 circumstances whereby a running a test suite on a multiple database
 configuration could cause the original source database (i.e., the
 actual production database) to be dropped, causing catastrophic loss
@@ -70,15 +70,15 @@ not be concerned about the data loss bug, or the manual configuration of
 documentation on :ref:`controlling the creation order of test
 databases <topics-testing-creation-dependencies>` for details.
 
-GeoDjango
+GeoThibaud
 =========
 
 The function-based :setting:`TEST_RUNNER` previously used to execute
-the GeoDjango test suite, ``django.contrib.gis.tests.run_gis_tests``,
+the GeoThibaud test suite, ``thibaud.contrib.gis.tests.run_gis_tests``,
 was finally deprecated in favor of a class-based test runner,
-``django.contrib.gis.tests.GeoDjangoTestSuiteRunner``, added in this
+``thibaud.contrib.gis.tests.GeoThibaudTestSuiteRunner``, added in this
 release.
 
-In addition, the GeoDjango test suite is now included when
-:ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
+In addition, the GeoThibaud test suite is now included when
+:ref:`running the Thibaud test suite <running-unit-tests>` with ``runtests.py``
 and using :ref:`spatial database backends <spatial-backends>`.

@@ -1,14 +1,14 @@
 import json
 
-from django.conf import settings
-from django.contrib.admin.utils import quote
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.urls import NoReverseMatch, reverse
-from django.utils import timezone
-from django.utils.text import get_text_list
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from thibaud.conf import settings
+from thibaud.contrib.admin.utils import quote
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
+from thibaud.urls import NoReverseMatch, reverse
+from thibaud.utils import timezone
+from thibaud.utils.text import get_text_list
+from thibaud.utils.translation import gettext
+from thibaud.utils.translation import gettext_lazy as _
 
 ADDITION = 1
 CHANGE = 2
@@ -85,7 +85,7 @@ class LogEntry(models.Model):
     class Meta:
         verbose_name = _("log entry")
         verbose_name_plural = _("log entries")
-        db_table = "django_admin_log"
+        db_table = "thibaud_admin_log"
         ordering = ["-action_time"]
 
     def __repr__(self):

@@ -1,14 +1,14 @@
 =========================
-Django shortcut functions
+Thibaud shortcut functions
 =========================
 
-.. module:: django.shortcuts
+.. module:: thibaud.shortcuts
    :synopsis:
-       Convenience shortcuts that span multiple levels of Django's MVC stack.
+       Convenience shortcuts that span multiple levels of Thibaud's MVC stack.
 
 .. index:: shortcuts
 
-The package ``django.shortcuts`` collects helper functions and classes that
+The package ``thibaud.shortcuts`` collects helper functions and classes that
 "span" multiple levels of MVC. In other words, these functions/classes
 introduce controlled coupling for convenience's sake.
 
@@ -18,11 +18,11 @@ introduce controlled coupling for convenience's sake.
 .. function:: render(request, template_name, context=None, content_type=None, status=None, using=None)
 
    Combines a given template with a given context dictionary and returns an
-   :class:`~django.http.HttpResponse` object with that rendered text.
+   :class:`~thibaud.http.HttpResponse` object with that rendered text.
 
-   Django does not provide a shortcut function which returns a
-   :class:`~django.template.response.TemplateResponse` because the constructor
-   of :class:`~django.template.response.TemplateResponse` offers the same level
+   Thibaud does not provide a shortcut function which returns a
+   :class:`~thibaud.template.response.TemplateResponse` because the constructor
+   of :class:`~thibaud.template.response.TemplateResponse` offers the same level
    of convenience as :func:`render()`.
 
 Required arguments
@@ -62,7 +62,7 @@ Example
 The following example renders the template ``myapp/index.html`` with the
 MIME type :mimetype:`application/xhtml+xml`::
 
-    from django.shortcuts import render
+    from thibaud.shortcuts import render
 
 
     def my_view(request):
@@ -78,8 +78,8 @@ MIME type :mimetype:`application/xhtml+xml`::
 
 This example is equivalent to::
 
-    from django.http import HttpResponse
-    from django.template import loader
+    from thibaud.http import HttpResponse
+    from thibaud.template import loader
 
 
     def my_view(request):
@@ -93,15 +93,15 @@ This example is equivalent to::
 
 .. function:: redirect(to, *args, permanent=False, preserve_request=False, **kwargs)
 
-   Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
+   Returns an :class:`~thibaud.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
 
    The arguments could be:
 
-   * A model: the model's :meth:`~django.db.models.Model.get_absolute_url()`
+   * A model: the model's :meth:`~thibaud.db.models.Model.get_absolute_url()`
      function will be called.
 
-   * A view name, possibly with arguments: :func:`~django.urls.reverse` will be
+   * A view name, possibly with arguments: :func:`~thibaud.urls.reverse` will be
      used to reverse-resolve the name.
 
    * An absolute or relative URL, which will be used as-is for the redirect
@@ -135,10 +135,10 @@ Examples
 You can use the :func:`redirect` function in a number of ways.
 
 #. By passing some object; that object's
-   :meth:`~django.db.models.Model.get_absolute_url` method will be called
+   :meth:`~thibaud.db.models.Model.get_absolute_url` method will be called
    to figure out the redirect URL::
 
-        from django.shortcuts import redirect
+        from thibaud.shortcuts import redirect
 
 
         def my_view(request):
@@ -148,7 +148,7 @@ You can use the :func:`redirect` function in a number of ways.
 
 #. By passing the name of a view and optionally some positional or
    keyword arguments; the URL will be reverse resolved using the
-   :func:`~django.urls.reverse` method::
+   :func:`~thibaud.urls.reverse` method::
 
         def my_view(request):
             ...
@@ -196,21 +196,21 @@ original HTTP method::
 
     *Asynchronous version*: ``aget_object_or_404()``
 
-    Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model
-    manager, but it raises :class:`~django.http.Http404` instead of the model's
-    :class:`~django.db.models.Model.DoesNotExist` exception.
+    Calls :meth:`~thibaud.db.models.query.QuerySet.get()` on a given model
+    manager, but it raises :class:`~thibaud.http.Http404` instead of the model's
+    :class:`~thibaud.db.models.Model.DoesNotExist` exception.
 
 Arguments
 ---------
 
 ``klass``
-    A :class:`~django.db.models.Model` class,
-    a :class:`~django.db.models.Manager`,
-    or a :class:`~django.db.models.query.QuerySet` instance from which to get
+    A :class:`~thibaud.db.models.Model` class,
+    a :class:`~thibaud.db.models.Manager`,
+    or a :class:`~thibaud.db.models.query.QuerySet` instance from which to get
     the object.
 
 ``*args``
-    :class:`Q objects <django.db.models.Q>`.
+    :class:`Q objects <thibaud.db.models.Q>`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -222,7 +222,7 @@ Example
 The following example gets the object with the primary key of 1 from
 ``MyModel``::
 
-    from django.shortcuts import get_object_or_404
+    from thibaud.shortcuts import get_object_or_404
 
 
     def my_view(request):
@@ -230,7 +230,7 @@ The following example gets the object with the primary key of 1 from
 
 This example is equivalent to::
 
-    from django.http import Http404
+    from thibaud.http import Http404
 
 
     def my_view(request):
@@ -239,9 +239,9 @@ This example is equivalent to::
         except MyModel.DoesNotExist:
             raise Http404("No MyModel matches the given query.")
 
-The most common use case is to pass a :class:`~django.db.models.Model`, as
+The most common use case is to pass a :class:`~thibaud.db.models.Model`, as
 shown above. However, you can also pass a
-:class:`~django.db.models.query.QuerySet` instance::
+:class:`~thibaud.db.models.query.QuerySet` instance::
 
     queryset = Book.objects.filter(title__startswith="M")
     get_object_or_404(queryset, pk=1)
@@ -253,20 +253,20 @@ The above example is a bit contrived since it's equivalent to doing::
 but it can be useful if you are passed the ``queryset`` variable from somewhere
 else.
 
-Finally, you can also use a :class:`~django.db.models.Manager`. This is useful
+Finally, you can also use a :class:`~thibaud.db.models.Manager`. This is useful
 for example if you have a
 :ref:`custom manager<custom-managers>`::
 
     get_object_or_404(Book.dahl_objects, title="Matilda")
 
 You can also use
-:class:`related managers<django.db.models.fields.related.RelatedManager>`::
+:class:`related managers<thibaud.db.models.fields.related.RelatedManager>`::
 
     author = Author.objects.get(name="Roald Dahl")
     get_object_or_404(author.book_set, title="Matilda")
 
 Note: As with ``get()``, a
-:class:`~django.core.exceptions.MultipleObjectsReturned` exception
+:class:`~thibaud.core.exceptions.MultipleObjectsReturned` exception
 will be raised if more than one object is found.
 
 ``get_list_or_404()``
@@ -277,20 +277,20 @@ will be raised if more than one object is found.
 
     *Asynchronous version*: ``aget_list_or_404()``
 
-    Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on
-    a given model manager cast to a list, raising :class:`~django.http.Http404`
+    Returns the result of :meth:`~thibaud.db.models.query.QuerySet.filter()` on
+    a given model manager cast to a list, raising :class:`~thibaud.http.Http404`
     if the resulting list is empty.
 
 Arguments
 ---------
 
 ``klass``
-    A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
-    :class:`~django.db.models.query.QuerySet` instance from which to get the
+    A :class:`~thibaud.db.models.Model`, :class:`~thibaud.db.models.Manager` or
+    :class:`~thibaud.db.models.query.QuerySet` instance from which to get the
     list.
 
 ``*args``
-    :class:`Q objects <django.db.models.Q>`.
+    :class:`Q objects <thibaud.db.models.Q>`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -301,7 +301,7 @@ Example
 
 The following example gets all published objects from ``MyModel``::
 
-    from django.shortcuts import get_list_or_404
+    from thibaud.shortcuts import get_list_or_404
 
 
     def my_view(request):
@@ -309,7 +309,7 @@ The following example gets all published objects from ``MyModel``::
 
 This example is equivalent to::
 
-    from django.http import Http404
+    from thibaud.http import Http404
 
 
     def my_view(request):

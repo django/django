@@ -1,9 +1,9 @@
-from django import forms
-from django.contrib.contenttypes.forms import generic_inlineformset_factory
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.test import TestCase
-from django.test.utils import isolate_apps
+from thibaud import forms
+from thibaud.contrib.contenttypes.forms import generic_inlineformset_factory
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
+from thibaud.test import TestCase
+from thibaud.test.utils import isolate_apps
 
 from .models import (
     Animal,

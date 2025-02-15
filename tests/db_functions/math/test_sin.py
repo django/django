@@ -1,10 +1,10 @@
 import math
 from decimal import Decimal
 
-from django.db.models import DecimalField
-from django.db.models.functions import Sin
-from django.test import TestCase
-from django.test.utils import register_lookup
+from thibaud.db.models import DecimalField
+from thibaud.db.models.functions import Sin
+from thibaud.test import TestCase
+from thibaud.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 

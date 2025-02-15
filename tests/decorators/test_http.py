@@ -2,9 +2,9 @@ import datetime
 
 from asgiref.sync import iscoroutinefunction
 
-from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.test import SimpleTestCase
-from django.views.decorators.http import (
+from thibaud.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
+from thibaud.test import SimpleTestCase
+from thibaud.views.decorators.http import (
     condition,
     conditional_page,
     require_http_methods,

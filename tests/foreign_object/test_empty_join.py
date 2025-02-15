@@ -1,4 +1,4 @@
-from django.test import TestCase
+from thibaud.test import TestCase
 
 from .models import SlugPage
 

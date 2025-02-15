@@ -2,12 +2,12 @@ from collections import namedtuple
 
 import sqlparse
 
-from django.db import DatabaseError
-from django.db.backends.base.introspection import BaseDatabaseIntrospection
-from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
-from django.db.backends.base.introspection import TableInfo
-from django.db.models import Index
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.db import DatabaseError
+from thibaud.db.backends.base.introspection import BaseDatabaseIntrospection
+from thibaud.db.backends.base.introspection import FieldInfo as BaseFieldInfo
+from thibaud.db.backends.base.introspection import TableInfo
+from thibaud.db.models import Index
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 FieldInfo = namedtuple(
     "FieldInfo", BaseFieldInfo._fields + ("pk", "has_json_constraint")
@@ -26,7 +26,7 @@ def get_field_size(name):
 # types include variables in them -- e.g. "varchar(30)" -- and can't be matched
 # as a simple dictionary lookup.
 class FlexibleFieldLookupDict:
-    # Maps SQL types to Django Field types. Some of the SQL types have multiple
+    # Maps SQL types to Thibaud Field types. Some of the SQL types have multiple
     # entries here because SQLite allows for anything and doesn't normalize the
     # field type; it uses whatever was given.
     base_data_types_reverse = {

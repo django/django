@@ -1,10 +1,10 @@
 ==========================
-Django 3.0.8 release notes
+Thibaud 3.0.8 release notes
 ==========================
 
 *July 1, 2020*
 
-Django 3.0.8 fixes several bugs in 3.0.7.
+Thibaud 3.0.8 fixes several bugs in 3.0.7.
 
 Bugfixes
 ========
@@ -12,14 +12,14 @@ Bugfixes
 * Fixed messages of ``InvalidCacheKey`` exceptions and ``CacheKeyWarning``
   warnings raised by cache key validation (:ticket:`31654`).
 
-* Fixed a regression in Django 3.0.7 that caused a queryset crash when grouping
+* Fixed a regression in Thibaud 3.0.7 that caused a queryset crash when grouping
   by a many-to-one relationship (:ticket:`31660`).
 
-* Reallowed, following a regression in Django 3.0, non-expressions having a
+* Reallowed, following a regression in Thibaud 3.0, non-expressions having a
   ``filterable`` attribute to be used as the right-hand side in queryset
   filters (:ticket:`31664`).
 
-* Fixed a regression in Django 3.0.2 that caused a migration crash on
+* Fixed a regression in Thibaud 3.0.2 that caused a migration crash on
   PostgreSQL when adding a foreign key to a model with a namespaced
   ``db_table`` (:ticket:`31735`).
 

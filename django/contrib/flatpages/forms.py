@@ -1,9 +1,9 @@
-from django import forms
-from django.conf import settings
-from django.contrib.flatpages.models import FlatPage
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from thibaud import forms
+from thibaud.conf import settings
+from thibaud.contrib.flatpages.models import FlatPage
+from thibaud.core.exceptions import ValidationError
+from thibaud.utils.translation import gettext
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class FlatpageForm(forms.ModelForm):
@@ -37,7 +37,7 @@ class FlatpageForm(forms.ModelForm):
     def _trailing_slash_required(self):
         return (
             settings.APPEND_SLASH
-            and "django.middleware.common.CommonMiddleware" in settings.MIDDLEWARE
+            and "thibaud.middleware.common.CommonMiddleware" in settings.MIDDLEWARE
         )
 
     def clean_url(self):

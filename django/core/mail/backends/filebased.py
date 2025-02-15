@@ -3,9 +3,9 @@
 import datetime
 import os
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
 
 
 class EmailBackend(ConsoleEmailBackend):

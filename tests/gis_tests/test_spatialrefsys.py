@@ -1,9 +1,9 @@
 import re
 
-from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
-from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
-from django.utils.functional import cached_property
+from thibaud.contrib.gis.db.backends.base.models import SpatialRefSysMixin
+from thibaud.db import connection
+from thibaud.test import TestCase, skipUnlessDBFeature
+from thibaud.utils.functional import cached_property
 
 test_srs = (
     {
@@ -140,7 +140,7 @@ class SpatialRefSysTest(TestCase):
         Test adding a new entry in the SpatialRefSys model using the
         add_srs_entry utility.
         """
-        from django.contrib.gis.utils import add_srs_entry
+        from thibaud.contrib.gis.utils import add_srs_entry
 
         add_srs_entry(3857)
         self.assertTrue(self.SpatialRefSys.objects.filter(srid=3857).exists())

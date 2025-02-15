@@ -1,5 +1,5 @@
-from django.db import models
-from django.urls import reverse
+from thibaud.db import models
+from thibaud.urls import reverse
 
 
 class TestModel(models.Model):

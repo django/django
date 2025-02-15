@@ -1,9 +1,9 @@
-from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404, HttpResponseRedirect
-from django.utils.translation import gettext as _
+from thibaud.apps import apps
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.contrib.sites.shortcuts import get_current_site
+from thibaud.core.exceptions import ObjectDoesNotExist
+from thibaud.http import Http404, HttpResponseRedirect
+from thibaud.utils.translation import gettext as _
 
 
 def shortcut(request, content_type_id, object_id):
@@ -48,7 +48,7 @@ def shortcut(request, content_type_id, object_id):
     except ObjectDoesNotExist:
         object_domain = None
 
-    if apps.is_installed("django.contrib.sites"):
+    if apps.is_installed("thibaud.contrib.sites"):
         Site = apps.get_model("sites.Site")
         opts = obj._meta
 

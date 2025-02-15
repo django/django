@@ -1,6 +1,6 @@
-from django.conf import STATICFILES_STORAGE_ALIAS, settings
-from django.contrib.staticfiles.finders import get_finders
-from django.core.checks import Error
+from thibaud.conf import STATICFILES_STORAGE_ALIAS, settings
+from thibaud.contrib.staticfiles.finders import get_finders
+from thibaud.core.checks import Error
 
 E005 = Error(
     f"The STORAGES setting must define a '{STATICFILES_STORAGE_ALIAS}' storage.",

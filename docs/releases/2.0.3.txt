@@ -1,16 +1,16 @@
 ==========================
-Django 2.0.3 release notes
+Thibaud 2.0.3 release notes
 ==========================
 
 *March 6, 2018*
 
-Django 2.0.3 fixes two security issues and several bugs in 2.0.2. Also, the
+Thibaud 2.0.3 fixes two security issues and several bugs in 2.0.2. Also, the
 latest string translations from Transifex are incorporated.
 
 CVE-2018-7536: Denial-of-service possibility in ``urlize`` and ``urlizetrunc`` template filters
 ===============================================================================================
 
-The ``django.utils.html.urlize()`` function was extremely slow to evaluate
+The ``thibaud.utils.html.urlize()`` function was extremely slow to evaluate
 certain inputs due to catastrophic backtracking vulnerabilities in two regular
 expressions. The ``urlize()`` function is used to implement the ``urlize`` and
 ``urlizetrunc`` template filters, which were thus vulnerable.
@@ -21,7 +21,7 @@ behaves similarly.
 CVE-2018-7537: Denial-of-service possibility in ``truncatechars_html`` and ``truncatewords_html`` template filters
 ==================================================================================================================
 
-If ``django.utils.text.Truncator``'s ``chars()`` and ``words()`` methods were
+If ``thibaud.utils.text.Truncator``'s ``chars()`` and ``words()`` methods were
 passed the ``html=True`` argument, they were extremely slow to evaluate certain
 inputs due to a catastrophic backtracking vulnerability in a regular
 expression. The ``chars()`` and ``words()`` methods are used to implement the

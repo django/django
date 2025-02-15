@@ -1,6 +1,6 @@
-from django.core.exceptions import FieldError
-from django.db import connection
-from django.db.models import (
+from thibaud.core.exceptions import FieldError
+from thibaud.db import connection
+from thibaud.db.models import (
     BooleanField,
     Exists,
     ExpressionWrapper,
@@ -9,11 +9,11 @@ from django.db.models import (
     Q,
     Value,
 )
-from django.db.models.expressions import NegatedExpression, RawSQL
-from django.db.models.functions import Lower
-from django.db.models.lookups import Exact, IsNull
-from django.db.models.sql.where import NothingNode
-from django.test import SimpleTestCase, TestCase
+from thibaud.db.models.expressions import NegatedExpression, RawSQL
+from thibaud.db.models.functions import Lower
+from thibaud.db.models.lookups import Exact, IsNull
+from thibaud.db.models.sql.where import NothingNode
+from thibaud.test import SimpleTestCase, TestCase
 
 from .models import Tag
 
@@ -94,7 +94,7 @@ class QTests(SimpleTestCase):
     def test_deconstruct(self):
         q = Q(price__gt=F("discounted_price"))
         path, args, kwargs = q.deconstruct()
-        self.assertEqual(path, "django.db.models.Q")
+        self.assertEqual(path, "thibaud.db.models.Q")
         self.assertEqual(args, (("price__gt", F("discounted_price")),))
         self.assertEqual(kwargs, {})
 
@@ -322,7 +322,7 @@ class QCheckTests(TestCase):
         return True.
         """
         q = Q(RawSQL("price > %s", params=(20,), output_field=BooleanField()))
-        with self.assertLogs("django.db.models", "WARNING") as cm:
+        with self.assertLogs("thibaud.db.models", "WARNING") as cm:
             self.assertIs(q.check({"price": 10}), True)
         self.assertIn(
             f"Got a database error calling check() on {q!r}: ",

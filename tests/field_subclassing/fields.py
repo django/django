@@ -1,5 +1,5 @@
-from django.db import models
-from django.db.models.query_utils import DeferredAttribute
+from thibaud.db import models
+from thibaud.db.models.query_utils import DeferredAttribute
 
 
 class CustomTypedField(models.TextField):

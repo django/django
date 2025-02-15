@@ -1,5 +1,5 @@
-from django.conf import DEFAULT_STORAGE_ALIAS
-from django.utils.functional import LazyObject
+from thibaud.conf import DEFAULT_STORAGE_ALIAS
+from thibaud.utils.functional import LazyObject
 
 from .base import Storage
 from .filesystem import FileSystemStorage

@@ -4,10 +4,10 @@ Serialize data to/from JSON Lines
 
 import json
 
-from django.core.serializers.base import DeserializationError
-from django.core.serializers.json import DjangoJSONEncoder
-from django.core.serializers.python import Deserializer as PythonDeserializer
-from django.core.serializers.python import Serializer as PythonSerializer
+from thibaud.core.serializers.base import DeserializationError
+from thibaud.core.serializers.json import ThibaudJSONEncoder
+from thibaud.core.serializers.python import Deserializer as PythonDeserializer
+from thibaud.core.serializers.python import Serializer as PythonSerializer
 
 
 class Serializer(PythonSerializer):
@@ -22,7 +22,7 @@ class Serializer(PythonSerializer):
         self.json_kwargs.pop("fields", None)
         self.json_kwargs.pop("indent", None)
         self.json_kwargs["separators"] = (",", ": ")
-        self.json_kwargs.setdefault("cls", DjangoJSONEncoder)
+        self.json_kwargs.setdefault("cls", ThibaudJSONEncoder)
         self.json_kwargs.setdefault("ensure_ascii", False)
 
     def start_serialization(self):

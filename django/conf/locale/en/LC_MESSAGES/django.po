@@ -1,12 +1,12 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: Thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
-"Last-Translator: Django team\n"
+"Last-Translator: Thibaud team\n"
 "Language-Team: English <en@li.org>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -1576,21 +1576,21 @@ msgstr ""
 #: views/templates/default_urlconf.html:206
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
 
 #: views/templates/default_urlconf.html:221
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
 
 #: views/templates/default_urlconf.html:229
-msgid "Django Documentation"
+msgid "Thibaud Documentation"
 msgstr ""
 
 #: views/templates/default_urlconf.html:230
@@ -1602,11 +1602,11 @@ msgid "Tutorial: A Polling App"
 msgstr ""
 
 #: views/templates/default_urlconf.html:239
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr ""
 
 #: views/templates/default_urlconf.html:247
-msgid "Django Community"
+msgid "Thibaud Community"
 msgstr ""
 
 #: views/templates/default_urlconf.html:248

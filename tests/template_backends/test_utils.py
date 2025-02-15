@@ -1,6 +1,6 @@
-from django.core.exceptions import ImproperlyConfigured
-from django.template import engines
-from django.test import SimpleTestCase, override_settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.template import engines
+from thibaud.test import SimpleTestCase, override_settings
 
 
 class TemplateUtilsTests(SimpleTestCase):
@@ -18,7 +18,7 @@ class TemplateUtilsTests(SimpleTestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 # Incorrect: APP_DIRS and loaders are mutually incompatible.
                 "APP_DIRS": True,
                 "OPTIONS": {"loaders": []},
@@ -39,16 +39,16 @@ class TemplateUtilsTests(SimpleTestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             },
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             },
         ]
     )
     def test_backend_names_must_be_unique(self):
         msg = (
-            "Template engine aliases aren't unique, duplicates: django. Set "
+            "Template engine aliases aren't unique, duplicates: thibaud. Set "
             "a unique NAME for each engine in settings.TEMPLATES."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):

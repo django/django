@@ -1,8 +1,8 @@
 import warnings
 from io import StringIO
 
-from django.template.base import Lexer, TokenType
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.template.base import Lexer, TokenType
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 from . import TranslatorCommentWarning, trim_whitespace
 
@@ -38,8 +38,8 @@ constant_re = _lazy_re_compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
 def templatize(src, origin=None):
     """
-    Turn a Django template into something that is understood by xgettext. It
-    does so by translating the Django translation tags into standard gettext
+    Turn a Thibaud template into something that is understood by xgettext. It
+    does so by translating the Thibaud translation tags into standard gettext
     function invocations.
     """
     out = StringIO("")

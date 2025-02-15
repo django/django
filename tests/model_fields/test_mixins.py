@@ -1,6 +1,6 @@
-from django.db.models.fields.mixins import FieldCacheMixin
-from django.test import SimpleTestCase
-from django.utils.functional import cached_property
+from thibaud.db.models.fields.mixins import FieldCacheMixin
+from thibaud.test import SimpleTestCase
+from thibaud.utils.functional import cached_property
 
 from .models import Foo
 

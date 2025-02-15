@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from django.conf import settings
-from django.db.models.expressions import Func
-from django.db.models.fields import (
+from thibaud.conf import settings
+from thibaud.db.models.expressions import Func
+from thibaud.db.models.fields import (
     DateField,
     DateTimeField,
     DurationField,
@@ -10,7 +10,7 @@ from django.db.models.fields import (
     IntegerField,
     TimeField,
 )
-from django.db.models.lookups import (
+from thibaud.db.models.lookups import (
     Transform,
     YearExact,
     YearGt,
@@ -18,7 +18,7 @@ from django.db.models.lookups import (
     YearLt,
     YearLte,
 )
-from django.utils import timezone
+from thibaud.utils import timezone
 
 
 class TimezoneMixin:

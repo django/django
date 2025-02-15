@@ -1,7 +1,7 @@
-from django.db import models
-from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import isolate_apps
+from thibaud.db import models
+from thibaud.template import Context, Template
+from thibaud.test import SimpleTestCase, TestCase, override_settings
+from thibaud.test.utils import isolate_apps
 
 from .models import (
     AbstractBase1,

@@ -1,12 +1,12 @@
 ==========================
-Django 1.8.7 release notes
+Thibaud 1.8.7 release notes
 ==========================
 
 *November 24, 2015*
 
-Django 1.8.7 fixes a security issue and several bugs in 1.8.6.
+Thibaud 1.8.7 fixes a security issue and several bugs in 1.8.6.
 
-Additionally, Django's vendored version of six, ``django.utils.six``, has
+Additionally, Thibaud's vendored version of six, ``thibaud.utils.six``, has
 been upgraded to the latest release (1.10.0).
 
 Fixed settings leak possibility in ``date`` template filter
@@ -19,7 +19,7 @@ obtain any secret in the application's settings by specifying a settings key
 instead of a date format. e.g. ``"SECRET_KEY"`` instead of ``"j/m/Y"``.
 
 To remedy this, the underlying function used by the ``date`` template filter,
-``django.utils.formats.get_format()``, now only allows accessing the date/time
+``thibaud.utils.formats.get_format()``, now only allows accessing the date/time
 formatting settings.
 
 Bugfixes
@@ -38,15 +38,15 @@ Bugfixes
 * Fixed a regression in 1.8.6 that caused an application with South migrations
   in the ``migrations`` directory to fail (:ticket:`25618`).
 
-* Fixed a data loss possibility with :class:`~django.db.models.Prefetch` if
+* Fixed a data loss possibility with :class:`~thibaud.db.models.Prefetch` if
   ``to_attr`` is set to a ``ManyToManyField`` (:ticket:`25693`).
 
 * Fixed a regression in 1.8 by making ``gettext()`` once again return UTF-8
   bytestrings on Python 2 if the input is a bytestring (:ticket:`25720`).
 
 * Fixed serialization of
-  :class:`~django.contrib.postgres.fields.DateRangeField` and
-  :class:`~django.contrib.postgres.fields.DateTimeRangeField` (:ticket:`24937`).
+  :class:`~thibaud.contrib.postgres.fields.DateRangeField` and
+  :class:`~thibaud.contrib.postgres.fields.DateTimeRangeField` (:ticket:`24937`).
 
 * Fixed the exact lookup of ``ArrayField`` (:ticket:`25666`).
 

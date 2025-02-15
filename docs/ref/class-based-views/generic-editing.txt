@@ -5,15 +5,15 @@ Generic editing views
 The following views are described on this page and provide a foundation for
 editing content:
 
-* :class:`django.views.generic.edit.FormView`
-* :class:`django.views.generic.edit.CreateView`
-* :class:`django.views.generic.edit.UpdateView`
-* :class:`django.views.generic.edit.DeleteView`
+* :class:`thibaud.views.generic.edit.FormView`
+* :class:`thibaud.views.generic.edit.CreateView`
+* :class:`thibaud.views.generic.edit.UpdateView`
+* :class:`thibaud.views.generic.edit.DeleteView`
 
 .. seealso::
 
     The :doc:`messages framework </ref/contrib/messages>` contains
-    :class:`~django.contrib.messages.views.SuccessMessageMixin`, which
+    :class:`~thibaud.contrib.messages.views.SuccessMessageMixin`, which
     facilitates presenting messages about successful form submissions.
 
 .. note::
@@ -21,8 +21,8 @@ editing content:
     Some of the examples on this page assume that an ``Author`` model has been
     defined as follows in ``myapp/models.py``::
 
-        from django.db import models
-        from django.urls import reverse
+        from thibaud.db import models
+        from thibaud.urls import reverse
 
 
         class Author(models.Model):
@@ -34,7 +34,7 @@ editing content:
 ``FormView``
 ============
 
-.. class:: django.views.generic.edit.FormView
+.. class:: thibaud.views.generic.edit.FormView
 
     A view that displays a form. On error, redisplays the form with validation
     errors; on success, redirects to a new URL.
@@ -43,15 +43,15 @@ editing content:
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseFormView`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.edit.BaseFormView`
+    * :class:`thibaud.views.generic.edit.FormMixin`
+    * :class:`thibaud.views.generic.edit.ProcessFormView`
+    * :class:`thibaud.views.generic.base.View`
 
     **Example myapp/forms.py**::
 
-        from django import forms
+        from thibaud import forms
 
 
         class ContactForm(forms.Form):
@@ -65,7 +65,7 @@ editing content:
     **Example myapp/views.py**::
 
         from myapp.forms import ContactForm
-        from django.views.generic.edit import FormView
+        from thibaud.views.generic.edit import FormView
 
 
         class ContactFormView(FormView):
@@ -81,31 +81,31 @@ editing content:
 
     **Example myapp/contact.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Send message">
         </form>
 
-.. class:: django.views.generic.edit.BaseFormView
+.. class:: thibaud.views.generic.edit.BaseFormView
 
     A base view for displaying a form. It is not intended to be used directly,
     but rather as a parent class of the
-    :class:`django.views.generic.edit.FormView` or other views displaying a
+    :class:`thibaud.views.generic.edit.FormView` or other views displaying a
     form.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`thibaud.views.generic.edit.FormMixin`
+    * :class:`thibaud.views.generic.edit.ProcessFormView`
 
 ``CreateView``
 ==============
 
-.. class:: django.views.generic.edit.CreateView
+.. class:: thibaud.views.generic.edit.CreateView
 
     A view that displays a form for creating an object, redisplaying the form
     with validation errors (if there are any) and saving the object.
@@ -114,14 +114,14 @@ editing content:
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseCreateView`
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.edit.BaseCreateView`
+    * :class:`thibaud.views.generic.edit.ModelFormMixin`
+    * :class:`thibaud.views.generic.edit.FormMixin`
+    * :class:`thibaud.views.generic.detail.SingleObjectMixin`
+    * :class:`thibaud.views.generic.edit.ProcessFormView`
+    * :class:`thibaud.views.generic.base.View`
 
     **Attributes**
 
@@ -141,7 +141,7 @@ editing content:
 
     **Example myapp/views.py**::
 
-        from django.views.generic.edit import CreateView
+        from thibaud.views.generic.edit import CreateView
         from myapp.models import Author
 
 
@@ -151,25 +151,25 @@ editing content:
 
     **Example myapp/author_form.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Save">
         </form>
 
-.. class:: django.views.generic.edit.BaseCreateView
+.. class:: thibaud.views.generic.edit.BaseCreateView
 
     A base view for creating a new object instance. It is not intended to be
     used directly, but rather as a parent class of the
-    :class:`django.views.generic.edit.CreateView`.
+    :class:`thibaud.views.generic.edit.CreateView`.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`thibaud.views.generic.edit.ModelFormMixin`
+    * :class:`thibaud.views.generic.edit.ProcessFormView`
 
     **Methods**
 
@@ -184,7 +184,7 @@ editing content:
 ``UpdateView``
 ==============
 
-.. class:: django.views.generic.edit.UpdateView
+.. class:: thibaud.views.generic.edit.UpdateView
 
     A view that displays a form for editing an existing object, redisplaying
     the form with validation errors (if there are any) and saving changes to
@@ -195,14 +195,14 @@ editing content:
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseUpdateView`
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.edit.BaseUpdateView`
+    * :class:`thibaud.views.generic.edit.ModelFormMixin`
+    * :class:`thibaud.views.generic.edit.FormMixin`
+    * :class:`thibaud.views.generic.detail.SingleObjectMixin`
+    * :class:`thibaud.views.generic.edit.ProcessFormView`
+    * :class:`thibaud.views.generic.base.View`
 
     **Attributes**
 
@@ -221,7 +221,7 @@ editing content:
 
     **Example myapp/views.py**::
 
-        from django.views.generic.edit import UpdateView
+        from thibaud.views.generic.edit import UpdateView
         from myapp.models import Author
 
 
@@ -232,25 +232,25 @@ editing content:
 
     **Example myapp/author_update_form.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Update">
         </form>
 
-.. class:: django.views.generic.edit.BaseUpdateView
+.. class:: thibaud.views.generic.edit.BaseUpdateView
 
     A base view for updating an existing object instance. It is not intended to
     be used directly, but rather as a parent class of the
-    :class:`django.views.generic.edit.UpdateView`.
+    :class:`thibaud.views.generic.edit.UpdateView`.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`thibaud.views.generic.edit.ModelFormMixin`
+    * :class:`thibaud.views.generic.edit.ProcessFormView`
 
     **Methods**
 
@@ -265,7 +265,7 @@ editing content:
 ``DeleteView``
 ==============
 
-.. class:: django.views.generic.edit.DeleteView
+.. class:: thibaud.views.generic.edit.DeleteView
 
     A view that displays a confirmation page and deletes an existing object.
     The given object will only be deleted if the request method is ``POST``. If
@@ -276,23 +276,23 @@ editing content:
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseDeleteView`
-    * :class:`django.views.generic.edit.DeletionMixin`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.base.ContextMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`thibaud.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`thibaud.views.generic.base.TemplateResponseMixin`
+    * :class:`thibaud.views.generic.edit.BaseDeleteView`
+    * :class:`thibaud.views.generic.edit.DeletionMixin`
+    * :class:`thibaud.views.generic.edit.FormMixin`
+    * :class:`thibaud.views.generic.base.ContextMixin`
+    * :class:`thibaud.views.generic.detail.BaseDetailView`
+    * :class:`thibaud.views.generic.detail.SingleObjectMixin`
+    * :class:`thibaud.views.generic.base.View`
 
     **Attributes**
 
     .. attribute:: form_class
 
-        Inherited from :class:`~django.views.generic.edit.BaseDeleteView`. The
+        Inherited from :class:`~thibaud.views.generic.edit.BaseDeleteView`. The
         form class that will be used to confirm the request. By default
-        :class:`django.forms.Form`, resulting in an empty form that is always
+        :class:`thibaud.forms.Form`, resulting in an empty form that is always
         valid.
 
         By providing your own ``Form`` subclass, you can add additional
@@ -308,8 +308,8 @@ editing content:
 
     **Example myapp/views.py**::
 
-        from django.urls import reverse_lazy
-        from django.views.generic.edit import DeleteView
+        from thibaud.urls import reverse_lazy
+        from thibaud.views.generic.edit import DeleteView
         from myapp.models import Author
 
 
@@ -319,7 +319,7 @@ editing content:
 
     **Example myapp/author_confirm_delete.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <form method="post">{% csrf_token %}
             <p>Are you sure you want to delete "{{ object }}"?</p>
@@ -327,16 +327,16 @@ editing content:
             <input type="submit" value="Confirm">
         </form>
 
-.. class:: django.views.generic.edit.BaseDeleteView
+.. class:: thibaud.views.generic.edit.BaseDeleteView
 
     A base view for deleting an object instance. It is not intended to be used
     directly, but rather as a parent class of the
-    :class:`django.views.generic.edit.DeleteView`.
+    :class:`thibaud.views.generic.edit.DeleteView`.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.DeletionMixin`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`thibaud.views.generic.edit.DeletionMixin`
+    * :class:`thibaud.views.generic.edit.FormMixin`
+    * :class:`thibaud.views.generic.detail.BaseDetailView`

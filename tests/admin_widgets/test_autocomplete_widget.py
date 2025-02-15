@@ -1,9 +1,9 @@
-from django import forms
-from django.contrib import admin
-from django.contrib.admin.widgets import AutocompleteSelect
-from django.forms import ModelChoiceField
-from django.test import TestCase, override_settings
-from django.utils import translation
+from thibaud import forms
+from thibaud.contrib import admin
+from thibaud.contrib.admin.widgets import AutocompleteSelect
+from thibaud.forms import ModelChoiceField
+from thibaud.test import TestCase, override_settings
+from thibaud.utils import translation
 
 from .models import Album, Band, ReleaseEvent, VideoStream
 

@@ -1,7 +1,7 @@
-from django.contrib.contenttypes.models import ContentType
-from django.db.models import ProtectedError, Q, Sum
-from django.forms.models import modelform_factory
-from django.test import TestCase, skipIfDBFeature
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db.models import ProtectedError, Q, Sum
+from thibaud.forms.models import modelform_factory
+from thibaud.test import TestCase, skipIfDBFeature
 
 from .models import (
     A,

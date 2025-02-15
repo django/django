@@ -1,8 +1,8 @@
-from django.forms import CharField, Form, Media, MultiWidget, TextInput
-from django.forms.widgets import MediaAsset, Script
-from django.template import Context, Template
-from django.test import SimpleTestCase, override_settings
-from django.utils.html import html_safe
+from thibaud.forms import CharField, Form, Media, MultiWidget, TextInput
+from thibaud.forms.widgets import MediaAsset, Script
+from thibaud.template import Context, Template
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils.html import html_safe
 
 
 class CSS(MediaAsset):

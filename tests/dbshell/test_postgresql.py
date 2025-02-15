@@ -5,9 +5,9 @@ import sys
 from pathlib import Path
 from unittest import mock, skipUnless
 
-from django.db import connection
-from django.db.backends.postgresql.client import DatabaseClient
-from django.test import SimpleTestCase
+from thibaud.db import connection
+from thibaud.db.backends.postgresql.client import DatabaseClient
+from thibaud.test import SimpleTestCase
 
 
 class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
@@ -79,8 +79,8 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
 
     def test_service(self):
         self.assertEqual(
-            self.settings_to_cmd_args_env({"OPTIONS": {"service": "django_test"}}),
-            (["psql"], {"PGSERVICE": "django_test"}),
+            self.settings_to_cmd_args_env({"OPTIONS": {"service": "thibaud_test"}}),
+            (["psql"], {"PGSERVICE": "thibaud_test"}),
         )
 
     def test_passfile(self):
@@ -105,14 +105,14 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             self.settings_to_cmd_args_env(
                 {
                     "OPTIONS": {
-                        "service": "django_test",
+                        "service": "thibaud_test",
                         "passfile": "~/.custompgpass",
                     },
                 }
             ),
             (
                 ["psql"],
-                {"PGSERVICE": "django_test", "PGPASSFILE": "~/.custompgpass"},
+                {"PGSERVICE": "thibaud_test", "PGPASSFILE": "~/.custompgpass"},
             ),
         )
 

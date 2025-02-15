@@ -1,8 +1,8 @@
 ===========================
-Django Deprecation Timeline
+Thibaud Deprecation Timeline
 ===========================
 
-This document outlines when various pieces of Django will be removed or altered
+This document outlines when various pieces of Thibaud will be removed or altered
 in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
@@ -12,7 +12,7 @@ about each item can often be found in the release notes of two versions prior.
 7.0
 ---
 
-See the :ref:`Django 6.0 release notes <deprecated-features-6.0>` for more
+See the :ref:`Thibaud 6.0 release notes <deprecated-features-6.0>` for more
 details on these changes.
 
 .. _deprecation-removed-in-6.1:
@@ -20,30 +20,30 @@ details on these changes.
 6.1
 ---
 
-See the :ref:`Django 5.2 release notes <deprecated-features-5.2>` for more
+See the :ref:`Thibaud 5.2 release notes <deprecated-features-5.2>` for more
 details on these changes.
 
-* The ``all`` keyword argument of ``django.contrib.staticfiles.finders.find()``
+* The ``all`` keyword argument of ``thibaud.contrib.staticfiles.finders.find()``
   will be removed.
 
 * The fallback to ``request.user`` when ``user`` is ``None`` in
-  ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
+  ``thibaud.contrib.auth.login()`` and ``thibaud.contrib.auth.alogin()`` will be
   removed.
 
 * The ``ordering`` keyword argument of the PostgreSQL specific aggregation
-  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
-  ``django.contrib.postgres.aggregates.JSONBAgg``, and
-  ``django.contrib.postgres.aggregates.StringAgg`` will be removed.
+  functions ``thibaud.contrib.postgres.aggregates.ArrayAgg``,
+  ``thibaud.contrib.postgres.aggregates.JSONBAgg``, and
+  ``thibaud.contrib.postgres.aggregates.StringAgg`` will be removed.
 
 .. _deprecation-removed-in-6.0:
 
 6.0
 ---
 
-See the :ref:`Django 5.0 release notes <deprecated-features-5.0>` for more
+See the :ref:`Thibaud 5.0 release notes <deprecated-features-5.0>` for more
 details on these changes.
 
-* The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
+* The ``ThibaudDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
   renderers will be removed.
 
 * Support for passing positional arguments to ``BaseConstraint`` will be
@@ -52,7 +52,7 @@ details on these changes.
 * ``request`` will be required in the signature of
   ``ModelAdmin.lookup_allowed()`` subclasses.
 
-* The ``django.db.models.sql.datastructures.Join`` will no longer fallback to
+* The ``thibaud.db.models.sql.datastructures.Join`` will no longer fallback to
   ``get_joining_columns()``.
 
 * The ``get_joining_columns()`` method of ``ForeignObject`` and
@@ -70,7 +70,7 @@ details on these changes.
 
 * ``BaseDatabaseOperations.field_cast_sql()`` will be removed.
 
-* The ``ChoicesMeta`` alias to ``django.db.models.enums.ChoicesType`` will be
+* The ``ChoicesMeta`` alias to ``thibaud.db.models.enums.ChoicesType`` will be
   removed.
 
 * The ``Prefetch.get_current_queryset()`` method will be removed.
@@ -83,32 +83,32 @@ details on these changes.
 
 * The ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting will be removed.
 
-See the :ref:`Django 5.1 release notes <deprecated-features-5.1>` for more
+See the :ref:`Thibaud 5.1 release notes <deprecated-features-5.1>` for more
 details on these changes.
 
 * The ``ModelAdmin.log_deletion()`` and ``LogEntryManager.log_action()``
   methods will be removed.
 
-* The undocumented ``django.utils.itercompat.is_iterable()`` function and the
-  ``django.utils.itercompat`` module will be removed.
+* The undocumented ``thibaud.utils.itercompat.is_iterable()`` function and the
+  ``thibaud.utils.itercompat`` module will be removed.
 
-* The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method will be removed.
+* The ``thibaud.contrib.gis.geoip2.GeoIP2.coords()`` method will be removed.
 
-* The ``django.contrib.gis.geoip2.GeoIP2.open()`` method will be removed.
+* The ``thibaud.contrib.gis.geoip2.GeoIP2.open()`` method will be removed.
 
 * Support for passing positional arguments to ``Model.save()`` and
   ``Model.asave()`` will be removed.
 
-* The setter for ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` will be
+* The setter for ``thibaud.contrib.gis.gdal.OGRGeometry.coord_dim`` will be
   removed.
 
-* ``django.urls.register_converter()`` will no longer allow overriding existing
+* ``thibaud.urls.register_converter()`` will no longer allow overriding existing
   converters.
 
 * The ``check`` keyword argument of ``CheckConstraint`` will be removed.
 
 * The ``OS_OPEN_FLAGS`` attribute of
-  :class:`~django.core.files.storage.FileSystemStorage` will be removed.
+  :class:`~thibaud.core.files.storage.FileSystemStorage` will be removed.
 
 * The ``get_cache_name()`` method of ``FieldCacheMixin`` will be removed.
 
@@ -117,7 +117,7 @@ details on these changes.
 5.1
 ---
 
-See the :ref:`Django 4.2 release notes <deprecated-features-4.2>` for more
+See the :ref:`Thibaud 4.2 release notes <deprecated-features-4.2>` for more
 details on these changes.
 
 * The ``BaseUserManager.make_random_password()`` method will be removed.
@@ -126,16 +126,16 @@ details on these changes.
 
 * The ``length_is`` template filter will be removed.
 
-* The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
-  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
-  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` will be removed.
+* The ``thibaud.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``thibaud.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``thibaud.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` will be removed.
 
-* The model ``django.contrib.postgres.fields.CICharField``,
-  ``django.contrib.postgres.fields.CIEmailField``, and
-  ``django.contrib.postgres.fields.CITextField`` will be removed. Stub fields
+* The model ``thibaud.contrib.postgres.fields.CICharField``,
+  ``thibaud.contrib.postgres.fields.CIEmailField``, and
+  ``thibaud.contrib.postgres.fields.CITextField`` will be removed. Stub fields
   will remain for compatibility with historical migrations.
 
-* The ``django.contrib.postgres.fields.CIText`` mixin will be removed.
+* The ``thibaud.contrib.postgres.fields.CIText`` mixin will be removed.
 
 * The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget``
   will be removed.
@@ -153,7 +153,7 @@ details on these changes.
 * The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings will be
   removed.
 
-* The ``django.core.files.storage.get_storage_class()`` function will be
+* The ``thibaud.core.files.storage.get_storage_class()`` function will be
   removed.
 
 .. _deprecation-removed-in-5.0:
@@ -161,14 +161,14 @@ details on these changes.
 5.0
 ---
 
-See the :ref:`Django 4.0 release notes <deprecated-features-4.0>` for more
+See the :ref:`Thibaud 4.0 release notes <deprecated-features-4.0>` for more
 details on these changes.
 
 * The ``SERIALIZE`` test setting will be removed.
 
-* The undocumented ``django.utils.baseconv`` module will be removed.
+* The undocumented ``thibaud.utils.baseconv`` module will be removed.
 
-* The undocumented ``django.utils.datetime_safe`` module will be removed.
+* The undocumented ``thibaud.utils.datetime_safe`` module will be removed.
 
 * The default value of the ``USE_TZ`` setting will change from ``False`` to
   ``True``.
@@ -179,7 +179,7 @@ details on these changes.
 * The ``extra_tests`` argument for ``DiscoverRunner.build_suite()`` and
   ``DiscoverRunner.run_tests()`` will be removed.
 
-* The ``django.contrib.postgres.aggregates.ArrayAgg``, ``JSONBAgg``, and
+* The ``thibaud.contrib.postgres.aggregates.ArrayAgg``, ``JSONBAgg``, and
   ``StringAgg`` aggregates will return ``None`` when there are no rows instead
   of ``[]``, ``[]``, and ``''`` respectively.
 
@@ -192,18 +192,18 @@ details on these changes.
 * The ``is_dst`` argument will be removed from:
 
   * ``QuerySet.datetimes()``
-  * ``django.utils.timezone.make_aware()``
-  * ``django.db.models.functions.Trunc()``
-  * ``django.db.models.functions.TruncSecond()``
-  * ``django.db.models.functions.TruncMinute()``
-  * ``django.db.models.functions.TruncHour()``
-  * ``django.db.models.functions.TruncDay()``
-  * ``django.db.models.functions.TruncWeek()``
-  * ``django.db.models.functions.TruncMonth()``
-  * ``django.db.models.functions.TruncQuarter()``
-  * ``django.db.models.functions.TruncYear()``
+  * ``thibaud.utils.timezone.make_aware()``
+  * ``thibaud.db.models.functions.Trunc()``
+  * ``thibaud.db.models.functions.TruncSecond()``
+  * ``thibaud.db.models.functions.TruncMinute()``
+  * ``thibaud.db.models.functions.TruncHour()``
+  * ``thibaud.db.models.functions.TruncDay()``
+  * ``thibaud.db.models.functions.TruncWeek()``
+  * ``thibaud.db.models.functions.TruncMonth()``
+  * ``thibaud.db.models.functions.TruncQuarter()``
+  * ``thibaud.db.models.functions.TruncYear()``
 
-* The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
+* The ``thibaud.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
   will be removed.
 
 * The undocumented ``BaseForm._html_output()`` method will be removed.
@@ -211,24 +211,24 @@ details on these changes.
 * The ability to return a ``str``, rather than a ``SafeString``, when rendering
   an ``ErrorDict`` and ``ErrorList`` will be removed.
 
-See the :ref:`Django 4.1 release notes <deprecated-features-4.1>` for more
+See the :ref:`Thibaud 4.1 release notes <deprecated-features-4.1>` for more
 details on these changes.
 
 * The ``SitemapIndexItem.__str__()`` method will be removed.
 
 * The ``CSRF_COOKIE_MASKED`` transitional setting will be removed.
 
-* The ``name`` argument of ``django.utils.functional.cached_property()`` will
+* The ``name`` argument of ``thibaud.utils.functional.cached_property()`` will
   be removed.
 
 * The ``opclasses`` argument of
-  ``django.contrib.postgres.constraints.ExclusionConstraint`` will be removed.
+  ``thibaud.contrib.postgres.constraints.ExclusionConstraint`` will be removed.
 
 * The undocumented ability to pass ``errors=None`` to
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will be
   removed.
 
-* ``django.contrib.sessions.serializers.PickleSerializer`` will be removed.
+* ``thibaud.contrib.sessions.serializers.PickleSerializer`` will be removed.
 
 * The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
   objects without providing the ``chunk_size`` argument will no longer be
@@ -240,22 +240,22 @@ details on these changes.
   ``RemoteUserBackend.configure_user()`` subclasses.
 
 * Support for logging out via ``GET`` requests in the
-  ``django.contrib.auth.views.LogoutView`` and
-  ``django.contrib.auth.views.logout_then_login()`` will be removed.
+  ``thibaud.contrib.auth.views.LogoutView`` and
+  ``thibaud.contrib.auth.views.logout_then_login()`` will be removed.
 
-* The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` will be
+* The ``thibaud.utils.timezone.utc`` alias to ``datetime.timezone.utc`` will be
   removed.
 
 * Passing a response object and a form/formset name to
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will no
   longer be allowed.
 
-* The ``django.contrib.gis.admin.OpenLayersWidget`` will be removed.
+* The ``thibaud.contrib.gis.admin.OpenLayersWidget`` will be removed.
 
-* The ``django.contrib.auth.hashers.CryptPasswordHasher`` will be removed.
+* The ``thibaud.contrib.auth.hashers.CryptPasswordHasher`` will be removed.
 
-* The ``"django/forms/default.html"`` and
-  ``"django/forms/formsets/default.html"`` templates will be removed.
+* The ``"thibaud/forms/default.html"`` and
+  ``"thibaud/forms/formsets/default.html"`` templates will be removed.
 
 * The ability to pass ``nulls_first=False`` or ``nulls_last=False`` to
   ``Expression.asc()`` and ``Expression.desc()`` methods, and the ``OrderBy``
@@ -266,7 +266,7 @@ details on these changes.
 4.1
 ---
 
-See the :ref:`Django 3.2 release notes <deprecated-features-3.2>` for more
+See the :ref:`Thibaud 3.2 release notes <deprecated-features-3.2>` for more
 details on these changes.
 
 * Support for assigning objects which don't support creating deep copies with
@@ -276,46 +276,46 @@ details on these changes.
 * ``BaseCommand.requires_system_checks`` won't support boolean values.
 
 * The ``whitelist`` argument and ``domain_whitelist`` attribute of
-  ``django.core.validators.EmailValidator`` will be removed.
+  ``thibaud.core.validators.EmailValidator`` will be removed.
 
 * The ``default_app_config`` module variable will be removed.
 
 * ``TransactionTestCase.assertQuerysetEqual()`` will no longer automatically
   call ``repr()`` on a queryset when compared to string values.
 
-* ``django.core.cache.backends.memcached.MemcachedCache`` will be removed.
+* ``thibaud.core.cache.backends.memcached.MemcachedCache`` will be removed.
 
-* Support for the pre-Django 3.2 format of messages used by
-  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+* Support for the pre-Thibaud 3.2 format of messages used by
+  ``thibaud.contrib.messages.storage.cookie.CookieStorage`` will be removed.
 
 .. _deprecation-removed-in-4.0:
 
 4.0
 ---
 
-See the :ref:`Django 3.0 release notes <deprecated-features-3.0>` for more
+See the :ref:`Thibaud 3.0 release notes <deprecated-features-3.0>` for more
 details on these changes.
 
-* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+* ``thibaud.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
   ``urlunquote_plus()`` will be removed.
 
-* ``django.utils.encoding.force_text()`` and ``smart_text()`` will be removed.
+* ``thibaud.utils.encoding.force_text()`` and ``smart_text()`` will be removed.
 
-* ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
+* ``thibaud.utils.translation.ugettext()``, ``ugettext_lazy()``,
   ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` will be
   removed.
 
-* ``django.views.i18n.set_language()`` will no longer set the user language in
-  ``request.session`` (key ``django.utils.translation.LANGUAGE_SESSION_KEY``).
+* ``thibaud.views.i18n.set_language()`` will no longer set the user language in
+  ``request.session`` (key ``thibaud.utils.translation.LANGUAGE_SESSION_KEY``).
 
 * ``alias=None`` will be required in the signature of
-  ``django.db.models.Expression.get_group_by_cols()`` subclasses.
+  ``thibaud.db.models.Expression.get_group_by_cols()`` subclasses.
 
-* ``django.utils.text.unescape_entities()`` will be removed.
+* ``thibaud.utils.text.unescape_entities()`` will be removed.
 
-* ``django.utils.http.is_safe_url()`` will be removed.
+* ``thibaud.utils.http.is_safe_url()`` will be removed.
 
-See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
+See the :ref:`Thibaud 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 
 * The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting will be removed.
@@ -323,39 +323,39 @@ details on these changes.
 * The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
   as the right-hand side will no longer be allowed.
 
-* The ``django.db.models.query_utils.InvalidQuery`` exception class will be
+* The ``thibaud.db.models.query_utils.InvalidQuery`` exception class will be
   removed.
 
-* The ``django-admin.py`` entry point will be removed.
+* The ``thibaud-admin.py`` entry point will be removed.
 
 * The ``HttpRequest.is_ajax()`` method will be removed.
 
-* Support for the pre-Django 3.1 encoding format of cookies values used by
-  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+* Support for the pre-Thibaud 3.1 encoding format of cookies values used by
+  ``thibaud.contrib.messages.storage.cookie.CookieStorage`` will be removed.
 
-* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+* Support for the pre-Thibaud 3.1 password reset tokens in the admin site (that
   use the SHA-1 hashing algorithm) will be removed.
 
-* Support for the pre-Django 3.1 encoding format of sessions will be removed.
+* Support for the pre-Thibaud 3.1 encoding format of sessions will be removed.
 
-* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+* Support for the pre-Thibaud 3.1 ``thibaud.core.signing.Signer`` signatures
   (encoded with the SHA-1 algorithm) will be removed.
 
-* Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
-  (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` will be
+* Support for the pre-Thibaud 3.1 ``thibaud.core.signing.dumps()`` signatures
+  (encoded with the SHA-1 algorithm) in ``thibaud.core.signing.loads()`` will be
   removed.
 
-* Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
+* Support for the pre-Thibaud 3.1 user sessions (that use the SHA-1 algorithm)
   will be removed.
 
 * The ``get_response`` argument for
-  ``django.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
+  ``thibaud.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
   won't accept ``None``.
 
-* The ``providing_args`` argument for ``django.dispatch.Signal`` will be
+* The ``providing_args`` argument for ``thibaud.dispatch.Signal`` will be
   removed.
 
-* The ``length`` argument for ``django.utils.crypto.get_random_string()`` will
+* The ``length`` argument for ``thibaud.utils.crypto.get_random_string()`` will
   be required.
 
 * The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
@@ -366,14 +366,14 @@ details on these changes.
 * The model ``NullBooleanField`` will be removed. A stub field will remain for
   compatibility with historical migrations.
 
-* ``django.conf.urls.url()`` will be removed.
+* ``thibaud.conf.urls.url()`` will be removed.
 
-* The model ``django.contrib.postgres.fields.JSONField`` will be removed. A
+* The model ``thibaud.contrib.postgres.fields.JSONField`` will be removed. A
   stub field will remain for compatibility with historical migrations.
 
-* ``django.contrib.postgres.forms.JSONField``,
-  ``django.contrib.postgres.fields.jsonb.KeyTransform``, and
-  ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` will be removed.
+* ``thibaud.contrib.postgres.forms.JSONField``,
+  ``thibaud.contrib.postgres.fields.jsonb.KeyTransform``, and
+  ``thibaud.contrib.postgres.fields.jsonb.KeyTextTransform`` will be removed.
 
 * The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags will be removed.
 
@@ -384,21 +384,21 @@ details on these changes.
 3.1
 ---
 
-See the :ref:`Django 2.2 release notes <deprecated-features-2.2>` for more
+See the :ref:`Thibaud 2.2 release notes <deprecated-features-2.2>` for more
 details on these changes.
 
-* ``django.utils.timezone.FixedOffset`` will be removed.
+* ``thibaud.utils.timezone.FixedOffset`` will be removed.
 
-* ``django.core.paginator.QuerySetPaginator`` will be removed.
+* ``thibaud.core.paginator.QuerySetPaginator`` will be removed.
 
 * A model's ``Meta.ordering`` will no longer affect ``GROUP BY`` queries.
 
-* ``django.contrib.postgres.fields.FloatRangeField`` and
-  ``django.contrib.postgres.forms.FloatRangeField`` will be removed.
+* ``thibaud.contrib.postgres.fields.FloatRangeField`` and
+  ``thibaud.contrib.postgres.forms.FloatRangeField`` will be removed.
 
 * The ``FILE_CHARSET`` setting will be removed.
 
-* ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` will be
+* ``thibaud.contrib.staticfiles.storage.CachedStaticFilesStorage`` will be
   removed.
 
 * ``RemoteUserBackend.configure_user()`` will require ``request`` as the first
@@ -412,12 +412,12 @@ details on these changes.
 3.0
 ---
 
-See the :ref:`Django 2.0 release notes<deprecated-features-2.0>` for more
+See the :ref:`Thibaud 2.0 release notes<deprecated-features-2.0>` for more
 details on these changes.
 
-* The ``django.db.backends.postgresql_psycopg2`` module will be removed.
+* The ``thibaud.db.backends.postgresql_psycopg2`` module will be removed.
 
-* ``django.shortcuts.render_to_response()`` will be removed.
+* ``thibaud.shortcuts.render_to_response()`` will be removed.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting will be removed.
 
@@ -429,17 +429,17 @@ details on these changes.
 * The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
   ``latest()`` will be removed.
 
-See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
+See the :ref:`Thibaud 2.1 release notes <deprecated-features-2.1>` for more
 details on these changes.
 
-* ``django.contrib.gis.db.models.functions.ForceRHR`` will be removed.
+* ``thibaud.contrib.gis.db.models.functions.ForceRHR`` will be removed.
 
-* ``django.utils.http.cookie_date()`` will be removed.
+* ``thibaud.utils.http.cookie_date()`` will be removed.
 
 * The ``staticfiles`` and ``admin_static`` template tag libraries will be
   removed.
 
-* ``django.contrib.staticfiles.templatetags.static()`` will be removed.
+* ``thibaud.contrib.staticfiles.templatetags.static()`` will be removed.
 
 * The shim to allow ``InlineModelAdmin.has_add_permission()`` to be defined
   without an ``obj`` argument will be removed.
@@ -449,7 +449,7 @@ details on these changes.
 2.1
 ---
 
-See the :ref:`Django 1.11 release notes<deprecated-features-1.11>` for more
+See the :ref:`Thibaud 1.11 release notes<deprecated-features-1.11>` for more
 details on these changes.
 
 * ``contrib.auth.views.login()``, ``logout()``, ``password_change()``,
@@ -460,14 +460,14 @@ details on these changes.
 * The ``extra_context`` parameter of ``contrib.auth.views.logout_then_login()``
   will be removed.
 
-* ``django.test.runner.setup_databases()`` will be removed.
+* ``thibaud.test.runner.setup_databases()`` will be removed.
 
-* ``django.utils.translation.string_concat()`` will be removed.
+* ``thibaud.utils.translation.string_concat()`` will be removed.
 
-* ``django.core.cache.backends.memcached.PyLibMCCache`` will no longer support
+* ``thibaud.core.cache.backends.memcached.PyLibMCCache`` will no longer support
   passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
 
-* The ``host`` parameter of ``django.utils.http.is_safe_url()`` will be
+* The ``host`` parameter of ``thibaud.utils.http.is_safe_url()`` will be
   removed.
 
 * Silencing of exceptions raised while rendering the ``{% include %}`` template
@@ -478,10 +478,10 @@ details on these changes.
 * The ``authenticate()`` method of authentication backends will require
   ``request`` as the first positional argument.
 
-* The ``django.db.models.permalink()`` decorator will be removed.
+* The ``thibaud.db.models.permalink()`` decorator will be removed.
 
 * The ``USE_ETAGS`` setting will be removed. ``CommonMiddleware`` and
-  ``django.utils.cache.patch_response_headers()`` will no longer set ETags.
+  ``thibaud.utils.cache.patch_response_headers()`` will no longer set ETags.
 
 * The ``Model._meta.has_auto_field`` attribute will be removed.
 
@@ -496,16 +496,16 @@ details on these changes.
 2.0
 ---
 
-See the :ref:`Django 1.9 release notes<deprecated-features-1.9>` for more
+See the :ref:`Thibaud 1.9 release notes<deprecated-features-1.9>` for more
 details on these changes.
 
-* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
+* The ``weak`` argument to ``thibaud.dispatch.signals.Signal.disconnect()`` will
   be removed.
 
-* ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
+* ``thibaud.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
   will be removed.
 
-* The ``django.forms.extras`` package will be removed.
+* The ``thibaud.forms.extras`` package will be removed.
 
 * The ``assignment_tag`` helper will be removed.
 
@@ -520,49 +520,49 @@ details on these changes.
 * The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField``  will be
   required.
 
-* ``django.db.models.fields.add_lazy_relation()`` will be removed.
+* ``thibaud.db.models.fields.add_lazy_relation()`` will be removed.
 
 * When time zone support is enabled, database backends that don't support time
   zones won't convert aware datetimes to naive values in UTC anymore when such
   values are passed as parameters to SQL queries executed outside of the ORM,
   e.g. with ``cursor.execute()``.
 
-* The ``django.contrib.auth.tests.utils.skipIfCustomUser()`` decorator will be
+* The ``thibaud.contrib.auth.tests.utils.skipIfCustomUser()`` decorator will be
   removed.
 
 * The ``GeoManager`` and ``GeoQuerySet`` classes will be removed.
 
-* The ``django.contrib.gis.geoip`` module will be removed.
+* The ``thibaud.contrib.gis.geoip`` module will be removed.
 
 * The ``supports_recursion`` check for template loaders will be removed from:
 
-  * ``django.template.engine.Engine.find_template()``
-  * ``django.template.loader_tags.ExtendsNode.find_template()``
-  * ``django.template.loaders.base.Loader.supports_recursion()``
-  * ``django.template.loaders.cached.Loader.supports_recursion()``
+  * ``thibaud.template.engine.Engine.find_template()``
+  * ``thibaud.template.loader_tags.ExtendsNode.find_template()``
+  * ``thibaud.template.loaders.base.Loader.supports_recursion()``
+  * ``thibaud.template.loaders.cached.Loader.supports_recursion()``
 
 * The ``load_template()`` and ``load_template_sources()`` template loader
   methods will be removed.
 
 * The ``template_dirs`` argument for template loaders will be removed:
 
-  * ``django.template.loaders.base.Loader.get_template()``
-  * ``django.template.loaders.cached.Loader.cache_key()``
-  * ``django.template.loaders.cached.Loader.get_template()``
-  * ``django.template.loaders.cached.Loader.get_template_sources()``
-  * ``django.template.loaders.filesystem.Loader.get_template_sources()``
+  * ``thibaud.template.loaders.base.Loader.get_template()``
+  * ``thibaud.template.loaders.cached.Loader.cache_key()``
+  * ``thibaud.template.loaders.cached.Loader.get_template()``
+  * ``thibaud.template.loaders.cached.Loader.get_template_sources()``
+  * ``thibaud.template.loaders.filesystem.Loader.get_template_sources()``
 
-* The ``django.template.loaders.base.Loader.__call__()`` method will be
+* The ``thibaud.template.loaders.base.Loader.__call__()`` method will be
   removed.
 
 * Support for custom error views with a single positional parameter will be
   dropped.
 
-* The ``mime_type`` attribute of ``django.utils.feedgenerator.Atom1Feed`` and
-  ``django.utils.feedgenerator.RssFeed`` will be removed in favor of
+* The ``mime_type`` attribute of ``thibaud.utils.feedgenerator.Atom1Feed`` and
+  ``thibaud.utils.feedgenerator.RssFeed`` will be removed in favor of
   ``content_type``.
 
-* The ``app_name`` argument to ``django.conf.urls.include()`` will be
+* The ``app_name`` argument to ``thibaud.conf.urls.include()`` will be
   removed.
 
 * Support for passing a 3-tuple as the first argument to ``include()`` will
@@ -574,7 +574,7 @@ details on these changes.
 * ``Field._get_val_from_obj()`` will be removed in favor of
   ``Field.value_from_object()``.
 
-* ``django.template.loaders.eggs.Loader`` will be removed.
+* ``thibaud.template.loaders.eggs.Loader`` will be removed.
 
 * The ``current_app`` parameter to the ``contrib.auth`` views will be removed.
 
@@ -587,11 +587,11 @@ details on these changes.
 * The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` will be
   removed.
 
-* The ``django.template.loader.LoaderOrigin`` and
-  ``django.template.base.StringOrigin`` aliases for
-  ``django.template.base.Origin`` will be removed.
+* The ``thibaud.template.loader.LoaderOrigin`` and
+  ``thibaud.template.base.StringOrigin`` aliases for
+  ``thibaud.template.base.Origin`` will be removed.
 
-See the :ref:`Django 1.10 release notes <deprecated-features-1.10>` for more
+See the :ref:`Thibaud 1.10 release notes <deprecated-features-1.10>` for more
 details on these changes.
 
 * The ``makemigrations --exit`` option will be removed.
@@ -600,29 +600,29 @@ details on these changes.
   relation will be removed.
 
 * The ``get_srid()`` and ``set_srid()`` methods of
-  ``django.contrib.gis.geos.GEOSGeometry`` will be removed.
+  ``thibaud.contrib.gis.geos.GEOSGeometry`` will be removed.
 
 * The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
-  ``set_z()`` methods of ``django.contrib.gis.geos.Point`` will be removed.
+  ``set_z()`` methods of ``thibaud.contrib.gis.geos.Point`` will be removed.
 
 * The ``get_coords()`` and ``set_coords()`` methods of
-  ``django.contrib.gis.geos.Point`` will be removed.
+  ``thibaud.contrib.gis.geos.Point`` will be removed.
 
-* The ``cascaded_union`` property of ``django.contrib.gis.geos.MultiPolygon``
+* The ``cascaded_union`` property of ``thibaud.contrib.gis.geos.MultiPolygon``
   will be removed.
 
-* ``django.utils.functional.allow_lazy()`` will be removed.
+* ``thibaud.utils.functional.allow_lazy()`` will be removed.
 
 * The ``shell --plain`` option will be removed.
 
-* The ``django.core.urlresolvers`` module will be removed.
+* The ``thibaud.core.urlresolvers`` module will be removed.
 
 * The model ``CommaSeparatedIntegerField`` will be removed. A stub field will
   remain for compatibility with historical migrations.
 
 * Support for the template ``Context.has_key()`` method will be removed.
 
-* Support for the ``django.core.files.storage.Storage.accessed_time()``,
+* Support for the ``thibaud.core.files.storage.Storage.accessed_time()``,
   ``created_time()``, and ``modified_time()`` methods will be removed.
 
 * Support for query lookups using the model name when
@@ -645,7 +645,7 @@ details on these changes.
 
 * The ``javascript_catalog()`` and ``json_catalog()`` views will be removed.
 
-* The ``django.contrib.gis.utils.precision_wkt()`` function will be removed.
+* The ``thibaud.contrib.gis.utils.precision_wkt()`` function will be removed.
 
 * In multi-table inheritance, implicit promotion of a ``OneToOneField`` to a
   ``parent_link`` will be removed.
@@ -660,7 +660,7 @@ details on these changes.
   be removed.
 
 * The ``escape`` filter will change to use
-  ``django.utils.html.conditional_escape()``.
+  ``thibaud.utils.html.conditional_escape()``.
 
 * ``Manager.use_for_related_fields`` will be removed.
 
@@ -676,7 +676,7 @@ details on these changes.
 1.10
 ----
 
-See the :ref:`Django 1.8 release notes<deprecated-features-1.8>` for more
+See the :ref:`Thibaud 1.8 release notes<deprecated-features-1.8>` for more
 details on these changes.
 
 * Support for calling a ``SQLCompiler`` directly as an alias for calling its
@@ -685,10 +685,10 @@ details on these changes.
 * ``cycle`` and ``firstof`` template tags will be removed from the ``future``
   template tag library (used during the 1.6/1.7 deprecation period).
 
-* ``django.conf.urls.patterns()`` will be removed.
+* ``thibaud.conf.urls.patterns()`` will be removed.
 
 * Support for the ``prefix`` argument to
-  ``django.conf.urls.i18n.i18n_patterns()`` will be removed.
+  ``thibaud.conf.urls.i18n.i18n_patterns()`` will be removed.
 
 * ``SimpleTestCase.urls`` will be removed.
 
@@ -703,27 +703,27 @@ details on these changes.
 * Support for :py:mod:`optparse` will be dropped for custom management commands
   (replaced by :py:mod:`argparse`).
 
-* The class ``django.core.management.NoArgsCommand`` will be removed. Use
-  :class:`~django.core.management.BaseCommand` instead, which takes no arguments
+* The class ``thibaud.core.management.NoArgsCommand`` will be removed. Use
+  :class:`~thibaud.core.management.BaseCommand` instead, which takes no arguments
   by default.
 
-* ``django.core.context_processors`` module will be removed.
+* ``thibaud.core.context_processors`` module will be removed.
 
-* ``django.db.models.sql.aggregates`` module will be removed.
+* ``thibaud.db.models.sql.aggregates`` module will be removed.
 
-* ``django.contrib.gis.db.models.sql.aggregates`` module will be removed.
+* ``thibaud.contrib.gis.db.models.sql.aggregates`` module will be removed.
 
-* The following methods and properties of ``django.db.sql.query.Query`` will
+* The following methods and properties of ``thibaud.db.sql.query.Query`` will
   be removed:
 
   * Properties: ``aggregates`` and ``aggregate_select``
   * Methods: ``add_aggregate``, ``set_aggregate_mask``, and
     ``append_aggregate_mask``.
 
-* ``django.template.resolve_variable`` will be removed.
+* ``thibaud.template.resolve_variable`` will be removed.
 
 * The following private APIs will be removed from
-  :class:`django.db.models.options.Options` (``Model._meta``):
+  :class:`thibaud.db.models.options.Options` (``Model._meta``):
 
   * ``get_field_by_name()``
   * ``get_all_field_names()``
@@ -735,30 +735,30 @@ details on these changes.
   * ``get_all_related_many_to_many_objects()``
   * ``get_all_related_m2m_objects_with_model()``
 
-* The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
+* The ``error_message`` argument of ``thibaud.forms.RegexField`` will be removed.
 
 * The ``unordered_list`` filter will no longer support old style lists.
 
 * Support for string ``view`` arguments to ``url()`` will be removed.
 
-* The backward compatible shim  to rename ``django.forms.Form._has_changed()``
+* The backward compatible shim  to rename ``thibaud.forms.Form._has_changed()``
   to ``has_changed()`` will be removed.
 
 * The ``removetags`` template filter will be removed.
 
 * The ``remove_tags()`` and ``strip_entities()`` functions in
-  ``django.utils.html`` will be removed.
+  ``thibaud.utils.html`` will be removed.
 
 * The ``is_admin_site`` argument to
-  ``django.contrib.auth.views.password_reset()`` will be removed.
+  ``thibaud.contrib.auth.views.password_reset()`` will be removed.
 
-* ``django.db.models.field.subclassing.SubfieldBase`` will be removed.
+* ``thibaud.db.models.field.subclassing.SubfieldBase`` will be removed.
 
-* ``django.utils.checksums`` will be removed; its functionality is included
-  in ``django-localflavor`` 1.1+.
+* ``thibaud.utils.checksums`` will be removed; its functionality is included
+  in ``thibaud-localflavor`` 1.1+.
 
 * The ``original_content_type_id`` attribute on
-  ``django.contrib.admin.helpers.InlineAdminForm`` will be removed.
+  ``thibaud.contrib.admin.helpers.InlineAdminForm`` will be removed.
 
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
   defined with no default value for its ``form_class`` argument will be removed.
@@ -772,47 +772,47 @@ details on these changes.
   * ``TEMPLATE_LOADERS``
   * ``TEMPLATE_STRING_IF_INVALID``
 
-* The backwards compatibility alias ``django.template.loader.BaseLoader`` will
+* The backwards compatibility alias ``thibaud.template.loader.BaseLoader`` will
   be removed.
 
-* Django template objects returned by
-  :func:`~django.template.loader.get_template` and
-  :func:`~django.template.loader.select_template` won't accept a
-  :class:`~django.template.Context` in their
-  :meth:`~django.template.backends.base.Template.render()` method anymore.
+* Thibaud template objects returned by
+  :func:`~thibaud.template.loader.get_template` and
+  :func:`~thibaud.template.loader.select_template` won't accept a
+  :class:`~thibaud.template.Context` in their
+  :meth:`~thibaud.template.backends.base.Template.render()` method anymore.
 
 * :doc:`Template response APIs </ref/template-response>` will enforce the use
   of :class:`dict` and backend-dependent template objects instead of
-  :class:`~django.template.Context` and :class:`~django.template.Template`
+  :class:`~thibaud.template.Context` and :class:`~thibaud.template.Template`
   respectively.
 
 * The ``current_app`` parameter for the following function and classes will be
   removed:
 
-  * ``django.shortcuts.render()``
-  * ``django.template.Context()``
-  * ``django.template.RequestContext()``
-  * ``django.template.response.TemplateResponse()``
+  * ``thibaud.shortcuts.render()``
+  * ``thibaud.template.Context()``
+  * ``thibaud.template.RequestContext()``
+  * ``thibaud.template.response.TemplateResponse()``
 
 * The ``dictionary`` and ``context_instance`` parameters for the following
   functions will be removed:
 
-  * ``django.shortcuts.render()``
-  * ``django.shortcuts.render_to_response()``
-  * ``django.template.loader.render_to_string()``
+  * ``thibaud.shortcuts.render()``
+  * ``thibaud.shortcuts.render_to_response()``
+  * ``thibaud.template.loader.render_to_string()``
 
 * The ``dirs`` parameter for the following functions will be removed:
 
-  * ``django.template.loader.get_template()``
-  * ``django.template.loader.select_template()``
-  * ``django.shortcuts.render()``
-  * ``django.shortcuts.render_to_response()``
+  * ``thibaud.template.loader.get_template()``
+  * ``thibaud.template.loader.select_template()``
+  * ``thibaud.shortcuts.render()``
+  * ``thibaud.shortcuts.render_to_response()``
 
 * Session verification will be enabled regardless of whether or not
-  ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
+  ``'thibaud.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
   ``MIDDLEWARE_CLASSES``.
 
-* Private attribute ``django.db.models.Field.related`` will be removed.
+* Private attribute ``thibaud.db.models.Field.related`` will be removed.
 
 * The ``--list`` option of the ``migrate`` management command will be removed.
 
@@ -841,7 +841,7 @@ details on these changes.
 * Support for the syntax of ``{% cycle %}`` that uses comma-separated arguments
   will be removed.
 
-* The warning that :class:`~django.core.signing.Signer` issues when given an
+* The warning that :class:`~thibaud.core.signing.Signer` issues when given an
   invalid separator will become an exception.
 
 .. _deprecation-removed-in-1.9:
@@ -849,21 +849,21 @@ details on these changes.
 1.9
 ---
 
-See the :ref:`Django 1.7 release notes<deprecated-features-1.7>` for more
+See the :ref:`Thibaud 1.7 release notes<deprecated-features-1.7>` for more
 details on these changes.
 
-* ``django.utils.dictconfig`` will be removed.
+* ``thibaud.utils.dictconfig`` will be removed.
 
-* ``django.utils.importlib`` will be removed.
+* ``thibaud.utils.importlib`` will be removed.
 
-* ``django.utils.tzinfo`` will be removed.
+* ``thibaud.utils.tzinfo`` will be removed.
 
-* ``django.utils.unittest`` will be removed.
+* ``thibaud.utils.unittest`` will be removed.
 
 * The ``syncdb`` command will be removed.
 
-* ``django.db.models.signals.pre_syncdb`` and
-  ``django.db.models.signals.post_syncdb`` will be removed.
+* ``thibaud.db.models.signals.pre_syncdb`` and
+  ``thibaud.db.models.signals.post_syncdb`` will be removed.
 
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
@@ -879,7 +879,7 @@ details on these changes.
   data will be removed.
 
 * All models will need to be defined inside an installed application or
-  declare an explicit :attr:`~django.db.models.Options.app_label`.
+  declare an explicit :attr:`~thibaud.db.models.Options.app_label`.
   Furthermore, it won't be possible to import them before their application
   is loaded. In particular, it won't be possible to import models inside
   the root package of their application.
@@ -890,24 +890,24 @@ details on these changes.
 * ``AppCommand.handle_app()`` will no longer be supported.
 
 * ``RequestSite`` and ``get_current_site()`` will no longer be importable from
-  ``django.contrib.sites.models``.
+  ``thibaud.contrib.sites.models``.
 
 * FastCGI support via the ``runfcgi`` management command will be
   removed. Please deploy your project using WSGI.
 
-* ``django.utils.datastructures.SortedDict`` will be removed. Use
+* ``thibaud.utils.datastructures.SortedDict`` will be removed. Use
   :class:`collections.OrderedDict` from the Python standard library instead.
 
 * ``ModelAdmin.declared_fieldsets`` will be removed.
 
-* Instances of ``util.py`` in the Django codebase have been renamed to
+* Instances of ``util.py`` in the Thibaud codebase have been renamed to
   ``utils.py`` in an effort to unify all util and utils references.
   The modules that provided backwards compatibility will be removed:
 
-  * ``django.contrib.admin.util``
-  * ``django.contrib.gis.db.backends.util``
-  * ``django.db.backends.util``
-  * ``django.forms.util``
+  * ``thibaud.contrib.admin.util``
+  * ``thibaud.contrib.gis.db.backends.util``
+  * ``thibaud.db.backends.util``
+  * ``thibaud.forms.util``
 
 * ``ModelAdmin.get_formsets`` will be removed.
 
@@ -920,24 +920,24 @@ details on these changes.
 * The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
   removed.
 
-* Private API ``django.forms.forms.get_declared_fields()`` will be removed.
+* Private API ``thibaud.forms.forms.get_declared_fields()`` will be removed.
 
 * The ability to use a ``SplitDateTimeWidget`` with ``DateTimeField`` will be
   removed.
 
 * The ``WSGIRequest.REQUEST`` property will be removed.
 
-* The class ``django.utils.datastructures.MergeDict`` will be removed.
+* The class ``thibaud.utils.datastructures.MergeDict`` will be removed.
 
 * The ``zh-cn`` and ``zh-tw`` language codes will be removed and have been
   replaced by the ``zh-hans`` and ``zh-hant`` language code respectively.
 
-* The internal ``django.utils.functional.memoize`` will be removed.
+* The internal ``thibaud.utils.functional.memoize`` will be removed.
 
-* ``django.core.cache.get_cache`` will be removed. Add suitable entries
-  to :setting:`CACHES` and use :data:`django.core.cache.caches` instead.
+* ``thibaud.core.cache.get_cache`` will be removed. Add suitable entries
+  to :setting:`CACHES` and use :data:`thibaud.core.cache.caches` instead.
 
-* ``django.db.models.loading`` will be removed.
+* ``thibaud.db.models.loading`` will be removed.
 
 * Passing callable arguments to querysets will no longer be possible.
 
@@ -950,56 +950,56 @@ details on these changes.
 
 * ``ModelAdmin.validate()`` will be removed.
 
-* ``django.db.backends.DatabaseValidation.validate_field`` will be removed in
+* ``thibaud.db.backends.DatabaseValidation.validate_field`` will be removed in
   favor of the ``check_field`` method.
 
 * The ``validate`` management command will be removed.
 
-* ``django.utils.module_loading.import_by_path`` will be removed in favor of
-  ``django.utils.module_loading.import_string``.
+* ``thibaud.utils.module_loading.import_by_path`` will be removed in favor of
+  ``thibaud.utils.module_loading.import_string``.
 
 * ``ssi`` and ``url`` template tags will be removed from the ``future`` template
   tag library (used during the 1.3/1.4 deprecation period).
 
-* ``django.utils.text.javascript_quote`` will be removed.
+* ``thibaud.utils.text.javascript_quote`` will be removed.
 
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
-* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
-  :class:`~django.forms.ModelMultipleChoiceField` will be removed.
+* The ``cache_choices`` option to :class:`~thibaud.forms.ModelChoiceField` and
+  :class:`~thibaud.forms.ModelMultipleChoiceField` will be removed.
 
 * The default value of the
-  :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
+  :attr:`RedirectView.permanent <thibaud.views.generic.base.RedirectView.permanent>`
   attribute will change from ``True`` to ``False``.
 
-* ``django.contrib.sitemaps.FlatPageSitemap`` will be removed in favor of
-  ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
+* ``thibaud.contrib.sitemaps.FlatPageSitemap`` will be removed in favor of
+  ``thibaud.contrib.flatpages.sitemaps.FlatPageSitemap``.
 
-* Private API ``django.test.utils.TestTemplateLoader`` will be removed.
+* Private API ``thibaud.test.utils.TestTemplateLoader`` will be removed.
 
-* The ``django.contrib.contenttypes.generic`` module will be removed.
+* The ``thibaud.contrib.contenttypes.generic`` module will be removed.
 
-* Private APIs ``django.db.models.sql.where.WhereNode.make_atom()`` and
-  ``django.db.models.sql.where.Constraint`` will be removed.
+* Private APIs ``thibaud.db.models.sql.where.WhereNode.make_atom()`` and
+  ``thibaud.db.models.sql.where.Constraint`` will be removed.
 
 .. _deprecation-removed-in-1.8:
 
 1.8
 ---
 
-See the :ref:`Django 1.6 release notes<deprecated-features-1.6>` for more
+See the :ref:`Thibaud 1.6 release notes<deprecated-features-1.6>` for more
 details on these changes.
 
-* ``django.contrib.comments`` will be removed.
+* ``thibaud.contrib.comments`` will be removed.
 
 * The following transaction management APIs will be removed:
 
   - ``TransactionMiddleware``,
   - the decorators and context managers ``autocommit``, ``commit_on_success``,
-    and ``commit_manually``, defined in ``django.db.transaction``,
+    and ``commit_manually``, defined in ``thibaud.db.transaction``,
   - the functions ``commit_unless_managed`` and ``rollback_unless_managed``,
-    also defined in ``django.db.transaction``,
+    also defined in ``thibaud.db.transaction``,
   - the ``TRANSACTIONS_MANAGED`` setting.
 
 * The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
@@ -1007,11 +1007,11 @@ details on these changes.
   tags in the ``future`` template tag library.
 
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
-  :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
+  :class:`thibaud.middleware.common.BrokenLinkEmailsMiddleware` middleware to
   your ``MIDDLEWARE_CLASSES`` setting instead.
 
-* ``django.middleware.doc.XViewMiddleware`` will be removed. Use
-  ``django.contrib.admindocs.middleware.XViewMiddleware`` instead.
+* ``thibaud.middleware.doc.XViewMiddleware`` will be removed. Use
+  ``thibaud.contrib.admindocs.middleware.XViewMiddleware`` instead.
 
 * ``Model._meta.module_name`` was renamed to ``model_name``.
 
@@ -1024,10 +1024,10 @@ details on these changes.
 * Remove the backward compatible shims introduced to rename the attributes
   ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
 
-* ``django.views.defaults.shortcut`` will be removed, as part of the
-  goal of removing all ``django.contrib`` references from the core
-  Django codebase. Instead use
-  ``django.contrib.contenttypes.views.shortcut``. ``django.conf.urls.shortcut``
+* ``thibaud.views.defaults.shortcut`` will be removed, as part of the
+  goal of removing all ``thibaud.contrib`` references from the core
+  Thibaud codebase. Instead use
+  ``thibaud.contrib.contenttypes.views.shortcut``. ``thibaud.conf.urls.shortcut``
   will also be removed.
 
 * Support for the Python Imaging Library (PIL) module will be removed, as it
@@ -1035,54 +1035,54 @@ details on these changes.
 
 * The following private APIs will be removed:
 
-  - ``django.db.backend``
-  - ``django.db.close_connection()``
-  - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
-  - ``django.db.transaction.is_managed()``
-  - ``django.db.transaction.managed()``
+  - ``thibaud.db.backend``
+  - ``thibaud.db.close_connection()``
+  - ``thibaud.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
+  - ``thibaud.db.transaction.is_managed()``
+  - ``thibaud.db.transaction.managed()``
 
-* ``django.forms.widgets.RadioInput`` will be removed in favor of
-  ``django.forms.widgets.RadioChoiceInput``.
+* ``thibaud.forms.widgets.RadioInput`` will be removed in favor of
+  ``thibaud.forms.widgets.RadioChoiceInput``.
 
-* The module ``django.test.simple`` and the class
-  ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
-  ``django.test.runner.DiscoverRunner``.
+* The module ``thibaud.test.simple`` and the class
+  ``thibaud.test.simple.ThibaudTestSuiteRunner`` will be removed. Instead use
+  ``thibaud.test.runner.DiscoverRunner``.
 
-* The module ``django.test._doctest`` will be removed. Instead use the doctest
+* The module ``thibaud.test._doctest`` will be removed. Instead use the doctest
   module from the Python standard library.
 
 * The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
 
 * Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
   more than one.* string to override or append to user-provided ``help_text`` in
-  forms for ManyToMany model fields will not be performed by Django anymore
+  forms for ManyToMany model fields will not be performed by Thibaud anymore
   either at the model or forms layer.
 
 * The ``Model._meta.get_(add|change|delete)_permission`` methods will
   be removed.
 
-* The session key ``django_language`` will no longer be read for backwards
+* The session key ``thibaud_language`` will no longer be read for backwards
   compatibility.
 
 * Geographic Sitemaps will be removed
-  (``django.contrib.gis.sitemaps.views.index`` and
-  ``django.contrib.gis.sitemaps.views.sitemap``).
+  (``thibaud.contrib.gis.sitemaps.views.index`` and
+  ``thibaud.contrib.gis.sitemaps.views.sitemap``).
 
-* ``django.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter and
-  ``django.utils.html.clean_html`` will be removed following an accelerated deprecation.
+* ``thibaud.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter and
+  ``thibaud.utils.html.clean_html`` will be removed following an accelerated deprecation.
 
 .. _deprecation-removed-in-1.7:
 
 1.7
 ---
 
-See the :ref:`Django 1.5 release notes<deprecated-features-1.5>` for more
+See the :ref:`Thibaud 1.5 release notes<deprecated-features-1.5>` for more
 details on these changes.
 
-* The module ``django.utils.simplejson`` will be removed. The standard library
+* The module ``thibaud.utils.simplejson`` will be removed. The standard library
   provides :mod:`json` which should be used instead.
 
-* The function ``django.utils.itercompat.product`` will be removed. The Python
+* The function ``thibaud.utils.itercompat.product`` will be removed. The Python
   builtin version should be used instead.
 
 * Auto-correction of INSTALLED_APPS and TEMPLATE_DIRS settings when they are
@@ -1090,16 +1090,16 @@ details on these changes.
   exception.
 
 * The ``mimetype`` argument to the ``__init__`` methods of
-  :class:`~django.http.HttpResponse`,
-  :class:`~django.template.response.SimpleTemplateResponse`, and
-  :class:`~django.template.response.TemplateResponse`, will be removed.
+  :class:`~thibaud.http.HttpResponse`,
+  :class:`~thibaud.template.response.SimpleTemplateResponse`, and
+  :class:`~thibaud.template.response.TemplateResponse`, will be removed.
   ``content_type`` should be used instead. This also applies to the
   ``render_to_response()`` shortcut and the sitemap views,
-  :func:`~django.contrib.sitemaps.views.index` and
-  :func:`~django.contrib.sitemaps.views.sitemap`.
+  :func:`~thibaud.contrib.sitemaps.views.index` and
+  :func:`~thibaud.contrib.sitemaps.views.sitemap`.
 
-* When :class:`~django.http.HttpResponse` is instantiated with an iterator,
-  or when :attr:`~django.http.HttpResponse.content` is set to an iterator,
+* When :class:`~thibaud.http.HttpResponse` is instantiated with an iterator,
+  or when :attr:`~thibaud.http.HttpResponse.content` is set to an iterator,
   that iterator will be immediately consumed.
 
 * The ``AUTH_PROFILE_MODULE`` setting, and the ``get_profile()`` method on
@@ -1111,64 +1111,64 @@ details on these changes.
 * The ``daily_cleanup.py`` script will be removed.
 
 * The ``depth`` keyword argument will be removed from
-  :meth:`~django.db.models.query.QuerySet.select_related`.
+  :meth:`~thibaud.db.models.query.QuerySet.select_related`.
 
 * The undocumented ``get_warnings_state()``/``restore_warnings_state()``
-  functions from :mod:`django.test.utils` and the ``save_warnings_state()``/
+  functions from :mod:`thibaud.test.utils` and the ``save_warnings_state()``/
   ``restore_warnings_state()``
-  :ref:`django.test.*TestCase <django-testcase-subclasses>` methods are
+  :ref:`thibaud.test.*TestCase <thibaud-testcase-subclasses>` methods are
   deprecated. Use the :class:`warnings.catch_warnings` context manager
   available starting with Python 2.6 instead.
 
 * The undocumented ``check_for_test_cookie`` method in
-  :class:`~django.contrib.auth.forms.AuthenticationForm` will be removed
+  :class:`~thibaud.contrib.auth.forms.AuthenticationForm` will be removed
   following an accelerated deprecation. Users subclassing this form should
   remove calls to this method, and instead ensure that their auth related views
   are CSRF protected, which ensures that cookies are enabled.
 
-* The version of ``django.contrib.auth.views.password_reset_confirm()`` that
+* The version of ``thibaud.contrib.auth.views.password_reset_confirm()`` that
   supports base36 encoded user IDs
-  (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
-  removed. If your site has been running Django 1.6 for more than
+  (``thibaud.contrib.auth.views.password_reset_confirm_uidb36``) will be
+  removed. If your site has been running Thibaud 1.6 for more than
   ``PASSWORD_RESET_TIMEOUT_DAYS``, this change will have no effect. If not,
-  then any password reset links generated before you upgrade to Django 1.7
+  then any password reset links generated before you upgrade to Thibaud 1.7
   won't work after the upgrade.
 
-* The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.
+* The ``thibaud.utils.encoding.StrAndUnicode`` mix-in will be removed.
 
 .. _deprecation-removed-in-1.6:
 
 1.6
 ---
 
-See the :ref:`Django 1.4 release notes<deprecated-features-1.4>` for more
+See the :ref:`Thibaud 1.4 release notes<deprecated-features-1.4>` for more
 details on these changes.
 
-* ``django.contrib.databrowse`` will be removed.
+* ``thibaud.contrib.databrowse`` will be removed.
 
-* ``django.contrib.localflavor`` will be removed following an accelerated
+* ``thibaud.contrib.localflavor`` will be removed following an accelerated
   deprecation.
 
-* ``django.contrib.markup`` will be removed following an accelerated
+* ``thibaud.contrib.markup`` will be removed following an accelerated
   deprecation.
 
-* The compatibility modules ``django.utils.copycompat`` and
-  ``django.utils.hashcompat`` as well as the functions
-  ``django.utils.itercompat.all`` and ``django.utils.itercompat.any`` will
+* The compatibility modules ``thibaud.utils.copycompat`` and
+  ``thibaud.utils.hashcompat`` as well as the functions
+  ``thibaud.utils.itercompat.all`` and ``thibaud.utils.itercompat.any`` will
   be removed. The Python builtin versions should be used instead.
 
 * The ``csrf_response_exempt`` and ``csrf_view_exempt`` decorators will
   be removed. Since 1.4 ``csrf_response_exempt`` has been a no-op (it
   returns the same function), and ``csrf_view_exempt`` has been a
-  synonym for ``django.views.decorators.csrf.csrf_exempt``, which should
+  synonym for ``thibaud.views.decorators.csrf.csrf_exempt``, which should
   be used to replace it.
 
-* The ``django.core.cache.backends.memcached.CacheClass`` backend
-  was split into two in Django 1.3 in order to introduce support for
+* The ``thibaud.core.cache.backends.memcached.CacheClass`` backend
+  was split into two in Thibaud 1.3 in order to introduce support for
   PyLibMC. The historical ``CacheClass`` will be removed in favor of
-  ``django.core.cache.backends.memcached.MemcachedCache``.
+  ``thibaud.core.cache.backends.memcached.MemcachedCache``.
 
-* The UK-prefixed objects of ``django.contrib.localflavor.uk`` will only
+* The UK-prefixed objects of ``thibaud.contrib.localflavor.uk`` will only
   be accessible through their GB-prefixed names (GB is the correct
   ISO 3166 code for United Kingdom).
 
@@ -1180,28 +1180,28 @@ details on these changes.
   backends in 1.4. The previous implementation will be removed.
 
 * Legacy ways of calling
-  :func:`~django.views.decorators.cache.cache_page` will be removed.
+  :func:`~thibaud.views.decorators.cache.cache_page` will be removed.
 
 * The backward-compatibility shim to automatically add a debug-false
   filter to the ``'mail_admins'`` logging handler will be removed. The
   :setting:`LOGGING` setting should include this filter explicitly if
   it is desired.
 
-* The builtin truncation functions ``django.utils.text.truncate_words()``
-  and ``django.utils.text.truncate_html_words()`` will be removed in
-  favor of the ``django.utils.text.Truncator`` class.
+* The builtin truncation functions ``thibaud.utils.text.truncate_words()``
+  and ``thibaud.utils.text.truncate_html_words()`` will be removed in
+  favor of the ``thibaud.utils.text.Truncator`` class.
 
-* The ``django.contrib.gis.geoip.GeoIP`` class was moved to
-  ``django.contrib.gis.geoip`` in 1.4 -- the shortcut in
-  ``django.contrib.gis.utils`` will be removed.
+* The ``thibaud.contrib.gis.geoip.GeoIP`` class was moved to
+  ``thibaud.contrib.gis.geoip`` in 1.4 -- the shortcut in
+  ``thibaud.contrib.gis.utils`` will be removed.
 
-* ``django.conf.urls.defaults`` will be removed. The functions
+* ``thibaud.conf.urls.defaults`` will be removed. The functions
   ``include()``, ``patterns()``, and ``url()``, plus
-  :data:`~django.conf.urls.handler404` and :data:`~django.conf.urls.handler500`
-  are now available through ``django.conf.urls``.
+  :data:`~thibaud.conf.urls.handler404` and :data:`~thibaud.conf.urls.handler500`
+  are now available through ``thibaud.conf.urls``.
 
 * The functions ``setup_environ()`` and ``execute_manager()`` will be removed
-  from :mod:`django.core.management`. This also means that the old (pre-1.4)
+  from :mod:`thibaud.core.management`. This also means that the old (pre-1.4)
   style of :file:`manage.py` file will no longer work.
 
 * Setting the ``is_safe`` and ``needs_autoescape`` flags as attributes of
@@ -1222,42 +1222,42 @@ details on these changes.
 1.5
 ---
 
-See the :ref:`Django 1.3 release notes<deprecated-features-1.3>` for more
+See the :ref:`Thibaud 1.3 release notes<deprecated-features-1.3>` for more
 details on these changes.
 
-* Starting Django without a :setting:`SECRET_KEY` will result in an exception
+* Starting Thibaud without a :setting:`SECRET_KEY` will result in an exception
   rather than a ``DeprecationWarning``. (This is accelerated from the usual
-  deprecation path; see the :doc:`Django 1.4 release notes</releases/1.4>`.)
+  deprecation path; see the :doc:`Thibaud 1.4 release notes</releases/1.4>`.)
 
 * The ``mod_python`` request handler will be removed. The ``mod_wsgi``
   handler should be used instead.
 
-* The ``template`` attribute on ``django.test.client.Response``
+* The ``template`` attribute on ``thibaud.test.client.Response``
   objects returned by the :ref:`test client <test-client>` will be removed.
-  The :attr:`~django.test.Response.templates` attribute should be
+  The :attr:`~thibaud.test.Response.templates` attribute should be
   used instead.
 
-* The ``django.test.simple.DjangoTestRunner`` will be removed.
+* The ``thibaud.test.simple.ThibaudTestRunner`` will be removed.
   Instead use a ``unittest``-native class. The features of the
-  ``django.test.simple.DjangoTestRunner`` (including fail-fast and
+  ``thibaud.test.simple.ThibaudTestRunner`` (including fail-fast and
   Ctrl-C test termination) can be provided by :class:`unittest.TextTestRunner`.
 
 * The undocumented function
-  ``django.contrib.formtools.utils.security_hash`` will be removed,
-  instead use ``django.contrib.formtools.utils.form_hmac``
+  ``thibaud.contrib.formtools.utils.security_hash`` will be removed,
+  instead use ``thibaud.contrib.formtools.utils.form_hmac``
 
 * The function-based generic view modules will be removed in favor of their
   class-based equivalents, outlined :doc:`here
   </topics/class-based-views/index>`.
 
-* The ``django.core.servers.basehttp.AdminMediaHandler`` will be
+* The ``thibaud.core.servers.basehttp.AdminMediaHandler`` will be
   removed.  In its place use
-  ``django.contrib.staticfiles.handlers.StaticFilesHandler``.
+  ``thibaud.contrib.staticfiles.handlers.StaticFilesHandler``.
 
 * The template tags library ``adminmedia`` and the template tag ``{%
   admin_media_prefix %}`` will be removed in favor of the generic static files
   handling. (This is faster than the usual deprecation path; see the
-  :doc:`Django 1.4 release notes</releases/1.4>`.)
+  :doc:`Thibaud 1.4 release notes</releases/1.4>`.)
 
 * The ``url`` and ``ssi`` template tags will be modified so that the first
   argument to each tag is a template variable, not an implied string. In 1.4,
@@ -1271,24 +1271,24 @@ details on these changes.
   The ``supports_inactive_user`` attribute will no longer be checked
   and can be removed from custom backends.
 
-* :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` will raise
-  a :class:`~django.contrib.gis.geos.GEOSException` when called
+* :meth:`~thibaud.contrib.gis.geos.GEOSGeometry.transform` will raise
+  a :class:`~thibaud.contrib.gis.geos.GEOSException` when called
   on a geometry with no SRID value.
 
-* ``django.http.CompatCookie`` will be removed in favor of
-  ``django.http.SimpleCookie``.
+* ``thibaud.http.CompatCookie`` will be removed in favor of
+  ``thibaud.http.SimpleCookie``.
 
-* ``django.core.context_processors.PermWrapper`` and
-  ``django.core.context_processors.PermLookupDict`` will be removed in
+* ``thibaud.core.context_processors.PermWrapper`` and
+  ``thibaud.core.context_processors.PermLookupDict`` will be removed in
   favor of the corresponding
-  ``django.contrib.auth.context_processors.PermWrapper`` and
-  ``django.contrib.auth.context_processors.PermLookupDict``, respectively.
+  ``thibaud.contrib.auth.context_processors.PermWrapper`` and
+  ``thibaud.contrib.auth.context_processors.PermLookupDict``, respectively.
 
 * The :setting:`MEDIA_URL` or :setting:`STATIC_URL` settings will be
   required to end with a trailing slash to ensure there is a consistent
   way to combine paths in templates.
 
-* ``django.db.models.fields.URLField.verify_exists`` will be removed. The
+* ``thibaud.db.models.fields.URLField.verify_exists`` will be removed. The
   feature was deprecated in 1.3.1 due to intractable security and
   performance issues and will follow a slightly accelerated deprecation
   timeframe.
@@ -1311,17 +1311,17 @@ details on these changes.
 1.4
 ---
 
-See the :ref:`Django 1.2 release notes<deprecated-features-1.2>` for more
+See the :ref:`Thibaud 1.2 release notes<deprecated-features-1.2>` for more
 details on these changes.
 
 * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` will be removed.  Use
   the ``{% csrf_token %}`` template tag inside forms to enable CSRF
   protection. ``CsrfViewMiddleware`` remains and is enabled by default.
 
-* The old imports for CSRF functionality (``django.contrib.csrf.*``),
+* The old imports for CSRF functionality (``thibaud.contrib.csrf.*``),
   which moved to core in 1.2, will be removed.
 
-* The ``django.contrib.gis.db.backend`` module will be removed in favor
+* The ``thibaud.contrib.gis.db.backend`` module will be removed in favor
   of the specific backends.
 
 * ``SMTPConnection`` will be removed in favor of a generic email backend API.
@@ -1333,13 +1333,13 @@ details on these changes.
   define database connections will be removed.
 
 * The ability to use shorthand notation to specify a database backend
-  (i.e., ``sqlite3`` instead of ``django.db.backends.sqlite3``) will be
+  (i.e., ``sqlite3`` instead of ``thibaud.db.backends.sqlite3``) will be
   removed.
 
 * The ``get_db_prep_save``, ``get_db_prep_value`` and
   ``get_db_prep_lookup`` methods will have to support multiple databases.
 
-* The ``Message`` model (in ``django.contrib.auth``), its related
+* The ``Message`` model (in ``thibaud.contrib.auth``), its related
   manager in the ``User`` model (``user.message_set``), and the
   associated methods (``user.message_set.create()`` and
   ``user.get_and_delete_messages()``), will be removed.  The
@@ -1363,27 +1363,27 @@ details on these changes.
   functions that are included with the built in template loaders for
   backwards compatibility.
 
-* ``django.utils.translation.get_date_formats()`` and
-  ``django.utils.translation.get_partial_date_formats()``. These functions
+* ``thibaud.utils.translation.get_date_formats()`` and
+  ``thibaud.utils.translation.get_partial_date_formats()``. These functions
   will be removed; use the locale-aware
-  ``django.utils.formats.get_format()`` to get the appropriate formats.
+  ``thibaud.utils.formats.get_format()`` to get the appropriate formats.
 
-* In ``django.forms.fields``, the constants: ``DEFAULT_DATE_INPUT_FORMATS``,
+* In ``thibaud.forms.fields``, the constants: ``DEFAULT_DATE_INPUT_FORMATS``,
   ``DEFAULT_TIME_INPUT_FORMATS`` and
   ``DEFAULT_DATETIME_INPUT_FORMATS`` will be removed. Use
-  ``django.utils.formats.get_format()`` to get the appropriate
+  ``thibaud.utils.formats.get_format()`` to get the appropriate
   formats.
 
 * The ability to use a function-based test runner will be removed,
-  along with the ``django.test.simple.run_tests()`` test runner.
+  along with the ``thibaud.test.simple.run_tests()`` test runner.
 
 * The ``views.feed()`` view and ``feeds.Feed`` class in
-  ``django.contrib.syndication`` will be removed. The class-based view
+  ``thibaud.contrib.syndication`` will be removed. The class-based view
   ``views.Feed`` should be used instead.
 
-* ``django.core.context_processors.auth``.  This release will
+* ``thibaud.core.context_processors.auth``.  This release will
   remove the old method in favor of the new method in
-  ``django.contrib.auth.context_processors.auth``.
+  ``thibaud.contrib.auth.context_processors.auth``.
 
 * The ``postgresql`` database backend will be removed, use the
   ``postgresql_psycopg2`` backend instead.
@@ -1395,21 +1395,21 @@ details on these changes.
   ``supports_inactive_user`` until version 1.5 when it will be assumed that
   all backends will handle inactive users.
 
-* ``django.db.models.fields.XMLField`` will be removed. This was
+* ``thibaud.db.models.fields.XMLField`` will be removed. This was
   deprecated as part of the 1.3 release. An accelerated deprecation
   schedule has been used because the field hasn't performed any role
   beyond that of a simple ``TextField`` since the removal of ``oldforms``.
   All uses of ``XMLField`` can be replaced with ``TextField``.
 
 * The undocumented ``mixin`` parameter to the ``open()`` method of
-  ``django.core.files.storage.Storage`` (and subclasses) will be removed.
+  ``thibaud.core.files.storage.Storage`` (and subclasses) will be removed.
 
 .. _deprecation-removed-in-1.3:
 
 1.3
 ---
 
-See the :ref:`Django 1.1 release notes<deprecated-features-1.1>` for more
+See the :ref:`Thibaud 1.1 release notes<deprecated-features-1.1>` for more
 details on these changes.
 
 * ``AdminSite.root()``.  This method of hooking up the admin URLs will be

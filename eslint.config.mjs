@@ -39,7 +39,7 @@ export default [
             globals: {
                 ...globals.browser,
                 ...globals.commonjs,
-                "django": false
+                "thibaud": false
             }
         }
     },
@@ -53,8 +53,8 @@ export default [
         ignores: [
             "**/*.min.js",
             "**/vendor/**/*.js",
-            "django/contrib/gis/templates/**/*.js",
-            "django/views/templates/*.js",
+            "thibaud/contrib/gis/templates/**/*.js",
+            "thibaud/views/templates/*.js",
             "docs/_build/**/*.js",
             "node_modules/**.js",
             "tests/**/*.js",

@@ -1,10 +1,10 @@
-from django.core.exceptions import ValidationError
-from django.forms import FloatField, NumberInput
-from django.test import SimpleTestCase
-from django.test.selenium import SeleniumTestCase
-from django.test.utils import override_settings
-from django.urls import reverse
-from django.utils import formats, translation
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms import FloatField, NumberInput
+from thibaud.test import SimpleTestCase
+from thibaud.test.selenium import SeleniumTestCase
+from thibaud.test.utils import override_settings
+from thibaud.urls import reverse
+from thibaud.utils import formats, translation
 
 from . import FormFieldAssertionsMixin
 

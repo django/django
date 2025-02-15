@@ -1,12 +1,12 @@
 from unittest import mock
 
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection, models
-from django.db.models import F
-from django.db.models.constraints import BaseConstraint, UniqueConstraint
-from django.db.models.functions import Abs, Lower, Sqrt, Upper
-from django.db.transaction import atomic
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import IntegrityError, connection, models
+from thibaud.db.models import F
+from thibaud.db.models.constraints import BaseConstraint, UniqueConstraint
+from thibaud.db.models.functions import Abs, Lower, Sqrt, Upper
+from thibaud.db.transaction import atomic
+from thibaud.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     ChildModel,
@@ -90,7 +90,7 @@ class BaseConstraintTests(SimpleTestCase):
             violation_error_code="custom_code",
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.BaseConstraint")
+        self.assertEqual(path, "thibaud.db.models.BaseConstraint")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
@@ -213,7 +213,7 @@ class CheckConstraintTests(TestCase):
         name = "price_gt_discounted_price"
         constraint = models.CheckConstraint(condition=check, name=name)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.CheckConstraint")
+        self.assertEqual(path, "thibaud.db.models.CheckConstraint")
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {"condition": check, "name": name})
 
@@ -730,7 +730,7 @@ class UniqueConstraintTests(TestCase):
         name = "unique_fields"
         constraint = models.UniqueConstraint(fields=fields, name=name)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(path, "thibaud.db.models.UniqueConstraint")
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {"fields": tuple(fields), "name": name})
 
@@ -742,7 +742,7 @@ class UniqueConstraintTests(TestCase):
             fields=fields, name=name, condition=condition
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(path, "thibaud.db.models.UniqueConstraint")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs, {"fields": tuple(fields), "name": name, "condition": condition}
@@ -757,7 +757,7 @@ class UniqueConstraintTests(TestCase):
             deferrable=models.Deferrable.DEFERRED,
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(path, "thibaud.db.models.UniqueConstraint")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
@@ -774,7 +774,7 @@ class UniqueConstraintTests(TestCase):
         include = ["baz_1", "baz_2"]
         constraint = models.UniqueConstraint(fields=fields, name=name, include=include)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(path, "thibaud.db.models.UniqueConstraint")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
@@ -793,7 +793,7 @@ class UniqueConstraintTests(TestCase):
             fields=fields, name=name, opclasses=opclasses
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(path, "thibaud.db.models.UniqueConstraint")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
@@ -811,7 +811,7 @@ class UniqueConstraintTests(TestCase):
             fields=fields, name=name, nulls_distinct=True
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(path, "thibaud.db.models.UniqueConstraint")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
@@ -826,7 +826,7 @@ class UniqueConstraintTests(TestCase):
         name = "unique_fields"
         constraint = models.UniqueConstraint(Lower("title"), name=name)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(path, "thibaud.db.models.UniqueConstraint")
         self.assertEqual(args, (Lower("title"),))
         self.assertEqual(kwargs, {"name": name})
 
@@ -1399,7 +1399,7 @@ class UniqueConstraintTests(TestCase):
     def test_expressions_with_opclasses(self):
         msg = (
             "UniqueConstraint.opclasses cannot be used with expressions. Use "
-            "django.contrib.postgres.indexes.OpClass() instead."
+            "thibaud.contrib.postgres.indexes.OpClass() instead."
         )
         with self.assertRaisesMessage(ValueError, msg):
             models.UniqueConstraint(

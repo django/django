@@ -1,4 +1,4 @@
-from django.utils.version import get_version
+from thibaud.utils.version import get_version
 
 VERSION = (6, 0, 0, "alpha", 0)
 
@@ -11,10 +11,10 @@ def setup(set_prefix=True):
     first setting), configure logging and populate the app registry.
     Set the thread-local urlresolvers script prefix if `set_prefix` is True.
     """
-    from django.apps import apps
-    from django.conf import settings
-    from django.urls import set_script_prefix
-    from django.utils.log import configure_logging
+    from thibaud.apps import apps
+    from thibaud.conf import settings
+    from thibaud.urls import set_script_prefix
+    from thibaud.utils.log import configure_logging
 
     configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
     if set_prefix:

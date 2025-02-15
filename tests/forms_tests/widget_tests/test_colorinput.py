@@ -1,4 +1,4 @@
-from django.forms import ColorInput
+from thibaud.forms import ColorInput
 
 from .base import WidgetTest
 

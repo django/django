@@ -1,4 +1,4 @@
-from django.forms import (
+from thibaud.forms import (
     CharField,
     ChoiceField,
     Form,
@@ -7,9 +7,9 @@ from django.forms import (
     Select,
     TextInput,
 )
-from django.test import SimpleTestCase
-from django.utils import translation
-from django.utils.translation import gettext_lazy
+from thibaud.test import SimpleTestCase
+from thibaud.utils import translation
+from thibaud.utils.translation import gettext_lazy
 
 from . import jinja2_tests
 

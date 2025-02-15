@@ -1,10 +1,10 @@
 ==========================
-Django 2.1.2 release notes
+Thibaud 2.1.2 release notes
 ==========================
 
 *October 1, 2018*
 
-Django 2.1.2 fixes a security issue and several bugs in 2.1.1. Also, the latest
+Thibaud 2.1.2 fixes a security issue and several bugs in 2.1.1. Also, the latest
 string translations from Transifex are incorporated.
 
 CVE-2018-16984: Password hash disclosure to "view only" admin users
@@ -30,7 +30,7 @@ Bugfixes
 
 * Added compatibility for ``cx_Oracle`` 7 (:ticket:`29759`).
 
-* Fixed a regression in Django 2.0 where unique index names weren't quoted
+* Fixed a regression in Thibaud 2.0 where unique index names weren't quoted
   (:ticket:`29778`).
 
 * Fixed a regression where sliced queries with multiple columns with the same

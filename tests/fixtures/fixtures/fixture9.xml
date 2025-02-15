@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<thibaud-objects version="1.0">
     <object pk="2" model="fixtures.visa">
         <field type="CharField" name="person">
             <natural>Stephane Grappelli</natural>
@@ -38,11 +38,11 @@
         <field type="CharField" name="name">Music for all ages</field>
         <field to="fixtures.person" name="authors" rel="ManyToManyRel">
             <object>
-                <natural>Django Reinhardt</natural>
+                <natural>Thibaud Reinhardt</natural>
             </object>
             <object>
                 <natural>Artist formerly known as &quot;Prince&quot;</natural>
             </object>
         </field>
     </object>
-</django-objects>
+</thibaud-objects>

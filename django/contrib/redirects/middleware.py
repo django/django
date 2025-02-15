@@ -1,10 +1,10 @@
-from django.apps import apps
-from django.conf import settings
-from django.contrib.redirects.models import Redirect
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponseGone, HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.contrib.redirects.models import Redirect
+from thibaud.contrib.sites.shortcuts import get_current_site
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import HttpResponseGone, HttpResponsePermanentRedirect
+from thibaud.utils.deprecation import MiddlewareMixin
 
 
 class RedirectFallbackMiddleware(MiddlewareMixin):
@@ -13,10 +13,10 @@ class RedirectFallbackMiddleware(MiddlewareMixin):
     response_redirect_class = HttpResponsePermanentRedirect
 
     def __init__(self, get_response):
-        if not apps.is_installed("django.contrib.sites"):
+        if not apps.is_installed("thibaud.contrib.sites"):
             raise ImproperlyConfigured(
                 "You cannot use RedirectFallbackMiddleware when "
-                "django.contrib.sites is not installed."
+                "thibaud.contrib.sites is not installed."
             )
         super().__init__(get_response)
 

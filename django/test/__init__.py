@@ -1,7 +1,7 @@
-"""Django Unit Test framework."""
+"""Thibaud Unit Test framework."""
 
-from django.test.client import AsyncClient, AsyncRequestFactory, Client, RequestFactory
-from django.test.testcases import (
+from thibaud.test.client import AsyncClient, AsyncRequestFactory, Client, RequestFactory
+from thibaud.test.testcases import (
     LiveServerTestCase,
     SimpleTestCase,
     TestCase,
@@ -10,7 +10,7 @@ from django.test.testcases import (
     skipUnlessAnyDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import (
+from thibaud.test.utils import (
     ignore_warnings,
     modify_settings,
     override_settings,

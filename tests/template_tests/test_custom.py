@@ -1,10 +1,10 @@
 import os
 
-from django.template import Context, Engine, TemplateSyntaxError
-from django.template.base import Node
-from django.template.library import InvalidTemplateLibrary
-from django.test import SimpleTestCase
-from django.test.utils import extend_sys_path
+from thibaud.template import Context, Engine, TemplateSyntaxError
+from thibaud.template.base import Node
+from thibaud.template.library import InvalidTemplateLibrary
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import extend_sys_path
 
 from .templatetags import custom, inclusion
 from .utils import ROOT

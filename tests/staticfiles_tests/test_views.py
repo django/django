@@ -1,8 +1,8 @@
 import posixpath
 from urllib.parse import quote
 
-from django.conf import settings
-from django.test import override_settings
+from thibaud.conf import settings
+from thibaud.test import override_settings
 
 from .cases import StaticFilesTestCase, TestDefaults
 

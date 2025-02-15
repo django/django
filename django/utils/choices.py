@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping
 from itertools import islice, tee, zip_longest
 
-from django.utils.functional import Promise
+from thibaud.utils.functional import Promise
 
 __all__ = [
     "BaseChoiceIterator",
@@ -71,8 +71,8 @@ def flatten_choices(choices):
 
 def normalize_choices(value, *, depth=0):
     """Normalize choices values consistently for fields and widgets."""
-    # Avoid circular import when importing django.forms.
-    from django.db.models.enums import ChoicesType
+    # Avoid circular import when importing thibaud.forms.
+    from thibaud.db.models.enums import ChoicesType
 
     match value:
         case BaseChoiceIterator() | Promise() | bytes() | str():

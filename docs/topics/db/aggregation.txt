@@ -2,14 +2,14 @@
 Aggregation
 ===========
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
-The topic guide on :doc:`Django's database-abstraction API </topics/db/queries>`
-described the way that you can use Django queries that create,
+The topic guide on :doc:`Thibaud's database-abstraction API </topics/db/queries>`
+described the way that you can use Thibaud queries that create,
 retrieve, update and delete individual objects. However, sometimes you will
 need to retrieve values that are derived by summarizing or *aggregating* a
 collection of objects. This topic guide describes the ways that aggregate values
-can be generated and returned using Django queries.
+can be generated and returned using Thibaud queries.
 
 Throughout this guide, we'll refer to the following models. These models are
 used to track the inventory for a series of online bookstores:
@@ -18,7 +18,7 @@ used to track the inventory for a series of online bookstores:
 
 .. code-block:: python
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Author(models.Model):
@@ -62,18 +62,18 @@ above:
 
     # Average price across all books, provide default to be returned instead
     # of None if no books exist.
-    >>> from django.db.models import Avg
+    >>> from thibaud.db.models import Avg
     >>> Book.objects.aggregate(Avg("price", default=0))
     {'price__avg': 34.35}
 
     # Max price across all books, provide default to be returned instead of
     # None if no books exist.
-    >>> from django.db.models import Max
+    >>> from thibaud.db.models import Max
     >>> Book.objects.aggregate(Max("price", default=0))
     {'price__max': Decimal('81.20')}
 
     # Difference between the highest priced book and the average price of all books.
-    >>> from django.db.models import FloatField
+    >>> from thibaud.db.models import FloatField
     >>> Book.objects.aggregate(
     ...     price_diff=Max("price", output_field=FloatField()) - Avg("price")
     ... )
@@ -83,7 +83,7 @@ above:
     # foreign key relationship backwards.
 
     # Each publisher, each with a count of books as a "num_books" attribute.
-    >>> from django.db.models import Count
+    >>> from thibaud.db.models import Count
     >>> pubs = Publisher.objects.annotate(num_books=Count("book"))
     >>> pubs
     <QuerySet [<Publisher: BaloneyPress>, <Publisher: SalamiPress>, ...]>
@@ -91,7 +91,7 @@ above:
     73
 
     # Each publisher, with a separate count of books with a rating above and below 5
-    >>> from django.db.models import Q
+    >>> from thibaud.db.models import Q
     >>> above_5 = Count("book", filter=Q(book__rating__gt=5))
     >>> below_5 = Count("book", filter=Q(book__rating__lte=5))
     >>> pubs = Publisher.objects.annotate(below_5=below_5).annotate(above_5=above_5)
@@ -108,9 +108,9 @@ above:
 Generating aggregates over a ``QuerySet``
 =========================================
 
-Django provides two ways to generate aggregates. The first way is to generate
+Thibaud provides two ways to generate aggregates. The first way is to generate
 summary values over an entire ``QuerySet``. For example, say you wanted to
-calculate the average price of all books available for sale. Django's query
+calculate the average price of all books available for sale. Thibaud's query
 syntax provides a means for describing the set of all books:
 
 .. code-block:: pycon
@@ -123,7 +123,7 @@ clause onto the ``QuerySet``:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import Avg
+    >>> from thibaud.db.models import Avg
     >>> Book.objects.all().aggregate(Avg("price"))
     {'price__avg': 34.35}
 
@@ -157,7 +157,7 @@ minimum price of all books, we would issue the query:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import Avg, Max, Min
+    >>> from thibaud.db.models import Avg, Max, Min
     >>> Book.objects.aggregate(Avg("price"), Max("price"), Min("price"))
     {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
 
@@ -183,16 +183,16 @@ number of authors:
 .. code-block:: pycon
 
     # Build an annotated queryset
-    >>> from django.db.models import Count
+    >>> from thibaud.db.models import Count
     >>> q = Book.objects.annotate(Count("authors"))
     # Interrogate the first object in the queryset
     >>> q[0]
-    <Book: The Definitive Guide to Django>
+    <Book: The Definitive Guide to Thibaud>
     >>> q[0].authors__count
     2
     # Interrogate the second object in the queryset
     >>> q[1]
-    <Book: Practical Django Projects>
+    <Book: Practical Thibaud Projects>
     >>> q[1].authors__count
     1
 
@@ -236,7 +236,7 @@ wrong results <10060>` because joins are used instead of subqueries:
     6
 
 For most aggregates, there is no way to avoid this problem, however, the
-:class:`~django.db.models.Count` aggregate has a ``distinct`` parameter that
+:class:`~thibaud.db.models.Count` aggregate has a ``distinct`` parameter that
 may help:
 
 .. code-block:: pycon
@@ -261,10 +261,10 @@ So far, we have dealt with aggregates over fields that belong to the
 model being queried. However, sometimes the value you want to aggregate
 will belong to a model that is related to the model you are querying.
 
-When specifying the field to be aggregated in an aggregate function, Django
+When specifying the field to be aggregated in an aggregate function, Thibaud
 will allow you to use the same :ref:`double underscore notation
 <field-lookups-intro>` that is used when referring to related fields in
-filters. Django will then handle any table joins that are required to retrieve
+filters. Thibaud will then handle any table joins that are required to retrieve
 and aggregate the related value.
 
 For example, to find the price range of books offered in each store,
@@ -272,10 +272,10 @@ you could use the annotation:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import Max, Min
+    >>> from thibaud.db.models import Max, Min
     >>> Store.objects.annotate(min_price=Min("books__price"), max_price=Max("books__price"))
 
-This tells Django to retrieve the ``Store`` model, join (through the
+This tells Thibaud to retrieve the ``Store`` model, join (through the
 many-to-many relationship) with the ``Book`` model, and aggregate on the
 price field of the book model to produce a minimum and maximum value.
 
@@ -309,7 +309,7 @@ total book stock counters (note how we use ``'book'`` to specify the
 
 .. code-block:: pycon
 
-    >>> from django.db.models import Avg, Count, Min, Sum
+    >>> from thibaud.db.models import Avg, Count, Min, Sum
     >>> Publisher.objects.annotate(Count("book"))
 
 (Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
@@ -360,21 +360,21 @@ constraining the objects that are considered for aggregation.
 When used with an ``annotate()`` clause, a filter has the effect of
 constraining the objects for which an annotation is calculated. For example,
 you can generate an annotated list of all books that have a title starting
-with "Django" using the query:
+with "Thibaud" using the query:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import Avg, Count
-    >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count("authors"))
+    >>> from thibaud.db.models import Avg, Count
+    >>> Book.objects.filter(name__startswith="Thibaud").annotate(num_authors=Count("authors"))
 
 When used with an ``aggregate()`` clause, a filter has the effect of
 constraining the objects over which the aggregate is calculated.
 For example, you can generate the average price of all books with a
-title that starts with "Django" using the query:
+title that starts with "Thibaud" using the query:
 
 .. code-block:: pycon
 
-    >>> Book.objects.filter(name__startswith="Django").aggregate(Avg("price"))
+    >>> Book.objects.filter(name__startswith="Thibaud").aggregate(Avg("price"))
 
 .. _filtering-on-annotations:
 
@@ -587,7 +587,7 @@ shows up, particularly, when counting things.
 
 By way of example, suppose you have a model like this::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Item(models.Model):
@@ -614,15 +614,15 @@ without any harmful effects, since that is already playing a role in the
 query.
 
 This behavior is the same as that noted in the queryset documentation for
-:meth:`~django.db.models.query.QuerySet.distinct` and the general rule is the
+:meth:`~thibaud.db.models.query.QuerySet.distinct` and the general rule is the
 same: normally you won't want extra columns playing a part in the result, so
 clear out the ordering, or at least make sure it's restricted only to those
 fields you also select in a ``values()`` call.
 
 .. note::
-    You might reasonably ask why Django doesn't remove the extraneous columns
+    You might reasonably ask why Thibaud doesn't remove the extraneous columns
     for you. The main reason is consistency with ``distinct()`` and other
-    places: Django **never** removes ordering constraints that you have
+    places: Thibaud **never** removes ordering constraints that you have
     specified (and we can't change those other methods' behavior, as that
     would violate our :doc:`/misc/api-stability` policy).
 
@@ -639,7 +639,7 @@ aggregate that author count, referencing the annotation field:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import Avg, Count
+    >>> from thibaud.db.models import Avg, Count
     >>> Book.objects.annotate(num_authors=Count("authors")).aggregate(Avg("num_authors"))
     {'num_authors__avg': 1.66}
 
@@ -653,22 +653,22 @@ the executed query returns no rows.
 
 You can specify a return value by providing the :ref:`default
 <aggregate-default>` argument for most aggregations. However, since
-:class:`~django.db.models.Count` does not support the :ref:`default
+:class:`~thibaud.db.models.Count` does not support the :ref:`default
 <aggregate-default>` argument, it will always return ``0`` for empty querysets
 or groups.
 
 For example, assuming that no book contains *web* in its name, calculating the
 total price for this book set would return ``None`` since there are no matching
-rows to compute the :class:`~django.db.models.Sum` aggregation on:
+rows to compute the :class:`~thibaud.db.models.Sum` aggregation on:
 
 .. code-block:: pycon
 
-    >>> from django.db.models import Sum
+    >>> from thibaud.db.models import Sum
     >>> Book.objects.filter(name__contains="web").aggregate(Sum("price"))
     {"price__sum": None}
 
 However, the :ref:`default <aggregate-default>` argument can be set when
-calling :class:`~django.db.models.Sum` to return a different default value if
+calling :class:`~thibaud.db.models.Sum` to return a different default value if
 no books can be found:
 
 .. code-block:: pycon
@@ -678,4 +678,4 @@ no books can be found:
 
 Under the hood, the :ref:`default <aggregate-default>` argument is implemented
 by wrapping the aggregate function with
-:class:`~django.db.models.functions.Coalesce`.
+:class:`~thibaud.db.models.functions.Coalesce`.

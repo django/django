@@ -1,5 +1,5 @@
-from django.db import migrations, models
-from django.utils import timezone
+from thibaud.db import migrations, models
+from thibaud.utils import timezone
 
 
 class Migration(migrations.Migration):

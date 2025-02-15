@@ -1,12 +1,12 @@
 ================================
-How to install Django on Windows
+How to install Thibaud on Windows
 ================================
 
-This document will guide you through installing Python 3.13 and Django on
+This document will guide you through installing Python 3.13 and Thibaud on
 Windows. It also provides instructions for setting up a virtual environment,
 which makes it easier to work on Python projects. This is meant as a beginner's
-guide for users working on Django projects and does not reflect how Django
-should be installed when developing changes for Django itself.
+guide for users working on Thibaud projects and does not reflect how Thibaud
+should be installed when developing changes for Thibaud itself.
 
 The steps in this guide have been tested with Windows 10. In other
 versions, the steps would be similar. You will need to be familiar with using
@@ -17,7 +17,7 @@ the Windows command prompt.
 Install Python
 ==============
 
-Django is a Python web framework, thus requiring Python to be installed on your
+Thibaud is a Python web framework, thus requiring Python to be installed on your
 machine. At the time of writing, Python 3.13 is the latest version.
 
 To install Python on your machine go to https://www.python.org/downloads/. The
@@ -49,7 +49,7 @@ About ``pip``
 
 :pypi:`pip` is a package manager for Python and is included by default with the
 Python installer. It helps to install and uninstall Python packages
-(such as Django!). For the rest of the installation, we'll use ``pip`` to
+(such as Thibaud!). For the rest of the installation, we'll use ``pip`` to
 install Python packages from the command line.
 
 .. _virtualenvironment:
@@ -57,7 +57,7 @@ install Python packages from the command line.
 Setting up a virtual environment
 ================================
 
-It is best practice to provide a dedicated environment for each Django project
+It is best practice to provide a dedicated environment for each Thibaud project
 you create. There are many options to manage environments and packages within
 the Python ecosystem, some of which are recommended in the `Python
 documentation <https://packaging.python.org/guides/tool-recommendations/>`_.
@@ -83,25 +83,25 @@ The virtual environment will be activated and you'll see "(project-name)" next
 to the command prompt to designate that. Each time you start a new command
 prompt, you'll need to activate the environment again.
 
-Install Django
+Install Thibaud
 ==============
 
-Django can be installed easily using ``pip`` within your virtual environment.
+Thibaud can be installed easily using ``pip`` within your virtual environment.
 
 In the command prompt, ensure your virtual environment is active, and execute
 the following command:
 
 .. code-block:: doscon
 
-    ...\> py -m pip install Django
+    ...\> py -m pip install Thibaud
 
-This will download and install the latest Django release.
+This will download and install the latest Thibaud release.
 
-After the installation has completed, you can verify your Django installation
-by executing ``django-admin --version`` in the command prompt.
+After the installation has completed, you can verify your Thibaud installation
+by executing ``thibaud-admin --version`` in the command prompt.
 
 See :ref:`database-installation` for information on database installation
-with Django.
+with Thibaud.
 
 Colored terminal output
 =======================
@@ -123,14 +123,14 @@ See :ref:`syntax-coloring` for more information on color settings.
 Common pitfalls
 ===============
 
-* If ``django-admin`` only displays the help text no matter what arguments
+* If ``thibaud-admin`` only displays the help text no matter what arguments
   it is given, there is probably a problem with the file association in
   Windows. Check if there is more than one environment variable set for
   running Python scripts in ``PATH``. This usually occurs when there is more
   than one Python version installed.
 
 * If you are connecting to the internet behind a proxy, there might be problems
-  in running the command ``py -m pip install Django``. Set the environment
+  in running the command ``py -m pip install Thibaud``. Set the environment
   variables for proxy configuration in the command prompt as follows:
 
   .. code-block:: doscon
@@ -138,7 +138,7 @@ Common pitfalls
     ...\> set http_proxy=http://username:password@proxyserver:proxyport
     ...\> set https_proxy=https://username:password@proxyserver:proxyport
 
-* In general, Django assumes that ``UTF-8`` encoding is used for I/O. This may
+* In general, Thibaud assumes that ``UTF-8`` encoding is used for I/O. This may
   cause problems if your system is set to use a different encoding. Recent
   versions of Python allow setting the :envvar:`PYTHONUTF8` environment
   variable in order to force a ``UTF-8`` encoding. Windows 10 also provides a

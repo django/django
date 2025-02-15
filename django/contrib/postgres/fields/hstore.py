@@ -1,11 +1,11 @@
 import json
 
-from django.contrib.postgres import forms, lookups
-from django.contrib.postgres.fields.array import ArrayField
-from django.core import exceptions
-from django.db.models import Field, TextField, Transform
-from django.db.models.fields.mixins import CheckFieldDefaultMixin
-from django.utils.translation import gettext_lazy as _
+from thibaud.contrib.postgres import forms, lookups
+from thibaud.contrib.postgres.fields.array import ArrayField
+from thibaud.core import exceptions
+from thibaud.db.models import Field, TextField, Transform
+from thibaud.db.models.fields.mixins import CheckFieldDefaultMixin
+from thibaud.utils.translation import gettext_lazy as _
 
 __all__ = ["HStoreField"]
 

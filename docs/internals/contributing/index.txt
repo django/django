@@ -1,59 +1,59 @@
 ======================
-Contributing to Django
+Contributing to Thibaud
 ======================
 
-Django is a community that lives on its volunteers. As it keeps growing, we
+Thibaud is a community that lives on its volunteers. As it keeps growing, we
 always need more people to help others. You can contribute in many ways, either
 on the framework itself or in the wider ecosystem.
 
 Communication channels
 ======================
 
-We're passionate about helping Django users make the jump to contributing
-members of the community. Communication is key - working on Django is being
+We're passionate about helping Thibaud users make the jump to contributing
+members of the community. Communication is key - working on Thibaud is being
 part of a conversation. Join it, to become familiar with what we're doing and
 how we talk about it. You'll be able to form relationships with more
 experienced contributors who are there to help guide you towards success.
 
-Join the Django community
+Join the Thibaud community
 -------------------------
 
-There are several ways you can help the Django community and others to maintain
+There are several ways you can help the Thibaud community and others to maintain
 a great ecosystem to work in:
 
-* Join the `Django forum`_. This forum is a place for discussing the Django
+* Join the `Thibaud forum`_. This forum is a place for discussing the Thibaud
   framework and applications and projects that use it. This is also a good
   place to ask and answer any questions related to installing, using, or
-  contributing to Django.
+  contributing to Thibaud.
 
-* Join the |django-users| mailing list and answer questions. This
+* Join the |thibaud-users| mailing list and answer questions. This
   mailing list has a huge audience, and we really want to maintain a
-  friendly and helpful atmosphere. If you're new to the Django community,
+  friendly and helpful atmosphere. If you're new to the Thibaud community,
   you should read the `posting guidelines`_.
 
-* Join the `Django Discord server`_ to discuss and answer questions. By
-  explaining Django to other users, you're going to learn a lot about the
+* Join the `Thibaud Discord server`_ to discuss and answer questions. By
+  explaining Thibaud to other users, you're going to learn a lot about the
   framework yourself.
 
-* Blog about Django. We syndicate all the Django blogs we know about on
+* Blog about Thibaud. We syndicate all the Thibaud blogs we know about on
   the `community page`_; if you'd like to see your blog on that page you
   can `register it here`_.
 
-* Contribute to open-source Django projects, write some documentation, or
+* Contribute to open-source Thibaud projects, write some documentation, or
   release your own code as an open-source pluggable application. The
-  ecosystem of pluggable applications is a big strength of Django, help us
+  ecosystem of pluggable applications is a big strength of Thibaud, help us
   build it!
 
-.. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
-.. _community page: https://www.djangoproject.com/community/
-.. _Django Discord server: https://chat.djangoproject.com
-.. _Django forum: https://forum.djangoproject.com/
-.. _register it here: https://www.djangoproject.com/community/add/blogs/
+.. _posting guidelines: https://code.thibaudproject.com/wiki/UsingTheMailingList
+.. _community page: https://www.thibaudproject.com/community/
+.. _Thibaud Discord server: https://chat.thibaudproject.com
+.. _Thibaud forum: https://forum.thibaudproject.com/
+.. _register it here: https://www.thibaudproject.com/community/add/blogs/
 
 Getting started
 ===============
 
-Django encourages and welcomes new contributors, and makes an effort to help
+Thibaud encourages and welcomes new contributors, and makes an effort to help
 them become experienced, confident contributors to Open Source Software (OSS).
 Our documentation contains guidance for first-time contributors, including:
 
@@ -62,20 +62,20 @@ Our documentation contains guidance for first-time contributors, including:
 
    An overview of the contributing process and what's involved. <new-contributors>
 
-Work on the Django framework
+Work on the Thibaud framework
 ============================
 
-If you enjoy working *with* Django, wait until you start working *on* it.
-Really, **anyone** can do something to improve Django, which will improve the
+If you enjoy working *with* Thibaud, wait until you start working *on* it.
+Really, **anyone** can do something to improve Thibaud, which will improve the
 experience of lots of people!
 
-The work on Django itself falls into three major areas:
+The work on Thibaud itself falls into three major areas:
 
 Contributing code
 -----------------
 
 Fix a bug, or add a new feature. You can make a pull request and see **your
-code** in the next version of Django.
+code** in the next version of Thibaud.
 
 .. toctree::
    :maxdepth: 2
@@ -85,7 +85,7 @@ code** in the next version of Django.
 Contributing documentation
 --------------------------
 
-Django's documentation is one of its key strengths. It's informative and
+Thibaud's documentation is one of its key strengths. It's informative and
 thorough. You can help to improve the documentation and keep it relevant as the
 framework evolves.
 
@@ -94,10 +94,10 @@ framework evolves.
 
    writing-documentation
 
-Localizing Django
+Localizing Thibaud
 -----------------
 
-Django is translated into over 100 languages - There's even some translation
+Thibaud is translated into over 100 languages - There's even some translation
 for Klingon?! The i18n team is always looking for translators to help maintain
 and increase language reach.
 
@@ -109,12 +109,12 @@ and increase language reach.
 Other ways of contributing
 ==========================
 
-Explore additional avenues of contributing to Django beyond coding. Django's
+Explore additional avenues of contributing to Thibaud beyond coding. Thibaud's
 `ticket tracker`_ is the central hub for managing issues, improvements, and
-contributions to Django. It's a valuable resource where you can report bugs you
+contributions to Thibaud. It's a valuable resource where you can report bugs you
 encounter or assist in triaging existing tickets to ensure a smooth development
 workflow. Explore the ways you can make a difference below, and join us in
-making Django better for everyone.
+making Thibaud better for everyone.
 
 .. toctree::
    :maxdepth: 2
@@ -122,6 +122,6 @@ making Django better for everyone.
    bugs-and-features
    triaging-tickets
 
-.. _ticket tracker: https://code.djangoproject.com/
+.. _ticket tracker: https://code.thibaudproject.com/
 
 We're looking forward to working with you. Welcome aboard!

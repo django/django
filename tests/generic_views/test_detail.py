@@ -1,11 +1,11 @@
 import datetime
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
-from django.views.generic.base import View
-from django.views.generic.detail import SingleObjectTemplateResponseMixin
-from django.views.generic.edit import ModelFormMixin
+from thibaud.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from thibaud.test import TestCase, override_settings
+from thibaud.test.client import RequestFactory
+from thibaud.views.generic.base import View
+from thibaud.views.generic.detail import SingleObjectTemplateResponseMixin
+from thibaud.views.generic.edit import ModelFormMixin
 
 from .models import Artist, Author, Book, Page
 

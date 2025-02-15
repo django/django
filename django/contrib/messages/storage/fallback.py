@@ -1,6 +1,6 @@
-from django.contrib.messages.storage.base import BaseStorage
-from django.contrib.messages.storage.cookie import CookieStorage
-from django.contrib.messages.storage.session import SessionStorage
+from thibaud.contrib.messages.storage.base import BaseStorage
+from thibaud.contrib.messages.storage.cookie import CookieStorage
+from thibaud.contrib.messages.storage.session import SessionStorage
 
 
 class FallbackStorage(BaseStorage):

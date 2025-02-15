@@ -2,7 +2,7 @@
 Formsets
 ========
 
-.. currentmodule:: django.forms.formsets
+.. currentmodule:: thibaud.forms.formsets
 
 .. class:: BaseFormSet
 
@@ -12,7 +12,7 @@ form:
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
     >>> class ArticleForm(forms.Form):
     ...     title = forms.CharField()
     ...     pub_date = forms.DateField()
@@ -23,7 +23,7 @@ a formset out of an ``ArticleForm`` you would do:
 
 .. code-block:: pycon
 
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
 You now have created a formset class named ``ArticleFormSet``.
@@ -41,7 +41,7 @@ in the formset and display them as you would with a regular form:
 
 As you can see it only displayed one empty form. The number of empty forms
 that is displayed is controlled by the ``extra`` parameter. By default,
-:func:`~django.forms.formsets.formset_factory` defines one extra form; the
+:func:`~thibaud.forms.formsets.formset_factory` defines one extra form; the
 following example will create a formset class to display two blank forms:
 
 .. code-block:: pycon
@@ -67,13 +67,13 @@ example:
 .. code-block:: pycon
 
     >>> import datetime
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
     >>> formset = ArticleFormSet(
     ...     initial=[
     ...         {
-    ...             "title": "Django is now open source",
+    ...             "title": "Thibaud is now open source",
     ...             "pub_date": datetime.date.today(),
     ...         }
     ...     ]
@@ -82,7 +82,7 @@ example:
     >>> for form in formset:
     ...     print(form)
     ...
-    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" value="Django is now open source" id="id_form-0-title"></div>
+    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" value="Thibaud is now open source" id="id_form-0-title"></div>
     <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" value="2023-02-11" id="id_form-0-pub_date"></div>
     <div><label for="id_form-1-title">Title:</label><input type="text" name="form-1-title" id="id_form-1-title"></div>
     <div><label for="id_form-1-pub_date">Pub date:</label><input type="text" name="form-1-pub_date" id="id_form-1-pub_date"></div>
@@ -107,12 +107,12 @@ something like: ``ArticleFormSet(request.POST, initial=[...])``.
 Limiting the maximum number of forms
 ====================================
 
-The ``max_num`` parameter to :func:`~django.forms.formsets.formset_factory`
+The ``max_num`` parameter to :func:`~thibaud.forms.formsets.formset_factory`
 gives you the ability to limit the number of forms the formset will display:
 
 .. code-block:: pycon
 
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
     >>> formset = ArticleFormSet()
@@ -140,7 +140,7 @@ of forms displayed (1000). In practice this is equivalent to no limit.
 
 By default, ``max_num`` only affects how many forms are displayed and does not
 affect validation.  If ``validate_max=True`` is passed to the
-:func:`~django.forms.formsets.formset_factory`, then ``max_num`` will affect
+:func:`~thibaud.forms.formsets.formset_factory`, then ``max_num`` will affect
 validation.  See :ref:`validate_max`.
 
 .. _formsets-absolute-max:
@@ -154,7 +154,7 @@ protects against memory exhaustion attacks using forged ``POST`` requests:
 
 .. code-block:: pycon
 
-    >>> from django.forms.formsets import formset_factory
+    >>> from thibaud.forms.formsets import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, absolute_max=1500)
     >>> data = {
@@ -183,7 +183,7 @@ all forms in the formset:
 
 .. code-block:: pycon
 
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm)
     >>> data = {
@@ -360,9 +360,9 @@ is where you define your own validation that works at the formset level:
 
 .. code-block:: pycon
 
-    >>> from django.core.exceptions import ValidationError
-    >>> from django.forms import BaseFormSet
-    >>> from django.forms import formset_factory
+    >>> from thibaud.core.exceptions import ValidationError
+    >>> from thibaud.forms import BaseFormSet
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
 
     >>> class BaseArticleFormSet(BaseFormSet):
@@ -406,7 +406,7 @@ Non-form errors will be rendered with an additional class of ``nonform`` to
 help distinguish them from form-specific errors. For example,
 ``{{ formset.non_form_errors }}`` would look like:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <ul class="errorlist nonform">
         <li>Articles in a set must have distinct titles.</li>
@@ -415,7 +415,7 @@ help distinguish them from form-specific errors. For example,
 Validating the number of forms in a formset
 ===========================================
 
-Django provides a couple ways to validate the minimum or maximum number of
+Thibaud provides a couple ways to validate the minimum or maximum number of
 submitted forms. Applications which need more customizable validation of the
 number of forms should use custom formset validation.
 
@@ -425,13 +425,13 @@ number of forms should use custom formset validation.
 ----------------
 
 If ``validate_max=True`` is passed to
-:func:`~django.forms.formsets.formset_factory`, validation will also check
+:func:`~thibaud.forms.formsets.formset_factory`, validation will also check
 that the number of forms in the data set, minus those marked for
 deletion, is less than or equal to ``max_num``.
 
 .. code-block:: pycon
 
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, max_num=1, validate_max=True)
     >>> data = {
@@ -470,13 +470,13 @@ to the :ref:`formsets-error-messages` argument.
 ----------------
 
 If ``validate_min=True`` is passed to
-:func:`~django.forms.formsets.formset_factory`, validation will also check
+:func:`~thibaud.forms.formsets.formset_factory`, validation will also check
 that the number of forms in the data set, minus those marked for
 deletion, is greater than or equal to ``min_num``.
 
 .. code-block:: pycon
 
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, min_num=3, validate_min=True)
     >>> data = {
@@ -506,7 +506,7 @@ to the :ref:`formsets-error-messages` argument.
 Dealing with ordering and deletion of forms
 ===========================================
 
-The :func:`~django.forms.formsets.formset_factory` provides two optional
+The :func:`~thibaud.forms.formsets.formset_factory` provides two optional
 parameters ``can_order`` and ``can_delete`` to help with ordering of forms in
 formsets and deletion of forms from a formset.
 
@@ -521,7 +521,7 @@ Lets you create a formset with the ability to order:
 
 .. code-block:: pycon
 
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
     >>> formset = ArticleFormSet(
@@ -578,25 +578,25 @@ happen when the user changes these values:
     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1}
     {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2}
 
-:class:`~django.forms.formsets.BaseFormSet` also provides an
-:attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute and
-:meth:`~django.forms.formsets.BaseFormSet.get_ordering_widget` method that
+:class:`~thibaud.forms.formsets.BaseFormSet` also provides an
+:attr:`~thibaud.forms.formsets.BaseFormSet.ordering_widget` attribute and
+:meth:`~thibaud.forms.formsets.BaseFormSet.get_ordering_widget` method that
 control the widget used with
-:attr:`~django.forms.formsets.BaseFormSet.can_order`.
+:attr:`~thibaud.forms.formsets.BaseFormSet.can_order`.
 
 ``ordering_widget``
 ^^^^^^^^^^^^^^^^^^^
 
 .. attribute:: BaseFormSet.ordering_widget
 
-Default: :class:`~django.forms.NumberInput`
+Default: :class:`~thibaud.forms.NumberInput`
 
 Set ``ordering_widget`` to specify the widget class to be used with
 ``can_order``:
 
 .. code-block:: pycon
 
-    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from thibaud.forms import BaseFormSet, formset_factory
     >>> from myapp.forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     ordering_widget = HiddenInput
@@ -616,7 +616,7 @@ use with ``can_order``:
 
 .. code-block:: pycon
 
-    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from thibaud.forms import BaseFormSet, formset_factory
     >>> from myapp.forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def get_ordering_widget(self):
@@ -638,7 +638,7 @@ Lets you create a formset with the ability to select forms for deletion:
 
 .. code-block:: pycon
 
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
     >>> formset = ArticleFormSet(
@@ -690,14 +690,14 @@ delete fields you can access them with ``deleted_forms``:
     >>> [form.cleaned_data for form in formset.deleted_forms]
     [{'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10), 'DELETE': True}]
 
-If you are using a :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`,
+If you are using a :class:`ModelFormSet<thibaud.forms.models.BaseModelFormSet>`,
 model instances for deleted forms will be deleted when you call
 ``formset.save()``.
 
 If you call ``formset.save(commit=False)``, objects will not be deleted
 automatically.  You'll need to call ``delete()`` on each of the
 :attr:`formset.deleted_objects
-<django.forms.models.BaseModelFormSet.deleted_objects>` to actually delete
+<thibaud.forms.models.BaseModelFormSet.deleted_objects>` to actually delete
 them:
 
 .. code-block:: pycon
@@ -711,25 +711,25 @@ On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
 
-:class:`~django.forms.formsets.BaseFormSet` also provides a
-:attr:`~django.forms.formsets.BaseFormSet.deletion_widget` attribute and
-:meth:`~django.forms.formsets.BaseFormSet.get_deletion_widget` method that
+:class:`~thibaud.forms.formsets.BaseFormSet` also provides a
+:attr:`~thibaud.forms.formsets.BaseFormSet.deletion_widget` attribute and
+:meth:`~thibaud.forms.formsets.BaseFormSet.get_deletion_widget` method that
 control the widget used with
-:attr:`~django.forms.formsets.BaseFormSet.can_delete`.
+:attr:`~thibaud.forms.formsets.BaseFormSet.can_delete`.
 
 ``deletion_widget``
 ^^^^^^^^^^^^^^^^^^^
 
 .. attribute:: BaseFormSet.deletion_widget
 
-Default: :class:`~django.forms.CheckboxInput`
+Default: :class:`~thibaud.forms.CheckboxInput`
 
 Set ``deletion_widget`` to specify the widget class to be used with
 ``can_delete``:
 
 .. code-block:: pycon
 
-    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from thibaud.forms import BaseFormSet, formset_factory
     >>> from myapp.forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     deletion_widget = HiddenInput
@@ -749,7 +749,7 @@ use with ``can_delete``:
 
 .. code-block:: pycon
 
-    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from thibaud.forms import BaseFormSet, formset_factory
     >>> from myapp.forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def get_deletion_widget(self):
@@ -780,8 +780,8 @@ fields/attributes of the order and deletion fields:
 
 .. code-block:: pycon
 
-    >>> from django.forms import BaseFormSet
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import BaseFormSet
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def add_fields(self, form, index):
@@ -808,8 +808,8 @@ You can pass this parameter when instantiating the formset:
 
 .. code-block:: pycon
 
-    >>> from django.forms import BaseFormSet
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import BaseFormSet
+    >>> from thibaud.forms import formset_factory
     >>> from myapp.forms import ArticleForm
 
     >>> class MyArticleForm(ArticleForm):
@@ -828,8 +828,8 @@ argument - the index of the form in the formset. The index is ``None`` for the
 
 .. code-block:: pycon
 
-    >>> from django.forms import BaseFormSet
-    >>> from django.forms import formset_factory
+    >>> from thibaud.forms import BaseFormSet
+    >>> from thibaud.forms import formset_factory
 
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def get_form_kwargs(self, index):
@@ -886,41 +886,41 @@ Formsets have the following attributes and methods associated with rendering:
     e.g. via ``print(formset)`` or in a template via ``{{ formset }}``.
 
     By default, a property returning the value of the renderer's
-    :attr:`~django.forms.renderers.BaseRenderer.formset_template_name`. You may
+    :attr:`~thibaud.forms.renderers.BaseRenderer.formset_template_name`. You may
     set it as a string template name in order to override that for a particular
     formset class.
 
     This template will be used to render the formset's management form, and
     then each form in the formset as per the template defined by the form's
-    :attr:`~django.forms.Form.template_name`.
+    :attr:`~thibaud.forms.Form.template_name`.
 
 .. attribute:: BaseFormSet.template_name_div
 
     The name of the template used when calling :meth:`.as_div`. By default this
-    is ``"django/forms/formsets/div.html"``. This template renders the
+    is ``"thibaud/forms/formsets/div.html"``. This template renders the
     formset's management form and then each form in the formset as per the
-    form's :meth:`~django.forms.Form.as_div` method.
+    form's :meth:`~thibaud.forms.Form.as_div` method.
 
 .. attribute:: BaseFormSet.template_name_p
 
     The name of the template used when calling :meth:`.as_p`. By default this
-    is ``"django/forms/formsets/p.html"``. This template renders the formset's
+    is ``"thibaud/forms/formsets/p.html"``. This template renders the formset's
     management form and then each form in the formset as per the form's
-    :meth:`~django.forms.Form.as_p` method.
+    :meth:`~thibaud.forms.Form.as_p` method.
 
 .. attribute:: BaseFormSet.template_name_table
 
     The name of the template used when calling :meth:`.as_table`. By default
-    this is ``"django/forms/formsets/table.html"``. This template renders the
+    this is ``"thibaud/forms/formsets/table.html"``. This template renders the
     formset's management form and then each form in the formset as per the
-    form's :meth:`~django.forms.Form.as_table` method.
+    form's :meth:`~thibaud.forms.Form.as_table` method.
 
 .. attribute:: BaseFormSet.template_name_ul
 
     The name of the template used when calling :meth:`.as_ul`. By default this
-    is ``"django/forms/formsets/ul.html"``. This template renders the formset's
+    is ``"thibaud/forms/formsets/ul.html"``. This template renders the formset's
     management form and then each form in the formset as per the form's
-    :meth:`~django.forms.Form.as_ul` method.
+    :meth:`~thibaud.forms.Form.as_ul` method.
 
 .. method:: BaseFormSet.get_context()
 
@@ -960,8 +960,8 @@ Using a formset inside a view is not very different from using a regular
 ``Form`` class. The only thing you will want to be aware of is making sure to
 use the management form inside the template. Let's look at a sample view::
 
-    from django.forms import formset_factory
-    from django.shortcuts import render
+    from thibaud.forms import formset_factory
+    from thibaud.shortcuts import render
     from myapp.forms import ArticleForm
 
 
@@ -978,7 +978,7 @@ use the management form inside the template. Let's look at a sample view::
 
 The ``manage_articles.html`` template might look like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <form method="post">
         {{ formset.management_form }}
@@ -992,7 +992,7 @@ The ``manage_articles.html`` template might look like this:
 However there's a slight shortcut for the above by letting the formset itself
 deal with the management form:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <form method="post">
         <table>
@@ -1017,7 +1017,7 @@ Manually rendered ``can_delete`` and ``can_order``
 If you manually render fields in the template, you can render
 ``can_delete`` parameter with ``{{ form.DELETE }}``:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <form method="post">
         {{ formset.management_form }}
@@ -1047,8 +1047,8 @@ borrow much of its behavior from forms. With that said you are able to use
 more than one formset to be sent to a view without name clashing. Let's take
 a look at how this might be accomplished::
 
-    from django.forms import formset_factory
-    from django.shortcuts import render
+    from thibaud.forms import formset_factory
+    from thibaud.shortcuts import render
     from myapp.forms import ArticleForm, BookForm
 
 

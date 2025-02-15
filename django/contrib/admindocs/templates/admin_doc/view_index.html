@@ -5,7 +5,7 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
+&rsaquo; <a href="{% url 'thibaud-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
 &rsaquo; {% translate 'Views' %}
 </div>
 {% endblock %}
@@ -45,7 +45,7 @@
 
 {% for view in ns_views.list|dictsort:"url" %}
 {% ifchanged %}
-<h3><a href="{% url 'django-admindocs-views-detail' view=view.full_name %}">{{ view.url }}</a></h3>
+<h3><a href="{% url 'thibaud-admindocs-views-detail' view=view.full_name %}">{{ view.url }}</a></h3>
 <p class="small quiet">{% blocktranslate with view.full_name as full_name and view.url_name as url_name %}
     View function: <code>{{ full_name }}</code>. Name: <code>{{ url_name }}</code>.
 {% endblocktranslate %}</p>

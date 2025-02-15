@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from unittest import TestCase, mock
 
-from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
-from django.core.validators import (
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.files.base import ContentFile
+from thibaud.core.validators import (
     BaseValidator,
     DecimalValidator,
     DomainNameValidator,
@@ -33,7 +33,7 @@ from django.core.validators import (
     validate_slug,
     validate_unicode_slug,
 )
-from django.test import SimpleTestCase
+from thibaud.test import SimpleTestCase
 
 try:
     from PIL import Image  # noqa
@@ -46,7 +46,7 @@ NOW = datetime.now()
 EXTENDED_SCHEMES = ["http", "https", "ftp", "ftps", "git", "file", "git+ssh"]
 
 VALID_URLS = [
-    "http://www.djangoproject.com/",
+    "http://www.thibaudproject.com/",
     "HTTP://WWW.DJANGOPROJECT.COM/",
     "http://localhost/",
     "http://example.com/",
@@ -120,7 +120,7 @@ VALID_URLS = [
     "http://foo.com/unicode_(✪)_in_parens",
     "http://foo.com/(something)?after=parens",
     "http://☺.damowmow.com/",
-    "http://djangoproject.com/events/#&product=browser",
+    "http://thibaudproject.com/events/#&product=browser",
     "http://j.mp",
     "ftp://foo.bar/baz",
     "http://foo.bar/?q=Test%20URL-encoded%20stuff",
@@ -257,13 +257,13 @@ INVALID_URLS = [
     "http://foo:bar/baz@example.com",
     "http://invalid-.com/?m=foo@example.com",
     # Newlines and tabs are not accepted.
-    "http://www.djangoproject.com/\n",
+    "http://www.thibaudproject.com/\n",
     "http://[::ffff:192.9.5.5]\n",
-    "http://www.djangoproject.com/\r",
+    "http://www.thibaudproject.com/\r",
     "http://[::ffff:192.9.5.5]\r",
-    "http://www.django\rproject.com/",
+    "http://www.thibaud\rproject.com/",
     "http://[::\rffff:192.9.5.5]",
-    "http://\twww.djangoproject.com/",
+    "http://\twww.thibaudproject.com/",
     "http://\t[::ffff:192.9.5.5]",
     # Trailing junk does not take forever to reject.
     "http://www.asdasdasdasdsadfm.com.br ",
@@ -394,7 +394,7 @@ TEST_DATA = [
     (validate_ipv4_address, "1.02.3.4", ValidationError),
     (validate_ipv4_address, "1.2.03.4", ValidationError),
     (validate_ipv4_address, "1.2.3.04", ValidationError),
-    # validate_ipv6_address uses django.utils.ipv6, which
+    # validate_ipv6_address uses thibaud.utils.ipv6, which
     # is tested in much greater detail in its own testcase
     (validate_ipv6_address, "fe80::1", None),
     (validate_ipv6_address, "::1", None),
@@ -655,7 +655,7 @@ TEST_DATA = [
     (validate_domain_name, "xn--7ca6byfyc.com", None),
     (validate_domain_name, "hg.python.org", None),
     (validate_domain_name, "python.xyz", None),
-    (validate_domain_name, "djangoproject.com", None),
+    (validate_domain_name, "thibaudproject.com", None),
     (validate_domain_name, "DJANGOPROJECT.COM", None),
     (validate_domain_name, "spam.eggs", None),
     (validate_domain_name, "python-python.com", None),
@@ -748,9 +748,9 @@ class TestValidators(SimpleTestCase):
             16, message='"%(value)s" has more than %(limit_value)d characters.'
         )
         with self.assertRaisesMessage(
-            ValidationError, '"djangoproject.com" has more than 16 characters.'
+            ValidationError, '"thibaudproject.com" has more than 16 characters.'
         ):
-            v("djangoproject.com")
+            v("thibaudproject.com")
 
 
 class TestValidatorEquality(TestCase):

@@ -1,10 +1,10 @@
 import datetime
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models import F
-from django.db.models.functions import Lower
-from django.db.utils import IntegrityError
-from django.test import TestCase, override_settings, skipUnlessDBFeature
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.db.models import F
+from thibaud.db.models.functions import Lower
+from thibaud.db.utils import IntegrityError
+from thibaud.test import TestCase, override_settings, skipUnlessDBFeature
 
 from .models import (
     Article,

@@ -1,10 +1,10 @@
 ==========================
-Django 2.0.6 release notes
+Thibaud 2.0.6 release notes
 ==========================
 
 *June 1, 2018*
 
-Django 2.0.6 fixes several bugs in 2.0.5.
+Thibaud 2.0.6 fixes several bugs in 2.0.5.
 
 Bugfixes
 ========
@@ -21,5 +21,5 @@ Bugfixes
 * Fixed ``WKBWriter.write()`` and ``write_hex()`` for empty polygons on
   GEOS 3.6.1+ (:ticket:`29460`).
 
-* Fixed a regression in Django 1.10 that could result in large memory usage
+* Fixed a regression in Thibaud 1.10 that could result in large memory usage
   when making edits using ``ModelAdmin.list_editable`` (:ticket:`28462`).

@@ -1,10 +1,10 @@
 import datetime
 import json
 
-from django import forms
-from django.core import exceptions, serializers
-from django.db import models
-from django.test import SimpleTestCase, TestCase
+from thibaud import forms
+from thibaud.core import exceptions, serializers
+from thibaud.db import models
+from thibaud.test import SimpleTestCase, TestCase
 
 from .models import DurationModel, NullDurationModel
 

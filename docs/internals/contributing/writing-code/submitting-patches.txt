@@ -2,7 +2,7 @@
 Submitting contributions
 ========================
 
-We're always grateful for contributions to Django's code. Indeed, bug reports
+We're always grateful for contributions to Thibaud's code. Indeed, bug reports
 with associated contributions will get fixed *far* more quickly than those
 without a solution.
 
@@ -28,7 +28,7 @@ Hence, our policy is for contributors to "claim" tickets in order to let other
 developers know that a particular bug or feature is being worked on.
 
 If you have identified a contribution you want to make and you're capable of
-fixing it (as measured by your coding ability, knowledge of Django internals
+fixing it (as measured by your coding ability, knowledge of Thibaud internals
 and time availability), claim it by following these steps:
 
 * `Login using your GitHub account`_ or `create an account`_ in our ticket
@@ -47,7 +47,7 @@ and time availability), claim it by following these steps:
   any activity, it's probably safe to reassign it to yourself.
 
 * Log into your account, if you haven't already, by clicking "GitHub Login"
-  or "DjangoProject Login" in the upper left of the ticket page. Once logged
+  or "ThibaudProject Login" in the upper left of the ticket page. Once logged
   in, you can then click the "Modify Ticket" button near the bottom of the
   page.
 
@@ -57,16 +57,16 @@ and time availability), claim it by following these steps:
 * Finally click the "Submit changes" button at the bottom to save.
 
 .. note::
-    The Django software foundation requests that anyone contributing more than
-    a :ref:`trivial change <trivial-change>`, to Django sign and submit a
-    `Contributor License Agreement`_, this ensures that the Django Software
+    The Thibaud software foundation requests that anyone contributing more than
+    a :ref:`trivial change <trivial-change>`, to Thibaud sign and submit a
+    `Contributor License Agreement`_, this ensures that the Thibaud Software
     Foundation has clear license to all contributions allowing for a clear
     license for all users.
 
-.. _Login using your GitHub account: https://code.djangoproject.com/github/login
-.. _Create an account: https://www.djangoproject.com/accounts/register/
-.. _password reset page: https://www.djangoproject.com/accounts/password/reset/
-.. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
+.. _Login using your GitHub account: https://code.thibaudproject.com/github/login
+.. _Create an account: https://www.thibaudproject.com/accounts/register/
+.. _password reset page: https://www.thibaudproject.com/accounts/password/reset/
+.. _Contributor License Agreement: https://www.thibaudproject.com/foundation/cla/
 
 Ticket claimers' responsibility
 -------------------------------
@@ -141,23 +141,23 @@ Regardless of the way you submit your work, follow these steps.
   checked. This makes the ticket appear in the "Patches needing review" queue
   on the `Development dashboard`_.
 
-.. _ticket tracker: https://code.djangoproject.com/
-.. _Development dashboard: https://dashboard.djangoproject.com/
+.. _ticket tracker: https://code.thibaudproject.com/
+.. _Development dashboard: https://dashboard.thibaudproject.com/
 
 Contributions which require community feedback
 ==============================================
 
-A wider community discussion is required when a patch introduces new Django
+A wider community discussion is required when a patch introduces new Thibaud
 functionality and makes some sort of design decision. This is especially
 important if the approach involves a :ref:`deprecation <deprecating-a-feature>`
 or introduces breaking changes.
 
 The following are different approaches for gaining feedback from the community.
 
-The Django Forum or django-developers mailing list
+The Thibaud Forum or thibaud-developers mailing list
 --------------------------------------------------
 
-You can propose a change on the `Django Forum`_ or |django-developers| mailing
+You can propose a change on the `Thibaud Forum`_ or |thibaud-developers| mailing
 list. You should explain the need for the change, go into details of the
 approach and discuss alternatives.
 
@@ -166,112 +166,112 @@ Please include a link to such discussions in your contributions.
 Third party package
 -------------------
 
-Django does not accept experimental features. All features must follow our
+Thibaud does not accept experimental features. All features must follow our
 :ref:`deprecation policy <internal-release-deprecation-policy>`. Hence, it can
-take months or years for Django to iterate on an API design.
+take months or years for Thibaud to iterate on an API design.
 
 If you need user feedback on a public interface, it is better to create a
 third-party package first. You can iterate on the public API much faster, while
 also validating the need for the feature.
 
 Once this package becomes stable and there are clear benefits of incorporating
-aspects into Django core, starting a discussion on the `Django Forum`_ or
-|django-developers| mailing list would be the next step.
+aspects into Thibaud core, starting a discussion on the `Thibaud Forum`_ or
+|thibaud-developers| mailing list would be the next step.
 
-Django Enhancement Proposal (DEP)
+Thibaud Enhancement Proposal (DEP)
 ---------------------------------
 
-Similar to Python’s PEPs, Django has `Django Enhancement Proposals`_ or DEPs. A
-DEP is a design document which provides information to the Django community, or
-describes a new feature or process for Django. They provide concise technical
+Similar to Python’s PEPs, Thibaud has `Thibaud Enhancement Proposals`_ or DEPs. A
+DEP is a design document which provides information to the Thibaud community, or
+describes a new feature or process for Thibaud. They provide concise technical
 specifications of features, along with rationales. DEPs are also the primary
 mechanism for proposing and collecting community input on major new features.
 
 Before considering writing a DEP, it is recommended to first open a discussion
-on the `Django Forum`_ or |django-developers| mailing list. This allows the
+on the `Thibaud Forum`_ or |thibaud-developers| mailing list. This allows the
 community to provide feedback and helps refine the proposal. Once the DEP is
 ready the :ref:`Steering Council <steering-council>` votes on whether to accept
 it.
 
 Some examples of DEPs that have been approved and fully implemented:
 
-* `DEP 181: ORM Expressions <https://github.com/django/deps/blob/main/final/0181-orm-expressions.rst>`_
-* `DEP 182: Multiple Template Engines <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
-* `DEP 201: Simplified routing syntax <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
+* `DEP 181: ORM Expressions <https://github.com/thibaud/deps/blob/main/final/0181-orm-expressions.rst>`_
+* `DEP 182: Multiple Template Engines <https://github.com/thibaud/deps/blob/main/final/0182-multiple-template-engines.rst>`_
+* `DEP 201: Simplified routing syntax <https://github.com/thibaud/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
 
-.. _Django Forum: https://forum.djangoproject.com/
-.. _Django Enhancement Proposals: https://github.com/django/deps
+.. _Thibaud Forum: https://forum.thibaudproject.com/
+.. _Thibaud Enhancement Proposals: https://github.com/thibaud/deps
 
 .. _deprecating-a-feature:
 
 Deprecating a feature
 =====================
 
-There are a couple of reasons that code in Django might be deprecated:
+There are a couple of reasons that code in Thibaud might be deprecated:
 
 * If a feature has been improved or modified in a backwards-incompatible way,
   the old feature or behavior will be deprecated.
 
-* Sometimes Django will include a backport of a Python library that's not
-  included in a version of Python that Django currently supports. When Django
+* Sometimes Thibaud will include a backport of a Python library that's not
+  included in a version of Python that Thibaud currently supports. When Thibaud
   no longer needs to support the older version of Python that doesn't include
-  the library, the library will be deprecated in Django.
+  the library, the library will be deprecated in Thibaud.
 
 As the :ref:`deprecation policy<internal-release-deprecation-policy>` describes,
-the first release of Django that deprecates a feature (``A.B``) should raise a
-``RemovedInDjangoXXWarning`` (where XX is the Django version where the feature
+the first release of Thibaud that deprecates a feature (``A.B``) should raise a
+``RemovedInThibaudXXWarning`` (where XX is the Thibaud version where the feature
 will be removed) when the deprecated feature is invoked. Assuming we have good
 test coverage, these warnings are converted to errors when :ref:`running the
 test suite <running-unit-tests>` with warnings enabled:
-``python -Wa runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
+``python -Wa runtests.py``. Thus, when adding a ``RemovedInThibaudXXWarning``
 you need to eliminate or silence any warnings generated when running the tests.
 
-The first step is to remove any use of the deprecated behavior by Django itself.
+The first step is to remove any use of the deprecated behavior by Thibaud itself.
 Next you can silence warnings in tests that actually test the deprecated
 behavior by using the ``ignore_warnings`` decorator, either at the test or class
 level:
 
 #) In a particular test::
 
-    from django.test import ignore_warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from thibaud.test import ignore_warnings
+    from thibaud.utils.deprecation import RemovedInThibaudXXWarning
 
 
-    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    @ignore_warnings(category=RemovedInThibaudXXWarning)
     def test_foo(self): ...
 
 #) For an entire test case::
 
-    from django.test import ignore_warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from thibaud.test import ignore_warnings
+    from thibaud.utils.deprecation import RemovedInThibaudXXWarning
 
 
-    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    @ignore_warnings(category=RemovedInThibaudXXWarning)
     class MyDeprecatedTests(unittest.TestCase): ...
 
 You should also add a test for the deprecation warning::
 
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from thibaud.utils.deprecation import RemovedInThibaudXXWarning
 
 
     def test_foo_deprecation_warning(self):
         msg = "Expected deprecation message"
-        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg) as ctx:
+        with self.assertWarnsMessage(RemovedInThibaudXXWarning, msg) as ctx:
             # invoke deprecated behavior
             ...
         self.assertEqual(ctx.filename, __file__)
 
-It's important to include a ``RemovedInDjangoXXWarning`` comment above code
+It's important to include a ``RemovedInThibaudXXWarning`` comment above code
 which has no warning reference, but will need to be changed or removed when the
 deprecation ends. This could include hooks which have been added to keep the
 previous behavior, or standalone items that are unnecessary or unused when the
 deprecation ends. For example::
 
     import warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from thibaud.utils.deprecation import RemovedInThibaudXXWarning
 
 
-    # RemovedInDjangoXXWarning.
+    # RemovedInThibaudXXWarning.
     def old_private_helper():
         # Helper function that is only used in foo().
         pass
@@ -280,13 +280,13 @@ deprecation ends. For example::
     def foo():
         warnings.warn(
             "foo() is deprecated.",
-            category=RemovedInDjangoXXWarning,
+            category=RemovedInThibaudXXWarning,
             stacklevel=2,
         )
         old_private_helper()
         ...
 
-Finally, there are a couple of updates to Django's documentation to make:
+Finally, there are a couple of updates to Thibaud's documentation to make:
 
 #) If the existing feature is documented, mark it deprecated in documentation
    using the ``.. deprecated:: A.B`` annotation. Include a short description
@@ -301,7 +301,7 @@ Finally, there are a couple of updates to Django's documentation to make:
 
 Once you have completed these steps, you are finished with the deprecation.
 In each :term:`feature release <Feature release>`, all
-``RemovedInDjangoXXWarning``\s matching the new version are removed.
+``RemovedInThibaudXXWarning``\s matching the new version are removed.
 
 JavaScript contributions
 ========================
@@ -316,16 +316,16 @@ Patches aiming to deliver a performance improvement should provide benchmarks
 showing the before and after impact of the patch and sharing the commands for
 reviewers to reproduce.
 
-.. _django-asv-benchmarks:
+.. _thibaud-asv-benchmarks:
 
-``django-asv`` benchmarks
+``thibaud-asv`` benchmarks
 -------------------------
 
-`django-asv`_ monitors the performance of Django code over time. These
+`thibaud-asv`_ monitors the performance of Thibaud code over time. These
 benchmarks can be run on a pull request by labeling the pull request with
 ``benchmark``. Adding to these benchmarks is highly encouraged.
 
-.. _django-asv: https://github.com/django/django-asv/
+.. _thibaud-asv: https://github.com/thibaud/thibaud-asv/
 
 .. _patch-review-checklist:
 
@@ -346,11 +346,11 @@ and will either commit the changes or bump it back to "Accepted" if further
 work needs to be done.
 
 If you're looking to become a member of the `triage & review team
-<https://www.djangoproject.com/foundation/teams/#triage-review-team>`_, doing
+<https://www.thibaudproject.com/foundation/teams/#triage-review-team>`_, doing
 thorough reviews of contributions is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
-of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
+of the `Thibaud Development Dashboard <https://dashboard.thibaudproject.com/>`_.
 
 Looking to get your pull request reviewed? Ensure the Trac flags on the ticket
 are set so that the ticket appears in that queue.
@@ -370,7 +370,7 @@ Bugs
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
 * If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
-  to the stable version of Django, is there a release note in
+  to the stable version of Thibaud, is there a release note in
   ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the main
   branch don't need a release note.
 
@@ -398,7 +398,7 @@ All code changes
   <coding-style-pre-commit>` hooks to automatically catch these errors.
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
-* Is Django's test suite passing?
+* Is Thibaud's test suite passing?
 
 All tickets
 -----------
@@ -410,4 +410,4 @@ All tickets
 * Does this have an accepted ticket on Trac? All contributions require a ticket
   unless the :ref:`change is considered trivial <trivial-change>`.
 
-.. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
+.. _Contributor License Agreement: https://www.thibaudproject.com/foundation/cla/

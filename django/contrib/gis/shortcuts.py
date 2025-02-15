@@ -1,9 +1,9 @@
 import zipfile
 from io import BytesIO
 
-from django.conf import settings
-from django.http import HttpResponse
-from django.template import loader
+from thibaud.conf import settings
+from thibaud.http import HttpResponse
+from thibaud.template import loader
 
 # NumPy supported?
 try:

@@ -2,26 +2,26 @@
 Creating forms from models
 ==========================
 
-.. currentmodule:: django.forms
+.. currentmodule:: thibaud.forms
 
 ``ModelForm``
 =============
 .. class:: ModelForm
 
 If you're building a database-driven app, chances are you'll have forms that
-map closely to Django models. For instance, you might have a ``BlogComment``
+map closely to Thibaud models. For instance, you might have a ``BlogComment``
 model, and you want to create a form that lets people submit comments. In this
 case, it would be redundant to define the field types in your form, because
 you've already defined the fields in your model.
 
-For this reason, Django provides a helper class that lets you create a ``Form``
-class from a Django model.
+For this reason, Thibaud provides a helper class that lets you create a ``Form``
+class from a Thibaud model.
 
 For example:
 
 .. code-block:: pycon
 
-    >>> from django.forms import ModelForm
+    >>> from thibaud.forms import ModelForm
     >>> from myapp.models import Article
 
     # Create the form class.
@@ -49,7 +49,7 @@ Each model field has a corresponding default form field. For example, a
 ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is the
 full list of conversions:
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
 =================================== ==================================================
 Model field                         Form field
@@ -58,89 +58,89 @@ Model field                         Form field
 
 :class:`BigAutoField`               Not represented in the form
 
-:class:`BigIntegerField`            :class:`~django.forms.IntegerField` with
+:class:`BigIntegerField`            :class:`~thibaud.forms.IntegerField` with
                                     ``min_value`` set to -9223372036854775808
                                     and ``max_value`` set to 9223372036854775807.
 
-:class:`BinaryField`                :class:`~django.forms.CharField`, if
+:class:`BinaryField`                :class:`~thibaud.forms.CharField`, if
                                     :attr:`~.Field.editable` is set to
                                     ``True`` on the model field, otherwise not
                                     represented in the form.
 
-:class:`BooleanField`               :class:`~django.forms.BooleanField`, or
-                                    :class:`~django.forms.NullBooleanField` if
+:class:`BooleanField`               :class:`~thibaud.forms.BooleanField`, or
+                                    :class:`~thibaud.forms.NullBooleanField` if
                                     ``null=True``.
 
-:class:`CharField`                  :class:`~django.forms.CharField` with
+:class:`CharField`                  :class:`~thibaud.forms.CharField` with
                                     ``max_length`` set to the model field's
                                     ``max_length`` and
-                                    :attr:`~django.forms.CharField.empty_value`
+                                    :attr:`~thibaud.forms.CharField.empty_value`
                                     set to ``None`` if ``null=True``.
 
-:class:`DateField`                  :class:`~django.forms.DateField`
+:class:`DateField`                  :class:`~thibaud.forms.DateField`
 
-:class:`DateTimeField`              :class:`~django.forms.DateTimeField`
+:class:`DateTimeField`              :class:`~thibaud.forms.DateTimeField`
 
-:class:`DecimalField`               :class:`~django.forms.DecimalField`
+:class:`DecimalField`               :class:`~thibaud.forms.DecimalField`
 
-:class:`DurationField`              :class:`~django.forms.DurationField`
+:class:`DurationField`              :class:`~thibaud.forms.DurationField`
 
-:class:`EmailField`                 :class:`~django.forms.EmailField`
+:class:`EmailField`                 :class:`~thibaud.forms.EmailField`
 
-:class:`FileField`                  :class:`~django.forms.FileField`
+:class:`FileField`                  :class:`~thibaud.forms.FileField`
 
-:class:`FilePathField`              :class:`~django.forms.FilePathField`
+:class:`FilePathField`              :class:`~thibaud.forms.FilePathField`
 
-:class:`FloatField`                 :class:`~django.forms.FloatField`
+:class:`FloatField`                 :class:`~thibaud.forms.FloatField`
 
-:class:`ForeignKey`                 :class:`~django.forms.ModelChoiceField`
+:class:`ForeignKey`                 :class:`~thibaud.forms.ModelChoiceField`
                                     (see below)
 
-:class:`ImageField`                 :class:`~django.forms.ImageField`
+:class:`ImageField`                 :class:`~thibaud.forms.ImageField`
 
-:class:`IntegerField`               :class:`~django.forms.IntegerField`
+:class:`IntegerField`               :class:`~thibaud.forms.IntegerField`
 
 ``IPAddressField``                  ``IPAddressField``
 
-:class:`GenericIPAddressField`      :class:`~django.forms.GenericIPAddressField`
+:class:`GenericIPAddressField`      :class:`~thibaud.forms.GenericIPAddressField`
 
-:class:`JSONField`                  :class:`~django.forms.JSONField`
+:class:`JSONField`                  :class:`~thibaud.forms.JSONField`
 
-:class:`ManyToManyField`            :class:`~django.forms.ModelMultipleChoiceField`
+:class:`ManyToManyField`            :class:`~thibaud.forms.ModelMultipleChoiceField`
                                     (see below)
 
-:class:`PositiveBigIntegerField`    :class:`~django.forms.IntegerField`
+:class:`PositiveBigIntegerField`    :class:`~thibaud.forms.IntegerField`
 
-:class:`PositiveIntegerField`       :class:`~django.forms.IntegerField`
+:class:`PositiveIntegerField`       :class:`~thibaud.forms.IntegerField`
 
-:class:`PositiveSmallIntegerField`  :class:`~django.forms.IntegerField`
+:class:`PositiveSmallIntegerField`  :class:`~thibaud.forms.IntegerField`
 
-:class:`SlugField`                  :class:`~django.forms.SlugField`
+:class:`SlugField`                  :class:`~thibaud.forms.SlugField`
 
 :class:`SmallAutoField`             Not represented in the form
 
-:class:`SmallIntegerField`          :class:`~django.forms.IntegerField`
+:class:`SmallIntegerField`          :class:`~thibaud.forms.IntegerField`
 
-:class:`TextField`                  :class:`~django.forms.CharField` with
+:class:`TextField`                  :class:`~thibaud.forms.CharField` with
                                     ``widget=forms.Textarea``
 
-:class:`TimeField`                  :class:`~django.forms.TimeField`
+:class:`TimeField`                  :class:`~thibaud.forms.TimeField`
 
-:class:`URLField`                   :class:`~django.forms.URLField`
+:class:`URLField`                   :class:`~thibaud.forms.URLField`
 
-:class:`UUIDField`                  :class:`~django.forms.UUIDField`
+:class:`UUIDField`                  :class:`~thibaud.forms.UUIDField`
 =================================== ==================================================
 
-.. currentmodule:: django.forms
+.. currentmodule:: thibaud.forms
 
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:
 
-* ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
+* ``ForeignKey`` is represented by ``thibaud.forms.ModelChoiceField``,
   which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
 
 * ``ManyToManyField`` is represented by
-  ``django.forms.ModelMultipleChoiceField``, which is a
+  ``thibaud.forms.ModelMultipleChoiceField``, which is a
   ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
 
 In addition, each generated form field has attributes set as follows:
@@ -170,8 +170,8 @@ A full example
 
 Consider this set of models::
 
-    from django.db import models
-    from django.forms import ModelForm
+    from thibaud.db import models
+    from thibaud.forms import ModelForm
 
     TITLE_CHOICES = {
         "MR": "Mr.",
@@ -210,7 +210,7 @@ With these models, the ``ModelForm`` subclasses above would be roughly
 equivalent to this (the only difference being the ``save()`` method, which
 we'll discuss in a moment.)::
 
-    from django import forms
+    from thibaud import forms
 
 
     class AuthorForm(forms.Form):
@@ -237,13 +237,13 @@ There are two main steps involved in validating a ``ModelForm``:
 2. :ref:`Validating the model instance <validating-objects>`
 
 Just like normal form validation, model form validation is triggered implicitly
-when calling :meth:`~django.forms.Form.is_valid()` or accessing the
-:attr:`~django.forms.Form.errors` attribute and explicitly when calling
+when calling :meth:`~thibaud.forms.Form.is_valid()` or accessing the
+:attr:`~thibaud.forms.Form.errors` attribute and explicitly when calling
 ``full_clean()``, although you will typically not use the latter method in
 practice.
 
 ``Model`` validation (:meth:`Model.full_clean()
-<django.db.models.Model.full_clean()>`) is triggered from within the form
+<thibaud.db.models.Model.full_clean()>`) is triggered from within the form
 validation step, right after the form's ``clean()`` method is called.
 
 .. warning::
@@ -294,23 +294,23 @@ Considerations regarding model's ``error_messages``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Error messages defined at the
-:attr:`form field <django.forms.Field.error_messages>` level or at the
+:attr:`form field <thibaud.forms.Field.error_messages>` level or at the
 :ref:`form Meta <modelforms-overriding-default-fields>` level always take
 precedence over the error messages defined at the
-:attr:`model field <django.db.models.Field.error_messages>` level.
+:attr:`model field <thibaud.db.models.Field.error_messages>` level.
 
 Error messages  defined on :attr:`model fields
-<django.db.models.Field.error_messages>` are only used when the
+<thibaud.db.models.Field.error_messages>` are only used when the
 ``ValidationError`` is raised during the :ref:`model validation
 <validating-objects>` step and no corresponding error messages are defined at
 the form level.
 
 You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
-validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
+validation by adding the :data:`~thibaud.core.exceptions.NON_FIELD_ERRORS` key
 to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
 
-    from django.core.exceptions import NON_FIELD_ERRORS
-    from django.forms import ModelForm
+    from thibaud.core.exceptions import NON_FIELD_ERRORS
+    from thibaud.forms import ModelForm
 
 
     class ArticleForm(ModelForm):
@@ -355,12 +355,12 @@ Note that if the form :ref:`hasn't been validated
 doesn't validate -- i.e., if ``form.errors`` evaluates to ``True``.
 
 If an optional field doesn't appear in the form's data, the resulting model
-instance uses the model field :attr:`~django.db.models.Field.default`, if
+instance uses the model field :attr:`~thibaud.db.models.Field.default`, if
 there is one, for that field. This behavior doesn't apply to fields that use
-:class:`~django.forms.CheckboxInput`,
-:class:`~django.forms.CheckboxSelectMultiple`, or
-:class:`~django.forms.SelectMultiple` (or any custom widget whose
-:meth:`~django.forms.Widget.value_omitted_from_data` method always returns
+:class:`~thibaud.forms.CheckboxInput`,
+:class:`~thibaud.forms.CheckboxSelectMultiple`, or
+:class:`~thibaud.forms.SelectMultiple` (or any custom widget whose
+:meth:`~thibaud.forms.Widget.value_omitted_from_data` method always returns
 ``False``) since an unchecked checkbox and unselected ``<select multiple>``
 don't appear in the data of an HTML form submission. Use a custom form field or
 widget if you're designing an API and want the default fallback behavior for a
@@ -377,13 +377,13 @@ by default.
 
 Another side effect of using ``commit=False`` is seen when your model has
 a many-to-many relation with another model. If your model has a many-to-many
-relation and you specify ``commit=False`` when you save a form, Django cannot
+relation and you specify ``commit=False`` when you save a form, Thibaud cannot
 immediately save the form data for the many-to-many relation. This is because
 it isn't possible to save many-to-many data for an instance until the instance
 exists in the database.
 
 To work around this problem, every time you save a form using ``commit=False``,
-Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
+Thibaud adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
 you've manually saved the instance produced by the form, you can invoke
 ``save_m2m()`` to save the many-to-many form data. For example:
 
@@ -446,7 +446,7 @@ these security concerns do not apply to you:
 1. Set the ``fields`` attribute to the special value ``'__all__'`` to indicate
    that all fields in the model should be used. For example::
 
-       from django.forms import ModelForm
+       from thibaud.forms import ModelForm
 
 
        class AuthorForm(ModelForm):
@@ -472,7 +472,7 @@ If either of these are used, the order the fields appear in the form will be the
 order the fields are defined in the model, with ``ManyToManyField`` instances
 appearing last.
 
-In addition, Django applies the following rule: if you set ``editable=False`` on
+In addition, Thibaud applies the following rule: if you set ``editable=False`` on
 the model field, *any* form created from the model via ``ModelForm`` will not
 include that field.
 
@@ -483,7 +483,7 @@ include that field.
     manually add the excluded fields back to the form, they will not
     be initialized from the model instance.
 
-    Django will prevent any attempt to save an incomplete model, so if
+    Thibaud will prevent any attempt to save an incomplete model, so if
     the model does not allow the missing fields to be empty, and does
     not provide a default value for the missing fields, any attempt to
     ``save()`` a ``ModelForm`` with missing fields will fail.  To
@@ -525,7 +525,7 @@ For example, if you want the ``CharField`` for the ``name`` attribute of
 ``Author`` to be represented by a ``<textarea>`` instead of its default
 ``<input type="text">``, you can override the field's widget::
 
-    from django.forms import ModelForm, Textarea
+    from thibaud.forms import ModelForm, Textarea
     from myapp.models import Author
 
 
@@ -548,7 +548,7 @@ attributes of the inner ``Meta`` class if you want to further customize a field.
 For example if you wanted to customize the wording of all user facing strings for
 the ``name`` field::
 
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     class AuthorForm(ModelForm):
@@ -573,7 +573,7 @@ the type of fields instantiated by the form.
 For example, if you wanted to use ``MySlugFormField`` for the ``slug``
 field, you could do the following::
 
-    from django.forms import ModelForm
+    from thibaud.forms import ModelForm
     from myapp.models import Article
 
 
@@ -587,7 +587,7 @@ field, you could do the following::
 
 or::
 
-    from django.forms import ModelForm
+    from thibaud.forms import ModelForm
     from myapp.models import Article
 
 
@@ -610,7 +610,7 @@ fields like you would in a regular ``Form``.
 If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
 
-    from django.forms import CharField, ModelForm
+    from thibaud.forms import CharField, ModelForm
     from myapp.models import Article
 
 
@@ -683,7 +683,7 @@ By default, the fields in a ``ModelForm`` will not localize their data. To
 enable localization for fields, you can use the ``localized_fields``
 attribute on the ``Meta`` class.
 
-    >>> from django.forms import ModelForm
+    >>> from thibaud.forms import ModelForm
     >>> from myapp.models import Author
     >>> class AuthorForm(ModelForm):
     ...     class Meta:
@@ -766,13 +766,13 @@ ModelForm factory function
 --------------------------
 
 You can create forms from a given model using the standalone function
-:func:`~django.forms.models.modelform_factory`, instead of using a class
+:func:`~thibaud.forms.models.modelform_factory`, instead of using a class
 definition. This may be more convenient if you do not have many customizations
 to make:
 
 .. code-block:: pycon
 
-    >>> from django.forms import modelform_factory
+    >>> from thibaud.forms import modelform_factory
     >>> from myapp.models import Book
     >>> BookForm = modelform_factory(Book, fields=["author", "title"])
 
@@ -781,7 +781,7 @@ specifying the widgets to be used for a given field:
 
 .. code-block:: pycon
 
-    >>> from django.forms import Textarea
+    >>> from thibaud.forms import Textarea
     >>> Form = modelform_factory(Book, form=BookForm, widgets={"title": Textarea()})
 
 The fields to include can be specified using the ``fields`` and ``exclude``
@@ -802,13 +802,13 @@ Model formsets
 
 .. class:: models.BaseModelFormSet
 
-Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
-of enhanced formset classes to make working with Django models more
+Like :doc:`regular formsets </topics/forms/formsets>`, Thibaud provides a couple
+of enhanced formset classes to make working with Thibaud models more
 convenient. Let's reuse the ``Author`` model from above:
 
 .. code-block:: pycon
 
-    >>> from django.forms import modelformset_factory
+    >>> from thibaud.forms import modelformset_factory
     >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
 
@@ -838,8 +838,8 @@ with the ``Author`` model. It works just like a regular formset:
 
 .. note::
 
-    :func:`~django.forms.models.modelformset_factory` uses
-    :func:`~django.forms.formsets.formset_factory` to generate formsets. This
+    :func:`~thibaud.forms.models.modelformset_factory` uses
+    :func:`~thibaud.forms.formsets.formset_factory` to generate formsets. This
     means that a model formset is an extension of a basic formset that knows
     how to interact with a particular model.
 
@@ -864,7 +864,7 @@ queryset that includes all objects in the model (e.g.,
 Alternatively, you can create a subclass that sets ``self.queryset`` in
 ``__init__``::
 
-    from django.forms import BaseModelFormSet
+    from thibaud.forms import BaseModelFormSet
     from myapp.models import Author
 
 
@@ -892,7 +892,7 @@ Changing the form
 -----------------
 
 By default, when you use ``modelformset_factory``, a model form will
-be created using :func:`~django.forms.models.modelform_factory`.
+be created using :func:`~thibaud.forms.models.modelform_factory`.
 Often, it can be useful to specify a custom model form. For example,
 you can create a custom model form that has custom validation::
 
@@ -948,7 +948,7 @@ Providing initial values
 As with regular formsets, it's possible to :ref:`specify initial data
 <formsets-initial-data>` for forms in the formset by specifying an ``initial``
 parameter when instantiating the model formset class returned by
-:func:`~django.forms.models.modelformset_factory`. However, with model
+:func:`~thibaud.forms.models.modelformset_factory`. However, with model
 formsets, the initial values only apply to extra forms, those that aren't
 attached to an existing model instance. If the length of ``initial`` exceeds
 the number of extra forms, the excess initial data is ignored. If the extra
@@ -1010,7 +1010,7 @@ Limiting the number of editable objects
 ---------------------------------------
 
 As with regular formsets, you can use the ``max_num`` and ``extra`` parameters
-to :func:`~django.forms.models.modelformset_factory` to limit the number of
+to :func:`~thibaud.forms.models.modelformset_factory` to limit the number of
 extra forms displayed.
 
 ``max_num`` does not prevent existing objects from being displayed:
@@ -1074,8 +1074,8 @@ Using a model formset in a view
 Model formsets are very similar to formsets. Let's say we want to present a
 formset to edit ``Author`` model instances::
 
-    from django.forms import modelformset_factory
-    from django.shortcuts import render
+    from thibaud.forms import modelformset_factory
+    from thibaud.shortcuts import render
     from myapp.models import Author
 
 
@@ -1107,7 +1107,7 @@ the unique constraints on your model (either ``unique``, ``unique_together`` or
 on a ``ModelFormSet`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 
-    from django.forms import BaseModelFormSet
+    from thibaud.forms import BaseModelFormSet
 
 
     class MyModelFormSet(BaseModelFormSet):
@@ -1124,7 +1124,7 @@ have already been created for each ``Form``. Modifying a value in
 to modify a value in ``ModelFormSet.clean()`` you must modify
 ``form.instance``::
 
-    from django.forms import BaseModelFormSet
+    from thibaud.forms import BaseModelFormSet
 
 
     class MyModelFormSet(BaseModelFormSet):
@@ -1143,8 +1143,8 @@ Using a custom queryset
 As stated earlier, you can override the default queryset used by the model
 formset::
 
-    from django.forms import modelformset_factory
-    from django.shortcuts import render
+    from thibaud.forms import modelformset_factory
+    from thibaud.shortcuts import render
     from myapp.models import Author
 
 
@@ -1170,11 +1170,11 @@ cases in this example.
 Using the formset in the template
 ---------------------------------
 
-There are three ways to render a formset in a Django template.
+There are three ways to render a formset in a Thibaud template.
 
 First, you can let the formset do most of the work:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <form method="post">
         {{ formset }}
@@ -1183,7 +1183,7 @@ First, you can let the formset do most of the work:
 Second, you can manually render the formset, but let the form deal with
 itself:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <form method="post">
         {{ formset.management_form }}
@@ -1198,7 +1198,7 @@ form as shown above. See the :ref:`management form documentation
 
 Third, you can manually render each field:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <form method="post">
         {{ formset.management_form }}
@@ -1213,7 +1213,7 @@ If you opt to use this third method and you don't iterate over the fields with
 a ``{% for %}`` loop, you'll need to render the primary key field. For example,
 if you were rendering the ``name`` and ``age`` fields of a model:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     <form method="post">
         {{ formset.management_form }}
@@ -1242,7 +1242,7 @@ Inline formsets is a small abstraction layer on top of model formsets. These
 simplify the case of working with related objects via a foreign key. Suppose
 you have these two models::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Author(models.Model):
@@ -1258,19 +1258,19 @@ a particular author, you could do this:
 
 .. code-block:: pycon
 
-    >>> from django.forms import inlineformset_factory
+    >>> from thibaud.forms import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book, fields=["title"])
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
 
 ``BookFormSet``'s :ref:`prefix <formset-prefix>` is ``'book_set'``
 (``<model name>_set`` ). If ``Book``'s ``ForeignKey`` to ``Author`` has a
-:attr:`~django.db.models.ForeignKey.related_name`, that's used instead.
+:attr:`~thibaud.db.models.ForeignKey.related_name`, that's used instead.
 
 .. note::
 
-    :func:`~django.forms.models.inlineformset_factory` uses
-    :func:`~django.forms.models.modelformset_factory` and marks
+    :func:`~thibaud.forms.models.inlineformset_factory` uses
+    :func:`~thibaud.forms.models.modelformset_factory` and marks
     ``can_delete=True``.
 
 .. seealso::
@@ -1286,7 +1286,7 @@ When overriding methods on ``InlineFormSet``, you should subclass
 
 For example, if you want to override ``clean()``::
 
-    from django.forms import BaseInlineFormSet
+    from thibaud.forms import BaseInlineFormSet
 
 
     class CustomInlineFormSet(BaseInlineFormSet):
@@ -1304,7 +1304,7 @@ Then when you create your inline formset, pass in the optional argument
 
 .. code-block:: pycon
 
-    >>> from django.forms import inlineformset_factory
+    >>> from thibaud.forms import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(
     ...     Author, Book, fields=["title"], formset=CustomInlineFormSet
     ... )
@@ -1332,7 +1332,7 @@ the following model::
         length_in_months = models.IntegerField()
 
 To resolve this, you can use ``fk_name`` to
-:func:`~django.forms.models.inlineformset_factory`:
+:func:`~thibaud.forms.models.inlineformset_factory`:
 
 .. code-block:: pycon
 

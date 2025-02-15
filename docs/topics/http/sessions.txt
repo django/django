@@ -2,10 +2,10 @@
 How to use sessions
 ===================
 
-.. module:: django.contrib.sessions
-   :synopsis: Provides session management for Django projects.
+.. module:: thibaud.contrib.sessions
+   :synopsis: Provides session management for Thibaud projects.
 
-Django provides full support for anonymous sessions. The session framework
+Thibaud provides full support for anonymous sessions. The session framework
 lets you store and retrieve arbitrary data on a per-site-visitor basis. It
 stores data on the server side and abstracts the sending and receiving of
 cookies. Cookies contain a session ID -- not the data itself (unless you're
@@ -19,13 +19,13 @@ Sessions are implemented via a piece of :doc:`middleware </ref/middleware>`.
 To enable session functionality, do the following:
 
 * Edit the :setting:`MIDDLEWARE` setting and make sure it contains
-  ``'django.contrib.sessions.middleware.SessionMiddleware'``. The default
-  ``settings.py`` created by ``django-admin startproject`` has
+  ``'thibaud.contrib.sessions.middleware.SessionMiddleware'``. The default
+  ``settings.py`` created by ``thibaud-admin startproject`` has
   ``SessionMiddleware`` activated.
 
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from :setting:`MIDDLEWARE` and
-``'django.contrib.sessions'`` from your :setting:`INSTALLED_APPS`.
+``'thibaud.contrib.sessions'`` from your :setting:`INSTALLED_APPS`.
 It'll save you a small bit of overhead.
 
 .. _configuring-sessions:
@@ -33,16 +33,16 @@ It'll save you a small bit of overhead.
 Configuring the session engine
 ==============================
 
-By default, Django stores sessions in your database (using the model
-``django.contrib.sessions.models.Session``). Though this is convenient, in
-some setups it's faster to store session data elsewhere, so Django can be
+By default, Thibaud stores sessions in your database (using the model
+``thibaud.contrib.sessions.models.Session``). Though this is convenient, in
+some setups it's faster to store session data elsewhere, so Thibaud can be
 configured to store session data on your filesystem or in your cache.
 
 Using database-backed sessions
 ------------------------------
 
 If you want to use a database-backed session, you need to add
-``'django.contrib.sessions'`` to your :setting:`INSTALLED_APPS` setting.
+``'thibaud.contrib.sessions'`` to your :setting:`INSTALLED_APPS` setting.
 
 Once you have configured your installation, run ``manage.py migrate``
 to install the single database table that stores session data.
@@ -54,7 +54,7 @@ Using cached sessions
 
 For better performance, you may want to use a cache-based session backend.
 
-To store session data using Django's cache system, you'll first need to make
+To store session data using Thibaud's cache system, you'll first need to make
 sure you've configured your cache; see the :doc:`cache documentation
 </topics/cache>` for details.
 
@@ -68,7 +68,7 @@ sure you've configured your cache; see the :doc:`cache documentation
     NOT multi-process safe, therefore probably not a good choice for production
     environments.
 
-If you have multiple caches defined in :setting:`CACHES`, Django will use the
+If you have multiple caches defined in :setting:`CACHES`, Thibaud will use the
 default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
@@ -78,12 +78,12 @@ cache or a non-persistent cache.
 The cached database backend (``cached_db``) uses a write-through cache --
 session writes are applied to both the database and cache, in that order. If
 writing to the cache fails, the exception is handled and logged via the
-:ref:`sessions logger <django-contrib-sessions-logger>`, to avoid failing an
+:ref:`sessions logger <thibaud-contrib-sessions-logger>`, to avoid failing an
 otherwise successful write operation.
 
 Session reads use the cache, or the database if the data has been evicted from
 the cache. To use this backend, set :setting:`SESSION_ENGINE` to
-``"django.contrib.sessions.backends.cached_db"``, and follow the configuration
+``"thibaud.contrib.sessions.backends.cached_db"``, and follow the configuration
 instructions for the `using database-backed sessions`_.
 
 The cache backend (``cache``) stores session data only in your cache. This is
@@ -91,7 +91,7 @@ faster because it avoids database persistence, but you will have to consider
 what happens when cache data is evicted. Eviction can occur if the cache fills
 up or the cache server is restarted, and it will mean session data is lost,
 including logging out users. To use this backend, set :setting:`SESSION_ENGINE`
-to ``"django.contrib.sessions.backends.cache"``.
+to ``"thibaud.contrib.sessions.backends.cache"``.
 
 The cache backend can be made persistent by using a persistent cache, such as
 Redis with appropriate configuration. But unless your cache is definitely
@@ -102,11 +102,11 @@ Using file-based sessions
 -------------------------
 
 To use file-based sessions, set the :setting:`SESSION_ENGINE` setting to
-``"django.contrib.sessions.backends.file"``.
+``"thibaud.contrib.sessions.backends.file"``.
 
 You might also want to set the :setting:`SESSION_FILE_PATH` setting (which
 defaults to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to
-control where Django stores session files. Be sure to check that your web
+control where Thibaud stores session files. Be sure to check that your web
 server has permissions to read and write to this location.
 
 .. _cookie-session-backend:
@@ -115,8 +115,8 @@ Using cookie-based sessions
 ---------------------------
 
 To use cookies-based sessions, set the :setting:`SESSION_ENGINE` setting to
-``"django.contrib.sessions.backends.signed_cookies"``. The session data will be
-stored using Django's tools for :doc:`cryptographic signing </topics/signing>`
+``"thibaud.contrib.sessions.backends.signed_cookies"``. The session data will be
+stored using Thibaud's tools for :doc:`cryptographic signing </topics/signing>`
 and the :setting:`SECRET_KEY` setting.
 
 .. note::
@@ -134,7 +134,7 @@ and the :setting:`SECRET_KEY` setting.
     changes by the client, so that the session data will be invalidated when being
     tampered with. The same invalidation happens if the client storing the
     cookie (e.g. your user's browser) can't store all of the session cookie and
-    drops data. Even though Django compresses the data, it's still entirely
+    drops data. Even though Thibaud compresses the data, it's still entirely
     possible to exceed the :rfc:`common limit of 4096 bytes <2965#section-5.3>`
     per cookie.
 
@@ -162,8 +162,8 @@ and the :setting:`SECRET_KEY` setting.
 Using sessions in views
 =======================
 
-When ``SessionMiddleware`` is activated, each :class:`~django.http.HttpRequest`
-object -- the first argument to any Django view function -- will have a
+When ``SessionMiddleware`` is activated, each :class:`~thibaud.http.HttpRequest`
+object -- the first argument to any Thibaud view function -- will have a
 ``session`` attribute, which is a dictionary-like object.
 
 You can read it and write to ``request.session`` at any point in your view.
@@ -253,7 +253,7 @@ You can edit it multiple times.
       Deletes the current session data from the session and deletes the session
       cookie. This is used if you want to ensure that the previous session data
       can't be accessed again from the user's browser (for example, the
-      :func:`django.contrib.auth.logout()` function calls it).
+      :func:`thibaud.contrib.auth.logout()` function calls it).
 
     .. method:: set_test_cookie()
     .. method:: aset_test_cookie()
@@ -380,7 +380,7 @@ You can edit it multiple times.
       *Asynchronous version*: ``acycle_key()``
 
       Creates a new session key while retaining the current session data.
-      :func:`django.contrib.auth.login()` calls this method to mitigate against
+      :func:`thibaud.contrib.auth.login()` calls this method to mitigate against
       session fixation.
 
 .. _session_serialization:
@@ -388,7 +388,7 @@ You can edit it multiple times.
 Session serialization
 ---------------------
 
-By default, Django serializes session data using JSON. You can use the
+By default, Thibaud serializes session data using JSON. You can use the
 :setting:`SESSION_SERIALIZER` setting to customize the session serialization
 format. Even with the caveats described in :ref:`custom-serializers`, we highly
 recommend sticking with JSON serialization *especially if you are using the
@@ -398,7 +398,7 @@ For example, here's an attack scenario if you use :mod:`pickle` to serialize
 session data. If you're using the :ref:`signed cookie session backend
 <cookie-session-backend>` and :setting:`SECRET_KEY` (or any key of
 :setting:`SECRET_KEY_FALLBACKS`) is known by an attacker (there isn't an
-inherent vulnerability in Django that would cause it to leak), the attacker
+inherent vulnerability in Thibaud that would cause it to leak), the attacker
 could insert a string into their session which, when unpickled, executes
 arbitrary code on the server. The technique for doing so is simple and easily
 available on the internet. Although the cookie session storage signs the
@@ -410,7 +410,7 @@ Bundled serializers
 
 .. class:: serializers.JSONSerializer
 
-    A wrapper around the JSON serializer from :mod:`django.core.signing`. Can
+    A wrapper around the JSON serializer from :mod:`thibaud.core.signing`. Can
     only serialize basic data types.
 
     In addition, as JSON supports only string keys, note that using non-string
@@ -437,14 +437,14 @@ Bundled serializers
 Write your own serializer
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that the :class:`~django.contrib.sessions.serializers.JSONSerializer`
+Note that the :class:`~thibaud.contrib.sessions.serializers.JSONSerializer`
 cannot handle arbitrary Python data types. As is often the case, there is a
 trade-off between convenience and security. If you wish to store more advanced
 data types including ``datetime`` and ``Decimal`` in JSON backed sessions, you
 will need to write a custom serializer (or convert such values to a JSON
 serializable object before storing them in ``request.session``). While
 serializing these values is often straightforward
-(:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
+(:class:`~thibaud.core.serializers.json.ThibaudJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
 was actually a string that just happened to be in the same format chosen for
@@ -461,7 +461,7 @@ Session object guidelines
   is more of a convention than a hard-and-fast rule.
 
 * Session dictionary keys that begin with an underscore are reserved for
-  internal use by Django.
+  internal use by Thibaud.
 
 * Don't override ``request.session`` with a new object, and don't access or
   set its attributes. Use it like a Python dictionary.
@@ -499,7 +499,7 @@ This simplistic view logs in a "member" of the site::
             pass
         return HttpResponse("You're logged out.")
 
-The standard :meth:`django.contrib.auth.logout` function actually does a bit
+The standard :meth:`thibaud.contrib.auth.logout` function actually does a bit
 more than this to prevent inadvertent data leakage. It calls the
 :meth:`~backends.base.SessionBase.flush` method of ``request.session``.
 We are using this example as a demonstration of how to work with session
@@ -508,7 +508,7 @@ objects, not as a full ``logout()`` implementation.
 Setting test cookies
 ====================
 
-As a convenience, Django provides a way to test whether the user's browser
+As a convenience, Thibaud provides a way to test whether the user's browser
 accepts cookies. Call the :meth:`~backends.base.SessionBase.set_test_cookie`
 method of ``request.session`` in a view, and call
 :meth:`~backends.base.SessionBase.test_cookie_worked` in a subsequent view --
@@ -524,8 +524,8 @@ yourself. Do this after you've verified that the test cookie worked.
 
 Here's a typical usage example::
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
+    from thibaud.http import HttpResponse
+    from thibaud.shortcuts import render
 
 
     def login(request):
@@ -544,21 +544,21 @@ Using sessions out of views
 .. note::
 
     The examples in this section import the ``SessionStore`` object directly
-    from the ``django.contrib.sessions.backends.db`` backend. In your own code,
+    from the ``thibaud.contrib.sessions.backends.db`` backend. In your own code,
     you should consider importing ``SessionStore`` from the session engine
     designated by :setting:`SESSION_ENGINE`, as below:
 
     .. code-block:: pycon
 
       >>> from importlib import import_module
-      >>> from django.conf import settings
+      >>> from thibaud.conf import settings
       >>> SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
 An API is available to manipulate session data outside of a view:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.sessions.backends.db import SessionStore
+    >>> from thibaud.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
     >>> s["last_login"] = 1376587691
@@ -576,14 +576,14 @@ Calling ``save()`` on a new session may also work but has a small chance of
 generating a ``session_key`` that collides with an existing one. ``create()``
 calls ``save()`` and loops until an unused ``session_key`` is generated.
 
-If you're using the ``django.contrib.sessions.backends.db`` backend, each
-session is a normal Django model. The ``Session`` model is defined in
-:source:`django/contrib/sessions/models.py`. Because it's a normal model, you can
-access sessions using the normal Django database API:
+If you're using the ``thibaud.contrib.sessions.backends.db`` backend, each
+session is a normal Thibaud model. The ``Session`` model is defined in
+:source:`thibaud/contrib/sessions/models.py`. Because it's a normal model, you can
+access sessions using the normal Thibaud database API:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.sessions.models import Session
+    >>> from thibaud.contrib.sessions.models import Session
     >>> s = Session.objects.get(pk="2b1189a188b44ad18c35e113ac6ceead")
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
@@ -603,7 +603,7 @@ format:
 When sessions are saved
 =======================
 
-By default, Django only saves to the session database when the session has been
+By default, Thibaud only saves to the session database when the session has been
 modified -- that is if any of its dictionary values have been assigned or
 deleted::
 
@@ -627,7 +627,7 @@ the session object::
     request.session.modified = True
 
 To change this default behavior, set the :setting:`SESSION_SAVE_EVERY_REQUEST`
-setting to ``True``. When set to ``True``, Django will save the session to the
+setting to ``True``. When set to ``True``, Thibaud will save the session to the
 database on every single request.
 
 Note that the session cookie is only sent when a session has been created or
@@ -653,7 +653,7 @@ which means session cookies will be stored in users' browsers for as long as
 :setting:`SESSION_COOKIE_AGE`. Use this if you don't want people to have to
 log in every time they open a browser.
 
-If :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` is set to ``True``, Django will
+If :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` is set to ``True``, Thibaud will
 use browser-length cookies -- cookies that expire as soon as the user closes
 their browser. Use this if you want people to have to log in every time they
 open a browser.
@@ -669,7 +669,7 @@ of ``request.session`` as described above in `using sessions in views`_.
     some cases, this can interfere with the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting and prevent sessions
     from expiring on browser close. Please be aware of this while testing
-    Django applications which have the
+    Thibaud applications which have the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting enabled.
 
 .. _clearing-the-session-store:
@@ -679,17 +679,17 @@ Clearing the session store
 
 As users create new sessions on your website, session data can accumulate in
 your session store. If you're using the database backend, the
-``django_session`` database table will grow. If you're using the file backend,
+``thibaud_session`` database table will grow. If you're using the file backend,
 your temporary directory will contain an increasing number of files.
 
 To understand this problem, consider what happens with the database backend.
-When a user logs in, Django adds a row to the ``django_session`` database
-table. Django updates this row each time the session data changes. If the user
-logs out manually, Django deletes the row. But if the user does *not* log out,
+When a user logs in, Thibaud adds a row to the ``thibaud_session`` database
+table. Thibaud updates this row each time the session data changes. If the user
+logs out manually, Thibaud deletes the row. But if the user does *not* log out,
 the row never gets deleted. A similar process happens with the file backend.
 
-Django does *not* provide automatic purging of expired sessions. Therefore,
-it's your job to purge expired sessions on a regular basis. Django provides a
+Thibaud does *not* provide automatic purging of expired sessions. Therefore,
+it's your job to purge expired sessions on a regular basis. Thibaud provides a
 clean-up management command for this purpose: :djadmin:`clearsessions`. It's
 recommended to call this command on a regular basis, for example as a daily
 cron job.
@@ -701,7 +701,7 @@ session data is stored by the users' browsers.
 Settings
 ========
 
-A few :ref:`Django settings <settings-sessions>` give you control over session
+A few :ref:`Thibaud settings <settings-sessions>` give you control over session
 behavior:
 
 * :setting:`SESSION_CACHE_ALIAS`
@@ -742,22 +742,22 @@ Technical details
 =================
 
 * The session dictionary accepts any :mod:`json` serializable value when using
-  :class:`~django.contrib.sessions.serializers.JSONSerializer`.
+  :class:`~thibaud.contrib.sessions.serializers.JSONSerializer`.
 
-* Session data is stored in a database table named ``django_session`` .
+* Session data is stored in a database table named ``thibaud_session`` .
 
-* Django only sends a cookie if it needs to. If you don't set any session
+* Thibaud only sends a cookie if it needs to. If you don't set any session
   data, it won't send a session cookie.
 
 The ``SessionStore`` object
 ---------------------------
 
-When working with sessions internally, Django uses a session store object from
+When working with sessions internally, Thibaud uses a session store object from
 the corresponding session engine. By convention, the session store object class
 is named ``SessionStore`` and is located in the module designated by
 :setting:`SESSION_ENGINE`.
 
-All ``SessionStore`` subclasses available in Django implement the following
+All ``SessionStore`` subclasses available in Thibaud implement the following
 data manipulation methods:
 
 * ``exists()``
@@ -792,12 +792,12 @@ Extending database-backed session engines
 =========================================
 
 Creating a custom database-backed session engine built upon those included in
-Django (namely ``db`` and ``cached_db``) may be done by inheriting
+Thibaud (namely ``db`` and ``cached_db``) may be done by inheriting
 :class:`~base_session.AbstractBaseSession` and either ``SessionStore`` class.
 
 ``AbstractBaseSession`` and ``BaseSessionManager`` are importable from
-``django.contrib.sessions.base_session`` so that they can be imported without
-including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
+``thibaud.contrib.sessions.base_session`` so that they can be imported without
+including ``thibaud.contrib.sessions`` in :setting:`INSTALLED_APPS`.
 
 .. class:: base_session.AbstractBaseSession
 
@@ -833,7 +833,7 @@ including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
         Decoding is performed by the session store class.
 
 You can also customize the model manager by subclassing
-:class:`~django.contrib.sessions.base_session.BaseSessionManager`:
+:class:`~thibaud.contrib.sessions.base_session.BaseSessionManager`:
 
 .. class:: base_session.BaseSessionManager
 
@@ -882,9 +882,9 @@ The example below shows a custom database-backed session engine that includes
 an additional database column to store an account ID (thus providing an option
 to query the database for all active sessions for an account)::
 
-    from django.contrib.sessions.backends.db import SessionStore as DBStore
-    from django.contrib.sessions.base_session import AbstractBaseSession
-    from django.db import models
+    from thibaud.contrib.sessions.backends.db import SessionStore as DBStore
+    from thibaud.contrib.sessions.base_session import AbstractBaseSession
+    from thibaud.db import models
 
 
     class CustomSession(AbstractBaseSession):
@@ -909,7 +909,7 @@ to query the database for all active sessions for an account)::
             obj.account_id = account_id
             return obj
 
-If you are migrating from the Django's built-in ``cached_db`` session store to
+If you are migrating from the Thibaud's built-in ``cached_db`` session store to
 a custom one based on ``cached_db``, you should override the cache key prefix
 in order to prevent a namespace clash::
 
@@ -921,7 +921,7 @@ in order to prevent a namespace clash::
 Session IDs in URLs
 ===================
 
-The Django sessions framework is entirely, and solely, cookie-based. It does
+The Thibaud sessions framework is entirely, and solely, cookie-based. It does
 not fall back to putting session IDs in URLs as a last resort, as PHP does.
 This is an intentional design decision. Not only does that behavior make URLs
 ugly, it makes your site vulnerable to session-ID theft via the "Referer"

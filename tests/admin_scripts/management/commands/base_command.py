@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from thibaud.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

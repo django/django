@@ -1,18 +1,18 @@
 import datetime
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.db import models
-from django.http import Http404
-from django.utils import timezone
-from django.utils.functional import cached_property
-from django.utils.translation import gettext as _
-from django.views.generic.base import View
-from django.views.generic.detail import (
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import models
+from thibaud.http import Http404
+from thibaud.utils import timezone
+from thibaud.utils.functional import cached_property
+from thibaud.utils.translation import gettext as _
+from thibaud.views.generic.base import View
+from thibaud.views.generic.detail import (
     BaseDetailView,
     SingleObjectTemplateResponseMixin,
 )
-from django.views.generic.list import (
+from thibaud.views.generic.list import (
     MultipleObjectMixin,
     MultipleObjectTemplateResponseMixin,
 )

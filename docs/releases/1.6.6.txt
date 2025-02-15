@@ -1,10 +1,10 @@
 ==========================
-Django 1.6.6 release notes
+Thibaud 1.6.6 release notes
 ==========================
 
 *August 20, 2014*
 
-Django 1.6.6 fixes several security issues and bugs in 1.6.5.
+Thibaud 1.6.6 fixes several security issues and bugs in 1.6.5.
 
 ``reverse()`` could generate URLs pointing to other hosts
 =========================================================
@@ -22,7 +22,7 @@ the domain and not to the scheme.
 File upload denial-of-service
 =============================
 
-Before this release, Django's file upload handing in its default configuration
+Before this release, Thibaud's file upload handing in its default configuration
 may degrade to producing a huge number of ``os.stat()`` system calls when a
 duplicate filename is uploaded. Since ``stat()`` may invoke IO, this may produce
 a huge data-dependent slowdown that slowly worsens over time. The net result is
@@ -34,7 +34,7 @@ and few HTTP requests would be all that is necessary to make a site unavailable.
 We've remedied the issue by changing the algorithm for generating file names
 if a file with the uploaded name already exists.
 :meth:`Storage.get_available_name()
-<django.core.files.storage.Storage.get_available_name>` now appends an
+<thibaud.core.files.storage.Storage.get_available_name>` now appends an
 underscore plus a random 7 character alphanumeric string (e.g. ``"_x3a1gho"``),
 rather than iterating through an underscore followed by a number (e.g. ``"_1"``,
 ``"_2"``, etc.).
@@ -42,7 +42,7 @@ rather than iterating through an underscore followed by a number (e.g. ``"_1"``,
 ``RemoteUserMiddleware`` session hijacking
 ==========================================
 
-When using the :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`
+When using the :class:`~thibaud.contrib.auth.middleware.RemoteUserMiddleware`
 and the ``RemoteUserBackend``, a change to the ``REMOTE_USER`` header between
 requests without an intervening logout could result in the prior user's session
 being co-opted by the subsequent user. The middleware now logs the user out on
@@ -51,7 +51,7 @@ a failed login attempt.
 Data leakage via query string manipulation in ``contrib.admin``
 ===============================================================
 
-In older versions of Django it was possible to reveal any field's data by
+In older versions of Thibaud it was possible to reveal any field's data by
 modifying the "popup" and "to_field" parameters of the query string on an admin
 change form page. For example, requesting a URL like
 ``/admin/auth/user/?_popup=1&t=password`` and viewing the page's HTML allowed

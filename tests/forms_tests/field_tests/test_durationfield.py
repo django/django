@@ -1,10 +1,10 @@
 import datetime
 
-from django.core.exceptions import ValidationError
-from django.forms import DurationField
-from django.test import SimpleTestCase
-from django.utils import translation
-from django.utils.duration import duration_string
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms import DurationField
+from thibaud.test import SimpleTestCase
+from thibaud.utils import translation
+from thibaud.utils.duration import duration_string
 
 from . import FormFieldAssertionsMixin
 

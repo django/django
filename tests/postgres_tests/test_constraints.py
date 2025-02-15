@@ -1,11 +1,11 @@
 import datetime
 from unittest import mock
 
-from django.contrib.postgres.indexes import OpClass
-from django.core.checks import Error
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection, transaction
-from django.db.models import (
+from thibaud.contrib.postgres.indexes import OpClass
+from thibaud.core.checks import Error
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import IntegrityError, connection, transaction
+from thibaud.db.models import (
     CASCADE,
     CharField,
     CheckConstraint,
@@ -20,24 +20,24 @@ from django.db.models import (
     Q,
     UniqueConstraint,
 )
-from django.db.models.fields.json import KeyTextTransform
-from django.db.models.functions import Cast, Left, Lower
-from django.test import skipUnlessDBFeature
-from django.test.utils import isolate_apps
-from django.utils import timezone
+from thibaud.db.models.fields.json import KeyTextTransform
+from thibaud.db.models.functions import Cast, Left, Lower
+from thibaud.test import skipUnlessDBFeature
+from thibaud.test.utils import isolate_apps
+from thibaud.utils import timezone
 
 from . import PostgreSQLTestCase
 from .models import HotelReservation, IntegerArrayModel, RangesModel, Room, Scene
 
 try:
-    from django.contrib.postgres.constraints import ExclusionConstraint
-    from django.contrib.postgres.fields import (
+    from thibaud.contrib.postgres.constraints import ExclusionConstraint
+    from thibaud.contrib.postgres.fields import (
         DateTimeRangeField,
         IntegerRangeField,
         RangeBoundary,
         RangeOperators,
     )
-    from django.db.backends.postgresql.psycopg_any import DateRange, NumericRange
+    from thibaud.db.backends.postgresql.psycopg_any import DateRange, NumericRange
 except ImportError:
     pass
 
@@ -590,7 +590,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         path, args, kwargs = constraint.deconstruct()
         self.assertEqual(
-            path, "django.contrib.postgres.constraints.ExclusionConstraint"
+            path, "thibaud.contrib.postgres.constraints.ExclusionConstraint"
         )
         self.assertEqual(args, ())
         self.assertEqual(
@@ -615,7 +615,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         path, args, kwargs = constraint.deconstruct()
         self.assertEqual(
-            path, "django.contrib.postgres.constraints.ExclusionConstraint"
+            path, "thibaud.contrib.postgres.constraints.ExclusionConstraint"
         )
         self.assertEqual(args, ())
         self.assertEqual(
@@ -641,7 +641,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         path, args, kwargs = constraint.deconstruct()
         self.assertEqual(
-            path, "django.contrib.postgres.constraints.ExclusionConstraint"
+            path, "thibaud.contrib.postgres.constraints.ExclusionConstraint"
         )
         self.assertEqual(args, ())
         self.assertEqual(
@@ -664,7 +664,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         path, args, kwargs = constraint.deconstruct()
         self.assertEqual(
-            path, "django.contrib.postgres.constraints.ExclusionConstraint"
+            path, "thibaud.contrib.postgres.constraints.ExclusionConstraint"
         )
         self.assertEqual(args, ())
         self.assertEqual(
@@ -684,7 +684,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         path, args, kwargs = constraint.deconstruct()
         self.assertEqual(
-            path, "django.contrib.postgres.constraints.ExclusionConstraint"
+            path, "thibaud.contrib.postgres.constraints.ExclusionConstraint"
         )
         self.assertEqual(args, ())
         self.assertEqual(

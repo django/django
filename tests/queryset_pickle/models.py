@@ -1,7 +1,7 @@
 import datetime
 
-from django.db import DJANGO_VERSION_PICKLE_KEY, models
-from django.utils.translation import gettext_lazy as _
+from thibaud.db import DJANGO_VERSION_PICKLE_KEY, models
+from thibaud.utils.translation import gettext_lazy as _
 
 
 def standalone_number():
@@ -14,14 +14,14 @@ class Numbers:
         return 2
 
 
-class PreviousDjangoVersionQuerySet(models.QuerySet):
+class PreviousThibaudVersionQuerySet(models.QuerySet):
     def __getstate__(self):
         state = super().__getstate__()
         state[DJANGO_VERSION_PICKLE_KEY] = "1.0"
         return state
 
 
-class MissingDjangoVersionQuerySet(models.QuerySet):
+class MissingThibaudVersionQuerySet(models.QuerySet):
     def __getstate__(self):
         state = super().__getstate__()
         del state[DJANGO_VERSION_PICKLE_KEY]
@@ -31,8 +31,8 @@ class MissingDjangoVersionQuerySet(models.QuerySet):
 class Group(models.Model):
     name = models.CharField(_("name"), max_length=100)
     objects = models.Manager()
-    previous_django_version_objects = PreviousDjangoVersionQuerySet.as_manager()
-    missing_django_version_objects = MissingDjangoVersionQuerySet.as_manager()
+    previous_thibaud_version_objects = PreviousThibaudVersionQuerySet.as_manager()
+    missing_thibaud_version_objects = MissingThibaudVersionQuerySet.as_manager()
 
 
 class Event(models.Model):

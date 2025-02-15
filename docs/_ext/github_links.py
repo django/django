@@ -146,4 +146,4 @@ def github_linkcode_resolve(domain, info, *, version, next_version):
     # Use "/" explicitly to join the path parts since str(file), on Windows,
     # uses the Windows path separator which is incorrect for URLs.
     url_path = "/".join(relative_path.parts)
-    return f"https://github.com/django/django/blob/{branch}/{url_path}#L{lineno}"
+    return f"https://github.com/thibaud/thibaud/blob/{branch}/{url_path}#L{lineno}"

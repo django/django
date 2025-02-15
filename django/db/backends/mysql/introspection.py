@@ -3,11 +3,11 @@ from collections import namedtuple
 import sqlparse
 from MySQLdb.constants import FIELD_TYPE
 
-from django.db.backends.base.introspection import BaseDatabaseIntrospection
-from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
-from django.db.backends.base.introspection import TableInfo as BaseTableInfo
-from django.db.models import Index
-from django.utils.datastructures import OrderedSet
+from thibaud.db.backends.base.introspection import BaseDatabaseIntrospection
+from thibaud.db.backends.base.introspection import FieldInfo as BaseFieldInfo
+from thibaud.db.backends.base.introspection import TableInfo as BaseTableInfo
+from thibaud.db.models import Index
+from thibaud.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple(
     "FieldInfo",

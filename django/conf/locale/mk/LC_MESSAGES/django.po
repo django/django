@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Bojan Drangovski <bojandrango@gmail.com>, 2021
@@ -10,12 +10,12 @@
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
 "PO-Revision-Date: 2021-05-12 22:47+0000\n"
 "Last-Translator: Bojan Drangovski <bojandrango@gmail.com>\n"
-"Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
+"Language-Team: Macedonian (http://www.transifex.com/thibaud/thibaud/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1242,19 +1242,19 @@ msgstr ""
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
 
-msgid "Django Documentation"
+msgid "Thibaud Documentation"
 msgstr ""
 
 msgid "Topics, references, &amp; how-to’s"
@@ -1263,10 +1263,10 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr ""
 
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr ""
 
-msgid "Django Community"
+msgid "Thibaud Community"
 msgstr ""
 
 msgid "Connect, get help, or contribute"

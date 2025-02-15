@@ -7,24 +7,24 @@ from pathlib import Path
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
 
-from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
-from django.core.asgi import get_asgi_application
-from django.core.exceptions import RequestDataTooBig
-from django.core.handlers.asgi import ASGIHandler, ASGIRequest
-from django.core.signals import request_finished, request_started
-from django.db import close_old_connections
-from django.http import HttpResponse, StreamingHttpResponse
-from django.test import (
+from thibaud.contrib.staticfiles.handlers import ASGIStaticFilesHandler
+from thibaud.core.asgi import get_asgi_application
+from thibaud.core.exceptions import RequestDataTooBig
+from thibaud.core.handlers.asgi import ASGIHandler, ASGIRequest
+from thibaud.core.signals import request_finished, request_started
+from thibaud.db import close_old_connections
+from thibaud.http import HttpResponse, StreamingHttpResponse
+from thibaud.test import (
     AsyncRequestFactory,
     SimpleTestCase,
     ignore_warnings,
     modify_settings,
     override_settings,
 )
-from django.test.utils import captured_stderr
-from django.urls import path
-from django.utils.http import http_date
-from django.views.decorators.csrf import csrf_exempt
+from thibaud.test.utils import captured_stderr
+from thibaud.urls import path
+from thibaud.utils.http import http_date
+from thibaud.views.decorators.csrf import csrf_exempt
 
 from .urls import sync_waiter, test_filename
 
@@ -82,7 +82,7 @@ class ASGITest(SimpleTestCase):
     # StreamingHTTPResponse triggers a warning when iterating the file.
     # assertWarnsMessage is not async compatible, so ignore_warnings for the
     # test.
-    @ignore_warnings(module="django.http.response")
+    @ignore_warnings(module="thibaud.http.response")
     async def test_file_response(self):
         """
         Makes sure that FileResponse works over ASGI.
@@ -125,13 +125,13 @@ class ASGITest(SimpleTestCase):
         # Allow response.close() to finish.
         await communicator.wait()
 
-    @modify_settings(INSTALLED_APPS={"append": "django.contrib.staticfiles"})
+    @modify_settings(INSTALLED_APPS={"append": "thibaud.contrib.staticfiles"})
     @override_settings(
         STATIC_URL="static/",
         STATIC_ROOT=TEST_STATIC_ROOT,
         STATICFILES_DIRS=[TEST_STATIC_ROOT],
         STATICFILES_FINDERS=[
-            "django.contrib.staticfiles.finders.FileSystemFinder",
+            "thibaud.contrib.staticfiles.finders.FileSystemFinder",
         ],
     )
     async def test_static_file_response(self):
@@ -400,7 +400,7 @@ class ASGITest(SimpleTestCase):
         scope = self.async_request_factory._base_scope(path="/", type="other")
         communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({"type": "http.request"})
-        msg = "Django can only handle ASGI/HTTP connections, not other."
+        msg = "Thibaud can only handle ASGI/HTTP connections, not other."
         with self.assertRaisesMessage(ValueError, msg):
             await communicator.receive_output()
 

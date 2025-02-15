@@ -1,7 +1,7 @@
 import random
 import string
 
-from django.db import models
+from thibaud.db import models
 
 
 class MyWrapper:

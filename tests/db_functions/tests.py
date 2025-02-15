@@ -1,8 +1,8 @@
-from django.db.models import CharField
-from django.db.models import Value as V
-from django.db.models.functions import Coalesce, Length, Upper
-from django.test import TestCase
-from django.test.utils import register_lookup
+from thibaud.db.models import CharField
+from thibaud.db.models import Value as V
+from thibaud.db.models.functions import Coalesce, Length, Upper
+from thibaud.test import TestCase
+from thibaud.test.utils import register_lookup
 
 from .models import Author
 

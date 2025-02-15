@@ -1,5 +1,5 @@
-from django.core.management import call_command
-from django.test import override_settings
+from thibaud.core.management import call_command
+from thibaud.test import override_settings
 
 from .test_base import MigrationTestBase
 

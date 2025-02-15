@@ -1,5 +1,5 @@
-from django.conf import settings
-from django.utils.module_loading import import_string
+from thibaud.conf import settings
+from thibaud.utils.module_loading import import_string
 
 
 def default_storage(request):

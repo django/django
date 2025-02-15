@@ -1,10 +1,10 @@
 ============================
-Django 1.11.21 release notes
+Thibaud 1.11.21 release notes
 ============================
 
 *June 3, 2019*
 
-Django 1.11.21 fixes a security issue in 1.11.20.
+Thibaud 1.11.21 fixes a security issue in 1.11.20.
 
 CVE-2019-12308: AdminURLFieldWidget XSS
 ---------------------------------------
@@ -15,7 +15,7 @@ value stored in the database, or a value provided as a URL query parameter
 payload, could result in an clickable JavaScript link.
 
 ``AdminURLFieldWidget`` now validates the provided value using
-:class:`~django.core.validators.URLValidator` before displaying the clickable
+:class:`~thibaud.core.validators.URLValidator` before displaying the clickable
 link. You may customize the validator by passing a ``validator_class`` kwarg to
 ``AdminURLFieldWidget.__init__()``, e.g. when using
-:attr:`~django.contrib.admin.ModelAdmin.formfield_overrides`.
+:attr:`~thibaud.contrib.admin.ModelAdmin.formfield_overrides`.

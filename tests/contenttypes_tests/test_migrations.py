@@ -1,19 +1,19 @@
 from importlib import import_module
 
-from django.apps import apps
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.test import TransactionTestCase
+from thibaud.apps import apps
+from thibaud.contrib.auth.models import Permission
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import DEFAULT_DB_ALIAS, connections
+from thibaud.test import TransactionTestCase
 
 remove_content_type_name = import_module(
-    "django.contrib.contenttypes.migrations.0002_remove_content_type_name"
+    "thibaud.contrib.contenttypes.migrations.0002_remove_content_type_name"
 )
 
 
 class MultiDBRemoveContentTypeNameTests(TransactionTestCase):
     databases = {"default", "other"}
-    available_apps = ["django.contrib.auth", "django.contrib.contenttypes"]
+    available_apps = ["thibaud.contrib.auth", "thibaud.contrib.contenttypes"]
 
     def test_add_legacy_name_other_database(self):
         # add_legacy_name() should update ContentType objects in the specified

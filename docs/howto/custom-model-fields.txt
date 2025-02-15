@@ -2,22 +2,22 @@
 How to create custom model fields
 =================================
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
 Introduction
 ============
 
 The :doc:`model reference </topics/db/models>` documentation explains how to use
-Django's standard field classes -- :class:`~django.db.models.CharField`,
-:class:`~django.db.models.DateField`, etc. For many purposes, those classes are
-all you'll need. Sometimes, though, the Django version won't meet your precise
+Thibaud's standard field classes -- :class:`~thibaud.db.models.CharField`,
+:class:`~thibaud.db.models.DateField`, etc. For many purposes, those classes are
+all you'll need. Sometimes, though, the Thibaud version won't meet your precise
 requirements, or you'll want to use a field that is entirely different from
-those shipped with Django.
+those shipped with Thibaud.
 
-Django's built-in field types don't cover every possible database column type --
+Thibaud's built-in field types don't cover every possible database column type --
 only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
 column types, such as geographic polygons or even user-created types such as
-`PostgreSQL custom types`_, you can define your own Django ``Field`` subclasses.
+`PostgreSQL custom types`_, you can define your own Thibaud ``Field`` subclasses.
 
 .. _PostgreSQL custom types: https://www.postgresql.org/docs/current/sql-createtype.html
 
@@ -50,7 +50,7 @@ something like this::
 
 .. _Bridge: https://en.wikipedia.org/wiki/Contract_bridge
 
-This is an ordinary Python class, with nothing Django-specific about it.
+This is an ordinary Python class, with nothing Thibaud-specific about it.
 We'd like to be able to do things like this in our models (we assume the
 ``hand`` attribute on the model is an instance of ``Hand``)::
 
@@ -62,7 +62,7 @@ We'd like to be able to do things like this in our models (we assume the
     example.save()
 
 We assign to and retrieve from the ``hand`` attribute in our model just like
-any other Python class. The trick is to tell Django how to handle saving and
+any other Python class. The trick is to tell Thibaud how to handle saving and
 loading such an object.
 
 In order to use the ``Hand`` class in our models, we **do not** have to change
@@ -94,7 +94,7 @@ but the rule is still the same: those are the only types you have to work
 with. Anything you want to store in the database must fit into one of
 those types.
 
-Normally, you're either writing a Django field to match a particular database
+Normally, you're either writing a Thibaud field to match a particular database
 column type, or you will need a way to convert your data to, say, a string.
 
 For our ``Hand`` example, we could convert the card data to a string of 104
@@ -105,16 +105,16 @@ say, all the *north* cards first, then the *east*, *south* and *west* cards. So
 What does a field class do?
 ---------------------------
 
-All of Django's fields (and when we say *fields* in this document, we always
+All of Thibaud's fields (and when we say *fields* in this document, we always
 mean model fields and not :doc:`form fields </ref/forms/fields>`) are subclasses
-of :class:`django.db.models.Field`. Most of the information that Django records
+of :class:`thibaud.db.models.Field`. Most of the information that Thibaud records
 about a field is common to all fields -- name, help text, uniqueness and so
 forth. Storing all that information is handled by ``Field``. We'll get into the
 precise details of what ``Field`` can do later on; for now, suffice it to say
 that everything descends from ``Field`` and then customizes key pieces of the
 class behavior.
 
-It's important to realize that a Django field class is not what is stored in
+It's important to realize that a Thibaud field class is not what is stored in
 your model attributes. The model attributes contain normal Python objects. The
 field classes you define in a model are actually stored in the ``Meta`` class
 when the model class is created (the precise details of how this is done are
@@ -123,7 +123,7 @@ you're just creating and modifying attributes. Instead, they provide the
 machinery for converting between the attribute value and what is stored in the
 database or sent to the :doc:`serializer </topics/serialization>`.
 
-Keep this in mind when creating your own custom fields. The Django ``Field``
+Keep this in mind when creating your own custom fields. The Thibaud ``Field``
 subclass you write provides the machinery for converting between your Python
 instances and the database/serializer values in various ways (there are
 differences between storing a value and using a value for lookups, for
@@ -143,24 +143,24 @@ classes when you want a custom field:
 Writing a field subclass
 ========================
 
-When planning your :class:`~django.db.models.Field` subclass, first give some
-thought to which existing :class:`~django.db.models.Field` class your new field
-is most similar to. Can you subclass an existing Django field and save yourself
-some work? If not, you should subclass the :class:`~django.db.models.Field`
+When planning your :class:`~thibaud.db.models.Field` subclass, first give some
+thought to which existing :class:`~thibaud.db.models.Field` class your new field
+is most similar to. Can you subclass an existing Thibaud field and save yourself
+some work? If not, you should subclass the :class:`~thibaud.db.models.Field`
 class, from which everything is descended.
 
 Initializing your new field is a matter of separating out any arguments that are
 specific to your case from the common arguments and passing the latter to the
-``__init__()`` method of :class:`~django.db.models.Field` (or your parent
+``__init__()`` method of :class:`~thibaud.db.models.Field` (or your parent
 class).
 
 In our example, we'll call our field ``HandField``. (It's a good idea to call
-your :class:`~django.db.models.Field` subclass ``<Something>Field``, so it's
-easily identifiable as a :class:`~django.db.models.Field` subclass.) It doesn't
+your :class:`~thibaud.db.models.Field` subclass ``<Something>Field``, so it's
+easily identifiable as a :class:`~thibaud.db.models.Field` subclass.) It doesn't
 behave like any existing field, so we'll subclass directly from
-:class:`~django.db.models.Field`::
+:class:`~thibaud.db.models.Field`::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class HandField(models.Field):
@@ -176,13 +176,13 @@ card values plus their suits; 104 characters in total.
 
 .. note::
 
-    Many of Django's model fields accept options that they don't do anything
+    Many of Thibaud's model fields accept options that they don't do anything
     with. For example, you can pass both
-    :attr:`~django.db.models.Field.editable` and
-    :attr:`~django.db.models.DateField.auto_now` to a
-    :class:`django.db.models.DateField` and it will ignore the
-    :attr:`~django.db.models.Field.editable` parameter
-    (:attr:`~django.db.models.DateField.auto_now` being set implies
+    :attr:`~thibaud.db.models.Field.editable` and
+    :attr:`~thibaud.db.models.DateField.auto_now` to a
+    :class:`thibaud.db.models.DateField` and it will ignore the
+    :attr:`~thibaud.db.models.Field.editable` parameter
+    (:attr:`~thibaud.db.models.DateField.auto_now` being set implies
     ``editable=False``). No error is raised in this case.
 
     This behavior simplifies the field classes, because they don't need to
@@ -193,36 +193,36 @@ card values plus their suits; 104 characters in total.
 
 The ``Field.__init__()`` method takes the following parameters:
 
-* :attr:`~django.db.models.Field.verbose_name`
+* :attr:`~thibaud.db.models.Field.verbose_name`
 * ``name``
-* :attr:`~django.db.models.Field.primary_key`
-* :attr:`~django.db.models.CharField.max_length`
-* :attr:`~django.db.models.Field.unique`
-* :attr:`~django.db.models.Field.blank`
-* :attr:`~django.db.models.Field.null`
-* :attr:`~django.db.models.Field.db_index`
+* :attr:`~thibaud.db.models.Field.primary_key`
+* :attr:`~thibaud.db.models.CharField.max_length`
+* :attr:`~thibaud.db.models.Field.unique`
+* :attr:`~thibaud.db.models.Field.blank`
+* :attr:`~thibaud.db.models.Field.null`
+* :attr:`~thibaud.db.models.Field.db_index`
 * ``rel``: Used for related fields (like :class:`ForeignKey`). For advanced
   use only.
-* :attr:`~django.db.models.Field.default`
-* :attr:`~django.db.models.Field.editable`
+* :attr:`~thibaud.db.models.Field.default`
+* :attr:`~thibaud.db.models.Field.editable`
 * ``serialize``: If ``False``, the field will not be serialized when the model
-  is passed to Django's :doc:`serializers </topics/serialization>`. Defaults to
+  is passed to Thibaud's :doc:`serializers </topics/serialization>`. Defaults to
   ``True``.
-* :attr:`~django.db.models.Field.unique_for_date`
-* :attr:`~django.db.models.Field.unique_for_month`
-* :attr:`~django.db.models.Field.unique_for_year`
-* :attr:`~django.db.models.Field.choices`
-* :attr:`~django.db.models.Field.help_text`
-* :attr:`~django.db.models.Field.db_column`
-* :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
+* :attr:`~thibaud.db.models.Field.unique_for_date`
+* :attr:`~thibaud.db.models.Field.unique_for_month`
+* :attr:`~thibaud.db.models.Field.unique_for_year`
+* :attr:`~thibaud.db.models.Field.choices`
+* :attr:`~thibaud.db.models.Field.help_text`
+* :attr:`~thibaud.db.models.Field.db_column`
+* :attr:`~thibaud.db.models.Field.db_tablespace`: Only for index creation, if the
   backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
   ignore this option.
-* :attr:`~django.db.models.Field.auto_created`: ``True`` if the field was
-  automatically created, as for the :class:`~django.db.models.OneToOneField`
+* :attr:`~thibaud.db.models.Field.auto_created`: ``True`` if the field was
+  automatically created, as for the :class:`~thibaud.db.models.OneToOneField`
   used by model inheritance. For advanced use only.
 
 All of the options without an explanation in the above list have the same
-meaning they do for normal Django fields. See the :doc:`field documentation
+meaning they do for normal Thibaud fields. See the :doc:`field documentation
 </ref/models/fields>` for examples and details.
 
 .. _custom-field-deconstruct-method:
@@ -232,7 +232,7 @@ Field deconstruction
 
 The counterpoint to writing your ``__init__()`` method is writing the
 :meth:`~.Field.deconstruct` method. It's used during :doc:`model migrations
-</topics/migrations>` to tell Django how to take an instance of your new field
+</topics/migrations>` to tell Thibaud how to take an instance of your new field
 and reduce it to a serialized form - in particular, what arguments to pass to
 ``__init__()`` to recreate it.
 
@@ -257,7 +257,7 @@ max_length in ``__init__()``. The ``deconstruct()`` method on the base ``Field``
 class will see this and try to return it in the keyword arguments; thus,
 we can drop it from the keyword arguments for readability::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class HandField(models.Field):
@@ -275,7 +275,7 @@ that puts its value into ``kwargs`` yourself. You should also omit the value
 from ``kwargs`` when it isn't necessary to reconstruct the state of the field,
 such as when the default value is being used::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class CommaSepField(models.Field):
@@ -335,7 +335,7 @@ For example::
 Changing a custom field's base class
 ------------------------------------
 
-You can't change the base class of a custom field because Django won't detect
+You can't change the base class of a custom field because Thibaud won't detect
 the change and make a migration for it. For example, if you start with::
 
     class CustomCharField(models.CharField): ...
@@ -363,23 +363,23 @@ Documenting your custom field
 As always, you should document your field type, so users will know what it is.
 In addition to providing a docstring for it, which is useful for developers,
 you can also allow users of the admin app to see a short description of the
-field type via the :doc:`django.contrib.admindocs
+field type via the :doc:`thibaud.contrib.admindocs
 </ref/contrib/admin/admindocs>` application. To do this provide descriptive
 text in a :attr:`~Field.description` class attribute of your custom field. In
 the above example, the description displayed by the ``admindocs`` application
 for a ``HandField`` will be 'A hand of cards (bridge style)'.
 
-In the :mod:`django.contrib.admindocs` display, the field description is
+In the :mod:`thibaud.contrib.admindocs` display, the field description is
 interpolated with ``field.__dict__`` which allows the description to
 incorporate arguments of the field. For example, the description for
-:class:`~django.db.models.CharField` is::
+:class:`~thibaud.db.models.CharField` is::
 
     description = _("String (up to %(max_length)s)")
 
 Useful methods
 --------------
 
-Once you've created your :class:`~django.db.models.Field` subclass, you might
+Once you've created your :class:`~thibaud.db.models.Field` subclass, you might
 consider overriding a few standard methods, depending on your field's behavior.
 The list of methods below is in approximately decreasing order of importance,
 so start from the top.
@@ -392,7 +392,7 @@ Custom database types
 Say you've created a PostgreSQL custom type called ``mytype``. You can
 subclass ``Field`` and implement the :meth:`~Field.db_type` method, like so::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class MytypeField(models.Field):
@@ -423,7 +423,7 @@ For example::
                 return "timestamp"
 
 The :meth:`~Field.db_type` and :meth:`~Field.rel_db_type` methods are called by
-Django when the framework constructs the ``CREATE TABLE`` statements for your
+Thibaud when the framework constructs the ``CREATE TABLE`` statements for your
 application -- that is, when you first create your tables. The methods are also
 called when constructing a ``WHERE`` clause that includes the model field --
 that is, when you retrieve data using QuerySet methods like ``get()``,
@@ -466,9 +466,9 @@ time -- i.e., when the class is instantiated. To do that, implement
         my_field = BetterCharField(25)
 
 Finally, if your column requires truly complex SQL setup, return ``None`` from
-:meth:`.db_type`. This will cause Django's SQL creation code to skip
+:meth:`.db_type`. This will cause Thibaud's SQL creation code to skip
 over this field. You are then responsible for creating the column in the right
-table in some other way, but this gives you a way to tell Django to get out of
+table in some other way, but this gives you a way to tell Thibaud to get out of
 the way.
 
 The :meth:`~Field.rel_db_type` method is called by fields such as ``ForeignKey``
@@ -495,10 +495,10 @@ complex than strings, dates, integers, or floats, then you may need to override
 
 If present for the field subclass, ``from_db_value()`` will be called in all
 circumstances when the data is loaded from the database, including in
-aggregates and :meth:`~django.db.models.query.QuerySet.values` calls.
+aggregates and :meth:`~thibaud.db.models.query.QuerySet.values` calls.
 
 ``to_python()`` is called by deserialization and during the
-:meth:`~django.db.models.Model.clean` method used from forms.
+:meth:`~thibaud.db.models.Model.clean` method used from forms.
 
 As a general rule, ``to_python()`` should deal gracefully with any of the
 following arguments:
@@ -516,9 +516,9 @@ instances::
 
     import re
 
-    from django.core.exceptions import ValidationError
-    from django.db import models
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.core.exceptions import ValidationError
+    from thibaud.db import models
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     def parse_hand(hand_string):
@@ -552,7 +552,7 @@ Notice that we always return a ``Hand`` instance from these methods. That's the
 Python object type we want to store in the model's attribute.
 
 For ``to_python()``, if anything goes wrong during value conversion, you should
-raise a :exc:`~django.core.exceptions.ValidationError` exception.
+raise a :exc:`~thibaud.core.exceptions.ValidationError` exception.
 
 .. _converting-python-objects-to-query-values:
 
@@ -595,7 +595,7 @@ be made. The specific connection that will be used for the query is
 passed as the ``connection`` parameter. This allows you to use
 backend-specific conversion logic if it is required.
 
-For example, Django uses the following method for its
+For example, Thibaud uses the following method for its
 :class:`BinaryField`::
 
     def get_db_prep_value(self, value, connection, prepared=False):
@@ -614,10 +614,10 @@ Preprocessing values before saving
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to preprocess the value just before saving, you can use
-:meth:`~Field.pre_save`. For example, Django's
-:class:`~django.db.models.DateTimeField` uses this method to set the attribute
-correctly in the case of :attr:`~django.db.models.DateField.auto_now` or
-:attr:`~django.db.models.DateField.auto_now_add`.
+:meth:`~Field.pre_save`. For example, Thibaud's
+:class:`~thibaud.db.models.DateTimeField` uses this method to set the attribute
+correctly in the case of :attr:`~thibaud.db.models.DateField.auto_now` or
+:attr:`~thibaud.db.models.DateField.auto_now_add`.
 
 If you do override this method, you must return the value of the attribute at
 the end. You should also update the model's attribute if you make any changes
@@ -629,13 +629,13 @@ correct value.
 Specifying the form field for a model field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To customize the form field used by :class:`~django.forms.ModelForm`, you can
+To customize the form field used by :class:`~thibaud.forms.ModelForm`, you can
 override :meth:`~Field.formfield`.
 
 The form field class can be specified via the ``form_class`` and
 ``choices_form_class`` arguments; the latter is used if the field has choices
 specified, the former otherwise. If these arguments are not provided,
-:class:`~django.forms.CharField` or :class:`~django.forms.TypedChoiceField`
+:class:`~thibaud.forms.CharField` or :class:`~thibaud.forms.TypedChoiceField`
 will be used.
 
 All of the ``kwargs`` dictionary is passed directly to the form field's
@@ -645,7 +645,7 @@ delegate further handling to the parent class. This might require you to write
 a custom form field (and even a form widget). See the :doc:`forms documentation
 </topics/forms/index>` for information about this.
 
-If you wish to exclude the field from the :class:`~django.forms.ModelForm`, you
+If you wish to exclude the field from the :class:`~thibaud.forms.ModelForm`, you
 can override the :meth:`~Field.formfield` method to return ``None``.
 
 Continuing our ongoing example, we can write the :meth:`~Field.formfield` method
@@ -694,14 +694,14 @@ No matter which database backend we are using, this will mean that
 :djadmin:`migrate` and other SQL commands create the right column type for
 storing a string.
 
-If :meth:`.get_internal_type` returns a string that is not known to Django for
+If :meth:`.get_internal_type` returns a string that is not known to Thibaud for
 the database backend you are using -- that is, it doesn't appear in
-``django.db.backends.<db_name>.base.DatabaseWrapper.data_types`` -- the string
+``thibaud.db.backends.<db_name>.base.DatabaseWrapper.data_types`` -- the string
 will still be used by the serializer, but the default :meth:`~Field.db_type`
 method will return ``None``. See the documentation of :meth:`~Field.db_type`
 for reasons why this might be useful. Putting a descriptive string in as the
 type of the field for the serializer is a useful idea if you're ever going to
-be using the serializer output in some other place, outside of Django.
+be using the serializer output in some other place, outside of Thibaud.
 
 .. _converting-model-field-to-serialization:
 
@@ -729,8 +729,8 @@ complex conversions between your Python types and your database and
 serialization formats. Here are a couple of tips to make things go more
 smoothly:
 
-#. Look at the existing Django fields (in
-   :source:`django/db/models/fields/__init__.py`) for inspiration. Try to find
+#. Look at the existing Thibaud fields (in
+   :source:`thibaud/db/models/fields/__init__.py`) for inspiration. Try to find
    a field that's similar to what you want and extend it a little bit,
    instead of creating an entirely new field from scratch.
 
@@ -750,10 +750,10 @@ mechanics provided by ``FileField``, such as controlling database storage and
 retrieval, can remain unchanged, leaving subclasses to deal with the challenge
 of supporting a particular type of file.
 
-Django provides a ``File`` class, which is used as a proxy to the file's
+Thibaud provides a ``File`` class, which is used as a proxy to the file's
 contents and operations. This can be subclassed to customize how the file is
 accessed, and what methods are available. It lives at
-``django.db.models.fields.files``, and its default behavior is explained in the
+``thibaud.db.models.fields.files``, and its default behavior is explained in the
 :doc:`file documentation </ref/files/file>`.
 
 Once a subclass of ``File`` is created, the new ``FileField`` subclass must be
@@ -766,8 +766,8 @@ A few suggestions
 In addition to the above details, there are a few guidelines which can greatly
 improve the efficiency and readability of the field's code.
 
-#. The source for Django's own ``ImageField`` (in
-   :source:`django/db/models/fields/files.py`) is a great example of how to
+#. The source for Thibaud's own ``ImageField`` (in
+   :source:`thibaud/db/models/fields/files.py`) is a great example of how to
    subclass ``FileField`` to support a particular type of file, as it
    incorporates all of the techniques described above.
 

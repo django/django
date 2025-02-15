@@ -1,8 +1,8 @@
 import datetime
 
-from django import forms
-from django.forms import CheckboxSelectMultiple, ChoiceField, Form
-from django.test import override_settings
+from thibaud import forms
+from thibaud.forms import CheckboxSelectMultiple, ChoiceField, Form
+from thibaud.test import override_settings
 
 from .base import WidgetTest
 

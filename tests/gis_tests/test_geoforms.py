@@ -1,11 +1,11 @@
 import re
 
-from django.contrib.gis import forms
-from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
-from django.contrib.gis.geos import GEOSGeometry
-from django.core.exceptions import ValidationError
-from django.test import SimpleTestCase, override_settings
-from django.utils.html import escape
+from thibaud.contrib.gis import forms
+from thibaud.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
+from thibaud.contrib.gis.geos import GEOSGeometry
+from thibaud.core.exceptions import ValidationError
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils.html import escape
 
 
 class GeometryFieldTest(SimpleTestCase):
@@ -154,7 +154,7 @@ class GeometryFieldTest(SimpleTestCase):
             }
         )
 
-        with self.assertLogs("django.contrib.gis", "ERROR") as logger_calls:
+        with self.assertLogs("thibaud.contrib.gis", "ERROR") as logger_calls:
             output = str(form)
 
         # The first point can't use assertInHTML() due to non-deterministic

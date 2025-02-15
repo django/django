@@ -2,7 +2,7 @@ import os
 from asyncio import get_running_loop
 from functools import wraps
 
-from django.core.exceptions import SynchronousOnlyOperation
+from thibaud.core.exceptions import SynchronousOnlyOperation
 
 
 def async_unsafe(message):

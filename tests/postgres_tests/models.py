@@ -1,4 +1,4 @@
-from django.db import models
+from thibaud.db import models
 
 from .fields import (
     ArrayField,

@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from django.http import FileResponse
+from thibaud.http import FileResponse
 
 FILE_RESPONSE_HOLDER = {}
 

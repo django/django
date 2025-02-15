@@ -3,12 +3,12 @@
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
 
-from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
-from django.contrib.gis.geos.libgeos import GEOM_PTR
-from django.contrib.gis.geos.linestring import LinearRing, LineString
-from django.contrib.gis.geos.point import Point
-from django.contrib.gis.geos.polygon import Polygon
+from thibaud.contrib.gis.geos import prototypes as capi
+from thibaud.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
+from thibaud.contrib.gis.geos.libgeos import GEOM_PTR
+from thibaud.contrib.gis.geos.linestring import LinearRing, LineString
+from thibaud.contrib.gis.geos.point import Point
+from thibaud.contrib.gis.geos.polygon import Polygon
 
 
 class GeometryCollection(GEOSGeometry):

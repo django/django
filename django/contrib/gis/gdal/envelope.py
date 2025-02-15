@@ -13,7 +13,7 @@
 
 from ctypes import Structure, c_double
 
-from django.contrib.gis.gdal.error import GDALException
+from thibaud.contrib.gis.gdal.error import GDALException
 
 
 # The OGR definition of an Envelope is a C structure containing four doubles.

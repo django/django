@@ -11,25 +11,25 @@ from io import StringIO
 from pathlib import Path
 from urllib.request import urlopen
 
-from django.conf import DEFAULT_STORAGE_ALIAS, STATICFILES_STORAGE_ALIAS
-from django.core.cache import cache
-from django.core.exceptions import SuspiciousFileOperation
-from django.core.files.base import ContentFile, File
-from django.core.files.storage import FileSystemStorage, InvalidStorageError
-from django.core.files.storage import Storage as BaseStorage
-from django.core.files.storage import StorageHandler, default_storage, storages
-from django.core.files.uploadedfile import (
+from thibaud.conf import DEFAULT_STORAGE_ALIAS, STATICFILES_STORAGE_ALIAS
+from thibaud.core.cache import cache
+from thibaud.core.exceptions import SuspiciousFileOperation
+from thibaud.core.files.base import ContentFile, File
+from thibaud.core.files.storage import FileSystemStorage, InvalidStorageError
+from thibaud.core.files.storage import Storage as BaseStorage
+from thibaud.core.files.storage import StorageHandler, default_storage, storages
+from thibaud.core.files.uploadedfile import (
     InMemoryUploadedFile,
     SimpleUploadedFile,
     TemporaryUploadedFile,
 )
-from django.db.models import FileField
-from django.db.models.fields.files import FileDescriptor
-from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
-from django.test.utils import requires_tz_support
-from django.urls import NoReverseMatch, reverse_lazy
-from django.utils import timezone
-from django.utils._os import symlinks_supported
+from thibaud.db.models import FileField
+from thibaud.db.models.fields.files import FileDescriptor
+from thibaud.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
+from thibaud.test.utils import requires_tz_support
+from thibaud.urls import NoReverseMatch, reverse_lazy
+from thibaud.utils import timezone
+from thibaud.utils._os import symlinks_supported
 
 from .models import (
     Storage,
@@ -45,7 +45,7 @@ FILE_SUFFIX_REGEX = "[A-Za-z0-9]{7}"
 class FileSystemStorageTests(unittest.TestCase):
     def test_deconstruction(self):
         path, args, kwargs = temp_storage.deconstruct()
-        self.assertEqual(path, "django.core.files.storage.FileSystemStorage")
+        self.assertEqual(path, "thibaud.core.files.storage.FileSystemStorage")
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {"location": temp_storage_location})
 
@@ -104,20 +104,20 @@ class FileStorageTests(SimpleTestCase):
     def _test_file_time_getter(self, getter):
         # Check for correct behavior under both USE_TZ=True and USE_TZ=False.
         # The tests are similar since they both set up a situation where the
-        # system time zone, Django's TIME_ZONE, and UTC are distinct.
+        # system time zone, Thibaud's TIME_ZONE, and UTC are distinct.
         self._test_file_time_getter_tz_handling_on(getter)
         self._test_file_time_getter_tz_handling_off(getter)
 
     @override_settings(USE_TZ=True, TIME_ZONE="Africa/Algiers")
     def _test_file_time_getter_tz_handling_on(self, getter):
-        # Django's TZ (and hence the system TZ) is set to Africa/Algiers which
-        # is UTC+1 and has no DST change. We can set the Django TZ to something
-        # else so that UTC, Django's TIME_ZONE, and the system timezone are all
+        # Thibaud's TZ (and hence the system TZ) is set to Africa/Algiers which
+        # is UTC+1 and has no DST change. We can set the Thibaud TZ to something
+        # else so that UTC, Thibaud's TIME_ZONE, and the system timezone are all
         # different.
         now_in_algiers = timezone.make_aware(datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
-            # At this point the system TZ is +1 and the Django TZ
+            # At this point the system TZ is +1 and the Thibaud TZ
             # is -5. The following will be aware in UTC.
             now = timezone.now()
             self.assertFalse(self.storage.exists("test.file.tz.on"))
@@ -133,24 +133,24 @@ class FileStorageTests(SimpleTestCase):
             # The three timezones are indeed distinct.
             naive_now = datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
-            django_offset = timezone.get_current_timezone().utcoffset(naive_now)
+            thibaud_offset = timezone.get_current_timezone().utcoffset(naive_now)
             utc_offset = datetime_timezone.utc.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
-            self.assertLess(django_offset, utc_offset)
+            self.assertLess(thibaud_offset, utc_offset)
 
             # dt and now should be the same effective time.
             self.assertLess(abs(dt - now), timedelta(seconds=2))
 
     @override_settings(USE_TZ=False, TIME_ZONE="Africa/Algiers")
     def _test_file_time_getter_tz_handling_off(self, getter):
-        # Django's TZ (and hence the system TZ) is set to Africa/Algiers which
-        # is UTC+1 and has no DST change. We can set the Django TZ to something
-        # else so that UTC, Django's TIME_ZONE, and the system timezone are all
+        # Thibaud's TZ (and hence the system TZ) is set to Africa/Algiers which
+        # is UTC+1 and has no DST change. We can set the Thibaud TZ to something
+        # else so that UTC, Thibaud's TIME_ZONE, and the system timezone are all
         # different.
         now_in_algiers = timezone.make_aware(datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
-            # At this point the system TZ is +1 and the Django TZ
+            # At this point the system TZ is +1 and the Thibaud TZ
             # is -5.
             self.assertFalse(self.storage.exists("test.file.tz.off"))
 
@@ -164,10 +164,10 @@ class FileStorageTests(SimpleTestCase):
             # The three timezones are indeed distinct.
             naive_now = datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
-            django_offset = timezone.get_current_timezone().utcoffset(naive_now)
+            thibaud_offset = timezone.get_current_timezone().utcoffset(naive_now)
             utc_offset = datetime_timezone.utc.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
-            self.assertLess(django_offset, utc_offset)
+            self.assertLess(thibaud_offset, utc_offset)
 
             # dt and naive_now should be the same effective time.
             self.assertLess(abs(dt - naive_now), timedelta(seconds=2))
@@ -727,8 +727,8 @@ class FileFieldStorageTests(TestCase):
             obj1.normal.size
 
         # Saving a file enables full functionality.
-        obj1.normal.save("django_test.txt", ContentFile("content"))
-        self.assertEqual(obj1.normal.name, "tests/django_test.txt")
+        obj1.normal.save("thibaud_test.txt", ContentFile("content"))
+        self.assertEqual(obj1.normal.name, "tests/thibaud_test.txt")
         self.assertEqual(obj1.normal.size, 7)
         self.assertEqual(obj1.normal.read(), b"content")
         obj1.normal.close()
@@ -742,22 +742,22 @@ class FileFieldStorageTests(TestCase):
 
         obj1.save()
         dirs, files = temp_storage.listdir("tests")
-        self.assertEqual(sorted(files), ["assignment.txt", "django_test.txt"])
+        self.assertEqual(sorted(files), ["assignment.txt", "thibaud_test.txt"])
 
         # Save another file with the same name.
         obj2 = Storage()
-        obj2.normal.save("django_test.txt", ContentFile("more content"))
+        obj2.normal.save("thibaud_test.txt", ContentFile("more content"))
         obj2_name = obj2.normal.name
-        self.assertRegex(obj2_name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
+        self.assertRegex(obj2_name, "tests/thibaud_test_%s.txt" % FILE_SUFFIX_REGEX)
         self.assertEqual(obj2.normal.size, 12)
         obj2.normal.close()
 
         # Deleting an object does not delete the file it uses.
         obj2.delete()
-        obj2.normal.save("django_test.txt", ContentFile("more content"))
+        obj2.normal.save("thibaud_test.txt", ContentFile("more content"))
         self.assertNotEqual(obj2_name, obj2.normal.name)
         self.assertRegex(
-            obj2.normal.name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX
+            obj2.normal.name, "tests/thibaud_test_%s.txt" % FILE_SUFFIX_REGEX
         )
         obj2.normal.close()
 
@@ -893,8 +893,8 @@ class FileFieldStorageTests(TestCase):
     def test_empty_upload_to(self):
         # upload_to can be empty, meaning it does not use subdirectory.
         obj = Storage()
-        obj.empty.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj.empty.name, "django_test.txt")
+        obj.empty.save("thibaud_test.txt", ContentFile("more content"))
+        self.assertEqual(obj.empty.name, "thibaud_test.txt")
         self.assertEqual(obj.empty.read(), b"more content")
         obj.empty.close()
 
@@ -927,10 +927,10 @@ class FileFieldStorageTests(TestCase):
     def test_filefield_pickling(self):
         # Push an object into the cache to make sure it pickles properly
         obj = Storage()
-        obj.normal.save("django_test.txt", ContentFile("more content"))
+        obj.normal.save("thibaud_test.txt", ContentFile("more content"))
         obj.normal.close()
         cache.set("obj", obj)
-        self.assertEqual(cache.get("obj").normal.name, "tests/django_test.txt")
+        self.assertEqual(cache.get("obj").normal.name, "tests/thibaud_test.txt")
 
     def test_file_object(self):
         # Create sample file
@@ -959,7 +959,7 @@ class FileFieldStorageTests(TestCase):
     @override_settings(
         STORAGES={
             DEFAULT_STORAGE_ALIAS: {
-                "BACKEND": "django.core.files.storage.InMemoryStorage"
+                "BACKEND": "thibaud.core.files.storage.InMemoryStorage"
             }
         }
     )
@@ -987,7 +987,7 @@ class FieldCallableFileStorageTests(SimpleTestCase):
 
         msg = (
             "FileField.storage must be a subclass/instance of "
-            "django.core.files.storage.base.Storage"
+            "thibaud.core.files.storage.base.Storage"
         )
         for invalid_type in (NotStorage, str, list, set, tuple):
             with self.subTest(invalid_type=invalid_type):
@@ -1193,7 +1193,7 @@ class StorageHandlerTests(SimpleTestCase):
     @override_settings(
         STORAGES={
             "custom_storage": {
-                "BACKEND": "django.core.files.storage.FileSystemStorage",
+                "BACKEND": "thibaud.core.files.storage.FileSystemStorage",
             },
         }
     )
@@ -1208,10 +1208,10 @@ class StorageHandlerTests(SimpleTestCase):
             storages.backends,
             {
                 DEFAULT_STORAGE_ALIAS: {
-                    "BACKEND": "django.core.files.storage.FileSystemStorage",
+                    "BACKEND": "thibaud.core.files.storage.FileSystemStorage",
                 },
                 STATICFILES_STORAGE_ALIAS: {
-                    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+                    "BACKEND": "thibaud.contrib.staticfiles.storage.StaticFilesStorage",
                 },
             },
         )
@@ -1226,13 +1226,13 @@ class StorageHandlerTests(SimpleTestCase):
         test_storages = StorageHandler(
             {
                 "invalid_backend": {
-                    "BACKEND": "django.nonexistent.NonexistentBackend",
+                    "BACKEND": "thibaud.nonexistent.NonexistentBackend",
                 },
             }
         )
         msg = (
-            "Could not find backend 'django.nonexistent.NonexistentBackend': "
-            "No module named 'django.nonexistent'"
+            "Could not find backend 'thibaud.nonexistent.NonexistentBackend': "
+            "No module named 'thibaud.nonexistent'"
         )
         with self.assertRaisesMessage(InvalidStorageError, msg):
             test_storages["invalid_backend"]

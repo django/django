@@ -1,4 +1,4 @@
-from django.db.models import DecimalField, DurationField, Func
+from thibaud.db.models import DecimalField, DurationField, Func
 
 
 class IntervalToSeconds(Func):

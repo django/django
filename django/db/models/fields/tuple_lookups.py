@@ -1,15 +1,15 @@
 import itertools
 
-from django.core.exceptions import EmptyResultSet
-from django.db.models import Field
-from django.db.models.expressions import (
+from thibaud.core.exceptions import EmptyResultSet
+from thibaud.db.models import Field
+from thibaud.db.models.expressions import (
     ColPairs,
     Func,
     ResolvedOuterRef,
     Subquery,
     Value,
 )
-from django.db.models.lookups import (
+from thibaud.db.models.lookups import (
     Exact,
     GreaterThan,
     GreaterThanOrEqual,
@@ -18,8 +18,8 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-from django.db.models.sql import Query
-from django.db.models.sql.where import AND, OR, WhereNode
+from thibaud.db.models.sql import Query
+from thibaud.db.models.sql.where import AND, OR, WhereNode
 
 
 class Tuple(Func):

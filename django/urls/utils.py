@@ -1,8 +1,8 @@
 import functools
 from importlib import import_module
 
-from django.core.exceptions import ViewDoesNotExist
-from django.utils.module_loading import module_has_submodule
+from thibaud.core.exceptions import ViewDoesNotExist
+from thibaud.utils.module_loading import module_has_submodule
 
 
 @functools.cache
@@ -57,8 +57,8 @@ def get_callable(lookup_view):
 
 
 def get_mod_func(callback):
-    # Convert 'django.views.news.stories.story_detail' to
-    # ['django.views.news.stories', 'story_detail']
+    # Convert 'thibaud.views.news.stories.story_detail' to
+    # ['thibaud.views.news.stories', 'story_detail']
     try:
         dot = callback.rindex(".")
     except ValueError:

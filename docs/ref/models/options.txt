@@ -9,7 +9,7 @@ This document explains all the possible :ref:`metadata options
 Available ``Meta`` options
 ==========================
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
 ``abstract``
 ------------
@@ -39,7 +39,7 @@ Available ``Meta`` options
 .. attribute:: Options.base_manager_name
 
     The attribute name of the manager, for example, ``'objects'``, to use for
-    the model's :attr:`~django.db.models.Model._base_manager`.
+    the model's :attr:`~thibaud.db.models.Model._base_manager`.
 
 ``db_table``
 ------------
@@ -55,7 +55,7 @@ Available ``Meta`` options
 Table names
 ~~~~~~~~~~~
 
-To save you time, Django automatically derives the name of the database table
+To save you time, Thibaud automatically derives the name of the database table
 from the name of your model class and the app that contains it. A model's
 database table name is constructed by joining the model's "app label" -- the
 name you used in :djadmin:`manage.py startapp <startapp>` -- to the model's
@@ -70,7 +70,7 @@ To override the database table name, use the ``db_table`` parameter in
 
 If your database table name is an SQL reserved word, or contains characters that
 aren't allowed in Python variable names -- notably, the hyphen -- that's OK.
-Django quotes column and table names behind the scenes.
+Thibaud quotes column and table names behind the scenes.
 
 .. admonition:: Use lowercase table names for MariaDB and MySQL
 
@@ -81,13 +81,13 @@ Django quotes column and table names behind the scenes.
 .. admonition:: Table name quoting for Oracle
 
    In order to meet the 30-char limitation Oracle has on table names,
-   and match the usual conventions for Oracle databases, Django may shorten
+   and match the usual conventions for Oracle databases, Thibaud may shorten
    table names and turn them all-uppercase. To prevent such transformations,
    use a quoted name as the value for ``db_table``::
 
        db_table = '"name_left_in_lowercase"'
 
-   Such quoted names can also be used with Django's other supported database
+   Such quoted names can also be used with Thibaud's other supported database
    backends; except for Oracle, however, the quotes have no effect. See the
    :ref:`Oracle notes <oracle-notes>` for more details.
 
@@ -98,7 +98,7 @@ Django quotes column and table names behind the scenes.
 
 The comment on the database table to use for this model. It is useful for
 documenting database tables for individuals with direct database access who may
-not be looking at your Django code. For example::
+not be looking at your Thibaud code. For example::
 
     class Answer(models.Model):
         question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -123,7 +123,7 @@ not be looking at your Django code. For example::
 .. attribute:: Options.default_manager_name
 
     The name of the manager to use for the model's
-    :attr:`~django.db.models.Model._default_manager`.
+    :attr:`~thibaud.db.models.Model._default_manager`.
 
 ``default_related_name``
 ------------------------
@@ -150,8 +150,8 @@ not be looking at your Django code. For example::
     The name of a field or a list of field names in the model, typically
     :class:`DateField`, :class:`DateTimeField`, or :class:`IntegerField`. This
     specifies the default field(s) to use in your model :class:`Manager`’s
-    :meth:`~django.db.models.query.QuerySet.latest` and
-    :meth:`~django.db.models.query.QuerySet.earliest` methods.
+    :meth:`~thibaud.db.models.query.QuerySet.latest` and
+    :meth:`~thibaud.db.models.query.QuerySet.earliest` methods.
 
     Example::
 
@@ -161,16 +161,16 @@ not be looking at your Django code. For example::
         # Latest by priority descending, order_date ascending.
         get_latest_by = ["-priority", "order_date"]
 
-    See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
+    See the :meth:`~thibaud.db.models.query.QuerySet.latest` docs for more.
 
 ``managed``
 -----------
 
 .. attribute:: Options.managed
 
-    Defaults to ``True``, meaning Django will create the appropriate database
+    Defaults to ``True``, meaning Thibaud will create the appropriate database
     tables in :djadmin:`migrate` or as part of migrations and remove them as
-    part of a :djadmin:`flush` management command. That is, Django
+    part of a :djadmin:`flush` management command. That is, Thibaud
     *manages* the database tables' lifecycles.
 
     If ``False``, no database table creation, modification, or deletion
@@ -186,7 +186,7 @@ not be looking at your Django code. For example::
        are modeling when using unmanaged models.
 
     #. If a model with ``managed=False`` contains a
-       :class:`~django.db.models.ManyToManyField` that points to another
+       :class:`~thibaud.db.models.ManyToManyField` that points to another
        unmanaged model, then the intermediate table for the many-to-many
        join will also not be created. However, the intermediary table
        between one managed and one unmanaged model *will* be created.
@@ -214,7 +214,7 @@ not be looking at your Django code. For example::
     ``Question`` object, and a question has more than one answer, and the order
     of answers matters, you'd do this::
 
-        from django.db import models
+        from thibaud.db import models
 
 
         class Question(models.Model):
@@ -305,7 +305,7 @@ not be looking at your Django code. For example::
     You can also use :doc:`query expressions </ref/models/expressions>`. To
     order by ``author`` ascending and make null values sort last, use this::
 
-        from django.db.models import F
+        from thibaud.db.models import F
 
         ordering = [F("author").asc(nulls_last=True)]
 
@@ -381,11 +381,11 @@ not be looking at your Django code. For example::
 
 .. attribute:: Options.select_on_save
 
-    Determines if Django will use the pre-1.6
-    :meth:`django.db.models.Model.save()` algorithm. The old algorithm
+    Determines if Thibaud will use the pre-1.6
+    :meth:`thibaud.db.models.Model.save()` algorithm. The old algorithm
     uses ``SELECT`` to determine if there is an existing row to be updated.
     The new algorithm tries an ``UPDATE`` directly. In some rare cases the
-    ``UPDATE`` of an existing row isn't visible to Django. An example is the
+    ``UPDATE`` of an existing row isn't visible to Thibaud. An example is the
     PostgreSQL ``ON UPDATE`` trigger which returns ``NULL``. In such cases the
     new algorithm will end up doing an ``INSERT`` even when a row exists in
     the database.
@@ -393,7 +393,7 @@ not be looking at your Django code. For example::
     Usually there is no need to set this attribute. The default is
     ``False``.
 
-    See :meth:`django.db.models.Model.save()` for more about the old and
+    See :meth:`thibaud.db.models.Model.save()` for more about the old and
     new saving algorithm.
 
 ``indexes``
@@ -404,7 +404,7 @@ not be looking at your Django code. For example::
     A list of :doc:`indexes </ref/models/indexes>` that you want to define on
     the model::
 
-        from django.db import models
+        from thibaud.db import models
 
 
         class Customer(models.Model):
@@ -433,7 +433,7 @@ not be looking at your Django code. For example::
         unique_together = [["driver", "restaurant"]]
 
     This is a list of lists that must be unique when considered together.
-    It's used in the Django admin and is enforced at the database level (i.e., the
+    It's used in the Thibaud admin and is enforced at the database level (i.e., the
     appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
     statement).
 
@@ -442,10 +442,10 @@ not be looking at your Django code. For example::
 
         unique_together = ["driver", "restaurant"]
 
-    A :class:`~django.db.models.ManyToManyField` cannot be included in
+    A :class:`~thibaud.db.models.ManyToManyField` cannot be included in
     ``unique_together``. (It's not clear what that would even mean!) If you
     need to validate uniqueness related to a
-    :class:`~django.db.models.ManyToManyField`, try using a signal or
+    :class:`~thibaud.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.
 
     The ``ValidationError`` raised during model validation when the constraint
@@ -459,7 +459,7 @@ not be looking at your Django code. For example::
     A list of :doc:`constraints </ref/models/constraints>` that you want to
     define on the model::
 
-        from django.db import models
+        from thibaud.db import models
 
 
         class Customer(models.Model):
@@ -479,7 +479,7 @@ not be looking at your Django code. For example::
 
         verbose_name = "pizza"
 
-    If this isn't given, Django will use a munged version of the class name:
+    If this isn't given, Thibaud will use a munged version of the class name:
     ``CamelCase`` becomes ``camel case``.
 
 ``verbose_name_plural``
@@ -491,7 +491,7 @@ not be looking at your Django code. For example::
 
         verbose_name_plural = "stories"
 
-    If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+    If this isn't given, Thibaud will use :attr:`~Options.verbose_name` + ``"s"``.
 
 Read-only ``Meta`` attributes
 =============================

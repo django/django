@@ -2,12 +2,12 @@ import copy
 import datetime
 import re
 
-from django.db import DatabaseError
-from django.db.backends.base.schema import (
+from thibaud.db import DatabaseError
+from thibaud.db.backends.base.schema import (
     BaseDatabaseSchemaEditor,
     _related_non_m2m_objects,
 )
-from django.utils.duration import duration_iso_string
+from thibaud.utils.duration import duration_iso_string
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):

@@ -1,13 +1,13 @@
 """
 Transactions
 
-Django handles transactions in three different ways. The default is to commit
+Thibaud handles transactions in three different ways. The default is to commit
 each transaction upon a write, but you can decorate a function to get
 commit-on-success behavior. Alternatively, you can manage the transaction
 manually.
 """
 
-from django.db import models
+from thibaud.db import models
 
 
 class Reporter(models.Model):

@@ -1,7 +1,7 @@
 from MySQLdb.constants import FIELD_TYPE
 
-from django.contrib.gis.gdal import OGRGeomType
-from django.db.backends.mysql.introspection import DatabaseIntrospection
+from thibaud.contrib.gis.gdal import OGRGeomType
+from thibaud.db.backends.mysql.introspection import DatabaseIntrospection
 
 
 class MySQLIntrospection(DatabaseIntrospection):
@@ -19,10 +19,10 @@ class MySQLIntrospection(DatabaseIntrospection):
             # column.
             for column, typ, null, key, default, extra in cursor.fetchall():
                 if column == description.name:
-                    # Using OGRGeomType to convert from OGC name to Django field.
+                    # Using OGRGeomType to convert from OGC name to Thibaud field.
                     # MySQL does not support 3D or SRIDs, so the field params
                     # are empty.
-                    field_type = OGRGeomType(typ).django
+                    field_type = OGRGeomType(typ).thibaud
                     field_params = {}
                     break
         return field_type, field_params

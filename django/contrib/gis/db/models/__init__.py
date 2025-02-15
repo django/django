@@ -1,10 +1,10 @@
-from django.db.models import *  # NOQA isort:skip
-from django.db.models import __all__ as models_all  # isort:skip
-import django.contrib.gis.db.models.functions  # NOQA
-import django.contrib.gis.db.models.lookups  # NOQA
-from django.contrib.gis.db.models.aggregates import *  # NOQA
-from django.contrib.gis.db.models.aggregates import __all__ as aggregates_all
-from django.contrib.gis.db.models.fields import (
+from thibaud.db.models import *  # NOQA isort:skip
+from thibaud.db.models import __all__ as models_all  # isort:skip
+import thibaud.contrib.gis.db.models.functions  # NOQA
+import thibaud.contrib.gis.db.models.lookups  # NOQA
+from thibaud.contrib.gis.db.models.aggregates import *  # NOQA
+from thibaud.contrib.gis.db.models.aggregates import __all__ as aggregates_all
+from thibaud.contrib.gis.db.models.fields import (
     GeometryCollectionField,
     GeometryField,
     LineStringField,

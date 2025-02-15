@@ -16,19 +16,19 @@ from xml.dom.minidom import Node, parseString
 
 from asgiref.sync import iscoroutinefunction
 
-from django.apps import apps
-from django.apps.registry import Apps
-from django.conf import UserSettingsHolder, settings
-from django.core import mail
-from django.core.exceptions import ImproperlyConfigured
-from django.core.signals import request_started, setting_changed
-from django.db import DEFAULT_DB_ALIAS, connections, reset_queries
-from django.db.models.options import Options
-from django.template import Template
-from django.test.signals import template_rendered
-from django.urls import get_script_prefix, set_script_prefix
-from django.utils.translation import deactivate
-from django.utils.version import PYPY
+from thibaud.apps import apps
+from thibaud.apps.registry import Apps
+from thibaud.conf import UserSettingsHolder, settings
+from thibaud.core import mail
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.signals import request_started, setting_changed
+from thibaud.db import DEFAULT_DB_ALIAS, connections, reset_queries
+from thibaud.db.models.options import Options
+from thibaud.template import Template
+from thibaud.test.signals import template_rendered
+from thibaud.urls import get_script_prefix, set_script_prefix
+from thibaud.utils.translation import deactivate
+from thibaud.utils.version import PYPY
 
 try:
     import jinja2
@@ -144,7 +144,7 @@ def setup_test_environment(debug=None):
     settings.DEBUG = debug
 
     saved_data.email_backend = settings.EMAIL_BACKEND
-    settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    settings.EMAIL_BACKEND = "thibaud.core.mail.backends.locmem.EmailBackend"
 
     saved_data.template_render = Template._render
     Template._render = instrumented_test_render
@@ -529,11 +529,11 @@ class override_settings(TestContextDecorator):
             }
 
     def decorate_class(self, cls):
-        from django.test import SimpleTestCase
+        from thibaud.test import SimpleTestCase
 
         if not issubclass(cls, SimpleTestCase):
             raise ValueError(
-                "Only subclasses of Django SimpleTestCase can be decorated "
+                "Only subclasses of Thibaud SimpleTestCase can be decorated "
                 "with override_settings"
             )
         self.save_options(cls)
@@ -598,7 +598,7 @@ class override_system_checks(TestContextDecorator):
     """
 
     def __init__(self, new_checks, deployment_checks=None):
-        from django.core.checks.registry import registry
+        from thibaud.core.checks.registry import registry
 
         self.registry = registry
         self.new_checks = new_checks
@@ -836,7 +836,7 @@ def freeze_time(t):
     modifies the time function of the time module. Modules which import the
     time function directly (e.g. `from time import time`) won't be affected
     This isn't meant as a public API, but helps reduce some repetitive code in
-    Django's test suite.
+    Thibaud's test suite.
     """
     _real_time = time.time
     time.time = lambda: t
@@ -849,17 +849,17 @@ def freeze_time(t):
 def require_jinja2(test_func):
     """
     Decorator to enable a Jinja2 template engine in addition to the regular
-    Django template engine for a test or skip it if Jinja2 isn't available.
+    Thibaud template engine for a test or skip it if Jinja2 isn't available.
     """
     test_func = skipIf(jinja2 is None, "this test requires jinja2")(test_func)
     return override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "APP_DIRS": True,
             },
             {
-                "BACKEND": "django.template.backends.jinja2.Jinja2",
+                "BACKEND": "thibaud.template.backends.jinja2.Jinja2",
                 "APP_DIRS": True,
                 "OPTIONS": {"keep_trailing_newline": True},
             },
@@ -884,12 +884,12 @@ class override_script_prefix(TestContextDecorator):
 
 class LoggingCaptureMixin:
     """
-    Capture the output from the 'django' logger and store it on the class's
+    Capture the output from the 'thibaud' logger and store it on the class's
     logger_output attribute.
     """
 
     def setUp(self):
-        self.logger = logging.getLogger("django")
+        self.logger = logging.getLogger("thibaud")
         self.old_stream = self.logger.handlers[0].stream
         self.logger_output = StringIO()
         self.logger.handlers[0].stream = self.logger_output

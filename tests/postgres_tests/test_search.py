@@ -6,13 +6,13 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 
-from django.db.models import F, Value
+from thibaud.db.models import F, Value
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import Character, Line, LineSavedSearch, Scene
 
 try:
-    from django.contrib.postgres.search import (
+    from thibaud.contrib.postgres.search import (
         SearchConfig,
         SearchHeadline,
         SearchQuery,

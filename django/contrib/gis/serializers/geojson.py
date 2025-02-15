@@ -1,8 +1,8 @@
 import json
 
-from django.contrib.gis.gdal import CoordTransform, SpatialReference
-from django.core.serializers.base import SerializerDoesNotExist
-from django.core.serializers.json import Serializer as JSONSerializer
+from thibaud.contrib.gis.gdal import CoordTransform, SpatialReference
+from thibaud.core.serializers.base import SerializerDoesNotExist
+from thibaud.core.serializers.json import Serializer as JSONSerializer
 
 
 class Serializer(JSONSerializer):

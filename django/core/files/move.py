@@ -1,14 +1,14 @@
 """
 Move a file in the safest way possible::
 
-    >>> from django.core.files.move import file_move_safe
+    >>> from thibaud.core.files.move import file_move_safe
     >>> file_move_safe("/tmp/old_file", "/tmp/new_file")
 """
 
 import os
 from shutil import copymode, copystat
 
-from django.core.files import locks
+from thibaud.core.files import locks
 
 __all__ = ["file_move_safe"]
 

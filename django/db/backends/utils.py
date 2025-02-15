@@ -7,11 +7,11 @@ import warnings
 from contextlib import contextmanager
 from hashlib import md5
 
-from django.apps import apps
-from django.db import NotSupportedError
-from django.utils.dateparse import parse_time
+from thibaud.apps import apps
+from thibaud.db import NotSupportedError
+from thibaud.utils.dateparse import parse_time
 
-logger = logging.getLogger("django.db.backends")
+logger = logging.getLogger("thibaud.db.backends")
 
 
 class CursorWrapper:

@@ -1,6 +1,6 @@
-from django.contrib.gis.db.models import GeometryField
-from django.db.backends.postgresql.schema import DatabaseSchemaEditor
-from django.db.models.expressions import Col, Func
+from thibaud.contrib.gis.db.models import GeometryField
+from thibaud.db.backends.postgresql.schema import DatabaseSchemaEditor
+from thibaud.db.models.expressions import Col, Func
 
 
 class PostGISSchemaEditor(DatabaseSchemaEditor):

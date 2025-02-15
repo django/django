@@ -6,7 +6,7 @@
 from ctypes import POINTER, c_bool, c_char_p, c_double, c_int, c_int64, c_void_p
 from functools import partial
 
-from django.contrib.gis.gdal.prototypes.errcheck import (
+from thibaud.contrib.gis.gdal.prototypes.errcheck import (
     check_arg_errcode,
     check_const_string,
     check_errcode,

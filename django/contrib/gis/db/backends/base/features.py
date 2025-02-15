@@ -1,6 +1,6 @@
 import re
 
-from django.contrib.gis.db import models
+from thibaud.contrib.gis.db import models
 
 
 class BaseSpatialFeatures:
@@ -9,7 +9,7 @@ class BaseSpatialFeatures:
     # Does the database contain a SpatialRefSys model to store SRID information?
     has_spatialrefsys_table = True
 
-    # Does the backend support the django.contrib.gis.utils.add_srs_entry() utility?
+    # Does the backend support the thibaud.contrib.gis.utils.add_srs_entry() utility?
     supports_add_srs_entry = True
     # Does the backend introspect GeometryField to its subtypes?
     supports_geometry_field_introspection = True

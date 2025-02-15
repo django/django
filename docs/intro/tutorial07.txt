@@ -1,9 +1,9 @@
 =====================================
-Writing your first Django app, part 7
+Writing your first Thibaud app, part 7
 =====================================
 
 This tutorial begins where :doc:`Tutorial 6 </intro/tutorial06>` left off. We're
-continuing the web-poll application and will focus on customizing Django's
+continuing the web-poll application and will focus on customizing Thibaud's
 automatically-generated admin site that we first explored in :doc:`Tutorial 2
 </intro/tutorial02>`.
 
@@ -16,9 +16,9 @@ Customize the admin form
 ========================
 
 By registering the ``Question`` model with ``admin.site.register(Question)``,
-Django was able to construct a default form representation. Often, you'll want
+Thibaud was able to construct a default form representation. Often, you'll want
 to customize how the admin form looks and works. You'll do this by telling
-Django the options you want when you register the object.
+Thibaud the options you want when you register the object.
 
 Let's see how this works by reordering the fields on the edit form. Replace
 the ``admin.site.register(Question)`` line with:
@@ -26,7 +26,7 @@ the ``admin.site.register(Question)`` line with:
 .. code-block:: python
     :caption: ``polls/admin.py``
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
     from .models import Question
 
@@ -56,7 +56,7 @@ up into fieldsets:
 .. code-block:: python
     :caption: ``polls/admin.py``
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
     from .models import Question
 
@@ -71,7 +71,7 @@ up into fieldsets:
     admin.site.register(Question, QuestionAdmin)
 
 The first element of each tuple in
-:attr:`~django.contrib.admin.ModelAdmin.fieldsets` is the title of the fieldset.
+:attr:`~thibaud.contrib.admin.ModelAdmin.fieldsets` is the title of the fieldset.
 Here's what our form looks like now:
 
 .. image:: _images/admin08t.png
@@ -91,28 +91,28 @@ with the admin just as we did with ``Question``:
 .. code-block:: python
     :caption: ``polls/admin.py``
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
     from .models import Choice, Question
 
     # ...
     admin.site.register(Choice)
 
-Now "Choices" is an available option in the Django admin. The "Add choice" form
+Now "Choices" is an available option in the Thibaud admin. The "Add choice" form
 looks like this:
 
 .. image:: _images/admin09.png
    :alt: Choice admin page
 
 In that form, the "Question" field is a select box containing every question in the
-database. Django knows that a :class:`~django.db.models.ForeignKey` should be
+database. Thibaud knows that a :class:`~thibaud.db.models.ForeignKey` should be
 represented in the admin as a ``<select>`` box. In our case, only one question
 exists at this point.
 
 Also note the "Add another question" link next to "Question." Every object with
 a ``ForeignKey`` relationship to another gets this for free. When you click
 "Add another question", you'll get a popup window with the "Add question" form.
-If you add a question in that window and click "Save", Django will save the
+If you add a question in that window and click "Save", Thibaud will save the
 question to the database and dynamically add it as the selected choice on the
 "Add choice" form you're looking at.
 
@@ -126,7 +126,7 @@ registration code to read:
 .. code-block:: python
     :caption: ``polls/admin.py``
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
     from .models import Choice, Question
 
@@ -146,7 +146,7 @@ registration code to read:
 
     admin.site.register(Question, QuestionAdmin)
 
-This tells Django: "``Choice`` objects are edited on the ``Question`` admin page. By
+This tells Thibaud: "``Choice`` objects are edited on the ``Question`` admin page. By
 default, provide enough fields for 3 choices."
 
 Load the "Add question" page to see how that looks:
@@ -167,7 +167,7 @@ image shows an added slot:
    :alt: Additional slot added dynamically
 
 One small problem, though. It takes a lot of screen space to display all the
-fields for entering related ``Choice`` objects. For that reason, Django offers a
+fields for entering related ``Choice`` objects. For that reason, Thibaud offers a
 tabular way of displaying inline related objects. To use it, change the
 ``ChoiceInline`` declaration to read:
 
@@ -196,9 +196,9 @@ Here's what it looks like at this point:
 .. image:: _images/admin04t.png
    :alt: Polls change list page
 
-By default, Django displays the ``str()`` of each object. But sometimes it'd be
+By default, Thibaud displays the ``str()`` of each object. But sometimes it'd be
 more helpful if we could display individual fields. To do that, use the
-:attr:`~django.contrib.admin.ModelAdmin.list_display` admin option, which is a
+:attr:`~thibaud.contrib.admin.ModelAdmin.list_display` admin option, which is a
 list of field names to display, as columns, on the change list page for the
 object:
 
@@ -231,14 +231,14 @@ of an arbitrary method is not supported. Also note that the column header for
 underscores replaced with spaces), and that each line contains the string
 representation of the output.
 
-You can improve that by using the :func:`~django.contrib.admin.display`
+You can improve that by using the :func:`~thibaud.contrib.admin.display`
 decorator on that method (extending the :file:`polls/models.py` file that was
 created in :doc:`Tutorial 2 </intro/tutorial02>`), as follows:
 
 .. code-block:: python
     :caption: ``polls/models.py``
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
 
     class Question(models.Model):
@@ -253,11 +253,11 @@ created in :doc:`Tutorial 2 </intro/tutorial02>`), as follows:
             return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
 For more information on the properties configurable via the decorator, see
-:attr:`~django.contrib.admin.ModelAdmin.list_display`.
+:attr:`~thibaud.contrib.admin.ModelAdmin.list_display`.
 
 Edit your :file:`polls/admin.py` file again and add an improvement to the
 ``Question`` change list page: filters using the
-:attr:`~django.contrib.admin.ModelAdmin.list_filter`. Add the following line to
+:attr:`~thibaud.contrib.admin.ModelAdmin.list_filter`. Add the following line to
 ``QuestionAdmin``::
 
     list_filter = ["pub_date"]
@@ -269,7 +269,7 @@ That adds a "Filter" sidebar that lets people filter the change list by the
    :alt: Polls change list page, updated
 
 The type of filter displayed depends on the type of field you're filtering on.
-Because ``pub_date`` is a :class:`~django.db.models.DateTimeField`, Django
+Because ``pub_date`` is a :class:`~thibaud.db.models.DateTimeField`, Thibaud
 knows to give appropriate filter options: "Any date", "Today", "Past 7 days",
 "This month", "This year".
 
@@ -278,36 +278,36 @@ This is shaping up well. Let's add some search capability::
     search_fields = ["question_text"]
 
 That adds a search box at the top of the change list. When somebody enters
-search terms, Django will search the ``question_text`` field. You can use as many
+search terms, Thibaud will search the ``question_text`` field. You can use as many
 fields as you'd like -- although because it uses a ``LIKE`` query behind the
 scenes, limiting the number of search fields to a reasonable number will make
 it easier for your database to do the search.
 
 Now's also a good time to note that change lists give you free pagination. The
 default is to display 100 items per page. :attr:`Change list pagination
-<django.contrib.admin.ModelAdmin.list_per_page>`, :attr:`search boxes
-<django.contrib.admin.ModelAdmin.search_fields>`, :attr:`filters
-<django.contrib.admin.ModelAdmin.list_filter>`, :attr:`date-hierarchies
-<django.contrib.admin.ModelAdmin.date_hierarchy>`, and
-:attr:`column-header-ordering <django.contrib.admin.ModelAdmin.list_display>`
+<thibaud.contrib.admin.ModelAdmin.list_per_page>`, :attr:`search boxes
+<thibaud.contrib.admin.ModelAdmin.search_fields>`, :attr:`filters
+<thibaud.contrib.admin.ModelAdmin.list_filter>`, :attr:`date-hierarchies
+<thibaud.contrib.admin.ModelAdmin.date_hierarchy>`, and
+:attr:`column-header-ordering <thibaud.contrib.admin.ModelAdmin.list_display>`
 all work together like you think they should.
 
 Customize the admin look and feel
 =================================
 
-Clearly, having "Django administration" at the top of each admin page is
+Clearly, having "Thibaud administration" at the top of each admin page is
 ridiculous. It's just placeholder text.
 
-You can change it, though, using Django's template system. The Django admin is
-powered by Django itself, and its interfaces use Django's own template system.
+You can change it, though, using Thibaud's template system. The Thibaud admin is
+powered by Thibaud itself, and its interfaces use Thibaud's own template system.
 
 .. _ref-customizing-your-projects-templates:
 
 Customizing your *project's* templates
 --------------------------------------
 
-Create a ``templates`` directory in your ``djangotutorial`` directory.
-Templates can live anywhere on your filesystem that Django can access. (Django
+Create a ``templates`` directory in your ``thibaudtutorial`` directory.
+Templates can live anywhere on your filesystem that Thibaud can access. (Thibaud
 runs as whatever user your server runs.) However, keeping your templates within
 the project is a good convention to follow.
 
@@ -319,21 +319,21 @@ Open your settings file (:file:`mysite/settings.py`, remember) and add a
 
     TEMPLATES = [
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "DIRS": [BASE_DIR / "templates"],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.request",
-                    "django.contrib.auth.context_processors.auth",
-                    "django.contrib.messages.context_processors.messages",
+                    "thibaud.template.context_processors.request",
+                    "thibaud.contrib.auth.context_processors.auth",
+                    "thibaud.contrib.messages.context_processors.messages",
                 ],
             },
         },
     ]
 
 :setting:`DIRS <TEMPLATES-DIRS>` is a list of filesystem directories to check
-when loading Django templates; it's a search path.
+when loading Thibaud templates; it's a search path.
 
 .. admonition:: Organizing templates
 
@@ -345,25 +345,25 @@ when loading Django templates; it's a search path.
     :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.
 
 Now create a directory called ``admin`` inside ``templates``, and copy the
-template ``admin/base_site.html`` from within the default Django admin
-template directory in the source code of Django itself
-(:source:`django/contrib/admin/templates`) into that directory.
+template ``admin/base_site.html`` from within the default Thibaud admin
+template directory in the source code of Thibaud itself
+(:source:`thibaud/contrib/admin/templates`) into that directory.
 
-.. admonition:: Where are the Django source files?
+.. admonition:: Where are the Thibaud source files?
 
-    If you have difficulty finding where the Django source files are located
+    If you have difficulty finding where the Thibaud source files are located
     on your system, run the following command:
 
     .. console::
 
-        $ python -c "import django; print(django.__path__)"
+        $ python -c "import thibaud; print(thibaud.__path__)"
 
 Then, edit the file and replace
-``{{ site_header|default:_('Django administration') }}`` (including the curly
+``{{ site_header|default:_('Thibaud administration') }}`` (including the curly
 braces) with your own site's name as you see fit. You should end up with
 a section of code like:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% block branding %}
     <div id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></div>
@@ -374,16 +374,16 @@ a section of code like:
 
 We use this approach to teach you how to override templates. In an actual
 project, you would probably use
-the :attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
+the :attr:`thibaud.contrib.admin.AdminSite.site_header` attribute to more easily
 make this particular customization.
 
 This template file contains lots of text like ``{% block branding %}``
-and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's
-template language. When Django renders ``admin/base_site.html``, this
+and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Thibaud's
+template language. When Thibaud renders ``admin/base_site.html``, this
 template language will be evaluated to produce the final HTML page, just like
 we saw in :doc:`Tutorial 3 </intro/tutorial03>`.
 
-Note that any of Django's default admin templates can be overridden. To
+Note that any of Thibaud's default admin templates can be overridden. To
 override a template, do the same thing you did with ``base_site.html`` -- copy
 it from the default directory into your custom directory, and make changes.
 
@@ -391,26 +391,26 @@ Customizing your *application's* templates
 ------------------------------------------
 
 Astute readers will ask: But if :setting:`DIRS <TEMPLATES-DIRS>` was empty by
-default, how was Django finding the default admin templates? The answer is
+default, how was Thibaud finding the default admin templates? The answer is
 that, since :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` is set to ``True``,
-Django automatically looks for a ``templates/`` subdirectory within each
+Thibaud automatically looks for a ``templates/`` subdirectory within each
 application package, for use as a fallback (don't forget that
-``django.contrib.admin`` is an application).
+``thibaud.contrib.admin`` is an application).
 
 Our poll application is not very complex and doesn't need custom admin
 templates. But if it grew more sophisticated and required modification of
-Django's standard admin templates for some of its functionality, it would be
+Thibaud's standard admin templates for some of its functionality, it would be
 more sensible to modify the *application's* templates, rather than those in the
 *project*. That way, you could include the polls application in any new project
 and be assured that it would find the custom templates it needed.
 
 See the :ref:`template loading documentation <template-loading>` for more
-information about how Django finds its templates.
+information about how Thibaud finds its templates.
 
 Customize the admin index page
 ==============================
 
-On a similar note, you might want to customize the look and feel of the Django
+On a similar note, you might want to customize the look and feel of the Thibaud
 admin index page.
 
 By default, it displays all the apps in :setting:`INSTALLED_APPS` that have been
@@ -422,7 +422,7 @@ The template to customize is ``admin/index.html``. (Do the same as with
 ``admin/base_site.html`` in the previous section -- copy it from the default
 directory to your custom template directory). Edit the file, and you'll see it
 uses a template variable called ``app_list``. That variable contains every
-installed Django app. Instead of using that, you can hard-code links to
+installed Thibaud app. Instead of using that, you can hard-code links to
 object-specific admin pages in whatever way you think is best.
 
 When you're comfortable with the admin, read :doc:`part 8 of this

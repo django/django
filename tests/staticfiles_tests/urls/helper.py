@@ -1,3 +1,3 @@
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from thibaud.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = staticfiles_urlpatterns()

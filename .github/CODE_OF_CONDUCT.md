@@ -1,3 +1,3 @@
-# Django Code of Conduct
+# Thibaud Code of Conduct
 
-See https://www.djangoproject.com/conduct/.
+See https://www.thibaudproject.com/conduct/.

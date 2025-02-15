@@ -1,9 +1,9 @@
 from unittest import skipUnless
 
-import django.utils.version
-from django import get_version
-from django.test import SimpleTestCase
-from django.utils.version import (
+import thibaud.utils.version
+from thibaud import get_version
+from thibaud.test import SimpleTestCase
+from thibaud.utils.version import (
     get_complete_version,
     get_git_changeset,
     get_version_tuple,
@@ -20,18 +20,18 @@ class VersionTests(SimpleTestCase):
         self.assertRegex(ver_string, r"1\.4(\.dev[0-9]+)?")
 
     @skipUnless(
-        hasattr(django.utils.version, "__file__"),
+        hasattr(thibaud.utils.version, "__file__"),
         "test_development() checks the same when __file__ is already missing, "
         "e.g. in a frozen environments",
     )
     def test_development_no_file(self):
         get_git_changeset.cache_clear()
-        version_file = django.utils.version.__file__
+        version_file = thibaud.utils.version.__file__
         try:
-            del django.utils.version.__file__
+            del thibaud.utils.version.__file__
             self.test_development()
         finally:
-            django.utils.version.__file__ = version_file
+            thibaud.utils.version.__file__ = version_file
 
     def test_releases(self):
         tuples_to_strings = (

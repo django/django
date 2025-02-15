@@ -2,11 +2,11 @@
 JavaScript code
 ===============
 
-While most of Django core is Python, the ``admin`` and ``gis`` contrib apps
+While most of Thibaud core is Python, the ``admin`` and ``gis`` contrib apps
 contain JavaScript code.
 
 Please follow these coding standards when writing JavaScript code for inclusion
-in Django.
+in Thibaud.
 
 Code style
 ==========
@@ -28,14 +28,14 @@ Code style
   changed with JavaScript. For instance, when binding a click handler, use
   ``$('body').on('click', selector, func)`` instead of
   ``$(selector).click(func)``. This makes it easier for projects to extend
-  Django's default behavior with JavaScript.
+  Thibaud's default behavior with JavaScript.
 
 .. _javascript-patches:
 
 JavaScript patches
 ==================
 
-Django's admin system leverages the jQuery framework to increase the
+Thibaud's admin system leverages the jQuery framework to increase the
 capabilities of the admin interface. In conjunction, there is an emphasis on
 admin JavaScript performance and minimizing overall admin media file size.
 
@@ -44,25 +44,25 @@ admin JavaScript performance and minimizing overall admin media file size.
 JavaScript tests
 ================
 
-Django's JavaScript tests can be run in a browser or from the command line.
+Thibaud's JavaScript tests can be run in a browser or from the command line.
 The tests are located in a top level :source:`js_tests` directory.
 
 Writing tests
 -------------
 
-Django's JavaScript tests use `QUnit`_. Here is an example test module:
+Thibaud's JavaScript tests use `QUnit`_. Here is an example test module:
 
 .. code-block:: javascript
 
     QUnit.module('magicTricks', {
         beforeEach: function() {
-            const $ = django.jQuery;
+            const $ = thibaud.jQuery;
             $('#qunit-fixture').append('<button class="button"></button>');
         }
     });
 
     QUnit.test('removeOnClick removes button on click', function(assert) {
-        const $ = django.jQuery;
+        const $ = thibaud.jQuery;
         removeOnClick('.button');
         assert.equal($('.button').length, 1);
         $('.button').click();
@@ -70,7 +70,7 @@ Django's JavaScript tests use `QUnit`_. Here is an example test module:
     });
 
     QUnit.test('copyOnClick adds button on click', function(assert) {
-        const $ = django.jQuery;
+        const $ = thibaud.jQuery;
         copyOnClick('.button');
         assert.equal($('.button').length, 1);
         $('.button').click();
@@ -105,7 +105,7 @@ Testing from the command line
 To run the tests from the command line, you need to have `Node.js`_ installed.
 
 After installing ``Node.js``, install the JavaScript test dependencies by
-running the following from the root of your Django checkout:
+running the following from the root of your Thibaud checkout:
 
 .. console::
 

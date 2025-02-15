@@ -1,5 +1,5 @@
-from django.db.models.expressions import Func
-from django.db.models.fields import FloatField, IntegerField
+from thibaud.db.models.expressions import Func
+from thibaud.db.models.fields import FloatField, IntegerField
 
 __all__ = [
     "CumeDist",

@@ -9,16 +9,16 @@ from collections import defaultdict
 from graphlib import CycleError, TopologicalSorter
 from itertools import chain
 
-from django.forms.utils import flatatt, to_current_timezone
-from django.templatetags.static import static
-from django.utils import formats
-from django.utils.choices import normalize_choices
-from django.utils.dates import MONTHS
-from django.utils.formats import get_format
-from django.utils.html import format_html, html_safe
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
+from thibaud.forms.utils import flatatt, to_current_timezone
+from thibaud.templatetags.static import static
+from thibaud.utils import formats
+from thibaud.utils.choices import normalize_choices
+from thibaud.utils.dates import MONTHS
+from thibaud.utils.formats import get_format
+from thibaud.utils.html import format_html, html_safe
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.safestring import mark_safe
+from thibaud.utils.translation import gettext_lazy as _
 
 from .renderers import get_default_renderer
 
@@ -184,7 +184,7 @@ class Media:
         """
         Given a relative or absolute path to a static asset, return an absolute
         path. An absolute path will be returned unchanged while a relative path
-        will be passed to django.templatetags.static.static().
+        will be passed to thibaud.templatetags.static.static().
         """
         if path.startswith(("http://", "https://", "/")):
             return path
@@ -370,7 +370,7 @@ class Input(Widget):
     """
 
     input_type = None  # Subclasses must define this.
-    template_name = "django/forms/widgets/input.html"
+    template_name = "thibaud/forms/widgets/input.html"
 
     def __init__(self, attrs=None):
         if attrs is not None:
@@ -386,42 +386,42 @@ class Input(Widget):
 
 class TextInput(Input):
     input_type = "text"
-    template_name = "django/forms/widgets/text.html"
+    template_name = "thibaud/forms/widgets/text.html"
 
 
 class NumberInput(Input):
     input_type = "number"
-    template_name = "django/forms/widgets/number.html"
+    template_name = "thibaud/forms/widgets/number.html"
 
 
 class EmailInput(Input):
     input_type = "email"
-    template_name = "django/forms/widgets/email.html"
+    template_name = "thibaud/forms/widgets/email.html"
 
 
 class URLInput(Input):
     input_type = "url"
-    template_name = "django/forms/widgets/url.html"
+    template_name = "thibaud/forms/widgets/url.html"
 
 
 class ColorInput(Input):
     input_type = "color"
-    template_name = "django/forms/widgets/color.html"
+    template_name = "thibaud/forms/widgets/color.html"
 
 
 class SearchInput(Input):
     input_type = "search"
-    template_name = "django/forms/widgets/search.html"
+    template_name = "thibaud/forms/widgets/search.html"
 
 
 class TelInput(Input):
     input_type = "tel"
-    template_name = "django/forms/widgets/tel.html"
+    template_name = "thibaud/forms/widgets/tel.html"
 
 
 class PasswordInput(Input):
     input_type = "password"
-    template_name = "django/forms/widgets/password.html"
+    template_name = "thibaud/forms/widgets/password.html"
 
     def __init__(self, attrs=None, render_value=False):
         super().__init__(attrs)
@@ -435,7 +435,7 @@ class PasswordInput(Input):
 
 class HiddenInput(Input):
     input_type = "hidden"
-    template_name = "django/forms/widgets/hidden.html"
+    template_name = "thibaud/forms/widgets/hidden.html"
 
 
 class MultipleHiddenInput(HiddenInput):
@@ -444,7 +444,7 @@ class MultipleHiddenInput(HiddenInput):
     of values.
     """
 
-    template_name = "django/forms/widgets/multiple_hidden.html"
+    template_name = "thibaud/forms/widgets/multiple_hidden.html"
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -480,7 +480,7 @@ class FileInput(Input):
     allow_multiple_selected = False
     input_type = "file"
     needs_multipart_form = True
-    template_name = "django/forms/widgets/file.html"
+    template_name = "thibaud/forms/widgets/file.html"
 
     def __init__(self, attrs=None):
         if (
@@ -527,7 +527,7 @@ class ClearableFileInput(FileInput):
     clear_checkbox_label = _("Clear")
     initial_text = _("Currently")
     input_text = _("Change")
-    template_name = "django/forms/widgets/clearable_file_input.html"
+    template_name = "thibaud/forms/widgets/clearable_file_input.html"
     checked = False
 
     def clear_checkbox_name(self, name):
@@ -597,7 +597,7 @@ class ClearableFileInput(FileInput):
 
 
 class Textarea(Widget):
-    template_name = "django/forms/widgets/textarea.html"
+    template_name = "thibaud/forms/widgets/textarea.html"
 
     def __init__(self, attrs=None):
         # Use slightly better defaults than HTML's 20x2 box
@@ -623,17 +623,17 @@ class DateTimeBaseInput(TextInput):
 
 class DateInput(DateTimeBaseInput):
     format_key = "DATE_INPUT_FORMATS"
-    template_name = "django/forms/widgets/date.html"
+    template_name = "thibaud/forms/widgets/date.html"
 
 
 class DateTimeInput(DateTimeBaseInput):
     format_key = "DATETIME_INPUT_FORMATS"
-    template_name = "django/forms/widgets/datetime.html"
+    template_name = "thibaud/forms/widgets/datetime.html"
 
 
 class TimeInput(DateTimeBaseInput):
     format_key = "TIME_INPUT_FORMATS"
-    template_name = "django/forms/widgets/time.html"
+    template_name = "thibaud/forms/widgets/time.html"
 
 
 # Defined at module level so that CheckboxInput is picklable (#17976)
@@ -643,7 +643,7 @@ def boolean_check(v):
 
 class CheckboxInput(Input):
     input_type = "checkbox"
-    template_name = "django/forms/widgets/checkbox.html"
+    template_name = "thibaud/forms/widgets/checkbox.html"
 
     def __init__(self, attrs=None, check_test=None):
         super().__init__(attrs)
@@ -820,8 +820,8 @@ class ChoiceWidget(Widget):
 
 class Select(ChoiceWidget):
     input_type = "select"
-    template_name = "django/forms/widgets/select.html"
-    option_template_name = "django/forms/widgets/select_option.html"
+    template_name = "thibaud/forms/widgets/select.html"
+    option_template_name = "thibaud/forms/widgets/select_option.html"
     add_id_index = False
     checked_attribute = {"selected": True}
     option_inherits_attrs = False
@@ -876,7 +876,7 @@ class NullBooleanSelect(Select):
                 False: "false",
                 "true": "true",
                 "false": "false",
-                # For backwards compatibility with Django < 2.2.
+                # For backwards compatibility with Thibaud < 2.2.
                 "2": "true",
                 "3": "false",
             }[value]
@@ -892,7 +892,7 @@ class NullBooleanSelect(Select):
             False: False,
             "true": True,
             "false": False,
-            # For backwards compatibility with Django < 2.2.
+            # For backwards compatibility with Thibaud < 2.2.
             "2": True,
             "3": False,
         }.get(value)
@@ -916,8 +916,8 @@ class SelectMultiple(Select):
 
 class RadioSelect(ChoiceWidget):
     input_type = "radio"
-    template_name = "django/forms/widgets/radio.html"
-    option_template_name = "django/forms/widgets/radio_option.html"
+    template_name = "thibaud/forms/widgets/radio.html"
+    option_template_name = "thibaud/forms/widgets/radio_option.html"
     use_fieldset = True
 
     def id_for_label(self, id_, index=None):
@@ -934,8 +934,8 @@ class RadioSelect(ChoiceWidget):
 class CheckboxSelectMultiple(RadioSelect):
     allow_multiple_selected = True
     input_type = "checkbox"
-    template_name = "django/forms/widgets/checkbox_select.html"
-    option_template_name = "django/forms/widgets/checkbox_option.html"
+    template_name = "thibaud/forms/widgets/checkbox_select.html"
+    option_template_name = "thibaud/forms/widgets/checkbox_option.html"
 
     def use_required_attribute(self, initial):
         # Don't use the 'required' attribute because browser validation would
@@ -959,7 +959,7 @@ class MultiWidget(Widget):
     You'll probably want to use this class with MultiValueField.
     """
 
-    template_name = "django/forms/widgets/multiwidget.html"
+    template_name = "thibaud/forms/widgets/multiwidget.html"
     use_fieldset = True
 
     def __init__(self, widgets, attrs=None):
@@ -1061,7 +1061,7 @@ class SplitDateTimeWidget(MultiWidget):
     """
 
     supports_microseconds = False
-    template_name = "django/forms/widgets/splitdatetime.html"
+    template_name = "thibaud/forms/widgets/splitdatetime.html"
 
     def __init__(
         self,
@@ -1095,7 +1095,7 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     A widget that splits datetime input into two <input type="hidden"> inputs.
     """
 
-    template_name = "django/forms/widgets/splithiddendatetime.html"
+    template_name = "thibaud/forms/widgets/splithiddendatetime.html"
 
     def __init__(
         self,
@@ -1122,7 +1122,7 @@ class SelectDateWidget(Widget):
     month_field = "%s_month"
     day_field = "%s_day"
     year_field = "%s_year"
-    template_name = "django/forms/widgets/select_date.html"
+    template_name = "thibaud/forms/widgets/select_date.html"
     input_type = "select"
     select_widget = Select
     date_re = _lazy_re_compile(r"(\d{4}|0)-(\d\d?)-(\d\d?)$")

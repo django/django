@@ -1,15 +1,15 @@
 ===========================
-Django 1.8.19 release notes
+Thibaud 1.8.19 release notes
 ===========================
 
 *March 6, 2018*
 
-Django 1.8.19 fixes two security issues in 1.18.18.
+Thibaud 1.8.19 fixes two security issues in 1.18.18.
 
 CVE-2018-7536: Denial-of-service possibility in ``urlize`` and ``urlizetrunc`` template filters
 ===============================================================================================
 
-The ``django.utils.html.urlize()`` function was extremely slow to evaluate
+The ``thibaud.utils.html.urlize()`` function was extremely slow to evaluate
 certain inputs due to a catastrophic backtracking vulnerability in a regular
 expression. The ``urlize()`` function is used to implement the ``urlize`` and
 ``urlizetrunc`` template filters, which were thus vulnerable.
@@ -20,7 +20,7 @@ similarly.
 CVE-2018-7537: Denial-of-service possibility in ``truncatechars_html`` and ``truncatewords_html`` template filters
 ==================================================================================================================
 
-If ``django.utils.text.Truncator``'s ``chars()`` and ``words()`` methods were
+If ``thibaud.utils.text.Truncator``'s ``chars()`` and ``words()`` methods were
 passed the ``html=True`` argument, they were extremely slow to evaluate certain
 inputs due to a catastrophic backtracking vulnerability in a regular
 expression. The ``chars()`` and ``words()`` methods are used to implement the

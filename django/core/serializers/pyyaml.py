@@ -10,9 +10,9 @@ import decimal
 
 import yaml
 
-from django.core.serializers.base import DeserializationError
-from django.core.serializers.python import Deserializer as PythonDeserializer
-from django.core.serializers.python import Serializer as PythonSerializer
+from thibaud.core.serializers.base import DeserializationError
+from thibaud.core.serializers.python import Deserializer as PythonDeserializer
+from thibaud.core.serializers.python import Serializer as PythonSerializer
 
 # Use the C (faster) implementation if possible
 try:
@@ -22,7 +22,7 @@ except ImportError:
     from yaml import SafeDumper, SafeLoader
 
 
-class DjangoSafeDumper(SafeDumper):
+class ThibaudSafeDumper(SafeDumper):
     def represent_decimal(self, data):
         return self.represent_scalar("tag:yaml.org,2002:str", str(data))
 
@@ -30,13 +30,13 @@ class DjangoSafeDumper(SafeDumper):
         return self.represent_mapping("tag:yaml.org,2002:map", data.items())
 
 
-DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
-DjangoSafeDumper.add_representer(
-    collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict
+ThibaudSafeDumper.add_representer(decimal.Decimal, ThibaudSafeDumper.represent_decimal)
+ThibaudSafeDumper.add_representer(
+    collections.OrderedDict, ThibaudSafeDumper.represent_ordered_dict
 )
 # Workaround to represent dictionaries in insertion order.
 # See https://github.com/yaml/pyyaml/pull/143.
-DjangoSafeDumper.add_representer(dict, DjangoSafeDumper.represent_ordered_dict)
+ThibaudSafeDumper.add_representer(dict, ThibaudSafeDumper.represent_ordered_dict)
 
 
 class Serializer(PythonSerializer):
@@ -58,7 +58,7 @@ class Serializer(PythonSerializer):
 
     def end_serialization(self):
         self.options.setdefault("allow_unicode", True)
-        yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
+        yaml.dump(self.objects, self.stream, Dumper=ThibaudSafeDumper, **self.options)
 
     def getvalue(self):
         # Grandparent super

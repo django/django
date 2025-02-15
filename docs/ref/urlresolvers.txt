@@ -1,8 +1,8 @@
 =================================
-``django.urls`` utility functions
+``thibaud.urls`` utility functions
 =================================
 
-.. module:: django.urls
+.. module:: thibaud.urls
 
 ``reverse()``
 =============
@@ -33,7 +33,7 @@ you can use any of the following to reverse the URL::
 
 If the URL accepts arguments, you may pass them in ``args``. For example::
 
-    from django.urls import reverse
+    from thibaud.urls import reverse
 
 
     def myview(request):
@@ -49,7 +49,7 @@ You can also pass ``kwargs`` instead of ``args``. For example:
 ``args`` and ``kwargs`` cannot be passed to ``reverse()`` at the same time.
 
 If no match can be made, ``reverse()`` raises a
-:class:`~django.urls.NoReverseMatch` exception.
+:class:`~thibaud.urls.NoReverseMatch` exception.
 
 The ``reverse()`` function can reverse a large variety of regular expression
 patterns for URLs, but not every possible one. The main restriction at the
@@ -68,7 +68,7 @@ The ``urlconf`` argument is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
 
 The ``query`` keyword argument specifies parameters to be added to the returned
-URL. It can accept an instance of :class:`~django.http.QueryDict` (such as
+URL. It can accept an instance of :class:`~thibaud.http.QueryDict` (such as
 ``request.GET``) or any value compatible with :func:`urllib.parse.urlencode`.
 The encoded query string is appended to the resolved URL, prefixed by a ``?``.
 
@@ -80,7 +80,7 @@ For example:
 
 .. code-block:: pycon
 
-   >>> from django.urls import reverse
+   >>> from thibaud.urls import reverse
    >>> reverse("admin:index", query={"q": "biscuits", "page": 2}, fragment="results")
    '/admin/?q=biscuits&page=2#results'
    >>> reverse("admin:index", query=[("color", "blue"), ("color", 1), ("none", None)])
@@ -110,14 +110,14 @@ For example:
 .. admonition:: Reversing class-based views by view object
 
     The view object can also be the result of calling
-    :meth:`~django.views.generic.base.View.as_view` if the same view object is
+    :meth:`~thibaud.views.generic.base.View.as_view` if the same view object is
     used in the URLConf. Following the original example, the view object could
     be defined as:
 
     .. code-block:: python
        :caption: ``news/views.py``
 
-        from django.views import View
+        from thibaud.views import View
 
 
         class ArchiveView(View): ...
@@ -141,7 +141,7 @@ URLConf is loaded. Some common cases where this function is necessary are:
   view.
 
 * providing a reversed URL to a decorator (such as the ``login_url`` argument
-  for the :func:`django.contrib.auth.decorators.permission_required`
+  for the :func:`thibaud.contrib.auth.decorators.permission_required`
   decorator).
 
 * providing a reversed URL as a default value for a parameter in a function's
@@ -156,13 +156,13 @@ corresponding view functions. It has the following signature:
 .. function:: resolve(path, urlconf=None)
 
 ``path`` is the URL path you want to resolve. As with
-:func:`~django.urls.reverse`, you don't need to worry about the ``urlconf``
+:func:`~thibaud.urls.reverse`, you don't need to worry about the ``urlconf``
 parameter. The function returns a :class:`ResolverMatch` object that allows you
 to access various metadata about the resolved URL.
 
 If the URL does not resolve, the function raises a
-:exc:`~django.urls.Resolver404` exception (a subclass of
-:class:`~django.http.Http404`) .
+:exc:`~thibaud.urls.Resolver404` exception (a subclass of
+:class:`~thibaud.http.Http404`) .
 
 .. class:: ResolverMatch
 
@@ -248,12 +248,12 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
 
     func, args, kwargs = resolve("/some/path/")
 
-One possible use of :func:`~django.urls.resolve` would be to test whether a
+One possible use of :func:`~thibaud.urls.resolve` would be to test whether a
 view would raise a ``Http404`` error before redirecting to it::
 
     from urllib.parse import urlsplit
-    from django.urls import resolve
-    from django.http import Http404, HttpResponseRedirect
+    from thibaud.urls import resolve
+    from thibaud.http import Http404, HttpResponseRedirect
 
 
     def myview(request):
@@ -276,13 +276,13 @@ view would raise a ``Http404`` error before redirecting to it::
 
 .. function:: get_script_prefix()
 
-Normally, you should always use :func:`~django.urls.reverse` to define URLs
+Normally, you should always use :func:`~thibaud.urls.reverse` to define URLs
 within your application. However, if your application constructs part of the
 URL hierarchy itself, you may occasionally need to generate URLs. In that
-case, you need to be able to find the base URL of the Django project within
-its web server (normally, :func:`~django.urls.reverse` takes care of this for
+case, you need to be able to find the base URL of the Thibaud project within
+its web server (normally, :func:`~thibaud.urls.reverse` takes care of this for
 you). In that case, you can call ``get_script_prefix()``, which will return
-the script prefix portion of the URL for your Django project. If your Django
+the script prefix portion of the URL for your Thibaud project. If your Thibaud
 project is at the root of its web server, this is always ``"/"``.
 
 .. warning::

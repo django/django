@@ -1,5 +1,5 @@
-from django.contrib.auth.models import AbstractBaseUser, UserManager
-from django.db import models
+from thibaud.contrib.auth.models import AbstractBaseUser, UserManager
+from thibaud.db import models
 
 
 class CustomUserNonUniqueUsername(AbstractBaseUser):

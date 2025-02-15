@@ -1,9 +1,9 @@
 """
-Interfaces for serializing Django objects.
+Interfaces for serializing Thibaud objects.
 
 Usage::
 
-    from django.core import serializers
+    from thibaud.core import serializers
     json = serializers.serialize("json", some_queryset)
     objects = list(serializers.deserialize("json", json))
 
@@ -18,17 +18,17 @@ To add your own serializers, use the SERIALIZATION_MODULES setting::
 
 import importlib
 
-from django.apps import apps
-from django.conf import settings
-from django.core.serializers.base import SerializerDoesNotExist
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core.serializers.base import SerializerDoesNotExist
 
 # Built-in serializers
 BUILTIN_SERIALIZERS = {
-    "xml": "django.core.serializers.xml_serializer",
-    "python": "django.core.serializers.python",
-    "json": "django.core.serializers.json",
-    "yaml": "django.core.serializers.pyyaml",
-    "jsonl": "django.core.serializers.jsonl",
+    "xml": "thibaud.core.serializers.xml_serializer",
+    "python": "thibaud.core.serializers.python",
+    "json": "thibaud.core.serializers.json",
+    "yaml": "thibaud.core.serializers.pyyaml",
+    "jsonl": "thibaud.core.serializers.jsonl",
 }
 
 _serializers = {}

@@ -1,5 +1,5 @@
-import django.contrib.contenttypes.models
-from django.db import migrations, models
+import thibaud.contrib.contenttypes.models
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -29,13 +29,13 @@ class Migration(migrations.Migration):
             ],
             options={
                 "ordering": ("name",),
-                "db_table": "django_content_type",
+                "db_table": "thibaud_content_type",
                 "verbose_name": "content type",
                 "verbose_name_plural": "content types",
             },
             bases=(models.Model,),
             managers=[
-                ("objects", django.contrib.contenttypes.models.ContentTypeManager()),
+                ("objects", thibaud.contrib.contenttypes.models.ContentTypeManager()),
             ],
         ),
         migrations.AlterUniqueTogether(

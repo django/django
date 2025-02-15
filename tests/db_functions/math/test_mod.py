@@ -1,8 +1,8 @@
 import math
 from decimal import Decimal
 
-from django.db.models.functions import Mod
-from django.test import TestCase
+from thibaud.db.models.functions import Mod
+from thibaud.test import TestCase
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 

@@ -1,6 +1,6 @@
-from django.conf import settings
-from django.conf.urls.static import static
-from django.contrib.staticfiles.views import serve
+from thibaud.conf import settings
+from thibaud.conf.urls.static import static
+from thibaud.contrib.staticfiles.views import serve
 
 urlpatterns = []
 

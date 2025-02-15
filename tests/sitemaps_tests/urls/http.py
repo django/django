@@ -1,11 +1,11 @@
 from datetime import date, datetime
 
-from django.conf.urls.i18n import i18n_patterns
-from django.contrib.sitemaps import GenericSitemap, Sitemap, views
-from django.http import HttpResponse
-from django.urls import path
-from django.utils import timezone
-from django.views.decorators.cache import cache_page
+from thibaud.conf.urls.i18n import i18n_patterns
+from thibaud.contrib.sitemaps import GenericSitemap, Sitemap, views
+from thibaud.http import HttpResponse
+from thibaud.urls import path
+from thibaud.utils import timezone
+from thibaud.views.decorators.cache import cache_page
 
 from ..models import I18nTestModel, TestModel
 
@@ -291,139 +291,139 @@ urlpatterns = [
         "simple/sitemap-<section>.xml",
         views.sitemap,
         {"sitemaps": simple_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "simple/sitemap.xml",
         views.sitemap,
         {"sitemaps": simple_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "simple/i18n.xml",
         views.sitemap,
         {"sitemaps": simple_i18n_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "alternates/i18n.xml",
         views.sitemap,
         {"sitemaps": alternates_i18n_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "limited/i18n.xml",
         views.sitemap,
         {"sitemaps": limited_i18n_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "x-default/i18n.xml",
         views.sitemap,
         {"sitemaps": xdefault_i18n_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "simple/custom-sitemap.xml",
         views.sitemap,
         {"sitemaps": simple_sitemaps, "template_name": "custom_sitemap.xml"},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "empty/sitemap.xml",
         views.sitemap,
         {"sitemaps": empty_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod/sitemap.xml",
         views.sitemap,
         {"sitemaps": fixed_lastmod_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod-mixed/sitemap.xml",
         views.sitemap,
         {"sitemaps": fixed_lastmod_mixed_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod/date-sitemap.xml",
         views.sitemap,
         {"sitemaps": {"date-sitemap": DateSiteMap}},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod/tz-sitemap.xml",
         views.sitemap,
         {"sitemaps": {"tz-sitemap": TimezoneSiteMap}},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod-sitemaps/mixed-ascending.xml",
         views.sitemap,
         {"sitemaps": sitemaps_lastmod_mixed_ascending},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod-sitemaps/mixed-descending.xml",
         views.sitemap,
         {"sitemaps": sitemaps_lastmod_mixed_descending},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod-sitemaps/ascending.xml",
         views.sitemap,
         {"sitemaps": sitemaps_lastmod_ascending},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "item-by-lang/i18n.xml",
         views.sitemap,
         {"sitemaps": item_by_lang_i18n_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "item-by-lang-alternates/i18n.xml",
         views.sitemap,
         {"sitemaps": item_by_lang_alternates_i18n_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod-sitemaps/descending.xml",
         views.sitemap,
         {"sitemaps": sitemaps_lastmod_descending},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "lastmod/get-latest-lastmod-none-sitemap.xml",
         views.index,
         {"sitemaps": get_latest_lastmod_none_sitemaps},
-        name="django.contrib.sitemaps.views.index",
+        name="thibaud.contrib.sitemaps.views.index",
     ),
     path(
         "lastmod/get-latest-lastmod-sitemap.xml",
         views.index,
         {"sitemaps": get_latest_lastmod_sitemaps},
-        name="django.contrib.sitemaps.views.index",
+        name="thibaud.contrib.sitemaps.views.index",
     ),
     path(
         "lastmod/latest-lastmod-timezone-sitemap.xml",
         views.index,
         {"sitemaps": latest_lastmod_timezone_sitemaps},
-        name="django.contrib.sitemaps.views.index",
+        name="thibaud.contrib.sitemaps.views.index",
     ),
     path(
         "generic/sitemap.xml",
         views.sitemap,
         {"sitemaps": generic_sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "generic-lastmod/sitemap.xml",
         views.sitemap,
         {"sitemaps": generic_sitemaps_lastmod},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "cached/index.xml",
@@ -440,7 +440,7 @@ urlpatterns = [
         "sitemap-without-entries/sitemap.xml",
         views.sitemap,
         {"sitemaps": {}},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     ),
     path(
         "callable-lastmod-partial/index.xml",
@@ -471,7 +471,7 @@ urlpatterns = [
         "generic-lastmod/index.xml",
         views.index,
         {"sitemaps": generic_sitemaps_lastmod},
-        name="django.contrib.sitemaps.views.index",
+        name="thibaud.contrib.sitemaps.views.index",
     ),
 ]
 

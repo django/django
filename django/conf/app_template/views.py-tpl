@@ -1,3 +1,3 @@
-from django.shortcuts import render
+from thibaud.shortcuts import render
 
 # Create your views here.

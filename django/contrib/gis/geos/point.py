@@ -1,9 +1,9 @@
 from ctypes import c_uint
 
-from django.contrib.gis import gdal
-from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.geometry import GEOSGeometry
+from thibaud.contrib.gis import gdal
+from thibaud.contrib.gis.geos import prototypes as capi
+from thibaud.contrib.gis.geos.error import GEOSException
+from thibaud.contrib.gis.geos.geometry import GEOSGeometry
 
 
 class Point(GEOSGeometry):

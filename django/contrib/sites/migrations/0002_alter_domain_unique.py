@@ -1,5 +1,5 @@
-import django.contrib.sites.models
-from django.db import migrations, models
+import thibaud.contrib.sites.models
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 max_length=100,
                 unique=True,
-                validators=[django.contrib.sites.models._simple_domain_name_validator],
+                validators=[thibaud.contrib.sites.models._simple_domain_name_validator],
                 verbose_name="domain name",
             ),
         ),

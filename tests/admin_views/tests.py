@@ -6,41 +6,41 @@ import zoneinfo
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlsplit
 
-from django import forms
-from django.contrib import admin
-from django.contrib.admin import AdminSite, ModelAdmin
-from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-from django.contrib.admin.models import ADDITION, DELETION, LogEntry
-from django.contrib.admin.options import TO_FIELD_VAR
-from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.utils import quote
-from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import AdminPasswordChangeForm
-from django.contrib.auth.models import Group, Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.core import mail
-from django.core.checks import Error
-from django.core.files import temp as tempfile
-from django.forms.utils import ErrorList
-from django.template.response import TemplateResponse
-from django.test import (
+from thibaud import forms
+from thibaud.contrib import admin
+from thibaud.contrib.admin import AdminSite, ModelAdmin
+from thibaud.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from thibaud.contrib.admin.models import ADDITION, DELETION, LogEntry
+from thibaud.contrib.admin.options import TO_FIELD_VAR
+from thibaud.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from thibaud.contrib.admin.tests import AdminSeleniumTestCase
+from thibaud.contrib.admin.utils import quote
+from thibaud.contrib.admin.views.main import IS_POPUP_VAR
+from thibaud.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
+from thibaud.contrib.auth.admin import UserAdmin
+from thibaud.contrib.auth.forms import AdminPasswordChangeForm
+from thibaud.contrib.auth.models import Group, Permission, User
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core import mail
+from thibaud.core.checks import Error
+from thibaud.core.files import temp as tempfile
+from thibaud.forms.utils import ErrorList
+from thibaud.template.response import TemplateResponse
+from thibaud.test import (
     RequestFactory,
     TestCase,
     modify_settings,
     override_settings,
     skipUnlessDBFeature,
 )
-from django.test.selenium import screenshot_cases
-from django.test.utils import override_script_prefix
-from django.urls import NoReverseMatch, resolve, reverse
-from django.utils import formats, translation
-from django.utils.cache import get_max_age
-from django.utils.encoding import iri_to_uri
-from django.utils.html import escape
-from django.utils.http import urlencode
+from thibaud.test.selenium import screenshot_cases
+from thibaud.test.utils import override_script_prefix
+from thibaud.urls import NoReverseMatch, resolve, reverse
+from thibaud.utils import formats, translation
+from thibaud.utils.cache import get_max_age
+from thibaud.utils.encoding import iri_to_uri
+from thibaud.utils.html import escape
+from thibaud.utils.http import urlencode
 
 from . import customadmin
 from .admin import CityAdmin, site, site2
@@ -413,7 +413,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_basic_edit_GET_old_url_redirect(self):
         """
-        The change URL changed in Django 1.9, but the old one still redirects.
+        The change URL changed in Thibaud 1.9, but the old one still redirects.
         """
         response = self.client.get(
             reverse("admin:admin_views_section_change", args=(self.s1.pk,)).replace(
@@ -1136,7 +1136,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContains(response, "%Y-%m-%d %H:%M:%S")
 
     def test_disallowed_filtering(self):
-        with self.assertLogs("django.security.DisallowedModelAdminLookup", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedModelAdminLookup", "ERROR"):
             response = self.client.get(
                 "%s?owner__email__startswith=fuzzy"
                 % reverse("admin:admin_views_album_changelist")
@@ -1179,13 +1179,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_disallowed_to_field(self):
         url = reverse("admin:admin_views_section_changelist")
-        with self.assertLogs("django.security.DisallowedModelAdminToField", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedModelAdminToField", "ERROR"):
             response = self.client.get(url, {TO_FIELD_VAR: "missing_field"})
         self.assertEqual(response.status_code, 400)
 
         # Specifying a field that is not referred by any other model registered
         # to this admin site should raise an exception.
-        with self.assertLogs("django.security.DisallowedModelAdminToField", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedModelAdminToField", "ERROR"):
             response = self.client.get(
                 reverse("admin:admin_views_section_changelist"), {TO_FIELD_VAR: "name"}
             )
@@ -1232,13 +1232,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         # #25622 - Specifying a field of a model only referred by a generic
         # relation should raise DisallowedModelAdminToField.
         url = reverse("admin:admin_views_referencedbygenrel_changelist")
-        with self.assertLogs("django.security.DisallowedModelAdminToField", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedModelAdminToField", "ERROR"):
             response = self.client.get(url, {TO_FIELD_VAR: "object_id"})
         self.assertEqual(response.status_code, 400)
 
         # We also want to prevent the add, change, and delete views from
         # leaking a disallowed field value.
-        with self.assertLogs("django.security.DisallowedModelAdminToField", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedModelAdminToField", "ERROR"):
             response = self.client.post(
                 reverse("admin:admin_views_section_add"), {TO_FIELD_VAR: "name"}
             )
@@ -1246,12 +1246,12 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
         section = Section.objects.create()
         url = reverse("admin:admin_views_section_change", args=(section.pk,))
-        with self.assertLogs("django.security.DisallowedModelAdminToField", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedModelAdminToField", "ERROR"):
             response = self.client.post(url, {TO_FIELD_VAR: "name"})
         self.assertEqual(response.status_code, 400)
 
         url = reverse("admin:admin_views_section_delete", args=(section.pk,))
-        with self.assertLogs("django.security.DisallowedModelAdminToField", "ERROR"):
+        with self.assertLogs("thibaud.security.DisallowedModelAdminToField", "ERROR"):
             response = self.client.post(url, {TO_FIELD_VAR: "name"})
         self.assertEqual(response.status_code, 400)
 
@@ -1465,7 +1465,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:app_list", args=("admin_views",)))
         self.assertContains(
             response,
-            "<title>Admin_Views administration | Django site admin</title>",
+            "<title>Admin_Views administration | Thibaud site admin</title>",
         )
         self.assertEqual(response.context["title"], "Admin_Views administration")
         self.assertEqual(response.context["app_label"], "admin_views")
@@ -1478,7 +1478,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin2:app_list", args=("admin_views",)))
         self.assertContains(
             response,
-            "<title>Admin_Views administration | Django site admin</title>",
+            "<title>Admin_Views administration | Thibaud site admin</title>",
         )
         # Models are in reverse order.
         models = [model["name"] for model in response.context["app_list"][0]["models"]]
@@ -1490,7 +1490,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            "<title>Article 1 | Change article | Django site admin</title>",
+            "<title>Article 1 | Change article | Thibaud site admin</title>",
         )
         self.assertContains(response, "<h1>Change article</h1>")
         self.assertContains(response, "<h2>Article 1</h2>")
@@ -1499,7 +1499,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            "<title>Article 2 | Change article | Django site admin</title>",
+            "<title>Article 2 | Change article | Thibaud site admin</title>",
         )
         self.assertContains(response, "<h1>Change article</h1>")
         self.assertContains(response, "<h2>Article 2</h2>")
@@ -1537,7 +1537,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            "<title>Article 1 | View article | Django site admin</title>",
+            "<title>Article 1 | View article | Thibaud site admin</title>",
         )
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(response, "<h2>Article 1</h2>")
@@ -1546,7 +1546,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            "<title>Article 2 | View article | Django site admin</title>",
+            "<title>Article 2 | View article | Thibaud site admin</title>",
         )
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(response, "<h2>Article 2</h2>")
@@ -1565,10 +1565,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         ]
         for url in tests:
             with self.subTest(url=url):
-                with self.assertNoLogs("django.template", "DEBUG"):
+                with self.assertNoLogs("thibaud.template", "DEBUG"):
                     self.client.get(url)
         # Login must be after logout.
-        with self.assertNoLogs("django.template", "DEBUG"):
+        with self.assertNoLogs("thibaud.template", "DEBUG"):
             self.client.post(reverse("admin:logout"))
             self.client.get(reverse("admin:login"))
 
@@ -1579,20 +1579,20 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "index": "0",
             "_selected_action": self.a1.pk,
         }
-        with self.assertNoLogs("django.template", "DEBUG"):
+        with self.assertNoLogs("thibaud.template", "DEBUG"):
             self.client.post(reverse("admin:admin_views_article_changelist"), post_data)
 
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
                 "NAME": (
-                    "django.contrib.auth.password_validation."
+                    "thibaud.contrib.auth.password_validation."
                     "UserAttributeSimilarityValidator"
                 )
             },
             {
                 "NAME": (
-                    "django.contrib.auth.password_validation."
+                    "thibaud.contrib.auth.password_validation."
                     "NumericPasswordValidator"
                 )
             },
@@ -1660,19 +1660,19 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     AUTH_PASSWORD_VALIDATORS=[
         {
             "NAME": (
-                "django.contrib.auth.password_validation."
+                "thibaud.contrib.auth.password_validation."
                 "UserAttributeSimilarityValidator"
             )
         },
         {
             "NAME": (
-                "django.contrib.auth.password_validation." "NumericPasswordValidator"
+                "thibaud.contrib.auth.password_validation." "NumericPasswordValidator"
             )
         },
     ],
     TEMPLATES=[
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             # Put this app's and the shared tests templates dirs in DIRS to
             # take precedence over the admin's templates dir.
             "DIRS": [
@@ -1682,9 +1682,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.request",
-                    "django.contrib.auth.context_processors.auth",
-                    "django.contrib.messages.context_processors.messages",
+                    "thibaud.template.context_processors.request",
+                    "thibaud.contrib.auth.context_processors.auth",
+                    "thibaud.contrib.messages.context_processors.messages",
                 ],
             },
         }
@@ -1872,7 +1872,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
             "_selected_action": group.id,
         }
         response = self.client.post(reverse("admin:auth_group_changelist"), post_data)
-        self.assertEqual(response.context["site_header"], "Django administration")
+        self.assertEqual(response.context["site_header"], "Thibaud administration")
         self.assertContains(response, "bodyclass_consistency_check ")
 
     def test_filter_with_custom_template(self):
@@ -2155,7 +2155,7 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
     def test_custom_admin_site_view(self):
         self.client.force_login(self.superuser)
         response = self.client.get(reverse("admin2:my_view"))
-        self.assertEqual(response.content, b"Django is a magical pony!")
+        self.assertEqual(response.content, b"Thibaud is a magical pony!")
 
     def test_pwd_change_custom_template(self):
         self.client.force_login(self.superuser)
@@ -2177,13 +2177,13 @@ def get_perm(Model, codename):
     # Test with the admin's documented list of required context processors.
     TEMPLATES=[
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.request",
-                    "django.contrib.auth.context_processors.auth",
-                    "django.contrib.messages.context_processors.messages",
+                    "thibaud.template.context_processors.request",
+                    "thibaud.contrib.auth.context_processors.auth",
+                    "thibaud.contrib.messages.context_processors.messages",
                 ],
             },
         }
@@ -2532,7 +2532,7 @@ class AdminViewPermissionsTest(TestCase):
         )
         response = self.client.get(reverse("admin:admin_views_article_add"))
         self.assertEqual(response.context["title"], "Add article")
-        self.assertContains(response, "<title>Add article | Django site admin</title>")
+        self.assertContains(response, "<title>Add article | Thibaud site admin</title>")
         self.assertContains(
             response, '<input type="submit" value="Save and view" name="_continue">'
         )
@@ -2621,7 +2621,7 @@ class AdminViewPermissionsTest(TestCase):
         # make sure the view removes test cookie
         self.assertIs(self.client.session.test_cookie_worked(), False)
 
-    @mock.patch("django.contrib.admin.options.InlineModelAdmin.has_change_permission")
+    @mock.patch("thibaud.contrib.admin.options.InlineModelAdmin.has_change_permission")
     def test_add_view_with_view_only_inlines(self, has_change_permission):
         """User with add permission to a section but view-only for inlines."""
         self.viewuser.user_permissions.add(
@@ -2673,12 +2673,12 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(article_changelist_url)
         self.assertContains(
             response,
-            "<title>Select article to view | Django site admin</title>",
+            "<title>Select article to view | Thibaud site admin</title>",
         )
         self.assertContains(response, "<h1>Select article to view</h1>")
         self.assertEqual(response.context["title"], "Select article to view")
         response = self.client.get(article_change_url)
-        self.assertContains(response, "<title>View article | Django site admin</title>")
+        self.assertContains(response, "<title>View article | Thibaud site admin</title>")
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(response, "<label>Extra form field:</label>")
         self.assertContains(
@@ -2700,14 +2700,14 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.context["title"], "Select article to change")
         self.assertContains(
             response,
-            "<title>Select article to change | Django site admin</title>",
+            "<title>Select article to change | Thibaud site admin</title>",
         )
         self.assertContains(response, "<h1>Select article to change</h1>")
         response = self.client.get(article_change_url)
         self.assertEqual(response.context["title"], "Change article")
         self.assertContains(
             response,
-            "<title>Change article | Django site admin</title>",
+            "<title>Change article | Thibaud site admin</title>",
         )
         self.assertContains(response, "<h1>Change article</h1>")
         post = self.client.post(article_change_url, change_dict)
@@ -2831,7 +2831,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.force_login(self.viewuser)
         response = self.client.get(change_url)
         self.assertEqual(response.context["title"], "View article")
-        self.assertContains(response, "<title>View article | Django site admin</title>")
+        self.assertContains(response, "<title>View article | Thibaud site admin</title>")
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(
             response,
@@ -3422,13 +3422,13 @@ class AdminViewPermissionsTest(TestCase):
     ROOT_URLCONF="admin_views.urls",
     TEMPLATES=[
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.request",
-                    "django.contrib.auth.context_processors.auth",
-                    "django.contrib.messages.context_processors.messages",
+                    "thibaud.template.context_processors.request",
+                    "thibaud.contrib.auth.context_processors.auth",
+                    "thibaud.contrib.messages.context_processors.messages",
                 ],
             },
         }
@@ -3807,10 +3807,10 @@ class AdminViewDeletedObjectsTest(TestCase):
         GenericRelation(related_query_name='...') pointing to it, those objects
         should be listed for deletion.
         """
-        bookmark = Bookmark.objects.create(name="djangoproject")
-        tag = FunkyTag.objects.create(content_object=bookmark, name="django")
+        bookmark = Bookmark.objects.create(name="thibaudproject")
+        tag = FunkyTag.objects.create(content_object=bookmark, name="thibaud")
         tag_url = reverse("admin:admin_views_funkytag_change", args=(tag.id,))
-        should_contain = '<li>Funky tag: <a href="%s">django' % tag_url
+        should_contain = '<li>Funky tag: <a href="%s">thibaud' % tag_url
         response = self.client.get(
             reverse("admin:admin_views_bookmark_delete", args=(bookmark.pk,))
         )
@@ -4239,13 +4239,13 @@ class AdminViewListEditable(TestCase):
 
     def test_inheritance(self):
         Podcast.objects.create(
-            name="This Week in Django", release_date=datetime.date.today()
+            name="This Week in Thibaud", release_date=datetime.date.today()
         )
         response = self.client.get(reverse("admin:admin_views_podcast_changelist"))
         self.assertEqual(response.status_code, 200)
 
     def test_inheritance_2(self):
-        Vodcast.objects.create(name="This Week in Django", released=True)
+        Vodcast.objects.create(name="This Week in Thibaud", released=True)
         response = self.client.get(reverse("admin:admin_views_vodcast_changelist"))
         self.assertEqual(response.status_code, 200)
 
@@ -4582,7 +4582,7 @@ class AdminViewListEditable(TestCase):
         fields are displayed but separately (not in the table) and only once.
         """
         story1 = Story.objects.create(
-            title="The adventures of Guido", content="Once upon a time in Djangoland..."
+            title="The adventures of Guido", content="Once upon a time in Thibaudland..."
         )
         story2 = Story.objects.create(
             title="Crouching Tiger, Hidden Python",
@@ -4610,7 +4610,7 @@ class AdminViewListEditable(TestCase):
         """
         story1 = OtherStory.objects.create(
             title="The adventures of Guido",
-            content="Once upon a time in Djangoland...",
+            content="Once upon a time in Thibaudland...",
         )
         story2 = OtherStory.objects.create(
             title="Crouching Tiger, Hidden Python",
@@ -5789,7 +5789,7 @@ class PrePopulatedTest(TestCase):
 
 
 def _clean_sidebar_state(driver):
-    driver.execute_script("localStorage.removeItem('django.admin.navSidebarIsOpen')")
+    driver.execute_script("localStorage.removeItem('thibaud.admin.navSidebarIsOpen')")
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -6962,7 +6962,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             readonly_content="test\r\n\r\ntest\r\n\r\ntest\r\n\r\ntest",
         )
         Link.objects.create(
-            url="http://www.djangoproject.com",
+            url="http://www.thibaudproject.com",
             post=p,
             readonly_link_content="test\r\nlink",
         )
@@ -6976,7 +6976,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
     def test_readonly_post(self):
         data = {
-            "title": "Django Got Readonly Fields",
+            "title": "Thibaud Got Readonly Fields",
             "content": "This is an incredible development.",
             "link_set-TOTAL_FORMS": "1",
             "link_set-INITIAL_FORMS": "0",
@@ -7677,7 +7677,7 @@ class CSSTest(TestCase):
         Cells of the change list table should contain the field name in their
         class attribute.
         """
-        Podcast.objects.create(name="Django Dose", release_date=datetime.date.today())
+        Podcast.objects.create(name="Thibaud Dose", release_date=datetime.date.today())
         response = self.client.get(reverse("admin:admin_views_podcast_changelist"))
         self.assertContains(response, '<th class="field-name">')
         self.assertContains(response, '<td class="field-release_date nowrap">')
@@ -7693,7 +7693,7 @@ except ImportError:
 @unittest.skipUnless(docutils, "no docutils installed.")
 @override_settings(ROOT_URLCONF="admin_views.urls")
 @modify_settings(
-    INSTALLED_APPS={"append": ["django.contrib.admindocs", "django.contrib.flatpages"]}
+    INSTALLED_APPS={"append": ["thibaud.contrib.admindocs", "thibaud.contrib.flatpages"]}
 )
 class AdminDocsTest(TestCase):
     @classmethod
@@ -7706,7 +7706,7 @@ class AdminDocsTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_tags(self):
-        response = self.client.get(reverse("django-admindocs-tags"))
+        response = self.client.get(reverse("thibaud-admindocs-tags"))
 
         # The builtin tag group exists
         self.assertContains(response, "<h2>Built-in tags</h2>", count=2, html=True)
@@ -7745,7 +7745,7 @@ class AdminDocsTest(TestCase):
         )
 
     def test_filters(self):
-        response = self.client.get(reverse("django-admindocs-filters"))
+        response = self.client.get(reverse("thibaud-admindocs-filters"))
 
         # The builtin filter group exists
         self.assertContains(response, "<h2>Built-in filters</h2>", count=2, html=True)
@@ -7757,7 +7757,7 @@ class AdminDocsTest(TestCase):
         )
 
     def test_index_headers(self):
-        response = self.client.get(reverse("django-admindocs-docroot"))
+        response = self.client.get(reverse("thibaud-admindocs-docroot"))
         self.assertContains(response, "<h1>Documentation</h1>")
         self.assertContains(response, '<h2><a href="tags/">Tags</a></h2>')
         self.assertContains(response, '<h2><a href="filters/">Filters</a></h2>')
@@ -7772,13 +7772,13 @@ class AdminDocsTest(TestCase):
     ROOT_URLCONF="admin_views.urls",
     TEMPLATES=[
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.request",
-                    "django.contrib.auth.context_processors.auth",
-                    "django.contrib.messages.context_processors.messages",
+                    "thibaud.template.context_processors.request",
+                    "thibaud.contrib.auth.context_processors.auth",
+                    "thibaud.contrib.messages.context_processors.messages",
                 ],
             },
         }

@@ -1,10 +1,10 @@
 ===========================
-Django 1.5.11 release notes
+Thibaud 1.5.11 release notes
 ===========================
 
 *October 22, 2014*
 
-Django 1.5.11 fixes a couple regressions in the 1.5.9 security release.
+Thibaud 1.5.11 fixes a couple regressions in the 1.5.9 security release.
 
 Bugfixes
 ========

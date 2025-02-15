@@ -1,5 +1,5 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Group
-from django.db import models
+from thibaud.contrib.auth.models import AbstractBaseUser, BaseUserManager, Group
+from thibaud.db import models
 
 
 class Email(models.Model):

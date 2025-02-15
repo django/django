@@ -5,10 +5,10 @@ To perform an OR lookup, or a lookup that combines ANDs and ORs, combine
 ``QuerySet`` objects using ``&`` and ``|`` operators.
 
 Alternatively, use positional arguments, and pass one or more expressions of
-clauses using the variable ``django.db.models.Q``.
+clauses using the variable ``thibaud.db.models.Q``.
 """
 
-from django.db import models
+from thibaud.db import models
 
 
 class Article(models.Model):

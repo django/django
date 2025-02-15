@@ -1,8 +1,8 @@
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.flatpages.models import FlatPage
-from django.contrib.sites.models import Site
-from django.test import TestCase, modify_settings, override_settings
+from thibaud.conf import settings
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.flatpages.models import FlatPage
+from thibaud.contrib.sites.models import Site
+from thibaud.test import TestCase, modify_settings, override_settings
 
 from .settings import FLATPAGES_TEMPLATES
 
@@ -52,16 +52,16 @@ class TestDataMixin:
         cls.fp4.sites.add(cls.site1)
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.flatpages"})
+@modify_settings(INSTALLED_APPS={"append": "thibaud.contrib.flatpages"})
 @override_settings(
     LOGIN_URL="/accounts/login/",
     MIDDLEWARE=[
-        "django.middleware.common.CommonMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+        "thibaud.middleware.common.CommonMiddleware",
+        "thibaud.contrib.sessions.middleware.SessionMiddleware",
+        "thibaud.middleware.csrf.CsrfViewMiddleware",
+        "thibaud.contrib.auth.middleware.AuthenticationMiddleware",
+        "thibaud.contrib.messages.middleware.MessageMiddleware",
+        # no 'thibaud.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ],
     ROOT_URLCONF="flatpages_tests.urls",
     TEMPLATES=FLATPAGES_TEMPLATES,
@@ -115,17 +115,17 @@ class FlatpageViewTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it special!</p>")
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.flatpages"})
+@modify_settings(INSTALLED_APPS={"append": "thibaud.contrib.flatpages"})
 @override_settings(
     APPEND_SLASH=True,
     LOGIN_URL="/accounts/login/",
     MIDDLEWARE=[
-        "django.middleware.common.CommonMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+        "thibaud.middleware.common.CommonMiddleware",
+        "thibaud.contrib.sessions.middleware.SessionMiddleware",
+        "thibaud.middleware.csrf.CsrfViewMiddleware",
+        "thibaud.contrib.auth.middleware.AuthenticationMiddleware",
+        "thibaud.contrib.messages.middleware.MessageMiddleware",
+        # no 'thibaud.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ],
     ROOT_URLCONF="flatpages_tests.urls",
     TEMPLATES=FLATPAGES_TEMPLATES,

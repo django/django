@@ -1,11 +1,11 @@
-from django.apps import AppConfig
-from django.contrib.staticfiles.checks import check_finders, check_storages
-from django.core import checks
-from django.utils.translation import gettext_lazy as _
+from thibaud.apps import AppConfig
+from thibaud.contrib.staticfiles.checks import check_finders, check_storages
+from thibaud.core import checks
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class StaticFilesConfig(AppConfig):
-    name = "django.contrib.staticfiles"
+    name = "thibaud.contrib.staticfiles"
     verbose_name = _("Static Files")
     ignore_patterns = ["CVS", ".*", "*~"]
 

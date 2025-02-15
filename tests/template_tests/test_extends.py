@@ -1,7 +1,7 @@
 import os
 
-from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
-from django.test import SimpleTestCase
+from thibaud.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
+from thibaud.test import SimpleTestCase
 
 from .utils import ROOT, setup
 
@@ -42,7 +42,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
             dirs=[os.path.join(RECURSIVE, "fs")],
             loaders=[
                 (
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "one.html": (
                             '{% extends "one.html" %}{% block content %}'
@@ -58,7 +58,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
                         ),
                     },
                 ),
-                "django.template.loaders.filesystem.Loader",
+                "thibaud.template.loaders.filesystem.Loader",
             ],
         )
         template = engine.get_template("one.html")
@@ -91,9 +91,9 @@ class ExtendsBehaviorTests(SimpleTestCase):
             ],
             loaders=[
                 (
-                    "django.template.loaders.cached.Loader",
+                    "thibaud.template.loaders.cached.Loader",
                     [
-                        "django.template.loaders.filesystem.Loader",
+                        "thibaud.template.loaders.filesystem.Loader",
                     ],
                 ),
             ],
@@ -127,7 +127,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
         engine = Engine(
             loaders=[
                 [
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "base.html": (
                             '{% extends "base.html" %}{% block content %}'
@@ -136,7 +136,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
                     },
                 ],
                 [
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "base.html": "{% block content %}loader2{% endblock %}",
                     },
@@ -155,7 +155,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
         engine = Engine(
             loaders=[
                 [
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "base.html": (
                             "{% extends 'base.html' %}{% block base %}{{ block.super }}"
@@ -168,7 +168,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
                     },
                 ],
                 [
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "base.html": (
                             "{% block base %}1{% endblock %}"

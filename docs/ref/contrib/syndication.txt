@@ -2,17 +2,17 @@
 The syndication feed framework
 ==============================
 
-.. module:: django.contrib.syndication
+.. module:: thibaud.contrib.syndication
    :synopsis: A framework for generating syndication feeds, in RSS and Atom,
               quite easily.
 
-Django comes with a high-level syndication-feed-generating framework for
+Thibaud comes with a high-level syndication-feed-generating framework for
 creating RSS_ and :rfc:`Atom <4287>` feeds.
 
 To create any syndication feed, all you have to do is write a short
 Python class. You can create as many feeds as you want.
 
-Django also comes with a lower-level feed-generating API. Use this if
+Thibaud also comes with a lower-level feed-generating API. Use this if
 you want to generate feeds outside of a web context, or in some other
 lower-level way.
 
@@ -25,24 +25,24 @@ Overview
 --------
 
 The high-level feed-generating framework is supplied by the
-:class:`~django.contrib.syndication.views.Feed` class. To create a
-feed, write a :class:`~django.contrib.syndication.views.Feed` class
+:class:`~thibaud.contrib.syndication.views.Feed` class. To create a
+feed, write a :class:`~thibaud.contrib.syndication.views.Feed` class
 and point to an instance of it in your :doc:`URLconf
 </topics/http/urls>`.
 
 ``Feed`` classes
 ----------------
 
-A :class:`~django.contrib.syndication.views.Feed` class is a Python
+A :class:`~thibaud.contrib.syndication.views.Feed` class is a Python
 class that represents a syndication feed. A feed can be simple (e.g.,
 a "site news" feed, or a basic feed displaying the latest entries of a
 blog) or more complex (e.g., a feed displaying all the blog entries in
 a particular category, where the category is variable).
 
-Feed classes subclass :class:`django.contrib.syndication.views.Feed`.
+Feed classes subclass :class:`thibaud.contrib.syndication.views.Feed`.
 They can live anywhere in your codebase.
 
-Instances of :class:`~django.contrib.syndication.views.Feed` classes
+Instances of :class:`~thibaud.contrib.syndication.views.Feed` classes
 are views which can be used in your :doc:`URLconf </topics/http/urls>`.
 
 A simple example
@@ -51,8 +51,8 @@ A simple example
 This simple example, taken from a hypothetical police beat news site describes
 a feed of the latest five news items::
 
-    from django.contrib.syndication.views import Feed
-    from django.urls import reverse
+    from thibaud.contrib.syndication.views import Feed
+    from thibaud.urls import reverse
     from policebeat.models import NewsItem
 
 
@@ -77,7 +77,7 @@ a feed of the latest five news items::
 To connect a URL to this feed, put an instance of the Feed object in
 your :doc:`URLconf </topics/http/urls>`. For example::
 
-    from django.urls import path
+    from thibaud.urls import path
     from myproject.feeds import LatestEntriesFeed
 
     urlpatterns = [
@@ -88,7 +88,7 @@ your :doc:`URLconf </topics/http/urls>`. For example::
 
 Note:
 
-* The Feed class subclasses :class:`django.contrib.syndication.views.Feed`.
+* The Feed class subclasses :class:`thibaud.contrib.syndication.views.Feed`.
 
 * ``title``, ``link`` and ``description`` correspond to the
   standard RSS ``<title>``, ``<link>`` and ``<description>`` elements,
@@ -96,9 +96,9 @@ Note:
 
 * ``items()`` is, a method that returns a list of objects that should be
   included in the feed as ``<item>`` elements. Although this example returns
-  ``NewsItem`` objects using Django's :doc:`object-relational mapper
+  ``NewsItem`` objects using Thibaud's :doc:`object-relational mapper
   </ref/models/querysets>`, ``items()`` doesn't have to return model instances.
-  Although you get a few bits of functionality "for free" by using Django
+  Although you get a few bits of functionality "for free" by using Thibaud
   models, ``items()`` can return any type of object you want.
 
 * If you're creating an Atom feed, rather than an RSS feed, set the
@@ -109,28 +109,28 @@ One thing is left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
 ``<link>`` and ``<description>``. We need to tell the framework what data to put
 into those elements.
 
-* For the contents of ``<title>`` and ``<description>``, Django tries
+* For the contents of ``<title>`` and ``<description>``, Thibaud tries
   calling the methods ``item_title()`` and ``item_description()`` on
-  the :class:`~django.contrib.syndication.views.Feed` class. They are passed
+  the :class:`~thibaud.contrib.syndication.views.Feed` class. They are passed
   a single parameter, ``item``, which is the object itself. These are
   optional; by default, the string representation of the object is used for
   both.
 
   If you want to do any special formatting for either the title or
-  description, :doc:`Django templates </ref/templates/language>` can be used
+  description, :doc:`Thibaud templates </ref/templates/language>` can be used
   instead. Their paths can be specified with the ``title_template`` and
   ``description_template`` attributes on the
-  :class:`~django.contrib.syndication.views.Feed` class. The templates are
+  :class:`~thibaud.contrib.syndication.views.Feed` class. The templates are
   rendered for each item and are passed two template context variables:
 
   * ``{{ obj }}`` -- The current object (one of whichever objects you
     returned in ``items()``).
 
-  * ``{{ site }}`` -- A :class:`django.contrib.sites.models.Site` object
+  * ``{{ site }}`` -- A :class:`thibaud.contrib.sites.models.Site` object
     representing the current site. This is useful for ``{{ site.domain
-    }}`` or ``{{ site.name }}``. If you do *not* have the Django sites
+    }}`` or ``{{ site.name }}``. If you do *not* have the Thibaud sites
     framework installed, this will be set to a
-    :class:`~django.contrib.sites.requests.RequestSite` object. See the
+    :class:`~thibaud.contrib.sites.requests.RequestSite` object. See the
     :ref:`RequestSite section of the sites framework documentation
     <requestsite-objects>` for more.
 
@@ -144,7 +144,7 @@ into those elements.
       in your ``Feed`` subclass. For example::
 
         from mysite.models import Article
-        from django.contrib.syndication.views import Feed
+        from thibaud.contrib.syndication.views import Feed
 
 
         class ArticlesFeed(Feed):
@@ -161,7 +161,7 @@ into those elements.
 
   And the template:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
     Something about {{ foo }}: {{ obj.description }}
 
@@ -185,11 +185,11 @@ into those elements.
   and return the modified dictionary.
 
 * To specify the contents of ``<link>``, you have two options. For each item
-  in ``items()``, Django first tries calling the
+  in ``items()``, Thibaud first tries calling the
   ``item_link()`` method on the
-  :class:`~django.contrib.syndication.views.Feed` class. In a similar way to
+  :class:`~thibaud.contrib.syndication.views.Feed` class. In a similar way to
   the title and description, it is passed it a single parameter,
-  ``item``. If that method doesn't exist, Django tries executing a
+  ``item``. If that method doesn't exist, Thibaud tries executing a
   ``get_absolute_url()`` method on that object. Both
   ``get_absolute_url()`` and ``item_link()`` should return the
   item's URL as a normal Python string. As with ``get_absolute_url()``, the
@@ -204,7 +204,7 @@ The framework also supports more complex feeds, via arguments.
 
 For example, a website could offer an RSS feed of recent crimes for every
 police beat in a city. It'd be silly to create a separate
-:class:`~django.contrib.syndication.views.Feed` class for each police beat; that
+:class:`~thibaud.contrib.syndication.views.Feed` class for each police beat; that
 would violate the :ref:`DRY principle <dry>` and would couple data to
 programming logic. Instead, the syndication framework lets you access the
 arguments passed from your :doc:`URLconf </topics/http/urls>` so feeds can output
@@ -224,7 +224,7 @@ method along with the request object.
 
 Here's the code for these beat-specific feeds::
 
-    from django.contrib.syndication.views import Feed
+    from thibaud.contrib.syndication.views import Feed
 
 
     class BeatFeed(Feed):
@@ -245,11 +245,11 @@ Here's the code for these beat-specific feeds::
         def items(self, obj):
             return Crime.objects.filter(beat=obj).order_by("-crime_date")[:30]
 
-To generate the feed's ``<title>``, ``<link>`` and ``<description>``, Django
+To generate the feed's ``<title>``, ``<link>`` and ``<description>``, Thibaud
 uses the ``title()``, ``link()`` and ``description()`` methods. In
 the previous example, they were string class attributes, but this example
 illustrates that they can be either strings *or* methods. For each of
-``title``, ``link`` and ``description``, Django follows this
+``title``, ``link`` and ``description``, Thibaud follows this
 algorithm:
 
 * First, it tries to call a method, passing the ``obj`` argument, where
@@ -266,14 +266,14 @@ class attribute (which should be a list).
 We are using a template for the item descriptions. It can be as minimal as
 this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ obj.description }}
 
 However, you are free to add formatting as desired.
 
 The ``ExampleFeed`` class below gives full documentation on methods and
-attributes of :class:`~django.contrib.syndication.views.Feed` classes.
+attributes of :class:`~thibaud.contrib.syndication.views.Feed` classes.
 
 Specifying the type of feed
 ---------------------------
@@ -281,9 +281,9 @@ Specifying the type of feed
 By default, feeds produced in this framework use RSS 2.0.
 
 To change that, add a ``feed_type`` attribute to your
-:class:`~django.contrib.syndication.views.Feed` class, like so::
+:class:`~thibaud.contrib.syndication.views.Feed` class, like so::
 
-    from django.utils.feedgenerator import Atom1Feed
+    from thibaud.utils.feedgenerator import Atom1Feed
 
 
     class MyFeed(Feed):
@@ -293,9 +293,9 @@ Note that you set ``feed_type`` to a class object, not an instance.
 
 Currently available feed types are:
 
-* :class:`django.utils.feedgenerator.Rss201rev2Feed` (RSS 2.01. Default.)
-* :class:`django.utils.feedgenerator.RssUserland091Feed` (RSS 0.91.)
-* :class:`django.utils.feedgenerator.Atom1Feed` (Atom 1.0.)
+* :class:`thibaud.utils.feedgenerator.Rss201rev2Feed` (RSS 2.01. Default.)
+* :class:`thibaud.utils.feedgenerator.RssUserland091Feed` (RSS 0.91.)
+* :class:`thibaud.utils.feedgenerator.Atom1Feed` (Atom 1.0.)
 
 Enclosures
 ----------
@@ -311,7 +311,7 @@ Language
 
 Feeds created by the syndication framework automatically include the
 appropriate ``<language>`` tag (RSS 2.0) or ``xml:lang`` attribute (Atom). By
-default, this is :func:`django.utils.translation.get_language()`. You can change it
+default, this is :func:`thibaud.utils.translation.get_language()`. You can change it
 by setting the ``language`` class attribute.
 
 URLs
@@ -332,14 +332,14 @@ Publishing Atom and RSS feeds in tandem
 
 Some developers like to make available both Atom *and* RSS versions of their
 feeds. To do that, you can create a subclass of your
-:class:`~django.contrib.syndication.views.Feed` class and set the ``feed_type``
+:class:`~thibaud.contrib.syndication.views.Feed` class and set the ``feed_type``
 to something different. Then update your URLconf to add the extra versions.
 
 Here's a full example::
 
-    from django.contrib.syndication.views import Feed
+    from thibaud.contrib.syndication.views import Feed
     from policebeat.models import NewsItem
-    from django.utils.feedgenerator import Atom1Feed
+    from thibaud.utils.feedgenerator import Atom1Feed
 
 
     class RssSiteNewsFeed(Feed):
@@ -361,7 +361,7 @@ Here's a full example::
     a feed-level "description," but they *do* provide for a "subtitle."
 
     If you provide a ``description`` in your
-    :class:`~django.contrib.syndication.views.Feed` class, Django will *not*
+    :class:`~thibaud.contrib.syndication.views.Feed` class, Thibaud will *not*
     automatically put that into the ``subtitle`` element, because a
     subtitle and description are not necessarily the same thing. Instead, you
     should define a ``subtitle`` attribute.
@@ -371,7 +371,7 @@ Here's a full example::
 
 And the accompanying URLconf::
 
-    from django.urls import path
+    from thibaud.urls import path
     from myproject.feeds import AtomSiteNewsFeed, RssSiteNewsFeed
 
     urlpatterns = [
@@ -387,15 +387,15 @@ And the accompanying URLconf::
 .. class:: views.Feed
 
 This example illustrates all possible attributes and methods for a
-:class:`~django.contrib.syndication.views.Feed` class::
+:class:`~thibaud.contrib.syndication.views.Feed` class::
 
-    from django.contrib.syndication.views import Feed
-    from django.utils import feedgenerator
+    from thibaud.contrib.syndication.views import Feed
+    from thibaud.utils import feedgenerator
 
 
     class ExampleFeed(Feed):
         # FEED TYPE -- Optional. This should be a class that subclasses
-        # django.utils.feedgenerator.SyndicationFeed. This designates
+        # thibaud.utils.feedgenerator.SyndicationFeed. This designates
         # which type of feed this should be: RSS 2.0, Atom 1.0, etc. If
         # you don't specify feed_type, your feed will be RSS 2.0. This
         # should be a class, not an instance of the class.
@@ -403,7 +403,7 @@ This example illustrates all possible attributes and methods for a
         feed_type = feedgenerator.Rss201rev2Feed
 
         # TEMPLATE NAMES -- Optional. These should be strings
-        # representing names of Django templates that the system should
+        # representing names of Thibaud templates that the system should
         # use in rendering the title and description of your feed items.
         # Both are optional. If a template is not specified, the
         # item_title() or item_description() methods are used instead.
@@ -412,7 +412,7 @@ This example illustrates all possible attributes and methods for a
         description_template = None
 
         # LANGUAGE -- Optional. This should be a string specifying a language
-        # code. Defaults to django.utils.translation.get_language().
+        # code. Defaults to thibaud.utils.translation.get_language().
         language = "de"
 
         # TITLE -- One of the following three is required. The framework
@@ -562,7 +562,7 @@ This example illustrates all possible attributes and methods for a
             Returns the feed's categories as iterable over strings.
             """
 
-        categories = ["python", "django"]  # Hard-coded list of categories.
+        categories = ["python", "thibaud"]  # Hard-coded list of categories.
 
         # COPYRIGHT NOTICE -- One of the following three is optional. The
         # framework looks for them in this order.
@@ -637,7 +637,7 @@ This example illustrates all possible attributes and methods for a
             """
             Takes the current request and the arguments from the URL, and
             returns an object represented by this feed. Raises
-            django.core.exceptions.ObjectDoesNotExist on error.
+            thibaud.core.exceptions.ObjectDoesNotExist on error.
             """
 
         # ITEM TITLE AND DESCRIPTION -- If title_template or
@@ -778,12 +778,12 @@ This example illustrates all possible attributes and methods for a
         def item_enclosures(self, item):
             """
             Takes an item, as returned by items(), and returns a list of
-            ``django.utils.feedgenerator.Enclosure`` objects.
+            ``thibaud.utils.feedgenerator.Enclosure`` objects.
             """
 
         def item_enclosures(self):
             """
-            Returns the ``django.utils.feedgenerator.Enclosure`` list for every
+            Returns the ``thibaud.utils.feedgenerator.Enclosure`` list for every
             item in the feed.
             """
 
@@ -894,7 +894,7 @@ This example illustrates all possible attributes and methods for a
             Returns the categories for every item in the feed.
             """
 
-        item_categories = ["python", "django"]  # Hard-coded categories.
+        item_categories = ["python", "thibaud"]  # Hard-coded categories.
 
         # ITEM COPYRIGHT NOTICE (only applicable to Atom feeds) -- One of the
         # following three is optional. The framework looks for them in this
@@ -935,26 +935,26 @@ The low-level framework
 
 Behind the scenes, the high-level RSS framework uses a lower-level framework
 for generating feeds' XML. This framework lives in a single module:
-:source:`django/utils/feedgenerator.py`.
+:source:`thibaud/utils/feedgenerator.py`.
 
 You use this framework on your own, for lower-level feed generation. You can
 also create custom feed generator subclasses for use with the ``feed_type``
 ``Feed`` option.
 
-.. currentmodule:: django.utils.feedgenerator
+.. currentmodule:: thibaud.utils.feedgenerator
 
 ``SyndicationFeed`` classes
 ---------------------------
 
-The :mod:`~django.utils.feedgenerator` module contains a base class:
+The :mod:`~thibaud.utils.feedgenerator` module contains a base class:
 
-* :class:`django.utils.feedgenerator.SyndicationFeed`
+* :class:`thibaud.utils.feedgenerator.SyndicationFeed`
 
 and several subclasses:
 
-* :class:`django.utils.feedgenerator.RssUserland091Feed`
-* :class:`django.utils.feedgenerator.Rss201rev2Feed`
-* :class:`django.utils.feedgenerator.Atom1Feed`
+* :class:`thibaud.utils.feedgenerator.RssUserland091Feed`
+* :class:`thibaud.utils.feedgenerator.Rss201rev2Feed`
+* :class:`thibaud.utils.feedgenerator.Atom1Feed`
 
 Each of these three classes knows how to render a certain type of feed as XML.
 They share this interface:
@@ -988,7 +988,7 @@ They share this interface:
 
     * ``categories`` should be a sequence of strings.
     * ``stylesheets`` should be a sequence of either strings or
-      :class:`~django.utils.feedgenerator.Stylesheet` instances.
+      :class:`~thibaud.utils.feedgenerator.Stylesheet` instances.
 
     Beware that some control characters are
     `not allowed <https://www.w3.org/International/questions/qa-controls>`_ in
@@ -1029,7 +1029,7 @@ They share this interface:
     * ``pubdate`` should be a Python  :class:`~datetime.datetime` object.
     * ``updateddate`` should be a Python  :class:`~datetime.datetime` object.
     * ``enclosures`` should be a list of
-      :class:`django.utils.feedgenerator.Enclosure` instances.
+      :class:`thibaud.utils.feedgenerator.Enclosure` instances.
     * ``categories`` should be a sequence of strings.
 
 :meth:`.SyndicationFeed.write`
@@ -1042,7 +1042,7 @@ For example, to create an Atom 1.0 feed and print it to standard output:
 
 .. code-block:: pycon
 
-    >>> from django.utils import feedgenerator
+    >>> from thibaud.utils import feedgenerator
     >>> from datetime import datetime
     >>> f = feedgenerator.Atom1Feed(
     ...     title="My Blog",
@@ -1064,7 +1064,7 @@ For example, to create an Atom 1.0 feed and print it to standard output:
     ...
     </feed>
 
-.. currentmodule:: django.contrib.syndication
+.. currentmodule:: thibaud.contrib.syndication
 
 Custom feed generators
 ----------------------
@@ -1140,7 +1140,7 @@ the feed class.
 
 This can be a hardcoded URL::
 
-    from django.contrib.syndication.views import Feed
+    from thibaud.contrib.syndication.views import Feed
 
 
     class FeedWithHardcodedStylesheet(Feed):
@@ -1148,10 +1148,10 @@ This can be a hardcoded URL::
             "https://example.com/rss_stylesheet.xslt",
         ]
 
-You can also use Django's static files system::
+You can also use Thibaud's static files system::
 
-    from django.contrib.syndication.views import Feed
-    from django.templatetags.static import static
+    from thibaud.contrib.syndication.views import Feed
+    from thibaud.templatetags.static import static
 
 
     class FeedWithStaticFileStylesheet(Feed):
@@ -1162,8 +1162,8 @@ You can also use Django's static files system::
 Another option is to have a view in your project that renders the XSLT
 document. You can then link it like so::
 
-    from django.contrib.syndication.views import Feed
-    from django.urls import reverse_lazy
+    from thibaud.contrib.syndication.views import Feed
+    from thibaud.urls import reverse_lazy
 
 
     class FeedWithStylesheetView(Feed):
@@ -1171,12 +1171,12 @@ document. You can then link it like so::
             reverse_lazy("your-custom-view-name"),
         ]
 
-Django will normally try to guess the MIME type of the given URL based on its
+Thibaud will normally try to guess the MIME type of the given URL based on its
 extension, but if that fails you can specify it using the
-:class:`~django.utils.feedgenerator.Stylesheet` class::
+:class:`~thibaud.utils.feedgenerator.Stylesheet` class::
 
-    from django.contrib.syndication.views import Feed
-    from django.utils.feedgenerator import Stylesheet
+    from thibaud.contrib.syndication.views import Feed
+    from thibaud.utils.feedgenerator import Stylesheet
 
 
     class FeedWithHardcodedStylesheet(Feed):
@@ -1185,11 +1185,11 @@ extension, but if that fails you can specify it using the
         ]
 
 Similarly, if you'd like to use a different ``media`` attribute than ``screen``
-(Django's default), you can use the
-:class:`~django.utils.feedgenerator.Stylesheet` class again::
+(Thibaud's default), you can use the
+:class:`~thibaud.utils.feedgenerator.Stylesheet` class again::
 
-    from django.contrib.syndication.views import Feed
-    from django.utils.feedgenerator import Stylesheet
+    from thibaud.contrib.syndication.views import Feed
+    from thibaud.utils.feedgenerator import Stylesheet
 
 
     class FeedWithHardcodedStylesheet(Feed):
@@ -1199,8 +1199,8 @@ Similarly, if you'd like to use a different ``media`` attribute than ``screen``
 
 Any of these options can be combined when using multiple stylesheets::
 
-    from django.contrib.syndication.views import Feed
-    from django.utils.feedgenerator import Stylesheet
+    from thibaud.contrib.syndication.views import Feed
+    from thibaud.utils.feedgenerator import Stylesheet
 
 
     class MultiStylesheetFeed(Feed):

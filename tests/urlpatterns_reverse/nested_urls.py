@@ -1,5 +1,5 @@
-from django.urls import include, path
-from django.views import View
+from thibaud.urls import include, path
+from thibaud.views import View
 
 
 def view1(request):

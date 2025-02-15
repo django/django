@@ -2,12 +2,12 @@
 File storage API
 ================
 
-.. module:: django.core.files.storage
+.. module:: thibaud.core.files.storage
 
 Getting the default storage class
 =================================
 
-Django provides convenient ways to access the default storage class:
+Thibaud provides convenient ways to access the default storage class:
 
 .. data:: storages
 
@@ -24,33 +24,33 @@ Django provides convenient ways to access the default storage class:
 
     .. code-block:: pycon
 
-        >>> from django.core.files.storage import storages
+        >>> from thibaud.core.files.storage import storages
         >>> storages.backends
-        {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
-         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+        {'default': {'BACKEND': 'thibaud.core.files.storage.FileSystemStorage'},
+         'staticfiles': {'BACKEND': 'thibaud.contrib.staticfiles.storage.StaticFilesStorage'},
          'custom': {'BACKEND': 'package.storage.CustomStorage'}}
         >>> storage_instance = storages.create_storage({"BACKEND": "package.storage.CustomStorage"})
 
 .. class:: DefaultStorage
 
-    :class:`~django.core.files.storage.DefaultStorage` provides
+    :class:`~thibaud.core.files.storage.DefaultStorage` provides
     lazy access to the default storage system as defined by ``default`` key in
     :setting:`STORAGES`. :class:`DefaultStorage` uses
-    :data:`~django.core.files.storage.storages` internally.
+    :data:`~thibaud.core.files.storage.storages` internally.
 
 .. data:: default_storage
 
-    :data:`~django.core.files.storage.default_storage` is an instance of the
-    :class:`~django.core.files.storage.DefaultStorage`.
+    :data:`~thibaud.core.files.storage.default_storage` is an instance of the
+    :class:`~thibaud.core.files.storage.DefaultStorage`.
 
 The ``FileSystemStorage`` class
 ===============================
 
 .. class:: FileSystemStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None, allow_overwrite=False)
 
-    The :class:`~django.core.files.storage.FileSystemStorage` class implements
+    The :class:`~thibaud.core.files.storage.FileSystemStorage` class implements
     basic file storage on a local filesystem. It inherits from
-    :class:`~django.core.files.storage.Storage` and provides implementations
+    :class:`~thibaud.core.files.storage.Storage` and provides implementations
     for all the public methods thereof.
 
     .. note::
@@ -95,7 +95,7 @@ The ``InMemoryStorage`` class
 
 .. class:: InMemoryStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
 
-    The :class:`~django.core.files.storage.InMemoryStorage` class implements
+    The :class:`~thibaud.core.files.storage.InMemoryStorage` class implements
     a memory-based file storage. It has no persistence, but can be useful for
     speeding up tests by avoiding disk access.
 
@@ -126,7 +126,7 @@ The ``Storage`` class
 
 .. class:: Storage
 
-    The :class:`~django.core.files.storage.Storage` class provides a
+    The :class:`~thibaud.core.files.storage.Storage` class provides a
     standardized API for storing files, along with a set of default
     behaviors that all other storage systems can inherit or override
     as necessary.
@@ -134,7 +134,7 @@ The ``Storage`` class
     .. note::
         When methods return naive ``datetime`` objects, the effective timezone
         used will be the current value of ``os.environ['TZ']``; note that this
-        is usually set from Django's :setting:`TIME_ZONE`.
+        is usually set from Thibaud's :setting:`TIME_ZONE`.
 
     .. method:: delete(name)
 
@@ -171,7 +171,7 @@ The ``Storage`` class
         The length of the filename will not exceed ``max_length``, if provided.
         If a free unique filename cannot be found, a
         :exc:`SuspiciousFileOperation
-        <django.core.exceptions.SuspiciousOperation>` exception will be raised.
+        <thibaud.core.exceptions.SuspiciousOperation>` exception will be raised.
 
         If a file with ``name`` already exists, :meth:`get_alternative_name` is
         called to obtain an alternative name.
@@ -205,7 +205,7 @@ The ``Storage`` class
         returns a filename to be passed to the :meth:`save` method.
 
         The ``filename`` argument may include a path as returned by
-        :attr:`FileField.upload_to <django.db.models.FileField.upload_to>`.
+        :attr:`FileField.upload_to <thibaud.db.models.FileField.upload_to>`.
         In that case, the path won't be passed to :attr:`get_valid_name()` but
         will be prepended back to the resulting name.
 
@@ -243,7 +243,7 @@ The ``Storage`` class
         :meth:`get_available_name`.
 
         The ``content`` argument must be an instance of
-        :class:`django.core.files.File` or a file-like object that can be
+        :class:`thibaud.core.files.File` or a file-like object that can be
         wrapped in ``File``.
 
     .. method:: size(name)

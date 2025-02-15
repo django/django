@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from thibaud.core.management.base import BaseCommand
 
 
 def module_to_dict(module, omittable=lambda k: k.startswith("_") or not k.isupper()):
@@ -7,7 +7,7 @@ def module_to_dict(module, omittable=lambda k: k.startswith("_") or not k.isuppe
 
 
 class Command(BaseCommand):
-    help = """Displays differences between the current settings.py and Django's
+    help = """Displays differences between the current settings.py and Thibaud's
     default settings."""
 
     requires_system_checks = []
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             metavar="MODULE",
             help=(
                 "The settings module to compare the current settings against. Leave "
-                "empty to compare against Django's default settings."
+                "empty to compare against Thibaud's default settings."
             ),
         )
         parser.add_argument(
@@ -43,7 +43,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
-        from django.conf import Settings, global_settings, settings
+        from thibaud.conf import Settings, global_settings, settings
 
         # Because settings are imported lazily, we need to explicitly load them.
         if not settings.configured:

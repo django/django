@@ -2,10 +2,10 @@ import copy
 import unittest
 from unittest import mock
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import NotSupportedError, ProgrammingError, connection
-from django.db.models import BooleanField
-from django.test import TestCase, TransactionTestCase
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import NotSupportedError, ProgrammingError, connection
+from thibaud.db.models import BooleanField
+from thibaud.test import TestCase, TransactionTestCase
 
 from ..models import VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
@@ -40,7 +40,7 @@ class Tests(TestCase):
     def test_dbms_session(self):
         """A stored procedure can be called through a cursor wrapper."""
         with connection.cursor() as cursor:
-            cursor.callproc("DBMS_SESSION.SET_IDENTIFIER", ["_django_testing!"])
+            cursor.callproc("DBMS_SESSION.SET_IDENTIFIER", ["_thibaud_testing!"])
 
     def test_cursor_var(self):
         """Cursor variables can be passed as query parameters."""
@@ -144,7 +144,7 @@ class TransactionalTests(TransactionTestCase):
     available_apps = ["backends"]
 
     def test_password_with_at_sign(self):
-        from django.db.backends.oracle.base import Database
+        from thibaud.db.backends.oracle.base import Database
 
         old_password = connection.settings_dict["PASSWORD"]
         connection.settings_dict["PASSWORD"] = "p@ssword"

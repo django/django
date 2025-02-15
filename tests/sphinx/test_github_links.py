@@ -1,7 +1,7 @@
 import pathlib
 import sys
 
-from django.test import SimpleTestCase
+from thibaud.test import SimpleTestCase
 
 
 def last_n_parts(path, n):
@@ -17,7 +17,7 @@ class GitHubLinkTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         # The file implementing the code under test is in the docs folder and
-        # is not part of the Django package. This means it cannot be imported
+        # is not part of the Thibaud package. This means it cannot be imported
         # through standard means. Include its parent in the pythonpath for the
         # duration of the tests to allow the code to be imported.
         cls.ext_path = str((pathlib.Path(__file__).parents[2] / "docs/_ext").resolve())
@@ -48,14 +48,14 @@ class I:
         self.assertEqual(locator.import_locations, {"b": "a", "c": "a", "e": ".d"})
 
     def test_module_name_to_file_path_package(self):
-        path = github_links.module_name_to_file_path("django")
+        path = github_links.module_name_to_file_path("thibaud")
 
-        self.assertEqual(last_n_parts(path, 2), "django/__init__.py")
+        self.assertEqual(last_n_parts(path, 2), "thibaud/__init__.py")
 
     def test_module_name_to_file_path_module(self):
-        path = github_links.module_name_to_file_path("django.shortcuts")
+        path = github_links.module_name_to_file_path("thibaud.shortcuts")
 
-        self.assertEqual(last_n_parts(path, 2), "django/shortcuts.py")
+        self.assertEqual(last_n_parts(path, 2), "thibaud/shortcuts.py")
 
     def test_get_path_and_line_class(self):
         path, line = github_links.get_path_and_line(
@@ -186,7 +186,7 @@ class I:
             github_links.github_linkcode_resolve(
                 "py", info, version="3.2", next_version="3.2"
             ),
-            "https://github.com/django/django/blob/main/tests/sphinx/"
+            "https://github.com/thibaud/thibaud/blob/main/tests/sphinx/"
             "testdata/package/module.py#L12",
         )
 
@@ -199,7 +199,7 @@ class I:
             github_links.github_linkcode_resolve(
                 "py", info, version="2.2", next_version="3.2"
             ),
-            "https://github.com/django/django/blob/stable/2.2.x/tests/sphinx/"
+            "https://github.com/thibaud/thibaud/blob/stable/2.2.x/tests/sphinx/"
             "testdata/package/module.py#L12",
         )
 

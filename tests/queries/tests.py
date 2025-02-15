@@ -4,15 +4,15 @@ import sys
 import unittest
 from operator import attrgetter
 
-from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
-from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import CharField, Count, Exists, F, Max, OuterRef, Q
-from django.db.models.expressions import RawSQL
-from django.db.models.functions import ExtractYear, Length, LTrim
-from django.db.models.sql.constants import LOUTER
-from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, register_lookup
+from thibaud.core.exceptions import EmptyResultSet, FieldError, FullResultSet
+from thibaud.db import DEFAULT_DB_ALIAS, connection
+from thibaud.db.models import CharField, Count, Exists, F, Max, OuterRef, Q
+from thibaud.db.models.expressions import RawSQL
+from thibaud.db.models.functions import ExtractYear, Length, LTrim
+from thibaud.db.models.sql.constants import LOUTER
+from thibaud.db.models.sql.where import AND, OR, NothingNode, WhereNode
+from thibaud.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from thibaud.test.utils import CaptureQueriesContext, register_lookup
 
 from .models import (
     FK1,
@@ -650,13 +650,13 @@ class Queries1Tests(TestCase):
 
         # Ordering by a many-valued attribute (e.g. a many-to-many or reverse
         # ForeignKey) is legal, but the results might not make sense. That
-        # isn't Django's problem. Garbage in, garbage out.
+        # isn't Thibaud's problem. Garbage in, garbage out.
         self.assertSequenceEqual(
             Item.objects.filter(tags__isnull=False).order_by("tags", "id"),
             [self.i1, self.i2, self.i1, self.i2, self.i4],
         )
 
-        # If we replace the default ordering, Django adjusts the required
+        # If we replace the default ordering, Thibaud adjusts the required
         # tables automatically. Item normally requires a join with Note to do
         # the default ordering, but that isn't needed here.
         qs = Item.objects.order_by("name")
@@ -1272,7 +1272,7 @@ class Queries1Tests(TestCase):
         )
 
     def test_ticket_20250(self):
-        # A negated Q along with an annotated queryset failed in Django 1.4
+        # A negated Q along with an annotated queryset failed in Thibaud 1.4
         qs = Author.objects.annotate(Count("item"))
         qs = qs.filter(~Q(extra__value=0)).order_by("name")
 
@@ -1856,7 +1856,7 @@ class Queries5Tests(TestCase):
         # fields and model fields in the ordering.
         self.assertSequenceEqual(
             Ranking.objects.extra(
-                tables=["django_site"], order_by=["-django_site.id", "rank"]
+                tables=["thibaud_site"], order_by=["-thibaud_site.id", "rank"]
             ),
             [self.rank1, self.rank2, self.rank3],
         )
@@ -1896,7 +1896,7 @@ class Queries5Tests(TestCase):
 
     def test_ticket7045(self):
         # Extra tables used to crash SQL construction on the second use.
-        qs = Ranking.objects.extra(tables=["django_site"])
+        qs = Ranking.objects.extra(tables=["thibaud_site"])
         qs.query.get_compiler(qs.db).as_sql()
         # test passes if this doesn't raise an exception.
         qs.query.get_compiler(qs.db).as_sql()
@@ -1975,7 +1975,7 @@ class Queries5Tests(TestCase):
 
     def test_filter_unsaved_object(self):
         msg = "Model instances passed to related filters must be saved."
-        company = Company.objects.create(name="Django")
+        company = Company.objects.create(name="Thibaud")
         with self.assertRaisesMessage(ValueError, msg):
             Employment.objects.filter(employer=Company(name="unsaved"))
         with self.assertRaisesMessage(ValueError, msg):
@@ -3352,7 +3352,7 @@ class ExcludeTests(TestCase):
         )
 
     def test_exclude_unsaved_object(self):
-        company = Company.objects.create(name="Django")
+        company = Company.objects.create(name="Thibaud")
         msg = "Model instances passed to related filters must be saved."
         with self.assertRaisesMessage(ValueError, msg):
             Employment.objects.exclude(employer=Company(name="unsaved"))

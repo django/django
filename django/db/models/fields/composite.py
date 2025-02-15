@@ -1,9 +1,9 @@
 import json
 
-from django.core import checks
-from django.db.models import NOT_PROVIDED, Field
-from django.db.models.expressions import ColPairs
-from django.db.models.fields.tuple_lookups import (
+from thibaud.core import checks
+from thibaud.db.models import NOT_PROVIDED, Field
+from thibaud.db.models.expressions import ColPairs
+from thibaud.db.models.fields.tuple_lookups import (
     TupleExact,
     TupleGreaterThan,
     TupleGreaterThanOrEqual,
@@ -12,7 +12,7 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThan,
     TupleLessThanOrEqual,
 )
-from django.utils.functional import cached_property
+from thibaud.utils.functional import cached_property
 
 
 class AttributeSetter:

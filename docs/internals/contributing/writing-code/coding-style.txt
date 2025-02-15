@@ -2,7 +2,7 @@
 Coding style
 ============
 
-Please follow these coding standards when writing code for inclusion in Django.
+Please follow these coding standards when writing code for inclusion in Thibaud.
 
 .. _coding-style-pre-commit:
 
@@ -47,7 +47,7 @@ Python style
 
   Use :pypi:`flake8` to check for problems in this area. Note that our
   ``.flake8`` file contains some excluded files (deprecated modules we don't
-  care about cleaning up and some third-party code that Django vendors) as well
+  care about cleaning up and some third-party code that Thibaud vendors) as well
   as some excluded errors that we don't consider as gross violations. Remember
   that :pep:`8` is only a guide, so respect the style of the surrounding code
   as a primary goal.
@@ -101,8 +101,8 @@ Python style
 * In docstrings, follow the style of existing docstrings and :pep:`257`.
 
 * In tests, use
-  :meth:`~django.test.SimpleTestCase.assertRaisesMessage` and
-  :meth:`~django.test.SimpleTestCase.assertWarnsMessage`
+  :meth:`~thibaud.test.SimpleTestCase.assertRaisesMessage` and
+  :meth:`~thibaud.test.SimpleTestCase.assertWarnsMessage`
   instead of :meth:`~unittest.TestCase.assertRaises` and
   :meth:`~unittest.TestCase.assertWarns` so you can check the
   exception or warning message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
@@ -148,10 +148,10 @@ Imports
       import module  # isort:skip
 
 * Put imports in these groups: future, standard library, third-party libraries,
-  other Django components, local Django component, try/excepts. Sort lines in
+  other Thibaud components, local Thibaud component, try/excepts. Sort lines in
   each group alphabetically by the full module name. Place all ``import module``
   statements before ``from module import objects`` in each section. Use absolute
-  imports for other Django components and relative imports for local components.
+  imports for other Thibaud components and relative imports for local components.
 
 * On each line, alphabetize the items with the upper case items grouped before
   the lowercase items.
@@ -166,7 +166,7 @@ Imports
   For example (comments are for explanatory purposes only):
 
   .. code-block:: python
-      :caption: ``django/contrib/admin/example.py``
+      :caption: ``thibaud/contrib/admin/example.py``
 
       # future
       from __future__ import unicode_literals
@@ -178,9 +178,9 @@ Imports
       # third-party
       import bcrypt
 
-      # Django
-      from django.http import Http404
-      from django.http.response import (
+      # Thibaud
+      from thibaud.http import Http404
+      from thibaud.http.response import (
           Http404,
           HttpResponse,
           HttpResponseNotAllowed,
@@ -188,7 +188,7 @@ Imports
           cookie,
       )
 
-      # local Django
+      # local Thibaud
       from .models import LogEntry
 
       # try/except
@@ -205,22 +205,22 @@ Imports
 * Use convenience imports whenever available. For example, do this
   ::
 
-      from django.views import View
+      from thibaud.views import View
 
   instead of::
 
-      from django.views.generic.base import View
+      from thibaud.views.generic.base import View
 
 Template style
 ==============
 
-Follow the below rules in Django template code.
+Follow the below rules in Thibaud template code.
 
 * ``{% extends %}`` should be the first non-comment line.
 
   Do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% extends "base.html" %}
 
@@ -232,7 +232,7 @@ Follow the below rules in Django template code.
 
   Or this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {# This is a comment #}
       {% extends "base.html" %}
@@ -245,7 +245,7 @@ Follow the below rules in Django template code.
 
   Don't do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% load i18n %}
       {% extends "base.html" %}
@@ -260,13 +260,13 @@ Follow the below rules in Django template code.
 
   Do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {{ user }}
 
   Don't do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {{user}}
 
@@ -274,13 +274,13 @@ Follow the below rules in Django template code.
 
   Do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% load i18n l10 tz %}
 
   Don't do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% load l10 i18n tz %}
 
@@ -288,13 +288,13 @@ Follow the below rules in Django template code.
 
   Do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% load humanize %}
 
   Don't do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {%load humanize%}
 
@@ -303,7 +303,7 @@ Follow the below rules in Django template code.
 
   Do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% block header %}
 
@@ -313,7 +313,7 @@ Follow the below rules in Django template code.
 
   Don't do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% block header %}
 
@@ -326,13 +326,13 @@ Follow the below rules in Django template code.
 
   Do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
     {% if user.name|lower == "admin" %}
 
   Don't do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
     {% if user . name | lower  ==  "admin" %}
 
@@ -343,7 +343,7 @@ Follow the below rules in Django template code.
 
   Do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% extends "base.html" %}
 
@@ -351,7 +351,7 @@ Follow the below rules in Django template code.
 
   Don't do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
       {% extends "base.html" %}
 
@@ -361,7 +361,7 @@ Follow the below rules in Django template code.
 View style
 ==========
 
-* In Django views, the first parameter in a view function should be called
+* In Thibaud views, the first parameter in a view function should be called
   ``request``.
 
   Do this::
@@ -441,10 +441,10 @@ Model style
             UP = "U", "Up"
             DOWN = "D", "Down"
 
-Use of ``django.conf.settings``
+Use of ``thibaud.conf.settings``
 ===============================
 
-Modules should not in general use settings stored in ``django.conf.settings``
+Modules should not in general use settings stored in ``thibaud.conf.settings``
 at the top level (i.e. evaluated when the module is imported). The explanation
 for this is as follows:
 
@@ -452,7 +452,7 @@ Manual configuration of settings (i.e. not relying on the
 :envvar:`DJANGO_SETTINGS_MODULE` environment variable) is allowed and possible
 as follows::
 
-    from django.conf import settings
+    from thibaud.conf import settings
 
     settings.configure({}, SOME_SETTING="foo")
 
@@ -463,8 +463,8 @@ already been configured).
 
 So, if there is a module containing some code as follows::
 
-    from django.conf import settings
-    from django.urls import get_callable
+    from thibaud.conf import settings
+    from thibaud.urls import get_callable
 
     default_foo_view = get_callable(settings.FOO_VIEW)
 
@@ -474,8 +474,8 @@ level is incompatible with the ability to configure the settings object
 manually, or makes it very difficult in some circumstances.
 
 Instead of the above code, a level of laziness or indirection must be used,
-such as ``django.utils.functional.LazyObject``,
-``django.utils.functional.lazy()`` or ``lambda``.
+such as ``thibaud.utils.functional.LazyObject``,
+``thibaud.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
 =============
@@ -495,7 +495,7 @@ Miscellaneous
   highlight them in diff outputs.
 
 * Please don't put your name in the code you contribute. Our policy is to
-  keep contributors' names in the ``AUTHORS`` file distributed with Django
+  keep contributors' names in the ``AUTHORS`` file distributed with Thibaud
   -- not scattered throughout the codebase itself. Feel free to include a
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
@@ -503,7 +503,7 @@ Miscellaneous
 JavaScript style
 ================
 
-For details about the JavaScript code style used by Django, see
+For details about the JavaScript code style used by Thibaud, see
 :doc:`javascript`.
 
 .. _editorconfig: https://editorconfig.org/

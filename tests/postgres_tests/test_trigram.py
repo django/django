@@ -1,11 +1,11 @@
-from django.db.models import F, Value
-from django.db.models.functions import Concat
+from thibaud.db.models import F, Value
+from thibaud.db.models.functions import Concat
 
 from . import PostgreSQLTestCase
 from .models import CharFieldModel, TextFieldModel
 
 try:
-    from django.contrib.postgres.search import (
+    from thibaud.contrib.postgres.search import (
         TrigramDistance,
         TrigramSimilarity,
         TrigramStrictWordDistance,

@@ -7,18 +7,18 @@ from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
 from urllib.parse import urlsplit
 
-from django import forms
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.admin import helpers, widgets
-from django.contrib.admin.checks import (
+from thibaud import forms
+from thibaud.conf import settings
+from thibaud.contrib import messages
+from thibaud.contrib.admin import helpers, widgets
+from thibaud.contrib.admin.checks import (
     BaseModelAdminChecks,
     InlineModelAdminChecks,
     ModelAdminChecks,
 )
-from django.contrib.admin.exceptions import DisallowedModelAdminToField, NotRegistered
-from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.utils import (
+from thibaud.contrib.admin.exceptions import DisallowedModelAdminToField, NotRegistered
+from thibaud.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from thibaud.contrib.admin.utils import (
     NestedObjects,
     construct_change_message,
     flatten_fieldsets,
@@ -29,46 +29,46 @@ from django.contrib.admin.utils import (
     quote,
     unquote,
 )
-from django.contrib.admin.widgets import AutocompleteSelect, AutocompleteSelectMultiple
-from django.contrib.auth import get_permission_codename
-from django.core.exceptions import (
+from thibaud.contrib.admin.widgets import AutocompleteSelect, AutocompleteSelectMultiple
+from thibaud.contrib.auth import get_permission_codename
+from thibaud.core.exceptions import (
     FieldDoesNotExist,
     FieldError,
     PermissionDenied,
     ValidationError,
 )
-from django.core.paginator import Paginator
-from django.db import models, router, transaction
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.functions import Cast
-from django.forms.formsets import DELETION_FIELD_NAME, all_valid
-from django.forms.models import (
+from thibaud.core.paginator import Paginator
+from thibaud.db import models, router, transaction
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.functions import Cast
+from thibaud.forms.formsets import DELETION_FIELD_NAME, all_valid
+from thibaud.forms.models import (
     BaseInlineFormSet,
     inlineformset_factory,
     modelform_defines_fields,
     modelform_factory,
     modelformset_factory,
 )
-from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
-from django.http import HttpResponseRedirect
-from django.http.response import HttpResponseBase
-from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.utils.html import format_html
-from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
-from django.utils.text import (
+from thibaud.forms.widgets import CheckboxSelectMultiple, SelectMultiple
+from thibaud.http import HttpResponseRedirect
+from thibaud.http.response import HttpResponseBase
+from thibaud.template.response import SimpleTemplateResponse, TemplateResponse
+from thibaud.urls import reverse
+from thibaud.utils.decorators import method_decorator
+from thibaud.utils.html import format_html
+from thibaud.utils.http import urlencode
+from thibaud.utils.safestring import mark_safe
+from thibaud.utils.text import (
     capfirst,
     format_lazy,
     get_text_list,
     smart_split,
     unescape_string_literal,
 )
-from django.utils.translation import gettext as _
-from django.utils.translation import ngettext
-from django.views.decorators.csrf import csrf_protect
-from django.views.generic import RedirectView
+from thibaud.utils.translation import gettext as _
+from thibaud.utils.translation import ngettext
+from thibaud.views.decorators.csrf import csrf_protect
+from thibaud.views.generic import RedirectView
 
 IS_POPUP_VAR = "_popup"
 TO_FIELD_VAR = "_to_field"
@@ -87,7 +87,7 @@ HORIZONTAL, VERTICAL = 1, 2
 def get_content_type_for_model(obj):
     # Since this module gets imported in the application's root package,
     # it cannot import models from other applications at the module level.
-    from django.contrib.contenttypes.models import ContentType
+    from thibaud.contrib.contenttypes.models import ContentType
 
     return ContentType.objects.get_for_model(obj, for_concrete_model=False)
 
@@ -447,7 +447,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         )
 
     def lookup_allowed(self, lookup, value, request):
-        from django.contrib.admin.filters import SimpleListFilter
+        from thibaud.contrib.admin.filters import SimpleListFilter
 
         model = self.model
         # Check FKey lookups that are allowed, so that popups produced by
@@ -568,7 +568,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     def has_change_permission(self, request, obj=None):
         """
         Return True if the given request has permission to change the given
-        Django model instance, the default implementation doesn't examine the
+        Thibaud model instance, the default implementation doesn't examine the
         `obj` parameter.
 
         Can be overridden by the user in subclasses. In such case it should
@@ -583,7 +583,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     def has_delete_permission(self, request, obj=None):
         """
         Return True if the given request has permission to delete the given
-        Django model instance, the default implementation doesn't examine the
+        Thibaud model instance, the default implementation doesn't examine the
         `obj` parameter.
 
         Can be overridden by the user in subclasses. In such case it should
@@ -598,7 +598,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     def has_view_permission(self, request, obj=None):
         """
         Return True if the given request has permission to view the given
-        Django model instance. The default implementation doesn't examine the
+        Thibaud model instance. The default implementation doesn't examine the
         `obj` parameter.
 
         If overridden by the user in subclasses, it should return True if the
@@ -703,7 +703,7 @@ class ModelAdmin(BaseModelAdmin):
         return inline_instances
 
     def get_urls(self):
-        from django.urls import path
+        from thibaud.urls import path
 
         def wrap(view):
             def wrapper(*args, **kwargs):
@@ -839,7 +839,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         Return the ChangeList class for use on the changelist page.
         """
-        from django.contrib.admin.views.main import ChangeList
+        from thibaud.contrib.admin.views.main import ChangeList
 
         return ChangeList
 
@@ -939,7 +939,7 @@ class ModelAdmin(BaseModelAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
-        from django.contrib.admin.models import ADDITION, LogEntry
+        from thibaud.contrib.admin.models import ADDITION, LogEntry
 
         return LogEntry.objects.log_actions(
             user_id=request.user.pk,
@@ -955,7 +955,7 @@ class ModelAdmin(BaseModelAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
-        from django.contrib.admin.models import CHANGE, LogEntry
+        from thibaud.contrib.admin.models import CHANGE, LogEntry
 
         return LogEntry.objects.log_actions(
             user_id=request.user.pk,
@@ -972,7 +972,7 @@ class ModelAdmin(BaseModelAdmin):
 
         The default implementation creates admin LogEntry objects.
         """
-        from django.contrib.admin.models import DELETION, LogEntry
+        from thibaud.contrib.admin.models import DELETION, LogEntry
 
         return LogEntry.objects.log_actions(
             user_id=request.user.pk,
@@ -1236,7 +1236,7 @@ class ModelAdmin(BaseModelAdmin):
     ):
         """
         Send a message to the user. The default implementation
-        posts a message using the django.contrib.messages backend.
+        posts a message using the thibaud.contrib.messages backend.
 
         Exposes almost the same API as messages.add_message(), but accepts the
         positional arguments in a different order to maintain backwards
@@ -1973,7 +1973,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         The 'change list' admin view for this model.
         """
-        from django.contrib.admin.views.main import ERROR_FLAG
+        from thibaud.contrib.admin.views.main import ERROR_FLAG
 
         app_label = self.opts.app_label
         if not self.has_view_or_change_permission(request):
@@ -2232,8 +2232,8 @@ class ModelAdmin(BaseModelAdmin):
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
-        from django.contrib.admin.models import LogEntry
-        from django.contrib.admin.views.main import PAGE_VAR
+        from thibaud.contrib.admin.models import LogEntry
+        from thibaud.contrib.admin.views.main import PAGE_VAR
 
         # First check if the user can see this history.
         model = self.model

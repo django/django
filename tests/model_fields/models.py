@@ -2,16 +2,16 @@ import json
 import tempfile
 import uuid
 
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.core.files.storage import FileSystemStorage
-from django.core.serializers.json import DjangoJSONEncoder
-from django.db import connection, models
-from django.db.models import F, Value
-from django.db.models.fields.files import ImageFieldFile
-from django.db.models.functions import Lower
-from django.utils.functional import SimpleLazyObject
-from django.utils.translation import gettext_lazy as _
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core.files.storage import FileSystemStorage
+from thibaud.core.serializers.json import ThibaudJSONEncoder
+from thibaud.db import connection, models
+from thibaud.db.models import F, Value
+from thibaud.db.models.fields.files import ImageFieldFile
+from thibaud.db.models.functions import Lower
+from thibaud.utils.functional import SimpleLazyObject
+from thibaud.utils.translation import gettext_lazy as _
 
 from .storage import NoReadFileSystemStorage
 
@@ -413,7 +413,7 @@ class JSONModel(models.Model):
 class NullableJSONModel(models.Model):
     value = models.JSONField(blank=True, null=True)
     value_custom = models.JSONField(
-        encoder=DjangoJSONEncoder,
+        encoder=ThibaudJSONEncoder,
         decoder=CustomJSONDecoder,
         null=True,
     )

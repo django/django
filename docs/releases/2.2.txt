@@ -1,90 +1,90 @@
 ========================
-Django 2.2 release notes
+Thibaud 2.2 release notes
 ========================
 
 *April 1, 2019*
 
-Welcome to Django 2.2!
+Welcome to Thibaud 2.2!
 
 These release notes cover the :ref:`new features <whats-new-2.2>`, as well as
 some :ref:`backwards incompatible changes <backwards-incompatible-2.2>` you'll
-want to be aware of when upgrading from Django 2.1 or earlier. We've
+want to be aware of when upgrading from Thibaud 2.1 or earlier. We've
 :ref:`begun the deprecation process for some features
 <deprecated-features-2.2>`.
 
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 2.2 is designated as a :term:`long-term support release
+Thibaud 2.2 is designated as a :term:`long-term support release
 <Long-term support release>`. It will receive security updates for at least
-three years after its release. Support for the previous LTS, Django 1.11, will
+three years after its release. Support for the previous LTS, Thibaud 1.11, will
 end in April 2020.
 
 Python compatibility
 ====================
 
-Django 2.2 supports Python 3.5, 3.6, 3.7, 3.8 (as of 2.2.8), and 3.9 (as of
+Thibaud 2.2 supports Python 3.5, 3.6, 3.7, 3.8 (as of 2.2.8), and 3.9 (as of
 2.2.17). We **highly recommend** and only officially support the latest release
 of each series.
 
 .. _whats-new-2.2:
 
-What's new in Django 2.2
+What's new in Thibaud 2.2
 ========================
 
 Constraints
 -----------
 
-The new :class:`~django.db.models.CheckConstraint` and
-:class:`~django.db.models.UniqueConstraint` classes enable adding custom
+The new :class:`~thibaud.db.models.CheckConstraint` and
+:class:`~thibaud.db.models.UniqueConstraint` classes enable adding custom
 database constraints. Constraints are added to models using the
-:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+:attr:`Meta.constraints <thibaud.db.models.Options.constraints>` option.
 
 Minor features
 --------------
 
-:mod:`django.contrib.admin`
+:mod:`thibaud.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added a CSS class to the column headers of
-  :class:`~django.contrib.admin.TabularInline`.
+  :class:`~thibaud.contrib.admin.TabularInline`.
 
-:mod:`django.contrib.auth`
+:mod:`thibaud.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The ``HttpRequest`` is now passed as the first positional argument to
   :meth:`.RemoteUserBackend.configure_user`, if it accepts it.
 
-:mod:`django.contrib.gis`
+:mod:`thibaud.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added Oracle support for the
-  :class:`~django.contrib.gis.db.models.functions.Envelope` function.
+  :class:`~thibaud.contrib.gis.db.models.functions.Envelope` function.
 
 * Added SpatiaLite support for the :lookup:`coveredby` and :lookup:`covers`
   lookups.
 
-:mod:`django.contrib.postgres`
+:mod:`thibaud.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``ordering`` argument for
-  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
-  :class:`~django.contrib.postgres.aggregates.StringAgg` determines the
+  :class:`~thibaud.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~thibaud.contrib.postgres.aggregates.StringAgg` determines the
   ordering of the aggregated elements.
 
-* The new :class:`~django.contrib.postgres.indexes.BTreeIndex`,
-  :class:`~django.contrib.postgres.indexes.HashIndex` and
-  :class:`~django.contrib.postgres.indexes.SpGistIndex` classes allow
+* The new :class:`~thibaud.contrib.postgres.indexes.BTreeIndex`,
+  :class:`~thibaud.contrib.postgres.indexes.HashIndex` and
+  :class:`~thibaud.contrib.postgres.indexes.SpGistIndex` classes allow
   creating ``B-Tree``, ``hash``, and ``SP-GiST`` indexes in the database.
 
-* :class:`~django.contrib.postgres.indexes.BrinIndex` now has the
+* :class:`~thibaud.contrib.postgres.indexes.BrinIndex` now has the
   ``autosummarize`` parameter.
 
 * The new ``search_type`` parameter of
-  :class:`~django.contrib.postgres.search.SearchQuery` allows searching for
+  :class:`~thibaud.contrib.postgres.search.SearchQuery` allows searching for
   a phrase or raw expression.
 
-:mod:`django.contrib.staticfiles`
+:mod:`thibaud.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added path matching to the :option:`collectstatic --ignore` option so that
@@ -98,9 +98,9 @@ Database backends
 Generic Views
 ~~~~~~~~~~~~~
 
-* The new :meth:`View.setup <django.views.generic.base.View.setup>` hook
+* The new :meth:`View.setup <thibaud.views.generic.base.View.setup>` hook
   initializes view attributes before calling
-  :meth:`~django.views.generic.base.View.dispatch`. It allows mixins to set up
+  :meth:`~thibaud.views.generic.base.View.dispatch`. It allows mixins to set up
   instance attributes for reuse in child classes.
 
 Internationalization
@@ -123,8 +123,8 @@ Management Commands
   models for partition tables on PostgreSQL. In older versions, models are
   created child tables instead the parent.
 
-* :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
-  for Oracle and PostgreSQL, and :class:`~django.db.models.AutoField` for
+* :djadmin:`inspectdb` now introspects :class:`~thibaud.db.models.DurationField`
+  for Oracle and PostgreSQL, and :class:`~thibaud.db.models.AutoField` for
   SQLite.
 
 * On Oracle, :djadmin:`dbshell` is wrapped with ``rlwrap``, if available.
@@ -156,33 +156,33 @@ Models
 
 * Added support for partial indexes (:attr:`.Index.condition`).
 
-* Added the :class:`~django.db.models.functions.NullIf` and
-  :class:`~django.db.models.functions.Reverse` database functions, as well as
+* Added the :class:`~thibaud.db.models.functions.NullIf` and
+  :class:`~thibaud.db.models.functions.Reverse` database functions, as well as
   many :ref:`math database functions <math-functions>`.
 
 * Setting the new ``ignore_conflicts`` parameter of
   :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
   failure to insert rows that fail uniqueness constraints or other checks.
 
-* The new :class:`~django.db.models.functions.ExtractIsoYear` function extracts
-  ISO-8601 week-numbering years from :class:`~django.db.models.DateField` and
-  :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_year`
+* The new :class:`~thibaud.db.models.functions.ExtractIsoYear` function extracts
+  ISO-8601 week-numbering years from :class:`~thibaud.db.models.DateField` and
+  :class:`~thibaud.db.models.DateTimeField`, and the new :lookup:`iso_year`
   lookup allows querying by an ISO-8601 week-numbering year.
 
 * The new :meth:`.QuerySet.bulk_update` method allows efficiently updating
   specific fields on multiple model instances.
 
-* Django no longer always starts a transaction when a single query is being
+* Thibaud no longer always starts a transaction when a single query is being
   performed, such as ``Model.save()``, ``QuerySet.update()``, and
   ``Model.delete()``. This improves the performance of autocommit by reducing
   the number of database round trips.
 
-* Added SQLite support for the :class:`~django.db.models.StdDev` and
-  :class:`~django.db.models.Variance` functions.
+* Added SQLite support for the :class:`~thibaud.db.models.StdDev` and
+  :class:`~thibaud.db.models.Variance` functions.
 
 * The handling of ``DISTINCT`` aggregation is added to the
-  :class:`~django.db.models.Aggregate` class. Adding :attr:`allow_distinct =
-  True <django.db.models.Aggregate.allow_distinct>` as a class attribute on
+  :class:`~thibaud.db.models.Aggregate` class. Adding :attr:`allow_distinct =
+  True <thibaud.db.models.Aggregate.allow_distinct>` as a class attribute on
   ``Aggregate`` subclasses allows a ``distinct`` keyword argument to be
   specified on initialization to ensure that the aggregate function is only
   called for each distinct value of ``expressions``.
@@ -215,7 +215,7 @@ Tests
   URL, ignoring the ordering of the query string.
   :meth:`~.SimpleTestCase.assertRedirects` uses the new assertion.
 
-* The test :class:`~.django.test.Client` now supports automatic JSON
+* The test :class:`~.thibaud.test.Client` now supports automatic JSON
   serialization of list and tuple ``data`` when
   ``content_type='application/json'``.
 
@@ -223,12 +223,12 @@ Tests
   database setting allows using Oracle Managed Files (OMF) tablespaces.
 
 * Deferrable database constraints are now checked at the end of each
-  :class:`~django.test.TestCase` test on SQLite 3.20+, just like on other
+  :class:`~thibaud.test.TestCase` test on SQLite 3.20+, just like on other
   backends that support deferrable constraints. These checks aren't implemented
   for older versions of SQLite because they would require expensive table
   introspection there.
 
-* :class:`~django.test.runner.DiscoverRunner` now skips the setup of databases
+* :class:`~thibaud.test.runner.DiscoverRunner` now skips the setup of databases
   not :ref:`referenced by tests<testing-multi-db>`.
 
 URLs
@@ -279,7 +279,7 @@ backends.
   ``DatabaseIntrospection.get_constraints()`` returns must be normalized by
   ``identifier_converter()``.
 
-* SQL generation for indexes is moved from :class:`~django.db.models.Index` to
+* SQL generation for indexes is moved from :class:`~thibaud.db.models.Index` to
   ``SchemaEditor`` and these ``SchemaEditor`` methods are added:
 
   * ``_create_primary_key_sql()`` and ``_delete_primary_key_sql()``
@@ -294,9 +294,9 @@ backends.
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
 
-For example, in older versions of Django::
+For example, in older versions of Thibaud::
 
-    from django.contrib import admin
+    from thibaud.contrib import admin
 
 
     class BaseAdmin(admin.ModelAdmin):
@@ -314,7 +314,7 @@ before::
     class SubAdmin(BaseAdmin):
         actions = BaseAdmin.actions + ["b"]
 
-:mod:`django.contrib.gis`
+:mod:`thibaud.contrib.gis`
 -------------------------
 
 * Support for GDAL 1.9 and 1.10 is dropped.
@@ -323,26 +323,26 @@ before::
 -----------------------------------------------
 
 Initial data migrations are now loaded in
-:class:`~django.test.TransactionTestCase` at the end of the test, after the
+:class:`~thibaud.test.TransactionTestCase` at the end of the test, after the
 database flush. In older versions, this data was loaded at the beginning of the
 test, but this prevents the :option:`test --keepdb` option from working
 properly (the database was empty at the end of the whole test suite). This
 change shouldn't have an impact on your tests unless you've customized
-:class:`~django.test.TransactionTestCase`'s internals.
+:class:`~thibaud.test.TransactionTestCase`'s internals.
 
 ``sqlparse`` is required dependency
 -----------------------------------
 
-To simplify a few parts of Django's database handling, :pypi:`sqlparse 0.2.2+
+To simplify a few parts of Thibaud's database handling, :pypi:`sqlparse 0.2.2+
 <sqlparse>` is now a required dependency. It's automatically installed along
-with Django.
+with Thibaud.
 
 ``cached_property`` aliases
 ---------------------------
 
 In usage like::
 
-    from django.utils.functional import cached_property
+    from thibaud.utils.functional import cached_property
 
 
     class A:
@@ -398,7 +398,7 @@ incorrectly (where the old algorithm produced results correctly by
 coincidence).
 
 Audit all ``Media`` classes for any missing dependencies. For example,
-widgets depending on ``django.jQuery`` must specify
+widgets depending on ``thibaud.jQuery`` must specify
 ``js=['admin/js/jquery.init.js', ...]`` when :ref:`declaring form media assets
 <assets-as-a-static-definition>`.
 
@@ -417,7 +417,7 @@ Miscellaneous
 * For consistency with WSGI servers, the test client now sets the
   ``Content-Length`` header to a string rather than an integer.
 
-* The return value of :func:`django.utils.text.slugify` is no longer marked as
+* The return value of :func:`thibaud.utils.text.slugify` is no longer marked as
   HTML safe.
 
 * The default truncation character used by the :tfilter:`urlizetrunc`,
@@ -428,8 +428,8 @@ Miscellaneous
 
 * Support for bytestring paths in the template filesystem loader is removed.
 
-* :func:`django.utils.http.urlsafe_base64_encode` now returns a string instead
-  of a bytestring, and :func:`django.utils.http.urlsafe_base64_decode` may no
+* :func:`thibaud.utils.http.urlsafe_base64_encode` now returns a string instead
+  of a bytestring, and :func:`thibaud.utils.http.urlsafe_base64_decode` may no
   longer be passed a bytestring.
 
 * Support for ``cx_Oracle`` < 6.0 is removed.
@@ -444,32 +444,32 @@ Miscellaneous
   of ``1``, ``2``, and ``3``. For backwards compatibility, the old values are
   still accepted as data.
 
-* :attr:`Group.name <django.contrib.auth.models.Group.name>` ``max_length``
+* :attr:`Group.name <thibaud.contrib.auth.models.Group.name>` ``max_length``
   is increased from 80 to 150 characters.
 
 * Tests that violate deferrable database constraints now error when run on
   SQLite 3.20+, just like on other backends that support such constraints.
 
-* To catch usage mistakes, the test :class:`~django.test.Client` and
-  :func:`django.utils.http.urlencode` now raise ``TypeError`` if ``None`` is
+* To catch usage mistakes, the test :class:`~thibaud.test.Client` and
+  :func:`thibaud.utils.http.urlencode` now raise ``TypeError`` if ``None`` is
   passed as a value to encode because ``None`` can't be encoded in GET and POST
   data. Either pass an empty string or omit the value.
 
 * The ``ping_google`` management command now defaults to ``https``
   instead of ``http`` for the sitemap's URL. If your site uses http, use the
   new ``ping_google --sitemap-uses-http`` option. If you use the
-  ``django.contrib.sitemaps.ping_google`` function, set the new
+  ``thibaud.contrib.sitemaps.ping_google`` function, set the new
   ``sitemap_uses_https`` argument to ``False``.
 
 * :djadmin:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).
 
-* The :class:`~django.db.models.Avg`, :class:`~django.db.models.StdDev`, and
-  :class:`~django.db.models.Variance` aggregate functions now return a
+* The :class:`~thibaud.db.models.Avg`, :class:`~thibaud.db.models.StdDev`, and
+  :class:`~thibaud.db.models.Variance` aggregate functions now return a
   ``Decimal`` instead of a ``float`` when the input is ``Decimal``.
 
 * Tests will fail on SQLite if apps without migrations have relations to apps
   with migrations. This has been a documented restriction since migrations were
-  added in Django 1.7, but it fails more reliably now. You'll see tests failing
+  added in Thibaud 1.7, but it fails more reliably now. You'll see tests failing
   with errors like ``no such table: <app_label>_<model>``. This was observed
   with several third-party apps that had models in tests without migrations.
   You must add migrations for such models.
@@ -483,7 +483,7 @@ Miscellaneous
   .. note::
 
     The ability to handle ``.po`` files containing different plural equations
-    for the same language was added in Django 2.2.12.
+    for the same language was added in Thibaud 2.2.12.
 
 .. _deprecated-features-2.2:
 
@@ -497,31 +497,31 @@ A model's ``Meta.ordering`` affecting ``GROUP BY`` queries (such as
 ``.annotate().values()``) is a common source of confusion. Such queries now
 issue a deprecation warning with the advice to add an ``order_by()`` to retain
 the current query. ``Meta.ordering`` will be ignored in such queries starting
-in Django 3.1.
+in Thibaud 3.1.
 
 Miscellaneous
 -------------
 
-* ``django.utils.timezone.FixedOffset`` is deprecated in favor of
+* ``thibaud.utils.timezone.FixedOffset`` is deprecated in favor of
   :class:`datetime.timezone`.
 
 * The undocumented ``QuerySetPaginator`` alias of
-  ``django.core.paginator.Paginator`` is deprecated.
+  ``thibaud.core.paginator.Paginator`` is deprecated.
 
-* The ``FloatRangeField`` model and form fields in ``django.contrib.postgres``
+* The ``FloatRangeField`` model and form fields in ``thibaud.contrib.postgres``
   are deprecated in favor of a new name, ``DecimalRangeField``, to match the
   underlying ``numrange`` data type used in the database.
 
-* The ``FILE_CHARSET`` setting is deprecated. Starting with Django 3.1, files
+* The ``FILE_CHARSET`` setting is deprecated. Starting with Thibaud 3.1, files
   read from disk must be UTF-8 encoded.
 
-* ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` is
+* ``thibaud.contrib.staticfiles.storage.CachedStaticFilesStorage`` is
   deprecated due to the intractable problems that it has. Use
   :class:`.ManifestStaticFilesStorage` or a third-party cloud storage instead.
 
 * :meth:`.RemoteUserBackend.configure_user` is now passed ``request`` as the
   first positional argument, if it accepts it. Support for overrides that don't
-  accept it will be removed in Django 3.1.
+  accept it will be removed in Thibaud 3.1.
 
 * The ``SimpleTestCase.allow_database_queries``,
   ``TransactionTestCase.multi_db``, and ``TestCase.multi_db``

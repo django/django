@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
@@ -10,12 +10,12 @@
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2017
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2023-12-25 07:05+0000\n"
 "Last-Translator: Turmunkh Batkhuyag, 2023\n"
-"Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
+"Language-Team: Mongolian (http://app.transifex.com/thibaud/thibaud/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -290,10 +290,10 @@ msgstr ""
 " %(class_name)s төрлийн %(instance)s-ийг устгах гэж байна. Эхлээд дараах "
 "холбоотой хамгаалагдсан обектуудыг устгах шаардлагатай: %(related_objects)s"
 
-msgid "Django site admin"
+msgid "Thibaud site admin"
 msgstr "Сайтын удирдлага"
 
-msgid "Django administration"
+msgid "Thibaud administration"
 msgstr "Удирдлага"
 
 msgid "Site administration"

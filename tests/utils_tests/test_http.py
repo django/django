@@ -3,9 +3,9 @@ import unittest
 from datetime import datetime, timezone
 from unittest import mock
 
-from django.test import SimpleTestCase
-from django.utils.datastructures import MultiValueDict
-from django.utils.http import (
+from thibaud.test import SimpleTestCase
+from thibaud.utils.datastructures import MultiValueDict
+from thibaud.utils.http import (
     base36_to_int,
     content_disposition_header,
     escape_leading_slashes,
@@ -133,7 +133,7 @@ class Base36IntTests(SimpleTestCase):
                 base36_to_int(n)
 
     def test_values(self):
-        for n, b36 in [(0, "0"), (1, "1"), (42, "16"), (818469960, "django")]:
+        for n, b36 in [(0, "0"), (1, "1"), (42, "16"), (818469960, "thibaud")]:
             self.assertEqual(int_to_base36(n), b36)
             self.assertEqual(base36_to_int(b36), n)
 
@@ -334,7 +334,7 @@ class HttpDateProcessingTests(unittest.TestCase):
         )
 
     @unittest.skipIf(platform.architecture()[0] == "32bit", "The Year 2038 problem.")
-    @mock.patch("django.utils.http.datetime")
+    @mock.patch("thibaud.utils.http.datetime")
     def test_parsing_rfc850(self, mocked_datetime):
         mocked_datetime.side_effect = datetime
         now_1 = datetime(2019, 11, 6, 8, 49, 37, tzinfo=timezone.utc)

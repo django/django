@@ -1,4 +1,4 @@
-from django.db import migrations, models
+from thibaud.db import migrations, models
 
 
 def raise_error(apps, schema_editor):

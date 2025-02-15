@@ -14,27 +14,27 @@ import warnings
 from pathlib import Path
 
 try:
-    import django
+    import thibaud
 except ImportError as e:
     raise RuntimeError(
-        "Django module not found, reference tests/README.rst for instructions."
+        "Thibaud module not found, reference tests/README.rst for instructions."
     ) from e
 else:
-    from django.apps import apps
-    from django.conf import settings
-    from django.core.exceptions import ImproperlyConfigured
-    from django.db import connection, connections
-    from django.test import TestCase, TransactionTestCase
-    from django.test.runner import get_max_test_processes, parallel_type
-    from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
-    from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
-    from django.utils.deprecation import (
-        RemovedInDjango61Warning,
-        RemovedInDjango70Warning,
+    from thibaud.apps import apps
+    from thibaud.conf import settings
+    from thibaud.core.exceptions import ImproperlyConfigured
+    from thibaud.db import connection, connections
+    from thibaud.test import TestCase, TransactionTestCase
+    from thibaud.test.runner import get_max_test_processes, parallel_type
+    from thibaud.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
+    from thibaud.test.utils import NullTimeKeeper, TimeKeeper, get_runner
+    from thibaud.utils.deprecation import (
+        RemovedInThibaud61Warning,
+        RemovedInThibaud70Warning,
     )
-    from django.utils.functional import classproperty
-    from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PYPY
+    from thibaud.utils.functional import classproperty
+    from thibaud.utils.log import DEFAULT_LOGGING
+    from thibaud.utils.version import PYPY
 
 
 try:
@@ -46,8 +46,8 @@ else:
     warnings.filterwarnings("ignore", r"\(1003, *", category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter("error", RemovedInDjango70Warning)
-warnings.simplefilter("error", RemovedInDjango61Warning)
+warnings.simplefilter("error", RemovedInThibaud70Warning)
+warnings.simplefilter("error", RemovedInThibaud61Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
@@ -66,7 +66,7 @@ RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, "templates")
 
 # Create a specific subdirectory for the duration of the test suite.
-TMPDIR = tempfile.mkdtemp(prefix="django_")
+TMPDIR = tempfile.mkdtemp(prefix="thibaud_")
 # Set the TMPDIR environment variable in addition to tempfile.tempdir
 # so that children processes inherit it.
 tempfile.tempdir = os.environ["TMPDIR"] = TMPDIR
@@ -87,30 +87,30 @@ SUBDIRS_TO_SKIP = {
 }
 
 ALWAYS_INSTALLED_APPS = [
-    "django.contrib.contenttypes",
-    "django.contrib.auth",
-    "django.contrib.sites",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.admin.apps.SimpleAdminConfig",
-    "django.contrib.staticfiles",
+    "thibaud.contrib.contenttypes",
+    "thibaud.contrib.auth",
+    "thibaud.contrib.sites",
+    "thibaud.contrib.sessions",
+    "thibaud.contrib.messages",
+    "thibaud.contrib.admin.apps.SimpleAdminConfig",
+    "thibaud.contrib.staticfiles",
 ]
 
 ALWAYS_MIDDLEWARE = [
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
+    "thibaud.contrib.sessions.middleware.SessionMiddleware",
+    "thibaud.middleware.common.CommonMiddleware",
+    "thibaud.middleware.csrf.CsrfViewMiddleware",
+    "thibaud.contrib.auth.middleware.AuthenticationMiddleware",
+    "thibaud.contrib.messages.middleware.MessageMiddleware",
 ]
 
 # Need to add the associated contrib app to INSTALLED_APPS in some cases to
 # avoid "RuntimeError: Model class X doesn't declare an explicit app_label
 # and isn't in an application in INSTALLED_APPS."
 CONTRIB_TESTS_TO_APPS = {
-    "deprecation": ["django.contrib.flatpages", "django.contrib.redirects"],
-    "flatpages_tests": ["django.contrib.flatpages"],
-    "redirects_tests": ["django.contrib.redirects"],
+    "deprecation": ["thibaud.contrib.flatpages", "thibaud.contrib.redirects"],
+    "flatpages_tests": ["thibaud.contrib.flatpages"],
+    "redirects_tests": ["thibaud.contrib.redirects"],
 }
 
 
@@ -172,7 +172,7 @@ def get_filtered_test_modules(start_at, start_after, gis_enabled, test_labels=No
         label_modules.add(test_module)
 
     # It would be nice to put this validation earlier but it must come after
-    # django.setup() so that connection.features.gis_enabled can be accessed.
+    # thibaud.setup() so that connection.features.gis_enabled can be accessed.
     if "gis_tests" in label_modules and not gis_enabled:
         print("Aborting: A GIS database backend is required to run gis_tests.")
         sys.exit(1)
@@ -218,14 +218,14 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.STATIC_ROOT = os.path.join(TMPDIR, "static")
     settings.TEMPLATES = [
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "DIRS": [TEMPLATE_DIR],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.request",
-                    "django.contrib.auth.context_processors.auth",
-                    "django.contrib.messages.context_processors.messages",
+                    "thibaud.template.context_processors.request",
+                    "thibaud.contrib.auth.context_processors.auth",
+                    "thibaud.contrib.messages.context_processors.messages",
                 ],
             },
         }
@@ -243,16 +243,16 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     log_config = copy.deepcopy(DEFAULT_LOGGING)
     # Filter out non-error logging so we don't have to capture it in lots of
     # tests.
-    log_config["loggers"]["django"]["level"] = "ERROR"
+    log_config["loggers"]["thibaud"]["level"] = "ERROR"
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         "fields.W342",  # ForeignKey(unique=True) -> OneToOneField
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
-    django.setup()
+    thibaud.setup()
 
-    # This flag must be evaluated after django.setup() because otherwise it can
+    # This flag must be evaluated after thibaud.setup() because otherwise it can
     # raise AppRegistryNotReady when running gis_tests in isolation on some
     # backends (e.g. PostGIS).
     gis_enabled = connection.features.gis_enabled
@@ -278,7 +278,7 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-# This function should be called only after calling django.setup(),
+# This function should be called only after calling thibaud.setup(),
 # since it calls connection.features.gis_enabled.
 def get_apps_to_install(test_modules):
     for test_module in test_modules:
@@ -289,7 +289,7 @@ def get_apps_to_install(test_modules):
     # Add contrib.gis to INSTALLED_APPS if needed (rather than requiring
     # @override_settings(INSTALLED_APPS=...) on all test cases.
     if connection.features.gis_enabled:
-        yield "django.contrib.gis"
+        yield "thibaud.contrib.gis"
 
 
 def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
@@ -318,7 +318,7 @@ def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
     TestCase.available_apps = None
 
     # Set an environment variable that other code may consult to see if
-    # Django's own test suite is running.
+    # Thibaud's own test suite is running.
     os.environ["RUNNING_DJANGOS_TEST_SUITE"] = "true"
 
     test_labels = test_labels or test_modules
@@ -358,7 +358,7 @@ class ActionSelenium(argparse.Action):
         setattr(namespace, self.dest, browsers)
 
 
-def django_tests(
+def thibaud_tests(
     verbosity,
     interactive,
     failfast,
@@ -384,8 +384,8 @@ def django_tests(
         max_parallel = parallel
 
     if verbosity >= 1:
-        msg = "Testing against Django installed in '%s'" % os.path.dirname(
-            django.__file__
+        msg = "Testing against Thibaud installed in '%s'" % os.path.dirname(
+            thibaud.__file__
         )
         if max_parallel > 1:
             msg += " with up to %d processes" % max_parallel
@@ -395,10 +395,10 @@ def django_tests(
     test_labels, state = setup_run_tests(*process_setup_args)
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, "TEST_RUNNER"):
-        settings.TEST_RUNNER = "django.test.runner.DiscoverRunner"
+        settings.TEST_RUNNER = "thibaud.test.runner.DiscoverRunner"
 
     if parallel in {0, "auto"}:
-        # This doesn't work before django.setup() on some databases.
+        # This doesn't work before thibaud.setup() on some databases.
         if all(conn.features.can_clone_databases for conn in connections.all()):
             parallel = max_parallel
         else:
@@ -534,7 +534,7 @@ def paired_tests(paired_test, options, test_labels, start_at, start_after):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run the Django test suite.")
+    parser = argparse.ArgumentParser(description="Run the Thibaud test suite.")
     parser.add_argument(
         "modules",
         nargs="*",
@@ -554,17 +554,17 @@ if __name__ == "__main__":
         "--noinput",
         action="store_false",
         dest="interactive",
-        help="Tells Django to NOT prompt the user for input of any kind.",
+        help="Tells Thibaud to NOT prompt the user for input of any kind.",
     )
     parser.add_argument(
         "--failfast",
         action="store_true",
-        help="Tells Django to stop running the test suite after first failed test.",
+        help="Tells Thibaud to stop running the test suite after first failed test.",
     )
     parser.add_argument(
         "--keepdb",
         action="store_true",
-        help="Tells Django to preserve the test database between runs.",
+        help="Tells Thibaud to preserve the test database between runs.",
     )
     parser.add_argument(
         "--settings",
@@ -785,7 +785,7 @@ if __name__ == "__main__":
     else:
         time_keeper = TimeKeeper() if options.timing else NullTimeKeeper()
         with time_keeper.timed("Total run"):
-            failures = django_tests(
+            failures = thibaud_tests(
                 options.verbosity,
                 options.interactive,
                 options.failfast,

@@ -1,8 +1,8 @@
-from django import forms
-from django.contrib.gis.gdal import GDALException
-from django.contrib.gis.geos import GEOSException, GEOSGeometry
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from thibaud import forms
+from thibaud.contrib.gis.gdal import GDALException
+from thibaud.contrib.gis.geos import GEOSException, GEOSGeometry
+from thibaud.core.exceptions import ValidationError
+from thibaud.utils.translation import gettext_lazy as _
 
 from .widgets import OpenLayersWidget
 

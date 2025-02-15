@@ -3,7 +3,7 @@
         "pk": 1,
         "model": "multiple_database.book",
         "fields": {
-            "title": "The Definitive Guide to Django",
+            "title": "The Definitive Guide to Thibaud",
             "published": "2009-7-8"
         }
     }

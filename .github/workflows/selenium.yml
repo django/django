@@ -45,7 +45,7 @@ jobs:
       postgres:
         image: postgres:14-alpine
         env:
-          POSTGRES_DB: django
+          POSTGRES_DB: thibaud
           POSTGRES_USER: user
           POSTGRES_PASSWORD: postgres
         ports:

@@ -1,4 +1,4 @@
-from django.db import migrations, models
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
             options={
                 "ordering": ["old_path"],
                 "unique_together": {("site", "old_path")},
-                "db_table": "django_redirect",
+                "db_table": "thibaud_redirect",
                 "verbose_name": "redirect",
                 "verbose_name_plural": "redirects",
             },

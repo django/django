@@ -1,8 +1,8 @@
 import os
 
-from django.template import Context, Template
-from django.test import SimpleTestCase, override_settings
-from django.utils.translation import activate, get_language, trans_real
+from thibaud.template import Context, Template
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils.translation import activate, get_language, trans_real
 
 from .utils import POFileAssertionMixin
 
@@ -16,7 +16,7 @@ SAMPLEPROJECT_LOCALE = os.path.join(SAMPLEPROJECT_DIR, "locale")
 class FrenchTestCase(SimpleTestCase):
     """Tests using the French translations of the sampleproject."""
 
-    PO_FILE = os.path.join(SAMPLEPROJECT_LOCALE, "fr", "LC_MESSAGES", "django.po")
+    PO_FILE = os.path.join(SAMPLEPROJECT_LOCALE, "fr", "LC_MESSAGES", "thibaud.po")
 
     def setUp(self):
         self._language = get_language()
@@ -187,6 +187,6 @@ class RenderingTemplatesWithPercentSigns(FrenchTestCase):
             "2 percent signs %%{% endblocktranslate %}"
         )
         self.assertEqual(
-            block_tpl.render(Context({"name": "Django"})),
-            "Django dit: 1 pour cent signe %, deux signes de pourcentage %%",
+            block_tpl.render(Context({"name": "Thibaud"})),
+            "Thibaud dit: 1 pour cent signe %, deux signes de pourcentage %%",
         )

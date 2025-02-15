@@ -1,6 +1,6 @@
-from django.conf import settings
-from django.core.checks.messages import Error, Warning
-from django.core.checks.urls import (
+from thibaud.conf import settings
+from thibaud.core.checks.messages import Error, Warning
+from thibaud.core.checks.urls import (
     E006,
     check_custom_error_handlers,
     check_url_config,
@@ -8,8 +8,8 @@ from django.core.checks.urls import (
     check_url_settings,
     get_warning_for_invalid_pattern,
 )
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
 
 
 class CheckUrlConfigTests(SimpleTestCase):
@@ -290,14 +290,14 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     def test_bad_handlers_invalid_path(self):
         result = check_custom_error_handlers(None)
         paths = [
-            "django.views.bad_handler",
-            "django.invalid_module.bad_handler",
+            "thibaud.views.bad_handler",
+            "thibaud.invalid_module.bad_handler",
             "invalid_module.bad_handler",
-            "django",
+            "thibaud",
         ]
         hints = [
-            "Could not import '{}'. View does not exist in module django.views.",
-            "Could not import '{}'. Parent module django.invalid_module does not "
+            "Could not import '{}'. View does not exist in module thibaud.views.",
+            "Could not import '{}'. Parent module thibaud.invalid_module does not "
             "exist.",
             "No module named 'invalid_module'",
             "Could not import '{}'. The path must be fully qualified.",

@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
-from django.urls import reverse
+from thibaud.core.management.base import BaseCommand
+from thibaud.urls import reverse
 
 
 class Command(BaseCommand):

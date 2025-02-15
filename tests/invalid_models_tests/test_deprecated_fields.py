@@ -1,9 +1,9 @@
 from unittest import skipUnless
 
-from django.core import checks
-from django.db import connection, models
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps
+from thibaud.core import checks
+from thibaud.db import connection, models
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import isolate_apps
 
 
 @isolate_apps("invalid_models_tests")
@@ -68,7 +68,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
 
     @skipUnless(connection.vendor == "postgresql", "PostgreSQL specific SQL")
     def test_postgres_jsonfield_deprecated(self):
-        from django.contrib.postgres.fields import JSONField
+        from thibaud.contrib.postgres.fields import JSONField
 
         class PostgresJSONFieldModel(models.Model):
             field = JSONField()
@@ -77,9 +77,9 @@ class DeprecatedFieldsTests(SimpleTestCase):
             PostgresJSONFieldModel.check(),
             [
                 checks.Error(
-                    "django.contrib.postgres.fields.JSONField is removed except "
+                    "thibaud.contrib.postgres.fields.JSONField is removed except "
                     "for support in historical migrations.",
-                    hint="Use django.db.models.JSONField instead.",
+                    hint="Use thibaud.db.models.JSONField instead.",
                     obj=PostgresJSONFieldModel._meta.get_field("field"),
                     id="fields.E904",
                 ),
@@ -88,7 +88,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
 
     @skipUnless(connection.vendor == "postgresql", "PostgreSQL specific SQL")
     def test_postgres_ci_fields_deprecated(self):
-        from django.contrib.postgres.fields import (
+        from thibaud.contrib.postgres.fields import (
             ArrayField,
             CICharField,
             CIEmailField,
@@ -105,7 +105,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
             PostgresCIFieldsModel.check(),
             [
                 checks.Error(
-                    "django.contrib.postgres.fields.CICharField is removed except for "
+                    "thibaud.contrib.postgres.fields.CICharField is removed except for "
                     "support in historical migrations.",
                     hint=(
                         'Use CharField(db_collation="…") with a case-insensitive '
@@ -115,7 +115,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
                     id="fields.E905",
                 ),
                 checks.Error(
-                    "django.contrib.postgres.fields.CIEmailField is removed except for "
+                    "thibaud.contrib.postgres.fields.CIEmailField is removed except for "
                     "support in historical migrations.",
                     hint=(
                         'Use EmailField(db_collation="…") with a case-insensitive '
@@ -125,7 +125,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
                     id="fields.E906",
                 ),
                 checks.Error(
-                    "django.contrib.postgres.fields.CITextField is removed except for "
+                    "thibaud.contrib.postgres.fields.CITextField is removed except for "
                     "support in historical migrations.",
                     hint=(
                         'Use TextField(db_collation="…") with a case-insensitive '
@@ -136,7 +136,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
                 ),
                 checks.Error(
                     "Base field for array has errors:\n"
-                    "    django.contrib.postgres.fields.CITextField is removed except "
+                    "    thibaud.contrib.postgres.fields.CITextField is removed except "
                     "for support in historical migrations. (fields.E907)",
                     obj=PostgresCIFieldsModel._meta.get_field("array_ci_text"),
                     id="postgres.E001",

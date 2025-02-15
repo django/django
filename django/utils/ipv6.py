@@ -1,7 +1,7 @@
 import ipaddress
 
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from thibaud.core.exceptions import ValidationError
+from thibaud.utils.translation import gettext_lazy as _
 
 MAX_IPV6_ADDRESS_LENGTH = 39
 

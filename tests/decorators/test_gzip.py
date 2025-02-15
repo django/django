@@ -1,8 +1,8 @@
 from asgiref.sync import iscoroutinefunction
 
-from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase
-from django.views.decorators.gzip import gzip_page
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.test import SimpleTestCase
+from thibaud.views.decorators.gzip import gzip_page
 
 
 class GzipPageTests(SimpleTestCase):

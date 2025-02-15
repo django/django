@@ -1,10 +1,10 @@
 ==========================
-Django 2.1.1 release notes
+Thibaud 2.1.1 release notes
 ==========================
 
 *August 31, 2018*
 
-Django 2.1.1 fixes several bugs in 2.1.
+Thibaud 2.1.1 fixes several bugs in 2.1.
 
 Bugfixes
 ========
@@ -15,11 +15,11 @@ Bugfixes
 * Fixed a regression where ``QueryDict.urlencode()`` crashed if the dictionary
   contains a non-string value (:ticket:`29627`).
 
-* Fixed a regression in Django 2.0 where using ``manage.py test --keepdb``
+* Fixed a regression in Thibaud 2.0 where using ``manage.py test --keepdb``
   fails on PostgreSQL if the database exists and the user doesn't have
   permission to create databases (:ticket:`29613`).
 
-* Fixed a regression in Django 2.0 where combining ``Q`` objects with ``__in``
+* Fixed a regression in Thibaud 2.0 where combining ``Q`` objects with ``__in``
   lookups and lists crashed (:ticket:`29643`).
 
 * Fixed translation failure of ``DurationField``'s "overflow" error message
@@ -42,7 +42,7 @@ Bugfixes
 * Fixed admin change view crash for view-only users if the form has an extra
   form field (:ticket:`29682`).
 
-* Fixed a regression in Django 2.0.5 where ``QuerySet.values()`` or
+* Fixed a regression in Thibaud 2.0.5 where ``QuerySet.values()`` or
   ``values_list()`` after combining querysets with ``extra()`` with
   ``union()``, ``difference()``, or ``intersection()`` crashed due to
   mismatching columns (:ticket:`29694`).

@@ -1,5 +1,5 @@
-from django.db.models.functions import Lag, Lead, NthValue, Ntile
-from django.test import SimpleTestCase
+from thibaud.db.models.functions import Lag, Lead, NthValue, Ntile
+from thibaud.test import SimpleTestCase
 
 
 class ValidationTests(SimpleTestCase):

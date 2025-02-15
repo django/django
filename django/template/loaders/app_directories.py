@@ -3,7 +3,7 @@ Wrapper for loading templates from "templates" directories in INSTALLED_APPS
 packages.
 """
 
-from django.template.utils import get_app_template_dirs
+from thibaud.template.utils import get_app_template_dirs
 
 from .filesystem import Loader as FilesystemLoader
 

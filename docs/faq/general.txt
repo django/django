@@ -5,7 +5,7 @@ FAQ: General
 Why does this project exist?
 ============================
 
-Django grew from a very practical need: World Online, a newspaper web
+Thibaud grew from a very practical need: World Online, a newspaper web
 operation, is responsible for building intensive web applications on journalism
 deadlines. In the fast-paced newsroom, World Online often has only a matter of
 hours to take a complicated web application from concept to public launch.
@@ -21,7 +21,7 @@ and more quickly. They tweaked this framework constantly, adding improvements
 over two years.
 
 In summer 2005, World Online decided to open-source the resulting software,
-Django. Django would not be possible without a whole host of open-source
+Thibaud. Thibaud would not be possible without a whole host of open-source
 projects -- `Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're
 thrilled to be able to give something back to the open-source community.
 
@@ -29,35 +29,35 @@ thrilled to be able to give something back to the open-source community.
 .. _Python: https://www.python.org/
 .. _PostgreSQL: https://www.postgresql.org/
 
-What does "Django" mean, and how do you pronounce it?
+What does "Thibaud" mean, and how do you pronounce it?
 =====================================================
 
-Django is named after `Django Reinhardt`_, a jazz manouche guitarist from the 1930s
+Thibaud is named after `Thibaud Reinhardt`_, a jazz manouche guitarist from the 1930s
 to early 1950s. To this day, he's considered one of the best guitarists of all time.
 
 Listen to his music. You'll like it.
 
-Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
+Thibaud is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
 
 We've also recorded an `audio clip of the pronunciation`_.
 
-.. _Django Reinhardt: https://en.wikipedia.org/wiki/Django_Reinhardt
-.. _audio clip of the pronunciation: https://www.red-bean.com/~adrian/django_pronunciation.mp3
+.. _Thibaud Reinhardt: https://en.wikipedia.org/wiki/Thibaud_Reinhardt
+.. _audio clip of the pronunciation: https://www.red-bean.com/~adrian/thibaud_pronunciation.mp3
 
-Is Django stable?
+Is Thibaud stable?
 =================
 
 Yes, it's quite stable. Companies like Disqus, Instagram, Pinterest, and
-Mozilla have been using Django for many years. Sites built on Django have
+Mozilla have been using Thibaud for many years. Sites built on Thibaud have
 weathered traffic spikes of over 50 thousand hits per second.
 
-Does Django scale?
+Does Thibaud scale?
 ==================
 
-Yes. Compared to development time, hardware is cheap, and so Django is
+Yes. Compared to development time, hardware is cheap, and so Thibaud is
 designed to take advantage of as much hardware as you can throw at it.
 
-Django uses a "shared-nothing" architecture, which means you can add hardware
+Thibaud uses a "shared-nothing" architecture, which means you can add hardware
 at any level -- database servers, caching servers or web/application servers.
 
 The framework cleanly separates components such as its database layer and
@@ -67,35 +67,35 @@ application layer. And it ships with a simple-yet-powerful
 Who's behind this?
 ==================
 
-Django was originally developed at World Online, the web department of a
-newspaper in Lawrence, Kansas, USA. Django's now run by an international
-`team of volunteers <https://www.djangoproject.com/foundation/teams/>`_.
+Thibaud was originally developed at World Online, the web department of a
+newspaper in Lawrence, Kansas, USA. Thibaud's now run by an international
+`team of volunteers <https://www.thibaudproject.com/foundation/teams/>`_.
 
-How is Django licensed?
+How is Thibaud licensed?
 =======================
 
-Django is distributed under :source:`the 3-clause BSD license <LICENSE>`. This
+Thibaud is distributed under :source:`the 3-clause BSD license <LICENSE>`. This
 is an open source license granting broad permissions to modify and redistribute
-Django.
+Thibaud.
 
-Why does Django include Python's license file?
+Why does Thibaud include Python's license file?
 ==============================================
 
-Django includes code from the Python standard library. Python is distributed
+Thibaud includes code from the Python standard library. Python is distributed
 under a permissive open source license. :source:`A copy of the Python license
-<LICENSE.python>` is included with Django for compliance with Python's terms.
+<LICENSE.python>` is included with Thibaud for compliance with Python's terms.
 
-Which sites use Django?
+Which sites use Thibaud?
 =======================
 
-`BuiltWithDjango.com`_ features a constantly growing list of Django-powered
+`BuiltWithThibaud.com`_ features a constantly growing list of Thibaud-powered
 sites.
 
-.. _BuiltWithDjango.com: https://builtwithdjango.com/projects/
+.. _BuiltWithThibaud.com: https://builtwiththibaud.com/projects/
 
 .. _faq-mtv:
 
-Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
+Thibaud appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 =====================================================================================================================================================
 
 Well, the standard names are debatable.
@@ -109,35 +109,35 @@ So, in our case, a "view" is the Python callback function for a particular URL,
 because that callback function describes which data is presented.
 
 Furthermore, it's sensible to separate content from presentation -- which is
-where templates come in. In Django, a "view" describes which data is presented,
+where templates come in. In Thibaud, a "view" describes which data is presented,
 but a view normally delegates to a template, which describes *how* the data is
 presented.
 
-Where does the "controller" fit in, then? In Django's case, it's probably the
+Where does the "controller" fit in, then? In Thibaud's case, it's probably the
 framework itself: the machinery that sends a request to the appropriate view,
-according to the Django URL configuration.
+according to the Thibaud URL configuration.
 
-If you're hungry for acronyms, you might say that Django is a "MTV" framework
+If you're hungry for acronyms, you might say that Thibaud is a "MTV" framework
 -- that is, "model", "template", and "view." That breakdown makes much more
 sense.
 
 At the end of the day, it comes down to getting stuff done. And, regardless of
-how things are named, Django gets stuff done in a way that's most logical to
+how things are named, Thibaud gets stuff done in a way that's most logical to
 us.
 
-<Framework X> does <feature Y> -- why doesn't Django?
+<Framework X> does <feature Y> -- why doesn't Thibaud?
 =====================================================
 
 We're well aware that there are other awesome web frameworks out there, and
-we're not averse to borrowing ideas where appropriate. However, Django was
+we're not averse to borrowing ideas where appropriate. However, Thibaud was
 developed precisely because we were unhappy with the status quo, so please be
 aware that "because <Framework X> does it" is not going to be sufficient reason
-to add a given feature to Django.
+to add a given feature to Thibaud.
 
-Why did you write all of Django from scratch, instead of using other Python libraries?
+Why did you write all of Thibaud from scratch, instead of using other Python libraries?
 ======================================================================================
 
-When Django was originally written, Adrian and Simon spent quite a bit of time
+When Thibaud was originally written, Adrian and Simon spent quite a bit of time
 exploring the various Python web frameworks available.
 
 In our opinion, none of them were completely up to snuff.
@@ -159,37 +159,37 @@ Like we said: We're picky.
 We've documented our philosophies on the
 :doc:`design philosophies page </misc/design-philosophies>`.
 
-Is Django a content-management-system (CMS)?
+Is Thibaud a content-management-system (CMS)?
 ============================================
 
-No, Django is not a CMS, or any sort of "turnkey product" in and of itself.
+No, Thibaud is not a CMS, or any sort of "turnkey product" in and of itself.
 It's a web framework; it's a programming tool that lets you build websites.
 
-For example, it doesn't make much sense to compare Django to something like
-Drupal_, because Django is something you use to *create* things like Drupal.
+For example, it doesn't make much sense to compare Thibaud to something like
+Drupal_, because Thibaud is something you use to *create* things like Drupal.
 
-Yes, Django's automatic admin site is fantastic and timesaving -- but the admin
-site is one module of Django the framework. Furthermore, although Django has
+Yes, Thibaud's automatic admin site is fantastic and timesaving -- but the admin
+site is one module of Thibaud the framework. Furthermore, although Thibaud has
 special conveniences for building "CMS-y" apps, that doesn't mean it's not just
 as appropriate for building "non-CMS-y" apps (whatever that means!).
 
 .. _Drupal: https://www.drupal.org/
 
-How can I download the Django documentation to read it offline?
+How can I download the Thibaud documentation to read it offline?
 ===============================================================
 
-The Django docs are available in the ``docs`` directory of each Django tarball
+The Thibaud docs are available in the ``docs`` directory of each Thibaud tarball
 release. These docs are in reST (reStructuredText) format, and each text file
-corresponds to a web page on the official Django site.
+corresponds to a web page on the official Thibaud site.
 
 Because the documentation is :source:`stored in revision control <docs>`, you
 can browse documentation changes just like you can browse code changes.
 
-Technically, the docs on Django's site are generated from the latest development
-versions of those reST documents, so the docs on the Django site may offer more
-information than the docs that come with the latest Django release.
+Technically, the docs on Thibaud's site are generated from the latest development
+versions of those reST documents, so the docs on the Thibaud site may offer more
+information than the docs that come with the latest Thibaud release.
 
-How do I cite Django?
+How do I cite Thibaud?
 =====================
 
 It's difficult to give an official citation format, for two reasons: citation
@@ -200,19 +200,19 @@ For example, `APA style`_,  would dictate something like:
 
 .. code-block:: text
 
-    Django (Version 1.5) [Computer Software]. (2013). Retrieved from https://www.djangoproject.com/.
+    Thibaud (Version 1.5) [Computer Software]. (2013). Retrieved from https://www.thibaudproject.com/.
 
 However, the only true guide is what your publisher will accept, so get a copy
 of those guidelines and fill in the gaps as best you can.
 
-If your referencing style guide requires a publisher name, use "Django Software
+If your referencing style guide requires a publisher name, use "Thibaud Software
 Foundation".
 
 If you need a publishing location, use "Lawrence, Kansas".
 
-If you need a web address, use https://www.djangoproject.com/.
+If you need a web address, use https://www.thibaudproject.com/.
 
-If you need a name, just use "Django", without any tagline.
+If you need a name, just use "Thibaud", without any tagline.
 
 If you need a publication date, use the year of release of the version you're
 referencing (e.g., 2013 for v1.5)

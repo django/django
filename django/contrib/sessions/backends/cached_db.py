@@ -4,13 +4,13 @@ Cached, database-backed sessions.
 
 import logging
 
-from django.conf import settings
-from django.contrib.sessions.backends.db import SessionStore as DBStore
-from django.core.cache import caches
+from thibaud.conf import settings
+from thibaud.contrib.sessions.backends.db import SessionStore as DBStore
+from thibaud.core.cache import caches
 
-KEY_PREFIX = "django.contrib.sessions.cached_db"
+KEY_PREFIX = "thibaud.contrib.sessions.cached_db"
 
-logger = logging.getLogger("django.contrib.sessions")
+logger = logging.getLogger("thibaud.contrib.sessions")
 
 
 class SessionStore(DBStore):

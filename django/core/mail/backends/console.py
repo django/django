@@ -5,7 +5,7 @@ Email backend that writes messages to console instead of sending them.
 import sys
 import threading
 
-from django.core.mail.backends.base import BaseEmailBackend
+from thibaud.core.mail.backends.base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):

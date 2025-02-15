@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # 0d21a39e384d88c2313b89b5042c04cb, 2017
@@ -22,12 +22,12 @@
 # Stefano Brentegani <sbrentegani@gmail.com>, 2014-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-17 02:13-0600\n"
 "PO-Revision-Date: 2023-04-25 06:49+0000\n"
 "Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023\n"
-"Language-Team: Italian (http://www.transifex.com/django/django/language/"
+"Language-Team: Italian (http://www.transifex.com/thibaud/thibaud/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1329,27 +1329,27 @@ msgstr "Installazione completata con successo! Congratulazioni!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Leggi le <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">note di rilascio</a> per Django "
+"Leggi le <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">note di rilascio</a> per Thibaud "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
 "Stai vedendo questa pagina perché hai impostato <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> nel tuo file di configurazione e non hai "
 "configurato nessun URL."
 
-msgid "Django Documentation"
-msgstr "Documentazione di Django"
+msgid "Thibaud Documentation"
+msgstr "Documentazione di Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Temi, riferimenti, &amp; guide"
@@ -1357,11 +1357,11 @@ msgstr "Temi, riferimenti, &amp; guide"
 msgid "Tutorial: A Polling App"
 msgstr "Tutorial: un'app per sondaggi"
 
-msgid "Get started with Django"
-msgstr "Iniziare con Django"
+msgid "Get started with Thibaud"
+msgstr "Iniziare con Thibaud"
 
-msgid "Django Community"
-msgstr "La Community di Django"
+msgid "Thibaud Community"
+msgstr "La Community di Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Connettiti, chiedi aiuto, o contribuisci."

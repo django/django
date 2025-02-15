@@ -2,13 +2,13 @@
 Tools for sending email.
 """
 
-from django.conf import settings
+from thibaud.conf import settings
 
 # Imported for backwards compatibility and for the sake
 # of a cleaner namespace. These symbols used to be in
-# django/core/mail.py before the introduction of email
+# thibaud/core/mail.py before the introduction of email
 # backends and the subsequent reorganization (See #10355)
-from django.core.mail.message import (
+from thibaud.core.mail.message import (
     DEFAULT_ATTACHMENT_MIME_TYPE,
     BadHeaderError,
     EmailAlternative,
@@ -20,8 +20,8 @@ from django.core.mail.message import (
     forbid_multi_line_headers,
     make_msgid,
 )
-from django.core.mail.utils import DNS_NAME, CachedDnsName
-from django.utils.module_loading import import_string
+from thibaud.core.mail.utils import DNS_NAME, CachedDnsName
+from thibaud.utils.module_loading import import_string
 
 __all__ = [
     "CachedDnsName",

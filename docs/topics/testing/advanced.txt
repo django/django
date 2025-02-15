@@ -5,18 +5,18 @@ Advanced testing topics
 The request factory
 ===================
 
-.. currentmodule:: django.test
+.. currentmodule:: thibaud.test
 
 .. class:: RequestFactory
 
-The :class:`~django.test.RequestFactory` shares the same API as
+The :class:`~thibaud.test.RequestFactory` shares the same API as
 the test client. However, instead of behaving like a browser, the
 RequestFactory provides a way to generate a request instance that can
 be used as the first argument to any view. This means you can test a
 view function the same way as you would test any other function -- as
 a black box, with exactly known inputs, testing for specific outputs.
 
-The API for the :class:`~django.test.RequestFactory` is a slightly
+The API for the :class:`~thibaud.test.RequestFactory` is a slightly
 restricted subset of the test client API:
 
 * It only has access to the HTTP methods :meth:`~Client.get()`,
@@ -37,8 +37,8 @@ Example
 
 The following is a unit test using the request factory::
 
-    from django.contrib.auth.models import AnonymousUser, User
-    from django.test import RequestFactory, TestCase
+    from thibaud.contrib.auth.models import AnonymousUser, User
+    from thibaud.test import RequestFactory, TestCase
 
     from .views import MyView, my_view
 
@@ -76,7 +76,7 @@ AsyncRequestFactory
 
 ``RequestFactory`` creates WSGI-like requests. If you want to create ASGI-like
 requests, including having a correct ASGI ``scope``, you can instead use
-``django.test.AsyncRequestFactory``.
+``thibaud.test.AsyncRequestFactory``.
 
 This class is directly API-compatible with ``RequestFactory``, with the only
 difference being that it returns ``ASGIRequest`` instances rather than
@@ -90,14 +90,14 @@ Testing class-based views
 
 In order to test class-based views outside of the request/response cycle you
 must ensure that they are configured correctly, by calling
-:meth:`~django.views.generic.base.View.setup` after instantiation.
+:meth:`~thibaud.views.generic.base.View.setup` after instantiation.
 
 For example, assuming the following class-based view:
 
 .. code-block:: python
     :caption: ``views.py``
 
-    from django.views.generic import TemplateView
+    from thibaud.views.generic import TemplateView
 
 
     class HomeView(TemplateView):
@@ -114,7 +114,7 @@ your test's code:
 .. code-block:: python
     :caption: ``tests.py``
 
-    from django.test import RequestFactory, TestCase
+    from thibaud.test import RequestFactory, TestCase
     from .views import HomeView
 
 
@@ -140,32 +140,32 @@ the request's host and use custom host names in tests must include those hosts
 in :setting:`ALLOWED_HOSTS`.
 
 The first option to do so is to add the hosts to your settings file. For
-example, the test suite for docs.djangoproject.com includes the following::
+example, the test suite for docs.thibaudproject.com includes the following::
 
-    from django.test import TestCase
+    from thibaud.test import TestCase
 
 
     class SearchFormTestCase(TestCase):
         def test_empty_get(self):
             response = self.client.get(
                 "/en/dev/search/",
-                headers={"host": "docs.djangoproject.dev:8000"},
+                headers={"host": "docs.thibaudproject.dev:8000"},
             )
             self.assertEqual(response.status_code, 200)
 
 and the settings file includes a list of the domains supported by the project::
 
-    ALLOWED_HOSTS = ["www.djangoproject.dev", "docs.djangoproject.dev", ...]
+    ALLOWED_HOSTS = ["www.thibaudproject.dev", "docs.thibaudproject.dev", ...]
 
 Another option is to add the required hosts to :setting:`ALLOWED_HOSTS` using
-:meth:`~django.test.override_settings()` or
-:attr:`~django.test.SimpleTestCase.modify_settings()`. This option may be
+:meth:`~thibaud.test.override_settings()` or
+:attr:`~thibaud.test.SimpleTestCase.modify_settings()`. This option may be
 preferable in standalone apps that can't package their own settings file or
 for projects where the list of domains is not static (e.g., subdomains for
 multitenancy). For example, you could write a test for the domain
 ``http://otherserver/`` as follows::
 
-    from django.test import TestCase, override_settings
+    from thibaud.test import TestCase, override_settings
 
 
     class MultiDomainTestCase(TestCase):
@@ -194,19 +194,19 @@ When the test databases are created, there won't be any replication,
 and as a result, data created on the primary won't be seen on the
 replica.
 
-To compensate for this, Django allows you to define that a database is
+To compensate for this, Thibaud allows you to define that a database is
 a *test mirror*. Consider the following (simplified) example database
 configuration::
 
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.mysql",
+            "ENGINE": "thibaud.db.backends.mysql",
             "NAME": "myproject",
             "HOST": "dbprimary",
             # ... plus some other settings
         },
         "replica": {
-            "ENGINE": "django.db.backends.mysql",
+            "ENGINE": "thibaud.db.backends.mysql",
             "NAME": "myproject",
             "HOST": "dbreplica",
             "TEST": {
@@ -222,7 +222,7 @@ alias ``replica``. As you might expect, ``dbreplica`` has been configured
 by the database administrator as a read replica of ``dbprimary``, so in
 normal activity, any write to ``default`` will appear on ``replica``.
 
-If Django created two independent test databases, this would break any
+If Thibaud created two independent test databases, this would break any
 tests that expected replication to occur. However, the ``replica``
 database has been configured as a test mirror (using the
 :setting:`MIRROR <TEST_MIRROR>` test setting), indicating that under
@@ -234,15 +234,15 @@ will be redirected to point at ``default``. As a result, writes to
 ``default`` will appear on ``replica`` -- but because they are actually
 the same database, not because there is data replication between the
 two databases. As this depends on transactions, the tests must use
-:class:`~django.test.TransactionTestCase` instead of
-:class:`~django.test.TestCase`.
+:class:`~thibaud.test.TransactionTestCase` instead of
+:class:`~thibaud.test.TestCase`.
 
 .. _topics-testing-creation-dependencies:
 
 Controlling creation order for test databases
 ---------------------------------------------
 
-By default, Django will assume all databases depend on the ``default``
+By default, Thibaud will assume all databases depend on the ``default``
 database and therefore always create the ``default`` database first.
 However, no guarantees are made on the creation order of any other
 databases in your test setup.
@@ -292,7 +292,7 @@ pair is not guaranteed), then ``hearts``, and finally ``spades``.
 
 If there are any circular dependencies in the :setting:`DEPENDENCIES
 <TEST_DEPENDENCIES>` definition, an
-:exc:`~django.core.exceptions.ImproperlyConfigured` exception will be raised.
+:exc:`~thibaud.core.exceptions.ImproperlyConfigured` exception will be raised.
 
 Advanced features of ``TransactionTestCase``
 ============================================
@@ -305,26 +305,26 @@ Advanced features of ``TransactionTestCase``
         a deprecation period in the future, for instance to accommodate changes
         in application loading.
 
-        It's used to optimize Django's own test suite, which contains hundreds
+        It's used to optimize Thibaud's own test suite, which contains hundreds
         of models but no relations between models in different applications.
 
-    By default, ``available_apps`` is set to ``None``. After each test, Django
+    By default, ``available_apps`` is set to ``None``. After each test, Thibaud
     calls :djadmin:`flush` to reset the database state. This empties all tables
-    and emits the :data:`~django.db.models.signals.post_migrate` signal, which
+    and emits the :data:`~thibaud.db.models.signals.post_migrate` signal, which
     recreates one content type and four permissions for each model. This
     operation gets expensive proportionally to the number of models.
 
-    Setting ``available_apps`` to a list of applications instructs Django to
+    Setting ``available_apps`` to a list of applications instructs Thibaud to
     behave as if only the models from these applications were available. The
     behavior of ``TransactionTestCase`` changes as follows:
 
-    - :data:`~django.db.models.signals.post_migrate` is fired before each
+    - :data:`~thibaud.db.models.signals.post_migrate` is fired before each
       test to create the content types and permissions for each model in
       available apps, in case they're missing.
-    - After each test, Django empties only tables corresponding to models in
+    - After each test, Thibaud empties only tables corresponding to models in
       available apps. However, at the database level, truncation may cascade to
       related models in unavailable apps. Furthermore
-      :data:`~django.db.models.signals.post_migrate` isn't fired; it will be
+      :data:`~thibaud.db.models.signals.post_migrate` isn't fired; it will be
       fired by the next ``TransactionTestCase``, after the correct set of
       applications is selected.
 
@@ -333,15 +333,15 @@ Advanced features of ``TransactionTestCase``
     cause unrelated tests to fail. Be careful with tests that use sessions;
     the default session engine stores them in the database.
 
-    Since :data:`~django.db.models.signals.post_migrate` isn't emitted after
+    Since :data:`~thibaud.db.models.signals.post_migrate` isn't emitted after
     flushing the database, its state after a ``TransactionTestCase`` isn't the
     same as after a ``TestCase``: it's missing the rows created by listeners
-    to :data:`~django.db.models.signals.post_migrate`. Considering the
+    to :data:`~thibaud.db.models.signals.post_migrate`. Considering the
     :ref:`order in which tests are executed <order-of-tests>`, this isn't an
     issue, provided either all ``TransactionTestCase`` in a given test suite
     declare ``available_apps``, or none of them.
 
-    ``available_apps`` is mandatory in Django's own test suite.
+    ``available_apps`` is mandatory in Thibaud's own test suite.
 
 .. attribute:: TransactionTestCase.reset_sequences
 
@@ -368,7 +368,7 @@ Enforce running test classes sequentially
 =========================================
 
 If you have test classes that cannot be run in parallel (e.g. because they
-share a common resource), you can use ``django.test.testcases.SerializeMixin``
+share a common resource), you can use ``thibaud.test.testcases.SerializeMixin``
 to run them sequentially. This mixin uses a filesystem ``lockfile``.
 
 For example, you can use ``__file__`` to determine that all test classes in the
@@ -376,8 +376,8 @@ same file that inherit from ``SerializeMixin`` will run sequentially::
 
     import os
 
-    from django.test import TestCase
-    from django.test.testcases import SerializeMixin
+    from thibaud.test import TestCase
+    from thibaud.test.testcases import SerializeMixin
 
 
     class ImageTestCaseMixin(SerializeMixin):
@@ -401,12 +401,12 @@ same file that inherit from ``SerializeMixin`` will run sequentially::
 
 .. _testing-reusable-applications:
 
-Using the Django test runner to test reusable applications
+Using the Thibaud test runner to test reusable applications
 ==========================================================
 
 If you are writing a :doc:`reusable application </intro/reusable-apps>`
-you may want to use the Django test runner to run your own test suite
-and thus benefit from the Django testing infrastructure.
+you may want to use the Thibaud test runner to run your own test suite
+and thus benefit from the Thibaud testing infrastructure.
 
 A common practice is a *tests* directory next to the application code, with the
 following structure:
@@ -433,13 +433,13 @@ Let's take a look inside a couple of those files:
     import os
     import sys
 
-    import django
-    from django.conf import settings
-    from django.test.utils import get_runner
+    import thibaud
+    from thibaud.conf import settings
+    from thibaud.test.utils import get_runner
 
     if __name__ == "__main__":
         os.environ["DJANGO_SETTINGS_MODULE"] = "tests.test_settings"
-        django.setup()
+        thibaud.setup()
         TestRunner = get_runner(settings)
         test_runner = TestRunner()
         failures = test_runner.run_tests(["tests"])
@@ -447,10 +447,10 @@ Let's take a look inside a couple of those files:
 
 
 This is the script that you invoke to run the test suite. It sets up the
-Django environment, creates the test database and runs the tests.
+Thibaud environment, creates the test database and runs the tests.
 
 For the sake of clarity, this example contains only the bare minimum
-necessary to use the Django test runner. You may want to add
+necessary to use the Thibaud test runner. You may want to add
 command-line options for controlling verbosity, passing in specific test
 labels to run, etc.
 
@@ -462,7 +462,7 @@ labels to run, etc.
         "tests",
     ]
 
-This file contains the :doc:`Django settings </topics/settings>`
+This file contains the :doc:`Thibaud settings </topics/settings>`
 required to run your app's tests.
 
 Again, this is a minimal example; your tests may require additional
@@ -478,14 +478,14 @@ file.
 Using different testing frameworks
 ==================================
 
-Clearly, :mod:`unittest` is not the only Python testing framework. While Django
+Clearly, :mod:`unittest` is not the only Python testing framework. While Thibaud
 doesn't provide explicit support for alternative frameworks, it does provide a
 way to invoke tests constructed for an alternative framework as if they were
-normal Django tests.
+normal Thibaud tests.
 
-When you run ``./manage.py test``, Django looks at the :setting:`TEST_RUNNER`
+When you run ``./manage.py test``, Thibaud looks at the :setting:`TEST_RUNNER`
 setting to determine what to do. By default, :setting:`TEST_RUNNER` points to
-``'django.test.runner.DiscoverRunner'``. This class defines the default Django
+``'thibaud.test.runner.DiscoverRunner'``. This class defines the default Thibaud
 testing behavior. This behavior involves:
 
 #. Performing global pre-test setup.
@@ -507,9 +507,9 @@ testing behavior. This behavior involves:
 #. Performing global post-test teardown.
 
 If you define your own test runner class and point :setting:`TEST_RUNNER` at
-that class, Django will execute your test runner whenever you run
+that class, Thibaud will execute your test runner whenever you run
 ``./manage.py test``. In this way, it is possible to use any test framework
-that can be executed from Python code, or to modify the Django test execution
+that can be executed from Python code, or to modify the Thibaud test execution
 process to satisfy whatever testing requirements you may have.
 
 .. _topics-testing-test_runner:
@@ -517,10 +517,10 @@ process to satisfy whatever testing requirements you may have.
 Defining a test runner
 ----------------------
 
-.. currentmodule:: django.test.runner
+.. currentmodule:: thibaud.test.runner
 
-A test runner is a class defining a ``run_tests()`` method. Django ships
-with a ``DiscoverRunner`` class that defines the default Django testing
+A test runner is a class defining a ``run_tests()`` method. Thibaud ships
+with a ``DiscoverRunner`` class that defines the default Thibaud testing
 behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used by ``run_tests()`` to set up, execute
 and tear down the test suite.
@@ -530,7 +530,7 @@ and tear down the test suite.
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
     ``top_level`` can be used to specify the directory containing your
-    top-level Python modules. Usually Django can figure this out automatically,
+    top-level Python modules. Usually Thibaud can figure this out automatically,
     so it's not necessary to specify this option. If specified, it should
     generally be the directory containing your ``manage.py`` file.
 
@@ -562,7 +562,7 @@ and tear down the test suite.
 
     ``parallel`` specifies the number of processes.  If ``parallel`` is greater
     than ``1``, the test suite will run in ``parallel`` processes. If there are
-    fewer test case classes than configured processes, Django will reduce the
+    fewer test case classes than configured processes, Thibaud will reduce the
     number of processes accordingly. Each process gets its own database. This
     option requires the third-party ``tblib`` package to display tracebacks
     correctly.
@@ -575,7 +575,7 @@ and tear down the test suite.
     with ``tags``.
 
     If ``debug_sql`` is ``True``, failing test cases will output SQL queries
-    logged to the :ref:`django.db.backends logger <django-db-logger>` as well
+    logged to the :ref:`thibaud.db.backends logger <thibaud-db-logger>` as well
     as the traceback. If ``verbosity`` is ``2``, then queries in all tests are
     output.
 
@@ -609,7 +609,7 @@ and tear down the test suite.
     ``durations`` will show a list of the N slowest test cases. Setting this
     option to ``0`` will result in the duration for all tests being shown.
 
-    Django may, from time to time, extend the capabilities of the test runner
+    Thibaud may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
     expansion. If you subclass ``DiscoverRunner`` or write your own test
     runner, ensure it accepts ``**kwargs``.
@@ -667,7 +667,7 @@ Methods
 .. method:: DiscoverRunner.setup_test_environment(**kwargs)
 
     Sets up the test environment by calling
-    :func:`~django.test.utils.setup_test_environment` and setting
+    :func:`~thibaud.test.utils.setup_test_environment` and setting
     :setting:`DEBUG` to ``self.debug_mode`` (defaults to ``False``).
 
 .. method:: DiscoverRunner.build_suite(test_labels=None, **kwargs)
@@ -695,7 +695,7 @@ Methods
 .. method:: DiscoverRunner.setup_databases(**kwargs)
 
     Creates the test databases by calling
-    :func:`~django.test.utils.setup_databases`.
+    :func:`~thibaud.test.utils.setup_databases`.
 
 .. method:: DiscoverRunner.run_checks(databases)
 
@@ -715,7 +715,7 @@ Methods
 .. method:: DiscoverRunner.teardown_databases(old_config, **kwargs)
 
     Destroys the test databases, restoring pre-test conditions by calling
-    :func:`~django.test.utils.teardown_databases`.
+    :func:`~thibaud.test.utils.teardown_databases`.
 
 .. method:: DiscoverRunner.teardown_test_environment(**kwargs)
 
@@ -741,14 +741,14 @@ Methods
 Testing utilities
 -----------------
 
-``django.test.utils``
+``thibaud.test.utils``
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. module:: django.test.utils
+.. module:: thibaud.test.utils
    :synopsis: Helpers to write custom test runners.
 
-To assist in the creation of your own test runner, Django provides a number of
-utility methods in the ``django.test.utils`` module.
+To assist in the creation of your own test runner, Thibaud provides a number of
+utility methods in the ``thibaud.test.utils`` module.
 
 .. function:: setup_test_environment(debug=None)
 
@@ -788,10 +788,10 @@ utility methods in the ``django.test.utils`` module.
     configuration that need to be reversed. It's the return value of the
     :meth:`setup_databases` method.
 
-``django.db.connection.creation``
+``thibaud.db.connection.creation``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. currentmodule:: django.db.connection.creation
+.. currentmodule:: thibaud.db.connection.creation
 
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
@@ -812,7 +812,7 @@ can be useful during testing.
     * If ``autoclobber`` is ``True``, the database will be destroyed
       without consulting the user.
 
-    ``serialize`` determines if Django serializes the database into an
+    ``serialize`` determines if Thibaud serializes the database into an
     in-memory JSON string before running tests (used to restore the database
     state between tests if you don't have transactions). You can set this to
     ``False`` to speed up creation time if you don't have any test classes
@@ -837,7 +837,7 @@ can be useful during testing.
     ``old_database_name``.
 
     The ``verbosity`` argument has the same behavior as for
-    :class:`~django.test.runner.DiscoverRunner`.
+    :class:`~thibaud.test.runner.DiscoverRunner`.
 
     If the ``keepdb`` argument is ``True``, then the connection to the
     database will be closed, but the database will not be destroyed.
@@ -852,7 +852,7 @@ parts of your code are being exercised by tests and which are not. It's an
 important part of testing applications, so it's strongly recommended to check
 the coverage of your tests.
 
-Django can be easily integrated with `coverage.py`_, a tool for measuring code
+Thibaud can be easily integrated with `coverage.py`_, a tool for measuring code
 coverage of Python programs. First, install :pypi:`coverage`. Next, run the
 following from your project folder containing ``manage.py``:
 
@@ -867,7 +867,7 @@ project. You can see a report of this data by typing following command:
 
    coverage report
 
-Note that some Django code was executed while running tests, but it is not
+Note that some Thibaud code was executed while running tests, but it is not
 listed here because of the ``source`` flag passed to the previous command.
 
 For more options like annotated HTML listings detailing missed lines, see the

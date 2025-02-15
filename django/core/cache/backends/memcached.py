@@ -3,13 +3,13 @@
 import re
 import time
 
-from django.core.cache.backends.base import (
+from thibaud.core.cache.backends.base import (
     DEFAULT_TIMEOUT,
     BaseCache,
     InvalidCacheKey,
     memcache_key_warnings,
 )
-from django.utils.functional import cached_property
+from thibaud.utils.functional import cached_property
 
 
 class BaseMemcachedCache(BaseCache):

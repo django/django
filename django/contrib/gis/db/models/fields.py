@@ -1,9 +1,9 @@
 from collections import defaultdict, namedtuple
 
-from django.contrib.gis import forms, gdal
-from django.contrib.gis.db.models.proxy import SpatialProxy
-from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.geos import (
+from thibaud.contrib.gis import forms, gdal
+from thibaud.contrib.gis.db.models.proxy import SpatialProxy
+from thibaud.contrib.gis.gdal.error import GDALException
+from thibaud.contrib.gis.geos import (
     GeometryCollection,
     GEOSException,
     GEOSGeometry,
@@ -14,9 +14,9 @@ from django.contrib.gis.geos import (
     Point,
     Polygon,
 )
-from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Field
-from django.utils.translation import gettext_lazy as _
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db.models import Field
+from thibaud.utils.translation import gettext_lazy as _
 
 # Local cache of the spatial_ref_sys table, which holds SRID data for each
 # spatial database alias. This cache exists so that the database isn't queried
@@ -35,7 +35,7 @@ def get_srid_info(srid, connection):
     given SRID from the `spatial_ref_sys` (or equivalent) spatial database
     table for the given database connection.  These results are cached.
     """
-    from django.contrib.gis.gdal import SpatialReference
+    from thibaud.contrib.gis.gdal import SpatialReference
 
     global _srid_cache
 
@@ -389,7 +389,7 @@ class ExtentField(Field):
 
 class RasterField(BaseSpatialField):
     """
-    Raster field for GeoDjango -- evaluates into GDALRaster objects.
+    Raster field for GeoThibaud -- evaluates into GDALRaster objects.
     """
 
     description = _("Raster Field")
@@ -422,7 +422,7 @@ class RasterField(BaseSpatialField):
         setattr(cls, self.attname, SpatialProxy(gdal.GDALRaster, self))
 
     def get_transform(self, name):
-        from django.contrib.gis.db.models.lookups import RasterBandTransform
+        from thibaud.contrib.gis.db.models.lookups import RasterBandTransform
 
         try:
             band_index = int(name)

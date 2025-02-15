@@ -1,4 +1,4 @@
-from django.urls import path
+from thibaud.urls import path
 
 from . import admin
 

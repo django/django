@@ -1,6 +1,6 @@
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.db.models import NOT_PROVIDED, F, UniqueConstraint
-from django.db.models.constants import LOOKUP_SEP
+from thibaud.db.backends.base.schema import BaseDatabaseSchemaEditor
+from thibaud.db.models import NOT_PROVIDED, F, UniqueConstraint
+from thibaud.db.models.constants import LOOKUP_SEP
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):

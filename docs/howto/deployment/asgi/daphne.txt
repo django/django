@@ -1,9 +1,9 @@
 =============================
-How to use Django with Daphne
+How to use Thibaud with Daphne
 =============================
 
 :pypi:`Daphne <daphne>` is a pure-Python ASGI server for UNIX, maintained by
-members of the Django project. It acts as the reference server for ASGI.
+members of the Thibaud project. It acts as the reference server for ASGI.
 
 Installing Daphne
 ===================
@@ -14,7 +14,7 @@ You can install Daphne with ``pip``:
 
     python -m pip install daphne
 
-Running Django in Daphne
+Running Thibaud in Daphne
 ========================
 
 When Daphne is installed, a ``daphne`` command is available which starts the
@@ -22,7 +22,7 @@ Daphne server process. At its simplest, Daphne needs to be called with the
 location of a module containing an ASGI application object, followed by what
 the application is called (separated by a colon).
 
-For a typical Django project, invoking Daphne would look like:
+For a typical Thibaud project, invoking Daphne would look like:
 
 .. code-block:: shell
 

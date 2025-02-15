@@ -1,9 +1,9 @@
 import os
 from datetime import datetime, timedelta, timezone
 
-from django.conf import settings
-from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
-from django.core.files import storage
+from thibaud.conf import settings
+from thibaud.contrib.staticfiles.storage import ManifestStaticFilesStorage
+from thibaud.core.files import storage
 
 
 class DummyStorage(storage.Storage):

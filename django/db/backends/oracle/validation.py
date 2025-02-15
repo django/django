@@ -1,5 +1,5 @@
-from django.core import checks
-from django.db.backends.base.validation import BaseDatabaseValidation
+from thibaud.core import checks
+from thibaud.db.backends.base.validation import BaseDatabaseValidation
 
 
 class DatabaseValidation(BaseDatabaseValidation):

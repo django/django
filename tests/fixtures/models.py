@@ -10,10 +10,10 @@ in the application directory, or in one of the directories named in the
 
 import uuid
 
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from thibaud.contrib.auth.models import Permission
+from thibaud.contrib.contenttypes.fields import GenericForeignKey
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
 
 
 class Category(models.Model):

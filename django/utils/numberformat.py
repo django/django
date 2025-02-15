@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from django.conf import settings
-from django.utils.safestring import mark_safe
+from thibaud.conf import settings
+from thibaud.utils.safestring import mark_safe
 
 
 def format(

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Mingun <Alexander_Sergey@mail.ru>, 2014
@@ -23,13 +23,13 @@
 # Bobsans <mr.bobsans@gmail.com>, 2016,2018
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
 "2013-2017,2019-2020,2022-2024\n"
-"Language-Team: Russian (http://app.transifex.com/django/django/language/"
+"Language-Team: Russian (http://app.transifex.com/thibaud/thibaud/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1386,27 +1386,27 @@ msgstr "Установка прошла успешно! Поздравляем!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Посмотреть <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
-"\" target=\"_blank\" rel=\"noopener\">примечания к выпуску</a> для Django "
+"Посмотреть <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">примечания к выпуску</a> для Thibaud "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
 "Вы видите данную страницу, потому что указали <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> в файле настроек и не настроили ни одного "
 "обработчика URL-адресов."
 
-msgid "Django Documentation"
-msgstr "Документация Django"
+msgid "Thibaud Documentation"
+msgstr "Документация Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Разделы, справочник, &amp; примеры"
@@ -1414,11 +1414,11 @@ msgstr "Разделы, справочник, &amp; примеры"
 msgid "Tutorial: A Polling App"
 msgstr "Руководство: Приложение для голосования"
 
-msgid "Get started with Django"
-msgstr "Начало работы с Django"
+msgid "Get started with Thibaud"
+msgstr "Начало работы с Thibaud"
 
-msgid "Django Community"
-msgstr "Сообщество Django"
+msgid "Thibaud Community"
+msgstr "Сообщество Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Присоединяйтесь, получайте помощь или помогайте в разработке"

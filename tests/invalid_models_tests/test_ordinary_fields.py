@@ -1,16 +1,16 @@
 import unittest
 import uuid
 
-from django.core.checks import Error
-from django.core.checks import Warning as DjangoWarning
-from django.db import connection, models
-from django.db.models.functions import Coalesce, LPad, Pi
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import isolate_apps, override_settings
-from django.utils.functional import lazy
-from django.utils.timezone import now
-from django.utils.translation import gettext_lazy as _
-from django.utils.version import get_docs_version
+from thibaud.core.checks import Error
+from thibaud.core.checks import Warning as ThibaudWarning
+from thibaud.db import connection, models
+from thibaud.db.models.functions import Coalesce, LPad, Pi
+from thibaud.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from thibaud.test.utils import isolate_apps, override_settings
+from thibaud.utils.functional import lazy
+from thibaud.utils.timezone import now
+from thibaud.utils.translation import gettext_lazy as _
+from thibaud.utils.version import get_docs_version
 
 
 @isolate_apps("invalid_models_tests")
@@ -27,7 +27,7 @@ class AutoFieldTests(SimpleTestCase):
         class Model(models.Model):
             field = models.AutoField(primary_key=False)
 
-            # Prevent Django from autocreating `id` AutoField, which would
+            # Prevent Thibaud from autocreating `id` AutoField, which would
             # result in an error, because a model must have exactly one
             # AutoField.
             another = models.IntegerField(primary_key=True)
@@ -52,7 +52,7 @@ class AutoFieldTests(SimpleTestCase):
         self.assertEqual(
             field.check(),
             [
-                DjangoWarning(
+                ThibaudWarning(
                     "'max_length' is ignored when used with %s."
                     % field.__class__.__name__,
                     hint="Remove 'max_length' from field",
@@ -429,7 +429,7 @@ class CharFieldTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == "mysql", "Test valid only for MySQL")
     def test_too_long_char_field_under_mysql(self):
-        from django.db.backends.mysql.validation import DatabaseValidation
+        from thibaud.db.backends.mysql.validation import DatabaseValidation
 
         class Model(models.Model):
             field = models.CharField(unique=True, max_length=256)
@@ -439,11 +439,11 @@ class CharFieldTests(TestCase):
         self.assertEqual(
             validator.check_field(field),
             [
-                DjangoWarning(
+                ThibaudWarning(
                     "%s may not allow unique CharFields to have a max_length > "
                     "255." % connection.display_name,
                     hint=(
-                        "See: https://docs.djangoproject.com/en/%s/ref/databases/"
+                        "See: https://docs.thibaudproject.com/en/%s/ref/databases/"
                         "#mysql-character-fields" % get_docs_version()
                     ),
                     obj=field,
@@ -527,21 +527,21 @@ class DateFieldTests(SimpleTestCase):
         self.assertEqual(
             errors,
             [
-                DjangoWarning(
+                ThibaudWarning(
                     "Fixed default value provided.",
                     hint="It seems you set a fixed date / time / datetime "
                     "value as default for this field. This may not be "
                     "what you want. If you want to have the current date "
-                    "as default, use `django.utils.timezone.now`",
+                    "as default, use `thibaud.utils.timezone.now`",
                     obj=field_dt,
                     id="fields.W161",
                 ),
-                DjangoWarning(
+                ThibaudWarning(
                     "Fixed default value provided.",
                     hint="It seems you set a fixed date / time / datetime "
                     "value as default for this field. This may not be "
                     "what you want. If you want to have the current date "
-                    "as default, use `django.utils.timezone.now`",
+                    "as default, use `thibaud.utils.timezone.now`",
                     obj=field_d,
                     id="fields.W161",
                 ),
@@ -572,21 +572,21 @@ class DateTimeFieldTests(SimpleTestCase):
         self.assertEqual(
             errors,
             [
-                DjangoWarning(
+                ThibaudWarning(
                     "Fixed default value provided.",
                     hint="It seems you set a fixed date / time / datetime "
                     "value as default for this field. This may not be "
                     "what you want. If you want to have the current date "
-                    "as default, use `django.utils.timezone.now`",
+                    "as default, use `thibaud.utils.timezone.now`",
                     obj=field_dt,
                     id="fields.W161",
                 ),
-                DjangoWarning(
+                ThibaudWarning(
                     "Fixed default value provided.",
                     hint="It seems you set a fixed date / time / datetime "
                     "value as default for this field. This may not be "
                     "what you want. If you want to have the current date "
-                    "as default, use `django.utils.timezone.now`",
+                    "as default, use `thibaud.utils.timezone.now`",
                     obj=field_d,
                     id="fields.W161",
                 ),
@@ -840,7 +840,7 @@ class IntegerFieldTests(SimpleTestCase):
                 self.assertEqual(
                     field.check(),
                     [
-                        DjangoWarning(
+                        ThibaudWarning(
                             "'max_length' is ignored when used with %s."
                             % field.__class__.__name__,
                             hint="Remove 'max_length' from field",
@@ -909,31 +909,31 @@ class TimeFieldTests(SimpleTestCase):
         self.assertEqual(
             errors,
             [
-                DjangoWarning(
+                ThibaudWarning(
                     "Fixed default value provided.",
                     hint="It seems you set a fixed date / time / datetime "
                     "value as default for this field. This may not be "
                     "what you want. If you want to have the current date "
-                    "as default, use `django.utils.timezone.now`",
+                    "as default, use `thibaud.utils.timezone.now`",
                     obj=fields[0],
                     id="fields.W161",
                 ),
-                DjangoWarning(
+                ThibaudWarning(
                     "Fixed default value provided.",
                     hint="It seems you set a fixed date / time / datetime "
                     "value as default for this field. This may not be "
                     "what you want. If you want to have the current date "
-                    "as default, use `django.utils.timezone.now`",
+                    "as default, use `thibaud.utils.timezone.now`",
                     obj=fields[1],
                     id="fields.W161",
                 ),
-                DjangoWarning(
+                ThibaudWarning(
                     "Fixed default value provided.",
                     hint=(
                         "It seems you set a fixed date / time / datetime value as "
                         "default for this field. This may not be what you want. "
                         "If you want to have the current date as default, use "
-                        "`django.utils.timezone.now`"
+                        "`thibaud.utils.timezone.now`"
                     ),
                     obj=fields[2],
                     id="fields.W161",
@@ -959,7 +959,7 @@ class TextFieldTests(TestCase):
         self.assertEqual(
             field.check(databases=self.databases),
             [
-                DjangoWarning(
+                ThibaudWarning(
                     "%s does not support a database index on %s columns."
                     % (connection.display_name, field_type),
                     hint=(
@@ -1035,7 +1035,7 @@ class JSONFieldTests(TestCase):
         self.assertEqual(
             Model._meta.get_field("field").check(),
             [
-                DjangoWarning(
+                ThibaudWarning(
                     msg=(
                         "JSONField default should be a callable instead of an "
                         "instance so that it's not shared between all field "
@@ -1081,7 +1081,7 @@ class DbCommentTests(TestCase):
             []
             if connection.features.supports_comments
             else [
-                DjangoWarning(
+                ThibaudWarning(
                     f"{connection.display_name} does not support comments on columns "
                     f"(db_comment).",
                     obj=Model._meta.get_field("field"),
@@ -1417,7 +1417,7 @@ class GeneratedFieldTests(TestCase):
             )
 
         expected_warnings = [
-            DjangoWarning(
+            ThibaudWarning(
                 "GeneratedField.output_field has warnings:"
                 "\n    'max_length' is ignored when used with IntegerField. "
                 "(fields.W122)",

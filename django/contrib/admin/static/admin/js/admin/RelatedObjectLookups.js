@@ -3,7 +3,7 @@
 // and Add Another links.
 'use strict';
 {
-    const $ = django.jQuery;
+    const $ = thibaud.jQuery;
     let popupIndex = 0;
     const relatedWindows = [];
 
@@ -223,7 +223,7 @@
         $('body').on('click', '.related-widget-wrapper-link[data-popup="yes"]', function(e) {
             e.preventDefault();
             if (this.href) {
-                const event = $.Event('django:show-related', {href: this.href});
+                const event = $.Event('thibaud:show-related', {href: this.href});
                 $(this).trigger(event);
                 if (!event.isDefaultPrevented()) {
                     showRelatedObjectPopup(this);
@@ -231,7 +231,7 @@
             }
         });
         $('body').on('change', '.related-widget-wrapper select', function(e) {
-            const event = $.Event('django:update-related');
+            const event = $.Event('thibaud:update-related');
             $(this).trigger(event);
             if (!event.isDefaultPrevented()) {
                 updateRelatedObjectLinks(this);
@@ -240,7 +240,7 @@
         $('.related-widget-wrapper select').trigger('change');
         $('body').on('click', '.related-lookup', function(e) {
             e.preventDefault();
-            const event = $.Event('django:lookup-related');
+            const event = $.Event('thibaud:lookup-related');
             $(this).trigger(event);
             if (!event.isDefaultPrevented()) {
                 showRelatedObjectLookupPopup(this);

@@ -1,10 +1,10 @@
 ===========================
-Django 1.10.2 release notes
+Thibaud 1.10.2 release notes
 ===========================
 
 *October 1, 2016*
 
-Django 1.10.2 fixes several bugs in 1.10.1.
+Thibaud 1.10.2 fixes several bugs in 1.10.1.
 
 Bugfixes
 ========
@@ -21,7 +21,7 @@ Bugfixes
 * Fixed model form ``default`` fallback for ``CheckboxSelectMultiple``,
   ``MultiWidget``, ``FileInput``, ``SplitDateTimeWidget``, ``SelectDateWidget``,
   and ``SplitArrayWidget`` (:ticket:`27186`). Custom widgets affected by this
-  issue should implement :meth:`~django.forms.Widget.value_omitted_from_data`.
+  issue should implement :meth:`~thibaud.forms.Widget.value_omitted_from_data`.
 
 * Fixed a crash in ``runserver`` logging during a "Broken pipe" error
   (:ticket:`27271`).

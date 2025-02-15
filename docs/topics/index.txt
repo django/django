@@ -1,8 +1,8 @@
 ============
-Using Django
+Using Thibaud
 ============
 
-Introductions to all the key parts of Django you'll need to know:
+Introductions to all the key parts of Thibaud you'll need to know:
 
 .. toctree::
    :maxdepth: 2

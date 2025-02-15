@@ -1,1 +1,1 @@
-# Django settings for {{ project_name }} test project.
+# Thibaud settings for {{ project_name }} test project.

@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.test import SimpleTestCase
+from thibaud.contrib import admin
+from thibaud.test import SimpleTestCase
 
 
 class AdminAutoDiscoverTests(SimpleTestCase):

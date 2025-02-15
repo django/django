@@ -1,51 +1,51 @@
 ========================
-Django 3.2 release notes
+Thibaud 3.2 release notes
 ========================
 
 *April 6, 2021*
 
-Welcome to Django 3.2!
+Welcome to Thibaud 3.2!
 
 These release notes cover the :ref:`new features <whats-new-3.2>`, as well as
 some :ref:`backwards incompatible changes <backwards-incompatible-3.2>` you'll
-want to be aware of when upgrading from Django 3.1 or earlier. We've
+want to be aware of when upgrading from Thibaud 3.1 or earlier. We've
 :ref:`begun the deprecation process for some features
 <deprecated-features-3.2>`.
 
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 3.2 is designated as a :term:`long-term support release
+Thibaud 3.2 is designated as a :term:`long-term support release
 <Long-term support release>`. It will receive security updates for at least
-three years after its release. Support for the previous LTS, Django 2.2, will
+three years after its release. Support for the previous LTS, Thibaud 2.2, will
 end in April 2022.
 
 Python compatibility
 ====================
 
-Django 3.2 supports Python 3.6, 3.7, 3.8, 3.9, and 3.10 (as of 3.2.9). We
+Thibaud 3.2 supports Python 3.6, 3.7, 3.8, 3.9, and 3.10 (as of 3.2.9). We
 **highly recommend** and only officially support the latest release of each
 series.
 
 .. _whats-new-3.2:
 
-What's new in Django 3.2
+What's new in Thibaud 3.2
 ========================
 
-Automatic :class:`~django.apps.AppConfig` discovery
+Automatic :class:`~thibaud.apps.AppConfig` discovery
 ---------------------------------------------------
 
-Most pluggable applications define an :class:`~django.apps.AppConfig` subclass
+Most pluggable applications define an :class:`~thibaud.apps.AppConfig` subclass
 in an ``apps.py`` submodule. Many define a ``default_app_config`` variable
 pointing to this class in their ``__init__.py``.
 
 When the ``apps.py`` submodule exists and defines a single
-:class:`~django.apps.AppConfig` subclass, Django now uses that configuration
+:class:`~thibaud.apps.AppConfig` subclass, Thibaud now uses that configuration
 automatically, so you can remove ``default_app_config``.
 
 ``default_app_config`` made it possible to declare only the application's path
-in :setting:`INSTALLED_APPS` (e.g. ``'django.contrib.admin'``) rather than the
-app config's path (e.g. ``'django.contrib.admin.apps.AdminConfig'``). It was
+in :setting:`INSTALLED_APPS` (e.g. ``'thibaud.contrib.admin'``) rather than the
+app config's path (e.g. ``'thibaud.contrib.admin.apps.AdminConfig'``). It was
 introduced for backwards-compatibility with the former style, with the intent
 to switch the ecosystem to the latter, but the switch didn't happen.
 
@@ -58,38 +58,38 @@ Customizing type of auto-created primary keys
 ---------------------------------------------
 
 When defining a model, if no field in a model is defined with
-:attr:`primary_key=True <django.db.models.Field.primary_key>` an implicit
+:attr:`primary_key=True <thibaud.db.models.Field.primary_key>` an implicit
 primary key is added. The type of this implicit primary key can now be
 controlled via the :setting:`DEFAULT_AUTO_FIELD` setting and
-:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+:attr:`AppConfig.default_auto_field <thibaud.apps.AppConfig.default_auto_field>`
 attribute. No more needing to override primary keys in all models.
 
 Maintaining the historical behavior, the default value for
-:setting:`DEFAULT_AUTO_FIELD` is :class:`~django.db.models.AutoField`. Starting
+:setting:`DEFAULT_AUTO_FIELD` is :class:`~thibaud.db.models.AutoField`. Starting
 with 3.2 new projects are generated with :setting:`DEFAULT_AUTO_FIELD` set to
-:class:`~django.db.models.BigAutoField`. Also, new apps are generated with
-:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
-set to :class:`~django.db.models.BigAutoField`. In a future Django release the
+:class:`~thibaud.db.models.BigAutoField`. Also, new apps are generated with
+:attr:`AppConfig.default_auto_field <thibaud.apps.AppConfig.default_auto_field>`
+set to :class:`~thibaud.db.models.BigAutoField`. In a future Thibaud release the
 default value of :setting:`DEFAULT_AUTO_FIELD` will be changed to
-:class:`~django.db.models.BigAutoField`.
+:class:`~thibaud.db.models.BigAutoField`.
 
 To avoid unwanted migrations in the future, either explicitly set
-:setting:`DEFAULT_AUTO_FIELD` to :class:`~django.db.models.AutoField`::
+:setting:`DEFAULT_AUTO_FIELD` to :class:`~thibaud.db.models.AutoField`::
 
-    DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+    DEFAULT_AUTO_FIELD = "thibaud.db.models.AutoField"
 
 or configure it on a per-app basis::
 
-    from django.apps import AppConfig
+    from thibaud.apps import AppConfig
 
 
     class MyAppConfig(AppConfig):
-        default_auto_field = "django.db.models.AutoField"
+        default_auto_field = "thibaud.db.models.AutoField"
         name = "my_app"
 
 or on a per-model basis::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class MyModel(models.Model):
@@ -108,13 +108,13 @@ such tables.
 Functional indexes
 ------------------
 
-The new :attr:`*expressions <django.db.models.Index.expressions>` positional
-argument of :class:`Index() <django.db.models.Index>` enables creating
+The new :attr:`*expressions <thibaud.db.models.Index.expressions>` positional
+argument of :class:`Index() <thibaud.db.models.Index>` enables creating
 functional indexes on expressions and database functions. For example::
 
-    from django.db import models
-    from django.db.models import F, Index, Value
-    from django.db.models.functions import Lower, Upper
+    from thibaud.db import models
+    from thibaud.db.models import F, Index, Value
+    from thibaud.db.models.functions import Lower, Upper
 
 
     class MyModel(models.Model):
@@ -137,27 +137,27 @@ functional indexes on expressions and database functions. For example::
             ]
 
 Functional indexes are added to models using the
-:attr:`Meta.indexes <django.db.models.Options.indexes>` option.
+:attr:`Meta.indexes <thibaud.db.models.Options.indexes>` option.
 
 ``pymemcache`` support
 ----------------------
 
-The new ``django.core.cache.backends.memcached.PyMemcacheCache`` cache backend
+The new ``thibaud.core.cache.backends.memcached.PyMemcacheCache`` cache backend
 allows using the :pypi:`pymemcache` library for memcached. ``pymemcache`` 3.4.0
 or higher is required. For more details, see the :doc:`documentation on caching
-in Django </topics/cache>`.
+in Thibaud </topics/cache>`.
 
 New decorators for the admin site
 ---------------------------------
 
-The new :func:`~django.contrib.admin.display` decorator allows for easily
+The new :func:`~thibaud.contrib.admin.display` decorator allows for easily
 adding options to custom display functions that can be used with
-:attr:`~django.contrib.admin.ModelAdmin.list_display` or
-:attr:`~django.contrib.admin.ModelAdmin.readonly_fields`.
+:attr:`~thibaud.contrib.admin.ModelAdmin.list_display` or
+:attr:`~thibaud.contrib.admin.ModelAdmin.readonly_fields`.
 
-Likewise, the new :func:`~django.contrib.admin.action` decorator allows for
+Likewise, the new :func:`~thibaud.contrib.admin.action` decorator allows for
 easily adding options to action functions that can be used with
-:attr:`~django.contrib.admin.ModelAdmin.actions`.
+:attr:`~thibaud.contrib.admin.ModelAdmin.actions`.
 
 Using the ``@display`` decorator has the advantage that it is now
 possible to use the ``@property`` decorator when needing to specify attributes
@@ -172,7 +172,7 @@ hood.
 Minor features
 --------------
 
-:mod:`django.contrib.admin`
+:mod:`thibaud.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :attr:`.ModelAdmin.search_fields` now allows searching against quoted phrases
@@ -185,9 +185,9 @@ Minor features
   according to browser settings. See :ref:`admin-theming` for more details.
 
 * :attr:`.ModelAdmin.autocomplete_fields` now respects
-  :attr:`ForeignKey.to_field <django.db.models.ForeignKey.to_field>` and
+  :attr:`ForeignKey.to_field <thibaud.db.models.ForeignKey.to_field>` and
   :attr:`ForeignKey.limit_choices_to
-  <django.db.models.ForeignKey.limit_choices_to>` when searching a related
+  <thibaud.db.models.ForeignKey.limit_choices_to>` when searching a related
   model.
 
 * The admin now installs a final catch-all view that redirects unauthenticated
@@ -198,7 +198,7 @@ Minor features
   :attr:`.AdminSite.final_catch_all_view` to ``False`` to disable the
   catch-all view.
 
-:mod:`django.contrib.auth`
+:mod:`thibaud.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
@@ -216,32 +216,32 @@ Minor features
 * The default salt entropy for the Argon2, MD5, PBKDF2, SHA-1 password hashers
   is increased from 71 to 128 bits.
 
-:mod:`django.contrib.contenttypes`
+:mod:`thibaud.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``absolute_max`` argument for
-  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory`
+  :func:`~thibaud.contrib.contenttypes.forms.generic_inlineformset_factory`
   allows customizing the maximum number of forms that can be instantiated when
   supplying ``POST`` data. See :ref:`formsets-absolute-max` for more details.
 
 * The new ``can_delete_extra`` argument for
-  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory`
+  :func:`~thibaud.contrib.contenttypes.forms.generic_inlineformset_factory`
   allows removal of the option to delete extra forms. See
   :attr:`~.BaseFormSet.can_delete_extra` for more information.
 
-:mod:`django.contrib.gis`
+:mod:`thibaud.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :meth:`.GDALRaster.transform` method now supports
-  :class:`~django.contrib.gis.gdal.SpatialReference`.
+  :class:`~thibaud.contrib.gis.gdal.SpatialReference`.
 
-* The :class:`~django.contrib.gis.gdal.DataSource` class now supports
+* The :class:`~thibaud.contrib.gis.gdal.DataSource` class now supports
   :class:`pathlib.Path`.
 
-* The :class:`~django.contrib.gis.utils.LayerMapping` class now supports
+* The :class:`~thibaud.contrib.gis.utils.LayerMapping` class now supports
   :class:`pathlib.Path`.
 
-:mod:`django.contrib.postgres`
+:mod:`thibaud.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :attr:`.ExclusionConstraint.include` attribute allows creating
@@ -256,32 +256,32 @@ Minor features
 * The new :attr:`.JSONBAgg.distinct` attribute determines if aggregated values
   will be distinct.
 
-* The :class:`~django.contrib.postgres.operations.CreateExtension` operation
+* The :class:`~thibaud.contrib.postgres.operations.CreateExtension` operation
   now checks that the extension already exists in the database and skips the
   migration if so.
 
-* The new :class:`~django.contrib.postgres.operations.CreateCollation` and
-  :class:`~django.contrib.postgres.operations.RemoveCollation` operations
+* The new :class:`~thibaud.contrib.postgres.operations.CreateCollation` and
+  :class:`~thibaud.contrib.postgres.operations.RemoveCollation` operations
   allow creating and dropping collations on PostgreSQL. See
   :ref:`manage-postgresql-collations` for more details.
 
-* Lookups for :class:`~django.contrib.postgres.fields.ArrayField` now allow
+* Lookups for :class:`~thibaud.contrib.postgres.fields.ArrayField` now allow
   (non-nested) arrays containing expressions as right-hand sides.
 
-* The new :class:`OpClass() <django.contrib.postgres.indexes.OpClass>`
+* The new :class:`OpClass() <thibaud.contrib.postgres.indexes.OpClass>`
   expression allows creating functional indexes on expressions with a custom
   operator class. See :ref:`new_functional_indexes` for more details.
 
-:mod:`django.contrib.sitemaps`
+:mod:`thibaud.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new :class:`~django.contrib.sitemaps.Sitemap` attributes
-  :attr:`~django.contrib.sitemaps.Sitemap.alternates`,
-  :attr:`~django.contrib.sitemaps.Sitemap.languages` and
-  :attr:`~django.contrib.sitemaps.Sitemap.x_default` allow
+* The new :class:`~thibaud.contrib.sitemaps.Sitemap` attributes
+  :attr:`~thibaud.contrib.sitemaps.Sitemap.alternates`,
+  :attr:`~thibaud.contrib.sitemaps.Sitemap.languages` and
+  :attr:`~thibaud.contrib.sitemaps.Sitemap.x_default` allow
   generating sitemap *alternates* to localized versions of your pages.
 
-:mod:`django.contrib.syndication`
+:mod:`thibaud.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``item_comments`` hook allows specifying a comments URL per feed
@@ -291,30 +291,30 @@ Database backends
 ~~~~~~~~~~~~~~~~~
 
 * Third-party database backends can now skip or mark as expected failures
-  tests in Django's test suite using the new
-  ``DatabaseFeatures.django_test_skips`` and
-  ``django_test_expected_failures`` attributes.
+  tests in Thibaud's test suite using the new
+  ``DatabaseFeatures.thibaud_test_skips`` and
+  ``thibaud_test_expected_failures`` attributes.
 
 Decorators
 ~~~~~~~~~~
 
-* The new :func:`~django.views.decorators.common.no_append_slash` decorator
+* The new :func:`~thibaud.views.decorators.common.no_append_slash` decorator
   allows individual views to be excluded from :setting:`APPEND_SLASH` URL
   normalization.
 
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* Custom :class:`~django.views.debug.ExceptionReporter` subclasses can now
-  define the :attr:`~django.views.debug.ExceptionReporter.html_template_path`
-  and :attr:`~django.views.debug.ExceptionReporter.text_template_path`
+* Custom :class:`~thibaud.views.debug.ExceptionReporter` subclasses can now
+  define the :attr:`~thibaud.views.debug.ExceptionReporter.html_template_path`
+  and :attr:`~thibaud.views.debug.ExceptionReporter.text_template_path`
   properties to override the templates used to render exception reports.
 
 File Uploads
 ~~~~~~~~~~~~
 
 * The new :meth:`FileUploadHandler.upload_interrupted()
-  <django.core.files.uploadhandler.FileUploadHandler.upload_interrupted>`
+  <thibaud.core.files.uploadhandler.FileUploadHandler.upload_interrupted>`
   callback allows handling interrupted uploads.
 
 Forms
@@ -330,7 +330,7 @@ Forms
   removal of the option to delete extra forms. See
   :attr:`~.BaseFormSet.can_delete_extra` for more information.
 
-* :class:`~django.forms.formsets.BaseFormSet` now reports a user facing error,
+* :class:`~thibaud.forms.formsets.BaseFormSet` now reports a user facing error,
   rather than raising an exception, when the management form is missing or has
   been tampered with. To customize this error message, pass the
   ``error_messages`` argument with the key ``'missing_management_form'`` when
@@ -340,8 +340,8 @@ Generic Views
 ~~~~~~~~~~~~~
 
 * The ``week_format`` attributes of
-  :class:`~django.views.generic.dates.WeekMixin` and
-  :class:`~django.views.generic.dates.WeekArchiveView` now support the
+  :class:`~thibaud.views.generic.dates.WeekMixin` and
+  :class:`~thibaud.views.generic.dates.WeekArchiveView` now support the
   ``'%V'`` ISO 8601 week format.
 
 Management Commands
@@ -384,7 +384,7 @@ Models
   supported on PostgreSQL, allows acquiring weaker locks that don't block the
   creation of rows that reference locked rows through a foreign key.
 
-* :class:`When() <django.db.models.expressions.When>` expression now allows
+* :class:`When() <thibaud.db.models.expressions.When>` expression now allows
   using the ``condition`` argument with ``lookups``.
 
 * The new :attr:`.Index.include` and :attr:`.UniqueConstraint.include`
@@ -397,15 +397,15 @@ Models
 * The :meth:`.QuerySet.update` method now respects the ``order_by()`` clause on
   MySQL and MariaDB.
 
-* :class:`FilteredRelation() <django.db.models.FilteredRelation>` now supports
+* :class:`FilteredRelation() <thibaud.db.models.FilteredRelation>` now supports
   nested relations.
 
 * The ``of`` argument of :meth:`.QuerySet.select_for_update()` is now allowed
   on MySQL 8.0.1+.
 
-* :class:`Value() <django.db.models.Value>` expression now
+* :class:`Value() <thibaud.db.models.Value>` expression now
   automatically resolves its ``output_field`` to the appropriate
-  :class:`Field <django.db.models.Field>` subclass based on the type of
+  :class:`Field <thibaud.db.models.Field>` subclass based on the type of
   its provided ``value`` for :py:class:`bool`, :py:class:`bytes`,
   :py:class:`float`, :py:class:`int`, :py:class:`str`,
   :py:class:`datetime.date`, :py:class:`datetime.datetime`,
@@ -419,7 +419,7 @@ Models
   expressions that don't need to be selected but are used for filtering,
   ordering, or as a part of complex expressions.
 
-* The new :class:`~django.db.models.functions.Collate` function allows
+* The new :class:`~thibaud.db.models.functions.Collate` function allows
   filtering and ordering by specified database collations.
 
 * The ``field_name`` argument of :meth:`.QuerySet.in_bulk()` now accepts
@@ -427,33 +427,33 @@ Models
   :meth:`.QuerySet.distinct`.
 
 * The new ``tzinfo`` parameter of the
-  :class:`~django.db.models.functions.TruncDate` and
-  :class:`~django.db.models.functions.TruncTime` database functions allows
+  :class:`~thibaud.db.models.functions.TruncDate` and
+  :class:`~thibaud.db.models.functions.TruncTime` database functions allows
   truncating datetimes in a specific timezone.
 
 * The new ``db_collation`` argument for
-  :attr:`CharField <django.db.models.CharField.db_collation>` and
-  :attr:`TextField <django.db.models.TextField.db_collation>` allows setting a
+  :attr:`CharField <thibaud.db.models.CharField.db_collation>` and
+  :attr:`TextField <thibaud.db.models.TextField.db_collation>` allows setting a
   database collation for the field.
 
-* Added the :class:`~django.db.models.functions.Random` database function.
+* Added the :class:`~thibaud.db.models.functions.Random` database function.
 
-* :ref:`aggregation-functions`, :class:`F() <django.db.models.F>`,
-  :class:`OuterRef() <django.db.models.OuterRef>`, and other expressions now
+* :ref:`aggregation-functions`, :class:`F() <thibaud.db.models.F>`,
+  :class:`OuterRef() <thibaud.db.models.OuterRef>`, and other expressions now
   allow using transforms. See :ref:`using-transforms-in-expressions` for
   details.
 
-* The new ``durable`` argument for :func:`~django.db.transaction.atomic`
+* The new ``durable`` argument for :func:`~thibaud.db.transaction.atomic`
   guarantees that changes made in the atomic block will be committed if the
   block exits without errors. A nested atomic block marked as durable will
   raise a ``RuntimeError``.
 
-* Added the :class:`~django.db.models.functions.JSONObject` database function.
+* Added the :class:`~thibaud.db.models.functions.JSONObject` database function.
 
 Pagination
 ~~~~~~~~~~
 
-* The new :meth:`django.core.paginator.Paginator.get_elided_page_range` method
+* The new :meth:`thibaud.core.paginator.Paginator.get_elided_page_range` method
   allows generating a page range with some of the values elided. If there are a
   large number of pages, this can be helpful for generating a reasonable number
   of page links in a template.
@@ -466,10 +466,10 @@ Requests and Responses
   Both interfaces will continue to be supported. See
   :ref:`setting-header-fields` for details.
 
-* The new ``headers`` parameter of :class:`~django.http.HttpResponse`,
-  :class:`~django.template.response.SimpleTemplateResponse`, and
-  :class:`~django.template.response.TemplateResponse` allows setting response
-  :attr:`~django.http.HttpResponse.headers` on instantiation.
+* The new ``headers`` parameter of :class:`~thibaud.http.HttpResponse`,
+  :class:`~thibaud.template.response.SimpleTemplateResponse`, and
+  :class:`~thibaud.template.response.TemplateResponse` allows setting response
+  :attr:`~thibaud.http.HttpResponse.headers` on instantiation.
 
 Security
 ~~~~~~~~
@@ -478,16 +478,16 @@ Security
   access, rather than when settings are first loaded. This enables running
   management commands that do not rely on the ``SECRET_KEY`` without needing to
   provide a value. As a consequence of this, calling
-  :func:`~django.conf.settings.configure` without providing a valid
+  :func:`~thibaud.conf.settings.configure` without providing a valid
   ``SECRET_KEY``, and then going on to access ``settings.SECRET_KEY`` will now
-  raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+  raise an :exc:`~thibaud.core.exceptions.ImproperlyConfigured` exception.
 
 * The new ``Signer.sign_object()`` and ``Signer.unsign_object()`` methods allow
   signing complex data structures. See :ref:`signing-complex-data` for more
   details.
 
-  Also, :func:`signing.dumps() <django.core.signing.dumps>` and
-  :func:`~django.core.signing.loads` become shortcuts for
+  Also, :func:`signing.dumps() <thibaud.core.signing.dumps>` and
+  :func:`~thibaud.core.signing.loads` become shortcuts for
   :meth:`.TimestampSigner.sign_object` and
   :meth:`~.TimestampSigner.unsign_object`.
 
@@ -502,7 +502,7 @@ Serialization
 Signals
 ~~~~~~~
 
-* :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now logs
+* :meth:`Signal.send_robust() <thibaud.dispatch.Signal.send_robust>` now logs
   exceptions.
 
 Templates
@@ -520,27 +520,27 @@ Tests
 * Objects assigned to class attributes in :meth:`.TestCase.setUpTestData` are
   now isolated for each test method. Such objects are now required to support
   creating deep copies with :py:func:`copy.deepcopy`. Assigning objects which
-  don't support ``deepcopy()`` is deprecated and will be removed in Django 4.1.
+  don't support ``deepcopy()`` is deprecated and will be removed in Thibaud 4.1.
 
-* :class:`~django.test.runner.DiscoverRunner` now enables
+* :class:`~thibaud.test.runner.DiscoverRunner` now enables
   :py:mod:`faulthandler` by default. This can be disabled by using the
   :option:`test --no-faulthandler` option.
 
-* :class:`~django.test.runner.DiscoverRunner` and the
+* :class:`~thibaud.test.runner.DiscoverRunner` and the
   :djadmin:`test` management command can now track timings, including database
   setup and total run time. This can be enabled by using the :option:`test
   --timing` option.
 
-* :class:`~django.test.Client` now preserves the request query string when
+* :class:`~thibaud.test.Client` now preserves the request query string when
   following 307 and 308 redirects.
 
 * The new :meth:`.TestCase.captureOnCommitCallbacks` method captures callback
   functions passed to :func:`transaction.on_commit()
-  <django.db.transaction.on_commit>` in a list. This allows you to test such
+  <thibaud.db.transaction.on_commit>` in a list. This allows you to test such
   callbacks without using the slower :class:`.TransactionTestCase`.
 
 * :meth:`TransactionTestCase.assertQuerysetEqual()
-  <django.test.TransactionTestCase.assertQuerySetEqual>` now supports direct
+  <thibaud.test.TransactionTestCase.assertQuerySetEqual>` now supports direct
   comparison against another queryset rather than being restricted to
   comparison against a list of string representations of objects when using the
   default value for the ``transform`` argument.
@@ -548,15 +548,15 @@ Tests
 Utilities
 ~~~~~~~~~
 
-* The new ``depth`` parameter of ``django.utils.timesince.timesince()`` and
-  ``django.utils.timesince.timeuntil()`` functions allows specifying the number
+* The new ``depth`` parameter of ``thibaud.utils.timesince.timesince()`` and
+  ``thibaud.utils.timesince.timeuntil()`` functions allows specifying the number
   of adjacent time units to return.
 
 Validators
 ~~~~~~~~~~
 
 * Built-in validators now include the provided value in the ``params`` argument
-  of a raised :exc:`~django.core.exceptions.ValidationError`. This allows
+  of a raised :exc:`~thibaud.core.exceptions.ValidationError`. This allows
   custom error messages to use the ``%(value)s`` placeholder.
 
 * The :class:`.ValidationError` equality operator now ignores ``messages`` and
@@ -601,7 +601,7 @@ backends.
   ``supports_non_deterministic_collations`` to ``False``.
 
 * ``DatabaseOperations.random_function_sql()`` is removed in favor of the new
-  :class:`~django.db.models.functions.Random` database function.
+  :class:`~thibaud.db.models.functions.Random` database function.
 
 * ``DatabaseOperations.date_trunc_sql()`` and
   ``DatabaseOperations.time_trunc_sql()`` now take the optional ``tzname``
@@ -619,7 +619,7 @@ backends.
   is not a part of the ``CREATE INDEX`` statement, set
   ``DatabaseFeatures.collate_as_index_expression`` to ``True``.
 
-:mod:`django.contrib.admin`
+:mod:`thibaud.contrib.admin`
 ---------------------------
 
 * Pagination links in the admin are now 1-indexed instead of 0-indexed, i.e.
@@ -628,7 +628,7 @@ backends.
 * The new admin catch-all view will break URL patterns routed after the admin
   URLs and matching the admin URL prefix. You can either adjust your URL
   ordering or, if necessary, set :attr:`AdminSite.final_catch_all_view
-  <django.contrib.admin.AdminSite.final_catch_all_view>` to ``False``,
+  <thibaud.contrib.admin.AdminSite.final_catch_all_view>` to ``False``,
   disabling the catch-all view. See :ref:`whats-new-3.2` for more details.
 
 * Minified JavaScript files are no longer included with the admin. If you
@@ -639,7 +639,7 @@ backends.
 * :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
   such as ``'a'`` or ``'an'``.
 
-:mod:`django.contrib.gis`
+:mod:`thibaud.contrib.gis`
 -------------------------
 
 * Support for PostGIS 2.2 is removed.
@@ -652,25 +652,25 @@ backends.
 Dropped support for PostgreSQL 9.5
 ----------------------------------
 
-Upstream support for PostgreSQL 9.5 ends in February 2021. Django 3.2 supports
+Upstream support for PostgreSQL 9.5 ends in February 2021. Thibaud 3.2 supports
 PostgreSQL 9.6 and higher.
 
 Dropped support for MySQL 5.6
 -----------------------------
 
-The end of upstream support for MySQL 5.6 is April 2021. Django 3.2 supports
+The end of upstream support for MySQL 5.6 is April 2021. Thibaud 3.2 supports
 MySQL 5.7 and higher.
 
 Miscellaneous
 -------------
 
-* Django now supports non-``pytz`` time zones, such as Python 3.9+'s
+* Thibaud now supports non-``pytz`` time zones, such as Python 3.9+'s
   :mod:`zoneinfo` module and its backport.
 
 * The undocumented ``SpatiaLiteOperations.proj4_version()`` method is renamed
   to ``proj_version()``.
 
-* :func:`~django.utils.text.slugify` now removes leading and trailing dashes
+* :func:`~thibaud.utils.text.slugify` now removes leading and trailing dashes
   and underscores.
 
 * The :tfilter:`intcomma` and :tfilter:`intword` template filters no longer
@@ -680,43 +680,43 @@ Miscellaneous
 
 * The cache keys no longer includes the language when internationalization is
   disabled (``USE_I18N = False``) and localization is enabled
-  (``USE_L10N = True``). After upgrading to Django 3.2 in such configurations,
+  (``USE_L10N = True``). After upgrading to Thibaud 3.2 in such configurations,
   the first request to any previously cached value will be a cache miss.
 
 * ``ForeignKey.validate()`` now uses
-  :attr:`~django.db.models.Model._base_manager` rather than
-  :attr:`~django.db.models.Model._default_manager` to check that related
+  :attr:`~thibaud.db.models.Model._base_manager` rather than
+  :attr:`~thibaud.db.models.Model._default_manager` to check that related
   instances exist.
 
-* When an application defines an :class:`~django.apps.AppConfig` subclass in
-  an ``apps.py`` submodule, Django now uses this configuration automatically,
+* When an application defines an :class:`~thibaud.apps.AppConfig` subclass in
+  an ``apps.py`` submodule, Thibaud now uses this configuration automatically,
   even if it isn't enabled with ``default_app_config``. Set ``default = False``
-  in the :class:`~django.apps.AppConfig` subclass if you need to prevent this
+  in the :class:`~thibaud.apps.AppConfig` subclass if you need to prevent this
   behavior. See :ref:`whats-new-3.2` for more details.
 
 * Instantiating an abstract model now raises ``TypeError``.
 
-* Keyword arguments to :func:`~django.test.utils.setup_databases` are now
+* Keyword arguments to :func:`~thibaud.test.utils.setup_databases` are now
   keyword-only.
 
-* The undocumented ``django.utils.http.limited_parse_qsl()`` function is
+* The undocumented ``thibaud.utils.http.limited_parse_qsl()`` function is
   removed. Please use :func:`urllib.parse.parse_qsl` instead.
 
-* ``django.test.utils.TestContextDecorator`` now uses
+* ``thibaud.test.utils.TestContextDecorator`` now uses
   :py:meth:`~unittest.TestCase.addCleanup` so that cleanups registered in the
   :py:meth:`~unittest.TestCase.setUp` method are called before
   ``TestContextDecorator.disable()``.
 
 * ``SessionMiddleware`` now raises a
-  :exc:`~django.contrib.sessions.exceptions.SessionInterrupted` exception
-  instead of :exc:`~django.core.exceptions.SuspiciousOperation` when a session
+  :exc:`~thibaud.contrib.sessions.exceptions.SessionInterrupted` exception
+  instead of :exc:`~thibaud.core.exceptions.SuspiciousOperation` when a session
   is destroyed in a concurrent request.
 
-* The :class:`django.db.models.Field` equality operator now correctly
+* The :class:`thibaud.db.models.Field` equality operator now correctly
   distinguishes inherited field instances across models. Additionally, the
   ordering of such fields is now defined.
 
-* The undocumented ``django.core.files.locks.lock()`` function now returns
+* The undocumented ``thibaud.core.files.locks.lock()`` function now returns
   ``False`` if the file cannot be locked, instead of raising
   :exc:`BlockingIOError`.
 
@@ -727,8 +727,8 @@ Miscellaneous
   using :option:`makemessages --locale` option, when they contain hyphens
   (``'-'``).
 
-* The ``django.contrib.auth.forms.ReadOnlyPasswordHashField`` form field is now
-  :attr:`~django.forms.Field.disabled` by default. Therefore
+* The ``thibaud.contrib.auth.forms.ReadOnlyPasswordHashField`` form field is now
+  :attr:`~thibaud.forms.Field.disabled` by default. Therefore
   ``UserChangeForm.clean_password()`` is no longer required to return the
   initial value.
 
@@ -742,9 +742,9 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.8.3 to 3.9.0.
 
-* :class:`~django.contrib.messages.storage.cookie.CookieStorage` now stores
+* :class:`~thibaud.contrib.messages.storage.cookie.CookieStorage` now stores
   messages in the :rfc:`6265` compliant format. Support for cookies that use
-  the old format remains until Django 4.1.
+  the old format remains until Thibaud 4.1.
 
 * The minimum supported version of ``asgiref`` is increased from 3.2.10 to
   3.3.2.
@@ -766,7 +766,7 @@ Miscellaneous
   instead of ``False``.
 
 * The ``whitelist`` argument and ``domain_whitelist`` attribute of
-  :class:`~django.core.validators.EmailValidator` are deprecated. Use
+  :class:`~thibaud.core.validators.EmailValidator` are deprecated. Use
   ``allowlist`` instead of ``whitelist``, and ``domain_allowlist`` instead of
   ``domain_whitelist``. You may need to rename ``whitelist`` in existing
   migrations.
@@ -780,12 +780,12 @@ Miscellaneous
   values, is deprecated. If you need the previous behavior, explicitly set
   ``transform`` to ``repr``.
 
-* The ``django.core.cache.backends.memcached.MemcachedCache`` backend is
+* The ``thibaud.core.cache.backends.memcached.MemcachedCache`` backend is
   deprecated as ``python-memcached`` has some problems and seems to be
-  unmaintained. Use ``django.core.cache.backends.memcached.PyMemcacheCache``
-  or ``django.core.cache.backends.memcached.PyLibMCCache`` instead.
+  unmaintained. Use ``thibaud.core.cache.backends.memcached.PyMemcacheCache``
+  or ``thibaud.core.cache.backends.memcached.PyLibMCCache`` instead.
 
 * The format of messages used by
-  ``django.contrib.messages.storage.cookie.CookieStorage`` is different from
-  the format generated by older versions of Django. Support for the old format
-  remains until Django 4.1.
+  ``thibaud.contrib.messages.storage.cookie.CookieStorage`` is different from
+  the format generated by older versions of Thibaud. Support for the old format
+  remains until Thibaud 4.1.

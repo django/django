@@ -1,13 +1,13 @@
 """
 Serialization
 
-``django.core.serializers`` provides interfaces to converting Django
+``thibaud.core.serializers`` provides interfaces to converting Thibaud
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
 
 from decimal import Decimal
 
-from django.db import models
+from thibaud.db import models
 
 
 class CategoryMetaDataManager(models.Manager):

@@ -6,9 +6,9 @@
 
 from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_uint, c_void_p
 
-from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.prototypes.generation import (
+from thibaud.contrib.gis.gdal.envelope import OGREnvelope
+from thibaud.contrib.gis.gdal.libgdal import lgdal
+from thibaud.contrib.gis.gdal.prototypes.generation import (
     bool_output,
     const_string_output,
     double_output,

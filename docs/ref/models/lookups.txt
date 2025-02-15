@@ -2,12 +2,12 @@
 Lookup API reference
 ====================
 
-.. module:: django.db.models.lookups
+.. module:: thibaud.db.models.lookups
    :synopsis: Lookups API
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
-This document has the API references of lookups, the Django API for building
+This document has the API references of lookups, the Thibaud API for building
 the ``WHERE`` clause of a database query. To learn how to *use* lookups, see
 :doc:`/topics/db/queries`; to learn how to *create* new lookups, see
 :doc:`/howto/custom-lookups`.
@@ -16,8 +16,8 @@ The lookup API has two components: a :class:`~lookups.RegisterLookupMixin` class
 that registers lookups, and the :ref:`Query Expression API <query-expression>`, a
 set of methods that a class has to implement to be registrable as a lookup.
 
-Django has two base classes that follow the query expression API and from where
-all Django builtin lookups are derived:
+Thibaud has two base classes that follow the query expression API and from where
+all Thibaud builtin lookups are derived:
 
 * :class:`Lookup`: to lookup a field (e.g. the ``exact`` of ``field_name__exact``)
 * :class:`Transform`: to transform a field
@@ -33,10 +33,10 @@ A lookup expression consists of three parts:
 Registration API
 ================
 
-Django uses :class:`~lookups.RegisterLookupMixin` to give a class the interface to
+Thibaud uses :class:`~lookups.RegisterLookupMixin` to give a class the interface to
 register lookups on itself or its instances. The two prominent examples are
-:class:`~django.db.models.Field`, the base class of all model fields, and
-:class:`Transform`, the base class of all Django transforms.
+:class:`~thibaud.db.models.Field`, the base class of all model fields, and
+:class:`Transform`, the base class of all Thibaud transforms.
 
 .. class:: lookups.RegisterLookupMixin
 
@@ -114,10 +114,10 @@ following methods:
 .. method:: as_vendorname(compiler, connection)
 
     Works like ``as_sql()`` method. When an expression is compiled by
-    ``compiler.compile()``, Django will first try to call ``as_vendorname()``,
+    ``compiler.compile()``, Thibaud will first try to call ``as_vendorname()``,
     where ``vendorname`` is the vendor name of the backend used for executing
     the query. The ``vendorname`` is one of ``postgresql``, ``oracle``,
-    ``sqlite``, or ``mysql`` for Django's built-in backends.
+    ``sqlite``, or ``mysql`` for Thibaud's built-in backends.
 
 .. method:: get_lookup(lookup_name)
 
@@ -132,7 +132,7 @@ following methods:
 .. attribute:: output_field
 
     Defines the type of class returned by the ``get_lookup()`` method. It must
-    be a :class:`~django.db.models.Field` instance.
+    be a :class:`~thibaud.db.models.Field` instance.
 
 ``Transform`` reference
 =======================
@@ -172,7 +172,7 @@ following methods:
     .. attribute:: output_field
 
         Defines the class this transformation outputs. It must be a
-        :class:`~django.db.models.Field` instance. By default is the same as
+        :class:`~thibaud.db.models.Field` instance. By default is the same as
         its ``lhs.output_field``.
 
 ``Lookup`` reference
@@ -219,7 +219,7 @@ following methods:
         :attr:`prepare_rhs` determines whether it should be prepared for use as
         a parameter in a query. In order to do so,
         ``lhs.output_field.get_prep_value()`` is called if defined, or ``rhs``
-        is wrapped in :class:`Value() <django.db.models.Value>` otherwise.
+        is wrapped in :class:`Value() <thibaud.db.models.Value>` otherwise.
 
     .. method:: process_lhs(compiler, connection, lhs=None)
 

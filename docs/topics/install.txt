@@ -1,13 +1,13 @@
 =====================
-How to install Django
+How to install Thibaud
 =====================
 
-This document will get you up and running with Django.
+This document will get you up and running with Thibaud.
 
 Install Python
 ==============
 
-Django is a Python web framework. See :ref:`faq-python-version-support` for
+Thibaud is a Python web framework. See :ref:`faq-python-version-support` for
 details.
 
 Get the latest version of Python at https://www.python.org/downloads/ or with
@@ -15,18 +15,18 @@ your operating system's package manager.
 
 .. admonition:: Python on Windows
 
-    If you are just starting with Django and using Windows, you may find
+    If you are just starting with Thibaud and using Windows, you may find
     :doc:`/howto/windows` useful.
 
 Install Apache and ``mod_wsgi``
 ===============================
 
-If you just want to experiment with Django, skip ahead to the next
-section; Django includes a lightweight web server you can use for
+If you just want to experiment with Thibaud, skip ahead to the next
+section; Thibaud includes a lightweight web server you can use for
 testing, so you won't need to set up Apache until you're ready to
-deploy Django in production.
+deploy Thibaud in production.
 
-If you want to use Django on a production site, use `Apache`_ with
+If you want to use Thibaud on a production site, use `Apache`_ with
 `mod_wsgi`_. mod_wsgi operates in one of two modes: embedded
 mode or daemon mode. In embedded mode, mod_wsgi is similar to
 mod_perl -- it embeds Python within Apache and loads Python code into
@@ -40,15 +40,15 @@ without restarting the entire Apache web server, possibly making
 refreshing your codebase more seamless. Consult the mod_wsgi
 documentation to determine which mode is right for your setup. Make
 sure you have Apache installed with the mod_wsgi module activated.
-Django will work with any version of Apache that supports mod_wsgi.
+Thibaud will work with any version of Apache that supports mod_wsgi.
 
-See :doc:`How to use Django with mod_wsgi </howto/deployment/wsgi/modwsgi>`
+See :doc:`How to use Thibaud with mod_wsgi </howto/deployment/wsgi/modwsgi>`
 for information on how to configure mod_wsgi once you have it
 installed.
 
-If you can't use mod_wsgi for some reason, fear not: Django supports many other
+If you can't use mod_wsgi for some reason, fear not: Thibaud supports many other
 deployment options. One is :doc:`uWSGI </howto/deployment/wsgi/uwsgi>`; it works
-very well with `nginx`_. Additionally, Django follows the WSGI spec
+very well with `nginx`_. Additionally, Thibaud follows the WSGI spec
 (:pep:`3333`), which allows it to run on a variety of server platforms.
 
 .. _Apache: https://httpd.apache.org/
@@ -60,8 +60,8 @@ very well with `nginx`_. Additionally, Django follows the WSGI spec
 Get your database running
 =========================
 
-If you plan to use Django's database API functionality, you'll need to make
-sure a database server is running. Django supports many different database
+If you plan to use Thibaud's database API functionality, you'll need to make
+sure a database server is running. Thibaud supports many different database
 servers and is officially supported with PostgreSQL_, MariaDB_, MySQL_, Oracle_
 and SQLite_.
 
@@ -74,7 +74,7 @@ production.
 
 In addition to the officially supported databases, there are :ref:`backends
 provided by 3rd parties <third-party-notes>` that allow you to use other
-databases with Django.
+databases with Thibaud.
 
 To use another database other than SQLite, you'll need to make sure that the
 appropriate Python database bindings are installed:
@@ -101,10 +101,10 @@ And ensure that the following keys in the ``'default'`` item of the
 :setting:`DATABASES` dictionary match your database connection settings:
 
 * :setting:`ENGINE <DATABASE-ENGINE>` -- Either
-  ``'django.db.backends.sqlite3'``,
-  ``'django.db.backends.postgresql'``,
-  ``'django.db.backends.mysql'``, or
-  ``'django.db.backends.oracle'``. Other backends are :ref:`also available
+  ``'thibaud.db.backends.sqlite3'``,
+  ``'thibaud.db.backends.postgresql'``,
+  ``'thibaud.db.backends.mysql'``, or
+  ``'thibaud.db.backends.oracle'``. Other backends are :ref:`also available
   <third-party-notes>`.
 
 * :setting:`NAME` -- The name of your database. If you’re using SQLite, the
@@ -124,17 +124,17 @@ And ensure that the following keys in the ``'default'`` item of the
     with "``CREATE DATABASE database_name;``" within your database's
     interactive prompt.
 
-If you plan to use Django's ``manage.py migrate`` command to automatically
-create database tables for your models (after first installing Django and
-creating a project), you'll need to ensure that Django has permission to create
+If you plan to use Thibaud's ``manage.py migrate`` command to automatically
+create database tables for your models (after first installing Thibaud and
+creating a project), you'll need to ensure that Thibaud has permission to create
 and alter tables in the database you're using; if you plan to manually create
-the tables, you can grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
+the tables, you can grant Thibaud ``SELECT``, ``INSERT``, ``UPDATE`` and
 ``DELETE`` permissions. After creating a database user with these permissions,
 you'll specify the details in your project's settings file, see
 :setting:`DATABASES` for details.
 
-If you're using Django's :doc:`testing framework</topics/testing/index>` to test
-database queries, Django will need permission to create a test database.
+If you're using Thibaud's :doc:`testing framework</topics/testing/index>` to test
+database queries, Thibaud will need permission to create a test database.
 
 .. _PostgreSQL: https://www.postgresql.org/
 .. _MariaDB: https://mariadb.org/
@@ -145,9 +145,9 @@ database queries, Django will need permission to create a test database.
 .. _oracledb: https://oracle.github.io/python-oracledb/
 .. _Oracle: https://www.oracle.com/
 
-.. _install-django-code:
+.. _install-thibaud-code:
 
-Install the Django code
+Install the Thibaud code
 =======================
 
 Installation instructions are slightly different depending on whether you're
@@ -159,7 +159,7 @@ release, or fetching the latest development version.
 Installing an official release with ``pip``
 -------------------------------------------
 
-This is the recommended way to install Django.
+This is the recommended way to install Thibaud.
 
 #. Install pip_. The easiest is to use the `standalone pip installer`_. If your
    distribution already has ``pip`` installed, you might need to update it if
@@ -176,7 +176,7 @@ This is the recommended way to install Django.
 
    .. console::
 
-        $ python -m pip install Django
+        $ python -m pip install Thibaud
 
 .. _pip: https://pip.pypa.io/
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installation/
@@ -187,44 +187,44 @@ Installing a distribution-specific package
 ------------------------------------------
 
 Check the :doc:`distribution specific notes </misc/distributions>` to see if
-your platform/distribution provides official Django packages/installers.
+your platform/distribution provides official Thibaud packages/installers.
 Distribution-provided packages will typically allow for automatic installation
 of dependencies and supported upgrade paths; however, these packages will rarely
-contain the latest release of Django.
+contain the latest release of Thibaud.
 
 .. _installing-development-version:
 
 Installing the development version
 ----------------------------------
 
-.. admonition:: Tracking Django development
+.. admonition:: Tracking Thibaud development
 
-    If you decide to use the latest development version of Django,
+    If you decide to use the latest development version of Thibaud,
     you'll want to pay close attention to `the development timeline`_,
     and you'll want to keep an eye on the :ref:`release notes for the
     upcoming release <development_release_notes>`. This will help you stay
     on top of any new features you might want to use, as well as any changes
-    you'll need to make to your code when updating your copy of Django.
+    you'll need to make to your code when updating your copy of Thibaud.
     (For stable releases, any necessary changes are documented in the
     release notes.)
 
-.. _the development timeline: https://code.djangoproject.com/timeline
+.. _the development timeline: https://code.thibaudproject.com/timeline
 
-If you'd like to be able to update your Django code occasionally with the
+If you'd like to be able to update your Thibaud code occasionally with the
 latest bug fixes and improvements, follow these instructions:
 
 #. Make sure that you have Git_ installed and that you can run its commands
    from a shell. (Enter ``git help`` at a shell prompt to test this.)
 
-#. Check out Django's main development branch like so:
+#. Check out Thibaud's main development branch like so:
 
    .. console::
 
-        $ git clone https://github.com/django/django.git
+        $ git clone https://github.com/thibaud/thibaud.git
 
-   This will create a directory ``django`` in your current directory.
+   This will create a directory ``thibaud`` in your current directory.
 
-#. Make sure that the Python interpreter can load Django's code. The most
+#. Make sure that the Python interpreter can load Thibaud's code. The most
    convenient way to do this is to use a virtual environment and pip_. The
    :doc:`contributing tutorial </intro/contributing>` walks through how to
    create a virtual environment.
@@ -234,14 +234,14 @@ latest bug fixes and improvements, follow these instructions:
 
    .. console::
 
-        $ python -m pip install -e django/
+        $ python -m pip install -e thibaud/
 
-   This will make Django's code importable, and will also make the
-   ``django-admin`` utility command available. In other words, you're all
+   This will make Thibaud's code importable, and will also make the
+   ``thibaud-admin`` utility command available. In other words, you're all
    set!
 
-When you want to update your copy of the Django source code, run the command
-``git pull`` from within the ``django`` directory. When you do this, Git will
+When you want to update your copy of the Thibaud source code, run the command
+``git pull`` from within the ``thibaud`` directory. When you do this, Git will
 download any changes.
 
 .. _Git: https://git-scm.com/

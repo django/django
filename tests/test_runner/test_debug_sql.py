@@ -1,9 +1,9 @@
 import unittest
 from io import StringIO
 
-from django.db import connection
-from django.test import TestCase
-from django.test.runner import DiscoverRunner
+from thibaud.db import connection
+from thibaud.test import TestCase
+from thibaud.test.runner import DiscoverRunner
 
 from .models import Person
 

@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 
-from django.core.exceptions import ValidationError
+from thibaud.core.exceptions import ValidationError
 
 
 class TestValidationError(unittest.TestCase):

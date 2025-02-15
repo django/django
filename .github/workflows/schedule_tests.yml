@@ -38,7 +38,7 @@ jobs:
 
   pyc-only:
     runs-on: ubuntu-latest
-    name: Byte-compiled Django with no source files (only .pyc files)
+    name: Byte-compiled Thibaud with no source files (only .pyc files)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
       - run: python -m pip install .
       - name: Prepare site-packages
         run: |
-          DJANGO_PACKAGE_ROOT=$(python -c 'import site; print(site.getsitepackages()[0])')/django
+          DJANGO_PACKAGE_ROOT=$(python -c 'import site; print(site.getsitepackages()[0])')/thibaud
           echo $DJANGO_PACKAGE_ROOT
           python -m compileall -b $DJANGO_PACKAGE_ROOT
           find $DJANGO_PACKAGE_ROOT -name '*.py' -print -delete
@@ -106,7 +106,7 @@ jobs:
       postgres:
         image: postgres:14-alpine
         env:
-          POSTGRES_DB: django
+          POSTGRES_DB: thibaud
           POSTGRES_USER: user
           POSTGRES_PASSWORD: postgres
         ports:
@@ -151,7 +151,7 @@ jobs:
       postgres:
         image: postgres:${{ matrix.version }}-alpine
         env:
-          POSTGRES_DB: django
+          POSTGRES_DB: thibaud
           POSTGRES_USER: user
           POSTGRES_PASSWORD: postgres
         ports:

@@ -5,13 +5,13 @@ Form classes
 import copy
 import datetime
 
-from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.forms.fields import Field
-from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
-from django.forms.widgets import Media, MediaDefiningClass
-from django.utils.datastructures import MultiValueDict
-from django.utils.functional import cached_property
-from django.utils.translation import gettext as _
+from thibaud.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from thibaud.forms.fields import Field
+from thibaud.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
+from thibaud.forms.widgets import Media, MediaDefiningClass
+from thibaud.utils.datastructures import MultiValueDict
+from thibaud.utils.functional import cached_property
+from thibaud.utils.translation import gettext as _
 
 from .renderers import get_default_renderer
 
@@ -62,11 +62,11 @@ class BaseForm(RenderableFormMixin):
     prefix = None
     use_required_attribute = True
 
-    template_name_div = "django/forms/div.html"
-    template_name_p = "django/forms/p.html"
-    template_name_table = "django/forms/table.html"
-    template_name_ul = "django/forms/ul.html"
-    template_name_label = "django/forms/label.html"
+    template_name_div = "thibaud/forms/div.html"
+    template_name_p = "thibaud/forms/p.html"
+    template_name_table = "thibaud/forms/table.html"
+    template_name_ul = "thibaud/forms/ul.html"
+    template_name_label = "thibaud/forms/label.html"
 
     bound_field_class = None
 

@@ -4,7 +4,7 @@ Reverse lookups
 This demonstrates the reverse lookup features of the database API.
 """
 
-from django.db import models
+from thibaud.db import models
 
 
 class User(models.Model):

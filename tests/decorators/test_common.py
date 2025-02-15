@@ -1,8 +1,8 @@
 from asgiref.sync import iscoroutinefunction
 
-from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase
-from django.views.decorators.common import no_append_slash
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.test import SimpleTestCase
+from thibaud.views.decorators.common import no_append_slash
 
 
 class NoAppendSlashTests(SimpleTestCase):

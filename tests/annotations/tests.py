@@ -2,9 +2,9 @@ import datetime
 from decimal import Decimal
 from unittest import skipUnless
 
-from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db import connection
-from django.db.models import (
+from thibaud.core.exceptions import FieldDoesNotExist, FieldError
+from thibaud.db import connection
+from thibaud.db.models import (
     BooleanField,
     Case,
     CharField,
@@ -26,8 +26,8 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.expressions import RawSQL
-from django.db.models.functions import (
+from thibaud.db.models.expressions import RawSQL
+from thibaud.db.models.functions import (
     Cast,
     Coalesce,
     ExtractYear,
@@ -36,9 +36,9 @@ from django.db.models.functions import (
     Lower,
     Trim,
 )
-from django.db.models.sql.query import get_field_names_from_opts
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import register_lookup
+from thibaud.db.models.sql.query import get_field_names_from_opts
+from thibaud.test import TestCase, skipUnlessDBFeature
+from thibaud.test.utils import register_lookup
 
 from .models import (
     Author,
@@ -82,7 +82,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
         cls.b1 = Book.objects.create(
             isbn="159059725",
-            name="The Definitive Guide to Django: Web Development Done Right",
+            name="The Definitive Guide to Thibaud: Web Development Done Right",
             pages=447,
             rating=4.5,
             price=Decimal("30.00"),
@@ -92,7 +92,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
         cls.b2 = Book.objects.create(
             isbn="067232959",
-            name="Sams Teach Yourself Django in 24 Hours",
+            name="Sams Teach Yourself Thibaud in 24 Hours",
             pages=528,
             rating=3.0,
             price=Decimal("23.09"),
@@ -102,7 +102,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
         cls.b3 = Book.objects.create(
             isbn="159059996",
-            name="Practical Django Projects",
+            name="Practical Thibaud Projects",
             pages=300,
             rating=4.0,
             price=Decimal("29.69"),
@@ -112,7 +112,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
         cls.b4 = Book.objects.create(
             isbn="013235613",
-            name="Python Web Development with Django",
+            name="Python Web Development with Thibaud",
             pages=350,
             rating=4.0,
             price=Decimal("29.69"),
@@ -238,7 +238,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
 
     def test_chaining_transforms(self):
-        Company.objects.create(name=" Django Software Foundation  ")
+        Company.objects.create(name=" Thibaud Software Foundation  ")
         Company.objects.create(name="Yahoo")
         with register_lookup(CharField, Trim), register_lookup(CharField, Length):
             for expr in [Length("name__trim"), F("name__trim__length")]:
@@ -246,7 +246,7 @@ class NonAggregateAnnotationTestCase(TestCase):
                     self.assertCountEqual(
                         Company.objects.annotate(length=expr).values("name", "length"),
                         [
-                            {"name": " Django Software Foundation  ", "length": 26},
+                            {"name": " Thibaud Software Foundation  ", "length": 26},
                             {"name": "Yahoo", "length": 5},
                         ],
                     )
@@ -542,7 +542,7 @@ class NonAggregateAnnotationTestCase(TestCase):
                 store_name=F("store__name"),
             )
             .filter(
-                name="Practical Django Projects",
+                name="Practical Thibaud Projects",
             )
             .order_by("store_name")
         )
@@ -835,7 +835,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             description="Beautiful Devices",
         ).save()
         Company(
-            name="Django Software Foundation",
+            name="Thibaud Software Foundation",
             motto=None,
             ticker_name=None,
             description=None,
@@ -864,7 +864,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             qs,
             [
                 ("Apple", "APPL"),
-                ("Django Software Foundation", "No Tag"),
+                ("Thibaud Software Foundation", "No Tag"),
                 ("Google", "Do No Evil"),
                 ("Yahoo", "Internet Company"),
             ],
@@ -879,7 +879,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             description="Beautiful Devices",
         ).save()
         Company(
-            name="Django Software Foundation",
+            name="Thibaud Software Foundation",
             motto=None,
             ticker_name=None,
             description=None,
@@ -920,7 +920,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             qs,
             [
                 ("Apple", "APPL".lower()),
-                ("Django Software Foundation", "No Tag".lower()),
+                ("Thibaud Software Foundation", "No Tag".lower()),
                 ("Google", "Do No Evil".lower()),
                 ("Yahoo", "Internet Company".lower()),
             ],
@@ -1225,7 +1225,7 @@ class AliasTests(TestCase):
             contact=cls.a1,
             publisher=p1,
             pubdate=datetime.date(2007, 12, 6),
-            name="The Definitive Guide to Django: Web Development Done Right",
+            name="The Definitive Guide to Thibaud: Web Development Done Right",
         )
         cls.b2 = Book.objects.create(
             isbn="159059996",
@@ -1235,7 +1235,7 @@ class AliasTests(TestCase):
             contact=cls.a3,
             publisher=p1,
             pubdate=datetime.date(2008, 6, 23),
-            name="Practical Django Projects",
+            name="Practical Thibaud Projects",
         )
         cls.b3 = Book.objects.create(
             isbn="013790395",

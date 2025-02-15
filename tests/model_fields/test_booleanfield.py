@@ -1,7 +1,7 @@
-from django import forms
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, models, transaction
-from django.test import SimpleTestCase, TestCase
+from thibaud import forms
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import IntegrityError, models, transaction
+from thibaud.test import SimpleTestCase, TestCase
 
 from .models import BooleanModel, FksToBooleans, NullBooleanModel
 

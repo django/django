@@ -2,11 +2,11 @@
 Classes to represent the definitions of aggregate functions.
 """
 
-from django.core.exceptions import FieldError, FullResultSet
-from django.db.models.expressions import Case, ColPairs, Func, Star, Value, When
-from django.db.models.fields import IntegerField
-from django.db.models.functions import Coalesce
-from django.db.models.functions.mixins import (
+from thibaud.core.exceptions import FieldError, FullResultSet
+from thibaud.db.models.expressions import Case, ColPairs, Func, Star, Value, When
+from thibaud.db.models.fields import IntegerField
+from thibaud.db.models.functions import Coalesce
+from thibaud.db.models.functions.mixins import (
     FixDurationInputMixin,
     NumericOutputFieldMixin,
 )

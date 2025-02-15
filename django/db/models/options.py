@@ -2,25 +2,25 @@ import bisect
 import copy
 from collections import defaultdict
 
-from django.apps import apps
-from django.conf import settings
-from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
-from django.core.signals import setting_changed
-from django.db import connections
-from django.db.models import (
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
+from thibaud.core.signals import setting_changed
+from thibaud.db import connections
+from thibaud.db.models import (
     AutoField,
     CompositePrimaryKey,
     Manager,
     OrderWrt,
     UniqueConstraint,
 )
-from django.db.models.fields import composite
-from django.db.models.query_utils import PathInfo
-from django.utils.datastructures import ImmutableList, OrderedSet
-from django.utils.functional import cached_property
-from django.utils.module_loading import import_string
-from django.utils.text import camel_case_to_spaces, format_lazy
-from django.utils.translation import override
+from thibaud.db.models.fields import composite
+from thibaud.db.models.query_utils import PathInfo
+from thibaud.utils.datastructures import ImmutableList, OrderedSet
+from thibaud.utils.functional import cached_property
+from thibaud.utils.module_loading import import_string
+from thibaud.utils.text import camel_case_to_spaces, format_lazy
+from thibaud.utils.translation import override
 
 PROXY_PARENTS = object()
 
@@ -176,8 +176,8 @@ class Options:
         return self.apps.app_configs.get(self.app_label)
 
     def contribute_to_class(self, cls, name):
-        from django.db import connection
-        from django.db.backends.utils import truncate_name
+        from thibaud.db import connection
+        from thibaud.db.backends.utils import truncate_name
 
         cls._meta = self
         self.model = cls
@@ -194,7 +194,7 @@ class Options:
         if self.meta:
             meta_attrs = self.meta.__dict__.copy()
             for name in self.meta.__dict__:
-                # Ignore any private attributes that Django doesn't care about.
+                # Ignore any private attributes that Thibaud doesn't care about.
                 # NOTE: We can't modify a dictionary's contents while looping
                 # over it, so we loop over the *original* dictionary instead.
                 if name.startswith("_"):
@@ -526,7 +526,7 @@ class Options:
         Return a list of all forward fields on the model and its parents,
         excluding ManyToManyFields.
 
-        Private API intended only to be used by Django itself; get_fields()
+        Private API intended only to be used by Thibaud itself; get_fields()
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
@@ -567,7 +567,7 @@ class Options:
         """
         Return a list of all concrete fields on the model and its parents.
 
-        Private API intended only to be used by Django itself; get_fields()
+        Private API intended only to be used by Thibaud itself; get_fields()
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
@@ -580,7 +580,7 @@ class Options:
         """
         Return a list of all concrete fields on the model.
 
-        Private API intended only to be used by Django itself; get_fields()
+        Private API intended only to be used by Thibaud itself; get_fields()
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
@@ -593,7 +593,7 @@ class Options:
         """
         Return a list of all many to many fields on the model and its parents.
 
-        Private API intended only to be used by Django itself; get_fields()
+        Private API intended only to be used by Thibaud itself; get_fields()
         combined with filtering of field properties is the public API for
         obtaining this list.
         """
@@ -613,7 +613,7 @@ class Options:
         objects can come from a one-to-one, one-to-many, or many-to-many field
         relation type.
 
-        Private API intended only to be used by Django itself; get_fields()
+        Private API intended only to be used by Thibaud itself; get_fields()
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
@@ -635,7 +635,7 @@ class Options:
         fields = self._get_fields(reverse=False)
         for field in fields:
             res[field.name] = field
-            # Due to the way Django's internals work, get_field() should also
+            # Due to the way Thibaud's internals work, get_field() should also
             # be able to fetch a field by attname. In the case of a concrete
             # field with relation, includes the *_id name too
             try:
@@ -650,7 +650,7 @@ class Options:
         fields = self._get_fields(forward=False, include_hidden=True)
         for field in fields:
             res[field.name] = field
-            # Due to the way Django's internals work, get_field() should also
+            # Due to the way Thibaud's internals work, get_field() should also
             # be able to fetch a field by attname. In the case of a concrete
             # field with relation, includes the *_id name too
             try:
@@ -893,7 +893,7 @@ class Options:
                 "Invalid argument for include_parents: %s" % (include_parents,)
             )
         # This helper function is used to allow recursion in ``get_fields()``
-        # implementation and to provide a fast way for Django's internals to
+        # implementation and to provide a fast way for Thibaud's internals to
         # access specific subsets of fields.
 
         # Creates a cache key composed of all arguments
@@ -1031,7 +1031,7 @@ class Options:
     @cached_property
     def db_returning_fields(self):
         """
-        Private API intended only to be used by Django itself.
+        Private API intended only to be used by Thibaud itself.
         Fields to be returned after a database insert.
         """
         return [

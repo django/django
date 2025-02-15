@@ -6,15 +6,15 @@ from datetime import datetime, timedelta
 from importlib import import_module
 from unittest import skipUnless
 
-from django import forms
-from django.conf import settings
-from django.contrib import admin
-from django.contrib.admin import widgets
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.auth.models import User
-from django.core.files.storage import default_storage
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import (
+from thibaud import forms
+from thibaud.conf import settings
+from thibaud.contrib import admin
+from thibaud.contrib.admin import widgets
+from thibaud.contrib.admin.tests import AdminSeleniumTestCase
+from thibaud.contrib.auth.models import User
+from thibaud.core.files.storage import default_storage
+from thibaud.core.files.uploadedfile import SimpleUploadedFile
+from thibaud.db.models import (
     CharField,
     DateField,
     DateTimeField,
@@ -22,11 +22,11 @@ from django.db.models import (
     ManyToManyField,
     UUIDField,
 )
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.selenium import screenshot_cases
-from django.test.utils import requires_tz_support
-from django.urls import reverse
-from django.utils import translation
+from thibaud.test import SimpleTestCase, TestCase, override_settings
+from thibaud.test.selenium import screenshot_cases
+from thibaud.test.utils import requires_tz_support
+from thibaud.urls import reverse
+from thibaud.utils import translation
 
 from .models import (
     Advisor,
@@ -1133,7 +1133,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_calendar_show_date_from_input(self):
         """
         The calendar shows the date from the input field for every locale
-        supported by Django.
+        supported by Thibaud.
         """
         from selenium.webdriver.common.by import By
 
@@ -1147,13 +1147,13 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         # Get month name translations for every locale
         month_string = "May"
         path = os.path.join(
-            os.path.dirname(import_module("django.contrib.admin").__file__), "locale"
+            os.path.dirname(import_module("thibaud.contrib.admin").__file__), "locale"
         )
         url = reverse("admin:admin_widgets_member_change", args=(member.pk,))
         with self.small_screen_size():
             for language_code, language_name in settings.LANGUAGES:
                 try:
-                    catalog = gettext.translation("djangojs", path, [language_code])
+                    catalog = gettext.translation("thibaudjs", path, [language_code])
                 except OSError:
                     continue
                 if month_string in catalog._catalog:

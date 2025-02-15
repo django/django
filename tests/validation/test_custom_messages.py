@@ -1,4 +1,4 @@
-from django.test import SimpleTestCase
+from thibaud.test import SimpleTestCase
 
 from . import ValidationAssertions
 from .models import CustomMessagesModel

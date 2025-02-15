@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Albin Larsson <albin.post@gmail.com>, 2022
@@ -22,12 +22,12 @@
 # Tomas Lööw <tomas.loow@mailbox.org>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: Jörgen Olofsson, 2024\n"
-"Language-Team: Swedish (http://app.transifex.com/django/django/language/"
+"Language-Team: Swedish (http://app.transifex.com/thibaud/thibaud/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1325,26 +1325,26 @@ msgstr "Installationen lyckades! Grattis!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Visa <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> för Django %(version)s"
+"Visa <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> för Thibaud %(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Du ser den här sidan eftersom <a href=\"https://docs.djangoproject.com/en/"
+"Du ser den här sidan eftersom <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> i din settings-fil och du har inte "
 "konfigurerat några URL:er."
 
-msgid "Django Documentation"
-msgstr "Djangodokumentation"
+msgid "Thibaud Documentation"
+msgstr "Thibauddokumentation"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Ämnen, referenser och how-to’s"
@@ -1352,11 +1352,11 @@ msgstr "Ämnen, referenser och how-to’s"
 msgid "Tutorial: A Polling App"
 msgstr "Tutorial: En undersöknings-app"
 
-msgid "Get started with Django"
-msgstr "Kom igång med Django"
+msgid "Get started with Thibaud"
+msgstr "Kom igång med Thibaud"
 
-msgid "Django Community"
-msgstr "Djangos community"
+msgid "Thibaud Community"
+msgstr "Thibauds community"
 
 msgid "Connect, get help, or contribute"
 msgstr "Kontakta, begär hjälp eller bidra"

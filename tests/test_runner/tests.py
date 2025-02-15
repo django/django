@@ -1,5 +1,5 @@
 """
-Tests for django test runner
+Tests for thibaud test runner
 """
 
 import collections.abc
@@ -11,13 +11,13 @@ from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django import db
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management import call_command
-from django.core.management.base import SystemCheckError
-from django.test import SimpleTestCase, TransactionTestCase, skipUnlessDBFeature
-from django.test.runner import (
+from thibaud import db
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.management import call_command
+from thibaud.core.management.base import SystemCheckError
+from thibaud.test import SimpleTestCase, TransactionTestCase, skipUnlessDBFeature
+from thibaud.test.runner import (
     DiscoverRunner,
     Shuffler,
     _init_worker,
@@ -25,8 +25,8 @@ from django.test.runner import (
     reorder_tests,
     shuffle_tests,
 )
-from django.test.testcases import connections_support_transactions
-from django.test.utils import (
+from thibaud.test.testcases import connections_support_transactions
+from thibaud.test.utils import (
     captured_stderr,
     dependency_ordered,
     get_unique_databases_and_mirrors,
@@ -540,14 +540,14 @@ class ManageCommandParallelTests(SimpleTestCase):
 
     @mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "7"})
     @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
-    def test_no_parallel_django_test_processes_env(self, *mocked_objects):
+    def test_no_parallel_thibaud_test_processes_env(self, *mocked_objects):
         with captured_stderr() as stderr:
             call_command("test", testrunner="test_runner.tests.MockTestRunner")
         self.assertEqual(stderr.getvalue(), "")
 
     @mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "invalid"})
     @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
-    def test_django_test_processes_env_non_int(self, *mocked_objects):
+    def test_thibaud_test_processes_env_non_int(self, *mocked_objects):
         with self.assertRaises(ValueError):
             call_command(
                 "test",
@@ -557,7 +557,7 @@ class ManageCommandParallelTests(SimpleTestCase):
 
     @mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "7"})
     @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
-    def test_django_test_processes_parallel_default(self, *mocked_objects):
+    def test_thibaud_test_processes_parallel_default(self, *mocked_objects):
         for parallel in ["--parallel", "--parallel=auto"]:
             with self.subTest(parallel=parallel):
                 with captured_stderr() as stderr:
@@ -584,19 +584,19 @@ class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
 
     def test_default_options(self):
         args = ["test", "--settings=test_project.settings"]
-        out, err = self.run_django_admin(args)
+        out, err = self.run_thibaud_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "1:2:3")
 
     def test_default_and_given_options(self):
         args = ["test", "--settings=test_project.settings", "--option_b=foo"]
-        out, err = self.run_django_admin(args)
+        out, err = self.run_thibaud_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "1:foo:3")
 
     def test_option_name_and_value_separated(self):
         args = ["test", "--settings=test_project.settings", "--option_b", "foo"]
-        out, err = self.run_django_admin(args)
+        out, err = self.run_thibaud_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "1:foo:3")
 
@@ -608,7 +608,7 @@ class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
             "--option_b=foo",
             "--option_c=31337",
         ]
-        out, err = self.run_django_admin(args)
+        out, err = self.run_thibaud_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "bar:foo:31337")
 
@@ -632,7 +632,7 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
             "--option_b=foo",
             "--option_c=31337",
         ]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_thibaud_admin(args, "test_project.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "bar:foo:31337")
 
@@ -644,13 +644,13 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
             "--option_b=foo",
             "--option_c=31337",
         ]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_thibaud_admin(args, "test_project.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "bar:foo:31337")
 
     def test_no_testrunner(self):
         args = ["test", "--testrunner"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_thibaud_admin(args, "test_project.settings")
         self.assertIn("usage", err)
         self.assertNotIn("Traceback", err)
         self.assertNoOutput(out)
@@ -659,7 +659,7 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
 class NoInitializeSuiteTestRunnerTests(SimpleTestCase):
     @mock.patch.object(multiprocessing, "get_start_method", return_value="spawn")
     @mock.patch(
-        "django.test.runner.ParallelTestSuite.initialize_suite",
+        "thibaud.test.runner.ParallelTestSuite.initialize_suite",
         side_effect=Exception("initialize_suite() is called."),
     )
     def test_no_initialize_suite_test_runner(self, *mocked_objects):
@@ -695,7 +695,7 @@ class NoInitializeSuiteTestRunnerTests(SimpleTestCase):
             )
             runner.run_tests(
                 [
-                    "test_runner_apps.sample.tests_sample.TestDjangoTestCase",
+                    "test_runner_apps.sample.tests_sample.TestThibaudTestCase",
                     "test_runner_apps.simple.tests",
                 ]
             )
@@ -734,7 +734,7 @@ class TestRunnerInitializerTests(SimpleTestCase):
         with self.assertRaisesMessage(Exception, "multiprocessing.Pool()"):
             runner.run_tests(
                 [
-                    "test_runner_apps.sample.tests_sample.TestDjangoTestCase",
+                    "test_runner_apps.sample.tests_sample.TestThibaudTestCase",
                     "test_runner_apps.simple.tests",
                 ]
             )
@@ -787,16 +787,16 @@ class SQLiteInMemoryTestDbs(TransactionTestCase):
             tested_connections = db.ConnectionHandler(
                 {
                     "default": {
-                        "ENGINE": "django.db.backends.sqlite3",
+                        "ENGINE": "thibaud.db.backends.sqlite3",
                         option_key: option_value,
                     },
                     "other": {
-                        "ENGINE": "django.db.backends.sqlite3",
+                        "ENGINE": "thibaud.db.backends.sqlite3",
                         option_key: option_value,
                     },
                 }
             )
-            with mock.patch("django.test.utils.connections", new=tested_connections):
+            with mock.patch("thibaud.test.utils.connections", new=tested_connections):
                 other = tested_connections["other"]
                 try:
                     new_test_connections = DiscoverRunner(verbosity=0).setup_databases()
@@ -821,7 +821,7 @@ class DummyBackendTest(unittest.TestCase):
         setup_databases() doesn't fail with dummy database backend.
         """
         tested_connections = db.ConnectionHandler({})
-        with mock.patch("django.test.utils.connections", new=tested_connections):
+        with mock.patch("thibaud.test.utils.connections", new=tested_connections):
             runner_instance = DiscoverRunner(verbosity=0)
             old_config = runner_instance.setup_databases()
             runner_instance.teardown_databases(old_config)
@@ -835,7 +835,7 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
         tested_connections = db.ConnectionHandler(
             {"default": {"NAME": "dummy"}, "aliased": {"NAME": "dummy"}}
         )
-        with mock.patch("django.test.utils.connections", new=tested_connections):
+        with mock.patch("thibaud.test.utils.connections", new=tested_connections):
             runner_instance = DiscoverRunner(verbosity=0)
             old_config = runner_instance.setup_databases()
             runner_instance.teardown_databases(old_config)
@@ -849,20 +849,20 @@ class SetupDatabasesTests(unittest.TestCase):
         tested_connections = db.ConnectionHandler(
             {
                 "default": {
-                    "ENGINE": "django.db.backends.dummy",
+                    "ENGINE": "thibaud.db.backends.dummy",
                     "NAME": "dbname",
                 },
                 "other": {
-                    "ENGINE": "django.db.backends.dummy",
+                    "ENGINE": "thibaud.db.backends.dummy",
                     "NAME": "dbname",
                 },
             }
         )
 
         with mock.patch(
-            "django.db.backends.dummy.base.DatabaseWrapper.creation_class"
+            "thibaud.db.backends.dummy.base.DatabaseWrapper.creation_class"
         ) as mocked_db_creation:
-            with mock.patch("django.test.utils.connections", new=tested_connections):
+            with mock.patch("thibaud.test.utils.connections", new=tested_connections):
                 old_config = self.runner_instance.setup_databases()
                 self.runner_instance.teardown_databases(old_config)
         mocked_db_creation.return_value.destroy_test_db.assert_called_once_with(
@@ -877,21 +877,21 @@ class SetupDatabasesTests(unittest.TestCase):
         tested_connections = db.ConnectionHandler(
             {
                 "other": {
-                    "ENGINE": "django.db.backends.dummy",
+                    "ENGINE": "thibaud.db.backends.dummy",
                     "NAME": "dbname",
                 },
                 "default": {
-                    "ENGINE": "django.db.backends.dummy",
+                    "ENGINE": "thibaud.db.backends.dummy",
                     "NAME": "dbname",
                 },
             }
         )
-        with mock.patch("django.test.utils.connections", new=tested_connections):
+        with mock.patch("thibaud.test.utils.connections", new=tested_connections):
             test_databases, _ = get_unique_databases_and_mirrors()
             self.assertEqual(
                 test_databases,
                 {
-                    ("", "", "django.db.backends.dummy", "test_dbname"): (
+                    ("", "", "thibaud.db.backends.dummy", "test_dbname"): (
                         "dbname",
                         ["default", "other"],
                     ),
@@ -909,7 +909,7 @@ class SetupDatabasesTests(unittest.TestCase):
         )
         # Using the real current name as old_name to not mess with the test suite.
         old_name = settings.DATABASES[db.DEFAULT_DB_ALIAS]["NAME"]
-        with mock.patch("django.db.connections", new=tested_connections):
+        with mock.patch("thibaud.db.connections", new=tested_connections):
             tested_connections["default"].creation.destroy_test_db(
                 old_name, verbosity=0, keepdb=True
             )
@@ -921,14 +921,14 @@ class SetupDatabasesTests(unittest.TestCase):
         tested_connections = db.ConnectionHandler(
             {
                 "default": {
-                    "ENGINE": "django.db.backends.dummy",
+                    "ENGINE": "thibaud.db.backends.dummy",
                 },
             }
         )
         with mock.patch(
-            "django.db.backends.dummy.base.DatabaseWrapper.creation_class"
+            "thibaud.db.backends.dummy.base.DatabaseWrapper.creation_class"
         ) as mocked_db_creation:
-            with mock.patch("django.test.utils.connections", new=tested_connections):
+            with mock.patch("thibaud.test.utils.connections", new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
             verbosity=0, autoclobber=False, serialize=True, keepdb=False
@@ -972,10 +972,10 @@ class EmptyDefaultDatabaseTest(unittest.TestCase):
         error when running a unit test that does not use a database.
         """
         tested_connections = db.ConnectionHandler({"default": {}})
-        with mock.patch("django.db.connections", new=tested_connections):
+        with mock.patch("thibaud.db.connections", new=tested_connections):
             connection = tested_connections[db.utils.DEFAULT_DB_ALIAS]
             self.assertEqual(
-                connection.settings_dict["ENGINE"], "django.db.backends.dummy"
+                connection.settings_dict["ENGINE"], "thibaud.db.backends.dummy"
             )
             connections_support_transactions()
 
@@ -986,24 +986,24 @@ class RunTestsExceptionHandlingTests(unittest.TestCase):
         Teardown functions are run when run_checks() raises SystemCheckError.
         """
         with (
-            mock.patch("django.test.runner.DiscoverRunner.setup_test_environment"),
-            mock.patch("django.test.runner.DiscoverRunner.setup_databases"),
-            mock.patch("django.test.runner.DiscoverRunner.build_suite"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.setup_test_environment"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.setup_databases"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.build_suite"),
             mock.patch(
-                "django.test.runner.DiscoverRunner.run_checks",
+                "thibaud.test.runner.DiscoverRunner.run_checks",
                 side_effect=SystemCheckError,
             ),
             mock.patch(
-                "django.test.runner.DiscoverRunner.teardown_databases"
+                "thibaud.test.runner.DiscoverRunner.teardown_databases"
             ) as teardown_databases,
             mock.patch(
-                "django.test.runner.DiscoverRunner.teardown_test_environment"
+                "thibaud.test.runner.DiscoverRunner.teardown_test_environment"
             ) as teardown_test_environment,
         ):
             runner = DiscoverRunner(verbosity=0, interactive=False)
             with self.assertRaises(SystemCheckError):
                 runner.run_tests(
-                    ["test_runner_apps.sample.tests_sample.TestDjangoTestCase"]
+                    ["test_runner_apps.sample.tests_sample.TestThibaudTestCase"]
                 )
             self.assertTrue(teardown_databases.called)
             self.assertTrue(teardown_test_environment.called)
@@ -1014,25 +1014,25 @@ class RunTestsExceptionHandlingTests(unittest.TestCase):
         and teardown databases() raises ValueError.
         """
         with (
-            mock.patch("django.test.runner.DiscoverRunner.setup_test_environment"),
-            mock.patch("django.test.runner.DiscoverRunner.setup_databases"),
-            mock.patch("django.test.runner.DiscoverRunner.build_suite"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.setup_test_environment"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.setup_databases"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.build_suite"),
             mock.patch(
-                "django.test.runner.DiscoverRunner.run_checks",
+                "thibaud.test.runner.DiscoverRunner.run_checks",
                 side_effect=SystemCheckError,
             ),
             mock.patch(
-                "django.test.runner.DiscoverRunner.teardown_databases",
+                "thibaud.test.runner.DiscoverRunner.teardown_databases",
                 side_effect=ValueError,
             ) as teardown_databases,
             mock.patch(
-                "django.test.runner.DiscoverRunner.teardown_test_environment"
+                "thibaud.test.runner.DiscoverRunner.teardown_test_environment"
             ) as teardown_test_environment,
         ):
             runner = DiscoverRunner(verbosity=0, interactive=False)
             with self.assertRaises(SystemCheckError):
                 runner.run_tests(
-                    ["test_runner_apps.sample.tests_sample.TestDjangoTestCase"]
+                    ["test_runner_apps.sample.tests_sample.TestThibaudTestCase"]
                 )
             self.assertTrue(teardown_databases.called)
             self.assertFalse(teardown_test_environment.called)
@@ -1043,24 +1043,24 @@ class RunTestsExceptionHandlingTests(unittest.TestCase):
         run_checks().
         """
         with (
-            mock.patch("django.test.runner.DiscoverRunner.setup_test_environment"),
-            mock.patch("django.test.runner.DiscoverRunner.setup_databases"),
-            mock.patch("django.test.runner.DiscoverRunner.build_suite"),
-            mock.patch("django.test.runner.DiscoverRunner.run_checks"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.setup_test_environment"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.setup_databases"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.build_suite"),
+            mock.patch("thibaud.test.runner.DiscoverRunner.run_checks"),
             mock.patch(
-                "django.test.runner.DiscoverRunner.teardown_databases",
+                "thibaud.test.runner.DiscoverRunner.teardown_databases",
                 side_effect=ValueError,
             ) as teardown_databases,
             mock.patch(
-                "django.test.runner.DiscoverRunner.teardown_test_environment"
+                "thibaud.test.runner.DiscoverRunner.teardown_test_environment"
             ) as teardown_test_environment,
         ):
             runner = DiscoverRunner(verbosity=0, interactive=False)
             with self.assertRaises(ValueError):
-                # Suppress the output when running TestDjangoTestCase.
+                # Suppress the output when running TestThibaudTestCase.
                 with mock.patch("sys.stderr"):
                     runner.run_tests(
-                        ["test_runner_apps.sample.tests_sample.TestDjangoTestCase"]
+                        ["test_runner_apps.sample.tests_sample.TestThibaudTestCase"]
                     )
             self.assertTrue(teardown_databases.called)
             self.assertFalse(teardown_test_environment.called)

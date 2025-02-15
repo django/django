@@ -4,15 +4,15 @@ import re
 from functools import partial
 from itertools import chain
 
-from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
-from django.db import DatabaseError, NotSupportedError
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
-from django.db.models.fields import AutoField, composite
-from django.db.models.functions import Cast, Random
-from django.db.models.lookups import Lookup
-from django.db.models.query_utils import select_related_descend
-from django.db.models.sql.constants import (
+from thibaud.core.exceptions import EmptyResultSet, FieldError, FullResultSet
+from thibaud.db import DatabaseError, NotSupportedError
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
+from thibaud.db.models.fields import AutoField, composite
+from thibaud.db.models.functions import Cast, Random
+from thibaud.db.models.lookups import Lookup
+from thibaud.db.models.query_utils import select_related_descend
+from thibaud.db.models.sql.constants import (
     CURSOR,
     GET_ITERATOR_CHUNK_SIZE,
     MULTI,
@@ -21,11 +21,11 @@ from django.db.models.sql.constants import (
     ROW_COUNT,
     SINGLE,
 )
-from django.db.models.sql.query import Query, get_order_dir
-from django.db.transaction import TransactionManagementError
-from django.utils.functional import cached_property
-from django.utils.hashable import make_hashable
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.db.models.sql.query import Query, get_order_dir
+from thibaud.db.transaction import TransactionManagementError
+from thibaud.utils.functional import cached_property
+from thibaud.utils.hashable import make_hashable
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 
 class PositionRef(Ref):
@@ -1798,7 +1798,7 @@ class SQLInsertCompiler(SQLCompiler):
         result = ["%s %s" % (insert_statement, qn(opts.db_table))]
 
         if fields := list(self.query.fields):
-            from django.db.models.expressions import DatabaseDefault
+            from thibaud.db.models.expressions import DatabaseDefault
 
             supports_default_keyword_in_bulk_insert = (
                 self.connection.features.supports_default_keyword_in_bulk_insert

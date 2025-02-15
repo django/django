@@ -3,30 +3,30 @@ Troubleshooting
 ===============
 
 This page contains some advice about errors and problems commonly encountered
-during the development of Django applications.
+during the development of Thibaud applications.
 
-.. _troubleshooting-django-admin:
+.. _troubleshooting-thibaud-admin:
 
-Problems running ``django-admin``
+Problems running ``thibaud-admin``
 =================================
 
-``command not found: django-admin``
+``command not found: thibaud-admin``
 -----------------------------------
 
-:doc:`django-admin </ref/django-admin>` should be on your system path if you
-installed Django via ``pip``. If it's not in your path, ensure you have your
+:doc:`thibaud-admin </ref/thibaud-admin>` should be on your system path if you
+installed Thibaud via ``pip``. If it's not in your path, ensure you have your
 virtual environment activated and you can try running the equivalent command
-``python -m django``.
+``python -m thibaud``.
 
 macOS permissions
 -----------------
 
 If you're using macOS, you may see the message "permission denied" when
-you try to run ``django-admin``. This is because, on Unix-based systems like
+you try to run ``thibaud-admin``. This is because, on Unix-based systems like
 macOS, a file must be marked as "executable" before it can be run as a program.
 To do this, open Terminal.app and navigate (using the ``cd`` command) to the
-directory where :doc:`django-admin </ref/django-admin>` is installed, then
-run the command ``sudo chmod +x django-admin``.
+directory where :doc:`thibaud-admin </ref/thibaud-admin>` is installed, then
+run the command ``sudo chmod +x thibaud-admin``.
 
 Miscellaneous
 =============
@@ -53,5 +53,5 @@ pitfalls producing this error:
 
 Related resources:
 
-* :doc:`Unicode in Django </ref/unicode>`
+* :doc:`Unicode in Thibaud </ref/unicode>`
 * https://wiki.python.org/moin/UnicodeDecodeError

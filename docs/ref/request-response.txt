@@ -2,21 +2,21 @@
 Request and response objects
 ============================
 
-.. module:: django.http
+.. module:: thibaud.http
    :synopsis: Classes dealing with HTTP requests and responses.
 
 Quick overview
 ==============
 
-Django uses request and response objects to pass state through the system.
+Thibaud uses request and response objects to pass state through the system.
 
-When a page is requested, Django creates an :class:`HttpRequest` object that
-contains metadata about the request. Then Django loads the appropriate view,
+When a page is requested, Thibaud creates an :class:`HttpRequest` object that
+contains metadata about the request. Then Thibaud loads the appropriate view,
 passing the :class:`HttpRequest` as the first argument to the view function.
 Each view is responsible for returning an :class:`HttpResponse` object.
 
 This document explains the APIs for :class:`HttpRequest` and
-:class:`HttpResponse` objects, which are defined in the :mod:`django.http`
+:class:`HttpResponse` objects, which are defined in the :mod:`thibaud.http`
 module.
 
 ``HttpRequest`` objects
@@ -127,7 +127,7 @@ All attributes should be considered read-only, unless stated otherwise.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="">``. Each
-    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
+    value in ``FILES`` is an :class:`~thibaud.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
@@ -201,16 +201,16 @@ All attributes should be considered read-only, unless stated otherwise.
         >>> request.headers.get("user-agent")
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
 
-    For use in, for example, Django templates, headers can also be looked up
+    For use in, for example, Thibaud templates, headers can also be looked up
     using underscores in place of hyphens:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {{ request.headers.user_agent }}
 
 .. attribute:: HttpRequest.resolver_match
 
-    An instance of :class:`~django.urls.ResolverMatch` representing the
+    An instance of :class:`~thibaud.urls.ResolverMatch` representing the
     resolved URL. This attribute is only set after URL resolving took place,
     which means it's available in all views but not in middleware which are
     executed before URL resolving takes place (you can use it in
@@ -219,19 +219,19 @@ All attributes should be considered read-only, unless stated otherwise.
 Attributes set by application code
 ----------------------------------
 
-Django doesn't set these attributes itself but makes use of them if set by your
+Thibaud doesn't set these attributes itself but makes use of them if set by your
 application.
 
 .. attribute:: HttpRequest.current_app
 
     The :ttag:`url` template tag will use its value as the ``current_app``
-    argument to :func:`~django.urls.reverse()`.
+    argument to :func:`~thibaud.urls.reverse()`.
 
 .. attribute:: HttpRequest.urlconf
 
     This will be used as the root URLconf for the current request, overriding
     the :setting:`ROOT_URLCONF` setting. See
-    :ref:`how-django-processes-a-request` for details.
+    :ref:`how-thibaud-processes-a-request` for details.
 
     ``urlconf`` can be set to ``None`` to revert any changes made by previous
     middleware and return to using the :setting:`ROOT_URLCONF`.
@@ -249,32 +249,32 @@ application.
 Attributes set by middleware
 ----------------------------
 
-Some of the middleware included in Django's contrib apps set attributes on the
+Some of the middleware included in Thibaud's contrib apps set attributes on the
 request. If you don't see the attribute on a request, be sure the appropriate
 middleware class is listed in :setting:`MIDDLEWARE`.
 
 .. attribute:: HttpRequest.session
 
-    From the :class:`~django.contrib.sessions.middleware.SessionMiddleware`: A
+    From the :class:`~thibaud.contrib.sessions.middleware.SessionMiddleware`: A
     readable and writable, dictionary-like object that represents the current
     session.
 
 .. attribute:: HttpRequest.site
 
-    From the :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`:
-    An instance of :class:`~django.contrib.sites.models.Site` or
-    :class:`~django.contrib.sites.requests.RequestSite` as returned by
-    :func:`~django.contrib.sites.shortcuts.get_current_site()`
+    From the :class:`~thibaud.contrib.sites.middleware.CurrentSiteMiddleware`:
+    An instance of :class:`~thibaud.contrib.sites.models.Site` or
+    :class:`~thibaud.contrib.sites.requests.RequestSite` as returned by
+    :func:`~thibaud.contrib.sites.shortcuts.get_current_site()`
     representing the current site.
 
 .. attribute:: HttpRequest.user
 
-    From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
+    From the :class:`~thibaud.contrib.auth.middleware.AuthenticationMiddleware`:
     An instance of :setting:`AUTH_USER_MODEL` representing the currently
     logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of :class:`~django.contrib.auth.models.AnonymousUser`. You
+    to an instance of :class:`~thibaud.contrib.auth.models.AnonymousUser`. You
     can tell them apart with
-    :attr:`~django.contrib.auth.models.User.is_authenticated`, like so::
+    :attr:`~thibaud.contrib.auth.models.User.is_authenticated`, like so::
 
         if request.user.is_authenticated:
             ...  # Do something for logged-in users.
@@ -289,11 +289,11 @@ Methods
 
 .. method:: HttpRequest.auser()
 
-    From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
+    From the :class:`~thibaud.contrib.auth.middleware.AuthenticationMiddleware`:
     Coroutine. Returns an instance of :setting:`AUTH_USER_MODEL` representing
     the currently logged-in user. If the user isn't currently logged in,
     ``auser`` will return an instance of
-    :class:`~django.contrib.auth.models.AnonymousUser`. This is similar to the
+    :class:`~thibaud.contrib.auth.models.AnonymousUser`. This is similar to the
     :attr:`user` attribute but it works in async contexts.
 
 .. method:: HttpRequest.get_host()
@@ -306,7 +306,7 @@ Methods
 
     Example: ``"127.0.0.1:8000"``
 
-    Raises ``django.core.exceptions.DisallowedHost`` if the host is not in
+    Raises ``thibaud.core.exceptions.DisallowedHost`` if the host is not in
     :setting:`ALLOWED_HOSTS` or the domain name is invalid according to
     :rfc:`1034`/:rfc:`1035 <1035>`.
 
@@ -338,8 +338,8 @@ Methods
 
         This middleware should be positioned before any other middleware that
         relies on the value of :meth:`~HttpRequest.get_host()` -- for instance,
-        :class:`~django.middleware.common.CommonMiddleware` or
-        :class:`~django.middleware.csrf.CsrfViewMiddleware`.
+        :class:`~thibaud.middleware.common.CommonMiddleware` or
+        :class:`~thibaud.middleware.csrf.CsrfViewMiddleware`.
 
 .. method:: HttpRequest.get_port()
 
@@ -389,7 +389,7 @@ Methods
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
     Returns a cookie value for a signed cookie, or raises a
-    ``django.core.signing.BadSignature`` exception if the signature is
+    ``thibaud.core.signing.BadSignature`` exception if the signature is
     no longer valid. If you provide the ``default`` argument the exception
     will be suppressed and that default value will be returned instead.
 
@@ -457,10 +457,10 @@ Methods
     .. note::
 
         If a response varies depending on the content of the ``Accept`` header
-        and you are using some form of caching like Django's
-        :mod:`cache middleware <django.middleware.cache>`, you should decorate
+        and you are using some form of caching like Thibaud's
+        :mod:`cache middleware <thibaud.middleware.cache>`, you should decorate
         the view with :func:`vary_on_headers('Accept')
-        <django.views.decorators.vary.vary_on_headers>` so that the responses
+        <thibaud.views.decorators.vary.vary_on_headers>` so that the responses
         are properly cached.
 
 .. method:: HttpRequest.accepts(mime_type)
@@ -506,7 +506,7 @@ Methods
 .. class:: QueryDict
 
 In an :class:`HttpRequest` object, the :attr:`~HttpRequest.GET` and
-:attr:`~HttpRequest.POST` attributes are instances of ``django.http.QueryDict``,
+:attr:`~HttpRequest.POST` attributes are instances of ``thibaud.http.QueryDict``,
 a dictionary-like class customized to deal with multiple values for the same
 key. This is necessary because some HTML form elements, notably
 ``<select multiple>``, pass multiple values for the same key.
@@ -556,7 +556,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Returns the last value for the given key; or an empty list (``[]``) if the
     key exists but has no values. Raises
-    ``django.utils.datastructures.MultiValueDictKeyError`` if the key does not
+    ``thibaud.utils.datastructures.MultiValueDictKeyError`` if the key does not
     exist. (This is a subclass of Python's standard :exc:`KeyError`, so you can
     stick to catching ``KeyError``.)
 
@@ -728,11 +728,11 @@ In addition, ``QueryDict`` has the following methods:
 .. class:: HttpResponse
 
 In contrast to :class:`HttpRequest` objects, which are created automatically by
-Django, :class:`HttpResponse` objects are your responsibility. Each view you
+Thibaud, :class:`HttpResponse` objects are your responsibility. Each view you
 write is responsible for instantiating, populating, and returning an
 :class:`HttpResponse`.
 
-The :class:`HttpResponse` class lives in the :mod:`django.http` module.
+The :class:`HttpResponse` class lives in the :mod:`thibaud.http` module.
 
 Usage
 -----
@@ -745,7 +745,7 @@ or :class:`memoryview`, to the :class:`HttpResponse` constructor:
 
 .. code-block:: pycon
 
-    >>> from django.http import HttpResponse
+    >>> from thibaud.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
     >>> response = HttpResponse(b"Bytestrings are also accepted.")
@@ -806,9 +806,9 @@ You can also set headers on instantiation:
     >>> response = HttpResponse(headers={"Age": 120})
 
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
-to use the :func:`~django.utils.cache.patch_cache_control` and
-:func:`~django.utils.cache.patch_vary_headers` methods from
-:mod:`django.utils.cache`, since these fields can have multiple, comma-separated
+to use the :func:`~thibaud.utils.cache.patch_cache_control` and
+:func:`~thibaud.utils.cache.patch_vary_headers` methods from
+:mod:`thibaud.utils.cache`, since these fields can have multiple, comma-separated
 values. The "patch" methods ensure that other values, e.g. added by a
 middleware, are not removed.
 
@@ -832,7 +832,7 @@ you might return a Microsoft Excel spreadsheet:
     ...     },
     ... )
 
-There's nothing Django-specific about the ``Content-Disposition`` header, but
+There's nothing Thibaud-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
 
 Attributes
@@ -986,7 +986,7 @@ Methods
       accessing the protected cookie data.
     * Use ``samesite='Strict'`` or ``samesite='Lax'`` to tell the browser not
       to send this cookie when performing a cross-origin request. `SameSite`_
-      isn't supported by all browsers, so it's not a replacement for Django's
+      isn't supported by all browsers, so it's not a replacement for Thibaud's
       CSRF protection, but rather a defense in depth measure.
 
       Use ``samesite='None'`` (string) to explicitly state that this cookie is
@@ -999,7 +999,7 @@ Methods
 
         :rfc:`RFC 6265 <6265#section-6.1>` states that user agents should
         support cookies of at least 4096 bytes. For many browsers this is also
-        the maximum size. Django will not raise an exception if there's an
+        the maximum size. Thibaud will not raise an exception if there's an
         attempt to store a cookie of more than 4096 bytes, but many browsers
         will not set the cookie correctly.
 
@@ -1068,9 +1068,9 @@ Methods
 ``HttpResponse`` subclasses
 ---------------------------
 
-Django includes a number of ``HttpResponse`` subclasses that handle different
+Thibaud includes a number of ``HttpResponse`` subclasses that handle different
 types of HTTP responses. Like ``HttpResponse``, these subclasses live in
-:mod:`django.http`.
+:mod:`thibaud.http`.
 
 .. class:: HttpResponseRedirect
 
@@ -1141,18 +1141,18 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 .. note::
 
     If a custom subclass of :class:`HttpResponse` implements a ``render``
-    method, Django will treat it as emulating a
-    :class:`~django.template.response.SimpleTemplateResponse`, and the
+    method, Thibaud will treat it as emulating a
+    :class:`~thibaud.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
 Custom response classes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-If you find yourself needing a response class that Django doesn't provide, you
+If you find yourself needing a response class that Thibaud doesn't provide, you
 can create it with the help of :py:class:`http.HTTPStatus`. For example::
 
     from http import HTTPStatus
-    from django.http import HttpResponse
+    from thibaud.http import HttpResponse
 
 
     class HttpResponseNoContent(HttpResponse):
@@ -1161,7 +1161,7 @@ can create it with the help of :py:class:`http.HTTPStatus`. For example::
 ``JsonResponse`` objects
 ========================
 
-.. class:: JsonResponse(data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None, **kwargs)
+.. class:: JsonResponse(data, encoder=ThibaudJSONEncoder, safe=True, json_dumps_params=None, **kwargs)
 
     An :class:`HttpResponse` subclass that helps to create a JSON-encoded
     response. It inherits most behavior from its superclass with a couple
@@ -1174,7 +1174,7 @@ can create it with the help of :py:class:`http.HTTPStatus`. For example::
     JSON-serializable object.
 
     The ``encoder``, which defaults to
-    :class:`django.core.serializers.json.DjangoJSONEncoder`, will be used to
+    :class:`thibaud.core.serializers.json.ThibaudJSONEncoder`, will be used to
     serialize the data. See :ref:`JSON serialization
     <serialization-formats-json>` for more details about this serializer.
 
@@ -1193,7 +1193,7 @@ Typical usage could look like:
 
 .. code-block:: pycon
 
-    >>> from django.http import JsonResponse
+    >>> from thibaud.http import JsonResponse
     >>> response = JsonResponse({"foo": "bar"})
     >>> response.content
     b'{"foo": "bar"}'
@@ -1218,9 +1218,9 @@ using non-dict objects in JSON-encoded response.
 
     Before the `5th edition of ECMAScript
     <https://262.ecma-international.org/5.1/#sec-11.1.4>`_ it was possible to
-    poison the JavaScript ``Array`` constructor. For this reason, Django does
+    poison the JavaScript ``Array`` constructor. For this reason, Thibaud does
     not allow passing non-dict objects to the
-    :class:`~django.http.JsonResponse` constructor by default.  However, most
+    :class:`~thibaud.http.JsonResponse` constructor by default.  However, most
     modern browsers implement ECMAScript 5 which removes this attack vector.
     Therefore it is possible to disable this security precaution.
 
@@ -1242,7 +1242,7 @@ parameter to the constructor method:
 .. class:: StreamingHttpResponse
 
 The :class:`StreamingHttpResponse` class is used to stream a response from
-Django to the browser.
+Thibaud to the browser.
 
 .. admonition:: Advanced usage
 
@@ -1258,7 +1258,7 @@ content when generating the response would take too long or uses too much
 memory. For instance, it's useful for :ref:`generating large CSV files
 <streaming-csv-files>`.
 
-There are performance considerations when doing this, though. Django, under
+There are performance considerations when doing this, though. Thibaud, under
 WSGI, is designed for short-lived requests. Streaming responses will tie a
 worker process for the entire duration of the response. This may result in poor
 performance.
@@ -1352,7 +1352,7 @@ Attributes
 Handling disconnects
 --------------------
 
-If the client disconnects during a streaming response, Django will cancel the
+If the client disconnects during a streaming response, Thibaud will cancel the
 coroutine that is handling the response. If you want to clean up resources
 manually, you can do so by catching the ``asyncio.CancelledError``::
 
@@ -1407,7 +1407,7 @@ a file open in binary mode like so:
 
 .. code-block:: pycon
 
-    >>> from django.http import FileResponse
+    >>> from thibaud.http import FileResponse
     >>> response = FileResponse(open("myfile.png", "rb"))
 
 The file will be closed automatically, so don't open it with a context manager.
@@ -1435,6 +1435,6 @@ Methods
 
 .. class:: HttpResponseBase
 
-The :class:`HttpResponseBase` class is common to all Django responses.
+The :class:`HttpResponseBase` class is common to all Thibaud responses.
 It should not be used to create responses directly, but it can be
 useful for type-checking.

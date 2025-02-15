@@ -1,10 +1,10 @@
 import io
 
-from django.conf import settings
-from django.core.cache import cache
-from django.http import HttpResponse
-from django.http.response import HttpResponseBase
-from django.test import SimpleTestCase
+from thibaud.conf import settings
+from thibaud.core.cache import cache
+from thibaud.http import HttpResponse
+from thibaud.http.response import HttpResponseBase
+from thibaud.test import SimpleTestCase
 
 UTF8 = "utf-8"
 ISO88591 = "iso-8859-1"

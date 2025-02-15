@@ -1,4 +1,4 @@
-from django.contrib import admin
+from thibaud.contrib import admin
 
 
 class CustomAdminSite(admin.AdminSite):

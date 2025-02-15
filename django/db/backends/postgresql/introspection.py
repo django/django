@@ -1,16 +1,16 @@
 from collections import namedtuple
 
-from django.db.backends.base.introspection import BaseDatabaseIntrospection
-from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
-from django.db.backends.base.introspection import TableInfo as BaseTableInfo
-from django.db.models import Index
+from thibaud.db.backends.base.introspection import BaseDatabaseIntrospection
+from thibaud.db.backends.base.introspection import FieldInfo as BaseFieldInfo
+from thibaud.db.backends.base.introspection import TableInfo as BaseTableInfo
+from thibaud.db.models import Index
 
 FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("is_autofield", "comment"))
 TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
-    # Maps type codes to Django Field types.
+    # Maps type codes to Thibaud Field types.
     data_types_reverse = {
         16: "BooleanField",
         17: "BinaryField",
@@ -41,7 +41,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
         if description.is_autofield or (
-            # Required for pre-Django 4.1 serial columns.
+            # Required for pre-Thibaud 4.1 serial columns.
             description.default
             and "nextval" in description.default
         ):
@@ -280,7 +280,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     type_ == self.index_default_access_method
                     and
                     # '_btree' references
-                    # django.contrib.postgres.indexes.BTreeIndex.suffix.
+                    # thibaud.contrib.postgres.indexes.BTreeIndex.suffix.
                     not index.endswith("_btree")
                     and options is None
                 )

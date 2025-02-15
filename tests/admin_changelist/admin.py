@@ -1,7 +1,7 @@
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator
+from thibaud.contrib import admin
+from thibaud.contrib.auth.admin import UserAdmin
+from thibaud.contrib.auth.models import User
+from thibaud.core.paginator import Paginator
 
 from .models import Band, Child, Event, Genre, GrandChild, Parent, ProxyUser, Swallow
 

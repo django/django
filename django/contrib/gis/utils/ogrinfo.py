@@ -4,8 +4,8 @@ of a GDAL data source -- the functionality is analogous to the output
 produced by the `ogrinfo` utility.
 """
 
-from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.gdal.geometries import GEO_CLASSES
+from thibaud.contrib.gis.gdal import DataSource
+from thibaud.contrib.gis.gdal.geometries import GEO_CLASSES
 
 
 def ogrinfo(data_source, num_features=10):

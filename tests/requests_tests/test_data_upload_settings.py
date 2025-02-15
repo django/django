@@ -1,13 +1,13 @@
 from io import BytesIO
 
-from django.core.exceptions import (
+from thibaud.core.exceptions import (
     RequestDataTooBig,
     TooManyFieldsSent,
     TooManyFilesSent,
 )
-from django.core.handlers.wsgi import WSGIRequest
-from django.test import SimpleTestCase
-from django.test.client import FakePayload
+from thibaud.core.handlers.wsgi import WSGIRequest
+from thibaud.test import SimpleTestCase
+from thibaud.test.client import FakePayload
 
 TOO_MANY_FIELDS_MSG = (
     "The number of GET/POST parameters exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS."

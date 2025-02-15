@@ -1,3 +1,3 @@
-from django.template import Library
+from thibaud.template import Library
 
 register = Library()

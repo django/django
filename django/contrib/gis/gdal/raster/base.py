@@ -1,5 +1,5 @@
-from django.contrib.gis.gdal.base import GDALBase
-from django.contrib.gis.gdal.prototypes import raster as capi
+from thibaud.contrib.gis.gdal.base import GDALBase
+from thibaud.contrib.gis.gdal.prototypes import raster as capi
 
 
 class GDALRasterBase(GDALBase):

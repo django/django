@@ -1,22 +1,22 @@
-from django.apps import apps
-from django.apps.registry import Apps
-from django.conf import settings
-from django.contrib.sites import models
-from django.contrib.sites.checks import check_site_id
-from django.contrib.sites.management import create_default_site
-from django.contrib.sites.middleware import CurrentSiteMiddleware
-from django.contrib.sites.models import Site, clear_site_cache
-from django.contrib.sites.requests import RequestSite
-from django.contrib.sites.shortcuts import get_current_site
-from django.core import checks
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db.models.signals import post_migrate
-from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase, TestCase, modify_settings, override_settings
-from django.test.utils import captured_stdout
+from thibaud.apps import apps
+from thibaud.apps.registry import Apps
+from thibaud.conf import settings
+from thibaud.contrib.sites import models
+from thibaud.contrib.sites.checks import check_site_id
+from thibaud.contrib.sites.management import create_default_site
+from thibaud.contrib.sites.middleware import CurrentSiteMiddleware
+from thibaud.contrib.sites.models import Site, clear_site_cache
+from thibaud.contrib.sites.requests import RequestSite
+from thibaud.contrib.sites.shortcuts import get_current_site
+from thibaud.core import checks
+from thibaud.core.exceptions import ObjectDoesNotExist, ValidationError
+from thibaud.db.models.signals import post_migrate
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.test import SimpleTestCase, TestCase, modify_settings, override_settings
+from thibaud.test.utils import captured_stdout
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.sites"})
+@modify_settings(INSTALLED_APPS={"append": "thibaud.contrib.sites"})
 class SitesFrameworkTests(TestCase):
     databases = {"default", "other"}
 
@@ -75,7 +75,7 @@ class SitesFrameworkTests(TestCase):
             get_current_site(request)
 
         # A RequestSite is returned if the sites framework is not installed
-        with self.modify_settings(INSTALLED_APPS={"remove": "django.contrib.sites"}):
+        with self.modify_settings(INSTALLED_APPS={"remove": "thibaud.contrib.sites"}):
             site = get_current_site(request)
             self.assertIsInstance(site, RequestSite)
             self.assertEqual(site.name, "example.com")
@@ -131,7 +131,7 @@ class SitesFrameworkTests(TestCase):
             get_current_site(request)
 
         # Ensure domain for RequestSite always matches host header
-        with self.modify_settings(INSTALLED_APPS={"remove": "django.contrib.sites"}):
+        with self.modify_settings(INSTALLED_APPS={"remove": "thibaud.contrib.sites"}):
             request.META = {"HTTP_HOST": "example.com"}
             site = get_current_site(request)
             self.assertEqual(site.name, "example.com")
@@ -251,7 +251,7 @@ class JustOtherRouter:
         return db == "other"
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.sites"})
+@modify_settings(INSTALLED_APPS={"append": "thibaud.contrib.sites"})
 class CreateDefaultSiteTests(TestCase):
     databases = {"default", "other"}
 

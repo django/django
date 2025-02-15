@@ -1,10 +1,10 @@
 ==========================
-Django 4.1.7 release notes
+Thibaud 4.1.7 release notes
 ==========================
 
 *February 14, 2023*
 
-Django 4.1.7 fixes a security issue with severity "moderate" and a bug in
+Thibaud 4.1.7 fixes a security issue with severity "moderate" and a bug in
 4.1.6.
 
 CVE-2023-24580: Potential denial-of-service vulnerability in file uploads
@@ -20,5 +20,5 @@ The number of files parts parsed is now limited via the new
 Bugfixes
 ========
 
-* Fixed a bug in Django 4.1 that caused a crash of model validation on
+* Fixed a bug in Thibaud 4.1 that caused a crash of model validation on
   ``ValidationError`` with no ``code`` (:ticket:`34319`).

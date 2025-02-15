@@ -1,14 +1,14 @@
-from django.contrib.auth import (
+from thibaud.contrib.auth import (
     aauthenticate,
     aget_user,
     alogin,
     alogout,
     aupdate_session_auth_hash,
 )
-from django.contrib.auth.models import AnonymousUser, User
-from django.http import HttpRequest
-from django.test import TestCase, override_settings
-from django.utils.deprecation import RemovedInDjango61Warning
+from thibaud.contrib.auth.models import AnonymousUser, User
+from thibaud.http import HttpRequest
+from thibaud.test import TestCase, override_settings
+from thibaud.utils.deprecation import RemovedInThibaud61Warning
 
 
 class AsyncAuthTest(TestCase):
@@ -61,12 +61,12 @@ class AsyncAuthTest(TestCase):
         self.assertIsInstance(user, User)
         self.assertEqual(user.username, second_user.username)
 
-    # RemovedInDjango61Warning: When the deprecation ends, replace with:
+    # RemovedInThibaud61Warning: When the deprecation ends, replace with:
     # async def test_alogin_without_user(self):
     async def test_alogin_without_user_no_request_user(self):
         request = HttpRequest()
         request.session = await self.client.asession()
-        # RemovedInDjango61Warning: When the deprecation ends, replace with:
+        # RemovedInThibaud61Warning: When the deprecation ends, replace with:
         # with self.assertRaisesMessage(
         #     AttributeError,
         #     "'NoneType' object has no attribute 'get_session_auth_hash'",
@@ -78,13 +78,13 @@ class AsyncAuthTest(TestCase):
                 "'HttpRequest' object has no attribute 'auser'",
             ),
             self.assertWarnsMessage(
-                RemovedInDjango61Warning,
+                RemovedInThibaud61Warning,
                 "Fallback to request.user when user is None will be removed.",
             ),
         ):
             await alogin(request, None)
 
-    # RemovedInDjango61Warning: When the deprecation ends, remove completely.
+    # RemovedInThibaud61Warning: When the deprecation ends, remove completely.
     async def test_alogin_without_user_anonymous_request(self):
         async def auser():
             return AnonymousUser()
@@ -99,13 +99,13 @@ class AsyncAuthTest(TestCase):
                 "'AnonymousUser' object has no attribute '_meta'",
             ),
             self.assertWarnsMessage(
-                RemovedInDjango61Warning,
+                RemovedInThibaud61Warning,
                 "Fallback to request.user when user is None will be removed.",
             ),
         ):
             await alogin(request, None)
 
-    # RemovedInDjango61Warning: When the deprecation ends, remove completely.
+    # RemovedInThibaud61Warning: When the deprecation ends, remove completely.
     async def test_alogin_without_user_authenticated_request(self):
         async def auser():
             return self.test_user
@@ -115,7 +115,7 @@ class AsyncAuthTest(TestCase):
         request.auser = auser
         request.session = await self.client.asession()
         with self.assertWarnsMessage(
-            RemovedInDjango61Warning,
+            RemovedInThibaud61Warning,
             "Fallback to request.user when user is None will be removed.",
         ):
             await alogin(request, None)
@@ -162,8 +162,8 @@ class AsyncAuthTest(TestCase):
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[
-            "django.contrib.auth.backends.ModelBackend",
-            "django.contrib.auth.backends.AllowAllUsersModelBackend",
+            "thibaud.contrib.auth.backends.ModelBackend",
+            "thibaud.contrib.auth.backends.AllowAllUsersModelBackend",
         ]
     )
     async def test_client_aforce_login_backend(self):
@@ -171,7 +171,7 @@ class AsyncAuthTest(TestCase):
         await self.test_user.asave()
         await self.client.aforce_login(
             self.test_user,
-            backend="django.contrib.auth.backends.AllowAllUsersModelBackend",
+            backend="thibaud.contrib.auth.backends.AllowAllUsersModelBackend",
         )
         request = HttpRequest()
         request.session = await self.client.asession()

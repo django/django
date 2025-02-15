@@ -1,8 +1,8 @@
-from django.db import connection
-from django.db.models import CharField, F, Max
-from django.db.models.functions import Lower
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import register_lookup
+from thibaud.db import connection
+from thibaud.db.models import CharField, F, Max
+from thibaud.db.models.functions import Lower
+from thibaud.test import TestCase, skipUnlessDBFeature
+from thibaud.test.utils import register_lookup
 
 from .models import Celebrity, Fan, Staff, StaffTag, Tag
 

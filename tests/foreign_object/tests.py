@@ -3,11 +3,11 @@ import datetime
 import pickle
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
-from django.db import connection, models
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
-from django.utils import translation
+from thibaud.core.exceptions import FieldError
+from thibaud.db import connection, models
+from thibaud.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from thibaud.test.utils import isolate_apps
+from thibaud.utils import translation
 
 from .models import (
     Article,

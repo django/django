@@ -4,15 +4,15 @@ FAQ: Databases and models
 
 .. _faq-see-raw-sql-queries:
 
-How can I see the raw SQL queries Django is running?
+How can I see the raw SQL queries Thibaud is running?
 ====================================================
 
-Make sure your Django :setting:`DEBUG` setting is set to ``True``.
+Make sure your Thibaud :setting:`DEBUG` setting is set to ``True``.
 Then do this:
 
 .. code-block:: pycon
 
-    >>> from django.db import connection
+    >>> from thibaud.db import connection
     >>> connection.queries
     [{'sql': 'SELECT polls_polls.id, polls_polls.question, polls_polls.pub_date FROM polls_polls',
     'time': '0.002'}]
@@ -32,17 +32,17 @@ same interface on each member of the ``connections`` dictionary:
 
 .. code-block:: pycon
 
-    >>> from django.db import connections
+    >>> from thibaud.db import connections
     >>> connections["my_db_alias"].queries
 
 If you need to clear the query list manually at any point in your functions,
 call ``reset_queries()``, like this::
 
-    from django.db import reset_queries
+    from thibaud.db import reset_queries
 
     reset_queries()
 
-Can I use Django with a preexisting database?
+Can I use Thibaud with a preexisting database?
 =============================================
 
 Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
@@ -50,14 +50,14 @@ Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
 If I make changes to a model, how do I update the database?
 ===========================================================
 
-Take a look at Django's support for :mod:`schema migrations
-<django.db.migrations>`.
+Take a look at Thibaud's support for :mod:`schema migrations
+<thibaud.db.migrations>`.
 
 If you don't mind clearing data, your project's ``manage.py`` utility has a
 :djadmin:`flush` option to reset the database to the state it was in
 immediately after :djadmin:`migrate` was executed.
 
-Do Django models support multiple-column primary keys?
+Do Thibaud models support multiple-column primary keys?
 ======================================================
 
 No. Only single-column primary keys are supported.
@@ -69,24 +69,24 @@ uniqueness at that level. Single-column primary keys are needed for things such
 as the admin interface to work; e.g., you need a single value to specify
 an object to edit or delete.
 
-Does Django support NoSQL databases?
+Does Thibaud support NoSQL databases?
 ====================================
 
-NoSQL databases are not officially supported by Django itself. There are,
+NoSQL databases are not officially supported by Thibaud itself. There are,
 however, a number of side projects and forks which allow NoSQL functionality in
-Django.
+Thibaud.
 
 You can take a look on `the wiki page`_ which discusses some projects.
 
-.. _the wiki page: https://code.djangoproject.com/wiki/NoSqlSupport
+.. _the wiki page: https://code.thibaudproject.com/wiki/NoSqlSupport
 
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ==================================================================================================================
 
-We try to avoid adding special cases in the Django code to accommodate all the
+We try to avoid adding special cases in the Thibaud code to accommodate all the
 database-specific options such as table type, etc. If you'd like to use any of
 these options, create a migration with a
-:class:`~django.db.migrations.operations.RunSQL` operation that contains
+:class:`~thibaud.db.migrations.operations.RunSQL` operation that contains
 ``ALTER TABLE`` statements that do what you want to do.
 
 For example, if you're using MySQL and want your tables to use the MyISAM table

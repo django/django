@@ -1,10 +1,10 @@
 ===========================
-Django 3.2.13 release notes
+Thibaud 3.2.13 release notes
 ===========================
 
 *April 11, 2022*
 
-Django 3.2.13 fixes two security issues with severity "high" in
+Thibaud 3.2.13 fixes two security issues with severity "high" in
 3.2.12 and a regression in 3.2.4.
 
 CVE-2022-28346: Potential SQL injection in ``QuerySet.annotate()``, ``aggregate()``, and ``extra()``
@@ -25,6 +25,6 @@ using a suitably crafted dictionary, with dictionary expansion, as the
 Bugfixes
 ========
 
-* Fixed a regression in Django 3.2.4 that caused the auto-reloader to no longer
+* Fixed a regression in Thibaud 3.2.4 that caused the auto-reloader to no longer
   detect changes when the ``DIRS`` option of the ``TEMPLATES`` setting
   contained an empty string (:ticket:`33628`).

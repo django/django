@@ -1,5 +1,5 @@
-from django.db import models
-from django.test import TestCase
+from thibaud.db import models
+from thibaud.test import TestCase
 
 from .models import (
     Book,
@@ -570,7 +570,7 @@ class CustomManagerTests(TestCase):
         mgr = models.Manager()
         as_manager, mgr_path, qs_path, args, kwargs = mgr.deconstruct()
         self.assertFalse(as_manager)
-        self.assertEqual(mgr_path, "django.db.models.manager.Manager")
+        self.assertEqual(mgr_path, "thibaud.db.models.manager.Manager")
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {})
 
@@ -615,7 +615,7 @@ class CustomManagerTests(TestCase):
         mgr = CustomManager("arg")
         msg = (
             "Could not find manager BaseCustomManagerFromCustomQuerySet in "
-            "django.db.models.manager.\n"
+            "thibaud.db.models.manager.\n"
             "Please note that you need to inherit from managers you "
             "dynamically generated with 'from_queryset()'."
         )

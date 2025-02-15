@@ -4,15 +4,15 @@ of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
 
-from django.http import (
+from thibaud.http import (
     Http404,
     HttpResponse,
     HttpResponsePermanentRedirect,
     HttpResponseRedirect,
 )
-from django.template import loader
-from django.urls import NoReverseMatch, reverse
-from django.utils.functional import Promise
+from thibaud.template import loader
+from thibaud.urls import NoReverseMatch, reverse
+from thibaud.utils.functional import Promise
 
 
 def render(
@@ -20,7 +20,7 @@ def render(
 ):
     """
     Return an HttpResponse whose content is filled with the result of calling
-    django.template.loader.render_to_string() with the passed arguments.
+    thibaud.template.loader.render_to_string() with the passed arguments.
     """
     content = loader.render_to_string(template_name, context, request, using=using)
     return HttpResponse(content, content_type, status)

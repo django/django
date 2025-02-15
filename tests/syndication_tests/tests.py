@@ -1,15 +1,15 @@
 import datetime
 from xml.dom import minidom
 
-from django.contrib.sites.models import Site
-from django.contrib.syndication import views
-from django.core.exceptions import ImproperlyConfigured
-from django.templatetags.static import static
-from django.test import TestCase, override_settings
-from django.test.utils import requires_tz_support
-from django.urls import reverse, reverse_lazy
-from django.utils import timezone
-from django.utils.feedgenerator import (
+from thibaud.contrib.sites.models import Site
+from thibaud.contrib.syndication import views
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.templatetags.static import static
+from thibaud.test import TestCase, override_settings
+from thibaud.test.utils import requires_tz_support
+from thibaud.urls import reverse, reverse_lazy
+from thibaud.utils import timezone
+from thibaud.utils.feedgenerator import (
     Atom1Feed,
     Rss201rev2Feed,
     Stylesheet,
@@ -145,7 +145,7 @@ class SyndicationFeedTest(FeedTestCase):
                 "copyright": "Copyright (c) 2007, Sally Smith",
             },
         )
-        self.assertCategories(chan, ["python", "django"])
+        self.assertCategories(chan, ["python", "thibaud"])
 
         # Ensure the content of the channel is correct
         self.assertChildNodeContent(
@@ -333,7 +333,7 @@ class SyndicationFeedTest(FeedTestCase):
                 "link": "http://example.com/blog/",
             },
         )
-        self.assertCategories(chan, ["python", "django"])
+        self.assertCategories(chan, ["python", "thibaud"])
 
         # Check feed_url is passed
         self.assertEqual(
@@ -466,7 +466,7 @@ class SyndicationFeedTest(FeedTestCase):
         feed = minidom.parseString(response.content).firstChild
 
         self.assertEqual(feed.nodeName, "feed")
-        self.assertEqual(feed.getAttribute("django"), "rocks")
+        self.assertEqual(feed.getAttribute("thibaud"), "rocks")
         self.assertChildNodes(
             feed,
             [
@@ -655,7 +655,7 @@ class SyndicationFeedTest(FeedTestCase):
             (
                 Stylesheet("/stylesheet.xsl"),
                 "stylesheets should be a list, "
-                "not <class 'django.utils.feedgenerator.Stylesheet'>",
+                "not <class 'thibaud.utils.feedgenerator.Stylesheet'>",
             ),
         ]:
             args = ("title", "/link", "description")
@@ -801,16 +801,16 @@ class SyndicationFeedTest(FeedTestCase):
                 "https://example.com/foo/?arg=value",
             ),
             (
-                ("example.com", "http://djangoproject.com/doc/"),
-                "http://djangoproject.com/doc/",
+                ("example.com", "http://thibaudproject.com/doc/"),
+                "http://thibaudproject.com/doc/",
             ),
             (
-                ("example.com", "https://djangoproject.com/doc/"),
-                "https://djangoproject.com/doc/",
+                ("example.com", "https://thibaudproject.com/doc/"),
+                "https://thibaudproject.com/doc/",
             ),
             (
-                ("example.com", "mailto:uhoh@djangoproject.com"),
-                "mailto:uhoh@djangoproject.com",
+                ("example.com", "mailto:uhoh@thibaudproject.com"),
+                "mailto:uhoh@thibaudproject.com",
             ),
             (
                 ("example.com", "//example.com/foo/?arg=value"),

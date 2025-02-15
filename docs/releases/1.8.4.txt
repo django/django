@@ -1,22 +1,22 @@
 ==========================
-Django 1.8.4 release notes
+Thibaud 1.8.4 release notes
 ==========================
 
 *August 18, 2015*
 
-Django 1.8.4 fixes a security issue and several bugs in 1.8.3.
+Thibaud 1.8.4 fixes a security issue and several bugs in 1.8.3.
 
 Denial-of-service possibility in ``logout()`` view by filling session store
 ===========================================================================
 
 Previously, a session could be created when anonymously accessing the
-``django.contrib.auth.views.logout()`` view (provided it wasn't decorated
-with :func:`~django.contrib.auth.decorators.login_required` as done in the
+``thibaud.contrib.auth.views.logout()`` view (provided it wasn't decorated
+with :func:`~thibaud.contrib.auth.decorators.login_required` as done in the
 admin). This could allow an attacker to easily create many new session records
 by sending repeated requests, potentially filling up the session store or
 causing other users' session records to be evicted.
 
-The :class:`~django.contrib.sessions.middleware.SessionMiddleware` has been
+The :class:`~thibaud.contrib.sessions.middleware.SessionMiddleware` has been
 modified to no longer create empty session records, including when
 :setting:`SESSION_SAVE_EVERY_REQUEST` is active.
 
@@ -24,7 +24,7 @@ Bugfixes
 ========
 
 * Added the ability to serialize values from the newly added
-  :class:`~django.db.models.UUIDField` (:ticket:`25019`).
+  :class:`~thibaud.db.models.UUIDField` (:ticket:`25019`).
 
 * Added a system check warning if the old ``TEMPLATE_*`` settings are defined
   in addition to the new ``TEMPLATES`` setting.

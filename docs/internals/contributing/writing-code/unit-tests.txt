@@ -2,12 +2,12 @@
 Unit tests
 ==========
 
-Django comes with a test suite of its own, in the ``tests`` directory of the
+Thibaud comes with a test suite of its own, in the ``tests`` directory of the
 code base. It's our policy to make sure all tests pass at all times.
 
 We appreciate any and all contributions to the test suite!
 
-The Django tests all use the testing infrastructure that ships with Django for
+The Thibaud tests all use the testing infrastructure that ships with Thibaud for
 testing applications. See :doc:`/topics/testing/overview` for an explanation of
 how to write new tests.
 
@@ -19,7 +19,7 @@ Running the unit tests
 Quickstart
 ----------
 
-First, `fork Django on GitHub <https://github.com/django/django/fork>`__.
+First, `fork Thibaud on GitHub <https://github.com/thibaud/thibaud/fork>`__.
 
 Second, create and activate a virtual environment. If you're not familiar with
 how to do that, read our :doc:`contributing tutorial </intro/contributing>`.
@@ -28,8 +28,8 @@ Next, clone your fork, install some requirements, and run the tests:
 
 .. console::
 
-   $ git clone https://github.com/YourGitHubName/django.git django-repo
-   $ cd django-repo/tests
+   $ git clone https://github.com/YourGitHubName/thibaud.git thibaud-repo
+   $ cd thibaud-repo/tests
    $ python -m pip install -e ..
    $ python -m pip install -r requirements/py3.txt
    $ ./runtests.py
@@ -44,8 +44,8 @@ If you have trouble installing the requirements, you can skip that step. See
 test dependencies. If you don't have an optional dependency installed, the
 tests that require it will be skipped.
 
-Running the tests requires a Django settings module that defines the databases
-to use. To help you get started, Django provides and uses a sample settings
+Running the tests requires a Thibaud settings module that defines the databases
+to use. To help you get started, Thibaud provides and uses a sample settings
 module that uses the SQLite database. See :ref:`running-unit-tests-settings` to
 learn how to use a different settings module to run the tests with a different
 database.
@@ -56,12 +56,12 @@ Running tests using ``tox``
 ---------------------------
 
 `Tox <https://tox.wiki/>`_ is a tool for running tests in different virtual
-environments. Django includes a basic ``tox.ini`` that automates some checks
+environments. Thibaud includes a basic ``tox.ini`` that automates some checks
 that our build server performs on pull requests. To run the unit tests and
 other checks (such as :ref:`import sorting <coding-style-imports>`, the
 :ref:`documentation spelling checker <documentation-spelling-check>`, and
 :ref:`code formatting <coding-style-python>`), install and run the ``tox``
-command from any place in the Django source tree:
+command from any place in the Thibaud source tree:
 
 .. console::
 
@@ -89,7 +89,7 @@ Testing other Python versions and database backends
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition to the default environments, ``tox`` supports running unit tests
-for other versions of Python and other database backends. Since Django's test
+for other versions of Python and other database backends. Since Thibaud's test
 suite doesn't bundle a settings file for database backends other than SQLite,
 however, you must :ref:`create and provide your own test settings
 <running-unit-tests-settings>`. For example, to run the tests on Python 3.12
@@ -99,7 +99,7 @@ using PostgreSQL:
 
     $ tox -e py312-postgres -- --settings=my_postgres_settings
 
-This command sets up a Python 3.12 virtual environment, installs Django's
+This command sets up a Python 3.12 virtual environment, installs Thibaud's
 test suite dependencies (including those for PostgreSQL), and calls
 ``runtests.py`` with the supplied arguments (in this case,
 ``--settings=my_postgres_settings``).
@@ -126,7 +126,7 @@ Windows users should use:
 Running the JavaScript tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django includes a set of :ref:`JavaScript unit tests <javascript-tests>` for
+Thibaud includes a set of :ref:`JavaScript unit tests <javascript-tests>` for
 functions in certain contrib apps. The JavaScript tests aren't run by default
 using ``tox`` because they require ``Node.js`` to be installed and aren't
 necessary for the majority of patches. To run the JavaScript tests using
@@ -139,14 +139,14 @@ necessary for the majority of patches. To run the JavaScript tests using
 This command runs ``npm install`` to ensure test requirements are up to
 date and then runs ``npm test``.
 
-Running tests using ``django-docker-box``
+Running tests using ``thibaud-docker-box``
 -----------------------------------------
 
-`django-docker-box`_ allows you to run the Django's test suite across all
-supported databases and python versions. See the `django-docker-box`_ project
+`thibaud-docker-box`_ allows you to run the Thibaud's test suite across all
+supported databases and python versions. See the `thibaud-docker-box`_ project
 page for installation and usage instructions.
 
-.. _django-docker-box: https://github.com/django/django-docker-box/
+.. _thibaud-docker-box: https://github.com/thibaud/thibaud-docker-box/
 
 .. _running-unit-tests-settings:
 
@@ -159,8 +159,8 @@ database, you'll need to define your own settings file. Some tests, such as
 those for ``contrib.postgres``, are specific to a particular database backend
 and will be skipped if run with a different backend. Some tests are skipped or
 expected failures on a particular database backend (see
-``DatabaseFeatures.django_test_skips`` and
-``DatabaseFeatures.django_test_expected_failures`` on each backend).
+``DatabaseFeatures.thibaud_test_skips`` and
+``DatabaseFeatures.thibaud_test_expected_failures`` on each backend).
 
 To run the tests with different settings, ensure that the module is on your
 :envvar:`PYTHONPATH` and pass the module with ``--settings``.
@@ -199,8 +199,8 @@ test settings dictionary for the applicable database.
 Running only some of the tests
 ------------------------------
 
-Django's entire test suite takes a while to run, and running every single test
-could be redundant if, say, you just added a test to Django that you want to
+Thibaud's entire test suite takes a while to run, and running every single test
+could be redundant if, say, you just added a test to Thibaud that you want to
 run quickly without running everything else. You can run a subset of the unit
 tests by appending the names of the test modules to ``runtests.py`` on the
 command line.
@@ -276,14 +276,14 @@ For testing changes to the admin UI, the selenium tests can be run with the
 ``tests/screenshots/`` directory.
 
 To define when screenshots should be taken during a selenium test, the test
-class must use the ``@django.test.selenium.screenshot_cases`` decorator with a
+class must use the ``@thibaud.test.selenium.screenshot_cases`` decorator with a
 list of supported screenshot types (``"desktop_size"``, ``"mobile_size"``,
 ``"small_screen_size"``, ``"rtl"``, ``"dark"``, and ``"high_contrast"``). It
 can then call ``self.take_screenshot("unique-screenshot-name")`` at the desired
 point to generate the screenshots. For example::
 
-    from django.test.selenium import SeleniumTestCase, screenshot_cases
-    from django.urls import reverse
+    from thibaud.test.selenium import SeleniumTestCase, screenshot_cases
+    from thibaud.urls import reverse
 
 
     class SeleniumTests(SeleniumTestCase):
@@ -330,7 +330,7 @@ dependencies:
 
 You can find these dependencies in `pip requirements files
 <https://pip.pypa.io/en/latest/user_guide/#requirements-files>`_ inside the
-``tests/requirements`` directory of the Django source tree and install them
+``tests/requirements`` directory of the Thibaud source tree and install them
 like so:
 
 .. console::
@@ -349,7 +349,7 @@ If you want to test the memcached or Redis cache backends, you'll also need to
 define a :setting:`CACHES` setting that points at your memcached or Redis
 instance respectively.
 
-To run the GeoDjango tests, you will need to :doc:`set up a spatial database
+To run the GeoThibaud tests, you will need to :doc:`set up a spatial database
 and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 
 Each of these dependencies is optional. If you're missing any of them, the
@@ -365,7 +365,7 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings:
+To run coverage on the Thibaud test suite using the standard test settings:
 
 .. console::
 
@@ -383,10 +383,10 @@ After that generate the html report by running:
 
    $ coverage html
 
-When running coverage for the Django tests, the included ``.coveragerc``
+When running coverage for the Thibaud tests, the included ``.coveragerc``
 settings file  defines ``coverage_html`` as the output directory for the report
 and also excludes several directories not relevant to the results
-(test code or external code included in Django).
+(test code or external code included in Thibaud).
 
 .. _contrib-apps:
 
@@ -509,7 +509,7 @@ Seeing the SQL queries run during a test
 ----------------------------------------
 
 If you wish to examine the SQL being run in failing tests, you can turn on
-:ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
+:ref:`SQL logging <thibaud-db-logger>` using the ``--debug-sql`` option. If you
 combine this with ``--verbosity=2``, all SQL queries will be output:
 
 .. console::
@@ -536,14 +536,14 @@ Tips for writing tests
 Isolating model registration
 ----------------------------
 
-To avoid polluting the global :attr:`~django.apps.apps` registry and prevent
+To avoid polluting the global :attr:`~thibaud.apps.apps` registry and prevent
 unnecessary table creation, models defined in a test method should be bound to
 a temporary ``Apps`` instance. To do this, use the
-:func:`~django.test.utils.isolate_apps` decorator::
+:func:`~thibaud.test.utils.isolate_apps` decorator::
 
-    from django.db import models
-    from django.test import SimpleTestCase
-    from django.test.utils import isolate_apps
+    from thibaud.db import models
+    from thibaud.test import SimpleTestCase
+    from thibaud.test.utils import isolate_apps
 
 
     class TestModelDefinition(SimpleTestCase):
@@ -557,19 +557,19 @@ a temporary ``Apps`` instance. To do this, use the
 .. admonition:: Setting ``app_label``
 
     Models defined in a test method with no explicit
-    :attr:`~django.db.models.Options.app_label` are automatically assigned the
+    :attr:`~thibaud.db.models.Options.app_label` are automatically assigned the
     label of the app in which their test class is located.
 
     In order to make sure the models defined within the context of
-    :func:`~django.test.utils.isolate_apps` instances are correctly
+    :func:`~thibaud.test.utils.isolate_apps` instances are correctly
     installed, you should pass the set of targeted ``app_label`` as arguments:
 
     .. code-block:: python
         :caption: ``tests/app_label/tests.py``
 
-        from django.db import models
-        from django.test import SimpleTestCase
-        from django.test.utils import isolate_apps
+        from thibaud.db import models
+        from thibaud.test import SimpleTestCase
+        from thibaud.test.utils import isolate_apps
 
 
         class TestModelDefinition(SimpleTestCase):

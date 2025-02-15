@@ -1,9 +1,9 @@
 from ctypes import c_void_p
 
-from django.contrib.gis.gdal.base import GDALBase
-from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.gdal.prototypes import ds as capi
-from django.utils.encoding import force_bytes, force_str
+from thibaud.contrib.gis.gdal.base import GDALBase
+from thibaud.contrib.gis.gdal.error import GDALException
+from thibaud.contrib.gis.gdal.prototypes import ds as capi
+from thibaud.utils.encoding import force_bytes, force_str
 
 
 class Driver(GDALBase):

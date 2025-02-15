@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.db import models
+from thibaud.contrib import admin
+from thibaud.db import models
 
 
 class Band(models.Model):

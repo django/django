@@ -1,5 +1,5 @@
 {
-  "name": "Django",
+  "name": "Thibaud",
   "private": true,
   "scripts": {
     "pretest": "eslint .",

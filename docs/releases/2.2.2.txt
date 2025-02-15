@@ -1,10 +1,10 @@
 ==========================
-Django 2.2.2 release notes
+Thibaud 2.2.2 release notes
 ==========================
 
 *June 3, 2019*
 
-Django 2.2.2 fixes security issues and several bugs in 2.2.1.
+Thibaud 2.2.2 fixes security issues and several bugs in 2.2.1.
 
 CVE-2019-12308: AdminURLFieldWidget XSS
 ---------------------------------------
@@ -15,10 +15,10 @@ value stored in the database, or a value provided as a URL query parameter
 payload, could result in an clickable JavaScript link.
 
 ``AdminURLFieldWidget`` now validates the provided value using
-:class:`~django.core.validators.URLValidator` before displaying the clickable
+:class:`~thibaud.core.validators.URLValidator` before displaying the clickable
 link. You may customize the validator by passing a ``validator_class`` kwarg to
 ``AdminURLFieldWidget.__init__()``, e.g. when using
-:attr:`~django.contrib.admin.ModelAdmin.formfield_overrides`.
+:attr:`~thibaud.contrib.admin.ModelAdmin.formfield_overrides`.
 
 Patched bundled jQuery for CVE-2019-11358: Prototype pollution
 --------------------------------------------------------------
@@ -28,32 +28,32 @@ jQuery before 3.4.0, mishandles ``jQuery.extend(true, {}, ...)`` because of
 enumerable ``__proto__`` property, it could extend the native
 ``Object.prototype``.
 
-The bundled version of jQuery used by the Django admin has been patched to
+The bundled version of jQuery used by the Thibaud admin has been patched to
 allow for the ``select2`` library's use of ``jQuery.extend()``.
 
 Bugfixes
 ========
 
-* Fixed a regression in Django 2.2 that stopped Show/Hide toggles working on
+* Fixed a regression in Thibaud 2.2 that stopped Show/Hide toggles working on
   dynamically added admin inlines (:ticket:`30459`).
 
-* Fixed a regression in Django 2.2 where deprecation message crashes if
+* Fixed a regression in Thibaud 2.2 where deprecation message crashes if
   ``Meta.ordering`` contains an expression (:ticket:`30463`).
 
-* Fixed a regression in Django 2.2.1 where
-  :class:`~django.contrib.postgres.search.SearchVector` generates SQL with a
+* Fixed a regression in Thibaud 2.2.1 where
+  :class:`~thibaud.contrib.postgres.search.SearchVector` generates SQL with a
   redundant ``Coalesce`` call (:ticket:`30488`).
 
-* Fixed a regression in Django 2.2 where auto-reloader doesn't detect changes
+* Fixed a regression in Thibaud 2.2 where auto-reloader doesn't detect changes
   in ``manage.py`` file when using ``StatReloader`` (:ticket:`30479`).
 
-* Fixed crash of :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
-  :class:`~django.contrib.postgres.aggregates.StringAgg` with ``ordering``
+* Fixed crash of :class:`~thibaud.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~thibaud.contrib.postgres.aggregates.StringAgg` with ``ordering``
   argument when used in a ``Subquery`` (:ticket:`30315`).
 
-* Fixed a regression in Django 2.2 that caused a crash of auto-reloader when
+* Fixed a regression in Thibaud 2.2 that caused a crash of auto-reloader when
   an exception with custom signature is raised (:ticket:`30516`).
 
-* Fixed a regression in Django 2.2.1 where auto-reloader unnecessarily reloads
+* Fixed a regression in Thibaud 2.2.1 where auto-reloader unnecessarily reloads
   translation files multiple times when using ``StatReloader``
   (:ticket:`30523`).

@@ -3,23 +3,23 @@ import uuid
 from functools import lru_cache
 from itertools import chain
 
-from django.conf import settings
-from django.db import NotSupportedError
-from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
-from django.db.models import (
+from thibaud.conf import settings
+from thibaud.db import NotSupportedError
+from thibaud.db.backends.base.operations import BaseDatabaseOperations
+from thibaud.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
+from thibaud.db.models import (
     AutoField,
     CompositePrimaryKey,
     Exists,
     ExpressionWrapper,
     Lookup,
 )
-from django.db.models.expressions import RawSQL
-from django.db.models.sql.where import WhereNode
-from django.utils import timezone
-from django.utils.encoding import force_bytes, force_str
-from django.utils.functional import cached_property
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.db.models.expressions import RawSQL
+from thibaud.db.models.sql.where import WhereNode
+from thibaud.utils import timezone
+from thibaud.utils.encoding import force_bytes, force_str
+from thibaud.utils.functional import cached_property
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 from .base import Database
 from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
@@ -127,7 +127,7 @@ END;
 
     # Oracle crashes with "ORA-03113: end-of-file on communication channel"
     # if the time zone name is passed in parameter. Use interpolation instead.
-    # https://groups.google.com/forum/#!msg/django-developers/zwQju7hbG78/9l934yelwfsJ
+    # https://groups.google.com/forum/#!msg/thibaud-developers/zwQju7hbG78/9l934yelwfsJ
     # This regexp matches all time zone names from the zoneinfo database.
     _tzname_re = _lazy_re_compile(r"^[\w/:+-]+$")
 
@@ -238,7 +238,7 @@ END;
         elif internal_type == "UUIDField":
             converters.append(self.convert_uuidfield_value)
         # Oracle stores empty strings as null. If the field accepts the empty
-        # string, undo this to adhere to the Django convention of using
+        # string, undo this to adhere to the Thibaud convention of using
         # the empty string instead of null.
         if expression.output_field.empty_strings_allowed:
             converters.append(
@@ -264,7 +264,7 @@ END;
         return value
 
     # oracledb always returns datetime.datetime objects for
-    # DATE and TIMESTAMP columns, but Django wants to see a
+    # DATE and TIMESTAMP columns, but Thibaud wants to see a
     # python datetime.date, .time, or .datetime.
 
     def convert_datetimefield_value(self, value, expression, connection):
@@ -455,7 +455,7 @@ END;
     @cached_property
     def _foreign_key_constraints(self):
         # 512 is large enough to fit the ~330 tables (as of this writing) in
-        # Django's test suite.
+        # Thibaud's test suite.
         return lru_cache(maxsize=512)(self.__foreign_key_constraints)
 
     def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
@@ -465,7 +465,7 @@ END;
         truncated_tables = {table.upper() for table in tables}
         constraints = set()
         # Oracle's TRUNCATE CASCADE only works with ON DELETE CASCADE foreign
-        # keys which Django doesn't define. Emulate the PostgreSQL behavior
+        # keys which Thibaud doesn't define. Emulate the PostgreSQL behavior
         # which truncates all dependent tables by manually retrieving all
         # foreign key constraints and resolving dependencies.
         for table in tables:
@@ -592,7 +592,7 @@ END;
         Transform a datetime value to an object compatible with what is expected
         by the backend driver for datetime columns.
 
-        If naive datetime is passed assumes that is in UTC. Normally Django
+        If naive datetime is passed assumes that is in UTC. Normally Thibaud
         models.DateTimeField makes sure that if USE_TZ is True passed datetime
         is timezone aware.
         """

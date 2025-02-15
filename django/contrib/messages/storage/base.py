@@ -1,6 +1,6 @@
-from django.conf import settings
-from django.contrib.messages import constants, utils
-from django.utils.functional import SimpleLazyObject
+from thibaud.conf import settings
+from thibaud.contrib.messages import constants, utils
+from thibaud.utils.functional import SimpleLazyObject
 
 LEVEL_TAGS = SimpleLazyObject(utils.get_level_tags)
 

@@ -1,13 +1,13 @@
 import logging
 
-from django.conf import settings
-from django.contrib.gis import gdal
-from django.contrib.gis.geometry import json_regex
-from django.contrib.gis.geos import GEOSException, GEOSGeometry
-from django.forms.widgets import Widget
-from django.utils import translation
+from thibaud.conf import settings
+from thibaud.contrib.gis import gdal
+from thibaud.contrib.gis.geometry import json_regex
+from thibaud.contrib.gis.geos import GEOSException, GEOSGeometry
+from thibaud.forms.widgets import Widget
+from thibaud.utils import translation
 
-logger = logging.getLogger("django.contrib.gis")
+logger = logging.getLogger("thibaud.contrib.gis")
 
 
 class BaseGeometryWidget(Widget):
@@ -68,7 +68,7 @@ class BaseGeometryWidget(Widget):
                 self.attrs,
                 {
                     "name": name,
-                    "module": "geodjango_%s" % name.replace("-", "_"),  # JS-safe
+                    "module": "geothibaud_%s" % name.replace("-", "_"),  # JS-safe
                     "serialized": self.serialize(value),
                     "geom_type": "Geometry" if geom_type == "Unknown" else geom_type,
                     "STATIC_URL": settings.STATIC_URL,

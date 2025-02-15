@@ -1,16 +1,16 @@
 ==============================================
-How to create custom ``django-admin`` commands
+How to create custom ``thibaud-admin`` commands
 ==============================================
 
-.. module:: django.core.management
+.. module:: thibaud.core.management
 
 Applications can register their own actions with ``manage.py``. For example,
-you might want to add a ``manage.py`` action for a Django app that you're
+you might want to add a ``manage.py`` action for a Thibaud app that you're
 distributing. In this document, we will be building a custom ``closepoll``
 command for the ``polls`` application from the
 :doc:`tutorial</intro/tutorial01>`.
 
-To do this, add a ``management/commands`` directory to the application. Django
+To do this, add a ``management/commands`` directory to the application. Thibaud
 will register a ``manage.py`` command for each Python module in that directory
 whose name doesn't begin with an underscore. For example:
 
@@ -46,7 +46,7 @@ The ``closepoll.py`` module has only one requirement -- it must define a class
 To implement the command, edit ``polls/management/commands/closepoll.py`` to
 look like this::
 
-    from django.core.management.base import BaseCommand, CommandError
+    from thibaud.core.management.base import BaseCommand, CommandError
     from polls.models import Question as Poll
 
 
@@ -124,7 +124,7 @@ parameter of the handle method. See the :py:mod:`argparse` Python documentation
 for more about ``add_argument`` usage.
 
 In addition to being able to add custom command line options, all
-:doc:`management commands</ref/django-admin>` can accept some default options
+:doc:`management commands</ref/thibaud-admin>` can accept some default options
 such as :option:`--verbosity` and :option:`--traceback`.
 
 .. _management-commands-and-locales:
@@ -139,7 +139,7 @@ locale (for example, to prevent translated content from being inserted into
 the database), deactivate translations using the ``@no_translations``
 decorator on your :meth:`~BaseCommand.handle` method::
 
-    from django.core.management.base import BaseCommand, no_translations
+    from thibaud.core.management.base import BaseCommand, no_translations
 
 
     class Command(BaseCommand):
@@ -162,7 +162,7 @@ Information on how to test custom management commands can be found in the
 Overriding commands
 ===================
 
-Django registers the built-in commands and then searches for commands in
+Thibaud registers the built-in commands and then searches for commands in
 :setting:`INSTALLED_APPS` in reverse. During the search, if a command name
 duplicates an already registered command, the newly discovered command
 overrides the first.
@@ -270,7 +270,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     Returns a ``CommandParser`` instance, which is an
     :class:`~argparse.ArgumentParser` subclass with a few customizations for
-    Django.
+    Thibaud.
 
     You can customize the instance by overriding this method and calling
     ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser` parameters.
@@ -284,7 +284,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.get_version()
 
-    Returns the Django version, which should be correct for all built-in Django
+    Returns the Thibaud version, which should be correct for all built-in Thibaud
     commands. User-supplied commands can override this method to return their
     own version.
 
@@ -297,7 +297,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 .. admonition:: Calling a management command in your code
 
     ``execute()`` should not be called directly from your code to execute a
-    command. Use :func:`~django.core.management.call_command` instead.
+    command. Use :func:`~thibaud.core.management.call_command` instead.
 
 .. method:: BaseCommand.handle(*args, **options)
 
@@ -308,7 +308,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.check(app_configs=None, tags=None,display_num_errors=False, include_deployment_checks=False, fail_level=checks.ERROR, databases=None)
 
-    Uses the system check framework to inspect the entire Django project for
+    Uses the system check framework to inspect the entire Thibaud project for
     potential problems. Serious problems are raised as a :exc:`CommandError`;
     warnings are output to ``stderr``; minor notifications are output to
     ``stdout``.
@@ -353,7 +353,7 @@ each application.
 .. method:: AppCommand.handle_app_config(app_config, **options)
 
     Perform the command's actions for ``app_config``, which will be an
-    :class:`~django.apps.AppConfig` instance corresponding to an application
+    :class:`~thibaud.apps.AppConfig` instance corresponding to an application
     label given on the command line.
 
 .. class:: LabelCommand
@@ -391,5 +391,5 @@ command. It accepts the optional ``returncode`` argument to customize the exit
 status for the management command to exit with, using :func:`sys.exit`.
 
 If a management command is called from code through
-:func:`~django.core.management.call_command`, it's up to you to catch the
+:func:`~thibaud.core.management.call_command`, it's up to you to catch the
 exception when needed.

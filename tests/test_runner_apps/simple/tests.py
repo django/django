@@ -1,10 +1,10 @@
 from unittest import TestCase
 
-from django.test import SimpleTestCase
-from django.test import TestCase as DjangoTestCase
+from thibaud.test import SimpleTestCase
+from thibaud.test import TestCase as ThibaudTestCase
 
 
-class DjangoCase1(DjangoTestCase):
+class ThibaudCase1(ThibaudTestCase):
     def test_1(self):
         pass
 
@@ -12,7 +12,7 @@ class DjangoCase1(DjangoTestCase):
         pass
 
 
-class DjangoCase2(DjangoTestCase):
+class ThibaudCase2(ThibaudTestCase):
     def test_1(self):
         pass
 

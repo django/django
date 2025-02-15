@@ -1,6 +1,6 @@
 import enum
 
-from django.db import router
+from thibaud.db import router
 
 
 class OperationCategory(str, enum.Enum):
@@ -55,7 +55,7 @@ class Operation:
     def deconstruct(self):
         """
         Return a 3-tuple of class import path (or just name if it lives
-        under django.db.migrations), positional arguments, and keyword
+        under thibaud.db.migrations), positional arguments, and keyword
         arguments.
         """
         return (

@@ -1,7 +1,7 @@
 import itertools
 
-from django.db.models import F
-from django.db.models.fields.tuple_lookups import (
+from thibaud.db.models import F
+from thibaud.db.models.fields.tuple_lookups import (
     TupleExact,
     TupleGreaterThan,
     TupleGreaterThanOrEqual,
@@ -10,8 +10,8 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThan,
     TupleLessThanOrEqual,
 )
-from django.db.models.lookups import In
-from django.test import TestCase, skipUnlessDBFeature
+from thibaud.db.models.lookups import In
+from thibaud.test import TestCase, skipUnlessDBFeature
 
 from .models import Contact, Customer
 

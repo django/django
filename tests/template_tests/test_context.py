@@ -1,8 +1,8 @@
 from copy import copy
 from unittest import mock
 
-from django.http import HttpRequest
-from django.template import (
+from thibaud.http import HttpRequest
+from thibaud.template import (
     Context,
     Engine,
     RequestContext,
@@ -10,8 +10,8 @@ from django.template import (
     Variable,
     VariableDoesNotExist,
 )
-from django.template.context import RenderContext
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from thibaud.template.context import RenderContext
+from thibaud.test import RequestFactory, SimpleTestCase, override_settings
 
 
 class ContextTests(SimpleTestCase):
@@ -249,7 +249,7 @@ class RequestContextTests(SimpleTestCase):
         engine = Engine(
             loaders=[
                 (
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "child": '{{ var|default:"none" }}',
                     },
@@ -296,10 +296,10 @@ class RequestContextTests(SimpleTestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "OPTIONS": {
                     "context_processors": [
-                        "django.template.context_processors.request",
+                        "thibaud.template.context_processors.request",
                         "template_tests.test_context.context_process_returning_none",
                     ],
                 },

@@ -2,14 +2,14 @@
 Working with Git and GitHub
 ===========================
 
-This section explains how the community can contribute code to Django via pull
+This section explains how the community can contribute code to Thibaud via pull
 requests. If you're interested in how :ref:`mergers <mergers-team>` handle
 them, see :doc:`../committing-code`.
 
 Below, we are going to show how to create a GitHub pull request containing the
 changes for Trac ticket #xxxxx. By creating a fully-ready pull request, you
 will make the reviewer's job easier, meaning that your work is more likely to
-be merged into Django.
+be merged into Thibaud.
 
 You could also upload a traditional patch to Trac, but it's less practical for
 reviews.
@@ -17,11 +17,11 @@ reviews.
 Installing Git
 ==============
 
-Django uses `Git`_ for its source control. You can `download
+Thibaud uses `Git`_ for its source control. You can `download
 <https://git-scm.com/download>`_ Git, but it's often easier to install with
 your operating system's package manager.
 
-Django's `Git repository`_ is hosted on `GitHub`_, and it is recommended
+Thibaud's `Git repository`_ is hosted on `GitHub`_, and it is recommended
 that you also work using GitHub.
 
 After installing Git, the first thing you should do is set up your name and
@@ -37,43 +37,43 @@ should know the email you use in the ``user.email`` field, as this will be
 used to associate your commits with your GitHub account.
 
 .. _Git: https://git-scm.com/
-.. _Git repository: https://github.com/django/django/
+.. _Git repository: https://github.com/thibaud/thibaud/
 .. _GitHub: https://github.com/
 
 Setting up local repository
 ===========================
 
 When you have created your GitHub account, with the nick "GitHub_nick", and
-`forked Django's repository <https://github.com/django/django/fork>`__,
+`forked Thibaud's repository <https://github.com/thibaud/thibaud/fork>`__,
 create a local copy of your fork:
 
 .. code-block:: shell
 
-    git clone https://github.com/GitHub_nick/django.git
+    git clone https://github.com/GitHub_nick/thibaud.git
 
-This will create a new directory "django", containing a clone of your GitHub
+This will create a new directory "thibaud", containing a clone of your GitHub
 repository. The rest of the git commands on this page need to be run within the
 cloned directory, so switch to it now:
 
 .. code-block:: shell
 
-    cd django
+    cd thibaud
 
 Your GitHub repository will be called "origin" in Git.
 
-You should also set up ``django/django`` as an "upstream" remote (that is, tell
-git that the reference Django repository was the source of your fork of it):
+You should also set up ``thibaud/thibaud`` as an "upstream" remote (that is, tell
+git that the reference Thibaud repository was the source of your fork of it):
 
 .. code-block:: shell
 
-    git remote add upstream https://github.com/django/django.git
+    git remote add upstream https://github.com/thibaud/thibaud.git
     git fetch upstream
 
 You can add other remotes similarly, for example:
 
 .. code-block:: shell
 
-    git remote add akaariai https://github.com/akaariai/django.git
+    git remote add akaariai https://github.com/akaariai/thibaud.git
 
 Working on a ticket
 ===================
@@ -136,9 +136,9 @@ their clone would become corrupt when you edit commits.
 There are also "public branches". These are branches other people are supposed
 to fork, so the history of these branches should never change. Good examples
 of public branches are the ``main`` and ``stable/A.B.x`` branches in the
-``django/django`` repository.
+``thibaud/thibaud`` repository.
 
-When you think your work is ready to be pulled into Django, you should create
+When you think your work is ready to be pulled into Thibaud, you should create
 a pull request at GitHub. A good pull request means:
 
 * commits with one logical change in each, following the
@@ -218,7 +218,7 @@ branch, and nobody should be basing their work on it.
 After upstream has changed
 --------------------------
 
-When upstream (``django/django``) has changed, you should rebase your work. To
+When upstream (``thibaud/thibaud``) has changed, you should rebase your work. To
 do this, use:
 
 .. code-block:: shell
@@ -284,14 +284,14 @@ commit when committing the code.
 Working on a patch
 ==================
 
-One of the ways that developers can contribute to Django is by reviewing
+One of the ways that developers can contribute to Thibaud is by reviewing
 patches. Those patches will typically exist as pull requests on GitHub and
 can be easily integrated into your local repository:
 
 .. code-block:: shell
 
     git checkout -b pull_xxxxx upstream/main
-    curl -L https://github.com/django/django/pull/xxxxx.patch | git am
+    curl -L https://github.com/thibaud/thibaud/pull/xxxxx.patch | git am
 
 This will create a new branch and then apply the changes from the pull request
 to it. At this point you can run the tests or do anything else you need to

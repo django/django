@@ -1,7 +1,7 @@
-from django.core.exceptions import PermissionDenied
-from django.template.response import TemplateResponse
-from django.test import SimpleTestCase, modify_settings, override_settings
-from django.urls import path
+from thibaud.core.exceptions import PermissionDenied
+from thibaud.template.response import TemplateResponse
+from thibaud.test import SimpleTestCase, modify_settings, override_settings
+from thibaud.urls import path
 
 
 class MiddlewareAccessingContent:

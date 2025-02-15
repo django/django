@@ -2,10 +2,10 @@
 The ``File`` object
 ===================
 
-The :mod:`django.core.files` module and its submodules contain built-in classes
-for basic file handling in Django.
+The :mod:`thibaud.core.files` module and its submodules contain built-in classes
+for basic file handling in Thibaud.
 
-.. currentmodule:: django.core.files
+.. currentmodule:: thibaud.core.files
 
 The ``File`` class
 ==================
@@ -13,8 +13,8 @@ The ``File`` class
 .. class:: File(file_object, name=None)
 
     The :class:`File` class is a thin wrapper around a Python
-    :py:term:`file object` with some Django-specific additions.
-    Internally, Django uses this class when it needs to represent a file.
+    :py:term:`file object` with some Thibaud-specific additions.
+    Internally, Thibaud uses this class when it needs to represent a file.
 
     :class:`File` objects have the following attributes and methods:
 
@@ -34,8 +34,8 @@ The ``File`` class
         .. admonition:: Be careful with this attribute in subclasses.
 
             Some subclasses of :class:`File`, including
-            :class:`~django.core.files.base.ContentFile` and
-            :class:`~django.db.models.fields.files.FieldFile`, may replace this
+            :class:`~thibaud.core.files.base.ContentFile` and
+            :class:`~thibaud.db.models.fields.files.FieldFile`, may replace this
             attribute with an object other than a Python :py:term:`file object`.
             In these cases, this attribute may itself be a :class:`File`
             subclass (and not necessarily the same subclass). Whenever
@@ -80,39 +80,39 @@ The ``File`` class
 
         Close the file.
 
-    In addition to the listed methods, :class:`~django.core.files.File` exposes
+    In addition to the listed methods, :class:`~thibaud.core.files.File` exposes
     the following attributes and methods of its ``file`` object:
     ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``, ``read``,
     ``readinto``, ``readline``, ``readlines``, ``seek``, ``tell``,
     ``truncate``, ``write``, ``writelines``, ``readable()``, ``writable()``,
     and ``seekable()``.
 
-.. currentmodule:: django.core.files.base
+.. currentmodule:: thibaud.core.files.base
 
 The ``ContentFile`` class
 =========================
 
 .. class:: ContentFile(content, name=None)
 
-    The ``ContentFile`` class inherits from :class:`~django.core.files.File`,
-    but unlike :class:`~django.core.files.File` it operates on string content
+    The ``ContentFile`` class inherits from :class:`~thibaud.core.files.File`,
+    but unlike :class:`~thibaud.core.files.File` it operates on string content
     (bytes also supported), rather than an actual file. For example::
 
-        from django.core.files.base import ContentFile
+        from thibaud.core.files.base import ContentFile
 
         f1 = ContentFile("esta frase está en español")
         f2 = ContentFile(b"these are bytes")
 
-.. currentmodule:: django.core.files.images
+.. currentmodule:: thibaud.core.files.images
 
 The ``ImageFile`` class
 =======================
 
 .. class:: ImageFile(file_object, name=None)
 
-    Django provides a built-in class specifically for images.
-    :class:`django.core.files.images.ImageFile` inherits all the attributes
-    and methods of :class:`~django.core.files.File`, and additionally
+    Thibaud provides a built-in class specifically for images.
+    :class:`thibaud.core.files.images.ImageFile` inherits all the attributes
+    and methods of :class:`~thibaud.core.files.File`, and additionally
     provides the following:
 
     .. attribute:: width
@@ -123,7 +123,7 @@ The ``ImageFile`` class
 
         Height of the image in pixels.
 
-.. currentmodule:: django.core.files
+.. currentmodule:: thibaud.core.files
 
 Additional methods on files attached to objects
 ===============================================
@@ -151,7 +151,7 @@ below) will also have a couple of extra methods:
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as
-    :class:`~django.core.files.base.ContentFile`.
+    :class:`~thibaud.core.files.base.ContentFile`.
 
 .. method:: File.delete(save=True)
 

@@ -14,11 +14,11 @@ from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
 
-from django.core import validators
-from django.core.exceptions import ValidationError
-from django.forms.boundfield import BoundField
-from django.forms.utils import from_current_timezone, to_current_timezone
-from django.forms.widgets import (
+from thibaud.core import validators
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms.boundfield import BoundField
+from thibaud.forms.utils import from_current_timezone, to_current_timezone
+from thibaud.forms.widgets import (
     FILE_INPUT_CONTRADICTION,
     CheckboxInput,
     ClearableFileInput,
@@ -39,14 +39,14 @@ from django.forms.widgets import (
     TimeInput,
     URLInput,
 )
-from django.utils import formats
-from django.utils.choices import normalize_choices
-from django.utils.dateparse import parse_datetime, parse_duration
-from django.utils.duration import duration_string
-from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext_lazy
+from thibaud.utils import formats
+from thibaud.utils.choices import normalize_choices
+from thibaud.utils.dateparse import parse_datetime, parse_duration
+from thibaud.utils.duration import duration_string
+from thibaud.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.translation import gettext_lazy as _
+from thibaud.utils.translation import ngettext_lazy
 
 __all__ = (
     "Field",
@@ -118,7 +118,7 @@ class Field:
         #           default Widget that it'll use if you don't specify this. In
         #           most cases, the default widget is TextInput.
         # label -- A verbose name for this field, for use in displaying this
-        #          field in a form. By default, Django will use a "pretty"
+        #          field in a form. By default, Thibaud will use a "pretty"
         #          version of the form field name, if the Field is part of a
         #          Form.
         # initial -- A value to use in this Field's initial display. This value

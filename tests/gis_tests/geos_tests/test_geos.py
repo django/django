@@ -8,8 +8,8 @@ from binascii import a2b_hex
 from io import BytesIO
 from unittest import mock, skipIf
 
-from django.contrib.gis import gdal
-from django.contrib.gis.geos import (
+from thibaud.contrib.gis import gdal
+from thibaud.contrib.gis.geos import (
     GeometryCollection,
     GEOSException,
     GEOSGeometry,
@@ -23,11 +23,11 @@ from django.contrib.gis.geos import (
     fromfile,
     fromstr,
 )
-from django.contrib.gis.geos.libgeos import geos_version_tuple
-from django.contrib.gis.shortcuts import numpy
-from django.template import Context
-from django.template.engine import Engine
-from django.test import SimpleTestCase
+from thibaud.contrib.gis.geos.libgeos import geos_version_tuple
+from thibaud.contrib.gis.shortcuts import numpy
+from thibaud.template import Context
+from thibaud.template.engine import Engine
+from thibaud.test import SimpleTestCase
 
 from ..test_data import TestDataMixin
 
@@ -319,7 +319,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         g2 = Point(x=float("nan"), y=math.inf)
         self.assertIs(g1.equals_identical(g2), True)
 
-    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
+    @mock.patch("thibaud.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
     def test_equals_identical_geos_version(self):
         g1 = fromstr("POINT (1 2 3)")
         g2 = fromstr("POINT (1 2 3)")
@@ -334,7 +334,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         pnt_xyzm = fromstr("POINT (5 23 8 0)")
         self.assertTrue(pnt_xyzm.hasm)
 
-    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
+    @mock.patch("thibaud.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
     def test_hasm_geos_version(self):
         p = fromstr("POINT (1 2 3)")
         msg = "GEOSGeometry.hasm requires GEOS >= 3.12.0."
@@ -474,7 +474,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             ):
                 LineString(numpy.array([(0, 0)]))
 
-        with mock.patch("django.contrib.gis.geos.linestring.numpy", False):
+        with mock.patch("thibaud.contrib.gis.geos.linestring.numpy", False):
             with self.assertRaisesMessage(
                 TypeError, "Invalid initialization input for LineStrings."
             ):
@@ -503,7 +503,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             LinearRing().is_counterclockwise
 
     def test_is_counterclockwise_geos_error(self):
-        with mock.patch("django.contrib.gis.geos.prototypes.cs_is_ccw") as mocked:
+        with mock.patch("thibaud.contrib.gis.geos.prototypes.cs_is_ccw") as mocked:
             mocked.return_value = 0
             mocked.func_name = "GEOSCoordSeq_isCCW"
             msg = 'Error encountered in GEOS C function "GEOSCoordSeq_isCCW".'
@@ -1491,19 +1491,19 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         """
         point = Point(4.337844, 50.827537, srid=4326)
         path, args, kwargs = point.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.point.Point")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.point.Point")
         self.assertEqual(args, (4.337844, 50.827537))
         self.assertEqual(kwargs, {"srid": 4326})
 
         ls = LineString(((0, 0), (1, 1)))
         path, args, kwargs = ls.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.linestring.LineString")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.linestring.LineString")
         self.assertEqual(args, (((0, 0), (1, 1)),))
         self.assertEqual(kwargs, {})
 
         ls2 = LineString([Point(0, 0), Point(1, 1)], srid=4326)
         path, args, kwargs = ls2.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.linestring.LineString")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.linestring.LineString")
         self.assertEqual(args, ([Point(0, 0), Point(1, 1)],))
         self.assertEqual(kwargs, {"srid": 4326})
 
@@ -1511,19 +1511,19 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         int_coords = ((0.4, 0.4), (0.4, 0.6), (0.6, 0.6), (0.6, 0.4), (0.4, 0.4))
         poly = Polygon(ext_coords, int_coords)
         path, args, kwargs = poly.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.polygon.Polygon")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.polygon.Polygon")
         self.assertEqual(args, (ext_coords, int_coords))
         self.assertEqual(kwargs, {})
 
         lr = LinearRing((0, 0), (0, 1), (1, 1), (0, 0))
         path, args, kwargs = lr.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.linestring.LinearRing")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.linestring.LinearRing")
         self.assertEqual(args, ((0, 0), (0, 1), (1, 1), (0, 0)))
         self.assertEqual(kwargs, {})
 
         mp = MultiPoint(Point(0, 0), Point(1, 1))
         path, args, kwargs = mp.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.collections.MultiPoint")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.collections.MultiPoint")
         self.assertEqual(args, (Point(0, 0), Point(1, 1)))
         self.assertEqual(kwargs, {})
 
@@ -1531,7 +1531,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         ls2 = LineString((2, 2), (3, 3))
         mls = MultiLineString(ls1, ls2)
         path, args, kwargs = mls.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.collections.MultiLineString")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.collections.MultiLineString")
         self.assertEqual(args, (ls1, ls2))
         self.assertEqual(kwargs, {})
 
@@ -1539,14 +1539,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         p2 = Polygon(((1, 1), (1, 2), (2, 2), (1, 1)))
         mp = MultiPolygon(p1, p2)
         path, args, kwargs = mp.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.collections.MultiPolygon")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.collections.MultiPolygon")
         self.assertEqual(args, (p1, p2))
         self.assertEqual(kwargs, {})
 
         poly = Polygon(((0, 0), (0, 1), (1, 1), (0, 0)))
         gc = GeometryCollection(Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
         path, args, kwargs = gc.deconstruct()
-        self.assertEqual(path, "django.contrib.gis.geos.collections.GeometryCollection")
+        self.assertEqual(path, "thibaud.contrib.gis.geos.collections.GeometryCollection")
         self.assertEqual(
             args, (Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
         )
@@ -1588,7 +1588,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         for version_string, version_tuple in versions:
             with self.subTest(version_string=version_string):
                 with mock.patch(
-                    "django.contrib.gis.geos.libgeos.geos_version",
+                    "thibaud.contrib.gis.geos.libgeos.geos_version",
                     lambda: version_string,
                 ):
                     self.assertEqual(geos_version_tuple(), version_tuple)

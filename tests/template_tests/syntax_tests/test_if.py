@@ -1,6 +1,6 @@
-from django.template import TemplateSyntaxError
-from django.template.defaulttags import IfNode
-from django.test import SimpleTestCase
+from thibaud.template import TemplateSyntaxError
+from thibaud.template.defaulttags import IfNode
+from thibaud.test import SimpleTestCase
 
 from ..utils import TestObj, setup
 

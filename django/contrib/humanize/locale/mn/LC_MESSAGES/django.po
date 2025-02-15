@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Bayarkhuu Bataa, 2014
@@ -9,12 +9,12 @@
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2023-12-24 18:40+0000\n"
 "Last-Translator: Turmunkh Batkhuyag, 2023\n"
-"Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
+"Language-Team: Mongolian (http://app.transifex.com/thibaud/thibaud/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

@@ -1,8 +1,8 @@
-from django.apps import apps
-from django.contrib.gis.db.models import GeometryField
-from django.contrib.sitemaps import Sitemap
-from django.db import models
-from django.urls import reverse
+from thibaud.apps import apps
+from thibaud.contrib.gis.db.models import GeometryField
+from thibaud.contrib.sitemaps import Sitemap
+from thibaud.db import models
+from thibaud.urls import reverse
 
 
 class KMLSitemap(Sitemap):
@@ -65,7 +65,7 @@ class KMLSitemap(Sitemap):
 
     def location(self, obj):
         return reverse(
-            "django.contrib.gis.sitemaps.views.%s" % self.geo_format,
+            "thibaud.contrib.gis.sitemaps.views.%s" % self.geo_format,
             kwargs={
                 "label": obj[0],
                 "model": obj[1],

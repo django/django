@@ -2,7 +2,7 @@
 Form and field validation
 =========================
 
-.. currentmodule:: django.forms
+.. currentmodule:: thibaud.forms
 
 Form validation happens when the data is cleaned. If you want to customize
 this process, there are various places to make changes, each one serving a
@@ -86,9 +86,9 @@ overridden:
   Note that any errors raised by your :meth:`Form.clean()` override will not
   be associated with any field in particular. They go into a special
   "field" (called ``__all__``), which you can access via the
-  :meth:`~django.forms.Form.non_field_errors` method if you need to. If you
+  :meth:`~thibaud.forms.Form.non_field_errors` method if you need to. If you
   want to attach errors to a specific field in the form, you need to call
-  :meth:`~django.forms.Form.add_error()`.
+  :meth:`~thibaud.forms.Form.add_error()`.
 
   Also note that there are special considerations when overriding
   the ``clean()`` method of a ``ModelForm`` subclass. (see the
@@ -178,8 +178,8 @@ to override your error message you can still opt for the less verbose::
 
     ValidationError(_("Invalid value: %s") % value)
 
-The :meth:`Form.errors.as_data() <django.forms.Form.errors.as_data()>` and
-:meth:`Form.errors.as_json() <django.forms.Form.errors.as_json()>` methods
+The :meth:`Form.errors.as_data() <thibaud.forms.Form.errors.as_data()>` and
+:meth:`Form.errors.as_json() <thibaud.forms.Form.errors.as_json()>` methods
 greatly benefit from fully featured ``ValidationError``\s (with a ``code`` name
 and a ``params`` dictionary).
 
@@ -222,19 +222,19 @@ previous features.
 Using validators
 ----------------
 
-Django's form (and model) fields support use of utility functions and classes
+Thibaud's form (and model) fields support use of utility functions and classes
 known as validators. A validator is a callable object or function that takes a
 value and returns nothing if the value is valid or raises a
-:exc:`~django.core.exceptions.ValidationError` if not. These can be passed to a
+:exc:`~thibaud.core.exceptions.ValidationError` if not. These can be passed to a
 field's constructor, via the field's ``validators`` argument, or defined on the
-:class:`~django.forms.Field` class itself with the ``default_validators``
+:class:`~thibaud.forms.Field` class itself with the ``default_validators``
 attribute.
 
 Validators can be used to validate values inside the field, let's have a look
-at Django's ``SlugField``::
+at Thibaud's ``SlugField``::
 
-    from django.core import validators
-    from django.forms import CharField
+    from thibaud.core import validators
+    from thibaud.forms import CharField
 
 
     class SlugField(CharField):
@@ -251,9 +251,9 @@ is equivalent to::
     slug = forms.CharField(validators=[validators.validate_slug])
 
 Common cases such as validating against an email or a regular expression can be
-handled using existing validator classes available in Django. For example,
+handled using existing validator classes available in Thibaud. For example,
 ``validators.validate_slug`` is an instance of
-a :class:`~django.core.validators.RegexValidator` constructed with the first
+a :class:`~thibaud.core.validators.RegexValidator` constructed with the first
 argument being the pattern: ``^[-a-zA-Z0-9_]+\Z``. See the section on
 :doc:`writing validators </ref/validators>` to see a list of what is already
 available and for an example of how to write a validator.
@@ -264,8 +264,8 @@ Form field default cleaning
 Let's first create a custom form field that validates its input is a string
 containing comma-separated email addresses. The full class looks like this::
 
-    from django import forms
-    from django.core.validators import validate_email
+    from thibaud import forms
+    from thibaud.core.validators import validate_email
 
 
     class MultiEmailField(forms.Field):
@@ -310,8 +310,8 @@ we want to make sure that the ``recipients`` field always contains the address
 don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
-    from django import forms
-    from django.core.exceptions import ValidationError
+    from thibaud import forms
+    from thibaud.core.exceptions import ValidationError
 
 
     class ContactForm(forms.Form):
@@ -353,8 +353,8 @@ common method is to display the error at the top of the form. To create such
 an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
 example::
 
-    from django import forms
-    from django.core.exceptions import ValidationError
+    from thibaud import forms
+    from thibaud.core.exceptions import ValidationError
 
 
     class ContactForm(forms.Form):
@@ -397,7 +397,7 @@ showing what is possible here and leaving it up to you and your designers to
 work out what works effectively in your particular situation. Our new code
 (replacing the previous sample) looks like this::
 
-    from django import forms
+    from thibaud import forms
 
 
     class ContactForm(forms.Form):

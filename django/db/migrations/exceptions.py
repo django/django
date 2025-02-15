@@ -1,4 +1,4 @@
-from django.db import DatabaseError
+from thibaud.db import DatabaseError
 
 
 class AmbiguityError(Exception):

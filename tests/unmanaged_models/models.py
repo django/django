@@ -3,9 +3,9 @@ Models can have a ``managed`` attribute, which specifies whether the SQL code
 is generated for the table on various manage.py operations.
 """
 
-from django.db import models
+from thibaud.db import models
 
-#  All of these models are created in the database by Django.
+#  All of these models are created in the database by Thibaud.
 
 
 class A01(models.Model):
@@ -38,7 +38,7 @@ class C01(models.Model):
 
 # All of these models use the same tables as the previous set (they are shadows
 # of possibly a subset of the columns). There should be no creation errors,
-# since we have told Django they aren't managed by Django.
+# since we have told Thibaud they aren't managed by Thibaud.
 
 
 class A02(models.Model):

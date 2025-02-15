@@ -2,10 +2,10 @@
 ``TemplateResponse`` and ``SimpleTemplateResponse``
 ===================================================
 
-.. module:: django.template.response
+.. module:: thibaud.template.response
    :synopsis: Classes dealing with lazy-rendered HTTP responses.
 
-Standard :class:`~django.http.HttpResponse` objects are static structures.
+Standard :class:`~thibaud.http.HttpResponse` objects are static structures.
 They are provided with a block of pre-rendered content at time of
 construction, and while that content can be modified, it isn't in a form that
 makes it easy to perform modifications.
@@ -16,7 +16,7 @@ view. For example, you may want to change the template that is used,
 or put additional data into the context.
 
 TemplateResponse provides a way to do just that. Unlike basic
-:class:`~django.http.HttpResponse` objects, TemplateResponse objects retain
+:class:`~thibaud.http.HttpResponse` objects, TemplateResponse objects retain
 the details of the template and context that was provided by the view to
 compute the response. The final output of the response is not computed until
 it is needed, later in the response process.
@@ -33,7 +33,7 @@ Attributes
 
     The name of the template to be rendered. Accepts a backend-dependent
     template object (such as those returned by
-    :func:`~django.template.loader.get_template()`), the name of a template,
+    :func:`~thibaud.template.loader.get_template()`), the name of a template,
     or a list of template names.
 
     Example: ``['foo.html', 'path/to/bar.html']``
@@ -59,13 +59,13 @@ Methods
 
 .. method:: SimpleTemplateResponse.__init__(template, context=None, content_type=None, status=None, charset=None, using=None, headers=None)
 
-    Instantiates a :class:`~django.template.response.SimpleTemplateResponse`
+    Instantiates a :class:`~thibaud.template.response.SimpleTemplateResponse`
     object with the given template, context, content type, HTTP status, and
     charset.
 
     ``template``
         A backend-dependent template object (such as those returned by
-        :func:`~django.template.loader.get_template()`), the name of a template,
+        :func:`~thibaud.template.loader.get_template()`), the name of a template,
         or a list of template names.
 
     ``context``
@@ -105,7 +105,7 @@ Methods
 
     Resolves the template instance to use for rendering. Accepts a
     backend-dependent template object (such as those returned by
-    :func:`~django.template.loader.get_template()`), the name of a template,
+    :func:`~thibaud.template.loader.get_template()`), the name of a template,
     or a list of template names.
 
     Returns the backend-dependent template object instance to be rendered.
@@ -118,12 +118,12 @@ Methods
     place. This hook can be used to defer certain processing
     operations (such as caching) until after rendering has occurred.
 
-    If the :class:`~django.template.response.SimpleTemplateResponse`
+    If the :class:`~thibaud.template.response.SimpleTemplateResponse`
     has already been rendered, the callback will be invoked
     immediately.
 
     When called, callbacks will be passed a single argument -- the
-    rendered :class:`~django.template.response.SimpleTemplateResponse`
+    rendered :class:`~thibaud.template.response.SimpleTemplateResponse`
     instance.
 
     If the callback returns a value that is not ``None``, this will be
@@ -146,24 +146,24 @@ Methods
 .. class:: TemplateResponse()
 
     ``TemplateResponse`` is a subclass of
-    :class:`~django.template.response.SimpleTemplateResponse` that knows about
-    the current :class:`~django.http.HttpRequest`.
+    :class:`~thibaud.template.response.SimpleTemplateResponse` that knows about
+    the current :class:`~thibaud.http.HttpRequest`.
 
 Methods
 -------
 
 .. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, charset=None, using=None, headers=None)
 
-    Instantiates a :class:`~django.template.response.TemplateResponse` object
+    Instantiates a :class:`~thibaud.template.response.TemplateResponse` object
     with the given request, template, context, content type, HTTP status, and
     charset.
 
     ``request``
-        An :class:`~django.http.HttpRequest` instance.
+        An :class:`~thibaud.http.HttpRequest` instance.
 
     ``template``
         A backend-dependent template object (such as those returned by
-        :func:`~django.template.loader.get_template()`), the name of a template,
+        :func:`~thibaud.template.loader.get_template()`), the name of a template,
         or a list of template names.
 
     ``context``
@@ -194,7 +194,7 @@ Methods
 The rendering process
 =====================
 
-Before a :class:`~django.template.response.TemplateResponse` instance can be
+Before a :class:`~thibaud.template.response.TemplateResponse` instance can be
 returned to the client, it must be rendered. The rendering process takes the
 intermediate representation of template and context, and turns it into the
 final byte stream that can be served to the client.
@@ -223,7 +223,7 @@ the content of the response manually:
 .. code-block:: pycon
 
     # Set up a rendered TemplateResponse
-    >>> from django.template.response import TemplateResponse
+    >>> from thibaud.template.response import TemplateResponse
     >>> t = TemplateResponse(request, "original.html", {})
     >>> t.render()
     >>> print(t.content)
@@ -265,7 +265,7 @@ To define a post-render callback, define a function that takes
 a single argument -- response -- and register that function with
 the template response::
 
-    from django.template.response import TemplateResponse
+    from thibaud.template.response import TemplateResponse
 
 
     def my_render_callback(response):
@@ -292,13 +292,13 @@ Using ``TemplateResponse`` and ``SimpleTemplateResponse``
 =========================================================
 
 A :class:`TemplateResponse` object can be used anywhere that a normal
-:class:`django.http.HttpResponse` can be used. It can also be used as an
-alternative to calling :func:`~django.shortcuts.render()`.
+:class:`thibaud.http.HttpResponse` can be used. It can also be used as an
+alternative to calling :func:`~thibaud.shortcuts.render()`.
 
 For example, the following view returns a :class:`TemplateResponse` with a
 template and a context containing a queryset::
 
-    from django.template.response import TemplateResponse
+    from thibaud.template.response import TemplateResponse
 
 
     def blog_index(request):

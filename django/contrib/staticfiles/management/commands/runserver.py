@@ -1,6 +1,6 @@
-from django.conf import settings
-from django.contrib.staticfiles.handlers import StaticFilesHandler
-from django.core.management.commands.runserver import Command as RunserverCommand
+from thibaud.conf import settings
+from thibaud.contrib.staticfiles.handlers import StaticFilesHandler
+from thibaud.core.management.commands.runserver import Command as RunserverCommand
 
 
 class Command(RunserverCommand):
@@ -14,7 +14,7 @@ class Command(RunserverCommand):
             "--nostatic",
             action="store_false",
             dest="use_static_handler",
-            help="Tells Django to NOT automatically serve static files at STATIC_URL.",
+            help="Tells Thibaud to NOT automatically serve static files at STATIC_URL.",
         )
         parser.add_argument(
             "--insecure",

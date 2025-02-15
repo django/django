@@ -2,9 +2,9 @@
 System check framework
 ======================
 
-.. module:: django.core.checks
+.. module:: thibaud.core.checks
 
-The system check framework is a set of static checks for validating Django
+The system check framework is a set of static checks for validating Thibaud
 projects. It detects common problems and provides hints for how to fix them.
 The framework is extensible so you can easily add your own checks.
 
@@ -14,12 +14,12 @@ triggered implicitly before most commands, including :djadmin:`runserver` and
 WSGI stack that is used in deployment. If you need to run system checks on your
 deployment server, trigger them explicitly using :djadmin:`check`.
 
-Serious errors will prevent Django commands (such as :djadmin:`runserver`) from
+Serious errors will prevent Thibaud commands (such as :djadmin:`runserver`) from
 running at all. Minor problems are reported to the console. If you have inspected
 the cause of a warning and are happy to ignore it, you can hide specific warnings
 using the :setting:`SILENCED_SYSTEM_CHECKS` setting in your project settings file.
 
-A full list of all checks that can be raised by Django can be found in the
+A full list of all checks that can be raised by Thibaud can be found in the
 :doc:`System check reference </ref/checks>`.
 
 Writing your own checks
@@ -29,7 +29,7 @@ The framework is flexible and allows you to write functions that perform
 any other kind of check you may require. The following is an example stub
 check function::
 
-    from django.core.checks import Error, register
+    from thibaud.core.checks import Error, register
 
 
     @register()
@@ -65,8 +65,8 @@ The function must return a list of messages. If no problems are found as a resul
 of the check, the check function must return an empty list.
 
 The warnings and errors raised by the check method must be instances of
-:class:`~django.core.checks.CheckMessage`. An instance of
-:class:`~django.core.checks.CheckMessage` encapsulates a single reportable
+:class:`~thibaud.core.checks.CheckMessage`. An instance of
+:class:`~thibaud.core.checks.CheckMessage` encapsulates a single reportable
 error or warning. It also provides context and hints applicable to the
 message, and a unique identifier that is used for filtering purposes.
 
@@ -92,7 +92,7 @@ Registering and labeling checks
 Lastly, your check function must be registered explicitly with system check
 registry. Checks should be registered in a file that's loaded when your
 application is loaded; for example, in the :meth:`AppConfig.ready()
-<django.apps.AppConfig.ready>` method.
+<thibaud.apps.AppConfig.ready>` method.
 
 .. function:: register(*tags)(function)
 
@@ -101,7 +101,7 @@ check. Tagging checks is useful since it allows you to run only a certain
 group of checks. For example, to register a compatibility check, you would
 make the following call::
 
-    from django.core.checks import register, Tags
+    from thibaud.core.checks import register, Tags
 
 
     @register(Tags.compatibility)
@@ -149,8 +149,8 @@ constructor of ``IntegerField``. You may want to add a check to ensure that user
 provide a min value that is less than or equal to the max value. The following
 code snippet shows how you can implement this check::
 
-    from django.core import checks
-    from django.db import models
+    from thibaud.core import checks
+    from thibaud.db import models
 
 
     class RangedIntegerField(models.IntegerField):
@@ -183,7 +183,7 @@ code snippet shows how you can implement this check::
             return []
 
 If you wanted to add checks to a model manager, you would take the same
-approach on your subclass of :class:`~django.db.models.Manager`.
+approach on your subclass of :class:`~thibaud.db.models.Manager`.
 
 If you want to add a check to a model class, the approach is *almost* the same:
 the only difference is that the check is a classmethod, not an instance method::
@@ -200,7 +200,7 @@ Writing tests
 
 Messages are comparable. That allows you to easily write tests::
 
-    from django.core.checks import Error
+    from thibaud.core.checks import Error
 
     errors = checked_object.check()
     expected_errors = [
@@ -218,21 +218,21 @@ Writing integration tests
 
 Given the need to register certain checks when the application loads, it can be
 useful to test their integration within the system checks framework. This can
-be accomplished by using the :func:`~django.core.management.call_command`
+be accomplished by using the :func:`~thibaud.core.management.call_command`
 function.
 
 For example, this test demonstrates that the :setting:`SITE_ID` setting must be
 an integer, a built-in :ref:`check from the sites framework
 <sites-system-checks>`::
 
-    from django.core.management import call_command
-    from django.core.management.base import SystemCheckError
-    from django.test import SimpleTestCase, modify_settings, override_settings
+    from thibaud.core.management import call_command
+    from thibaud.core.management.base import SystemCheckError
+    from thibaud.test import SimpleTestCase, modify_settings, override_settings
 
 
     class SystemCheckIntegrationTest(SimpleTestCase):
         @override_settings(SITE_ID="non_integer")
-        @modify_settings(INSTALLED_APPS={"prepend": "django.contrib.sites"})
+        @modify_settings(INSTALLED_APPS={"prepend": "thibaud.contrib.sites"})
         def test_non_integer_site_id(self):
             message = "(sites.E101) The SITE_ID setting must be an integer."
             with self.assertRaisesMessage(SystemCheckError, message):
@@ -241,8 +241,8 @@ an integer, a built-in :ref:`check from the sites framework
 Consider the following check which issues a warning on deployment if a custom
 setting named ``ENABLE_ANALYTICS`` is not set to ``True``::
 
-    from django.conf import settings
-    from django.core.checks import Warning, register
+    from thibaud.conf import settings
+    from thibaud.core.checks import Warning, register
 
 
     @register("myapp", deploy=True)
@@ -262,8 +262,8 @@ the warning message in the ``stderr`` output can be asserted like so::
 
     from io import StringIO
 
-    from django.core.management import call_command
-    from django.test import SimpleTestCase, override_settings
+    from thibaud.core.management import call_command
+    from thibaud.test import SimpleTestCase, override_settings
 
 
     class EnableAnalyticsDeploymentCheckTest(SimpleTestCase):

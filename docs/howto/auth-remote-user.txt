@@ -4,7 +4,7 @@ How to authenticate using ``REMOTE_USER``
 
 This document describes how to make use of external authentication sources
 (where the web server sets the ``REMOTE_USER`` environment variable) in your
-Django applications.  This type of authentication solution is typically seen on
+Thibaud applications.  This type of authentication solution is typically seen on
 intranet sites, with single sign-on solutions such as IIS and Integrated
 Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `WebAuth`_,
 `mod_auth_sspi`_, etc.
@@ -16,48 +16,48 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `WebAuth`_,
 
 When the web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application.  In
-Django, ``REMOTE_USER`` is made available in the :attr:`request.META
-<django.http.HttpRequest.META>` attribute.  Django can be configured to make
+Thibaud, ``REMOTE_USER`` is made available in the :attr:`request.META
+<thibaud.http.HttpRequest.META>` attribute.  Thibaud can be configured to make
 use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware``
 or ``PersistentRemoteUserMiddleware``, and
-:class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
-:mod:`django.contrib.auth`.
+:class:`~thibaud.contrib.auth.backends.RemoteUserBackend` classes found in
+:mod:`thibaud.contrib.auth`.
 
 Configuration
 =============
 
 First, you must add the
-:class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
+:class:`thibaud.contrib.auth.middleware.RemoteUserMiddleware` to the
 :setting:`MIDDLEWARE` setting **after** the
-:class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
+:class:`thibaud.contrib.auth.middleware.AuthenticationMiddleware`::
 
     MIDDLEWARE = [
         "...",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.auth.middleware.RemoteUserMiddleware",
+        "thibaud.contrib.auth.middleware.AuthenticationMiddleware",
+        "thibaud.contrib.auth.middleware.RemoteUserMiddleware",
         "...",
     ]
 
-Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
-with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
+Next, you must replace the :class:`~thibaud.contrib.auth.backends.ModelBackend`
+with :class:`~thibaud.contrib.auth.backends.RemoteUserBackend` in the
 :setting:`AUTHENTICATION_BACKENDS` setting::
 
     AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.RemoteUserBackend",
+        "thibaud.contrib.auth.backends.RemoteUserBackend",
     ]
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
 ``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
-using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
+using the :class:`~thibaud.contrib.auth.backends.RemoteUserBackend`.
 
 Be aware that this particular setup disables authentication with the default
 ``ModelBackend``. This means that if the ``REMOTE_USER`` value is not set
-then the user is unable to log in, even using Django's admin interface.
-Adding ``'django.contrib.auth.backends.ModelBackend'`` to the
+then the user is unable to log in, even using Thibaud's admin interface.
+Adding ``'thibaud.contrib.auth.backends.ModelBackend'`` to the
 ``AUTHENTICATION_BACKENDS`` list will use ``ModelBackend`` as a fallback
 if ``REMOTE_USER`` is absent, which will solve these issues.
 
-Django's user management, such as the views in ``contrib.admin`` and
+Thibaud's user management, such as the views in ``contrib.admin`` and
 the :djadmin:`createsuperuser` management command, doesn't integrate with
 remote users. These interfaces work with users stored in the database
 regardless of ``AUTHENTICATION_BACKENDS``.
@@ -69,16 +69,16 @@ regardless of ``AUTHENTICATION_BACKENDS``.
     ``ModelBackend``.
 
     Users with :attr:`is_active=False
-    <django.contrib.auth.models.User.is_active>` won't be allowed to
+    <thibaud.contrib.auth.models.User.is_active>` won't be allowed to
     authenticate. Use
-    :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
+    :class:`~thibaud.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
     you want to allow them to.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
 ``header`` attribute to the desired ``request.META`` key.  For example::
 
-    from django.contrib.auth.middleware import RemoteUserMiddleware
+    from thibaud.contrib.auth.middleware import RemoteUserMiddleware
 
 
     class CustomHeaderMiddleware(RemoteUserMiddleware):
@@ -101,7 +101,7 @@ If your authentication mechanism uses a custom HTTP header and not
     server, not directly from an HTTP request header.
 
 If you need more control, you can create your own authentication backend
-that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
+that inherits from :class:`~thibaud.contrib.auth.backends.RemoteUserBackend` and
 override one or more of its attributes and methods.
 
 .. _persistent-remote-user-middleware-howto:
@@ -118,8 +118,8 @@ HTTP server is usually only set up for one or a few login URLs, and after
 successful authentication, the application is supposed to maintain the
 authenticated session itself.
 
-:class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+:class:`~thibaud.contrib.auth.middleware.PersistentRemoteUserMiddleware`
 provides support for this use case. It will maintain the authenticated session
 until explicit logout by the user. The class can be used as a drop-in
-replacement of :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`
+replacement of :class:`~thibaud.contrib.auth.middleware.RemoteUserMiddleware`
 in the documentation above.

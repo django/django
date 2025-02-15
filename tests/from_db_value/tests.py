@@ -1,6 +1,6 @@
-from django.db import connection
-from django.db.models import Max
-from django.test import TestCase
+from thibaud.db import connection
+from thibaud.db.models import Max
+from thibaud.test import TestCase
 
 from .models import Cash, CashModel
 

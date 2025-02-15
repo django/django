@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # 534b44a19bf18d20b71ecc4eb77c572f_db336e9 <f8268c65f822ec11a3a2e5d482cd7ead_175>, 2011
@@ -6,12 +6,12 @@
 # Meir Kriheli <mkriheli@gmail.com>, 2012,2014-2015,2019-2020
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
 "PO-Revision-Date: 2020-08-02 13:26+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
-"Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
+"Language-Team: Hebrew (http://www.transifex.com/thibaud/thibaud/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

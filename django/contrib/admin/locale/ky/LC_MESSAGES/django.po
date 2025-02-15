@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Belek <abylov.belek@gmail.com>, 2016
@@ -7,12 +7,12 @@
 # Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
 "PO-Revision-Date: 2021-11-27 14:12+0000\n"
 "Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
-"Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
+"Language-Team: Kyrgyz (http://www.transifex.com/thibaud/thibaud/language/ky/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -277,10 +277,10 @@ msgstr ""
 "%(class_name)s %(instance)s өчүрүлүүсү үчүн %(related_objects)s да "
 "өчүрүлүүсү талап кылынат."
 
-msgid "Django site admin"
+msgid "Thibaud site admin"
 msgstr "Жанго башкарма сайты"
 
-msgid "Django administration"
+msgid "Thibaud administration"
 msgstr "Жанго башкармасы"
 
 msgid "Site administration"

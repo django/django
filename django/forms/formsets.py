@@ -1,12 +1,12 @@
-from django.core.exceptions import ValidationError
-from django.forms.fields import BooleanField, IntegerField
-from django.forms.forms import Form
-from django.forms.renderers import get_default_renderer
-from django.forms.utils import ErrorList, RenderableFormMixin
-from django.forms.widgets import CheckboxInput, HiddenInput, NumberInput
-from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext_lazy
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms.fields import BooleanField, IntegerField
+from thibaud.forms.forms import Form
+from thibaud.forms.renderers import get_default_renderer
+from thibaud.forms.utils import ErrorList, RenderableFormMixin
+from thibaud.forms.widgets import CheckboxInput, HiddenInput, NumberInput
+from thibaud.utils.functional import cached_property
+from thibaud.utils.translation import gettext_lazy as _
+from thibaud.utils.translation import ngettext_lazy
 
 __all__ = ("BaseFormSet", "formset_factory", "all_valid")
 
@@ -73,10 +73,10 @@ class BaseFormSet(RenderableFormMixin):
         ),
     }
 
-    template_name_div = "django/forms/formsets/div.html"
-    template_name_p = "django/forms/formsets/p.html"
-    template_name_table = "django/forms/formsets/table.html"
-    template_name_ul = "django/forms/formsets/ul.html"
+    template_name_div = "thibaud/forms/formsets/div.html"
+    template_name_p = "thibaud/forms/formsets/p.html"
+    template_name_table = "thibaud/forms/formsets/table.html"
+    template_name_ul = "thibaud/forms/formsets/ul.html"
 
     def __init__(
         self,

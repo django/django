@@ -1,7 +1,7 @@
-from django.db import migrations, models
-from django.db.migrations import operations
-from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.models.functions import Abs
+from thibaud.db import migrations, models
+from thibaud.db.migrations import operations
+from thibaud.db.migrations.optimizer import MigrationOptimizer
+from thibaud.db.models.functions import Abs
 
 from .models import EmptyManager, UnicodeModel
 from .test_base import OptimizerTestBase

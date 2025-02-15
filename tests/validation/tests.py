@@ -1,7 +1,7 @@
-from django import forms
-from django.core.exceptions import NON_FIELD_ERRORS
-from django.test import TestCase
-from django.utils.functional import lazy
+from thibaud import forms
+from thibaud.core.exceptions import NON_FIELD_ERRORS
+from thibaud.test import TestCase
+from thibaud.utils.functional import lazy
 
 from . import ValidationAssertions
 from .models import (

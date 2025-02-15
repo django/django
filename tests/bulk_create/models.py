@@ -2,9 +2,9 @@ import datetime
 import uuid
 from decimal import Decimal
 
-from django.db import models
-from django.db.models.functions import Now
-from django.utils import timezone
+from thibaud.db import models
+from thibaud.db.models.functions import Now
+from thibaud.utils import timezone
 
 try:
     from PIL import Image

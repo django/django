@@ -1,9 +1,9 @@
-from django.core.exceptions import ImproperlyConfigured
-from django.forms import Form
-from django.forms import models as model_forms
-from django.http import HttpResponseRedirect
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
-from django.views.generic.detail import (
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.forms import Form
+from thibaud.forms import models as model_forms
+from thibaud.http import HttpResponseRedirect
+from thibaud.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from thibaud.views.generic.detail import (
     BaseDetailView,
     SingleObjectMixin,
     SingleObjectTemplateResponseMixin,

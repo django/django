@@ -1,7 +1,7 @@
 import os
 
-from django.core.management.commands.makemessages import TranslatableFile
-from django.test import SimpleTestCase
+from thibaud.core.management.commands.makemessages import TranslatableFile
+from thibaud.test import SimpleTestCase
 
 
 class TranslatableFileTests(SimpleTestCase):

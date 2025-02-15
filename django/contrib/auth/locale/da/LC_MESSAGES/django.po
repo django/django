@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
@@ -10,12 +10,12 @@
 # valberg <valberg@orn.li>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 08:09+0000\n"
 "Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023-2024\n"
-"Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
+"Language-Team: Danish (http://app.transifex.com/thibaud/thibaud/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

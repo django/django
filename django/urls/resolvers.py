@@ -16,15 +16,15 @@ from urllib.parse import quote
 
 from asgiref.local import Local
 
-from django.conf import settings
-from django.core.checks import Error, Warning
-from django.core.checks.urls import check_resolver
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.datastructures import MultiValueDict
-from django.utils.functional import cached_property
-from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
-from django.utils.regex_helper import _lazy_re_compile, normalize
-from django.utils.translation import get_language
+from thibaud.conf import settings
+from thibaud.core.checks import Error, Warning
+from thibaud.core.checks.urls import check_resolver
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.utils.datastructures import MultiValueDict
+from thibaud.utils.functional import cached_property
+from thibaud.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
+from thibaud.utils.regex_helper import _lazy_re_compile, normalize
+from thibaud.utils.translation import get_language
 
 from .converters import get_converters
 from .exceptions import NoReverseMatch, Resolver404
@@ -252,7 +252,7 @@ def _route_to_regex(route, is_endpoint):
     Convert a path pattern into a regular expression. Return the regular
     expression and a dictionary mapping the capture names to the converters.
     For example, 'foo/<int:pk>' returns '^foo\\/(?P<pk>[0-9]+)'
-    and {'pk': <django.urls.converters.IntConverter>}.
+    and {'pk': <thibaud.urls.converters.IntConverter>}.
     """
     parts = ["^"]
     all_converters = get_converters()
@@ -346,7 +346,7 @@ class RoutePattern(CheckURLMixin):
                 Warning(
                     "Your URL pattern {} has a route that contains '(?P<', begins "
                     "with a '^', or ends with a '$'. This was likely an oversight "
-                    "when migrating to django.urls.path().".format(self.describe()),
+                    "when migrating to thibaud.urls.path().".format(self.describe()),
                     id="2_0.W001",
                 )
             )
@@ -440,7 +440,7 @@ class URLPattern:
             return []
 
     def _check_callback(self):
-        from django.views import View
+        from thibaud.views import View
 
         view = self.callback
         if inspect.isclass(view) and issubclass(view, View):
@@ -732,8 +732,8 @@ class URLResolver:
         callback = getattr(self.urlconf_module, "handler%s" % view_type, None)
         if not callback:
             # No handler specified in file; use lazy import, since
-            # django.conf.urls imports this file.
-            from django.conf import urls
+            # thibaud.conf.urls imports this file.
+            from thibaud.conf import urls
 
             callback = getattr(urls, "handler%s" % view_type)
         return get_callable(callback)

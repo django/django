@@ -2,19 +2,19 @@
 Model field reference
 =====================
 
-.. module:: django.db.models.fields
+.. module:: thibaud.db.models.fields
    :synopsis: Built-in field types.
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
 This document contains all the API references of :class:`Field` including the
-`field options`_ and `field types`_ Django offers.
+`field options`_ and `field types`_ Thibaud offers.
 
 .. seealso::
 
     If the built-in fields don't do the trick, you can try
-    :pypi:`django-localflavor` (`documentation
-    <https://django-localflavor.readthedocs.io/>`_), which contains assorted
+    :pypi:`thibaud-localflavor` (`documentation
+    <https://thibaud-localflavor.readthedocs.io/>`_), which contains assorted
     pieces of code that are useful for particular countries and cultures.
 
     Also, you can easily :doc:`write your own custom model fields
@@ -22,9 +22,9 @@ This document contains all the API references of :class:`Field` including the
 
 .. note::
 
-    Fields are defined in :mod:`django.db.models.fields`, but for convenience
-    they're imported into :mod:`django.db.models`. The standard convention is
-    to use ``from django.db import models`` and refer to fields as
+    Fields are defined in :mod:`thibaud.db.models.fields`, but for convenience
+    they're imported into :mod:`thibaud.db.models`. The standard convention is
+    to use ``from thibaud.db import models`` and refer to fields as
     ``models.<Foo>Field``.
 
 .. _common-model-field-options:
@@ -39,11 +39,11 @@ The following arguments are available to all field types. All are optional.
 
 .. attribute:: Field.null
 
-If ``True``, Django will store empty values as ``NULL`` in the database. Default
+If ``True``, Thibaud will store empty values as ``NULL`` in the database. Default
 is ``False``.
 
 Avoid using :attr:`~Field.null` on string-based fields such as
-:class:`CharField` and :class:`TextField`. The Django convention is to use an
+:class:`CharField` and :class:`TextField`. The Thibaud convention is to use an
 empty string, not ``NULL``, as the "no data" state for string-based fields. If a
 string-based field has ``null=False``, empty strings can still be saved for "no
 data". If a string-based field has ``null=True``, that means it has two possible
@@ -78,7 +78,7 @@ If a field has ``blank=False``, the field will be required.
 .. admonition:: Supplying missing values
 
     ``blank=True`` can be used with fields having ``null=False``, but this will
-    require implementing :meth:`~django.db.models.Model.clean` on the model in
+    require implementing :meth:`~thibaud.db.models.Model.clean` on the model in
     order to programmatically supply any missing values.
 
 .. _field-choices:
@@ -143,7 +143,7 @@ the choices are:
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Student(models.Model):
@@ -225,10 +225,10 @@ meant for static data that doesn't change much, if ever.
 .. note::
     A new migration is created each time the order of ``choices`` changes.
 
-For each model field that has :attr:`~Field.choices` set, Django will normalize
+For each model field that has :attr:`~Field.choices` set, Thibaud will normalize
 the choices to a list of 2-tuples and add a method to retrieve the
 human-readable name for the field's current value. See
-:meth:`~django.db.models.Model.get_FOO_display` in the database API
+:meth:`~thibaud.db.models.Model.get_FOO_display` in the database API
 documentation.
 
 .. _field-choices-blank-label:
@@ -238,17 +238,17 @@ Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 with the select box. To override this behavior, add a tuple to ``choices``
 containing ``None``; e.g. ``(None, 'Your String For Display')``.
 Alternatively, you can use an empty string instead of ``None`` where this makes
-sense - such as on a :class:`~django.db.models.CharField`.
+sense - such as on a :class:`~thibaud.db.models.CharField`.
 
 .. _field-choices-enum-types:
 
 Enumeration types
 ~~~~~~~~~~~~~~~~~
 
-In addition, Django provides enumeration types that you can subclass to define
+In addition, Thibaud provides enumeration types that you can subclass to define
 choices in a concise way::
 
-    from django.utils.translation import gettext_lazy as _
+    from thibaud.utils.translation import gettext_lazy as _
 
 
     class Student(models.Model):
@@ -275,7 +275,7 @@ These work similar to :mod:`enum` from Python's standard library, but with some
 modifications:
 
 * Enum member values are a tuple of arguments to use when constructing the
-  concrete data type. Django supports adding an extra string value to the end
+  concrete data type. Thibaud supports adding an extra string value to the end
   of this tuple to be used as the human-readable name, or ``label``. The
   ``label`` can be a lazy translatable string. Thus, in most cases, the member
   value will be a ``(value, label)`` 2-tuple. See below for :ref:`an example
@@ -317,7 +317,7 @@ title-case):
     'Jet Ski'
 
 Since the case where the enum values need to be integers is extremely common,
-Django provides an ``IntegerChoices`` class. For example::
+Thibaud provides an ``IntegerChoices`` class. For example::
 
     class Card(models.Model):
         class Suit(models.IntegerChoices):
@@ -345,7 +345,7 @@ that labels are automatically generated as highlighted above:
 
 If you require support for a concrete data type other than ``int`` or ``str``,
 you can subclass ``Choices`` and the required concrete data type, e.g.
-:class:`~datetime.date` for use with :class:`~django.db.models.DateField`::
+:class:`~datetime.date` for use with :class:`~thibaud.db.models.DateField`::
 
     class MoonLandings(datetime.date, models.Choices):
         APOLLO_11 = 1969, 7, 20, "Apollo 11 (Eagle)"
@@ -376,11 +376,11 @@ There are some additional caveats to be aware of:
 .. attribute:: Field.db_column
 
 The name of the database column to use for this field. If this isn't given,
-Django will use the field's name.
+Thibaud will use the field's name.
 
 If your database column name is an SQL reserved word, or contains
 characters that aren't allowed in Python variable names -- notably, the
-hyphen -- that's OK. Django quotes column and table names behind the
+hyphen -- that's OK. Thibaud quotes column and table names behind the
 scenes.
 
 ``db_comment``
@@ -390,7 +390,7 @@ scenes.
 
 The comment on the database column to use for this field. It is useful for
 documenting fields for individuals with direct database access who may not be
-looking at your Django code. For example::
+looking at your Thibaud code. For example::
 
     pub_date = models.DateTimeField(
         db_comment="Date and time when the article was published",
@@ -402,7 +402,7 @@ looking at your Django code. For example::
 .. attribute:: Field.db_default
 
 The database-computed default value for this field. This can be a literal value
-or a database function, such as :class:`~django.db.models.functions.Now`::
+or a database function, such as :class:`~thibaud.db.models.functions.Now`::
 
     created = models.DateTimeField(db_default=Now())
 
@@ -468,7 +468,7 @@ The default can't be a mutable object (model instance, ``list``, ``set``, etc.),
 as a reference to the same instance of that object would be used as the default
 value in all new model instances. Instead, wrap the desired default in a
 callable. For example, if you want to specify a default ``dict`` for
-:class:`~django.db.models.JSONField`, use a function::
+:class:`~thibaud.db.models.JSONField`, use a function::
 
     def contact_default():
         return {"email": "to1@example.com"}
@@ -497,7 +497,7 @@ The default value can also be set at the database level with
 .. attribute:: Field.editable
 
 If ``False``, the field will not be displayed in the admin or any other
-:class:`~django.forms.ModelForm`. It will also be skipped during :ref:`model
+:class:`~thibaud.forms.ModelForm`. It will also be skipped during :ref:`model
 validation <validating-objects>`. Default is ``True``.
 
 ``error_messages``
@@ -531,7 +531,7 @@ desire. For example::
     help_text = "Please use the following format: <em>YYYY-MM-DD</em>."
 
 Alternatively you can use plain text and
-:func:`django.utils.html.escape` to escape any HTML special characters. Ensure
+:func:`thibaud.utils.html.escape` to escape any HTML special characters. Ensure
 that you escape any help text that may come from untrusted users to avoid a
 cross-site scripting attack.
 
@@ -543,11 +543,11 @@ cross-site scripting attack.
 If ``True``, this field is the primary key for the model.
 
 If you don't specify ``primary_key=True`` for any field in your model and have
-not defined a composite primary key, Django will automatically add a field to
+not defined a composite primary key, Thibaud will automatically add a field to
 hold the primary key. So, you don't need to set ``primary_key=True`` on any of
 your fields unless you want to override the default primary-key behavior. The
 type of auto-created primary key fields can be specified per app in
-:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+:attr:`AppConfig.default_auto_field <thibaud.apps.AppConfig.default_auto_field>`
 or globally in the :setting:`DEFAULT_AUTO_FIELD` setting. For more, see
 :ref:`automatic-primary-key-fields`.
 
@@ -562,7 +562,7 @@ key on an existing object and then save it, a new object will be created
 alongside the old one.
 
 The primary key field is set to ``None`` when
-:meth:`deleting <django.db.models.Model.delete>` an object.
+:meth:`deleting <thibaud.db.models.Model.delete>` an object.
 
 .. versionchanged:: 5.2
 
@@ -577,8 +577,8 @@ If ``True``, this field must be unique throughout the table.
 
 This is enforced at the database level and by model validation. If
 you try to save a model with a duplicate value in a :attr:`~Field.unique`
-field, a :exc:`django.db.IntegrityError` will be raised by the model's
-:meth:`~django.db.models.Model.save` method.
+field, a :exc:`thibaud.db.IntegrityError` will be raised by the model's
+:meth:`~thibaud.db.models.Model.save` method.
 
 This option is valid on all field types except :class:`ManyToManyField` and
 :class:`OneToOneField`.
@@ -595,7 +595,7 @@ Set this to the name of a :class:`DateField` or :class:`DateTimeField` to
 require that this field be unique for the value of the date field.
 
 For example, if you have a field ``title`` that has
-``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
+``unique_for_date="pub_date"``, then Thibaud wouldn't allow the entry of two
 records with the same ``title`` and ``pub_date``.
 
 Note that if you set this to point to a :class:`DateTimeField`, only the date
@@ -605,7 +605,7 @@ portion of the field will be considered. Besides, when :setting:`USE_TZ` is
 
 This is enforced by :meth:`Model.validate_unique()` during model validation
 but not at the database level. If any :attr:`~Field.unique_for_date` constraint
-involves fields that are not part of a :class:`~django.forms.ModelForm` (for
+involves fields that are not part of a :class:`~thibaud.forms.ModelForm` (for
 example, if one of the fields is listed in ``exclude`` or has
 :attr:`editable=False<Field.editable>`), :meth:`Model.validate_unique()` will
 skip validation for that particular constraint.
@@ -630,7 +630,7 @@ Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
 
 .. attribute:: Field.verbose_name
 
-A human-readable name for the field. If the verbose name isn't given, Django
+A human-readable name for the field. If the verbose name isn't given, Thibaud
 will automatically create it using the field's attribute name, converting
 underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
@@ -647,7 +647,7 @@ documentation </ref/validators>` for more information.
 Field types
 ===========
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
 ``AutoField``
 -------------
@@ -675,7 +675,7 @@ guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
 A 64-bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
-:class:`~django.forms.NumberInput`.
+:class:`~thibaud.forms.NumberInput`.
 
 ``BinaryField``
 ---------------
@@ -686,13 +686,13 @@ A field to store raw binary data. It can be assigned :class:`bytes`,
 :class:`bytearray`, or :class:`memoryview`.
 
 By default, ``BinaryField`` sets :attr:`~Field.editable` to ``False``, in which
-case it can't be included in a :class:`~django.forms.ModelForm`.
+case it can't be included in a :class:`~thibaud.forms.ModelForm`.
 
 .. attribute:: BinaryField.max_length
 
     Optional. The maximum length (in bytes) of the field. The maximum length is
-    enforced in Django's validation using
-    :class:`~django.core.validators.MaxLengthValidator`.
+    enforced in Thibaud's validation using
+    :class:`~thibaud.core.validators.MaxLengthValidator`.
 
 .. admonition:: Abusing ``BinaryField``
 
@@ -707,8 +707,8 @@ case it can't be included in a :class:`~django.forms.ModelForm`.
 
 A true/false field.
 
-The default form widget for this field is :class:`~django.forms.CheckboxInput`,
-or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
+The default form widget for this field is :class:`~thibaud.forms.CheckboxInput`,
+or :class:`~thibaud.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
@@ -722,7 +722,7 @@ isn't defined.
 
 A virtual field used for defining a composite primary key.
 
-This field must be defined as the model's ``pk`` attribute. If present, Django
+This field must be defined as the model's ``pk`` attribute. If present, Thibaud
 will create the underlying model table with a composite primary key.
 
 The ``*field_names`` argument is a list of positional field names that compose
@@ -737,18 +737,18 @@ See :doc:`/topics/composite-primary-key` for more details.
 
 A string field, for small- to large-sized strings.
 
-For large amounts of text, use :class:`~django.db.models.TextField`.
+For large amounts of text, use :class:`~thibaud.db.models.TextField`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~thibaud.forms.TextInput`.
 
 :class:`CharField` has the following extra arguments:
 
 .. attribute:: CharField.max_length
 
     The maximum length (in characters) of the field. The ``max_length``
-    is enforced at the database level and in Django's validation using
-    :class:`~django.core.validators.MaxLengthValidator`. It's required for all
-    database backends included with Django except PostgreSQL and SQLite, which
+    is enforced at the database level and in Thibaud's validation using
+    :class:`~thibaud.core.validators.MaxLengthValidator`. It's required for all
+    database backends included with Thibaud except PostgreSQL and SQLite, which
     supports unlimited ``VARCHAR`` columns.
 
     .. note::
@@ -791,9 +791,9 @@ optional arguments:
     used; it's not just a default value that you can override.
 
     The field is only automatically updated when calling :meth:`Model.save()
-    <django.db.models.Model.save>`. The field isn't updated when making updates
+    <thibaud.db.models.Model.save>`. The field isn't updated when making updates
     to other fields in other ways such as :meth:`QuerySet.update()
-    <django.db.models.query.QuerySet.update>`, though you can specify a custom
+    <thibaud.db.models.query.QuerySet.update>`, though you can specify a custom
     value for the field in an update like that.
 
 .. attribute:: DateField.auto_now_add
@@ -808,10 +808,10 @@ optional arguments:
     * For :class:`DateField`: ``default=date.today`` - from
       :meth:`datetime.date.today`
     * For :class:`DateTimeField`: ``default=timezone.now`` - from
-      :func:`django.utils.timezone.now`
+      :func:`thibaud.utils.timezone.now`
 
 The default form widget for this field is a
-:class:`~django.forms.DateInput`. The admin adds a JavaScript calendar,
+:class:`~thibaud.forms.DateInput`. The admin adds a JavaScript calendar,
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
@@ -850,8 +850,8 @@ A date and time, represented in Python by a ``datetime.datetime`` instance.
 Takes the same extra arguments as :class:`DateField`.
 
 The default form widget for this field is a single
-:class:`~django.forms.DateTimeInput`. The admin uses two separate
-:class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
+:class:`~thibaud.forms.DateTimeInput`. The admin uses two separate
+:class:`~thibaud.forms.TextInput` widgets with JavaScript shortcuts.
 
 .. warning:: Always use :class:`DateTimeField` with a ``datetime.datetime``
     instance.
@@ -870,7 +870,7 @@ The default form widget for this field is a single
 
 A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
-:class:`~django.core.validators.DecimalValidator`.
+:class:`~thibaud.core.validators.DecimalValidator`.
 
 Has the following **required** arguments:
 
@@ -893,9 +893,9 @@ decimal places::
 
     models.DecimalField(..., max_digits=19, decimal_places=10)
 
-The default form widget for this field is a :class:`~django.forms.NumberInput`
-when :attr:`~django.forms.Field.localize` is ``False`` or
-:class:`~django.forms.TextInput` otherwise.
+The default form widget for this field is a :class:`~thibaud.forms.NumberInput`
+when :attr:`~thibaud.forms.Field.localize` is ``False`` or
+:class:`~thibaud.forms.TextInput` otherwise.
 
 .. note::
 
@@ -927,7 +927,7 @@ SECOND(6)``. Otherwise a ``bigint`` of microseconds is used.
 .. class:: EmailField(max_length=254, **options)
 
 A :class:`CharField` that checks that the value is a valid email address using
-:class:`~django.core.validators.EmailValidator`.
+:class:`~thibaud.core.validators.EmailValidator`.
 
 ``FileField``
 -------------
@@ -946,7 +946,7 @@ Has the following optional arguments:
 
     This attribute provides a way of setting the upload directory and file name,
     and can be set in two ways. In both cases, the value is passed to the
-    :meth:`Storage.save() <django.core.files.storage.Storage.save>` method.
+    :meth:`Storage.save() <thibaud.core.files.storage.Storage.save>` method.
 
     If you specify a string value or a :class:`~pathlib.Path`, it may contain
     :func:`~time.strftime` formatting, which will be replaced by the date/time
@@ -961,7 +961,7 @@ Has the following optional arguments:
             upload = models.FileField(upload_to="uploads/%Y/%m/%d/")
 
     If you are using the default
-    :class:`~django.core.files.storage.FileSystemStorage`, the string value
+    :class:`~thibaud.core.files.storage.FileSystemStorage`, the string value
     will be appended to your :setting:`MEDIA_ROOT` path to form the location on
     the local filesystem where uploaded files will be stored. If you are using
     a different storage, check that storage's documentation to see how it
@@ -1007,13 +1007,13 @@ Has the following optional arguments:
     for details on how to provide this object.
 
 The default form widget for this field is a
-:class:`~django.forms.ClearableFileInput`.
+:class:`~thibaud.forms.ClearableFileInput`.
 
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
 
 #. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
-   full path to a directory where you'd like Django to store uploaded files.
+   full path to a directory where you'd like Thibaud to store uploaded files.
    (For performance, these files are not stored in the database.) Define
    :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
    that this directory is writable by the web server's user account.
@@ -1024,8 +1024,8 @@ takes a few steps:
 
 #. All that will be stored in your database is a path to the file
    (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-   convenience :attr:`~django.db.models.fields.files.FieldFile.url` attribute
-   provided by Django. For example, if your :class:`ImageField` is called
+   convenience :attr:`~thibaud.db.models.fields.files.FieldFile.url` attribute
+   provided by Thibaud. For example, if your :class:`ImageField` is called
    ``mug_shot``, you can get the absolute path to your image in a template with
    ``{{ object.mug_shot.url }}``.
 
@@ -1037,10 +1037,10 @@ the two-digit day. If you upload a file on Jan. 15, 2007, it will be saved in
 the directory ``/home/media/photos/2007/01/15``.
 
 If you wanted to retrieve the uploaded file's on-disk filename, or the file's
-size, you could use the :attr:`~django.core.files.File.name` and
-:attr:`~django.core.files.File.size` attributes respectively; for more
+size, you could use the :attr:`~thibaud.core.files.File.name` and
+:attr:`~thibaud.core.files.File.size` attributes respectively; for more
 information on the available attributes and methods, see the
-:class:`~django.core.files.File` class reference and the :doc:`/topics/files`
+:class:`~thibaud.core.files.File` class reference and the :doc:`/topics/files`
 topic guide.
 
 .. note::
@@ -1049,9 +1049,9 @@ topic guide.
     saved.
 
 The uploaded file's relative URL can be obtained using the
-:attr:`~django.db.models.fields.files.FieldFile.url` attribute. Internally,
-this calls the :meth:`~django.core.files.storage.Storage.url` method of the
-underlying :class:`~django.core.files.storage.Storage` class.
+:attr:`~thibaud.db.models.fields.files.FieldFile.url` attribute. Internally,
+this calls the :meth:`~thibaud.core.files.storage.Storage.url` method of the
+underlying :class:`~thibaud.core.files.storage.Storage` class.
 
 .. _file-upload-security:
 
@@ -1074,22 +1074,22 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 ``FileField`` and ``FieldFile``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. currentmodule:: django.db.models.fields.files
+.. currentmodule:: thibaud.db.models.fields.files
 
 .. class:: FieldFile
 
-When you access a :class:`~django.db.models.FileField` on a model, you are
+When you access a :class:`~thibaud.db.models.FileField` on a model, you are
 given an instance of :class:`FieldFile` as a proxy for accessing the underlying
 file.
 
-The API of :class:`FieldFile` mirrors that of :class:`~django.core.files.File`,
+The API of :class:`FieldFile` mirrors that of :class:`~thibaud.core.files.File`,
 with one key difference: *The object wrapped by the class is not necessarily a
 wrapper around Python's built-in file object.* Instead, it is a wrapper around
-the result of the :attr:`Storage.open()<django.core.files.storage.Storage.open>`
-method, which may be a :class:`~django.core.files.File` object, or it may be a
-custom storage's implementation of the :class:`~django.core.files.File` API.
+the result of the :attr:`Storage.open()<thibaud.core.files.storage.Storage.open>`
+method, which may be a :class:`~thibaud.core.files.File` object, or it may be a
+custom storage's implementation of the :class:`~thibaud.core.files.File` API.
 
-In addition to the API inherited from :class:`~django.core.files.File` such as
+In addition to the API inherited from :class:`~thibaud.core.files.File` such as
 ``read()`` and ``write()``, :class:`FieldFile` includes several methods that
 can be used to interact with the underlying file:
 
@@ -1102,25 +1102,25 @@ can be used to interact with the underlying file:
 .. attribute:: FieldFile.name
 
 The name of the file including the relative path from the root of the
-:class:`~django.core.files.storage.Storage` of the associated
-:class:`~django.db.models.FileField`.
+:class:`~thibaud.core.files.storage.Storage` of the associated
+:class:`~thibaud.db.models.FileField`.
 
 .. attribute:: FieldFile.path
 
 A read-only property to access the file's local filesystem path by calling the
-:meth:`~django.core.files.storage.Storage.path` method of the underlying
-:class:`~django.core.files.storage.Storage` class.
+:meth:`~thibaud.core.files.storage.Storage.path` method of the underlying
+:class:`~thibaud.core.files.storage.Storage` class.
 
 .. attribute:: FieldFile.size
 
 The result of the underlying :attr:`Storage.size()
-<django.core.files.storage.Storage.size>` method.
+<thibaud.core.files.storage.Storage.size>` method.
 
 .. attribute:: FieldFile.url
 
 A read-only property to access the file's relative URL by calling the
-:meth:`~django.core.files.storage.Storage.url` method of the underlying
-:class:`~django.core.files.storage.Storage` class.
+:meth:`~thibaud.core.files.storage.Storage.url` method of the underlying
+:class:`~thibaud.core.files.storage.Storage` class.
 
 .. method:: FieldFile.open(mode='rb')
 
@@ -1142,7 +1142,7 @@ associated with this instance.
 This method takes a filename and file contents and passes them to the storage
 class for the field, then associates the stored file with the model field.
 If you want to manually associate file data with
-:class:`~django.db.models.FileField` instances on your model, the ``save()``
+:class:`~thibaud.db.models.FileField` instances on your model, the ``save()``
 method is used to persist that file data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
@@ -1152,11 +1152,11 @@ saved after the file associated with this field has been altered. Defaults to
 ``True``.
 
 Note that the ``content`` argument should be an instance of
-:class:`django.core.files.File`, not Python's built-in file object.
-You can construct a :class:`~django.core.files.File` from an existing
+:class:`thibaud.core.files.File`, not Python's built-in file object.
+You can construct a :class:`~thibaud.core.files.File` from an existing
 Python file object like this::
 
-    from django.core.files import File
+    from thibaud.core.files import File
 
     # Open an existing file using Python's built-in open()
     f = open("/path/to/hello.world")
@@ -1164,7 +1164,7 @@ Python file object like this::
 
 Or you can construct one from a Python string like this::
 
-    from django.core.files.base import ContentFile
+    from thibaud.core.files.base import ContentFile
 
     myfile = ContentFile("hello world")
 
@@ -1185,7 +1185,7 @@ to cleanup orphaned files, you'll need to handle it yourself (for instance,
 with a custom management command that can be run manually or scheduled to run
 periodically via e.g. cron).
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
 ``FilePathField``
 -----------------
@@ -1205,8 +1205,8 @@ directory on the filesystem. Has some special arguments, of which the first is
     path at runtime. Example::
 
         import os
-        from django.conf import settings
-        from django.db import models
+        from thibaud.conf import settings
+        from thibaud.db import models
 
 
         def images_path():
@@ -1260,9 +1260,9 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 A floating-point number represented in Python by a ``float`` instance.
 
-The default form widget for this field is a :class:`~django.forms.NumberInput`
-when :attr:`~django.forms.Field.localize` is ``False`` or
-:class:`~django.forms.TextInput` otherwise.
+The default form widget for this field is a :class:`~thibaud.forms.NumberInput`
+when :attr:`~thibaud.forms.Field.localize` is ``False`` or
+:class:`~thibaud.forms.TextInput` otherwise.
 
 .. _floatfield_vs_decimalfield:
 
@@ -1322,7 +1322,7 @@ materialized view.
 .. admonition:: Database limitations
 
     There are many database-specific restrictions on generated fields that
-    Django doesn't validate and the database may raise an error e.g. PostgreSQL
+    Thibaud doesn't validate and the database may raise an error e.g. PostgreSQL
     requires functions and operators referenced in a generated column to be
     marked as ``IMMUTABLE``.
 
@@ -1343,7 +1343,7 @@ materialized view.
 
 An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
 ``2a02:42fe::4``). The default form widget for this field is a
-:class:`~django.forms.TextInput`.
+:class:`~thibaud.forms.TextInput`.
 
 The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
 including using the IPv4 format suggested in paragraph 3 of that section, like
@@ -1398,7 +1398,7 @@ columns with a default max length of 100 characters. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 The default form widget for this field is a
-:class:`~django.forms.ClearableFileInput`.
+:class:`~thibaud.forms.ClearableFileInput`.
 
 ``IntegerField``
 ----------------
@@ -1406,15 +1406,15 @@ The default form widget for this field is a
 .. class:: IntegerField(**options)
 
 An integer. Values from ``-2147483648`` to ``2147483647`` are safe in all
-databases supported by Django.
+databases supported by Thibaud.
 
-It uses :class:`~django.core.validators.MinValueValidator` and
-:class:`~django.core.validators.MaxValueValidator` to validate the input based
+It uses :class:`~thibaud.core.validators.MinValueValidator` and
+:class:`~thibaud.core.validators.MaxValueValidator` to validate the input based
 on the values that the default database supports.
 
-The default form widget for this field is a :class:`~django.forms.NumberInput`
-when :attr:`~django.forms.Field.localize` is ``False`` or
-:class:`~django.forms.TextInput` otherwise.
+The default form widget for this field is a :class:`~thibaud.forms.NumberInput`
+when :attr:`~thibaud.forms.Field.localize` is ``False`` or
+:class:`~thibaud.forms.TextInput` otherwise.
 
 ``JSONField``
 -------------
@@ -1433,7 +1433,7 @@ Python native format: dictionaries, lists, strings, numbers, booleans and
     An optional :py:class:`json.JSONEncoder` subclass to serialize data types
     not supported by the standard JSON serializer (e.g. ``datetime.datetime``
     or :class:`~python:uuid.UUID`). For example, you can use the
-    :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
+    :class:`~thibaud.core.serializers.json.ThibaudJSONEncoder` class.
 
     Defaults to ``json.JSONEncoder``.
 
@@ -1453,7 +1453,7 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 
 .. admonition:: Default value
 
-    If you give the field a :attr:`~django.db.models.Field.default`, ensure
+    If you give the field a :attr:`~thibaud.db.models.Field.default`, ensure
     it's a callable such as the :py:class:`dict` class or a function that
     returns a fresh object each time. Incorrectly using a mutable object like
     ``default={}`` or ``default=[]`` creates a mutable default that is shared
@@ -1461,10 +1461,10 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 
 .. admonition:: Indexing
 
-    :class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
+    :class:`~thibaud.db.models.Index` and :attr:`.Field.db_index` both create a
     B-tree index, which isn't particularly helpful when querying ``JSONField``.
     On PostgreSQL only, you can use
-    :class:`~django.contrib.postgres.indexes.GinIndex` that is better suited.
+    :class:`~thibaud.contrib.postgres.indexes.GinIndex` that is better suited.
 
 .. admonition:: PostgreSQL users
 
@@ -1489,7 +1489,7 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
-safe in all databases supported by Django.
+safe in all databases supported by Thibaud.
 
 ``PositiveIntegerField``
 ------------------------
@@ -1498,7 +1498,7 @@ safe in all databases supported by Django.
 
 Like an :class:`IntegerField`, but must be either positive or zero (``0``).
 Values from ``0`` to ``2147483647`` are safe in all databases supported by
-Django. The value ``0`` is accepted for backward compatibility reasons.
+Thibaud. The value ``0`` is accepted for backward compatibility reasons.
 
 ``PositiveSmallIntegerField``
 -----------------------------
@@ -1507,7 +1507,7 @@ Django. The value ``0`` is accepted for backward compatibility reasons.
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``32767`` are safe in all
-databases supported by Django.
+databases supported by Thibaud.
 
 ``SlugField``
 -------------
@@ -1520,17 +1520,17 @@ in URLs.
 
 Like a CharField, you can specify :attr:`~CharField.max_length` (read the note
 about database portability and :attr:`~CharField.max_length` in that section,
-too). If :attr:`~CharField.max_length` is not specified, Django will use a
+too). If :attr:`~CharField.max_length` is not specified, Thibaud will use a
 default length of 50.
 
 Implies setting :attr:`Field.db_index` to ``True``.
 
 It is often useful to automatically prepopulate a SlugField based on the value
 of some other value.  You can do this automatically in the admin using
-:attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
+:attr:`~thibaud.contrib.admin.ModelAdmin.prepopulated_fields`.
 
-It uses :class:`~django.core.validators.validate_slug` or
-:class:`~django.core.validators.validate_unicode_slug` for validation.
+It uses :class:`~thibaud.core.validators.validate_slug` or
+:class:`~thibaud.core.validators.validate_unicode_slug` for validation.
 
 .. attribute:: SlugField.allow_unicode
 
@@ -1544,7 +1544,7 @@ It uses :class:`~django.core.validators.validate_slug` or
 
 Like an :class:`AutoField`, but only allows values under a certain
 (database-dependent) limit. Values from ``1`` to ``32767`` are safe in all
-databases supported by Django.
+databases supported by Thibaud.
 
 ``SmallIntegerField``
 ---------------------
@@ -1553,7 +1553,7 @@ databases supported by Django.
 
 Like an :class:`IntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``-32768`` to ``32767`` are safe in all
-databases supported by Django.
+databases supported by Thibaud.
 
 ``TextField``
 -------------
@@ -1561,10 +1561,10 @@ databases supported by Django.
 .. class:: TextField(**options)
 
 A large text field. The default form widget for this field is a
-:class:`~django.forms.Textarea`.
+:class:`~thibaud.forms.Textarea`.
 
 If you specify a ``max_length`` attribute, it will be reflected in the
-:class:`~django.forms.Textarea` widget of the auto-generated form field.
+:class:`~thibaud.forms.Textarea` widget of the auto-generated form field.
 However it is not enforced at the model or database level. Use a
 :class:`CharField` for that.
 
@@ -1589,7 +1589,7 @@ However it is not enforced at the model or database level. Use a
 A time, represented in Python by a ``datetime.time`` instance. Accepts the same
 auto-population options as :class:`DateField`.
 
-The default form widget for this field is a :class:`~django.forms.TimeInput`.
+The default form widget for this field is a :class:`~thibaud.forms.TimeInput`.
 The admin adds some JavaScript shortcuts.
 
 ``URLField``
@@ -1598,9 +1598,9 @@ The admin adds some JavaScript shortcuts.
 .. class:: URLField(max_length=200, **options)
 
 A :class:`CharField` for a URL, validated by
-:class:`~django.core.validators.URLValidator`.
+:class:`~thibaud.core.validators.URLValidator`.
 
-The default form widget for this field is a :class:`~django.forms.URLInput`.
+The default form widget for this field is a :class:`~thibaud.forms.URLInput`.
 
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
@@ -1620,7 +1620,7 @@ Universally unique identifiers are a good alternative to :class:`AutoField` for
 it is recommended to use :attr:`~Field.default`::
 
     import uuid
-    from django.db import models
+    from thibaud.db import models
 
 
     class MyUUIDModel(models.Model):
@@ -1643,12 +1643,12 @@ not an instance of ``UUID``.
 Relationship fields
 ===================
 
-.. module:: django.db.models.fields.related
+.. module:: thibaud.db.models.fields.related
    :synopsis: Related field types
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
-Django also defines a set of fields that represent relations.
+Thibaud also defines a set of fields that represent relations.
 
 .. _ref-foreignkey:
 
@@ -1660,7 +1660,7 @@ Django also defines a set of fields that represent relations.
 A many-to-one relationship. Requires two positional arguments: the class to
 which the model is related and the :attr:`~ForeignKey.on_delete` option::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Manufacturer(models.Model):
@@ -1687,7 +1687,7 @@ like a partial or multiple column index.
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django appends ``"_id"`` to the field name to create its
+Behind the scenes, Thibaud appends ``"_id"`` to the field name to create its
 database column name. In the above example, the database table for the ``Car``
 model will have a ``manufacturer_id`` column. You can change this explicitly by
 specifying :attr:`~Field.db_column`, however, your code should never have to
@@ -1704,7 +1704,7 @@ relation works.
 
 .. attribute:: ForeignKey.on_delete
 
-    When an object referenced by a :class:`ForeignKey` is deleted, Django will
+    When an object referenced by a :class:`ForeignKey` is deleted, Thibaud will
     emulate the behavior of the SQL constraint specified by the
     :attr:`on_delete` argument. For example, if you have a nullable
     :class:`ForeignKey` and you want it to be set null when the referenced
@@ -1721,29 +1721,29 @@ relation works.
     database-level cascade options :ticket:`may be implemented later <21961>`.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
-:mod:`django.db.models`:
+:mod:`thibaud.db.models`:
 
 * .. attribute:: CASCADE
 
-    Cascade deletes. Django emulates the behavior of the SQL constraint ON
+    Cascade deletes. Thibaud emulates the behavior of the SQL constraint ON
     DELETE CASCADE and also deletes the object containing the ForeignKey.
 
     :meth:`.Model.delete` isn't called on related models, but the
-    :data:`~django.db.models.signals.pre_delete` and
-    :data:`~django.db.models.signals.post_delete` signals are sent for all
+    :data:`~thibaud.db.models.signals.pre_delete` and
+    :data:`~thibaud.db.models.signals.post_delete` signals are sent for all
     deleted objects.
 
 * .. attribute:: PROTECT
 
     Prevent deletion of the referenced object by raising
-    :exc:`~django.db.models.ProtectedError`, a subclass of
-    :exc:`django.db.IntegrityError`.
+    :exc:`~thibaud.db.models.ProtectedError`, a subclass of
+    :exc:`thibaud.db.IntegrityError`.
 
 * .. attribute:: RESTRICT
 
     Prevent deletion of the referenced object by raising
-    :exc:`~django.db.models.RestrictedError` (a subclass of
-    :exc:`django.db.IntegrityError`). Unlike :attr:`PROTECT`, deletion of the
+    :exc:`~thibaud.db.models.RestrictedError` (a subclass of
+    :exc:`thibaud.db.IntegrityError`). Unlike :attr:`PROTECT`, deletion of the
     referenced object is allowed if it also references a different object
     that is being deleted in the same operation, but via a :attr:`CASCADE`
     relationship.
@@ -1794,14 +1794,14 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 * .. function:: SET()
 
     Set the :class:`ForeignKey` to the value passed to
-    :func:`~django.db.models.SET()`, or if a callable is passed in,
+    :func:`~thibaud.db.models.SET()`, or if a callable is passed in,
     the result of calling it. In most cases, passing a callable will be
     necessary to avoid executing queries at the time your ``models.py`` is
     imported::
 
-        from django.conf import settings
-        from django.contrib.auth import get_user_model
-        from django.db import models
+        from thibaud.conf import settings
+        from thibaud.contrib.auth import get_user_model
+        from thibaud.db import models
 
 
         def get_sentinel_user():
@@ -1817,7 +1817,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 * .. attribute:: DO_NOTHING
 
     Take no action. If your database backend enforces referential
-    integrity, this will cause an :exc:`~django.db.IntegrityError` unless
+    integrity, this will cause an :exc:`~thibaud.db.IntegrityError` unless
     you manually add an SQL ``ON DELETE`` constraint to the database field.
 
 .. attribute:: ForeignKey.limit_choices_to
@@ -1825,8 +1825,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Sets a limit to the available choices for this field when this field is
     rendered using a ``ModelForm`` or the admin (by default, all objects
     in the queryset are available to choose). Either a dictionary, a
-    :class:`~django.db.models.Q` object, or a callable returning a
-    dictionary or :class:`~django.db.models.Q` object can be used.
+    :class:`~thibaud.db.models.Q` object, or a callable returning a
+    dictionary or :class:`~thibaud.db.models.Q` object can be used.
 
     For example::
 
@@ -1837,7 +1837,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         )
 
     causes the corresponding field on the ``ModelForm`` to list only ``Users``
-    that have ``is_staff=True``. This may be helpful in the Django admin.
+    that have ``is_staff=True``. This may be helpful in the Thibaud admin.
 
     The callable form can be helpful, for instance, when used in conjunction
     with the Python ``datetime`` module to limit selections by date range. For
@@ -1850,10 +1850,10 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         limit_choices_to = limit_pub_date_choices
 
     If ``limit_choices_to`` is or returns a :class:`Q object
-    <django.db.models.Q>`, which is useful for :ref:`complex queries
+    <thibaud.db.models.Q>`, which is useful for :ref:`complex queries
     <complex-lookups-with-q>`, then it will only have an effect on the choices
     available in the admin when the field is not listed in
-    :attr:`~django.contrib.admin.ModelAdmin.raw_id_fields` in the
+    :attr:`~thibaud.contrib.admin.ModelAdmin.raw_id_fields` in the
     ``ModelAdmin`` for the model.
 
     .. note::
@@ -1875,7 +1875,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     :ref:`abstract models <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
-    If you'd prefer Django not to create a backwards relation, set
+    If you'd prefer Thibaud not to create a backwards relation, set
     ``related_name`` to ``'+'`` or end it with ``'+'``. For example, this will
     ensure that the ``User`` model won't have a backwards relation to this
     model::
@@ -1890,7 +1890,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     The name to use for the reverse filter name from the target model. It
     defaults to the value of :attr:`related_name` or
-    :attr:`~django.db.models.Options.default_related_name` if set, otherwise it
+    :attr:`~thibaud.db.models.Options.default_related_name` if set, otherwise it
     defaults to the name of the model::
 
         # Declare the ForeignKey with related_query_name
@@ -1912,7 +1912,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 .. attribute:: ForeignKey.to_field
 
-    The field on the related object that the relation is to. By default, Django
+    The field on the related object that the relation is to. By default, Thibaud
     uses the primary key of the related object. If you reference a different
     field, that field must have ``unique=True``.
 
@@ -1961,12 +1961,12 @@ which the model is related, which works exactly the same as it does for
 :ref:`lazy <lazy-relationships>` relationships.
 
 Related objects can be added, removed, or created with the field's
-:class:`~django.db.models.fields.related.RelatedManager`.
+:class:`~thibaud.db.models.fields.related.RelatedManager`.
 
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django creates an intermediary join table to represent the
+Behind the scenes, Thibaud creates an intermediary join table to represent the
 many-to-many relationship. By default, this table name is generated using the
 name of the many-to-many field and the name of the table for the model that
 contains it. Since some databases don't support table names above a certain
@@ -1999,29 +1999,29 @@ that control how the relationship functions.
     Only used in the definition of ManyToManyFields on self. Consider the
     following model::
 
-        from django.db import models
+        from thibaud.db import models
 
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")
 
-    When Django processes this model, it identifies that it has a
+    When Thibaud processes this model, it identifies that it has a
     :class:`ManyToManyField` on itself, and as a result, it doesn't add a
     ``person_set`` attribute to the ``Person`` class. Instead, the
     :class:`ManyToManyField` is assumed to be symmetrical -- that is, if I am
     your friend, then you are my friend.
 
     If you do not want symmetry in many-to-many relationships with ``self``, set
-    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Django to
+    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Thibaud to
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
 .. attribute:: ManyToManyField.through
 
-    Django will automatically generate a table to manage many-to-many
+    Thibaud will automatically generate a table to manage many-to-many
     relationships. However, if you want to manually specify the intermediary
     table, you can use the :attr:`~ManyToManyField.through` option to specify
-    the Django model that represents the intermediate table that you want to
+    the Thibaud model that represents the intermediate table that you want to
     use.
 
     The most common use for this option is when you want to associate
@@ -2031,8 +2031,8 @@ that control how the relationship functions.
     .. note::
 
         If you don't want multiple associations between the same instances, add
-        a :class:`~django.db.models.UniqueConstraint` including the from and to
-        fields. Django's automatically generated many-to-many tables include
+        a :class:`~thibaud.db.models.UniqueConstraint` including the from and to
+        fields. Thibaud's automatically generated many-to-many tables include
         such a constraint.
 
     .. note::
@@ -2040,7 +2040,7 @@ that control how the relationship functions.
         Recursive relationships using an intermediary model can't determine the
         reverse accessors names, as they would be the same. You need to set a
         :attr:`~ForeignKey.related_name` to at least one of them. If you'd
-        prefer Django not to create a backwards relation, set ``related_name``
+        prefer Thibaud not to create a backwards relation, set ``related_name``
         to ``'+'``.
 
     If you don't specify an explicit ``through`` model, there is still an
@@ -2072,12 +2072,12 @@ that control how the relationship functions.
 
 .. attribute:: ManyToManyField.through_fields
 
-    Only used when a custom intermediary model is specified. Django will
+    Only used when a custom intermediary model is specified. Thibaud will
     normally determine which fields of the intermediary model to use in order
     to establish a many-to-many relationship automatically. However,
     consider the following models::
 
-        from django.db import models
+        from thibaud.db import models
 
 
         class Person(models.Model):
@@ -2104,9 +2104,9 @@ that control how the relationship functions.
             invite_reason = models.CharField(max_length=64)
 
     ``Membership`` has *two* foreign keys to ``Person`` (``person`` and
-    ``inviter``), which makes the relationship ambiguous and Django can't know
+    ``inviter``), which makes the relationship ambiguous and Thibaud can't know
     which one to use. In this case, you must explicitly specify which
-    foreign keys Django should use using ``through_fields``, as in the example
+    foreign keys Thibaud should use using ``through_fields``, as in the example
     above.
 
     ``through_fields`` accepts a 2-tuple ``('field1', 'field2')``, where
@@ -2121,12 +2121,12 @@ that control how the relationship functions.
     :ref:`recursive relationships <recursive-relationships>`
     when an intermediary model is used and there are more than two
     foreign keys to the model, or you want to explicitly specify which two
-    Django should use.
+    Thibaud should use.
 
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this
-    is not provided, Django will assume a default name based upon the names of:
+    is not provided, Thibaud will assume a default name based upon the names of:
     the table for the model defining the relationship and the name of the field
     itself.
 
@@ -2183,13 +2183,13 @@ including all the options regarding :ref:`recursive <recursive-relationships>`
 and :ref:`lazy <lazy-relationships>` relationships.
 
 If you do not specify the :attr:`~ForeignKey.related_name` argument for the
-``OneToOneField``, Django will use the lowercase name of the current model as
+``OneToOneField``, Thibaud will use the lowercase name of the current model as
 default value.
 
 With the following example::
 
-    from django.conf import settings
-    from django.db import models
+    from thibaud.conf import settings
+    from thibaud.db import models
 
 
     class MySpecialUser(models.Model):
@@ -2216,7 +2216,7 @@ your resulting ``User`` model will have the following attributes:
 A ``RelatedObjectDoesNotExist`` exception is raised when accessing the reverse
 relationship if an entry in the related table doesn't exist. This is a subclass
 of the target model's :exc:`Model.DoesNotExist
-<django.db.models.Model.DoesNotExist>` exception and can be accessed as an
+<thibaud.db.models.Model.DoesNotExist>` exception and can be accessed as an
 attribute of the reverse accessor. For example, if a user doesn't have a
 supervisor designated by ``MySpecialUser``::
 
@@ -2261,7 +2261,7 @@ Recursive
 To define a relationship where a model references itself, use ``"self"`` as the
 first argument of the relationship field::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Manufacturer(models.Model):
@@ -2280,7 +2280,7 @@ Relative
 When a relationship needs to be created with a model that has not been defined
 yet, it can be referenced by its name rather than the model object itself::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Car(models.Model):
@@ -2301,7 +2301,7 @@ concrete model and are not relative to the abstract model's ``app_label``:
 .. code-block:: python
     :caption: ``products/models.py``
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class AbstractCar(models.Model):
@@ -2313,7 +2313,7 @@ concrete model and are not relative to the abstract model's ``app_label``:
 .. code-block:: python
     :caption: ``production/models.py``
 
-    from django.db import models
+    from thibaud.db import models
     from products.models import AbstractCar
 
 
@@ -2361,27 +2361,27 @@ Field API reference
 .. class:: Field
 
     ``Field`` is an abstract class that represents a database table column.
-    Django uses fields to create the database table (:meth:`db_type`), to map
+    Thibaud uses fields to create the database table (:meth:`db_type`), to map
     Python types to database (:meth:`get_prep_value`) and vice-versa
     (:meth:`from_db_value`).
 
-    A field is thus a fundamental piece in different Django APIs, notably,
-    :class:`models <django.db.models.Model>` and :class:`querysets
-    <django.db.models.query.QuerySet>`.
+    A field is thus a fundamental piece in different Thibaud APIs, notably,
+    :class:`models <thibaud.db.models.Model>` and :class:`querysets
+    <thibaud.db.models.query.QuerySet>`.
 
     In models, a field is instantiated as a class attribute and represents a
     particular table column, see :doc:`/topics/db/models`. It has attributes
-    such as :attr:`null` and :attr:`unique`, and methods that Django uses to
+    such as :attr:`null` and :attr:`unique`, and methods that Thibaud uses to
     map the field value to database-specific values.
 
     A ``Field`` is a subclass of
-    :class:`~django.db.models.lookups.RegisterLookupMixin` and thus both
-    :class:`~django.db.models.Transform` and
-    :class:`~django.db.models.Lookup` can be registered on it to be used
+    :class:`~thibaud.db.models.lookups.RegisterLookupMixin` and thus both
+    :class:`~thibaud.db.models.Transform` and
+    :class:`~thibaud.db.models.Lookup` can be registered on it to be used
     in ``QuerySet``\s (e.g. ``field_name__exact="foo"``). All :ref:`built-in
     lookups <field-lookups>` are registered by default.
 
-    All of Django's built-in fields, such as :class:`CharField`, are particular
+    All of Thibaud's built-in fields, such as :class:`CharField`, are particular
     implementations of ``Field``. If you need a custom field, you can either
     subclass any of the built-in fields or write a ``Field`` from scratch. In
     either case, see :doc:`/howto/custom-model-fields`.
@@ -2389,7 +2389,7 @@ Field API reference
     .. attribute:: description
 
         A verbose description of the field, e.g. for the
-        :mod:`django.contrib.admindocs` application.
+        :mod:`thibaud.contrib.admindocs` application.
 
         The description can be of the form::
 
@@ -2405,7 +2405,7 @@ Field API reference
         Overriding this class attribute allows for customizing the get and set
         behavior.
 
-    To map a ``Field`` to a database-specific type, Django exposes several
+    To map a ``Field`` to a database-specific type, Thibaud exposes several
     methods:
 
     .. method:: get_internal_type()
@@ -2430,7 +2430,7 @@ Field API reference
 
         See :ref:`custom-database-types` for usage in custom fields.
 
-    There are three main situations where Django needs to interact with the
+    There are three main situations where Thibaud needs to interact with the
     database backend and fields:
 
     * when it queries the database (Python value -> database backend value)
@@ -2474,7 +2474,7 @@ Field API reference
         .. note::
 
             For performance reasons, ``from_db_value`` is not implemented as a
-            no-op on fields which do not require it (all Django fields).
+            no-op on fields which do not require it (all Thibaud fields).
             Consequently you may not call ``super`` in your definition.
 
     When saving, :meth:`pre_save` and :meth:`get_db_prep_save` are used:
@@ -2496,7 +2496,7 @@ Field API reference
 
         It should return the value of the appropriate attribute from
         ``model_instance`` for this field. The attribute name is in
-        ``self.attname`` (this is set up by :class:`~django.db.models.Field`).
+        ``self.attname`` (this is set up by :class:`~thibaud.db.models.Field`).
 
         See :ref:`preprocessing-values-before-saving` for usage.
 
@@ -2507,7 +2507,7 @@ Field API reference
 
         Converts the value into the correct Python object. It acts as the
         reverse of :meth:`value_to_string`, and is also called in
-        :meth:`~django.db.models.Model.clean`.
+        :meth:`~thibaud.db.models.Model.clean`.
 
         See :ref:`converting-values-to-python-objects` for usage.
 
@@ -2526,21 +2526,21 @@ Field API reference
 
         See :ref:`converting-model-field-to-serialization` for usage.
 
-    When using :class:`model forms <django.forms.ModelForm>`, the ``Field``
+    When using :class:`model forms <thibaud.forms.ModelForm>`, the ``Field``
     needs to know which form field it should be represented by:
 
     .. method:: formfield(form_class=None, choices_form_class=None, **kwargs)
 
-        Returns the default :class:`django.forms.Field` of this field for
-        :class:`~django.forms.ModelForm`.
+        Returns the default :class:`thibaud.forms.Field` of this field for
+        :class:`~thibaud.forms.ModelForm`.
 
         If :meth:`~Field.formfield` is overridden to return ``None``, this field
-        is excluded from the :class:`~django.forms.ModelForm`.
+        is excluded from the :class:`~thibaud.forms.ModelForm`.
 
         By default, if both ``form_class`` and ``choices_form_class`` are
-        ``None``, it uses :class:`~django.forms.CharField`. If the field has
-        :attr:`~django.db.models.Field.choices` and ``choices_form_class``
-        isn't specified, it uses :class:`~django.forms.TypedChoiceField`.
+        ``None``, it uses :class:`~thibaud.forms.CharField`. If the field has
+        :attr:`~thibaud.db.models.Field.choices` and ``choices_form_class``
+        isn't specified, it uses :class:`~thibaud.forms.TypedChoiceField`.
 
         See :ref:`specifying-form-field-for-model-field` for usage.
 
@@ -2549,7 +2549,7 @@ Field API reference
         Returns a 4-tuple with enough information to recreate the field:
 
         1. The name of the field on the model.
-        2. The import path of the field (e.g. ``"django.db.models.IntegerField"``).
+        2. The import path of the field (e.g. ``"thibaud.db.models.IntegerField"``).
            This should be the most portable version, so less specific may be better.
         3. A list of positional arguments.
         4. A dict of keyword arguments.
@@ -2594,8 +2594,8 @@ Attributes for fields
 
     Boolean flag that indicates if a field is hidden and should not be returned
     by :meth:`Options.get_fields()
-    <django.db.models.options.Options.get_fields>` by default. An example is
-    the reverse field for a :class:`~django.db.models.ForeignKey` with a
+    <thibaud.db.models.options.Options.get_fields>` by default. An example is
+    the reverse field for a :class:`~thibaud.db.models.ForeignKey` with a
     ``related_name`` that starts with ``'+'``.
 
 .. attribute:: Field.is_relation
@@ -2621,7 +2621,7 @@ have boolean values (rather than ``None``) if the field is a relation type
 .. attribute:: Field.many_to_many
 
     Boolean flag that is ``True`` if the field has a many-to-many relation;
-    ``False`` otherwise. The only field included with Django where this is
+    ``False`` otherwise. The only field included with Thibaud where this is
     ``True`` is ``ManyToManyField``.
 
 .. attribute:: Field.many_to_one

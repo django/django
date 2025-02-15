@@ -1,8 +1,8 @@
 import copy
 
-from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.db.models.sql import AreaField, DistanceField
-from django.test import SimpleTestCase
+from thibaud.contrib.gis.db.models import GeometryField
+from thibaud.contrib.gis.db.models.sql import AreaField, DistanceField
+from thibaud.test import SimpleTestCase
 
 
 class FieldsTests(SimpleTestCase):

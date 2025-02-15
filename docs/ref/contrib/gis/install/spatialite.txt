@@ -111,7 +111,7 @@ including SQLite, SpatiaLite, PROJ, and GEOS. Install them like this:
     $ brew install spatialite-tools
     $ brew install gdal
 
-Finally, for GeoDjango to be able to find the SpatiaLite library, set
+Finally, for GeoThibaud to be able to find the SpatiaLite library, set
 the ``SPATIALITE_LIBRARY_PATH`` setting to its path. This will be within
 your brew install path, which you can check with:
 

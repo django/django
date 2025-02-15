@@ -1,1 +1,1 @@
-# Mail backends shipped with Django.
+# Mail backends shipped with Thibaud.

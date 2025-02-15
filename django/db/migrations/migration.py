@@ -1,7 +1,7 @@
 import re
 
-from django.db.migrations.utils import get_migration_name_timestamp
-from django.db.transaction import atomic
+from thibaud.db.migrations.utils import get_migration_name_timestamp
+from thibaud.db.transaction import atomic
 
 from .exceptions import IrreversibleError
 
@@ -10,12 +10,12 @@ class Migration:
     """
     The base class for all migrations.
 
-    Migration files will import this from django.db.migrations.Migration
+    Migration files will import this from thibaud.db.migrations.Migration
     and subclass it as a class called Migration. It will have one or more
     of the following attributes:
 
      - operations: A list of Operation instances, probably from
-       django.db.migrations.operations
+       thibaud.db.migrations.operations
      - dependencies: A list of tuples of (app_path, migration_name)
      - run_before: A list of tuples of (app_path, migration_name)
      - replaces: A list of migration_names
@@ -224,7 +224,7 @@ class Migration:
 
 class SwappableTuple(tuple):
     """
-    Subclass of tuple so Django can tell this was originally a swappable
+    Subclass of tuple so Thibaud can tell this was originally a swappable
     dependency when it reads the migration file.
     """
 

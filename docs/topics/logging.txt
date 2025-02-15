@@ -7,7 +7,7 @@ Logging
 .. seealso::
 
     * :ref:`logging-how-to`
-    * :ref:`Django logging reference <logging-ref>`
+    * :ref:`Thibaud logging reference <logging-ref>`
 
 Python programmers will often use ``print()`` in their code as a quick and
 convenient debugging tool. Using the logging framework is only a little more
@@ -18,7 +18,7 @@ structured - information about the state and health of your application.
 Overview
 ========
 
-Django uses and extends Python's builtin :mod:`logging` module to perform
+Thibaud uses and extends Python's builtin :mod:`logging` module to perform
 system logging. This module is discussed in detail in Python's own
 documentation; this section provides a quick overview.
 
@@ -148,10 +148,10 @@ read more about how to :ref:`filter error reports <filtering-error-reports>`.
 ``AdminEmailHandler``
 ---------------------
 
-The built-in :class:`~django.utils.log.AdminEmailHandler` deserves a mention in
+The built-in :class:`~thibaud.utils.log.AdminEmailHandler` deserves a mention in
 the context of security. If its ``include_html`` option is enabled, the email
 message it sends will contain a full traceback, with names and values of local
-variables at each level of the stack, plus the values of your Django settings
+variables at each level of the stack, plus the values of your Thibaud settings
 (in other words, the same level of detail that is exposed in a web page when
 :setting:`DEBUG` is ``True``).
 
@@ -168,7 +168,7 @@ Configuring logging
 
 Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.
-By default, Django uses the :ref:`dictConfig format
+By default, Thibaud uses the :ref:`dictConfig format
 <logging-config-dictschema>`.
 
 In order to configure logging, you use :setting:`LOGGING` to define a
@@ -177,7 +177,7 @@ handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
 
-By default, the :setting:`LOGGING` setting is merged with :ref:`Django's
+By default, the :setting:`LOGGING` setting is merged with :ref:`Thibaud's
 default logging configuration <default-logging-configuration>` using the
 following scheme.
 
@@ -192,7 +192,7 @@ you can set ``disable_existing_loggers`` to ``False`` and redefine some or all
 of the default loggers; or you can set :setting:`LOGGING_CONFIG` to ``None``
 and :ref:`handle logging config yourself <disabling-logging-configuration>`.
 
-Logging is configured as part of the general Django ``setup()`` function.
+Logging is configured as part of the general Thibaud ``setup()`` function.
 Therefore, you can be certain that loggers are always ready for use in your
 project code.
 
@@ -231,7 +231,7 @@ This configures the parent ``root`` logger to send messages with the
 development.
 
 Next we can add more fine-grained logging. Here's an example of how to make the
-logging system print more messages from just the :ref:`django-logger` named
+logging system print more messages from just the :ref:`thibaud-logger` named
 logger:
 
 .. code-block:: python
@@ -252,7 +252,7 @@ logger:
             "level": "WARNING",
         },
         "loggers": {
-            "django": {
+            "thibaud": {
                 "handlers": ["console"],
                 "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
                 "propagate": False,
@@ -260,16 +260,16 @@ logger:
         },
     }
 
-By default, this config sends messages from the ``django`` logger of level
-``INFO`` or higher to the console. This is the same level as Django's default
+By default, this config sends messages from the ``thibaud`` logger of level
+``INFO`` or higher to the console. This is the same level as Thibaud's default
 logging config, except that the default config only displays log records when
-``DEBUG=True``. Django does not log many such ``INFO`` level messages. With
+``DEBUG=True``. Thibaud does not log many such ``INFO`` level messages. With
 this config, however, you can also set the environment variable
-``DJANGO_LOG_LEVEL=DEBUG`` to see all of Django's debug logging which is very
+``DJANGO_LOG_LEVEL=DEBUG`` to see all of Thibaud's debug logging which is very
 verbose as it includes all database queries.
 
 You don't have to log to the console. Here's a configuration which writes all
-logging from the :ref:`django-logger` named logger to a local file:
+logging from the :ref:`thibaud-logger` named logger to a local file:
 
 .. code-block:: python
     :caption: ``settings.py``
@@ -281,11 +281,11 @@ logging from the :ref:`django-logger` named logger to a local file:
             "file": {
                 "level": "DEBUG",
                 "class": "logging.FileHandler",
-                "filename": "/path/to/django/debug.log",
+                "filename": "/path/to/thibaud/debug.log",
             },
         },
         "loggers": {
-            "django": {
+            "thibaud": {
                 "handlers": ["file"],
                 "level": "DEBUG",
                 "propagate": True,
@@ -294,7 +294,7 @@ logging from the :ref:`django-logger` named logger to a local file:
     }
 
 If you use this example, be sure to change the ``'filename'`` path to a
-location that's writable by the user that's running the Django application.
+location that's writable by the user that's running the Thibaud application.
 
 Finally, here's an example of a fairly complex logging setup:
 
@@ -320,7 +320,7 @@ Finally, here's an example of a fairly complex logging setup:
                 "foo": "bar",
             },
             "require_debug_true": {
-                "()": "django.utils.log.RequireDebugTrue",
+                "()": "thibaud.utils.log.RequireDebugTrue",
             },
         },
         "handlers": {
@@ -332,16 +332,16 @@ Finally, here's an example of a fairly complex logging setup:
             },
             "mail_admins": {
                 "level": "ERROR",
-                "class": "django.utils.log.AdminEmailHandler",
+                "class": "thibaud.utils.log.AdminEmailHandler",
                 "filters": ["special"],
             },
         },
         "loggers": {
-            "django": {
+            "thibaud": {
                 "handlers": ["console"],
                 "propagate": True,
             },
-            "django.request": {
+            "thibaud.request": {
                 "handlers": ["mail_admins"],
                 "level": "ERROR",
                 "propagate": False,
@@ -381,7 +381,7 @@ This logging configuration does the following things:
     ``foo`` will be given a value of ``bar`` when instantiating
     ``SpecialFilter``.
 
-  * ``django.utils.log.RequireDebugTrue``, which passes on records when
+  * ``thibaud.utils.log.RequireDebugTrue``, which passes on records when
     :setting:`DEBUG` is ``True``.
 
 * Defines two handlers:
@@ -390,19 +390,19 @@ This logging configuration does the following things:
     (or higher) message to ``sys.stderr``. This handler uses the ``simple``
     output format.
 
-  * ``mail_admins``, an :class:`~django.utils.log.AdminEmailHandler`, which
+  * ``mail_admins``, an :class:`~thibaud.utils.log.AdminEmailHandler`, which
     emails any ``ERROR`` (or higher) message to the site :setting:`ADMINS`.
     This handler uses the ``special`` filter.
 
 * Configures three loggers:
 
-  * ``django``, which passes all messages to the ``console`` handler.
+  * ``thibaud``, which passes all messages to the ``console`` handler.
 
-  * ``django.request``, which passes all ``ERROR`` messages to
+  * ``thibaud.request``, which passes all ``ERROR`` messages to
     the ``mail_admins`` handler. In addition, this logger is
     marked to *not* propagate messages. This means that log
-    messages written to ``django.request`` will not be handled
-    by the ``django`` logger.
+    messages written to ``thibaud.request`` will not be handled
+    by the ``thibaud`` logger.
 
   * ``myproject.custom``, which passes all messages at ``INFO``
     or higher that also pass the ``special`` filter to two
@@ -418,7 +418,7 @@ If you don't want to use Python's dictConfig format to configure your
 logger, you can specify your own configuration scheme.
 
 The :setting:`LOGGING_CONFIG` setting defines the callable that will
-be used to configure Django's loggers. By default, it points at
+be used to configure Thibaud's loggers. By default, it points at
 Python's :func:`logging.config.dictConfig()` function. However, if you want to
 use a different configuration process, you can use any other callable
 that takes a single argument. The contents of :setting:`LOGGING` will
@@ -432,15 +432,15 @@ Disabling logging configuration
 If you don't want to configure logging at all (or you want to manually
 configure logging using your own approach), you can set
 :setting:`LOGGING_CONFIG` to ``None``. This will disable the
-configuration process for :ref:`Django's default logging
+configuration process for :ref:`Thibaud's default logging
 <default-logging-configuration>`.
 
 Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the automatic
 configuration process is disabled, not logging itself. If you disable the
-configuration process, Django will still make logging calls, falling back to
+configuration process, Thibaud will still make logging calls, falling back to
 whatever default logging behavior is defined.
 
-Here's an example that disables Django's logging configuration and then
+Here's an example that disables Thibaud's logging configuration and then
 manually configures logging:
 
 .. code-block:: python

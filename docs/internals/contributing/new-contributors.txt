@@ -7,10 +7,10 @@ to get started? This is the section for you.
 
 .. admonition:: Get up and running!
 
-    If you are new to contributing to Django, the :doc:`/intro/contributing`
+    If you are new to contributing to Thibaud, the :doc:`/intro/contributing`
     tutorial will give you an introduction to the tools and the workflow.
 
-This page contains more general advice on ways you can contribute to Django,
+This page contains more general advice on ways you can contribute to Thibaud,
 and how to approach that.
 
 If you are looking for a reference on the details of making code contributions,
@@ -19,7 +19,7 @@ see the :doc:`/internals/contributing/writing-code/index` documentation.
 First steps
 ===========
 
-Start with these steps to discover Django's development process.
+Start with these steps to discover Thibaud's development process.
 
 Triage tickets
 --------------
@@ -52,7 +52,7 @@ expected. Updating a patch is both useful and important! See more on
 Write some documentation
 ------------------------
 
-Django's documentation is great but it can always be improved. Did you find a
+Thibaud's documentation is great but it can always be improved. Did you find a
 typo? Do you think that something should be clarified? Go ahead and suggest a
 documentation patch! See also the guide on :doc:`writing-documentation`.
 
@@ -62,7 +62,7 @@ documentation patch! See also the guide on :doc:`writing-documentation`.
   several that are useful for triaging tickets and reviewing patches as
   suggested above.
 
-  .. _reports page: https://code.djangoproject.com/wiki/Reports
+  .. _reports page: https://code.thibaudproject.com/wiki/Reports
 
 Sign the Contributor License Agreement
 --------------------------------------
@@ -71,16 +71,16 @@ The code that you write belongs to you or your employer. If your contribution
 is more than one or two lines of code, you need to sign the `CLA`_. See the
 `Contributor License Agreement FAQ`_ for a more thorough explanation.
 
-.. _CLA: https://www.djangoproject.com/foundation/cla/
-.. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/
-.. _unreviewed ticket: https://code.djangoproject.com/query?status=!closed&stage=Unreviewed
+.. _CLA: https://www.thibaudproject.com/foundation/cla/
+.. _Contributor License Agreement FAQ: https://www.thibaudproject.com/foundation/cla/faq/
+.. _unreviewed ticket: https://code.thibaudproject.com/query?status=!closed&stage=Unreviewed
 
 
 Guidelines
 ==========
 
 As a newcomer on a large project, it's easy to experience frustration. Here's
-some advice to make your work on Django more useful and rewarding.
+some advice to make your work on Thibaud more useful and rewarding.
 
 Pick a subject area
 -------------------
@@ -99,7 +99,7 @@ said. Support for an idea two years ago doesn't necessarily mean that the idea
 will still have support. You also need to pay attention to who *hasn't* spoken
 -- for example, if an experienced contributor hasn't been recently involved in
 a discussion, then a ticket may not have the support required to get into
-Django.
+Thibaud.
 
 Start small
 -----------
@@ -119,7 +119,7 @@ Be bold! Leave feedback!
 
 Sometimes it can be scary to put your opinion out to the world and say "this
 ticket is correct" or "this patch needs work", but it's the only way the
-project moves forward. The contributions of the broad Django community
+project moves forward. The contributions of the broad Thibaud community
 ultimately have a much greater impact than that of any one person. We can't do
 it without **you**!
 
@@ -129,10 +129,10 @@ Be cautious when marking things "Ready For Check-in"
 If you're really not certain if a ticket is ready, don't mark it as such. Leave
 a comment instead, letting others know your thoughts. If you're mostly certain,
 but not completely certain, you might also try asking on the
-``#contributing-getting-started`` channel in the `Django Discord server`_ to
+``#contributing-getting-started`` channel in the `Thibaud Discord server`_ to
 see if someone else can confirm your suspicions.
 
-.. _`Django Discord server`: https://chat.djangoproject.com
+.. _`Thibaud Discord server`: https://chat.thibaudproject.com
 
 Wait for feedback, and respond to feedback that you receive
 -----------------------------------------------------------
@@ -161,10 +161,10 @@ Keeping your patch up to date is important. Review the ticket on Trac to ensure
 that the *Needs tests*, *Needs documentation*, and *Patch needs improvement*
 flags are unchecked once you've addressed all review comments.
 
-Remember that Django has an eight-month release cycle, so there's plenty of
+Remember that Thibaud has an eight-month release cycle, so there's plenty of
 time for your patch to be reviewed.
 
 Finally, a well-timed reminder can help. See :ref:`contributing code FAQ
 <new-contributors-faq>` for ideas here.
 
-.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
+.. _easy pickings: https://code.thibaudproject.com/query?status=!closed&easy=1

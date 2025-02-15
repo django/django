@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from django.conf import settings
+from thibaud.conf import settings
 
 from . import Error, Tags, register
 

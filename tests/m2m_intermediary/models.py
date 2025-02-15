@@ -10,7 +10,7 @@ field, which specifies the ``Reporter``'s position for the given article
 (e.g. "Staff writer").
 """
 
-from django.db import models
+from thibaud.db import models
 
 
 class Reporter(models.Model):

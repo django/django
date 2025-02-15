@@ -2,8 +2,8 @@
  The GeometryColumns and SpatialRefSys models for the PostGIS backend.
 """
 
-from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
-from django.db import models
+from thibaud.contrib.gis.db.backends.base.models import SpatialRefSysMixin
+from thibaud.db import models
 
 
 class PostGISGeometryColumns(models.Model):

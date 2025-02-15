@@ -1,10 +1,10 @@
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.core.checks import Error
-from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db import models
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core.checks import Error
+from thibaud.core.exceptions import FieldDoesNotExist, FieldError
+from thibaud.db import models
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import isolate_apps
 
 
 @isolate_apps("model_inheritance")

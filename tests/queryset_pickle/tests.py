@@ -1,9 +1,9 @@
 import datetime
 import pickle
 
-import django
-from django.db import models
-from django.test import TestCase
+import thibaud
+from thibaud.db import models
+from thibaud.test import TestCase
 
 from .models import (
     BinaryFieldModel,
@@ -322,25 +322,25 @@ class PickleabilityTestCase(TestCase):
         qs = qs.filter(id=0)
         self.assert_pickles(qs)
 
-    def test_missing_django_version_unpickling(self):
+    def test_missing_thibaud_version_unpickling(self):
         """
         #21430 -- Verifies a warning is raised for querysets that are
-        unpickled without a Django version
+        unpickled without a Thibaud version
         """
-        qs = Group.missing_django_version_objects.all()
-        msg = "Pickled queryset instance's Django version is not specified."
+        qs = Group.missing_thibaud_version_objects.all()
+        msg = "Pickled queryset instance's Thibaud version is not specified."
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
 
     def test_unsupported_unpickle(self):
         """
         #21430 -- Verifies a warning is raised for querysets that are
-        unpickled with a different Django version than the current
+        unpickled with a different Thibaud version than the current
         """
-        qs = Group.previous_django_version_objects.all()
+        qs = Group.previous_thibaud_version_objects.all()
         msg = (
-            "Pickled queryset instance's Django version 1.0 does not match "
-            "the current version %s." % django.__version__
+            "Pickled queryset instance's Thibaud version 1.0 does not match "
+            "the current version %s." % thibaud.__version__
         )
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))

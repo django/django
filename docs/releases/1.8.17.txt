@@ -1,10 +1,10 @@
 ===========================
-Django 1.8.17 release notes
+Thibaud 1.8.17 release notes
 ===========================
 
 *December 1, 2016*
 
-Django 1.8.17 fixes a regression in 1.8.16.
+Thibaud 1.8.17 fixes a regression in 1.8.16.
 
 Bugfixes
 ========

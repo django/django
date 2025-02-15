@@ -4,10 +4,10 @@ import tempfile
 import unittest
 from contextlib import contextmanager
 
-from django.template import TemplateDoesNotExist
-from django.template.engine import Engine
-from django.test import SimpleTestCase, override_settings
-from django.utils.functional import lazystr
+from thibaud.template import TemplateDoesNotExist
+from thibaud.template.engine import Engine
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils.functional import lazystr
 
 from .utils import TEMPLATE_DIR
 
@@ -18,9 +18,9 @@ class CachedLoaderTests(SimpleTestCase):
             dirs=[TEMPLATE_DIR],
             loaders=[
                 (
-                    "django.template.loaders.cached.Loader",
+                    "thibaud.template.loaders.cached.Loader",
                     [
-                        "django.template.loaders.filesystem.Loader",
+                        "thibaud.template.loaders.filesystem.Loader",
                     ],
                 ),
             ],
@@ -122,7 +122,7 @@ class FileSystemLoaderTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(
-            dirs=[TEMPLATE_DIR], loaders=["django.template.loaders.filesystem.Loader"]
+            dirs=[TEMPLATE_DIR], loaders=["thibaud.template.loaders.filesystem.Loader"]
         )
         super().setUpClass()
 
@@ -155,12 +155,12 @@ class FileSystemLoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.template_name, "index.html")
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
         self.assertEqual(
-            template.origin.loader_name, "django.template.loaders.filesystem.Loader"
+            template.origin.loader_name, "thibaud.template.loaders.filesystem.Loader"
         )
 
     def test_loaders_dirs(self):
         engine = Engine(
-            loaders=[("django.template.loaders.filesystem.Loader", [TEMPLATE_DIR])]
+            loaders=[("thibaud.template.loaders.filesystem.Loader", [TEMPLATE_DIR])]
         )
         template = engine.get_template("index.html")
         self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, "index.html"))
@@ -169,7 +169,7 @@ class FileSystemLoaderTests(SimpleTestCase):
         """An empty dirs list in loaders overrides top level dirs."""
         engine = Engine(
             dirs=[TEMPLATE_DIR],
-            loaders=[("django.template.loaders.filesystem.Loader", [])],
+            loaders=[("thibaud.template.loaders.filesystem.Loader", [])],
         )
         with self.assertRaises(TemplateDoesNotExist):
             engine.get_template("index.html")
@@ -238,7 +238,7 @@ class AppDirectoriesLoaderTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(
-            loaders=["django.template.loaders.app_directories.Loader"],
+            loaders=["thibaud.template.loaders.app_directories.Loader"],
         )
         super().setUpClass()
 
@@ -261,7 +261,7 @@ class LocmemLoaderTests(SimpleTestCase):
         cls.engine = Engine(
             loaders=[
                 (
-                    "django.template.loaders.locmem.Loader",
+                    "thibaud.template.loaders.locmem.Loader",
                     {
                         "index.html": "index",
                     },

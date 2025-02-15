@@ -1,7 +1,7 @@
 import json
 
-from django import template
-from django.template.context import Context
+from thibaud import template
+from thibaud.template.context import Context
 
 from .base import InclusionAdminNode
 

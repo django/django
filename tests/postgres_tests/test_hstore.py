@@ -1,20 +1,20 @@
 import json
 
-from django.core import checks, exceptions, serializers
-from django.db import connection
-from django.db.models import F, OuterRef, Subquery
-from django.db.models.expressions import RawSQL
-from django.forms import Form
-from django.test.utils import CaptureQueriesContext, isolate_apps
+from thibaud.core import checks, exceptions, serializers
+from thibaud.db import connection
+from thibaud.db.models import F, OuterRef, Subquery
+from thibaud.db.models.expressions import RawSQL
+from thibaud.forms import Form
+from thibaud.test.utils import CaptureQueriesContext, isolate_apps
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import HStoreModel, PostgreSQLModel
 
 try:
-    from django.contrib.postgres import forms
-    from django.contrib.postgres.fields import HStoreField
-    from django.contrib.postgres.fields.hstore import KeyTransform
-    from django.contrib.postgres.validators import KeysValidator
+    from thibaud.contrib.postgres import forms
+    from thibaud.contrib.postgres.fields import HStoreField
+    from thibaud.contrib.postgres.fields.hstore import KeyTransform
+    from thibaud.contrib.postgres.validators import KeysValidator
 except ImportError:
     pass
 
@@ -475,7 +475,7 @@ class TestValidator(PostgreSQLSimpleTestCase):
         }
         validator = KeysValidator(keys=["a", "b"], strict=True, messages=messages)
         path, args, kwargs = validator.deconstruct()
-        self.assertEqual(path, "django.contrib.postgres.validators.KeysValidator")
+        self.assertEqual(path, "thibaud.contrib.postgres.validators.KeysValidator")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs, {"keys": ["a", "b"], "strict": True, "messages": messages}

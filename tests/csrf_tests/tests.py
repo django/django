@@ -1,10 +1,10 @@
 import re
 
-from django.conf import settings
-from django.contrib.sessions.backends.cache import SessionStore
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest, HttpResponse, UnreadablePostError
-from django.middleware.csrf import (
+from thibaud.conf import settings
+from thibaud.contrib.sessions.backends.cache import SessionStore
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import HttpRequest, HttpResponse, UnreadablePostError
+from thibaud.middleware.csrf import (
     CSRF_ALLOWED_CHARS,
     CSRF_SECRET_LENGTH,
     CSRF_SESSION_KEY,
@@ -22,8 +22,8 @@ from django.middleware.csrf import (
     get_token,
     rotate_token,
 )
-from django.test import SimpleTestCase, override_settings
-from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
     ensure_csrf_cookie_view,
@@ -343,7 +343,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         req = self._get_request(method="POST", cookie=cookie)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % expected)
@@ -369,7 +369,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         )
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(resp["Content-Type"], "text/html; charset=utf-8")
@@ -476,7 +476,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_request(method="PUT")
         mw = CsrfViewMiddleware(post_form_view)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(
@@ -484,7 +484,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         )
 
         req = self._get_request(method="DELETE")
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(
@@ -853,7 +853,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         ensure_csrf_cookie() doesn't log warnings (#19436).
         """
-        with self.assertNoLogs("django.security.csrf", "WARNING"):
+        with self.assertNoLogs("thibaud.security.csrf", "WARNING"):
             req = self._get_request()
             ensure_csrf_cookie_view(req)
 
@@ -871,7 +871,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         req = self._get_POST_request_with_token(request_class=PostErrorRequest)
         req.post_error = UnreadablePostError("Error reading input data.")
         mw.process_request(req)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(
@@ -900,7 +900,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
@@ -915,7 +915,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
@@ -931,7 +931,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
@@ -958,7 +958,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
@@ -984,7 +984,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+        with self.assertLogs("thibaud.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]

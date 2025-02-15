@@ -1,7 +1,7 @@
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.auth.models import User
-from django.test import override_settings
-from django.urls import reverse
+from thibaud.contrib.admin.tests import AdminSeleniumTestCase
+from thibaud.contrib.auth.models import User
+from thibaud.test import override_settings
+from thibaud.urls import reverse
 
 from .models import CamelCaseModel
 

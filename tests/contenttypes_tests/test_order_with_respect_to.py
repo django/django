@@ -1,6 +1,6 @@
 from order_with_respect_to.base_tests import BaseOrderWithRespectToTests
 
-from django.test import TestCase
+from thibaud.test import TestCase
 
 from .models import Answer, Post, Question
 

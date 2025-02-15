@@ -2,13 +2,13 @@ import time
 import unittest
 from datetime import date, datetime
 
-from django.core.exceptions import FieldError
-from django.db import connection, models
-from django.db.models.fields.related_lookups import RelatedGreaterThan
-from django.db.models.lookups import EndsWith, StartsWith
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import register_lookup
-from django.utils import timezone
+from thibaud.core.exceptions import FieldError
+from thibaud.db import connection, models
+from thibaud.db.models.fields.related_lookups import RelatedGreaterThan
+from thibaud.db.models.lookups import EndsWith, StartsWith
+from thibaud.test import SimpleTestCase, TestCase, override_settings
+from thibaud.test.utils import register_lookup
+from thibaud.utils import timezone
 
 from .models import Article, Author, MySQLUnixTimestamp
 

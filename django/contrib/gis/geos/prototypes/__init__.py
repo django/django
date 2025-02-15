@@ -4,7 +4,7 @@
  via ctypes.
 """
 
-from django.contrib.gis.geos.prototypes.coordseq import (  # NOQA
+from thibaud.contrib.gis.geos.prototypes.coordseq import (  # NOQA
     create_cs,
     cs_clone,
     cs_getdims,
@@ -20,7 +20,7 @@ from django.contrib.gis.geos.prototypes.coordseq import (  # NOQA
     cs_setz,
     get_cs,
 )
-from django.contrib.gis.geos.prototypes.geom import (  # NOQA
+from thibaud.contrib.gis.geos.prototypes.geom import (  # NOQA
     create_collection,
     create_empty_polygon,
     create_linearring,
@@ -43,8 +43,8 @@ from django.contrib.gis.geos.prototypes.geom import (  # NOQA
     get_num_coords,
     get_num_geoms,
 )
-from django.contrib.gis.geos.prototypes.misc import *  # NOQA
-from django.contrib.gis.geos.prototypes.predicates import (  # NOQA
+from thibaud.contrib.gis.geos.prototypes.misc import *  # NOQA
+from thibaud.contrib.gis.geos.prototypes.predicates import (  # NOQA
     geos_contains,
     geos_covers,
     geos_crosses,
@@ -65,4 +65,4 @@ from django.contrib.gis.geos.prototypes.predicates import (  # NOQA
     geos_touches,
     geos_within,
 )
-from django.contrib.gis.geos.prototypes.topology import *  # NOQA
+from thibaud.contrib.gis.geos.prototypes.topology import *  # NOQA

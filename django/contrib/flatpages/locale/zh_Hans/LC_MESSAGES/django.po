@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -10,12 +10,12 @@
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
 "PO-Revision-Date: 2020-03-04 04:05+0000\n"
 "Last-Translator: wolf ice <warwolf7677@163.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
+"Language-Team: Chinese (China) (http://www.transifex.com/thibaud/thibaud/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

@@ -1,5 +1,5 @@
-from django.db import DatabaseError, IntegrityError, models, transaction
-from django.test import TestCase
+from thibaud.db import DatabaseError, IntegrityError, models, transaction
+from thibaud.test import TestCase
 
 from .models import (
     Counter,

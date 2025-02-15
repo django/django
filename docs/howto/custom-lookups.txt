@@ -2,9 +2,9 @@
 How to write custom lookups
 ===========================
 
-.. currentmodule:: django.db.models
+.. currentmodule:: thibaud.db.models
 
-Django offers a wide variety of :ref:`built-in lookups <field-lookups>` for
+Thibaud offers a wide variety of :ref:`built-in lookups <field-lookups>` for
 filtering (for example, ``exact`` and ``icontains``). This documentation
 explains how to write custom lookups and how to alter the working of existing
 lookups. For the API references of lookups, see the :doc:`/ref/models/lookups`.
@@ -24,9 +24,9 @@ This SQL is backend independent, so we don't need to worry about different
 databases.
 
 There are two steps to making this work. Firstly we need to implement the
-lookup, then we need to tell Django about it::
+lookup, then we need to tell Thibaud about it::
 
-  from django.db.models import Lookup
+  from thibaud.db.models import Lookup
 
 
   class NotEqual(Lookup):
@@ -43,13 +43,13 @@ the field class we want the lookup to be available for. In this case, the lookup
 makes sense on all ``Field`` subclasses, so we register it with ``Field``
 directly::
 
-  from django.db.models import Field
+  from thibaud.db.models import Field
 
   Field.register_lookup(NotEqual)
 
 Lookup registration can also be done using a decorator pattern::
 
-    from django.db.models import Field
+    from thibaud.db.models import Field
 
 
     @Field.register_lookup
@@ -110,12 +110,12 @@ or where it did not exceed a certain amount
 .. note::
     This example is somewhat contrived, but it nicely demonstrates the range of
     functionality which is possible in a database backend independent manner,
-    and without duplicating functionality already in Django.
+    and without duplicating functionality already in Thibaud.
 
 We will start by writing an ``AbsoluteValue`` transformer. This will use the SQL
 function ``ABS()`` to transform the value before comparison::
 
-  from django.db.models import Transform
+  from thibaud.db.models import Transform
 
 
   class AbsoluteValue(Transform):
@@ -124,7 +124,7 @@ function ``ABS()`` to transform the value before comparison::
 
 Next, let's register it for ``IntegerField``::
 
-  from django.db.models import IntegerField
+  from thibaud.db.models import IntegerField
 
   IntegerField.register_lookup(AbsoluteValue)
 
@@ -144,7 +144,7 @@ SQL:
 
     SELECT ... WHERE ABS("experiments"."change") < 27
 
-Note that in case there is no other lookup specified, Django interprets
+Note that in case there is no other lookup specified, Thibaud interprets
 ``change__abs=27`` as ``change__abs__exact=27``.
 
 This also allows the result to be used in ``ORDER BY`` and ``DISTINCT ON``
@@ -162,14 +162,14 @@ And on databases that support distinct on fields (such as PostgreSQL),
     SELECT ... DISTINCT ON ABS("experiments"."change")
 
 When looking for which lookups are allowable after the ``Transform`` has been
-applied, Django uses the ``output_field`` attribute. We didn't need to specify
+applied, Thibaud uses the ``output_field`` attribute. We didn't need to specify
 this here as it didn't change, but supposing we were applying ``AbsoluteValue``
 to some field which represents a more complex type (for example a point
 relative to an origin, or a complex number) then we may have wanted to specify
 that the transform returns a ``FloatField`` type for further lookups. This can
 be done by adding an ``output_field`` attribute to the transform::
 
-    from django.db.models import FloatField, Transform
+    from thibaud.db.models import FloatField, Transform
 
 
     class AbsoluteValue(Transform):
@@ -200,7 +200,7 @@ the following SQL:
 
 The implementation is::
 
-  from django.db.models import Lookup
+  from thibaud.db.models import Lookup
 
 
   class AbsoluteValueLessThan(Lookup):
@@ -248,16 +248,16 @@ right-hand side. For instance, if you want to filter a queryset based on the
 equality of the left and right-hand side insensitively to some SQL function.
 
 Let's examine case-insensitive transformations here. This transformation isn't
-very useful in practice as Django already comes with a bunch of built-in
+very useful in practice as Thibaud already comes with a bunch of built-in
 case-insensitive lookups, but it will be a nice demonstration of bilateral
 transformations in a database-agnostic way.
 
 We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()`` to
 transform the values before comparison. We define
-:attr:`bilateral = True <django.db.models.Transform.bilateral>` to indicate that
+:attr:`bilateral = True <thibaud.db.models.Transform.bilateral>` to indicate that
 this transformation should apply to both ``lhs`` and ``rhs``::
 
-  from django.db.models import Transform
+  from thibaud.db.models import Transform
 
 
   class UpperCase(Transform):
@@ -267,7 +267,7 @@ this transformation should apply to both ``lhs`` and ``rhs``::
 
 Next, let's register it::
 
-  from django.db.models import CharField, TextField
+  from thibaud.db.models import CharField, TextField
 
   CharField.register_lookup(UpperCase)
   TextField.register_lookup(UpperCase)
@@ -286,7 +286,7 @@ Sometimes different database vendors require different SQL for the same
 operation. For this example we will rewrite a custom implementation for
 MySQL for the NotEqual operator. Instead of ``<>`` we will be using ``!=``
 operator. (Note that in reality almost all databases support both, including
-all the official databases supported by Django).
+all the official databases supported by Thibaud).
 
 We can change the behavior on a specific backend by creating a subclass of
 ``NotEqual`` with an ``as_mysql`` method::
@@ -304,11 +304,11 @@ We can change the behavior on a specific backend by creating a subclass of
 We can then register it with ``Field``. It takes the place of the original
 ``NotEqual`` class as it has the same ``lookup_name``.
 
-When compiling a query, Django first looks for ``as_%s % connection.vendor``
+When compiling a query, Thibaud first looks for ``as_%s % connection.vendor``
 methods, and then falls back to ``as_sql``. The vendor names for the in-built
 backends are ``sqlite``, ``postgresql``, ``oracle`` and ``mysql``.
 
-How Django determines the lookups and transforms which are used
+How Thibaud determines the lookups and transforms which are used
 ===============================================================
 
 In some cases you may wish to dynamically change which ``Transform`` or

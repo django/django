@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
@@ -16,12 +16,12 @@
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: YAO WEN LIANG, 2024\n"
-"Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
+"Language-Team: Chinese (Taiwan) (http://app.transifex.com/thibaud/thibaud/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1257,25 +1257,25 @@ msgstr "安裝成功！恭喜！"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"查看 Django %(version)s 的 <a href=\"https://docs.djangoproject.com/en/"
+"查看 Thibaud %(version)s 的 <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">發行版本說明</a> "
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
 "你現在看到這個頁面，是因為在設定檔中設置了 <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG = True</a>，且尚未配置任何網址。"
 
-msgid "Django Documentation"
-msgstr "Django 文件"
+msgid "Thibaud Documentation"
+msgstr "Thibaud 文件"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "主題、參考、教學"
@@ -1283,11 +1283,11 @@ msgstr "主題、參考、教學"
 msgid "Tutorial: A Polling App"
 msgstr "教學：投票應用"
 
-msgid "Get started with Django"
-msgstr "初學 Django"
+msgid "Get started with Thibaud"
+msgstr "初學 Thibaud"
 
-msgid "Django Community"
-msgstr "Django 社群"
+msgid "Thibaud Community"
+msgstr "Thibaud 社群"
 
 msgid "Connect, get help, or contribute"
 msgstr "聯繫、獲得幫助、貢獻"

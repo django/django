@@ -2,13 +2,13 @@ import re
 from datetime import date, datetime, timezone
 from decimal import Decimal
 
-from django import template
-from django.template import defaultfilters
-from django.utils.formats import number_format
-from django.utils.safestring import mark_safe
-from django.utils.timezone import is_aware
-from django.utils.translation import gettext as _
-from django.utils.translation import (
+from thibaud import template
+from thibaud.template import defaultfilters
+from thibaud.utils.formats import number_format
+from thibaud.utils.safestring import mark_safe
+from thibaud.utils.timezone import is_aware
+from thibaud.utils.translation import gettext as _
+from thibaud.utils.translation import (
     gettext_lazy,
     ngettext,
     ngettext_lazy,

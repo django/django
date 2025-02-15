@@ -4,9 +4,9 @@ from math import ceil
 from operator import attrgetter
 from unittest import skipUnless
 
-from django.core.exceptions import FieldError
-from django.db import connection, models
-from django.db.models import (
+from thibaud.core.exceptions import FieldError
+from thibaud.db import connection, models
+from thibaud.db.models import (
     BooleanField,
     Case,
     Exists,
@@ -19,8 +19,8 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Abs, Cast, Length, Substr
-from django.db.models.lookups import (
+from thibaud.db.models.functions import Abs, Cast, Length, Substr
+from thibaud.db.models.lookups import (
     Exact,
     GreaterThan,
     GreaterThanOrEqual,
@@ -29,8 +29,8 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps, register_lookup
+from thibaud.test import TestCase, skipUnlessDBFeature
+from thibaud.test.utils import isolate_apps, register_lookup
 
 from .models import (
     Article,
@@ -666,7 +666,7 @@ class LookupTests(TestCase):
 
     def test_escaping(self):
         # Underscores, percent signs and backslashes have special meaning in the
-        # underlying SQL code, but Django handles the quoting of them automatically.
+        # underlying SQL code, but Thibaud handles the quoting of them automatically.
         a8 = Article.objects.create(
             headline="Article_ with underscore", pub_date=datetime(2005, 11, 20)
         )

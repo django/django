@@ -5,13 +5,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from django.core.exceptions import FieldError, SuspiciousFileOperation
-from django.core.files import File, temp
-from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import TemporaryUploadedFile
-from django.db import IntegrityError, models
-from django.test import TestCase, override_settings
-from django.test.utils import isolate_apps
+from thibaud.core.exceptions import FieldError, SuspiciousFileOperation
+from thibaud.core.files import File, temp
+from thibaud.core.files.base import ContentFile
+from thibaud.core.files.uploadedfile import TemporaryUploadedFile
+from thibaud.db import IntegrityError, models
+from thibaud.test import TestCase, override_settings
+from thibaud.test.utils import isolate_apps
 
 from .models import Document
 

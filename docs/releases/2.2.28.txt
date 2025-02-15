@@ -1,10 +1,10 @@
 ===========================
-Django 2.2.28 release notes
+Thibaud 2.2.28 release notes
 ===========================
 
 *April 11, 2022*
 
-Django 2.2.28 fixes two security issues with severity "high" in 2.2.27.
+Thibaud 2.2.28 fixes two security issues with severity "high" in 2.2.27.
 
 CVE-2022-28346: Potential SQL injection in ``QuerySet.annotate()``, ``aggregate()``, and ``extra()``
 ====================================================================================================

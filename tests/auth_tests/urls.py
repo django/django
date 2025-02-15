@@ -1,22 +1,22 @@
-from django.contrib import admin
-from django.contrib.auth import views
-from django.contrib.auth.decorators import (
+from thibaud.contrib import admin
+from thibaud.contrib.auth import views
+from thibaud.contrib.auth.decorators import (
     login_not_required,
     login_required,
     permission_required,
 )
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.urls import urlpatterns as auth_urlpatterns
-from django.contrib.auth.views import LoginView
-from django.contrib.messages.api import info
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
-from django.template import RequestContext, Template
-from django.urls import path, re_path, reverse_lazy
-from django.utils.decorators import method_decorator
-from django.views import View
-from django.views.decorators.cache import never_cache
-from django.views.i18n import set_language
+from thibaud.contrib.auth.forms import AuthenticationForm
+from thibaud.contrib.auth.urls import urlpatterns as auth_urlpatterns
+from thibaud.contrib.auth.views import LoginView
+from thibaud.contrib.messages.api import info
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.shortcuts import render
+from thibaud.template import RequestContext, Template
+from thibaud.urls import path, re_path, reverse_lazy
+from thibaud.utils.decorators import method_decorator
+from thibaud.views import View
+from thibaud.views.decorators.cache import never_cache
+from thibaud.views.i18n import set_language
 
 
 class CustomRequestAuthenticationForm(AuthenticationForm):
@@ -191,7 +191,7 @@ urlpatterns = auth_urlpatterns + [
         views.PasswordResetConfirmView.as_view(
             post_reset_login=True,
             post_reset_login_backend=(
-                "django.contrib.auth.backends.AllowAllUsersModelBackend"
+                "thibaud.contrib.auth.backends.AllowAllUsersModelBackend"
             ),
         ),
     ),

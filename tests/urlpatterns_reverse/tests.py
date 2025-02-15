@@ -8,19 +8,19 @@ import threading
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.http import (
+from thibaud.conf import settings
+from thibaud.contrib.auth.models import User
+from thibaud.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from thibaud.http import (
     HttpRequest,
     HttpResponsePermanentRedirect,
     HttpResponseRedirect,
     QueryDict,
 )
-from django.shortcuts import redirect
-from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
-from django.test.utils import override_script_prefix
-from django.urls import (
+from thibaud.shortcuts import redirect
+from thibaud.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from thibaud.test.utils import override_script_prefix
+from thibaud.urls import (
     NoReverseMatch,
     Resolver404,
     ResolverMatch,
@@ -36,7 +36,7 @@ from django.urls import (
     reverse,
     reverse_lazy,
 )
-from django.urls.resolvers import RegexPattern
+from thibaud.urls.resolvers import RegexPattern
 
 from . import middleware, urlconf_outer, views
 from .utils import URLObject
@@ -597,12 +597,12 @@ class URLPatternReverse(SimpleTestCase):
             reverse(
                 "test",
                 query={
-                    "hello world": "django project",
+                    "hello world": "thibaud project",
                     "foo": [123, 456],
                     "@invalid": ["?", "!", "a b"],
                 },
             ),
-            "/test/1?hello+world=django+project&foo=123&foo=456"
+            "/test/1?hello+world=thibaud+project&foo=123&foo=456"
             "&%40invalid=%3F&%40invalid=%21&%40invalid=a+b",
         )
 
@@ -807,7 +807,7 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
         self.write_settings(
             "settings.py",
             extra=(
-                "from django.urls import reverse_lazy\n"
+                "from thibaud.urls import reverse_lazy\n"
                 "LOGIN_URL = reverse_lazy('login')"
             ),
         )
@@ -1717,7 +1717,7 @@ class ViewLoadingTests(SimpleTestCase):
             get_callable("urlpatterns_reverse.views.i_should_not_exist")
 
     def test_attributeerror_not_hidden(self):
-        msg = "I am here to confuse django.urls.get_callable"
+        msg = "I am here to confuse thibaud.urls.get_callable"
         with self.assertRaisesMessage(AttributeError, msg):
             get_callable("urlpatterns_reverse.views_broken.i_am_broken")
 

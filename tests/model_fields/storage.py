@@ -1,4 +1,4 @@
-from django.core.files.storage.filesystem import FileSystemStorage
+from thibaud.core.files.storage.filesystem import FileSystemStorage
 
 
 class NoReadFileSystemStorage(FileSystemStorage):

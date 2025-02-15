@@ -4,11 +4,11 @@ FAQ: Contributing code
 
 .. _new-contributors-faq:
 
-How can I get started contributing code to Django?
+How can I get started contributing code to Thibaud?
 ==================================================
 
 Thanks for asking! We've written an entire document devoted to this question.
-It's titled :doc:`Contributing to Django </internals/contributing/index>`.
+It's titled :doc:`Contributing to Thibaud </internals/contributing/index>`.
 
 I submitted a bug fix several weeks ago. Why are you ignoring my contribution?
 ==============================================================================
@@ -16,14 +16,14 @@ I submitted a bug fix several weeks ago. Why are you ignoring my contribution?
 Don't worry: We're not ignoring you!
 
 It's important to understand there is a difference between "a ticket is being
-ignored" and "a ticket has not been attended to yet." Django's ticket system
+ignored" and "a ticket has not been attended to yet." Thibaud's ticket system
 contains hundreds of open tickets, of various degrees of impact on end-user
-functionality, and Django's developers have to review and prioritize.
+functionality, and Thibaud's developers have to review and prioritize.
 
-On top of that: the people who work on Django are all volunteers. As a result,
+On top of that: the people who work on Thibaud are all volunteers. As a result,
 the amount of time that we have to work on the framework is limited and will
 vary from week to week depending on our spare time. If we're busy, we may not
-be able to spend as much time on Django as we might want.
+be able to spend as much time on Thibaud as we might want.
 
 The best way to make sure tickets do not get hung up on the way to checkin is
 to make it dead easy, even for someone who may not be intimately familiar with
@@ -41,7 +41,7 @@ that area of the code, to understand the problem and verify the fix:
   explanation why not? A test expresses succinctly what the problem is,
   and shows that the branch actually fixes it.
 
-If your contribution is not suitable for inclusion in Django, we won't ignore
+If your contribution is not suitable for inclusion in Thibaud, we won't ignore
 it -- we'll close the ticket. So if your ticket is still open, it doesn't mean
 we're ignoring you; it just means we haven't had time to look at it yet.
 
@@ -54,7 +54,7 @@ post your message right before a release deadline, you're not likely to get the
 sort of attention you require.
 
 Gentle reminders in the ``#contributing-getting-started`` channel in the
-`Django Discord server`_ can work.
+`Thibaud Discord server`_ can work.
 
 Another way to get traction is to pull several related tickets together. When
 someone sits down to review a bug in an area they haven't touched for
@@ -68,13 +68,13 @@ issue over and over again. This sort of behavior will not gain you any
 additional attention -- certainly not the attention that you need in order to
 get your issue addressed.
 
-.. _`Django Discord server`: https://chat.djangoproject.com
+.. _`Thibaud Discord server`: https://chat.thibaudproject.com
 
 But I've reminded you several times and you keep ignoring my contribution!
 ==========================================================================
 
 Seriously - we're not ignoring you. If your contribution is not suitable for
-inclusion in Django, we will close the ticket. For all the other tickets, we
+inclusion in Thibaud, we will close the ticket. For all the other tickets, we
 need to prioritize our efforts, which means that some tickets will be
 addressed before others.
 
@@ -93,8 +93,8 @@ concentrating on the rebuild, we can close all the little bugs at once, and
 hopefully prevent other little bugs from appearing in the future.
 
 Whatever the reason, please keep in mind that while you may hit a particular
-bug regularly, it doesn't necessarily follow that every single Django user
-will hit the same bug. Different users use Django in different ways, stressing
+bug regularly, it doesn't necessarily follow that every single Thibaud user
+will hit the same bug. Different users use Thibaud in different ways, stressing
 different parts of the code under different conditions. When we evaluate the
 relative priorities, we are generally trying to consider the needs of the
 entire community, instead of prioritizing the impact on one particular user.

@@ -2,14 +2,14 @@ import datetime
 from io import StringIO
 from unittest import mock
 
-from django.core.management.base import OutputWrapper
-from django.db.migrations.questioner import (
+from thibaud.core.management.base import OutputWrapper
+from thibaud.db.migrations.questioner import (
     InteractiveMigrationQuestioner,
     MigrationQuestioner,
 )
-from django.db.models import NOT_PROVIDED
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from thibaud.db.models import NOT_PROVIDED
+from thibaud.test import SimpleTestCase
+from thibaud.test.utils import override_settings
 
 
 class QuestionerTests(SimpleTestCase):

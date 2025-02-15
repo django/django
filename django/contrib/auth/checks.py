@@ -1,10 +1,10 @@
 from itertools import chain
 from types import MethodType
 
-from django.apps import apps
-from django.conf import settings
-from django.core import checks
-from django.utils.module_loading import import_string
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core import checks
+from thibaud.utils.module_loading import import_string
 
 from .management import _get_builtin_permissions
 
@@ -74,7 +74,7 @@ def check_user_model(app_configs=None, **kwargs):
         for constraint in cls._meta.total_unique_constraints
     ):
         if settings.AUTHENTICATION_BACKENDS == [
-            "django.contrib.auth.backends.ModelBackend"
+            "thibaud.contrib.auth.backends.ModelBackend"
         ]:
             errors.append(
                 checks.Error(
@@ -241,20 +241,20 @@ def check_middleware(app_configs, **kwargs):
     errors = []
 
     login_required_index = _subclass_index(
-        "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        "thibaud.contrib.auth.middleware.LoginRequiredMiddleware",
         settings.MIDDLEWARE,
     )
 
     if login_required_index != -1:
         auth_index = _subclass_index(
-            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "thibaud.contrib.auth.middleware.AuthenticationMiddleware",
             settings.MIDDLEWARE,
         )
         if auth_index == -1 or auth_index > login_required_index:
             errors.append(
                 checks.Error(
-                    "In order to use django.contrib.auth.middleware."
-                    "LoginRequiredMiddleware, django.contrib.auth.middleware."
+                    "In order to use thibaud.contrib.auth.middleware."
+                    "LoginRequiredMiddleware, thibaud.contrib.auth.middleware."
                     "AuthenticationMiddleware must be defined before it in MIDDLEWARE.",
                     id="auth.E013",
                 )

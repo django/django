@@ -1,1 +1,1 @@
-This directory contains extra stuff that can improve your Django experience.
+This directory contains extra stuff that can improve your Thibaud experience.

@@ -1,9 +1,9 @@
 from datetime import date, datetime, time
 
-from django import forms
-from django.core.exceptions import ValidationError
-from django.test import SimpleTestCase, override_settings
-from django.utils import translation
+from thibaud import forms
+from thibaud.core.exceptions import ValidationError
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils import translation
 
 
 class LocalizedTimeTests(SimpleTestCase):

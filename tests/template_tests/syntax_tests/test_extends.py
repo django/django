@@ -1,7 +1,7 @@
-from django.template import NodeList, TemplateSyntaxError
-from django.template.base import Node
-from django.template.loader_tags import ExtendsNode
-from django.test import SimpleTestCase
+from thibaud.template import NodeList, TemplateSyntaxError
+from thibaud.template.base import Node
+from thibaud.template.loader_tags import ExtendsNode
+from thibaud.test import SimpleTestCase
 
 from ..utils import setup
 

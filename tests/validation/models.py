@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.db.models.functions import Lower
+from thibaud.core.exceptions import ValidationError
+from thibaud.db import models
+from thibaud.db.models.functions import Lower
 
 
 def validate_answer_to_universe(value):

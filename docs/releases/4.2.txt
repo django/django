@@ -1,43 +1,43 @@
 ========================
-Django 4.2 release notes
+Thibaud 4.2 release notes
 ========================
 
 *April 3, 2023*
 
-Welcome to Django 4.2!
+Welcome to Thibaud 4.2!
 
 These release notes cover the :ref:`new features <whats-new-4.2>`, as well as
 some :ref:`backwards incompatible changes <backwards-incompatible-4.2>` you'll
-want to be aware of when upgrading from Django 4.1 or earlier. We've
+want to be aware of when upgrading from Thibaud 4.1 or earlier. We've
 :ref:`begun the deprecation process for some features
 <deprecated-features-4.2>`.
 
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 4.2 is designated as a :term:`long-term support release
+Thibaud 4.2 is designated as a :term:`long-term support release
 <Long-term support release>`. It will receive security updates for at least
-three years after its release. Support for the previous LTS, Django 3.2, will
+three years after its release. Support for the previous LTS, Thibaud 3.2, will
 end in April 2024.
 
 Python compatibility
 ====================
 
-Django 4.2 supports Python 3.8, 3.9, 3.10, 3.11, and 3.12 (as of 4.2.8). We
+Thibaud 4.2 supports Python 3.8, 3.9, 3.10, 3.11, and 3.12 (as of 4.2.8). We
 **highly recommend** and only officially support the latest release of each
 series.
 
 .. _whats-new-4.2:
 
-What's new in Django 4.2
+What's new in Thibaud 4.2
 ========================
 
 Psycopg 3 support
 -----------------
 
-Django now supports `psycopg`_ version 3.1.8 or higher. To update your code,
+Thibaud now supports `psycopg`_ version 3.1.8 or higher. To update your code,
 install the :pypi:`psycopg library <psycopg>`, you don't need to change the
-:setting:`ENGINE <DATABASE-ENGINE>` as ``django.db.backends.postgresql``
+:setting:`ENGINE <DATABASE-ENGINE>` as ``thibaud.db.backends.postgresql``
 supports both libraries.
 
 Support for ``psycopg2`` is likely to be deprecated and removed at some point
@@ -53,12 +53,12 @@ As a consequence, you may need to make some changes to account for
 Comments on columns and tables
 ------------------------------
 
-The new :attr:`Field.db_comment <django.db.models.Field.db_comment>` and
-:attr:`Meta.db_table_comment <django.db.models.Options.db_table_comment>`
+The new :attr:`Field.db_comment <thibaud.db.models.Field.db_comment>` and
+:attr:`Meta.db_table_comment <thibaud.db.models.Options.db_table_comment>`
 options allow creating comments on columns and tables, respectively. For
 example::
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Question(models.Model):
@@ -82,14 +82,14 @@ example::
         class Meta:
             db_table_comment = "Question answers"
 
-Also, the new :class:`~django.db.migrations.operations.AlterModelTableComment`
+Also, the new :class:`~thibaud.db.migrations.operations.AlterModelTableComment`
 operation allows changing table comments defined in the
-:attr:`Meta.db_table_comment <django.db.models.Options.db_table_comment>`.
+:attr:`Meta.db_table_comment <thibaud.db.models.Options.db_table_comment>`.
 
 Mitigation for the BREACH attack
 --------------------------------
 
-:class:`~django.middleware.gzip.GZipMiddleware` now includes a mitigation for
+:class:`~thibaud.middleware.gzip.GZipMiddleware` now includes a mitigation for
 the BREACH attack. It will add up to 100 random bytes to gzip responses to make
 BREACH attacks harder. Read more about the mitigation technique in the `Heal
 The Breach (HTB) paper`_.
@@ -99,7 +99,7 @@ The Breach (HTB) paper`_.
 In-memory file storage
 ----------------------
 
-The new :class:`django.core.files.storage.InMemoryStorage` class provides a
+The new :class:`thibaud.core.files.storage.InMemoryStorage` class provides a
 non-persistent storage useful for speeding up tests by avoiding disk access.
 
 Custom file storages
@@ -116,7 +116,7 @@ deprecated as of this release.
 Minor features
 --------------
 
-:mod:`django.contrib.admin`
+:mod:`thibaud.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The light or dark color theme of the admin can now be toggled in the UI, as
@@ -127,12 +127,12 @@ Minor features
   override the default font families.
 
 * The :source:`admin/delete_confirmation.html
-  <django/contrib/admin/templates/admin/delete_confirmation.html>` template now
+  <thibaud/contrib/admin/templates/admin/delete_confirmation.html>` template now
   has some additional blocks and scripting hooks to ease customization.
 
 * The chosen options of
-  :attr:`~django.contrib.admin.ModelAdmin.filter_horizontal` and
-  :attr:`~django.contrib.admin.ModelAdmin.filter_vertical` widgets are now
+  :attr:`~thibaud.contrib.admin.ModelAdmin.filter_horizontal` and
+  :attr:`~thibaud.contrib.admin.ModelAdmin.filter_vertical` widgets are now
   filterable.
 
 * The ``admin/base.html`` template now has a new block ``nav-breadcrumbs``
@@ -143,70 +143,70 @@ Minor features
 
 * jQuery is upgraded from version 3.6.0 to 3.6.4.
 
-:mod:`django.contrib.auth`
+:mod:`thibaud.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   390,000 to 600,000.
 
-* :class:`~django.contrib.auth.forms.UserCreationForm` now saves many-to-many
+* :class:`~thibaud.contrib.auth.forms.UserCreationForm` now saves many-to-many
   form fields for a custom user model.
 
-* The new :class:`~django.contrib.auth.forms.BaseUserCreationForm` is now the
+* The new :class:`~thibaud.contrib.auth.forms.BaseUserCreationForm` is now the
   recommended base class for customizing the user creation form.
 
-:mod:`django.contrib.gis`
+:mod:`thibaud.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :doc:`GeoJSON serializer </ref/contrib/gis/serializers>` now outputs the
   ``id`` key for serialized features, which defaults to the primary key of
   objects.
 
-* The :class:`~django.contrib.gis.gdal.GDALRaster` class now supports
+* The :class:`~thibaud.contrib.gis.gdal.GDALRaster` class now supports
   :class:`pathlib.Path`.
 
-* The :class:`~django.contrib.gis.geoip2.GeoIP2` class now supports  ``.mmdb``
+* The :class:`~thibaud.contrib.gis.geoip2.GeoIP2` class now supports  ``.mmdb``
   files downloaded from DB-IP.
 
 * The OpenLayers template widget no longer includes inline CSS (which also
   removes the former ``map_css`` block) to better comply with a strict Content
   Security Policy.
 
-* :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
+* :class:`~thibaud.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
   OpenLayers 7.2.2 (previously 4.6.5).
 
 * The new :lookup:`isempty` lookup and
-  :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
+  :class:`IsEmpty() <thibaud.contrib.gis.db.models.functions.IsEmpty>`
   expression allow filtering empty geometries on PostGIS.
 
-* The new :class:`FromWKB() <django.contrib.gis.db.models.functions.FromWKB>`
-  and :class:`FromWKT() <django.contrib.gis.db.models.functions.FromWKT>`
+* The new :class:`FromWKB() <thibaud.contrib.gis.db.models.functions.FromWKB>`
+  and :class:`FromWKT() <thibaud.contrib.gis.db.models.functions.FromWKT>`
   functions allow creating geometries from Well-known binary (WKB) and
   Well-known text (WKT) representations.
 
-:mod:`django.contrib.postgres`
+:mod:`thibaud.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :lookup:`trigram_strict_word_similar` lookup, and the
   :class:`TrigramStrictWordSimilarity()
-  <django.contrib.postgres.search.TrigramStrictWordSimilarity>` and
+  <thibaud.contrib.postgres.search.TrigramStrictWordSimilarity>` and
   :class:`TrigramStrictWordDistance()
-  <django.contrib.postgres.search.TrigramStrictWordDistance>` expressions allow
+  <thibaud.contrib.postgres.search.TrigramStrictWordDistance>` expressions allow
   using trigram strict word similarity.
 
 * The :lookup:`arrayfield.overlap` lookup now supports ``QuerySet.values()``
   and ``values_list()`` as a right-hand side.
 
-:mod:`django.contrib.sitemaps`
+:mod:`thibaud.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :meth:`.Sitemap.get_languages_for_item` method allows customizing the
   list of languages for which the item is displayed.
 
-:mod:`django.contrib.staticfiles`
+:mod:`thibaud.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
+* :class:`~thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   has experimental support for replacing paths to JavaScript modules in
   ``import`` and ``export`` statements with their hashed counterparts. If you
   want to try it, subclass ``ManifestStaticFilesStorage`` and set the
@@ -238,10 +238,10 @@ Error Reporting
 Forms
 ~~~~~
 
-* :class:`~django.forms.ModelForm` now accepts the new ``Meta`` option
+* :class:`~thibaud.forms.ModelForm` now accepts the new ``Meta`` option
   ``formfield_callback`` to customize form fields.
 
-* :func:`~django.forms.models.modelform_factory` now respects the
+* :func:`~thibaud.forms.models.modelform_factory` now respects the
   ``formfield_callback`` attribute of the ``form``’s ``Meta``.
 
 Internationalization
@@ -252,7 +252,7 @@ Internationalization
 Logging
 ~~~~~~~
 
-* The :ref:`django-db-logger` logger now logs transaction management queries
+* The :ref:`thibaud-db-logger` logger now logs transaction management queries
   (``BEGIN``, ``COMMIT``, and ``ROLLBACK``) at the ``DEBUG`` level.
 
 Management Commands
@@ -277,23 +277,23 @@ Models
   against window functions when performing aggregation.
 
 * :meth:`~.QuerySet.prefetch_related` now supports
-  :class:`~django.db.models.Prefetch` objects with sliced querysets.
+  :class:`~thibaud.db.models.Prefetch` objects with sliced querysets.
 
 * :ref:`Registering lookups <lookup-registration-api>` on
-  :class:`~django.db.models.Field` instances is now supported.
+  :class:`~thibaud.db.models.Field` instances is now supported.
 
-* The new ``robust`` argument for :func:`~django.db.transaction.on_commit`
+* The new ``robust`` argument for :func:`~thibaud.db.transaction.on_commit`
   allows performing actions that can fail after a database transaction is
   successfully committed.
 
-* The new :class:`KT() <django.db.models.fields.json.KT>` expression represents
+* The new :class:`KT() <thibaud.db.models.fields.json.KT>` expression represents
   the text value of a key, index, or path transform of
-  :class:`~django.db.models.JSONField`.
+  :class:`~thibaud.db.models.JSONField`.
 
-* :class:`~django.db.models.functions.Now` now supports microsecond precision
+* :class:`~thibaud.db.models.functions.Now` now supports microsecond precision
   on MySQL and millisecond precision on SQLite.
 
-* :class:`F() <django.db.models.F>` expressions that output ``BooleanField``
+* :class:`F() <thibaud.db.models.F>` expressions that output ``BooleanField``
   can now be negated using ``~F()`` (inversion operator).
 
 * ``Model`` now provides asynchronous versions of some methods that use the
@@ -305,15 +305,15 @@ Models
   :meth:`~.RelatedManager.aclear`, :meth:`~.RelatedManager.aremove`, and
   :meth:`~.RelatedManager.aset`.
 
-* :attr:`CharField.max_length <django.db.models.CharField.max_length>` is no
+* :attr:`CharField.max_length <thibaud.db.models.CharField.max_length>` is no
   longer required to be set on PostgreSQL, which supports unlimited ``VARCHAR``
   columns.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* :class:`~django.http.StreamingHttpResponse` now supports async iterators
-  when Django is served via ASGI.
+* :class:`~thibaud.http.StreamingHttpResponse` now supports async iterators
+  when Thibaud is served via ASGI.
 
 Tests
 ~~~~~
@@ -321,9 +321,9 @@ Tests
 * The :option:`test --debug-sql` option now formats SQL queries with
   ``sqlparse``.
 
-* The :class:`~django.test.RequestFactory`,
-  :class:`~django.test.AsyncRequestFactory`, :class:`~django.test.Client`, and
-  :class:`~django.test.AsyncClient` classes now support the ``headers``
+* The :class:`~thibaud.test.RequestFactory`,
+  :class:`~thibaud.test.AsyncRequestFactory`, :class:`~thibaud.test.Client`, and
+  :class:`~thibaud.test.AsyncClient` classes now support the ``headers``
   parameter, which accepts a dictionary of header names and values. This allows
   a more natural syntax for declaring headers.
 
@@ -340,17 +340,17 @@ Tests
 Utilities
 ~~~~~~~~~
 
-* The new ``encoder`` parameter for :meth:`django.utils.html.json_script`
+* The new ``encoder`` parameter for :meth:`thibaud.utils.html.json_script`
   function allows customizing a JSON encoder class.
 
 * The private internal vendored copy of ``urllib.parse.urlsplit()`` now strips
   ``'\r'``, ``'\n'``, and ``'\t'`` (see :cve:`2022-0391` and :bpo:`43882`).
   This is to protect projects that may be incorrectly using the internal
   ``url_has_allowed_host_and_scheme()`` function, instead of using one of the
-  documented functions for handling URL redirects. The Django functions were
+  documented functions for handling URL redirects. The Thibaud functions were
   not affected.
 
-* The new :func:`django.utils.http.content_disposition_header` function returns
+* The new :func:`thibaud.utils.http.content_disposition_header` function returns
   a ``Content-Disposition`` HTTP header value as specified by :rfc:`6266`.
 
 Validators
@@ -384,19 +384,19 @@ backends.
 Dropped support for MariaDB 10.3
 --------------------------------
 
-Upstream support for MariaDB 10.3 ends in May 2023. Django 4.2 supports MariaDB
+Upstream support for MariaDB 10.3 ends in May 2023. Thibaud 4.2 supports MariaDB
 10.4 and higher.
 
 Dropped support for MySQL 5.7
 -----------------------------
 
-Upstream support for MySQL 5.7 ends in October 2023. Django 4.2 supports MySQL
+Upstream support for MySQL 5.7 ends in October 2023. Thibaud 4.2 supports MySQL
 8 and higher.
 
 Dropped support for PostgreSQL 11
 ---------------------------------
 
-Upstream support for PostgreSQL 11 ends in November 2023. Django 4.2 supports
+Upstream support for PostgreSQL 11 ends in November 2023. Thibaud 4.2 supports
 PostgreSQL 12 and higher.
 
 Setting ``update_fields`` in ``Model.save()`` may now be required
@@ -404,7 +404,7 @@ Setting ``update_fields`` in ``Model.save()`` may now be required
 
 In order to avoid updating unnecessary columns,
 :meth:`.QuerySet.update_or_create` now passes ``update_fields`` to the
-:meth:`Model.save() <django.db.models.Model.save>` calls. As a consequence, any
+:meth:`Model.save() <thibaud.db.models.Model.save>` calls. As a consequence, any
 fields modified in the custom ``save()`` methods should be added to the
 ``update_fields`` keyword argument before calling ``super()``. See
 :ref:`overriding-model-methods` for more details.
@@ -413,7 +413,7 @@ Dropped support for raw aggregations on MySQL
 ---------------------------------------------
 
 MySQL 8+ allows functional dependencies on ``GROUP BY`` columns, so the
-pre-Django 4.2 workaround of grouping by primary keys of the main table is
+pre-Thibaud 4.2 workaround of grouping by primary keys of the main table is
 removed. As a consequence, using ``RawSQL()`` aggregations is no longer
 supported on MySQL as there is no way to determine if such aggregations are
 needed or valid in the ``GROUP BY`` clause. Use :ref:`aggregation-functions`
@@ -422,8 +422,8 @@ instead.
 Miscellaneous
 -------------
 
-* The undocumented ``django.http.multipartparser.parse_header()`` function is
-  removed. Use ``django.utils.http.parse_header_parameters()`` instead.
+* The undocumented ``thibaud.http.multipartparser.parse_header()`` function is
+  removed. Use ``thibaud.utils.http.parse_header_parameters()`` instead.
 
 * :ttag:`{% blocktranslate asvar … %}<blocktranslate>` result is now marked as
   safe for (HTML) output purposes.
@@ -440,7 +440,7 @@ Miscellaneous
   0.3.1.
 
 * The undocumented ``negated`` parameter of the
-  :class:`~django.db.models.Exists` expression is removed.
+  :class:`~thibaud.db.models.Exists` expression is removed.
 
 * The ``is_summary`` argument of the undocumented ``Query.add_annotation()``
   method is removed.
@@ -450,9 +450,9 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.5.2 to
   3.6.0.
 
-* :class:`~django.contrib.auth.forms.UserCreationForm` now rejects usernames
+* :class:`~thibaud.contrib.auth.forms.UserCreationForm` now rejects usernames
   that differ only in case. If you need the previous behavior, use
-  :class:`~django.contrib.auth.forms.BaseUserCreationForm` instead.
+  :class:`~thibaud.contrib.auth.forms.BaseUserCreationForm` instead.
 
 * The minimum supported version of ``mysqlclient`` is increased from 1.4.0 to
   1.4.3.
@@ -469,12 +469,12 @@ Miscellaneous
   3.0.0 to 3.4.0.
 
 * Manually instantiated ``WSGIRequest`` objects must be provided a file-like
-  object for ``wsgi.input``. Previously, Django was more lax than the expected
+  object for ``wsgi.input``. Previously, Thibaud was more lax than the expected
   behavior as specified by the WSGI specification.
 
 * Support for ``PROJ`` < 5 is removed.
 
-* :class:`~django.core.mail.backends.smtp.EmailBackend` now verifies a
+* :class:`~thibaud.core.mail.backends.smtp.EmailBackend` now verifies a
   :py:attr:`hostname <ssl.SSLContext.check_hostname>` and
   :py:attr:`certificates <ssl.SSLContext.verify_mode>`. If you need the
   previous behavior that is less restrictive and not recommended, subclass
@@ -489,7 +489,7 @@ Features deprecated in 4.2
 ---------------------------------------------------------------
 
 The ``Meta.index_together`` option is deprecated in favor of the
-:attr:`~django.db.models.Options.indexes` option.
+:attr:`~thibaud.db.models.Options.indexes` option.
 
 Migrating existing ``index_together`` should be handled as a migration. For
 example::
@@ -511,16 +511,16 @@ Should become::
             indexes = [models.Index(fields=["rank", "name"])]
 
 Running the :djadmin:`makemigrations` command will generate a migration
-containing a :class:`~django.db.migrations.operations.RenameIndex` operation
+containing a :class:`~thibaud.db.migrations.operations.RenameIndex` operation
 which will rename the existing index. Next, consider squashing migrations to
 remove ``index_together`` from historical migrations.
 
 The ``AlterIndexTogether`` migration operation is now officially supported only
-for pre-Django 4.2 migration files. For backward compatibility reasons, it's
+for pre-Thibaud 4.2 migration files. For backward compatibility reasons, it's
 still part of the public API, and there's no plan to deprecate or remove it,
 but it should not be used for new migrations. Use
-:class:`~django.db.migrations.operations.AddIndex` and
-:class:`~django.db.migrations.operations.RemoveIndex` operations instead.
+:class:`~thibaud.db.migrations.operations.AddIndex` and
+:class:`~thibaud.db.migrations.operations.RemoveIndex` operations instead.
 
 Passing encoded JSON string literals to ``JSONField`` is deprecated
 -------------------------------------------------------------------
@@ -555,7 +555,7 @@ Should become::
         JSONBAgg("field", default=[]),
     )
 
-From Django 5.1+ string literals will be implicitly interpreted as JSON string
+From Thibaud 5.1+ string literals will be implicitly interpreted as JSON string
 literals.
 
 Miscellaneous
@@ -569,35 +569,35 @@ Miscellaneous
 * The ``length_is`` template filter is deprecated in favor of :tfilter:`length`
   and the ``==`` operator within an :ttag:`{% if %}<if>` tag. For example
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
     {% if value|length == 4 %}…{% endif %}
     {% if value|length == 4 %}True{% else %}False{% endif %}
 
   instead of:
 
-  .. code-block:: html+django
+  .. code-block:: html+thibaud
 
     {% if value|length_is:4 %}…{% endif %}
     {{ value|length_is:4 }}
 
-* ``django.contrib.auth.hashers.SHA1PasswordHasher``,
-  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
-  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are deprecated.
+* ``thibaud.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``thibaud.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``thibaud.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are deprecated.
 
-* ``django.contrib.postgres.fields.CICharField`` is deprecated in favor of
+* ``thibaud.contrib.postgres.fields.CICharField`` is deprecated in favor of
   ``CharField(db_collation="…")`` with a case-insensitive non-deterministic
   collation.
 
-* ``django.contrib.postgres.fields.CIEmailField`` is deprecated in favor of
+* ``thibaud.contrib.postgres.fields.CIEmailField`` is deprecated in favor of
   ``EmailField(db_collation="…")`` with a case-insensitive non-deterministic
   collation.
 
-* ``django.contrib.postgres.fields.CITextField`` is deprecated in favor of
+* ``thibaud.contrib.postgres.fields.CITextField`` is deprecated in favor of
   ``TextField(db_collation="…")`` with a case-insensitive non-deterministic
   collation.
 
-* ``django.contrib.postgres.fields.CIText`` mixin is deprecated.
+* ``thibaud.contrib.postgres.fields.CIText`` mixin is deprecated.
 
 * The ``map_height`` and ``map_width`` attributes of ``BaseGeometryWidget`` are
   deprecated, use CSS to size map widgets instead.
@@ -617,4 +617,4 @@ Miscellaneous
 * The ``STATICFILES_STORAGE`` setting is deprecated in favor of
   ``STORAGES["staticfiles"]``.
 
-* The ``django.core.files.storage.get_storage_class()`` function is deprecated.
+* The ``thibaud.core.files.storage.get_storage_class()`` function is deprecated.

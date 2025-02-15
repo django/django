@@ -4,8 +4,8 @@
 
 from ctypes import c_void_p, string_at
 
-from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import GEOSFuncFactory
+from thibaud.contrib.gis.geos.error import GEOSException
+from thibaud.contrib.gis.geos.libgeos import GEOSFuncFactory
 
 # Getting the `free` routine used to free the memory allocated for
 # string pointers returned by GEOS.

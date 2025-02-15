@@ -1,11 +1,11 @@
-from django.conf import settings
-from django.contrib.auth import aget_user, get_user, get_user_model
-from django.contrib.auth.models import AnonymousUser, User
-from django.core.exceptions import ImproperlyConfigured
-from django.db import IntegrityError
-from django.http import HttpRequest
-from django.test import TestCase, override_settings
-from django.utils import translation
+from thibaud.conf import settings
+from thibaud.contrib.auth import aget_user, get_user, get_user_model
+from thibaud.contrib.auth.models import AnonymousUser, User
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import IntegrityError
+from thibaud.http import HttpRequest
+from thibaud.test import TestCase, override_settings
+from thibaud.utils import translation
 
 from .models import CustomUser
 

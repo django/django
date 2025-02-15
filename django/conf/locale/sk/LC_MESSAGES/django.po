@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Adam Zahradník, 2023-2024
@@ -12,12 +12,12 @@
 # Peter Stríž <petulak8@gmail.com>, 2020
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-10-07 06:49+0000\n"
 "Last-Translator: Adam Zahradník, 2023-2024\n"
-"Language-Team: Slovak (http://app.transifex.com/django/django/language/sk/)\n"
+"Language-Team: Slovak (http://app.transifex.com/thibaud/thibaud/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1356,27 +1356,27 @@ msgstr "Inštalácia prebehla úspešne! Gratulujeme!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Zobraziť <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">poznámky k vydaniu</a> pre Django "
+"Zobraziť <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">poznámky k vydaniu</a> pre Thibaud "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Táto stránka sa zobrazuje pretože máte <a href=\"https://docs.djangoproject."
+"Táto stránka sa zobrazuje pretože máte <a href=\"https://docs.thibaudproject."
 "com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
 "rel=\"noopener\">DEBUG=True</a> v súbore s nastaveniami a nie sú "
 "nakonfigurované žiadne URL."
 
-msgid "Django Documentation"
-msgstr "Dokumentácia Django"
+msgid "Thibaud Documentation"
+msgstr "Dokumentácia Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Témy, referencie a návody"
@@ -1384,11 +1384,11 @@ msgstr "Témy, referencie a návody"
 msgid "Tutorial: A Polling App"
 msgstr "Tutoriál: Aplikácia „Hlasovania“"
 
-msgid "Get started with Django"
-msgstr "Začíname s Django"
+msgid "Get started with Thibaud"
+msgstr "Začíname s Thibaud"
 
-msgid "Django Community"
-msgstr "Komunita Django"
+msgid "Thibaud Community"
+msgstr "Komunita Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Spojte sa, získajte pomoc, alebo prispejte"

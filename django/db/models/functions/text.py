@@ -1,8 +1,8 @@
-from django.db import NotSupportedError
-from django.db.models.expressions import Func, Value
-from django.db.models.fields import CharField, IntegerField, TextField
-from django.db.models.functions import Cast, Coalesce
-from django.db.models.lookups import Transform
+from thibaud.db import NotSupportedError
+from thibaud.db.models.expressions import Func, Value
+from thibaud.db.models.fields import CharField, IntegerField, TextField
+from thibaud.db.models.functions import Cast, Coalesce
+from thibaud.db.models.lookups import Transform
 
 
 class MySQLSHA2Mixin:

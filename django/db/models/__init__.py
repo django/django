@@ -1,10 +1,10 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import signals
-from django.db.models.aggregates import *  # NOQA
-from django.db.models.aggregates import __all__ as aggregates_all
-from django.db.models.constraints import *  # NOQA
-from django.db.models.constraints import __all__ as constraints_all
-from django.db.models.deletion import (
+from thibaud.core.exceptions import ObjectDoesNotExist
+from thibaud.db.models import signals
+from thibaud.db.models.aggregates import *  # NOQA
+from thibaud.db.models.aggregates import __all__ as aggregates_all
+from thibaud.db.models.constraints import *  # NOQA
+from thibaud.db.models.constraints import __all__ as constraints_all
+from thibaud.db.models.deletion import (
     CASCADE,
     DO_NOTHING,
     PROTECT,
@@ -15,9 +15,9 @@ from django.db.models.deletion import (
     ProtectedError,
     RestrictedError,
 )
-from django.db.models.enums import *  # NOQA
-from django.db.models.enums import __all__ as enums_all
-from django.db.models.expressions import (
+from thibaud.db.models.enums import *  # NOQA
+from thibaud.db.models.enums import __all__ as enums_all
+from thibaud.db.models.expressions import (
     Case,
     Exists,
     Expression,
@@ -36,28 +36,28 @@ from django.db.models.expressions import (
     WindowFrame,
     WindowFrameExclusion,
 )
-from django.db.models.fields import *  # NOQA
-from django.db.models.fields import __all__ as fields_all
-from django.db.models.fields.composite import CompositePrimaryKey
-from django.db.models.fields.files import FileField, ImageField
-from django.db.models.fields.generated import GeneratedField
-from django.db.models.fields.json import JSONField
-from django.db.models.fields.proxy import OrderWrt
-from django.db.models.indexes import *  # NOQA
-from django.db.models.indexes import __all__ as indexes_all
-from django.db.models.lookups import Lookup, Transform
-from django.db.models.manager import Manager
-from django.db.models.query import (
+from thibaud.db.models.fields import *  # NOQA
+from thibaud.db.models.fields import __all__ as fields_all
+from thibaud.db.models.fields.composite import CompositePrimaryKey
+from thibaud.db.models.fields.files import FileField, ImageField
+from thibaud.db.models.fields.generated import GeneratedField
+from thibaud.db.models.fields.json import JSONField
+from thibaud.db.models.fields.proxy import OrderWrt
+from thibaud.db.models.indexes import *  # NOQA
+from thibaud.db.models.indexes import __all__ as indexes_all
+from thibaud.db.models.lookups import Lookup, Transform
+from thibaud.db.models.manager import Manager
+from thibaud.db.models.query import (
     Prefetch,
     QuerySet,
     aprefetch_related_objects,
     prefetch_related_objects,
 )
-from django.db.models.query_utils import FilteredRelation, Q
+from thibaud.db.models.query_utils import FilteredRelation, Q
 
 # Imports that would create circular imports if sorted
-from django.db.models.base import DEFERRED, Model  # isort:skip
-from django.db.models.fields.related import (  # isort:skip
+from thibaud.db.models.base import DEFERRED, Model  # isort:skip
+from thibaud.db.models.fields.related import (  # isort:skip
     ForeignKey,
     ForeignObject,
     OneToOneField,

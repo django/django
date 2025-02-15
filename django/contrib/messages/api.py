@@ -1,5 +1,5 @@
-from django.contrib.messages import constants
-from django.contrib.messages.storage import default_storage
+from thibaud.contrib.messages import constants
+from thibaud.contrib.messages.storage import default_storage
 
 __all__ = (
     "add_message",
@@ -34,7 +34,7 @@ def add_message(request, level, message, extra_tags="", fail_silently=False):
         if not fail_silently:
             raise MessageFailure(
                 "You cannot add messages without installing "
-                "django.contrib.messages.middleware.MessageMiddleware"
+                "thibaud.contrib.messages.middleware.MessageMiddleware"
             )
     else:
         return messages.add(level, message, extra_tags)

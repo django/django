@@ -1,11 +1,11 @@
 import json
 import unittest
 
-from django.core.serializers.base import DeserializationError, DeserializedObject
-from django.core.serializers.json import Deserializer as JsonDeserializer
-from django.core.serializers.jsonl import Deserializer as JsonlDeserializer
-from django.core.serializers.python import Deserializer
-from django.test import SimpleTestCase
+from thibaud.core.serializers.base import DeserializationError, DeserializedObject
+from thibaud.core.serializers.json import Deserializer as JsonDeserializer
+from thibaud.core.serializers.jsonl import Deserializer as JsonlDeserializer
+from thibaud.core.serializers.python import Deserializer
+from thibaud.test import SimpleTestCase
 
 from .models import Author
 
@@ -103,7 +103,7 @@ class TestDeserializer(SimpleTestCase):
 
     @unittest.skipUnless(HAS_YAML, "No yaml library detected")
     def test_yaml_bytes_input(self):
-        from django.core.serializers.pyyaml import Deserializer as YamlDeserializer
+        from thibaud.core.serializers.pyyaml import Deserializer as YamlDeserializer
 
         test_string = """- pk: 1
   model: serializers.author

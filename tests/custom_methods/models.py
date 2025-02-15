@@ -6,7 +6,7 @@ Any method you add to a model will be available to instances.
 
 import datetime
 
-from django.db import models
+from thibaud.db import models
 
 
 class Article(models.Model):
@@ -27,7 +27,7 @@ class Article(models.Model):
         Verbose version of get_articles_from_same_day_1, which does a custom
         database query for the sake of demonstration.
         """
-        from django.db import connection
+        from thibaud.db import connection
 
         with connection.cursor() as cursor:
             cursor.execute(

@@ -1,13 +1,13 @@
 import json
 
-from django.contrib.messages.storage.base import BaseStorage
-from django.contrib.messages.storage.cookie import MessageDecoder, MessageEncoder
-from django.core.exceptions import ImproperlyConfigured
+from thibaud.contrib.messages.storage.base import BaseStorage
+from thibaud.contrib.messages.storage.cookie import MessageDecoder, MessageEncoder
+from thibaud.core.exceptions import ImproperlyConfigured
 
 
 class SessionStorage(BaseStorage):
     """
-    Store messages in the session (that is, django.contrib.sessions).
+    Store messages in the session (that is, thibaud.contrib.sessions).
     """
 
     session_key = "_messages"

@@ -1,4 +1,4 @@
-from django.contrib.admin import (
+from thibaud.contrib.admin import (
     HORIZONTAL,
     VERTICAL,
     AdminSite,
@@ -11,7 +11,7 @@ from django.contrib.admin import (
     register,
     site,
 )
-from django.contrib.gis.admin.options import GISModelAdmin
+from thibaud.contrib.gis.admin.options import GISModelAdmin
 
 __all__ = [
     "HORIZONTAL",

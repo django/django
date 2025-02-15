@@ -4,12 +4,12 @@ from os import path
 from unittest import mock
 from urllib.parse import quote
 
-from django.conf.urls.static import static
-from django.core.exceptions import ImproperlyConfigured
-from django.http import FileResponse, HttpResponseNotModified
-from django.test import SimpleTestCase, override_settings
-from django.utils.http import http_date
-from django.views.static import directory_index, was_modified_since
+from thibaud.conf.urls.static import static
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import FileResponse, HttpResponseNotModified
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.utils.http import http_date
+from thibaud.views.static import directory_index, was_modified_since
 
 from .. import urls
 from ..urls import media_dir
@@ -17,7 +17,7 @@ from ..urls import media_dir
 
 @override_settings(DEBUG=True, ROOT_URLCONF="view_tests.urls")
 class StaticTests(SimpleTestCase):
-    """Tests django views in django/views/static.py"""
+    """Tests thibaud views in thibaud/views/static.py"""
 
     prefix = "site_media"
 
@@ -76,7 +76,7 @@ class StaticTests(SimpleTestCase):
         response = self.client.get(
             "/%s/%s" % (self.prefix, file_name),
             headers={
-                # This is 24h before max Unix time. Remember to fix Django and
+                # This is 24h before max Unix time. Remember to fix Thibaud and
                 # update this test well before 2038 :)
                 "if-modified-since": "Mon, 18 Jan 2038 05:14:07 GMT"
             },
@@ -136,11 +136,11 @@ class StaticTests(SimpleTestCase):
     @override_settings(
         TEMPLATES=[
             {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
                 "OPTIONS": {
                     "loaders": [
                         (
-                            "django.template.loaders.locmem.Loader",
+                            "thibaud.template.loaders.locmem.Loader",
                             {
                                 "static/directory_index.html": "Test index",
                             },
@@ -160,7 +160,7 @@ class StaticTests(SimpleTestCase):
         be opened as utf-8 charset as is the default specified on template
         engines.
         """
-        from django.views.static import Path
+        from thibaud.views.static import Path
 
         with mock.patch.object(Path, "open") as m:
             directory_index(mock.MagicMock(), mock.MagicMock())

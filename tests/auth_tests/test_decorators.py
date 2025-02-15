@@ -1,17 +1,17 @@
 from asgiref.sync import iscoroutinefunction
 
-from django.conf import settings
-from django.contrib.auth import models
-from django.contrib.auth.decorators import (
+from thibaud.conf import settings
+from thibaud.contrib.auth import models
+from thibaud.contrib.auth.decorators import (
     login_not_required,
     login_required,
     permission_required,
     user_passes_test,
 )
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
+from thibaud.core.exceptions import PermissionDenied
+from thibaud.http import HttpResponse
+from thibaud.test import TestCase, override_settings
+from thibaud.test.client import RequestFactory
 
 from .test_views import AuthViewsTestCase
 

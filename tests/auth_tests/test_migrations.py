@@ -1,30 +1,30 @@
 from importlib import import_module
 
-from django.apps import apps
-from django.contrib.auth.models import Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.db import connection, connections
-from django.test import TransactionTestCase
-from django.test.utils import captured_stdout
+from thibaud.apps import apps
+from thibaud.contrib.auth.models import Permission, User
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import connection, connections
+from thibaud.test import TransactionTestCase
+from thibaud.test.utils import captured_stdout
 
 from .models import Proxy, UserProxy
 
 update_proxy_permissions = import_module(
-    "django.contrib.auth.migrations.0011_update_proxy_permissions"
+    "thibaud.contrib.auth.migrations.0011_update_proxy_permissions"
 )
 
 
 class ProxyModelWithDifferentAppLabelTests(TransactionTestCase):
     available_apps = [
         "auth_tests",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
+        "thibaud.contrib.auth",
+        "thibaud.contrib.contenttypes",
     ]
 
     def setUp(self):
         """
         Create proxy permissions with content_type to the concrete model
-        rather than the proxy model (as they were before Django 2.2 and
+        rather than the proxy model (as they were before Thibaud 2.2 and
         migration 11).
         """
         Permission.objects.all().delete()
@@ -105,14 +105,14 @@ class ProxyModelWithDifferentAppLabelTests(TransactionTestCase):
 class ProxyModelWithSameAppLabelTests(TransactionTestCase):
     available_apps = [
         "auth_tests",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
+        "thibaud.contrib.auth",
+        "thibaud.contrib.contenttypes",
     ]
 
     def setUp(self):
         """
         Create proxy permissions with content_type to the concrete model
-        rather than the proxy model (as they were before Django 2.2 and
+        rather than the proxy model (as they were before Thibaud 2.2 and
         migration 11).
         """
         Permission.objects.all().delete()
@@ -219,8 +219,8 @@ class MultiDBProxyModelAppLabelTests(TransactionTestCase):
     databases = {"default", "other"}
     available_apps = [
         "auth_tests",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
+        "thibaud.contrib.auth",
+        "thibaud.contrib.contenttypes",
     ]
 
     def setUp(self):

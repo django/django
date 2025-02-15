@@ -6,7 +6,7 @@ objects corresponding to geographic model fields.
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
 
-from django.db.models.query_utils import DeferredAttribute
+from thibaud.db.models.query_utils import DeferredAttribute
 
 
 class SpatialProxy(DeferredAttribute):

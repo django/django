@@ -1,6 +1,6 @@
-from django.contrib.auth import views as auth_views
-from django.urls import path
-from django.views.generic import RedirectView
+from thibaud.contrib.auth import views as auth_views
+from thibaud.urls import path
+from thibaud.views.generic import RedirectView
 
 from . import views
 from .models import Article, DateArticle

@@ -9,14 +9,14 @@ import warnings
 
 from asgiref.local import Local
 
-from django.apps import apps
-from django.conf import settings
-from django.conf.locale import LANG_INFO
-from django.core.exceptions import AppRegistryNotReady
-from django.core.signals import setting_changed
-from django.dispatch import receiver
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import SafeData, mark_safe
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.conf.locale import LANG_INFO
+from thibaud.core.exceptions import AppRegistryNotReady
+from thibaud.core.signals import setting_changed
+from thibaud.dispatch import receiver
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.safestring import SafeData, mark_safe
 
 from . import to_language, to_locale
 
@@ -72,7 +72,7 @@ def reset_cache(*, setting, **kwargs):
 
 class TranslationCatalog:
     """
-    Simulate a dict for DjangoTranslation._catalog so as multiple catalogs
+    Simulate a dict for ThibaudTranslation._catalog so as multiple catalogs
     with different plural equations are kept separate.
     """
 
@@ -126,7 +126,7 @@ class TranslationCatalog:
         raise KeyError
 
 
-class DjangoTranslation(gettext_module.GNUTranslations):
+class ThibaudTranslation(gettext_module.GNUTranslations):
     """
     Set up the GNUTranslations context with regard to output charset.
 
@@ -136,7 +136,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     different from the requested language.
     """
 
-    domain = "django"
+    domain = "thibaud"
 
     def __init__(self, language, domain=None, localedirs=None):
         """Create a GNUTranslations() using many locale directories"""
@@ -152,11 +152,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         # pluralization: anything except one is pluralized.
         self.plural = lambda n: int(n != 1)
 
-        if self.domain == "django":
+        if self.domain == "thibaud":
             if localedirs is not None:
-                # A module-level cache is used for caching 'django' translations
+                # A module-level cache is used for caching 'thibaud' translations
                 warnings.warn(
-                    "localedirs is ignored when domain is 'django'.", RuntimeWarning
+                    "localedirs is ignored when domain is 'thibaud'.", RuntimeWarning
                 )
                 localedirs = None
             self._init_translation_catalog()
@@ -171,7 +171,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self._add_local_translations()
         if (
             self.__language == settings.LANGUAGE_CODE
-            and self.domain == "django"
+            and self.domain == "thibaud"
             and self._catalog is None
         ):
             # default lang should have at least one translation file available.
@@ -185,7 +185,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._catalog = TranslationCatalog()
 
     def __repr__(self):
-        return "<DjangoTranslation lang:%s>" % self.__language
+        return "<ThibaudTranslation lang:%s>" % self.__language
 
     def _new_gnu_trans(self, localedir, use_null_fallback=True):
         """
@@ -203,7 +203,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         )
 
     def _init_translation_catalog(self):
-        """Create a base catalog using global django translations."""
+        """Create a base catalog using global thibaud translations."""
         settingsfile = sys.modules[settings.__module__].__file__
         localedir = os.path.join(os.path.dirname(settingsfile), "locale")
         translation = self._new_gnu_trans(localedir)
@@ -239,11 +239,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             "en"
         ):
             return
-        if self.domain == "django":
+        if self.domain == "thibaud":
             # Get from cache
             default_translation = translation(settings.LANGUAGE_CODE)
         else:
-            default_translation = DjangoTranslation(
+            default_translation = ThibaudTranslation(
                 settings.LANGUAGE_CODE, domain=self.domain, localedirs=localedirs
             )
         self.add_fallback(default_translation)
@@ -253,7 +253,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         if not getattr(other, "_catalog", None):
             return  # NullTranslations() has no _catalog
         if self._catalog is None:
-            # Take plural and _info from first catalog found (generally Django's).
+            # Take plural and _info from first catalog found (generally Thibaud's).
             self.plural = other.plural
             self._info = other._info.copy()
             self._catalog = TranslationCatalog(other)
@@ -285,11 +285,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
 def translation(language):
     """
-    Return a translation object in the default 'django' domain.
+    Return a translation object in the default 'thibaud' domain.
     """
     global _translations
     if language not in _translations:
-        _translations[language] = DjangoTranslation(language)
+        _translations[language] = ThibaudTranslation(language)
     return _translations[language]
 
 
@@ -468,13 +468,13 @@ def check_for_language(lang_code):
 
     lru_cache should have a maxsize to prevent from memory exhaustion attacks,
     as the provided language codes are taken from the HTTP request. See also
-    <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
+    <https://www.thibaudproject.com/weblog/2007/oct/26/security-fix/>.
     """
     # First, a quick check to make sure lang_code is well-formed (#21458)
     if lang_code is None or not language_code_re.search(lang_code):
         return False
     return any(
-        gettext_module.find("django", path, [to_locale(lang_code)]) is not None
+        gettext_module.find("thibaud", path, [to_locale(lang_code)]) is not None
         for path in all_locale_paths()
     )
 
@@ -502,7 +502,7 @@ def get_supported_language_variant(lang_code, strict=False):
 
     lru_cache should have a maxsize to prevent from memory exhaustion attacks,
     as the provided language codes are taken from the HTTP request. See also
-    <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
+    <https://www.thibaudproject.com/weblog/2007/oct/26/security-fix/>.
     """
     if lang_code:
         # Truncate the language code to a maximum length to avoid potential

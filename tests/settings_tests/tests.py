@@ -4,10 +4,10 @@ import unittest
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
-from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
-from django.test import (
+from thibaud.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import HttpRequest
+from thibaud.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
@@ -15,8 +15,8 @@ from django.test import (
     override_settings,
     signals,
 )
-from django.test.utils import requires_tz_support
-from django.urls import clear_script_prefix, set_script_prefix
+from thibaud.test.utils import requires_tz_support
+from thibaud.urls import clear_script_prefix, set_script_prefix
 
 
 @modify_settings(ITEMS={"prepend": ["b"], "append": ["d"], "remove": ["a", "e"]})
@@ -217,7 +217,7 @@ class SettingsTests(SimpleTestCase):
         self.assertTrue(issubclass(decorated, SimpleTestCase))
 
         with self.assertRaisesMessage(
-            Exception, "Only subclasses of Django SimpleTestCase"
+            Exception, "Only subclasses of Thibaud SimpleTestCase"
         ):
             decorated = override_settings(TEST="override")(UnittestTestCaseSubclass)
 
@@ -333,7 +333,7 @@ class SettingsTests(SimpleTestCase):
             getattr(s, "foo")
 
     @requires_tz_support
-    @mock.patch("django.conf.global_settings.TIME_ZONE", "test")
+    @mock.patch("thibaud.conf.global_settings.TIME_ZONE", "test")
     def test_incorrect_timezone(self):
         with self.assertRaisesMessage(ValueError, "Incorrect timezone setting: test"):
             settings._setup()

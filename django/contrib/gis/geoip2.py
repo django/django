@@ -15,11 +15,11 @@ directory corresponding to settings.GEOIP_PATH.
 import ipaddress
 import socket
 
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_ipv46_address
-from django.utils._os import to_path
-from django.utils.functional import cached_property
+from thibaud.conf import settings
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.validators import validate_ipv46_address
+from thibaud.utils._os import to_path
+from thibaud.utils.functional import cached_property
 
 __all__ = ["HAS_GEOIP2"]
 
@@ -201,7 +201,7 @@ class GeoIP2:
         """
         Return a dictionary with the country code and name when given an
         IP address or a Fully Qualified Domain Name (FQDN). For example, both
-        '24.124.1.80' and 'djangoproject.com' are valid parameters.
+        '24.124.1.80' and 'thibaudproject.com' are valid parameters.
         """
         response = self._query(query, require_city=False)
         return {
@@ -225,6 +225,6 @@ class GeoIP2:
     def geos(self, query):
         "Return a GEOS Point object for the given query."
         # Allows importing and using GeoIP2() when GEOS is not installed.
-        from django.contrib.gis.geos import Point
+        from thibaud.contrib.gis.geos import Point
 
         return Point(self.lon_lat(query), srid=4326)

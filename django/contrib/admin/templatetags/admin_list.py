@@ -1,14 +1,14 @@
 import datetime
 
-from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.utils import (
+from thibaud.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from thibaud.contrib.admin.utils import (
     display_for_field,
     display_for_value,
     get_fields_from_path,
     label_for_field,
     lookup_field,
 )
-from django.contrib.admin.views.main import (
+from thibaud.contrib.admin.views.main import (
     ALL_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
@@ -16,18 +16,18 @@ from django.contrib.admin.views.main import (
     PAGE_VAR,
     SEARCH_VAR,
 )
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
-from django.db.models.constants import LOOKUP_SEP
-from django.template import Library
-from django.template.loader import get_template
-from django.templatetags.static import static
-from django.urls import NoReverseMatch
-from django.utils import formats, timezone
-from django.utils.html import format_html
-from django.utils.safestring import mark_safe
-from django.utils.text import capfirst
-from django.utils.translation import gettext as _
+from thibaud.core.exceptions import ObjectDoesNotExist
+from thibaud.db import models
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.template import Library
+from thibaud.template.loader import get_template
+from thibaud.templatetags.static import static
+from thibaud.urls import NoReverseMatch
+from thibaud.utils import formats, timezone
+from thibaud.utils.html import format_html
+from thibaud.utils.safestring import mark_safe
+from thibaud.utils.text import capfirst
+from thibaud.utils.translation import gettext as _
 
 from .base import InclusionAdminNode
 

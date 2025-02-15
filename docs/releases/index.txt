@@ -2,20 +2,20 @@
 Release notes
 =============
 
-Release notes for the official Django releases. Each release note will tell you
+Release notes for the official Thibaud releases. Each release note will tell you
 what's new in each version, and will also describe any backwards-incompatible
 changes made in that version.
 
-For those :doc:`upgrading to a new version of Django</howto/upgrade-version>`,
+For those :doc:`upgrading to a new version of Thibaud</howto/upgrade-version>`,
 you will need to check all the backwards-incompatible changes and
 :doc:`deprecated features</internals/deprecation>` for each 'final' release
-from the one after your current Django version, up to and including the new
+from the one after your current Thibaud version, up to and including the new
 version.
 
 Final releases
 ==============
 
-Below are release notes through Django |version| and its patch releases. Newer
+Below are release notes through Thibaud |version| and its patch releases. Newer
 versions of the documentation contain the release notes for any later releases.
 
 .. _development_release_notes:
@@ -521,7 +521,7 @@ Pre-1.0 releases
 Security releases
 =================
 
-Whenever a security issue is disclosed via :doc:`Django's security
+Whenever a security issue is disclosed via :doc:`Thibaud's security
 policies </internals/security>`, appropriate release notes are now
 added to all affected release series.
 

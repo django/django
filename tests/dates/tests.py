@@ -1,9 +1,9 @@
 import datetime
 from unittest import skipUnless
 
-from django.core.exceptions import FieldError
-from django.db import connection
-from django.test import TestCase, override_settings
+from thibaud.core.exceptions import FieldError
+from thibaud.db import connection
+from thibaud.test import TestCase, override_settings
 
 from .models import Article, Category, Comment
 

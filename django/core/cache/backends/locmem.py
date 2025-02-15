@@ -4,7 +4,7 @@ import time
 from collections import OrderedDict
 from threading import Lock
 
-from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from thibaud.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 
 # Global in-memory store of cache data. Keyed by name, to provide
 # multiple named local memory caches.

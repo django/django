@@ -1,15 +1,15 @@
 import unittest
 from unittest import mock
 
-from django.core.checks.database import check_database_backends
-from django.db import connection, connections
-from django.test import TestCase
+from thibaud.core.checks.database import check_database_backends
+from thibaud.db import connection, connections
+from thibaud.test import TestCase
 
 
 class DatabaseCheckTests(TestCase):
     databases = {"default", "other"}
 
-    @mock.patch("django.db.backends.base.validation.BaseDatabaseValidation.check")
+    @mock.patch("thibaud.db.backends.base.validation.BaseDatabaseValidation.check")
     def test_database_checks_called(self, mocked_check):
         check_database_backends()
         self.assertFalse(mocked_check.called)

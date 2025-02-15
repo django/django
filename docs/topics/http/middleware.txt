@@ -2,17 +2,17 @@
 Middleware
 ==========
 
-Middleware is a framework of hooks into Django's request/response processing.
-It's a light, low-level "plugin" system for globally altering Django's input
+Middleware is a framework of hooks into Thibaud's request/response processing.
+It's a light, low-level "plugin" system for globally altering Thibaud's input
 or output.
 
 Each middleware component is responsible for doing some specific function. For
-example, Django includes a middleware component,
-:class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, that
+example, Thibaud includes a middleware component,
+:class:`~thibaud.contrib.auth.middleware.AuthenticationMiddleware`, that
 associates users with requests using sessions.
 
 This document explains how middleware works, how you activate middleware, and
-how to write your own middleware. Django ships with some built-in middleware
+how to write your own middleware. Thibaud ships with some built-in middleware
 you can use right out of the box. They're documented in the :doc:`built-in
 middleware reference </ref/middleware>`.
 
@@ -59,7 +59,7 @@ Or it can be written as a class whose instances are callable, like this::
 
             return response
 
-The ``get_response`` callable provided by Django might be the actual view (if
+The ``get_response`` callable provided by Thibaud might be the actual view (if
 this is the last listed middleware) or it might be the next middleware in the
 chain. The current middleware doesn't need to know or care what exactly it is,
 just that it represents whatever comes next.
@@ -84,7 +84,7 @@ Middleware factories must accept a ``get_response`` argument. You can also
 initialize some global state for the middleware. Keep in mind a couple of
 caveats:
 
-* Django initializes your middleware with only the ``get_response`` argument,
+* Thibaud initializes your middleware with only the ``get_response`` argument,
   so you can't define ``__init__()`` as requiring any other arguments.
 
 * Unlike the ``__call__()`` method which is called once per request,
@@ -95,47 +95,47 @@ Marking middleware as unused
 
 It's sometimes useful to determine at startup time whether a piece of
 middleware should be used. In these cases, your middleware's ``__init__()``
-method may raise :exc:`~django.core.exceptions.MiddlewareNotUsed`. Django will
+method may raise :exc:`~thibaud.core.exceptions.MiddlewareNotUsed`. Thibaud will
 then remove that middleware from the middleware process and log a debug message
-to the :ref:`django-request-logger` logger when :setting:`DEBUG` is ``True``.
+to the :ref:`thibaud-request-logger` logger when :setting:`DEBUG` is ``True``.
 
 Activating middleware
 =====================
 
 To activate a middleware component, add it to the :setting:`MIDDLEWARE` list in
-your Django settings.
+your Thibaud settings.
 
 In :setting:`MIDDLEWARE`, each middleware component is represented by a string:
 the full Python path to the middleware factory's class or function name. For
-example, here's the default value created by :djadmin:`django-admin
+example, here's the default value created by :djadmin:`thibaud-admin
 startproject <startproject>`::
 
     MIDDLEWARE = [
-        "django.middleware.security.SecurityMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.common.CommonMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "thibaud.middleware.security.SecurityMiddleware",
+        "thibaud.contrib.sessions.middleware.SessionMiddleware",
+        "thibaud.middleware.common.CommonMiddleware",
+        "thibaud.middleware.csrf.CsrfViewMiddleware",
+        "thibaud.contrib.auth.middleware.AuthenticationMiddleware",
+        "thibaud.contrib.messages.middleware.MessageMiddleware",
+        "thibaud.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
 
-A Django installation doesn't require any middleware — :setting:`MIDDLEWARE`
+A Thibaud installation doesn't require any middleware — :setting:`MIDDLEWARE`
 can be empty, if you'd like — but it's strongly suggested that you at least use
-:class:`~django.middleware.common.CommonMiddleware`.
+:class:`~thibaud.middleware.common.CommonMiddleware`.
 
 The order in :setting:`MIDDLEWARE` matters because a middleware can depend on
 other middleware. For instance,
-:class:`~django.contrib.auth.middleware.AuthenticationMiddleware` stores the
+:class:`~thibaud.contrib.auth.middleware.AuthenticationMiddleware` stores the
 authenticated user in the session; therefore, it must run after
-:class:`~django.contrib.sessions.middleware.SessionMiddleware`. See
-:ref:`middleware-ordering` for some common hints about ordering of Django
+:class:`~thibaud.contrib.sessions.middleware.SessionMiddleware`. See
+:ref:`middleware-ordering` for some common hints about ordering of Thibaud
 middleware classes.
 
 Middleware order and layering
 =============================
 
-During the request phase, before calling the view, Django applies middleware in
+During the request phase, before calling the view, Thibaud applies middleware in
 the order it's defined in :setting:`MIDDLEWARE`, top-down.
 
 You can think of it like an onion: each middleware class is a "layer" that
@@ -163,35 +163,35 @@ can add three other special methods to class-based middleware:
 
 .. method:: process_view(request, view_func, view_args, view_kwargs)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``view_func`` is
-the Python function that Django is about to use. (It's the actual function
+``request`` is an :class:`~thibaud.http.HttpRequest` object. ``view_func`` is
+the Python function that Thibaud is about to use. (It's the actual function
 object, not the name of the function as a string.) ``view_args`` is a list of
 positional arguments that will be passed to the view, and ``view_kwargs`` is a
 dictionary of keyword arguments that will be passed to the view. Neither
 ``view_args`` nor ``view_kwargs`` include the first view argument
 (``request``).
 
-``process_view()`` is called just before Django calls the view.
+``process_view()`` is called just before Thibaud calls the view.
 
-It should return either ``None`` or an :class:`~django.http.HttpResponse`
-object. If it returns ``None``, Django will continue processing this request,
+It should return either ``None`` or an :class:`~thibaud.http.HttpResponse`
+object. If it returns ``None``, Thibaud will continue processing this request,
 executing any other ``process_view()`` middleware and, then, the appropriate
-view. If it returns an :class:`~django.http.HttpResponse` object, Django won't
+view. If it returns an :class:`~thibaud.http.HttpResponse` object, Thibaud won't
 bother calling the appropriate view; it'll apply response middleware to that
-:class:`~django.http.HttpResponse` and return the result.
+:class:`~thibaud.http.HttpResponse` and return the result.
 
 .. note::
 
-    Accessing :attr:`request.POST <django.http.HttpRequest.POST>` inside
+    Accessing :attr:`request.POST <thibaud.http.HttpRequest.POST>` inside
     middleware before the view runs or in ``process_view()`` will prevent any
     view running after the middleware from being able to :ref:`modify the
     upload handlers for the request <modifying_upload_handlers_on_the_fly>`,
     and should normally be avoided.
 
-    The :class:`~django.middleware.csrf.CsrfViewMiddleware` class can be
+    The :class:`~thibaud.middleware.csrf.CsrfViewMiddleware` class can be
     considered an exception, as it provides the
-    :func:`~django.views.decorators.csrf.csrf_exempt` and
-    :func:`~django.views.decorators.csrf.csrf_protect` decorators which allow
+    :func:`~thibaud.views.decorators.csrf.csrf_exempt` and
+    :func:`~thibaud.views.decorators.csrf.csrf_protect` decorators which allow
     views to explicitly control at what point the CSRF validation should occur.
 
 .. _exception-middleware:
@@ -201,13 +201,13 @@ bother calling the appropriate view; it'll apply response middleware to that
 
 .. method:: process_exception(request, exception)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``exception`` is an
+``request`` is an :class:`~thibaud.http.HttpRequest` object. ``exception`` is an
 ``Exception`` object raised by the view function.
 
-Django calls ``process_exception()`` when a view raises an exception.
+Thibaud calls ``process_exception()`` when a view raises an exception.
 ``process_exception()`` should return either ``None`` or an
-:class:`~django.http.HttpResponse` object. If it returns an
-:class:`~django.http.HttpResponse` object, the template response and response
+:class:`~thibaud.http.HttpResponse` object. If it returns an
+:class:`~thibaud.http.HttpResponse` object, the template response and response
 middleware will be applied and the resulting response returned to the
 browser. Otherwise, :ref:`default exception handling <error-views>` kicks in.
 
@@ -223,18 +223,18 @@ middleware won't be called at all.
 
 .. method:: process_template_response(request, response)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is
-the :class:`~django.template.response.TemplateResponse` object (or equivalent)
-returned by a Django view or by a middleware.
+``request`` is an :class:`~thibaud.http.HttpRequest` object. ``response`` is
+the :class:`~thibaud.template.response.TemplateResponse` object (or equivalent)
+returned by a Thibaud view or by a middleware.
 
 ``process_template_response()`` is called just after the view has finished
 executing, if the response instance has a ``render()`` method, indicating that
-it is a :class:`~django.template.response.TemplateResponse` or equivalent.
+it is a :class:`~thibaud.template.response.TemplateResponse` or equivalent.
 
 It must return a response object that implements a ``render`` method. It could
 alter the given ``response`` by changing ``response.template_name`` and
 ``response.context_data``, or it could create and return a brand-new
-:class:`~django.template.response.TemplateResponse` or equivalent.
+:class:`~thibaud.template.response.TemplateResponse` or equivalent.
 
 You don't need to explicitly render responses -- responses will be
 automatically rendered once all template response middleware has been
@@ -246,8 +246,8 @@ includes ``process_template_response()``.
 Dealing with streaming responses
 ================================
 
-Unlike :class:`~django.http.HttpResponse`,
-:class:`~django.http.StreamingHttpResponse` does not have a ``content``
+Unlike :class:`~thibaud.http.HttpResponse`,
+:class:`~thibaud.http.StreamingHttpResponse` does not have a ``content``
 attribute. As a result, middleware can no longer assume that all responses
 will have a ``content`` attribute. If they need access to the content, they
 must test for streaming responses and adjust their behavior accordingly::
@@ -267,16 +267,16 @@ must test for streaming responses and adjust their behavior accordingly::
             for chunk in content:
                 yield alter_content(chunk)
 
-:class:`~django.http.StreamingHttpResponse` allows both synchronous and
+:class:`~thibaud.http.StreamingHttpResponse` allows both synchronous and
 asynchronous iterators. The wrapping function must match. Check
 :attr:`StreamingHttpResponse.is_async
-<django.http.StreamingHttpResponse.is_async>` if your middleware needs to
+<thibaud.http.StreamingHttpResponse.is_async>` if your middleware needs to
 support both types of iterator.
 
 Exception handling
 ==================
 
-Django automatically converts exceptions raised by the view or by middleware
+Thibaud automatically converts exceptions raised by the view or by middleware
 into an appropriate HTTP response with an error status code. :ref:`Certain
 exceptions <error-views>` are converted to 4xx status codes, while an unknown
 exception is converted to a 500 status code.
@@ -288,9 +288,9 @@ calling its ``get_response`` callable. Middleware don't need to worry about
 wrapping their call to ``get_response`` in a ``try/except`` and handling an
 exception that might have been raised by a later middleware or the view. Even
 if the very next middleware in the chain raises an
-:class:`~django.http.Http404` exception, for example, your middleware won't see
-that exception; instead it will get an :class:`~django.http.HttpResponse`
-object with a :attr:`~django.http.HttpResponse.status_code` of 404.
+:class:`~thibaud.http.Http404` exception, for example, your middleware won't see
+that exception; instead it will get an :class:`~thibaud.http.HttpResponse`
+object with a :attr:`~thibaud.http.HttpResponse.status_code` of 404.
 
 You can set :setting:`DEBUG_PROPAGATE_EXCEPTIONS` to ``True`` to skip this
 conversion and propagate exceptions upward.
@@ -301,10 +301,10 @@ Asynchronous support
 ====================
 
 Middleware can support any combination of synchronous and asynchronous
-requests. Django will adapt requests to fit the middleware's requirements if it
+requests. Thibaud will adapt requests to fit the middleware's requirements if it
 cannot support both, but at a performance penalty.
 
-By default, Django assumes that your middleware is capable of handling only
+By default, Thibaud assumes that your middleware is capable of handling only
 synchronous requests. To change these assumptions, set the following attributes
 on your middleware factory function or class:
 
@@ -315,15 +315,15 @@ on your middleware factory function or class:
   asynchronous requests. Defaults to ``False``.
 
 If your middleware has both ``sync_capable = True`` and
-``async_capable = True``, then Django will pass it the request without
+``async_capable = True``, then Thibaud will pass it the request without
 converting it. In this case, you can work out if your middleware will receive
 async requests by checking if the ``get_response`` object you are passed is a
 coroutine function, using ``asgiref.sync.iscoroutinefunction``.
 
-The ``django.utils.decorators`` module contains
-:func:`~django.utils.decorators.sync_only_middleware`,
-:func:`~django.utils.decorators.async_only_middleware`, and
-:func:`~django.utils.decorators.sync_and_async_middleware` decorators that
+The ``thibaud.utils.decorators`` module contains
+:func:`~thibaud.utils.decorators.sync_only_middleware`,
+:func:`~thibaud.utils.decorators.async_only_middleware`, and
+:func:`~thibaud.utils.decorators.sync_and_async_middleware` decorators that
 allow you to apply these flags to middleware factory functions.
 
 The returned callable must match the sync or async nature of the
@@ -332,13 +332,13 @@ return a coroutine function (``async def``).
 
 ``process_view``, ``process_template_response`` and ``process_exception``
 methods, if they are provided, should also be adapted to match the sync/async
-mode. However, Django will individually adapt them as required if you do not,
+mode. However, Thibaud will individually adapt them as required if you do not,
 at an additional performance penalty.
 
 Here's an example of how to create a middleware function that supports both::
 
     from asgiref.sync import iscoroutinefunction
-    from django.utils.decorators import sync_and_async_middleware
+    from thibaud.utils.decorators import sync_and_async_middleware
 
 
     @sync_and_async_middleware
@@ -364,7 +364,7 @@ Here's an example of how to create a middleware function that supports both::
 
     If you declare a hybrid middleware that supports both synchronous and
     asynchronous calls, the kind of call you get may not match the underlying
-    view. Django will optimize the middleware call stack to have as few
+    view. Thibaud will optimize the middleware call stack to have as few
     sync/async transitions as possible.
 
     Thus, even if you are wrapping an async view, you may be called in sync
@@ -392,16 +392,16 @@ instances are correctly marked as coroutine functions::
 
 .. _upgrading-middleware:
 
-Upgrading pre-Django 1.10-style middleware
+Upgrading pre-Thibaud 1.10-style middleware
 ==========================================
 
-.. class:: django.utils.deprecation.MiddlewareMixin
+.. class:: thibaud.utils.deprecation.MiddlewareMixin
     :module:
 
-Django provides ``django.utils.deprecation.MiddlewareMixin`` to ease creating
+Thibaud provides ``thibaud.utils.deprecation.MiddlewareMixin`` to ease creating
 middleware classes that are compatible with both :setting:`MIDDLEWARE` and the
 old ``MIDDLEWARE_CLASSES``, and support synchronous and asynchronous requests.
-All middleware classes included with Django are compatible with both settings.
+All middleware classes included with Thibaud are compatible with both settings.
 
 The mixin provides an ``__init__()`` method that requires a ``get_response``
 argument and stores it in ``self.get_response``.
@@ -415,7 +415,7 @@ The ``__call__()`` method:
 #. Returns the response.
 
 If used with ``MIDDLEWARE_CLASSES``, the ``__call__()`` method will
-never be used; Django calls ``process_request()`` and ``process_response()``
+never be used; Thibaud calls ``process_request()`` and ``process_response()``
 directly.
 
 In most cases, inheriting from this mixin will be sufficient to make an
@@ -440,7 +440,7 @@ These are the behavioral differences between using :setting:`MIDDLEWARE` and
    exceptions raised from a middleware ``process_request`` method. Under
    :setting:`MIDDLEWARE`, ``process_exception`` applies only to exceptions
    raised from the view (or from the ``render`` method of a
-   :class:`~django.template.response.TemplateResponse`). Exceptions raised from
+   :class:`~thibaud.template.response.TemplateResponse`). Exceptions raised from
    a middleware are converted to the appropriate HTTP response and then passed
    to the next middleware.
 
@@ -448,7 +448,7 @@ These are the behavioral differences between using :setting:`MIDDLEWARE` and
    an exception, the ``process_response`` methods of all earlier middleware are
    skipped and a ``500 Internal Server Error`` HTTP response is always
    returned (even if the exception raised was e.g. an
-   :class:`~django.http.Http404`). Under :setting:`MIDDLEWARE`, an exception
+   :class:`~thibaud.http.Http404`). Under :setting:`MIDDLEWARE`, an exception
    raised from a middleware will immediately be converted to the appropriate
    HTTP response, and then the next middleware in line will see that
    response. Middleware are never skipped due to a middleware raising an

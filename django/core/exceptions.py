@@ -1,10 +1,10 @@
 """
-Global Django exception classes.
+Global Thibaud exception classes.
 """
 
 import operator
 
-from django.utils.hashable import make_hashable
+from thibaud.utils.hashable import make_hashable
 
 
 class FieldDoesNotExist(Exception):
@@ -14,7 +14,7 @@ class FieldDoesNotExist(Exception):
 
 
 class AppRegistryNotReady(Exception):
-    """The django.apps registry is not populated yet"""
+    """The thibaud.apps registry is not populated yet"""
 
     pass
 
@@ -117,7 +117,7 @@ class MiddlewareNotUsed(Exception):
 
 
 class ImproperlyConfigured(Exception):
-    """Django is somehow improperly configured"""
+    """Thibaud is somehow improperly configured"""
 
     pass
 

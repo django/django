@@ -1,9 +1,9 @@
 import datetime
 
-from django.db import models
-from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import requires_tz_support
-from django.utils import timezone
+from thibaud.db import models
+from thibaud.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
+from thibaud.test.utils import requires_tz_support
+from thibaud.utils import timezone
 
 from .models import DateTimeModel
 

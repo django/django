@@ -1,10 +1,10 @@
 from unittest import mock
 
-from django.conf import settings
-from django.db import connection, models
-from django.db.models.functions import Lower, Upper
-from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import isolate_apps
+from thibaud.conf import settings
+from thibaud.db import connection, models
+from thibaud.db.models.functions import Lower, Upper
+from thibaud.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
+from thibaud.test.utils import isolate_apps
 
 from .models import Book, ChildModel1, ChildModel2
 
@@ -148,7 +148,7 @@ class SimpleIndexesTests(SimpleTestCase):
     def test_expressions_with_opclasses(self):
         msg = (
             "Index.opclasses cannot be used with expressions. Use "
-            "django.contrib.postgres.indexes.OpClass() instead."
+            "thibaud.contrib.postgres.indexes.OpClass() instead."
         )
         with self.assertRaisesMessage(ValueError, msg):
             models.Index(
@@ -213,7 +213,7 @@ class SimpleIndexesTests(SimpleTestCase):
         index = models.Index(fields=["title"], db_tablespace="idx_tbls")
         index.set_name_with_model(Book)
         path, args, kwargs = index.deconstruct()
-        self.assertEqual(path, "django.db.models.Index")
+        self.assertEqual(path, "thibaud.db.models.Index")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
@@ -232,7 +232,7 @@ class SimpleIndexesTests(SimpleTestCase):
         )
         index.set_name_with_model(Book)
         path, args, kwargs = index.deconstruct()
-        self.assertEqual(path, "django.db.models.Index")
+        self.assertEqual(path, "thibaud.db.models.Index")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
@@ -251,7 +251,7 @@ class SimpleIndexesTests(SimpleTestCase):
         )
         index.set_name_with_model(Book)
         path, args, kwargs = index.deconstruct()
-        self.assertEqual(path, "django.db.models.Index")
+        self.assertEqual(path, "thibaud.db.models.Index")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
@@ -265,7 +265,7 @@ class SimpleIndexesTests(SimpleTestCase):
     def test_deconstruct_with_expressions(self):
         index = models.Index(Upper("title"), name="book_func_idx")
         path, args, kwargs = index.deconstruct()
-        self.assertEqual(path, "django.db.models.Index")
+        self.assertEqual(path, "thibaud.db.models.Index")
         self.assertEqual(args, (Upper("title"),))
         self.assertEqual(kwargs, {"name": "book_func_idx"})
 

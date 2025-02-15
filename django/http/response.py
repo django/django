@@ -13,17 +13,17 @@ from urllib.parse import urlsplit
 
 from asgiref.sync import async_to_sync, sync_to_async
 
-from django.conf import settings
-from django.core import signals, signing
-from django.core.exceptions import DisallowedRedirect
-from django.core.serializers.json import DjangoJSONEncoder
-from django.http.cookie import SimpleCookie
-from django.utils import timezone
-from django.utils.datastructures import CaseInsensitiveMapping
-from django.utils.encoding import iri_to_uri
-from django.utils.functional import cached_property
-from django.utils.http import content_disposition_header, http_date
-from django.utils.regex_helper import _lazy_re_compile
+from thibaud.conf import settings
+from thibaud.core import signals, signing
+from thibaud.core.exceptions import DisallowedRedirect
+from thibaud.core.serializers.json import ThibaudJSONEncoder
+from thibaud.http.cookie import SimpleCookie
+from thibaud.utils import timezone
+from thibaud.utils.datastructures import CaseInsensitiveMapping
+from thibaud.utils.encoding import iri_to_uri
+from thibaud.utils.functional import cached_property
+from thibaud.utils.http import content_disposition_header, http_date
+from thibaud.utils.regex_helper import _lazy_re_compile
 
 _charset_from_content_type_re = _lazy_re_compile(
     r";\s*charset=(?P<charset>[^\s;]+)", re.I
@@ -726,7 +726,7 @@ class JsonResponse(HttpResponse):
       are allowed to be passed due to a security flaw before ECMAScript 5. See
       the ``safe`` parameter for more information.
     :param encoder: Should be a json encoder class. Defaults to
-      ``django.core.serializers.json.DjangoJSONEncoder``.
+      ``thibaud.core.serializers.json.ThibaudJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
       to ``True``.
     :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
@@ -735,7 +735,7 @@ class JsonResponse(HttpResponse):
     def __init__(
         self,
         data,
-        encoder=DjangoJSONEncoder,
+        encoder=ThibaudJSONEncoder,
         safe=True,
         json_dumps_params=None,
         **kwargs,

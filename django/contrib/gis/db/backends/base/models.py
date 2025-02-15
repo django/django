@@ -1,5 +1,5 @@
-from django.contrib.gis import gdal
-from django.utils.functional import cached_property
+from thibaud.contrib.gis import gdal
+from thibaud.utils.functional import cached_property
 
 
 class SpatialRefSysMixin:

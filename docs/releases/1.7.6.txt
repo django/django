@@ -1,16 +1,16 @@
 ==========================
-Django 1.7.6 release notes
+Thibaud 1.7.6 release notes
 ==========================
 
 *March 9, 2015*
 
-Django 1.7.6 fixes a security issue and several bugs in 1.7.5.
+Thibaud 1.7.6 fixes a security issue and several bugs in 1.7.5.
 
 Mitigated an XSS attack via properties in ``ModelAdmin.readonly_fields``
 ========================================================================
 
 The :attr:`ModelAdmin.readonly_fields
-<django.contrib.admin.ModelAdmin.readonly_fields>` attribute in the Django
+<thibaud.contrib.admin.ModelAdmin.readonly_fields>` attribute in the Thibaud
 admin allows displaying model fields and model attributes. While the former
 were correctly escaped, the latter were not. Thus untrusted content could be
 injected into the admin, presenting an exploitation vector for XSS attacks.

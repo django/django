@@ -5,9 +5,9 @@ Base file upload handler classes, and the built-in concrete subclasses
 import os
 from io import BytesIO
 
-from django.conf import settings
-from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
-from django.utils.module_loading import import_string
+from thibaud.conf import settings
+from thibaud.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
+from thibaud.utils.module_loading import import_string
 
 __all__ = [
     "UploadFileException",
@@ -36,7 +36,7 @@ class StopUpload(UploadFileException):
 
     def __init__(self, connection_reset=False):
         """
-        If ``connection_reset`` is ``True``, Django knows will halt the upload
+        If ``connection_reset`` is ``True``, Thibaud knows will halt the upload
         without consuming the rest of the upload. This will cause the browser to
         show a "connection reset" error.
         """
@@ -241,10 +241,10 @@ def load_handler(path, *args, **kwargs):
     Given a path to a handler, return an instance of that handler.
 
     E.g.::
-        >>> from django.http import HttpRequest
+        >>> from thibaud.http import HttpRequest
         >>> request = HttpRequest()
         >>> load_handler(
-        ...     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+        ...     'thibaud.core.files.uploadhandler.TemporaryFileUploadHandler',
         ...     request,
         ... )
         <TemporaryFileUploadHandler object at 0x...>

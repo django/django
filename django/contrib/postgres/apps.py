@@ -1,13 +1,13 @@
-from django.apps import AppConfig
-from django.core.signals import setting_changed
-from django.db import connections
-from django.db.backends.postgresql.psycopg_any import RANGE_TYPES
-from django.db.backends.signals import connection_created
-from django.db.migrations.writer import MigrationWriter
-from django.db.models import CharField, OrderBy, TextField
-from django.db.models.functions import Collate
-from django.db.models.indexes import IndexExpression
-from django.utils.translation import gettext_lazy as _
+from thibaud.apps import AppConfig
+from thibaud.core.signals import setting_changed
+from thibaud.db import connections
+from thibaud.db.backends.postgresql.psycopg_any import RANGE_TYPES
+from thibaud.db.backends.signals import connection_created
+from thibaud.db.migrations.writer import MigrationWriter
+from thibaud.db.models import CharField, OrderBy, TextField
+from thibaud.db.models.functions import Collate
+from thibaud.db.models.indexes import IndexExpression
+from thibaud.utils.translation import gettext_lazy as _
 
 from .indexes import OpClass
 from .lookups import (
@@ -23,13 +23,13 @@ from .signals import register_type_handlers
 
 def uninstall_if_needed(setting, value, enter, **kwargs):
     """
-    Undo the effects of PostgresConfig.ready() when django.contrib.postgres
+    Undo the effects of PostgresConfig.ready() when thibaud.contrib.postgres
     is "uninstalled" by override_settings().
     """
     if (
         not enter
         and setting == "INSTALLED_APPS"
-        and "django.contrib.postgres" not in set(value)
+        and "thibaud.contrib.postgres" not in set(value)
     ):
         connection_created.disconnect(register_type_handlers)
         CharField._unregister_lookup(Unaccent)
@@ -50,7 +50,7 @@ def uninstall_if_needed(setting, value, enter, **kwargs):
 
 
 class PostgresConfig(AppConfig):
-    name = "django.contrib.postgres"
+    name = "thibaud.contrib.postgres"
     verbose_name = _("PostgreSQL extensions")
 
     def ready(self):
@@ -60,11 +60,11 @@ class PostgresConfig(AppConfig):
             if conn.vendor == "postgresql":
                 conn.introspection.data_types_reverse.update(
                     {
-                        3904: "django.contrib.postgres.fields.IntegerRangeField",
-                        3906: "django.contrib.postgres.fields.DecimalRangeField",
-                        3910: "django.contrib.postgres.fields.DateTimeRangeField",
-                        3912: "django.contrib.postgres.fields.DateRangeField",
-                        3926: "django.contrib.postgres.fields.BigIntegerRangeField",
+                        3904: "thibaud.contrib.postgres.fields.IntegerRangeField",
+                        3906: "thibaud.contrib.postgres.fields.DecimalRangeField",
+                        3910: "thibaud.contrib.postgres.fields.DateTimeRangeField",
+                        3912: "thibaud.contrib.postgres.fields.DateRangeField",
+                        3926: "thibaud.contrib.postgres.fields.BigIntegerRangeField",
                     }
                 )
                 if conn.connection is not None:

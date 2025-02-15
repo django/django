@@ -1,5 +1,5 @@
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import ClearableFileInput, FileField, Form, MultiWidget
+from thibaud.core.files.uploadedfile import SimpleUploadedFile
+from thibaud.forms import ClearableFileInput, FileField, Form, MultiWidget
 
 from .base import WidgetTest
 
@@ -133,7 +133,7 @@ class ClearableFileInputTest(WidgetTest):
             )
 
         form = TestForm()
-        with self.assertNoLogs("django.template", "DEBUG"):
+        with self.assertNoLogs("thibaud.template", "DEBUG"):
             form.render()
 
     def test_render_as_subwidget(self):

@@ -4,9 +4,9 @@ from functools import wraps
 
 from asgiref.sync import iscoroutinefunction, sync_to_async
 
-from django.conf import settings
-from django.core import signals
-from django.core.exceptions import (
+from thibaud.conf import settings
+from thibaud.core import signals
+from thibaud.core.exceptions import (
     BadRequest,
     PermissionDenied,
     RequestDataTooBig,
@@ -14,11 +14,11 @@ from django.core.exceptions import (
     TooManyFieldsSent,
     TooManyFilesSent,
 )
-from django.http import Http404
-from django.http.multipartparser import MultiPartParserError
-from django.urls import get_resolver, get_urlconf
-from django.utils.log import log_response
-from django.views import debug
+from thibaud.http import Http404
+from thibaud.http.multipartparser import MultiPartParserError
+from thibaud.urls import get_resolver, get_urlconf
+from thibaud.utils.log import log_response
+from thibaud.views import debug
 
 
 def convert_exception_to_response(get_response):
@@ -119,7 +119,7 @@ def response_for_exception(request, exc):
         # The request logger receives events for any problematic request
         # The security logger receives events for all SuspiciousOperations
         security_logger = logging.getLogger(
-            "django.security.%s" % exc.__class__.__name__
+            "thibaud.security.%s" % exc.__class__.__name__
         )
         security_logger.error(
             str(exc),

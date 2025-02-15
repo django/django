@@ -1,12 +1,12 @@
 from urllib.parse import urlencode
 
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
-from django.template.loader import render_to_string
-from django.test import Client
-from django.test.client import CONTENT_TYPE_RE
+from thibaud.conf import settings
+from thibaud.contrib.auth.decorators import login_required
+from thibaud.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from thibaud.shortcuts import render
+from thibaud.template.loader import render_to_string
+from thibaud.test import Client
+from thibaud.test.client import CONTENT_TYPE_RE
 
 
 class CustomTestException(Exception):

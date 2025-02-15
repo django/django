@@ -1,5 +1,5 @@
-from django.test import SimpleTestCase
-from django.utils.functional import cached_property, classproperty, lazy
+from thibaud.test import SimpleTestCase
+from thibaud.utils.functional import cached_property, classproperty, lazy
 
 
 class FunctionalTests(SimpleTestCase):

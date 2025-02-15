@@ -1,5 +1,5 @@
-from django.db import IntegrityError
-from django.test import TestCase, skipUnlessDBFeature
+from thibaud.db import IntegrityError
+from thibaud.test import TestCase, skipUnlessDBFeature
 
 from .models import Post, Tenant, User
 

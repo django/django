@@ -27,36 +27,36 @@ from urllib.request import url2pathname
 
 from asgiref.sync import async_to_sync, iscoroutinefunction
 
-from django.apps import apps
-from django.conf import settings
-from django.core import mail
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.core.files import locks
-from django.core.handlers.wsgi import WSGIHandler, get_path_info
-from django.core.management import call_command
-from django.core.management.color import no_style
-from django.core.management.sql import emit_post_migrate_signal
-from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
-from django.core.signals import setting_changed
-from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
-from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
-from django.forms.fields import CharField
-from django.http import QueryDict
-from django.http.request import split_domain_port, validate_host
-from django.test.client import AsyncClient, Client
-from django.test.html import HTMLParseError, parse_html
-from django.test.signals import template_rendered
-from django.test.utils import (
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core import mail
+from thibaud.core.exceptions import ImproperlyConfigured, ValidationError
+from thibaud.core.files import locks
+from thibaud.core.handlers.wsgi import WSGIHandler, get_path_info
+from thibaud.core.management import call_command
+from thibaud.core.management.color import no_style
+from thibaud.core.management.sql import emit_post_migrate_signal
+from thibaud.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
+from thibaud.core.signals import setting_changed
+from thibaud.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from thibaud.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
+from thibaud.forms.fields import CharField
+from thibaud.http import QueryDict
+from thibaud.http.request import split_domain_port, validate_host
+from thibaud.test.client import AsyncClient, Client
+from thibaud.test.html import HTMLParseError, parse_html
+from thibaud.test.signals import template_rendered
+from thibaud.test.utils import (
     CaptureQueriesContext,
     ContextList,
     compare_xml,
     modify_settings,
     override_settings,
 )
-from django.utils.functional import classproperty
-from django.views.static import serve
+from thibaud.utils.functional import classproperty
+from thibaud.views.static import serve
 
-logger = logging.getLogger("django.test")
+logger = logging.getLogger("thibaud.test")
 
 __all__ = (
     "TestCase",
@@ -295,7 +295,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def __call__(self, result=None):
         """
-        Wrapper around default __call__ method to perform common Django test
+        Wrapper around default __call__ method to perform common Thibaud test
         set up. This means that user-defined TestCases aren't required to
         include a call to super().setUp().
         """
@@ -471,14 +471,14 @@ class SimpleTestCase(unittest.TestCase):
                 path = urljoin(response.request["PATH_INFO"], path)
 
             if fetch_redirect_response:
-                # netloc might be empty, or in cases where Django tests the
+                # netloc might be empty, or in cases where Thibaud tests the
                 # HTTP scheme, the convention is for netloc to be 'testserver'.
                 # Trust both as "internal" URLs here.
                 domain, port = split_domain_port(netloc)
                 if domain and not validate_host(domain, settings.ALLOWED_HOSTS):
                     raise ValueError(
                         "The test client is unable to fetch remote URLs (got %s). "
-                        "If the host is served by Django, add '%s' to ALLOWED_HOSTS. "
+                        "If the host is served by Thibaud, add '%s' to ALLOWED_HOSTS. "
                         "Otherwise, use "
                         "assertRedirects(..., fetch_redirect_response=False)."
                         % (url, domain)
@@ -638,7 +638,7 @@ class SimpleTestCase(unittest.TestCase):
         if not hasattr(response, attribute):
             raise ValueError(
                 f"{method_name}() is only usable on responses fetched using "
-                "the Django test Client."
+                "the Thibaud test Client."
             )
 
     def _assert_form_error(self, form, field, errors, msg_prefix, form_repr):
@@ -1081,7 +1081,7 @@ class TransactionTestCase(SimpleTestCase):
         "and silence this failure."
     )
 
-    # If transactions aren't available, Django will serialize the database
+    # If transactions aren't available, Thibaud will serialize the database
     # contents into a fixture during setup and flush and reload them
     # during teardown (as flush does not restore data from migrations).
     # This can be slow; this flag allows enabling on a per-case basis.
@@ -1647,7 +1647,7 @@ class FSFilesHandler(WSGIHandler):
         return url2pathname(relative_url)
 
     def get_response(self, request):
-        from django.http import Http404
+        from thibaud.http import Http404
 
         if self._should_handle(request.path):
             try:
@@ -1659,7 +1659,7 @@ class FSFilesHandler(WSGIHandler):
     def serve(self, request):
         os_rel_path = self.file_path(request.path)
         os_rel_path = posixpath.normpath(unquote(os_rel_path))
-        # Emulate behavior of django.contrib.staticfiles.views.serve() when it
+        # Emulate behavior of thibaud.contrib.staticfiles.views.serve() when it
         # invokes staticfiles' finders functionality.
         # TODO: Modify if/when that internal API is refactored
         final_rel_path = os_rel_path.replace("\\", "/").lstrip("/")

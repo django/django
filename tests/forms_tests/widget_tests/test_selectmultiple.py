@@ -1,4 +1,4 @@
-from django.forms import ChoiceField, Form, SelectMultiple
+from thibaud.forms import ChoiceField, Form, SelectMultiple
 
 from .base import WidgetTest
 

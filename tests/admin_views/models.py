@@ -2,14 +2,14 @@ import datetime
 import tempfile
 import uuid
 
-from django.contrib import admin
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
-from django.db import models
-from django.utils import timezone
+from thibaud.contrib import admin
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.files.storage import FileSystemStorage
+from thibaud.db import models
+from thibaud.utils import timezone
 
 
 class Section(models.Model):

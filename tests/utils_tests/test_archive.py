@@ -4,9 +4,9 @@ import sys
 import tempfile
 import unittest
 
-from django.core.exceptions import SuspiciousOperation
-from django.test import SimpleTestCase
-from django.utils import archive
+from thibaud.core.exceptions import SuspiciousOperation
+from thibaud.test import SimpleTestCase
+from thibaud.utils import archive
 
 try:
     import bz2  # NOQA

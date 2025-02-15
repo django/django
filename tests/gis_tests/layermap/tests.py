@@ -4,17 +4,17 @@ from copy import copy
 from decimal import Decimal
 from pathlib import Path
 
-from django.conf import settings
-from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.utils.layermapping import (
+from thibaud.conf import settings
+from thibaud.contrib.gis.gdal import DataSource
+from thibaud.contrib.gis.utils.layermapping import (
     InvalidDecimal,
     InvalidString,
     LayerMapError,
     LayerMapping,
     MissingForeignKey,
 )
-from django.db import connection
-from django.test import TestCase, override_settings
+from thibaud.db import connection
+from thibaud.test import TestCase, override_settings
 
 from .models import (
     City,

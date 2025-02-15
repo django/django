@@ -1,6 +1,6 @@
-from django.template.defaultfilters import slice_filter
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from thibaud.template.defaultfilters import slice_filter
+from thibaud.test import SimpleTestCase
+from thibaud.utils.safestring import mark_safe
 
 from ..utils import setup
 

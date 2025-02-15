@@ -2,21 +2,21 @@ import datetime
 from io import StringIO
 from wsgiref.util import FileWrapper
 
-from django import forms
-from django.contrib import admin
-from django.contrib.admin import BooleanFieldListFilter
-from django.contrib.admin.views.main import ChangeList
-from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.contrib.auth.models import Group, User
-from django.core.exceptions import ValidationError
-from django.core.mail import EmailMessage
-from django.db import models
-from django.forms.models import BaseModelFormSet
-from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
-from django.urls import path
-from django.utils.html import format_html
-from django.utils.safestring import mark_safe
-from django.views.decorators.common import no_append_slash
+from thibaud import forms
+from thibaud.contrib import admin
+from thibaud.contrib.admin import BooleanFieldListFilter
+from thibaud.contrib.admin.views.main import ChangeList
+from thibaud.contrib.auth.admin import GroupAdmin, UserAdmin
+from thibaud.contrib.auth.models import Group, User
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.mail import EmailMessage
+from thibaud.db import models
+from thibaud.forms.models import BaseModelFormSet
+from thibaud.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from thibaud.urls import path
+from thibaud.utils.html import format_html
+from thibaud.utils.safestring import mark_safe
+from thibaud.views.decorators.common import no_append_slash
 
 from .forms import MediaActionForm
 from .models import (
@@ -407,7 +407,7 @@ def external_mail(modeladmin, request, selected):
 
 @admin.action(description="Redirect to (Awesome action)")
 def redirect_to(modeladmin, request, selected):
-    from django.http import HttpResponseRedirect
+    from thibaud.http import HttpResponseRedirect
 
     return HttpResponseRedirect("/some-where-else/")
 

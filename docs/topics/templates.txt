@@ -2,39 +2,39 @@
 Templates
 =========
 
-.. module:: django.template
-    :synopsis: Django's template system
+.. module:: thibaud.template
+    :synopsis: Thibaud's template system
 
-Being a web framework, Django needs a convenient way to generate HTML
+Being a web framework, Thibaud needs a convenient way to generate HTML
 dynamically. The most common approach relies on templates. A template contains
 the static parts of the desired HTML output as well as some special syntax
 describing how dynamic content will be inserted. For a hands-on example of
 creating HTML pages with templates, see :doc:`Tutorial 3 </intro/tutorial03>`.
 
-A Django project can be configured with one or several template engines (or
-even zero if you don't use templates). Django ships built-in backends for its
-own template system, creatively called the Django template language (DTL), and
+A Thibaud project can be configured with one or several template engines (or
+even zero if you don't use templates). Thibaud ships built-in backends for its
+own template system, creatively called the Thibaud template language (DTL), and
 for the popular alternative Jinja2_. Backends for other template languages may
 be available from third-parties. You can also write your own custom backend,
 see :doc:`Custom template backend </howto/custom-template-backend>`
 
-Django defines a standard API for loading and rendering templates regardless
+Thibaud defines a standard API for loading and rendering templates regardless
 of the backend. Loading consists of finding the template for a given identifier
 and preprocessing it, usually compiling it to an in-memory representation.
 Rendering means interpolating the template with context data and returning the
 resulting string.
 
-The :doc:`Django template language </ref/templates/language>` is Django's own
-template system. Until Django 1.8 it was the only built-in option available.
+The :doc:`Thibaud template language </ref/templates/language>` is Thibaud's own
+template system. Until Thibaud 1.8 it was the only built-in option available.
 It's a good template library even though it's fairly opinionated and sports a
 few idiosyncrasies. If you don't have a pressing reason to choose another
 backend, you should use the DTL, especially if you're writing a pluggable
-application and you intend to distribute templates. Django's contrib apps that
-include templates, like :doc:`django.contrib.admin </ref/contrib/admin/index>`,
+application and you intend to distribute templates. Thibaud's contrib apps that
+include templates, like :doc:`thibaud.contrib.admin </ref/contrib/admin/index>`,
 use the DTL.
 
 For historical reasons, both the generic support for template engines and the
-implementation of the Django template language live in the ``django.template``
+implementation of the Thibaud template language live in the ``thibaud.template``
 namespace.
 
 .. warning::
@@ -46,7 +46,7 @@ namespace.
 
 .. _template-language-intro:
 
-The Django template language
+The Thibaud template language
 ============================
 
 Syntax
@@ -54,18 +54,18 @@ Syntax
 
 .. admonition:: About this section
 
-    This is an overview of the Django template language's syntax. For details
+    This is an overview of the Thibaud template language's syntax. For details
     see the :doc:`language syntax reference </ref/templates/language>`.
 
-A Django template is a text document or a Python string marked-up using the
-Django template language. Some constructs are recognized and interpreted by the
+A Thibaud template is a text document or a Python string marked-up using the
+Thibaud template language. Some constructs are recognized and interpreted by the
 template engine. The main ones are variables and tags.
 
 A template is rendered with a context. Rendering replaces variables with their
 values, which are looked up in the context, and executes tags. Everything else
 is output as is.
 
-The syntax of the Django template language involves four constructs.
+The syntax of the Thibaud template language involves four constructs.
 
 Variables
 ~~~~~~~~~
@@ -75,21 +75,21 @@ mapping keys to values.
 
 Variables are surrounded by ``{{`` and ``}}`` like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     My first name is {{ first_name }}. My last name is {{ last_name }}.
 
 With a context of ``{'first_name': 'John', 'last_name': 'Doe'}``, this template
 renders to:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     My first name is John. My last name is Doe.
 
 Dictionary lookup, attribute lookup and list-index lookups are implemented with
 a dot notation:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ my_dict.key }}
     {{ my_object.attribute }}
@@ -109,19 +109,19 @@ content from a database, or even enable access to other template tags.
 
 Tags are surrounded by ``{%`` and ``%}`` like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% csrf_token %}
 
 Most tags accept arguments:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% cycle 'odd' 'even' %}
 
 Some tags require beginning and ending tags:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if user.is_authenticated %}Hello, {{ user.username }}.{% endif %}
 
@@ -136,20 +136,20 @@ Filters transform the values of variables and tag arguments.
 
 They look like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
-     {{ django|title }}
+     {{ thibaud|title }}
 
-With a context of ``{'django': 'the web framework for perfectionists with
+With a context of ``{'thibaud': 'the web framework for perfectionists with
 deadlines'}``, this template renders to:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     The Web Framework For Perfectionists With Deadlines
 
 Some filters take an argument:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {{ my_date|date:"Y-m-d" }}
 
@@ -162,7 +162,7 @@ Comments
 
 Comments look like this:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {# this won't be rendered #}
 
@@ -173,63 +173,63 @@ Components
 
 .. admonition:: About this section
 
-    This is an overview of the Django template language's APIs. For details
+    This is an overview of the Thibaud template language's APIs. For details
     see the :doc:`API reference </ref/templates/api>`.
 
 Engine
 ~~~~~~
 
-:class:`django.template.Engine` encapsulates an instance of the Django
+:class:`thibaud.template.Engine` encapsulates an instance of the Thibaud
 template system. The main reason for instantiating an
-:class:`~django.template.Engine` directly is to use the Django template
-language outside of a Django project.
+:class:`~thibaud.template.Engine` directly is to use the Thibaud template
+language outside of a Thibaud project.
 
-:class:`django.template.backends.django.DjangoTemplates` is a thin wrapper
-adapting :class:`django.template.Engine` to Django's template backend API.
+:class:`thibaud.template.backends.thibaud.ThibaudTemplates` is a thin wrapper
+adapting :class:`thibaud.template.Engine` to Thibaud's template backend API.
 
 Template
 ~~~~~~~~
 
-:class:`django.template.Template` represents a compiled template. Templates are
+:class:`thibaud.template.Template` represents a compiled template. Templates are
 obtained with :meth:`.Engine.get_template` or :meth:`.Engine.from_string`.
 
-Likewise ``django.template.backends.django.Template`` is a thin wrapper
-adapting :class:`django.template.Template` to the common template API.
+Likewise ``thibaud.template.backends.thibaud.Template`` is a thin wrapper
+adapting :class:`thibaud.template.Template` to the common template API.
 
 Context
 ~~~~~~~
 
-:class:`django.template.Context` holds some metadata in addition to the context
+:class:`thibaud.template.Context` holds some metadata in addition to the context
 data. It is passed to :meth:`.Template.render` for rendering a template.
 
-:class:`django.template.RequestContext` is a subclass of
-:class:`~django.template.Context` that stores the current
-:class:`~django.http.HttpRequest` and runs template context processors.
+:class:`thibaud.template.RequestContext` is a subclass of
+:class:`~thibaud.template.Context` that stores the current
+:class:`~thibaud.http.HttpRequest` and runs template context processors.
 
 The common API doesn't have an equivalent concept. Context data is passed in a
-plain :class:`dict` and the current :class:`~django.http.HttpRequest` is passed
+plain :class:`dict` and the current :class:`~thibaud.http.HttpRequest` is passed
 separately if needed.
 
 Loaders
 ~~~~~~~
 
 Template loaders are responsible for locating templates, loading them, and
-returning :class:`~django.template.Template` objects.
+returning :class:`~thibaud.template.Template` objects.
 
-Django provides several :ref:`built-in template loaders <template-loaders>`
+Thibaud provides several :ref:`built-in template loaders <template-loaders>`
 and supports :ref:`custom template loaders <custom-template-loaders>`.
 
 Context processors
 ~~~~~~~~~~~~~~~~~~
 
 Context processors are functions that receive the current
-:class:`~django.http.HttpRequest` as an argument and return a :class:`dict` of
+:class:`~thibaud.http.HttpRequest` as an argument and return a :class:`dict` of
 data to be added to the rendering context.
 
 Their main use is to add common data shared by all templates to the context
 without repeating code in every view.
 
-Django provides many :ref:`built-in context processors <context-processors>`,
+Thibaud provides many :ref:`built-in context processors <context-processors>`,
 and you can implement your own additional context processors, too.
 
 .. _template-engines:
@@ -247,7 +247,7 @@ more useful value::
 
     TEMPLATES = [
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "DIRS": [],
             "APP_DIRS": True,
             "OPTIONS": {
@@ -257,9 +257,9 @@ more useful value::
     ]
 
 :setting:`BACKEND <TEMPLATES-BACKEND>` is a dotted Python path to a template
-engine class implementing Django's template backend API. The built-in backends
-are :class:`django.template.backends.django.DjangoTemplates` and
-:class:`django.template.backends.jinja2.Jinja2`.
+engine class implementing Thibaud's template backend API. The built-in backends
+are :class:`thibaud.template.backends.thibaud.ThibaudTemplates` and
+:class:`thibaud.template.backends.jinja2.Jinja2`.
 
 Since most engines load templates from files, the top-level configuration for
 each engine contains two common settings:
@@ -282,9 +282,9 @@ backend with different options. In that case you should define a unique
 Usage
 -----
 
-.. module:: django.template.loader
+.. module:: thibaud.template.loader
 
-The ``django.template.loader`` module defines two functions to load templates.
+The ``thibaud.template.loader`` module defines two functions to load templates.
 
 .. function:: get_template(template_name, using=None)
 
@@ -296,9 +296,9 @@ The ``django.template.loader`` module defines two functions to load templates.
 
     ``get_template()`` tries each template engine in order until one succeeds.
     If the template cannot be found, it raises
-    :exc:`~django.template.TemplateDoesNotExist`. If the template is found but
+    :exc:`~thibaud.template.TemplateDoesNotExist`. If the template is found but
     contains invalid syntax, it raises
-    :exc:`~django.template.TemplateSyntaxError`.
+    :exc:`~thibaud.template.TemplateSyntaxError`.
 
     How templates are searched and loaded depends on each engine's backend and
     configuration.
@@ -312,10 +312,10 @@ The ``django.template.loader`` module defines two functions to load templates.
     list of template names. It tries each name in order and returns the first
     template that exists.
 
-.. currentmodule:: django.template
+.. currentmodule:: thibaud.template
 
 If loading a template fails, the following two exceptions, defined in
-``django.template``, may be raised:
+``thibaud.template``, may be raised:
 
 .. exception:: TemplateDoesNotExist(msg, tried=None, backend=None, chain=None)
 
@@ -333,9 +333,9 @@ If loading a template fails, the following two exceptions, defined in
         ``status`` is a string with the reason the template wasn't found.
 
     ``chain``
-        A list of intermediate :exc:`~django.template.TemplateDoesNotExist`
+        A list of intermediate :exc:`~thibaud.template.TemplateDoesNotExist`
         exceptions raised when trying to load a template. This is used by
-        functions, such as :func:`~django.template.loader.get_template`, that
+        functions, such as :func:`~thibaud.template.loader.get_template`, that
         try to load a given template from multiple engines.
 
 .. exception:: TemplateSyntaxError(msg)
@@ -345,7 +345,7 @@ If loading a template fails, the following two exceptions, defined in
 ``Template`` objects returned by ``get_template()`` and ``select_template()``
 must provide a ``render()`` method with the following signature:
 
-.. currentmodule:: django.template.backends.base
+.. currentmodule:: thibaud.template.backends.base
 
 .. method:: Template.render(context=None, request=None)
 
@@ -354,7 +354,7 @@ must provide a ``render()`` method with the following signature:
     If ``context`` is provided, it must be a :class:`dict`. If it isn't
     provided, the engine will render the template with an empty context.
 
-    If ``request`` is provided, it must be an :class:`~django.http.HttpRequest`.
+    If ``request`` is provided, it must be an :class:`~thibaud.http.HttpRequest`.
     Then the engine must make it, as well as the CSRF token, available in the
     template. How this is achieved is up to each backend.
 
@@ -363,42 +363,42 @@ Here's an example of the search algorithm. For this example the
 
     TEMPLATES = [
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "DIRS": [
                 "/home/html/example.com",
                 "/home/html/default",
             ],
         },
         {
-            "BACKEND": "django.template.backends.jinja2.Jinja2",
+            "BACKEND": "thibaud.template.backends.jinja2.Jinja2",
             "DIRS": [
                 "/home/html/jinja2",
             ],
         },
     ]
 
-If you call ``get_template('story_detail.html')``, here are the files Django
+If you call ``get_template('story_detail.html')``, here are the files Thibaud
 will look for, in order:
 
-* ``/home/html/example.com/story_detail.html`` (``'django'`` engine)
-* ``/home/html/default/story_detail.html`` (``'django'`` engine)
+* ``/home/html/example.com/story_detail.html`` (``'thibaud'`` engine)
+* ``/home/html/default/story_detail.html`` (``'thibaud'`` engine)
 * ``/home/html/jinja2/story_detail.html`` (``'jinja2'`` engine)
 
 If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
-here's what Django will look for:
+here's what Thibaud will look for:
 
-* ``/home/html/example.com/story_253_detail.html`` (``'django'`` engine)
-* ``/home/html/default/story_253_detail.html`` (``'django'`` engine)
+* ``/home/html/example.com/story_253_detail.html`` (``'thibaud'`` engine)
+* ``/home/html/default/story_253_detail.html`` (``'thibaud'`` engine)
 * ``/home/html/jinja2/story_253_detail.html`` (``'jinja2'`` engine)
-* ``/home/html/example.com/story_detail.html`` (``'django'`` engine)
-* ``/home/html/default/story_detail.html`` (``'django'`` engine)
+* ``/home/html/example.com/story_detail.html`` (``'thibaud'`` engine)
+* ``/home/html/default/story_detail.html`` (``'thibaud'`` engine)
 * ``/home/html/jinja2/story_detail.html`` (``'jinja2'`` engine)
 
-When Django finds a template that exists, it stops looking.
+When Thibaud finds a template that exists, it stops looking.
 
-.. admonition:: Use ``django.template.loader.select_template()`` for more flexibility
+.. admonition:: Use ``thibaud.template.loader.select_template()`` for more flexibility
 
-    You can use :func:`~django.template.loader.select_template()` for flexible
+    You can use :func:`~thibaud.template.loader.select_template()` for flexible
     template loading. For example, if you've written a news story and want
     some stories to have custom templates, use something like
     ``select_template(['story_%s_detail.html' % story.id,
@@ -408,7 +408,7 @@ When Django finds a template that exists, it stops looking.
 
 It's possible -- and preferable -- to organize templates in subdirectories
 inside each directory containing templates. The convention is to make a
-subdirectory for each Django app, with subdirectories within those
+subdirectory for each Thibaud app, with subdirectories within those
 subdirectories as needed.
 
 Do this for your own sanity. Storing all templates in the root level of a
@@ -421,14 +421,14 @@ To load a template that's within a subdirectory, use a slash, like so::
 Using the same :setting:`TEMPLATES` option as above, this will attempt to load
 the following templates:
 
-* ``/home/html/example.com/news/story_detail.html`` (``'django'`` engine)
-* ``/home/html/default/news/story_detail.html`` (``'django'`` engine)
+* ``/home/html/example.com/news/story_detail.html`` (``'thibaud'`` engine)
+* ``/home/html/default/news/story_detail.html`` (``'thibaud'`` engine)
 * ``/home/html/jinja2/news/story_detail.html`` (``'jinja2'`` engine)
 
-.. currentmodule:: django.template.loader
+.. currentmodule:: thibaud.template.loader
 
 In addition, to cut down on the repetitive nature of loading and rendering
-templates, Django provides a shortcut function which automates the process.
+templates, Thibaud provides a shortcut function which automates the process.
 
 .. function:: render_to_string(template_name, context=None, request=None, using=None)
 
@@ -438,14 +438,14 @@ templates, Django provides a shortcut function which automates the process.
 
     ``template_name``
         The name of the template to load and render. If it's a list of template
-        names, Django uses :func:`select_template` instead of
+        names, Thibaud uses :func:`select_template` instead of
         :func:`get_template` to find the template.
 
     ``context``
         A :class:`dict` to be used as the template's context for rendering.
 
     ``request``
-        An optional :class:`~django.http.HttpRequest` that will be available
+        An optional :class:`~thibaud.http.HttpRequest` that will be available
         during the template's rendering process.
 
     ``using``
@@ -454,46 +454,46 @@ templates, Django provides a shortcut function which automates the process.
 
     Usage example::
 
-        from django.template.loader import render_to_string
+        from thibaud.template.loader import render_to_string
 
         rendered = render_to_string("my_template.html", {"foo": "bar"})
 
-See also the :func:`~django.shortcuts.render()` shortcut which calls
+See also the :func:`~thibaud.shortcuts.render()` shortcut which calls
 :func:`render_to_string()` and feeds the result into an
-:class:`~django.http.HttpResponse` suitable for returning from a view.
+:class:`~thibaud.http.HttpResponse` suitable for returning from a view.
 
 Finally, you can use configured engines directly:
 
 .. data:: engines
 
-    Template engines are available in ``django.template.engines``::
+    Template engines are available in ``thibaud.template.engines``::
 
-        from django.template import engines
+        from thibaud.template import engines
 
-        django_engine = engines["django"]
-        template = django_engine.from_string("Hello {{ name }}!")
+        thibaud_engine = engines["thibaud"]
+        template = thibaud_engine.from_string("Hello {{ name }}!")
 
-    The lookup key — ``'django'`` in this example — is the engine's
+    The lookup key — ``'thibaud'`` in this example — is the engine's
     :setting:`NAME <TEMPLATES-NAME>`.
 
-.. module:: django.template.backends
+.. module:: thibaud.template.backends
 
 Built-in backends
 -----------------
 
-.. module:: django.template.backends.django
+.. module:: thibaud.template.backends.thibaud
 
-.. class:: DjangoTemplates
+.. class:: ThibaudTemplates
 
 Set :setting:`BACKEND <TEMPLATES-BACKEND>` to
-``'django.template.backends.django.DjangoTemplates'`` to configure a Django
+``'thibaud.template.backends.thibaud.ThibaudTemplates'`` to configure a Thibaud
 template engine.
 
-When :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` is ``True``, ``DjangoTemplates``
+When :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` is ``True``, ``ThibaudTemplates``
 engines look for templates in the ``templates`` subdirectory of installed
 applications. This generic name was kept for backwards-compatibility.
 
-``DjangoTemplates`` engines accept the following :setting:`OPTIONS
+``ThibaudTemplates`` engines accept the following :setting:`OPTIONS
 <TEMPLATES-OPTIONS>`:
 
 * ``'autoescape'``: a boolean that controls whether HTML autoescaping is
@@ -512,7 +512,7 @@ applications. This generic name was kept for backwards-compatibility.
 
   It defaults to an empty list.
 
-  See :class:`~django.template.RequestContext` for more information.
+  See :class:`~thibaud.template.RequestContext` for more information.
 
 * ``'debug'``: a boolean that turns on/off template debug mode. If it is
   ``True``, the fancy error page will display a detailed report for any
@@ -550,7 +550,7 @@ applications. This generic name was kept for backwards-compatibility.
       OPTIONS = {
           "libraries": {
               "myapp_tags": "path.to.myapp.tags",
-              "admin.urls": "django.contrib.admin.templatetags.admin_urls",
+              "admin.urls": "thibaud.contrib.admin.templatetags.admin_urls",
           },
       }
 
@@ -567,7 +567,7 @@ applications. This generic name was kept for backwards-compatibility.
   Tags and filters from built-in libraries can be used without first calling
   the :ttag:`{% load %} <load>` tag.
 
-.. module:: django.template.backends.jinja2
+.. module:: thibaud.template.backends.jinja2
 
 .. class:: Jinja2
 
@@ -578,15 +578,15 @@ Requires Jinja2_ to be installed:
     $ python -m pip install Jinja2
 
 Set :setting:`BACKEND <TEMPLATES-BACKEND>` to
-``'django.template.backends.jinja2.Jinja2'`` to configure a Jinja2_ engine.
+``'thibaud.template.backends.jinja2.Jinja2'`` to configure a Jinja2_ engine.
 
 When :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` is ``True``, ``Jinja2`` engines
 look for templates in the ``jinja2`` subdirectory of installed applications.
 
 The most important entry in :setting:`OPTIONS <TEMPLATES-OPTIONS>` is
 ``'environment'``. It's a dotted Python path to a callable returning a Jinja2
-environment. It defaults to ``'jinja2.Environment'``. Django invokes that
-callable and passes other options as keyword arguments. Furthermore, Django
+environment. It defaults to ``'jinja2.Environment'``. Thibaud invokes that
+callable and passes other options as keyword arguments. Furthermore, Thibaud
 adds defaults that differ from Jinja2's for a few options:
 
 * ``'autoescape'``: ``True``
@@ -607,7 +607,7 @@ adds defaults that differ from Jinja2's for a few options:
 
   .. admonition:: Using context processors with Jinja2 templates is discouraged.
 
-    Context processors are useful with Django templates because Django templates
+    Context processors are useful with Thibaud templates because Thibaud templates
     don't support calling functions with arguments. Since Jinja2 doesn't have
     that limitation, it's recommended to put the function that you would use as a
     context processor in the global variables available to the template using
@@ -618,7 +618,7 @@ adds defaults that differ from Jinja2's for a few options:
 
       {{ function(request) }}
 
-    Some Django templates context processors return a fixed value. For Jinja2
+    Some Thibaud templates context processors return a fixed value. For Jinja2
     templates, this layer of indirection isn't necessary since you can add
     constants directly in ``jinja2.Environment``.
 
@@ -632,17 +632,17 @@ adds defaults that differ from Jinja2's for a few options:
     more in line with the design of Jinja2.
 
 The default configuration is purposefully kept to a minimum. If a template is
-rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),
+rendered with a request (e.g. when using :py:func:`~thibaud.shortcuts.render`),
 the ``Jinja2`` backend adds the globals ``request``, ``csrf_input``, and
 ``csrf_token`` to the context. Apart from that, this backend doesn't create a
-Django-flavored environment. It doesn't know about Django filters and tags.
-In order to use Django-specific APIs, you must configure them into the
+Thibaud-flavored environment. It doesn't know about Thibaud filters and tags.
+In order to use Thibaud-specific APIs, you must configure them into the
 environment.
 
 For example, you can create ``myproject/jinja2.py`` with this content::
 
-    from django.templatetags.static import static
-    from django.urls import reverse
+    from thibaud.templatetags.static import static
+    from thibaud.urls import reverse
 
     from jinja2 import Environment
 
@@ -667,12 +667,12 @@ Then you could use the following constructs in Jinja2 templates:
 
     <a href="{{ url('admin:index') }}">Administration</a>
 
-The concepts of tags and filters exist both in the Django template language
+The concepts of tags and filters exist both in the Thibaud template language
 and in Jinja2 but they're used differently. Since Jinja2 supports passing
 arguments to callables in templates, many features that require a template tag
-or filter in Django templates can be achieved by calling a function in Jinja2
+or filter in Thibaud templates can be achieved by calling a function in Jinja2
 templates, as shown in the example above. Jinja2's global namespace removes the
-need for template context processors. The Django template language doesn't have
+need for template context processors. The Thibaud template language doesn't have
 an equivalent of Jinja2 tests.
 
 .. _Jinja2: https://jinja.palletsprojects.com/

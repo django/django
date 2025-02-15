@@ -7,12 +7,12 @@ import mimetypes
 import posixpath
 from pathlib import Path
 
-from django.http import FileResponse, Http404, HttpResponse, HttpResponseNotModified
-from django.template import Context, Engine, TemplateDoesNotExist, loader
-from django.utils._os import safe_join
-from django.utils.http import http_date, parse_http_date
-from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
+from thibaud.http import FileResponse, Http404, HttpResponse, HttpResponseNotModified
+from thibaud.template import Context, Engine, TemplateDoesNotExist, loader
+from thibaud.utils._os import safe_join
+from thibaud.utils.http import http_date, parse_http_date
+from thibaud.utils.translation import gettext as _
+from thibaud.utils.translation import gettext_lazy
 
 
 def builtin_template_path(name):
@@ -31,7 +31,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 
     To use, put a URL pattern such as::
 
-        from django.views.static import serve
+        from thibaud.views.static import serve
 
         path('<path:path>', serve, {'document_root': '/path/to/my/files/'})
 
@@ -78,7 +78,7 @@ def directory_index(path, fullpath):
         )
     except TemplateDoesNotExist:
         with builtin_template_path("directory_index.html").open(encoding="utf-8") as fh:
-            t = Engine(libraries={"i18n": "django.templatetags.i18n"}).from_string(
+            t = Engine(libraries={"i18n": "thibaud.templatetags.i18n"}).from_string(
                 fh.read()
             )
         c = Context()

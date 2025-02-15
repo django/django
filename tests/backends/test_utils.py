@@ -1,15 +1,15 @@
-"""Tests for django.db.backends.utils"""
+"""Tests for thibaud.db.backends.utils"""
 
 from decimal import Decimal, Rounded
 
-from django.db import NotSupportedError, connection
-from django.db.backends.utils import (
+from thibaud.db import NotSupportedError, connection
+from thibaud.db.backends.utils import (
     format_number,
     split_identifier,
     split_tzname_delta,
     truncate_name,
 )
-from django.test import (
+from thibaud.test import (
     SimpleTestCase,
     TransactionTestCase,
     skipIfDBFeature,

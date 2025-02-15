@@ -1,6 +1,6 @@
-from django.db import connection, models
-from django.db.models.functions import Lower
-from django.utils.functional import SimpleLazyObject
+from thibaud.db import connection, models
+from thibaud.db.models.functions import Lower
+from thibaud.utils.functional import SimpleLazyObject
 
 
 class People(models.Model):

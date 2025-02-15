@@ -8,8 +8,8 @@
  model and the `SDO_COORD_REF_SYS` is used for the SpatialRefSys model.
 """
 
-from django.contrib.gis.db import models
-from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
+from thibaud.contrib.gis.db import models
+from thibaud.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 
 
 class OracleGeometryColumns(models.Model):

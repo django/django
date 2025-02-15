@@ -1,8 +1,8 @@
 =================================
-Django version 0.96 release notes
+Thibaud version 0.96 release notes
 =================================
 
-Welcome to Django 0.96!
+Welcome to Thibaud 0.96!
 
 The primary goal for 0.96 is a cleanup and stabilization of the features
 introduced in 0.95. There have been a few small `backwards-incompatible
@@ -12,10 +12,10 @@ and should not require major changes to existing applications.
 However, we're also releasing 0.96 now because we have a set of
 backwards-incompatible changes scheduled for the near future. Once
 completed, they will involve some code changes for application
-developers, so we recommend that you stick with Django 0.96 until the
+developers, so we recommend that you stick with Thibaud 0.96 until the
 next official release; then you'll be able to upgrade in one step
 instead of needing to make incremental changes to keep up with the
-development version of Django.
+development version of Thibaud.
 
 Backwards-incompatible changes
 ==============================
@@ -27,14 +27,14 @@ The following changes may require you to update your code when you switch from
 -------------------------------
 
 Due to a bug in older versions of the ``MySQLdb`` Python module (which
-Django uses to connect to MySQL databases), Django's MySQL backend now
+Thibaud uses to connect to MySQL databases), Thibaud's MySQL backend now
 requires version 1.2.1p2 or higher of ``MySQLdb``, and will raise
 exceptions if you attempt to use an older version.
 
 If you're currently unable to upgrade your copy of ``MySQLdb`` to meet
 this requirement, a separate, backwards-compatible backend, called
-"mysql_old", has been added to Django. To use this backend, change
-the ``DATABASE_ENGINE`` setting in your Django settings file from this::
+"mysql_old", has been added to Thibaud. To use this backend, change
+the ``DATABASE_ENGINE`` setting in your Thibaud settings file from this::
 
     DATABASE_ENGINE = "mysql"
 
@@ -46,7 +46,7 @@ However, we strongly encourage MySQL users to upgrade to a more recent
 version of ``MySQLdb`` as soon as possible, The "mysql_old" backend is
 provided only to ease this transition, and is considered deprecated;
 aside from any necessary security fixes, it will not be actively
-maintained, and it will be removed in a future release of Django.
+maintained, and it will be removed in a future release of Thibaud.
 
 Also, note that some features, like the new ``DATABASE_OPTIONS``
 setting (see the :doc:`databases documentation </ref/databases>` for details),
@@ -56,7 +56,7 @@ are only available on the "mysql" backend, and will not be made available for
 Database constraint names changed
 ---------------------------------
 
-The format of the constraint names Django generates for foreign key
+The format of the constraint names Thibaud generates for foreign key
 references have changed slightly. These names are generally only used
 when it is not possible to put the reference directly on the affected
 column, so they are not always visible.
@@ -85,7 +85,7 @@ support:
 
 * There are new ``dumpdata`` and ``loaddata`` commands which, as
   you might expect, will dump and load data to/from the
-  database. These commands can operate against any of Django's
+  database. These commands can operate against any of Thibaud's
   supported serialization formats.
 
 * The ``sqlinitialdata`` command has been renamed to ``sqlcustom`` to
@@ -97,7 +97,7 @@ support:
 Backslash escaping changed
 --------------------------
 
-The Django database API now escapes backslashes given as query parameters. If
+The Thibaud database API now escapes backslashes given as query parameters. If
 you have any database API code that matches backslashes, and it was working before
 (despite the lack of escaping), you'll have to change your code to "unescape" the
 slashes one level.
@@ -131,37 +131,37 @@ most notable changes in this release.
 New forms library
 -----------------
 
-``django.newforms`` is Django's new form-handling library. It's a
-replacement for ``django.forms``, the old form/manipulator/validation
+``thibaud.newforms`` is Thibaud's new form-handling library. It's a
+replacement for ``thibaud.forms``, the old form/manipulator/validation
 framework.  Both APIs are available in 0.96, but over the next two
 releases we plan to switch completely to the new forms system, and
 deprecate and remove the old system.
 
 There are three elements to this transition:
 
-* We've copied the current ``django.forms`` to
-  ``django.oldforms``. This allows you to upgrade your code *now*
+* We've copied the current ``thibaud.forms`` to
+  ``thibaud.oldforms``. This allows you to upgrade your code *now*
   rather than waiting for the backwards-incompatible change and
   rushing to fix your code after the fact.  Just change your
   import statements like this::
 
-      from django import forms  # 0.95-style
-      from django import oldforms as forms  # 0.96-style
+      from thibaud import forms  # 0.95-style
+      from thibaud import oldforms as forms  # 0.96-style
 
-* The next official release of Django will move the current
-  ``django.newforms`` to ``django.forms``. This will be a
+* The next official release of Thibaud will move the current
+  ``thibaud.newforms`` to ``thibaud.forms``. This will be a
   backwards-incompatible change, and anyone still using the old
-  version of ``django.forms`` at that time will need to change
+  version of ``thibaud.forms`` at that time will need to change
   their import statements as described above.
 
 * The next release after that will completely remove
-  ``django.oldforms``.
+  ``thibaud.oldforms``.
 
 Although the ``newforms`` library will continue to evolve, it's ready for use
 for most common cases. We recommend that anyone new to form handling skip the
 old forms system and start with the new.
 
-For more information about ``django.newforms``, read the :doc:`newforms
+For more information about ``thibaud.newforms``, read the :doc:`newforms
 documentation </topics/forms/index>`.
 
 URLconf improvements
@@ -171,13 +171,13 @@ You can now use any callable as the callback in URLconfs (previously, only
 strings that referred to callables were allowed). This allows a much more
 natural use of URLconfs. For example, this URLconf::
 
-    from django.conf.urls.defaults import *
+    from thibaud.conf.urls.defaults import *
 
     urlpatterns = patterns("", ("^myview/$", "mysite.myapp.views.myview"))
 
 can now be rewritten as::
 
-    from django.conf.urls.defaults import *
+    from thibaud.conf.urls.defaults import *
     from mysite.myapp.views import myview
 
     urlpatterns = patterns("", ("^myview/$", myview))
@@ -187,9 +187,9 @@ change allows you to apply decorators to views *in your
 URLconf*. Thus, you can make a generic view require login very
 easily::
 
-    from django.conf.urls.defaults import *
-    from django.contrib.auth.decorators import login_required
-    from django.views.generic.list_detail import object_list
+    from thibaud.conf.urls.defaults import *
+    from thibaud.contrib.auth.decorators import login_required
+    from thibaud.views.generic.list_detail import object_list
     from mysite.myapp.models import MyModel
 
     info = {
@@ -204,7 +204,7 @@ be valid for the foreseeable future.
 The test framework
 ------------------
 
-Django now includes a test framework so you can start transmuting fear into
+Thibaud now includes a test framework so you can start transmuting fear into
 boredom (with apologies to Kent Beck). You can write tests based on
 :mod:`doctest` or :mod:`unittest` and test your views with a simple test client.
 
@@ -226,7 +226,7 @@ Thanks
 ======
 
 Since 0.95, a number of people have stepped forward and taken a major
-new role in Django's development. We'd like to thank these people for
+new role in Thibaud's development. We'd like to thank these people for
 all their hard work:
 
 * Russell Keith-Magee and Malcolm Tredinnick for their major code
@@ -243,5 +243,5 @@ all their hard work:
 
 * Everyone who submitted a bug report, patch or ticket comment. We can't
   possibly thank everyone by name -- over 200 developers submitted patches
-  that went into 0.96 -- but everyone who's contributed to Django is listed
+  that went into 0.96 -- but everyone who's contributed to Thibaud is listed
   in :source:`AUTHORS`.

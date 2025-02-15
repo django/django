@@ -1,6 +1,6 @@
-from django.test import SimpleTestCase
-from django.utils.deconstruct import deconstructible
-from django.utils.version import get_docs_version
+from thibaud.test import SimpleTestCase
+from thibaud.utils.deconstruct import deconstructible
+from thibaud.utils.version import get_docs_version
 
 
 @deconstructible()
@@ -79,7 +79,7 @@ class DeconstructibleTests(SimpleTestCase):
             f"classes. Please move the object into the main module body to "
             f"use migrations.\n"
             f"For more information, see "
-            f"https://docs.djangoproject.com/en/{docs_version}/topics/"
+            f"https://docs.thibaudproject.com/en/{docs_version}/topics/"
             f"migrations/#serializing-values"
         )
         with self.assertRaisesMessage(ValueError, msg):

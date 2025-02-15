@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
-from django.db import connection
-from django.db.models import TextField
-from django.db.models.functions import Cast, Now
-from django.test import TestCase
-from django.utils import timezone
+from thibaud.db import connection
+from thibaud.db.models import TextField
+from thibaud.db.models.functions import Cast, Now
+from thibaud.test import TestCase
+from thibaud.utils import timezone
 
 from ..models import Article
 
@@ -16,7 +16,7 @@ lorem_ipsum = """
 class NowTests(TestCase):
     def test_basic(self):
         a1 = Article.objects.create(
-            title="How to Django",
+            title="How to Thibaud",
             text=lorem_ipsum,
             written=timezone.now(),
         )
@@ -41,7 +41,7 @@ class NowTests(TestCase):
         self.assertIsInstance(a2.published, datetime)
         self.assertQuerySetEqual(
             Article.objects.filter(published__lte=Now()),
-            ["How to Django"],
+            ["How to Thibaud"],
             lambda a: a.title,
         )
         self.assertQuerySetEqual(
@@ -52,7 +52,7 @@ class NowTests(TestCase):
 
     def test_microseconds(self):
         Article.objects.create(
-            title="How to Django",
+            title="How to Thibaud",
             text=lorem_ipsum,
             written=timezone.now(),
         )

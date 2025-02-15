@@ -14,22 +14,22 @@ from ctypes import (
 )
 from pathlib import Path
 
-from django.contrib.gis.gdal.driver import Driver
-from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.gdal.prototypes import raster as capi
-from django.contrib.gis.gdal.raster.band import BandList
-from django.contrib.gis.gdal.raster.base import GDALRasterBase
-from django.contrib.gis.gdal.raster.const import (
+from thibaud.contrib.gis.gdal.driver import Driver
+from thibaud.contrib.gis.gdal.error import GDALException
+from thibaud.contrib.gis.gdal.prototypes import raster as capi
+from thibaud.contrib.gis.gdal.raster.band import BandList
+from thibaud.contrib.gis.gdal.raster.base import GDALRasterBase
+from thibaud.contrib.gis.gdal.raster.const import (
     GDAL_RESAMPLE_ALGORITHMS,
     VSI_DELETE_BUFFER_ON_READ,
     VSI_FILESYSTEM_PREFIX,
     VSI_MEM_FILESYSTEM_BASE_PATH,
     VSI_TAKE_BUFFER_OWNERSHIP,
 )
-from django.contrib.gis.gdal.srs import SpatialReference, SRSException
-from django.contrib.gis.geometry import json_regex
-from django.utils.encoding import force_bytes, force_str
-from django.utils.functional import cached_property
+from thibaud.contrib.gis.gdal.srs import SpatialReference, SRSException
+from thibaud.contrib.gis.geometry import json_regex
+from thibaud.utils.encoding import force_bytes, force_str
+from thibaud.utils.functional import cached_property
 
 
 class TransformPoint(list):

@@ -1,8 +1,8 @@
 """
-Settings and configuration for Django.
+Settings and configuration for Thibaud.
 
 Read values from the module specified by the DJANGO_SETTINGS_MODULE environment
-variable, and then from django.conf.global_settings; see the global_settings.py
+variable, and then from thibaud.conf.global_settings; see the global_settings.py
 for a list of all possible variables.
 """
 
@@ -13,10 +13,10 @@ import traceback
 import warnings
 from pathlib import Path
 
-import django
-from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import LazyObject, empty
+import thibaud
+from thibaud.conf import global_settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
@@ -38,9 +38,9 @@ class SettingsReference(str):
 
 class LazySettings(LazyObject):
     """
-    A lazy proxy for either global Django settings or a custom settings object.
+    A lazy proxy for either global Thibaud settings or a custom settings object.
     The user can manually configure settings prior to using them. Otherwise,
-    Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
+    Thibaud uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
     """
 
     def _setup(self, name=None):
@@ -128,7 +128,7 @@ class LazySettings(LazyObject):
         # Don't apply prefix to absolute paths and URLs.
         if value.startswith(("http://", "https://", "/")):
             return value
-        from django.urls import get_script_prefix
+        from thibaud.urls import get_script_prefix
 
         return "%s%s" % (get_script_prefix(), value)
 
@@ -139,11 +139,11 @@ class LazySettings(LazyObject):
 
     def _show_deprecation_warning(self, message, category):
         stack = traceback.extract_stack()
-        # Show a warning if the setting is used outside of Django.
+        # Show a warning if the setting is used outside of Thibaud.
         # Stack index: -1 this line, -2 the property, -3 the
         # LazyObject __getattribute__(), -4 the caller.
         filename, _, _, _ = stack[-4]
-        if not filename.startswith(os.path.dirname(django.__file__)):
+        if not filename.startswith(os.path.dirname(thibaud.__file__)):
             warnings.warn(message, category, stacklevel=2)
 
 

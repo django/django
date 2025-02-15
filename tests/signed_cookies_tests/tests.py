@@ -1,9 +1,9 @@
 from datetime import timedelta
 
-from django.core import signing
-from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import freeze_time
+from thibaud.core import signing
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.test.utils import freeze_time
 
 
 class SignedCookieTest(SimpleTestCase):

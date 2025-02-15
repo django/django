@@ -1,4 +1,4 @@
-from django.dispatch import Signal
+from thibaud.dispatch import Signal
 
 request_started = Signal()
 request_finished = Signal()

@@ -9,16 +9,16 @@ from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django.conf import STATICFILES_STORAGE_ALIAS, settings
-from django.contrib.staticfiles import storage
-from django.contrib.staticfiles.management.commands import collectstatic, runserver
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management import CommandError, call_command
-from django.core.management.base import SystemCheckError
-from django.test import RequestFactory, override_settings
-from django.test.utils import extend_sys_path
-from django.utils._os import symlinks_supported
-from django.utils.functional import empty
+from thibaud.conf import STATICFILES_STORAGE_ALIAS, settings
+from thibaud.contrib.staticfiles import storage
+from thibaud.contrib.staticfiles.management.commands import collectstatic, runserver
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.management import CommandError, call_command
+from thibaud.core.management.base import SystemCheckError
+from thibaud.test import RequestFactory, override_settings
+from thibaud.test.utils import extend_sys_path
+from thibaud.utils._os import symlinks_supported
+from thibaud.utils.functional import empty
 
 from .cases import CollectionTestCase, StaticFilesTestCase, TestDefaults
 from .settings import TEST_ROOT, TEST_SETTINGS
@@ -34,10 +34,10 @@ class TestNoFilesCreated:
 
 
 class TestRunserver(StaticFilesTestCase):
-    @override_settings(MIDDLEWARE=["django.middleware.common.CommonMiddleware"])
+    @override_settings(MIDDLEWARE=["thibaud.middleware.common.CommonMiddleware"])
     def test_middleware_loaded_only_once(self):
         command = runserver.Command()
-        with mock.patch("django.middleware.common.CommonMiddleware") as mocked:
+        with mock.patch("thibaud.middleware.common.CommonMiddleware") as mocked:
             command.get_handler(use_static_handler=True, insecure_serving=True)
             self.assertEqual(mocked.call_count, 1)
 
@@ -150,7 +150,7 @@ class TestConfiguration(StaticFilesTestCase):
                     **settings.STORAGES,
                     STATICFILES_STORAGE_ALIAS: {
                         "BACKEND": (
-                            "django.contrib.staticfiles.storage.StaticFilesStorage"
+                            "thibaud.contrib.staticfiles.storage.StaticFilesStorage"
                         )
                     },
                 }
@@ -196,7 +196,7 @@ class TestCollectionHelpSubcommand(AdminScriptTestCase):
         Even if the STATIC_ROOT setting is not set, one can still call the
         `manage.py help collectstatic` command.
         """
-        self.write_settings("settings.py", apps=["django.contrib.staticfiles"])
+        self.write_settings("settings.py", apps=["thibaud.contrib.staticfiles"])
         out, err = self.run_manage(["help", "collectstatic"])
         self.assertNoOutput(err)
 
@@ -260,7 +260,7 @@ class TestCollectionVerbosity(CollectionTestCase):
             **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": (
-                    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+                    "thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage"
                 )
             },
         }
@@ -275,7 +275,7 @@ class TestCollectionVerbosity(CollectionTestCase):
             **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": (
-                    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+                    "thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage"
                 )
             },
         }
@@ -428,7 +428,7 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
     STORAGES={
         **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
-            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+            "BACKEND": "thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage"
         },
     }
 )

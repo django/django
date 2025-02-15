@@ -1,19 +1,19 @@
 from unittest import mock
 
-from django.apps.registry import apps as global_apps
-from django.db import DatabaseError, connection, migrations, models
-from django.db.migrations.exceptions import InvalidMigrationPlan
-from django.db.migrations.executor import MigrationExecutor
-from django.db.migrations.graph import MigrationGraph
-from django.db.migrations.recorder import MigrationRecorder
-from django.db.migrations.state import ProjectState
-from django.test import (
+from thibaud.apps.registry import apps as global_apps
+from thibaud.db import DatabaseError, connection, migrations, models
+from thibaud.db.migrations.exceptions import InvalidMigrationPlan
+from thibaud.db.migrations.executor import MigrationExecutor
+from thibaud.db.migrations.graph import MigrationGraph
+from thibaud.db.migrations.recorder import MigrationRecorder
+from thibaud.db.migrations.state import ProjectState
+from thibaud.test import (
     SimpleTestCase,
     modify_settings,
     override_settings,
     skipUnlessDBFeature,
 )
-from django.test.utils import isolate_lru_cache
+from thibaud.test.utils import isolate_lru_cache
 
 from .test_base import MigrationTestBase
 
@@ -30,8 +30,8 @@ class ExecutorTests(MigrationTestBase):
     available_apps = [
         "migrations",
         "migrations2",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
+        "thibaud.contrib.auth",
+        "thibaud.contrib.contenttypes",
     ]
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
@@ -377,7 +377,7 @@ class ExecutorTests(MigrationTestBase):
     @override_settings(
         MIGRATION_MODULES={
             "migrations": "migrations.test_migrations_custom_user",
-            "django.contrib.auth": "django.contrib.auth.migrations",
+            "thibaud.contrib.auth": "thibaud.contrib.auth.migrations",
         },
         AUTH_USER_MODEL="migrations.Author",
     )
@@ -783,7 +783,7 @@ class ExecutorTests(MigrationTestBase):
 
         executor = MigrationExecutor(connection)
         with mock.patch(
-            "django.db.migrations.executor.MigrationExecutor.record_migration"
+            "thibaud.db.migrations.executor.MigrationExecutor.record_migration"
         ) as record_migration:
             record_migration.side_effect = RuntimeError("Recording migration failed.")
             with self.assertRaisesMessage(RuntimeError, "Recording migration failed."):
@@ -835,7 +835,7 @@ class ExecutorTests(MigrationTestBase):
     @mock.patch.object(MigrationRecorder, "has_table", return_value=False)
     def test_migrate_skips_schema_creation(self, mocked_has_table):
         """
-        The django_migrations table is not created if there are no migrations
+        The thibaud_migrations table is not created if there are no migrations
         to record.
         """
         executor = MigrationExecutor(connection)

@@ -1,4 +1,4 @@
-from django.urls import re_path
+from thibaud.urls import re_path
 
 from . import views
 

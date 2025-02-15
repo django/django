@@ -1,19 +1,19 @@
 ========================
-Django 2.0 release notes
+Thibaud 2.0 release notes
 ========================
 
 *December 2, 2017*
 
-Welcome to Django 2.0!
+Welcome to Thibaud 2.0!
 
 These release notes cover the :ref:`new features <whats-new-2.0>`, as well as
 some :ref:`backwards incompatible changes <backwards-incompatible-2.0>` you'll
-want to be aware of when upgrading from Django 1.11 or earlier. We've
+want to be aware of when upgrading from Thibaud 1.11 or earlier. We've
 :ref:`dropped some features<removed-features-2.0>` that have reached the end of
 their deprecation cycle, and we've :ref:`begun the deprecation process for some
 features <deprecated-features-2.0>`.
 
-This release starts Django's use of a :ref:`loose form of semantic versioning
+This release starts Thibaud's use of a :ref:`loose form of semantic versioning
 <internal-release-cadence>`, but there aren't any major backwards incompatible
 changes that might be expected of a 2.0 release. Upgrading should be a similar
 amount of effort as past feature releases.
@@ -24,35 +24,35 @@ project.
 Python compatibility
 ====================
 
-Django 2.0 supports Python 3.4, 3.5, 3.6, and 3.7. We **highly recommend** and
+Thibaud 2.0 supports Python 3.4, 3.5, 3.6, and 3.7. We **highly recommend** and
 only officially support the latest release of each series.
 
-The Django 1.11.x series is the last to support Python 2.7.
+The Thibaud 1.11.x series is the last to support Python 2.7.
 
-Django 2.0 will be the last release series to support Python 3.4. If you plan
-a deployment of Python 3.4 beyond the end-of-life for Django 2.0 (April 2019),
-stick with Django 1.11 LTS (supported until April 2020) instead. Note, however,
+Thibaud 2.0 will be the last release series to support Python 3.4. If you plan
+a deployment of Python 3.4 beyond the end-of-life for Thibaud 2.0 (April 2019),
+stick with Thibaud 1.11 LTS (supported until April 2020) instead. Note, however,
 that the end-of-life for Python 3.4 is March 2019.
 
-Third-party library support for older version of Django
+Third-party library support for older version of Thibaud
 =======================================================
 
-Following the release of Django 2.0, we suggest that third-party app authors
-drop support for all versions of Django prior to 1.11. At that time, you should
+Following the release of Thibaud 2.0, we suggest that third-party app authors
+drop support for all versions of Thibaud prior to 1.11. At that time, you should
 be able to run your package's tests using ``python -Wd`` so that deprecation
 warnings do appear. After making the deprecation warning fixes, your app should
-be compatible with Django 2.0.
+be compatible with Thibaud 2.0.
 
 .. _whats-new-2.0:
 
-What's new in Django 2.0
+What's new in Thibaud 2.0
 ========================
 
 Simplified URL routing syntax
 -----------------------------
 
-The new :func:`django.urls.path()` function allows a simpler, more readable URL
-routing syntax. For example, this example from previous Django releases::
+The new :func:`thibaud.urls.path()` function allows a simpler, more readable URL
+routing syntax. For example, this example from previous Thibaud releases::
 
     url(r"^articles/(?P<year>[0-9]{4})/$", views.year_archive),
 
@@ -67,11 +67,11 @@ rewritten example. For example, the year 10000 will now match since the year
 integers aren't constrained to be exactly four digits long as they are in the
 regular expression.
 
-The ``django.conf.urls.url()`` function from previous versions is now available
-as :func:`django.urls.re_path`. The old location remains for backwards
+The ``thibaud.conf.urls.url()`` function from previous versions is now available
+as :func:`thibaud.urls.re_path`. The old location remains for backwards
 compatibility, without an imminent deprecation. The old
-``django.conf.urls.include()`` function is now importable from ``django.urls``
-so you can use ``from django.urls import include, path, re_path`` in your
+``thibaud.conf.urls.include()`` function is now importable from ``thibaud.urls``
+so you can use ``from thibaud.urls import include, path, re_path`` in your
 URLconfs.
 
 The :doc:`/topics/http/urls` document is rewritten to feature the new syntax
@@ -86,7 +86,7 @@ browsers may experience varying levels of graceful degradation.
 Window expressions
 ------------------
 
-The new :class:`~django.db.models.expressions.Window` expression allows
+The new :class:`~thibaud.db.models.expressions.Window` expression allows
 adding an ``OVER`` clause to querysets. You can use :ref:`window functions
 <window-functions>` and :ref:`aggregate functions <aggregation-functions>` in
 the expression.
@@ -94,7 +94,7 @@ the expression.
 Minor features
 --------------
 
-:mod:`django.contrib.admin`
+:mod:`thibaud.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :attr:`.ModelAdmin.autocomplete_fields` attribute and
@@ -102,77 +102,77 @@ Minor features
   `Select2 <https://select2.org/>`_ search widget for ``ForeignKey`` and
   ``ManyToManyField``.
 
-:mod:`django.contrib.auth`
+:mod:`thibaud.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   36,000 to 100,000.
 
-:mod:`django.contrib.gis`
+:mod:`thibaud.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added MySQL support for the
-  :class:`~django.contrib.gis.db.models.functions.AsGeoJSON` function,
-  :class:`~django.contrib.gis.db.models.functions.GeoHash` function,
-  :class:`~django.contrib.gis.db.models.functions.IsValid` function,
+  :class:`~thibaud.contrib.gis.db.models.functions.AsGeoJSON` function,
+  :class:`~thibaud.contrib.gis.db.models.functions.GeoHash` function,
+  :class:`~thibaud.contrib.gis.db.models.functions.IsValid` function,
   :lookup:`isvalid` lookup, and :ref:`distance lookups <distance-lookups>`.
 
-* Added the :class:`~django.contrib.gis.db.models.functions.Azimuth` and
-  :class:`~django.contrib.gis.db.models.functions.LineLocatePoint` functions,
+* Added the :class:`~thibaud.contrib.gis.db.models.functions.Azimuth` and
+  :class:`~thibaud.contrib.gis.db.models.functions.LineLocatePoint` functions,
   supported on PostGIS and SpatiaLite.
 
-* Any :class:`~django.contrib.gis.geos.GEOSGeometry` imported from GeoJSON now
+* Any :class:`~thibaud.contrib.gis.geos.GEOSGeometry` imported from GeoJSON now
   has its SRID set.
 
 * Added the :attr:`.OSMWidget.default_zoom` attribute to customize the map's
   default zoom level.
 
 * Made metadata readable and editable on rasters through the
-  :attr:`~django.contrib.gis.gdal.GDALRaster.metadata`,
-  :attr:`~django.contrib.gis.gdal.GDALRaster.info`, and
-  :attr:`~django.contrib.gis.gdal.GDALBand.metadata` attributes.
+  :attr:`~thibaud.contrib.gis.gdal.GDALRaster.metadata`,
+  :attr:`~thibaud.contrib.gis.gdal.GDALRaster.info`, and
+  :attr:`~thibaud.contrib.gis.gdal.GDALBand.metadata` attributes.
 
 * Allowed passing driver-specific creation options to
-  :class:`~django.contrib.gis.gdal.GDALRaster` objects using ``papsz_options``.
+  :class:`~thibaud.contrib.gis.gdal.GDALRaster` objects using ``papsz_options``.
 
-* Allowed creating :class:`~django.contrib.gis.gdal.GDALRaster` objects in
+* Allowed creating :class:`~thibaud.contrib.gis.gdal.GDALRaster` objects in
   GDAL's internal virtual filesystem. Rasters can now be :ref:`created from and
   converted to binary data <gdal-raster-vsimem>` in-memory.
 
 * The new :meth:`GDALBand.color_interp()
-  <django.contrib.gis.gdal.GDALBand.color_interp>` method returns the color
+  <thibaud.contrib.gis.gdal.GDALBand.color_interp>` method returns the color
   interpretation for the band.
 
-:mod:`django.contrib.postgres`
+:mod:`thibaud.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``distinct`` argument for
-  :class:`~django.contrib.postgres.aggregates.ArrayAgg` determines if
+  :class:`~thibaud.contrib.postgres.aggregates.ArrayAgg` determines if
   concatenated values will be distinct.
 
-* The new :class:`~django.contrib.postgres.functions.RandomUUID` database
+* The new :class:`~thibaud.contrib.postgres.functions.RandomUUID` database
   function returns a version 4 UUID. It requires use of PostgreSQL's
   ``pgcrypto`` extension which can be activated using the new
-  :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+  :class:`~thibaud.contrib.postgres.operations.CryptoExtension` migration
   operation.
 
-* :class:`django.contrib.postgres.indexes.GinIndex` now supports the
+* :class:`thibaud.contrib.postgres.indexes.GinIndex` now supports the
   ``fastupdate`` and ``gin_pending_list_limit`` parameters.
 
-* The new :class:`~django.contrib.postgres.indexes.GistIndex` class allows
+* The new :class:`~thibaud.contrib.postgres.indexes.GistIndex` class allows
   creating ``GiST`` indexes in the database. The new
-  :class:`~django.contrib.postgres.operations.BtreeGistExtension` migration
+  :class:`~thibaud.contrib.postgres.operations.BtreeGistExtension` migration
   operation installs the ``btree_gist`` extension to add support for operator
   classes that aren't built-in.
 
 * :djadmin:`inspectdb` can now introspect ``JSONField`` and various
-  ``RangeField``\s (``django.contrib.postgres`` must be in ``INSTALLED_APPS``).
+  ``RangeField``\s (``thibaud.contrib.postgres`` must be in ``INSTALLED_APPS``).
 
-:mod:`django.contrib.sitemaps`
+:mod:`thibaud.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added the ``protocol`` keyword argument to the
-  :class:`~django.contrib.sitemaps.GenericSitemap` constructor.
+  :class:`~thibaud.contrib.sitemaps.GenericSitemap` constructor.
 
 Cache
 ~~~~~
@@ -183,20 +183,20 @@ Cache
 File Storage
 ~~~~~~~~~~~~
 
-* :meth:`File.open() <django.core.files.File.open>` can be used as a context
+* :meth:`File.open() <thibaud.core.files.File.open>` can be used as a context
   manager, e.g. ``with file.open() as f:``.
 
 Forms
 ~~~~~
 
 * The new ``date_attrs`` and ``time_attrs`` arguments for
-  :class:`~django.forms.SplitDateTimeWidget` and
-  :class:`~django.forms.SplitHiddenDateTimeWidget` allow specifying different
+  :class:`~thibaud.forms.SplitDateTimeWidget` and
+  :class:`~thibaud.forms.SplitHiddenDateTimeWidget` allow specifying different
   HTML attributes for the ``DateInput`` and ``TimeInput`` (or hidden)
   subwidgets.
 
 * The new :meth:`Form.errors.get_json_data()
-  <django.forms.Form.errors.get_json_data>` method returns form errors as
+  <thibaud.forms.Form.errors.get_json_data>` method returns form errors as
   a dictionary suitable for including in a JSON response.
 
 Generic Views
@@ -233,7 +233,7 @@ Migrations
 Models
 ~~~~~~
 
-* The new :class:`~django.db.models.functions.StrIndex` database function
+* The new :class:`~thibaud.db.models.functions.StrIndex` database function
   finds the starting index of a string inside another string.
 
 * On Oracle, ``AutoField`` and ``BigAutoField`` are now created as `identity
@@ -244,27 +244,27 @@ Models
 * The new ``chunk_size`` parameter of :meth:`.QuerySet.iterator` controls the
   number of rows fetched by the Python database client when streaming results
   from the database. For databases that don't support server-side cursors, it
-  controls the number of results Django fetches from the database adapter.
+  controls the number of results Thibaud fetches from the database adapter.
 
 * :meth:`.QuerySet.earliest`, :meth:`.QuerySet.latest`, and
-  :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>` now
+  :attr:`Meta.get_latest_by <thibaud.db.models.Options.get_latest_by>` now
   allow ordering by several fields.
 
-* Added the :class:`~django.db.models.functions.ExtractQuarter` function to
-  extract the quarter from :class:`~django.db.models.DateField` and
-  :class:`~django.db.models.DateTimeField`, and exposed it through the
+* Added the :class:`~thibaud.db.models.functions.ExtractQuarter` function to
+  extract the quarter from :class:`~thibaud.db.models.DateField` and
+  :class:`~thibaud.db.models.DateTimeField`, and exposed it through the
   :lookup:`quarter` lookup.
 
-* Added the :class:`~django.db.models.functions.TruncQuarter` function to
-  truncate :class:`~django.db.models.DateField` and
-  :class:`~django.db.models.DateTimeField` to the first day of a quarter.
+* Added the :class:`~thibaud.db.models.functions.TruncQuarter` function to
+  truncate :class:`~thibaud.db.models.DateField` and
+  :class:`~thibaud.db.models.DateTimeField` to the first day of a quarter.
 
-* Added the :attr:`~django.db.models.Index.db_tablespace` parameter to
+* Added the :attr:`~thibaud.db.models.Index.db_tablespace` parameter to
   class-based indexes.
 
 * If the database supports a native duration field (Oracle and PostgreSQL),
-  :class:`~django.db.models.functions.Extract` now works with
-  :class:`~django.db.models.DurationField`.
+  :class:`~thibaud.db.models.functions.Extract` now works with
+  :class:`~thibaud.db.models.DurationField`.
 
 * Added the ``of`` argument to :meth:`.QuerySet.select_for_update()`, supported
   on PostgreSQL and Oracle, to lock only rows from specific tables rather than
@@ -276,11 +276,11 @@ Models
   results based on any unique model field.
 
 * :meth:`.CursorWrapper.callproc()` now takes an optional dictionary of keyword
-  parameters, if the backend supports this feature. Of Django's built-in
+  parameters, if the backend supports this feature. Of Thibaud's built-in
   backends, only Oracle supports it.
 
 * The new :meth:`connection.execute_wrapper()
-  <django.db.backends.base.DatabaseWrapper.execute_wrapper>` method allows
+  <thibaud.db.backends.base.DatabaseWrapper.execute_wrapper>` method allows
   :doc:`installing wrappers around execution of database queries
   </topics/db/instrumentation>`.
 
@@ -289,7 +289,7 @@ Models
   over the same fields or relations.
 
 * Added support for expressions in :attr:`Meta.ordering
-  <django.db.models.Options.ordering>`.
+  <thibaud.db.models.Options.ordering>`.
 
 * The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
   results as named tuples.
@@ -300,7 +300,7 @@ Models
 Pagination
 ~~~~~~~~~~
 
-* Added :meth:`Paginator.get_page() <django.core.paginator.Paginator.get_page>`
+* Added :meth:`Paginator.get_page() <thibaud.core.paginator.Paginator.get_page>`
   to provide the documented pattern of handling invalid page numbers.
 
 Requests and Responses
@@ -312,7 +312,7 @@ Templates
 ~~~~~~~~~
 
 * To increase the usefulness of :meth:`.Engine.get_default` in third-party
-  apps, it now returns the first engine if multiple ``DjangoTemplates`` engines
+  apps, it now returns the first engine if multiple ``ThibaudTemplates`` engines
   are configured in ``TEMPLATES`` rather than raising ``ImproperlyConfigured``.
 
 * Custom template tags may now accept keyword-only arguments.
@@ -320,7 +320,7 @@ Templates
 Tests
 ~~~~~
 
-* Added threading support to :class:`~django.test.LiveServerTestCase`.
+* Added threading support to :class:`~thibaud.test.LiveServerTestCase`.
 
 * Added settings that allow customizing the test tablespace parameters for
   Oracle: :setting:`DATAFILE_SIZE`, :setting:`DATAFILE_TMP_SIZE`,
@@ -330,7 +330,7 @@ Validators
 ~~~~~~~~~~
 
 * The new :class:`.ProhibitNullCharactersValidator` disallows the null
-  character in the input of the :class:`~django.forms.CharField` form field
+  character in the input of the :class:`~thibaud.forms.CharField` form field
   and its subclasses. Null character input was observed from vulnerability
   scanning tools. Most databases silently discard null characters, but
   psycopg2 2.7+ raises an exception when trying to save a null character to
@@ -344,11 +344,11 @@ Backwards incompatible changes in 2.0
 Removed support for bytestrings in some places
 ----------------------------------------------
 
-To support native Python 2 strings, older Django versions had to accept both
+To support native Python 2 strings, older Thibaud versions had to accept both
 bytestrings and Unicode strings. Now that Python 2 support is dropped,
 bytestrings should only be encountered around input/output boundaries (handling
 of binary fields or HTTP streams, for example). You might have to update your
-code to limit bytestring usage to a minimum, as Django no longer accepts
+code to limit bytestring usage to a minimum, as Thibaud no longer accepts
 bytestrings in certain code paths. Python's :option:`-b` option may help detect
 that mistake in your code.
 
@@ -371,7 +371,7 @@ backends.
   parameters.
 
 * Third-party database backends should add a ``DatabaseWrapper.display_name``
-  attribute with the name of the database that your backend works with. Django
+  attribute with the name of the database that your backend works with. Thibaud
   may use it in various messages, such as in system checks.
 
 * The first argument of ``SchemaEditor._alter_column_type_sql()`` is now
@@ -385,7 +385,7 @@ backends.
   requires that the arguments to ``OF`` be columns rather than tables, set
   ``DatabaseFeatures.select_for_update_of_column = True``.
 
-* To enable support for :class:`~django.db.models.expressions.Window`
+* To enable support for :class:`~thibaud.db.models.expressions.Window`
   expressions, set ``DatabaseFeatures.supports_over_clause`` to ``True``. You
   may need to customize the ``DatabaseOperations.window_start_rows_start_end()``
   and/or ``window_start_range_start_end()`` methods.
@@ -393,13 +393,13 @@ backends.
 * Third-party database backends should add a
   ``DatabaseOperations.cast_char_field_without_max_length`` attribute with the
   database data type that will be used in the
-  :class:`~django.db.models.functions.Cast` function for a ``CharField`` if the
+  :class:`~thibaud.db.models.functions.Cast` function for a ``CharField`` if the
   ``max_length`` argument isn't provided.
 
 * The first argument of ``DatabaseCreation._clone_test_db()`` and
   ``get_test_db_clone_settings()`` is now ``suffix`` rather
   than ``number`` (in case you want to rename the signatures in your backend
-  for consistency). ``django.test`` also now passes those values as strings
+  for consistency). ``thibaud.test`` also now passes those values as strings
   rather than as integers.
 
 * Third-party database backends should add a
@@ -409,30 +409,30 @@ backends.
 Dropped support for Oracle 11.2
 -------------------------------
 
-The end of upstream support for Oracle 11.2 is Dec. 2020. Django 1.11 will be
-supported until April 2020 which almost reaches this date. Django 2.0
+The end of upstream support for Oracle 11.2 is Dec. 2020. Thibaud 1.11 will be
+supported until April 2020 which almost reaches this date. Thibaud 2.0
 officially supports Oracle 12.1+.
 
 Default MySQL isolation level is read committed
 -----------------------------------------------
 
 MySQL's default isolation level, repeatable read, may cause data loss in
-typical Django usage. To prevent that and for consistency with other databases,
+typical Thibaud usage. To prevent that and for consistency with other databases,
 the default isolation level is now read committed. You can use the
 :setting:`DATABASES` setting to :ref:`use a different isolation level
 <mysql-isolation-level>`, if needed.
 
-:attr:`AbstractUser.last_name <django.contrib.auth.models.User.last_name>` ``max_length`` increased to 150
+:attr:`AbstractUser.last_name <thibaud.contrib.auth.models.User.last_name>` ``max_length`` increased to 150
 ----------------------------------------------------------------------------------------------------------
 
-A migration for :attr:`django.contrib.auth.models.User.last_name` is included.
+A migration for :attr:`thibaud.contrib.auth.models.User.last_name` is included.
 If you have a custom user model inheriting from ``AbstractUser``, you'll need
 to generate and apply a database migration for your user model.
 
 If you want to preserve the 30 character limit for last names, use a custom
 form::
 
-    from django.contrib.auth.forms import UserChangeForm
+    from thibaud.contrib.auth.forms import UserChangeForm
 
 
     class MyUserChangeForm(UserChangeForm):
@@ -441,8 +441,8 @@ form::
 If you wish to keep this restriction in the admin when editing users, set
 ``UserAdmin.form`` to use this form::
 
-    from django.contrib.auth.admin import UserAdmin
-    from django.contrib.auth.models import User
+    from thibaud.contrib.auth.admin import UserAdmin
+    from thibaud.contrib.auth.models import User
 
 
     class MyUserAdmin(UserAdmin):
@@ -514,7 +514,7 @@ Foreign keys are now created with ``DEFERRABLE INITIALLY DEFERRED`` instead of
 foreign keys with the new definition, particularly if you're using a pattern
 like this::
 
-    from django.db import transaction
+    from thibaud.db import transaction
 
     with transaction.atomic():
         Book.objects.create(author_id=1)
@@ -523,11 +523,11 @@ like this::
 If you don't recreate the foreign key as ``DEFERRED``, the first ``create()``
 would fail now that foreign key constraints are enforced.
 
-Backup your database first! After upgrading to Django 2.0, you can then
+Backup your database first! After upgrading to Thibaud 2.0, you can then
 rebuild tables using a script similar to this::
 
-    from django.apps import apps
-    from django.db import connection
+    from thibaud.apps import apps
+    from thibaud.db import connection
 
     for app in apps.get_app_configs():
         for model in app.get_models(include_auto_created=True):
@@ -543,8 +543,8 @@ This script hasn't received extensive testing and needs adaption for various
 cases such as multiple databases. Feel free to contribute improvements.
 
 In addition, because of a table alteration limitation of SQLite, it's prohibited
-to perform :class:`~django.db.migrations.operations.RenameModel` and
-:class:`~django.db.migrations.operations.RenameField` operations on models or
+to perform :class:`~thibaud.db.migrations.operations.RenameModel` and
+:class:`~thibaud.db.migrations.operations.RenameField` operations on models or
 fields referenced by other models in a transaction. In order to allow migrations
 containing these operations to be applied, you must set the
 ``Migration.atomic`` attribute to ``False``.
@@ -554,17 +554,17 @@ Miscellaneous
 
 * The ``SessionAuthenticationMiddleware`` class is removed. It provided no
   functionality since session authentication is unconditionally enabled in
-  Django 1.10.
+  Thibaud 1.10.
 
 * The default HTTP error handlers (``handler404``, etc.) are now callables
-  instead of dotted Python path strings. Django favors callable references
+  instead of dotted Python path strings. Thibaud favors callable references
   since they provide better performance and debugging experience.
 
-* :class:`~django.views.generic.base.RedirectView` no longer silences
+* :class:`~thibaud.views.generic.base.RedirectView` no longer silences
   ``NoReverseMatch`` if the ``pattern_name`` doesn't exist.
 
-* When ``USE_L10N`` is off, :class:`~django.forms.FloatField` and
-  :class:`~django.forms.DecimalField` now respect :setting:`DECIMAL_SEPARATOR`
+* When ``USE_L10N`` is off, :class:`~thibaud.forms.FloatField` and
+  :class:`~thibaud.forms.DecimalField` now respect :setting:`DECIMAL_SEPARATOR`
   and :setting:`THOUSAND_SEPARATOR` during validation. For example, with the
   settings::
 
@@ -575,17 +575,17 @@ Miscellaneous
 
   an input of ``"1.345"`` is now converted to ``1345`` instead of ``1.345``.
 
-* Subclasses of :class:`~django.contrib.auth.models.AbstractBaseUser` are no
+* Subclasses of :class:`~thibaud.contrib.auth.models.AbstractBaseUser` are no
   longer required to implement ``get_short_name()`` and ``get_full_name()``.
   (The base implementations that raise ``NotImplementedError`` are removed.)
-  ``django.contrib.admin`` uses these methods if implemented but doesn't
+  ``thibaud.contrib.admin`` uses these methods if implemented but doesn't
   require them. Third-party apps that use these methods may want to adopt a
   similar approach.
 
 * The ``FIRST_DAY_OF_WEEK`` and ``NUMBER_GROUPING`` format settings are now
   kept as integers in JavaScript and JSON i18n view outputs.
 
-* :meth:`~django.test.TransactionTestCase.assertNumQueries` now ignores
+* :meth:`~thibaud.test.TransactionTestCase.assertNumQueries` now ignores
   connection configuration queries. Previously, if a test opened a new database
   connection, those queries could be included as part of the
   ``assertNumQueries()`` count.
@@ -601,7 +601,7 @@ Miscellaneous
       Book.objects.iterator(chunk_size=100)
 
 * Providing unknown package names in the ``packages`` argument of the
-  :class:`~django.views.i18n.JavaScriptCatalog` view now raises ``ValueError``
+  :class:`~thibaud.views.i18n.JavaScriptCatalog` view now raises ``ValueError``
   instead of passing silently.
 
 * A model instance's primary key now appears in the default ``Model.__str__()``
@@ -615,7 +615,7 @@ Miscellaneous
   <automatic-spatial-transformations>` now raises ``NotImplementedError``
   on MySQL instead of silently using non-transformed geometries.
 
-* ``django.core.exceptions.DjangoRuntimeWarning`` is removed. It was only used
+* ``thibaud.core.exceptions.ThibaudRuntimeWarning`` is removed. It was only used
   in the cache backend as an intermediate class in ``CacheKeyWarning``'s
   inheritance of ``RuntimeWarning``.
 
@@ -627,8 +627,8 @@ Miscellaneous
   the relative order of elements in each list <form-media-asset-order>`.
   ``MediaOrderConflictWarning`` is issued if the order can't be preserved.
 
-* ``django.contrib.gis.gdal.OGRException`` is removed. It's been an alias for
-  ``GDALException`` since Django 1.8.
+* ``thibaud.contrib.gis.gdal.OGRException`` is removed. It's been an alias for
+  ``GDALException`` since Thibaud 1.8.
 
 * Support for GEOS 3.3.x is dropped.
 
@@ -656,20 +656,20 @@ instead of::
     (self, value, expression, connection, context)
 
 Support for the old signature in custom fields and expressions remains until
-Django 3.0.
+Thibaud 3.0.
 
 Miscellaneous
 -------------
 
-* The ``django.db.backends.postgresql_psycopg2`` module is deprecated in favor
-  of ``django.db.backends.postgresql``. It's been an alias since Django 1.9.
+* The ``thibaud.db.backends.postgresql_psycopg2`` module is deprecated in favor
+  of ``thibaud.db.backends.postgresql``. It's been an alias since Thibaud 1.9.
   This only affects code that imports from the module directly. The
   ``DATABASES`` setting can still use
-  ``'django.db.backends.postgresql_psycopg2'``, though you can simplify that by
-  using the ``'django.db.backends.postgresql'`` name added in Django 1.9.
+  ``'thibaud.db.backends.postgresql_psycopg2'``, though you can simplify that by
+  using the ``'thibaud.db.backends.postgresql'`` name added in Thibaud 1.9.
 
-* ``django.shortcuts.render_to_response()`` is deprecated in favor of
-  :func:`django.shortcuts.render`. ``render()`` takes the same arguments
+* ``thibaud.shortcuts.render_to_response()`` is deprecated in favor of
+  :func:`thibaud.shortcuts.render`. ``render()`` takes the same arguments
   except that it also requires a ``request``.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
@@ -690,18 +690,18 @@ Features removed in 2.0
 =======================
 
 These features have reached the end of their deprecation cycle and are removed
-in Django 2.0.
+in Thibaud 2.0.
 
 See :ref:`deprecated-features-1.9` for details on these changes, including how
 to remove usage of these features.
 
-* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` is
+* The ``weak`` argument to ``thibaud.dispatch.signals.Signal.disconnect()`` is
   removed.
 
-* ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
+* ``thibaud.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
   is removed.
 
-* The ``django.forms.extras`` package is removed.
+* The ``thibaud.forms.extras`` package is removed.
 
 * The ``assignment_tag`` helper is removed.
 
@@ -715,44 +715,44 @@ to remove usage of these features.
   required in models and migrations. Consider squashing migrations so that you
   have fewer of them to update.
 
-* ``django.db.models.fields.add_lazy_relation()`` is removed.
+* ``thibaud.db.models.fields.add_lazy_relation()`` is removed.
 
 * When time zone support is enabled, database backends that don't support time
   zones no longer convert aware datetimes to naive values in UTC anymore when
   such values are passed as parameters to SQL queries executed outside of the
   ORM, e.g. with ``cursor.execute()``.
 
-* ``django.contrib.auth.tests.utils.skipIfCustomUser()`` is removed.
+* ``thibaud.contrib.auth.tests.utils.skipIfCustomUser()`` is removed.
 
 * The ``GeoManager`` and ``GeoQuerySet`` classes are removed.
 
-* The ``django.contrib.gis.geoip`` module is removed.
+* The ``thibaud.contrib.gis.geoip`` module is removed.
 
 * The ``supports_recursion`` check for template loaders is removed from:
 
-  * ``django.template.engine.Engine.find_template()``
-  * ``django.template.loader_tags.ExtendsNode.find_template()``
-  * ``django.template.loaders.base.Loader.supports_recursion()``
-  * ``django.template.loaders.cached.Loader.supports_recursion()``
+  * ``thibaud.template.engine.Engine.find_template()``
+  * ``thibaud.template.loader_tags.ExtendsNode.find_template()``
+  * ``thibaud.template.loaders.base.Loader.supports_recursion()``
+  * ``thibaud.template.loaders.cached.Loader.supports_recursion()``
 
 * The ``load_template`` and ``load_template_sources`` template loader methods
   are removed.
 
 * The ``template_dirs`` argument for template loaders is removed:
 
-  * ``django.template.loaders.base.Loader.get_template()``
-  * ``django.template.loaders.cached.Loader.cache_key()``
-  * ``django.template.loaders.cached.Loader.get_template()``
-  * ``django.template.loaders.cached.Loader.get_template_sources()``
-  * ``django.template.loaders.filesystem.Loader.get_template_sources()``
+  * ``thibaud.template.loaders.base.Loader.get_template()``
+  * ``thibaud.template.loaders.cached.Loader.cache_key()``
+  * ``thibaud.template.loaders.cached.Loader.get_template()``
+  * ``thibaud.template.loaders.cached.Loader.get_template_sources()``
+  * ``thibaud.template.loaders.filesystem.Loader.get_template_sources()``
 
-* ``django.template.loaders.base.Loader.__call__()`` is removed.
+* ``thibaud.template.loaders.base.Loader.__call__()`` is removed.
 
 * Support for custom error views that don't accept an ``exception`` parameter
   is removed.
 
-* The ``mime_type`` attribute of ``django.utils.feedgenerator.Atom1Feed`` and
-  ``django.utils.feedgenerator.RssFeed`` is removed.
+* The ``mime_type`` attribute of ``thibaud.utils.feedgenerator.Atom1Feed`` and
+  ``thibaud.utils.feedgenerator.RssFeed`` is removed.
 
 * The ``app_name`` argument to ``include()`` is removed.
 
@@ -764,7 +764,7 @@ to remove usage of these features.
 
 * ``Field._get_val_from_obj()`` is removed.
 
-* ``django.template.loaders.eggs.Loader`` is removed.
+* ``thibaud.template.loaders.eggs.Loader`` is removed.
 
 * The ``current_app`` parameter to the ``contrib.auth`` function-based views is
   removed.
@@ -778,9 +778,9 @@ to remove usage of these features.
 * The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` is
   removed.
 
-* The ``django.template.loader.LoaderOrigin`` and
-  ``django.template.base.StringOrigin`` aliases for
-  ``django.template.base.Origin`` are removed.
+* The ``thibaud.template.loader.LoaderOrigin`` and
+  ``thibaud.template.base.StringOrigin`` aliases for
+  ``thibaud.template.base.Origin`` are removed.
 
 See :ref:`deprecated-features-1.10` for details on these changes.
 
@@ -790,30 +790,30 @@ See :ref:`deprecated-features-1.10` for details on these changes.
   relation is removed.
 
 * The ``get_srid()`` and ``set_srid()`` methods of
-  ``django.contrib.gis.geos.GEOSGeometry`` are removed.
+  ``thibaud.contrib.gis.geos.GEOSGeometry`` are removed.
 
 * The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
-  ``set_z()`` methods of ``django.contrib.gis.geos.Point`` are removed.
+  ``set_z()`` methods of ``thibaud.contrib.gis.geos.Point`` are removed.
 
 * The ``get_coords()`` and ``set_coords()`` methods of
-  ``django.contrib.gis.geos.Point`` are removed.
+  ``thibaud.contrib.gis.geos.Point`` are removed.
 
-* The ``cascaded_union`` property of ``django.contrib.gis.geos.MultiPolygon``
+* The ``cascaded_union`` property of ``thibaud.contrib.gis.geos.MultiPolygon``
   is removed.
 
-* ``django.utils.functional.allow_lazy()`` is removed.
+* ``thibaud.utils.functional.allow_lazy()`` is removed.
 
 * The ``shell --plain`` option is removed.
 
-* The ``django.core.urlresolvers`` module is removed in favor of its new
-  location, ``django.urls``.
+* The ``thibaud.core.urlresolvers`` module is removed in favor of its new
+  location, ``thibaud.urls``.
 
 * ``CommaSeparatedIntegerField`` is removed, except for support in historical
   migrations.
 
 * The template ``Context.has_key()`` method is removed.
 
-* Support for the ``django.core.files.storage.Storage.accessed_time()``,
+* Support for the ``thibaud.core.files.storage.Storage.accessed_time()``,
   ``created_time()``, and ``modified_time()`` methods is removed.
 
 * Support for query lookups using the model name when
@@ -834,7 +834,7 @@ See :ref:`deprecated-features-1.10` for details on these changes.
 
 * The ``javascript_catalog()`` and ``json_catalog()`` views are removed.
 
-* ``django.contrib.gis.utils.precision_wkt()`` is removed.
+* ``thibaud.contrib.gis.utils.precision_wkt()`` is removed.
 
 * In multi-table inheritance, implicit promotion of a ``OneToOneField`` to a
   ``parent_link`` is removed.
@@ -848,7 +848,7 @@ See :ref:`deprecated-features-1.10` for details on these changes.
   ``EscapeBytes``, ``EscapeText``, ``EscapeString``, and ``EscapeUnicode`` are
   removed.
 
-* The ``escape`` filter now uses ``django.utils.html.conditional_escape()``.
+* The ``escape`` filter now uses ``thibaud.utils.html.conditional_escape()``.
 
 * ``Manager.use_for_related_fields`` is removed.
 

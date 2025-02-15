@@ -5,20 +5,20 @@ from collections import defaultdict
 from functools import reduce
 from operator import or_
 
-from django.core.exceptions import FieldDoesNotExist
-from django.core.validators import EMPTY_VALUES
-from django.db import models, router
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import Collector
-from django.forms.utils import pretty_name
-from django.urls import NoReverseMatch, reverse
-from django.utils import formats, timezone
-from django.utils.hashable import make_hashable
-from django.utils.html import format_html
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.text import capfirst
-from django.utils.translation import ngettext
-from django.utils.translation import override as translation_override
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.core.validators import EMPTY_VALUES
+from thibaud.db import models, router
+from thibaud.db.models.constants import LOOKUP_SEP
+from thibaud.db.models.deletion import Collector
+from thibaud.forms.utils import pretty_name
+from thibaud.urls import NoReverseMatch, reverse
+from thibaud.utils import formats, timezone
+from thibaud.utils.hashable import make_hashable
+from thibaud.utils.html import format_html
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.text import capfirst
+from thibaud.utils.translation import ngettext
+from thibaud.utils.translation import override as translation_override
 
 QUOTE_MAP = {i: "_%02X" % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
@@ -427,7 +427,7 @@ def help_text_for_field(name, model):
 
 
 def display_for_field(value, field, empty_value_display, avoid_link=False):
-    from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from thibaud.contrib.admin.templatetags.admin_list import _boolean_icon
 
     if getattr(field, "flatchoices", None):
         try:
@@ -466,7 +466,7 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
 
 
 def display_for_value(value, empty_value_display, boolean=False):
-    from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from thibaud.contrib.admin.templatetags.admin_list import _boolean_icon
 
     if boolean:
         return _boolean_icon(value)
@@ -532,9 +532,9 @@ def get_fields_from_path(model, path):
     """Return list of Fields given path relative to model.
 
     e.g. (ModelX, "user__groups__name") -> [
-        <django.db.models.fields.related.ForeignKey object at 0x...>,
-        <django.db.models.fields.related.ManyToManyField object at 0x...>,
-        <django.db.models.fields.CharField object at 0x...>,
+        <thibaud.db.models.fields.related.ForeignKey object at 0x...>,
+        <thibaud.db.models.fields.related.ManyToManyField object at 0x...>,
+        <thibaud.db.models.fields.CharField object at 0x...>,
     ]
     """
     pieces = path.split(LOOKUP_SEP)

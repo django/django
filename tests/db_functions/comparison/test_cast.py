@@ -2,10 +2,10 @@ import datetime
 import decimal
 import unittest
 
-from django.db import connection, models
-from django.db.models.functions import Cast
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from thibaud.db import connection, models
+from thibaud.db.models.functions import Cast
+from thibaud.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from thibaud.test.utils import CaptureQueriesContext
 
 from ..models import Author, DTModel, Fan, FloatModel
 
@@ -32,7 +32,7 @@ class CastTests(TestCase):
         self.assertEqual(numbers.get().cast_string, "1")
 
     # Silence "Truncated incorrect CHAR(1) value: 'Bob'".
-    @ignore_warnings(module="django.db.backends.mysql.base")
+    @ignore_warnings(module="thibaud.db.backends.mysql.base")
     @skipUnlessDBFeature("supports_cast_with_precision")
     def test_cast_to_char_field_with_max_length(self):
         names = Author.objects.annotate(

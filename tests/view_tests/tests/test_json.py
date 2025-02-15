@@ -1,6 +1,6 @@
 import json
 
-from django.test import SimpleTestCase, override_settings
+from thibaud.test import SimpleTestCase, override_settings
 
 
 @override_settings(ROOT_URLCONF="view_tests.generic_urls")

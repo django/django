@@ -1,9 +1,9 @@
 import tempfile
 import uuid
 
-from django.contrib.auth.models import User
-from django.core.files.storage import FileSystemStorage
-from django.db import models
+from thibaud.contrib.auth.models import User
+from thibaud.core.files.storage import FileSystemStorage
+from thibaud.db import models
 
 try:
     from PIL import Image

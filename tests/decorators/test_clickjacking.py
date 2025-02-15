@@ -1,9 +1,9 @@
 from asgiref.sync import iscoroutinefunction
 
-from django.http import HttpRequest, HttpResponse
-from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.test import SimpleTestCase
-from django.views.decorators.clickjacking import (
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.middleware.clickjacking import XFrameOptionsMiddleware
+from thibaud.test import SimpleTestCase
+from thibaud.views.decorators.clickjacking import (
     xframe_options_deny,
     xframe_options_exempt,
     xframe_options_sameorigin,

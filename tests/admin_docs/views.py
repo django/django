@@ -1,7 +1,7 @@
-from django.contrib.admindocs.middleware import XViewMiddleware
-from django.http import HttpResponse
-from django.utils.decorators import decorator_from_middleware
-from django.views.generic import View
+from thibaud.contrib.admindocs.middleware import XViewMiddleware
+from thibaud.http import HttpResponse
+from thibaud.utils.decorators import decorator_from_middleware
+from thibaud.views.generic import View
 
 xview_dec = decorator_from_middleware(XViewMiddleware)
 

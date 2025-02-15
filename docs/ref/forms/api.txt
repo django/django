@@ -2,11 +2,11 @@
 The Forms API
 =============
 
-.. module:: django.forms
+.. module:: thibaud.forms
 
 .. admonition:: About this document
 
-    This document covers the gritty details of Django's forms API. You should
+    This document covers the gritty details of Thibaud's forms API. You should
     read the :doc:`introduction to working with forms </topics/forms/index>`
     first.
 
@@ -208,7 +208,7 @@ from a view.
 The ``field`` argument is the name of the field to which the errors
 should be added. If its value is ``None`` the error will be treated as
 a non-field error as returned by :meth:`Form.non_field_errors()
-<django.forms.Form.non_field_errors>`.
+<thibaud.forms.Form.non_field_errors>`.
 
 The ``error`` argument can be a string, or preferably an instance of
 ``ValidationError``. See :ref:`raising-validation-error` for best practices
@@ -224,15 +224,15 @@ a specific error ``code``. If ``code`` is ``None``, it will return ``True``
 if the field contains any errors at all.
 
 To check for non-field errors use
-:data:`~django.core.exceptions.NON_FIELD_ERRORS` as the ``field`` parameter.
+:data:`~thibaud.core.exceptions.NON_FIELD_ERRORS` as the ``field`` parameter.
 
 .. method:: Form.non_field_errors()
 
 This method returns the list of errors from :attr:`Form.errors
-<django.forms.Form.errors>`  that aren't associated with a particular field.
+<thibaud.forms.Form.errors>`  that aren't associated with a particular field.
 This includes ``ValidationError``\s that are raised in :meth:`Form.clean()
-<django.forms.Form.clean>` and errors added using :meth:`Form.add_error(None,
-"...") <django.forms.Form.add_error>`.
+<thibaud.forms.Form.clean>` and errors added using :meth:`Form.add_error(None,
+"...") <thibaud.forms.Form.add_error>`.
 
 Behavior of unbound forms
 -------------------------
@@ -271,7 +271,7 @@ it's not necessary to include every field in your form. For example:
 These values are only displayed for unbound forms, and they're not used as
 fallback values if a particular value isn't provided.
 
-If a :class:`~django.forms.Field` defines :attr:`~Field.initial` *and* you
+If a :class:`~thibaud.forms.Field` defines :attr:`~Field.initial` *and* you
 include :attr:`~Form.initial` when instantiating the ``Form``, then the latter
 ``initial`` will have precedence. In this example, ``initial`` is provided both
 at the field level and at the form instance level, and the latter gets
@@ -279,7 +279,7 @@ precedence:
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial="class")
     ...     url = forms.URLField()
@@ -382,11 +382,11 @@ attribute:
     >>> for row in f.fields.values():
     ...     print(row)
     ...
-    <django.forms.fields.CharField object at 0x7ffaac632510>
-    <django.forms.fields.URLField object at 0x7ffaac632f90>
-    <django.forms.fields.CharField object at 0x7ffaac3aa050>
+    <thibaud.forms.fields.CharField object at 0x7ffaac632510>
+    <thibaud.forms.fields.URLField object at 0x7ffaac632f90>
+    <thibaud.forms.fields.CharField object at 0x7ffaac3aa050>
     >>> f.fields["name"]
-    <django.forms.fields.CharField object at 0x7ffaac6324d0>
+    <thibaud.forms.fields.CharField object at 0x7ffaac6324d0>
 
 You can alter the field and :class:`.BoundField` of :class:`Form` instance to
 change the way it is presented in the form:
@@ -420,7 +420,7 @@ data, but also for "cleaning" it -- normalizing it to a consistent format. This
 is a nice feature, because it allows data for a particular field to be input in
 a variety of ways, always resulting in consistent output.
 
-For example, :class:`~django.forms.DateField` normalizes input into a
+For example, :class:`~thibaud.forms.DateField` normalizes input into a
 Python ``datetime.date`` object. Regardless of whether you pass it a string in
 the format ``'1994-07-15'``, a ``datetime.date`` object, or a number of other
 formats, ``DateField`` will always normalize it to a ``datetime.date`` object
@@ -493,7 +493,7 @@ fields. In this example, the data dictionary doesn't include a value for the
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
     >>> class OptionalPersonForm(forms.Form):
     ...     first_name = forms.CharField()
     ...     last_name = forms.CharField()
@@ -604,7 +604,7 @@ The name of the template rendered if the form is cast into a string, e.g. via
 ``print(form)`` or in a template via ``{{ form }}``.
 
 By default, a property returning the value of the renderer's
-:attr:`~django.forms.renderers.BaseRenderer.form_template_name`. You may set it
+:attr:`~thibaud.forms.renderers.BaseRenderer.form_template_name`. You may set it
 as a string template name in order to override that for a particular form
 class.
 
@@ -674,7 +674,7 @@ template name.
 
 .. attribute:: Form.template_name_div
 
-The template used by ``as_div()``. Default: ``'django/forms/div.html'``.
+The template used by ``as_div()``. Default: ``'thibaud/forms/div.html'``.
 
 .. method:: Form.as_div()
 
@@ -712,7 +712,7 @@ The template used by ``as_div()``. Default: ``'django/forms/div.html'``.
 
 .. attribute:: Form.template_name_p
 
-The template used by ``as_p()``. Default: ``'django/forms/p.html'``.
+The template used by ``as_p()``. Default: ``'thibaud/forms/p.html'``.
 
 .. method:: Form.as_p()
 
@@ -735,7 +735,7 @@ containing one field:
 
 .. attribute:: Form.template_name_ul
 
-The template used by ``as_ul()``. Default: ``'django/forms/ul.html'``.
+The template used by ``as_ul()``. Default: ``'thibaud/forms/ul.html'``.
 
 .. method:: Form.as_ul()
 
@@ -759,7 +759,7 @@ you can specify any HTML attributes on the ``<ul>`` for flexibility:
 
 .. attribute:: Form.template_name_table
 
-The template used by ``as_table()``. Default: ``'django/forms/table.html'``.
+The template used by ``as_table()``. Default: ``'thibaud/forms/table.html'``.
 
 .. method:: Form.as_table()
 
@@ -793,7 +793,7 @@ attributes to required rows or to rows with errors: set the
 :attr:`Form.error_css_class` and/or :attr:`Form.required_css_class`
 attributes::
 
-    from django import forms
+    from thibaud import forms
 
 
     class ContactForm(forms.Form):
@@ -921,12 +921,12 @@ Note that the label suffix is added only if the last character of the
 label isn't a punctuation character (in English, those are ``.``, ``!``, ``?``
 or ``:``).
 
-Fields can also define their own :attr:`~django.forms.Field.label_suffix`.
+Fields can also define their own :attr:`~thibaud.forms.Field.label_suffix`.
 This will take precedence over :attr:`Form.label_suffix
-<django.forms.Form.label_suffix>`. The suffix can also be overridden at runtime
+<thibaud.forms.Form.label_suffix>`. The suffix can also be overridden at runtime
 using the ``label_suffix`` parameter to
-:meth:`~django.forms.BoundField.label_tag`/
-:meth:`~django.forms.BoundField.legend_tag`.
+:meth:`~thibaud.forms.BoundField.label_tag`/
+:meth:`~thibaud.forms.BoundField.legend_tag`.
 
 .. attribute:: Form.use_required_attribute
 
@@ -949,7 +949,7 @@ Specifies the :doc:`renderer <renderers>` to use for the form. Defaults to
 You can set this as a class attribute when declaring your form or use the
 ``renderer`` argument to ``Form.__init__()``. For example::
 
-    from django import forms
+    from thibaud import forms
 
 
     class MyForm(forms.Form):
@@ -980,14 +980,14 @@ ignored. This makes it possible to disable a field in a subclass by setting it
 to ``None`` without having to redefine ordering.
 
 You can also use the ``Form.field_order`` argument to a :class:`Form` to
-override the field order. If a :class:`~django.forms.Form` defines
+override the field order. If a :class:`~thibaud.forms.Form` defines
 :attr:`~Form.field_order` *and* you include ``field_order`` when instantiating
 the ``Form``, then the latter ``field_order`` will have precedence.
 
 .. method:: Form.order_fields(field_order)
 
 You may rearrange the fields any time using ``order_fields()`` with a list of
-field names as in :attr:`~django.forms.Form.field_order`.
+field names as in :attr:`~thibaud.forms.Form.field_order`.
 
 .. _form-error-display:
 
@@ -1033,7 +1033,7 @@ The following:
         <input type="checkbox" name="cc_myself" id="id_cc_myself" checked>
     </div>
 
-Django's default form templates will associate validation errors with their
+Thibaud's default form templates will associate validation errors with their
 input by using the ``aria-describedby`` HTML attribute when the field has an
 ``auto_id`` and a custom ``aria-describedby`` is not provided. If a custom
 ``aria-describedby`` is set when defining the widget this will override the
@@ -1054,7 +1054,7 @@ Customizing the error list format
 
 .. class:: ErrorList(initlist=None, error_class=None, renderer=None, field_id=None)
 
-    By default, forms use ``django.forms.utils.ErrorList`` to format validation
+    By default, forms use ``thibaud.forms.utils.ErrorList`` to format validation
     errors. ``ErrorList`` is a list like object where ``initlist`` is the
     list of errors. In addition this class has the following attributes and
     methods.
@@ -1088,19 +1088,19 @@ Customizing the error list format
 
         The name of the template used when calling ``__str__`` or
         :meth:`render`. By default this is
-        ``'django/forms/errors/list/default.html'`` which is a proxy for the
+        ``'thibaud/forms/errors/list/default.html'`` which is a proxy for the
         ``'ul.html'`` template.
 
     .. attribute:: template_name_text
 
         The name of the template used when calling :meth:`.as_text`. By default
-        this is ``'django/forms/errors/list/text.html'``. This template renders
+        this is ``'thibaud/forms/errors/list/text.html'``. This template renders
         the errors as a list of bullet points.
 
     .. attribute:: template_name_ul
 
         The name of the template used when calling :meth:`.as_ul`. By default
-        this is ``'django/forms/errors/list/ul.html'``. This template renders
+        this is ``'thibaud/forms/errors/list/ul.html'``. This template renders
         the errors in ``<li>`` tags with a wrapping ``<ul>`` with the CSS
         classes as defined by :attr:`.error_class`.
 
@@ -1210,8 +1210,8 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.data
 
-    This property returns the data for this :class:`~django.forms.BoundField`
-    extracted by the widget's :meth:`~django.forms.Widget.value_from_datadict`
+    This property returns the data for this :class:`~thibaud.forms.BoundField`
+    extracted by the widget's :meth:`~thibaud.forms.Widget.value_from_datadict`
     method, or ``None`` if it wasn't given:
 
     .. code-block:: pycon
@@ -1250,22 +1250,22 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.field
 
-    The form :class:`~django.forms.Field` instance from the form class that
-    this :class:`~django.forms.BoundField` wraps.
+    The form :class:`~thibaud.forms.Field` instance from the form class that
+    this :class:`~thibaud.forms.BoundField` wraps.
 
 .. attribute:: BoundField.form
 
-    The :class:`~django.forms.Form` instance this :class:`~django.forms.BoundField`
+    The :class:`~thibaud.forms.Form` instance this :class:`~thibaud.forms.BoundField`
     is bound to.
 
 .. attribute:: BoundField.help_text
 
-    The :attr:`~django.forms.Field.help_text` of the field.
+    The :attr:`~thibaud.forms.Field.help_text` of the field.
 
 .. attribute:: BoundField.html_name
 
     The name that will be used in the widget's HTML ``name`` attribute. It takes
-    the form :attr:`~django.forms.Form.prefix` into account.
+    the form :attr:`~thibaud.forms.Form.prefix` into account.
 
 .. attribute:: BoundField.id_for_label
 
@@ -1274,13 +1274,13 @@ Attributes of ``BoundField``
     :meth:`~BoundField.label_tag`/:meth:`~BoundField.legend_tag` will do this
     for you):
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         <label for="{{ form.my_field.id_for_label }}">...</label>{{ my_field }}
 
     By default, this will be the field's name prefixed by ``id_``
     ("``id_my_field``" for the example above). You may modify the ID by setting
-    :attr:`~django.forms.Widget.attrs` on the field's widget. For example,
+    :attr:`~thibaud.forms.Widget.attrs` on the field's widget. For example,
     declaring a field like this::
 
         my_field = forms.CharField(widget=forms.TextInput(attrs={"id": "myFIELD"}))
@@ -1319,12 +1319,12 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.is_hidden
 
-    Returns ``True`` if this :class:`~django.forms.BoundField`'s widget is
+    Returns ``True`` if this :class:`~thibaud.forms.BoundField`'s widget is
     hidden.
 
 .. attribute:: BoundField.label
 
-    The :attr:`~django.forms.Field.label` of the field. This is used in
+    The :attr:`~thibaud.forms.Field.label` of the field. This is used in
     :meth:`~BoundField.label_tag`/:meth:`~BoundField.legend_tag`.
 
 .. attribute:: BoundField.name
@@ -1344,8 +1344,8 @@ Attributes of ``BoundField``
     The name of the template rendered with :meth:`.BoundField.as_field_group`.
 
     A property returning the value of the
-    :attr:`~django.forms.Field.template_name` if set otherwise
-    :attr:`~django.forms.renderers.BaseRenderer.field_template_name`.
+    :attr:`~thibaud.forms.Field.template_name` if set otherwise
+    :attr:`~thibaud.forms.renderers.BaseRenderer.field_template_name`.
 
 .. attribute:: BoundField.use_fieldset
 
@@ -1357,7 +1357,7 @@ Attributes of ``BoundField``
     trailing ``input`` or ``widget`` removed. This may be used when building
     forms where the layout is dependent upon the widget type. For example:
 
-    .. code-block:: html+django
+    .. code-block:: html+thibaud
 
         {% for field in form %}
             {% if field.widget_type == 'checkbox' %}
@@ -1375,14 +1375,14 @@ Methods of ``BoundField``
 
     Renders the field using :meth:`.BoundField.render` with default values
     which renders the ``BoundField``, including its label, help text and errors
-    using the template's :attr:`~django.forms.Field.template_name` if set
-    otherwise :attr:`~django.forms.renderers.BaseRenderer.field_template_name`
+    using the template's :attr:`~thibaud.forms.Field.template_name` if set
+    otherwise :attr:`~thibaud.forms.renderers.BaseRenderer.field_template_name`
 
 .. method:: BoundField.as_hidden(attrs=None, **kwargs)
 
     Returns a string of HTML for representing this as an ``<input type="hidden">``.
 
-    ``**kwargs`` are passed to :meth:`~django.forms.BoundField.as_widget`.
+    ``**kwargs`` are passed to :meth:`~thibaud.forms.BoundField.as_widget`.
 
     This method is primarily used internally. You should use a widget instead.
 
@@ -1392,12 +1392,12 @@ Methods of ``BoundField``
     attributes passed as ``attrs``.  If no widget is specified, then the
     field's default widget will be used.
 
-    ``only_initial`` is used by Django internals and should not be set
+    ``only_initial`` is used by Thibaud internals and should not be set
     explicitly.
 
 .. method:: BoundField.css_classes(extra_classes=None)
 
-    When you use Django's rendering shortcuts, CSS classes are used to
+    When you use Thibaud's rendering shortcuts, CSS classes are used to
     indicate required form fields or fields that contain errors. If you're
     manually rendering a form, you can access these CSS classes using the
     ``css_classes`` method:
@@ -1506,7 +1506,7 @@ Customizing ``BoundField``
 
 .. versionadded:: 5.2
 
-Define a custom :class:`~django.forms.BoundField` class to use when rendering
+Define a custom :class:`~thibaud.forms.BoundField` class to use when rendering
 the form. This takes precedence over the project-level
 :attr:`.BaseRenderer.bound_field_class` (along with a custom
 :setting:`FORM_RENDERER`), but can be overridden by the field-level
@@ -1522,7 +1522,7 @@ previous options are preferred.
 
 You may want to use a custom :class:`.BoundField` if you need to access some
 additional information about a form field in a template and using a subclass of
-:class:`~django.forms.Field` isn't sufficient.
+:class:`~thibaud.forms.Field` isn't sufficient.
 
 For example, if you have a ``GPSCoordinatesField``, and want to be able to
 access additional information about the coordinates in a template, this could
@@ -1598,12 +1598,12 @@ Alternatively, to override the ``BoundField`` class at the project level,
 .. code-block:: python
     :caption: ``mysite/renderers.py``
 
-    from django.forms.renderers import DjangoTemplates
+    from thibaud.forms.renderers import ThibaudTemplates
 
     from .forms import CustomBoundField
 
 
-    class CustomRenderer(DjangoTemplates):
+    class CustomRenderer(ThibaudTemplates):
         bound_field_class = CustomBoundField
 
 .. code-block:: python
@@ -1637,7 +1637,7 @@ need to bind the file data containing the mugshot image:
 .. code-block:: pycon
 
     # Bound form with an image field
-    >>> from django.core.files.uploadedfile import SimpleUploadedFile
+    >>> from thibaud.core.files.uploadedfile import SimpleUploadedFile
     >>> data = {
     ...     "subject": "hello",
     ...     "message": "Hi there",
@@ -1681,7 +1681,7 @@ tells you whether the form requires multipart encoding for submission:
 
 Here's an example of how you might use this in a template:
 
-.. code-block:: html+django
+.. code-block:: html+thibaud
 
     {% if form.is_multipart %}
         <form enctype="multipart/form-data" method="post" action="/foo/">
@@ -1725,7 +1725,7 @@ classes:
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
     >>> class PersonForm(forms.Form):
     ...     first_name = forms.CharField()
     ...     last_name = forms.CharField()
@@ -1748,7 +1748,7 @@ by setting the name of the field to ``None`` on the subclass. For example:
 
 .. code-block:: pycon
 
-    >>> from django import forms
+    >>> from thibaud import forms
 
     >>> class ParentForm(forms.Form):
     ...     name = forms.CharField()
@@ -1769,7 +1769,7 @@ Prefixes for forms
 
 .. attribute:: Form.prefix
 
-You can put several Django forms inside one ``<form>`` tag. To give each
+You can put several Thibaud forms inside one ``<form>`` tag. To give each
 ``Form`` its own namespace, use the ``prefix`` keyword argument:
 
 .. code-block:: pycon

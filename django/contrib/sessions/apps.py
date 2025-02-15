@@ -1,7 +1,7 @@
-from django.apps import AppConfig
-from django.utils.translation import gettext_lazy as _
+from thibaud.apps import AppConfig
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class SessionsConfig(AppConfig):
-    name = "django.contrib.sessions"
+    name = "thibaud.contrib.sessions"
     verbose_name = _("Sessions")

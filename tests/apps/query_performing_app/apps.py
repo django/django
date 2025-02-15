@@ -1,5 +1,5 @@
-from django.apps import AppConfig
-from django.db import connections
+from thibaud.apps import AppConfig
+from thibaud.db import connections
 
 
 class BaseAppConfig(AppConfig):

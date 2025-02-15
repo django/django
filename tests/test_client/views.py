@@ -2,23 +2,23 @@ import json
 from urllib.parse import urlencode
 from xml.dom.minidom import parseString
 
-from django.contrib.auth.decorators import login_required, permission_required
-from django.core import mail
-from django.core.exceptions import ValidationError
-from django.forms import fields
-from django.forms.forms import Form
-from django.http import (
+from thibaud.contrib.auth.decorators import login_required, permission_required
+from thibaud.core import mail
+from thibaud.core.exceptions import ValidationError
+from thibaud.forms import fields
+from thibaud.forms.forms import Form
+from thibaud.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseNotAllowed,
     HttpResponseNotFound,
     HttpResponseRedirect,
 )
-from django.shortcuts import render
-from django.template import Context, Template
-from django.test import Client
-from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
+from thibaud.shortcuts import render
+from thibaud.template import Context, Template
+from thibaud.test import Client
+from thibaud.utils.decorators import method_decorator
+from thibaud.views.generic import TemplateView
 
 
 def get_view(request):
@@ -397,8 +397,8 @@ def nesting_exception_view(request):
     raise Exception("exception message")
 
 
-def django_project_redirect(request):
-    return HttpResponseRedirect("https://www.djangoproject.com/")
+def thibaud_project_redirect(request):
+    return HttpResponseRedirect("https://www.thibaudproject.com/")
 
 
 def no_trailing_slash_external_redirect(request):

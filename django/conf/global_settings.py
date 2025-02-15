@@ -1,11 +1,11 @@
 """
-Default Django settings. Override these with settings in the module pointed to
+Default Thibaud settings. Override these with settings in the module pointed to
 by the DJANGO_SETTINGS_MODULE environment variable.
 """
 
 
 # This is defined here as a do-nothing function because we can't import
-# django.utils.translation -- that module depends on the settings.
+# thibaud.utils.translation -- that module depends on the settings.
 def gettext_noop(s):
     return s
 
@@ -40,7 +40,7 @@ ALLOWED_HOSTS = []
 # interpreted as the default user time zone.
 TIME_ZONE = "America/Chicago"
 
-# If you set this to True, Django will use timezone-aware datetimes.
+# If you set this to True, Thibaud will use timezone-aware datetimes.
 USE_TZ = True
 
 # Language code for this installation. Valid choices can be found here:
@@ -155,13 +155,13 @@ LANGUAGES = [
 # Languages using BiDi (right-to-left) layout
 LANGUAGES_BIDI = ["he", "ar", "ar-dz", "ckb", "fa", "ug", "ur"]
 
-# If you set this to False, Django will make some optimizations so as not
+# If you set this to False, Thibaud will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
 LOCALE_PATHS = []
 
 # Settings for language cookie
-LANGUAGE_COOKIE_NAME = "django_language"
+LANGUAGE_COOKIE_NAME = "thibaud_language"
 LANGUAGE_COOKIE_AGE = None
 LANGUAGE_COOKIE_DOMAIN = None
 LANGUAGE_COOKIE_PATH = "/"
@@ -186,11 +186,11 @@ DATABASES = {}
 # Classes used to implement DB routing behavior.
 DATABASE_ROUTERS = []
 
-# The email backend to use. For possible shortcuts see django.core.mail.
+# The email backend to use. For possible shortcuts see thibaud.core.mail.
 # The default is to use the SMTP backend.
 # Third-party backends can be specified by providing a Python path
 # to a module that defines an EmailBackend class.
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "thibaud.core.mail.backends.smtp.EmailBackend"
 
 # Host for sending email.
 EMAIL_HOST = "localhost"
@@ -216,15 +216,15 @@ INSTALLED_APPS = []
 TEMPLATES = []
 
 # Default form rendering class.
-FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
+FORM_RENDERER = "thibaud.forms.renderers.ThibaudTemplates"
 
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = "webmaster@localhost"
 
-# Subject-line prefix for email messages send with django.core.mail.mail_admins
+# Subject-line prefix for email messages send with thibaud.core.mail.mail_admins
 # or ...mail_managers.  Make sure to include the trailing space.
-EMAIL_SUBJECT_PREFIX = "[Django] "
+EMAIL_SUBJECT_PREFIX = "[Thibaud] "
 
 # Whether to append trailing slashes to URLs.
 APPEND_SLASH = True
@@ -261,8 +261,8 @@ ABSOLUTE_URL_OVERRIDES = {}
 #    ]
 IGNORABLE_404_URLS = []
 
-# A secret key for this particular Django installation. Used in secret-key
-# hashing algorithms. Set this in your settings, or Django will complain
+# A secret key for this particular Thibaud installation. Used in secret-key
+# hashing algorithms. Set this in your settings, or Thibaud will complain
 # loudly.
 SECRET_KEY = ""
 
@@ -272,10 +272,10 @@ SECRET_KEY_FALLBACKS = []
 
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "thibaud.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "thibaud.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
@@ -297,8 +297,8 @@ STATIC_URL = None
 
 # List of upload handler classes to be applied in order.
 FILE_UPLOAD_HANDLERS = [
-    "django.core.files.uploadhandler.MemoryFileUploadHandler",
-    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+    "thibaud.core.files.uploadhandler.MemoryFileUploadHandler",
+    "thibaud.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
 
 # Maximum size, in bytes, of a request before it will be streamed to the
@@ -318,7 +318,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 DATA_UPLOAD_MAX_NUMBER_FILES = 100
 
 # Directory in which upload streamed files will be temporarily saved. A value of
-# `None` will make Django use the operating system's default temporary directory
+# `None` will make Thibaud use the operating system's default temporary directory
 # (i.e. "/tmp" on *nix systems).
 FILE_UPLOAD_TEMP_DIR = None
 
@@ -339,34 +339,34 @@ FILE_UPLOAD_DIRECTORY_PERMISSIONS = None
 FORMAT_MODULE_PATH = None
 
 # Default formatting for date objects. See all available format strings here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# https://docs.thibaudproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = "N j, Y"
 
 # Default formatting for datetime objects. See all available format strings here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# https://docs.thibaudproject.com/en/dev/ref/templates/builtins/#date
 DATETIME_FORMAT = "N j, Y, P"
 
 # Default formatting for time objects. See all available format strings here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# https://docs.thibaudproject.com/en/dev/ref/templates/builtins/#date
 TIME_FORMAT = "P"
 
 # Default formatting for date objects when only the year and month are relevant.
 # See all available format strings here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# https://docs.thibaudproject.com/en/dev/ref/templates/builtins/#date
 YEAR_MONTH_FORMAT = "F Y"
 
 # Default formatting for date objects when only the month and day are relevant.
 # See all available format strings here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# https://docs.thibaudproject.com/en/dev/ref/templates/builtins/#date
 MONTH_DAY_FORMAT = "F j"
 
 # Default short formatting for date objects. See all available format strings here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# https://docs.thibaudproject.com/en/dev/ref/templates/builtins/#date
 SHORT_DATE_FORMAT = "m/d/Y"
 
 # Default short formatting for datetime objects.
 # See all available format strings here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# https://docs.thibaudproject.com/en/dev/ref/templates/builtins/#date
 SHORT_DATETIME_FORMAT = "m/d/Y P"
 
 # Default formats to be used when parsing dates from input boxes, in order
@@ -436,7 +436,7 @@ DEFAULT_TABLESPACE = ""
 DEFAULT_INDEX_TABLESPACE = ""
 
 # Default primary key field type.
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+DEFAULT_AUTO_FIELD = "thibaud.db.models.AutoField"
 
 # Default X-Frame-Options header value
 X_FRAME_OPTIONS = "DENY"
@@ -444,14 +444,14 @@ X_FRAME_OPTIONS = "DENY"
 USE_X_FORWARDED_HOST = False
 USE_X_FORWARDED_PORT = False
 
-# The Python dotted path to the WSGI application that Django's internal server
+# The Python dotted path to the WSGI application that Thibaud's internal server
 # (runserver) will use. If `None`, the return value of
-# 'django.core.wsgi.get_wsgi_application' is used, thus preserving the same
-# behavior as previous versions of Django. Otherwise this should point to an
+# 'thibaud.core.wsgi.get_wsgi_application' is used, thus preserving the same
+# behavior as previous versions of Thibaud. Otherwise this should point to an
 # actual WSGI application object.
 WSGI_APPLICATION = None
 
-# If your Django app is behind a proxy that sets a header to specify secure
+# If your Thibaud app is behind a proxy that sets a header to specify secure
 # connections, AND that proxy ensures that user-submitted headers with the
 # same name are ignored (so that people can't spoof it), set this value to
 # a tuple of (header_name, header_value). For any requests that come in with
@@ -495,12 +495,12 @@ SESSION_SAVE_EVERY_REQUEST = False
 # Whether a user's session cookie expires when the web browser is closed.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 # The module to store session data
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_ENGINE = "thibaud.contrib.sessions.backends.db"
 # Directory to store session files if using the file session module. If None,
 # the backend will use a sensible default.
 SESSION_FILE_PATH = None
 # class to serialize session data
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
+SESSION_SERIALIZER = "thibaud.contrib.sessions.serializers.JSONSerializer"
 
 #########
 # CACHE #
@@ -509,7 +509,7 @@ SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
 # The cache backends to use.
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "BACKEND": "thibaud.core.cache.backends.locmem.LocMemCache",
     }
 }
 CACHE_MIDDLEWARE_KEY_PREFIX = ""
@@ -522,7 +522,7 @@ CACHE_MIDDLEWARE_ALIAS = "default"
 
 AUTH_USER_MODEL = "auth.User"
 
-AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+AUTHENTICATION_BACKENDS = ["thibaud.contrib.auth.backends.ModelBackend"]
 
 LOGIN_URL = "/accounts/login/"
 
@@ -537,11 +537,11 @@ PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 # password using different algorithms will be converted automatically
 # upon login
 PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
-    "django.contrib.auth.hashers.Argon2PasswordHasher",
-    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
-    "django.contrib.auth.hashers.ScryptPasswordHasher",
+    "thibaud.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "thibaud.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "thibaud.contrib.auth.hashers.Argon2PasswordHasher",
+    "thibaud.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "thibaud.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
 AUTH_PASSWORD_VALIDATORS = []
@@ -550,7 +550,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # SIGNING #
 ###########
 
-SIGNING_BACKEND = "django.core.signing.TimestampSigner"
+SIGNING_BACKEND = "thibaud.core.signing.TimestampSigner"
 
 ########
 # CSRF #
@@ -558,7 +558,7 @@ SIGNING_BACKEND = "django.core.signing.TimestampSigner"
 
 # Dotted path to callable to be used as view when a request is
 # rejected by the CSRF middleware.
-CSRF_FAILURE_VIEW = "django.views.csrf.csrf_failure"
+CSRF_FAILURE_VIEW = "thibaud.views.csrf.csrf_failure"
 
 # Settings for CSRF cookie.
 CSRF_COOKIE_NAME = "csrftoken"
@@ -577,10 +577,10 @@ CSRF_USE_SESSIONS = False
 ############
 
 # Class to use as messages backend
-MESSAGE_STORAGE = "django.contrib.messages.storage.fallback.FallbackStorage"
+MESSAGE_STORAGE = "thibaud.contrib.messages.storage.fallback.FallbackStorage"
 
 # Default values of MESSAGE_LEVEL and MESSAGE_TAGS are defined within
-# django.contrib.messages to avoid imports in this settings file.
+# thibaud.contrib.messages to avoid imports in this settings file.
 
 ###########
 # LOGGING #
@@ -594,18 +594,18 @@ LOGGING = {}
 
 # Default exception reporter class used in case none has been
 # specifically assigned to the HttpRequest instance.
-DEFAULT_EXCEPTION_REPORTER = "django.views.debug.ExceptionReporter"
+DEFAULT_EXCEPTION_REPORTER = "thibaud.views.debug.ExceptionReporter"
 
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.
-DEFAULT_EXCEPTION_REPORTER_FILTER = "django.views.debug.SafeExceptionReporterFilter"
+DEFAULT_EXCEPTION_REPORTER_FILTER = "thibaud.views.debug.SafeExceptionReporterFilter"
 
 ###########
 # TESTING #
 ###########
 
 # The name of the class to use to run the test suite
-TEST_RUNNER = "django.test.runner.DiscoverRunner"
+TEST_RUNNER = "thibaud.test.runner.DiscoverRunner"
 
 # Apps that don't need to be serialized at test database creation time
 # (only apps with migrations are to start with)
@@ -628,9 +628,9 @@ STATICFILES_DIRS = []
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = [
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    "thibaud.contrib.staticfiles.finders.FileSystemFinder",
+    "thibaud.contrib.staticfiles.finders.AppDirectoriesFinder",
+    # 'thibaud.contrib.staticfiles.finders.DefaultStorageFinder',
 ]
 
 ##############
@@ -647,7 +647,7 @@ MIGRATION_MODULES = {}
 # List of all issues generated by system checks that should be silenced. Light
 # issues like warnings, infos or debugs will not generate a message. Silencing
 # serious issues like errors and criticals does not result in hiding the
-# message, but Django will not stop you from e.g. running server.
+# message, but Thibaud will not stop you from e.g. running server.
 SILENCED_SYSTEM_CHECKS = []
 
 #######################

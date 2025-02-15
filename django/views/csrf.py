@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from django.conf import settings
-from django.http import HttpResponseForbidden
-from django.template import Context, Engine, TemplateDoesNotExist, loader
-from django.utils.translation import gettext as _
-from django.utils.version import get_docs_version
+from thibaud.conf import settings
+from thibaud.http import HttpResponseForbidden
+from thibaud.template import Context, Engine, TemplateDoesNotExist, loader
+from thibaud.utils.translation import gettext as _
+from thibaud.utils.version import get_docs_version
 
 CSRF_FAILURE_TEMPLATE_NAME = "403_csrf.html"
 
@@ -23,7 +23,7 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
     """
     Default view used when request fails CSRF protection
     """
-    from django.middleware.csrf import REASON_NO_CSRF_COOKIE, REASON_NO_REFERER
+    from thibaud.middleware.csrf import REASON_NO_CSRF_COOKIE, REASON_NO_REFERER
 
     c = {
         "title": _("Forbidden"),

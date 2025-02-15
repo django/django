@@ -1,19 +1,19 @@
 import os
 from unittest.mock import patch
 
-import django
-from django.apps import AppConfig, apps
-from django.apps.registry import Apps
-from django.contrib.admin.models import LogEntry
-from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.db import connections, models
-from django.test import (
+import thibaud
+from thibaud.apps import AppConfig, apps
+from thibaud.apps.registry import Apps
+from thibaud.contrib.admin.models import LogEntry
+from thibaud.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
+from thibaud.db import connections, models
+from thibaud.test import (
     SimpleTestCase,
     TransactionTestCase,
     override_settings,
     skipUnlessDBFeature,
 )
-from django.test.utils import extend_sys_path, isolate_apps
+from thibaud.test.utils import extend_sys_path, isolate_apps
 
 from .models import SoAlternative, TotallyNormal, new_apps
 from .one_config_app.apps import OneConfig
@@ -25,15 +25,15 @@ from .two_configs_one_default_app.apps import TwoConfig
 SOME_INSTALLED_APPS = [
     "apps.apps.MyAdmin",
     "apps.apps.MyAuth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
+    "thibaud.contrib.contenttypes",
+    "thibaud.contrib.sessions",
+    "thibaud.contrib.messages",
+    "thibaud.contrib.staticfiles",
 ]
 
 SOME_INSTALLED_APPS_NAMES = [
-    "django.contrib.admin",
-    "django.contrib.auth",
+    "thibaud.contrib.admin",
+    "thibaud.contrib.auth",
 ] + SOME_INSTALLED_APPS[2:]
 
 HERE = os.path.dirname(__file__)
@@ -161,27 +161,27 @@ class AppsTests(SimpleTestCase):
         Tests apps.get_app_config().
         """
         app_config = apps.get_app_config("admin")
-        self.assertEqual(app_config.name, "django.contrib.admin")
+        self.assertEqual(app_config.name, "thibaud.contrib.admin")
 
         app_config = apps.get_app_config("staticfiles")
-        self.assertEqual(app_config.name, "django.contrib.staticfiles")
+        self.assertEqual(app_config.name, "thibaud.contrib.staticfiles")
 
         with self.assertRaises(LookupError):
             apps.get_app_config("admindocs")
 
-        msg = "No installed app with label 'django.contrib.auth'. Did you mean 'myauth'"
+        msg = "No installed app with label 'thibaud.contrib.auth'. Did you mean 'myauth'"
         with self.assertRaisesMessage(LookupError, msg):
-            apps.get_app_config("django.contrib.auth")
+            apps.get_app_config("thibaud.contrib.auth")
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_is_installed(self):
         """
         Tests apps.is_installed().
         """
-        self.assertIs(apps.is_installed("django.contrib.admin"), True)
-        self.assertIs(apps.is_installed("django.contrib.auth"), True)
-        self.assertIs(apps.is_installed("django.contrib.staticfiles"), True)
-        self.assertIs(apps.is_installed("django.contrib.admindocs"), False)
+        self.assertIs(apps.is_installed("thibaud.contrib.admin"), True)
+        self.assertIs(apps.is_installed("thibaud.contrib.auth"), True)
+        self.assertIs(apps.is_installed("thibaud.contrib.staticfiles"), True)
+        self.assertIs(apps.is_installed("thibaud.contrib.admindocs"), False)
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
@@ -481,25 +481,25 @@ class AppConfigTests(SimpleTestCase):
 
     @override_settings(
         INSTALLED_APPS=["apps.apps.ModelPKAppsConfig"],
-        DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField",
+        DEFAULT_AUTO_FIELD="thibaud.db.models.SmallAutoField",
     )
     def test_app_default_auto_field(self):
         apps_config = apps.get_app_config("apps")
         self.assertEqual(
             apps_config.default_auto_field,
-            "django.db.models.BigAutoField",
+            "thibaud.db.models.BigAutoField",
         )
         self.assertIs(apps_config._is_default_auto_field_overridden, True)
 
     @override_settings(
         INSTALLED_APPS=["apps.apps.PlainAppsConfig"],
-        DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField",
+        DEFAULT_AUTO_FIELD="thibaud.db.models.SmallAutoField",
     )
     def test_default_auto_field_setting(self):
         apps_config = apps.get_app_config("apps")
         self.assertEqual(
             apps_config.default_auto_field,
-            "django.db.models.SmallAutoField",
+            "thibaud.db.models.SmallAutoField",
         )
         self.assertIs(apps_config._is_default_auto_field_overridden, False)
 
@@ -613,7 +613,7 @@ class QueryPerformingAppTests(TransactionTestCase):
         try:
             with patch.multiple(apps, ready=False, loading=False, app_configs={}):
                 with self.assertWarnsMessage(RuntimeWarning, self.expected_msg):
-                    django.setup()
+                    thibaud.setup()
 
                 app_config = apps.get_app_config("query_performing_app")
                 return app_config.query_results

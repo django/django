@@ -3,9 +3,9 @@ from decimal import Decimal
 from io import StringIO
 from ipaddress import IPv6Address
 
-from django.core.exceptions import ValidationError
-from django.test import SimpleTestCase
-from django.utils.ipv6 import (
+from thibaud.core.exceptions import ValidationError
+from thibaud.test import SimpleTestCase
+from thibaud.utils.ipv6 import (
     MAX_IPV6_ADDRESS_LENGTH,
     clean_ipv6_address,
     is_valid_ipv6_address,

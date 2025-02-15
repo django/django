@@ -1,8 +1,8 @@
 import datetime
 
-from django.db import connection, models, transaction
-from django.db.models import Exists, OuterRef
-from django.test import (
+from thibaud.db import connection, models, transaction
+from thibaud.db.models import Exists, OuterRef
+from thibaud.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
@@ -83,7 +83,7 @@ class DeleteLockingTest(TransactionTestCase):
 class DeleteCascadeTests(TestCase):
     def test_generic_relation_cascade(self):
         """
-        Django cascades deletes through generic-related objects to their
+        Thibaud cascades deletes through generic-related objects to their
         reverse relations.
         """
         person = Person.objects.create(name="Nelson Mandela")

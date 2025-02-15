@@ -1,5 +1,5 @@
-from django.core.management import call_command
-from django.test import TestCase, TransactionTestCase
+from thibaud.core.management import call_command
+from thibaud.test import TestCase, TransactionTestCase
 
 from .models import Book
 

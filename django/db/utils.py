@@ -1,17 +1,17 @@
 import pkgutil
 from importlib import import_module
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
 
-# For backwards compatibility with Django < 3.2
-from django.utils.connection import ConnectionDoesNotExist  # NOQA: F401
-from django.utils.connection import BaseConnectionHandler
-from django.utils.functional import cached_property
-from django.utils.module_loading import import_string
+# For backwards compatibility with Thibaud < 3.2
+from thibaud.utils.connection import ConnectionDoesNotExist  # NOQA: F401
+from thibaud.utils.connection import BaseConnectionHandler
+from thibaud.utils.functional import cached_property
+from thibaud.utils.module_loading import import_string
 
 DEFAULT_DB_ALIAS = "default"
-DJANGO_VERSION_PICKLE_KEY = "_django_version"
+DJANGO_VERSION_PICKLE_KEY = "_thibaud_version"
 
 
 class Error(Exception):
@@ -53,7 +53,7 @@ class NotSupportedError(DatabaseError):
 class DatabaseErrorWrapper:
     """
     Context manager and decorator that reraises backend-specific database
-    exceptions using Django's common wrappers.
+    exceptions using Thibaud's common wrappers.
     """
 
     def __init__(self, wrapper):
@@ -105,33 +105,33 @@ def load_backend(backend_name):
     Return a database backend's "base" module given a fully qualified database
     backend name, or raise an error if it doesn't exist.
     """
-    # This backend was renamed in Django 1.9.
-    if backend_name == "django.db.backends.postgresql_psycopg2":
-        backend_name = "django.db.backends.postgresql"
+    # This backend was renamed in Thibaud 1.9.
+    if backend_name == "thibaud.db.backends.postgresql_psycopg2":
+        backend_name = "thibaud.db.backends.postgresql"
 
     try:
         return import_module("%s.base" % backend_name)
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all built-in database backends.
-        import django.db.backends
+        import thibaud.db.backends
 
         builtin_backends = [
             name
-            for _, name, ispkg in pkgutil.iter_modules(django.db.backends.__path__)
+            for _, name, ispkg in pkgutil.iter_modules(thibaud.db.backends.__path__)
             if ispkg and name not in {"base", "dummy"}
         ]
-        if backend_name not in ["django.db.backends.%s" % b for b in builtin_backends]:
+        if backend_name not in ["thibaud.db.backends.%s" % b for b in builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))
             raise ImproperlyConfigured(
                 "%r isn't an available database backend or couldn't be "
                 "imported. Check the above exception. To use one of the "
-                "built-in backends, use 'django.db.backends.XXX', where XXX "
+                "built-in backends, use 'thibaud.db.backends.XXX', where XXX "
                 "is one of:\n"
                 "    %s" % (backend_name, ", ".join(backend_reprs))
             ) from e_user
         else:
-            # If there's some other error, this must be an error in Django
+            # If there's some other error, this must be an error in Thibaud
             raise
 
 
@@ -147,21 +147,21 @@ class ConnectionHandler(BaseConnectionHandler):
     def configure_settings(self, databases):
         databases = super().configure_settings(databases)
         if databases == {}:
-            databases[DEFAULT_DB_ALIAS] = {"ENGINE": "django.db.backends.dummy"}
+            databases[DEFAULT_DB_ALIAS] = {"ENGINE": "thibaud.db.backends.dummy"}
         elif DEFAULT_DB_ALIAS not in databases:
             raise ImproperlyConfigured(
                 f"You must define a '{DEFAULT_DB_ALIAS}' database."
             )
         elif databases[DEFAULT_DB_ALIAS] == {}:
-            databases[DEFAULT_DB_ALIAS]["ENGINE"] = "django.db.backends.dummy"
+            databases[DEFAULT_DB_ALIAS]["ENGINE"] = "thibaud.db.backends.dummy"
 
         # Configure default settings.
         for conn in databases.values():
             conn.setdefault("ATOMIC_REQUESTS", False)
             conn.setdefault("AUTOCOMMIT", True)
-            conn.setdefault("ENGINE", "django.db.backends.dummy")
-            if conn["ENGINE"] == "django.db.backends." or not conn["ENGINE"]:
-                conn["ENGINE"] = "django.db.backends.dummy"
+            conn.setdefault("ENGINE", "thibaud.db.backends.dummy")
+            if conn["ENGINE"] == "thibaud.db.backends." or not conn["ENGINE"]:
+                conn["ENGINE"] = "thibaud.db.backends.dummy"
             conn.setdefault("CONN_MAX_AGE", 0)
             conn.setdefault("CONN_HEALTH_CHECKS", False)
             conn.setdefault("OPTIONS", {})
@@ -185,7 +185,7 @@ class ConnectionHandler(BaseConnectionHandler):
     def databases(self):
         # Maintained for backward compatibility as some 3rd party packages have
         # made use of this private API in the past. It is no longer used within
-        # Django itself.
+        # Thibaud itself.
         return self.settings
 
     def create_connection(self, alias):

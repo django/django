@@ -3,8 +3,8 @@ Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
 
-from django.core.exceptions import FullResultSet
-from django.db.models.sql.constants import INNER, LOUTER
+from thibaud.core.exceptions import FullResultSet
+from thibaud.db.models.sql.constants import INNER, LOUTER
 
 
 class MultiJoin(Exception):

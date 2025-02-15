@@ -9,11 +9,11 @@ from datetime import datetime
 from itertools import cycle as itertools_cycle
 from itertools import groupby
 
-from django.conf import settings
-from django.utils import timezone
-from django.utils.html import conditional_escape, escape, format_html
-from django.utils.lorem_ipsum import paragraphs, words
-from django.utils.safestring import mark_safe
+from thibaud.conf import settings
+from thibaud.utils import timezone
+from thibaud.utils.html import conditional_escape, escape, format_html
+from thibaud.utils.lorem_ipsum import paragraphs, words
+from thibaud.utils.safestring import mark_safe
 
 from .base import (
     BLOCK_TAG_END,
@@ -418,7 +418,7 @@ class SpacelessNode(Node):
         self.nodelist = nodelist
 
     def render(self, context):
-        from django.utils.html import strip_spaces_between_tags
+        from thibaud.utils.html import strip_spaces_between_tags
 
         return strip_spaces_between_tags(self.nodelist.render(context).strip())
 
@@ -461,7 +461,7 @@ class URLNode(Node):
         )
 
     def render(self, context):
-        from django.urls import NoReverseMatch, reverse
+        from thibaud.urls import NoReverseMatch, reverse
 
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
@@ -1073,7 +1073,7 @@ def load(parser, token):
     Load a custom template tag library into the parser.
 
     For example, to load the template tags in
-    ``django/templatetags/news/photos.py``::
+    ``thibaud/templatetags/news/photos.py``::
 
         {% load news.photos %}
 
@@ -1220,7 +1220,7 @@ def regroup(parser, token):
     looks like:
 
         * Guitar:
-            * Django Reinhardt
+            * Thibaud Reinhardt
             * Emily Remler
         * Piano:
             * Lovie Austin

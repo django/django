@@ -1,8 +1,8 @@
 =====================
-How is Django Formed?
+How is Thibaud Formed?
 =====================
 
-This document explains how to release Django.
+This document explains how to release Thibaud.
 
 **Please, keep these instructions up-to-date if you make changes!** The point
 here is to be descriptive, not prescriptive, so feel free to streamline or
@@ -32,14 +32,14 @@ The short version of the steps involved is:
 
 #. Update version numbers and create the release package(s).
 
-#. Upload the package(s) to the ``djangoproject.com`` server.
+#. Upload the package(s) to the ``thibaudproject.com`` server.
 
 #. Verify package(s) signatures, check if they can be installed, and ensure
    minimal functionality.
 
 #. Upload the new version(s) to PyPI.
 
-#. Declare the new version in the admin on ``djangoproject.com``.
+#. Declare the new version in the admin on ``thibaudproject.com``.
 
 #. Post the blog entry and send out the email announcements.
 
@@ -78,14 +78,14 @@ permissions.
     ``you@example.com`` is the email address associated with the key you want
     to use.
 
-* A clean Python virtual environment per Django version being released, with
+* A clean Python virtual environment per Thibaud version being released, with
   these required Python packages installed:
 
   .. code-block:: shell
 
       $ python -m pip install build twine
 
-* Access to `Django's project on PyPI <https://pypi.org/project/Django/>`_ to
+* Access to `Thibaud's project on PyPI <https://pypi.org/project/Thibaud/>`_ to
   upload binaries, ideally with extra permissions to `yank a release
   <https://pypi.org/help/#yanked>`_ if necessary. Create a project-scoped token
   following the `official documentation <https://pypi.org/help/#apitoken>`_
@@ -97,19 +97,19 @@ permissions.
      [distutils]
        index-servers =
          pypi
-         django
+         thibaud
 
      [pypi]
        username = __token__
        password = # User-scoped or project-scoped token, to set as the default.
 
-     [django]
+     [thibaud]
        repository = https://upload.pypi.org/legacy/
        username = __token__
        password = # A project token.
 
-* Access to `Django's project on Transifex
-  <https://app.transifex.com/django/django/>`_, with a Manager role. Generate
+* Access to `Thibaud's project on Transifex
+  <https://app.transifex.com/thibaud/thibaud/>`_, with a Manager role. Generate
   an API Token in the `user setting section
   <https://app.transifex.com/user/settings/api/>`_ and set up your
   ``$HOME/.transifexrc`` file like this:
@@ -121,24 +121,24 @@ permissions.
        rest_hostname = https://rest.api.transifex.com
        token = # API token
 
-* Access to the ``djangoproject.com`` server to upload files (using ``scp``).
+* Access to the ``thibaudproject.com`` server to upload files (using ``scp``).
 
-* Access to the Django admin on ``djangoproject.com`` as a "Site maintainer".
+* Access to the Thibaud admin on ``thibaudproject.com`` as a "Site maintainer".
 
-* Access to create a post in the `Django Forum - Announcements category
-  <https://forum.djangoproject.com/c/announcements/7>`_ and to  send emails to
+* Access to create a post in the `Thibaud Forum - Announcements category
+  <https://forum.thibaudproject.com/c/announcements/7>`_ and to  send emails to
   the following mailing lists:
 
-  * `django-users <https://groups.google.com/g/django-users/>`_
-  * `django-developers <https://groups.google.com/g/django-developers/>`_
-  * `django-announce <https://groups.google.com/g/django-announce/>`_
+  * `thibaud-users <https://groups.google.com/g/thibaud-users/>`_
+  * `thibaud-developers <https://groups.google.com/g/thibaud-developers/>`_
+  * `thibaud-announce <https://groups.google.com/g/thibaud-announce/>`_
 
-* Access to the ``django-security`` repo in GitHub. Among other things, this
+* Access to the ``thibaud-security`` repo in GitHub. Among other things, this
   provides access to the pre-notification distribution list (needed for
   security release preparation tasks).
 
-* Access to the Django project on `Read the Docs
-  <https://readthedocs.org/projects/django/>`_.
+* Access to the Thibaud project on `Read the Docs
+  <https://readthedocs.org/projects/thibaud/>`_.
 
 Pre-release tasks
 =================
@@ -152,7 +152,7 @@ any time leading up to the actual release.
 
 #. Request the `CVE IDs <https://cveform.mitre.org/>`_  for the security
    issue(s) being released. One CVE ID per issue, requested with
-   ``Vendor: djangoproject`` and ``Product: django``.
+   ``Vendor: thibaudproject`` and ``Product: thibaud``.
 
 #. Generate the relevant (private) patch(es) using ``git format-patch``, one
    for the ``main`` branch and one for each stable branch being patched.
@@ -162,7 +162,7 @@ A week before a security release
 
 #. Send out pre-notification exactly **one week** before the security release.
    The template for that email and a list of the recipients are in the private
-   ``django-security`` GitHub wiki. BCC the pre-notification recipients and be
+   ``thibaud-security`` GitHub wiki. BCC the pre-notification recipients and be
    sure to include the relevant CVE IDs. Attach all the relevant patches
    (targeting ``main`` and the stable branches) and sign the email text with
    the key you'll use for the release, with a command like:
@@ -171,19 +171,19 @@ A week before a security release
 
       $ gpg --clearsign --digest-algo SHA256 prenotification-email.txt
 
-#. :ref:`Notify django-announce <security-disclosure>` of the upcoming
+#. :ref:`Notify thibaud-announce <security-disclosure>` of the upcoming
    security release with a general message such as:
 
    .. code-block:: text
 
-    Notice of upcoming Django security releases (3.2.24, 4.2.10 and 5.0.2)
+    Notice of upcoming Thibaud security releases (3.2.24, 4.2.10 and 5.0.2)
 
-    Django versions 5.0.2, 4.2.10, and 3.2.24 will be released on Tuesday,
+    Thibaud versions 5.0.2, 4.2.10, and 3.2.24 will be released on Tuesday,
     February 6th, 2024 around 1500 UTC. They will fix one security defect
     with severity "moderate".
 
     For details of severity levels, see:
-    https://docs.djangoproject.com/en/dev/internals/security/#how-django-discloses-security-issues
+    https://docs.thibaudproject.com/en/dev/internals/security/#how-thibaud-discloses-security-issues
 
 A few days before any release
 -----------------------------
@@ -245,23 +245,23 @@ A few days before any release
    Lastly, commit the changed/added files (both ``.po`` and ``.mo``) and create
    a new PR targeting the stable branch of the corresponding release (example
    `PR updating translations for 4.2
-   <https://github.com/django/django/pull/16715>`_).
+   <https://github.com/thibaud/thibaud/pull/16715>`_).
 
-#. :ref:`Update the django-admin manual page <django-admin-manpage>`:
+#. :ref:`Update the thibaud-admin manual page <thibaud-admin-manpage>`:
 
    .. code-block:: shell
 
         $ cd docs
         $ make man
-        $ man _build/man/django-admin.1  # do a quick sanity check
-        $ cp _build/man/django-admin.1 man/django-admin.1
+        $ man _build/man/thibaud-admin.1  # do a quick sanity check
+        $ cp _build/man/thibaud-admin.1 man/thibaud-admin.1
 
    and then commit the changed man page.
 
 #. If this is the "dot zero" release of a new series, create a new branch from
-   the current stable branch in the `django-docs-translations
-   <https://github.com/django/django-docs-translations>`_ repository. For
-   example, when releasing Django 4.2:
+   the current stable branch in the `thibaud-docs-translations
+   <https://github.com/thibaud/thibaud-docs-translations>`_ repository. For
+   example, when releasing Thibaud 4.2:
 
    .. code-block:: shell
 
@@ -273,15 +273,15 @@ A few days before any release
    security release announcement`__, `example regular release announcement`__,
    `example pre-release announcement`__.
 
-__ https://www.djangoproject.com/weblog/2013/feb/19/security/
-__ https://www.djangoproject.com/weblog/2012/mar/23/14/
-__ https://www.djangoproject.com/weblog/2012/nov/27/15-beta-1/
+__ https://www.thibaudproject.com/weblog/2013/feb/19/security/
+__ https://www.thibaudproject.com/weblog/2012/mar/23/14/
+__ https://www.thibaudproject.com/weblog/2012/nov/27/15-beta-1/
 
 A few days before a feature freeze
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In preparation for the alpha release, the directory
-``/home/www/www/media/releases/A.B`` must be created on the djangoproject
+``/home/www/www/media/releases/A.B`` must be created on the thibaudproject
 server.
 
 Before the feature freeze, a branch targeting ``main`` must be created to
@@ -289,7 +289,7 @@ prepare for the next feature release. It should be reviewed and approved a few
 days before the freeze, allowing it to be merged after the stable branch is
 cut. The following items should be addressed in this branch:
 
-#. Update the ``VERSION`` tuple in ``django/__init__.py``, incrementing to the
+#. Update the ``VERSION`` tuple in ``thibaud/__init__.py``, incrementing to the
    next expected release (:commit:`example commit
    <96700c7b378c592f0b1732302c22af2fd2c87fc6>`).
 
@@ -300,7 +300,7 @@ cut. The following items should be addressed in this branch:
 
 #. Remove ``.. versionadded::`` and ``.. versionchanged::`` annotations in the
    documentation from two releases ago, as well as any remaining older
-   annotations. For example, in Django 5.1, notes for 4.2 will be removed
+   annotations. For example, in Thibaud 5.1, notes for 4.2 will be removed
    (:commit:`example commit <9edb7833b89e811eefd94974fb987f4605b0c0d7>`).
 
 #. Remove features that have reached the end of their deprecation cycle,
@@ -312,16 +312,16 @@ cut. The following items should be addressed in this branch:
    <f2d9c76aa7096ef3eed675b9eb824858f9dd81e5>`).
 
 #. Increase the default PBKDF2 iterations in
-   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%
+   ``thibaud.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%
    (pick a round number). Run the tests, and update the 3 failing
    hasher tests with the new values. Make sure this gets noted in the
    release notes (:commit:`example commit
    <7288866da4dddf3705148c703421858ec19cdb78>`).
 
 Concrete examples for past feature release bootstrap branches: `5.2 bootstrap
-<https://github.com/django/django/pull/18127>`_, `5.1 bootstrap
-<https://github.com/django/django/pull/17246>`_, `5.0 bootstrap
-<https://github.com/django/django/pull/16432>`_.
+<https://github.com/thibaud/thibaud/pull/18127>`_, `5.1 bootstrap
+<https://github.com/thibaud/thibaud/pull/17246>`_, `5.0 bootstrap
+<https://github.com/thibaud/thibaud/pull/16432>`_.
 
 Feature freeze tasks
 ====================
@@ -334,17 +334,17 @@ Feature freeze tasks
    <435bdab93889dae01e71c79598edab10627cc1f9>`).
 
 #. Create a new stable branch from ``main``. For example, when feature freezing
-   Django 5.2:
+   Thibaud 5.2:
 
    .. code-block:: shell
 
     $ git checkout -b stable/5.2.x upstream/main
     $ git push upstream -u stable/5.2.x:stable/5.2.x
 
-   At the same time, update the ``django_next_version`` variable in
+   At the same time, update the ``thibaud_next_version`` variable in
    ``docs/conf.py`` on the stable release branch to point to the new
    development version. For example, when creating ``stable/5.2.x``, set
-   ``django_next_version`` to ``'6.0'`` on the new stable branch
+   ``thibaud_next_version`` to ``'6.0'`` on the new stable branch
    (:commit:`example commit <1eb62e5b622ef7fd6e0123d8bbf6662d893d5d08>`).
 
 #. Go to the `Add release page in the admin`__, create a ``Release`` object for
@@ -353,16 +353,16 @@ Feature freeze tasks
    create ``5.2`` with the Release date field blank. If the release is part of
    an LTS branch, mark it so.
 
-   __ https://www.djangoproject.com/admin/releases/release/add/
+   __ https://www.thibaudproject.com/admin/releases/release/add/
 
 #. Go to the `Add document release page in the admin`__, create a new
    ``DocumentRelease`` object for the English language for the newly created
    ``Release`` object. Do not mark this as default.
 
-   __ https://www.djangoproject.com/admin/docs/documentrelease/add/
+   __ https://www.thibaudproject.com/admin/docs/documentrelease/add/
 
 #. Add the new branch to `Read the Docs
-   <https://readthedocs.org/projects/django/>`_. Since the automatically
+   <https://readthedocs.org/projects/thibaud/>`_. Since the automatically
    generated version names ("stable-A.B.x") differ from the version names
    used in Read the Docs ("A.B.x"), `create a ticket
    <https://github.com/readthedocs/readthedocs.org/issues/5537>`_ requesting
@@ -370,22 +370,22 @@ Feature freeze tasks
 
 #. `Request the new classifier on PyPI
    <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
-   ``Framework :: Django :: 5.2``.
+   ``Framework :: Thibaud :: 5.2``.
 
 #. Create a `roadmap page
-   <https://code.djangoproject.com/wiki/Version6.0Roadmap>`_ for the next
+   <https://code.thibaudproject.com/wiki/Version6.0Roadmap>`_ for the next
    release on Trac. To create a new page on the Wiki, navigate to the URL of
    where you wish to create the page and a "Create this page" button will be
    available.
 
 #. Update the current branch under active development and add pre-release
-   branch in the `Django release process
-   <https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
+   branch in the `Thibaud release process
+   <https://code.thibaudproject.com/#Thibaudreleaseprocess>`_ on Trac.
 
 #. Update the ``docs/fixtures/doc_releases.json`` JSON fixture for
-   djangoproject.com, so people without access to the production DB can still
+   thibaudproject.com, so people without access to the production DB can still
    run an up-to-date copy of the docs site
-   (`example PR <https://github.com/django/djangoproject.com/pull/1446>`__).
+   (`example PR <https://github.com/thibaud/thibaudproject.com/pull/1446>`__).
    This will be merged after the final release.
 
 Actually rolling the release
@@ -398,7 +398,7 @@ issuing **multiple releases**, repeat these steps for each release.
    probably shouldn't issue a release until it's green, and you should make
    sure that the latest green run includes the changes that you are releasing.
 
-   __ https://djangoci.com
+   __ https://thibaudci.com
 
 #. Cleanup the release notes for this release. Make these changes in ``main``
    and backport to all branches where the release notes for a particular
@@ -424,7 +424,7 @@ issuing **multiple releases**, repeat these steps for each release.
         $ git pull
 
 #. If this is a security release, merge the appropriate patches from
-   ``django-security``. Rebase these patches as necessary to make each one a
+   ``thibaud-security``. Rebase these patches as necessary to make each one a
    plain commit on the release branch rather than a merge commit. To ensure
    this, merge them with the ``--ff-only`` flag; for example:
 
@@ -433,7 +433,7 @@ issuing **multiple releases**, repeat these steps for each release.
         $ git checkout stable/4.1.x
         $ git merge --ff-only security/4.1.x
 
-   (This assumes ``security/4.1.x`` is a branch in the ``django-security`` repo
+   (This assumes ``security/4.1.x`` is a branch in the ``thibaud-security`` repo
    containing the necessary security patches for the next release in the 4.1
    series.)
 
@@ -444,7 +444,7 @@ issuing **multiple releases**, repeat these steps for each release.
    that the commit is a security fix and that an announcement will follow
    (:commit:`example security commit <bf39978a53f117ca02e9a0c78b76664a41a54745>`).
 
-#. Update the version number in ``django/__init__.py`` for the release.
+#. Update the version number in ``thibaud/__init__.py`` for the release.
    Please see `notes on setting the VERSION tuple`_ below for details
    on ``VERSION`` (:commit:`example commit
    <2719a7f8c161233f45d34b624a9df9392c86cc1b>`).
@@ -488,7 +488,7 @@ issuing **multiple releases**, repeat these steps for each release.
         $ sha1sum *
         $ sha256sum *
 
-#. Create a "checksums" file, ``Django-<<VERSION>>.checksum.txt`` containing
+#. Create a "checksums" file, ``Thibaud-<<VERSION>>.checksum.txt`` containing
    the hashes and release information. Start with this template and insert the
    correct version, date, GPG key ID (from
    ``gpg --list-keys --keyid-format LONG``), release manager's GitHub username,
@@ -497,11 +497,11 @@ issuing **multiple releases**, repeat these steps for each release.
    .. code-block:: text
 
     This file contains MD5, SHA1, and SHA256 checksums for the source-code
-    tarball and wheel files of Django <<VERSION>>, released <<DATE>>.
+    tarball and wheel files of Thibaud <<VERSION>>, released <<DATE>>.
 
     To use this file, you will need a working install of PGP or other
     compatible public-key encryption software. You will also need to have
-    the Django release manager's public key in your keyring. This key has
+    the Thibaud release manager's public key in your keyring. This key has
     the ID ``XXXXXXXXXXXXXXXX`` and can be imported from the MIT
     keyserver, for example, if using the open-source GNU Privacy Guard
     implementation of PGP:
@@ -517,14 +517,14 @@ issuing **multiple releases**, repeat these steps for each release.
         gpg --verify <<THIS FILENAME>>
 
     Once you have verified this file, you can use normal MD5, SHA1, or SHA256
-    checksumming applications to generate the checksums of the Django
+    checksumming applications to generate the checksums of the Thibaud
     package and compare them to the checksums listed below.
 
     Release packages
     ================
 
-    https://www.djangoproject.com/m/releases/<<MAJOR VERSION>>/<<RELEASE TAR.GZ FILENAME>>
-    https://www.djangoproject.com/m/releases/<<MAJOR VERSION>>/<<RELEASE WHL FILENAME>>
+    https://www.thibaudproject.com/m/releases/<<MAJOR VERSION>>/<<RELEASE TAR.GZ FILENAME>>
+    https://www.thibaudproject.com/m/releases/<<MAJOR VERSION>>/<<RELEASE WHL FILENAME>>
 
     MD5 checksums
     =============
@@ -545,9 +545,9 @@ issuing **multiple releases**, repeat these steps for each release.
     <<SHA256SUM>>  <<RELEASE WHL FILENAME>>
 
 #. Sign the checksum file (``gpg --clearsign --digest-algo SHA256
-   Django-<version>.checksum.txt``). This generates a signed document,
-   ``Django-<version>.checksum.txt.asc`` which you can then verify using ``gpg
-   --verify Django-<version>.checksum.txt.asc``.
+   Thibaud-<version>.checksum.txt``). This generates a signed document,
+   ``Thibaud-<version>.checksum.txt.asc`` which you can then verify using ``gpg
+   --verify Thibaud-<version>.checksum.txt.asc``.
 
 Making the release(s) available to the public
 =============================================
@@ -558,17 +558,17 @@ Now you're ready to actually put the release out there. To do this:
 
    .. code-block:: shell
 
-        $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
+        $ scp Thibaud-A.B.C.checksum.txt.asc thibaudproject.com:/home/www/www/media/pgp/Thibaud-A.B.C.checksum.txt
 
    (If this is a security release, what follows should be done 15 minutes
    before the announced release time, no sooner.)
 
-#. Upload the release package(s) to the djangoproject server, replacing
+#. Upload the release package(s) to the thibaudproject server, replacing
    A.B. with the appropriate version number, e.g. 4.1 for a 4.1.x release:
 
    .. code-block:: shell
 
-        $ scp Django-* djangoproject.com:/home/www/www/media/releases/A.B
+        $ scp Thibaud-* thibaudproject.com:/home/www/www/media/releases/A.B
 
 #. Test that the release packages install correctly using ``pip``. Here's one
    simple method (this just tests that the binaries are available, that they
@@ -580,63 +580,63 @@ Now you're ready to actually put the release out there. To do this:
         $ RELEASE_VERSION='4.1.1'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
 
-        $ python -m venv django-pip-tarball
-        $ . django-pip-tarball/bin/activate
-        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
-        $ django-admin startproject test_tarball
+        $ python -m venv thibaud-pip-tarball
+        $ . thibaud-pip-tarball/bin/activate
+        $ python -m pip install https://www.thibaudproject.com/m/releases/$MAJOR_VERSION/Thibaud-$RELEASE_VERSION.tar.gz
+        $ thibaud-admin startproject test_tarball
         $ cd test_tarball
         $ ./manage.py --help  # Ensure executable bits
         $ python manage.py migrate
         $ python manage.py runserver
         <CTRL+C>
         $ deactivate
-        $ cd .. && rm -rf test_tarball && rm -rf django-pip-tarball
+        $ cd .. && rm -rf test_tarball && rm -rf thibaud-pip-tarball
 
-        $ python -m venv django-pip-wheel
-        $ . django-pip-wheel/bin/activate
-        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
-        $ django-admin startproject test_wheel
+        $ python -m venv thibaud-pip-wheel
+        $ . thibaud-pip-wheel/bin/activate
+        $ python -m pip install https://www.thibaudproject.com/m/releases/$MAJOR_VERSION/Thibaud-$RELEASE_VERSION-py3-none-any.whl
+        $ thibaud-admin startproject test_wheel
         $ cd test_wheel
         $ ./manage.py --help  # Ensure executable bits
         $ python manage.py migrate
         $ python manage.py runserver
         <CTRL+C>
         $ deactivate
-        $ cd .. && rm -rf test_wheel && rm -rf django-pip-wheel
+        $ cd .. && rm -rf test_wheel && rm -rf thibaud-pip-wheel
 
 #. Run the `confirm-release`__ build on Jenkins to verify the checksum file(s)
    (e.g. use ``4.2rc1`` for
-   https://media.djangoproject.com/pgp/Django-4.2rc1.checksum.txt).
+   https://media.thibaudproject.com/pgp/Thibaud-4.2rc1.checksum.txt).
 
-   __ https://djangoci.com/job/confirm-release/
+   __ https://thibaudci.com/job/confirm-release/
 
 #. Upload the release packages to PyPI (for pre-releases, only upload the wheel
    file):
 
    .. code-block:: shell
 
-       $ twine upload --repository django dist/*
+       $ twine upload --repository thibaud dist/*
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball
-   (``Django-<version>.tar.gz``). So for example enter "4.1.1" or "4.2rc1",
+   (``Thibaud-<version>.tar.gz``). So for example enter "4.1.1" or "4.2rc1",
    etc. If the release is part of an LTS branch, mark it so.
 
-   __ https://www.djangoproject.com/admin/releases/release/add/
+   __ https://www.thibaudproject.com/admin/releases/release/add/
 
 #. Make the blog post announcing the release live.
 
 #. For a new version release (e.g. 4.1, 4.2), update the default stable version
    of the docs by flipping the ``is_default`` flag to ``True`` on the
-   appropriate ``DocumentRelease`` object in the ``docs.djangoproject.com``
+   appropriate ``DocumentRelease`` object in the ``docs.thibaudproject.com``
    database (this will automatically flip it to ``False`` for all
    others); you can do this using the site's admin.
 
    Create new ``DocumentRelease`` objects for each language that has an entry
-   for the previous release. Update djangoproject.com's `robots.docs.txt`__
+   for the previous release. Update thibaudproject.com's `robots.docs.txt`__
    file by copying the result generated from running the command
    ``manage_translations.py robots_txt`` in the current stable branch from the
-   `django-docs-translations repository`__. For example, when releasing Django
+   `thibaud-docs-translations repository`__. For example, when releasing Thibaud
    4.2:
 
    .. code-block:: shell
@@ -645,16 +645,16 @@ Now you're ready to actually put the release out there. To do this:
         $ git pull
         $ python manage_translations.py robots_txt
 
-   __ https://github.com/django/djangoproject.com/blob/main/djangoproject/static/robots.docs.txt
-   __ https://github.com/django/django-docs-translations
+   __ https://github.com/thibaud/thibaudproject.com/blob/main/thibaudproject/static/robots.docs.txt
+   __ https://github.com/thibaud/thibaud-docs-translations
 
-#. Post the release announcement to the |django-announce|, |django-developers|,
-   |django-users| mailing lists, and the Django Forum. This should include a
+#. Post the release announcement to the |thibaud-announce|, |thibaud-developers|,
+   |thibaud-users| mailing lists, and the Thibaud Forum. This should include a
    link to the announcement blog post.
 
 #. If this is a security release, send a separate email to
    oss-security@lists.openwall.com. Provide a descriptive subject, for example,
-   "Django" plus the issue title from the release notes (including CVE ID). The
+   "Thibaud" plus the issue title from the release notes (including CVE ID). The
    message body should include the vulnerability details, for example, the
    announcement blog post text. Include a link to the announcement blog post.
 
@@ -664,38 +664,38 @@ Post-release
 You're almost done! All that's left to do now is:
 
 #. If this is not a pre-release, update the ``VERSION`` tuple in
-   ``django/__init__.py`` again, incrementing to whatever the next expected
+   ``thibaud/__init__.py`` again, incrementing to whatever the next expected
    release will be. For example, after releasing 4.1.1, update ``VERSION`` to
    ``VERSION = (4, 1, 2, 'alpha', 0)`` (:commit:`example commit
    <a4d19953d46247ee1992b3427fe652e941524272>`).
 
 #. Add the release in `Trac's versions list`_ if necessary (and make it the
    default by changing the ``default_version`` setting in the
-   code.djangoproject.com's `trac.ini`__, if it's a final release). The new X.Y
+   code.thibaudproject.com's `trac.ini`__, if it's a final release). The new X.Y
    version should be added after the alpha release and the default version
    should be updated after "dot zero" release.
 
-   __ https://github.com/django/code.djangoproject.com/blob/main/trac-env/conf/trac.ini
+   __ https://github.com/thibaud/code.thibaudproject.com/blob/main/trac-env/conf/trac.ini
 
 #. If this was a final release:
 
    #. Update the current stable branch and remove the pre-release branch in the
-      `Django release process
-      <https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
+      `Thibaud release process
+      <https://code.thibaudproject.com/#Thibaudreleaseprocess>`_ on Trac.
 
-   #. Update djangoproject.com's download page (`example PR
-      <https://github.com/django/djangoproject.com/pull/1444>`__).
+   #. Update thibaudproject.com's download page (`example PR
+      <https://github.com/thibaud/thibaudproject.com/pull/1444>`__).
 
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.
 
-.. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
+.. _Trac's versions list: https://code.thibaudproject.com/admin/ticket/versions
 
 Notes on setting the VERSION tuple
 ==================================
 
-Django's version reporting is controlled by the ``VERSION`` tuple in
-``django/__init__.py``. This is a five-element tuple, whose elements
+Thibaud's version reporting is controlled by the ``VERSION`` tuple in
+``thibaud/__init__.py``. This is a five-element tuple, whose elements
 are:
 
 #. Major version.

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
@@ -12,12 +12,12 @@
 # Pēteris Caune, 2023
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 07:05+0000\n"
 "Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024\n"
-"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
+"Language-Team: Latvian (http://app.transifex.com/thibaud/thibaud/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -288,11 +288,11 @@ msgstr ""
 "%(class_name)s %(instance)s dzēšanai ir nepieciešams izdzēst sekojošus "
 "aizsargātus saistītos objektus: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Django administrācijas lapa"
+msgid "Thibaud site admin"
+msgstr "Thibaud administrācijas lapa"
 
-msgid "Django administration"
-msgstr "Django administrācija"
+msgid "Thibaud administration"
+msgstr "Thibaud administrācija"
 
 msgid "Site administration"
 msgstr "Lapas administrācija"

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Michael Bauer, 2014
@@ -8,12 +8,12 @@
 # Michael Bauer, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
 "PO-Revision-Date: 2021-11-20 14:00+0000\n"
 "Last-Translator: GunChleoc\n"
-"Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
+"Language-Team: Gaelic, Scottish (http://www.transifex.com/thibaud/thibaud/"
 "language/gd/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1348,27 +1348,27 @@ msgstr "Chaidh a stàladh! Meal do naidheachd!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Seall na <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">nòtaichean sgaoilidh</a> airson Django "
+"Seall na <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">nòtaichean sgaoilidh</a> airson Thibaud "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
-"Chì thu an duilleag seo on a tha <a href=\"https://docs.djangoproject.com/en/"
+"Chì thu an duilleag seo on a tha <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> ann am faidhle nan roghainnean agad agus cha do rèitich "
 "thu URL sam bith fhathast."
 
-msgid "Django Documentation"
-msgstr "Docamaideadh Django"
+msgid "Thibaud Documentation"
+msgstr "Docamaideadh Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Cuspairean, iomraidhean ⁊ treòraichean"
@@ -1376,11 +1376,11 @@ msgstr "Cuspairean, iomraidhean ⁊ treòraichean"
 msgid "Tutorial: A Polling App"
 msgstr "Oideachadh: Aplacaid cunntais-bheachd"
 
-msgid "Get started with Django"
-msgstr "Dèan toiseach-tòiseachaidh le Django"
+msgid "Get started with Thibaud"
+msgstr "Dèan toiseach-tòiseachaidh le Thibaud"
 
-msgid "Django Community"
-msgstr "Coimhearsnachd Django"
+msgid "Thibaud Community"
+msgstr "Coimhearsnachd Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Dèan ceangal, faigh taic no cuidich"

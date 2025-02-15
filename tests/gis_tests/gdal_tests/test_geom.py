@@ -2,19 +2,19 @@ import json
 import pickle
 from unittest import mock, skipIf
 
-from django.contrib.gis.gdal import (
+from thibaud.contrib.gis.gdal import (
     CoordTransform,
     GDALException,
     OGRGeometry,
     OGRGeomType,
     SpatialReference,
 )
-from django.contrib.gis.gdal.geometries import CircularString, CurvePolygon
-from django.contrib.gis.geos import GEOSException
-from django.contrib.gis.geos.libgeos import geos_version_tuple
-from django.template import Context
-from django.template.engine import Engine
-from django.test import SimpleTestCase
+from thibaud.contrib.gis.gdal.geometries import CircularString, CurvePolygon
+from thibaud.contrib.gis.geos import GEOSException
+from thibaud.contrib.gis.geos.libgeos import geos_version_tuple
+from thibaud.template import Context
+from thibaud.template.engine import Engine
+from thibaud.test import SimpleTestCase
 
 from ..test_data import TestDataMixin
 
@@ -51,11 +51,11 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(OGRGeomType(1), OGRGeomType("point"))
         self.assertNotEqual(OGRGeomType("POINT"), OGRGeomType(6))
 
-        # Testing the Django field name equivalent property.
-        self.assertEqual("PointField", OGRGeomType("Point").django)
-        self.assertEqual("GeometryField", OGRGeomType("Geometry").django)
-        self.assertEqual("GeometryField", OGRGeomType("Unknown").django)
-        self.assertIsNone(OGRGeomType("none").django)
+        # Testing the Thibaud field name equivalent property.
+        self.assertEqual("PointField", OGRGeomType("Point").thibaud)
+        self.assertEqual("GeometryField", OGRGeomType("Geometry").thibaud)
+        self.assertEqual("GeometryField", OGRGeomType("Unknown").thibaud)
+        self.assertIsNone(OGRGeomType("none").thibaud)
 
         # 'Geometry' initialization implies an unknown geometry type.
         gt = OGRGeomType("Geometry")
@@ -71,7 +71,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(OGRGeomType(wkb25bit + 1), "Point25D")
         self.assertEqual(OGRGeomType("MultiLineString25D"), (5 + wkb25bit))
         self.assertEqual(
-            "GeometryCollectionField", OGRGeomType("GeometryCollection25D").django
+            "GeometryCollectionField", OGRGeomType("GeometryCollection25D").thibaud
         )
 
     def test_wkt(self):
@@ -880,7 +880,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         geo_m = OGRGeometry("POINT M (1 2 3)")
         self.assertEqual(geo_m.geos.wkt, "POINT M (1 2 3)")
 
-    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
+    @mock.patch("thibaud.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
     def test_point_m_dimension_geos_version(self):
         geo_zm = OGRGeometry("POINT ZM (1 2 3 4)")
         self.assertEqual(geo_zm.geos.wkt, "POINT Z (1 2 3)")

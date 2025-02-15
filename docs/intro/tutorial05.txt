@@ -1,5 +1,5 @@
 =====================================
-Writing your first Django app, part 5
+Writing your first Thibaud app, part 5
 =====================================
 
 This tutorial begins where :doc:`Tutorial 4 </intro/tutorial04>` left off.
@@ -38,11 +38,11 @@ Why you need to create tests
 So why create tests, and why now?
 
 You may feel that you have quite enough on your plate just learning
-Python/Django, and having yet another thing to learn and do may seem
+Python/Thibaud, and having yet another thing to learn and do may seem
 overwhelming and perhaps unnecessary. After all, our polls application is
 working quite happily now; going through the trouble of creating automated
 tests is not going to make it work any better. If creating the polls
-application is the last bit of Django programming you will ever do, then true,
+application is the last bit of Thibaud programming you will ever do, then true,
 you don't need to know how to create automated tests. But, if that's not the
 case, now is an excellent time to learn.
 
@@ -89,7 +89,7 @@ Tests make your code more attractive
 
 You might have created a brilliant piece of software, but you will find that
 many other developers will refuse to look at it because it lacks tests; without
-tests, they won't trust it. Jacob Kaplan-Moss, one of Django's original
+tests, they won't trust it. Jacob Kaplan-Moss, one of Thibaud's original
 developers, says "Code without tests is broken by design."
 
 That other developers want to see tests in your software before they take it
@@ -102,7 +102,7 @@ The previous points are written from the point of view of a single developer
 maintaining an application. Complex applications will be maintained by teams.
 Tests guarantee that colleagues don't inadvertently break your code (and that
 you don't break theirs without knowing). If you want to make a living as a
-Django programmer, you must be good at writing tests!
+Thibaud programmer, you must be good at writing tests!
 
 Basic testing strategies
 ========================
@@ -149,7 +149,7 @@ whose date lies in the future:
 .. code-block:: pycon
 
     >>> import datetime
-    >>> from django.utils import timezone
+    >>> from thibaud.utils import timezone
     >>> # create a Question instance with pub_date 30 days in the future
     >>> future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
     >>> # was it published recently?
@@ -175,8 +175,8 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
 
     import datetime
 
-    from django.test import TestCase
-    from django.utils import timezone
+    from thibaud.test import TestCase
+    from thibaud.utils import timezone
 
     from .models import Question
 
@@ -191,7 +191,7 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
             future_question = Question(pub_date=time)
             self.assertIs(future_question.was_published_recently(), False)
 
-Here we have created a :class:`django.test.TestCase` subclass with a method that
+Here we have created a :class:`thibaud.test.TestCase` subclass with a method that
 creates a ``Question`` instance with a ``pub_date`` in the future. We then check
 the output of ``was_published_recently()`` - which *ought* to be False.
 
@@ -215,7 +215,7 @@ and you'll see something like:
     FAIL: test_was_published_recently_with_future_question (polls.tests.QuestionModelTests)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "/path/to/djangotutorial/polls/tests.py", line 16, in test_was_published_recently_with_future_question
+      File "/path/to/thibaudtutorial/polls/tests.py", line 16, in test_was_published_recently_with_future_question
         self.assertIs(future_question.was_published_recently(), False)
     AssertionError: True is not False
 
@@ -236,7 +236,7 @@ What happened is this:
 
 * ``manage.py test polls`` looked for tests in the ``polls`` application
 
-* it found a subclass of the :class:`django.test.TestCase` class
+* it found a subclass of the :class:`thibaud.test.TestCase` class
 
 * it created a special database for the purpose of testing
 
@@ -348,10 +348,10 @@ through a web browser.
 
 Before we try to fix anything, let's have a look at the tools at our disposal.
 
-The Django test client
+The Thibaud test client
 ----------------------
 
-Django provides a test :class:`~django.test.Client` to simulate a user
+Thibaud provides a test :class:`~thibaud.test.Client` to simulate a user
 interacting with the code at the view level.  We can use it in ``tests.py``
 or even in the :djadmin:`shell`.
 
@@ -365,10 +365,10 @@ environment in the :djadmin:`shell`:
 
 .. code-block:: pycon
 
-    >>> from django.test.utils import setup_test_environment
+    >>> from thibaud.test.utils import setup_test_environment
     >>> setup_test_environment()
 
-:meth:`~django.test.utils.setup_test_environment` installs a template renderer
+:meth:`~thibaud.test.utils.setup_test_environment` installs a template renderer
 which will allow us to examine some additional attributes on responses such as
 ``response.context`` that otherwise wouldn't be available. Note that this
 method *does not* set up a test database, so the following will be run against
@@ -378,12 +378,12 @@ questions you already created. You might get unexpected results if your
 it earlier, check it before continuing.
 
 Next we need to import the test client class (later in ``tests.py`` we will use
-the :class:`django.test.TestCase` class, which comes with its own client, so
+the :class:`thibaud.test.TestCase` class, which comes with its own client, so
 this won't be required):
 
 .. code-block:: pycon
 
-    >>> from django.test import Client
+    >>> from thibaud.test import Client
     >>> # create an instance of the client for our use
     >>> client = Client()
 
@@ -401,7 +401,7 @@ With that ready, we can ask the client to do some work for us:
     404
     >>> # on the other hand we should expect to find something at '/polls/'
     >>> # we'll use 'reverse()' rather than a hardcoded URL
-    >>> from django.urls import reverse
+    >>> from thibaud.urls import reverse
     >>> response = client.get(reverse("polls:index"))
     >>> response.status_code
     200
@@ -417,7 +417,7 @@ The list of polls shows polls that aren't published yet (i.e. those that have a
 ``pub_date`` in the future). Let's fix that.
 
 In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
-based on :class:`~django.views.generic.list.ListView`:
+based on :class:`~thibaud.views.generic.list.ListView`:
 
 .. code-block:: python
     :caption: ``polls/views.py``
@@ -437,7 +437,7 @@ an import:
 .. code-block:: python
     :caption: ``polls/views.py``
 
-    from django.utils import timezone
+    from thibaud.utils import timezone
 
 and then we must amend the ``get_queryset`` method like so:
 
@@ -472,7 +472,7 @@ Add the following to ``polls/tests.py``:
 .. code-block:: python
     :caption: ``polls/tests.py``
 
-    from django.urls import reverse
+    from thibaud.urls import reverse
 
 and we'll create a shortcut function to create questions as well as a new test
 class:
@@ -555,10 +555,10 @@ repetition out of the process of creating questions.
 
 ``test_no_questions`` doesn't create any questions, but checks the message:
 "No polls are available." and verifies the ``latest_question_list`` is empty.
-Note that the :class:`django.test.TestCase` class provides some additional
+Note that the :class:`thibaud.test.TestCase` class provides some additional
 assertion methods. In these examples, we use
-:meth:`~django.test.SimpleTestCase.assertContains()` and
-:meth:`~django.test.TransactionTestCase.assertQuerySetEqual()`.
+:meth:`~thibaud.test.SimpleTestCase.assertContains()` and
+:meth:`~thibaud.test.TransactionTestCase.assertQuerySetEqual()`.
 
 In ``test_past_question``, we create a question and verify that it appears in
 the list.
@@ -678,10 +678,10 @@ achieve some very clever things.
 For example, while our tests here have covered some of the internal logic of a
 model and the way our views publish information, you can use an "in-browser"
 framework such as Selenium_ to test the way your HTML actually renders in a
-browser. These tools allow you to check not just the behavior of your Django
+browser. These tools allow you to check not just the behavior of your Thibaud
 code, but also, for example, of your JavaScript. It's quite something to see
 the tests launch a browser, and start interacting with your site, as if a human
-being were driving it! Django includes :class:`~django.test.LiveServerTestCase`
+being were driving it! Thibaud includes :class:`~thibaud.test.LiveServerTestCase`
 to facilitate integration with tools like Selenium.
 
 If you have a complex application, you may want to run tests automatically
@@ -694,7 +694,7 @@ a piece of code, it usually means that code should be refactored or removed.
 Coverage will help to identify dead code. See
 :ref:`topics-testing-code-coverage` for details.
 
-:doc:`Testing in Django </topics/testing/index>` has comprehensive
+:doc:`Testing in Thibaud </topics/testing/index>` has comprehensive
 information about testing.
 
 .. _Selenium: https://www.selenium.dev/
@@ -703,9 +703,9 @@ information about testing.
 What's next?
 ============
 
-For full details on testing, see :doc:`Testing in Django
+For full details on testing, see :doc:`Testing in Thibaud
 </topics/testing/index>`.
 
-When you're comfortable with testing Django views, read
+When you're comfortable with testing Thibaud views, read
 :doc:`part 6 of this tutorial</intro/tutorial06>` to learn about
 static files management.

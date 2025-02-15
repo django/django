@@ -3,20 +3,20 @@ from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
-from django.core.exceptions import BadRequest, DisallowedHost
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.files.uploadhandler import MemoryFileUploadHandler
-from django.core.handlers.wsgi import LimitedStream, WSGIRequest
-from django.http import (
+from thibaud.core.exceptions import BadRequest, DisallowedHost
+from thibaud.core.files.uploadedfile import InMemoryUploadedFile
+from thibaud.core.files.uploadhandler import MemoryFileUploadHandler
+from thibaud.core.handlers.wsgi import LimitedStream, WSGIRequest
+from thibaud.http import (
     HttpHeaders,
     HttpRequest,
     RawPostDataException,
     UnreadablePostError,
 )
-from django.http.multipartparser import MAX_TOTAL_HEADER_SIZE, MultiPartParserError
-from django.http.request import split_domain_port
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
+from thibaud.http.multipartparser import MAX_TOTAL_HEADER_SIZE, MultiPartParserError
+from thibaud.http.request import split_domain_port
+from thibaud.test import RequestFactory, SimpleTestCase, override_settings
+from thibaud.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
 
 
 class ErrorFileUploadHandler(MemoryFileUploadHandler):
@@ -670,7 +670,7 @@ class RequestsTests(SimpleTestCase):
                     'Content-Disposition: form-data; name="CSV"',
                     "Content-Type: text/csv",
                     "",
-                    "Framework,ID.Django,1.Flask,2.",
+                    "Framework,ID.Thibaud,1.Flask,2.",
                     f"--{BOUNDARY}--",
                 ]
             )
@@ -691,7 +691,7 @@ class RequestsTests(SimpleTestCase):
                     '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
                     'Harmless", "author": ["Douglas", Adams"]}}'
                 ],
-                "CSV": ["Framework,ID.Django,1.Flask,2."],
+                "CSV": ["Framework,ID.Thibaud,1.Flask,2."],
             },
         )
 
@@ -710,7 +710,7 @@ class RequestsTests(SimpleTestCase):
                     "Content-Type: application/octet-stream",
                     "",
                     "Framework,ID",
-                    "Django,1",
+                    "Thibaud,1",
                     "Flask,2",
                     f"--{BOUNDARY}--",
                 ]

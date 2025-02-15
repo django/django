@@ -5,10 +5,10 @@ run with a backend other than PostgreSQL.
 
 import enum
 
-from django.db import models
+from thibaud.db import models
 
 try:
-    from django.contrib.postgres.fields import (
+    from thibaud.contrib.postgres.fields import (
         ArrayField,
         BigIntegerRangeField,
         DateRangeField,
@@ -17,7 +17,7 @@ try:
         HStoreField,
         IntegerRangeField,
     )
-    from django.contrib.postgres.search import SearchVector, SearchVectorField
+    from thibaud.contrib.postgres.search import SearchVector, SearchVectorField
 except ImportError:
 
     class DummyArrayField(models.Field):

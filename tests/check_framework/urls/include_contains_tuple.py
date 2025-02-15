@@ -1,4 +1,4 @@
-from django.urls import include, path
+from thibaud.urls import include, path
 
 urlpatterns = [
     path("", include([(r"^tuple/$", lambda x: x)])),

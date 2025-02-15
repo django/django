@@ -5,7 +5,7 @@ import warnings
 from collections import Counter, defaultdict
 from functools import partial
 
-from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
+from thibaud.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 
 from .config import AppConfig
 
@@ -129,7 +129,7 @@ class Apps:
     def check_apps_ready(self):
         """Raise an exception if all apps haven't been imported yet."""
         if not self.apps_ready:
-            from django.conf import settings
+            from thibaud.conf import settings
 
             # If "not ready" is due to unconfigured settings, accessing
             # INSTALLED_APPS raises a more helpful ImproperlyConfigured
@@ -164,7 +164,7 @@ class Apps:
                     break
             raise LookupError(message)
 
-    # This method is performance-critical at least for Django's test suite.
+    # This method is performance-critical at least for Thibaud's test suite.
     @functools.cache
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
@@ -243,7 +243,7 @@ class Apps:
         """
         Check whether an application with this name exists in the registry.
 
-        app_name is the full name of the app e.g. 'django.contrib.admin'.
+        app_name is the full name of the app e.g. 'thibaud.contrib.admin'.
         """
         self.check_apps_ready()
         return any(ac.name == app_name for ac in self.app_configs.values())
@@ -289,7 +289,7 @@ class Apps:
 
         This method is decorated with @functools.cache because it's performance
         critical when it comes to migrations. Since the swappable settings don't
-        change after Django has loaded the settings, there is no reason to get
+        change after Thibaud has loaded the settings, there is no reason to get
         the respective settings attribute over and over again.
         """
         to_string = to_string.lower()

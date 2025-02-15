@@ -1,18 +1,18 @@
 import re
 from urllib.parse import urlsplit
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.urls import re_path
-from django.views.static import serve
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.urls import re_path
+from thibaud.views.static import serve
 
 
 def static(prefix, view=serve, **kwargs):
     """
     Return a URL pattern for serving files in debug mode.
 
-    from django.conf import settings
-    from django.conf.urls.static import static
+    from thibaud.conf import settings
+    from thibaud.conf.urls.static import static
 
     urlpatterns = [
         # ... the rest of your URLconf goes here ...

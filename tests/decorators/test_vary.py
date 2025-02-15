@@ -1,8 +1,8 @@
 from asgiref.sync import iscoroutinefunction
 
-from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase
-from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from thibaud.http import HttpRequest, HttpResponse
+from thibaud.test import SimpleTestCase
+from thibaud.views.decorators.vary import vary_on_cookie, vary_on_headers
 
 
 class VaryOnHeadersTests(SimpleTestCase):

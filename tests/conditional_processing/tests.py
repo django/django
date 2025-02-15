@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.test import SimpleTestCase, override_settings
+from thibaud.test import SimpleTestCase, override_settings
 
 FULL_RESPONSE = "Test conditional get response"
 LAST_MODIFIED = datetime(2007, 10, 21, 23, 21, 47)

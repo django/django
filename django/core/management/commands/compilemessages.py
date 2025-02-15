@@ -5,8 +5,8 @@ import os
 import tempfile
 from pathlib import Path
 
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import find_command, is_ignored_path, popen_wrapper
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.core.management.utils import find_command, is_ignored_path, popen_wrapper
 
 
 def has_bom(fn):
@@ -84,7 +84,7 @@ class Command(BaseCommand):
 
         basedirs = [os.path.join("conf", "locale"), "locale"]
         if os.environ.get("DJANGO_SETTINGS_MODULE"):
-            from django.conf import settings
+            from thibaud.conf import settings
 
             basedirs.extend(settings.LOCALE_PATHS)
 
@@ -104,7 +104,7 @@ class Command(BaseCommand):
 
         if not basedirs:
             raise CommandError(
-                "This script should be run from the Django Git "
+                "This script should be run from the Thibaud Git "
                 "checkout or your project or app tree, or with "
                 "the settings module specified."
             )
@@ -163,7 +163,7 @@ class Command(BaseCommand):
 
                 if has_bom(po_path):
                     self.stderr.write(
-                        "The %s file has a BOM (Byte Order Mark). Django only "
+                        "The %s file has a BOM (Byte Order Mark). Thibaud only "
                         "supports .po files encoded in UTF-8 and without any BOM."
                         % po_path
                     )

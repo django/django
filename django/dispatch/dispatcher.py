@@ -5,9 +5,9 @@ import weakref
 
 from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
 
-from django.utils.inspect import func_accepts_kwargs
+from thibaud.utils.inspect import func_accepts_kwargs
 
-logger = logging.getLogger("django.dispatch")
+logger = logging.getLogger("thibaud.dispatch")
 
 
 def _make_id(target):
@@ -81,7 +81,7 @@ class Signal:
                 a receiver. This will usually be a string, though it may be
                 anything hashable.
         """
-        from django.conf import settings
+        from thibaud.conf import settings
 
         # If DEBUG is on, check that we got a good receiver
         if settings.configured and settings.DEBUG:

@@ -6,20 +6,20 @@ from contextlib import contextmanager
 from unittest import SkipTest, skipIf
 from xml.dom.minidom import parseString
 
-from django.contrib.auth.models import User
-from django.core import serializers
-from django.db import connection
-from django.db.models import F, Max, Min
-from django.db.models.functions import Now
-from django.http import HttpRequest
-from django.template import (
+from thibaud.contrib.auth.models import User
+from thibaud.core import serializers
+from thibaud.db import connection
+from thibaud.db.models import F, Max, Min
+from thibaud.db.models.functions import Now
+from thibaud.http import HttpRequest
+from thibaud.template import (
     Context,
     RequestContext,
     Template,
     TemplateSyntaxError,
     context_processors,
 )
-from django.test import (
+from thibaud.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
@@ -27,10 +27,10 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import requires_tz_support
-from django.urls import reverse
-from django.utils import timezone, translation
-from django.utils.timezone import timedelta
+from thibaud.test.utils import requires_tz_support
+from thibaud.urls import reverse
+from thibaud.utils import timezone, translation
+from thibaud.utils.timezone import timedelta
 
 from .forms import (
     EventForm,
@@ -1165,7 +1165,7 @@ class TemplateTests(SimpleTestCase):
     @skipIf(sys.platform == "win32", "Windows uses non-standard time zone names")
     def test_tz_template_context_processor(self):
         """
-        Test the django.template.context_processors.tz template context processor.
+        Test the thibaud.template.context_processors.tz template context processor.
         """
         tpl = Template("{{ TIME_ZONE }}")
         context = Context()

@@ -1,16 +1,16 @@
 from functools import partial
 
-from django.contrib.admin.checks import InlineModelAdminChecks
-from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.forms import (
+from thibaud.contrib.admin.checks import InlineModelAdminChecks
+from thibaud.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
+from thibaud.contrib.contenttypes.fields import GenericForeignKey
+from thibaud.contrib.contenttypes.forms import (
     BaseGenericInlineFormSet,
     generic_inlineformset_factory,
 )
-from django.core import checks
-from django.core.exceptions import FieldDoesNotExist
-from django.forms import ALL_FIELDS
-from django.forms.models import modelform_defines_fields
+from thibaud.core import checks
+from thibaud.core.exceptions import FieldDoesNotExist
+from thibaud.forms import ALL_FIELDS
+from thibaud.forms.models import modelform_defines_fields
 
 
 class GenericInlineModelAdminChecks(InlineModelAdminChecks):

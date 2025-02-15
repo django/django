@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from django.db.models.utils import AltersData
-from django.template import Context, Engine
+from thibaud.db.models.utils import AltersData
+from thibaud.template import Context, Engine
 
 
 class CallableVariablesTests(TestCase):

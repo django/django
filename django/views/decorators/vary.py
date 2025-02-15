@@ -2,7 +2,7 @@ from functools import wraps
 
 from asgiref.sync import iscoroutinefunction
 
-from django.utils.cache import patch_vary_headers
+from thibaud.utils.cache import patch_vary_headers
 
 
 def vary_on_headers(*headers):

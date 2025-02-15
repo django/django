@@ -1,12 +1,12 @@
-from django import db
-from django.contrib import auth
+from thibaud import db
+from thibaud.contrib import auth
 
 UserModel = auth.get_user_model()
 
 
 def check_password(environ, username, password):
     """
-    Authenticate against Django's auth database.
+    Authenticate against Thibaud's auth database.
 
     mod_wsgi docs specify None, True, False as return value depending
     on whether the user exists and authenticates.

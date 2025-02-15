@@ -3,14 +3,14 @@ Many-to-many relationships
 ==========================
 
 To define a many-to-many relationship, use
-:class:`~django.db.models.ManyToManyField`.
+:class:`~thibaud.db.models.ManyToManyField`.
 
 In this example, an ``Article`` can be published in multiple ``Publication``
 objects, and a ``Publication`` has multiple ``Article`` objects:
 
 .. code-block:: python
 
-    from django.db import models
+    from thibaud.db import models
 
 
     class Publication(models.Model):
@@ -51,7 +51,7 @@ Create an ``Article``:
 
 .. code-block:: pycon
 
-    >>> a1 = Article(headline="Django lets you build web apps easily")
+    >>> a1 = Article(headline="Thibaud lets you build web apps easily")
 
 You can't associate it with a ``Publication`` until it's been saved:
 
@@ -60,7 +60,7 @@ You can't associate it with a ``Publication`` until it's been saved:
     >>> a1.publications.add(p1)
     Traceback (most recent call last):
     ...
-    ValueError: "<Article: Django lets you build web apps easily>" needs to have a value for field "id" before this many-to-many relationship can be used.
+    ValueError: "<Article: Thibaud lets you build web apps easily>" needs to have a value for field "id" before this many-to-many relationship can be used.
 
 Save it!
 
@@ -99,7 +99,7 @@ Adding an object of the wrong type raises :exc:`TypeError`:
     TypeError: 'Publication' instance expected
 
 Create and add a ``Publication`` to an ``Article`` in one step using
-:meth:`~django.db.models.fields.related.RelatedManager.create`:
+:meth:`~thibaud.db.models.fields.related.RelatedManager.create`:
 
 .. code-block:: pycon
 
@@ -121,7 +121,7 @@ Create and add a ``Publication`` to an ``Article`` in one step using
     >>> p2.article_set.all()
     <QuerySet [<Article: NASA uses Python>]>
     >>> p1.article_set.all()
-    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Publication.objects.get(id=4).article_set.all()
     <QuerySet [<Article: NASA uses Python>]>
 
@@ -131,13 +131,13 @@ relationships <lookups-that-span-relationships>`:
 .. code-block:: pycon
 
     >>> Article.objects.filter(publications__id=1)
-    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications__pk=1)
-    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications=1)
-    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications=p1)
-    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>, <Article: NASA uses Python>]>
 
     >>> Article.objects.filter(publications__title__startswith="Science")
     <QuerySet [<Article: NASA uses Python>, <Article: NASA uses Python>]>
@@ -145,8 +145,8 @@ relationships <lookups-that-span-relationships>`:
     >>> Article.objects.filter(publications__title__startswith="Science").distinct()
     <QuerySet [<Article: NASA uses Python>]>
 
-The :meth:`~django.db.models.query.QuerySet.count` function respects
-:meth:`~django.db.models.query.QuerySet.distinct` as well:
+The :meth:`~thibaud.db.models.query.QuerySet.count` function respects
+:meth:`~thibaud.db.models.query.QuerySet.distinct` as well:
 
 .. code-block:: pycon
 
@@ -157,12 +157,12 @@ The :meth:`~django.db.models.query.QuerySet.count` function respects
     1
 
     >>> Article.objects.filter(publications__in=[1, 2]).distinct()
-    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications__in=[p1, p2]).distinct()
-    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>, <Article: NASA uses Python>]>
 
 Reverse m2m queries are supported (i.e., starting at the table that doesn't have
-a :class:`~django.db.models.ManyToManyField`):
+a :class:`~thibaud.db.models.ManyToManyField`):
 
 .. code-block:: pycon
 
@@ -194,7 +194,7 @@ involved is a little complex):
 .. code-block:: pycon
 
     >>> Article.objects.exclude(publications=p2)
-    <QuerySet [<Article: Django lets you build web apps easily>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>]>
 
 If we delete a ``Publication``, its ``Articles`` won't be able to access it:
 
@@ -213,7 +213,7 @@ If we delete an ``Article``, its ``Publications`` won't be able to access it:
 
     >>> a2.delete()
     >>> Article.objects.all()
-    <QuerySet [<Article: Django lets you build web apps easily>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>]>
     >>> p2.article_set.all()
     <QuerySet []>
 
@@ -312,7 +312,7 @@ go:
     >>> Publication.objects.all()
     <QuerySet [<Publication: Highlights for Children>, <Publication: The Python Journal>]>
     >>> Article.objects.all()
-    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA finds intelligent life on Earth>, <Article: NASA uses Python>, <Article: Oxygen-free diet works wonders>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>, <Article: NASA finds intelligent life on Earth>, <Article: NASA uses Python>, <Article: Oxygen-free diet works wonders>]>
     >>> a2.publications.all()
     <QuerySet [<Publication: The Python Journal>]>
 
@@ -320,13 +320,13 @@ Bulk delete some articles - references to deleted objects should go:
 
 .. code-block:: pycon
 
-    >>> q = Article.objects.filter(headline__startswith="Django")
+    >>> q = Article.objects.filter(headline__startswith="Thibaud")
     >>> print(q)
-    <QuerySet [<Article: Django lets you build web apps easily>]>
+    <QuerySet [<Article: Thibaud lets you build web apps easily>]>
     >>> q.delete()
 
-After the :meth:`~django.db.models.query.QuerySet.delete`, the
-:class:`~django.db.models.query.QuerySet` cache needs to be cleared, and the
+After the :meth:`~thibaud.db.models.query.QuerySet.delete`, the
+:class:`~thibaud.db.models.query.QuerySet` cache needs to be cleared, and the
 referenced objects should be gone:
 
 .. code-block:: pycon

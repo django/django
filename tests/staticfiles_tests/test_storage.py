@@ -8,13 +8,13 @@ from io import StringIO
 from pathlib import Path
 from unittest import mock
 
-from django.conf import STATICFILES_STORAGE_ALIAS, settings
-from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.management.commands.collectstatic import (
+from thibaud.conf import STATICFILES_STORAGE_ALIAS, settings
+from thibaud.contrib.staticfiles import finders, storage
+from thibaud.contrib.staticfiles.management.commands.collectstatic import (
     Command as CollectstaticCommand,
 )
-from django.core.management import call_command
-from django.test import SimpleTestCase, override_settings
+from thibaud.core.management import call_command
+from thibaud.test import SimpleTestCase, override_settings
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -179,7 +179,7 @@ class TestHashedFiles:
 
     @override_settings(
         STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "loop")],
-        STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+        STATICFILES_FINDERS=["thibaud.contrib.staticfiles.finders.FileSystemFinder"],
     )
     def test_import_loop(self):
         finders.get_finder.cache_clear()
@@ -335,7 +335,7 @@ class TestHashedFiles:
 
     @override_settings(
         STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "faulty")],
-        STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+        STATICFILES_FINDERS=["thibaud.contrib.staticfiles.finders.FileSystemFinder"],
     )
     def test_post_processing_failure(self):
         """
@@ -350,7 +350,7 @@ class TestHashedFiles:
 
     @override_settings(
         STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "nonutf8")],
-        STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+        STATICFILES_FINDERS=["thibaud.contrib.staticfiles.finders.FileSystemFinder"],
     )
     def test_post_processing_nonutf8(self):
         finders.get_finder.cache_clear()
@@ -401,7 +401,7 @@ class TestExtraPatternsStorage(CollectionTestCase):
     STORAGES={
         **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
-            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+            "BACKEND": "thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage",
         },
     }
 )
@@ -567,7 +567,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
     STORAGES={
         **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
-            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+            "BACKEND": "thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage",
         },
     },
 )
@@ -578,7 +578,7 @@ class TestCollectionManifestStorageStaticUrlSlash(CollectionTestCase):
     def test_protocol_relative_url_ignored(self):
         with override_settings(
             STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "static_url_slash")],
-            STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+            STATICFILES_FINDERS=["thibaud.contrib.staticfiles.finders.FileSystemFinder"],
         ):
             self.run_collectstatic()
         relpath = self.hashed_file_path("ignored.css")
@@ -873,7 +873,7 @@ class TestStaticFilePermissions(CollectionTestCase):
     STORAGES={
         **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
-            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+            "BACKEND": "thibaud.contrib.staticfiles.storage.ManifestStaticFilesStorage",
         },
     }
 )

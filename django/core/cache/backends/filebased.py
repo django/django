@@ -8,9 +8,9 @@ import time
 import zlib
 from hashlib import md5
 
-from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
-from django.core.files import locks
-from django.core.files.move import file_move_safe
+from thibaud.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from thibaud.core.files import locks
+from thibaud.core.files.move import file_move_safe
 
 
 class FileBasedCache(BaseCache):

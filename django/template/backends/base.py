@@ -1,7 +1,7 @@
-from django.core.exceptions import ImproperlyConfigured, SuspiciousFileOperation
-from django.template.utils import get_app_template_dirs
-from django.utils._os import safe_join
-from django.utils.functional import cached_property
+from thibaud.core.exceptions import ImproperlyConfigured, SuspiciousFileOperation
+from thibaud.template.utils import get_app_template_dirs
+from thibaud.utils._os import safe_join
+from thibaud.utils.functional import cached_property
 
 
 class BaseEngine:

@@ -1,5 +1,5 @@
-from django.db.models import Func, Index
-from django.utils.functional import cached_property
+from thibaud.db.models import Func, Index
+from thibaud.utils.functional import cached_property
 
 __all__ = [
     "BloomIndex",

@@ -1,9 +1,9 @@
-from django.contrib.messages import Message, constants
-from django.contrib.messages.storage.session import SessionStorage
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
-from django.test import TestCase
-from django.utils.safestring import SafeData, mark_safe
+from thibaud.contrib.messages import Message, constants
+from thibaud.contrib.messages.storage.session import SessionStorage
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.http import HttpRequest
+from thibaud.test import TestCase
+from thibaud.utils.safestring import SafeData, mark_safe
 
 from .base import BaseTests
 
@@ -58,6 +58,6 @@ class SessionTests(BaseTests, TestCase):
         the message storage.
         """
         storage = self.get_storage()
-        message = Message(constants.DEBUG, mark_safe("<b>Hello Django!</b>"))
+        message = Message(constants.DEBUG, mark_safe("<b>Hello Thibaud!</b>"))
         set_session_data(storage, [message])
         self.assertIsInstance(list(storage)[0].message, SafeData)

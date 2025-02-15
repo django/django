@@ -2,11 +2,11 @@
 Deployment checklist
 ====================
 
-The internet is a hostile environment. Before deploying your Django project,
+The internet is a hostile environment. Before deploying your Thibaud project,
 you should take some time to review your settings, with security, performance,
 and operations in mind.
 
-Django includes many :doc:`security features </topics/security>`. Some are
+Thibaud includes many :doc:`security features </topics/security>`. Some are
 built-in and always enabled. Others are optional because they aren't always
 appropriate, or because they're inconvenient for development. For example,
 forcing HTTPS may not be suitable for all websites, and it's impractical for
@@ -18,7 +18,7 @@ Error reporting needs are also widely different.
 
 The following checklist includes settings that:
 
-- must be set properly for Django to provide the expected level of security;
+- must be set properly for Thibaud to provide the expected level of security;
 - are expected to be different in each environment;
 - enable optional security features;
 - enable performance optimizations;
@@ -98,7 +98,7 @@ Environment-specific settings
 :setting:`ALLOWED_HOSTS`
 ------------------------
 
-When :setting:`DEBUG = False <DEBUG>`, Django doesn't work at all without a
+When :setting:`DEBUG = False <DEBUG>`, Thibaud doesn't work at all without a
 suitable value for :setting:`ALLOWED_HOSTS`.
 
 This setting is required to protect your site against some CSRF attacks. If
@@ -106,10 +106,10 @@ you use a wildcard, you must perform your own validation of the ``Host`` HTTP
 header, or otherwise ensure that you aren't vulnerable to this category of
 attacks.
 
-You should also configure the web server that sits in front of Django to
+You should also configure the web server that sits in front of Thibaud to
 validate the host. It should respond with a static error page or ignore
-requests for incorrect hosts instead of forwarding the request to Django. This
-way you'll avoid spurious errors in your Django logs (or emails if you have
+requests for incorrect hosts instead of forwarding the request to Thibaud. This
+way you'll avoid spurious errors in your Thibaud logs (or emails if you have
 error reporting configured that way). For example, on nginx you might set up a
 default server to return "444 No Response" on an unrecognized host:
 
@@ -124,7 +124,7 @@ default server to return "444 No Response" on an unrecognized host:
 -----------------
 
 If you're using a cache, connection parameters may be different in development
-and in production. Django defaults to per-process :ref:`local-memory caching
+and in production. Thibaud defaults to per-process :ref:`local-memory caching
 <local-memory-caching>` which may not be desirable.
 
 Cache servers often have weak authentication. Make sure they only accept
@@ -149,7 +149,7 @@ If you haven't set up backups for your database, do it right now!
 
 If your site sends emails, these values need to be set correctly.
 
-By default, Django sends email from webmaster@localhost and root@localhost.
+By default, Thibaud sends email from webmaster@localhost and root@localhost.
 However, some mail providers reject email from these addresses. To use
 different sender addresses, modify the :setting:`DEFAULT_FROM_EMAIL` and
 :setting:`SERVER_EMAIL` settings.
@@ -176,14 +176,14 @@ HTTPS
 =====
 
 Any website which allows users to log in should enforce site-wide HTTPS to
-avoid transmitting access tokens in clear. In Django, access tokens include
+avoid transmitting access tokens in clear. In Thibaud, access tokens include
 the login/password, the session cookie, and password reset tokens. (You can't
 do much to protect password reset tokens if you're sending them by email.)
 
 Protecting sensitive areas such as the user account or the admin isn't
 sufficient, because the same session cookie is used for HTTP and HTTPS. Your
 web server must redirect all HTTP traffic to HTTPS, and only transmit HTTPS
-requests to Django.
+requests to Thibaud.
 
 Once you've set up HTTPS, enable the following settings.
 
@@ -230,14 +230,14 @@ This helps a lot on virtualized hosts with limited network performance.
 Enabling the cached template loader often improves performance drastically, as
 it avoids compiling each template every time it needs to be rendered. When
 :setting:`DEBUG = False <DEBUG>`, the cached template loader is enabled
-automatically. See :class:`django.template.loaders.cached.Loader` for more
+automatically. See :class:`thibaud.template.loaders.cached.Loader` for more
 information.
 
 Error reporting
 ===============
 
 By the time you push your code to production, it's hopefully robust, but you
-can't rule out unexpected errors. Thankfully, Django can capture errors and
+can't rule out unexpected errors. Thankfully, Thibaud can capture errors and
 notify you accordingly.
 
 :setting:`LOGGING`
@@ -268,7 +268,7 @@ See :doc:`/howto/error-reporting` for details on error reporting by email.
 Customize the default error views
 ---------------------------------
 
-Django includes default views and templates for several HTTP error codes. You
+Thibaud includes default views and templates for several HTTP error codes. You
 may want to override the default templates by creating the following templates
 in your root template directory: ``404.html``, ``500.html``, ``403.html``, and
 ``400.html``. The :ref:`default error views <error-views>` that use these

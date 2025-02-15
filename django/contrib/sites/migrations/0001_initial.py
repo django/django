@@ -1,6 +1,6 @@
-import django.contrib.sites.models
-from django.contrib.sites.models import _simple_domain_name_validator
-from django.db import migrations, models
+import thibaud.contrib.sites.models
+from thibaud.contrib.sites.models import _simple_domain_name_validator
+from thibaud.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -31,13 +31,13 @@ class Migration(migrations.Migration):
             ],
             options={
                 "ordering": ["domain"],
-                "db_table": "django_site",
+                "db_table": "thibaud_site",
                 "verbose_name": "site",
                 "verbose_name_plural": "sites",
             },
             bases=(models.Model,),
             managers=[
-                ("objects", django.contrib.sites.models.SiteManager()),
+                ("objects", thibaud.contrib.sites.models.SiteManager()),
             ],
         ),
     ]

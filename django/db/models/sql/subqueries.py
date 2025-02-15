@@ -2,13 +2,13 @@
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
-from django.core.exceptions import FieldError
-from django.db.models.sql.constants import (
+from thibaud.core.exceptions import FieldError
+from thibaud.db.models.sql.constants import (
     GET_ITERATOR_CHUNK_SIZE,
     NO_RESULTS,
     ROW_COUNT,
 )
-from django.db.models.sql.query import Query
+from thibaud.db.models.sql.query import Query
 
 __all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery"]
 

@@ -1,20 +1,20 @@
 import threading
 from ctypes import POINTER, Structure, byref, c_byte, c_char_p, c_int, c_size_t
 
-from django.contrib.gis.geos.base import GEOSBase
-from django.contrib.gis.geos.libgeos import (
+from thibaud.contrib.gis.geos.base import GEOSBase
+from thibaud.contrib.gis.geos.libgeos import (
     GEOM_PTR,
     GEOSFuncFactory,
     geos_version_tuple,
 )
-from django.contrib.gis.geos.prototypes.errcheck import (
+from thibaud.contrib.gis.geos.prototypes.errcheck import (
     check_geom,
     check_sized_string,
     check_string,
 )
-from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
-from django.utils.encoding import force_bytes
-from django.utils.functional import SimpleLazyObject
+from thibaud.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
+from thibaud.utils.encoding import force_bytes
+from thibaud.utils.functional import SimpleLazyObject
 
 
 # ### The WKB/WKT Reader/Writer structures and pointers ###
@@ -255,7 +255,7 @@ class WKBWriter(IOBase):
         self.outdim = dim
 
     def _handle_empty_point(self, geom):
-        from django.contrib.gis.geos import Point
+        from thibaud.contrib.gis.geos import Point
 
         if isinstance(geom, Point) and geom.empty:
             if self.srid:

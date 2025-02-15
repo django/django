@@ -1,20 +1,20 @@
 import re
 
-from django.conf import settings
-from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
-from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import GeometryField, RasterField
-from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.geos.geometry import GEOSGeometryBase
-from django.contrib.gis.geos.prototypes.io import wkb_r
-from django.contrib.gis.measure import Distance
-from django.core.exceptions import ImproperlyConfigured
-from django.db import NotSupportedError, ProgrammingError
-from django.db.backends.postgresql.operations import DatabaseOperations
-from django.db.backends.postgresql.psycopg_any import is_psycopg3
-from django.db.models import Func, Value
-from django.utils.functional import cached_property
-from django.utils.version import get_version_tuple
+from thibaud.conf import settings
+from thibaud.contrib.gis.db.backends.base.operations import BaseSpatialOperations
+from thibaud.contrib.gis.db.backends.utils import SpatialOperator
+from thibaud.contrib.gis.db.models import GeometryField, RasterField
+from thibaud.contrib.gis.gdal import GDALRaster
+from thibaud.contrib.gis.geos.geometry import GEOSGeometryBase
+from thibaud.contrib.gis.geos.prototypes.io import wkb_r
+from thibaud.contrib.gis.measure import Distance
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.db import NotSupportedError, ProgrammingError
+from thibaud.db.backends.postgresql.operations import DatabaseOperations
+from thibaud.db.backends.postgresql.psycopg_any import is_psycopg3
+from thibaud.db.models import Func, Value
+from thibaud.utils.functional import cached_property
+from thibaud.utils.version import get_version_tuple
 
 from .adapter import PostGISAdapter
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
@@ -203,7 +203,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
-                    "GeoDjango requires at least PostGIS version 3.1. "
+                    "GeoThibaud requires at least PostGIS version 3.1. "
                     "Was the database created from a spatial database "
                     "template?" % self.connection.settings_dict["NAME"]
                 )

@@ -2,9 +2,9 @@
 Tests of ModelAdmin system checks logic.
 """
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from thibaud.contrib.contenttypes.fields import GenericForeignKey
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.db import models
 
 
 class Album(models.Model):

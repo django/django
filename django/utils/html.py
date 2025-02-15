@@ -7,13 +7,13 @@ from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
-from django.core.exceptions import SuspiciousOperation, ValidationError
-from django.core.validators import EmailValidator
-from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
-from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import SafeData, SafeString, mark_safe
-from django.utils.text import normalize_newlines
+from thibaud.core.exceptions import SuspiciousOperation, ValidationError
+from thibaud.core.validators import EmailValidator
+from thibaud.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
+from thibaud.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.safestring import SafeData, SafeString, mark_safe
+from thibaud.utils.text import normalize_newlines
 
 # https://html.spec.whatwg.org/#void-elements
 VOID_ELEMENTS = frozenset(
@@ -93,9 +93,9 @@ def json_script(value, element_id=None, encoder=None):
     value is safe to be output anywhere except for inside a tag attribute. Wrap
     the escaped JSON in a script tag.
     """
-    from django.core.serializers.json import DjangoJSONEncoder
+    from thibaud.core.serializers.json import ThibaudJSONEncoder
 
-    json_str = json.dumps(value, cls=encoder or DjangoJSONEncoder).translate(
+    json_str = json.dumps(value, cls=encoder or ThibaudJSONEncoder).translate(
         _json_script_escapes
     )
     if element_id:
@@ -111,7 +111,7 @@ def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
 
-    This function relies on the __html__ convention used both by Django's
+    This function relies on the __html__ convention used both by Thibaud's
     SafeData class and by third-party libraries like markupsafe.
     """
     if isinstance(text, Promise):
@@ -479,7 +479,7 @@ def avoid_wrapping(value):
 
 def html_safe(klass):
     """
-    A decorator that defines the __html__ method. This helps non-Django
+    A decorator that defines the __html__ method. This helps non-Thibaud
     templates to detect classes whose __str__ methods return SafeString.
     """
     if "__html__" in klass.__dict__:

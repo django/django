@@ -1,4 +1,4 @@
-from django.db.models import (
+from thibaud.db.models import (
     Case,
     F,
     FilteredRelation,
@@ -8,9 +8,9 @@ from django.db.models import (
     TextField,
     When,
 )
-from django.db.models.functions import Cast
-from django.db.models.lookups import Exact
-from django.test import TestCase, skipUnlessDBFeature
+from thibaud.db.models.functions import Cast
+from thibaud.db.models.lookups import Exact
+from thibaud.test import TestCase, skipUnlessDBFeature
 
 from .models import Comment, Tenant, User
 

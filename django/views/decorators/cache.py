@@ -2,9 +2,9 @@ from functools import wraps
 
 from asgiref.sync import iscoroutinefunction
 
-from django.middleware.cache import CacheMiddleware
-from django.utils.cache import add_never_cache_headers, patch_cache_control
-from django.utils.decorators import decorator_from_middleware_with_args
+from thibaud.middleware.cache import CacheMiddleware
+from thibaud.utils.cache import add_never_cache_headers, patch_cache_control
+from thibaud.utils.decorators import decorator_from_middleware_with_args
 
 
 def cache_page(timeout, *, cache=None, key_prefix=None):
@@ -15,7 +15,7 @@ def cache_page(timeout, *, cache=None, key_prefix=None):
     The cache is keyed by the URL and some data from the headers.
     Additionally there is the key prefix that is used to distinguish different
     cache areas in a multi-site setup. You could use the
-    get_current_site().domain, for example, as that is unique across a Django
+    get_current_site().domain, for example, as that is unique across a Thibaud
     project.
 
     Additionally, all headers from the response's Vary header will be taken

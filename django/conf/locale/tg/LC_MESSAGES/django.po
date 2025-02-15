@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020
@@ -7,12 +7,12 @@
 # Surush Sufiew <siriusproger@gmail.com>, 2020
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-19 20:23+0200\n"
 "PO-Revision-Date: 2020-07-30 18:50+0000\n"
 "Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
-"Language-Team: Tajik (http://www.transifex.com/django/django/language/tg/)\n"
+"Language-Team: Tajik (http://www.transifex.com/thibaud/thibaud/language/tg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1251,18 +1251,18 @@ msgstr "“%(path)s” вуҷуд надорад"
 msgid "Index of %(directory)s"
 msgstr "Рӯёхати файлҳои директорияи %(directory)s"
 
-msgid "Django: the Web framework for perfectionists with deadlines."
+msgid "Thibaud: the Web framework for perfectionists with deadlines."
 msgstr ""
-"Django: веб-фреймворк барои перфектсионистҳо бо дедлайнҳо. Бисёр фреймворки "
+"Thibaud: веб-фреймворк барои перфектсионистҳо бо дедлайнҳо. Бисёр фреймворки "
 "табъи дилва хастанакунанда ҳангоми кор."
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"Инҷо <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\\'noopener\\''>андешаҳо</a> оиди баромади Django "
+"Инҷо <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\\'noopener\\''>андешаҳо</a> оиди баромади Thibaud "
 "%(version)s"
 
 msgid "The install worked successfully! Congratulations!"
@@ -1270,18 +1270,18 @@ msgstr "Ҷобаҷогузорӣ муваффақона анҷом ёфт! Та�
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
 "Шумо ин хабарро барои он мебинед, ки дар <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"thibaudproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
 "\\'noopener\\'>ишора намудед: DEBUG=True</a> ва дар файли "
 "ҷобаҷогузорӣ(settings)ягонто танзимгари URL-суроғаҳоро ишора нанамудед."
 
-msgid "Django Documentation"
-msgstr "Ҳуҷҷатгузории Django"
+msgid "Thibaud Documentation"
+msgstr "Ҳуҷҷатгузории Thibaud"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr ""
@@ -1289,11 +1289,11 @@ msgstr ""
 msgid "Tutorial: A Polling App"
 msgstr "Роҳбарият: Барнома барои овоздиҳӣ"
 
-msgid "Get started with Django"
-msgstr "оғози кор бо Django"
+msgid "Get started with Thibaud"
+msgstr "оғози кор бо Thibaud"
 
-msgid "Django Community"
-msgstr "Иттиҳоди Django"
+msgid "Thibaud Community"
+msgstr "Иттиҳоди Thibaud"
 
 msgid "Connect, get help, or contribute"
 msgstr "Бо мо ҳамкорӣ намуда имкониятҳои навро пайдо намоед."

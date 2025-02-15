@@ -6,22 +6,22 @@ from functools import total_ordering
 from itertools import dropwhile
 from pathlib import Path
 
-import django
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.files.temp import NamedTemporaryFile
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import (
+import thibaud
+from thibaud.conf import settings
+from thibaud.core.exceptions import ImproperlyConfigured
+from thibaud.core.files.temp import NamedTemporaryFile
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.core.management.utils import (
     find_command,
     handle_extensions,
     is_ignored_path,
     popen_wrapper,
 )
-from django.utils.encoding import DEFAULT_LOCALE_ENCODING
-from django.utils.functional import cached_property
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.text import get_text_list
-from django.utils.translation import templatize
+from thibaud.utils.encoding import DEFAULT_LOCALE_ENCODING
+from thibaud.utils.functional import cached_property
+from thibaud.utils.regex_helper import _lazy_re_compile
+from thibaud.utils.text import get_text_list
+from thibaud.utils.translation import templatize
 
 plural_forms_re = _lazy_re_compile(
     r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL
@@ -79,7 +79,7 @@ class BuildFile:
 
     @cached_property
     def is_templatized(self):
-        if self.domain == "django":
+        if self.domain == "thibaud":
             file_ext = os.path.splitext(self.translatable.file)[1]
             return file_ext != ".py"
         return False
@@ -110,7 +110,7 @@ class BuildFile:
         with open(self.path, encoding="utf-8") as fp:
             src_data = fp.read()
 
-        if self.domain == "django":
+        if self.domain == "thibaud":
             content = templatize(src_data, origin=self.path[2:])
 
         with open(self.work_path, "w", encoding="utf-8") as fp:
@@ -200,7 +200,7 @@ class Command(BaseCommand):
     help = (
         "Runs over the entire source tree of the current directory and pulls out all "
         "strings marked for translation. It creates (or updates) a message file in the "
-        "conf/locale (in the django tree) or locale (for projects and applications) "
+        "conf/locale (in the thibaud tree) or locale (for projects and applications) "
         "directory.\n\nYou must run this command with one of either the --locale, "
         "--exclude, or --all options."
     )
@@ -236,8 +236,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "--domain",
             "-d",
-            default="django",
-            help='The domain of the message files (default: "django").',
+            default="thibaud",
+            help='The domain of the message files (default: "thibaud").',
         )
         parser.add_argument(
             "--all",
@@ -251,7 +251,7 @@ class Command(BaseCommand):
             dest="extensions",
             action="append",
             help='The file extension(s) to examine (default: "html,txt,py", or "js" '
-            'if the domain is "djangojs"). Separate multiple extensions with '
+            'if the domain is "thibaudjs"). Separate multiple extensions with '
             "commas, or use -e multiple times.",
         )
         parser.add_argument(
@@ -349,12 +349,12 @@ class Command(BaseCommand):
         self.no_obsolete = options["no_obsolete"]
         self.keep_pot = options["keep_pot"]
 
-        if self.domain not in ("django", "djangojs"):
+        if self.domain not in ("thibaud", "thibaudjs"):
             raise CommandError(
                 "currently makemessages only supports domains "
-                "'django' and 'djangojs'"
+                "'thibaud' and 'thibaudjs'"
             )
-        if self.domain == "djangojs":
+        if self.domain == "thibaudjs":
             exts = extensions or ["js"]
         else:
             exts = extensions or ["html", "txt", "py"]
@@ -372,14 +372,14 @@ class Command(BaseCommand):
                 % get_text_list(list(self.extensions), "and")
             )
 
-        self.invoked_for_django = False
+        self.invoked_for_thibaud = False
         self.locale_paths = []
         self.default_locale_path = None
         if os.path.isdir(os.path.join("conf", "locale")):
             self.locale_paths = [os.path.abspath(os.path.join("conf", "locale"))]
             self.default_locale_path = self.locale_paths[0]
             self.ignore_patterns.append("views/templates/i18n_catalog.js")
-            self.invoked_for_django = True
+            self.invoked_for_thibaud = True
         else:
             if self.settings_available:
                 self.locale_paths.extend(settings.LOCALE_PATHS)
@@ -599,7 +599,7 @@ class Command(BaseCommand):
                     "processing file %s in %s"
                     % (translatable.file, translatable.dirpath)
                 )
-            if self.domain not in ("djangojs", "django"):
+            if self.domain not in ("thibaudjs", "thibaud"):
                 continue
             build_file = self.build_file_class(self, self.domain, translatable)
             try:
@@ -621,7 +621,7 @@ class Command(BaseCommand):
                 raise
             build_files.append(build_file)
 
-        if self.domain == "djangojs":
+        if self.domain == "thibaudjs":
             args = [
                 "xgettext",
                 "-d",
@@ -634,7 +634,7 @@ class Command(BaseCommand):
                 "--keyword=npgettext:1c,2,3",
                 "--output=-",
             ]
-        elif self.domain == "django":
+        elif self.domain == "thibaud":
             args = [
                 "xgettext",
                 "-d",
@@ -715,7 +715,7 @@ class Command(BaseCommand):
         else:
             with open(potfile, encoding="utf-8") as fp:
                 msgs = fp.read()
-            if not self.invoked_for_django:
+            if not self.invoked_for_thibaud:
                 msgs = self.copy_plural_forms(msgs, locale)
         msgs = normalize_eols(msgs)
         msgs = msgs.replace(
@@ -737,21 +737,21 @@ class Command(BaseCommand):
 
     def copy_plural_forms(self, msgs, locale):
         """
-        Copy plural forms header contents from a Django catalog of locale to
+        Copy plural forms header contents from a Thibaud catalog of locale to
         the msgs string, inserting it at the right place. msgs should be the
         contents of a newly created .po file.
         """
-        django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
-        if self.domain == "djangojs":
-            domains = ("djangojs", "django")
+        thibaud_dir = os.path.normpath(os.path.join(os.path.dirname(thibaud.__file__)))
+        if self.domain == "thibaudjs":
+            domains = ("thibaudjs", "thibaud")
         else:
-            domains = ("django",)
+            domains = ("thibaud",)
         for domain in domains:
-            django_po = os.path.join(
-                django_dir, "conf", "locale", locale, "LC_MESSAGES", "%s.po" % domain
+            thibaud_po = os.path.join(
+                thibaud_dir, "conf", "locale", locale, "LC_MESSAGES", "%s.po" % domain
             )
-            if os.path.exists(django_po):
-                with open(django_po, encoding="utf-8") as fp:
+            if os.path.exists(thibaud_po):
+                with open(thibaud_po, encoding="utf-8") as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
                     plural_form_line = m["value"]

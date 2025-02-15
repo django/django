@@ -47,7 +47,7 @@
                     <a href="{{ site_url }}">{% translate 'View site' %}</a> /
                 {% endif %}
                 {% if user.is_active and user.is_staff %}
-                    {% url 'django-admindocs-docroot' as docsroot %}
+                    {% url 'thibaud-admindocs-docroot' as docsroot %}
                     {% if docsroot %}
                         <a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
                     {% endif %}

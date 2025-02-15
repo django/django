@@ -2,10 +2,10 @@
 The sitemap framework
 =====================
 
-.. module:: django.contrib.sitemaps
+.. module:: thibaud.contrib.sitemaps
    :synopsis: A framework for generating Google sitemap XML files.
 
-Django comes with a high-level sitemap-generating framework to create sitemap_
+Thibaud comes with a high-level sitemap-generating framework to create sitemap_
 XML files.
 
 .. _sitemap: https://www.sitemaps.org/
@@ -18,12 +18,12 @@ frequently your pages change and how "important" certain pages are in relation
 to other pages on your site. This information helps search engines index your
 site.
 
-The Django sitemap framework automates the creation of this XML file by letting
+The Thibaud sitemap framework automates the creation of this XML file by letting
 you express this information in Python code.
 
-It works much like Django's :doc:`syndication framework
+It works much like Thibaud's :doc:`syndication framework
 </ref/contrib/syndication>`. To create a sitemap, write a
-:class:`~django.contrib.sitemaps.Sitemap` class and point to it in your
+:class:`~thibaud.contrib.sitemaps.Sitemap` class and point to it in your
 :doc:`URLconf </topics/http/urls>`.
 
 Installation
@@ -31,17 +31,17 @@ Installation
 
 To install the sitemap app, follow these steps:
 
-#. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS` setting.
+#. Add ``'thibaud.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS` setting.
 
-#. Make sure your :setting:`TEMPLATES` setting contains a ``DjangoTemplates``
+#. Make sure your :setting:`TEMPLATES` setting contains a ``ThibaudTemplates``
    backend whose ``APP_DIRS`` options is set to ``True``. It's in there by
    default, so you'll only need to change this if you've changed that setting.
 
-#. Make sure you've installed the :mod:`sites framework<django.contrib.sites>`.
+#. Make sure you've installed the :mod:`sites framework<thibaud.contrib.sites>`.
 
 (Note: The sitemap application doesn't install any database tables. The only
 reason it needs to go into :setting:`INSTALLED_APPS` is so that the
-:func:`~django.template.loaders.app_directories.Loader` template
+:func:`~thibaud.template.loaders.app_directories.Loader` template
 loader can find the default templates.)
 
 Initialization
@@ -49,19 +49,19 @@ Initialization
 
 .. function:: views.sitemap(request, sitemaps, section=None, template_name='sitemap.xml', content_type='application/xml')
 
-To activate sitemap generation on your Django site, add this line to your
+To activate sitemap generation on your Thibaud site, add this line to your
 :doc:`URLconf </topics/http/urls>`::
 
-    from django.contrib.sitemaps.views import sitemap
+    from thibaud.contrib.sitemaps.views import sitemap
 
     path(
         "sitemap.xml",
         sitemap,
         {"sitemaps": sitemaps},
-        name="django.contrib.sitemaps.views.sitemap",
+        name="thibaud.contrib.sitemaps.views.sitemap",
     )
 
-This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
+This tells Thibaud to build a sitemap when a client accesses :file:`/sitemap.xml`.
 
 The name of the sitemap file is not important, but the location is. Search
 engines will only index links in your sitemap for the current URL level and
@@ -72,17 +72,17 @@ reference any URL in your site. However, if your sitemap lives at
 
 The sitemap view takes an extra, required argument: ``{'sitemaps': sitemaps}``.
 ``sitemaps`` should be a dictionary that maps a short section label (e.g.,
-``blog`` or ``news``) to its :class:`~django.contrib.sitemaps.Sitemap` class
+``blog`` or ``news``) to its :class:`~thibaud.contrib.sitemaps.Sitemap` class
 (e.g., ``BlogSitemap`` or ``NewsSitemap``). It may also map to an *instance* of
-a :class:`~django.contrib.sitemaps.Sitemap` class (e.g.,
+a :class:`~thibaud.contrib.sitemaps.Sitemap` class (e.g.,
 ``BlogSitemap(some_var)``).
 
 ``Sitemap`` classes
 ===================
 
-A :class:`~django.contrib.sitemaps.Sitemap` class is a Python class that
+A :class:`~thibaud.contrib.sitemaps.Sitemap` class is a Python class that
 represents a "section" of entries in your sitemap. For example, one
-:class:`~django.contrib.sitemaps.Sitemap` class could represent all the entries
+:class:`~thibaud.contrib.sitemaps.Sitemap` class could represent all the entries
 of your blog, while another could represent all of the events in your events
 calendar.
 
@@ -91,8 +91,8 @@ In the simplest case, all these sections get lumped together into one
 sitemap index that references individual sitemap files, one per section. (See
 `Creating a sitemap index`_ below.)
 
-:class:`~django.contrib.sitemaps.Sitemap` classes must subclass
-``django.contrib.sitemaps.Sitemap``. They can live anywhere in your codebase.
+:class:`~thibaud.contrib.sitemaps.Sitemap` classes must subclass
+``thibaud.contrib.sitemaps.Sitemap``. They can live anywhere in your codebase.
 
 An example
 ==========
@@ -101,7 +101,7 @@ Let's assume you have a blog system, with an ``Entry`` model, and you want your
 sitemap to include all the links to your individual blog entries. Here's how
 your sitemap class might look::
 
-    from django.contrib.sitemaps import Sitemap
+    from thibaud.contrib.sitemaps import Sitemap
     from blog.models import Entry
 
 
@@ -187,15 +187,15 @@ Note:
         If all items in a sitemap have a :attr:`~Sitemap.lastmod`, the sitemap
         generated by :func:`views.sitemap` will have a ``Last-Modified``
         header equal to the latest ``lastmod``. You can activate the
-        :class:`~django.middleware.http.ConditionalGetMiddleware` to make
-        Django respond appropriately to requests with an ``If-Modified-Since``
+        :class:`~thibaud.middleware.http.ConditionalGetMiddleware` to make
+        Thibaud respond appropriately to requests with an ``If-Modified-Since``
         header which will prevent sending the sitemap if it hasn't changed.
 
     .. attribute:: Sitemap.paginator
 
         **Optional.**
 
-        This property returns a :class:`~django.core.paginator.Paginator` for
+        This property returns a :class:`~thibaud.core.paginator.Paginator` for
         :attr:`~Sitemap.items()`. If you generate sitemaps in a batch you may
         want to override this as a cached property in order to avoid multiple
         ``items()`` calls.
@@ -323,7 +323,7 @@ The sitemap framework provides a convenience class for a common case:
 
 .. class:: GenericSitemap(info_dict, priority=None, changefreq=None, protocol=None)
 
-    The :class:`django.contrib.sitemaps.GenericSitemap` class allows you to
+    The :class:`thibaud.contrib.sitemaps.GenericSitemap` class allows you to
     create a sitemap by passing it a dictionary which has to contain at least
     a ``queryset`` entry. This queryset will be used to generate the items
     of the sitemap. It may also have a ``date_field`` entry that
@@ -342,9 +342,9 @@ Example
 Here's an example of a :doc:`URLconf </topics/http/urls>` using
 :class:`GenericSitemap`::
 
-    from django.contrib.sitemaps import GenericSitemap
-    from django.contrib.sitemaps.views import sitemap
-    from django.urls import path
+    from thibaud.contrib.sitemaps import GenericSitemap
+    from thibaud.contrib.sitemaps.views import sitemap
+    from thibaud.urls import path
     from blog.models import Entry
 
     info_dict = {
@@ -360,7 +360,7 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using
             "sitemap.xml",
             sitemap,
             {"sitemaps": {"blog": GenericSitemap(info_dict, priority=0.6)}},
-            name="django.contrib.sitemaps.views.sitemap",
+            name="thibaud.contrib.sitemaps.views.sitemap",
         ),
     ]
 
@@ -371,12 +371,12 @@ Sitemap for static views
 
 Often you want the search engine crawlers to index views which are neither
 object detail pages nor flatpages. The solution is to explicitly list URL
-names for these views in ``items`` and call :func:`~django.urls.reverse` in
+names for these views in ``items`` and call :func:`~thibaud.urls.reverse` in
 the ``location`` method of the sitemap. For example::
 
     # sitemaps.py
-    from django.contrib import sitemaps
-    from django.urls import reverse
+    from thibaud.contrib import sitemaps
+    from thibaud.urls import reverse
 
 
     class StaticViewSitemap(sitemaps.Sitemap):
@@ -391,8 +391,8 @@ the ``location`` method of the sitemap. For example::
 
 
     # urls.py
-    from django.contrib.sitemaps.views import sitemap
-    from django.urls import path
+    from thibaud.contrib.sitemaps.views import sitemap
+    from thibaud.urls import path
 
     from .sitemaps import StaticViewSitemap
     from . import views
@@ -410,7 +410,7 @@ the ``location`` method of the sitemap. For example::
             "sitemap.xml",
             sitemap,
             {"sitemaps": sitemaps},
-            name="django.contrib.sitemaps.views.sitemap",
+            name="thibaud.contrib.sitemaps.views.sitemap",
         ),
     ]
 
@@ -418,39 +418,39 @@ the ``location`` method of the sitemap. For example::
 Creating a sitemap index
 ========================
 
-.. function:: views.index(request, sitemaps, template_name='sitemap_index.xml', content_type='application/xml', sitemap_url_name='django.contrib.sitemaps.views.sitemap')
+.. function:: views.index(request, sitemaps, template_name='sitemap_index.xml', content_type='application/xml', sitemap_url_name='thibaud.contrib.sitemaps.views.sitemap')
 
 The sitemap framework also has the ability to create a sitemap index that
 references individual sitemap files, one per each section defined in your
 ``sitemaps`` dictionary. The only differences in usage are:
 
-* You use two views in your URLconf: :func:`django.contrib.sitemaps.views.index`
-  and :func:`django.contrib.sitemaps.views.sitemap`.
-* The :func:`django.contrib.sitemaps.views.sitemap` view should take a
+* You use two views in your URLconf: :func:`thibaud.contrib.sitemaps.views.index`
+  and :func:`thibaud.contrib.sitemaps.views.sitemap`.
+* The :func:`thibaud.contrib.sitemaps.views.sitemap` view should take a
   ``section`` keyword argument.
 
 Here's what the relevant URLconf lines would look like for the example above::
 
-    from django.contrib.sitemaps import views
+    from thibaud.contrib.sitemaps import views
 
     urlpatterns = [
         path(
             "sitemap.xml",
             views.index,
             {"sitemaps": sitemaps},
-            name="django.contrib.sitemaps.views.index",
+            name="thibaud.contrib.sitemaps.views.index",
         ),
         path(
             "sitemap-<section>.xml",
             views.sitemap,
             {"sitemaps": sitemaps},
-            name="django.contrib.sitemaps.views.sitemap",
+            name="thibaud.contrib.sitemaps.views.sitemap",
         ),
     ]
 
 This will automatically generate a :file:`sitemap.xml` file that references
 both :file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
-:class:`~django.contrib.sitemaps.Sitemap` classes and the ``sitemaps``
+:class:`~thibaud.contrib.sitemaps.Sitemap` classes and the ``sitemaps``
 dict don't change at all.
 
 If all sitemaps have a ``lastmod`` returned by
@@ -458,15 +458,15 @@ If all sitemaps have a ``lastmod`` returned by
 ``Last-Modified`` header equal to the latest ``lastmod``.
 
 You should create an index file if one of your sitemaps has more than 50,000
-URLs. In this case, Django will automatically paginate the sitemap, and the
+URLs. In this case, Thibaud will automatically paginate the sitemap, and the
 index will reflect that.
 
 If you're not using the vanilla sitemap view -- for example, if it's wrapped
 with a caching decorator -- you must name your sitemap view and pass
 ``sitemap_url_name`` to the index view::
 
-    from django.contrib.sitemaps import views as sitemaps_views
-    from django.views.decorators.cache import cache_page
+    from thibaud.contrib.sitemaps import views as sitemaps_views
+    from thibaud.views.decorators.cache import cache_page
 
     urlpatterns = [
         path(
@@ -489,25 +489,25 @@ If you wish to use a different template for each sitemap or sitemap index
 available on your site, you may specify it by passing a ``template_name``
 parameter to the ``sitemap`` and ``index`` views via the URLconf::
 
-    from django.contrib.sitemaps import views
+    from thibaud.contrib.sitemaps import views
 
     urlpatterns = [
         path(
             "custom-sitemap.xml",
             views.index,
             {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
-            name="django.contrib.sitemaps.views.index",
+            name="thibaud.contrib.sitemaps.views.index",
         ),
         path(
             "custom-sitemap-<section>.xml",
             views.sitemap,
             {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
-            name="django.contrib.sitemaps.views.sitemap",
+            name="thibaud.contrib.sitemaps.views.sitemap",
         ),
     ]
 
 
-These views return :class:`~django.template.response.TemplateResponse`
+These views return :class:`~thibaud.template.response.TemplateResponse`
 instances which allow you to easily customize the response data before
 rendering. For more details, see the :doc:`TemplateResponse documentation
 </ref/template-response>`.
@@ -516,8 +516,8 @@ Context variables
 -----------------
 
 When customizing the templates for the
-:func:`~django.contrib.sitemaps.views.index` and
-:func:`~django.contrib.sitemaps.views.sitemap` views, you can rely on the
+:func:`~thibaud.contrib.sitemaps.views.index` and
+:func:`~thibaud.contrib.sitemaps.views.sitemap` views, you can rely on the
 following context variables.
 
 .. _sitemap-index-context-variables:
@@ -538,7 +538,7 @@ Sitemap
 
 The variable ``urlset`` is a list of URLs that should appear in the
 sitemap. Each URL exposes attributes as defined in the
-:class:`~django.contrib.sitemaps.Sitemap` class:
+:class:`~thibaud.contrib.sitemaps.Sitemap` class:
 
 - ``alternates``
 - ``changefreq``
@@ -558,7 +558,7 @@ Sitemap's :attr:`~Sitemap.items()` would return a list of items with
 ``publication_data`` and a ``tags`` field something like this would
 generate a Google News compatible sitemap:
 
-.. code-block:: xml+django
+.. code-block:: xml+thibaud
 
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset

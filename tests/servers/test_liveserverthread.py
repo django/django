@@ -1,6 +1,6 @@
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.test import LiveServerTestCase, TransactionTestCase
-from django.test.testcases import LiveServerThread
+from thibaud.db import DEFAULT_DB_ALIAS, connections
+from thibaud.test import LiveServerTestCase, TransactionTestCase
+from thibaud.test.testcases import LiveServerThread
 
 
 # Use TransactionTestCase instead of TestCase to run outside of a transaction,

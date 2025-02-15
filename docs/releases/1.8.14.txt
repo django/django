@@ -1,10 +1,10 @@
 ===========================
-Django 1.8.14 release notes
+Thibaud 1.8.14 release notes
 ===========================
 
 *July 18, 2016*
 
-Django 1.8.14 fixes a security issue and a bug in 1.8.13.
+Thibaud 1.8.14 fixes a security issue and a bug in 1.8.13.
 
 XSS in admin's add/change related popup
 =======================================

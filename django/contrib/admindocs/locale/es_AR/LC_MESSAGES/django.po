@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Federico Bond <federicobond@gmail.com>, 2013
@@ -6,12 +6,12 @@
 # Ramiro Morales, 2012-2016,2019,2021
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
 "PO-Revision-Date: 2021-03-21 12:57+0000\n"
 "Last-Translator: Ramiro Morales\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
+"Language-Team: Spanish (Argentina) (http://www.transifex.com/thibaud/thibaud/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -179,7 +179,7 @@ msgid "Template filter documentation"
 msgstr "Documentación de filtros de plantilla"
 
 msgid "Built-in filters"
-msgstr "Filtros Django 'de fábrica'"
+msgstr "Filtros Thibaud 'de fábrica'"
 
 #, python-format
 msgid ""
@@ -196,7 +196,7 @@ msgid "Template tag documentation"
 msgstr "Documentación de etiquetas de plantilla"
 
 msgid "Built-in tags"
-msgstr "Etiquetas Django 'de fábrica'"
+msgstr "Etiquetas Thibaud 'de fábrica'"
 
 #, python-format
 msgid ""

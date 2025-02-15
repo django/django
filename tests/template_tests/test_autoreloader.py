@@ -1,9 +1,9 @@
 from pathlib import Path
 from unittest import mock
 
-from django.template import autoreload
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import require_jinja2
+from thibaud.template import autoreload
+from thibaud.test import SimpleTestCase, override_settings
+from thibaud.test.utils import require_jinja2
 
 ROOT = Path(__file__).parent.absolute()
 EXTRA_TEMPLATES_DIR = ROOT / "templates_extra"
@@ -13,32 +13,32 @@ EXTRA_TEMPLATES_DIR = ROOT / "templates_extra"
     INSTALLED_APPS=["template_tests"],
     TEMPLATES=[
         {
-            "BACKEND": "django.template.backends.dummy.TemplateStrings",
+            "BACKEND": "thibaud.template.backends.dummy.TemplateStrings",
             "APP_DIRS": True,
         },
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             "DIRS": [EXTRA_TEMPLATES_DIR],
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.request",
+                    "thibaud.template.context_processors.request",
                 ],
                 "loaders": [
-                    "django.template.loaders.filesystem.Loader",
-                    "django.template.loaders.app_directories.Loader",
+                    "thibaud.template.loaders.filesystem.Loader",
+                    "thibaud.template.loaders.app_directories.Loader",
                 ],
             },
         },
     ],
 )
 class TemplateReloadTests(SimpleTestCase):
-    @mock.patch("django.template.autoreload.reset_loaders")
+    @mock.patch("thibaud.template.autoreload.reset_loaders")
     def test_template_changed(self, mock_reset):
         template_path = Path(__file__).parent / "templates" / "index.html"
         self.assertTrue(autoreload.template_changed(None, template_path))
         mock_reset.assert_called_once()
 
-    @mock.patch("django.template.autoreload.reset_loaders")
+    @mock.patch("thibaud.template.autoreload.reset_loaders")
     def test_non_template_changed(self, mock_reset):
         self.assertIsNone(autoreload.template_changed(None, Path(__file__)))
         mock_reset.assert_not_called()
@@ -47,37 +47,37 @@ class TemplateReloadTests(SimpleTestCase):
         TEMPLATES=[
             {
                 "DIRS": [ROOT],
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             }
         ]
     )
-    @mock.patch("django.template.autoreload.reset_loaders")
+    @mock.patch("thibaud.template.autoreload.reset_loaders")
     def test_non_template_changed_in_template_directory(self, mock_reset):
         self.assertIsNone(autoreload.template_changed(None, Path(__file__)))
         mock_reset.assert_not_called()
 
-    @mock.patch("django.forms.renderers.get_default_renderer")
+    @mock.patch("thibaud.forms.renderers.get_default_renderer")
     def test_form_template_reset_template_change(self, mock_renderer):
         template_path = Path(__file__).parent / "templates" / "index.html"
         self.assertIs(autoreload.template_changed(None, template_path), True)
         mock_renderer.assert_called_once()
 
-    @mock.patch("django.template.loaders.cached.Loader.reset")
+    @mock.patch("thibaud.template.loaders.cached.Loader.reset")
     def test_form_template_reset_template_change_reset_call(self, mock_loader_reset):
         template_path = Path(__file__).parent / "templates" / "index.html"
         self.assertIs(autoreload.template_changed(None, template_path), True)
         mock_loader_reset.assert_called_once()
 
-    @override_settings(FORM_RENDERER="django.forms.renderers.TemplatesSetting")
-    @mock.patch("django.template.loaders.cached.Loader.reset")
-    def test_form_template_reset_template_change_no_djangotemplates(
+    @override_settings(FORM_RENDERER="thibaud.forms.renderers.TemplatesSetting")
+    @mock.patch("thibaud.template.loaders.cached.Loader.reset")
+    def test_form_template_reset_template_change_no_thibaudtemplates(
         self, mock_loader_reset
     ):
         template_path = Path(__file__).parent / "templates" / "index.html"
         self.assertIs(autoreload.template_changed(None, template_path), True)
         mock_loader_reset.assert_not_called()
 
-    @mock.patch("django.forms.renderers.get_default_renderer")
+    @mock.patch("thibaud.forms.renderers.get_default_renderer")
     def test_form_template_reset_non_template_change(self, mock_renderer):
         self.assertIsNone(autoreload.template_changed(None, Path(__file__)))
         mock_renderer.assert_not_called()
@@ -102,7 +102,7 @@ class TemplateReloadTests(SimpleTestCase):
             },
         )
 
-    @mock.patch("django.template.loaders.base.Loader.reset")
+    @mock.patch("thibaud.template.loaders.base.Loader.reset")
     def test_reset_all_loaders(self, mock_reset):
         autoreload.reset_loaders()
         self.assertEqual(mock_reset.call_count, 2)
@@ -111,7 +111,7 @@ class TemplateReloadTests(SimpleTestCase):
         TEMPLATES=[
             {
                 "DIRS": [""],
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             }
         ]
     )
@@ -126,7 +126,7 @@ class TemplateReloadTests(SimpleTestCase):
                     "template_tests/relative_str",
                     Path("template_tests/relative_path"),
                 ],
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "BACKEND": "thibaud.template.backends.thibaud.ThibaudTemplates",
             }
         ]
     )
@@ -162,7 +162,7 @@ class Jinja2TemplateReloadTests(SimpleTestCase):
             },
         )
 
-    @mock.patch("django.template.loaders.base.Loader.reset")
+    @mock.patch("thibaud.template.loaders.base.Loader.reset")
     def test_reset_all_loaders(self, mock_reset):
         autoreload.reset_loaders()
         self.assertEqual(mock_reset.call_count, 0)

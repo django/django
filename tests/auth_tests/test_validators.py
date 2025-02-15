@@ -1,8 +1,8 @@
 import os
 
-from django.contrib.auth import validators
-from django.contrib.auth.models import User
-from django.contrib.auth.password_validation import (
+from thibaud.contrib.auth import validators
+from thibaud.contrib.auth.models import User
+from thibaud.contrib.auth.password_validation import (
     CommonPasswordValidator,
     MinimumLengthValidator,
     NumericPasswordValidator,
@@ -14,18 +14,18 @@ from django.contrib.auth.password_validation import (
     password_validators_help_texts,
     validate_password,
 )
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.db import models
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import isolate_apps
-from django.utils.html import conditional_escape
+from thibaud.core.exceptions import ImproperlyConfigured, ValidationError
+from thibaud.db import models
+from thibaud.test import SimpleTestCase, TestCase, override_settings
+from thibaud.test.utils import isolate_apps
+from thibaud.utils.html import conditional_escape
 
 
 @override_settings(
     AUTH_PASSWORD_VALIDATORS=[
-        {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+        {"NAME": "thibaud.contrib.auth.password_validation.CommonPasswordValidator"},
         {
-            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+            "NAME": "thibaud.contrib.auth.password_validation.MinimumLengthValidator",
             "OPTIONS": {
                 "min_length": 12,
             },
@@ -42,7 +42,7 @@ class PasswordValidationTest(SimpleTestCase):
 
     def test_get_password_validators_custom(self):
         validator_config = [
-            {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"}
+            {"NAME": "thibaud.contrib.auth.password_validation.CommonPasswordValidator"}
         ]
         validators = get_password_validators(validator_config)
         self.assertEqual(len(validators), 1)
@@ -66,7 +66,7 @@ class PasswordValidationTest(SimpleTestCase):
         )
 
         with self.assertRaises(ValidationError) as cm:
-            validate_password("django4242")
+            validate_password("thibaud4242")
         self.assertEqual(cm.exception.messages, [msg_too_short])
         self.assertEqual(cm.exception.error_list[0].code, "password_too_short")
 
@@ -286,7 +286,7 @@ class CommonPasswordValidatorTest(SimpleTestCase):
         self.assertEqual(cm.exception.messages, [expected_error])
         self.assertEqual(cm.exception.error_list[0].code, "password_too_common")
 
-    def test_validate_django_supplied_file(self):
+    def test_validate_thibaud_supplied_file(self):
         validator = CommonPasswordValidator()
         for password in validator.passwords:
             self.assertEqual(password, password.lower())

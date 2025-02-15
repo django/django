@@ -1,5 +1,5 @@
 =============================
-Django documentation contents
+Thibaud documentation contents
 =============================
 
 .. toctree::

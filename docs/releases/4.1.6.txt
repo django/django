@@ -1,10 +1,10 @@
 ==========================
-Django 4.1.6 release notes
+Thibaud 4.1.6 release notes
 ==========================
 
 *February 1, 2023*
 
-Django 4.1.6 fixes a security issue with severity "moderate" and a bug in
+Thibaud 4.1.6 fixes a security issue with severity "moderate" and a bug in
 4.1.5.
 
 CVE-2023-23969: Potential denial-of-service via ``Accept-Language`` headers
@@ -20,5 +20,5 @@ parsed up to a maximum length.
 Bugfixes
 ========
 
-* Fixed a bug in Django 4.1 that caused a crash of model validation on
+* Fixed a bug in Thibaud 4.1 that caused a crash of model validation on
   ``UniqueConstraint`` with ordered expressions (:ticket:`34291`).

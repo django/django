@@ -385,7 +385,7 @@ class SimpleLazyObject(LazyObject):
     A lazy object initialized from any function.
 
     Designed for compound objects of unknown type. For builtins or objects of
-    known type, use django.utils.functional.lazy.
+    known type, use thibaud.utils.functional.lazy.
     """
 
     def __init__(self, func):
@@ -393,7 +393,7 @@ class SimpleLazyObject(LazyObject):
         Pass in a callable that returns the object to be wrapped.
 
         If copies are made of the resulting SimpleLazyObject, which can happen
-        in various circumstances within Django, then you must ensure that the
+        in various circumstances within Thibaud, then you must ensure that the
         callable can be safely run more than once and will return the same
         value.
         """

@@ -4,17 +4,17 @@ import re
 from difflib import SequenceMatcher
 from pathlib import Path
 
-from django.conf import settings
-from django.core.exceptions import (
+from thibaud.conf import settings
+from thibaud.core.exceptions import (
     FieldDoesNotExist,
     ImproperlyConfigured,
     ValidationError,
 )
-from django.utils.functional import cached_property, lazy
-from django.utils.html import format_html, format_html_join
-from django.utils.module_loading import import_string
-from django.utils.translation import gettext as _
-from django.utils.translation import ngettext
+from thibaud.utils.functional import cached_property, lazy
+from thibaud.utils.html import format_html, format_html_join
+from thibaud.utils.module_loading import import_string
+from thibaud.utils.translation import gettext as _
+from thibaud.utils.translation import ngettext
 
 
 @functools.cache
@@ -221,7 +221,7 @@ class CommonPasswordValidator:
     Validate that the password is not a common password.
 
     The password is rejected if it occurs in a provided list of passwords,
-    which may be gzipped. The list Django ships with contains 20000 common
+    which may be gzipped. The list Thibaud ships with contains 20000 common
     passwords (lowercased and deduplicated), created by Royce Williams:
     https://gist.github.com/roycewilliams/226886fd01572964e1431ac8afc999ce
     The password list must be lowercased to match the comparison in validate().

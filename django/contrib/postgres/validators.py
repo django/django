@@ -1,13 +1,13 @@
-from django.core.exceptions import ValidationError
-from django.core.validators import (
+from thibaud.core.exceptions import ValidationError
+from thibaud.core.validators import (
     MaxLengthValidator,
     MaxValueValidator,
     MinLengthValidator,
     MinValueValidator,
 )
-from django.utils.deconstruct import deconstructible
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext_lazy
+from thibaud.utils.deconstruct import deconstructible
+from thibaud.utils.translation import gettext_lazy as _
+from thibaud.utils.translation import ngettext_lazy
 
 
 class ArrayMaxLengthValidator(MaxLengthValidator):

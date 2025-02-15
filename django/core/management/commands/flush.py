@@ -1,10 +1,10 @@
 from importlib import import_module
 
-from django.apps import apps
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management.color import no_style
-from django.core.management.sql import emit_post_migrate_signal, sql_flush
-from django.db import DEFAULT_DB_ALIAS, connections
+from thibaud.apps import apps
+from thibaud.core.management.base import BaseCommand, CommandError
+from thibaud.core.management.color import no_style
+from thibaud.core.management.sql import emit_post_migrate_signal, sql_flush
+from thibaud.db import DEFAULT_DB_ALIAS, connections
 
 
 class Command(BaseCommand):
@@ -20,7 +20,7 @@ class Command(BaseCommand):
             "--no-input",
             action="store_false",
             dest="interactive",
-            help="Tells Django to NOT prompt the user for input of any kind.",
+            help="Tells Thibaud to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
             "--database",
@@ -34,7 +34,7 @@ class Command(BaseCommand):
         connection = connections[database]
         verbosity = options["verbosity"]
         interactive = options["interactive"]
-        # The following are stealth options used by Django's internals.
+        # The following are stealth options used by Thibaud's internals.
         reset_sequences = options.get("reset_sequences", True)
         allow_cascade = options.get("allow_cascade", False)
         inhibit_post_migrate = options.get("inhibit_post_migrate", False)
@@ -78,7 +78,7 @@ Are you sure you want to do this?
                     "  * The database isn't running or isn't configured correctly.\n"
                     "  * At least one of the expected database tables doesn't exist.\n"
                     "  * The SQL was invalid.\n"
-                    "Hint: Look at the output of 'django-admin sqlflush'. "
+                    "Hint: Look at the output of 'thibaud-admin sqlflush'. "
                     "That's the SQL this command wasn't able to run."
                     % (connection.settings_dict["NAME"],)
                 ) from exc

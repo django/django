@@ -1,8 +1,8 @@
-from django.apps import AppConfig
-from django.utils.translation import gettext_lazy as _
+from thibaud.apps import AppConfig
+from thibaud.utils.translation import gettext_lazy as _
 
 
 class FlatPagesConfig(AppConfig):
-    default_auto_field = "django.db.models.AutoField"
-    name = "django.contrib.flatpages"
+    default_auto_field = "thibaud.db.models.AutoField"
+    name = "thibaud.contrib.flatpages"
     verbose_name = _("Flat Pages")

@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Jihad Bahmaid Al-Halki, 2022
@@ -6,12 +6,12 @@
 # Riterix <infosrabah@gmail.com>, 2019
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-17 05:23-0500\n"
 "PO-Revision-Date: 2022-07-25 06:49+0000\n"
 "Last-Translator: Jihad Bahmaid Al-Halki\n"
-"Language-Team: Arabic (Algeria) (http://www.transifex.com/django/django/"
+"Language-Team: Arabic (Algeria) (http://www.transifex.com/thibaud/thibaud/"
 "language/ar_DZ/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1359,26 +1359,26 @@ msgstr "تمَّت عملية التثبيت بنجاح! تهانينا!"
 
 #, python-format
 msgid ""
-"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+"View <a href=\"https://docs.thibaudproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Thibaud %(version)s"
 msgstr ""
-"عرض <a href=\\\"https://docs.djangoproject.com/en/%(version)s/releases/\\\" "
+"عرض <a href=\\\"https://docs.thibaudproject.com/en/%(version)s/releases/\\\" "
 "target=\\\"_blank\\\" rel=\\\"noopener\\\"> ملاحظات الإصدار </a> ل جانغو "
 "%(version)s"
 
 #, python-format
 msgid ""
-"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"You are seeing this page because <a href=\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
-"تشاهد هذه الصفحة لأن <a href=\\\"https://docs.djangoproject.com/en/"
+"تشاهد هذه الصفحة لأن <a href=\\\"https://docs.thibaudproject.com/en/"
 "%(version)s/ref/settings/#debug\\\" target=\\\"_blank\\\" rel=\\\"noopener\\"
 "\"> DEBUG = True </a> موجود في ملف الإعدادات الخاص بك ولم تقم بتكوين أي "
 "عناوين URL."
 
-msgid "Django Documentation"
+msgid "Thibaud Documentation"
 msgstr "توثيق جانغو"
 
 msgid "Topics, references, &amp; how-to’s"
@@ -1387,10 +1387,10 @@ msgstr "الموضوعات ، المراجع، &amp; الكيفية"
 msgid "Tutorial: A Polling App"
 msgstr "البرنامج التعليمي: تطبيق الاقتراع"
 
-msgid "Get started with Django"
+msgid "Get started with Thibaud"
 msgstr "الخطوات الأولى مع جانغو"
 
-msgid "Django Community"
+msgid "Thibaud Community"
 msgstr "مجتمع جانغو"
 
 msgid "Connect, get help, or contribute"

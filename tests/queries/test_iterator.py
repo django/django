@@ -1,9 +1,9 @@
 import datetime
 from unittest import mock
 
-from django.db import connections
-from django.db.models.sql.compiler import cursor_iter
-from django.test import TestCase
+from thibaud.db import connections
+from thibaud.db.models.sql.compiler import cursor_iter
+from thibaud.test import TestCase
 
 from .models import Article
 
@@ -27,7 +27,7 @@ class QuerySetIteratorTests(TestCase):
     def test_default_iterator_chunk_size(self):
         qs = Article.objects.iterator()
         with mock.patch(
-            "django.db.models.sql.compiler.cursor_iter", side_effect=cursor_iter
+            "thibaud.db.models.sql.compiler.cursor_iter", side_effect=cursor_iter
         ) as cursor_iter_mock:
             next(qs)
         self.assertEqual(cursor_iter_mock.call_count, 1)
@@ -38,7 +38,7 @@ class QuerySetIteratorTests(TestCase):
         batch_size = 3
         qs = Article.objects.iterator(chunk_size=batch_size)
         with mock.patch(
-            "django.db.models.sql.compiler.cursor_iter", side_effect=cursor_iter
+            "thibaud.db.models.sql.compiler.cursor_iter", side_effect=cursor_iter
         ) as cursor_iter_mock:
             next(qs)
         self.assertEqual(cursor_iter_mock.call_count, 1)

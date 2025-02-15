@@ -1,16 +1,16 @@
 from collections.abc import Iterable
 
-from django.apps import apps
-from django.contrib import auth
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.hashers import make_password
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail
-from django.db import models
-from django.db.models.manager import EmptyManager
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from thibaud.apps import apps
+from thibaud.contrib import auth
+from thibaud.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from thibaud.contrib.auth.hashers import make_password
+from thibaud.contrib.contenttypes.models import ContentType
+from thibaud.core.exceptions import PermissionDenied
+from thibaud.core.mail import send_mail
+from thibaud.db import models
+from thibaud.db.models.manager import EmptyManager
+from thibaud.utils import timezone
+from thibaud.utils.translation import gettext_lazy as _
 
 from .validators import UnicodeUsernameValidator
 
@@ -41,8 +41,8 @@ class Permission(models.Model):
     The permissions system provides a way to assign permissions to specific
     users and groups of users.
 
-    The permission system is used by the Django admin site, but may also be
-    useful in your own code. The Django admin site uses permissions as follows:
+    The permission system is used by the Thibaud admin site, but may also be
+    useful in your own code. The Thibaud admin site uses permissions as follows:
 
         - The "add" permission limits the user's ability to view the "add" form
           and add an object.
@@ -516,7 +516,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
 class User(AbstractUser):
     """
-    Users within the Django authentication system are represented by this
+    Users within the Thibaud authentication system are represented by this
     model.
 
     Username and password are required. Other fields are optional.
@@ -553,22 +553,22 @@ class AnonymousUser:
 
     def save(self):
         raise NotImplementedError(
-            "Django doesn't provide a DB representation for AnonymousUser."
+            "Thibaud doesn't provide a DB representation for AnonymousUser."
         )
 
     def delete(self):
         raise NotImplementedError(
-            "Django doesn't provide a DB representation for AnonymousUser."
+            "Thibaud doesn't provide a DB representation for AnonymousUser."
         )
 
     def set_password(self, raw_password):
         raise NotImplementedError(
-            "Django doesn't provide a DB representation for AnonymousUser."
+            "Thibaud doesn't provide a DB representation for AnonymousUser."
         )
 
     def check_password(self, raw_password):
         raise NotImplementedError(
-            "Django doesn't provide a DB representation for AnonymousUser."
+            "Thibaud doesn't provide a DB representation for AnonymousUser."
         )
 
     @property

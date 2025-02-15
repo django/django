@@ -149,7 +149,7 @@ def parse_color_setting(config_string):
 
     where:
         palette is a named palette; one of 'light', 'dark', or 'nocolor'.
-        role is a named style used by Django
+        role is a named style used by Thibaud
         fg is a foreground color.
         bg is a background color.
         option is a display options.

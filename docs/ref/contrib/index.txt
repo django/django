@@ -2,11 +2,11 @@
 ``contrib`` packages
 ====================
 
-Django aims to follow Python's :ref:`"batteries included" philosophy
+Thibaud aims to follow Python's :ref:`"batteries included" philosophy
 <tut-batteries-included>`. It ships with a variety of extra, optional tools
 that solve common web development problems.
 
-This code lives in :source:`django/contrib` in the Django distribution. This document
+This code lives in :source:`thibaud/contrib` in the Thibaud distribution. This document
 gives a rundown of the packages in ``contrib``, along with any dependencies
 those packages have.
 
@@ -14,7 +14,7 @@ those packages have.
 
     For most of these add-ons -- specifically, the add-ons that include either
     models or template tags -- you'll need to add the package name (e.g.,
-    ``'django.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
+    ``'thibaud.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
     and rerun ``manage.py migrate``.
 
 .. toctree::
@@ -37,7 +37,7 @@ those packages have.
 ``admin``
 =========
 
-The automatic Django administrative interface. For more information, see
+The automatic Thibaud administrative interface. For more information, see
 :doc:`Tutorial 2 </intro/tutorial02>` and the
 :doc:`admin documentation </ref/contrib/admin/index>`.
 
@@ -46,7 +46,7 @@ Requires the auth_ and contenttypes_ contrib packages to be installed.
 ``auth``
 ========
 
-Django's authentication framework.
+Thibaud's authentication framework.
 
 See :doc:`/topics/auth/index`.
 
@@ -54,7 +54,7 @@ See :doc:`/topics/auth/index`.
 ================
 
 A light framework for hooking into "types" of content, where each installed
-Django model is a separate content type.
+Thibaud model is a separate content type.
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
 
@@ -70,7 +70,7 @@ Requires the sites_ contrib package to be installed as well.
 ``gis``
 =======
 
-A world-class geospatial framework built on top of Django, that enables
+A world-class geospatial framework built on top of Thibaud, that enables
 storage, manipulation and display of spatial data.
 
 See the :doc:`/ref/contrib/gis/index` documentation for more.
@@ -78,7 +78,7 @@ See the :doc:`/ref/contrib/gis/index` documentation for more.
 ``humanize``
 ============
 
-A set of Django template filters useful for adding a "human touch" to data.
+A set of Thibaud template filters useful for adding a "human touch" to data.
 
 See the :doc:`humanize documentation </ref/contrib/humanize>`.
 
@@ -115,7 +115,7 @@ See the :doc:`sessions documentation </topics/http/sessions>`.
 =========
 
 A light framework that lets you operate multiple websites off of the same
-database and Django installation. It gives you hooks for associating objects to
+database and Thibaud installation. It gives you hooks for associating objects to
 one or more sites.
 
 See the :doc:`sites documentation </ref/contrib/sites>`.
@@ -138,4 +138,4 @@ Other add-ons
 =============
 
 If you have an idea for functionality to include in ``contrib``, let us know!
-Code it up, and post it to the |django-users| mailing list.
+Code it up, and post it to the |thibaud-users| mailing list.

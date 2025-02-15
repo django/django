@@ -1,11 +1,11 @@
 import functools
 from pathlib import Path
 
-from django.conf import settings
-from django.template.backends.django import DjangoTemplates
-from django.template.loader import get_template
-from django.utils.functional import cached_property
-from django.utils.module_loading import import_string
+from thibaud.conf import settings
+from thibaud.template.backends.thibaud import ThibaudTemplates
+from thibaud.template.loader import get_template
+from thibaud.utils.functional import cached_property
+from thibaud.utils.module_loading import import_string
 
 
 @functools.lru_cache
@@ -15,9 +15,9 @@ def get_default_renderer():
 
 
 class BaseRenderer:
-    form_template_name = "django/forms/div.html"
-    formset_template_name = "django/forms/formsets/div.html"
-    field_template_name = "django/forms/field.html"
+    form_template_name = "thibaud/forms/div.html"
+    formset_template_name = "thibaud/forms/formsets/div.html"
+    field_template_name = "thibaud/forms/field.html"
 
     bound_field_class = None
 
@@ -39,30 +39,30 @@ class EngineMixin:
             {
                 "APP_DIRS": True,
                 "DIRS": [Path(__file__).parent / self.backend.app_dirname],
-                "NAME": "djangoforms",
+                "NAME": "thibaudforms",
                 "OPTIONS": {},
             }
         )
 
 
-class DjangoTemplates(EngineMixin, BaseRenderer):
+class ThibaudTemplates(EngineMixin, BaseRenderer):
     """
-    Load Django templates from the built-in widget templates in
-    django/forms/templates and from apps' 'templates' directory.
+    Load Thibaud templates from the built-in widget templates in
+    thibaud/forms/templates and from apps' 'templates' directory.
     """
 
-    backend = DjangoTemplates
+    backend = ThibaudTemplates
 
 
 class Jinja2(EngineMixin, BaseRenderer):
     """
     Load Jinja2 templates from the built-in widget templates in
-    django/forms/jinja2 and from apps' 'jinja2' directory.
+    thibaud/forms/jinja2 and from apps' 'jinja2' directory.
     """
 
     @cached_property
     def backend(self):
-        from django.template.backends.jinja2 import Jinja2
+        from thibaud.template.backends.jinja2 import Jinja2
 
         return Jinja2
 

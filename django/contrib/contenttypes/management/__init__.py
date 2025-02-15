@@ -1,5 +1,5 @@
-from django.apps import apps as global_apps
-from django.db import DEFAULT_DB_ALIAS, IntegrityError, migrations, router, transaction
+from thibaud.apps import apps as global_apps
+from thibaud.db import DEFAULT_DB_ALIAS, IntegrityError, migrations, router, transaction
 
 
 class RenameContentType(migrations.RunPython):

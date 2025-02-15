@@ -1,7 +1,7 @@
 from ctypes import POINTER, c_byte, c_double, c_int, c_uint
 
-from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
-from django.contrib.gis.geos.prototypes.errcheck import GEOSException, last_arg_byref
+from thibaud.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
+from thibaud.contrib.gis.geos.prototypes.errcheck import GEOSException, last_arg_byref
 
 
 # ## Error-checking routines specific to coordinate sequences. ##

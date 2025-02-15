@@ -1,4 +1,4 @@
-from django.core.management.commands.makemigrations import (
+from thibaud.core.management.commands.makemigrations import (
     Command as MakeMigrationsCommand,
 )
 

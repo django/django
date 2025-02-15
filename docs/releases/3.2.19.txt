@@ -1,10 +1,10 @@
 ===========================
-Django 3.2.19 release notes
+Thibaud 3.2.19 release notes
 ===========================
 
 *May 3, 2023*
 
-Django 3.2.19 fixes a security issue with severity "low" in 3.2.18.
+Thibaud 3.2.19 fixes a security issue with severity "low" in 3.2.18.
 
 CVE-2023-31047: Potential bypass of validation when uploading multiple files using one form field
 =================================================================================================
@@ -14,8 +14,8 @@ Uploading multiple files using one form field has never been supported by
 uploaded file was validated. Unfortunately, :ref:`uploading_multiple_files`
 topic suggested otherwise.
 
-In order to avoid the vulnerability, :class:`~django.forms.ClearableFileInput`
-and :class:`~django.forms.FileInput` form widgets now raise ``ValueError`` when
+In order to avoid the vulnerability, :class:`~thibaud.forms.ClearableFileInput`
+and :class:`~thibaud.forms.FileInput` form widgets now raise ``ValueError`` when
 the ``multiple`` HTML attribute is set on them. To prevent the exception and
 keep the old behavior, set ``allow_multiple_selected`` to ``True``.
 

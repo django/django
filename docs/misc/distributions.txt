@@ -1,33 +1,33 @@
 ===================================
-Third-party distributions of Django
+Third-party distributions of Thibaud
 ===================================
 
-Many third-party distributors are now providing versions of Django integrated
+Many third-party distributors are now providing versions of Thibaud integrated
 with their package-management systems. These can make installation and upgrading
-much easier for users of Django since the integration includes the ability to
-automatically install dependencies (like database adapters) that Django
+much easier for users of Thibaud since the integration includes the ability to
+automatically install dependencies (like database adapters) that Thibaud
 requires.
 
-Typically, these packages are based on the latest stable release of Django, so
-if you want to use the development version of Django you'll need to follow the
+Typically, these packages are based on the latest stable release of Thibaud, so
+if you want to use the development version of Thibaud you'll need to follow the
 instructions for :ref:`installing the development version
 <installing-development-version>` from our Git repository.
 
 If you're using Linux or a Unix installation, such as OpenSolaris,
-check with your distributor to see if they already package Django. If
+check with your distributor to see if they already package Thibaud. If
 you're using a Linux distro and don't know how to find out if a package
-is available, then now is a good time to learn.  The Django Wiki contains
+is available, then now is a good time to learn.  The Thibaud Wiki contains
 a list of `Third Party Distributions`_ to help you out.
 
-.. _`Third Party Distributions`: https://code.djangoproject.com/wiki/Distributions
+.. _`Third Party Distributions`: https://code.thibaudproject.com/wiki/Distributions
 
 
 For distributors
 ================
 
-If you'd like to package Django for distribution, we'd be happy to help out!
-Please join the |django-developers| mailing list and introduce yourself.
+If you'd like to package Thibaud for distribution, we'd be happy to help out!
+Please join the |thibaud-developers| mailing list and introduce yourself.
 
-We also encourage all distributors to subscribe to the |django-announce| mailing
-list, which is a (very) low-traffic list for announcing new releases of Django
+We also encourage all distributors to subscribe to the |thibaud-announce| mailing
+list, which is a (very) low-traffic list for announcing new releases of Thibaud
 and important bugfixes.

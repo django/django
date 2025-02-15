@@ -2,15 +2,15 @@
 Cryptographic signing
 =====================
 
-.. module:: django.core.signing
-   :synopsis: Django's signing framework.
+.. module:: thibaud.core.signing
+   :synopsis: Thibaud's signing framework.
 
 The golden rule of web application security is to never trust data from
 untrusted sources. Sometimes it can be useful to pass data through an
 untrusted medium. Cryptographically signed values can be passed through an
 untrusted channel safe in the knowledge that any tampering will be detected.
 
-Django provides both a low-level API for signing values and a high-level API
+Thibaud provides both a low-level API for signing values and a high-level API
 for setting and reading signed cookies, one of the most common uses of
 signing in web applications.
 
@@ -28,7 +28,7 @@ You may also find signing useful for the following:
 Protecting ``SECRET_KEY`` and ``SECRET_KEY_FALLBACKS``
 ======================================================
 
-When you create a new Django project using :djadmin:`startproject`, the
+When you create a new Thibaud project using :djadmin:`startproject`, the
 ``settings.py`` file is generated automatically and gets a random
 :setting:`SECRET_KEY` value. This value is the key to securing signed
 data -- it is vital you keep this secure, or attackers could use it to
@@ -41,12 +41,12 @@ validate signed data and must be kept secure.
 Using the low-level API
 =======================
 
-Django's signing methods live in the ``django.core.signing`` module.
+Thibaud's signing methods live in the ``thibaud.core.signing`` module.
 To sign a value, first instantiate a ``Signer`` instance:
 
 .. code-block:: pycon
 
-    >>> from django.core.signing import Signer
+    >>> from thibaud.core.signing import Signer
     >>> signer = Signer()
     >>> value = signer.sign("My string")
     >>> value
@@ -87,11 +87,11 @@ If you wish to protect a list, tuple, or dictionary you can do so using the
 See :ref:`signing-complex-data` for more details.
 
 If the signature or value have been altered in any way, a
-``django.core.signing.BadSignature`` exception will be raised:
+``thibaud.core.signing.BadSignature`` exception will be raised:
 
 .. code-block:: pycon
 
-    >>> from django.core import signing
+    >>> from thibaud.core import signing
     >>> value += "m"
     >>> try:
     ...     original = signer.unsign(value)
@@ -168,7 +168,7 @@ created within a specified period of time:
 .. code-block:: pycon
 
     >>> from datetime import timedelta
-    >>> from django.core.signing import TimestampSigner
+    >>> from thibaud.core.signing import TimestampSigner
     >>> signer = TimestampSigner()
     >>> value = signer.sign("hello")
     >>> value
@@ -213,14 +213,14 @@ Protecting complex data structures
 If you wish to protect a list, tuple or dictionary you can do so using the
 ``Signer.sign_object()`` and ``unsign_object()`` methods, or signing module's
 ``dumps()`` or ``loads()`` functions (which are shortcuts for
-``TimestampSigner(salt='django.core.signing').sign_object()/unsign_object()``).
+``TimestampSigner(salt='thibaud.core.signing').sign_object()/unsign_object()``).
 These use JSON serialization under the hood. JSON ensures that even if your
 :setting:`SECRET_KEY` is stolen an attacker will not be able to execute
 arbitrary commands by exploiting the pickle format:
 
 .. code-block:: pycon
 
-    >>> from django.core import signing
+    >>> from thibaud.core import signing
     >>> signer = signing.TimestampSigner()
     >>> value = signer.sign_object({"foo": "bar"})
     >>> value
@@ -239,17 +239,17 @@ and tuples) if you pass in a tuple, you will get a list from
 
 .. code-block:: pycon
 
-    >>> from django.core import signing
+    >>> from thibaud.core import signing
     >>> value = signing.dumps(("a", "b", "c"))
     >>> signing.loads(value)
     ['a', 'b', 'c']
 
-.. function:: dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False)
+.. function:: dumps(obj, key=None, salt='thibaud.core.signing', serializer=JSONSerializer, compress=False)
 
     Returns URL-safe, signed base64 compressed JSON string. Serialized object
     is signed using :class:`~TimestampSigner`.
 
-.. function:: loads(string, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None, fallback_keys=None)
+.. function:: loads(string, key=None, salt='thibaud.core.signing', serializer=JSONSerializer, max_age=None, fallback_keys=None)
 
     Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
     Checks ``max_age`` (in seconds) if given.

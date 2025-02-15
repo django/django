@@ -1,15 +1,15 @@
 ==========================
-Django 5.0.5 release notes
+Thibaud 5.0.5 release notes
 ==========================
 
 *May 6, 2024*
 
-Django 5.0.5 fixes several bugs in 5.0.4.
+Thibaud 5.0.5 fixes several bugs in 5.0.4.
 
 Bugfixes
 ========
 
-* Fixed a bug in Django 5.0 that caused a crash of ``Model.save()`` when
+* Fixed a bug in Thibaud 5.0 that caused a crash of ``Model.save()`` when
   creating an instance of a model with a ``GeneratedField`` and providing a
   primary key (:ticket:`35350`).
 
@@ -17,19 +17,19 @@ Bugfixes
   validating email max line lengths with content decoded using the
   ``surrogateescape`` error handling scheme (:ticket:`35361`).
 
-* Fixed a bug in Django 5.0 that caused a crash when applying migrations
+* Fixed a bug in Thibaud 5.0 that caused a crash when applying migrations
   including alterations to ``GeneratedField`` such as setting ``db_index=True``
   on SQLite (:ticket:`35373`).
 
-* Allowed importing ``aprefetch_related_objects`` from ``django.db.models``
+* Allowed importing ``aprefetch_related_objects`` from ``thibaud.db.models``
   (:ticket:`35392`).
 
-* Fixed a bug in Django 5.0 that caused a migration crash when a
+* Fixed a bug in Thibaud 5.0 that caused a migration crash when a
   ``GeneratedField`` was added before any of the referenced fields from its
   ``expression`` definition (:ticket:`35359`).
 
-* Fixed a bug in Django 5.0 that caused a migration crash when altering a
+* Fixed a bug in Thibaud 5.0 that caused a migration crash when altering a
   ``GeneratedField`` referencing a renamed field (:ticket:`35422`).
 
-* Fixed a bug in Django 5.0 where the ``querysets`` argument of
+* Fixed a bug in Thibaud 5.0 where the ``querysets`` argument of
   ``GenericPrefetch`` was not required (:ticket:`35426`).

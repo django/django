@@ -1,10 +1,10 @@
 ==========================
-Django 1.7.1 release notes
+Thibaud 1.7.1 release notes
 ==========================
 
 *October 22, 2014*
 
-Django 1.7.1 fixes several bugs in 1.7.
+Thibaud 1.7.1 fixes several bugs in 1.7.
 
 Bugfixes
 ========
@@ -48,7 +48,7 @@ Bugfixes
   than a ``datetime`` (:ticket:`23403`).
 
 * Allowed migrations to work with ``app_label``\s that have the same last
-  part (e.g. ``django.contrib.auth`` and ``vendor.auth``) (:ticket:`23483`).
+  part (e.g. ``thibaud.contrib.auth`` and ``vendor.auth``) (:ticket:`23483`).
 
 * Restored the ability to deepcopy ``F`` objects (:ticket:`23492`).
 
@@ -62,10 +62,10 @@ Bugfixes
 * Fixed renaming of models with a self-referential many-to-many field
   (``ManyToManyField('self')``) (:ticket:`23503`).
 
-* Added the :meth:`~django.contrib.admin.InlineModelAdmin.get_extra()`,
-  :meth:`~django.contrib.admin.InlineModelAdmin.get_max_num()`, and
-  :meth:`~django.contrib.admin.InlineModelAdmin.get_min_num()` hooks to
-  :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`
+* Added the :meth:`~thibaud.contrib.admin.InlineModelAdmin.get_extra()`,
+  :meth:`~thibaud.contrib.admin.InlineModelAdmin.get_max_num()`, and
+  :meth:`~thibaud.contrib.admin.InlineModelAdmin.get_min_num()` hooks to
+  :class:`~thibaud.contrib.contenttypes.admin.GenericInlineModelAdmin`
   (:ticket:`23539`).
 
 * Made ``migrations.RunSQL`` no longer require percent sign escaping. This is
@@ -92,7 +92,7 @@ Bugfixes
 
 * Fixed ``deepcopy`` on ``ErrorList`` (:ticket:`23594`).
 
-* Made the :mod:`~django.contrib.admindocs` view to browse view details check
+* Made the :mod:`~thibaud.contrib.admindocs` view to browse view details check
   if the view specified in the URL exists in the URLconf. Previously it was
   possible to import arbitrary packages from the Python path. This was not
   considered a security issue because ``admindocs`` is only accessible to staff
@@ -104,7 +104,7 @@ Bugfixes
 * Fixed missing ``get_or_create`` and ``update_or_create`` on related managers
   causing ``IntegrityError`` (:ticket:`23611`).
 
-* Made :func:`~django.utils.http.urlsafe_base64_decode` return the proper
+* Made :func:`~thibaud.utils.http.urlsafe_base64_decode` return the proper
   type (bytestring) on Python 3 (:ticket:`23333`).
 
 * :djadmin:`makemigrations` can now serialize timezone-aware values
@@ -128,9 +128,9 @@ Bugfixes
   unclean exit of a previous test run (:ticket:`23649`).
 
 * Fixed :djadmin:`makemigrations` to detect changes to
-  :attr:`Meta.db_table <django.db.models.Options.db_table>` (:ticket:`23629`).
+  :attr:`Meta.db_table <thibaud.db.models.Options.db_table>` (:ticket:`23629`).
 
-* Fixed a regression when feeding the Django test client with an empty data
+* Fixed a regression when feeding the Thibaud test client with an empty data
   string (:ticket:`21740`).
 
 * Fixed a regression in :djadmin:`makemessages` where static files were

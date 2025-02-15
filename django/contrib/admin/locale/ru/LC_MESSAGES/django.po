@@ -1,4 +1,4 @@
-# This file is distributed under the same license as the Django package.
+# This file is distributed under the same license as the Thibaud package.
 #
 # Translators:
 # Alex Ibragimov, 2021
@@ -15,12 +15,12 @@
 # Bobsans <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: thibaud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2024-08-07 07:05+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2024\n"
-"Language-Team: Russian (http://app.transifex.com/django/django/language/"
+"Language-Team: Russian (http://app.transifex.com/thibaud/thibaud/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -295,11 +295,11 @@ msgstr ""
 "Удаление объекта %(instance)s типа %(class_name)s будет требовать удаления "
 "следующих связанных объектов: %(related_objects)s"
 
-msgid "Django site admin"
-msgstr "Административный сайт Django"
+msgid "Thibaud site admin"
+msgstr "Административный сайт Thibaud"
 
-msgid "Django administration"
-msgstr "Администрирование Django"
+msgid "Thibaud administration"
+msgstr "Администрирование Thibaud"
 
 msgid "Site administration"
 msgstr "Администрирование сайта"

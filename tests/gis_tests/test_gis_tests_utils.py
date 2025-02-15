@@ -1,5 +1,5 @@
-from django.db import connection, models
-from django.test import SimpleTestCase
+from thibaud.db import connection, models
+from thibaud.test import SimpleTestCase
 
 from .utils import FuncTestMixin
 

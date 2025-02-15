@@ -3,24 +3,24 @@ import sys
 import warnings
 from itertools import takewhile
 
-from django.apps import apps
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError, no_translations
-from django.core.management.utils import run_formatters
-from django.db import DEFAULT_DB_ALIAS, OperationalError, connections, router
-from django.db.migrations import Migration
-from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.migration import SwappableTuple
-from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.migrations.questioner import (
+from thibaud.apps import apps
+from thibaud.conf import settings
+from thibaud.core.management.base import BaseCommand, CommandError, no_translations
+from thibaud.core.management.utils import run_formatters
+from thibaud.db import DEFAULT_DB_ALIAS, OperationalError, connections, router
+from thibaud.db.migrations import Migration
+from thibaud.db.migrations.autodetector import MigrationAutodetector
+from thibaud.db.migrations.loader import MigrationLoader
+from thibaud.db.migrations.migration import SwappableTuple
+from thibaud.db.migrations.optimizer import MigrationOptimizer
+from thibaud.db.migrations.questioner import (
     InteractiveMigrationQuestioner,
     MigrationQuestioner,
     NonInteractiveMigrationQuestioner,
 )
-from django.db.migrations.state import ProjectState
-from django.db.migrations.utils import get_migration_name_timestamp
-from django.db.migrations.writer import MigrationWriter
+from thibaud.db.migrations.state import ProjectState
+from thibaud.db.migrations.utils import get_migration_name_timestamp
+from thibaud.db.migrations.writer import MigrationWriter
 
 
 class Command(BaseCommand):
@@ -54,7 +54,7 @@ class Command(BaseCommand):
             "--no-input",
             action="store_false",
             dest="interactive",
-            help="Tells Django to NOT prompt the user for input of any kind.",
+            help="Tells Thibaud to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
             "-n",
@@ -147,7 +147,7 @@ class Command(BaseCommand):
         )
         for alias in sorted(aliases_to_check):
             connection = connections[alias]
-            if connection.settings_dict["ENGINE"] != "django.db.backends.dummy" and any(
+            if connection.settings_dict["ENGINE"] != "thibaud.db.backends.dummy" and any(
                 # At least one model must be migrated to the database.
                 router.allow_migrate(
                     connection.alias, app_label, model_name=model._meta.object_name

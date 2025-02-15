@@ -1,9 +1,9 @@
-from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.coordseq import GEOSCoordSeq
-from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
-from django.contrib.gis.geos.point import Point
-from django.contrib.gis.shortcuts import numpy
+from thibaud.contrib.gis.geos import prototypes as capi
+from thibaud.contrib.gis.geos.coordseq import GEOSCoordSeq
+from thibaud.contrib.gis.geos.error import GEOSException
+from thibaud.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
+from thibaud.contrib.gis.geos.point import Point
+from thibaud.contrib.gis.shortcuts import numpy
 
 
 class LineString(LinearGeometryMixin, GEOSGeometry):
