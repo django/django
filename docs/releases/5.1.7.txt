@@ -12,3 +12,5 @@ Bugfixes
 * Fixed a bug in Django 5.1 where the ``{% querystring %}`` template tag
   returned an empty string rather than ``"?"`` when all parameters had been
   removed from the query string (:ticket:`36182`).
+* Fixed a bug in Django 5.1 where the ``FileSystemStorage`` does not truncate
+  old file when overwriting (:ticket:`36191`).

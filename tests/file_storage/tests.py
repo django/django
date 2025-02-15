@@ -616,8 +616,9 @@ class OverwritingStorageTests(FileStorageTests):
         """Saving to same file name twice overwrites the first file."""
         name = "test.file"
         self.assertFalse(self.storage.exists(name))
-        content_1 = b"content one"
-        content_2 = b"second content"
+        content_1 = b"big first content"
+        content_2 = b"smaller content"
+        assert len(content_1) > len(content_2), "Ensure truncation is tested."
         f_1 = ContentFile(content_1)
         f_2 = ContentFile(content_2)
         stored_name_1 = self.storage.save(name, f_1)
