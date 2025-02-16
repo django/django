@@ -454,7 +454,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 path.append(json.dumps(key_transform))
             else:
                 if num < 0:
-                    path.append("[#%s]" % num)  
+                    path.append("[#%s]" % num)
                 else:
                     path.append("[%s]" % num)
         return "".join(path)

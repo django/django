@@ -802,4 +802,3 @@ class BaseDatabaseOperations:
             else:
                 path.append("[%s]" % num)  # Standard JSON path syntax
         return "".join(path)
-        
