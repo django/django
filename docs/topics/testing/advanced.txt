@@ -842,6 +842,18 @@ can be useful during testing.
     If the ``keepdb`` argument is ``True``, then the connection to the
     database will be closed, but the database will not be destroyed.
 
+.. function:: serialize_db_to_string()
+
+    Serializes the database into an in-memory JSON string that can be used to
+    restore the database state between tests if the backend doesn't support
+    transactions or if your suite contains test classes with
+    :ref:`serialized_rollback=True <test-case-serialized-rollback>` enabled.
+
+    This function should only be called once all test databases have been
+    created as the serialization process could result in queries against
+    non-test databases depending on your
+    :ref:`routing configuration <topics-db-multi-db-routing>`.
+
 .. _topics-testing-code-coverage:
 
 Integration with ``coverage.py``
