@@ -789,7 +789,7 @@ class BaseDatabaseOperations:
     def format_debug_sql(self, sql):
         # Hook for backends (e.g. NoSQL) to customize formatting.
         return sqlparse.format(sql, reindent=True, keyword_case="upper")
-    
+
     def compile_json_path(self, key_transforms, include_root=True):
         """Default JSON path constructor (used for non-SQLite databases)."""
         path = ["$"] if include_root else []
@@ -802,3 +802,4 @@ class BaseDatabaseOperations:
             else:
                 path.append("[%s]" % num)  # Standard JSON path syntax
         return "".join(path)
+        
