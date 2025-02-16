@@ -441,3 +441,19 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def force_group_by(self):
         return ["GROUP BY TRUE"] if Database.sqlite_version_info < (3, 39) else []
+    
+    def compile_json_path(self, key_transforms, include_root=True):
+        """Constructs a JSON path, handling SQLite-specific negative index syntax."""
+        path = ["$"] if include_root else []
+        for key_transform in key_transforms:
+            try:
+                num = int(key_transform)
+            except ValueError:  # Non-integer key
+                path.append(".")
+                path.append(json.dumps(key_transform))
+            else:
+                if num < 0:
+                    path.append("[#%s]" % num)  # SQLite requires `#` for negative indices
+                else:
+                    path.append("[%s]" % num)
+        return "".join(path)
