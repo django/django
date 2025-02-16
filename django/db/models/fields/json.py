@@ -373,12 +373,12 @@ class KeyTransform(Transform):
 
     def as_mysql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = compile_json_path(key_transforms)
+        json_path = connection.ops.compile_json_path(key_transforms)
         return "JSON_EXTRACT(%s, %%s)" % lhs, tuple(params) + (json_path,)
 
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = compile_json_path(key_transforms)
+        json_path = connection.ops.compile_json_path(key_transforms)
         if connection.features.supports_primitives_in_json_field:
             sql = (
                 "COALESCE("
@@ -414,7 +414,7 @@ class KeyTransform(Transform):
 
     def as_sqlite(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = compile_json_path(key_transforms)
+        json_path = connection.ops.compile_json_path(key_transforms)
         datatype_values = ",".join(
             [repr(datatype) for datatype in connection.ops.jsonfield_datatype_values]
         )
@@ -436,7 +436,7 @@ class KeyTextTransform(KeyTransform):
             return "JSON_UNQUOTE(%s)" % sql, params
         else:
             lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-            json_path = compile_json_path(key_transforms)
+            json_path = connection.ops.compile_json_path(key_transforms)
             return "(%s ->> %%s)" % lhs, tuple(params) + (json_path,)
 
     @classmethod
