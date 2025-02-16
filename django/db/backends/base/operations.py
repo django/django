@@ -800,5 +800,5 @@ class BaseDatabaseOperations:
                 path.append(".")
                 path.append(json.dumps(key_transform))
             else:
-                path.append("[%s]" % num)  # Standard JSON path syntax
+                path.append("[%s]" % num)
         return "".join(path)
