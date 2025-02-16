@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import uuid
+import json
 from functools import lru_cache
 from itertools import chain
 
@@ -453,7 +454,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 path.append(json.dumps(key_transform))
             else:
                 if num < 0:
-                    path.append("[#%s]" % num)  # SQLite requires `#` for negative indices
+                    path.append("[#%s]" % num)
                 else:
                     path.append("[%s]" % num)
         return "".join(path)
