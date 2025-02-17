@@ -16,3 +16,8 @@ Bugfixes
 * Fixed a bug in Django 5.1 where ``FileSystemStorage``, with
   ``allow_overwrite`` set to ``True``, did not truncate the overwritten file
   content (:ticket:`36191`).
+
+* Fixed a regression in Django 5.1 where the ``count`` and ``exists`` methods
+  of ``ManyToManyField`` related managers would always return ``0`` and
+  ``False`` when the intermediary model back references used ``to_field``
+  (:ticket:`36197`).

@@ -1219,7 +1219,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 return None
             hints = {"instance": self.instance}
             manager = self.through._base_manager.db_manager(db, hints=hints)
-            filters = {self.source_field_name: self.instance.pk}
+            filters = {self.source_field_name: self.related_val[0]}
             # Nullable target rows must be excluded as well as they would have
             # been filtered out from an INNER JOIN.
             if self.target_field.null:
