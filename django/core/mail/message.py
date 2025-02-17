@@ -1,5 +1,6 @@
 import email.message
 import email.policy
+import functools
 import mimetypes
 import warnings
 from collections import namedtuple
@@ -127,6 +128,10 @@ class EmailMessage:
             if name.lower() not in {"from", "to", "cc", "reply-to"}:
                 msg[name] = force_str(value, strings_only=True)
         self._idna_encode_address_header_domains(msg)
+
+        # Work around python/cpython#121284 if necessary.
+        if has_python_encoded_word_refolding_bug():
+            work_around_python_encoded_word_refolding_bug(msg)
         return msg
 
     def recipients(self):
@@ -399,3 +404,39 @@ class EmailMultiAlternatives(EmailMessage):
             if mimetype.startswith("text/") and text not in content:
                 return False
         return True
+
+
+@functools.cache
+def has_python_encoded_word_refolding_bug():
+    """
+    Check if the Python email package has a bug in refolding an address header
+    containing an RFC 2047 encoded-word. See python/cpython#121284.
+
+    If the bug is present, a special character (like a comma) can "break out" of
+    the encoded-word when the message is serialized, altering the header's meaning.
+    """
+    msg = email.message.EmailMessage()
+    msg["To"] = "=?utf-8?q?Needs_refolding=2C_has_encoded_comma?= <to@example.com>"
+    msg_bytes = msg.as_bytes(policy=email.policy.default.clone(max_line_length=20))
+    # Check if the comma got unencoded (and not moved into a quoted-string).
+    return b"," in msg_bytes and b'"' not in msg_bytes
+
+
+def work_around_python_encoded_word_refolding_bug(msg):
+    """
+    Update the given email.message.EmailMessage in place to work around
+    python/cpython#121284.
+
+    Rebuilds all address headers, which avoids the bug by forcing
+    re-serialization from scratch (without refolding).
+    """
+    for header, value in msg.items():
+        if isinstance(value, AddressHeader):
+            # Address headers can only appear once (but it doesn't hurt to check).
+            if len(msg.get_all(header)) > 1:
+                raise ValueError(
+                    f"Email header {header!r} does not support multiple instances."
+                )
+            # Replace with the parsed list of Address objects. This discards
+            # any cached serialized strings that might go through refolding.
+            msg.replace_header(header, value.addresses)
