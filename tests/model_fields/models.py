@@ -430,6 +430,17 @@ class RelatedJSONModel(models.Model):
         required_db_features = {"supports_json_field"}
 
 
+class CustomSerializationJSONModel(models.Model):
+    class StringifiedJSONField(models.JSONField):
+        def get_prep_value(self, value):
+            return json.dumps(value, cls=self.encoder)
+
+    json_field = StringifiedJSONField()
+
+    class Meta:
+        required_db_features = {"supports_json_field"}
+
+
 class AllFieldsModel(models.Model):
     big_integer = models.BigIntegerField()
     binary = models.BinaryField()
