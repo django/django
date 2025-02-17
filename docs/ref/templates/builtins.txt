@@ -427,7 +427,7 @@ Variable                    Description
                             loop (0-indexed)
 ``forloop.first``           True if this is the first time through the loop
 ``forloop.last``            True if this is the last time through the loop
-``forloop.length``           The length of the loop
+``forloop.length``          The length of the loop
 ``forloop.parentloop``      For nested loops, this is the loop surrounding
                             the current one
 ==========================  ===============================================
