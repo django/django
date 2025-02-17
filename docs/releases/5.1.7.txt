@@ -13,11 +13,3 @@ Bugfixes
   returned an empty string rather than ``"?"`` when all parameters had been
   removed from the query string (:ticket:`36182`).
 
-
-Minor features
-==============
-
-Templates
-~~~~~~~~~
-
-* Added ``total`` to the ``forloop`` builtin to access the total length of the loop (:ticket:`36186`).

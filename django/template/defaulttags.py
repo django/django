@@ -208,7 +208,7 @@ class ForNode(Node):
             # iteration just below.
             loop_dict = context["forloop"] = {
                 "parentloop": parentloop,
-                "total": len_values,
+                "length": len_values,
             }
             for i, item in enumerate(values):
                 # Shortcuts for current loop iteration number.
