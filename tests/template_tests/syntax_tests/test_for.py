@@ -356,6 +356,35 @@ class ForTagTests(SimpleTestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("invalid_for_loop", {"items": (1, 2)})
 
+    @setup(
+        {"for-tag-length01": "{% for val in values %}{{ forloop.length }}{% endfor %}"}
+    )
+    def test_for_tag_length01(self):
+        output = self.engine.render_to_string("for-tag-length01", {"values": [1, 2, 3]})
+        self.assertEqual(output, "333")
+
+    @setup(
+        {
+            "for-tag-length02": "{% for val in values reversed %}"
+            "{{ forloop.length }}{% endfor %}"
+        }
+    )
+    def test_for_tag_length02(self):
+        output = self.engine.render_to_string(
+            "for-tag-length02", {"values": [1, 2, 3, 4, 5, 6]}
+        )
+        self.assertEqual(output, "666666")
+
+    @setup(
+        {
+            "for-tag-length03": "{% for val in values reversed %}"
+            "{{ forloop.length }}{% endfor %}"
+        }
+    )
+    def test_for_tag_length03(self):
+        output = self.engine.render_to_string("for-tag-length03", {"values": []})
+        self.assertEqual(output, "")
+
 
 class ForNodeTests(SimpleTestCase):
     def test_repr(self):
