@@ -469,7 +469,7 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
         return display_for_value(value, empty_value_display)
 
 
-def display_for_value(value, empty_value_display, boolean=False, avoid_quote=False):
+def display_for_value(value, empty_value_display, boolean=False, quote=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
     if boolean:
@@ -488,11 +488,10 @@ def display_for_value(value, empty_value_display, boolean=False, avoid_quote=Fal
         return ", ".join(str(v) for v in value)
     elif isinstance(value, str) and not value.strip():
         value = value.replace(" ", "\xa0")
-        if not avoid_quote:
-            value = f"“{value}”"
-        return value
+        return f"“{value}”" if not quote else value
     else:
-        return str(value)
+        value = str(value)
+        return f"“{value}”" if quote else value
 
 
 class NotRelationField(Exception):

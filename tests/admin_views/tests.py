@@ -3501,7 +3501,7 @@ class AdminBlankStringObjectDisplayTest(TestCase):
         response = self.client.get(url)
         self.assertContains(
             response,
-            "<p>Are you sure you want to delete the cover letter “%s”?"
+            "<p>Are you sure you want to delete the cover letter %s?"
             % self.display_object_avoid_quote,
         )
         forbidden_obj = CoverLetter.objects.create(author="   ")
@@ -3510,7 +3510,7 @@ class AdminBlankStringObjectDisplayTest(TestCase):
         response = self.client.get(url)
         self.assertContains(
             response,
-            "<p>Deleting the cover letter “%s” would result in"
+            "<p>Deleting the cover letter %s would result in"
             % self.display_object_avoid_quote,
         )
         protected_obj = CoverLetter.objects.create(author="   ")
@@ -3519,7 +3519,7 @@ class AdminBlankStringObjectDisplayTest(TestCase):
         response = self.client.get(url)
         self.assertContains(
             response,
-            "<p>Deleting the cover letter “%s” would require deleting"
+            "<p>Deleting the cover letter %s would require deleting"
             % self.display_object_avoid_quote,
         )
 
@@ -5178,8 +5178,8 @@ class AdminCustomQuerysetTest(TestCase):
         pk = CoverLetter.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The cover letter “<a href="%s">'
-            "Candidate, Best</a>” was added successfully.</li>"
+            '<li class="success">The cover letter <a href="%s">'
+            "“Candidate, Best”</a> was added successfully.</li>"
             % reverse("admin:admin_views_coverletter_change", args=(pk,)),
             html=True,
         )
@@ -5200,8 +5200,8 @@ class AdminCustomQuerysetTest(TestCase):
         sm = ShortMessage.objects.all()[0]
         self.assertContains(
             response,
-            '<li class="success">The short message “<a href="%s">'
-            "%s</a>” was added successfully.</li>"
+            '<li class="success">The short message <a href="%s">'
+            "“%s”</a> was added successfully.</li>"
             % (reverse("admin:admin_views_shortmessage_change", args=(sm.pk,)), sm),
             html=True,
         )
@@ -5225,8 +5225,8 @@ class AdminCustomQuerysetTest(TestCase):
         pk = Telegram.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The telegram “<a href="%s">'
-            "Urgent telegram</a>” was added successfully.</li>"
+            '<li class="success">The telegram <a href="%s">'
+            "“Urgent telegram”</a> was added successfully.</li>"
             % reverse("admin:admin_views_telegram_change", args=(pk,)),
             html=True,
         )
@@ -5247,8 +5247,8 @@ class AdminCustomQuerysetTest(TestCase):
         p = Paper.objects.all()[0]
         self.assertContains(
             response,
-            '<li class="success">The paper “<a href="%s">'
-            "%s</a>” was added successfully.</li>"
+            '<li class="success">The paper <a href="%s">'
+            "“%s”</a> was added successfully.</li>"
             % (reverse("admin:admin_views_paper_change", args=(p.pk,)), p),
             html=True,
         )
@@ -5276,8 +5276,8 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __str__()
         self.assertContains(
             response,
-            '<li class="success">The cover letter “<a href="%s">'
-            "John Doe II</a>” was changed successfully.</li>"
+            '<li class="success">The cover letter <a href="%s">'
+            "“John Doe II”</a> was changed successfully.</li>"
             % reverse("admin:admin_views_coverletter_change", args=(cl.pk,)),
             html=True,
         )
@@ -5302,8 +5302,8 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by __str__().
         self.assertContains(
             response,
-            '<li class="success">The short message “<a href="%s">'
-            "%s</a>” was changed successfully.</li>"
+            '<li class="success">The short message <a href="%s">'
+            "“%s”</a> was changed successfully.</li>"
             % (reverse("admin:admin_views_shortmessage_change", args=(sm.pk,)), sm),
             html=True,
         )
@@ -5334,8 +5334,8 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __str__()
         self.assertContains(
             response,
-            '<li class="success">The telegram “<a href="%s">'
-            "Telegram without typo</a>” was changed successfully.</li>"
+            '<li class="success">The telegram <a href="%s">'
+            "“Telegram without typo”</a> was changed successfully.</li>"
             % reverse("admin:admin_views_telegram_change", args=(t.pk,)),
             html=True,
         )
@@ -5363,8 +5363,8 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by __str__().
         self.assertContains(
             response,
-            '<li class="success">The paper “<a href="%s">'
-            "%s</a>” was changed successfully.</li>"
+            '<li class="success">The paper <a href="%s">'
+            "“%s”</a> was changed successfully.</li>"
             % (reverse("admin:admin_views_paper_change", args=(p.pk,)), p),
             html=True,
         )
@@ -7570,8 +7570,8 @@ class UserAdminTest(TestCase):
         response = self.client.get(new_user_url)
         self.assertContains(
             response,
-            '<li class="success">The user “<a href="%s">'
-            "%s</a>” was added successfully. You may edit it again below.</li>"
+            '<li class="success">The user <a href="%s">'
+            "“%s”</a> was added successfully. You may edit it again below.</li>"
             % (new_user_url, new_user),
             html=True,
         )
