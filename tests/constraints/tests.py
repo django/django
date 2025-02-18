@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from unittest import mock
 
 from django.core.exceptions import ValidationError
@@ -1057,6 +1058,23 @@ class UniqueConstraintTests(TestCase):
             UniqueConstraintProduct,
             UniqueConstraintProduct(name=self.p1.name.upper()),
             exclude={"name"},
+        )
+
+    def test_validate_field_transform(self):
+        updated_date = datetime(2005, 7, 26)
+        UniqueConstraintProduct.objects.create(name="p1", updated=updated_date)
+        constraint = models.UniqueConstraint(
+            models.F("updated__date"), name="date_created_unique"
+        )
+        msg = "Constraint “date_created_unique” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintProduct,
+                UniqueConstraintProduct(updated=updated_date),
+            )
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(updated=updated_date + timedelta(days=1)),
         )
 
     def test_validate_ordered_expression(self):

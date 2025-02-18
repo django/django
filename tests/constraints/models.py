@@ -73,6 +73,7 @@ class UniqueConstraintProduct(models.Model):
     name = models.CharField(max_length=255)
     color = models.CharField(max_length=32, null=True)
     age = models.IntegerField(null=True)
+    updated = models.DateTimeField(null=True)
 
     class Meta:
         constraints = [
