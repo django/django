@@ -81,8 +81,8 @@ class DatetimeDatetimeSerializer(BaseSerializer):
     """For datetime.datetime."""
 
     def serialize(self):
-        if self.value.tzinfo is not None and self.value.tzinfo != datetime.timezone.utc:
-            self.value = self.value.astimezone(datetime.timezone.utc)
+        if self.value.tzinfo is not None and self.value.tzinfo != datetime.UTC:
+            self.value = self.value.astimezone(datetime.UTC)
         imports = ["import datetime"]
         return repr(self.value), set(imports)
 

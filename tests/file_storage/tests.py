@@ -1,3 +1,4 @@
+import datetime
 import os
 import shutil
 import sys
@@ -5,8 +6,6 @@ import tempfile
 import threading
 import time
 import unittest
-from datetime import datetime, timedelta
-from datetime import timezone as datetime_timezone
 from io import StringIO
 from pathlib import Path
 from urllib.request import urlopen
@@ -114,7 +113,7 @@ class FileStorageTests(SimpleTestCase):
         # is UTC+1 and has no DST change. We can set the Django TZ to something
         # else so that UTC, Django's TIME_ZONE, and the system timezone are all
         # different.
-        now_in_algiers = timezone.make_aware(datetime.now())
+        now_in_algiers = timezone.make_aware(datetime.datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
             # At this point the system TZ is +1 and the Django TZ
@@ -131,15 +130,15 @@ class FileStorageTests(SimpleTestCase):
             self.assertEqual(now.tzname(), dt.tzname())
 
             # The three timezones are indeed distinct.
-            naive_now = datetime.now()
+            naive_now = datetime.datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
-            utc_offset = datetime_timezone.utc.utcoffset(naive_now)
+            utc_offset = datetime.UTC.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
             self.assertLess(django_offset, utc_offset)
 
             # dt and now should be the same effective time.
-            self.assertLess(abs(dt - now), timedelta(seconds=2))
+            self.assertLess(abs(dt - now), datetime.timedelta(seconds=2))
 
     @override_settings(USE_TZ=False, TIME_ZONE="Africa/Algiers")
     def _test_file_time_getter_tz_handling_off(self, getter):
@@ -147,7 +146,7 @@ class FileStorageTests(SimpleTestCase):
         # is UTC+1 and has no DST change. We can set the Django TZ to something
         # else so that UTC, Django's TIME_ZONE, and the system timezone are all
         # different.
-        now_in_algiers = timezone.make_aware(datetime.now())
+        now_in_algiers = timezone.make_aware(datetime.datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
             # At this point the system TZ is +1 and the Django TZ
@@ -162,20 +161,20 @@ class FileStorageTests(SimpleTestCase):
             self.assertTrue(timezone.is_naive(dt))
 
             # The three timezones are indeed distinct.
-            naive_now = datetime.now()
+            naive_now = datetime.datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
-            utc_offset = datetime_timezone.utc.utcoffset(naive_now)
+            utc_offset = datetime.UTC.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
             self.assertLess(django_offset, utc_offset)
 
             # dt and naive_now should be the same effective time.
-            self.assertLess(abs(dt - naive_now), timedelta(seconds=2))
+            self.assertLess(abs(dt - naive_now), datetime.timedelta(seconds=2))
             # If we convert dt to an aware object using the Algiers
             # timezone then it should be the same effective time to
             # now_in_algiers.
             _dt = timezone.make_aware(dt, now_in_algiers.tzinfo)
-            self.assertLess(abs(_dt - now_in_algiers), timedelta(seconds=2))
+            self.assertLess(abs(_dt - now_in_algiers), datetime.timedelta(seconds=2))
 
     def test_file_get_accessed_time(self):
         """
@@ -190,11 +189,14 @@ class FileStorageTests(SimpleTestCase):
         atime = self.storage.get_accessed_time(f_name)
 
         self.assertEqual(
-            atime, datetime.fromtimestamp(os.path.getatime(self.storage.path(f_name)))
+            atime,
+            datetime.datetime.fromtimestamp(
+                os.path.getatime(self.storage.path(f_name))
+            ),
         )
         self.assertLess(
             timezone.now() - self.storage.get_accessed_time(f_name),
-            timedelta(seconds=2),
+            datetime.timedelta(seconds=2),
         )
 
     @requires_tz_support
@@ -213,10 +215,14 @@ class FileStorageTests(SimpleTestCase):
         ctime = self.storage.get_created_time(f_name)
 
         self.assertEqual(
-            ctime, datetime.fromtimestamp(os.path.getctime(self.storage.path(f_name)))
+            ctime,
+            datetime.datetime.fromtimestamp(
+                os.path.getctime(self.storage.path(f_name))
+            ),
         )
         self.assertLess(
-            timezone.now() - self.storage.get_created_time(f_name), timedelta(seconds=2)
+            timezone.now() - self.storage.get_created_time(f_name),
+            datetime.timedelta(seconds=2),
         )
 
     @requires_tz_support
@@ -235,11 +241,14 @@ class FileStorageTests(SimpleTestCase):
         mtime = self.storage.get_modified_time(f_name)
 
         self.assertEqual(
-            mtime, datetime.fromtimestamp(os.path.getmtime(self.storage.path(f_name)))
+            mtime,
+            datetime.datetime.fromtimestamp(
+                os.path.getmtime(self.storage.path(f_name))
+            ),
         )
         self.assertLess(
             timezone.now() - self.storage.get_modified_time(f_name),
-            timedelta(seconds=2),
+            datetime.timedelta(seconds=2),
         )
 
     @requires_tz_support

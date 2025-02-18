@@ -1,5 +1,5 @@
 import re
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from django import template
@@ -297,7 +297,7 @@ class NaturalTimeFormatter:
         if not isinstance(value, date):  # datetime is a subclass of date
             return value
 
-        now = datetime.now(timezone.utc if is_aware(value) else None)
+        now = datetime.now(UTC if is_aware(value) else None)
         if value < now:
             delta = now - value
             if delta.days != 0:
