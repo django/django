@@ -57,6 +57,7 @@
         } else {
             elem.value = chosenId;
         }
+        $(elem).trigger('change');
         const index = window.relatedWindows.indexOf(win);
         if (index > -1) {
             window.relatedWindows.splice(index, 1);
