@@ -29,9 +29,6 @@ ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
-* Join the ``#django`` channel on ``irc.libera.chat``. Lots of helpful people
-  hang out there. `Webchat is available <https://web.libera.chat/#django>`_.
-
 * Join the django-users mailing list, or read the archives, at
   https://groups.google.com/group/django-users.
 
