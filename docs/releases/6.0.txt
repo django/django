@@ -365,6 +365,9 @@ Miscellaneous
   ``per_page`` argument of :class:`django.core.paginator.Paginator` and
   :class:`django.core.paginator.AsyncPaginator` is deprecated.
 
+* Using a percent sign in a column alias or annotation is deprecated.
+  (Unintentional support existed only on SQLite and Oracle.)
+
 Features removed in 6.0
 =======================
 
