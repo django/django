@@ -21,7 +21,7 @@ class AreaField(models.FloatField):
             raise ValueError("AreaField only accepts Area measurement objects.")
         return value
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         if value is None:
             return
         area_att = connection.ops.get_area_att_for_field(self.geo_field)
@@ -54,7 +54,7 @@ class DistanceField(models.FloatField):
             return value
         return super().get_prep_value(value)
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         if not isinstance(value, Distance):
             return value
         distance_att = connection.ops.get_distance_att_for_field(self.geo_field)

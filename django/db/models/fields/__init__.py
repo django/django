@@ -995,21 +995,19 @@ class Field(RegisterLookupMixin):
             value = value._proxy____cast()
         return value
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         """
         Return field's value prepared for interacting with the database backend.
 
         Used by the default implementations of get_db_prep_save().
         """
-        if not prepared:
-            value = self.get_prep_value(value)
-        return value
+        return self.get_prep_value(value)
 
     def get_db_prep_save(self, value, connection):
         """Return field's value prepared for saving into a database."""
         if hasattr(value, "as_sql"):
             return value
-        return self.get_db_prep_value(value, connection=connection, prepared=False)
+        return self.get_db_prep_value(value, connection=connection)
 
     def has_default(self):
         """Return a boolean of whether this field has a default value."""
@@ -1536,10 +1534,9 @@ class DateField(DateTimeCheckMixin, Field):
         value = super().get_prep_value(value)
         return self.to_python(value)
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         # Casts dates into the format expected by the backend
-        if not prepared:
-            value = self.get_prep_value(value)
+        value = self.get_prep_value(value)
         return connection.ops.adapt_datefield_value(value)
 
     def value_to_string(self, obj):
@@ -1677,10 +1674,9 @@ class DateTimeField(DateField):
             value = timezone.make_aware(value, default_timezone)
         return value
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         # Casts datetimes into the format expected by the backend
-        if not prepared:
-            value = self.get_prep_value(value)
+        value = self.get_prep_value(value)
         return connection.ops.adapt_datetimefield_value(value)
 
     def value_to_string(self, obj):
@@ -1829,8 +1825,8 @@ class DecimalField(Field):
             )
         return decimal_value
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        value = super().get_db_prep_value(value, connection, prepared)
+    def get_db_prep_value(self, value, connection):
+        value = super().get_db_prep_value(value, connection)
         return connection.ops.adapt_decimalfield_value(
             self.to_python(value), self.max_digits, self.decimal_places
         )
@@ -1889,7 +1885,7 @@ class DurationField(Field):
             params={"value": value},
         )
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         if connection.features.has_native_duration_field:
             return value
         if value is None:
@@ -2131,8 +2127,8 @@ class IntegerField(Field):
                 "Field '%s' expected a number but got %r." % (self.name, value),
             ) from e
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        value = super().get_db_prep_value(value, connection, prepared)
+    def get_db_prep_value(self, value, connection):
+        value = super().get_db_prep_value(value, connection)
         return connection.ops.adapt_integerfield_value(value, self.get_internal_type())
 
     def get_internal_type(self):
@@ -2279,9 +2275,8 @@ class GenericIPAddressField(Field):
             )
         return value
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        if not prepared:
-            value = self.get_prep_value(value)
+    def get_db_prep_value(self, value, connection):
+        value = self.get_prep_value(value)
         return connection.ops.adapt_ipaddressfield_value(value)
 
     def get_prep_value(self, value):
@@ -2618,10 +2613,9 @@ class TimeField(DateTimeCheckMixin, Field):
         value = super().get_prep_value(value)
         return self.to_python(value)
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         # Casts times into the format expected by the backend
-        if not prepared:
-            value = self.get_prep_value(value)
+        value = self.get_prep_value(value)
         return connection.ops.adapt_timefield_value(value)
 
     def value_to_string(self, obj):
@@ -2709,8 +2703,8 @@ class BinaryField(Field):
             return b""
         return default
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        value = super().get_db_prep_value(value, connection, prepared)
+    def get_db_prep_value(self, value, connection):
+        value = super().get_db_prep_value(value, connection)
         if value is not None:
             return connection.Database.Binary(value)
         return value
@@ -2749,7 +2743,7 @@ class UUIDField(Field):
         value = super().get_prep_value(value)
         return self.to_python(value)
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         if value is None:
             return None
         if not isinstance(value, uuid.UUID):
@@ -2815,11 +2809,25 @@ class AutoFieldMixin:
     def validate(self, value, model_instance):
         pass
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        if not prepared:
-            value = self.get_prep_value(value)
-            value = connection.ops.validate_autopk_value(value)
-        return value
+    def get_db_prep_value(self, value, connection):
+        # Override get_db_prep_value() to avoid
+        # IntegerField.get_db_prep_value() which calls adapt_integerfield_value()
+        # and crashes on on PostgreSQL:
+        #
+        #  File "django/db/models/lookups.py", line 261, in <listcomp>
+        #    (v if hasattr(v, "as_sql") else get_db_prep_value(v, connection))
+        #  File "django/db/models/fields/__init__.py", line 2132, in get_db_prep_value
+        #    return connection.ops.adapt_integerfield_value(value, self.get_internal_type())  # noqa
+        #  File "django/db/backends/postgresql/operations.py", line 345, in adapt_integerfield_value  # noqa
+        #    return self.integerfield_type_map[internal_type](value)
+        # KeyError: 'AutoField'
+        #
+        # [this may not be the ideal fix]
+        return self.get_prep_value(value)
+
+    def get_db_prep_save(self, value, connection):
+        value = super().get_db_prep_save(value, connection)
+        return connection.ops.validate_autopk_value(value)
 
     def contribute_to_class(self, cls, name, **kwargs):
         if cls._meta.auto_field:

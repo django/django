@@ -122,12 +122,9 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     def get_placeholder(self, value, compiler, connection):
         return "%s::{}".format(self.db_type(connection))
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection):
         if isinstance(value, (list, tuple)):
-            return [
-                self.base_field.get_db_prep_value(i, connection, prepared=False)
-                for i in value
-            ]
+            return [self.base_field.get_db_prep_value(i, connection) for i in value]
         return value
 
     def deconstruct(self):

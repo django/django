@@ -119,13 +119,10 @@ class TestMethods(SimpleTestCase):
             connection.ops, "adapt_json_value", noop_adapt_json_value
         ):
             self.assertEqual(
-                field.get_db_prep_value(True, connection, prepared=False),
+                field.get_db_prep_value(True, connection),
                 {"value": True},
             )
-            self.assertIs(
-                field.get_db_prep_value(True, connection, prepared=True), True
-            )
-            self.assertEqual(field.get_db_prep_value(1, connection, prepared=False), 1)
+            self.assertEqual(field.get_db_prep_value(1, connection), 1)
 
 
 class TestValidation(SimpleTestCase):

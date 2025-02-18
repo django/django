@@ -96,9 +96,8 @@ class JSONField(CheckFieldDefaultMixin, Field):
     def get_internal_type(self):
         return "JSONField"
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        if not prepared:
-            value = self.get_prep_value(value)
+    def get_db_prep_value(self, value, connection):
+        value = self.get_prep_value(value)
         if isinstance(value, expressions.Value) and isinstance(
             value.output_field, JSONField
         ):
