@@ -1,0 +1,373 @@
+========================
+Django's tasks framework
+========================
+
+.. versionadded:: 6.0
+
+For a web application, there's often more than just turning HTTP requests into
+HTTP responses. For some functionality, it may be beneficial to run code outside
+of the request-response cycle.
+
+That's where background tasks come in.
+
+Background tasks can offload complexity outside of the request-response cycle,
+to be run somewhere else, potentially at a later date. This keeps requests fast,
+latency down, and improves the user's experience. For example, a user shouldn't
+need to wait for an email to send before their response returns.
+
+Background task fundamentals
+============================
+
+When work needs to be done in the background, Django creates a Task, which is
+stored in the Queue Store. This task contains all of the metadata needed to
+execute the task, as well as a unique identifier for Django to retrieve the
+result later.
+
+Outside of Django, a Worker looks at the Queue Store for new Tasks to run. When
+a new Task is added, the Worker claims the Task, executes it, and saves the
+status and result back to the Queue Store.
+
+.. _configuring-a-task-backend:
+
+Configuring a Task backend
+==========================
+
+The Task backend determines how and where tasks are stored for execution and how
+they are executed. Different task backends have different characteristics and
+configuration options, which may impact the performance and reliability of your
+application. Django comes with a number of :ref:`built-in backends
+<task-available-backends>`.
+
+Task backends are configured using the :setting:`TASKS` setting in your settings
+file. Whilst most applications will only need a single backend, multiple are
+supported.
+
+.. _immediate-task-backend:
+
+Immediate execution
+-------------------
+
+This is the default backend if another is not specified in your settings file.
+The immediate backend runs enqueued tasks immediately, rather than in the
+background. This allows background task functionality to be slowly added
+to an application, before the required infrastructure is available.
+
+To use it, set :setting:`BACKEND <TASKS-BACKEND>` to
+``"django.tasks.backends.immediate.ImmediateBackend"``::
+
+    TASKS = {"default": {"BACKEND": "django.tasks.backends.immediate.ImmediateBackend"}}
+
+The ``ImmediateBackend`` may also be useful in tests, to bypass the need to run a
+real background worker in your tests.
+
+.. warning::
+
+    When :setting:`ENQUEUE_ON_COMMIT <TASKS-ENQUEUE_ON_COMMIT>` is ``False``,
+    the task will be executed within the same transaction it was enqueued in.
+
+    See :ref:`task_transactions` for more.
+
+.. _dummy-task-backend:
+
+Dummy backend
+-------------
+
+The dummy backend doesn't execute enqueued Tasks at all, instead storing results
+for later use. Task results will forever remain in the ``NEW`` state.
+
+This backend is not intended for use in production - it is provided as a
+convenience that can be used during development and testing.
+
+To use it, set :setting:`BACKEND <TASKS-BACKEND>` to
+``"django.tasks.backends.dummy.DummyBackend"``::
+
+    TASKS = {"default": {"BACKEND": "django.tasks.backends.dummy.DummyBackend"}}
+
+The results for enqueued Tasks can be retrieved from the backend's
+:attr:`results <django.tasks.backends.dummy.DummyBackend.results>` attribute::
+
+    from django.tasks import default_task_backend
+
+    my_task.enqueue()
+
+    assert len(default_task_backend.results) == 1
+
+Stored results can be cleared using the
+:meth:`clear <django.tasks.backends.dummy.DummyBackend.clear>` method::
+
+    default_task_backend.clear()
+
+    assert len(default_task_backend.results) == 0
+
+Using a custom backend
+----------------------
+
+While Django includes support for a number of Task backends out-of-the-box,
+sometimes you might want to customize the the Task backend. To use an external
+Task backend with Django, use the Python import path as the
+:setting:`BACKEND <TASKS-BACKEND>` of the :setting:`TASKS` setting, like so::
+
+    TASKS = {
+        "default": {
+            "BACKEND": "path.to.backend",
+        }
+    }
+
+If you're building your own backend, you can use the built-in Task backends
+as reference implementations. You'll find the code in the
+:source:`django/tasks/backends/` directory of the Django source.
+
+Backend arguments
+-----------------
+
+Each backend can be given additional arguments to control its behavior.
+These arguments are provided as additional keys in the :setting:`TASKS` setting.
+Valid arguments are as follows:
+
+* :setting:`ENQUEUE_ON_COMMIT <TASKS-ENQUEUE_ON_COMMIT>`: Whether a Task should
+  be enqueued at the end of the current transaction (if there
+  is one) commits successfully, rather than enqueueing immediately. This argument
+  defaults to ``True``.
+
+* :setting:`QUEUES <TASKS-QUEUES>`: Restrict the queue names a Task may be
+  enqueued to. By default, only the ``"default"`` queue is allowed. Queue name
+  validation can be disabled by setting this to an empty list.
+
+Asynchronous support
+--------------------
+
+Django has developing support for asynchronous Task backends.
+
+``django.tasks.backends.base.BaseTaskBackend`` has async variants of all base
+methods. By convention, the asynchronous versions of all methods are prefixed
+with ``a``. The arguments for both variants are the same.
+
+Retrieving backends
+-------------------
+
+Backends can be retrieved using the ``tasks`` connection handler::
+
+    from django.tasks import tasks
+
+    tasks["default"]  # The default backend
+    tasks["reserve"]  # Another backend
+
+The "default" backend is available as ``default_task_backend``::
+
+    from django.tasks import default_task_backend
+
+Backend features
+----------------
+
+Django's tasks framework is designed to be backend-agnostic. This means some
+backends may not implement the same features as others, such as executing ``async``
+functions.
+
+Depending on the backend configured, it may be necessary to gracefully degrade
+functionality, or use a system check to prevent the application from starting at all.
+
+To facilitate this, certain features can be checked on a backend:
+
+* :attr:`supports_defer <django.tasks.backends.base.BaseTaskBackend.supports_defer>`:
+  Can Tasks be executed after a specific time using ``run_after``?
+
+* :attr:`supports_async_task <django.tasks.backends.base.BaseTaskBackend.supports_async_task>`:
+  Can ``async`` functions (coroutines) be used as task functions?
+
+* :attr:`supports_get_result <django.tasks.backends.base.BaseTaskBackend.supports_get_result>`:
+  Can a Task's results be retrieved from another thread or process?
+
+Defining tasks
+==============
+
+Tasks are defined using the :meth:`django.tasks.task` decorator on a
+module-level function::
+
+    from django.core.mail import send_mail
+    from django.tasks import task
+
+
+    @task
+    def email_users(emails, subject, message) -> int:
+        return send_mail(
+            subject=subject, message=message, from_email=None, recipient_list=emails
+        )
+
+
+The return value of the decorator is a :class:`django.tasks.Task` instance.
+
+.. note::
+
+    All arguments and return values must be JSON serializable, and round-trip
+    as the same types.
+
+    This means complex types like model instances, as well as many built-in types
+    like ``datetime`` and ``tuple`` cannot be used in Tasks without additional
+    conversion.
+
+The ``task`` decorator accepts a few keyword arguments to customize the Task:
+
+* ``priority``: The priority of the Task. Higher numbers will be executed sooner.
+
+* ``queue_name``: The name of the queue the Task will be executed on
+
+* ``backend``: The name of the backend this Task must use (as defined in
+  :setting:`TASKS`).
+
+* ``enqueue_on_commit``: Whether the Task is enqueued when the current transaction
+  commits successfully, or enqueued immediately.
+
+These arguments correspond to attributes on the created
+:class:`Task <django.tasks.Task>`.
+
+By convention, Tasks should be defined in a ``tasks.py`` file, however this is
+not enforced.
+
+Modifying tasks
+---------------
+
+Before enqueueing Tasks, it may be necessary to modify certain parameters of the Task.
+For example, to give it a higher priority than it would normally.
+
+A ``Task`` instance cannot be modified directly. Instead, a modified instance
+can be created with the :meth:`using <django.tasks.Task.using>` method, leaving
+the original as-is::
+
+    email_users.priority  # 0
+
+    email_users.using(priority=10).priority  # 10
+
+``using`` allows modifying the following attributes:
+
+* :attr:`priority <django.tasks.Task.priority>`
+* :attr:`backend <django.tasks.Task.backend>`
+* :attr:`queue_name <django.tasks.Task.queue_name>`
+* :attr:`run_after <django.tasks.Task.run_after>`
+
+``run_after`` may also be provided as a :class:`timedelta <datetime.timedelta>`,
+which is used relative to the current time (when ``using`` is called), or a
+timezone-aware :class:`datetime <datetime.datetime>`.
+
+Enqueueing Tasks
+================
+
+To add the Task to the queue store, so it will be executed, call the ``enqueue``
+method on it. If the task takes arguments, these can be passed as-is::
+
+    result = email_users.enqueue(
+        emails=["user@example.com"],
+        subject="You have a message",
+        message="Hello there!",
+    )
+
+Returned is a :class:`django.tasks.TaskResult`, which can be used to retrieve
+the result of the task once it has finished executing.
+
+To enqueue tasks in an ``async`` context, :meth:`aenqueue <django.tasks.Task.aenqueue>`
+is available as an ``async`` variant of ``enqueue``.
+
+.. _task_transactions:
+
+Transactions
+------------
+
+By default, tasks are enqueued after the current database transaction (if there is one)
+commits successfully (using :meth:`transaction.on_commit <django.db.transaction.on_commit>`),
+rather than enqueueing immediately. For most backends, tasks are run in a
+separate process, using a different database connection. Without waiting for the
+transaction to commit, workers could start process a Task which uses objects which it
+can't access yet.
+
+This behavior can be changed by changing the :setting:`TASKS-ENQUEUE_ON_COMMIT`
+setting for the backend, or for a specific task using the ``enqueue_on_commit``
+parameter.
+
+For example, consider this simplified example::
+
+    @task
+    def my_task():
+        Thing.objects.get()
+
+
+    with transaction.atomic():
+        Thing.objects.create()
+        my_task.enqueue()
+
+
+If ``ENQUEUE_ON_COMMIT = False``, then it is possible for ``my_task`` to run before
+the ``Thing`` is committed to the database, and the task won't be able to see
+the created object within your transaction.
+
+Task results
+============
+
+When enqueueing a ``Task``, you receive a :class:`django.tasks.TaskResult`,
+however it's likely useful to retrieve the result from somewhere else (for example
+another request or another task).
+
+Each ``TaskResult`` has a unique :attr:`id <django.tasks.TaskResult.id>`, which
+can be used to identify and retrieve the result once the code which enqueued the
+task has finished.
+
+The :meth:`django.tasks.Task.get_result` method can retrieve a result based on
+its ``id``::
+
+    # Later, somewhere else...
+    result = email_users.get_result(result_id)
+
+If the ``TaskResult`` exists, it is returned. If it doesn't exist, or isn't a
+result for ``email_users``, :exc:`django.tasks.exceptions.ResultDoesNotExist`
+is raised.
+
+To retrieve a ``TaskResult``, regardless of which kind of ``Task`` it was from,
+use the ``get_result`` method on the backend::
+
+    from django.tasks import default_task_backend
+
+    result = default_task_backend.get_result(result_id)
+
+To retrieve results in an ``async`` context, :meth:`aget_result <django.tasks.Task.aget_result>`
+is available as an ``async`` variant of ``get_result`` on both the backend and ``Task``.
+
+Some backends, such as the built in ``ImmediateBackend`` do not support ``get_result``.
+Calling ``get_result`` on these backends will raise :exc:`NotImplementedError`.
+
+Updating results
+----------------
+
+A ``TaskResult`` contains the status of a Task's execution at the point it was
+retrieved. If the Task finishes after ``get_result`` is called, it will not update.
+
+To refresh the values, call the :meth:`django.tasks.TaskResult.refresh` method::
+
+    result.status  # RUNNING
+
+    result.refresh()  # or await result.arefresh()
+
+    result.status  # SUCCEEDED
+
+Return values
+-------------
+
+If your Task function returns something, it can be retrieved from the
+:attr:`django.tasks.TaskResult.return_value` attribute::
+
+    if result.status == ResultStatus.SUCCEEDED:
+        result.return_value  # 42
+
+If the Task has not finished executing, or has failed, :exc:`ValueError` is raised.
+
+Exceptions
+----------
+
+If the Task doesn't succeed, and instead raises an exception, either
+as part of the Task or as part of running it, the exception class is saved
+to the :attr:`django.tasks.TaskResult.exception_class` attribute::
+
+    assert result.exception_class == ValueError
+
+Note that this is just the type of exception, and contains no other values.
+The traceback information is reduced to a string which you can use to help
+debugging::
+
+    print(result.traceback)
