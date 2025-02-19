@@ -282,6 +282,9 @@ Miscellaneous
 * ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
   ``serialize_db_to_string()`` instead.
 
+* Using a percent sign in a column alias or annotation is deprecated.
+  (Unintentional support existed only on SQLite and Oracle.)
+
 Features removed in 6.0
 =======================
 
