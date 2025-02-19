@@ -381,6 +381,11 @@ class ConnectionHealthChecksTests(SimpleTestCase):
         connection.set_autocommit(True)
         self.assertIs(new_connection, connection.connection)
 
+    def test_no_close_in_atomic(self):
+        with transaction.atomic():
+            connection.close_if_unusable_or_obsolete()
+            self.run_query()
+
 
 class MultiDatabaseTests(TestCase):
     databases = {"default", "other"}
