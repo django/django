@@ -12,7 +12,15 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
 
+class FakeDirEntry:
+    def __init__(self, name):
+        self.name = name
+
+
 class QuestionerTests(SimpleTestCase):
+    def setUp(self):
+        self.questioner = MigrationQuestioner()
+
     @override_settings(
         INSTALLED_APPS=["migrations"],
         MIGRATION_MODULES={"migrations": None},
@@ -20,6 +28,107 @@ class QuestionerTests(SimpleTestCase):
     def test_ask_initial_with_disabled_migrations(self):
         questioner = MigrationQuestioner()
         self.assertIs(False, questioner.ask_initial("migrations"))
+
+    def simulate_migration_files(self, file_names):
+        """Helper to create a list of FakeDirEntry based on provided file names"""
+        return [FakeDirEntry(name) for name in file_names]
+
+    def test_ask_initial_scenarios(self):
+        scenarios = [
+            (
+                ["__init__.py"],
+                True,
+                """
+                Simulate a migrations module with only an __init__.py file.
+                In this case, ask_initial should return True.
+                """,
+            ),
+            (
+                ["__init__.py", "0001_initial.py"],
+                False,
+                """
+                Simulate a migrations module with a __file__ attribute where the
+                directory contains an extra .py file. In this case, ask_initial
+                should return False.
+                """,
+            ),
+            (
+                ["__init__.py", "README.md"],
+                True,
+                """
+                Simulate a migrations module with a __file__ attribute where the
+                directory contains no other .py files except __init__.py. In this
+                case, ask_initial should return True.
+                """,
+            ),
+        ]
+        for file_names, expected, msg in scenarios:
+            with self.subTest(file_names=file_names):
+                with (
+                    mock.patch(
+                        "django.db.migrations.questioner.os.scandir"
+                    ) as mock_scandir,
+                    mock.patch("importlib.import_module") as mock_import_module,
+                ):
+
+                    fake_module = type(
+                        "FakeModule",
+                        (),
+                        {"__file__": "/fake/path/__init__.py"},
+                    )()
+                    mock_import_module.return_value = fake_module
+
+                    mock_scandir.return_value.__enter__.return_value = (
+                        self.simulate_migration_files(file_names)
+                    )
+                    self.assertEqual(
+                        self.questioner.ask_initial("migrations"),
+                        expected,
+                        msg,
+                    )
+
+    def test_ask_initial_with_module_path_multiple(self):
+        """Test scenarios with multiple paths"""
+        paths_scenarios = [
+            (
+                ["/fake/path1", "/fake/path2"],
+                False,
+                """
+                Simulate a migrations module with a __path__ attribute containing
+                multiple entries. When multiple paths are present, the method
+                returns False regardless of the directory contents.
+                """,
+            ),
+            (
+                ["/fake/path1"],
+                True,
+                """
+                Simulate a migrations module with a __path__ attribute containing
+                a single entry. It should work as if the module had a __file__
+                attribute.
+                """,
+            ),
+        ]
+        for paths, expected, msg in paths_scenarios:
+            with self.subTest(paths=paths):
+                with (
+                    mock.patch(
+                        "django.db.migrations.questioner.os.scandir"
+                    ) as mock_scandir,
+                    mock.patch("importlib.import_module") as mock_import_module,
+                ):
+
+                    fake_module = type("FakeModule", (), {"__path__": paths})()
+                    mock_import_module.return_value = fake_module
+                    mock_scandir.return_value.__enter__.return_value = (
+                        self.simulate_migration_files(["__init__.py"])
+                    )
+
+                    self.assertEqual(
+                        self.questioner.ask_initial("migrations"),
+                        expected,
+                        msg,
+                    )
 
     def test_ask_not_null_alteration(self):
         questioner = MigrationQuestioner()

@@ -658,9 +658,10 @@ class PycLoaderTests(MigrationTestBase):
         ) as migration_dir:
             # Compile .py files to .pyc files and delete .py files.
             compileall.compile_dir(migration_dir, force=True, quiet=1, legacy=True)
-            for name in os.listdir(migration_dir):
-                if name.endswith(".py"):
-                    os.remove(os.path.join(migration_dir, name))
+            with os.scandir(migration_dir) as entries:
+                for entry in entries:
+                    if entry.name.endswith(".py"):
+                        os.remove(entry.path)
             loader = MigrationLoader(connection)
             self.assertIn(("migrations", "0001_initial"), loader.disk_migrations)
 

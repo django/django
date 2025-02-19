@@ -47,11 +47,13 @@ class MigrationQuestioner:
             return self.defaults.get("ask_initial", False)
         else:
             if getattr(migrations_module, "__file__", None):
-                filenames = os.listdir(os.path.dirname(migrations_module.__file__))
+                with os.scandir(os.path.dirname(migrations_module.__file__)) as entries:
+                    filenames = [entry.name for entry in entries]
             elif hasattr(migrations_module, "__path__"):
                 if len(migrations_module.__path__) > 1:
                     return False
-                filenames = os.listdir(list(migrations_module.__path__)[0])
+                with os.scandir(list(migrations_module.__path__)[0]) as entries:
+                    filenames = [entry.name for entry in entries]
             return not any(x.endswith(".py") for x in filenames if x != "__init__.py")
 
     def ask_not_null_addition(self, field_name, model_name):

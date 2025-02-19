@@ -918,13 +918,12 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
         file_prefix = settings.SESSION_COOKIE_NAME
 
         def count_sessions():
-            return len(
-                [
-                    session_file
-                    for session_file in os.listdir(storage_path)
-                    if session_file.startswith(file_prefix)
-                ]
-            )
+            with os.scandir(storage_path) as entries:
+                return sum(
+                    1
+                    for session_file in entries
+                    if session_file.name.startswith(file_prefix)
+                )
 
         self.assertEqual(0, count_sessions())
 
