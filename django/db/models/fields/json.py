@@ -423,10 +423,16 @@ class KeyTransform(Transform):
         datatype_values = ",".join(
             [repr(datatype) for datatype in connection.ops.jsonfield_datatype_values]
         )
-        return (
-            "(CASE WHEN JSON_TYPE(%s, %%s) IN (%s) "
-            "THEN JSON_TYPE(%s, %%s) ELSE JSON_EXTRACT(%s, %%s) END)"
-        ) % (lhs, datatype_values, lhs, lhs), (tuple(params) + (json_path,)) * 3
+        if connection.get_database_version() >= (3, 38):
+            return (
+                "(CASE WHEN JSON_TYPE(%s, %%s) IN (%s) "
+                "THEN JSON_TYPE(%s, %%s) ELSE %s ->> %%s END)"
+            ) % (lhs, datatype_values, lhs, lhs), (tuple(params) + (json_path,)) * 3
+        else:
+            return (
+                "(CASE WHEN JSON_TYPE(%s, %%s) IN (%s) "
+                "THEN JSON_TYPE(%s, %%s) ELSE JSON_EXTRACT(%s, %%s) END)"
+            ) % (lhs, datatype_values, lhs, lhs), (tuple(params) + (json_path,)) * 3
 
 
 class KeyTextTransform(KeyTransform):
