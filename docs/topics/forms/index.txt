@@ -368,6 +368,68 @@ your fingertips. Once you understand the basics of the process described above,
 you should be prepared to understand other features of the forms system and
 ready to learn a bit more about the underlying machinery.
 
+Using a form for query parameters
+=================================
+
+A form can be used to handle query parameters on a GET request such as on a search form or filtering an API request.
+Since query parameters are strings in the url, we use the form as the single place to extract, convert and validate each field.
+To create a GET request form, create a Form class.
+
+.. code-block:: python
+    :caption: ``forms.py``
+
+    from django import forms
+
+
+    class SearchForm(forms.Form):
+        q = forms.CharField(label="Search", required=False)
+        advanced = forms.BooleanField(required=False, initial=False)
+
+When rendering the form in the template, the html form tag can omit ``method="post"`` and it will default to a get request.
+
+.. code-block:: html+django
+
+    <form action="/search/">
+        {{ form }}
+        <input type="submit" value="Submit">
+    </form>
+
+Upon submitting the form, the browser will append the query parameters ``/search/?q=foo&advanced=false`` to the url. In the view, we
+process the ``request.GET`` query parameters into the form.
+
+.. code-block:: python
+    :caption: ``views.py``
+
+    from django.http import HttpResponseRedirect
+    from django.shortcuts import render
+
+
+    def search(request):
+        form = SearchForm(request.GET or None)
+        # check whether it's valid:
+        if form.is_valid():
+            q = form.cleaned_data.get("q")
+            advanced = forms.cleaned_data.get("advanced")
+            # process the data from form.cleaned_data as required
+            results = perform_search(q=q, advanced=advanced)
+        else:
+            results = []
+        return render(request, "search.html", {"results": results, "form": form})
+
+.. admonition:: Query parameters are strings
+
+    Accessing url parameters directly on the request will be strings which may not work as expected.
+
+    .. code-block:: pycon
+
+        >>> request.GET.get("advanced")
+        'false'
+        >>> bool(request.GET.get("advanced"))
+        True
+
+    Using a form solves this problem and the cleaned data will contain values coerced to the correct type.
+
+
 More about Django :class:`Form` classes
 =======================================
 
