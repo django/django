@@ -606,15 +606,7 @@ example:
 
     Default: ``[]`` (Empty list)
 
-    A list of all the people who get code error notifications. When
-    ``DEBUG=False`` and a view raises an exception, Django will email these people
-    with the full exception information. Each member of the list should be a tuple
-    of (Full name, email address). Example::
-
-        [("John", "john@example.com"), ("Mary", "mary@example.com")]
-
-    Note that Django will email *all* of these people whenever an error happens.
-    See :doc:`/howto/error-reporting` for more information.
+    A list of all the people who get code error notifications...
 
   This marks up the following header as the "canonical" target for the
   setting ``ADMINS``. This means any time I talk about ``ADMINS``,
