@@ -179,6 +179,14 @@ Models
 
 * ...
 
+Pagination
+~~~~~~~~~~
+
+* The new :class:`~django.core.paginator.AsyncPaginator` and
+  :class:`~django.core.paginator.AsyncPage` provide async implementations of
+  :class:`~django.core.paginator.Paginator` and
+  :class:`~django.core.paginator.Page` respectively.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
