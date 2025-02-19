@@ -1315,8 +1315,8 @@ materialized view.
 
 .. admonition:: Refresh the data
 
-    Since the database always computed the value, the object must be reloaded
-    to access the new value after :meth:`~Model.save()`, for example, by using
+    Since the database computes the value, the object must be reloaded to
+    access the new value after :meth:`~Model.save()`, for example, by using
     :meth:`~Model.refresh_from_db()`.
 
 .. admonition:: Database limitations
