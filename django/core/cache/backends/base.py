@@ -388,6 +388,12 @@ class BaseCache:
     async def aclose(self, **kwargs):
         pass
 
+    def check(self, **kwargs):
+        raise NotImplementedError(
+            "subclasses may provide a check() method to verify the finder is "
+            "configured correctly."
+        )
+
 
 memcached_error_chars_re = _lazy_re_compile(r"[\x00-\x20\x7f]")
 
