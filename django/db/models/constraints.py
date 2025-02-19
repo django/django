@@ -66,7 +66,7 @@ class BaseConstraint:
     def get_violation_error_message(self):
         return self.violation_error_message % {"name": self.name}
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
         return []
 
     def _check_references(self, model, references):
@@ -147,7 +147,7 @@ class CheckConstraint(BaseConstraint):
             violation_error_message=violation_error_message,
         )
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
         errors = []
         if not (
             connection.features.supports_table_check_constraints
@@ -332,7 +332,7 @@ class UniqueConstraint(BaseConstraint):
     def contains_expressions(self):
         return bool(self.expressions)
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
         errors = model._check_local_fields({*self.fields, *self.include}, "constraints")
         required_db_features = model._meta.required_db_features
         if self.condition is not None and not (

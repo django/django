@@ -2458,7 +2458,7 @@ class Model(AltersData, metaclass=ModelBase):
                 continue
             connection = connections[db]
             for constraint in cls._meta.constraints:
-                errors.extend(constraint._check(cls, connection))
+                errors.extend(constraint.check(cls, connection))
         return errors
 
 
