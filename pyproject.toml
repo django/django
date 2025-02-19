@@ -18,7 +18,7 @@ description = "A high-level Python web framework that encourages rapid developme
 readme = "README.rst"
 license = {text = "BSD-3-Clause"}
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Web Environment",
     "Framework :: Django",
     "Intended Audience :: Developers",
