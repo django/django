@@ -517,6 +517,14 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 fields (:class:`.DateTimeRangeField` and :class:`.DecimalRangeField`) by using
 the ``default_bounds`` argument.
 
+.. warning::
+
+    PostgreSQL normalizes a range with no points to an empty range. This means
+    that a range with equal values specified for an included lower bound and
+    an  excluded upper bound (for example, ``Range(datetime.date(2005, 6, 21),
+    datetime.date(2005, 6, 21))`` or ``[4, 4)``) will become empty after saving
+    to the database, and the original bound values will be lost.
+
 ``IntegerRangeField``
 ---------------------
 
