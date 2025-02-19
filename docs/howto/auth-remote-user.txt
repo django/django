@@ -74,6 +74,9 @@ regardless of ``AUTHENTICATION_BACKENDS``.
     :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
     you want to allow them to.
 
+Using Custom HTTP Header
+========================
+
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
 ``header`` attribute to the desired ``request.META`` key.  For example::
@@ -99,6 +102,11 @@ If your authentication mechanism uses a custom HTTP header and not
     configuration with ``header = 'REMOTE_USER'``, since a key that doesn't
     start with ``HTTP_`` in ``request.META`` can only be set by your WSGI
     server, not directly from an HTTP request header.
+
+.. note::
+
+    Your custom middleware should replace ``RemoteUserMiddleware`` in the
+    ``MIDDLEWARE`` list.
 
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
