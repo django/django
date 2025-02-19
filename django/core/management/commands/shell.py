@@ -20,6 +20,14 @@ class Command(BaseCommand):
 
     requires_system_checks = []
     shells = ["ipython", "bpython", "python"]
+    default_imports = [
+        "django.conf.settings",
+        "django.db.connection",
+        "django.db.reset_queries",
+        "django.db.models",
+        "django.db.models.functions",
+        "django.utils.timezone",
+    ]
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -139,7 +147,7 @@ class Command(BaseCommand):
         ]
 
         """
-        app_models_imports = [
+        app_models_imports = self.default_imports + [
             f"{model.__module__}.{model.__name__}"
             for model in reversed(apps.get_models())
             if model.__module__
