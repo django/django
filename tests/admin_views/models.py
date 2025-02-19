@@ -746,12 +746,20 @@ class FoodDelivery(models.Model):
         unique_together = (("driver", "restaurant"),)
 
 
+class CascadeRefCoverLetter(models.Model):
+    coverletter = models.ForeignKey("CoverLetter", on_delete=models.CASCADE)
+
+
+class ProtectRefCoverLetter(models.Model):
+    coverletter = models.ForeignKey("CoverLetter", on_delete=models.PROTECT)
+
+
 class CoverLetter(models.Model):
-    author = models.CharField(max_length=30)
+    author = models.CharField(max_length=30, blank=True)
     date_written = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return self.author
+        return self.author or "   "
 
 
 class Paper(models.Model):
