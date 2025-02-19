@@ -438,7 +438,10 @@ class CustomSerializationJSONModel(models.Model):
     json_field = StringifiedJSONField()
 
     class Meta:
-        required_db_features = {"supports_json_field"}
+        required_db_features = {
+            "supports_json_field",
+            "supports_primitives_in_json_field",
+        }
 
 
 class AllFieldsModel(models.Model):
