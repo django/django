@@ -180,6 +180,9 @@ Models
 * :doc:`Constraints </ref/models/constraints>` now implement a ``check()``
   method that is already registered with the check framework.
 
+* Added support for :class:`~django.db.models.AnyValue` for MySQL, Oracle, and
+  PostgreSQL 16.0+.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
