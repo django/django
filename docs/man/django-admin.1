@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "DJANGO-ADMIN" "1" "January 15, 2025" "5.2" "Django"
+.TH "DJANGO-ADMIN" "1" "February 19, 2025" "5.2" "Django"
 .SH NAME
 django-admin \- Utility script for the Django web framework
 .sp
@@ -1429,6 +1429,14 @@ django\-admin shell \-i python
 Disables reading the startup script for the \(dqplain\(dq Python interpreter. By
 default, the script pointed to by the \X'tty: link https://docs.python.org/3/using/cmdline.html#envvar-PYTHONSTARTUP'\fI\%PYTHONSTARTUP\fP\X'tty: link' environment
 variable or the \fB~/.pythonrc.py\fP script is read.
+.INDENT 0.0
+.TP
+.B \-\-no\-imports
+.UNINDENT
+.sp
+
+.sp
+Disables the automatic import of models from \fI\%INSTALLED_APPS\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-command COMMAND, \-c COMMAND
