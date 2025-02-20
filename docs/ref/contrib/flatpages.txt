@@ -89,15 +89,20 @@ to place the pattern at the end of the other urlpatterns::
     matched.
 
 Another common setup is to use flat pages for a limited set of known pages and
-to hard code the urls, so you can reference them with the :ttag:`url` template
-tag::
+to hard code their URLs in the :doc:`URLconf </topics/http/urls>`::
 
     from django.contrib.flatpages import views
 
     urlpatterns += [
-        path("about-us/", views.flatpage, {"url": "/about-us/"}, name="about"),
-        path("license/", views.flatpage, {"url": "/license/"}, name="license"),
+        path("about-us/", views.flatpage, kwargs={"url": "/about-us/"}, name="about"),
+        path("license/", views.flatpage, kwargs={"url": "/license/"}, name="license"),
     ]
+
+The ``kwargs`` argument sets the ``url`` value used for the ``FlatPage`` model
+lookup in the flatpage view.
+
+The ``name`` argument allows the URL to be reversed in templates, for example
+using the :ttag:`url` template tag.
 
 Using the middleware
 --------------------
