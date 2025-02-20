@@ -277,6 +277,15 @@ Miscellaneous
 Features deprecated in 6.0
 ==========================
 
+Email
+-----
+
+* Setting :setting:`ADMINS` or :setting:`MANAGERS` to a list of (name, address)
+  tuples is deprecated. Change to a list of email address strings.
+  (Django had never actually used the name portion. If you do want to include
+  a name, use the :rfc:`5322` ``'"Name" <address>'`` format
+  or Python's :func:`~email.utils.formataddr`.)
+
 Miscellaneous
 -------------
 
