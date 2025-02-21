@@ -206,6 +206,9 @@ class DeferredAttribute:
     def __init__(self, field):
         self.field = field
 
+    def __set_name__(self, owner, name):
+        self.name = name
+
     def __get__(self, instance, cls=None):
         """
         Retrieve and caches the value from the datastore on the first lookup.

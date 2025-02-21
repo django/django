@@ -133,6 +133,9 @@ class ForwardManyToOneDescriptor:
     def __init__(self, field_with_rel):
         self.field = field_with_rel
 
+    def __set_name__(self, owner, name):
+        self.name = name
+
     @cached_property
     def RelatedObjectDoesNotExist(self):
         # The exception can't be created at initialization time since the
@@ -411,6 +414,9 @@ class ReverseOneToOneDescriptor:
         # which represents the reverse restaurant field (place.restaurant).
         self.related = related
 
+    def __set_name__(self, owner, name):
+        self.name = name
+
     @cached_property
     def RelatedObjectDoesNotExist(self):
         # The exception isn't created at initialization time for the sake of
@@ -605,6 +611,9 @@ class ReverseManyToOneDescriptor:
     def __init__(self, rel):
         self.rel = rel
         self.field = rel.field
+
+    def __set_name__(self, owner, name):
+        self.name = name
 
     @cached_property
     def related_manager_cls(self):
