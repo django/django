@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Page not found at {{ request.path_info }}</title>
+  <meta name="robots" content="NONE,NOARCHIVE">
+  <style>
+    html * { padding:0; margin:0; }
+    body * { padding:10px 20px; }
+    body * * { padding:0; }
+    body { font-family: sans-serif; background:#eee; color:#000; }
+    body > :where(header, main, footer) { border-bottom:1px solid #ddd; }
+    h1 { font-weight:normal; margin-bottom:.4em; }
+    h1 small { font-size:60%; color:#666; font-weight:normal; }
+    table { border:none; border-collapse: collapse; width:100%; }
+    td, th { vertical-align:top; padding:2px 3px; }
+    th { width:12em; text-align:right; color:#666; padding-right:.5em; }
+    #info { background:#f6f6f6; }
+    #info ol { margin: 0.5em 4em; }
+    #info ol li { font-family: monospace; }
+    #summary { background: #ffc; }
+    #explanation { background:#eee; border-bottom: 0px none; }
+    pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }
+  </style>
+</head>
+<body>
+  <header id="summary">
+    <h1>Page not found <small>(404)</small></h1>
+    {% if reason and resolved %}<pre class="exception_value">{{ reason }}</pre>{% endif %}
+    <table class="meta">
+      <tr>
+        <th scope="row">Request Method:</th>
+        <td>{{ request.META.REQUEST_METHOD }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Request URL:</th>
+        <td>{{ request.build_absolute_uri }}</td>
+      </tr>
+      {% if raising_view_name %}
+      <tr>
+        <th scope="row">Raised by:</th>
+        <td>{{ raising_view_name }}</td>
+      </tr>
+      {% endif %}
+    </table>
+  </header>
+
+  <main id="info">
+    {% if urlpatterns %}
+      <p>
+      Using the URLconf defined in <code>{{ urlconf }}</code>,
+      Django tried these URL patterns, in this order:
+      </p>
+      <ol>
+        {% for pattern in urlpatterns %}
+          <li>
+            {% for pat in pattern %}
+              <code>
+                {{ pat.pattern }}
+                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+              </code>
+            {% endfor %}
+          </li>
+        {% endfor %}
+      </ol>
+      <p>
+        {% if request_path %}
+          The current path, <code>{{ request_path }}</code>,
+        {% else %}
+          The empty path
+        {% endif %}
+        {% if resolved %}matched the last one.{% else %}didn’t match any of these.{% endif %}
+      </p>
+    {% endif %}
+  </main>
+
+  <footer id="explanation">
+    <p>
+      You’re seeing this error because you have <code>DEBUG = True</code> in
+      your Django settings file. Change that to <code>False</code>, and Django
+      will display a standard 404 page.
+    </p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,92 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# arneatec <arneatec@gmail.com>, 2022
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Venelin Stoykov <vkstoykov@gmail.com>, 2016
+# vestimir <vestimir@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2022-01-14 11:31+0000\n"
+"Last-Translator: arneatec <arneatec@gmail.com>\n"
+"Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
+"bg/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: bg\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Advanced options"
+msgstr "Допълнителни опции"
+
+msgid "Flat Pages"
+msgstr "Информативни страници"
+
+msgid "URL"
+msgstr "URL"
+
+msgid ""
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+msgstr ""
+"Пример: \"/about/contact/\".  Началната и крайната наклонена чертичка са "
+"задължителни."
+
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"Тази стойност трябва да съдържа само букви, цифри, точки, долни тирета, "
+"тирета, наклонени черти или тилди."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr ""
+"Пример: \"/about/contact/\". Началната наклонена чертичка е задължителна. "
+
+msgid "URL is missing a leading slash."
+msgstr "В URL липсва начална наклонена черта."
+
+msgid "URL is missing a trailing slash."
+msgstr "В URL липсва завършваща наклонена черта."
+
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "Flatpage с url %(url)s вече съществува за сайт %(site)s"
+
+msgid "title"
+msgstr "заглавие"
+
+msgid "content"
+msgstr "съдържание"
+
+msgid "enable comments"
+msgstr "позволяване на коментари"
+
+msgid "template name"
+msgstr "име на шаблон"
+
+msgid ""
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
+msgstr ""
+"Пример: \"flatpages/contact_page.html\".  Ако това не е указано, системата "
+"ще използва \"flatpages/default.html\".  "
+
+msgid "registration required"
+msgstr "изисква се регистрация"
+
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Ако това е чекнато, само логнати потребители ще могат да виждат страницата.  "
+
+msgid "sites"
+msgstr "сайтове"
+
+msgid "flat page"
+msgstr "информативна страница"
+
+msgid "flat pages"
+msgstr "информативни страници"

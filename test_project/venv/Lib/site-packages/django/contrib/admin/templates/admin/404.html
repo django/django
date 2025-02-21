@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{% translate 'Page not found' %}{% endblock %}
+
+{% block content %}
+
+<h2>{% translate 'Page not found' %}</h2>
+
+<p>{% translate 'We’re sorry, but the requested page could not be found.' %}</p>
+
+{% endblock %}

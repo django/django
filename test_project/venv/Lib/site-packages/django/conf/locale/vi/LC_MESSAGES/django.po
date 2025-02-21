@@ -1,0 +1,1234 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Claude Paroz <claude@2xlibre.net>, 2020
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Anh Phan <vietnamesel10n@gmail.com>, 2013
+# Thanh Le Viet <lethanhx2k@gmail.com>, 2013
+# Tran <hongdiepkien@gmail.com>, 2011
+# Tran Van <vantxm@yahoo.co.uk>, 2011,2013
+# Vuong Nguyen <autalpha@gmail.com>, 2011
+# xgenvn <xgenvn@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"vi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+msgid "Arabic"
+msgstr "Tiếng Ả Rập"
+
+msgid "Algerian Arabic"
+msgstr ""
+
+msgid "Asturian"
+msgstr "Asturian"
+
+msgid "Azerbaijani"
+msgstr "Tiếng Azerbaijan"
+
+msgid "Bulgarian"
+msgstr "Tiếng Bun-ga-ri"
+
+msgid "Belarusian"
+msgstr "Tiếng Bê-la-rút"
+
+msgid "Bengali"
+msgstr "Tiếng Bengal"
+
+msgid "Breton"
+msgstr "Tiếng Breton"
+
+msgid "Bosnian"
+msgstr "Tiếng Bosnia"
+
+msgid "Catalan"
+msgstr "Tiếng Catala"
+
+msgid "Czech"
+msgstr "Tiếng Séc"
+
+msgid "Welsh"
+msgstr "Xứ Wales"
+
+msgid "Danish"
+msgstr "Tiếng Đan Mạch"
+
+msgid "German"
+msgstr "Tiếng Đức"
+
+msgid "Lower Sorbian"
+msgstr ""
+
+msgid "Greek"
+msgstr "Tiếng Hy Lạp"
+
+msgid "English"
+msgstr "Tiếng Anh"
+
+msgid "Australian English"
+msgstr "Tiếng Anh ở Úc"
+
+msgid "British English"
+msgstr "British English"
+
+msgid "Esperanto"
+msgstr "Quốc Tế Ngữ"
+
+msgid "Spanish"
+msgstr "Tiếng Tây Ban Nha"
+
+msgid "Argentinian Spanish"
+msgstr "Argentinian Spanish"
+
+msgid "Colombian Spanish"
+msgstr ""
+
+msgid "Mexican Spanish"
+msgstr "Mexican Spanish"
+
+msgid "Nicaraguan Spanish"
+msgstr "Tiếng Tây Ban Nha-Nicaragua"
+
+msgid "Venezuelan Spanish"
+msgstr "Tiếng Vê-nê-du-ê-la"
+
+msgid "Estonian"
+msgstr "Tiếng Estonia"
+
+msgid "Basque"
+msgstr "Tiếng Baxcơ"
+
+msgid "Persian"
+msgstr "Tiếng Ba Tư"
+
+msgid "Finnish"
+msgstr "Tiếng Phần Lan"
+
+msgid "French"
+msgstr "Tiếng Pháp"
+
+msgid "Frisian"
+msgstr "Tiếng Frisco"
+
+msgid "Irish"
+msgstr "Tiếng Ai-len"
+
+msgid "Scottish Gaelic"
+msgstr ""
+
+msgid "Galician"
+msgstr "Tiếng Pháp cổ"
+
+msgid "Hebrew"
+msgstr "Tiếng Do Thái cổ"
+
+msgid "Hindi"
+msgstr "Tiếng Hindi"
+
+msgid "Croatian"
+msgstr "Tiếng Croatia"
+
+msgid "Upper Sorbian"
+msgstr ""
+
+msgid "Hungarian"
+msgstr "Tiếng Hung-ga-ri"
+
+msgid "Armenian"
+msgstr ""
+
+msgid "Interlingua"
+msgstr "Tiếng Khoa học Quốc tế"
+
+msgid "Indonesian"
+msgstr "Tiếng In-đô-nê-xi-a"
+
+msgid "Igbo"
+msgstr ""
+
+msgid "Ido"
+msgstr "Ido"
+
+msgid "Icelandic"
+msgstr "Tiếng Aixơlen"
+
+msgid "Italian"
+msgstr "Tiếng Ý"
+
+msgid "Japanese"
+msgstr "Tiếng Nhật Bản"
+
+msgid "Georgian"
+msgstr "Georgian"
+
+msgid "Kabyle"
+msgstr ""
+
+msgid "Kazakh"
+msgstr "Tiếng Kazakh"
+
+msgid "Khmer"
+msgstr "Tiếng Khơ-me"
+
+msgid "Kannada"
+msgstr "Tiếng Kannada"
+
+msgid "Korean"
+msgstr "Tiếng Hàn Quốc"
+
+msgid "Kyrgyz"
+msgstr ""
+
+msgid "Luxembourgish"
+msgstr "Tiếng Luxembourg"
+
+msgid "Lithuanian"
+msgstr "Tiếng Lat-vi"
+
+msgid "Latvian"
+msgstr "Ngôn ngữ vùng Bantic"
+
+msgid "Macedonian"
+msgstr "Tiếng Maxêđôni"
+
+msgid "Malayalam"
+msgstr "Tiếng Malayalam"
+
+msgid "Mongolian"
+msgstr "Tiếng Mông Cổ"
+
+msgid "Marathi"
+msgstr "Marathi"
+
+msgid "Burmese"
+msgstr "My-an-ma"
+
+msgid "Norwegian Bokmål"
+msgstr ""
+
+msgid "Nepali"
+msgstr "Nê-pan"
+
+msgid "Dutch"
+msgstr "Tiếng Hà Lan"
+
+msgid "Norwegian Nynorsk"
+msgstr "Tiếng Na Uy Nynorsk"
+
+msgid "Ossetic"
+msgstr "Ô-sét-ti-a"
+
+msgid "Punjabi"
+msgstr "Punjabi"
+
+msgid "Polish"
+msgstr "Tiếng Ba lan"
+
+msgid "Portuguese"
+msgstr "Tiếng Bồ Đào Nha"
+
+msgid "Brazilian Portuguese"
+msgstr "Brazilian Portuguese"
+
+msgid "Romanian"
+msgstr "Tiếng Ru-ma-ni"
+
+msgid "Russian"
+msgstr "Tiếng Nga"
+
+msgid "Slovak"
+msgstr "Ngôn ngữ Slô-vac"
+
+msgid "Slovenian"
+msgstr "Tiếng Slôven"
+
+msgid "Albanian"
+msgstr "Tiếng Albania"
+
+msgid "Serbian"
+msgstr "Tiếng Xéc-bi"
+
+msgid "Serbian Latin"
+msgstr "Serbian Latin"
+
+msgid "Swedish"
+msgstr "Tiếng Thụy Điển"
+
+msgid "Swahili"
+msgstr "Xì-qua-hi-đi thuộc ngôn ngữ Bantu"
+
+msgid "Tamil"
+msgstr "Tiếng Ta-min"
+
+msgid "Telugu"
+msgstr "Telugu"
+
+msgid "Tajik"
+msgstr ""
+
+msgid "Thai"
+msgstr "Tiếng Thái"
+
+msgid "Turkmen"
+msgstr ""
+
+msgid "Turkish"
+msgstr "Tiếng Thổ Nhĩ Kỳ"
+
+msgid "Tatar"
+msgstr "Tác-ta"
+
+msgid "Udmurt"
+msgstr "Udmurt"
+
+msgid "Ukrainian"
+msgstr "Tiếng Ukraina"
+
+msgid "Urdu"
+msgstr "Urdu"
+
+msgid "Uzbek"
+msgstr ""
+
+msgid "Vietnamese"
+msgstr "Tiếng Việt Nam"
+
+msgid "Simplified Chinese"
+msgstr "Tiếng Tàu giản thể"
+
+msgid "Traditional Chinese"
+msgstr "Tiếng Tàu truyền thống"
+
+msgid "Messages"
+msgstr ""
+
+msgid "Site Maps"
+msgstr "Bản đồ trang web"
+
+msgid "Static Files"
+msgstr "Tập tin tĩnh"
+
+msgid "Syndication"
+msgstr "Syndication"
+
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
+msgid "Enter a valid value."
+msgstr "Nhập một giá trị hợp lệ."
+
+msgid "Enter a valid URL."
+msgstr "Nhập một URL hợp lệ."
+
+msgid "Enter a valid integer."
+msgstr "Nhập một số nguyên hợp lệ."
+
+msgid "Enter a valid email address."
+msgstr "Nhập địa chỉ email."
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
+msgid "Enter a valid IPv4 address."
+msgstr "Nhập một địa chỉ IPv4 hợp lệ."
+
+msgid "Enter a valid IPv6 address."
+msgstr "Nhập địa chỉ IPv6 hợp lệ"
+
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Nhập địa chỉ IPv4 hoặc IPv6 hợp lệ"
+
+msgid "Enter only digits separated by commas."
+msgstr "Chỉ nhập chữ số, cách nhau bằng dấu phẩy."
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "Đảm bảo giá trị này là %(limit_value)s  (nó là %(show_value)s )."
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Đảm bảo giá trị này là nhỏ hơn hoặc bằng với %(limit_value)s ."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Đảm bảo giá trị này lớn hơn hoặc bằng với %(limit_value)s ."
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Giá trị này phải có ít nhất %(limit_value)d kí tự (hiện có %(show_value)d)"
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Giá trị này chỉ có tối đa %(limit_value)d kí tự (hiện có %(show_value)d)"
+
+msgid "Enter a number."
+msgstr "Nhập một số."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Đảm bảo rằng tối đa không có nhiều hơn %(max)s số."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Hãy chắc chắn rằng không có nhiều hơn %(max)s chữ số thập phân."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Hãy chắc chắn rằng không có nhiều hơn %(max)s chữ số trước dấu phẩy thập "
+"phân."
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
+
+msgid "and"
+msgstr "và"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr "%(model_name)s với thông tin %(field_labels)s đã tồn tại"
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "Giá trị %(value)r không phải là lựa chọn hợp lệ."
+
+msgid "This field cannot be null."
+msgstr "Trường này không thể để trống."
+
+msgid "This field cannot be blank."
+msgstr "Trường này không được để trắng."
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s có %(field_label)s đã tồn tại."
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr "%(field_label)s phải là duy nhất %(date_field_label)s %(lookup_type)s."
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Trường thuộc dạng: %(field_type)s "
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
+
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (hoặc là Đúng hoặc là Sai)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Chuỗi (dài đến %(max_length)s ký tự )"
+
+msgid "Comma-separated integers"
+msgstr "Các số nguyên được phân cách bằng dấu phẩy"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+msgid "Date (without time)"
+msgstr "Ngày (không có giờ)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+
+msgid "Date (with time)"
+msgstr "Ngày (có giờ)"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
+
+msgid "Decimal number"
+msgstr "Số thập phân"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
+msgid "Email address"
+msgstr "Địa chỉ email"
+
+msgid "File path"
+msgstr "Đường dẫn tắt tới file"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr ""
+
+msgid "Floating point number"
+msgstr "Giá trị dấu chấm động"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "Số nguyên"
+
+msgid "Big (8 byte) integer"
+msgstr "Big (8 byte) integer"
+
+msgid "IPv4 address"
+msgstr "Địa chỉ IPv4"
+
+msgid "IP address"
+msgstr "Địa chỉ IP"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
+
+msgid "Boolean (Either True, False or None)"
+msgstr "Luận lý (Có thể Đúng, Sai hoặc Không cái nào đúng)"
+
+msgid "Positive big integer"
+msgstr ""
+
+msgid "Positive integer"
+msgstr "Số nguyên dương"
+
+msgid "Positive small integer"
+msgstr "Số nguyên dương nhỏ"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Slug(lên đến %(max_length)s)"
+
+msgid "Small integer"
+msgstr "Số nguyên nhỏ"
+
+msgid "Text"
+msgstr "Đoạn văn"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+
+msgid "Time"
+msgstr "Giờ"
+
+msgid "URL"
+msgstr "Đường dẫn URL"
+
+msgid "Raw binary data"
+msgstr "Dữ liệu nhị phân "
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr ""
+
+msgid "File"
+msgstr "File"
+
+msgid "Image"
+msgstr "Image"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+
+msgid "Foreign Key (type determined by related field)"
+msgstr "Khóa ngoại (kiểu được xác định bởi trường liên hệ)"
+
+msgid "One-to-one relationship"
+msgstr "Mối quan hệ một-một"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
+msgid "Many-to-many relationship"
+msgstr "Mối quan hệ nhiều-nhiều"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
+msgid "This field is required."
+msgstr "Trường này là bắt buộc."
+
+msgid "Enter a whole number."
+msgstr "Nhập một số tổng thể."
+
+msgid "Enter a valid date."
+msgstr "Nhập một ngày hợp lệ."
+
+msgid "Enter a valid time."
+msgstr "Nhập một thời gian hợp lệ."
+
+msgid "Enter a valid date/time."
+msgstr "Nhập một ngày/thời gian hợp lệ."
+
+msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Không có tập tin nào được gửi. Hãy kiểm tra kiểu mã hóa của biểu mẫu."
+
+msgid "No file was submitted."
+msgstr "Không có tập tin nào được gửi."
+
+msgid "The submitted file is empty."
+msgstr "Tập tin được gửi là rỗng."
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] "Tên tệp tin có tối đa %(max)d kí tự (Hiện có %(length)d)"
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr "Vui lòng gửi một tập tin hoặc để ô chọn trắng, không chọn cả hai."
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Hãy tải lên một hình ảnh hợp lệ. Tập tin mà bạn đã tải không phải là hình "
+"ảnh hoặc đã bị hư hỏng."
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+"Hãy chọn một lựa chọn hợp lệ. %(value)s không phải là một trong các lựa chọn "
+"khả thi."
+
+msgid "Enter a list of values."
+msgstr "Nhập một danh sách giá trị."
+
+msgid "Enter a complete value."
+msgstr ""
+
+msgid "Enter a valid UUID."
+msgstr ""
+
+msgid "Enter a valid JSON."
+msgstr ""
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(Trường ẩn %(name)s) %(error)s"
+
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr ""
+
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] "Vui lòng đệ trình %d hoặc ít các mẫu đơn hơn."
+
+#, python-format
+msgid "Please submit %d or more forms."
+msgid_plural "Please submit %d or more forms."
+msgstr[0] ""
+
+msgid "Order"
+msgstr "Thứ tự"
+
+msgid "Delete"
+msgstr "Xóa"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Hãy sửa các dữ liệu trùng lặp cho %(field)s ."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Hãy sửa các dữ liệu trùng lặp cho %(field)s, mà phải là duy nhất."
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Hãy sửa các dữ liệu trùng lặp cho %(field_name)s  mà phải là duy nhất cho "
+"%(lookup)s tại %(date_field)s ."
+
+msgid "Please correct the duplicate values below."
+msgstr "Hãy sửa các giá trị trùng lặp dưới đây."
+
+msgid "The inline value did not match the parent instance."
+msgstr ""
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Hãy chọn một lựa chọn hợp lệ. Lựa chọn đó không phải là một trong các lựa "
+"chọn khả thi."
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+msgid "Clear"
+msgstr "Xóa"
+
+msgid "Currently"
+msgstr "Hiện nay"
+
+msgid "Change"
+msgstr "Thay đổi"
+
+msgid "Unknown"
+msgstr "Chưa xác định"
+
+msgid "Yes"
+msgstr "Có"
+
+msgid "No"
+msgstr "Không"
+
+#. Translators: Please do not add spaces around commas.
+msgid "yes,no,maybe"
+msgstr "Có,Không,Có thể"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d byte"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+msgid "p.m."
+msgstr "p.m."
+
+msgid "a.m."
+msgstr "a.m."
+
+msgid "PM"
+msgstr "chiều"
+
+msgid "AM"
+msgstr "sáng"
+
+msgid "midnight"
+msgstr "Nửa đêm"
+
+msgid "noon"
+msgstr "Buổi trưa"
+
+msgid "Monday"
+msgstr "Thứ 2"
+
+msgid "Tuesday"
+msgstr "Thứ 3"
+
+msgid "Wednesday"
+msgstr "Thứ 4"
+
+msgid "Thursday"
+msgstr "Thứ 5"
+
+msgid "Friday"
+msgstr "Thứ 6"
+
+msgid "Saturday"
+msgstr "Thứ 7"
+
+msgid "Sunday"
+msgstr "Chủ nhật"
+
+msgid "Mon"
+msgstr "Thứ 2"
+
+msgid "Tue"
+msgstr "Thứ 3"
+
+msgid "Wed"
+msgstr "Thứ 4"
+
+msgid "Thu"
+msgstr "Thứ 5"
+
+msgid "Fri"
+msgstr "Thứ 6"
+
+msgid "Sat"
+msgstr "Thứ 7"
+
+msgid "Sun"
+msgstr "Chủ nhật"
+
+msgid "January"
+msgstr "Tháng 1"
+
+msgid "February"
+msgstr "Tháng 2"
+
+msgid "March"
+msgstr "Tháng 3"
+
+msgid "April"
+msgstr "Tháng 4"
+
+msgid "May"
+msgstr "Tháng 5"
+
+msgid "June"
+msgstr "Tháng 6"
+
+msgid "July"
+msgstr "Tháng 7"
+
+msgid "August"
+msgstr "Tháng 8"
+
+msgid "September"
+msgstr "Tháng 9"
+
+msgid "October"
+msgstr "Tháng 10"
+
+msgid "November"
+msgstr "Tháng 11"
+
+msgid "December"
+msgstr "Tháng 12"
+
+msgid "jan"
+msgstr "Tháng 1"
+
+msgid "feb"
+msgstr "Tháng 2"
+
+msgid "mar"
+msgstr "Tháng 3"
+
+msgid "apr"
+msgstr "Tháng 4"
+
+msgid "may"
+msgstr "Tháng 5"
+
+msgid "jun"
+msgstr "Tháng 6"
+
+msgid "jul"
+msgstr "Tháng 7"
+
+msgid "aug"
+msgstr "Tháng 8"
+
+msgid "sep"
+msgstr "Tháng 9"
+
+msgid "oct"
+msgstr "Tháng 10"
+
+msgid "nov"
+msgstr "Tháng 11"
+
+msgid "dec"
+msgstr "Tháng 12"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Tháng 1."
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Tháng 2."
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Tháng ba"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Tháng tư"
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Tháng năm"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Tháng sáu"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Tháng bảy"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Tháng 8."
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Tháng 9."
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Tháng 10."
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Tháng 11."
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Tháng 12."
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "Tháng một"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "Tháng hai"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "Tháng ba"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "Tháng tư"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "Tháng năm"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "Tháng sáu"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "Tháng bảy"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "Tháng tám"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "Tháng Chín"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "Tháng Mười"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "Tháng mười một"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "Tháng mười hai"
+
+msgid "This is not a valid IPv6 address."
+msgstr ""
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr ""
+
+msgid "or"
+msgstr "hoặc"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d năm"
+
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d tháng"
+
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d tuần"
+
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d ngày"
+
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d giờ"
+
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d phút"
+
+msgid "Forbidden"
+msgstr ""
+
+msgid "CSRF verification failed. Request aborted."
+msgstr ""
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+
+msgid "More information is available with DEBUG=True."
+msgstr ""
+
+msgid "No year specified"
+msgstr "Không có năm xác định"
+
+msgid "Date out of range"
+msgstr ""
+
+msgid "No month specified"
+msgstr "Không có tháng xác định"
+
+msgid "No day specified"
+msgstr "Không có ngày xác định"
+
+msgid "No week specified"
+msgstr "Không có tuần xác định"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "Không có %(verbose_name_plural)s  phù hợp"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"%(verbose_name_plural)s trong tương lai không có sẵn vì %(class_name)s."
+"allow_future là False."
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Không có %(verbose_name)s tìm thấy phù hợp với truy vấn"
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Trang không hợp lệ (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
+
+msgid "Directory indexes are not allowed here."
+msgstr "Tại đây không cho phép đánh số chỉ mục dành cho thư mục."
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr ""
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "Index của %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

@@ -1,0 +1,47 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Shinya Okano <tokibito@gmail.com>, 2012,2014
+# Takuya N <takninnovationresearch@gmail.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-07 16:03+0000\n"
+"Last-Translator: Takuya N <takninnovationresearch@gmail.com>\n"
+"Language-Team: Japanese (http://www.transifex.com/django/django/language/"
+"ja/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Content Types"
+msgstr "コンテンツタイプ"
+
+msgid "python model class name"
+msgstr "Python モデルクラス名"
+
+msgid "content type"
+msgstr "コンテンツタイプ"
+
+msgid "content types"
+msgstr "コンテンツタイプ"
+
+#, python-format
+msgid "Content type %(ct_id)s object has no associated model"
+msgstr ""
+"コンテンツタイプ %(ct_id)s のオブジェクトは、関連付けられたモデルを持っていま"
+"せん"
+
+#, python-format
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
+msgstr "コンテンツタイプ %(ct_id)s のオブジェクト %(obj_id)s は存在しません"
+
+#, python-format
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr ""
+"%(ct_name)s のオブジェクトは get_absolute_url() メソッドを持っていません"

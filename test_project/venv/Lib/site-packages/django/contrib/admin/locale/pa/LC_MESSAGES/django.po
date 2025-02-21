@@ -1,0 +1,706 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# A S Alam, 2018
+# A S Alam, 2022
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Satnam S Virdi <satnam10virdi@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: A S Alam, 2022\n"
+"Language-Team: Panjabi (Punjabi) (http://www.transifex.com/django/django/"
+"language/pa/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pa\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "ਚੁਣੇ %(verbose_name_plural)s ਹਟਾਓ"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s ਠੀਕ ਤਰ੍ਹਾਂ ਹਟਾਈਆਂ ਗਈਆਂ।"
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s ਨੂੰ ਹਟਾਇਆ ਨਹੀਂ ਜਾ ਸਕਦਾ"
+
+msgid "Are you sure?"
+msgstr "ਕੀ ਤੁਸੀਂ ਇਹ ਚਾਹੁੰਦੇ ਹੋ?"
+
+msgid "Administration"
+msgstr "ਪ੍ਰਸ਼ਾਸਨ"
+
+msgid "All"
+msgstr "ਸਭ"
+
+msgid "Yes"
+msgstr "ਹਾਂ"
+
+msgid "No"
+msgstr "ਨਹੀਂ"
+
+msgid "Unknown"
+msgstr "ਅਣਜਾਣ"
+
+msgid "Any date"
+msgstr "ਕੋਈ ਵੀ ਮਿਤੀ"
+
+msgid "Today"
+msgstr "ਅੱਜ"
+
+msgid "Past 7 days"
+msgstr "ਪਿਛਲੇ ੭ ਦਿਨ"
+
+msgid "This month"
+msgstr "ਇਹ ਮਹੀਨੇ"
+
+msgid "This year"
+msgstr "ਇਹ ਸਾਲ"
+
+msgid "No date"
+msgstr "ਕੋਈ ਮਿਤੀ ਨਹੀਂ"
+
+msgid "Has date"
+msgstr "ਮਿਤੀ ਹੈ"
+
+msgid "Empty"
+msgstr "ਖਾਲੀ"
+
+msgid "Not empty"
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+
+msgid "Action:"
+msgstr "ਕਾਰਵਾਈ:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "%(verbose_name)s ਹੋਰ ਸ਼ਾਮਲ"
+
+msgid "Remove"
+msgstr "ਹਟਾਓ"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "ਬਦਲੋ"
+
+msgid "Deletion"
+msgstr ""
+
+msgid "action time"
+msgstr "ਕਾਰਵਾਈ ਸਮਾਂ"
+
+msgid "user"
+msgstr "ਵਰਤੋਂਕਾਰ"
+
+msgid "content type"
+msgstr "ਸਮੱਗਰੀ ਕਿਸਮ"
+
+msgid "object id"
+msgstr "ਆਬਜੈਕਟ id"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "ਆਬਜੈਕਟ repr"
+
+msgid "action flag"
+msgstr "ਕਾਰਵਾਈ ਫਲੈਗ"
+
+msgid "change message"
+msgstr "ਸੁਨੇਹਾ ਬਦਲੋ"
+
+msgid "log entry"
+msgstr "ਲਾਗ ਐਂਟਰੀ"
+
+msgid "log entries"
+msgstr "ਲਾਗ ਐਂਟਰੀਆਂ"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr ""
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr ""
+
+msgid "LogEntry Object"
+msgstr ""
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "ਅਤੇ"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "ਕੋਈ ਖੇਤਰ ਨਹੀਂ ਬਦਲਿਆ।"
+
+msgid "None"
+msgstr "ਕੋਈ ਨਹੀਂ"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr ""
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+msgid "No action selected."
+msgstr "ਕੋਈ ਕਾਰਵਾਈ ਨਹੀਂ ਚੁਣੀ ਗਈ।"
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr ""
+
+#, python-format
+msgid "Add %s"
+msgstr "%s ਸ਼ਾਮਲ"
+
+#, python-format
+msgid "Change %s"
+msgstr "%s ਬਦਲੋ"
+
+#, python-format
+msgid "View %s"
+msgstr "%s ਵੇਖੋ"
+
+msgid "Database error"
+msgstr "ਡਾਟਾਬੇਸ ਗਲਤੀ"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s ਠੀਕ ਤਰ੍ਹਾਂ ਬਦਲਿਆ ਗਿਆ।"
+msgstr[1] "%(count)s %(name)s ਠੀਕ ਤਰ੍ਹਾਂ ਬਦਲੇ ਗਏ ਹਨ।"
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s ਚੁਣਿਆ।"
+msgstr[1] "%(total_count)s ਚੁਣੇ"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#, python-format
+msgid "Change history: %s"
+msgstr "ਅਤੀਤ ਬਦਲੋ: %s"
+
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+msgid "Django site admin"
+msgstr "ਡੀਜਾਂਗੋ ਸਾਈਟ ਐਡਮਿਨ"
+
+msgid "Django administration"
+msgstr "ਡੀਜਾਂਗੋ ਪਰਸ਼ਾਸ਼ਨ"
+
+msgid "Site administration"
+msgstr "ਸਾਈਟ ਪਰਬੰਧ"
+
+msgid "Log in"
+msgstr "ਲਾਗ ਇਨ"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr ""
+
+msgid "Page not found"
+msgstr "ਸਫ਼ਾ ਨਹੀਂ ਲੱਭਿਆ"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
+
+msgid "Home"
+msgstr "ਘਰ"
+
+msgid "Server error"
+msgstr "ਸਰਵਰ ਗਲਤੀ"
+
+msgid "Server error (500)"
+msgstr "ਸਰਵਰ ਗਲਤੀ (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "ਸਰਵਰ ਗਲਤੀ <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+msgid "Run the selected action"
+msgstr "ਚੁਣੀ ਕਾਰਵਾਈ ਕਰੋ"
+
+msgid "Go"
+msgstr "ਜਾਓ"
+
+msgid "Click here to select the objects across all pages"
+msgstr "ਸਭ ਸਫ਼ਿਆਂ ਵਿੱਚੋਂ ਆਬਜੈਕਟ ਚੁਣਨ ਲਈ ਇੱਥੇ ਕਲਿੱਕ ਕਰੋ"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "ਸਭ %(total_count)s %(module_name)s ਚੁਣੋ"
+
+msgid "Clear selection"
+msgstr "ਚੋਣ ਸਾਫ਼ ਕਰੋ"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+msgid "Add"
+msgstr "ਸ਼ਾਮਲ"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr ""
+
+msgid "Enter a username and password."
+msgstr ""
+
+msgid "Change password"
+msgstr "ਪਾਸਵਰਡ ਬਦਲੋ"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "ਯੂਜ਼ਰ <strong>%(username)s</strong> ਲਈ ਨਵਾਂ ਪਾਸਵਰਡ ਦਿਓ।"
+
+msgid "Skip to main content"
+msgstr ""
+
+msgid "Welcome,"
+msgstr "ਜੀ ਆਇਆਂ ਨੂੰ, "
+
+msgid "View site"
+msgstr ""
+
+msgid "Documentation"
+msgstr "ਡੌਕੂਮੈਂਟੇਸ਼ਨ"
+
+msgid "Log out"
+msgstr "ਲਾਗ ਆਉਟ"
+
+msgid "Breadcrumbs"
+msgstr ""
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s ਸ਼ਾਮਲ"
+
+msgid "History"
+msgstr "ਅਤੀਤ"
+
+msgid "View on site"
+msgstr "ਸਾਈਟ ਉੱਤੇ ਜਾਓ"
+
+msgid "Filter"
+msgstr "ਫਿਲਟਰ"
+
+msgid "Clear all filters"
+msgstr ""
+
+msgid "Remove from sorting"
+msgstr ""
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+msgid "Toggle sorting"
+msgstr ""
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+msgid "Delete"
+msgstr "ਹਟਾਓ"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+msgid "Objects"
+msgstr ""
+
+msgid "Yes, I’m sure"
+msgstr ""
+
+msgid "No, take me back"
+msgstr ""
+
+msgid "Delete multiple objects"
+msgstr "ਕਈ ਆਬਜੈਕਟ ਹਟਾਓ"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+msgid "Delete?"
+msgstr "ਹਟਾਉਣਾ?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " %(filter_title)s ਵਲੋਂ "
+
+msgid "Summary"
+msgstr ""
+
+msgid "Recent actions"
+msgstr ""
+
+msgid "My actions"
+msgstr ""
+
+msgid "None available"
+msgstr "ਕੋਈ ਉਪਲੱਬਧ ਨਹੀਂ"
+
+msgid "Unknown content"
+msgstr "ਅਣਜਾਣ ਸਮੱਗਰੀ"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+msgid "Forgotten your password or username?"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
+msgid "Date/time"
+msgstr "ਮਿਤੀ/ਸਮਾਂ"
+
+msgid "User"
+msgstr "ਯੂਜ਼ਰ"
+
+msgid "Action"
+msgstr "ਕਾਰਵਾਈ"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+
+msgid "Show all"
+msgstr "ਸਭ ਵੇਖੋ"
+
+msgid "Save"
+msgstr "ਸੰਭਾਲੋ"
+
+msgid "Popup closing…"
+msgstr ""
+
+msgid "Search"
+msgstr "ਖੋਜ"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s ਕੁੱਲ"
+
+msgid "Save as new"
+msgstr "ਨਵੇਂ ਵਜੋਂ ਵੇਖੋ"
+
+msgid "Save and add another"
+msgstr "ਸੰਭਾਲੋ ਤੇ ਹੋਰ ਸ਼ਾਮਲ"
+
+msgid "Save and continue editing"
+msgstr "ਸੰਭਾਲੋ ਤੇ ਸੋਧਣਾ ਜਾਰੀ ਰੱਖੋ"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+
+msgid "Log in again"
+msgstr "ਫੇਰ ਲਾਗਇਨ ਕਰੋ"
+
+msgid "Password change"
+msgstr "ਪਾਸਵਰਡ ਬਦਲੋ"
+
+msgid "Your password was changed."
+msgstr "ਤੁਹਾਡਾ ਪਾਸਵਰਡ ਬਦਲਿਆ ਗਿਆ ਹੈ।"
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+
+msgid "Change my password"
+msgstr "ਮੇਰਾ ਪਾਸਵਰਡ ਬਦਲੋ"
+
+msgid "Password reset"
+msgstr "ਪਾਸਵਰਡ ਮੁੜ-ਸੈੱਟ"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "ਤੁਹਾਡਾ ਪਾਸਵਰਡ ਸੈੱਟ ਕੀਤਾ ਗਿਆ ਹੈ। ਤੁਸੀਂ ਜਾਰੀ ਰੱਖ ਕੇ ਹੁਣੇ ਲਾਗਇਨ ਕਰ ਸਕਦੇ ਹੋ।"
+
+msgid "Password reset confirmation"
+msgstr "ਪਾਸਵਰਡ ਮੁੜ-ਸੈੱਟ ਕਰਨ ਪੁਸ਼ਟੀ"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"ਆਪਣਾ ਨਵਾਂ ਪਾਸਵਰਡ ਦੋ ਵਾਰ ਦਿਉ ਤਾਂ ਕਿ ਅਸੀਂ ਜਾਂਚ ਕਰ ਸਕੀਏ ਕਿ ਤੁਸੀਂ ਠੀਕ ਤਰ੍ਹਾਂ ਲਿਖਿਆ ਹੈ।"
+
+msgid "New password:"
+msgstr "ਨਵਾਂ ਪਾਸਵਰਡ:"
+
+msgid "Confirm password:"
+msgstr "ਪਾਸਵਰਡ ਪੁਸ਼ਟੀ:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"ਪਾਸਵਰਡ ਰੀ-ਸੈੱਟ ਲਿੰਕ ਗਲਤ ਹੈ, ਸੰਭਵ ਤੌਰ ਉੱਤੇ ਇਹ ਪਹਿਲਾਂ ਹੀ ਵਰਤਿਆ ਜਾ ਚੁੱਕਾ ਹੈ। ਨਵਾਂ ਪਾਸਵਰਡ ਰੀ-"
+"ਸੈੱਟ ਲਈ ਬੇਨਤੀ ਭੇਜੋ ਜੀ।"
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "ਅੱਗੇ ਦਿੱਤੇ ਸਫ਼ੇ ਉੱਤੇ ਜਾਉ ਤੇ ਨਵਾਂ ਪਾਸਵਰਡ ਚੁਣੋ:"
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
+
+msgid "Thanks for using our site!"
+msgstr "ਸਾਡੀ ਸਾਈਟ ਵਰਤਣ ਲਈ ਧੰਨਵਾਦ ਜੀ!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s ਟੀਮ"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+
+msgid "Email address:"
+msgstr ""
+
+msgid "Reset my password"
+msgstr "ਮੇਰਾ ਪਾਸਵਰਡ ਮੁੜ-ਸੈੱਟ ਕਰੋ"
+
+msgid "All dates"
+msgstr "ਸਭ ਮਿਤੀਆਂ"
+
+#, python-format
+msgid "Select %s"
+msgstr "%s ਚੁਣੋ"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "ਬਦਲਣ ਲਈ %s ਚੁਣੋ"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
+
+msgid "Date:"
+msgstr "ਮਿਤੀ:"
+
+msgid "Time:"
+msgstr "ਸਮਾਂ:"
+
+msgid "Lookup"
+msgstr "ਖੋਜ"
+
+msgid "Currently:"
+msgstr ""
+
+msgid "Change:"
+msgstr ""

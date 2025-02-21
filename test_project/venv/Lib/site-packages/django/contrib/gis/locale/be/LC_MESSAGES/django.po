@@ -1,0 +1,87 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
+# znotdead <zhirafchik@gmail.com>, 2016,2019
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016,2019\n"
+"Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
+"be/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: be\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "GIS"
+msgstr "ГІС"
+
+msgid "The base GIS field."
+msgstr "Галоўнае поле ГІС."
+
+msgid ""
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Галоўнае геаметрычнае поле — адлюстроўвае геамэтрычныя віды паводле "
+"спэцыфікацыі «OpenGIS»."
+
+msgid "Point"
+msgstr "Пункт"
+
+msgid "Line string"
+msgstr "Ломаная"
+
+msgid "Polygon"
+msgstr "Шматкутнік"
+
+msgid "Multi-point"
+msgstr "Набор пунктаў"
+
+msgid "Multi-line string"
+msgstr "Набор ломаных"
+
+msgid "Multi polygon"
+msgstr "Набор шматкутнікаў"
+
+msgid "Geometry collection"
+msgstr "Набор ґеамэтрычных аб’ектаў"
+
+msgid "Extent Aggregate Field"
+msgstr "Поле аб'яднанай плошчы"
+
+msgid "Raster Field"
+msgstr "Растравае поле"
+
+msgid "No geometry value provided."
+msgstr "Не пазначылі значэньне ґеамэтрыі."
+
+msgid "Invalid geometry value."
+msgstr "Хібнае значэньне ґеамэтрыі."
+
+msgid "Invalid geometry type."
+msgstr "Хібны від ґеамэтрыі."
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr "Не ўдалося ператварыць ґеамэтрыю ў SRID."
+
+msgid "Delete all Features"
+msgstr "Выдаліць усе аб’екты"
+
+msgid "Debugging window (serialized value)"
+msgstr "Акно адладкі (сэрыялізаванае значэньне)"
+
+msgid "No feeds are registered."
+msgstr "Няма запісаных стужак."
+
+#, python-format
+msgid "Slug %r isn’t registered."
+msgstr "Біркі %r няма ў запісаных."

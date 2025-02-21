@@ -1,0 +1,89 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# fasouto <fsoutomoure@gmail.com>, 2011
+# fonso <fonzzo@gmail.com>, 2013
+# Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
+# X Bello <xbello@gmail.com>, 2023
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023\n"
+"Language-Team: Galician (http://app.transifex.com/django/django/language/"
+"gl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "GIS"
+msgstr "SIX"
+
+msgid "The base GIS field."
+msgstr "O cambo básico de XIS."
+
+msgid ""
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"O cambo básico Geometry — correspónese co tipo Geometry da especificación "
+"OpenGIS."
+
+msgid "Point"
+msgstr "Punto"
+
+msgid "Line string"
+msgstr "Secuencia de liñas"
+
+msgid "Polygon"
+msgstr "Polígono"
+
+msgid "Multi-point"
+msgstr "Punto múltiple"
+
+msgid "Multi-line string"
+msgstr "Cadea multi-liña"
+
+msgid "Multi polygon"
+msgstr "Multi polígono"
+
+msgid "Geometry collection"
+msgstr "Colección de xeometrías"
+
+msgid "Extent Aggregate Field"
+msgstr "Campo de Agregación de Extensión"
+
+msgid "Raster Field"
+msgstr "Campo de Raster"
+
+msgid "No geometry value provided."
+msgstr "Non se proporcionou un valor de xeometría."
+
+msgid "Invalid geometry value."
+msgstr "Valor xeométrico non válido."
+
+msgid "Invalid geometry type."
+msgstr "Tipo xeométrico non válido."
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Atopouse un erro mentras se trasnformaba a xeometría ó SRID do campo "
+"xeométrico do formulario."
+
+msgid "Delete all Features"
+msgstr "Eliminar tódalas Propiedades"
+
+msgid "Debugging window (serialized value)"
+msgstr "Ventá de depurado (valor serializado)"
+
+msgid "No feeds are registered."
+msgstr "Non hai feeds rexistradas."
+
+#, python-format
+msgid "Slug %r isn’t registered."
+msgstr "O slug %r non está rexistrado."

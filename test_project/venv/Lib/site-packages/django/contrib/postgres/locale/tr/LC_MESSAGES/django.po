@@ -1,0 +1,109 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# BouRock, 2015-2019,2023
+# BouRock, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: BouRock, 2015-2019,2023\n"
+"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
+"tr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL uzantıları"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Dizilimdeki %(nth)s öğesi doğrulanmadı:"
+
+msgid "Nested arrays must have the same length."
+msgstr "İç içe dizilimler aynı uzunlukta olmak zorunda."
+
+msgid "Map of strings to strings/nulls"
+msgstr "Dizgiler/boşlar olarak dizgilerin eşlemesi"
+
+#, python-format
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "“%(key)s” değeri bir dizgi ya da boş değil."
+
+msgid "Could not load JSON data."
+msgstr "JSON verisi yüklenemedi."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Bir JSON dizini girilmek zorundadır."
+
+msgid "Enter two valid values."
+msgstr "Iki geçerli değer girin."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Aralığın başlangıcı aralığın bitişini aşmamak zorundadır."
+
+msgid "Enter two whole numbers."
+msgstr "Bütün iki sayıyı girin."
+
+msgid "Enter two numbers."
+msgstr "İki sayı girin."
+
+msgid "Enter two valid date/times."
+msgstr "Geçerli iki tarih/saat girin."
+
+msgid "Enter two valid dates."
+msgstr "Geçerli iki tarih girin."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Liste %(show_value)d öğe içeriyor, %(limit_value)d değerden daha fazla "
+"içermemelidir."
+msgstr[1] ""
+"Liste %(show_value)d öğe içeriyor, %(limit_value)d değerden daha fazla "
+"içermemelidir."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Liste %(show_value)d öğe içeriyor, %(limit_value)d değerden daha az "
+"içermemelidir."
+msgstr[1] ""
+"Liste %(show_value)d öğe içeriyor, %(limit_value)d değerden daha az "
+"içermemelidir."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Bazı anahtarlar eksik: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Bazı bilinmeyen anahtarlar verilmiş: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr ""
+"Aralığın üst sınırının %(limit_value)s değerinden büyük olmadığından emin "
+"olun."
+
+#, python-format
+msgid ""
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr ""
+"Aralığın alt sınırının %(limit_value)s değerinden az olmadığından emin olun."

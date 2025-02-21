@@ -1,0 +1,52 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Viktar Palstsiuk <vipals@gmail.com>, 2015
+# znotdead <zhirafchik@gmail.com>, 2016,2019,2021
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 17:28+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
+"be/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: be\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "Redirects"
+msgstr "Перанакіраванні"
+
+msgid "site"
+msgstr "сайт"
+
+msgid "redirect from"
+msgstr "накіраваць з"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr ""
+"Тут мусіць быць поўны шлях бяз назвы дамэна. Прыклад: “/events/search/”."
+
+msgid "redirect to"
+msgstr "накіраваць да"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
+msgstr ""
+"Тут, як і ўверсе, мусіць быць поўны шлях, або поўная сеціўная спасылка, якая "
+"пачынаецца з “https://”."
+
+msgid "redirect"
+msgstr "накіраваньне"
+
+msgid "redirects"
+msgstr "накіраваньні"

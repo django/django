@@ -1,0 +1,50 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Claude Paroz <claude@2xlibre.net>, 2014-2015,2019,2021
+# Jannis Leidel <jannis@leidel.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-02 13:17+0000\n"
+"Last-Translator: Bruno Brouard <annoa.b@gmail.com>\n"
+"Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Redirects"
+msgstr "Redirections"
+
+msgid "site"
+msgstr "site"
+
+msgid "redirect from"
+msgstr "redirigé depuis"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr ""
+"Ceci doit être un chemin absolu, sans nom de domaine. Par exemple, « /"
+"evenements/rechercher/ »."
+
+msgid "redirect to"
+msgstr "redirigé vers"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
+msgstr ""
+"Ceci peut être soit un chemin absolu (voir ci-dessus) soit une URL complète "
+"débutant par un protocole tel que « https:// »."
+
+msgid "redirect"
+msgstr "redirection"
+
+msgid "redirects"
+msgstr "redirections"

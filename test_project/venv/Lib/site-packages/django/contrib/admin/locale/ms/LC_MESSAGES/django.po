@@ -1,0 +1,721 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jafry Hisham, 2021
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-12-06 07:41+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
+"Language-Team: Malay (http://www.transifex.com/django/django/language/ms/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ms\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Padam pilihan %(verbose_name_plural)s"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s berjaya dipadamkan"
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s tidak boleh dipadamkan"
+
+msgid "Are you sure?"
+msgstr "Adakah anda pasti?"
+
+msgid "Administration"
+msgstr "Pentadbiran"
+
+msgid "All"
+msgstr "Semua"
+
+msgid "Yes"
+msgstr "Ya"
+
+msgid "No"
+msgstr "Tidak"
+
+msgid "Unknown"
+msgstr "Tidak diketahui"
+
+msgid "Any date"
+msgstr "Sebarang tarikh"
+
+msgid "Today"
+msgstr "Hari ini"
+
+msgid "Past 7 days"
+msgstr "7 hari lalu"
+
+msgid "This month"
+msgstr "Bulan ini"
+
+msgid "This year"
+msgstr "Tahun ini"
+
+msgid "No date"
+msgstr "Tiada tarikh"
+
+msgid "Has date"
+msgstr "Mempunyai tarikh"
+
+msgid "Empty"
+msgstr "Kosong"
+
+msgid "Not empty"
+msgstr "Tidak kosong"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Sila masukkan %(username)s dan kata-laluan bagi akaun staf. Kedua-dua medan "
+"berkemungkinan kes-sensitif."
+
+msgid "Action:"
+msgstr "Tindakan"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Tambah %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Buang"
+
+msgid "Addition"
+msgstr "Tambahan"
+
+msgid "Change"
+msgstr "Tukar"
+
+msgid "Deletion"
+msgstr "Pemadaman"
+
+msgid "action time"
+msgstr "masa tindakan"
+
+msgid "user"
+msgstr "pengguna"
+
+msgid "content type"
+msgstr "jenis kandungan"
+
+msgid "object id"
+msgstr "id objek"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "repr objek"
+
+msgid "action flag"
+msgstr "bendera tindakan"
+
+msgid "change message"
+msgstr "tukar mesej"
+
+msgid "log entry"
+msgstr "entri log"
+
+msgid "log entries"
+msgstr "entri log"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr "\"%(object)s\" ditambah"
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "\"%(object)s\" ditukar - %(changes)s"
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr "\"%(object)s\" dipadam."
+
+msgid "LogEntry Object"
+msgstr "Objek EntriLog"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr "{name} “{object}” ditambah."
+
+msgid "Added."
+msgstr "Ditambah."
+
+msgid "and"
+msgstr "dan"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "“{object}” {name} untuk {fields} telah ditukar."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} telah ditukar."
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "“{object}” {name} telah dipadamkan"
+
+msgid "No fields changed."
+msgstr "Tiada medan diubah."
+
+msgid "None"
+msgstr "Tiada"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+"Tekan \"Control\", atau \"Command pada Mac untuk memilih lebih daripada satu."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} \"{obj}\" telah berjaya ditambah."
+
+msgid "You may edit it again below."
+msgstr "Anda boleh edit semula dibawah."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"{name} \"{obj}\" telah berjaya ditambah. Anda boleh menambah {name} lain "
+"dibawah."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" berjaya diubah. Anda boleh edit semula dibawah."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" berjaya ditambah. Anda boleh edit semula dibawah."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" berjaya diubah. Anda boleh tambah {name} lain dibawah"
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} \"{obj}\" berjaya diubah."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Item-item perlu dipilih mengikut turutan untuk tindakan lanjut. Tiada item-"
+"item yang diubah."
+
+msgid "No action selected."
+msgstr "Tiada tindakan dipilih."
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" berjaya dipadam."
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr ""
+"%(name)s dengan ID \"%(key)s\" tidak wujud. Mungkin ia telah dipadamkan?"
+
+#, python-format
+msgid "Add %s"
+msgstr "Tambah %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "Tukar %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Lihat %s"
+
+msgid "Database error"
+msgstr "Masalah pangkalan data"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s berjaya ditukar."
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "Kesemua %(total_count)s dipilih"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 daripada %(cnt)s dipilih"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "Sejarah penukaran: %s"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Memadam %(class_name)s %(instance)s memerlukan pemadaman objek berkaitan "
+"yang dilindungi: %(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Pentadbiran laman Django"
+
+msgid "Django administration"
+msgstr "Pentadbiran Django"
+
+msgid "Site administration"
+msgstr "Pentadbiran laman"
+
+msgid "Log in"
+msgstr "Log masuk"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "Pentadbiran %(app)s"
+
+msgid "Page not found"
+msgstr "Laman tidak dijumpai"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Maaf, tetapi laman yang diminta tidak dijumpai."
+
+msgid "Home"
+msgstr "Utama"
+
+msgid "Server error"
+msgstr "Masalah pelayan"
+
+msgid "Server error (500)"
+msgstr "Masalah pelayan (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Masalah pelayan <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Terdapat masalah. Ia telah dilaporkan kepada pentadbir laman melalui emel "
+"dan sepatutnya dibaiki sebentar lagi. Kesabaran anda amat dihargai."
+
+msgid "Run the selected action"
+msgstr "Jalankan tindakan yang dipilih"
+
+msgid "Go"
+msgstr "Teruskan"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Klik disini untuk memilih objek-objek disemua laman"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Pilih kesemua %(total_count)s%(module_name)s"
+
+msgid "Clear selection"
+msgstr "Padam pilihan"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Model didalam aplikasi %(name)s"
+
+msgid "Add"
+msgstr "Tambah"
+
+msgid "View"
+msgstr "Lihat"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Anda tidak mempunyai kebenaran untuk melihat atau edit apa-apa."
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr ""
+"Pertama sekali, masukkan nama pengguna dan kata laluan. Selepas itu, anda "
+"boleh edit pilihan pengguna yang lain"
+
+msgid "Enter a username and password."
+msgstr "Masukkan nama pengguna dan kata laluan."
+
+msgid "Change password"
+msgstr "Tukar kata laluan"
+
+msgid "Please correct the error below."
+msgstr "Sila betulkan ralat di bawah."
+
+msgid "Please correct the errors below."
+msgstr "Sila betulkan ralat-ralat di bawah."
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Masukkan kata lalauan bagi pengguna <strong>%(username)s</strong>"
+
+msgid "Welcome,"
+msgstr "Selamat datang,"
+
+msgid "View site"
+msgstr "Lihat laman"
+
+msgid "Documentation"
+msgstr "Dokumentasi"
+
+msgid "Log out"
+msgstr "Log keluar"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "Tambah %(name)s"
+
+msgid "History"
+msgstr "Sejarah"
+
+msgid "View on site"
+msgstr "Lihat di laman"
+
+msgid "Filter"
+msgstr "Tapis"
+
+msgid "Clear all filters"
+msgstr "Kosongkan kesemua tapisan"
+
+msgid "Remove from sorting"
+msgstr "Buang daripada penyusunan"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Keutamaan susunan: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Togol penyusunan"
+
+msgid "Delete"
+msgstr "Buang"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Memadam %(object_name)s '%(escaped_object)s' akan menyebabkan pembuangan "
+"objek-objek yang berkaitan, tetapi akaun anda tidak mempunyai kebenaran "
+"untuk memadam jenis-jenis objek-objek berikut:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Membuang  %(object_name)s '%(escaped_object)s' memerlukan pembuangan objek-"
+"objek berkaitan yang dilindungi:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Adakah anda pasti anda ingin membuang %(object_name)s \"%(escaped_object)s"
+"\"? Semua item-item berkaitan berikut akan turut dibuang:"
+
+msgid "Objects"
+msgstr "Objek-objek"
+
+msgid "Yes, I’m sure"
+msgstr "Ya, saya pasti"
+
+msgid "No, take me back"
+msgstr "Tidak, bawa saya kembali"
+
+msgid "Delete multiple objects"
+msgstr "Buang pelbagai objek"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Membuang %(objects_name)s akan menyebabkan pembuangan objek-objek yang "
+"berkaitan, tetapi akaun anda tidak mempunyai kebenaran to membuang jenis "
+"objek-objek berikut:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Membuang %(objects_name)s memerlukan pembuangan objek-objek berkaitan yang "
+"dilindungi:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Adakah anda pasti untuk membuang %(objects_name)s yang dipilih? Segala objek-"
+"objek berikut dan item-item yang berkaitan akan turut dibuang:"
+
+msgid "Delete?"
+msgstr "Buang?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Daripada %(filter_title)s"
+
+msgid "Summary"
+msgstr "Rumusan"
+
+msgid "Recent actions"
+msgstr "Tindakan terkini"
+
+msgid "My actions"
+msgstr "Tindakan saya"
+
+msgid "None available"
+msgstr "Tiada yang tersedia"
+
+msgid "Unknown content"
+msgstr "Kandungan tidak diketahui"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Nampaknya ada masalah dengan pemasangan pangkalan data anda. Pastikan jadual "
+"pangkalan yang bersesuaian telah di cipta, dan pastikan pangkalan data "
+"tersebut boleh dibaca oleh pengguna yang bersesuaian."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Anda telah disahkan sebagai %(username)s, tetapi anda tidak dibenarkan untuk "
+"mengakses ruangan ini. Adakah anda ingin log masuk menggunakan akaun lain?"
+
+msgid "Forgotten your password or username?"
+msgstr "Terlupa kata laluan atau nama pengguna anda?"
+
+msgid "Toggle navigation"
+msgstr "Togol navigasi"
+
+msgid "Start typing to filter…"
+msgstr "Mulakan menaip untuk menapis..."
+
+msgid "Filter navigation items"
+msgstr "Tapis item-item navigasi"
+
+msgid "Date/time"
+msgstr "Tarikh/masa"
+
+msgid "User"
+msgstr "Pengguna"
+
+msgid "Action"
+msgstr "Tindakan"
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+"Objek ini tidak mempunyai sejarah penukaran. Ini mungkin bermaksud ia tidak "
+"ditambah menggunakan laman admin ini."
+
+msgid "Show all"
+msgstr "Tunjuk semua"
+
+msgid "Save"
+msgstr "Simpan"
+
+msgid "Popup closing…"
+msgstr "Popup sedang ditutup..."
+
+msgid "Search"
+msgstr "Cari"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s keputusan"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s jumlah"
+
+msgid "Save as new"
+msgstr "Simpan sebagai baru"
+
+msgid "Save and add another"
+msgstr "Simpan dan tambah lagi"
+
+msgid "Save and continue editing"
+msgstr "Simpan dan teruskan mengedit"
+
+msgid "Save and view"
+msgstr "Simpan dan lihat"
+
+msgid "Close"
+msgstr "Tutup"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Tukar %(model)s yang dipilih"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Tambah %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Buang %(model)s pilihan"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Terima kasih kerana meluangkan masa di laman sesawang ini hari ini."
+
+msgid "Log in again"
+msgstr "Log masuk semula"
+
+msgid "Password change"
+msgstr "Pertukaran kata laluan"
+
+msgid "Your password was changed."
+msgstr "Kata laluan anda telah ditukarkan"
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Untuk tujuan keselamatan, sila masukkan kata laluan lama, kemudian masukkan "
+"kata laluan baru dua kali supaya kami dapat memastikan anda memasukkannya "
+"dengan betul."
+
+msgid "Change my password"
+msgstr "Tukar kata laluan saya"
+
+msgid "Password reset"
+msgstr "Tetap semula kata laluan"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Kata laluan anda telah ditetapkan. Sila log masuk."
+
+msgid "Password reset confirmation"
+msgstr "Pengesahan tetapan semula kata laluan"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Sila masukkan kata laluan baru anda dua kali supaya kami adpat memastikan "
+"anda memasukkannya dengan betul."
+
+msgid "New password:"
+msgstr "Kata laluan baru:"
+
+msgid "Confirm password:"
+msgstr "Sahkan kata laluan:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Pautan tetapan semula kata laluan tidak sah, mungkin kerana ia telah "
+"digunakan. Sila minta tetapan semula kata laluan yang baru."
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Kami telah menghantar panduan untuk menetapkan kata laluan anda melalui "
+"emel, sekiranya emel yang anda masukkan itu wujud. Anda sepatutnya "
+"menerimanya sebentar lagi."
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Jika anda tidak menerima emel, sila pastikan anda telah memasukkan alamat "
+"emel yang telah didaftarkan, dan semak folder spam anda."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Anda menerima emel ini kerana anda telah memohon untuk menetapkan semula "
+"kata laluan bagi akaun pengguna di %(site_name)s"
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Sila ke ruangan berikut dan pilih kata laluan baru:"
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Nama pengguna anda, sekiranya anda terlupa:"
+
+msgid "Thanks for using our site!"
+msgstr "Terima kasih kerana menggunakan laman kami!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Pasukan %(site_name)s"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+"Lupa kata laluan anda? Masukkan alamat emel anda dibawah, dan kami akan "
+"menghantar cara untuk menetapkan kata laluan baru."
+
+msgid "Email address:"
+msgstr "Alamat emel:"
+
+msgid "Reset my password"
+msgstr "Tetap semula kata laluan saya"
+
+msgid "All dates"
+msgstr "Semua tarikh"
+
+#, python-format
+msgid "Select %s"
+msgstr "Pilih %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "Pilih %s untuk diubah"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Pilih %s untuk lihat"
+
+msgid "Date:"
+msgstr "Tarikh:"
+
+msgid "Time:"
+msgstr "Masa:"
+
+msgid "Lookup"
+msgstr "Carian"
+
+msgid "Currently:"
+msgstr "Kini:"
+
+msgid "Change:"
+msgstr "Tukar:"

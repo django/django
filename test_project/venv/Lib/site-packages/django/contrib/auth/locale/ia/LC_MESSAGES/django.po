@@ -1,0 +1,310 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Martijn Dekker <mcdutchie@hotmail.com>, 2012,2021
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 09:22+0000\n"
+"Last-Translator: Transifex Bot <>\n"
+"Language-Team: Interlingua (http://www.transifex.com/django/django/language/"
+"ia/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ia\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Information personal"
+
+msgid "Permissions"
+msgstr "Permissiones"
+
+msgid "Important dates"
+msgstr "Datas importante"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Le objecto %(name)s con le clave primari %(key)r non existe."
+
+msgid "Password changed successfully."
+msgstr "Le cambio del contrasigno ha succedite."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Cambia contrasigno: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Authentication e autorisation"
+
+msgid "password"
+msgstr "contrasigno"
+
+msgid "last login"
+msgstr "ultime session"
+
+msgid "No password set."
+msgstr "Nulle contrasigno definite."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+"Le formato del contrasigno es invalide o le algorithmo de hash es incognite."
+
+msgid "The two password fields didn’t match."
+msgstr "Le duo campos de contrasigno non es identic."
+
+msgid "Password"
+msgstr "Contrasigno"
+
+msgid "Password confirmation"
+msgstr "Confirma contrasigno"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Scribe le mesme contrasigno que antea, pro verification."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+"Le contrasignos non es immagazinate in forma de texto simple, dunque il non "
+"es possibile vider le contrasigno de iste usator, ma tu pote cambiar le "
+"contrasigno con <a href=\"{}\">iste formulario</a>."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Per favor entra un %(username)s e contrasigno correcte. Nota que ambe campos "
+"pote distinguer inter majusculas e minusculas."
+
+msgid "This account is inactive."
+msgstr "Iste conto es inactive."
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "New password"
+msgstr "Nove contrasigno"
+
+msgid "New password confirmation"
+msgstr "Confirma nove contrasigno"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Le ancian contrasigno non es correcte. Per favor scribe lo de novo."
+
+msgid "Old password"
+msgstr "Ancian contrasigno"
+
+msgid "Password (again)"
+msgstr "Contrasigno (de novo)"
+
+msgid "algorithm"
+msgstr "algorithmo"
+
+msgid "iterations"
+msgstr "iterationes"
+
+msgid "salt"
+msgstr "sal"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "variety"
+msgstr "varietate"
+
+msgid "version"
+msgstr "version"
+
+msgid "memory cost"
+msgstr "costo de memoria"
+
+msgid "time cost"
+msgstr "costo de tempore"
+
+msgid "parallelism"
+msgstr "parallelismo"
+
+msgid "work factor"
+msgstr "factor de labor"
+
+msgid "checksum"
+msgstr "summa de controlo"
+
+msgid "block size"
+msgstr ""
+
+msgid "name"
+msgstr "nomine"
+
+msgid "content type"
+msgstr "typo de contento"
+
+msgid "codename"
+msgstr "nomine de codice"
+
+msgid "permission"
+msgstr "permission"
+
+msgid "permissions"
+msgstr "permissiones"
+
+msgid "group"
+msgstr "gruppo"
+
+msgid "groups"
+msgstr "gruppos"
+
+msgid "superuser status"
+msgstr "stato de superusator"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Indica que iste usator ha tote le permissiones sin assignar los "
+"explicitemente."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Le gruppos al quales iste usator pertine. Un usator recipe tote le "
+"permissiones concedite a cata un de su gruppos."
+
+msgid "user permissions"
+msgstr "permissiones de usator"
+
+msgid "Specific permissions for this user."
+msgstr "Permissiones specific pro iste usator."
+
+msgid "username"
+msgstr "nomine de usator"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Obligatori. 150 characteres o minus. Litteras, cifras e @/./+/-/_ solmente."
+
+msgid "A user with that username already exists."
+msgstr "Un usator con iste nomine de usator jam existe."
+
+msgid "first name"
+msgstr "prenomine"
+
+msgid "last name"
+msgstr "nomine de familia"
+
+msgid "email address"
+msgstr "adresse de e-mail"
+
+msgid "staff status"
+msgstr "stato de personal"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Indica si le usator pote aperir session in iste sito administrative."
+
+msgid "active"
+msgstr "active"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Indica si iste usator debe esser tractate como active. Dismarca isto in vice "
+"de deler contos."
+
+msgid "date joined"
+msgstr "data de inscription"
+
+msgid "user"
+msgstr "usator"
+
+msgid "users"
+msgstr "usatores"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Le contrasigno es troppo curte. Debe continer al minus %(min_length)d "
+"character."
+msgstr[1] ""
+"Le contrasigno es troppo curte. Debe continer al minus %(min_length)d "
+"characteres."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Le contrasigno debe continer al minus %(min_length)d character."
+msgstr[1] "Le contrasigno debe continer al minus %(min_length)d characteres."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Le contrasigno es troppo simile al %(verbose_name)s."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr ""
+"Le contrasigno non pote esser troppo similar a tu altere informationes "
+"personal."
+
+msgid "This password is too common."
+msgstr "Iste contrasigno es troppo commun."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Le contrasigno non pote esser un contrasigno communmente usate."
+
+msgid "This password is entirely numeric."
+msgstr "Iste contrasigno es toto numeric."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Le contrasigno non pote esser toto numeric."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Reinitialisation del contrasigno in %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Entra un nomine de usator valide. Pote continer solmente litteras anglese, "
+"numeros e le characteres @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Entra un nomine de usator valide. Pote continer solmente litteras, numeros e "
+"le characteres @/./+/-/_."
+
+msgid "Logged out"
+msgstr "Session claudite"
+
+msgid "Password reset"
+msgstr "Reinitialisation del contrasigno"
+
+msgid "Password reset sent"
+msgstr "Reinitialisation del contrasigno inviate"
+
+msgid "Enter new password"
+msgstr "Scribe nove contrasigno"
+
+msgid "Password reset unsuccessful"
+msgstr "Reinitialisation de contrasigno fallite"
+
+msgid "Password reset complete"
+msgstr "Contrasigno reinitialisate con successo"
+
+msgid "Password change"
+msgstr "Cambio de contrasigno"
+
+msgid "Password change successful"
+msgstr "Contrasigno cambiate con successo"

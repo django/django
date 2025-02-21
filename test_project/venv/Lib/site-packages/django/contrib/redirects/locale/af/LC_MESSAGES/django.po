@@ -1,0 +1,51 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Charl du Plessis <cjdupless@gmail.com>, 2021
+# F Wolff <friedel@translate.org.za>, 2019,2023
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2023-12-04 18:32+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019,2023\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
+"af/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: af\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Redirects"
+msgstr "Aansture"
+
+msgid "site"
+msgstr "werf"
+
+msgid "redirect from"
+msgstr "aanstuurvorm"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr ""
+"Hierdie moet ’n absolute pad wees met die domeinnaam uitgesluit. Soos "
+"byvoorbeeld: “/events/search/”."
+
+msgid "redirect to"
+msgstr "stuur aan na"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
+msgstr ""
+"Hierdie kan óf 'n absolute pad wees (soos bo) óf ’n volledige URL wees wat "
+"begin met ’n skema soos “https://”."
+
+msgid "redirect"
+msgstr "aanstuur"
+
+msgid "redirects"
+msgstr "aansture"

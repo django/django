@@ -1,0 +1,665 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Soslan Khubulov <inactive+soslan@transifex.com>, 2013
+# Soslan Khubulov <inactive+soslan@transifex.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Ossetic (http://www.transifex.com/django/django/language/"
+"os/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: os\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s хафт ӕрцыдысты."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Нӕ уайы схафын %(name)s"
+
+msgid "Are you sure?"
+msgstr "Ӕцӕг дӕ фӕнды?"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Схафын ӕвзӕрст %(verbose_name_plural)s"
+
+msgid "Administration"
+msgstr ""
+
+msgid "All"
+msgstr "Иууылдӕр"
+
+msgid "Yes"
+msgstr "О"
+
+msgid "No"
+msgstr "Нӕ"
+
+msgid "Unknown"
+msgstr "Ӕнӕбӕрӕг"
+
+msgid "Any date"
+msgstr "Цыфӕнды бон"
+
+msgid "Today"
+msgstr "Абон"
+
+msgid "Past 7 days"
+msgstr "Фӕстаг 7 бон"
+
+msgid "This month"
+msgstr "Ацы мӕй"
+
+msgid "This year"
+msgstr "Ацы аз"
+
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Дӕ хорзӕхӕй, раст кусӕджы аккаунты %(username)s ӕмӕ пароль бафысс. Дӕ сӕры "
+"дар уый, ӕмӕ дыууӕ дӕр гӕнӕн ис стыр ӕмӕ гыццыл дамгъӕ ӕвзарой."
+
+msgid "Action:"
+msgstr "Ми:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Бафтауын ӕндӕр %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Схафын"
+
+msgid "action time"
+msgstr "мийы рӕстӕг"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
+msgid "object id"
+msgstr "объекты бӕрӕггӕнӕн"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
+msgid "object repr"
+msgstr "объекты хуыз"
+
+msgid "action flag"
+msgstr "мийы флаг"
+
+msgid "change message"
+msgstr "фыстӕг фӕивын"
+
+msgid "log entry"
+msgstr "логы иуӕг"
+
+msgid "log entries"
+msgstr "логы иуӕгтӕ"
+
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "Ӕфтыд ӕрцыд \"%(object)s\"."
+
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "Ивд ӕрцыд \"%(object)s\" - %(changes)s"
+
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "Хафт ӕрцыд \"%(object)s.\""
+
+msgid "LogEntry Object"
+msgstr "ЛогыИуӕг Объект"
+
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "ӕмӕ"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Ивд бынат нӕй."
+
+msgid "None"
+msgstr "Никӕцы"
+
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Иуӕгтӕ хъуамӕ ӕвзӕрст уой, цӕмӕй цын исты ми бакӕнай. Ницы иуӕг ӕрцыд ивд."
+
+msgid "No action selected."
+msgstr "Ницы ми у ӕвзӕрст."
+
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" хафт ӕрцыд."
+
+#, python-format
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+
+#, python-format
+msgid "Add %s"
+msgstr "Бафтауын %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "Фӕивын %s"
+
+msgid "Database error"
+msgstr "Бӕрӕгдоны рӕдыд"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s ивд ӕрцыд."
+msgstr[1] "%(count)s %(name)s ивд ӕрцыдысты."
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s у ӕвзӕрст"
+msgstr[1] "%(total_count)s дӕр иууылдӕр сты ӕвзӕрст"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "%(cnt)s-ӕй 0 у ӕвзӕрст"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "Ивынты истори: %s"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+msgid "Django site admin"
+msgstr "Django сайты админ"
+
+msgid "Django administration"
+msgstr "Django администраци"
+
+msgid "Site administration"
+msgstr "Сайты администраци"
+
+msgid "Log in"
+msgstr "Бахизын"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr ""
+
+msgid "Page not found"
+msgstr "Фарс нӕ зыны"
+
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Хатыр, фӕлӕ домд фарс нӕ зыны."
+
+msgid "Home"
+msgstr "Хӕдзар"
+
+msgid "Server error"
+msgstr "Серверы рӕдыд"
+
+msgid "Server error (500)"
+msgstr "Серверы рӕдыд (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Серверы Рӕдыд <em>(500)</em>"
+
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Рӕдыд разынд. Уый тыххӕй сайты администратормӕ электрон фыстӕг ӕрвыст ӕрцыд "
+"ӕмӕ йӕ тагъд сраст кӕндзысты. Бузныг кӕй лӕууыс."
+
+msgid "Run the selected action"
+msgstr "Бакӕнын ӕвзӕрст ми"
+
+msgid "Go"
+msgstr "Бацӕуын"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Ам ныххӕц цӕмӕй алы фарсы объекттӕ равзарын"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Равзарын %(total_count)s %(module_name)s иууылдӕр"
+
+msgid "Clear selection"
+msgstr "Ӕвзӕрст асыгъдӕг кӕнын"
+
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Фыццаг бафысс фӕсномыг ӕмӕ пароль. Стӕй дӕ бон уыдзӕн фылдӕр архайӕджы "
+"фадӕттӕ ивын."
+
+msgid "Enter a username and password."
+msgstr "Бафысс фӕсномыг ӕмӕ пароль."
+
+msgid "Change password"
+msgstr "Пароль фӕивын"
+
+msgid "Please correct the error below."
+msgstr "Дӕ хорзӕхӕй, бындӕр цы рӕдыдтытӕ ис, уыдон сраст кӕн."
+
+msgid "Please correct the errors below."
+msgstr ""
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Бафысс ног пароль архайӕг <strong>%(username)s</strong>-ӕн."
+
+msgid "Welcome,"
+msgstr "Ӕгас цу,"
+
+msgid "View site"
+msgstr ""
+
+msgid "Documentation"
+msgstr "Документаци"
+
+msgid "Log out"
+msgstr "Рахизын"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "Бафтауын %(name)s"
+
+msgid "History"
+msgstr "Истори"
+
+msgid "View on site"
+msgstr "Сайты фенын"
+
+msgid "Filter"
+msgstr "Фӕрсудзӕн"
+
+msgid "Remove from sorting"
+msgstr "Радӕй айсын"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Рады приоритет: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Рад аивын"
+
+msgid "Delete"
+msgstr "Схафын"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' хафыны тыххӕй баст объекттӕ дӕр хафт "
+"ӕрцӕудзысты, фӕлӕ дӕ аккаунтӕн нӕй бар ацы объекты хуызтӕ хафын:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' хафын домы ацы хъахъхъӕд баст объекттӕ "
+"хафын дӕр:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Ӕцӕг дӕ фӕнды %(object_name)s \"%(escaped_object)s\" схафын? Ацы баст иуӕгтӕ "
+"иууылдӕр хафт ӕрцӕудзысты:"
+
+msgid "Objects"
+msgstr ""
+
+msgid "Yes, I'm sure"
+msgstr "О, ӕцӕг мӕ фӕнды"
+
+msgid "No, take me back"
+msgstr ""
+
+msgid "Delete multiple objects"
+msgstr "Цалдӕр объекты схафын"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Ӕвзӕрст %(objects_name)s хафыны тыххӕй йемӕ баст объекттӕ дӕр схафт "
+"уыдзысты, фӕлӕ дӕ аккаунтӕн нӕй бар ацы объекты хуызтӕ хафын:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Ӕвзӕрст %(objects_name)s хафын домы ацы хъахъхъӕд баст объекттӕ хафын дӕр:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Ӕцӕг дӕ фӕнды ӕвзӕрст %(objects_name)s схафын? ацы объекттӕ иууылдӕр, ӕмӕ "
+"семӕ баст иуӕгтӕ хафт ӕрцӕудзысты:"
+
+msgid "Change"
+msgstr "Фӕивын"
+
+msgid "Delete?"
+msgstr "Хъӕуы схафын?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "%(filter_title)s-мӕ гӕсгӕ"
+
+msgid "Summary"
+msgstr ""
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Моделтӕ %(name)s ӕфтуаны"
+
+msgid "Add"
+msgstr "Бафтауын"
+
+msgid "You don't have permission to edit anything."
+msgstr "Нӕй дын бар исты ивын."
+
+msgid "Recent actions"
+msgstr ""
+
+msgid "My actions"
+msgstr ""
+
+msgid "None available"
+msgstr "Ницы ис"
+
+msgid "Unknown content"
+msgstr "Ӕнӕбӕрӕг мидис"
+
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Дӕ бӕрӕгдоны цыдӕр раст ӕвӕрд нӕу. Сбӕрӕг кӕн, хъӕугӕ бӕрӕгдоны таблицӕтӕ "
+"конд кӕй сты ӕмӕ амынд архайӕгӕн бӕрӕгдон фӕрсыны бар кӕй ис, уый."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+msgid "Forgotten your password or username?"
+msgstr "Дӕ пароль кӕнӕ дӕ фӕсномыг ферох кодтай?"
+
+msgid "Date/time"
+msgstr "Бон/рӕстӕг"
+
+msgid "User"
+msgstr "Архайӕг"
+
+msgid "Action"
+msgstr "Ми"
+
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr "Ацы объектӕн ивдтыты истори нӕй. Уӕццӕгӕн ацы админӕй ӕфтыд нӕ уыд."
+
+msgid "Show all"
+msgstr "Иууылдӕр равдисын"
+
+msgid "Save"
+msgstr "Нывӕрын"
+
+msgid "Popup closing..."
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+msgid "Search"
+msgstr "Агурын"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s фӕстиуӕг"
+msgstr[1] "%(counter)s фӕстиуӕджы"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s иумӕ"
+
+msgid "Save as new"
+msgstr "Нывӕрын куыд ног"
+
+msgid "Save and add another"
+msgstr "Нывӕрын ӕмӕ ног бафтауын"
+
+msgid "Save and continue editing"
+msgstr "Нывӕрын ӕмӕ дарддӕр ивын"
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Бузныг дӕ рӕстӕг абон ацы веб сайтимӕ кӕй арвыстай."
+
+msgid "Log in again"
+msgstr "Ногӕй бахизын"
+
+msgid "Password change"
+msgstr "Пароль ивын"
+
+msgid "Your password was changed."
+msgstr "Дӕ пароль ивд ӕрцыд."
+
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Дӕ хорзӕхӕй, ӕдасдзинады тыххӕй, бафысс дӕ зӕронд пароль ӕмӕ стӕй та дыууӕ "
+"хатт дӕ нӕуӕг пароль, цӕмӕй мах сбӕлвырд кӕнӕм раст ӕй кӕй ныффыстай, уый."
+
+msgid "Change my password"
+msgstr "Мӕ пароль фӕивын"
+
+msgid "Password reset"
+msgstr "Пароль рацаразын"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Дӕ пароль ӕвӕрд ӕрцыд. Дӕ бон у дарддӕр ацӕуын ӕмӕ бахизын."
+
+msgid "Password reset confirmation"
+msgstr "Пароль ӕвӕрыны бӕлвырдгӕнӕн"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Дӕ хорзӕхӕй, дӕ ног пароль дыууӕ хатт бафысс, цӕмӕй мах сбӕрӕг кӕнӕм раст ӕй "
+"кӕй ныффыстай, уый."
+
+msgid "New password:"
+msgstr "Ног пароль:"
+
+msgid "Confirm password:"
+msgstr "Бӕлвырд пароль:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Парол ӕвӕрыны ӕрвитӕн раст нӕ уыд. Уӕццӕгӕн уый тыххӕй, ӕмӕ нырид пайдагонд "
+"ӕрцыд. Дӕ хорзӕхӕй, ӕрдом ног пароль ӕвӕрын."
+
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Кӕд ницы фыстӕг райстай, уӕд, дӕ хорзӕхӕй, сбӕрӕг кӕн цы электрон постимӕ "
+"срегистраци кодтай, уый бацамыдтай, ӕви нӕ, ӕмӕ абӕрӕг кӕн дӕ спамтӕ."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Ды райстай ацы фыстӕг, уымӕн ӕмӕ %(site_name)s-ы дӕ архайӕджы аккаунтӕн "
+"пароль сӕвӕрын ӕрдомдтай."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Дӕ хорзӕхӕй, ацу ацы фарсмӕ ӕмӕ равзар дӕ ног пароль:"
+
+msgid "Your username, in case you've forgotten:"
+msgstr "Дӕ фӕсномыг, кӕд дӕ ферох ис:"
+
+msgid "Thanks for using our site!"
+msgstr "Бузныг нӕ сайтӕй нын кӕй пайда кӕныс!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s-ы бал"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+"Ферох дӕ ис дӕ пароль? Дӕ пароль бындӕр бафысс, ӕмӕ дӕм мах email-ӕй ног "
+"пароль сывӕрыны амынд арвитдзыстӕм."
+
+msgid "Email address:"
+msgstr "Email адрис:"
+
+msgid "Reset my password"
+msgstr "Мӕ пароль ногӕй сӕвӕрын"
+
+msgid "All dates"
+msgstr "Бонтӕ иууылдӕр"
+
+#, python-format
+msgid "Select %s"
+msgstr "Равзарын %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "Равзарын %s ивынӕн"
+
+msgid "Date:"
+msgstr "Бон:"
+
+msgid "Time:"
+msgstr "Рӕстӕг:"
+
+msgid "Lookup"
+msgstr "Акӕсын"
+
+msgid "Currently:"
+msgstr "Нырыккон:"
+
+msgid "Change:"
+msgstr "Ивд:"

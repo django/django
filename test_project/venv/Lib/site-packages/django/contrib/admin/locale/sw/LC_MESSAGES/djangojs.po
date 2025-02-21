@@ -1,0 +1,217 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Machaku <bmachaku@gmail.com>, 2013-2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Swahili (http://www.transifex.com/django/django/language/"
+"sw/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sw\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "Yaliyomo: %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Hii ni orodha ya %s uliyochagua. Unaweza kuchagua baadhi vitu kwa kuvichagua "
+"katika kisanduku hapo chini kisha kubofya mshale wa \"Chagua\" kati ya "
+"visanduku viwili."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Chapisha katika kisanduku hiki ili kuchuja orodha ya %s iliyopo."
+
+msgid "Filter"
+msgstr "Chuja"
+
+msgid "Choose all"
+msgstr "Chagua vyote"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Bofya kuchagua %s kwa pamoja."
+
+msgid "Choose"
+msgstr "Chagua"
+
+msgid "Remove"
+msgstr "Ondoa"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "Chaguo la %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Hii ni orodha ya %s uliyochagua. Unaweza kuondoa baadhi vitu kwa kuvichagua "
+"katika kisanduku hapo chini kisha kubofya mshale wa \"Ondoa\" kati ya "
+"visanduku viwili."
+
+msgid "Remove all"
+msgstr "Ondoa vyote"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Bofya ili kuondoa %s chaguliwa kwa pamoja."
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "umechagua %(sel)s kati ya %(cnt)s"
+msgstr[1] "umechagua %(sel)s kati ya %(cnt)s"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Umeacha kuhifadhi mabadiliko katika uga zinazoharirika. Ikiwa utafanya tendo "
+"lingine, mabadiliko ambayo hayajahifadhiwa yatapotea."
+
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Umechagua tendo, lakini bado hujahifadhi mabadiliko yako katika uga husika. "
+"Tafadali bofya Sawa ukitaka kuhifadhi. Utahitajika kufanya upya kitendo "
+
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Umechagua tendo, lakini bado hujahifadhi mabadiliko yako katika uga husika.  "
+"Inawezekana unatafuta kitufe cha Nenda badala ya Hifadhi"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Kumbuka: Uko saa %s mbele ukilinganisha na majira ya seva"
+msgstr[1] "Kumbuka: Uko masaa %s mbele ukilinganisha na majira ya seva"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Kumbuka: Uko saa %s nyuma ukilinganisha na majira ya seva"
+msgstr[1] "Kumbuka: Uko masaa %s nyuma ukilinganisha na majira ya seva"
+
+msgid "Now"
+msgstr "Sasa"
+
+msgid "Choose a Time"
+msgstr ""
+
+msgid "Choose a time"
+msgstr "Chagua wakati"
+
+msgid "Midnight"
+msgstr "Usiku wa manane"
+
+msgid "6 a.m."
+msgstr "Saa 12 alfajiri"
+
+msgid "Noon"
+msgstr "Adhuhuri"
+
+msgid "6 p.m."
+msgstr ""
+
+msgid "Cancel"
+msgstr "Ghairi"
+
+msgid "Today"
+msgstr "Leo"
+
+msgid "Choose a Date"
+msgstr ""
+
+msgid "Yesterday"
+msgstr "Jana"
+
+msgid "Tomorrow"
+msgstr "Kesho"
+
+msgid "January"
+msgstr ""
+
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
+
+msgid "Show"
+msgstr "Onesha"
+
+msgid "Hide"
+msgstr "Ficha"

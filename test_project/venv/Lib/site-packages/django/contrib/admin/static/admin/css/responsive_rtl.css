@@ -1,0 +1,111 @@
+/* TABLETS */
+
+@media (max-width: 1024px) {
+    [dir="rtl"] .colMS {
+        margin-right: 0;
+    }
+
+    [dir="rtl"] #user-tools {
+        text-align: right;
+    }
+
+    [dir="rtl"] #changelist .actions label {
+        padding-left: 10px;
+        padding-right: 0;
+    }
+
+    [dir="rtl"] #changelist .actions select {
+        margin-left: 0;
+        margin-right: 15px;
+    }
+
+    [dir="rtl"] .change-list .filtered .results,
+    [dir="rtl"] .change-list .filtered .paginator,
+    [dir="rtl"] .filtered #toolbar,
+    [dir="rtl"] .filtered div.xfull,
+    [dir="rtl"] .filtered .actions,
+    [dir="rtl"] #changelist-filter {
+        margin-left: 0;
+    }
+
+    [dir="rtl"] .inline-group ul.tools a.add,
+    [dir="rtl"] .inline-group div.add-row a,
+    [dir="rtl"] .inline-group .tabular tr.add-row td a {
+        padding: 8px 26px 8px 10px;
+        background-position: calc(100% - 8px) 9px;
+    }
+
+    [dir="rtl"] .selector .selector-filter label {
+        margin-right: 0;
+        margin-left: 8px;
+    }
+
+    [dir="rtl"] .object-tools li {
+        float: right;
+    }
+
+    [dir="rtl"] .object-tools li + li {
+        margin-left: 0;
+        margin-right: 15px;
+    }
+
+    [dir="rtl"] .dashboard .module table td a {
+        padding-left: 0;
+        padding-right: 16px;
+    }
+
+    [dir="rtl"] .selector-add {
+        background-position: 0 -80px;
+    }
+
+    [dir="rtl"] .selector-remove {
+        background-position: 0 -120px;
+    }
+
+    [dir="rtl"] .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -100px;
+    }
+
+    [dir="rtl"] .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -140px;
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 767px) {
+    [dir="rtl"] .aligned .related-lookup,
+    [dir="rtl"] .aligned .datetimeshortcuts {
+        margin-left: 0;
+        margin-right: 15px;
+    }
+
+    [dir="rtl"] .aligned ul,
+    [dir="rtl"] form .aligned ul.errorlist {
+        margin-right: 0;
+    }
+
+    [dir="rtl"] #changelist-filter {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    [dir="rtl"] .aligned .vCheckboxLabel {
+        padding: 1px 5px 0 0;
+    }
+
+    [dir="rtl"] .selector-remove {
+        background-position: 0 0;
+    }
+
+    [dir="rtl"] .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -20px;
+    }
+
+    [dir="rtl"] .selector-add  {
+        background-position: 0 -40px;
+    }
+
+    [dir="rtl"] .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -60px;
+    }
+}

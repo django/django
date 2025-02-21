@@ -76,6 +76,10 @@ class BaseAdminTimeWidget(forms.TimeInput):
         attrs = {"class": "vTimeField", "size": "8", **(attrs or {})}
         super().__init__(attrs=attrs, format=format)
 
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["widget"]["attrs"].update({'aria-label': 'Last login, time'})
+        return context
 
 class AdminTimeWidget(BaseAdminTimeWidget):
     template_name = "admin/widgets/time.html"

@@ -438,7 +438,7 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
             'Date: <input value="2007-12-01" type="text" class="vDateField" '
             'name="test_0" size="10"><br>'
             'Time: <input value="09:30:00" type="text" class="vTimeField" '
-            'name="test_1" size="8"></p>',
+            'name="test_1" size="8" aria-label="Last login, time"></p>',
         )
 
     def test_localization(self):
@@ -452,7 +452,7 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
                 'Datum: <input value="01.12.2007" type="text" '
                 'class="vDateField" name="test_0"size="10"><br>'
                 'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
-                'name="test_1" size="8"></p>',
+                'name="test_1" size="8" aria-label="Last login, time"></p>',
             )
 
 
@@ -550,19 +550,14 @@ class AdminURLWidgetTest(SimpleTestCase):
         )
 
 
-class AdminUUIDWidgetTests(SimpleTestCase):
+class AdminTimeWidgetTest(SimpleTestCase):
     def test_attrs(self):
-        w = widgets.AdminUUIDInputWidget()
+        w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
-            w.render("test", "550e8400-e29b-41d4-a716-446655440000"),
-            '<input value="550e8400-e29b-41d4-a716-446655440000" type="text" '
-            'class="vUUIDField" name="test">',
-        )
-        w = widgets.AdminUUIDInputWidget(attrs={"class": "myUUIDInput"})
-        self.assertHTMLEqual(
-            w.render("test", "550e8400-e29b-41d4-a716-446655440000"),
-            '<input value="550e8400-e29b-41d4-a716-446655440000" type="text" '
-            'class="myUUIDInput" name="test">',
+            w.render("test", "09:30:00"),
+            '<p class="time">'
+            '<input aria-label="Last login, time" class="vTimeField" name="test" size="8" type="text" value="09:30:00">'
+            '</p>'
         )
 
 

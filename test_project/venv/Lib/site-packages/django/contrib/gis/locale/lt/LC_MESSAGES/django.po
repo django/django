@@ -1,0 +1,89 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Kostas <tamosiunas@gmail.com>, 2011
+# lauris <lauris@runbox.com>, 2011
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023
+# Matas Dailyda <matas@dailyda.com>, 2015
+# Simonas Kazlauskas <simonas@kazlauskas.me>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023\n"
+"Language-Team: Lithuanian (http://app.transifex.com/django/django/language/"
+"lt/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lt\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
+
+msgid "GIS"
+msgstr "GIS"
+
+msgid "The base GIS field."
+msgstr "Bazinis GIS laukas."
+
+msgid ""
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Bazinis geometrijos laukas — atvaizduoja OpenGIS Specification Geometry tipą."
+
+msgid "Point"
+msgstr "Taškas"
+
+msgid "Line string"
+msgstr "Atkarpa"
+
+msgid "Polygon"
+msgstr "Daugiakampis"
+
+msgid "Multi-point"
+msgstr "Taškų aibė"
+
+msgid "Multi-line string"
+msgstr "Atkarpų aibė"
+
+msgid "Multi polygon"
+msgstr "Daugiakampių aibė"
+
+msgid "Geometry collection"
+msgstr "Geometrinė kolekcija"
+
+msgid "Extent Aggregate Field"
+msgstr "Išplėsti agregato lauką"
+
+msgid "Raster Field"
+msgstr "Rastro laukas"
+
+msgid "No geometry value provided."
+msgstr "Nenurodyta geometrinė reikšmė"
+
+msgid "Invalid geometry value."
+msgstr "Netinkama geometrinė reikšmė"
+
+msgid "Invalid geometry type."
+msgstr "Netinkamas geometrinis tipas"
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr "Įvyko klaida pertvarkant geometrijos lauko SRID geometriją."
+
+msgid "Delete all Features"
+msgstr "Pašalinti visas ypatybes"
+
+msgid "Debugging window (serialized value)"
+msgstr "Derinimo langas (serijomis išdėstytos reikšmės)"
+
+msgid "No feeds are registered."
+msgstr "Nėra užregistruotų srautų."
+
+#, python-format
+msgid "Slug %r isn’t registered."
+msgstr "Adresas %r neregistruotas."

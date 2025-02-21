@@ -1,0 +1,88 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# jon_atkinson <jon@jonatkinson.co.uk>, 2011
+# Ross Poulton <ross@rossp.org>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: English (United Kingdom) (http://www.transifex.com/django/"
+"django/language/en_GB/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "GIS"
+msgstr ""
+
+msgid "The base GIS field."
+msgstr ""
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+
+msgid "Point"
+msgstr "Point"
+
+msgid "Line string"
+msgstr "Line string"
+
+msgid "Polygon"
+msgstr "Polygon"
+
+msgid "Multi-point"
+msgstr "Multi-point"
+
+msgid "Multi-line string"
+msgstr "Multi-line string"
+
+msgid "Multi polygon"
+msgstr "Multi polygon"
+
+msgid "Geometry collection"
+msgstr "Geometry collection"
+
+msgid "Extent Aggregate Field"
+msgstr ""
+
+msgid "Raster Field"
+msgstr ""
+
+msgid "No geometry value provided."
+msgstr "No geometry value provided."
+
+msgid "Invalid geometry value."
+msgstr "Invalid geometry value."
+
+msgid "Invalid geometry type."
+msgstr "Invalid geometry type."
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+
+msgid "Delete all Features"
+msgstr ""
+
+msgid "WKT debugging window:"
+msgstr ""
+
+msgid "Debugging window (serialized value)"
+msgstr ""
+
+msgid "No feeds are registered."
+msgstr "No feeds are registered."
+
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Slug %r isn't registered."

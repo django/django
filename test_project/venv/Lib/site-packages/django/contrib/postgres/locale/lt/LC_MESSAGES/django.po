@@ -1,0 +1,120 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Matas Dailyda <matas@dailyda.com>, 2015-2018
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
+"Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
+"lt/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lt\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL plėtiniai"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "%(nth)s elementų masyve yra nevalidžių:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Iterpti vienas į kitą masyvai turi būti vienodo ilgio."
+
+msgid "Map of strings to strings/nulls"
+msgstr "Susietos tekstinės reikšmės su tekstinėmis reikšmėmis/nulls"
+
+#, python-format
+msgid "The value of “%(key)s” is not a string or null."
+msgstr ""
+
+msgid "Could not load JSON data."
+msgstr "Nepavyko užkrauti JSON duomenų."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Įvestis turi būti JSON žodynas."
+
+msgid "Enter two valid values."
+msgstr "Įveskite dvi tinkamas reikšmes."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Diapazono pradžia negali būti didesnė už diapazono pabaigą."
+
+msgid "Enter two whole numbers."
+msgstr "Įveskite du sveikus skaičius."
+
+msgid "Enter two numbers."
+msgstr "Įveskite du skaičius."
+
+msgid "Enter two valid date/times."
+msgstr "Įveskite dvi tinkamas datas/laikus."
+
+msgid "Enter two valid dates."
+msgstr "Įveskite dvi tinkamas datas."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Sąrašas turi %(show_value)d elementą. Sąrašas neturėtų turėti daugiau "
+"elementų nei %(limit_value)d."
+msgstr[1] ""
+"Sąrašas turi %(show_value)d elementus. Sąrašas neturėtų turėti daugiau "
+"elementų nei %(limit_value)d."
+msgstr[2] ""
+"Sąrašas turi %(show_value)d elementų. Sąrašas neturėtų turėti daugiau "
+"elementų nei %(limit_value)d."
+msgstr[3] ""
+"Sąrašas turi %(show_value)d elementų. Sąrašas neturėtų turėti daugiau "
+"elementų nei %(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Sąrašas turi %(show_value)d elementą. Sąrašas turėtų turėti daugiau elementų "
+"nei %(limit_value)d."
+msgstr[1] ""
+"Sąrašas turi %(show_value)d elementus. Sąrašas turėtų turėti daugiau "
+"elementų nei %(limit_value)d."
+msgstr[2] ""
+"Sąrašas turi %(show_value)d elementų. Sąrašas turėtų turėti daugiau elementų "
+"nei %(limit_value)d."
+msgstr[3] ""
+"Sąrašas turi %(show_value)d elementų. Sąrašas turėtų turėti daugiau elementų "
+"nei %(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Kai kurių reikšmių nėra: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Buvo pateiktos kelios nežinomos reikšmės: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "Įsitikinkite kad diapazonas yra mažesnis arba lygus %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "Įsitikinkite kad diapazonas yra didesnis arba lygus %(limit_value)s."

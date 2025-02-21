@@ -1,0 +1,661 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Mansoorulhaq Mansoor <mnsrknp@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Urdu (http://www.transifex.com/django/django/language/ur/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ur\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s کو کامیابی سے مٹا دیا گیا۔"
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s نہیں مٹایا جا سکتا"
+
+msgid "Are you sure?"
+msgstr "آپ کو یقین ھے؟"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "منتخب شدہ %(verbose_name_plural)s مٹائیں"
+
+msgid "Administration"
+msgstr ""
+
+msgid "All"
+msgstr "تمام"
+
+msgid "Yes"
+msgstr "ھاں"
+
+msgid "No"
+msgstr "نھیں"
+
+msgid "Unknown"
+msgstr "نامعلوم"
+
+msgid "Any date"
+msgstr "کوئی تاریخ"
+
+msgid "Today"
+msgstr "آج"
+
+msgid "Past 7 days"
+msgstr "گزشتہ سات دن"
+
+msgid "This month"
+msgstr "یہ مھینہ"
+
+msgid "This year"
+msgstr "یہ سال"
+
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+
+msgid "Action:"
+msgstr "کاروائی:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "دوسرا %(verbose_name)s درج کریں"
+
+msgid "Remove"
+msgstr "خارج کریں"
+
+msgid "action time"
+msgstr "کاروائی کا وقت"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
+msgid "object id"
+msgstr "شے کا شناختی نمبر"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
+msgid "object repr"
+msgstr "شے کا نمائندہ"
+
+msgid "action flag"
+msgstr "کاروائی کا پرچم"
+
+msgid "change message"
+msgstr "پیغام تبدیل کریں"
+
+msgid "log entry"
+msgstr "لاگ کا اندراج"
+
+msgid "log entries"
+msgstr "لاگ کے اندراج"
+
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr ""
+
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr ""
+
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr ""
+
+msgid "LogEntry Object"
+msgstr ""
+
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "اور"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "کوئی خانہ تبدیل نھیں کیا گیا۔"
+
+msgid "None"
+msgstr "کوئی نھیں"
+
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"اشیاء پر کاروائی سرانجام دینے کے لئے ان کا منتخب ھونا ضروری ھے۔ کوئی شے "
+"تبدیل نھیں کی گئی۔"
+
+msgid "No action selected."
+msgstr "کوئی کاروائی منتخب نھیں کی گئی۔"
+
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" کامیابی سے مٹایا گیا تھا۔"
+
+#, python-format
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+
+#, python-format
+msgid "Add %s"
+msgstr "%s کا اضافہ کریں"
+
+#, python-format
+msgid "Change %s"
+msgstr "%s تبدیل کریں"
+
+msgid "Database error"
+msgstr "ڈیٹا بیس کی خرابی"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s کامیابی سے تبدیل کیا گیا تھا۔"
+msgstr[1] "%(count)s %(name)s کامیابی سے تبدیل کیے گئے تھے۔"
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s منتخب کیا گیا۔"
+msgstr[1] "تمام %(total_count)s منتخب کئے گئے۔"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "%(cnt)s میں سے 0 منتخب کیا گیا۔"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "%s کی تبدیلی کا تاریخ نامہ"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+msgid "Django site admin"
+msgstr "منتظم برائے جینگو سائٹ"
+
+msgid "Django administration"
+msgstr "انتظامیہ برائے جینگو سائٹ"
+
+msgid "Site administration"
+msgstr "سائٹ کی انتظامیہ"
+
+msgid "Log in"
+msgstr "اندر جائیں"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr ""
+
+msgid "Page not found"
+msgstr "صفحہ نھیں ملا"
+
+msgid "We're sorry, but the requested page could not be found."
+msgstr "ھم معذرت خواہ ھیں، مطلوبہ صفحہ نھیں مل سکا۔"
+
+msgid "Home"
+msgstr "گھر"
+
+msgid "Server error"
+msgstr "سرور کی خرابی"
+
+msgid "Server error (500)"
+msgstr "سرور کی خرابی (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "سرور کی خرابی <em>(500)</em>"
+
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+msgid "Run the selected action"
+msgstr "منتخب شدہ کاروائیاں چلائیں"
+
+msgid "Go"
+msgstr "جاؤ"
+
+msgid "Click here to select the objects across all pages"
+msgstr "تمام صفحات میں سے اشیاء منتخب کرنے کے لئے یہاں کلک کریں۔"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "تمام %(total_count)s %(module_name)s منتخب کریں"
+
+msgid "Clear selection"
+msgstr "انتخاب صاف کریں"
+
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"پہلے نام صارف اور لفظ اجازت درج کریں۔ پھر آپ مزید صارف کے حقوق مدوّن کرنے کے "
+"قابل ھوں گے۔"
+
+msgid "Enter a username and password."
+msgstr "نام صارف اور لفظ اجازت درج کریں۔"
+
+msgid "Change password"
+msgstr "لفظ اجازت تبدیل کریں"
+
+msgid "Please correct the error below."
+msgstr "براہ کرم نیچے غلطیاں درست کریں۔"
+
+msgid "Please correct the errors below."
+msgstr ""
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "صارف <strong>%(username)s</strong> کے لئے نیا لفظ اجازت درج کریں۔"
+
+msgid "Welcome,"
+msgstr "خوش آمدید،"
+
+msgid "View site"
+msgstr ""
+
+msgid "Documentation"
+msgstr "طریق استعمال"
+
+msgid "Log out"
+msgstr "باہر جائیں"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s کا اضافہ کریں"
+
+msgid "History"
+msgstr "تاریخ نامہ"
+
+msgid "View on site"
+msgstr "سائٹ پر مشاھدہ کریں"
+
+msgid "Filter"
+msgstr "چھانٹیں"
+
+msgid "Remove from sorting"
+msgstr ""
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+msgid "Toggle sorting"
+msgstr ""
+
+msgid "Delete"
+msgstr "مٹائیں"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' کو مٹانے کے نتیجے میں معتلقہ اشیاء مٹ "
+"سکتی ھیں، مگر آپ کے کھاتے کو اشیاء کی مندرجہ ذیل اقسام مٹانے کا حق حاصل نھیں "
+"ھے۔"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' کو مٹانے کے لئے مندرجہ ذیل محفوظ متعلقہ "
+"اشیاء کو مٹانے کی ضرورت پڑ سکتی ھے۔"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"واقعی آپ %(object_name)s \"%(escaped_object)s\" کو مٹانا چاہتے ھیں۔ مندرجہ "
+"ذیل تمام متعلقہ اجزاء مٹ جائیں گے۔"
+
+msgid "Objects"
+msgstr ""
+
+msgid "Yes, I'm sure"
+msgstr "ھاں، مجھے یقین ھے"
+
+msgid "No, take me back"
+msgstr ""
+
+msgid "Delete multiple objects"
+msgstr "متعدد اشیاء مٹائیں"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"منتخب شدہ %(objects_name)s کو مٹانے کے نتیجے میں متعلقہ اشیاء مٹ سکتی ھیں، "
+"لیکن آپ کے کھاتے کو اشیاء کی مندرجہ ذیل اقسام کو مٹانے کا حق حاصل نھیں ھے۔"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"منتخب شدہ %(objects_name)s کو مٹانے کے لئے مندرجہ ذیل محفوظ شدہ اشیاء کو "
+"مٹانے کی ضرورت پڑ سکتی ھے۔"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"واقعی آپ منتخب شدہ %(objects_name)s مٹانا چاھتے ھیں؟ مندرجہ ذیل اور ان سے "
+"متعلقہ تمام اشیاء حذف ھو جائیں گی۔"
+
+msgid "Change"
+msgstr "تدوین"
+
+msgid "Delete?"
+msgstr "مٹاؤں؟"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "از %(filter_title)s"
+
+msgid "Summary"
+msgstr ""
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+msgid "Add"
+msgstr "اضافہ"
+
+msgid "You don't have permission to edit anything."
+msgstr "آپ کو کوئی چیز مدوّن کرنے کا حق نھیں ھے۔"
+
+msgid "Recent actions"
+msgstr ""
+
+msgid "My actions"
+msgstr ""
+
+msgid "None available"
+msgstr "کچھ دستیاب نھیں"
+
+msgid "Unknown content"
+msgstr "نامعلوم مواد"
+
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"آپ کی ڈیٹا بیس کی تنصیب میں کوئی چیز خراب ھے۔ یقین کر لیں کہ موزون ڈیٹا بیس "
+"ٹیبل بنائے گئے تھے، اور یقین کر لیں کہ ڈیٹ بیس مناسب صارف کے پڑھے جانے کے "
+"قابل ھے۔"
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+msgid "Forgotten your password or username?"
+msgstr ""
+
+msgid "Date/time"
+msgstr "تاریخ/وقت"
+
+msgid "User"
+msgstr "صارف"
+
+msgid "Action"
+msgstr "کاروائی"
+
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"اس شے کا تبدیلی کا تاریخ نامہ نھیں ھے۔ اس کا غالباً بذریعہ اس منتظم سائٹ کے "
+"اضافہ نھیں کیا گیا۔"
+
+msgid "Show all"
+msgstr "تمام دکھائیں"
+
+msgid "Save"
+msgstr "محفوظ کریں"
+
+msgid "Popup closing..."
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+msgid "Search"
+msgstr "تلاش کریں"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s نتیجہ"
+msgstr[1] "%(counter)s نتائج"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "کل %(full_result_count)s"
+
+msgid "Save as new"
+msgstr "بطور نیا محفوظ کریں"
+
+msgid "Save and add another"
+msgstr "محفوظ کریں اور مزید اضافہ کریں"
+
+msgid "Save and continue editing"
+msgstr "محفوظ کریں اور تدوین جاری رکھیں"
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "ویب سائٹ پر آج کچھ معیاری وقت خرچ کرنے کے لئے شکریہ۔"
+
+msgid "Log in again"
+msgstr "دوبارہ اندر جائیں"
+
+msgid "Password change"
+msgstr "لفظ اجازت کی تبدیلی"
+
+msgid "Your password was changed."
+msgstr "آپ کا لفظ اجازت تبدیل کر دیا گیا تھا۔"
+
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"براہ کرم سیکیورٹی کی خاطر اپنا پرانا لفظ اجازت درج کریں اور پھر اپنا نیا لفظ "
+"اجازت دو مرتبہ درج کریں تاکہ ھم توثیق کر سکیں کہ آپ نے اسے درست درج کیا ھے۔"
+
+msgid "Change my password"
+msgstr "میرا لفظ تبدیل کریں"
+
+msgid "Password reset"
+msgstr "لفظ اجازت کی دوبارہ ترتیب"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+"آپ کا لفظ اجازت مرتب کر دیا گیا ھے۔ آپ کو آگے بڑھنے اور اندر جانے کی اجازت "
+"ھے۔"
+
+msgid "Password reset confirmation"
+msgstr "لفظ اجازت دوبارہ مرتب کرنے کی توثیق"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"براہ مھربانی اپنا نیا لفظ اجازت دو مرتبہ درج کریں تاکہ تاکہ ھم تصدیق کر سکیں "
+"کہ تم نے اسے درست درج کیا ھے۔"
+
+msgid "New password:"
+msgstr "نیا لفظ اجازت:"
+
+msgid "Confirm password:"
+msgstr "لفظ اجازت کی توثیق:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"لفظ اجازت دوبارہ مرتب کرنے کا رابطہ (لنک) غلط تھا، غالباً یہ پہلے ھی استعمال "
+"کیا چکا تھا۔ براہ مھربانی نیا لفظ اجازت مرتب کرنے کی درخواست کریں۔"
+
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "براہ مھربانی مندرجہ ذیل صفحے پر جائیں اور نیا لفظ اجازت پسند کریں:"
+
+msgid "Your username, in case you've forgotten:"
+msgstr "نام صارف، بھول جانے کی صورت میں:"
+
+msgid "Thanks for using our site!"
+msgstr "ھماری سائٹ استعمال کرنے کے لئے شکریہ"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s کی ٹیم"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+
+msgid "Email address:"
+msgstr ""
+
+msgid "Reset my password"
+msgstr "میرا لفظ اجازت دوبارہ مرتب کریں"
+
+msgid "All dates"
+msgstr "تمام تاریخیں"
+
+#, python-format
+msgid "Select %s"
+msgstr "%s منتخب کریں"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "تبدیل کرنے کے لئے %s منتخب کریں"
+
+msgid "Date:"
+msgstr "تاریخ:"
+
+msgid "Time:"
+msgstr "وقت:"
+
+msgid "Lookup"
+msgstr "ڈھونڈیں"
+
+msgid "Currently:"
+msgstr ""
+
+msgid "Change:"
+msgstr ""

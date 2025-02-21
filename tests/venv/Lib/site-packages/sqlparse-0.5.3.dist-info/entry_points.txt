@@ -1,0 +1,2 @@
+[console_scripts]
+sqlformat = sqlparse.__main__:main

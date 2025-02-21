@@ -1,0 +1,43 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
+"Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cy\n"
+"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
+"11) ? 2 : 3;\n"
+
+msgid "Content Types"
+msgstr "Mathau Cynnwys"
+
+msgid "python model class name"
+msgstr "end dosbarth model python"
+
+msgid "content type"
+msgstr "math cynnwys"
+
+msgid "content types"
+msgstr "mathau cynnwys"
+
+#, python-format
+msgid "Content type %(ct_id)s object has no associated model"
+msgstr "Does dim model cysylltiedig gyda gwrthrych math cynnwys %(ct_id)s"
+
+#, python-format
+msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgstr "Nid ydy gwrthrych %(obj_id)s math cynnwys %(ct_id)s yn bodoli"
+
+#, python-format
+msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgstr "Does dim swyddogaeth get_absolute_url() gyda'r gwrthrych %(ct_name)s"

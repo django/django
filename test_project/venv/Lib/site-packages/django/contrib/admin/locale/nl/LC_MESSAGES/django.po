@@ -1,0 +1,799 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Bas Peschier <bas.peschier@gmail.com>, 2013
+# Claude Paroz <claude@2xlibre.net>, 2017
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
+# Harro van der Klauw <hvdklauw@gmail.com>, 2012
+# Ilja Maas <iljamaas@dreamsolution.nl>, 2015
+# Jannis Leidel <jannis@leidel.info>, 2011
+# 6a27f10aef159701c7a5ff07f0fb0a78_05545ed <bc5d401a7ecd9343dd5afac265ed8ab3_4845>, 2011-2012
+# dokterbob <mathijs@mathijsfietst.nl>, 2015
+# Meteor0id, 2019-2020
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
+# Tino de Bruijn <tinodb@gmail.com>, 2011
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2024
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2024\n"
+"Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Geselecteerde %(verbose_name_plural)s verwijderen"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s met succes verwijderd."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s kan niet worden verwijderd "
+
+msgid "Are you sure?"
+msgstr "Weet u het zeker?"
+
+msgid "Administration"
+msgstr "Beheer"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nee"
+
+msgid "Unknown"
+msgstr "Onbekend"
+
+msgid "Any date"
+msgstr "Elke datum"
+
+msgid "Today"
+msgstr "Vandaag"
+
+msgid "Past 7 days"
+msgstr "Afgelopen zeven dagen"
+
+msgid "This month"
+msgstr "Deze maand"
+
+msgid "This year"
+msgstr "Dit jaar"
+
+msgid "No date"
+msgstr "Geen datum"
+
+msgid "Has date"
+msgstr "Heeft datum"
+
+msgid "Empty"
+msgstr "Leeg"
+
+msgid "Not empty"
+msgstr "Niet leeg"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Voer de correcte %(username)s en wachtwoord voor een stafaccount in. Let op "
+"dat beide velden hoofdlettergevoelig zijn."
+
+msgid "Action:"
+msgstr "Actie:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Nog een %(verbose_name)s toevoegen"
+
+msgid "Remove"
+msgstr "Verwijderen"
+
+msgid "Addition"
+msgstr "Toevoeging"
+
+msgid "Change"
+msgstr "Wijzigen"
+
+msgid "Deletion"
+msgstr "Verwijdering"
+
+msgid "action time"
+msgstr "actietijd"
+
+msgid "user"
+msgstr "gebruiker"
+
+msgid "content type"
+msgstr "inhoudstype"
+
+msgid "object id"
+msgstr "object-id"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "object-repr"
+
+msgid "action flag"
+msgstr "actievlag"
+
+msgid "change message"
+msgstr "wijzigingsbericht"
+
+msgid "log entry"
+msgstr "logboekvermelding"
+
+msgid "log entries"
+msgstr "logboekvermeldingen"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr "‘%(object)s’ toegevoegd."
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "‘%(object)s’ gewijzigd - %(changes)s"
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr "‘%(object)s’ verwijderd."
+
+msgid "LogEntry Object"
+msgstr "LogEntry-object"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr "{name} ‘{object}’ toegevoegd."
+
+msgid "Added."
+msgstr "Toegevoegd."
+
+msgid "and"
+msgstr "en"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{fields} voor {name} ‘{object}’ gewijzigd."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} gewijzigd."
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "{name} ‘{object}’ verwijderd."
+
+msgid "No fields changed."
+msgstr "Geen velden gewijzigd."
+
+msgid "None"
+msgstr "Geen"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+"Houd ‘Control’, of ‘Command’ op een Mac, ingedrukt om meerdere items te "
+"selecteren."
+
+msgid "Select this object for an action - {}"
+msgstr "Selecteer dit object voor een actie - {}"
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "De {name} ‘{obj}’ is met succes toegevoegd."
+
+msgid "You may edit it again below."
+msgstr "U kunt deze hieronder weer bewerken."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"De {name} ‘{obj}’ is met succes toegevoegd. U kunt hieronder nog een {name} "
+"toevoegen."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"De {name} ‘{obj}’ is met succes gewijzigd. U kunt deze hieronder nogmaals "
+"bewerken."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"De {name} ‘{obj}’ is met succes gewijzigd. U kunt hieronder nog een {name} "
+"toevoegen."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "De {name} ‘{obj}’ is met succes gewijzigd."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Er moeten items worden geselecteerd om acties op uit te voeren. Er zijn geen "
+"items gewijzigd."
+
+msgid "No action selected."
+msgstr "Geen actie geselecteerd."
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "De %(name)s ‘%(obj)s’ is met succes verwijderd."
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s met ID ‘%(key)s’ bestaat niet. Misschien is deze verwijderd?"
+
+#, python-format
+msgid "Add %s"
+msgstr "%s toevoegen"
+
+#, python-format
+msgid "Change %s"
+msgstr "%s wijzigen"
+
+#, python-format
+msgid "View %s"
+msgstr "%s weergeven"
+
+msgid "Database error"
+msgstr "Databasefout"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s is met succes gewijzigd."
+msgstr[1] "%(count)s %(name)s zijn met succes gewijzigd."
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s geselecteerd"
+msgstr[1] "Alle %(total_count)s geselecteerd"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 van de %(cnt)s geselecteerd"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "Wijzigingsgeschiedenis: %s"
+
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Het verwijderen van %(class_name)s %(instance)s vereist het verwijderen van "
+"de volgende beschermde gerelateerde objecten: %(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Django-websitebeheer"
+
+msgid "Django administration"
+msgstr "Django-beheer"
+
+msgid "Site administration"
+msgstr "Websitebeheer"
+
+msgid "Log in"
+msgstr "Aanmelden"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "%(app)s-beheer"
+
+msgid "Page not found"
+msgstr "Pagina niet gevonden"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Het spijt ons, maar de opgevraagde pagina kon niet worden gevonden."
+
+msgid "Home"
+msgstr "Voorpagina"
+
+msgid "Server error"
+msgstr "Serverfout"
+
+msgid "Server error (500)"
+msgstr "Serverfout (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Serverfout <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Er heeft zich een fout voorgedaan. Dit is via e-mail bij de "
+"websitebeheerders gemeld en zou snel verholpen moeten zijn. Bedankt voor uw "
+"geduld."
+
+msgid "Run the selected action"
+msgstr "De geselecteerde actie uitvoeren"
+
+msgid "Go"
+msgstr "Uitvoeren"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Klik hier om alle objecten op alle pagina's te selecteren"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Alle %(total_count)s %(module_name)s selecteren"
+
+msgid "Clear selection"
+msgstr "Selectie wissen"
+
+msgid "Breadcrumbs"
+msgstr "Broodkruimels"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modellen in de %(name)s-toepassing"
+
+msgid "Add"
+msgstr "Toevoegen"
+
+msgid "View"
+msgstr "Weergeven"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "U hebt geen rechten om iets te bekijken of te bewerken."
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr ""
+"Vul allereerst een gebruikersnaam en wachtwoord in. Daarna kunt u meer "
+"gebruikersopties bewerken."
+
+msgid "Enter a username and password."
+msgstr "Voer een gebruikersnaam en wachtwoord in."
+
+msgid "Change password"
+msgstr "Wachtwoord wijzigen"
+
+msgid "Set password"
+msgstr "Wachtwoord instellen"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Corrigeer de onderstaande fout."
+msgstr[1] "Corrigeer de onderstaande fouten."
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+"Voer een nieuw wachtwoord in voor de gebruiker <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Deze actie <strong>schakelt op wachtwoord gebaseerde authenticatie in</"
+"strong> voor deze gebruiker."
+
+msgid "Disable password-based authentication"
+msgstr "Op wachtwoord gebaseerde authenticatie uitschakelen"
+
+msgid "Enable password-based authentication"
+msgstr "Op wachtwoord gebaseerde authenticatie inschakelen"
+
+msgid "Skip to main content"
+msgstr "Naar hoofdinhoud"
+
+msgid "Welcome,"
+msgstr "Welkom,"
+
+msgid "View site"
+msgstr "Website bekijken"
+
+msgid "Documentation"
+msgstr "Documentatie"
+
+msgid "Log out"
+msgstr "Afmelden"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s toevoegen"
+
+msgid "History"
+msgstr "Geschiedenis"
+
+msgid "View on site"
+msgstr "Weergeven op website"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Hide counts"
+msgstr "Aantallen verbergen"
+
+msgid "Show counts"
+msgstr "Aantallen tonen"
+
+msgid "Clear all filters"
+msgstr "Alle filters wissen"
+
+msgid "Remove from sorting"
+msgstr "Verwijderen uit sortering"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Sorteerprioriteit: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Sortering aan/uit"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Thema wisselen (huidige thema: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Thema wisselen (huidige thema: licht)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Thema wisselen (huidige thema: donker)"
+
+msgid "Delete"
+msgstr "Verwijderen"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Het verwijderen van %(object_name)s '%(escaped_object)s' zou ook "
+"gerelateerde objecten verwijderen, maar uw account heeft geen rechten om de "
+"volgende typen objecten te verwijderen:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Het verwijderen van %(object_name)s '%(escaped_object)s' vereist het "
+"verwijderen van de volgende gerelateerde objecten:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Weet u zeker dat u %(object_name)s '%(escaped_object)s' wilt verwijderen? "
+"Alle volgende gerelateerde objecten worden verwijderd:"
+
+msgid "Objects"
+msgstr "Objecten"
+
+msgid "Yes, I’m sure"
+msgstr "Ja, ik weet het zeker"
+
+msgid "No, take me back"
+msgstr "Nee, teruggaan"
+
+msgid "Delete multiple objects"
+msgstr "Meerdere objecten verwijderen"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Het verwijderen van de geselecteerde %(objects_name)s zou ook gerelateerde "
+"objecten verwijderen, maar uw account heeft geen rechten om de volgende "
+"typen objecten te verwijderen:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Het verwijderen van de geselecteerde %(objects_name)s vereist het "
+"verwijderen van de volgende beschermde gerelateerde objecten:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Weet u zeker dat u de geselecteerde %(objects_name)s wilt verwijderen? Alle "
+"volgende objecten en hun aanverwante items zullen worden verwijderd:"
+
+msgid "Delete?"
+msgstr "Verwijderen?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Op %(filter_title)s "
+
+msgid "Summary"
+msgstr "Samenvatting"
+
+msgid "Recent actions"
+msgstr "Recente acties"
+
+msgid "My actions"
+msgstr "Mijn acties"
+
+msgid "None available"
+msgstr "Geen beschikbaar"
+
+msgid "Added:"
+msgstr "Toegevoegd:"
+
+msgid "Changed:"
+msgstr "Gewijzigd:"
+
+msgid "Deleted:"
+msgstr "Verwijderd:"
+
+msgid "Unknown content"
+msgstr "Onbekende inhoud"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Er is iets mis met de installatie van uw database. Zorg ervoor dat de juiste "
+"databasetabellen zijn aangemaakt en dat de database voor de juiste gebruiker "
+"leesbaar is."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"U bent geverifieerd als %(username)s, maar niet bevoegd om deze pagina te "
+"bekijken. Wilt u zich aanmelden bij een andere account?"
+
+msgid "Forgotten your password or username?"
+msgstr "Wachtwoord of gebruikersnaam vergeten?"
+
+msgid "Toggle navigation"
+msgstr "Navigatie aan/uit"
+
+msgid "Sidebar"
+msgstr "Zijbalk"
+
+msgid "Start typing to filter…"
+msgstr "Begin met typen om te filteren…"
+
+msgid "Filter navigation items"
+msgstr "Navigatie-items filteren"
+
+msgid "Date/time"
+msgstr "Datum/tijd"
+
+msgid "User"
+msgstr "Gebruiker"
+
+msgid "Action"
+msgstr "Actie"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "vermelding"
+msgstr[1] "vermeldingen"
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+"Dit object heeft geen wijzigingsgeschiedenis. Het is mogelijk niet via de "
+"beheerwebsite toegevoegd."
+
+msgid "Show all"
+msgstr "Alles tonen"
+
+msgid "Save"
+msgstr "Opslaan"
+
+msgid "Popup closing…"
+msgstr "Pop-up sluiten…"
+
+msgid "Search"
+msgstr "Zoeken"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s resultaat"
+msgstr[1] "%(counter)s resultaten"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s totaal"
+
+msgid "Save as new"
+msgstr "Opslaan als nieuw item"
+
+msgid "Save and add another"
+msgstr "Opslaan en nieuwe toevoegen"
+
+msgid "Save and continue editing"
+msgstr "Opslaan en opnieuw bewerken"
+
+msgid "Save and view"
+msgstr "Opslaan en weergeven"
+
+msgid "Close"
+msgstr "Sluiten"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Geselecteerde %(model)s wijzigen"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Nog een %(model)s toevoegen"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Geselecteerde %(model)s verwijderen"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Geselecteerde %(model)s weergeven"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Bedankt voor het vandaag wat tijd besteden aan de website."
+
+msgid "Log in again"
+msgstr "Opnieuw aanmelden"
+
+msgid "Password change"
+msgstr "Wachtwoordwijziging"
+
+msgid "Your password was changed."
+msgstr "Uw wachtwoord is gewijzigd."
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Voer omwille van beveiliging uw oude en twee keer uw nieuwe wachtwoord in, "
+"zodat we kunnen controleren of u geen typefouten hebt gemaakt."
+
+msgid "Change my password"
+msgstr "Mijn wachtwoord wijzigen"
+
+msgid "Password reset"
+msgstr "Wachtwoord hersteld"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Uw wachtwoord is ingesteld. U kunt nu verdergaan en zich aanmelden."
+
+msgid "Password reset confirmation"
+msgstr "Bevestiging wachtwoord herstellen"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Voer het nieuwe wachtwoord twee keer in, zodat we kunnen controleren of er "
+"geen typefouten zijn gemaakt."
+
+msgid "New password:"
+msgstr "Nieuw wachtwoord:"
+
+msgid "Confirm password:"
+msgstr "Bevestig wachtwoord:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"De link voor het herstellen van het wachtwoord is ongeldig, waarschijnlijk "
+"omdat de link al eens is gebruikt. Vraag opnieuw een wachtwoord aan."
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"We hebben u instructies gestuurd voor het instellen van uw wachtwoord, als "
+"er een account bestaat met het door u ingevoerde e-mailadres. U zou deze "
+"straks moeten ontvangen."
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Als u geen e-mail ontvangt, controleer dan of u het e-mailadres hebt "
+"ingevoerd waarmee u zich hebt geregistreerd, en controleer uw spam-map."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
+"wachtwoord voor uw account op %(site_name)s hebt gedaan."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Ga naar de volgende pagina en kies een nieuw wachtwoord:"
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn:"
+
+msgid "Thanks for using our site!"
+msgstr "Bedankt voor het gebruik van onze website!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Het %(site_name)s-team"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+"Wachtwoord vergeten? Vul hieronder uw e-mailadres in, en we sturen "
+"instructies voor het instellen van een nieuw wachtwoord."
+
+msgid "Email address:"
+msgstr "E-mailadres:"
+
+msgid "Reset my password"
+msgstr "Mijn wachtwoord opnieuw instellen"
+
+msgid "Select all objects on this page for an action"
+msgstr "Selecteer alle objecten op deze pagina voor een actie"
+
+msgid "All dates"
+msgstr "Alle datums"
+
+#, python-format
+msgid "Select %s"
+msgstr "Selecteer %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "Selecteer %s om te wijzigen"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Selecteer %s om te bekijken"
+
+msgid "Date:"
+msgstr "Datum:"
+
+msgid "Time:"
+msgstr "Tijd:"
+
+msgid "Lookup"
+msgstr "Opzoeken"
+
+msgid "Currently:"
+msgstr "Huidig:"
+
+msgid "Change:"
+msgstr "Wijzigen:"

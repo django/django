@@ -1,0 +1,332 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# HuanCheng Bai白宦成（Bestony） <xiqingongzi@gmail.com>, 2018
+# Fan Xu <xlivevil@aliyun.com>, 2022
+# jack yang, 2023
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Kaiqi Zhu, 2023
+# Kewei Ma <marknv.42@gmail.com>, 2016
+# Lele Long <schemacs@gmail.com>, 2011,2015
+# Liping Wang <lynn.config@gmail.com>, 2016
+# matthew Yip <yymmatthew@gmail.com>, 2020
+# mozillazg <opensource.mozillazg@gmail.com>, 2016
+# slene <vslene@gmail.com>, 2011
+# Veoco <one@nomox.cn>, 2021
+# spaceoi <zhangzhaoyu@gmail.com>, 2016
+# ced773123cfad7b4e8b79ca80f736af9, 2012
+# Kevin Sze <leiarix@gmail.com>, 2012
+# 高乐喆 <gaolezhe@outlook.com>, 2023
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-25 07:59+0000\n"
+"Last-Translator: jack yang, 2023\n"
+"Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
+"language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "可用 %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"这是可用的%s列表。你可以在选择框下面进行选择，然后点击两选框之间的“选择”箭"
+"头。"
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "在此框中键入以过滤可用的%s列表"
+
+msgid "Filter"
+msgstr "过滤"
+
+msgid "Choose all"
+msgstr "全选"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "点击选择全部%s。"
+
+msgid "Choose"
+msgstr "选择"
+
+msgid "Remove"
+msgstr "删除"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "选中的 %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"这是选中的 %s 的列表。你可以在选择框下面进行选择，然后点击两选框之间的“删"
+"除”箭头进行删除。"
+
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "在该框中键入以过滤所选%s的列表。"
+
+msgid "Remove all"
+msgstr "删除全部"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "删除所有已选择的%s。"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s所选选项不可见"
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "选中了 %(cnt)s 个中的 %(sel)s 个"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"你尚未保存一个可编辑栏位的变更. 如果你进行别的动作, 未保存的变更将会丢失."
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+"你已经选择一个动作，但是你没有保存你单独修改的地方。请点击OK保存。你需要再重"
+"新跑这个动作。"
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"你已经选择一个动作，但是没有单独修改任何一处。你可以选择'Go'按键而不"
+"是'Save'按键。"
+
+msgid "Now"
+msgstr "现在"
+
+msgid "Midnight"
+msgstr "午夜"
+
+msgid "6 a.m."
+msgstr "上午6点"
+
+msgid "Noon"
+msgstr "正午"
+
+msgid "6 p.m."
+msgstr "下午6点"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "注意：你比服务器时间超前 %s 个小时。"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "注意：你比服务器时间滞后 %s 个小时。"
+
+msgid "Choose a Time"
+msgstr "选择一个时间"
+
+msgid "Choose a time"
+msgstr "选择一个时间"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Today"
+msgstr "今天"
+
+msgid "Choose a Date"
+msgstr "选择一个日期"
+
+msgid "Yesterday"
+msgstr "昨天"
+
+msgid "Tomorrow"
+msgstr "明天"
+
+msgid "January"
+msgstr "一月"
+
+msgid "February"
+msgstr "二月"
+
+msgid "March"
+msgstr "三月"
+
+msgid "April"
+msgstr "四月"
+
+msgid "May"
+msgstr "五月"
+
+msgid "June"
+msgstr "六月"
+
+msgid "July"
+msgstr "七月"
+
+msgid "August"
+msgstr "八月"
+
+msgid "September"
+msgstr "九月"
+
+msgid "October"
+msgstr "十月"
+
+msgid "November"
+msgstr "十一月"
+
+msgid "December"
+msgstr "十二月"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "一月"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "二月"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "三月"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "四月"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "五月"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "六月"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "七月"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "八月"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "九月"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "十月"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "十一月"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "十二月"
+
+msgid "Sunday"
+msgstr "星期日"
+
+msgid "Monday"
+msgstr "星期一"
+
+msgid "Tuesday"
+msgstr "星期二"
+
+msgid "Wednesday"
+msgstr "星期三"
+
+msgid "Thursday"
+msgstr "星期四"
+
+msgid "Friday"
+msgstr "星期五"
+
+msgid "Saturday"
+msgstr "星期六"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "星期日"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "星期一"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "星期二"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "星期三"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "星期四"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "星期五"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "星期六"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "S"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "M"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "W"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "F"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
+
+msgid "Show"
+msgstr "显示"
+
+msgid "Hide"
+msgstr "隐藏"

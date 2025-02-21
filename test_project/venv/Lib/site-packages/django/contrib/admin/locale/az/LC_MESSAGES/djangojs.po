@@ -1,0 +1,272 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Ali Ismayilov <ali@ismailov.info>, 2011-2012
+# Emin Mastizada <emin@linux.com>, 2016,2020
+# Emin Mastizada <emin@linux.com>, 2016
+# Nicat Məmmədov <n1c4t97@gmail.com>, 2022
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
+"Last-Translator: Nicat Məmmədov <n1c4t97@gmail.com>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
+"az/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: az\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "Mümkün %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Bu, mümkün %s siyahısıdır. Onlardan bir neçəsini qarşısındakı xanaya işarə "
+"qoymaq və iki xana arasındakı \"Seç\"i tıqlamaqla seçmək olar."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Bu xanaya yazmaqla mümkün %s siyahısını filtrləyə bilərsiniz."
+
+msgid "Filter"
+msgstr "Süzgəc"
+
+msgid "Choose all"
+msgstr "Hamısını seç"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Bütün %s siyahısını seçmək üçün tıqlayın."
+
+msgid "Choose"
+msgstr "Seç"
+
+msgid "Remove"
+msgstr "Yığışdır"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "Seçilmiş %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Bu, seçilmiş %s siyahısıdır. Onlardan bir neçəsini aşağıdakı xanaya işarə "
+"qoymaq və iki xana arasındakı \"Sil\"i tıqlamaqla silmək olar."
+
+msgid "Remove all"
+msgstr "Hamısını sil"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Seçilmiş %s siyahısının hamısını silmək üçün tıqlayın."
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s / %(cnt)s seçilib"
+msgstr[1] "%(sel)s / %(cnt)s seçilib"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Bəzi sahələrdə etdiyiniz dəyişiklikləri hələ yadda saxlamamışıq. Əgər "
+"əməliyyatı işə salsanız, dəyişikliklər əldən gedəcək."
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+"Əməliyyat seçmisiniz, amma fərdi sahələrdəki dəyişiklikləriniz hələ də yadda "
+"saxlanılmayıb. Saxlamaq üçün lütfən Tamam düyməsinə klikləyin. Əməliyyatı "
+"təkrar işlətməli olacaqsınız."
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Əməliyyat seçmisiniz və fərdi sahələrdə dəyişiklər etməmisiniz. Böyük "
+"ehtimal Saxla düyməsi yerinə Get düyməsinə ehtiyyacınız var."
+
+msgid "Now"
+msgstr "İndi"
+
+msgid "Midnight"
+msgstr "Gecə yarısı"
+
+msgid "6 a.m."
+msgstr "6 a.m."
+
+msgid "Noon"
+msgstr "Günorta"
+
+msgid "6 p.m."
+msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Diqqət: Server vaxtından %s saat irəlidəsiniz."
+msgstr[1] "Diqqət: Server vaxtından %s saat irəlidəsiniz."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Diqqət: Server vaxtından %s saat geridəsiniz."
+msgstr[1] "Diqqət: Server vaxtından %s saat geridəsiniz."
+
+msgid "Choose a Time"
+msgstr "Vaxt Seçin"
+
+msgid "Choose a time"
+msgstr "Vaxtı seçin"
+
+msgid "Cancel"
+msgstr "Ləğv et"
+
+msgid "Today"
+msgstr "Bu gün"
+
+msgid "Choose a Date"
+msgstr "Tarix Seçin"
+
+msgid "Yesterday"
+msgstr "Dünən"
+
+msgid "Tomorrow"
+msgstr "Sabah"
+
+msgid "January"
+msgstr "Yanvar"
+
+msgid "February"
+msgstr "Fevral"
+
+msgid "March"
+msgstr "Mart"
+
+msgid "April"
+msgstr "Aprel"
+
+msgid "May"
+msgstr "May"
+
+msgid "June"
+msgstr "İyun"
+
+msgid "July"
+msgstr "İyul"
+
+msgid "August"
+msgstr "Avqust"
+
+msgid "September"
+msgstr "Sentyabr"
+
+msgid "October"
+msgstr "Oktyabr"
+
+msgid "November"
+msgstr "Noyabr"
+
+msgid "December"
+msgstr "Dekabr"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Yan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Fev"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "May"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "İyn"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "İyl"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Avq"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sen"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Noy"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dek"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "B"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "B"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Ç"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Ç"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "C"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "C"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "Ş"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+
+msgid "Show"
+msgstr "Göstər"
+
+msgid "Hide"
+msgstr "Gizlət"

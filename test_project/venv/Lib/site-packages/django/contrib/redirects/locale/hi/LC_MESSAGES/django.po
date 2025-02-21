@@ -1,0 +1,49 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Sandeep Satavlekar <sandysat@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Redirects"
+msgstr ""
+
+msgid "site"
+msgstr ""
+
+msgid "redirect from"
+msgstr "से अनुप्रेषित"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"डोमेन नाम को छोड़कर बाकि सब संपूर्ण पथ होना चाहिए | उदाहरण:   '/events/search'"
+
+msgid "redirect to"
+msgstr "को अनुप्रेषित"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"यह या तो एक संपूर्ण पथ  (जैसा ऊपर निर्दिष्ट किया हैं ) हो सकता है या  'http://' के साथ "
+"शुरू होनेवाला पूर्ण URL हो सकता है."
+
+msgid "redirect"
+msgstr "पुनः प्रेषित"
+
+msgid "redirects"
+msgstr "पुनः प्रेषित"

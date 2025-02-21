@@ -1,0 +1,49 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Soslan Khubulov <inactive+soslan@transifex.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2017-09-19 16:58+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Ossetic (http://www.transifex.com/django/django/language/"
+"os/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: os\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Redirects"
+msgstr ""
+
+msgid "site"
+msgstr ""
+
+msgid "redirect from"
+msgstr "арвитӕны формӕ"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Ай хъуамӕ уа ӕнӕ домены ном абсолютон фӕт. Цӕвиддон: '/events/search/'."
+
+msgid "redirect to"
+msgstr "арвитӕн ардӕм"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Ай гӕнӕн ис уа абсолютон фӕт (куыд уӕлийӕ) кӕнӕ 'http://'-йӕ байдайгӕ "
+"ӕнӕхъӕн URL."
+
+msgid "redirect"
+msgstr "арвитӕн"
+
+msgid "redirects"
+msgstr "арвитӕнтӕ"

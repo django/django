@@ -1,0 +1,639 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Kannada (http://www.transifex.com/django/django/language/"
+"kn/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: kn\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr "ಖಚಿತಪಡಿಸುವಿರಾ? "
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
+
+msgid "Administration"
+msgstr ""
+
+msgid "All"
+msgstr "ಎಲ್ಲಾ"
+
+msgid "Yes"
+msgstr "ಹೌದು"
+
+msgid "No"
+msgstr "ಇಲ್ಲ"
+
+msgid "Unknown"
+msgstr "ಗೊತ್ತಿಲ್ಲ(ದ/ದ್ದು)"
+
+msgid "Any date"
+msgstr "ಯಾವುದೇ ದಿನಾಂಕ"
+
+msgid "Today"
+msgstr "ಈದಿನ"
+
+msgid "Past 7 days"
+msgstr "ಕಳೆದ ೭ ದಿನಗಳು"
+
+msgid "This month"
+msgstr "ಈ ತಿಂಗಳು"
+
+msgid "This year"
+msgstr "ಈ ವರ್ಷ"
+
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+
+msgid "Action:"
+msgstr ""
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+msgid "Remove"
+msgstr "ತೆಗೆದು ಹಾಕಿ"
+
+msgid "action time"
+msgstr "ಕ್ರಮದ(ಕ್ರಿಯೆಯ) ಸಮಯ"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
+msgid "object id"
+msgstr "ವಸ್ತುವಿನ ಐಡಿ"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
+msgid "object repr"
+msgstr "ವಸ್ತು ಪ್ರಾತಿನಿಧ್ಯ"
+
+msgid "action flag"
+msgstr "ಕ್ರಮದ(ಕ್ರಿಯೆಯ) ಪತಾಕೆ"
+
+msgid "change message"
+msgstr "ಬದಲಾವಣೆಯ ಸಂದೇಶ/ಸಂದೇಶ ಬದಲಿಸಿ"
+
+msgid "log entry"
+msgstr "ಲಾಗ್ ದಾಖಲೆ"
+
+msgid "log entries"
+msgstr "ಲಾಗ್ ದಾಖಲೆಗಳು"
+
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr ""
+
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr ""
+
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr ""
+
+msgid "LogEntry Object"
+msgstr ""
+
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "ಮತ್ತು"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "ಯಾವುದೇ ಅಂಶಗಳು ಬದಲಾಗಲಿಲ್ಲ."
+
+msgid "None"
+msgstr ""
+
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+msgid "No action selected."
+msgstr ""
+
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" ಯಶಸ್ವಿಯಾಗಿ ಅಳಿಸಲಾಯಿತು."
+
+#, python-format
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+
+#, python-format
+msgid "Add %s"
+msgstr "%s ಸೇರಿಸಿ"
+
+#, python-format
+msgid "Change %s"
+msgstr "%s ಅನ್ನು ಬದಲಿಸು"
+
+msgid "Database error"
+msgstr "ದತ್ತಸಂಚಯದ ದೋಷ"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] ""
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#, python-format
+msgid "Change history: %s"
+msgstr "ಬದಲಾವಣೆಗಳ ಇತಿಹಾಸ: %s"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+msgid "Django site admin"
+msgstr "ಜಾಂಗೋ ತಾಣದ ಆಡಳಿತಗಾರರು"
+
+msgid "Django administration"
+msgstr "ಜಾಂಗೋ ಆಡಳಿತ"
+
+msgid "Site administration"
+msgstr "ತಾಣ ನಿರ್ವಹಣೆ"
+
+msgid "Log in"
+msgstr "ಒಳಗೆ ಬನ್ನಿ"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr ""
+
+msgid "Page not found"
+msgstr "ಪುಟ ಸಿಗಲಿಲ್ಲ"
+
+msgid "We're sorry, but the requested page could not be found."
+msgstr "ಕ್ಷಮಿಸಿ, ನೀವು ಕೇಳಿದ ಪುಟ ಸಿಗಲಿಲ್ಲ"
+
+msgid "Home"
+msgstr "ಪ್ರಾರಂಭಸ್ಥಳ(ಮನೆ)"
+
+msgid "Server error"
+msgstr "ಸರ್ವರ್ ದೋಷ"
+
+msgid "Server error (500)"
+msgstr "ಸರ್ವರ್ ದೋಷ(೫೦೦)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "ಸರ್ವರ್ ದೋಷ<em>(೫೦೦)</em>"
+
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+msgid "Run the selected action"
+msgstr ""
+
+msgid "Go"
+msgstr "ಹೋಗಿ"
+
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+msgid "Clear selection"
+msgstr ""
+
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"ಮೊದಲು ಬಳಕೆದಾರ-ಹೆಸರು ಮತ್ತು ಪ್ರವೇಶಪದವನ್ನು ಕೊಡಿರಿ. ನಂತರ, ನೀವು ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳನ್ನು  "
+"ಬದಲಿಸಬಹುದಾಗಿದೆ."
+
+msgid "Enter a username and password."
+msgstr ""
+
+msgid "Change password"
+msgstr "ಪ್ರವೇಶಪದ ಬದಲಿಸಿ"
+
+msgid "Please correct the error below."
+msgstr ""
+
+msgid "Please correct the errors below."
+msgstr ""
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+msgid "Welcome,"
+msgstr "ಸುಸ್ವಾಗತ."
+
+msgid "View site"
+msgstr ""
+
+msgid "Documentation"
+msgstr "ವಿವರಮಾಹಿತಿ"
+
+msgid "Log out"
+msgstr "ಹೊರಕ್ಕೆ ಹೋಗಿ"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s ಸೇರಿಸಿ"
+
+msgid "History"
+msgstr "ಚರಿತ್ರೆ"
+
+msgid "View on site"
+msgstr "ತಾಣದಲ್ಲಿ ನೋಡಿ"
+
+msgid "Filter"
+msgstr "ಸೋಸಕ"
+
+msgid "Remove from sorting"
+msgstr ""
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+msgid "Toggle sorting"
+msgstr ""
+
+msgid "Delete"
+msgstr "ಅಳಿಸಿಹಾಕಿ"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"'%(escaped_object)s'  %(object_name)s ಅನ್ನು ತೆಗೆದುಹಾಕುವುದರಿಂದ ಸಂಬಂಧಿತ ವಸ್ತುಗಳೂ "
+"ಕಳೆದುಹೋಗುತ್ತವೆ. ಆದರೆ ನಿಮ್ಮ ಖಾತೆಗೆ ಕೆಳಕಂಡ ಬಗೆಗಳ ವಸ್ತುಗಳನ್ನು ತೆಗೆದುಹಾಕಲು "
+"ಅನುಮತಿಯಿಲ್ಲ."
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+msgid "Objects"
+msgstr ""
+
+msgid "Yes, I'm sure"
+msgstr "ಹೌದು,ನನಗೆ ಖಚಿತವಿದೆ"
+
+msgid "No, take me back"
+msgstr ""
+
+msgid "Delete multiple objects"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+msgid "Change"
+msgstr "ಬದಲಿಸಿ/ಬದಲಾವಣೆ"
+
+msgid "Delete?"
+msgstr ""
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "%(filter_title)s ಇಂದ"
+
+msgid "Summary"
+msgstr ""
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+msgid "Add"
+msgstr "ಸೇರಿಸಿ"
+
+msgid "You don't have permission to edit anything."
+msgstr "ಯಾವುದನ್ನೂ ತಿದ್ದಲು ನಿಮಗೆ ಅನುಮತಿ ಇಲ್ಲ ."
+
+msgid "Recent actions"
+msgstr ""
+
+msgid "My actions"
+msgstr ""
+
+msgid "None available"
+msgstr "ಯಾವುದೂ ಲಭ್ಯವಿಲ್ಲ"
+
+msgid "Unknown content"
+msgstr ""
+
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"ಡಾಟಾಬೇಸನ್ನು ಇನ್ಸ್ಟಾಲ್ ಮಾಡುವಾಗ ಏನೋ ತಪ್ಪಾಗಿದೆ. ಸೂಕ್ತ  ಡಾಟಾಬೇಸ್ ಕೋಷ್ಟಕಗಳು ರಚನೆಯಾಗಿ ಅರ್ಹ "
+"ಬಳಕೆದಾರರು ಅವುಗಳನ್ನು ಓದಬಹುದಾಗಿದೆಯೇ ಎಂಬುದನ್ನು ಖಾತರಿ ಪಡಿಸಿಕೊಳ್ಳಿ."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+msgid "Forgotten your password or username?"
+msgstr ""
+
+msgid "Date/time"
+msgstr "ದಿನಾಂಕ/ಸಮಯ"
+
+msgid "User"
+msgstr "ಬಳಕೆದಾರ"
+
+msgid "Action"
+msgstr "ಕ್ರಮ(ಕ್ರಿಯೆ)"
+
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"ಈ ವಸ್ತುವಿಗೆ ಬದಲಾವಣೆಯ ಇತಿಹಾಸವಿಲ್ಲ. ಅದು ಬಹುಶಃ ಈ ಆಡಳಿತತಾಣದ ಮೂಲಕ ಸೇರಿಸಲ್ಪಟ್ಟಿಲ್ಲ."
+
+msgid "Show all"
+msgstr "ಎಲ್ಲವನ್ನೂ ತೋರಿಸು"
+
+msgid "Save"
+msgstr "ಉಳಿಸಿ"
+
+msgid "Popup closing..."
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "ಒಟ್ಟು %(full_result_count)s"
+
+msgid "Save as new"
+msgstr "ಹೊಸದರಂತೆ ಉಳಿಸಿ"
+
+msgid "Save and add another"
+msgstr "ಉಳಿಸಿ ಮತ್ತು ಇನ್ನೊಂದನ್ನು ಸೇರಿಸಿ"
+
+msgid "Save and continue editing"
+msgstr "ಉಳಿಸಿ ಮತ್ತು ತಿದ್ದುವುದನ್ನು ಮುಂದುವರಿಸಿರಿ."
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "ಈದಿನ ತಮ್ಮ ಅತ್ಯಮೂಲ್ಯವಾದ ಸಮಯವನ್ನು ನಮ್ಮ ತಾಣದಲ್ಲಿ ಕಳೆದುದಕ್ಕಾಗಿ ಧನ್ಯವಾದಗಳು."
+
+msgid "Log in again"
+msgstr "ಮತ್ತೆ ಒಳಬನ್ನಿ"
+
+msgid "Password change"
+msgstr "ಪ್ರವೇಶಪದ ಬದಲಾವಣೆ"
+
+msgid "Your password was changed."
+msgstr "ನಿಮ್ಮ ಪ್ರವೇಶಪದ ಬದಲಾಯಿಸಲಾಗಿದೆ"
+
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"ಭದ್ರತೆಯ ದೃಷ್ಟಿಯಿಂದ ದಯವಿಟ್ಟು ನಿಮ್ಮ ಹಳೆಯ ಪ್ರವೇಶಪದವನ್ನು ಸೂಚಿಸಿರಿ. ಆನಂತರ ನೀವು ಸರಿಯಾಗಿ "
+"ಬರೆದಿದ್ದೀರೆಂದು ನಾವು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಲು   ಹೊಸ ಪ್ರವೇಶಪದವನ್ನು ಎರಡು ಬಾರಿ ಬರೆಯಿರಿ."
+
+msgid "Change my password"
+msgstr "ನನ್ನ ಪ್ರವೇಶಪದ ಬದಲಿಸಿ"
+
+msgid "Password reset"
+msgstr "ಪ್ರವೇಶಪದವನ್ನು ಬದಲಿಸುವಿಕೆ"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+msgid "Password reset confirmation"
+msgstr ""
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+msgid "New password:"
+msgstr "ಹೊಸ ಪ್ರವೇಶಪದ:"
+
+msgid "Confirm password:"
+msgstr "ಪ್ರವೇಶಪದವನ್ನು ಖಚಿತಪಡಿಸಿ:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+msgid "Your username, in case you've forgotten:"
+msgstr "ನೀವು ಮರೆತಿದ್ದಲ್ಲಿ , ನಿಮ್ಮ ಬಳಕೆದಾರ-ಹೆಸರು"
+
+msgid "Thanks for using our site!"
+msgstr "ನಮ್ಮ ತಾಣವನ್ನು ಬಳಸಿದ್ದಕ್ದಾಗಿ ಧನ್ಯವಾದಗಳು!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s ತಂಡ"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+
+msgid "Email address:"
+msgstr ""
+
+msgid "Reset my password"
+msgstr "ನನ್ನ ಪ್ರವೇಶಪದವನ್ನು ಮತ್ತೆ ನಿರ್ಧರಿಸಿ "
+
+msgid "All dates"
+msgstr "ಎಲ್ಲಾ ದಿನಾಂಕಗಳು"
+
+#, python-format
+msgid "Select %s"
+msgstr "%s ಆಯ್ದುಕೊಳ್ಳಿ"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "ಬದಲಾಯಿಸಲು %s ಆಯ್ದುಕೊಳ್ಳಿ"
+
+msgid "Date:"
+msgstr "ದಿನಾಂಕ:"
+
+msgid "Time:"
+msgstr "ಸಮಯ:"
+
+msgid "Lookup"
+msgstr ""
+
+msgid "Currently:"
+msgstr ""
+
+msgid "Change:"
+msgstr ""

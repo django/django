@@ -1,0 +1,56 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ module_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}">{{ object|truncatewords:"18" }}</a>
+&rsaquo; {% translate 'History' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+<div id="change-history" class="module">
+
+{% if action_list %}
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">{% translate 'Date/time' %}</th>
+            <th scope="col">{% translate 'User' %}</th>
+            <th scope="col">{% translate 'Action' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for action in action_list %}
+        <tr>
+            <th scope="row">{{ action.action_time|date:"DATETIME_FORMAT" }}</th>
+            <td>{{ action.user.get_username }}{% if action.user.get_full_name %} ({{ action.user.get_full_name }}){% endif %}</td>
+            <td>{{ action.get_change_message }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p class="paginator">
+      {% if pagination_required %}
+        {% for i in page_range %}
+          {% if i == action_list.paginator.ELLIPSIS %}
+            {{ action_list.paginator.ELLIPSIS }}
+          {% elif i == action_list.number %}
+            <span class="this-page">{{ i }}</span>
+          {% else %}
+            <a href="?{{ page_var }}={{ i }}" {% if i == action_list.paginator.num_pages %} class="end" {% endif %}>{{ i }}</a>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {{ action_list.paginator.count }} {% blocktranslate count counter=action_list.paginator.count %}entry{% plural %}entries{% endblocktranslate %}
+    </p>
+{% else %}
+    <p>{% translate 'This object doesn’t have a change history. It probably wasn’t added via this admin site.' %}</p>
+{% endif %}
+</div>
+</div>
+{% endblock %}
