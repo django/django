@@ -27,8 +27,13 @@ implications, please send a description of the issue via email to
 team <https://www.djangoproject.com/foundation/teams/#security-team>`_.
 
 Once you've submitted an issue via email, you should receive an acknowledgment
-from a member of the security team within 48 hours, and depending on the
-action to be taken, you may receive further followup emails.
+from a member of the security team within 3 working days. After that, the
+security team will begin their analysis. Depending on the action to be taken,
+you may receive followup emails. It can take several weeks before the security
+team comes to a conclusion. There is no need to chase the security team unless
+you discover new, relevant information. All reports aim to be resolved within
+the industry-standard 90 days. Confirmed vulnerabilities with a
+:ref:`high severity level <severity-levels>` will be addressed promptly.
 
 .. admonition:: Sending encrypted reports
 
@@ -110,20 +115,15 @@ will not issue patches or new releases for those versions.
 
 .. _main development branch: https://github.com/django/django/
 
-.. _security-disclosure:
+.. _severity-levels:
 
-How Django discloses security issues
-====================================
+Security issue severity levels
+==============================
 
-Our process for taking a security issue from private discussion to
-public disclosure involves multiple steps.
+The severity level of a security vulnerability is determined by the attack
+type.
 
-Approximately one week before public disclosure, we send two notifications:
-
-First, we notify |django-announce| of the date and approximate time of the
-upcoming security release, as well as the severity of the issues. This is to
-aid organizations that need to ensure they have staff available to handle
-triaging our announcement and upgrade Django as needed. Severity levels are:
+Severity levels are:
 
 * **High**
 
@@ -143,6 +143,21 @@ triaging our announcement and upgrade Django as needed. Severity levels are:
   * Broken session management
   * Unvalidated redirects/forwards
   * Issues requiring an uncommon configuration option
+
+.. _security-disclosure:
+
+How Django discloses security issues
+====================================
+
+Our process for taking a security issue from private discussion to
+public disclosure involves multiple steps.
+
+Approximately one week before public disclosure, we send two notifications:
+
+First, we notify |django-announce| of the date and approximate time of the
+upcoming security release, as well as the severity of the issues. This is to
+aid organizations that need to ensure they have staff available to handle
+triaging our announcement and upgrade Django as needed.
 
 Second, we notify a list of :ref:`people and organizations
 <security-notifications>`, primarily composed of operating-system vendors and
