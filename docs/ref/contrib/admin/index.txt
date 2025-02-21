@@ -2614,6 +2614,13 @@ we can do this with inline admin models. Suppose we have the following models::
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
+        class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["person", "group"], name="unique_person_group"
+                )
+            ]
+
 The first step in displaying this intermediate model in the admin is to
 define an inline class for the ``Membership`` model::
 
