@@ -43,6 +43,131 @@ the industry-standard 90 days. Confirmed vulnerabilities with a
 
 .. _our public Trac instance: https://code.djangoproject.com/query
 
+Reporting guidelines
+--------------------
+
+Include a runnable proof of concept
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please privately share a minimal Django project or code snippet that
+demonstrates the potential vulnerability. Include clear instructions on how to
+set up, run, and reproduce the issue.
+
+Please do not attach screenshots of code.
+
+User input must be sanitized
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Reports based on a failure to sanitize user input are not valid security
+vulnerabilities. It is the developer's responsibility to properly handle user
+input. This principle is explained in our :ref:`security documentation
+<sanitize-user-input>`.
+
+For example, the following is **not considered valid** because ``email`` has
+not been sanitized::
+
+    from django.core.mail import send_mail
+    from django.http import JsonResponse
+
+
+    def my_proof_of_concept(request):
+        email = request.GET.get("email", "")
+        send_mail("Email subject", "Email body", email, ["admin@example.com"])
+        return JsonResponse(status=200)
+
+Developers must **always validate and sanitize input** before using it. The
+correct approach would be to use a Django form to ensure ``email`` is properly
+validated::
+
+    from django import forms
+    from django.core.mail import send_mail
+    from django.http import JsonResponse
+
+
+    class EmailForm(forms.Form):
+        email = forms.EmailField()
+
+
+    def my_proof_of_concept(request):
+        form = EmailForm(request.GET)
+        if form.is_valid():
+            send_mail(
+                "Email subject",
+                "Email body",
+                form.cleaned_data["email"],
+                ["admin@example.com"],
+            )
+            return JsonResponse(status=200)
+        return JsonResponse(form.errors, status=400)
+
+Similarly, as Django's raw SQL constructs (such as :meth:`~.QuerySet.extra` and
+:class:`.RawSQL` expression) provide developers with full control over the
+query, they are insecure if user input is not properly handled. As explained in
+our :ref:`security documentation <sql-injection-protection>`, it is the
+developer's responsibility to safely process user input for these functions.
+
+For instance, the following is **not considered valid** because ``query`` has
+not been sanitized::
+
+    from django.shortcuts import HttpResponse
+    from .models import MyModel
+
+
+    def my_proof_of_concept(request):
+        query = request.GET.get("query", "")
+        q = MyModel.objects.extra(select={"id": query})
+        return HttpResponse(q.values())
+
+Request headers and URLs must be under 8K bytes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To prevent denial-of-service (DoS) attacks, production-grade servers impose
+limits on request header and URL sizes. For example, by default Gunicorn allows
+up to roughly:
+
+* `4k bytes for a URL`_
+* `8K bytes for a request header`_
+
+Other web servers, such as Nginx and Apache, have similar restrictions to
+prevent excessive resource consumption.
+
+Consequently, the Django security team will not consider reports that rely on
+request headers or URLs exceeding 8K bytes, as such inputs are already
+mitigated at the server level in production environments.
+
+.. admonition:: :djadmin:`runserver` should never be used in production
+
+    Django's built-in development server does not enforce these limits because
+    it is not designed to be a production server.
+
+.. _`4k bytes for a URL`: https://docs.gunicorn.org/en/stable/settings.html#limit-request-line
+.. _`8k bytes for a request header`: https://docs.gunicorn.org/en/stable/settings.html#limit-request-field-size
+
+The request body must be under 2.5 MB
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` setting limits the default maximum
+request body size to 2.5 MB.
+
+As this is enforced on all production-grade Django projects by default, a proof
+of concept must not exceed 2.5 MB in the request body to be considered valid.
+
+Issues resulting from large, but potentially reasonable setting values, should
+be reported using the `public ticket tracker`_ for hardening.
+
+.. _public ticket tracker: https://code.djangoproject.com/
+
+Code under test must feasibly exist in a Django project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The proof of concept must plausibly occur in a production-grade Django
+application, reflecting real-world scenarios and following standard development
+practices.
+
+Django contains many private and undocumented functions that are not part of
+its public API. If a vulnerability depends on directly calling these internal
+functions in an unsafe way, it will not be considered a valid security issue.
+
 .. _security-report-evaluation:
 
 How does Django evaluate a report
