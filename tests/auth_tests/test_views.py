@@ -1703,7 +1703,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         )
         algo, salt, hash_string = u.password.split("$")
         self.assertContains(response, '<div class="readonly">testclient</div>')
-        # ReadOnlyPasswordHashWidget is used to render the field.
+        # The password value is hashed.
         self.assertContains(
             response,
             "<strong>algorithm</strong>: <bdi>%s</bdi>\n\n"
@@ -1715,6 +1715,9 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
                 hash_string[:6],
             ),
             html=True,
+        )
+        self.assertNotContains(
+            response, '<a class="button" href="../password/">Reset password</a>'
         )
         # Value in POST data is ignored.
         data = self.get_user_data(u)
