@@ -8,6 +8,7 @@ from urllib.parse import quote as urlquote
 from urllib.parse import urlsplit
 
 from django import forms
+from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import helpers, widgets
@@ -71,6 +72,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
 IS_POPUP_VAR = "_popup"
+SOURCE_MODEL_VAR = "_source_model"
 TO_FIELD_VAR = "_to_field"
 IS_FACETS_VAR = "_facets"
 
@@ -1343,6 +1345,7 @@ class ModelAdmin(BaseModelAdmin):
                 "save_on_top": self.save_on_top,
                 "to_field_var": TO_FIELD_VAR,
                 "is_popup_var": IS_POPUP_VAR,
+                "source_model_var": SOURCE_MODEL_VAR,
                 "app_label": app_label,
             }
         )
@@ -1399,12 +1402,30 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
-            popup_response_data = json.dumps(
-                {
-                    "value": str(value),
-                    "obj": str(obj),
-                }
-            )
+            popup_response = {
+                "value": str(value),
+                "obj": str(obj),
+            }
+
+            # Find the optgroup for the new item, if available
+            source_model_name = request.POST.get(SOURCE_MODEL_VAR)
+            if source_model_name:
+                app_label, model_name = source_model_name.split(".")
+                source_model = apps.get_model(app_label, model_name)
+                form_class = self.admin_site._registry[source_model].form
+                if (
+                    hasattr(form_class, "_meta")
+                    and hasattr(form_class._meta, "fields")
+                    and form_class._meta.fields is not None
+                    and self.opts.verbose_name_plural in form_class._meta.fields
+                ):
+                    choices = form_class().fields[self.opts.verbose_name_plural].choices
+                    for optgroup, choices in choices:
+                        for name, choice_obj in choices:
+                            if choice_obj == str(obj):
+                                popup_response["optgroup"] = optgroup
+
+            popup_response_data = json.dumps(popup_response)
             return TemplateResponse(
                 request,
                 self.popup_response_template
@@ -1914,6 +1935,7 @@ class ModelAdmin(BaseModelAdmin):
             "object_id": object_id,
             "original": obj,
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
+            "source_model": request.GET.get(SOURCE_MODEL_VAR),
             "to_field": to_field,
             "media": media,
             "inline_admin_formsets": inline_formsets,
