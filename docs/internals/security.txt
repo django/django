@@ -168,6 +168,32 @@ Django contains many private and undocumented functions that are not part of
 its public API. If a vulnerability depends on directly calling these internal
 functions in an unsafe way, it will not be considered a valid security issue.
 
+Content displayed by the Django Template Language must be under 100 KB
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Django Template Language (DTL) is designed for building the content needed
+to display web pages. In particular its text filters are meant for that kind of
+usage.
+
+For reference, the complete works of Shakespeare have about 3.5 million bytes
+in plain-text ASCII encoding. Displaying such in a single request is beyond the
+scope of almost all websites, and so outside the scope of the DTL too.
+
+Text processing is expensive. Django makes no guarantee that DTL text filters
+are never subject to degraded performance if passed deliberately crafted,
+sufficiently large inputs. Under default configurations, Django makes it
+difficult for sites to accidentally accept such payloads from untrusted
+sources, but, if it is necessary to display large amounts of user-provided
+content, it’s important that basic security measures are taken.
+
+User-provided content should always be constrained to known maximum length. It
+should be filtered to remove malicious content, and validated to match expected
+formats. It should then be processed offline, if necessary, before being
+displayed.
+
+Proof of concepts which use over 100 KB of data to be processed by the DTL will
+be considered invalid.
+
 .. _security-report-evaluation:
 
 How does Django evaluate a report
