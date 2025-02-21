@@ -1,3 +1,4 @@
+import gc
 from unittest.mock import MagicMock, patch
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
@@ -59,6 +60,43 @@ class DatabaseWrapperTests(SimpleTestCase):
     def test_check_database_version_supported_with_none_as_database_version(self):
         with patch.object(connection.features, "minimum_database_version", None):
             connection.check_database_version_supported()
+
+    def test_release_memory_without_garbage_collection(self):
+        try:
+            # Disable automatic garbage collection. To have control over when
+            # garbage collection is performed. This is necessary to ensure that another
+            # thread doesn't accidentally trigger it by simply executing code.
+            gc.disable()
+
+            # Delete the garbage list(`gc.garbage`) to ensure that other tests don't
+            # interfere with this test.
+            gc.collect()
+
+            # Set the garbage collection debugging flag to store all unreachable
+            # objects in `gc.garbage`. This is necessary to ensure that the
+            # garbage list is empty after the `DatabaseConnectionWrapper` is
+            # marked as garbage. Otherwise, the test will always pass.
+            # The garbage list isn't automatically populated because it costs
+            # extra CPU cycles
+            gc.set_debug(gc.DEBUG_SAVEALL)
+
+            # Create and close a connection. This should mark all the objects
+            # related to the connection as garbage.
+            connection.copy().close()
+
+            # Enforce garbage collection to populate the garbage list for inspection.
+            gc.collect()
+
+            # Ensure that the garbage list is empty. The garbage list is only valid
+            # until the next collection cycle so we can only make assertions about it
+            # before re-enabling automatic collection.
+            self.assertEqual(gc.garbage, [])
+        finally:
+            # Clean up the garbage collection settings. Re-enable automatic garbage
+            # collection. This step is mandatory to avoid running other tests without
+            # automatic garbage collection.
+            gc.set_debug(0)
+            gc.enable()
 
 
 class DatabaseWrapperLoggingTests(TransactionTestCase):
