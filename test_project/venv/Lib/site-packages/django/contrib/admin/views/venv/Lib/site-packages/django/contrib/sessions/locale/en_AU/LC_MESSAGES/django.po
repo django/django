@@ -1,0 +1,36 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Tom Fifield <tom@tomfifield.net>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2021-04-11 13:15+0000\n"
+"Last-Translator: Tom Fifield <tom@tomfifield.net>\n"
+"Language-Team: English (Australia) (http://www.transifex.com/django/django/"
+"language/en_AU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_AU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Sessions"
+msgstr "Sessions"
+
+msgid "session key"
+msgstr "session key"
+
+msgid "session data"
+msgstr "session data"
+
+msgid "expire date"
+msgstr "expire date"
+
+msgid "session"
+msgstr "session"
+
+msgid "sessions"
+msgstr "sessions"

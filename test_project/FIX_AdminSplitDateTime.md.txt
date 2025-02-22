@@ -1,0 +1,25 @@
+# Fix for AdminSplitDateTime Accessibility Issue
+
+## **Issue Description**
+The `AdminSplitDateTime` widget in Django Admin does not properly associate labels with its input fields, causing accessibility issues. Screen readers do not announce the date and time fields correctly.
+
+## **Proposed Fix**
+To fix this, the labels need to be explicitly associated with the `date` and `time` input fields.
+
+### **Steps to Implement the Fix**
+1. Modify the `django/contrib/admin/widgets.py` file to include proper `aria-labels` for accessibility.
+2. Ensure that the admin templates (`django/contrib/admin/templates/admin/widgets`) reflect this change.
+
+### **Updated Code in `widgets.py`**
+Modify the `AdminSplitDateTime` class inside **`django/contrib/admin/widgets.py`**:
+
+```python
+class AdminSplitDateTime(forms.SplitDateTimeWidget):
+    """
+    A SplitDateTimeWidget that includes better accessibility labels
+    for screen readers.
+    """
+    def __init__(self, attrs=None):
+        super().__init__(attrs, 
+                         date_attrs={"aria-label": "Date input for last login"}, 
+                         time_attrs={"aria-label": "Time input for last login"})

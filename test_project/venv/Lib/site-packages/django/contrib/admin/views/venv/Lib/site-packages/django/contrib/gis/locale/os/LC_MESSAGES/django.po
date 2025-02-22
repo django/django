@@ -1,0 +1,87 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Soslan Khubulov <inactive+soslan@transifex.com>, 2013
+# Soslan Khubulov <inactive+soslan@transifex.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Ossetic (http://www.transifex.com/django/django/language/"
+"os/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: os\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "GIS"
+msgstr ""
+
+msgid "The base GIS field."
+msgstr ""
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+
+msgid "Point"
+msgstr "Стъӕлф"
+
+msgid "Line string"
+msgstr "Хаахы рӕнхъ"
+
+msgid "Polygon"
+msgstr "Бирӕкъуымон"
+
+msgid "Multi-point"
+msgstr "Бирӕ-стъӕлф"
+
+msgid "Multi-line string"
+msgstr "Бирӕ-хаххы рӕнхъ"
+
+msgid "Multi polygon"
+msgstr "Бирӕ бирӕкъуымон"
+
+msgid "Geometry collection"
+msgstr "Геометриты ӕмбырд"
+
+msgid "Extent Aggregate Field"
+msgstr ""
+
+msgid "Raster Field"
+msgstr ""
+
+msgid "No geometry value provided."
+msgstr "Геометрийы бӕрц амынд нӕу."
+
+msgid "Invalid geometry value."
+msgstr "Геометрийы бӕрц раст нӕу."
+
+msgid "Invalid geometry type."
+msgstr "Геометрийы хуыз раст нӕу."
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Рӕдыд ӕрцыд SRID геометри формӕйы бынаты геометримӕ ивд куы цыдис, уӕд."
+
+msgid "Delete all Features"
+msgstr ""
+
+msgid "WKT debugging window:"
+msgstr ""
+
+msgid "Debugging window (serialized value)"
+msgstr ""
+
+msgid "No feeds are registered."
+msgstr "Ницы лӕсӕн уыд регистрацигонд."
+
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Слаг %r регистрацигонд нӕу."

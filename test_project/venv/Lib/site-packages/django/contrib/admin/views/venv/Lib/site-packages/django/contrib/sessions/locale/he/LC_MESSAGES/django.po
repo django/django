@@ -1,0 +1,37 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Meir Kriheli <mkriheli@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: he\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+
+msgid "Sessions"
+msgstr "התחברויות"
+
+msgid "session key"
+msgstr "מפתח התחברות (session key)"
+
+msgid "session data"
+msgstr "מידע התחברות (session data)"
+
+msgid "expire date"
+msgstr "תאריך פג תוקף"
+
+msgid "session"
+msgstr "התחברות"
+
+msgid "sessions"
+msgstr "התחברויות"

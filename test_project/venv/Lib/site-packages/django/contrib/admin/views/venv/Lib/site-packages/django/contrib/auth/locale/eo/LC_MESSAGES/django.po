@@ -1,0 +1,310 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2012-2013
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2013-2019
+# Matthieu Desplantes <matmututu@gmail.com>, 2021
+# Meiyer <interdist+translations@gmail.com>, 2022
+# Robin van der Vliet <info@robinvandervliet.com>, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2022-04-25 08:09+0000\n"
+"Last-Translator: Meiyer <interdist+translations@gmail.com>, 2022\n"
+"Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
+"eo/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: eo\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Personaj informoj"
+
+msgid "Permissions"
+msgstr "Permesoj"
+
+msgid "Important dates"
+msgstr "Gravaj datoj"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objekto %(name)skun ĉefŝlosilo %(key)r ne ekzistas."
+
+msgid "Password changed successfully."
+msgstr "Pasvorto suksese ŝanĝita."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Ŝanĝi pasvorton: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Aŭtentigo kaj rajtigo"
+
+msgid "password"
+msgstr "pasvorto"
+
+msgid "last login"
+msgstr "lasta ensaluto"
+
+msgid "No password set."
+msgstr "Neniu pasvorto agordita."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Nevalida pasvorta formato, aŭ nekonata haketa algoritmo."
+
+msgid "The two password fields didn’t match."
+msgstr "La du pasvortaj kampoj ne kongruas."
+
+msgid "Password"
+msgstr "Pasvorto"
+
+msgid "Password confirmation"
+msgstr "Pasvorta konfirmo"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Entajpu la saman pasvorton kiel supre, por konfirmo."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+"La pasvortoj ne estas konservitaj en klara formo, do ne eblas vidi la "
+"pasvorton de ĉi tiu uzanto, sed vi povas ŝanĝi la pasvorton per <a "
+"href=\"{}\">ĉi tiu formularo</a>."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Bonvolu enigi ĝustan %(username)sn kaj pasvorton. Notu, ke ambaŭ kampoj "
+"povas esti usklecodistingaj."
+
+msgid "This account is inactive."
+msgstr "Ĉi tiu konto ne estas aktiva."
+
+msgid "Email"
+msgstr "Retpoŝto"
+
+msgid "New password"
+msgstr "Nova pasvorto"
+
+msgid "New password confirmation"
+msgstr "Nova pasvorto por konfirmo"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Via malnova pasvorto estis tajpita malĝuste. Bonvolu denove entajpi ĝin."
+
+msgid "Old password"
+msgstr "Malnova pasvorto"
+
+msgid "Password (again)"
+msgstr "Pasvorto (denove)"
+
+msgid "algorithm"
+msgstr "algoritmo"
+
+msgid "iterations"
+msgstr "iteracioj"
+
+msgid "salt"
+msgstr "salo"
+
+msgid "hash"
+msgstr "haketo"
+
+msgid "variety"
+msgstr "diverseco"
+
+msgid "version"
+msgstr "versio"
+
+msgid "memory cost"
+msgstr "memor-kosto"
+
+msgid "time cost"
+msgstr "tempo-kosto"
+
+msgid "parallelism"
+msgstr "paralelismo"
+
+msgid "work factor"
+msgstr "laborfaktoro"
+
+msgid "checksum"
+msgstr "kontrolsumo"
+
+msgid "block size"
+msgstr "blok-grandeco"
+
+msgid "name"
+msgstr "nomo"
+
+msgid "content type"
+msgstr "enhava tipo"
+
+msgid "codename"
+msgstr "kodnomo"
+
+msgid "permission"
+msgstr "permeso"
+
+msgid "permissions"
+msgstr "permesoj"
+
+msgid "group"
+msgstr "grupo"
+
+msgid "groups"
+msgstr "grupoj"
+
+msgid "superuser status"
+msgstr "ĉefuzanta statuso"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Indikas ke tiu ĉi uzanto havas ĉiujn permesojn, sen eksplicite atribui ilin."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"La grupoj al kiuj tiu ĉi uzanto apartenas. Uzanto akiros ĉiujn permesojn "
+"atribuitajn al ĉiu el tiuj grupoj."
+
+msgid "user permissions"
+msgstr "uzantaj permesoj"
+
+msgid "Specific permissions for this user."
+msgstr "Specifaj permesoj por tiu ĉi uzanto."
+
+msgid "username"
+msgstr "salutnomo"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Petita. 150 signoj aŭ malpli. Nur literoj, ciferoj kaj @/./+/-/_."
+
+msgid "A user with that username already exists."
+msgstr "Uzanto kun sama salutnomo jam ekzistas."
+
+msgid "first name"
+msgstr "persona nomo"
+
+msgid "last name"
+msgstr "familia nomo"
+
+msgid "email address"
+msgstr "retpoŝta adreso"
+
+msgid "staff status"
+msgstr "personara statuso"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Indikas ĉu la uzanto povas saluti en ĉi-tiu administranta retejo."
+
+msgid "active"
+msgstr "aktiva"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Indikas ĉu la uzanto devus esti traktita kiel aktiva. Malmarku tion ĉi "
+"anstataŭ forigi kontojn."
+
+msgid "date joined"
+msgstr "dato de aliĝo"
+
+msgid "user"
+msgstr "uzanto"
+
+msgid "users"
+msgstr "uzantoj"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Tiu pasvorto estas tro mallonga. Ĝi devas enhavi almenaŭ %(min_length)d "
+"signon."
+msgstr[1] ""
+"Tiu pasvorto estas tro mallonga. Ĝi devas enhavi almenaŭ %(min_length)d "
+"signojn."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Via pasvorto devas enhavi almenaŭ %(min_length)d signon."
+msgstr[1] "Via pasvorto devas enhavi almenaŭ %(min_length)d signojn."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "La pasvorto estas tro simila al la %(verbose_name)s."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Via pasvorto ne povas esti tro simila al viaj aliaj personaj informoj."
+
+msgid "This password is too common."
+msgstr "Tiu pasvorto estas tro kutima."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Via pasvorto ne povas esti ofte uzata pasvorto."
+
+msgid "This password is entirely numeric."
+msgstr "Tiu ĉi pasvorto konsistas nur el ciferoj."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Via pasvorto ne povas konsisti nur el ciferoj."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Pasvorta rekomencigo ĉe %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Enigu salutnomon en ĝusta formo. Ĉi tiu valoro povas enhavi nur "
+"sensupersignajn literojn, ciferojn kaj la signojn @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Enigu salutnomon en ĝusta formo. Ĉi tiu valoro povas enhavi nur literojn, "
+"ciferojn kaj la signojn @/./+/-/_."
+
+msgid "Logged out"
+msgstr "Adiaŭita"
+
+msgid "Password reset"
+msgstr "Restarigo de pasvorto"
+
+msgid "Password reset sent"
+msgstr "Restarigo de pasvorto sendita"
+
+msgid "Enter new password"
+msgstr "Enigu novan pasvorton"
+
+msgid "Password reset unsuccessful"
+msgstr "Restarigo de pasvorto malsukcesa"
+
+msgid "Password reset complete"
+msgstr "Restarigo de pasvorto plenumita"
+
+msgid "Password change"
+msgstr "Pasvorta ŝanĝo"
+
+msgid "Password change successful"
+msgstr "Pasvorto sukcese ŝanĝita"

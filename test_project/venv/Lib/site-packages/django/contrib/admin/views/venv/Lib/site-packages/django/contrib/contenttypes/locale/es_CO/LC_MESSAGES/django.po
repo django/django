@@ -1,0 +1,43 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Carlos Muñoz <cmuozdiaz@outlook.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2017-09-20 03:01+0000\n"
+"Last-Translator: Carlos Muñoz <cmuozdiaz@outlook.com>\n"
+"Language-Team: Spanish (Colombia) (http://www.transifex.com/django/django/"
+"language/es_CO/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es_CO\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Content Types"
+msgstr "Tipos de contenido"
+
+msgid "python model class name"
+msgstr "nombre de la clase modelo de python"
+
+msgid "content type"
+msgstr "tipo de contenido"
+
+msgid "content types"
+msgstr "tipos de contenido"
+
+#, python-format
+msgid "Content type %(ct_id)s object has no associated model"
+msgstr ""
+"El objeto de tipo de contenido %(ct_id)s no tiene ningún modelo asociado."
+
+#, python-format
+msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgstr "El objeto de tipo de contenido %(ct_id)s objeto %(obj_id)s no existe"
+
+#, python-format
+msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgstr "El objeto %(ct_name)s no tiene un método get_absolute_url()"

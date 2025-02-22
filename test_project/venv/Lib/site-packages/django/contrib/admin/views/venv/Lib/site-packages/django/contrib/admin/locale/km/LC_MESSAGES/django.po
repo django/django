@@ -1,0 +1,636 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Khmer (http://www.transifex.com/django/django/language/km/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: km\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr "តើលោកអ្នកប្រាកដទេ?"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
+
+msgid "Administration"
+msgstr ""
+
+msgid "All"
+msgstr "ទាំងអស់"
+
+msgid "Yes"
+msgstr "យល់ព្រម"
+
+msgid "No"
+msgstr "មិនយល់ព្រម"
+
+msgid "Unknown"
+msgstr "មិន​ដឹង"
+
+msgid "Any date"
+msgstr "កាល​បរិច្ឆេទណាមួយ"
+
+msgid "Today"
+msgstr "ថ្ងៃនេះ"
+
+msgid "Past 7 days"
+msgstr "៧​ថ្ងៃ​កន្លង​មក"
+
+msgid "This month"
+msgstr "ខែ​នេះ"
+
+msgid "This year"
+msgstr "ឆ្នាំ​នេះ"
+
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+
+msgid "Action:"
+msgstr ""
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+msgid "Remove"
+msgstr "លប់ចេញ"
+
+msgid "action time"
+msgstr "ពេលវេលាប្រតិបត្តិការ"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
+msgid "object id"
+msgstr "លេខ​សំគាល់​កម្មវិធី (object id)"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
+msgid "object repr"
+msgstr "object repr"
+
+msgid "action flag"
+msgstr "សកម្មភាព"
+
+msgid "change message"
+msgstr "ផ្លាស់ប្តូរ"
+
+msgid "log entry"
+msgstr "កំណត់ហេតុ"
+
+msgid "log entries"
+msgstr "កំណត់ហេតុ"
+
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr ""
+
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr ""
+
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr ""
+
+msgid "LogEntry Object"
+msgstr ""
+
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "និង"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "ពុំមានទិន្នន័យត្រូវបានផ្លាស់ប្តូរ។"
+
+msgid "None"
+msgstr ""
+
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+msgid "No action selected."
+msgstr ""
+
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "ឈ្មោះកម្មវិធី %(name)s \"%(obj)s\" ត្រូវបានលប់ដោយជោគជ័យ។"
+
+#, python-format
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+
+#, python-format
+msgid "Add %s"
+msgstr "បន្ថែម %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "ផ្លាស់ប្តូរ %s"
+
+msgid "Database error"
+msgstr "ទិន្នន័យមូលដ្ឋានមានបញ្ហា"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] ""
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#, python-format
+msgid "Change history: %s"
+msgstr "សកម្មភាពផ្លាស់ប្តូរកន្លងមក : %s"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+msgid "Django site admin"
+msgstr "ទំព័រគ្រប់គ្រងរបស់ Django"
+
+msgid "Django administration"
+msgstr "ការ​គ្រប់គ្រង​របស់ ​Django"
+
+msgid "Site administration"
+msgstr "ទំព័រគ្រប់គ្រង"
+
+msgid "Log in"
+msgstr "ពិនិត្យចូល"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr ""
+
+msgid "Page not found"
+msgstr "ទំព័រ​ដែល​លោកអ្នកចង់​រក​នេះពុំមាន​នៅក្នុងម៉ាស៊ីនរបស់យើងខ្ញុំទេ"
+
+msgid "We're sorry, but the requested page could not be found."
+msgstr "សួមអភ័យទោស ទំព័រ​ដែល​លោកអ្នកចង់​រក​នេះពុំមាន​នឹងក្នុងម៉ាស៊ីនរបស់យើងខ្ញុំទេ"
+
+msgid "Home"
+msgstr "គេហទំព័រ"
+
+msgid "Server error"
+msgstr "ម៉ាស៊ីនផ្តល់សេវាកម្ម​ មានបញ្ហា"
+
+msgid "Server error (500)"
+msgstr "ម៉ាស៊ីនផ្តល់សេវាកម្ម​ មានបញ្ហា (៥០០)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "ម៉ាស៊ីនផ្តល់សេវាកម្ម​ មានបញ្ហា  <em>(៥០០)</em>"
+
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+msgid "Run the selected action"
+msgstr ""
+
+msgid "Go"
+msgstr "ស្វែងរក"
+
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+msgid "Clear selection"
+msgstr ""
+
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"តំបូងសូមបំពេញ ឈ្មោះជាសមាជិក និង ពាក្យសំងាត់​។ បន្ទាប់មកលោកអ្នកអាចបំពេញបន្ថែមជំរើសផ្សេងៗទៀតបាន។ "
+
+msgid "Enter a username and password."
+msgstr ""
+
+msgid "Change password"
+msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
+
+msgid "Please correct the error below."
+msgstr ""
+
+msgid "Please correct the errors below."
+msgstr ""
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+msgid "Welcome,"
+msgstr "សូមស្វាគមន៏"
+
+msgid "View site"
+msgstr ""
+
+msgid "Documentation"
+msgstr "ឯកសារ"
+
+msgid "Log out"
+msgstr "ចាកចេញ"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "បន្ថែម %(name)s"
+
+msgid "History"
+msgstr "សកម្មភាព​កន្លង​មក"
+
+msgid "View on site"
+msgstr "មើលនៅលើគេហទំព័រដោយផ្ទាល់"
+
+msgid "Filter"
+msgstr "ស្វែងរកជាមួយ"
+
+msgid "Remove from sorting"
+msgstr ""
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+msgid "Toggle sorting"
+msgstr ""
+
+msgid "Delete"
+msgstr "លប់"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​ព័ន្ធបាត់បង់ ។"
+" ក៏ប៉ន្តែលោកអ្នក​ពុំមាន​សិទ្ធិលប់​កម្មវិធី​ប្រភេទនេះទេ។"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"តើលោកអ្នកប្រាកដជាចង់លប់ %(object_name)s \"%(escaped_object)s"
+"\"? ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​ព័ន្ធបាត់បង់។"
+
+msgid "Objects"
+msgstr ""
+
+msgid "Yes, I'm sure"
+msgstr "ខ្ញុំច្បាស់​ជាចង់លប់"
+
+msgid "No, take me back"
+msgstr ""
+
+msgid "Delete multiple objects"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+msgid "Change"
+msgstr "ផ្លាស់ប្តូរ"
+
+msgid "Delete?"
+msgstr ""
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "ដោយ​  %(filter_title)s "
+
+msgid "Summary"
+msgstr ""
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+msgid "Add"
+msgstr "បន្ថែម"
+
+msgid "You don't have permission to edit anything."
+msgstr "លោកអ្នកពុំមានសិទ្ធិ ផ្លាស់​ប្តូរ ទេ។"
+
+msgid "Recent actions"
+msgstr ""
+
+msgid "My actions"
+msgstr ""
+
+msgid "None available"
+msgstr "គ្មាន"
+
+msgid "Unknown content"
+msgstr ""
+
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"មូលដ្ឋាន​ទិន្នន័យ​​​ របស់លោកអ្នក មានបញ្ហា។ តើ លោកអ្នកបាន បង្កើត តារាង​ របស់មូលដ្ឋានទិន្នន័យ​"
+" ហើយឬនៅ? តើ​ លោកអ្នកប្រាកដថាសមាជិកអាចអានមូលដ្ឋានទិន្នន័យនេះ​​បានឬទេ? "
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+msgid "Forgotten your password or username?"
+msgstr ""
+
+msgid "Date/time"
+msgstr "Date/time"
+
+msgid "User"
+msgstr "សមាជិក"
+
+msgid "Action"
+msgstr "សកម្មភាព"
+
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"កម្មវិធីនេះមិនមានសកម្មភាព​កន្លងមកទេ។ ប្រហែលជាសកម្មភាពទាំងនេះមិនបានធ្វើនៅទំព័រគ្រប់គ្រងនេះ។"
+
+msgid "Show all"
+msgstr "បង្ហាញទាំងអស់"
+
+msgid "Save"
+msgstr "រក្សាទុក"
+
+msgid "Popup closing..."
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "សរុបទាំងអស់ %(full_result_count)s"
+
+msgid "Save as new"
+msgstr "រក្សាទុក"
+
+msgid "Save and add another"
+msgstr "រក្សាទុក ហើយ បន្ថែម​ថ្មី"
+
+msgid "Save and continue editing"
+msgstr "រក្សាទុក ហើយ កែឯកសារដដែល"
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "សូមថ្លែងអំណរគុណ ដែលបានចំណាយ ពេលវេលាដ៏មានតំលៃ របស់លោកអ្នកមកទស្សនាគេហទំព័ររបស់យើងខ្ញុំ"
+
+msgid "Log in again"
+msgstr "ពិនិត្យចូលម្តងទៀត"
+
+msgid "Password change"
+msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
+
+msgid "Your password was changed."
+msgstr "ពាក្យសំងាត់របស់លោកអ្នកបានផ្លាស់ប្តូរហើយ"
+
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr "សូមបំពេញពាក្យសំងាត់ចាស់របស់លោកអ្នក។ ដើម្បីសុវត្ថភាព សូមបំពេញពាក្យសំងាត់ថ្មីខាងក្រោមពីរដង។"
+
+msgid "Change my password"
+msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
+
+msgid "Password reset"
+msgstr "ពាក្យសំងាត់បានកំណត់សារជាថ្មី"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+msgid "Password reset confirmation"
+msgstr ""
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+msgid "New password:"
+msgstr "ពាក្យសំងាត់ថ្មី"
+
+msgid "Confirm password:"
+msgstr "បំពេញពាក្យសំងាត់ថ្មីម្តងទៀត"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+msgid "Your username, in case you've forgotten:"
+msgstr "ឈ្មោះជាសមាជិកក្នុងករណីភ្លេច:"
+
+msgid "Thanks for using our site!"
+msgstr "សូមអរគុណដែលបានប្រើប្រាស់សេវាកម្មរបស់យើងខ្ញុំ"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "ក្រុមរបស់គេហទំព័រ %(site_name)s"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+
+msgid "Email address:"
+msgstr ""
+
+msgid "Reset my password"
+msgstr "កំណត់ពាក្យសំងាត់សារជាថ្មី"
+
+msgid "All dates"
+msgstr "កាលបរិច្ឆេទទាំងអស់"
+
+#, python-format
+msgid "Select %s"
+msgstr "ជ្រើសរើស %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "ជ្រើសរើស %s ដើម្បីផ្លាស់ប្តូរ"
+
+msgid "Date:"
+msgstr "កាលបរិច្ឆេទ"
+
+msgid "Time:"
+msgstr "ម៉ោង"
+
+msgid "Lookup"
+msgstr ""
+
+msgid "Currently:"
+msgstr ""
+
+msgid "Change:"
+msgstr ""

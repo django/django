@@ -1,0 +1,54 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Janusz Harkot <jh@trilab.pl>, 2014-2015
+# m_aciek <maciej.olko@gmail.com>, 2019,2021
+# Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-09-06 21:50+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
+"Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
+"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+msgid "Redirects"
+msgstr "Przekierowania"
+
+msgid "site"
+msgstr "strona"
+
+msgid "redirect from"
+msgstr "przekieruj z"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr ""
+"Podaj ścieżkę bezwzględną pomijając nazwę domeny. Na przykład „/events/"
+"search/”."
+
+msgid "redirect to"
+msgstr "przekieruj na"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
+msgstr ""
+"Może to być ścieżka bezwzględna (jak powyżej) lub pełny URL rozpoczynający "
+"się schematem takim jak \"https://\"."
+
+msgid "redirect"
+msgstr "przekierowanie"
+
+msgid "redirects"
+msgstr "przekierowania"

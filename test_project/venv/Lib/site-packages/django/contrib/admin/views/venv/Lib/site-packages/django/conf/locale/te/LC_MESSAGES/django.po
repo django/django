@@ -1,0 +1,1233 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# bhaskar teja yerneni <prudhviy@gmail.com>, 2011
+# Claude Paroz <claude@2xlibre.net>, 2020
+# Jannis Leidel <jannis@leidel.info>, 2011
+# ప్రవీణ్ ఇళ్ళ <mail2ipn@gmail.com>, 2013
+# వీవెన్ <veeven@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
+"Language-Team: Telugu (http://www.transifex.com/django/django/language/te/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: te\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Afrikaans"
+msgstr "ఆఫ్రికాన్స్"
+
+msgid "Arabic"
+msgstr "ఆరబిక్"
+
+msgid "Algerian Arabic"
+msgstr ""
+
+msgid "Asturian"
+msgstr ""
+
+msgid "Azerbaijani"
+msgstr "అజేర్బైజని "
+
+msgid "Bulgarian"
+msgstr "బల్గేరియన్"
+
+msgid "Belarusian"
+msgstr "బెలారషియన్"
+
+msgid "Bengali"
+msgstr "బెంగాలీ"
+
+msgid "Breton"
+msgstr "బ్రిటన్"
+
+msgid "Bosnian"
+msgstr "బోస్నియన్"
+
+msgid "Catalan"
+msgstr "కాటలాన్"
+
+msgid "Czech"
+msgstr "ఛెక్"
+
+msgid "Welsh"
+msgstr "వెల్ష్"
+
+msgid "Danish"
+msgstr "డానిష్"
+
+msgid "German"
+msgstr "జెర్మన్"
+
+msgid "Lower Sorbian"
+msgstr ""
+
+msgid "Greek"
+msgstr "గ్రీక్"
+
+msgid "English"
+msgstr "ఆంగ్లం"
+
+msgid "Australian English"
+msgstr ""
+
+msgid "British English"
+msgstr "బ్రిటీష్ ఆంగ్లం"
+
+msgid "Esperanto"
+msgstr "ఎస్పరాంటో"
+
+msgid "Spanish"
+msgstr "స్పానిష్"
+
+msgid "Argentinian Spanish"
+msgstr "అర్జెంటీనా స్పానిష్"
+
+msgid "Colombian Spanish"
+msgstr ""
+
+msgid "Mexican Spanish"
+msgstr "మెక్షికన్  స్పానిష్ "
+
+msgid "Nicaraguan Spanish"
+msgstr ""
+
+msgid "Venezuelan Spanish"
+msgstr "వెనుజులా స్పానిష్"
+
+msgid "Estonian"
+msgstr "ఎస్టొనియన్"
+
+msgid "Basque"
+msgstr "బాస్క్"
+
+msgid "Persian"
+msgstr "పారసీ"
+
+msgid "Finnish"
+msgstr "ఫీన్నిష్"
+
+msgid "French"
+msgstr "ఫ్రెంచ్"
+
+msgid "Frisian"
+msgstr "ఫ్రిసియన్"
+
+msgid "Irish"
+msgstr "ఐరిష్"
+
+msgid "Scottish Gaelic"
+msgstr ""
+
+msgid "Galician"
+msgstr "గలిసియన్"
+
+msgid "Hebrew"
+msgstr "హీబ్రూ"
+
+msgid "Hindi"
+msgstr "హిందీ"
+
+msgid "Croatian"
+msgstr "క్రొయేషియన్"
+
+msgid "Upper Sorbian"
+msgstr ""
+
+msgid "Hungarian"
+msgstr "హంగేరియన్"
+
+msgid "Armenian"
+msgstr ""
+
+msgid "Interlingua"
+msgstr "ఇంటర్లింగ్వా"
+
+msgid "Indonesian"
+msgstr "ఇండోనేషియన్"
+
+msgid "Igbo"
+msgstr ""
+
+msgid "Ido"
+msgstr ""
+
+msgid "Icelandic"
+msgstr "ఐస్లాండిక్"
+
+msgid "Italian"
+msgstr "ఇటాలియవ్"
+
+msgid "Japanese"
+msgstr "జపనీ"
+
+msgid "Georgian"
+msgstr "జార్జియన్"
+
+msgid "Kabyle"
+msgstr ""
+
+msgid "Kazakh"
+msgstr "కజఖ్"
+
+msgid "Khmer"
+msgstr "ఖ్మెర్"
+
+msgid "Kannada"
+msgstr "కన్నడ"
+
+msgid "Korean"
+msgstr "కొరియన్"
+
+msgid "Kyrgyz"
+msgstr ""
+
+msgid "Luxembourgish"
+msgstr "లగ్జెంబర్గిష్"
+
+msgid "Lithuanian"
+msgstr "లిథుయేనియన్"
+
+msgid "Latvian"
+msgstr "లాత్వియన్"
+
+msgid "Macedonian"
+msgstr "మెసిడోనియన్"
+
+msgid "Malayalam"
+msgstr "మలయాళం"
+
+msgid "Mongolian"
+msgstr "మంగోలియన్"
+
+msgid "Marathi"
+msgstr ""
+
+msgid "Burmese"
+msgstr "బర్మీస్"
+
+msgid "Norwegian Bokmål"
+msgstr ""
+
+msgid "Nepali"
+msgstr "నేపాలీ"
+
+msgid "Dutch"
+msgstr "డచ్"
+
+msgid "Norwegian Nynorsk"
+msgstr "నోర్వేగియన్ న్య్నోర్స్క్ "
+
+msgid "Ossetic"
+msgstr ""
+
+msgid "Punjabi"
+msgstr "పంజాబీ"
+
+msgid "Polish"
+msgstr "పొలిష్"
+
+msgid "Portuguese"
+msgstr "పోర్చుగీస్"
+
+msgid "Brazilian Portuguese"
+msgstr "బ్రజీలియన్  పోర్చుగీస్"
+
+msgid "Romanian"
+msgstr "రొమానియన్"
+
+msgid "Russian"
+msgstr "రష్యన్"
+
+msgid "Slovak"
+msgstr "స్లొవాక్"
+
+msgid "Slovenian"
+msgstr "స్లొవానియన్"
+
+msgid "Albanian"
+msgstr "అల్బేనియన్"
+
+msgid "Serbian"
+msgstr "సెర్బియన్"
+
+msgid "Serbian Latin"
+msgstr "సెర్బియన్ లాటిన్"
+
+msgid "Swedish"
+msgstr "స్వీడిష్"
+
+msgid "Swahili"
+msgstr "స్వాహిలి"
+
+msgid "Tamil"
+msgstr "తమిళం"
+
+msgid "Telugu"
+msgstr "తెలుగు"
+
+msgid "Tajik"
+msgstr ""
+
+msgid "Thai"
+msgstr "థాయి"
+
+msgid "Turkmen"
+msgstr ""
+
+msgid "Turkish"
+msgstr "టర్కిష్"
+
+msgid "Tatar"
+msgstr "టటర్"
+
+msgid "Udmurt"
+msgstr ""
+
+msgid "Ukrainian"
+msgstr "ఉక్రేనియన్"
+
+msgid "Urdu"
+msgstr "ఉర్దూ"
+
+msgid "Uzbek"
+msgstr ""
+
+msgid "Vietnamese"
+msgstr "వియెత్నామీ"
+
+msgid "Simplified Chinese"
+msgstr "సరళ చైనీ"
+
+msgid "Traditional Chinese"
+msgstr "సాంప్రదాయ  చైనీ"
+
+msgid "Messages"
+msgstr ""
+
+msgid "Site Maps"
+msgstr ""
+
+msgid "Static Files"
+msgstr ""
+
+msgid "Syndication"
+msgstr ""
+
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
+msgid "Enter a valid value."
+msgstr "సరైన విలువని ఇవ్వండి."
+
+msgid "Enter a valid URL."
+msgstr "సరైన URL ఇవ్వండి."
+
+msgid "Enter a valid integer."
+msgstr ""
+
+msgid "Enter a valid email address."
+msgstr "దయచేసి సరైన ఈమెయిల్ చిరునామాను ప్రవేశపెట్టండి."
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
+msgid "Enter a valid IPv4 address."
+msgstr "దయచేసి సరైన IPv4 అడ్రస్ ఇవ్వండి"
+
+msgid "Enter a valid IPv6 address."
+msgstr ""
+
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr ""
+
+msgid "Enter only digits separated by commas."
+msgstr "కామాల తో అంకెలు విడడీసి ఇవ్వండి "
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"దయచేసి దీని విలువ %(limit_value)s గ ఉండేట్లు చూసుకొనుము. ( మీరు సమర్పించిన విలువ "
+"%(show_value)s )"
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "దయచేసి దీని విలువ %(limit_value)s కు సమానముగా లేక తక్కువగా ఉండేట్లు చూసుకొనుము."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "దయచేసి దీని విలువ %(limit_value)s కు సమానముగా లేక ఎక్కువగా ఉండేట్లు చూసుకొనుము."
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Enter a number."
+msgstr "దయచేసి పూర్ణ సంఖ్య ఇవ్వండి"
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
+
+msgid "and"
+msgstr "మరియు"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr ""
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr ""
+
+msgid "This field cannot be null."
+msgstr "ఈ ఫీల్డ్ కాళీగా ఉందకూడడు      "
+
+msgid "This field cannot be blank."
+msgstr "ఈ ఖాళీని తప్పనిసరిగా పూరించాలి"
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
+
+msgid "Boolean (Either True or False)"
+msgstr "బూలియన్ (అవునా లేక కాదా)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "పదబంధం (గరిష్ఠం %(max_length)s)"
+
+msgid "Comma-separated integers"
+msgstr "కామా  తో విడడీసిన  సంఖ్య"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+msgid "Date (without time)"
+msgstr "తేదీ (సమయం లేకుండా)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+
+msgid "Date (with time)"
+msgstr "తేది (సమయం తో)"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
+
+msgid "Decimal number"
+msgstr "దశగణసంఖ్య"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
+msgid "Email address"
+msgstr "ఈమెయిలు చిరునామా"
+
+msgid "File path"
+msgstr "ఫైల్   పాత్"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr ""
+
+msgid "Floating point number"
+msgstr ""
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "పూర్ణసంఖ్య"
+
+msgid "Big (8 byte) integer"
+msgstr ""
+
+msgid "IPv4 address"
+msgstr ""
+
+msgid "IP address"
+msgstr "ఐపీ చిరునామా"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
+
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+msgid "Positive big integer"
+msgstr ""
+
+msgid "Positive integer"
+msgstr ""
+
+msgid "Positive small integer"
+msgstr ""
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+msgid "Small integer"
+msgstr ""
+
+msgid "Text"
+msgstr "పాఠ్యం"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+
+msgid "Time"
+msgstr "సమయం"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Raw binary data"
+msgstr ""
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr ""
+
+msgid "File"
+msgstr "దస్త్రం"
+
+msgid "Image"
+msgstr "బొమ్మ"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+msgid "One-to-one relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
+msgid "Many-to-many relationship"
+msgstr ""
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ""
+
+msgid "This field is required."
+msgstr "ఈ ఫీల్డ్ అవసరము"
+
+msgid "Enter a whole number."
+msgstr "పూర్ణ సంఖ్య ఇవ్వండి"
+
+msgid "Enter a valid date."
+msgstr "దయచేసి సరైన తేది ఇవ్వండి."
+
+msgid "Enter a valid time."
+msgstr "దయచేసి సరైన సమయం ఇవ్వండి."
+
+msgid "Enter a valid date/time."
+msgstr "దయచేసి సరైన తెది/సమయం ఇవ్వండి."
+
+msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+msgid "No file was submitted."
+msgstr "ఫైలు సమర్పించబడలేదు."
+
+msgid "The submitted file is empty."
+msgstr "మీరు సమర్పించిన  ఫైల్ కాళీగా ఉంది "
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+
+msgid "Enter a list of values."
+msgstr "సరైన విలువల జాబితాను ఇవ్వండి."
+
+msgid "Enter a complete value."
+msgstr ""
+
+msgid "Enter a valid UUID."
+msgstr ""
+
+msgid "Enter a valid JSON."
+msgstr ""
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ""
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr ""
+
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr ""
+
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Please submit %d or more forms."
+msgid_plural "Please submit %d or more forms."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Order"
+msgstr "అంతరము"
+
+msgid "Delete"
+msgstr "తొలగించు"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "దయచేసి %(field)s యొక్క నకలు విలువను సరిదిద్దుకోండి."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "దయచేసి %(field)s యొక్క నకలు విలువను సరిదిద్దుకోండి. దీని విలువ అద్వితీయమయినది "
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+msgid "Please correct the duplicate values below."
+msgstr "దయచేసి క్రింద ఉన్న నకలు విలువను సరిదిద్దుకోండి."
+
+msgid "The inline value did not match the parent instance."
+msgstr ""
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+msgid "Clear"
+msgstr ""
+
+msgid "Currently"
+msgstr "ప్రస్తుతము "
+
+msgid "Change"
+msgstr "మార్చు"
+
+msgid "Unknown"
+msgstr "తెలియనది"
+
+msgid "Yes"
+msgstr "అవును"
+
+msgid "No"
+msgstr "కాదు"
+
+#. Translators: Please do not add spaces around commas.
+msgid "yes,no,maybe"
+msgstr "అవును,కాదు,ఏమొ"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d బైటు"
+msgstr[1] "%(size)d బైట్లు"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s కిబై"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s మెబై"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s గిబై"
+
+#, python-format
+msgid "%s TB"
+msgstr ""
+
+#, python-format
+msgid "%s PB"
+msgstr ""
+
+msgid "p.m."
+msgstr "p.m."
+
+msgid "a.m."
+msgstr "a.m."
+
+msgid "PM"
+msgstr "PM"
+
+msgid "AM"
+msgstr "AM"
+
+msgid "midnight"
+msgstr "అర్ధరాత్రి"
+
+msgid "noon"
+msgstr "మధ్యాహ్నం"
+
+msgid "Monday"
+msgstr "సోమవారం"
+
+msgid "Tuesday"
+msgstr "మంగళవారం"
+
+msgid "Wednesday"
+msgstr "బుధవారం"
+
+msgid "Thursday"
+msgstr "గురువారం"
+
+msgid "Friday"
+msgstr "శుక్రవారం"
+
+msgid "Saturday"
+msgstr "శనివారం"
+
+msgid "Sunday"
+msgstr "ఆదివారం"
+
+msgid "Mon"
+msgstr "సోమ"
+
+msgid "Tue"
+msgstr "మంగళ"
+
+msgid "Wed"
+msgstr "బుధ"
+
+msgid "Thu"
+msgstr "గురు"
+
+msgid "Fri"
+msgstr "శుక్ర"
+
+msgid "Sat"
+msgstr "శని"
+
+msgid "Sun"
+msgstr "ఆది"
+
+msgid "January"
+msgstr "జనవరి"
+
+msgid "February"
+msgstr "ఫిబ్రవరి"
+
+msgid "March"
+msgstr "మార్చి"
+
+msgid "April"
+msgstr "ఎప్రిల్"
+
+msgid "May"
+msgstr "మే"
+
+msgid "June"
+msgstr "జూన్"
+
+msgid "July"
+msgstr "జులై"
+
+msgid "August"
+msgstr "ఆగష్టు"
+
+msgid "September"
+msgstr "సెప్టెంబర్"
+
+msgid "October"
+msgstr "అక్టోబర్"
+
+msgid "November"
+msgstr "నవంబర్"
+
+msgid "December"
+msgstr "డిసెంబర్"
+
+msgid "jan"
+msgstr "జన"
+
+msgid "feb"
+msgstr "ఫిబ్ర"
+
+msgid "mar"
+msgstr "మార్చి"
+
+msgid "apr"
+msgstr "ఎప్రి"
+
+msgid "may"
+msgstr "మే"
+
+msgid "jun"
+msgstr "జూన్"
+
+msgid "jul"
+msgstr "జూలై"
+
+msgid "aug"
+msgstr "ఆగ"
+
+msgid "sep"
+msgstr "సెప్టెం"
+
+msgid "oct"
+msgstr "అక్టో"
+
+msgid "nov"
+msgstr "నవం"
+
+msgid "dec"
+msgstr "డిసెం"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "జన."
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "ఫిబ్ర."
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "మార్చి"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "ఏప్రి."
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "మే"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "జూన్"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "జూలై"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "ఆగ."
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "సెప్టెం."
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "అక్టో."
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "నవం."
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "డిసెం."
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "జనవరి"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "ఫిబ్రవరి"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "మార్చి"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "ఏప్రిల్"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "మే"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "జూన్"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "జూలై"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "ఆగస్ట్"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "సెప్టెంబర్"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "అక్టోబర్"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "నవంబర్"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "డిసెంబర్"
+
+msgid "This is not a valid IPv6 address."
+msgstr ""
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr ""
+
+msgid "or"
+msgstr "లేదా"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Forbidden"
+msgstr ""
+
+msgid "CSRF verification failed. Request aborted."
+msgstr ""
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+
+msgid "More information is available with DEBUG=True."
+msgstr ""
+
+msgid "No year specified"
+msgstr ""
+
+msgid "Date out of range"
+msgstr ""
+
+msgid "No month specified"
+msgstr ""
+
+msgid "No day specified"
+msgstr ""
+
+msgid "No week specified"
+msgstr ""
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr ""
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr ""
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr ""
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
+
+msgid "Directory indexes are not allowed here."
+msgstr ""
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr ""
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr ""
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

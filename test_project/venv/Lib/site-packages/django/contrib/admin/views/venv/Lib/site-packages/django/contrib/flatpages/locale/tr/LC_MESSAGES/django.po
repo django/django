@@ -1,0 +1,94 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# BouRock, 2015,2019
+# BouRock, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Metin Amiroff <amiroff@gmail.com>, 2011
+# Murat Çorlu <muratcorlu@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 08:28+0000\n"
+"Last-Translator: BouRock\n"
+"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
+"tr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Advanced options"
+msgstr "Gelişmiş seçenekler"
+
+msgid "Flat Pages"
+msgstr "Düz Sayfalar"
+
+msgid "URL"
+msgstr "URL"
+
+msgid ""
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+msgstr ""
+"Örnek: “/hakkinda/iletisim/”. Başında ve sonunda bölü işareti olduğundan "
+"emin olun."
+
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"Bu değer sadece harfler, sayılar, noktalar, altçizgiler, tireler, bölme veya "
+"yaklaşık işaretleri içermek zorundadır."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr ""
+"Örnek: “/hakkinda/iletisim”. Başında bölü işareti olduğundan emin olun."
+
+msgid "URL is missing a leading slash."
+msgstr "URL başında bölü işareti eksik."
+
+msgid "URL is missing a trailing slash."
+msgstr "URL sonunda bölü işareti eksik."
+
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "%(url)s adresli düz sayfa %(site)s sitesinde zaten mevcut"
+
+msgid "title"
+msgstr "başlık"
+
+msgid "content"
+msgstr "içerik"
+
+msgid "enable comments"
+msgstr "yorumları etkinleştir"
+
+msgid "template name"
+msgstr "şablon adı"
+
+msgid ""
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
+msgstr ""
+"Örnek: “flatpages/contact_page.html”. Eğer bu şekilde yazılmazsa, sistem "
+"“flatpages/default.html” olarak kullanacak."
+
+msgid "registration required"
+msgstr "kayıt olma gerekli"
+
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Eğer bu işaretlenirse, sadece oturum açan kullanıcılar sayfayı "
+"görüntüleyebilecektir."
+
+msgid "sites"
+msgstr "siteler"
+
+msgid "flat page"
+msgstr "düz sayfa"
+
+msgid "flat pages"
+msgstr "düz sayfalar"

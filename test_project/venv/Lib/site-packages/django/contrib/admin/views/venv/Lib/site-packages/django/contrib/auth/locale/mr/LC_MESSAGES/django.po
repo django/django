@@ -1,0 +1,299 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Omkar Parab, 2024
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2024-01-25 08:09+0000\n"
+"Last-Translator: Omkar Parab, 2024\n"
+"Language-Team: Marathi (http://app.transifex.com/django/django/language/"
+"mr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: mr\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "वैयक्तिक माहिती"
+
+msgid "Permissions"
+msgstr "परवानगी"
+
+msgid "Important dates"
+msgstr "महत्वाच्या दिनांक"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+msgid "Password changed successfully."
+msgstr "गुप्तशब्द यशस्वीरीत्या बदलला."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "गुप्तशब्द बदला: %s"
+
+msgid "Authentication and Authorization"
+msgstr "प्रमाणीकरण आणि अधिकृतता"
+
+msgid "password"
+msgstr "गुप्तशब्द"
+
+msgid "last login"
+msgstr "शेवटचा प्रवेश"
+
+msgid "No password set."
+msgstr "कोणताही गुप्तशब्द सेट केलेला नाही."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "अयोग्य गुप्तशब्द स्वरूप किंवा अज्ञात हॅशिंग अलगोरीथम."
+
+msgid "The two password fields didn’t match."
+msgstr "दोन गुप्तशब्द क्षेत्र जुळत नाहीत."
+
+msgid "Password"
+msgstr "गुप्तशब्द"
+
+msgid "Password confirmation"
+msgstr "गुप्तशब्द निच्छितीकरण"
+
+msgid "Enter the same password as before, for verification."
+msgstr "पडताळणीसाठी आधीच्या गुप्तशब्दासारखा समान गुप्तशब्द नमूद करा."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+"कच्चे गुप्तशब्द साठवले जात नाहीत, त्यामुळे या वापरकर्त्याचा गुप्तशब्द पाहण्याचा कोणताही "
+"मार्ग नाही, परंतु तुम्ही हा <a href=\"{}\"> फॉर्म वापरून गुप्तशब्द बदलू शकता. </a>"
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"कृपया करून एक योग्य %(username)s आणि गुप्तशब्द नमूद करा. लक्षात घ्या की दोन्ही रखाणे "
+"संवेदनशील असू शकतात."
+
+msgid "This account is inactive."
+msgstr "हे खाते निष्क्रिय आहे."
+
+msgid "Email"
+msgstr "विपत्र"
+
+msgid "New password"
+msgstr "नवीन गुप्तशब्द"
+
+msgid "New password confirmation"
+msgstr "नवीन गुप्तशब्द निच्छितीकरण"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "तुम्ही जुना गुप्तशब्द चुकीचा टाकला होता. कृपया तो पुन्हा नमूद करा."
+
+msgid "Old password"
+msgstr "जुना गुप्तशब्द"
+
+msgid "Password (again)"
+msgstr "गुप्तशब्द (पुन्हा)"
+
+msgid "algorithm"
+msgstr "अल्गोरिदम"
+
+msgid "iterations"
+msgstr "पुनरावृत्ती"
+
+msgid "salt"
+msgstr ""
+
+msgid "hash"
+msgstr ""
+
+msgid "variety"
+msgstr "निरनिराळ्या"
+
+msgid "version"
+msgstr "आवृत्ती"
+
+msgid "memory cost"
+msgstr "स्मरणशक्ती खर्च"
+
+msgid "time cost"
+msgstr "वेळ खर्च"
+
+msgid "parallelism"
+msgstr "समांतरता"
+
+msgid "work factor"
+msgstr "कामाचा घटक"
+
+msgid "checksum"
+msgstr "चेकसम"
+
+msgid "block size"
+msgstr "ब्लॉक आकार"
+
+msgid "name"
+msgstr "नाव"
+
+msgid "content type"
+msgstr "सामुग्री प्रकार"
+
+msgid "codename"
+msgstr "सांकेतिक नाव"
+
+msgid "permission"
+msgstr "परवानगी"
+
+msgid "permissions"
+msgstr "परवानग्या"
+
+msgid "group"
+msgstr "समूह"
+
+msgid "groups"
+msgstr "समूहं"
+
+msgid "superuser status"
+msgstr "सुपरयूजर स्थिती"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "या वापरकर्त्याकडे स्पष्टपणे नियुक्त केल्याशिवाय सर्व परवानग्या आहेत असे नियुक्त करते."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"हा वापरकर्ता त्या गटांचा आहे. वापरकर्त्याला त्यांच्या प्रत्येक गटासाठी सर्व परवानग्या "
+"मिळतील."
+
+msgid "user permissions"
+msgstr "वापरकर्ता परवानग्या"
+
+msgid "Specific permissions for this user."
+msgstr "या वापरकर्त्यासाठी विशिष्ट परवानग्या."
+
+msgid "username"
+msgstr "वापरकर्तानाव"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "आवश्यक. 150 किंवा कमी वर्ण. अक्षरे, अंक आणि @/./+/-/_ फक्त. "
+
+msgid "A user with that username already exists."
+msgstr "त्या वापरकर्ता नावासह वापरकर्ता आधीपासूनच अस्तित्वात आहे."
+
+msgid "first name"
+msgstr "पहिले नाव"
+
+msgid "last name"
+msgstr "आडनाव"
+
+msgid "email address"
+msgstr "विपत्र पत्ता"
+
+msgid "staff status"
+msgstr "कर्मचारी स्थिती"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "वापरकर्ता या प्रशासक स्थळावर प्रवेश करू शकतो की नाही हे नियुक्त करते."
+
+msgid "active"
+msgstr "सक्रिय"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"या वापरकर्त्याला सक्रिय मानले जावे की नाही हे नियुक्त करते. खाती हटवण्याऐवजी ही निवड "
+"कमी करा. "
+
+msgid "date joined"
+msgstr "सहभाग दिनांक"
+
+msgid "user"
+msgstr "वापरकर्ता"
+
+msgid "users"
+msgstr "वापरकर्ते"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "गुप्तशब्द %(verbose_name)s सारखा अत्यंत सामान्य आहे."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "तुमचा गुप्तशब्द तुमच्या इतर वैयक्तिक माहितीशी सारखा असू शकत नाही."
+
+msgid "This password is too common."
+msgstr "हा गुप्तशब्द खूपच सामान्य आहे."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "तुमचा गुप्तशब्द हा सामान्यतः वापरला जाणारा गुप्तशब्द असू शकत नाही."
+
+msgid "This password is entirely numeric."
+msgstr "हा गुप्तशब्द पूर्णपणे संख्यात्मक आहे."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "तुमचा गुप्तशब्द पूर्णपणे संख्यात्मक असू शकत नाही."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "%(site_name)s वरील गुप्तशब्द पुनरस्थापना"
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
+"वैध वापरकर्तानाव प्रविष्ट करा. या मूल्यामध्ये केवळ असुरक्षित लोअरकेस a-z आणि अपरकेस A-Z "
+"अक्षरे, संख्या आणि @/./+/-/_ वर्ण असू शकतात."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"वैध वापरकर्तानाव प्रविष्ट करा. या मूल्यामध्ये फक्त अक्षरे, संख्या आणि @/./+/-/_ वर्ण असू "
+"शकतात."
+
+msgid "Logged out"
+msgstr "बाहेर पडलात"
+
+msgid "Password reset"
+msgstr "गुप्तशब्द पुनरस्थापना"
+
+msgid "Password reset sent"
+msgstr "गुप्तशब्द पुनरस्थापना पाठविले गेले आहे"
+
+msgid "Enter new password"
+msgstr "नवीन गुप्तशब्द लिहा"
+
+msgid "Password reset unsuccessful"
+msgstr "गुप्तशब्द पुनरस्थापना अयशस्वी"
+
+msgid "Password reset complete"
+msgstr "गुप्तशब्द पुनरस्थापना पूर्ण"
+
+msgid "Password change"
+msgstr "गुप्तशब्द बदलणे"
+
+msgid "Password change successful"
+msgstr "गुप्तशब्द बदलणे यशस्वी झाले"

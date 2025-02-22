@@ -1,0 +1,50 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jihad Bahmaid Al-Halki, 2022
+# Riterix <infosrabah@gmail.com>, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2022-07-24 18:32+0000\n"
+"Last-Translator: Jihad Bahmaid Al-Halki\n"
+"Language-Team: Arabic (Algeria) (http://www.transifex.com/django/django/"
+"language/ar_DZ/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ar_DZ\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+msgid "Redirects"
+msgstr "إعادات التوجيه"
+
+msgid "site"
+msgstr "موقع"
+
+msgid "redirect from"
+msgstr "إعادة التوجيه من"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr "يجب أن يكون هذا مساراً مطلقاً وبدون اسم النطاق. مثال: '/events/search/'."
+
+msgid "redirect to"
+msgstr "إعادة التوجيه إلى"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
+msgstr ""
+"قد يكون هذا المسار منتهي الصلاحية (كما هو موضح أعلاه) أو أن العنوان له بادئة "
+"بصيغة مثل\"https://\"."
+
+msgid "redirect"
+msgstr "إعادة التوجيه"
+
+msgid "redirects"
+msgstr "إعادات التوجيه"

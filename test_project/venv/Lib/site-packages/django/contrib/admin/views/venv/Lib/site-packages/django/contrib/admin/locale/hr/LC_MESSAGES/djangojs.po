@@ -1,0 +1,223 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# aljosa <aljosa.mohorovic@gmail.com>, 2011
+# Bojan Mihelač <bmihelac@mihelac.org>, 2012
+# Davor Lučić <r.dav.lc@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Croatian (http://www.transifex.com/django/django/language/"
+"hr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hr\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "Dostupno %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Ovo je popis dostupnih %s. Možete dodati pojedine na način da ih izaberete u "
+"polju ispod i kliknete \"Izaberi\" strelicu između dva polja. "
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Tipkajte u ovo polje da filtrirate listu dostupnih %s."
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Choose all"
+msgstr "Odaberi sve"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Kliknite da odabrete sve %s odjednom."
+
+msgid "Choose"
+msgstr "Izaberi"
+
+msgid "Remove"
+msgstr "Ukloni"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "Odabrano %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Ovo je popis odabranih %s. Možete ukloniti pojedine na način da ih izaberete "
+"u polju ispod i kliknete \"Ukloni\" strelicu između dva polja. "
+
+msgid "Remove all"
+msgstr "Ukloni sve"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Kliknite da uklonite sve izabrane %s odjednom."
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "odabrano %(sel)s od %(cnt)s"
+msgstr[1] "odabrano %(sel)s od %(cnt)s"
+msgstr[2] "odabrano %(sel)s od %(cnt)s"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Neke promjene nisu spremljene na pojedinim polja za uređivanje. Ako "
+"pokrenete akciju, nespremljene promjene će biti izgubljene."
+
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Odabrali ste akciju, ali niste još spremili promjene na pojedinim polja. "
+"Molimo kliknite OK za spremanje. Morat ćete ponovno pokrenuti akciju."
+
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Odabrali ste akciju, a niste napravili nikakve izmjene na pojedinim poljima. "
+"Vjerojatno tražite gumb Idi umjesto gumb Spremi."
+
+msgid "Now"
+msgstr "Sada"
+
+msgid "Midnight"
+msgstr "Ponoć"
+
+msgid "6 a.m."
+msgstr "6 ujutro"
+
+msgid "Noon"
+msgstr "Podne"
+
+msgid "6 p.m."
+msgstr "6 popodne"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+msgid "Choose a Time"
+msgstr "Izaberite vrijeme"
+
+msgid "Choose a time"
+msgstr "Izaberite vrijeme"
+
+msgid "Cancel"
+msgstr "Odustani"
+
+msgid "Today"
+msgstr "Danas"
+
+msgid "Choose a Date"
+msgstr "Odaberite datum"
+
+msgid "Yesterday"
+msgstr "Jučer"
+
+msgid "Tomorrow"
+msgstr "Sutra"
+
+msgid "January"
+msgstr ""
+
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
+
+msgid "Show"
+msgstr "Prikaži"
+
+msgid "Hide"
+msgstr "Sakri"

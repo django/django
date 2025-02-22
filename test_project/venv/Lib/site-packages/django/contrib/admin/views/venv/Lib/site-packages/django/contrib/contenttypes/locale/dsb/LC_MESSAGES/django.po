@@ -1,0 +1,43 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-25 16:03+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
+"language/dsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: dsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+msgid "Content Types"
+msgstr "Wopśimjeśowe typy"
+
+msgid "python model class name"
+msgstr "klasowe mě pythonowe modela"
+
+msgid "content type"
+msgstr "wopśimjeśowy typ"
+
+msgid "content types"
+msgstr "wopśimjeśowe typy"
+
+#, python-format
+msgid "Content type %(ct_id)s object has no associated model"
+msgstr "Objekt wopśimjeśowego typa %(ct_id)s njama zwězany model"
+
+#, python-format
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
+msgstr "Objekt %(obj_id)s wopśimjeśowego typa %(ct_id)s njeeksistěrujo"
+
+#, python-format
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr "Objekty %(ct_name)s njamaju metodu get_absolute_url()"

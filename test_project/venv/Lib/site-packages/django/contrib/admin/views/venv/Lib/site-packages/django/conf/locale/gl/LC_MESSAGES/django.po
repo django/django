@@ -1,0 +1,1356 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# fasouto <fsoutomoure@gmail.com>, 2011-2012
+# fonso <fonzzo@gmail.com>, 2011,2013
+# fonso <fonzzo@gmail.com>, 2013
+# fasouto <fsoutomoure@gmail.com>, 2017
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
+# 948a55bc37dd6d642f1875bb84258fff_07a28cc <c1911c41f2600393098639fceba5dab0_5932>, 2012
+# X Bello <xbello@gmail.com>, 2023-2024
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023-2024\n"
+"Language-Team: Galician (http://app.transifex.com/django/django/language/"
+"gl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Afrikaans"
+msgstr "Africáner"
+
+msgid "Arabic"
+msgstr "Árabe"
+
+msgid "Algerian Arabic"
+msgstr "Árabe Arxelino"
+
+msgid "Asturian"
+msgstr "Asturiano"
+
+msgid "Azerbaijani"
+msgstr "Azerí"
+
+msgid "Bulgarian"
+msgstr "Búlgaro"
+
+msgid "Belarusian"
+msgstr "Bielorruso"
+
+msgid "Bengali"
+msgstr "Bengalí"
+
+msgid "Breton"
+msgstr "Bretón"
+
+msgid "Bosnian"
+msgstr "Bosníaco"
+
+msgid "Catalan"
+msgstr "Catalán"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Kurdo Central (Sorani)"
+
+msgid "Czech"
+msgstr "Checo"
+
+msgid "Welsh"
+msgstr "Galés"
+
+msgid "Danish"
+msgstr "Dinamarqués"
+
+msgid "German"
+msgstr "Alemán"
+
+msgid "Lower Sorbian"
+msgstr "Baixo Sorabo"
+
+msgid "Greek"
+msgstr "Grego"
+
+msgid "English"
+msgstr "Inglés"
+
+msgid "Australian English"
+msgstr "Inglés australiano"
+
+msgid "British English"
+msgstr "inglés británico"
+
+msgid "Esperanto"
+msgstr "Esperanto"
+
+msgid "Spanish"
+msgstr "Español"
+
+msgid "Argentinian Spanish"
+msgstr "Español da Arxentina"
+
+msgid "Colombian Spanish"
+msgstr "Español de Colombia"
+
+msgid "Mexican Spanish"
+msgstr "Español de México"
+
+msgid "Nicaraguan Spanish"
+msgstr "Español de Nicaragua"
+
+msgid "Venezuelan Spanish"
+msgstr "Español de Venezuela"
+
+msgid "Estonian"
+msgstr "Estoniano"
+
+msgid "Basque"
+msgstr "Vasco"
+
+msgid "Persian"
+msgstr "Persa"
+
+msgid "Finnish"
+msgstr "Finés"
+
+msgid "French"
+msgstr "Francés"
+
+msgid "Frisian"
+msgstr "Frisón"
+
+msgid "Irish"
+msgstr "Irlandés"
+
+msgid "Scottish Gaelic"
+msgstr "Gaélico Escocés"
+
+msgid "Galician"
+msgstr "Galego"
+
+msgid "Hebrew"
+msgstr "Hebreo"
+
+msgid "Hindi"
+msgstr "Hindi"
+
+msgid "Croatian"
+msgstr "Croata"
+
+msgid "Upper Sorbian"
+msgstr "Alto Sorabo"
+
+msgid "Hungarian"
+msgstr "Húngaro"
+
+msgid "Armenian"
+msgstr "Armenio"
+
+msgid "Interlingua"
+msgstr "Interlingua"
+
+msgid "Indonesian"
+msgstr "Indonesio"
+
+msgid "Igbo"
+msgstr "Ibo"
+
+msgid "Ido"
+msgstr "Ido"
+
+msgid "Icelandic"
+msgstr "Islandés"
+
+msgid "Italian"
+msgstr "Italiano"
+
+msgid "Japanese"
+msgstr "Xaponés"
+
+msgid "Georgian"
+msgstr "Xeorxiano"
+
+msgid "Kabyle"
+msgstr "Cabilio"
+
+msgid "Kazakh"
+msgstr "Casaco"
+
+msgid "Khmer"
+msgstr "Camboxano"
+
+msgid "Kannada"
+msgstr "Canará"
+
+msgid "Korean"
+msgstr "Coreano"
+
+msgid "Kyrgyz"
+msgstr "Kirguiz"
+
+msgid "Luxembourgish"
+msgstr "Luxemburgués"
+
+msgid "Lithuanian"
+msgstr "Lituano"
+
+msgid "Latvian"
+msgstr "Letón"
+
+msgid "Macedonian"
+msgstr "Macedonio"
+
+msgid "Malayalam"
+msgstr "Mala"
+
+msgid "Mongolian"
+msgstr "Mongol"
+
+msgid "Marathi"
+msgstr "Marathi"
+
+msgid "Malay"
+msgstr "Malaio"
+
+msgid "Burmese"
+msgstr "Birmano"
+
+msgid "Norwegian Bokmål"
+msgstr "Bokmål Noruegués"
+
+msgid "Nepali"
+msgstr "Nepalés"
+
+msgid "Dutch"
+msgstr "Holandés"
+
+msgid "Norwegian Nynorsk"
+msgstr "Noruegués (nynorsk)"
+
+msgid "Ossetic"
+msgstr "Osetio"
+
+msgid "Punjabi"
+msgstr "Panxabiano"
+
+msgid "Polish"
+msgstr "Polaco"
+
+msgid "Portuguese"
+msgstr "Portugués"
+
+msgid "Brazilian Portuguese"
+msgstr "Portugués do Brasil"
+
+msgid "Romanian"
+msgstr "Romanés"
+
+msgid "Russian"
+msgstr "Ruso"
+
+msgid "Slovak"
+msgstr "Eslovaco"
+
+msgid "Slovenian"
+msgstr "Esloveno"
+
+msgid "Albanian"
+msgstr "Albanés"
+
+msgid "Serbian"
+msgstr "Serbio"
+
+msgid "Serbian Latin"
+msgstr "Serbio (alfabeto latino)"
+
+msgid "Swedish"
+msgstr "Sueco"
+
+msgid "Swahili"
+msgstr "Suahili"
+
+msgid "Tamil"
+msgstr "Támil"
+
+msgid "Telugu"
+msgstr "Telugu"
+
+msgid "Tajik"
+msgstr "Taxico"
+
+msgid "Thai"
+msgstr "Tai"
+
+msgid "Turkmen"
+msgstr "Turcomá"
+
+msgid "Turkish"
+msgstr "Turco"
+
+msgid "Tatar"
+msgstr "Tártaro"
+
+msgid "Udmurt"
+msgstr "Udmurt"
+
+msgid "Uyghur"
+msgstr "Uigur"
+
+msgid "Ukrainian"
+msgstr "Ucraíno"
+
+msgid "Urdu"
+msgstr "Urdu"
+
+msgid "Uzbek"
+msgstr "Uzbeco"
+
+msgid "Vietnamese"
+msgstr "Vietnamita"
+
+msgid "Simplified Chinese"
+msgstr "Chinés simplificado"
+
+msgid "Traditional Chinese"
+msgstr "Chinés tradicional"
+
+msgid "Messages"
+msgstr "Mensaxes"
+
+msgid "Site Maps"
+msgstr "Mapas do sitio"
+
+msgid "Static Files"
+msgstr "Arquivos Estáticos"
+
+msgid "Syndication"
+msgstr "Sindicación"
+
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+msgid "…"
+msgstr "…"
+
+msgid "That page number is not an integer"
+msgstr "Ese número de páxina non é un enteiro"
+
+msgid "That page number is less than 1"
+msgstr "Ese número de páxina é menor que 1"
+
+msgid "That page contains no results"
+msgstr "Esa páxina non contén resultados"
+
+msgid "Enter a valid value."
+msgstr "Insira un valor válido."
+
+msgid "Enter a valid domain name."
+msgstr "Introduza un nome de dominio válido."
+
+msgid "Enter a valid URL."
+msgstr "Insira un URL válido."
+
+msgid "Enter a valid integer."
+msgstr "Introduza un enteiro válido."
+
+msgid "Enter a valid email address."
+msgstr "Insira un enderezo de correo electrónico válido."
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Insira un “slug” valido composto por letras, números, guións baixos ou "
+"medios."
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Insira un “slug” valido composto por letras Unicode, números, guións baixos "
+"ou medios."
+
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Introduza unha dirección %(protocol)s válida."
+
+msgid "IPv4"
+msgstr "IPv4"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 ou IPv6"
+
+msgid "Enter only digits separated by commas."
+msgstr "Insira só díxitos separados por comas."
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Asegúrese de que este valor é %(limit_value)s (agora é %(show_value)s)."
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Asegure que este valor é menor ou igual a %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Asegure que este valor é maior ou igual a %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Asegúrese de que este valor é un múltiplo do tamaño do paso %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Asegúrese de que este valor é un múltiplo do tamaño do paso %(limit_value)s, "
+"comezando por %(offset)s, p. ex. %(offset)s, %(valid_value1)s, "
+"%(valid_value2)s, e sucesivos."
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Asegúrese de que este valor ten polo menos %(limit_value)d caracter (agora "
+"ten %(show_value)d)."
+msgstr[1] ""
+"Asegúrese de que este valor ten polo menos %(limit_value)d caracteres (agora "
+"ten %(show_value)d)."
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Asegúrese de que este valor ten como moito %(limit_value)d caracter (agora "
+"ten %(show_value)d)."
+msgstr[1] ""
+"Asegúrese de que este valor ten como moito %(limit_value)d caracteres (agora "
+"ten %(show_value)d)."
+
+msgid "Enter a number."
+msgstr "Insira un número."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Asegure que non hai mais de %(max)s díxito en total."
+msgstr[1] "Asegure que non hai mais de %(max)s díxitos en total."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Asegúrese de que non hai máis de %(max)s lugar decimal."
+msgstr[1] "Asegúrese de que non hai máis de %(max)s lugares decimais."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Asegúrese de que no hai máis de %(max)s díxito antes do punto decimal."
+msgstr[1] ""
+"Asegúrese de que non hai máis de %(max)s díxitos antes do punto decimal."
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+"Non se permite a extensión  “%(extension)s”. As extensións permitidas son: "
+"%(allowed_extensions)s."
+
+msgid "Null characters are not allowed."
+msgstr "Non se permiten caracteres nulos."
+
+msgid "and"
+msgstr "e"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr "Xa existe un %(model_name)s con este %(field_labels)s."
+
+#, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Viólase a restricción “%(name)s”."
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "O valor %(value)r non é unha opción válida."
+
+msgid "This field cannot be null."
+msgstr "Este campo non pode ser nulo."
+
+msgid "This field cannot be blank."
+msgstr "Este campo non pode estar baleiro."
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+"Xa existe un modelo %(model_name)s coa etiqueta de campo %(field_label)s."
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+"%(field_label)s ten que ser único para %(lookup_type)s en "
+"%(date_field_label)s."
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Campo de tipo: %(field_type)s"
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "O valor “%(value)s” ten que ser ou True ou False."
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "O valor “%(value)s” ten que ser True, False ou None."
+
+msgid "Boolean (Either True or False)"
+msgstr "Valor booleano (verdadeiro ou falso)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Cadea (máximo %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Texto (sin límite)"
+
+msgid "Comma-separated integers"
+msgstr "Números enteiros separados por comas"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+"O valor “%(value)s” ten un formato inválido de data. Debe estar no formato "
+"AAAA-MM-DD."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+"O valor “%(value)s” ten o formato correcto (AAAA-MM-DD) pero non é unha data "
+"válida."
+
+msgid "Date (without time)"
+msgstr "Data (sen a hora)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"O valor “%(value)s” ten un formato non válido. Debe de ter o formato AAAA-MM-"
+"DD HH:MM[:ss[.uuuuuu]][TZ]. "
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+"O valor “%(value)s” ten o formato correcto (AAAA-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) pero non é unha data/hora válida."
+
+msgid "Date (with time)"
+msgstr "Data (coa hora)"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr "“%(value)s” ten que ser un número en formato decimal."
+
+msgid "Decimal number"
+msgstr "Número decimal"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+"O valor “%(value)s” ten un formato non válido. Debe de ter o formato [DD] "
+"[[HH:]MM:]ss[.uuuuuu]. "
+
+msgid "Duration"
+msgstr "Duración"
+
+msgid "Email address"
+msgstr "Enderezo electrónico"
+
+msgid "File path"
+msgstr "Ruta de ficheiro"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr "O valor “%(value)s” ten que ser un número en coma flotante."
+
+msgid "Floating point number"
+msgstr "Número en coma flotante"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "O valor “%(value)s” ten que ser un número enteiro."
+
+msgid "Integer"
+msgstr "Número enteiro"
+
+msgid "Big (8 byte) integer"
+msgstr "Enteiro grande (8 bytes)"
+
+msgid "Small integer"
+msgstr "Enteiro pequeno"
+
+msgid "IPv4 address"
+msgstr "Enderezo IPv4"
+
+msgid "IP address"
+msgstr "Enderezo IP"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "O valor “%(value)s” ten que ser None, True ou False."
+
+msgid "Boolean (Either True, False or None)"
+msgstr "Booleano (verdadeiro, falso ou ningún)"
+
+msgid "Positive big integer"
+msgstr "Número enteiro positivo grande"
+
+msgid "Positive integer"
+msgstr "Numero enteiro positivo"
+
+msgid "Positive small integer"
+msgstr "Enteiro pequeno positivo"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Slug (ata %(max_length)s)"
+
+msgid "Text"
+msgstr "Texto"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+"O valor “%(value)s” ten un formato non válido. Ten que ter o formato HH:MM[:"
+"ss[.uuuuuu]]."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+"O valor “%(value)s” ten o formato correcto (HH:MM[:ss[.uuuuuu]]) pero non é "
+"unha hora válida."
+
+msgid "Time"
+msgstr "Hora"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Raw binary data"
+msgstr "Datos binarios en crú"
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr "“%(value)s” non é un UUID válido."
+
+msgid "Universally unique identifier"
+msgstr "Identificador único universal"
+
+msgid "File"
+msgstr "Ficheiro"
+
+msgid "Image"
+msgstr "Imaxe"
+
+msgid "A JSON object"
+msgstr "Un obxeto JSON"
+
+msgid "Value must be valid JSON."
+msgstr "O valor ten que ser JSON válido."
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr "A instancia de %(model)s co %(field)s %(value)r non existe."
+
+msgid "Foreign Key (type determined by related field)"
+msgstr "Clave Foránea (tipo determinado por un campo relacionado)"
+
+msgid "One-to-one relationship"
+msgstr "Relación un a un"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "Relación %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "Relacións %(from)s-%(to)s"
+
+msgid "Many-to-many relationship"
+msgstr "Relación moitos a moitos"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
+msgid "This field is required."
+msgstr "Requírese este campo."
+
+msgid "Enter a whole number."
+msgstr "Insira un número enteiro."
+
+msgid "Enter a valid date."
+msgstr "Insira unha data válida."
+
+msgid "Enter a valid time."
+msgstr "Insira unha hora válida."
+
+msgid "Enter a valid date/time."
+msgstr "Insira unha data/hora válida."
+
+msgid "Enter a valid duration."
+msgstr "Introduza unha duración válida."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "O número de días ten que estar entre {min_days} e {max_days}."
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+"Non se enviou ficheiro ningún. Comprobe o tipo de codificación do formulario."
+
+msgid "No file was submitted."
+msgstr "Non se enviou ficheiro ningún."
+
+msgid "The submitted file is empty."
+msgstr "O ficheiro enviado está baleiro."
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+"Asegúrese de que este nome de arquivo ten como moito %(max)d caracter (agora "
+"ten %(length)d)."
+msgstr[1] ""
+"Asegúrese de que este nome de arquivo ten como moito %(max)d caracteres "
+"(agora ten %(length)d)."
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+"Ou ben envíe un ficheiro, ou ben marque a casilla de eliminar, pero non "
+"ambas as dúas cousas."
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Suba unha imaxe válida. O ficheiro subido non era unha imaxe ou esta estaba "
+"corrupta."
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+"Escolla unha opción válida. %(value)s non se atopa entre as opcións "
+"dispoñibles."
+
+msgid "Enter a list of values."
+msgstr "Insira unha lista de valores."
+
+msgid "Enter a complete value."
+msgstr "Introduza un valor completo."
+
+msgid "Enter a valid UUID."
+msgstr "Insira un UUID válido."
+
+msgid "Enter a valid JSON."
+msgstr "Introduza un JSON válido."
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(Campo oculto %(name)s) %(error)s."
+
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
+msgstr ""
+"Faltan datos ou foron manipulados de ManagementForm. Campos afectados: "
+"%(field_names)s. Debería abrir un informe de bug si o problema é persistente."
+
+#, python-format
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Por favor envíe como moito %(num)d formulario."
+msgstr[1] "Por favor envíe como moito %(num)d formularios."
+
+#, python-format
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Por favor envíe polo menos %(num)d formulario."
+msgstr[1] "Pro favor envíe polo menos %(num)d formularios."
+
+msgid "Order"
+msgstr "Orde"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Corrixa os datos duplicados no campo %(field)s."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Corrixa os datos duplicados no campo %(field)s, que debe ser único."
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Corrixa os datos duplicados no campo %(field_name)s, que debe ser único para "
+"a busca %(lookup)s no campo %(date_field)s."
+
+msgid "Please correct the duplicate values below."
+msgstr "Corrixa os valores duplicados de abaixo."
+
+msgid "The inline value did not match the parent instance."
+msgstr "O valor na liña non coincide ca instancia nai."
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Escolla unha opción válida. Esta opción non se atopa entre as opcións "
+"dispoñíbeis"
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr "“%(pk)s” non é un valor válido."
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+"%(datetime)s non se puido interpretar na zona hora horaria "
+"%(current_timezone)s; pode ser ambiguo ou non existir."
+
+msgid "Clear"
+msgstr "Limpar"
+
+msgid "Currently"
+msgstr "Actualmente"
+
+msgid "Change"
+msgstr "Modificar"
+
+msgid "Unknown"
+msgstr "Descoñecido"
+
+msgid "Yes"
+msgstr "Si"
+
+msgid "No"
+msgstr "Non"
+
+#. Translators: Please do not add spaces around commas.
+msgid "yes,no,maybe"
+msgstr "si,non,quizais"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d byte"
+msgstr[1] "%(size)d bytes"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+msgid "p.m."
+msgstr "p.m."
+
+msgid "a.m."
+msgstr "a.m."
+
+msgid "PM"
+msgstr "PM"
+
+msgid "AM"
+msgstr "AM"
+
+msgid "midnight"
+msgstr "medianoite"
+
+msgid "noon"
+msgstr "mediodía"
+
+msgid "Monday"
+msgstr "Luns"
+
+msgid "Tuesday"
+msgstr "Martes"
+
+msgid "Wednesday"
+msgstr "Mércores"
+
+msgid "Thursday"
+msgstr "Xoves"
+
+msgid "Friday"
+msgstr "Venres"
+
+msgid "Saturday"
+msgstr "Sábado"
+
+msgid "Sunday"
+msgstr "Domingo"
+
+msgid "Mon"
+msgstr "lun"
+
+msgid "Tue"
+msgstr "mar"
+
+msgid "Wed"
+msgstr "mér"
+
+msgid "Thu"
+msgstr "xov"
+
+msgid "Fri"
+msgstr "ven"
+
+msgid "Sat"
+msgstr "sáb"
+
+msgid "Sun"
+msgstr "dom"
+
+msgid "January"
+msgstr "Xaneiro"
+
+msgid "February"
+msgstr "Febreiro"
+
+msgid "March"
+msgstr "Marzo"
+
+msgid "April"
+msgstr "Abril"
+
+msgid "May"
+msgstr "Maio"
+
+msgid "June"
+msgstr "Xuño"
+
+msgid "July"
+msgstr "Xullo"
+
+msgid "August"
+msgstr "Agosto"
+
+msgid "September"
+msgstr "Setembro"
+
+msgid "October"
+msgstr "Outubro"
+
+msgid "November"
+msgstr "Novembro"
+
+msgid "December"
+msgstr "Decembro"
+
+msgid "jan"
+msgstr "xan"
+
+msgid "feb"
+msgstr "feb"
+
+msgid "mar"
+msgstr "mar"
+
+msgid "apr"
+msgstr "abr"
+
+msgid "may"
+msgstr "mai"
+
+msgid "jun"
+msgstr "xuñ"
+
+msgid "jul"
+msgstr "xul"
+
+msgid "aug"
+msgstr "ago"
+
+msgid "sep"
+msgstr "set"
+
+msgid "oct"
+msgstr "out"
+
+msgid "nov"
+msgstr "nov"
+
+msgid "dec"
+msgstr "dec"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Xan."
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Feb."
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Marzo"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Abril"
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Maio"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Xuño"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Xullo"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Ago."
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Set."
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Out."
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Nov."
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Dec."
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "Xaneiro"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "Febreiro"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "Marzo"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "Abril"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "Maio"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "Xuño"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "Xullo"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "Agosto"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "Setembro"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "Outubro"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "Novembro"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "Decembro"
+
+msgid "This is not a valid IPv6 address."
+msgstr "Isto non é un enderezo IPv6 válido."
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
+
+msgid "or"
+msgstr "ou"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d ano"
+msgstr[1] "%(num)d anos"
+
+#, python-format
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d mes"
+msgstr[1] "%(num)d meses"
+
+#, python-format
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d semana"
+msgstr[1] "%(num)d semanas"
+
+#, python-format
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d día"
+msgstr[1] "%(num)d días"
+
+#, python-format
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d hora"
+msgstr[1] "%(num)d horas"
+
+#, python-format
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minuto"
+msgstr[1] "%(num)d minutos"
+
+msgid "Forbidden"
+msgstr "Denegado"
+
+msgid "CSRF verification failed. Request aborted."
+msgstr "Fallóu a verificación CSRF. Abortouse a petición."
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+"Está vendo esta mensaxe porque este sitio HTTPS require que o navegador "
+"envíe un \"Referer header\", pero non envióu ningún. Este encabezamento é "
+"necesario por razóns de seguridade, para asegurar que o navegador non está "
+"sendo suplantado por terceiros."
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+"Se ten o navegador configurado para deshabilitar os encabezamentos "
+"\"Referer\", por favor habilíteos polo menos para este sitio, ou para "
+"conexións HTTPS, ou para peticións de \"mesmo-orixe\"."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
+msgstr ""
+"Si está usando a etiqueta <meta name=\"referrer\" content=\"no-referrer\"> "
+"ou incluíndo o encabezado “Referrer-Policy: no-referrer”, por favor quíteos. "
+"A protección CSRF require o encabezado “Referer” para facer a comprobación "
+"estricta de referer. Si lle preocupa a privacidade, use alternativas como <a "
+"rel=\"noreferrer\" …> para enlazar con sitios de terceiros."
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+"Está vendo esta mensaxe porque este sitio HTTPS require unha cookie CSRF ó "
+"enviar formularios. Esta cookie é necesaria por razóns de seguridade, para "
+"asegurar que o navegador non está sendo suplantado por terceiros."
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+"Se ten o navegador configurado para deshabilitar as cookies, por favor "
+"habilíteas, polo menos para este sitio, ou para peticións de “same-origin”."
+
+msgid "More information is available with DEBUG=True."
+msgstr "Pode ver máis información se establece DEBUG=True."
+
+msgid "No year specified"
+msgstr "Non se especificou ningún ano"
+
+msgid "Date out of range"
+msgstr "Data fora de rango"
+
+msgid "No month specified"
+msgstr "Non se especificou ningún mes"
+
+msgid "No day specified"
+msgstr "Non se especificou ningún día"
+
+msgid "No week specified"
+msgstr "Non se especificou ningunha semana"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "Non hai %(verbose_name_plural)s dispoñibles"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"Non hai dispoñibles %(verbose_name_plural)s futuros/as porque %(class_name)s."
+"allow_futuro é False"
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr "A data “%(datestr)s” non é válida para o formato “%(format)s”"
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Non se atopou ningún/ha %(verbose_name)s que coincidise coa consulta"
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "A páxina non é “last” nin se pode converter a int."
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Páxina non válida (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "A lista está baleira pero “%(class_name)s.allow_empty” é False."
+
+msgid "Directory indexes are not allowed here."
+msgstr "Os índices de directorio non están permitidos aquí."
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr "“%(path)s” non existe"
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "Índice de %(directory)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "A instalación foi un éxito! Noraboa!"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Ver as <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">notas de publicación</a> para Django "
+"%(version)s"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
+msgstr ""
+"Está vendo esta páxina porque no arquivo de axustes ten <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> e non hai ningunha URL "
+"configurada."
+
+msgid "Django Documentation"
+msgstr "Documentación de Django"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Temas, referencias, &amp; guías de uso"
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutorial: aplicación de enquisas"
+
+msgid "Get started with Django"
+msgstr "Comenzar con Django"
+
+msgid "Django Community"
+msgstr "Comunidade de Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Conectar, conseguir axuda, ou contribuir"

@@ -1,0 +1,706 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# alkuma <alok.kumar@gmail.com>, 2013
+# Chandan kumar <chandankumar.093047@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Pratik <kpratik217@gmail.com>, 2013
+# Sandeep Satavlekar <sandysat@gmail.com>, 2011
+# Vaarun Sinha, 2022
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
+"Last-Translator: Vaarun Sinha\n"
+"Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "चुने हुए %(verbose_name_plural)s  हटा दीजिये "
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s सफलतापूर्वक हटा दिया गया है |"
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s नहीं हटा सकते"
+
+msgid "Are you sure?"
+msgstr "क्या आप निश्चित हैं?"
+
+msgid "Administration"
+msgstr ""
+
+msgid "All"
+msgstr "सभी"
+
+msgid "Yes"
+msgstr "हाँ"
+
+msgid "No"
+msgstr "नहीं"
+
+msgid "Unknown"
+msgstr "अनजान"
+
+msgid "Any date"
+msgstr "कोई भी तारीख"
+
+msgid "Today"
+msgstr "आज"
+
+msgid "Past 7 days"
+msgstr "पिछले 7 दिन"
+
+msgid "This month"
+msgstr "इस महीने"
+
+msgid "This year"
+msgstr "इस साल"
+
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"कृपया कर्मचारी खाते का सही %(username)s व कूटशब्द भरें। भरते समय दीर्घाक्षर और लघु अक्षर "
+"का खयाल रखें।"
+
+msgid "Action:"
+msgstr " क्रिया:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "एक और %(verbose_name)s जोड़ें "
+
+msgid "Remove"
+msgstr "निकालें"
+
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "बदलें"
+
+msgid "Deletion"
+msgstr ""
+
+msgid "action time"
+msgstr "कार्य के लिए समय"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
+msgid "object id"
+msgstr "वस्तु की आईडी "
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "वस्तु का निरूपण"
+
+msgid "action flag"
+msgstr "कार्य ध्वज"
+
+msgid "change message"
+msgstr "परिवर्तन सन्देश"
+
+msgid "log entry"
+msgstr "लॉग प्रविष्टि"
+
+msgid "log entries"
+msgstr "लॉग प्रविष्टियाँ"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr ""
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr ""
+
+msgid "LogEntry Object"
+msgstr "LogEntry ऑब्जेक्ट"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "और"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "कोई क्षेत्र नहीं बदला"
+
+msgid "None"
+msgstr "कोई नहीं"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr ""
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr "कार्रवाई हेतु आयटम सही अनुक्रम में चुने जाने चाहिए | कोई आइटम नहीं बदले गये हैं."
+
+msgid "No action selected."
+msgstr "कोई कार्रवाई नहीं चुनी है |"
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr ""
+
+#, python-format
+msgid "Add %s"
+msgstr "%s बढाएं"
+
+#, python-format
+msgid "Change %s"
+msgstr "%s बदलो"
+
+#, python-format
+msgid "View %s"
+msgstr ""
+
+msgid "Database error"
+msgstr "डेटाबेस त्रुटि"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s का परिवर्तन कामयाब हुआ |"
+msgstr[1] "%(count)s %(name)s का परिवर्तन कामयाब हुआ |"
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s चुने"
+msgstr[1] "सभी %(total_count)s चुने "
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "%(cnt)s में से 0 चुने"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "इतिहास बदलो: %s"
+
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+msgid "Django site admin"
+msgstr "ज्याँगो साइट प्रशासन"
+
+msgid "Django administration"
+msgstr "ज्याँगो प्रशासन"
+
+msgid "Site administration"
+msgstr "साइट प्रशासन"
+
+msgid "Log in"
+msgstr "लॉगिन"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr ""
+
+msgid "Page not found"
+msgstr "पृष्ठ लापता"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
+
+msgid "Home"
+msgstr "गृह"
+
+msgid "Server error"
+msgstr "सर्वर त्रुटि"
+
+msgid "Server error (500)"
+msgstr "सर्वर त्रुटि (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "सर्वर त्रुटि <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+msgid "Run the selected action"
+msgstr "चयनित कार्रवाई चलाइये"
+
+msgid "Go"
+msgstr "आगे बढ़े"
+
+msgid "Click here to select the objects across all pages"
+msgstr "सभी पृष्ठों पर मौजूद वस्तुओं को चुनने के लिए यहाँ क्लिक करें "
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "तमाम %(total_count)s %(module_name)s चुनें"
+
+msgid "Clear selection"
+msgstr "चयन खालिज किया जाये "
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s अनुप्रयोग के प्रतिरूप"
+
+msgid "Add"
+msgstr "बढाएं"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr ""
+
+msgid "Enter a username and password."
+msgstr "उपयोगकर्ता का नाम और कूटशब्द दर्ज करें."
+
+msgid "Change password"
+msgstr "पासवर्ड बदलें"
+
+msgid "Please correct the error below."
+msgstr ""
+
+msgid "Please correct the errors below."
+msgstr ""
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "<strong>%(username)s</strong> प्रवोक्ता के लिए नयी कूटशब्द दर्ज करें ।"
+
+msgid "Welcome,"
+msgstr "आपका स्वागत है,"
+
+msgid "View site"
+msgstr ""
+
+msgid "Documentation"
+msgstr "दस्तावेज़ीकरण"
+
+msgid "Log out"
+msgstr "लॉग आउट"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s बढाएं"
+
+msgid "History"
+msgstr "इतिहास"
+
+msgid "View on site"
+msgstr "साइट पे देखें"
+
+msgid "Filter"
+msgstr "छन्नी"
+
+msgid "Clear all filters"
+msgstr ""
+
+msgid "Remove from sorting"
+msgstr "श्रेणीकरण से हटाये "
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "श्रेणीकरण प्राथमिकता : %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "टॉगल श्रेणीकरण"
+
+msgid "Delete"
+msgstr "मिटाएँ"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' को मिटाने पर सम्बंधित वस्तुएँ भी मिटा दी "
+"जाएगी, परन्तु आप के खाते में निम्नलिखित प्रकार की वस्तुओं को मिटाने की अनुमति नहीं हैं |"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' को  हटाने के लिए उनसे संबंधित निम्नलिखित "
+"संरक्षित वस्तुओं को हटाने की आवश्यकता होगी:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"क्या आप %(object_name)s \"%(escaped_object)s\" हटाना चाहते हैं? निम्नलिखित सभी "
+"संबंधित वस्तुएँ नष्ट की जाएगी"
+
+msgid "Objects"
+msgstr ""
+
+msgid "Yes, I’m sure"
+msgstr ""
+
+msgid "No, take me back"
+msgstr ""
+
+msgid "Delete multiple objects"
+msgstr "अनेक वस्तुएं हटाएँ"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"चयनित %(objects_name)s हटाने पर उस से सम्बंधित वस्तुएं भी हट जाएगी, परन्तु आपके खाते में "
+"वस्तुओं के निम्नलिखित प्रकार हटाने की अनुमति नहीं है:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"चयनित %(objects_name)s को हटाने के पश्चात् निम्नलिखित संरक्षित संबंधित वस्तुओं को हटाने "
+"की आवश्यकता होगी |"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"क्या आप ने पक्का तय किया हैं की चयनित %(objects_name)s  को नष्ट किया जाये ? "
+"निम्नलिखित सभी वस्तुएं और उनसे सम्बंधित वस्तुए भी नष्ट की जाएगी:"
+
+msgid "Delete?"
+msgstr "मिटाएँ ?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "%(filter_title)s द्वारा"
+
+msgid "Summary"
+msgstr ""
+
+msgid "Recent actions"
+msgstr ""
+
+msgid "My actions"
+msgstr ""
+
+msgid "None available"
+msgstr " कोई भी उपलब्ध नहीं"
+
+msgid "Unknown content"
+msgstr "अज्ञात सामग्री"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+msgid "Forgotten your password or username?"
+msgstr "अपना पासवर्ड या उपयोगकर्ता नाम भूल गये हैं?"
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
+msgid "Date/time"
+msgstr "तिथि / समय"
+
+msgid "User"
+msgstr "उपभोक्ता"
+
+msgid "Action"
+msgstr "कार्य"
+
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+
+msgid "Show all"
+msgstr "सभी दिखाएँ"
+
+msgid "Save"
+msgstr "सुरक्षित कीजिये"
+
+msgid "Popup closing…"
+msgstr ""
+
+msgid "Search"
+msgstr "खोज"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s परिणाम"
+msgstr[1] "%(counter)s परिणाम"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s कुल परिणाम"
+
+msgid "Save as new"
+msgstr "नये सा सहेजें"
+
+msgid "Save and add another"
+msgstr "सहेजें और एक और जोडें"
+
+msgid "Save and continue editing"
+msgstr "सहेजें और संपादन करें"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+
+msgid "Log in again"
+msgstr "फिर से लॉगिन कीजिए"
+
+msgid "Password change"
+msgstr "कूटशब्द बदलें"
+
+msgid "Your password was changed."
+msgstr "आपके कूटशब्द को बदला गया है"
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+
+msgid "Change my password"
+msgstr "कूटशब्द बदलें"
+
+msgid "Password reset"
+msgstr "कूटशब्द पुनस्थाप"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "आपके कूटशब्द को स्थापित किया गया है । अब आप लॉगिन कर सकते है ।"
+
+msgid "Password reset confirmation"
+msgstr "कूटशब्द पुष्टि"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr "कृपया आपके नये कूटशब्द को दो बार दर्ज करें ताकि हम उसकी सत्याप्ती कर सकते है ।"
+
+msgid "New password:"
+msgstr "नया कूटशब्द "
+
+msgid "Confirm password:"
+msgstr "कूटशब्द पुष्टि कीजिए"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"कूटशब्द पुनस्थाप संपर्क अमान्य है, संभावना है कि उसे उपयोग किया गया है। कृपया फिर से कूटशब्द "
+"पुनस्थाप की आवेदन करें ।"
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"आपको यह डाक इसलिए आई है क्योंकि आप ने %(site_name)s पर अपने खाते का कूटशब्द बदलने का "
+"अनुरोध किया था |"
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "कृपया निम्नलिखित पृष्ठ पर नया कूटशब्द चुनिये :"
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
+
+msgid "Thanks for using our site!"
+msgstr "हमारे साइट को उपयोग करने के लिए धन्यवाद ।"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s दल"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+
+msgid "Email address:"
+msgstr "डाक पता -"
+
+msgid "Reset my password"
+msgstr " मेरे कूटशब्द की पुनःस्थापना"
+
+msgid "All dates"
+msgstr "सभी तिथियों"
+
+#, python-format
+msgid "Select %s"
+msgstr "%s चुनें"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "%s के बदली के लिए चयन करें"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
+
+msgid "Date:"
+msgstr "तिथि:"
+
+msgid "Time:"
+msgstr "समय:"
+
+msgid "Lookup"
+msgstr "लुक अप"
+
+msgid "Currently:"
+msgstr "फ़िलहाल - "
+
+msgid "Change:"
+msgstr "बदलाव -"
