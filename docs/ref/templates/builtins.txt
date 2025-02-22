@@ -1535,7 +1535,7 @@ Built-in filter reference
 
 Adds the argument to the value.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -1543,7 +1543,7 @@ For example in a template:
 
 If ``value`` is ``4``, then the output will be ``6``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1558,7 +1558,7 @@ it'll attempt to add the values together anyway. This will work on some data
 types (strings, list, etc.) and fail on others. If it fails, the result will
 be an empty string.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -1567,7 +1567,7 @@ For example in a template:
 and ``first`` is ``[1, 2, 3]`` and ``second`` is ``[4, 5, 6]``, then the
 output will be ``[1, 2, 3, 4, 5, 6]``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1589,7 +1589,7 @@ The output of ``sometext`` will be ``[1, 2, 3, 4, 5, 6]``.
 
 Adds slashes before quotes. Useful for escaping strings in CSV, for example.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -1598,7 +1598,7 @@ For example in a template:
 If ``value`` is ``"I'm using Django"``, the output will be
 ``"I\'m using Django"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1617,7 +1617,7 @@ If ``value`` is ``"I'm using Django"``, the output will be
 Capitalizes the first character of the value. If the first character is not
 a letter, this filter has no effect.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -1625,7 +1625,7 @@ For example in a template:
 
 If ``value`` is ``"django"``, the output will be ``"Django"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1642,7 +1642,7 @@ If ``value`` is ``"django"``, the output will be ``"Django"``.
 
 Centers the value in a field of a given width.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -1650,7 +1650,7 @@ For example in a template:
 
 If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1676,7 +1676,7 @@ For example in t a template:
 If ``value`` is ``"String with spaces"``, the output will be
 ``"Stringwithspaces"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1791,7 +1791,7 @@ Format character  Description                               Example output
                   (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -1836,7 +1836,7 @@ representation of a ``datetime`` value. E.g.:
     {{ value|date:"D d M Y" }} {{ value|time:"H:i" }}
 
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1902,7 +1902,7 @@ representation of a ``datetime`` value. E.g.:
 If value evaluates to ``False``, uses the given default. Otherwise, uses the
 value.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -1910,7 +1910,7 @@ For example in a template:
 
 If ``value`` is ``""`` (the empty string), the output will be ``nothing``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1931,7 +1931,7 @@ value.
 Note that if an empty string is given, the default value will *not* be used.
 Use the :tfilter:`default` filter if you want to fallback for empty strings.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -1939,7 +1939,7 @@ For example in a template:
 
 If ``value`` is ``None``, the output will be ``nothing``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -1957,7 +1957,7 @@ The output of ``sometext`` will be ``nothing``.
 Takes a list of dictionaries and returns that list sorted by the key given in
 the argument.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2043,7 +2043,7 @@ produce empty output:
 
     {{ values|dictsort:"0" }}
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2070,7 +2070,7 @@ The value of ``sorted_list`` will be:
 
 You can also do more complicated things like:
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2099,7 +2099,7 @@ The value of ``sorted_list`` will be:
 ``__getitem__()``) by elements at specified index. For example:
 
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2142,7 +2142,7 @@ but the returned value will be in reverse order.
 
 Returns ``True`` if the value is divisible by the argument.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2150,7 +2150,7 @@ For example in a template:
 
 If ``value`` is ``21``, the output would be ``True``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2228,7 +2228,7 @@ Applies the :tfilter:`escape` filter to each element of a sequence. Useful in
 conjunction with other filters that operate on sequences, such as
 :tfilter:`join`. 
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2236,7 +2236,7 @@ For example in a template:
         {{ my_list|escapeseq|join:", " }}
     {% endautoescape %}
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2257,7 +2257,7 @@ The output will be ``"&lt;b&gt;first&lt;/b&gt;, &lt;i&gt;second&lt;/i&gt;"``.
 Formats the value like a 'human-readable' file size (i.e. ``'13 KB'``,
 ``'4.1 MB'``, ``'102 bytes'``, etc.).
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2265,7 +2265,7 @@ For example in a template:
 
 If ``value`` is 123456789, the output would be ``117.7 MB``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2290,7 +2290,7 @@ The value of ``formatted_size`` will be ``'117.7\xa0MB'``.
 
 Returns the first item in a list.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2298,7 +2298,7 @@ For example in a template:
 
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2425,7 +2425,7 @@ digit, 2 is the second-right-most digit, etc. Returns the original value for
 invalid input (if input or argument is not an integer, or if argument is less
 than 1). Otherwise, output is always an integer.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2433,7 +2433,7 @@ For example in a template:
 
 If ``value`` is ``123456789``, the output will be ``8``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2455,7 +2455,7 @@ strings containing non-ASCII characters in a URL.
 It's safe to use this filter on a string that has already gone through the
 :tfilter:`urlencode` filter.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2464,7 +2464,7 @@ For example in a template:
 If ``value`` is ``"?test=I ♥ Django"``, the output will be
 ``"?test=I%20%E2%99%A5%20Django"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2482,7 +2482,7 @@ If ``value`` is ``"?test=I ♥ Django"``, the output will be
 
 Joins a list with a string, like Python's ``str.join(list)``
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2491,7 +2491,7 @@ For example in a template:
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 ``"a // b // c"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2547,7 +2547,7 @@ executable code.
 
 Returns the last item in a list.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2556,7 +2556,7 @@ For example in a template:
 If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output will be the
 string ``"d"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2573,7 +2573,7 @@ The value of ``last_item`` will be ``"d"``.
 
 Returns the length of the value. This works for both strings and lists.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2582,7 +2582,7 @@ For example in a template:
 If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 ``4``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2620,7 +2620,7 @@ slug</p>``.
 Converts all newlines in a piece of plain text to HTML line breaks
 (``<br>``).
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2629,7 +2629,7 @@ For example in a template:
 If ``value`` is ``Joel\nis a slug``, the output will be ``Joel<br>is a
 slug``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2646,7 +2646,7 @@ The output will be ``"Joel<br>is a slug"``.
 
 Displays text with line numbers.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2668,7 +2668,7 @@ the output will be:
     2. two
     3. three
 
-for example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2691,7 +2691,7 @@ Left-aligns the value in a field of a given width.
 
 **Argument:** field size
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2699,7 +2699,7 @@ For example in a template:
 
 If ``value`` is ``Django``, the output will be ``"Django    "``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2716,7 +2716,7 @@ The output will be ``"Django    "``.
 
 Converts a string into all lowercase.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2725,7 +2725,7 @@ For example in a template:
 If ``value`` is ``Totally LOVING this Album!``, the output will be
 ``totally loving this album!``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2743,7 +2743,7 @@ The output will be ``"totally loving this album!"``.
 Returns the value turned into a list. For a string, it's a list of characters.
 For an integer, the argument is cast to a string before creating a list.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2753,7 +2753,7 @@ If ``value`` is the string ``"Joel"``, the output would be the list
 ``['J', 'o', 'e', 'l']``. If ``value`` is ``123``, the output will be the
 list ``['1', '2', '3']``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2774,7 +2774,7 @@ equivalent.
 The input doesn't have to be a valid phone number. This will happily convert
 any string.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2790,7 +2790,7 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 Returns a plural suffix if the value is not ``1``, ``'1'``, or an object of
 length 1. By default, this suffix is ``'s'``.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2817,7 +2817,7 @@ Example:
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2871,7 +2871,7 @@ A wrapper around :func:`pprint.pprint` -- for debugging, really.
 
 Returns a random item from the given list.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2879,7 +2879,7 @@ For example in a template:
 
 If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2898,7 +2898,7 @@ Right-aligns the value in a field of a given width.
 
 **Argument:** field size
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2906,7 +2906,7 @@ For example in a template:
 
 If ``value`` is ``Django``, the output will be ``"    Django"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -2979,7 +2979,7 @@ Converts to ASCII. Converts spaces to hyphens. Removes characters that aren't
 alphanumerics, underscores, or hyphens. Converts to lowercase. Also strips
 leading and trailing whitespace.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -2987,7 +2987,7 @@ For example in a template:
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3006,7 +3006,7 @@ Formats the variable according to the argument, a string formatting specifier.
 This specifier uses the :ref:`old-string-formatting` syntax, with the exception
 that the leading "%" is dropped.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3014,7 +3014,7 @@ For example in a template:
 
 If ``value`` is ``10``, the output will be ``1.000000E+01``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3031,7 +3031,7 @@ The value of ``formatted_value`` will be ``"1.000000E+01"``.
 
 Makes all possible efforts to strip all [X]HTML tags.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3040,7 +3040,7 @@ For example in a template:
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``, the
 output will be ``"Joel is a slug"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3068,7 +3068,7 @@ Given format can be the predefined one :setting:`TIME_FORMAT`, or a custom
 format, same as the :tfilter:`date` filter. Note that the predefined format
 is locale-dependent.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3224,7 +3224,7 @@ Converts a string into titlecase by making words start with an uppercase
 character and the remaining characters lowercase. This tag makes no effort to
 keep "trivial words" in lowercase.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3232,7 +3232,7 @@ For example in a template:
 
 If ``value`` is ``"my FIRST post"``, the output will be ``"My First Post"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3252,7 +3252,7 @@ Truncated strings will end with a translatable ellipsis character ("…").
 
 **Argument:** Number of characters to truncate to
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3260,7 +3260,7 @@ For example in a template:
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i…"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3283,7 +3283,7 @@ Similar to :tfilter:`truncatechars`, except that it is aware of HTML tags. Any
 tags that are opened in the string and not closed before the truncation point
 are closed immediately after the truncation.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3292,7 +3292,7 @@ For example in a template:
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
 ``"<p>Joel i…</p>"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3319,7 +3319,7 @@ Truncates a string after a certain number of words.
 
 **Argument:** Number of words to truncate after
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3327,7 +3327,7 @@ For example in a template:
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is …"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3351,7 +3351,7 @@ are closed immediately after the truncation.
 This is less efficient than :tfilter:`truncatewords`, so should only be used
 when it is being passed HTML text.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3360,7 +3360,7 @@ For example in a template:
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
 ``"<p>Joel is …</p>"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3425,7 +3425,7 @@ The output of ``html`` will be
 
 Converts a string into all uppercase.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3433,7 +3433,7 @@ For example in a template:
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"JOEL IS A SLUG"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3450,7 +3450,7 @@ The output of ``uppercased`` will be ``"JOEL IS A SLUG"``.
 
 Escapes a value for use in a URL.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3459,7 +3459,7 @@ For example in a template:
 If ``value`` is ``"https://www.example.org/foo?a=b&c=d"``, the output will be
 ``"https%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3476,7 +3476,7 @@ be provided.
 If not provided, the '/' character is assumed safe. An empty string can be
 provided when *all* characters should be escaped. 
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3485,7 +3485,7 @@ For example in a template:
 If ``value`` is ``"https://www.example.org/"``, the output will be
 ``"https%3A%2F%2Fwww.example.org%2F"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3516,7 +3516,7 @@ punctuation (opening parens), and ``urlize`` will still do the right thing.
 Links generated by ``urlize`` have a ``rel="nofollow"`` attribute added
 to them.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3526,7 +3526,7 @@ If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
 ``"Check out <a href="http://www.djangoproject.com"
 rel="nofollow">www.djangoproject.com</a>"``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3576,7 +3576,7 @@ truncates URLs longer than the given character limit.
 **Argument:** Number of characters that link text should be truncated to,
 including the ellipsis that's added if truncation is necessary.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3586,7 +3586,7 @@ If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
 ``'Check out <a href="http://www.djangoproject.com"
 rel="nofollow">www.djangoproj…</a>'``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3607,7 +3607,7 @@ As with urlize_, this filter should only be applied to plain text.
 
 Returns the number of words.
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3615,7 +3615,7 @@ For example in a template:
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``4``.
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3634,7 +3634,7 @@ Wraps words at specified line length.
 
 **Argument:** number of characters at which to wrap the text
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
@@ -3648,7 +3648,7 @@ If ``value`` is ``Joel is a slug``, the output would be:
     is a
     slug
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
@@ -3667,13 +3667,13 @@ Maps values for ``True``, ``False``, and (optionally) ``None``, to the strings
 "yes", "no", "maybe", or a custom mapping passed as a comma-separated list, and
 returns one of those strings according to the value:
 
-For example in a template:
+For example, in a template:
 
 .. code-block:: html+django
 
     {{ value|yesno:"yeah,no,maybe" }}
 
-For example in Python:
+For example, in Python:
 
 .. code-block:: python
 
