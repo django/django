@@ -1,0 +1,83 @@
+===========
+Fetch modes
+===========
+
+.. module:: django.db.models.fields.fetch_modes
+
+.. currentmodule:: django.db.models
+
+When accessing model fields that were not loaded as part of the original query,
+Django will fetch that field’s data from the database. You can customize the
+behavior of this fetching with a **fetch mode**.
+
+Available modes
+===============
+
+Django provides three modes:
+
+* .. attribute:: FETCH_ONE
+
+    Fetches the missing field for the current instance only. This is the
+    default mode.
+
+* .. attribute:: FETCH_PEERS
+
+    Fetches the missing field for all instances that came from the same
+    ``QuerySet``. This behavior is based on the assumption that if you need a
+    field for one instance, you probably need it for all instances in the same
+    batch, because you’re likely looping over them.
+
+    This mode reduces most cases of the “N+1 queries problem” to two queries.
+
+* .. attribute:: RAISE
+
+    Raises a :exc:`~django.core.exceptions.FieldFetchBlocked` exception. Use
+    this mode to prevent unintentional queries in performance-critical sections
+    of code.
+
+Selecting a fetch mode
+======================
+
+Use one of these functions to change the fetch mode.
+
+.. function:: set_default_fetch_mode(mode)
+
+    Sets the global default fetch mode. This mode will be used for all field
+    fetching wherever a specific mode isn't set.
+
+    For example, to use the ``FETCH_PEERS`` mode globally, you could add this
+    code within an :meth:`AppConfig.ready <django.apps.AppConfig.ready>` method:
+
+    .. code-block:: python
+
+        from django.apps import AppConfig
+        from django.db.models import set_default_fetch_mode, FETCH_PEERS
+
+
+        class ExampleConfig(AppConfig):
+            ...
+
+            def ready(self):
+                set_default_fetch_mode(FETCH_PEERS)
+
+.. function:: fetch_mode(mode)
+
+    A function decorator and context manager that sets the fetch mode for a
+    section of code. This mode will be used for all field fetching within the
+    decorated function or context, within the current thread or asynchronous
+    task.
+
+    For example, to prevent further database queries during template rendering,
+    you could use ``RAISE`` around a call to :func:`~django.shortcuts.render`:
+
+    .. code-block:: python
+
+        from django.db.models import fetch_mode, RAISE
+
+
+        def dashboard(request):
+            ...
+            # Raise a FieldFetchBlocked exception for any on-demand queries
+            # attempted during template rendering
+            with fetch_mode(RAISE):
+                return render(request, "dashboard.html", context)
