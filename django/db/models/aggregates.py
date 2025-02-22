@@ -3,6 +3,7 @@ Classes to represent the definitions of aggregate functions.
 """
 
 from django.core.exceptions import FieldError, FullResultSet
+from django.db import NotSupportedError
 from django.db.models.expressions import Case, ColPairs, Func, Star, Value, When
 from django.db.models.fields import IntegerField
 from django.db.models.functions import Coalesce
@@ -13,6 +14,7 @@ from django.db.models.functions.mixins import (
 
 __all__ = [
     "Aggregate",
+    "AnyValue",
     "Avg",
     "Count",
     "Max",
@@ -152,6 +154,19 @@ class Aggregate(Func):
         if self.filter:
             options["filter"] = self.filter
         return options
+
+
+class AnyValue(Aggregate):
+    function = "ANY_VALUE"
+    name = "AnyValue"
+    arity = 1
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_any_value:
+            raise NotSupportedError(
+                "ANY_VALUE is not supported on this database backend."
+            )
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
