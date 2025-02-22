@@ -12,6 +12,8 @@ from django.db import close_old_connections
 from django.http import (
     BadHeaderError,
     HttpResponse,
+    HttpResponseCreated,
+    HttpResponseNoContent,
     HttpResponseNotAllowed,
     HttpResponseNotModified,
     HttpResponsePermanentRedirect,
@@ -548,6 +550,18 @@ class HttpResponseTests(SimpleTestCase):
 
 
 class HttpResponseSubclassesTests(SimpleTestCase):
+    def test_created(self):
+        response = HttpResponseCreated()
+        self.assertEqual(response.status_code, 201)
+
+    def test_no_content(self):
+        response = HttpResponseNoContent()
+        self.assertEqual(response.status_code, 204)
+        # 204 responses should not have content/content-type
+        with self.assertRaises(AttributeError):
+            response.content = "Hello dear"
+        self.assertNotIn("content-type", response)
+
     def test_redirect(self):
         response = HttpResponseRedirect("/redirected/")
         self.assertEqual(response.status_code, 302)

@@ -1072,6 +1072,21 @@ Django includes a number of ``HttpResponse`` subclasses that handle different
 types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 :mod:`django.http`.
 
+.. class:: HttpResponseCreated
+
+    Acts just like :class:`HttpResponse` but uses a 201 status code. Use this to
+    indicate that a resource has been successfully created.
+
+    .. versionadded:: 6.0
+
+.. class:: HttpResponseNoContent
+
+    The constructor doesn't take any arguments and no content should be added
+    to this response. Use this to indicate that a HTTP request has been
+    successfully completed, and there is no message body (status code 204).
+
+    .. versionadded:: 6.0
+
 .. class:: HttpResponseRedirect
 
     The first argument to the constructor is required -- the path to redirect

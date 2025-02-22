@@ -183,7 +183,14 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Two new subclasses of :class:`response <django.http.HttpResponse>` are added,
+  that can be especially useful when developing RESTful applications:
+
+  * :class:`response <django.http.HttpResponseCreated>` which is exactly the
+    same as a HttpResponse, but returns status code 201 ("Created")
+
+  * :class:`response <django.http.HttpResponseNoContent>` which returns a
+     HTTP 204 response with no content
 
 Security
 ~~~~~~~~
