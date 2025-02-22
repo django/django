@@ -15,6 +15,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
 from django.utils.hashable import make_hashable
 from django.utils.html import format_html
+from django.utils.http import urlencode
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import capfirst
 from django.utils.translation import ngettext
@@ -317,6 +318,25 @@ def lookup_field(name, obj, model_admin=None):
         attr = None
         value = getattr(obj, name)
     return f, attr, value
+
+
+def get_query_string(params, new_params=None, remove=None):
+    if new_params is None:
+        new_params = {}
+    if remove is None:
+        remove = []
+    params = params.copy()
+    for key in remove:
+        for target in list(params):
+            if target.startswith(key):
+                del params[target]
+    for key, value in new_params.items():
+        if value is None:
+            if key in params:
+                del params[key]
+        else:
+            params[key] = value
+    return "?%s" % urlencode(sorted(params.items()), doseq=True)
 
 
 def _get_non_gfk_field(opts, name):

@@ -1,19 +1,19 @@
 import datetime
 
+from django.contrib.admin.options import ALL_VAR, PAGE_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field,
     display_for_value,
     get_fields_from_path,
+    get_query_string,
     label_for_field,
     lookup_field,
 )
 from django.contrib.admin.views.main import (
-    ALL_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
     ORDER_VAR,
-    PAGE_VAR,
     SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
@@ -35,36 +35,43 @@ register = Library()
 
 
 @register.simple_tag
-def paginator_number(cl, i):
+def paginator_number(pagination, i):
     """
     Generate an individual page index link in a paginated list.
     """
-    if i == cl.paginator.ELLIPSIS:
-        return format_html("{} ", cl.paginator.ELLIPSIS)
-    elif i == cl.page_num:
+    if i == pagination.paginator.ELLIPSIS:
+        return format_html("{} ", pagination.paginator.ELLIPSIS)
+    elif i == pagination.page_num:
         return format_html('<span class="this-page">{}</span> ', i)
     else:
         return format_html(
             '<a href="{}"{}>{}</a> ',
-            cl.get_query_string({PAGE_VAR: i}),
-            mark_safe(' class="end"' if i == cl.paginator.num_pages else ""),
+            get_query_string(pagination.filter_params, {PAGE_VAR: i}),
+            mark_safe(' class="end"' if i == pagination.paginator.num_pages else ""),
             i,
         )
 
 
-def pagination(cl):
+def pagination(pagination):
     """
     Generate the series of links to the pages in a paginated list.
     """
-    pagination_required = (not cl.show_all or not cl.can_show_all) and cl.multi_page
+    pagination_required = (
+        not pagination.show_all or not pagination.can_show_all
+    ) and pagination.multi_page
     page_range = (
-        cl.paginator.get_elided_page_range(cl.page_num) if pagination_required else []
+        pagination.paginator.get_elided_page_range(pagination.page_num)
+        if pagination_required
+        else []
     )
-    need_show_all_link = cl.can_show_all and not cl.show_all and cl.multi_page
+    need_show_all_link = (
+        pagination.can_show_all and not pagination.show_all and pagination.multi_page
+    )
     return {
-        "cl": cl,
+        "pagination": pagination,
         "pagination_required": pagination_required,
-        "show_all_url": need_show_all_link and cl.get_query_string({ALL_VAR: ""}),
+        "show_all_url": need_show_all_link
+        and get_query_string(pagination.filter_params, {ALL_VAR: ""}),
         "page_range": page_range,
         "ALL_VAR": ALL_VAR,
         "1": 1,
@@ -76,8 +83,19 @@ def pagination_tag(parser, token):
     return InclusionAdminNode(
         parser,
         token,
-        func=pagination,
+        func=lambda pagination, **kwargs: pagination.pagination_context(**kwargs),
         template_name="pagination.html",
+        takes_context=False,
+    )
+
+
+@register.tag(name="change_list_pagination")
+def changelist_pagination_tag(parser, token):
+    return InclusionAdminNode(
+        parser,
+        token,
+        func=lambda pagination, **kwargs: pagination.pagination_context(**kwargs),
+        template_name="change_list_pagination.html",
         takes_context=False,
     )
 
@@ -169,9 +187,15 @@ def result_headers(cl):
             "sorted": is_sorted,
             "ascending": order_type == "asc",
             "sort_priority": sort_priority,
-            "url_primary": cl.get_query_string({ORDER_VAR: ".".join(o_list_primary)}),
-            "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove)}),
-            "url_toggle": cl.get_query_string({ORDER_VAR: ".".join(o_list_toggle)}),
+            "url_primary": get_query_string(
+                cl.filter_params, {ORDER_VAR: ".".join(o_list_primary)}
+            ),
+            "url_remove": get_query_string(
+                cl.filter_params, {ORDER_VAR: ".".join(o_list_remove)}
+            ),
+            "url_toggle": get_query_string(
+                cl.filter_params, {ORDER_VAR: ".".join(o_list_toggle)}
+            ),
             "class_attrib": (
                 format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
             ),
@@ -386,7 +410,7 @@ def date_hierarchy(cl):
         day_lookup = cl.params.get(day_field)
 
         def link(filters):
-            return cl.get_query_string(filters, [field_generic])
+            return get_query_string(cl.filter_params, filters, [field_generic])
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level

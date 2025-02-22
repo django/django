@@ -43,7 +43,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :attr:`~django.contrib.admin.ModelAdmin.list_per_page` and
+  :attr:`~django.contrib.admin.ModelAdmin.list_max_show_all` attributes
+  now apply to history page pagination in addition to change list page.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
