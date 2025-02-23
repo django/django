@@ -155,3 +155,9 @@ class CompositePKModelsTests(TestCase):
         self.assertEqual(4, token.permission_set.count())
         self.assertEqual(4, user.permission_set.count())
         self.assertEqual(4, comment.permission_set.count())
+
+    def test_refresh_foreign_object(self):
+        comment = Comment.objects.get(pk=self.comment_1.pk)
+        comment.user = None
+        comment.refresh_from_db()
+        self.assertEqual(comment.user, self.user_1)
