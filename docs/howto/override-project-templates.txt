@@ -3,10 +3,7 @@ How to change the files generated from ``startproject`` and ``startapp``
 ========================================================================
 
 
-Introduction
-============
-
-The first command you will run when setting up a django project is
+The first command you will run when setting up a Django project is
 :djadmin:`startproject`. Having set up your project, you will then start
 creating your apps with :djadmin:`startapp`. Each of these commands will create
 a file structure that is based on default templates within the Django
@@ -30,7 +27,7 @@ command. Here the command is run with the project name as ``myproject``:
 The resulting file structure is based on the default template-file structure in
 (:source:`django/conf/project_templates`). There, each file has the extension
 ``.py-tpl`` to denote the file as a template. Each template contains template
-tags that end up being filled from the command and django version context. The
+tags that end up being filled from the command and Django version context. The
 template context is detailed at the end of the documentation for
 :djadmin:`startproject`.
 
@@ -81,8 +78,8 @@ will be passed.
 Creating your own Project and App Templates
 ===========================================
 
-The default project and app file structures are the ones suggested by django,
-but not the only ones that can be used. Because django does not require a
+The default project and app file structures are the ones suggested by Django,
+but not the only ones that can be used. Because Django does not require a
 specific file structure for the ``settings`` or ``urls`` files, you can create
 your own structure. The only thing to watch out for is that the imports and
 references to other modules is correct. As long as the files find each other,
@@ -129,10 +126,10 @@ applicable) insert the context. When the files are copied from a custom project
 template, they are copied directly without any code modifications from the
 default templates. It is up to the developer to make sure that the template
 file structure and code actually works, and that they contain up-to-date code,
-settings, and variables for the version of django being used. When updating the
+settings, and variables for the version of Django being used. When updating the
 Django version, it is recommended to double-check against the default project
 or app template files to see what has been added or changed. It is highly
-recommended to start a django project first, make sure that the files work
+recommended to start a Django project first, make sure that the files work
 together, and then create a template based on that file structure and content.
 
 As a example, a flat Django project can look like this, with all of the files
