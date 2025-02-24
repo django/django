@@ -40,6 +40,7 @@ from .models import (
     Profile,
     ProfileCollection,
     Question,
+    ShoppingWeakness,
     ShowInlineParent,
     Sighting,
     SomeChildModel,
@@ -166,6 +167,37 @@ class TestInline(TestDataMixin, TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(Fashionista.objects.filter(person__firstname="Imelda")), 1)
+
+    def test_inline_constraints_validation(self):
+        person = Person.objects.create(firstname="Nami")
+        item = OutfitItem.objects.create(name="Jewellery")
+        fashionista = Fashionista.objects.create(person=person)
+        weakness = ShoppingWeakness.objects.create(fashionista=fashionista, item=item)
+
+        data = {
+            "person": person.id,
+            "shoppingweakness_set-TOTAL_FORMS": 2,
+            "shoppingweakness_set-INITIAL_FORMS": 1,
+            "shoppingweakness_set-MAX_NUM_FORMS": 1000,
+            "_save": "Save",
+            # Initial form data.
+            "shoppingweakness_set-0-id": weakness.id,
+            "shoppingweakness_set-0-fashionista": fashionista.person.id,
+            "shoppingweakness_set-0-item": item.id,
+            # Extra form with duplicate data should trigger validation error.
+            "shoppingweakness_set-1-id": "",
+            "shoppingweakness_set-1-fashionista": fashionista.person.id,
+            "shoppingweakness_set-1-item": item.id,
+        }
+        change_url = reverse(
+            "admin:admin_inlines_fashionista_change", args=(fashionista.pk,)
+        )
+        response = self.client.post(change_url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Duplicate fashionista and item data entered.",
+        )
 
     def test_tabular_inline_column_css_class(self):
         """

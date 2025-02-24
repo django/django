@@ -180,6 +180,16 @@ class ShoppingWeakness(models.Model):
     fashionista = models.ForeignKey(Fashionista, models.CASCADE)
     item = models.ForeignKey(OutfitItem, models.CASCADE)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                "fashionista",
+                "item",
+                name="unique_fashionista_item",
+                violation_error_message="Duplicate fashionista and item data entered.",
+            )
+        ]
+
 
 # Models for #35189
 
