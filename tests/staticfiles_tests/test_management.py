@@ -30,7 +30,8 @@ class TestNoFilesCreated:
         """
         Make sure no files were create in the destination directory.
         """
-        self.assertEqual(os.listdir(settings.STATIC_ROOT), [])
+        with os.scandir(settings.STATIC_ROOT) as entries:
+            self.assertEqual(next(entries, None), None)
 
 
 class TestRunserver(StaticFilesTestCase):
