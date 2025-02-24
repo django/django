@@ -178,7 +178,7 @@ Templating non-Python files
 
 Since the commands that use the templates just copy files, you can have any
 type of file in the project or app template. This is especially useful if you
-want to set up frontend or infrastructure files within the project template.
+want to set up front-end or infrastructure files within the project template.
 
 Any type of file is supported as long as it doesn't end with ``.pyo``,
 ``.pyc``, or ``.py.class``. Any type of directory is supported as long as it
@@ -218,7 +218,7 @@ To add non-python files to the templating engine, add the names to the
 
     $ django-admin startproject myproject . --extension js,toml
 
-So now all Javascript and toml files will be run through the templating engine
+So now all JavaScript and TOML files will be run through the templating engine
 to replace any variables.
 
 If you are using any non-python files that you need run through the templating
