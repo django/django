@@ -25,7 +25,7 @@ command. Here the command is run with the project name as ``myproject``:
    $ django-admin startproject myproject .
 
 The resulting file structure is based on the default template-file structure in
-(:source:`django/conf/project_templates`). There, each file has the extension
+(:source:`django/conf/project_template`). There, each file has the extension
 ``.py-tpl`` to denote the file as a template. Each template contains template
 tags that end up being filled from the command and Django version context. The
 template context is detailed at the end of the documentation for
@@ -57,10 +57,10 @@ A typical command to initialize an app with the name ``myapp``:
    $ python manage.py startapp myapp .
 
 This creates an app in the current directory with the default file structure
-found in (:source:`django/conf/app_templates`). As above, each template  has
-the extension ``.py-tpl`` to denote the file as a template, but is copied over
-as a python file. Each template contains template tags for the variables that
-will be passed.
+found in (:source:`django/conf/app_template`). As above, each template has the
+extension ``.py-tpl`` to denote the file as a template, but is copied over as a
+python file. Each template contains template tags for the variables that will
+be passed.
 
 .. code-block:: none
 
