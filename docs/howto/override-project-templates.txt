@@ -209,14 +209,16 @@ The basic command to start your project using your new template is:
 
 .. console::
 
-    $ django-admin startproject myproject .
+    $ django-admin startproject --template
+    /path_to_my_templates/myproject_template myproject
 
 To add non-python files to the templating engine, add the names to the
 ``extension`` flag like so:
 
 .. console::
 
-    $ django-admin startproject myproject . --extension js,toml
+    $ django-admin startproject --template
+    /path_to_my_templates/myproject_template myproject --extension js,toml
 
 So now all JavaScript and TOML files will be run through the templating engine
 to replace any variables.
@@ -228,7 +230,9 @@ template engine, you can add them individually after the ``name`` flag:
 
 .. console::
 
-    $ django-admin startproject myproject . --name Dockerfile,.gitignore
+    $ django-admin startproject --template
+    /path_to_my_templates/myproject_template myproject --name
+    Dockerfile,.gitignore
 
 To exclude any directories from being affected by the template engine, you can
 use the ``exclude`` flag and they will be removed from the folders to go
@@ -236,10 +240,13 @@ through templating:
 
 .. console::
 
-    $ django-admin startproject myproject . --exclude frontend,reference
+    $ django-admin startproject --template
+    /path_to_my_templates/myproject_template myproject --exclude
+    frontend,reference
 
-The flag usage above holds true for ``python manage.py startapp .``, but,
-instead, you would be working on the app level instead of the project level.
+The flag usage above holds true for ``python manage.py startapp --template
+/path_to_my_templates/myapp_template``, but, instead, you would be working on
+the app level instead of the project level.
 
 For more information, you can visit the documentation for
 :djadmin:`startproject` and :djadmin:`startapp`.
