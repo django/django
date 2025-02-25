@@ -159,6 +159,7 @@ def loads(
     serializer=JSONSerializer,
     max_age=None,
     fallback_keys=None,
+    expiration_key=None,
 ):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
@@ -166,11 +167,11 @@ def loads(
     The serializer is expected to accept a bytestring.
     """
     return TimestampSigner(
-        key=key, salt=salt, fallback_keys=fallback_keys
+        key=key,
+        salt=salt,
+        fallback_keys=fallback_keys,
     ).unsign_object(
-        s,
-        serializer=serializer,
-        max_age=max_age,
+        s, serializer=serializer, max_age=max_age, expiration_key=expiration_key
     )
 
 
@@ -266,12 +267,28 @@ class TimestampSigner(Signer):
         """
         result = super().unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
-        timestamp = b62_decode(timestamp)
-        if max_age is not None:
-            if isinstance(max_age, datetime.timedelta):
-                max_age = max_age.total_seconds()
-            # Check timestamp is not older than max_age
-            age = time.time() - timestamp
-            if age > max_age:
-                raise SignatureExpired("Signature age %s > %s seconds" % (age, max_age))
+        self.payload_timestamp = b62_decode(timestamp)
+        self._verify_max_age(max_age)
         return value
+
+    def unsign_object(self, signed_obj, max_age=None, expiration_key=None, **kwargs):
+        # First verify the outer max_age boundary
+        value = super().unsign_object(signed_obj, max_age=max_age, **kwargs)
+
+        # Then if expiration_key is provided, check it as an additional constraint
+        if expiration_key is not None:
+            expiry = value.get(expiration_key)
+            if expiry is not None:
+                self._verify_max_age(expiry)
+
+        return value
+
+    def _verify_max_age(self, max_age=None):
+        if max_age is None:
+            return
+        if isinstance(max_age, datetime.timedelta):
+            max_age = max_age.total_seconds()
+        # Check timestamp is not older than max_age
+        age = time.time() - self.payload_timestamp
+        if age > max_age:
+            raise SignatureExpired("Signature age %s > %s seconds" % (age, max_age))
