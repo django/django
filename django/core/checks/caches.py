@@ -21,6 +21,16 @@ def check_default_cache_is_configured(app_configs, **kwargs):
 
 @register(Tags.caches, deploy=True)
 def check_cache_location_not_exposed(app_configs, **kwargs):
+    cache = None
+    alias_name = ""
+    for alias, config in settings.CACHES.items():
+        if config.get("BACKEND").endswith("FileBasedCache"):
+            cache = caches[alias]
+            alias_name = alias
+
+    if cache is None:
+        return []
+
     errors = []
     for name in ("MEDIA_ROOT", "STATIC_ROOT", "STATICFILES_DIRS"):
         setting = getattr(settings, name, None)
@@ -34,43 +44,29 @@ def check_cache_location_not_exposed(app_configs, **kwargs):
                 paths.add(pathlib.Path(staticfiles_dir).resolve())
         else:
             paths = {pathlib.Path(setting).resolve()}
-        for alias in settings.CACHES:
-            cache = caches[alias]
-            if not isinstance(cache, FileBasedCache):
-                continue
-            cache_path = pathlib.Path(cache._dir).resolve()
-            if any(path == cache_path for path in paths):
-                relation = "matches"
-            elif any(path in cache_path.parents for path in paths):
-                relation = "is inside"
-            elif any(cache_path in path.parents for path in paths):
-                relation = "contains"
-            else:
-                continue
-            errors.append(
-                Warning(
-                    f"Your '{alias}' cache configuration might expose your cache "
-                    f"or lead to corruption of your data because its LOCATION "
-                    f"{relation} {name}.",
-                    id="caches.W002",
-                )
-            )
+
+        check_result = FileBasedCache.check(cache, paths, name, alias_name)
+        errors.append(check_result) if check_result else []
+
     return errors
 
 
 @register(Tags.caches)
 def check_file_based_cache_is_absolute(app_configs, **kwargs):
-    errors = []
+    alias_name = None
+    location = None
     for alias, config in settings.CACHES.items():
-        cache = caches[alias]
-        if not isinstance(cache, FileBasedCache):
-            continue
-        if not pathlib.Path(config["LOCATION"]).is_absolute():
-            errors.append(
-                Warning(
-                    f"Your '{alias}' cache LOCATION path is relative. Use an "
-                    f"absolute path instead.",
-                    id="caches.W003",
-                )
+        if config.get("BACKEND").endswith("FileBasedCache"):
+            alias_name = alias
+            location = config.get("LOCATION")
+
+    if location is not None and not pathlib.Path(location).is_absolute():
+        return [
+            Warning(
+                f"Your '{alias_name}' cache LOCATION path is relative. Use an "
+                f"absolute path instead.",
+                id="caches.W003",
             )
-    return errors
+        ]
+
+    return []
