@@ -7,6 +7,12 @@ Django 5.1.7 release notes
 Django 5.1.7 fixes a security issue with severity "moderate" and several bugs
 in 5.1.6.
 
+CVE-2025-26699: Potential denial-of-service vulnerability in ``django.utils.text.wrap()``
+=========================================================================================
+
+The ``wrap()`` and :tfilter:`wordwrap` template filter were subject to a
+potential denial-of-service attack when used with very long strings.
+
 Bugfixes
 ========
 
