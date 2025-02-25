@@ -1,19 +1,20 @@
 import datetime
+import warnings
 
+from django.contrib.admin.paginations import ALL_VAR, PAGE_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field,
     display_for_value,
     get_fields_from_path,
+    get_query_string,
     label_for_field,
     lookup_field,
 )
 from django.contrib.admin.views.main import (
-    ALL_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
     ORDER_VAR,
-    PAGE_VAR,
     SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
@@ -24,6 +25,7 @@ from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
 from django.utils import formats, timezone
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -39,6 +41,14 @@ def paginator_number(cl, i):
     """
     Generate an individual page index link in a paginated list.
     """
+    warnings.warn(
+        "paginator_number is deprecated. "
+        "use django.contrib.admin.paginations.Pagination.render_page instead. "
+        "paginator_number template tag has been "
+        "replaced by an method in the Pagination class.",
+        RemovedInDjango70Warning,
+        stacklevel=2,
+    )
     if i == cl.paginator.ELLIPSIS:
         return format_html("{} ", cl.paginator.ELLIPSIS)
     elif i == cl.page_num:
@@ -56,6 +66,14 @@ def pagination(cl):
     """
     Generate the series of links to the pages in a paginated list.
     """
+    warnings.warn(
+        "pagination is deprecated. "
+        "use django.contrib.admin.paginations.Pagination.pagination_context instead. "
+        "Pagination now provides pagination_required, page_range, "
+        "show_all_url(need_show_all_link) as attributes.",
+        RemovedInDjango70Warning,
+        stacklevel=2,
+    )
     pagination_required = (not cl.show_all or not cl.can_show_all) and cl.multi_page
     page_range = (
         cl.paginator.get_elided_page_range(cl.page_num) if pagination_required else []
@@ -76,8 +94,19 @@ def pagination_tag(parser, token):
     return InclusionAdminNode(
         parser,
         token,
-        func=pagination,
+        func=lambda pagination, **kwargs: pagination.pagination_context(**kwargs),
         template_name="pagination.html",
+        takes_context=False,
+    )
+
+
+@register.tag(name="change_list_pagination")
+def changelist_pagination_tag(parser, token):
+    return InclusionAdminNode(
+        parser,
+        token,
+        func=lambda pagination, **kwargs: pagination.pagination_context(**kwargs),
+        template_name="change_list_pagination.html",
         takes_context=False,
     )
 
@@ -169,9 +198,15 @@ def result_headers(cl):
             "sorted": is_sorted,
             "ascending": order_type == "asc",
             "sort_priority": sort_priority,
-            "url_primary": cl.get_query_string({ORDER_VAR: ".".join(o_list_primary)}),
-            "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove)}),
-            "url_toggle": cl.get_query_string({ORDER_VAR: ".".join(o_list_toggle)}),
+            "url_primary": get_query_string(
+                cl.filter_params, {ORDER_VAR: ".".join(o_list_primary)}
+            ),
+            "url_remove": get_query_string(
+                cl.filter_params, {ORDER_VAR: ".".join(o_list_remove)}
+            ),
+            "url_toggle": get_query_string(
+                cl.filter_params, {ORDER_VAR: ".".join(o_list_toggle)}
+            ),
             "class_attrib": (
                 format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
             ),
@@ -386,7 +421,7 @@ def date_hierarchy(cl):
         day_lookup = cl.params.get(day_field)
 
         def link(filters):
-            return cl.get_query_string(filters, [field_generic])
+            return get_query_string(cl.filter_params, filters, [field_generic])
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
