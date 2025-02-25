@@ -20,6 +20,7 @@ from django.contrib.admin.utils import (
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.test.utils import isolate_apps
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 
@@ -237,6 +238,15 @@ class UtilsTests(SimpleTestCase):
             12345, models.IntegerField(), self.empty_value
         )
         self.assertEqual(display_value, "12,345")
+
+    @isolate_apps("admin_utils")
+    def test_display_for_field_password_name_not_user_model(self):
+        class PasswordModel(models.Model):
+            password = models.CharField(max_length=200)
+
+        password_field = PasswordModel._meta.get_field("password")
+        display_value = display_for_field("test", password_field, self.empty_value)
+        self.assertEqual(display_value, "test")
 
     def test_list_display_for_value(self):
         display_value = display_for_value([1, 2, 3], self.empty_value)
