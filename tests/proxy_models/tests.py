@@ -243,7 +243,7 @@ class ProxyModelTests(TestCase):
         signals.post_save.connect(h4, sender=Person)
 
         MyPerson.objects.create(name="dino")
-        self.assertEqual(output, ["MyPerson pre save", "MyPerson post save"])
+        self.assertEqual(output, ["Person pre save", "Person post save"])
 
         output = []
 
@@ -255,7 +255,7 @@ class ProxyModelTests(TestCase):
 
         MyPersonProxy.objects.create(name="pebbles")
 
-        self.assertEqual(output, ["MyPersonProxy pre save", "MyPersonProxy post save"])
+        self.assertEqual(output, ["Person pre save", "Person post save"])
 
         signals.pre_save.disconnect(h1, sender=MyPerson)
         signals.post_save.disconnect(h2, sender=MyPerson)
