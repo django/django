@@ -448,7 +448,7 @@ some complex computations::
 
 The ``Aggregate`` API is as follows:
 
-.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, default=None, **extra)
+.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, default=None, order_by=None, **extra)
 
     .. attribute:: template
 
@@ -473,6 +473,15 @@ The ``Aggregate`` API is as follows:
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
 
+    .. attribute:: allow_order_by
+
+        .. versionadded:: 6.0
+
+        A class attribute determining whether or not this aggregate function
+        allows passing a ``order_by`` keyword argument. If set to ``False``
+        (default), ``TypeError`` is raised if ``order_by`` is passed as a value
+        other than ``None``.
+
     .. attribute:: empty_result_set_value
 
         Defaults to ``None`` since most aggregate functions result in ``NULL``
@@ -491,6 +500,12 @@ The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
+The ``order_by`` argument behaves similarly to the ``field_names`` input of the
+:meth:`~.QuerySet.order_by` function, accepting a field name (with an optional
+``"-"`` prefix which indicates descending order) or an expression (or a tuple
+or list of strings and/or expressions) that specifies the ordering of the
+elements in the result.
+
 The ``default`` argument takes a value that will be passed along with the
 aggregate to :class:`~django.db.models.functions.Coalesce`. This is useful for
 specifying a value to be returned other than ``None`` when the queryset (or
@@ -498,6 +513,10 @@ grouping) contains no entries.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
+
+.. versionchanged:: 6.0
+
+    The ``order_by`` argument was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
