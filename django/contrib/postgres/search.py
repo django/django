@@ -211,7 +211,7 @@ class SearchQuery(SearchQueryCombinable, Func):
         expressions = (value,)
         self.config = SearchConfig.from_parameter(config)
         if self.config is not None:
-            expressions = (self.config,) + expressions
+            expressions = (self.config, *expressions)
         self.invert = invert
         super().__init__(*expressions, output_field=output_field)
 
@@ -263,7 +263,7 @@ class SearchRank(Func):
             if not hasattr(weights, "resolve_expression"):
                 weights = Value(weights)
             weights = Cast(weights, ArrayField(_Float4Field()))
-            expressions = (weights,) + expressions
+            expressions = (weights, *expressions)
         if normalization is not None:
             if not hasattr(normalization, "resolve_expression"):
                 normalization = Value(normalization)
@@ -311,7 +311,7 @@ class SearchHeadline(Func):
         expressions = (expression, query)
         if config is not None:
             config = SearchConfig.from_parameter(config)
-            expressions = (config,) + expressions
+            expressions = (config, *expressions)
         super().__init__(*expressions)
 
     def as_sql(self, compiler, connection, function=None, template=None):

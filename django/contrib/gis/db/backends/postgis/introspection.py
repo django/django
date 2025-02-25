@@ -5,7 +5,8 @@ from django.db.backends.postgresql.introspection import DatabaseIntrospection
 class PostGISIntrospection(DatabaseIntrospection):
     postgis_oid_lookup = {}  # Populated when introspection is performed.
 
-    ignored_tables = DatabaseIntrospection.ignored_tables + [
+    ignored_tables = [
+        *DatabaseIntrospection.ignored_tables,
         "geography_columns",
         "geometry_columns",
         "raster_columns",
