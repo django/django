@@ -58,10 +58,12 @@ from django.db.models.expressions import (
 from django.db.models.functions import (
     Coalesce,
     Concat,
+    ExtractDay,
     Left,
     Length,
     Lower,
     Substr,
+    TruncDate,
     Upper,
 )
 from django.db.models.sql import constants
@@ -1329,6 +1331,29 @@ class FTests(SimpleTestCase):
         msg = "argument of type 'F' is not iterable"
         with self.assertRaisesMessage(TypeError, msg):
             "" in F("name")
+
+    def test_replace_expressions_transform(self):
+        replacements = {F("timestamp"): Value(None)}
+        self.assertEqual(
+            F("timestamp__date").replace_expressions(replacements), F("timestamp__date")
+        )
+        self.assertEqual(
+            F("timestamp__invalid").replace_expressions(replacements),
+            F("timestamp__invalid"),
+        )
+        replacements = {F("timestamp"): Value(datetime.datetime(2025, 3, 1, 14, 10))}
+        self.assertEqual(
+            F("timestamp__date").replace_expressions(replacements),
+            TruncDate(Value(datetime.datetime(2025, 3, 1, 14, 10))),
+        )
+        self.assertEqual(
+            F("timestamp__date__day").replace_expressions(replacements),
+            ExtractDay(TruncDate(Value(datetime.datetime(2025, 3, 1, 14, 10)))),
+        )
+        self.assertEqual(
+            F("timestamp__date__invalid").replace_expressions(replacements),
+            F("timestamp__date__invalid"),
+        )
 
 
 class ExpressionsTests(TestCase):
