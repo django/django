@@ -6,6 +6,7 @@ from django.contrib.admin.templatetags.admin_modify import submit_row
 from django.contrib.auth import get_permission_codename
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.template.defaulttags import querystring
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -160,13 +161,13 @@ class DateHierarchyTests(TestCase):
         tests = (
             ({}, [["year=2017"], ["year=2018"]]),
             ({"year": 2016}, []),
-            ({"year": 2017}, [["month=10", "year=2017"], ["month=12", "year=2017"]]),
+            ({"year": 2017}, [["year=2017", "month=10"], ["year=2017", "month=12"]]),
             ({"year": 2017, "month": 9}, []),
             (
                 {"year": 2017, "month": 12},
                 [
-                    ["day=15", "month=12", "year=2017"],
-                    ["day=31", "month=12", "year=2017"],
+                    ["year=2017", "month=12", "day=15"],
+                    ["year=2017", "month=12", "day=31"],
                 ],
             ),
         )
@@ -177,7 +178,9 @@ class DateHierarchyTests(TestCase):
                 request.user = self.superuser
                 changelist = modeladmin.get_changelist_instance(request)
                 spec = date_hierarchy(changelist)
-                choices = [choice["link"] for choice in spec["choices"]]
+                choices = [
+                    querystring(None, choice["link"]) for choice in spec["choices"]
+                ]
                 expected_choices = [
                     "&".join("posted__%s" % c for c in choice)
                     for choice in expected_choices
@@ -206,16 +209,16 @@ class DateHierarchyTests(TestCase):
             (
                 {"year": 2017},
                 [
-                    ["month=10", "year=2017"],
-                    ["month=12", "year=2017"],
+                    ["year=2017", "month=10"],
+                    ["year=2017", "month=12"],
                 ],
             ),
             ({"year": 2017, "month": 9}, []),
             (
                 {"year": 2017, "month": 12},
                 [
-                    ["day=15", "month=12", "year=2017"],
-                    ["day=31", "month=12", "year=2017"],
+                    ["year=2017", "month=12", "day=15"],
+                    ["year=2017", "month=12", "day=31"],
                 ],
             ),
         ]
@@ -226,7 +229,9 @@ class DateHierarchyTests(TestCase):
                 request.user = self.superuser
                 changelist = modeladmin.get_changelist_instance(request)
                 spec = date_hierarchy(changelist)
-                choices = [choice["link"] for choice in spec["choices"]]
+                choices = [
+                    querystring(None, choice["link"]) for choice in spec["choices"]
+                ]
                 expected_choices = [
                     "?" + "&".join("expires__%s" % c for c in choice)
                     for choice in expected_choices

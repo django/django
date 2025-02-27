@@ -350,6 +350,9 @@ Miscellaneous
   ``per_page`` argument of :class:`django.core.paginator.Paginator` and
   :class:`django.core.paginator.AsyncPaginator` is deprecated.
 
+* ``ChangeList.get_query_string()`` is deprecated. Use
+  :ttag:`{% querystring %} <querystring>` template tag instead.
+
 Features removed in 6.0
 =======================
 

@@ -20,6 +20,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.template import Library
+from django.template.defaulttags import querystring
 from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
@@ -46,7 +47,7 @@ def paginator_number(cl, i):
     else:
         return format_html(
             '<a role="button" href="{}"{}>{}</a> ',
-            cl.get_query_string({PAGE_VAR: i}),
+            querystring(None, {**cl.filter_params, PAGE_VAR: i}),
             mark_safe(' class="end"' if i == cl.paginator.num_pages else ""),
             i,
         )
@@ -64,7 +65,7 @@ def pagination(cl):
     return {
         "cl": cl,
         "pagination_required": pagination_required,
-        "show_all_url": need_show_all_link and cl.get_query_string({ALL_VAR: ""}),
+        "show_all_url": need_show_all_link and {ALL_VAR: ""},
         "page_range": page_range,
         "ALL_VAR": ALL_VAR,
         "1": 1,
@@ -169,9 +170,9 @@ def result_headers(cl):
             "sorted": is_sorted,
             "ascending": order_type == "asc",
             "sort_priority": sort_priority,
-            "url_primary": cl.get_query_string({ORDER_VAR: ".".join(o_list_primary)}),
-            "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove)}),
-            "url_toggle": cl.get_query_string({ORDER_VAR: ".".join(o_list_toggle)}),
+            "url_primary": {ORDER_VAR: ".".join(o_list_primary)},
+            "url_remove": {ORDER_VAR: ".".join(o_list_remove)},
+            "url_toggle": {ORDER_VAR: ".".join(o_list_toggle)},
             "class_attrib": (
                 format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
             ),
@@ -380,13 +381,11 @@ def date_hierarchy(cl):
         year_field = "%s__year" % field_name
         month_field = "%s__month" % field_name
         day_field = "%s__day" % field_name
-        field_generic = "%s__" % field_name
         year_lookup = cl.params.get(year_field)
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
-
-        def link(filters):
-            return cl.get_query_string(filters, [field_generic])
+        clear_params = cl.get_clear_related_filter_params("%s__" % field_name)
+        context = {"filter_params": cl.filter_params}
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
@@ -406,68 +405,85 @@ def date_hierarchy(cl):
 
         if year_lookup and month_lookup and day_lookup:
             day = datetime.date(int(year_lookup), int(month_lookup), int(day_lookup))
-            return {
-                "show": True,
-                "back": {
-                    "link": link({year_field: year_lookup, month_field: month_lookup}),
-                    "title": capfirst(formats.date_format(day, "YEAR_MONTH_FORMAT")),
-                },
-                "choices": [
-                    {"title": capfirst(formats.date_format(day, "MONTH_DAY_FORMAT"))}
-                ],
-            }
+            context.update(
+                {
+                    "show": True,
+                    "back": {
+                        "link": {
+                            **clear_params,
+                            year_field: year_lookup,
+                            month_field: month_lookup,
+                        },
+                        "title": capfirst(
+                            formats.date_format(day, "YEAR_MONTH_FORMAT")
+                        ),
+                    },
+                    "choices": [
+                        {
+                            "title": capfirst(
+                                formats.date_format(day, "MONTH_DAY_FORMAT")
+                            )
+                        }
+                    ],
+                }
+            )
         elif year_lookup and month_lookup:
             days = getattr(cl.queryset, dates_or_datetimes)(field_name, "day")
-            return {
-                "show": True,
-                "back": {
-                    "link": link({year_field: year_lookup}),
-                    "title": str(year_lookup),
-                },
-                "choices": [
-                    {
-                        "link": link(
-                            {
+            context.update(
+                {
+                    "show": True,
+                    "back": {
+                        "link": {**clear_params, year_field: year_lookup},
+                        "title": str(year_lookup),
+                    },
+                    "choices": [
+                        {
+                            "link": {
                                 year_field: year_lookup,
                                 month_field: month_lookup,
                                 day_field: day.day,
-                            }
-                        ),
-                        "title": capfirst(formats.date_format(day, "MONTH_DAY_FORMAT")),
-                    }
-                    for day in days
-                ],
-            }
+                            },
+                            "title": capfirst(
+                                formats.date_format(day, "MONTH_DAY_FORMAT")
+                            ),
+                        }
+                        for day in days
+                    ],
+                }
+            )
         elif year_lookup:
             months = getattr(cl.queryset, dates_or_datetimes)(field_name, "month")
-            return {
-                "show": True,
-                "back": {"link": link({}), "title": _("All dates")},
-                "choices": [
-                    {
-                        "link": link(
-                            {year_field: year_lookup, month_field: month.month}
-                        ),
-                        "title": capfirst(
-                            formats.date_format(month, "YEAR_MONTH_FORMAT")
-                        ),
-                    }
-                    for month in months
-                ],
-            }
+            context.update(
+                {
+                    "show": True,
+                    "back": {"link": {**clear_params}, "title": _("All dates")},
+                    "choices": [
+                        {
+                            "link": {year_field: year_lookup, month_field: month.month},
+                            "title": capfirst(
+                                formats.date_format(month, "YEAR_MONTH_FORMAT")
+                            ),
+                        }
+                        for month in months
+                    ],
+                }
+            )
         else:
             years = getattr(cl.queryset, dates_or_datetimes)(field_name, "year")
-            return {
-                "show": True,
-                "back": None,
-                "choices": [
-                    {
-                        "link": link({year_field: str(year.year)}),
-                        "title": str(year.year),
-                    }
-                    for year in years
-                ],
-            }
+            context.update(
+                {
+                    "show": True,
+                    "back": None,
+                    "choices": [
+                        {
+                            "link": {year_field: str(year.year)},
+                            "title": str(year.year),
+                        }
+                        for year in years
+                    ],
+                }
+            )
+        return context
 
 
 @register.tag(name="date_hierarchy")
@@ -513,6 +529,7 @@ def admin_list_filter(cl, spec):
             "title": spec.title,
             "choices": list(spec.choices(cl)),
             "spec": spec,
+            "cl": cl,
         }
     )
 
