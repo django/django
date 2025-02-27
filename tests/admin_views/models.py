@@ -982,6 +982,10 @@ class Worker(models.Model):
     surname = models.CharField(max_length=50)
 
 
+class Address(models.Model):
+    city = models.ForeignKey(City, models.CASCADE)
+
+
 # Models for #23329
 class ReferencedByParent(models.Model):
     name = models.CharField(max_length=20, unique=True)
