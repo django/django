@@ -18,6 +18,8 @@ details on these changes.
 * The ``serialize`` keyword argument of
   ``BaseDatabaseCreation.create_test_db()`` will be removed.
 
+* Using a percent sign in a column alias or annotation will raise ``ValueError``.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
