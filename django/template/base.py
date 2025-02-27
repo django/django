@@ -639,7 +639,7 @@ filter_raw_string = r"""
          (?:%(arg_sep)s
              (?:
               (?P<constant_arg>%(constant)s)|
-              (?P<var_arg>%(num)s|[%(var_chars)s]+)
+              (?P<var_arg>%(num)s$|[%(var_chars)s]+)
              )
          )?
  )""" % {
