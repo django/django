@@ -198,6 +198,42 @@ Minor features
   session engines now provide async API. The new asynchronous methods all have
   ``a`` prefixed names, e.g. ``aget()``, ``akeys()``, or ``acycle_key()``.
 
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* The error messaging is improved when ``Origin`` checking fails,
+  including better hints when likely proxy headers are detected.
+
 Database backends
 ~~~~~~~~~~~~~~~~~
 
