@@ -2,9 +2,10 @@
 Django 5.1.7 release notes
 ==========================
 
-*Expected March 5, 2025*
+*March 6, 2025*
 
-Django 5.1.7 fixes several bugs in 5.1.6.
+Django 5.1.7 fixes a security issue with severity "moderate" and several bugs
+in 5.1.6.
 
 Bugfixes
 ========

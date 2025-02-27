@@ -1,0 +1,7 @@
+===========================
+Django 5.0.13 release notes
+===========================
+
+*March 6, 2025*
+
+Django 5.0.13 fixes a security issue with severity "moderate" in 5.0.12.
