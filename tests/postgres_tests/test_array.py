@@ -28,6 +28,7 @@ from .models import (
     OtherTypesArrayModel,
     PostgreSQLModel,
     Tag,
+    TextFieldModel,
     WithSizeArrayModel,
 )
 
@@ -92,6 +93,183 @@ class BasicTests(PostgreSQLSimpleTestCase):
             with self.subTest(value=value, display=display):
                 instance = MyModel(field=value)
                 self.assertEqual(instance.get_field_display(), display)
+
+
+class TestIndexAndSliceUpdates(PostgreSQLTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ips = ["192.168.0.1", "::1"]
+        cls.uuids = [uuid.uuid4(), uuid.uuid4()]
+        cls.decimals = [decimal.Decimal(1.25), 1.75]
+        cls.tags = [Tag(1), Tag(2), Tag(3)]
+        cls.int_ranges = [NumericRange(10, 20), NumericRange(30, 40)]
+        cls.bigint_ranges = [
+            NumericRange(7000000000, 10000000000),
+            NumericRange(50000000000, 70000000000),
+        ]
+        cls.json = [
+            {"test": {"json": "update 1"}},
+            {"test": {"json": "update 2"}},
+            {"test": {"json": "update 3"}},
+        ]
+
+    def test_update_with_one_item(self):
+        instance = IntegerArrayModel(field=[0])
+        instance.save()
+        IntegerArrayModel.objects.update(field__0=1)
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [1])
+
+    def test_update_first(self):
+        instance = IntegerArrayModel(field=[1, 2, 3, 4])
+        instance.save()
+        IntegerArrayModel.objects.update(field__0=0)
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [0, 2, 3, 4])
+
+    def test_update_last(self):
+        instance = IntegerArrayModel(field=[1, 2, 3, 4])
+        instance.save()
+        IntegerArrayModel.objects.update(field__3=1)
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [1, 2, 3, 1])
+
+    def test_update_slice(self):
+        instance = IntegerArrayModel(field=[1, 2, 3, 4])
+        instance.save()
+        IntegerArrayModel.objects.update(field__1_3=[0, 0])
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [1, 0, 0, 4])
+
+    def test_update_nested(self):
+        instance = NestedIntegerArrayModel(field=[[1], [2], [3]])
+        instance.save()
+        NestedIntegerArrayModel.objects.update(field__0__0=10)
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [[10], [2], [3]])
+
+    def test_update_multiple_indexes(self):
+        instance = IntegerArrayModel(field=[1, 2, 3, 4])
+        instance.save()
+        IntegerArrayModel.objects.update(
+            field__0=5,
+            field__1=6,
+            field__2=7,
+            field__3=8,
+        )
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [5, 6, 7, 8])
+
+    def test_update_multiple_slices(self):
+        instance = IntegerArrayModel(field=[1, 2, 3, 4, 5, 6, 7, 8])
+        instance.save()
+        IntegerArrayModel.objects.update(
+            field__0_2=[-1, -2],
+            field__2_4=[-3, -4],
+            field__4_6=[-5, -6],
+            field__6_7=[-7],
+        )
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [-1, -2, -3, -4, -5, -6, -7, 8])
+
+    def test_update_on_db_value(self):
+        instance = NullableIntegerArrayModel(field=[1, 2], order=3)
+        instance.save()
+        NullableIntegerArrayModel.objects.update(field__0=F("order"))
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [3, 2])
+
+    def test_update_on_other_types(self):
+        instance = OtherTypesArrayModel(
+            ips=self.ips,
+            uuids=self.uuids,
+            decimals=self.decimals,
+            tags=self.tags,
+            json=self.json,
+            int_ranges=self.int_ranges,
+            bigint_ranges=self.bigint_ranges,
+        )
+        instance.save()
+
+        new_ip = "0.0.0.0"
+        new_uuid = uuid.uuid4()
+        new_decimal = decimal.Decimal("1.00")
+        new_json = {"test": {"json": "update 4"}}
+        new_int_range = NumericRange(50, 60)
+        new_bigint_range = NumericRange(90000000000, 100000000000)
+
+        OtherTypesArrayModel.objects.update(
+            ips__1=new_ip,
+            uuids__1=new_uuid,
+            decimals__1=new_decimal,
+            int_ranges__1=new_int_range,
+            bigint_ranges__1=new_bigint_range,
+            # For some reason update on json__2 throws
+            # django.db.utils.DataError: hstore keys can only be strings
+            json__2_3=[new_json],
+        )
+        instance.refresh_from_db()
+
+        self.assertEqual(instance.ips, [self.ips[0], new_ip])
+        self.assertEqual(instance.uuids, [self.uuids[0], new_uuid])
+        self.assertEqual(instance.decimals, [self.decimals[0], new_decimal])
+        self.assertEqual(instance.int_ranges, [self.int_ranges[0], new_int_range])
+        self.assertEqual(
+            instance.bigint_ranges, [self.bigint_ranges[0], new_bigint_range]
+        )
+        self.assertEqual(instance.json, [*self.json[:2], new_json])
+
+    def test_append_value_on_first_index_to_empty_field(self):
+        instance = IntegerArrayModel(field=[])
+        instance.save()
+        IntegerArrayModel.objects.update(field__0=1)
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [1])
+
+    def test_append_value_on_second_index_to_empty_field(self):
+        instance = IntegerArrayModel(field=[])
+        instance.save()
+        IntegerArrayModel.objects.update(field__1=1)
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [1])
+
+    def test_append_to_populated_field(self):
+        instance = IntegerArrayModel(field=[1, 2, 3])
+        instance.save()
+        IntegerArrayModel.objects.update(field__3=4)
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [1, 2, 3, 4])
+
+    def test_int_array_field_accepts_strings(self):
+        instance = IntegerArrayModel(field=[1, 2, 3])
+        instance.save()
+        IntegerArrayModel.objects.update(field__3="4")
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [1, 2, 3, 4])
+
+    @unittest.expectedFailure
+    def test_update_out_of_range(self):
+        instance = WithSizeArrayModel(field=[1, 2, 3])
+        instance.save()
+        IntegerArrayModel.objects.update(field__3=4)
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [1, 2, 3, 4])
+
+    @unittest.expectedFailure
+    def test_error_raised_on_not_supported_field(self):
+        TextFieldModel.objects.update(field__1="b")
+
+    @unittest.expectedFailure
+    def test_error_raised_on_not_supported_range_slice(self):
+        IntegerArrayModel.objects.update(field__1_1_1="2")
+
+    @unittest.expectedFailure
+    def test_error_raised_on_not_supported_index_nesting(self):
+        # IntegerArrayModel.objects.update(field__1__1=1)
+        # is passing silently when no records are present in database.
+        instance = IntegerArrayModel(field=[1])
+        instance.save()
+        IntegerArrayModel.objects.update(field__1__1=2)
 
 
 class TestSaveLoad(PostgreSQLTestCase):
