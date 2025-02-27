@@ -70,7 +70,7 @@
           {% result_list cl %}
           {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
         {% endblock %}
-        {% block pagination %}{% pagination cl %}{% endblock %}
+        {% block pagination %}{% change_list_pagination pagination cl=cl %}{% endblock %}
         </form>
       </div>
       {% block filters %}
