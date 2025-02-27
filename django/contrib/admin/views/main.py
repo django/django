@@ -31,6 +31,7 @@ from django.core.paginator import InvalidPage
 from django.db.models import F, Field, ManyToOneRel, OrderBy
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Combinable
+from django.template.defaulttags import querystring
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import make_aware
@@ -125,15 +126,19 @@ class ChangeList:
             )
         self.to_field = to_field
         self.params = dict(request.GET.items())
-        self.filter_params = dict(request.GET.lists())
+        self.query_dict = request.GET.copy()
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
-            del self.filter_params[PAGE_VAR]
+            del self.query_dict[PAGE_VAR]
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
-            del self.filter_params[ERROR_FLAG]
-        self.remove_facet_link = self.get_query_string(remove=[IS_FACETS_VAR])
-        self.add_facet_link = self.get_query_string({IS_FACETS_VAR: True})
+            del self.query_dict[ERROR_FLAG]
+        self.remove_facet_link = querystring(
+            None, self.query_dict, **{IS_FACETS_VAR: None}
+        )
+        self.add_facet_link = querystring(
+            None, self.query_dict, **{IS_FACETS_VAR: True}
+        )
 
         if self.is_popup:
             self.list_editable = ()
@@ -161,7 +166,7 @@ class ChangeList:
         """
         Return all params except IGNORED_PARAMS.
         """
-        params = params or self.filter_params
+        params = params or dict(self.query_dict.lists())
         lookup_params = params.copy()  # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
@@ -279,7 +284,7 @@ class ChangeList:
             new_params = {}
         if remove is None:
             remove = []
-        p = self.filter_params.copy()
+        p = self.query_dict.copy()
         for r in remove:
             for k in list(p):
                 if k.startswith(r):
@@ -574,9 +579,12 @@ class ChangeList:
         )
 
         # Set query string for clearing all filters.
-        self.clear_all_filters_qs = self.get_query_string(
-            new_params=remaining_lookup_params,
-            remove=self.get_filters_params(),
+        params = {param: None for param in self.get_filters_params()}
+        params.update(remaining_lookup_params)
+        self.clear_all_filters_qs = querystring(
+            None,
+            self.query_dict,
+            **params,
         )
         # Remove duplicates from results, if necessary
         if filters_may_have_duplicates | search_may_have_duplicates:
