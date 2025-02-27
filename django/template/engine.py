@@ -1,9 +1,11 @@
 import functools
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
+from ..utils.deprecation import RemovedInDjango60Warning
 from .base import Template
 from .context import Context, _builtin_context_processors
 from .exceptions import TemplateDoesNotExist
@@ -29,7 +31,13 @@ class Engine:
         libraries=None,
         builtins=None,
         autoescape=True,
+        multiline=False,
     ):
+        if not multiline:
+            warnings.warn(
+                "Multiline tags in templates will become the default in Django 6.0",
+                RemovedInDjango60Warning,
+            )
         if dirs is None:
             dirs = []
         if context_processors is None:
@@ -61,6 +69,7 @@ class Engine:
         self.template_libraries = self.get_template_libraries(libraries)
         self.builtins = self.default_builtins + builtins
         self.template_builtins = self.get_template_builtins(self.builtins)
+        self.multiline = multiline
 
     def __repr__(self):
         return (

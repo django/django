@@ -210,10 +210,20 @@ class BasicSyntaxTests(SimpleTestCase):
     @setup({"basic-syntax24": "{{ moo\n }}"})
     def test_basic_syntax24(self):
         """
-        Embedded newlines make it not-a-tag.
+        Embedded newlines make it not-a-tag if not in multiline mode.
         """
         output = self.engine.render_to_string("basic-syntax24")
         self.assertEqual(output, "{{ moo\n }}")
+
+    @setup({"basic-syntax24-multiline": "{{ \nfoo\n }}"})
+    def test_basic_syntax24_multiline(self):
+        """
+        Embedded newlines are ok in multiline mode.
+        """
+        output = self.multiline_engine.render_to_string(
+            "basic-syntax24-multiline", {"foo": "bar"}
+        )
+        self.assertEqual(output, "bar")
 
     # Literal strings are permitted inside variables, mostly for i18n
     # purposes.
@@ -324,6 +334,39 @@ class BasicSyntaxTests(SimpleTestCase):
             "basic-syntax38", {"var": {"callable": lambda: "foo bar"}}
         )
         self.assertEqual(output, "foo bar")
+
+    @setup(
+        {
+            "basic-syntax39-multiline": """
+                {% if
+                    foo
+                %}
+                    a
+                {%
+                    else
+                %}
+                    b
+                {%
+                    endif
+                %}
+                {#
+                    comment
+                #}
+                """
+        }
+    )
+    def test_basic_syntax39_multiline(self):
+        """
+        Embedded newlines are ok in multiline mode.
+        """
+        output = self.multiline_engine.render_to_string(
+            "basic-syntax39-multiline", {"foo": True}
+        ).strip()
+        self.assertEqual(output, "a")
+        output = self.multiline_engine.render_to_string(
+            "basic-syntax39-multiline", {"foo": False}
+        ).strip()
+        self.assertEqual(output, "b")
 
     @setup({"template": "{% block content %}"})
     def test_unclosed_block(self):
