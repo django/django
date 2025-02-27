@@ -184,6 +184,14 @@ Models
 * :doc:`Constraints </ref/models/constraints>` now implement a ``check()``
   method that is already registered with the check framework.
 
+Pagination
+~~~~~~~~~~
+
+* The new :class:`~django.core.paginator.AsyncPaginator` and
+  :class:`~django.core.paginator.AsyncPage` provide async implementations of
+  :class:`~django.core.paginator.Paginator` and
+  :class:`~django.core.paginator.Page` respectively.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
