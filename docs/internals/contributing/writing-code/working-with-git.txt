@@ -281,12 +281,12 @@ Your pull request should now contain the new commit too.
 Note that the merger is likely to squash the review commit into the previous
 commit when committing the code.
 
-Working on a patch
-==================
+Testing a pull request locally
+==============================
 
-One of the ways that developers can contribute to Django is by reviewing
-patches. Those patches will typically exist as pull requests on GitHub and
-can be easily integrated into your local repository:
+One of the ways that developers can contribute to Django is by reviewing and
+testing pull requests. Pull requests can be easily integrated into your local
+repository:
 
 .. code-block:: shell
 
@@ -295,7 +295,7 @@ can be easily integrated into your local repository:
 
 This will create a new branch and then apply the changes from the pull request
 to it. At this point you can run the tests or do anything else you need to
-do to investigate the quality of the patch.
+do to investigate the quality of the pull request.
 
 For more detail on working with pull requests see the
 :ref:`guidelines for mergers <handling-pull-requests>`.

@@ -25,7 +25,7 @@ our documentation also contains useful guidance on specific topics:
 .. toctree::
    :maxdepth: 1
 
-   How to submit a patch to Django for new and/or fixed behavior <submitting-patches>
+   How to submit a pull request to Django for new and/or fixed behavior <submitting-patches>
    How to write and run tests </topics/testing/overview>
    How to run Django's unit tests <unit-tests>
    How to work with Git and GitHub <working-with-git>
