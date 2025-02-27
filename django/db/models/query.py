@@ -883,7 +883,7 @@ class QuerySet(AltersData):
         self._for_write = True
         connection = connections[self.db]
         max_batch_size = connection.ops.bulk_batch_size(
-            [opts.pk, opts.pk] + fields, objs
+            (opts.pk, opts.pk, *fields), objs
         )
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         requires_casting = connection.features.requires_casted_case_in_updates
@@ -1516,9 +1516,7 @@ class QuerySet(AltersData):
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
-        clone.query.combined_queries = (self.query,) + tuple(
-            qs.query for qs in other_qs
-        )
+        clone.query.combined_queries = (self.query, *(qs.query for qs in other_qs))
         clone.query.combinator = combinator
         clone.query.combinator_all = all
         return clone

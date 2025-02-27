@@ -507,7 +507,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         # Is it a valid relational lookup?
         return not {
             LOOKUP_SEP.join(relation_parts),
-            LOOKUP_SEP.join(relation_parts + [part]),
+            LOOKUP_SEP.join((*relation_parts, part)),
         }.isdisjoint(valid_lookups)
 
     def to_field_allowed(self, request, to_field):
@@ -737,8 +737,7 @@ class ModelAdmin(BaseModelAdmin):
                 "<path:object_id>/",
                 wrap(
                     RedirectView.as_view(
-                        pattern_name="%s:%s_%s_change"
-                        % ((self.admin_site.name,) + info)
+                        pattern_name="%s:%s_%s_change" % (self.admin_site.name, *info)
                     )
                 ),
             ),
@@ -1051,7 +1050,7 @@ class ModelAdmin(BaseModelAdmin):
         Return a list of choices for use in a form object.  Each choice is a
         tuple (name, description).
         """
-        choices = [] + default_choices
+        choices = [*default_choices]
         for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)

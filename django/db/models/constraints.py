@@ -101,7 +101,7 @@ class BaseConstraint:
                 errors.append(
                     checks.Error(
                         "'constraints' refers to the joined field '%s'."
-                        % LOOKUP_SEP.join([field_name] + lookups),
+                        % LOOKUP_SEP.join([field_name, *lookups]),
                         obj=model,
                         id="models.E041",
                     )

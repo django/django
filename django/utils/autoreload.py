@@ -194,7 +194,7 @@ def common_roots(paths):
     # Turn the tree into a list of Path instances.
     def _walk(node, path):
         for prefix, child in node.items():
-            yield from _walk(child, path + (prefix,))
+            yield from _walk(child, (*path, prefix))
         if not node:
             yield Path(*path)
 

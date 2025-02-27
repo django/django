@@ -1452,7 +1452,7 @@ class SQLCompiler:
                     field = klass_info["field"]
                     if klass_info["reverse"]:
                         field = field.remote_field
-                    path = parent_path + [field.name]
+                    path = [*parent_path, field.name]
                     yield LOOKUP_SEP.join(path)
                 queue.extend(
                     (path, klass_info)
@@ -1905,7 +1905,7 @@ class SQLInsertCompiler(SQLCompiler):
             if on_conflict_suffix_sql:
                 result.append(on_conflict_suffix_sql)
             return [
-                (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
+                (" ".join((*result, "VALUES (%s)" % ", ".join(p))), vals)
                 for p, vals in zip(placeholder_rows, param_rows)
             ]
 

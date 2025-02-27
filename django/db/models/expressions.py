@@ -1654,7 +1654,7 @@ class Case(SQLiteNumericMixin, Expression):
         return "<%s: %s>" % (self.__class__.__name__, self)
 
     def get_source_expressions(self):
-        return self.cases + [self.default]
+        return [*self.cases, self.default]
 
     def set_source_expressions(self, exprs):
         *self.cases, self.default = exprs
