@@ -150,7 +150,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* Model forms now validate constraints on inline foreign keys by default.
+  This resolves a previous issue where constraints validation was skipped
+  during validation of inline model forms in the admin (:ticket:`35676`).
 
 Generic Views
 ~~~~~~~~~~~~~
