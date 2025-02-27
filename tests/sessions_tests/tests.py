@@ -35,6 +35,7 @@ from django.test import (
     ignore_warnings,
     override_settings,
 )
+from django.test.utils import freeze_time
 from django.utils import timezone
 
 from .models import SessionStore as CustomDatabaseSession
@@ -1245,11 +1246,6 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
     async def test_cycle_async(self):
         pass
 
-    @unittest.expectedFailure
-    def test_actual_expiry(self):
-        # The cookie backend doesn't handle non-default expiry dates, see #19201
-        super().test_actual_expiry()
-
     async def test_actual_expiry_async(self):
         pass
 
@@ -1286,6 +1282,25 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
         self,
     ):
         pass
+
+    def test_session_custom_expiry_load(self):
+        """
+        Test that a session with custom expiry set is respected when loading
+        with signed cookies.
+        """
+        session = self.backend()
+        session["foo"] = "bar"
+        session.set_expiry(10)
+        session.save()
+
+        session_data = session.session_key
+
+        session2 = self.backend(session_data)
+        self.assertEqual(session2.load()["foo"], "bar")
+
+        with freeze_time(timezone.now() + timedelta(seconds=11)):
+            session3 = self.backend(session_data)
+            self.assertEqual(session3.load(), {})
 
 
 class ClearSessionsCommandTests(SimpleTestCase):
