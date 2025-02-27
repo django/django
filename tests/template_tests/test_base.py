@@ -91,8 +91,8 @@ class VariableTests(SimpleTestCase):
         cases = {
             '{{ foo|default:"5.2e3" }}': 5200.0,  # 5.2 × 10³ = 5200.0
             '{{ foo|default:"5.2E3" }}': 5200.0,  # Case-insensitive
-            '{{ foo|default:"5.2e-3"}}': 0.0052,
-            '{{ foo|default:"-1.5E4" }}': -15000.0,  # Negative exponent
+            '{{ foo|default:"5.2e-3"}}': 0.0052,  # Negative exponent
+            '{{ foo|default:"-1.5E4" }}': -15000.0,
             '{{ foo|default:"+3.0e2" }}': 300.0,  # Explicit positive exponent
             '{{ foo|default:".5e2" }}': 50.0,  # 0.5 × 10² = 50.0
         }
