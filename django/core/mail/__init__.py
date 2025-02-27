@@ -21,6 +21,7 @@ from django.core.mail.message import (
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
+from django.utils.deprecation import RemovedInDjango70Warning, deprecate_posargs
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -44,7 +45,8 @@ __all__ = [
 ]
 
 
-def get_connection(backend=None, fail_silently=False, **kwds):
+@deprecate_posargs(RemovedInDjango70Warning, moved=["fail_silently"])
+def get_connection(backend=None, *, fail_silently=False, **kwds):
     """Load an email backend and return an instance of it.
 
     If backend is None (default), use settings.EMAIL_BACKEND.
@@ -56,11 +58,22 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     return klass(fail_silently=fail_silently, **kwds)
 
 
+@deprecate_posargs(
+    RemovedInDjango70Warning,
+    moved=[
+        "fail_silently",
+        "auth_user",
+        "auth_password",
+        "connection",
+        "html_message",
+    ],
+)
 def send_mail(
     subject,
     message,
     from_email,
     recipient_list,
+    *,
     fail_silently=False,
     auth_user=None,
     auth_password=None,
@@ -92,8 +105,22 @@ def send_mail(
     return mail.send()
 
 
+@deprecate_posargs(
+    RemovedInDjango70Warning,
+    moved=[
+        "fail_silently",
+        "auth_user",
+        "auth_password",
+        "connection",
+    ],
+)
 def send_mass_mail(
-    datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None
+    datatuple,
+    *,
+    fail_silently=False,
+    auth_user=None,
+    auth_password=None,
+    connection=None,
 ):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), send
@@ -119,8 +146,16 @@ def send_mass_mail(
     return connection.send_messages(messages)
 
 
+@deprecate_posargs(
+    RemovedInDjango70Warning,
+    moved=[
+        "fail_silently",
+        "connection",
+        "html_message",
+    ],
+)
 def mail_admins(
-    subject, message, fail_silently=False, connection=None, html_message=None
+    subject, message, *, fail_silently=False, connection=None, html_message=None
 ):
     """Send a message to the admins, as defined by the ADMINS setting."""
     if not settings.ADMINS:
@@ -139,8 +174,16 @@ def mail_admins(
     mail.send(fail_silently=fail_silently)
 
 
+@deprecate_posargs(
+    RemovedInDjango70Warning,
+    moved=[
+        "fail_silently",
+        "connection",
+        "html_message",
+    ],
+)
 def mail_managers(
-    subject, message, fail_silently=False, connection=None, html_message=None
+    subject, message, *, fail_silently=False, connection=None, html_message=None
 ):
     """Send a message to the managers, as defined by the MANAGERS setting."""
     if not settings.MANAGERS:
