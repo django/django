@@ -28,6 +28,7 @@ from django.utils.choices import BlankChoiceIterator
 from django.utils.version import PY314, PYPY
 
 from .models import (
+    UUIDPK,
     Article,
     ArticleStatus,
     Author,
@@ -2176,6 +2177,15 @@ class ModelMultipleChoiceFieldTests(TestCase):
         Category.objects.get(url="6th").delete()
         with self.assertRaises(ValidationError):
             f.clean([c6.id])
+
+    def test_model_multiple_choice_invalid_pk_value_error_messages(self):
+        uuid_f = forms.ModelMultipleChoiceField(UUIDPK.objects.all())
+        f = forms.ModelMultipleChoiceField(Category.objects.all())
+        for model_multiple_choice_form in [f, uuid_f]:
+            with self.assertRaisesMessage(
+                ValidationError, "“invalid” is not a valid value."
+            ):
+                model_multiple_choice_form.clean(["invalid"])
 
     def test_model_multiple_choice_required_false(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
