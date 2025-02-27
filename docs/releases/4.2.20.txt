@@ -1,0 +1,7 @@
+===========================
+Django 4.2.20 release notes
+===========================
+
+*March 6, 2025*
+
+Django 4.2.20 fixes a security issue with severity "moderate" in 4.2.19.
