@@ -606,7 +606,7 @@ The ``login_required`` decorator
 The ``LoginRequiredMixin`` mixin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When using :doc:`class-based views </topics/class-based-views/index>`, you can
+When using :ref:`class-based-views-explanation`, you can
 achieve the same behavior as with ``login_required`` by using the
 ``LoginRequiredMixin``. This mixin should be at the leftmost position in the
 inheritance list.
@@ -717,7 +717,7 @@ email in the desired domain and if not, redirects to the login page::
 
 .. class:: UserPassesTestMixin
 
-    When using :doc:`class-based views </topics/class-based-views/index>`, you
+    When using :ref:`class-based-views-explanation`, you
     can use the ``UserPassesTestMixin`` to do this.
 
     .. method:: test_func()
@@ -1042,8 +1042,7 @@ arguments in the URLconf, these will be passed on to the view. For example::
         ),
     ]
 
-All views are :doc:`class-based </topics/class-based-views/index>`, which allows
-you to easily customize them by subclassing.
+All views are :ref:`class-based-views-explanation`, which allows you to easily customize them by subclassing.
 
 .. _all-authentication-views:
 
