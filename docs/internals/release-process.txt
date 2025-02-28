@@ -131,9 +131,9 @@ page for the current state of support for each version.
 * The current development branch ``main`` will get new features and bug fixes
   requiring non-trivial refactoring.
 
-* Patches applied to the main branch must also be applied to the last feature
-  release branch, to be released in the next patch release of that feature
-  series, when they fix critical problems:
+* Commits from the main branch must also be applied to the last feature release
+  branch, to be released in the next patch release of that feature series, when
+  they fix critical problems:
 
   * Security issues.
 
