@@ -51,9 +51,7 @@ class LogEntryManager(models.Manager):
             change_message=change_message,
         )
 
-    def log_actions(
-        self, user_id, queryset, action_flag, change_message="", *, single_object=False
-    ):
+    def log_actions(self, user_id, queryset, action_flag, change_message=""):
         # RemovedInDjango60Warning.
         if type(self).log_action != LogEntryManager.log_action:
             warnings.warn(
@@ -93,7 +91,7 @@ class LogEntryManager(models.Manager):
             for obj in queryset
         ]
 
-        if single_object and log_entry_list:
+        if len(log_entry_list) == 1:
             instance = log_entry_list[0]
             instance.save()
             return instance

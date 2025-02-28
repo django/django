@@ -3855,21 +3855,18 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             [cls.m1],
             2,
             change_message="Changed something",
-            single_object=True,
         )
         LogEntry.objects.log_actions(
             user_pk,
             [cls.m1],
             1,
             change_message="Added something",
-            single_object=True,
         )
         LogEntry.objects.log_actions(
             user_pk,
             [cls.m1],
             3,
             change_message="Deleted something",
-            single_object=True,
         )
 
     def setUp(self):

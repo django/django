@@ -954,7 +954,6 @@ class ModelAdmin(BaseModelAdmin):
             queryset=[obj],
             action_flag=ADDITION,
             change_message=message,
-            single_object=True,
         )
 
     def log_change(self, request, obj, message):
@@ -970,7 +969,6 @@ class ModelAdmin(BaseModelAdmin):
             queryset=[obj],
             action_flag=CHANGE,
             change_message=message,
-            single_object=True,
         )
 
     def log_deletion(self, request, obj, object_repr):

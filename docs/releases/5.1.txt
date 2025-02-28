@@ -401,6 +401,11 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.7.0 to
   3.8.1.
 
+* To improve performance, the ``delete_selected`` admin action now uses
+  ``QuerySet.bulk_create()`` when creating multiple ``LogEntry`` objects. As a
+  result, ``pre_save`` and ``post_save`` signals for ``LogEntry`` are not sent
+  when multiple objects are deleted via this admin action.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1

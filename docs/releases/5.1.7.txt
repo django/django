@@ -22,3 +22,7 @@ Bugfixes
   of ``ManyToManyField`` related managers would always return ``0`` and
   ``False`` when the intermediary model back references used ``to_field``
   (:ticket:`36197`).
+
+* Fixed a regression in Django 5.1 where the ``pre_save`` and ``post_save``
+  signals for ``LogEntry`` were not sent when deleting a single object in the
+  admin (:ticket:`36217`).
