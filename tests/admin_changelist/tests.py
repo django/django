@@ -1845,7 +1845,7 @@ class GetAdminLogTests(TestCase):
         """{% get_admin_log %} works without specifying a user."""
         user = User(username="jondoe", password="secret", email="super@example.com")
         user.save()
-        LogEntry.objects.log_actions(user.pk, [user], 1, single_object=True)
+        LogEntry.objects.log_actions(user.pk, [user], 1)
         context = Context({"log_entries": LogEntry.objects.all()})
         t = Template(
             "{% load log %}"

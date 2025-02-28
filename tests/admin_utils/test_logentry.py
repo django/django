@@ -5,6 +5,7 @@ from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.utils import quote
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
@@ -41,11 +42,16 @@ class LogEntryTests(TestCase):
             [cls.a1],
             CHANGE,
             change_message="Changed something",
-            single_object=True,
         )
+
+    def post_save_listener(self, *args, **kwargs):
+        self.signals_count += 1
 
     def setUp(self):
         self.client.force_login(self.user)
+        self.signals_count = 0
+        post_save.connect(self.post_save_listener, sender=LogEntry)
+        self.addCleanup(post_save.disconnect, self.post_save_listener, sender=LogEntry)
 
     def test_logentry_save(self):
         """
@@ -271,6 +277,7 @@ class LogEntryTests(TestCase):
             for obj in queryset
         ]
         self.assertSequenceEqual(logs, expected_log_values)
+        self.assertEqual(self.signals_count, 0)
 
     def test_recentactions_without_content_type(self):
         """
@@ -314,6 +321,7 @@ class LogEntryTests(TestCase):
             "created_1": "00:00",
         }
         changelist_url = reverse("admin:admin_utils_articleproxy_changelist")
+        self.assertEqual(self.signals_count, 0)
 
         # add
         proxy_add_url = reverse("admin:admin_utils_articleproxy_add")
@@ -322,6 +330,7 @@ class LogEntryTests(TestCase):
         proxy_addition_log = LogEntry.objects.latest("id")
         self.assertEqual(proxy_addition_log.action_flag, ADDITION)
         self.assertEqual(proxy_addition_log.content_type, proxy_content_type)
+        self.assertEqual(self.signals_count, 1)
 
         # change
         article_id = proxy_addition_log.object_id
@@ -334,6 +343,7 @@ class LogEntryTests(TestCase):
         proxy_change_log = LogEntry.objects.latest("id")
         self.assertEqual(proxy_change_log.action_flag, CHANGE)
         self.assertEqual(proxy_change_log.content_type, proxy_content_type)
+        self.assertEqual(self.signals_count, 2)
 
         # delete
         proxy_delete_url = reverse(
@@ -344,6 +354,7 @@ class LogEntryTests(TestCase):
         proxy_delete_log = LogEntry.objects.latest("id")
         self.assertEqual(proxy_delete_log.action_flag, DELETION)
         self.assertEqual(proxy_delete_log.content_type, proxy_content_type)
+        self.assertEqual(self.signals_count, 3)
 
     def test_action_flag_choices(self):
         tests = ((1, "Addition"), (2, "Change"), (3, "Deletion"))
@@ -358,7 +369,6 @@ class LogEntryTests(TestCase):
             [self.a1],
             CHANGE,
             change_message="Article changed message",
-            single_object=True,
         )
         c1 = Car.objects.create()
         LogEntry.objects.log_actions(
@@ -366,7 +376,6 @@ class LogEntryTests(TestCase):
             [c1],
             ADDITION,
             change_message="Car created message",
-            single_object=True,
         )
         exp_str_article = escape(str(self.a1))
         exp_str_car = escape(str(c1))
