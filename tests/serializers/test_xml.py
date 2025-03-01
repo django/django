@@ -70,7 +70,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
         msg = "Article.headline (pk:%s) contains unserializable characters" % self.a1.pk
         with self.assertRaisesMessage(ValueError, msg):
             serializers.serialize(self.serializer_name, [self.a1])
-        self.a1.headline = "HT \u0009, LF \u000A, and CR \u000D are allowed"
+        self.a1.headline = "HT \u0009, LF \u000a, and CR \u000d are allowed"
         self.assertIn(
             "HT \t, LF \n, and CR \r are allowed",
             serializers.serialize(self.serializer_name, [self.a1]),

@@ -1,30 +1,30 @@
 """
-  The Spatial Reference class, represents OGR Spatial Reference objects.
+The Spatial Reference class, represents OGR Spatial Reference objects.
 
-  Example:
-  >>> from django.contrib.gis.gdal import SpatialReference
-  >>> srs = SpatialReference('WGS84')
-  >>> print(srs)
-  GEOGCS["WGS 84",
-      DATUM["WGS_1984",
-          SPHEROID["WGS 84",6378137,298.257223563,
-              AUTHORITY["EPSG","7030"]],
-          TOWGS84[0,0,0,0,0,0,0],
-          AUTHORITY["EPSG","6326"]],
-      PRIMEM["Greenwich",0,
-          AUTHORITY["EPSG","8901"]],
-      UNIT["degree",0.01745329251994328,
-          AUTHORITY["EPSG","9122"]],
-      AUTHORITY["EPSG","4326"]]
-  >>> print(srs.proj)
-  +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> print(srs.ellipsoid)
-  (6378137.0, 6356752.3142451793, 298.25722356300003)
-  >>> print(srs.projected, srs.geographic)
-  False True
-  >>> srs.import_epsg(32140)
-  >>> print(srs.name)
-  NAD83 / Texas South Central
+Example:
+>>> from django.contrib.gis.gdal import SpatialReference
+>>> srs = SpatialReference('WGS84')
+>>> print(srs)
+GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        TOWGS84[0,0,0,0,0,0,0],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.01745329251994328,
+        AUTHORITY["EPSG","9122"]],
+    AUTHORITY["EPSG","4326"]]
+>>> print(srs.proj)
++proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
+>>> print(srs.ellipsoid)
+(6378137.0, 6356752.3142451793, 298.25722356300003)
+>>> print(srs.projected, srs.geographic)
+False True
+>>> srs.import_epsg(32140)
+>>> print(srs.name)
+NAD83 / Texas South Central
 """
 
 from ctypes import byref, c_char_p, c_int
@@ -345,6 +345,7 @@ class SpatialReference(GDALBase):
 
 class CoordTransform(GDALBase):
     "The coordinate system transformation object."
+
     destructor = capi.destroy_ct
 
     def __init__(self, source, target):

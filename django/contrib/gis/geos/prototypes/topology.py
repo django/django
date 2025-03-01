@@ -1,6 +1,6 @@
 """
- This module houses the GEOS ctypes prototype functions for the
- topological operations on geometries.
+This module houses the GEOS ctypes prototype functions for the
+topological operations on geometries.
 """
 
 from ctypes import c_double, c_int
@@ -16,6 +16,7 @@ from django.contrib.gis.geos.prototypes.geom import geos_char_p
 
 class Topology(GEOSFuncFactory):
     "For GEOS unary topology functions."
+
     argtypes = [GEOM_PTR]
     restype = GEOM_PTR
     errcheck = staticmethod(check_geom)
