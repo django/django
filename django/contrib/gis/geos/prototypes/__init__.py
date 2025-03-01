@@ -1,7 +1,7 @@
 """
- This module contains all of the GEOS ctypes function prototypes. Each
- prototype handles the interaction between the GEOS library and Python
- via ctypes.
+This module contains all of the GEOS ctypes function prototypes. Each
+prototype handles the interaction between the GEOS library and Python
+via ctypes.
 """
 
 from django.contrib.gis.geos.prototypes.coordseq import (  # NOQA

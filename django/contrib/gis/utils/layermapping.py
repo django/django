@@ -1,10 +1,10 @@
 # LayerMapping -- A Django Model/OGR Layer Mapping Utility
 """
- The LayerMapping class provides a way to map the contents of OGR
- vector files (e.g. SHP files) to Geographic-enabled Django models.
+The LayerMapping class provides a way to map the contents of OGR
+vector files (e.g. SHP files) to Geographic-enabled Django models.
 
- For more information, please consult the GeoDjango documentation:
-   https://docs.djangoproject.com/en/dev/ref/contrib/gis/layermapping/
+For more information, please consult the GeoDjango documentation:
+  https://docs.djangoproject.com/en/dev/ref/contrib/gis/layermapping/
 """
 import sys
 from decimal import Decimal
