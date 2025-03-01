@@ -33,7 +33,7 @@ class OrderableAggMixin:
         return super().resolve_expression(*args, **kwargs)
 
     def get_source_expressions(self):
-        return super().get_source_expressions() + [self.order_by]
+        return [*super().get_source_expressions(), self.order_by]
 
     def set_source_expressions(self, exprs):
         *exprs, self.order_by = exprs
