@@ -654,7 +654,7 @@ class ListFiltersTests(TestCase):
         # books written by alfred (which is the filtering criteria set by
         # BookAdminWithCustomQueryset.get_queryset())
         self.assertEqual(3, len(choices))
-        self.assertEqual(choices[0]["query_string"], "?")
+        self.assertEqual(choices[0]["query_string"], "")
         self.assertEqual(choices[1]["query_string"], "?year=1999")
         self.assertEqual(choices[2]["query_string"], "?year=2009")
 
@@ -1166,7 +1166,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "availability")
         choice = select_by(filterspec.choices(changelist), "display", "All")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?")
+        self.assertEqual(choice["query_string"], "")
 
     def test_fieldlistfilter_underscorelookup_tuple(self):
         """
@@ -1223,7 +1223,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[0]["display"], "All")
         self.assertIs(choices[0]["selected"], True)
-        self.assertEqual(choices[0]["query_string"], "?")
+        self.assertEqual(choices[0]["query_string"], "")
 
         # Look for books in the 1980s ----------------------------------------
         request = self.request_factory.get("/", {"publication-decade": "the 80s"})
@@ -1295,7 +1295,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choices[3]["selected"], True)
         self.assertEqual(
             choices[3]["query_string"],
-            "?author__id__exact=%s&publication-decade=the+00s" % self.alfred.pk,
+            "?publication-decade=the+00s&author__id__exact=%s" % self.alfred.pk,
         )
 
         filterspec = changelist.get_filters(request)[0][0]
@@ -1304,7 +1304,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?author__id__exact=%s&publication-decade=the+00s" % self.alfred.pk,
+            "?publication-decade=the+00s&author__id__exact=%s" % self.alfred.pk,
         )
 
     def test_listfilter_without_title(self):
@@ -1370,7 +1370,7 @@ class ListFiltersTests(TestCase):
 
         self.assertEqual(choices[0]["display"], "All")
         self.assertIs(choices[0]["selected"], True)
-        self.assertEqual(choices[0]["query_string"], "?")
+        self.assertEqual(choices[0]["query_string"], "")
 
         self.assertEqual(choices[1]["display"], "the 1990's")
         self.assertIs(choices[1]["selected"], False)
@@ -1794,7 +1794,7 @@ class ListFiltersTests(TestCase):
         self.assertCountEqual(
             choices,
             [
-                ("All", True, "?"),
+                ("All", True, ""),
                 ("Development", False, "?department__code__exact=DEV"),
                 ("Design", False, "?department__code__exact=DSN"),
             ],
@@ -1989,7 +1989,7 @@ class ListFiltersTests(TestCase):
 
         self.assertEqual(choices[0]["display"], "All")
         self.assertIs(choices[0]["selected"], True)
-        self.assertEqual(choices[0]["query_string"], "?")
+        self.assertEqual(choices[0]["query_string"], "")
 
         self.assertEqual(choices[1]["display"], "Empty")
         self.assertIs(choices[1]["selected"], False)
