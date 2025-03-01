@@ -118,13 +118,20 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if "ONLY_FULL_GROUP_BY" in self.connection.sql_mode:
             skips.update(
                 {
-                    "GROUP BY cannot contain nonaggregated column when "
-                    "ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #34262.": {
-                        "aggregation.tests.AggregateTestCase."
-                        "test_group_by_nested_expression_with_params",
+                    "ANY_VALUE(...) OVER(...) is not supported in MySQL": {
+                        "aggregation.tests.AggregateTestCase.test_any_value_over",
                     },
                 }
             )
+            skips.update(
+                {
+                    "ANY_VALUE(...) FILTER(...) OVER(...) is not supported in MySQL": {
+                        "aggregation.tests.AggregateTestCase."
+                        "test_any_value_filter_over",
+                    },
+                }
+            )
+
         if self.connection.mysql_version < (8, 0, 31):
             skips.update(
                 {
@@ -301,3 +308,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return "ONLY_FULL_GROUP_BY" not in self.connection.sql_mode
         return True
+
+    @cached_property
+    def supports_any_value(self):
+        if self.connection.mysql_is_mariadb:
+            return False
+        return "ONLY_FULL_GROUP_BY" in self.connection.sql_mode
