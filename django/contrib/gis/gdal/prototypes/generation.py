@@ -1,6 +1,6 @@
 """
- This module contains functions that generate ctypes prototypes for the
- GDAL routines.
+This module contains functions that generate ctypes prototypes for the
+GDAL routines.
 """
 
 from ctypes import POINTER, c_bool, c_char_p, c_double, c_int, c_int64, c_void_p

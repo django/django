@@ -1,11 +1,11 @@
 """
- This module contains the spatial lookup types, and the `get_geo_where_clause`
- routine for Oracle Spatial.
+This module contains the spatial lookup types, and the `get_geo_where_clause`
+routine for Oracle Spatial.
 
- Please note that WKT support is broken on the XE version, and thus
- this backend will not work on such platforms.  Specifically, XE lacks
- support for an internal JVM, and Java libraries are required to use
- the WKT constructors.
+Please note that WKT support is broken on the XE version, and thus
+this backend will not work on such platforms.  Specifically, XE lacks
+support for an internal JVM, and Java libraries are required to use
+the WKT constructors.
 """
 
 import re

@@ -1,5 +1,5 @@
 """
- This module contains useful utilities for GeoDjango.
+This module contains useful utilities for GeoDjango.
 """
 
 from django.contrib.gis.utils.ogrinfo import ogrinfo

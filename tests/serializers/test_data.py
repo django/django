@@ -257,7 +257,7 @@ uuid_obj = uuid.uuid4()
 
 test_data = [
     # Format: (test helper, PK value, Model Class, data)
-    (data_obj, 1, BinaryData, memoryview(b"\x05\xFD\x00")),
+    (data_obj, 1, BinaryData, memoryview(b"\x05\xfd\x00")),
     (data_obj, 5, BooleanData, True),
     (data_obj, 6, BooleanData, False),
     (data_obj, 7, BooleanData, None),

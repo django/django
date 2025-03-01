@@ -350,10 +350,10 @@ class UsernameValidatorsTests(SimpleTestCase):
         invalid_usernames = [
             "o'connell",
             "عبد ال",
-            "zerowidth\u200Bspace",
-            "nonbreaking\u00A0space",
+            "zerowidth\u200bspace",
+            "nonbreaking\u00a0space",
             "en\u2013dash",
-            "trailingnewline\u000A",
+            "trailingnewline\u000a",
         ]
         v = validators.UnicodeUsernameValidator()
         for valid in valid_usernames:
