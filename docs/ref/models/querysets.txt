@@ -258,10 +258,14 @@ you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 .. method:: annotate(*args, **kwargs)
 
 Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
-expressions </ref/models/expressions>`. An expression may be a simple value, a
-reference to a field on the model (or any related models), or an aggregate
-expression (averages, sums, etc.) that has been computed over the objects that
-are related to the objects in the ``QuerySet``.
+expressions </ref/models/expressions>` or :class:`~django.db.models.Q` objects.
+Each object can be annotated with:
+
+* a simple value,  via ``Value()``;
+* a reference to a field on the model (or any related models), via ``F()``;
+* a boolean, via ``Q()``; or
+* a result from an aggregate expression (averages, sums, etc.) computed over
+  the objects that are related to the objects in the ``QuerySet``.
 
 Each argument to ``annotate()`` is an annotation that will be added
 to each object in the ``QuerySet`` that is returned.
