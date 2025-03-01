@@ -49,8 +49,8 @@ class MultiPartParser:
     """
     An RFC 7578 multipart/form-data parser.
 
-    ``MultiValueDict.parse()`` reads the input stream in ``chunk_size`` chunks
-    and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``.
+    ``MultiPartParser.parse()`` reads the input stream in ``chunk_size`` chunks
+    and returns a tuple of ``(QueryDict(POST), MultiValueDict(FILES))``.
     """
 
     boundary_re = _lazy_re_compile(r"[ -~]{0,200}[!-~]")
@@ -132,8 +132,8 @@ class MultiPartParser:
 
     def _parse(self):
         """
-        Parse the POST data and break it into a FILES MultiValueDict and a POST
-        MultiValueDict.
+        Parse the POST data and break it into a FILES MultiValueDict
+        and a POST QueryDict.
 
         Return a tuple containing the POST and FILES dictionary, respectively.
         """
@@ -145,7 +145,7 @@ class MultiPartParser:
         # HTTP spec says that Content-Length >= 0 is valid
         # handling content-length == 0 before continuing
         if self._content_length == 0:
-            return QueryDict(encoding=self._encoding), MultiValueDict()
+            return QueryDict(encoding=self._encoding), MultiValueDict(mutable=False)
 
         # See if any of the handlers take care of the parsing.
         # This allows overriding everything if need be.
@@ -361,7 +361,7 @@ class MultiPartParser:
         # Signal that the upload has completed.
         # any() shortcircuits if a handler's upload_complete() returns a value.
         any(handler.upload_complete() for handler in handlers)
-        self._post._mutable = False
+        self._post._mutable = self._files._mutable = False
         return self._post, self._files
 
     def handle_file_complete(self, old_field_name, counters):
