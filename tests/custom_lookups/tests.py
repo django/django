@@ -17,15 +17,15 @@ class Div3Lookup(models.Lookup):
     lookup_name = "div3"
 
     def as_sql(self, compiler, connection):
-        lhs, params = self.process_lhs(compiler, connection)
+        lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
-        params.extend(rhs_params)
+        params = (*lhs_params, *rhs_params)
         return "(%s) %%%% 3 = %s" % (lhs, rhs), params
 
     def as_oracle(self, compiler, connection):
-        lhs, params = self.process_lhs(compiler, connection)
+        lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
-        params.extend(rhs_params)
+        params = (*lhs_params, *rhs_params)
         return "mod(%s, 3) = %s" % (lhs, rhs), params
 
 
@@ -248,6 +248,28 @@ class LookupTests(TestCase):
             qs2 = Author.objects.filter(birthdate__justtheyear__isactually=1981)
             self.assertSequenceEqual(qs1, [a1])
             self.assertSequenceEqual(qs2, [a1])
+
+    def test_custom_lookup_with_subquery(self):
+        class NotEqual(models.Lookup):
+            lookup_name = "ne"
+
+            def as_sql(self, compiler, connection):
+                lhs, lhs_params = self.process_lhs(compiler, connection)
+                rhs, rhs_params = self.process_rhs(compiler, connection)
+                params = lhs_params + rhs_params
+                return "%s <> %s" % (lhs, rhs), params
+
+        author = Author.objects.create(name="Isabella")
+
+        with register_lookup(models.Field, NotEqual):
+            qs = Author.objects.annotate(
+                unknown_age=models.Subquery(
+                    Author.objects.filter(age__isnull=True)
+                    .order_by("name")
+                    .values("name")[:1]
+                )
+            ).filter(unknown_age__ne="Plato")
+            self.assertSequenceEqual(qs, [author])
 
     def test_custom_exact_lookup_none_rhs(self):
         """
