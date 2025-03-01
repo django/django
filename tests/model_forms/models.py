@@ -521,3 +521,27 @@ class Dice(models.Model):
         through=NumbersToDice,
         limit_choices_to=models.Q(value__gte=1),
     )
+
+
+class ConstraintsModel(models.Model):
+    name = models.CharField(max_length=100)
+    category = models.CharField(max_length=50, default="uncategorized")
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                # Defining expressions instead of fields should force this to
+                # validated as a Constraint instead of a simple unique or a
+                # unique_together.
+                "name",
+                "category",
+                name="unique_name_category",
+                violation_error_message="This product already exists.",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(price__gte=0),
+                name="price_gte_zero",
+                violation_error_message="Price must be greater than zero.",
+            ),
+        ]

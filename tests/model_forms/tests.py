@@ -40,6 +40,7 @@ from .models import (
     Character,
     Colour,
     ColourfulItem,
+    ConstraintsModel,
     CustomErrorMessage,
     CustomFF,
     CustomFieldForExclusionModel,
@@ -1037,6 +1038,12 @@ class IncompleteCategoryFormWithExclude(forms.ModelForm):
     class Meta:
         exclude = ["url"]
         model = Category
+
+
+class ConstraintsModelForm(forms.ModelForm):
+    class Meta:
+        model = ConstraintsModel
+        fields = "__all__"
 
 
 class ValidationTest(SimpleTestCase):
@@ -3718,3 +3725,75 @@ class ModelToDictTests(TestCase):
         # If data were a QuerySet, it would be reevaluated here and give "red"
         # instead of the original value.
         self.assertEqual(data, [blue])
+
+
+class ConstraintValidationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.product = ConstraintsModel.objects.create(
+            name="product", category="category", price="1.00"
+        )
+
+    def test_unique_constraint_no_instance(self):
+        data = {
+            "id": "",
+            "name": "product",
+            "category": "category",
+            "price": "2.00",
+        }
+        form = ConstraintsModelForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.non_field_errors(),
+            ["This product already exists."],
+        )
+
+    def test_unique_constraint_with_instance(self):
+        data = {
+            "id": str(self.product.id),
+            "name": "product",
+            "category": "category",
+            "price": "2.00",
+        }
+        form = ConstraintsModelForm(data, instance=self.product)
+        self.assertTrue(form.is_valid())
+
+    def test_constraints_validation_with_valid_form_data(self):
+        data = {"id": "", "name": "valid", "category": "category", "price": "0.10"}
+        form = ConstraintsModelForm(data)
+        self.assertTrue(form.is_valid())
+
+    def test_check_constraint_invalid_data(self):
+        data = {"id": "", "name": "valid", "category": "category", "price": "-1337"}
+        form = ConstraintsModelForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.non_field_errors(),
+            ["Price must be greater than zero."],
+        )
+
+    def test_check_both_constraints_invalid_data(self):
+        data = {"id": "", "name": "product", "category": "category", "price": "-1337"}
+        form = ConstraintsModelForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.non_field_errors(),
+            ["This product already exists.", "Price must be greater than zero."],
+        )
+
+    def test_validation_exclusion(self):
+        """
+        Excluding a field that is part of the Constraint's expressions
+        from the form should skip validation of the constraint.
+        """
+        self.assertEqual(
+            ConstraintsModel._meta.constraints[0].expressions,
+            (models.F("name"), models.F("category")),
+        )
+        obj = ConstraintsModel.objects.create(name="Django", price=0)
+        data = {"id": "", "name": "Django", "price": "0"}
+        form = modelform_factory(ConstraintsModel, fields=("name", "price"))(data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(
+            (obj.name, obj.category), (form.instance.name, form.instance.category)
+        )

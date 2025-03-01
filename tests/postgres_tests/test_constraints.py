@@ -22,6 +22,7 @@ from django.db.models import (
 )
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Left, Lower
+from django.forms import modelform_factory
 from django.test import skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -32,6 +33,7 @@ from .models import HotelReservation, IntegerArrayModel, RangesModel, Room, Scen
 try:
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import (
+        DateRangeField,
         DateTimeRangeField,
         IntegerRangeField,
         RangeBoundary,
@@ -309,7 +311,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
 
     def test_invalid_expressions(self):
         msg = "The expressions must be a list of 2-tuples."
-        for expressions in (["foo"], [("foo")], [("foo_1", "foo_2", "foo_3")]):
+        for expressions in (["foo"], ["foo"], [("foo_1", "foo_2", "foo_3")]):
             with self.subTest(expressions), self.assertRaisesMessage(ValueError, msg):
                 ExclusionConstraint(
                     index_type="GIST",
@@ -1256,3 +1258,47 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         msg = "Constraint “ints_equal” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
             constraint.validate(RangesModel, RangesModel())
+
+    def test_model_form_validation(self):
+        class Reservation(Model):
+            room = IntegerField(default=1)
+            datespan = DateRangeField()
+
+            class Meta:
+                constraints = [
+                    ExclusionConstraint(
+                        name="exclude_overlapping_dates_for_room",
+                        expressions=[
+                            ("room", RangeOperators.EQUAL),
+                            ("datespan", RangeOperators.OVERLAPS),
+                        ],
+                    )
+                ]
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Reservation)
+
+        Reservation.objects.create(datespan=DateRange("2025-01-01", "2025-01-03"))
+        data1 = {
+            "id": "",
+            "room": "1",
+            "datespan_0": "2025-01-02",
+            "datespan_1": "2025-01-05",
+        }
+        form1 = modelform_factory(Reservation, fields="__all__")(data1)
+        self.assertFalse(form1.is_valid())
+        self.assertEqual(
+            form1.non_field_errors(),
+            ["Constraint “exclude_overlapping_dates_for_room” is violated."],
+        )
+        # Form validation is skipped if a field included in the constraint's
+        # expressions is excluded from the model form. For this test, the field
+        # excluded must have a default, so as to violate the constraint and
+        # fail the test if the validation exclusion logic fails.
+        self.assertEqual(Reservation._meta.get_field("room").default, 1)
+        data2 = {"id": "", "datespan_0": "2025-01-02", "datespan_1": "2025-01-05"}
+        form2 = modelform_factory(Reservation, fields=["datespan"])(data2)
+        self.assertTrue(form2.is_valid())
+        msg = "Constraint “exclude_overlapping_dates_for_room” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            form2.instance.validate_constraints()
