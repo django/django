@@ -23,6 +23,7 @@ def check_cs_get(result, func, cargs):
 # ## Coordinate sequence prototype factory classes. ##
 class CsInt(GEOSFuncFactory):
     "For coordinate sequence routines that return an integer."
+
     argtypes = [CS_PTR, POINTER(c_uint)]
     restype = c_int
     errcheck = staticmethod(check_cs_get)
@@ -30,6 +31,7 @@ class CsInt(GEOSFuncFactory):
 
 class CsOperation(GEOSFuncFactory):
     "For coordinate sequence operations."
+
     restype = c_int
 
     def __init__(self, *args, ordinate=False, get=False, **kwargs):

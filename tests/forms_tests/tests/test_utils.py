@@ -73,7 +73,7 @@ class FormsUtilsTestCase(SimpleTestCase):
         )
         # Can take a Unicode string.
         self.assertHTMLEqual(
-            str(ErrorList(ValidationError("Not \u03C0.").messages)),
+            str(ErrorList(ValidationError("Not \u03c0.").messages)),
             '<ul class="errorlist"><li>Not π.</li></ul>',
         )
         # Can take a lazy string.
@@ -107,7 +107,7 @@ class FormsUtilsTestCase(SimpleTestCase):
                         ValidationError(
                             [
                                 "1. First error.",
-                                "2. Not \u03C0.",
+                                "2. Not \u03c0.",
                                 gettext_lazy("3. Error."),
                                 {
                                     "error_1": "4. First dict error.",
