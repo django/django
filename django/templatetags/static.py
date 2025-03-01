@@ -9,10 +9,13 @@ register = template.Library()
 
 
 class PrefixNode(template.Node):
+    __slots__ = ("varname", "name")
+
     def __repr__(self):
         return "<PrefixNode for %r>" % self.name
 
     def __init__(self, varname=None, name=None):
+        super().__init__()
         if name is None:
             raise template.TemplateSyntaxError(
                 "Prefix nodes must be given a name to return."
@@ -93,9 +96,12 @@ def get_media_prefix(parser, token):
 
 
 class StaticNode(template.Node):
+    __slots__ = ("varname", "path")
+
     child_nodelists = ()
 
     def __init__(self, varname=None, path=None):
+        super().__init__()
         if path is None:
             raise template.TemplateSyntaxError(
                 "Static template nodes must be given a path to return."
