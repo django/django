@@ -318,6 +318,10 @@ Models
 * :meth:`.QuerySet.explain` now supports the ``memory`` and ``serialize``
   options on PostgreSQL 17+.
 
+* The new :class:`~django.db.models.JSONArrayAgg` aggregate function accepts
+  a list of field names or expressions, converts each expression to a JSON
+  value, and returns a single JSON array containing those JSON values.
+
 * The new :class:`~django.db.models.functions.JSONArray` database function
   accepts a list of field names or expressions and returns a JSON array
   containing those values.
