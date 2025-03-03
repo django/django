@@ -257,6 +257,8 @@ class JSONArrayAgg(Aggregate):
             compiler, connection, function="JSON_GROUP_ARRAY", **extra_context
         )
         # JSON_GROUP_ARRAY defaults to returning an empty array on an empty set.
+        # Modifies the SQL to support a custom default value to be returned,
+        # if a default argument is not passed, null is returned instead of [].
         if (default := self.default) == []:
             return sql, params
         # Ensure Count() is against the exact same parameters (filter, distinct)
@@ -283,4 +285,14 @@ class JSONArrayAgg(Aggregate):
         extra_context.setdefault(
             "template", "%(function)s(%(distinct)s%(expressions)s RETURNING JSONB)"
         )
+        return self.as_sql(compiler, connection, **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        # Return same date field format as on other supported backends. 
+        expression = self.get_source_expressions()[0]
+        internal_type = expression.output_field.get_internal_type()
+        if internal_type == "DateField":
+            extra_context.setdefault(
+                "template", "%(function)s(to_char(%(expressions)s, 'YYYY-MM-DD'))"
+            )
         return self.as_sql(compiler, connection, **extra_context)
