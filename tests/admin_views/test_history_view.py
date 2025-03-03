@@ -66,7 +66,6 @@ class SeleniumTests(AdminSeleniumTestCase):
                 [self.superuser],
                 CHANGE,
                 change_message=f"Changed something {i}",
-                single_object=True,
             )
         self.admin_login(
             username="super",
