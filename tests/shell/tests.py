@@ -1,3 +1,5 @@
+import os
+import subprocess
 import sys
 import unittest
 from unittest import mock
@@ -23,24 +25,84 @@ class ShellCommandTestCase(SimpleTestCase):
 
     def test_command_option(self):
         with self.assertLogs("test", "INFO") as cm:
-            call_command(
-                "shell",
-                command=(
-                    "import django; from logging import getLogger; "
-                    'getLogger("test").info(django.__version__)'
-                ),
-            )
+            with captured_stdout():
+                call_command(
+                    "shell",
+                    command=(
+                        "import django; from logging import getLogger; "
+                        'getLogger("test").info(django.__version__)'
+                    ),
+                )
         self.assertEqual(cm.records[0].getMessage(), __version__)
 
     def test_command_option_globals(self):
         with captured_stdout() as stdout:
-            call_command("shell", command=self.script_globals)
+            call_command("shell", command=self.script_globals, verbosity=0)
         self.assertEqual(stdout.getvalue().strip(), "True")
 
     def test_command_option_inline_function_call(self):
         with captured_stdout() as stdout:
-            call_command("shell", command=self.script_with_inline_function)
+            call_command("shell", command=self.script_with_inline_function, verbosity=0)
         self.assertEqual(stdout.getvalue().strip(), __version__)
+
+    @override_settings(INSTALLED_APPS=["shell"])
+    def test_no_settings(self):
+        test_environ = os.environ.copy()
+        if "DJANGO_SETTINGS_MODULE" in test_environ:
+            del test_environ["DJANGO_SETTINGS_MODULE"]
+        error = (
+            "Automatic imports are disabled since settings are not configured.\n"
+            "DJANGO_SETTINGS_MODULE value is None.\n"
+            "HINT: Ensure that the settings module is configured and set.\n\n"
+        )
+        for verbosity, assertError in [
+            ("0", self.assertNotIn),
+            ("1", self.assertIn),
+            ("2", self.assertIn),
+        ]:
+            with self.subTest(verbosity=verbosity, get_auto_imports="models"):
+                p = subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "django",
+                        "shell",
+                        "-c",
+                        "print(globals())",
+                        "-v",
+                        verbosity,
+                    ],
+                    capture_output=True,
+                    env=test_environ,
+                    text=True,
+                    umask=-1,
+                )
+                assertError(error, p.stdout)
+                self.assertNotIn("Marker", p.stdout)
+
+            with self.subTest(verbosity=verbosity, get_auto_imports="without-models"):
+                with mock.patch(
+                    "django.core.management.commands.shell.Command.get_auto_imports",
+                    return_value=["django.urls.resolve"],
+                ):
+                    p = subprocess.run(
+                        [
+                            sys.executable,
+                            "-m",
+                            "django",
+                            "shell",
+                            "-c",
+                            "print(globals())",
+                            "-v",
+                            verbosity,
+                        ],
+                        capture_output=True,
+                        env=test_environ,
+                        text=True,
+                        umask=-1,
+                    )
+                    assertError(error, p.stdout)
+                    self.assertNotIn("resolve", p.stdout)
 
     @unittest.skipIf(
         sys.platform == "win32", "Windows select() doesn't support file descriptors."
@@ -50,7 +112,7 @@ class ShellCommandTestCase(SimpleTestCase):
         with captured_stdin() as stdin, captured_stdout() as stdout:
             stdin.write("print(100)\n")
             stdin.seek(0)
-            call_command("shell")
+            call_command("shell", verbosity=0)
         self.assertEqual(stdout.getvalue().strip(), "100")
 
     @unittest.skipIf(
@@ -62,7 +124,7 @@ class ShellCommandTestCase(SimpleTestCase):
         with captured_stdin() as stdin, captured_stdout() as stdout:
             stdin.write(self.script_globals)
             stdin.seek(0)
-            call_command("shell")
+            call_command("shell", verbosity=0)
         self.assertEqual(stdout.getvalue().strip(), "True")
 
     @unittest.skipIf(
@@ -74,7 +136,7 @@ class ShellCommandTestCase(SimpleTestCase):
         with captured_stdin() as stdin, captured_stdout() as stdout:
             stdin.write(self.script_with_inline_function)
             stdin.seek(0)
-            call_command("shell")
+            call_command("shell", verbosity=0)
         self.assertEqual(stdout.getvalue().strip(), __version__)
 
     def test_ipython(self):
