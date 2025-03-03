@@ -1,3 +1,5 @@
+import os
+import subprocess
 import sys
 import unittest
 from unittest import mock
@@ -41,6 +43,26 @@ class ShellCommandTestCase(SimpleTestCase):
         with captured_stdout() as stdout:
             call_command("shell", command=self.script_with_inline_function)
         self.assertEqual(stdout.getvalue().strip(), __version__)
+
+    def test_no_settings(self):
+        test_environ = os.environ.copy()
+        if "DJANGO_SETTINGS_MODULE" in test_environ:
+            del test_environ["DJANGO_SETTINGS_MODULE"]
+        p = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "django",
+                "shell",
+                "-c",
+                self.script_with_inline_function,
+            ],
+            capture_output=True,
+            env=test_environ,
+            text=True,
+            umask=-1,
+        )
+        self.assertEqual(p.stdout.strip(), __version__)
 
     @unittest.skipIf(
         sys.platform == "win32", "Windows select() doesn't support file descriptors."

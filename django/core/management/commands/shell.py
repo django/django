@@ -6,6 +6,7 @@ from collections import defaultdict
 from importlib import import_module
 
 from django.apps import apps
+from django.core.exceptions import AppRegistryNotReady
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
 from django.utils.module_loading import import_string as import_dotted_path
@@ -139,9 +140,13 @@ class Command(BaseCommand):
         ]
 
         """
+        try:
+            models = apps.get_models()
+        except AppRegistryNotReady:
+            return []
         app_models_imports = [
             f"{model.__module__}.{model.__name__}"
-            for model in reversed(apps.get_models())
+            for model in reversed(models)
             if model.__module__
         ]
         return app_models_imports
