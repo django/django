@@ -40,6 +40,12 @@ database connection at the end of each request. To enable persistent
 connections, set :setting:`CONN_MAX_AGE` to a positive integer of seconds. For
 unlimited persistent connections, set it to ``None``.
 
+.. warning::
+
+    Persistent connections :ticket:`do not work <33497>` when running Django
+    under ASGI. Setting :setting:`CONN_MAX_AGE` to anything other than ``0``
+    may cause you to exceed your database connection limit.
+
 Connection management
 ~~~~~~~~~~~~~~~~~~~~~
 
