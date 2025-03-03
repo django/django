@@ -6,6 +6,7 @@ from collections import defaultdict
 from importlib import import_module
 
 from django.apps import apps
+from django.core.exceptions import AppRegistryNotReady
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
 from django.utils.module_loading import import_string as import_dotted_path
@@ -150,6 +151,22 @@ class Command(BaseCommand):
         if options and options.get("no_imports"):
             return {}
 
+        verbosity = options["verbosity"] if options else 0
+
+        try:
+            apps.check_models_ready()
+        except AppRegistryNotReady:
+            if verbosity > 0:
+                settings_env_var = os.getenv("DJANGO_SETTINGS_MODULE")
+                self.stdout.write(
+                    "Automatic imports are disabled since settings are not configured."
+                    f"\nDJANGO_SETTINGS_MODULE value is {settings_env_var!r}.\n"
+                    "HINT: Ensure that the settings module is configured and set.",
+                    self.style.ERROR,
+                    ending="\n\n",
+                )
+            return {}
+
         path_imports = self.get_auto_imports()
         if path_imports is None:
             return {}
@@ -175,7 +192,6 @@ class Command(BaseCommand):
             name: obj for items in auto_imports.values() for name, obj in items
         }
 
-        verbosity = options["verbosity"] if options else 0
         if verbosity < 1:
             return namespace
 
@@ -228,7 +244,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         # Execute the command and exit.
         if options["command"]:
-            exec(options["command"], {**globals(), **self.get_namespace()})
+            exec(options["command"], {**globals(), **self.get_namespace(**options)})
             return
 
         # Execute stdin if it has anything to read and exit.
@@ -238,7 +254,7 @@ class Command(BaseCommand):
             and not sys.stdin.isatty()
             and select.select([sys.stdin], [], [], 0)[0]
         ):
-            exec(sys.stdin.read(), {**globals(), **self.get_namespace()})
+            exec(sys.stdin.read(), {**globals(), **self.get_namespace(**options)})
             return
 
         available_shells = (
