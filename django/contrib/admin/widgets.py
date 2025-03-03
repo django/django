@@ -50,6 +50,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 
 
 class BaseAdminDateWidget(forms.DateInput):
+
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -66,6 +67,7 @@ class AdminDateWidget(BaseAdminDateWidget):
 
 
 class BaseAdminTimeWidget(forms.TimeInput):
+
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -249,6 +251,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     admin interface.
     """
 
+    use_fieldset = True
     template_name = "admin/widgets/related_widget_wrapper.html"
 
     def __init__(
@@ -362,16 +365,19 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
 
 class AdminTextareaWidget(forms.Textarea):
+
     def __init__(self, attrs=None):
         super().__init__(attrs={"class": "vLargeTextField", **(attrs or {})})
 
 
 class AdminTextInputWidget(forms.TextInput):
+
     def __init__(self, attrs=None):
         super().__init__(attrs={"class": "vTextField", **(attrs or {})})
 
 
 class AdminEmailInputWidget(forms.EmailInput):
+
     def __init__(self, attrs=None):
         super().__init__(attrs={"class": "vTextField", **(attrs or {})})
 
@@ -411,6 +417,7 @@ class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
 
 
 class AdminUUIDInputWidget(forms.TextInput):
+
     def __init__(self, attrs=None):
         super().__init__(attrs={"class": "vUUIDField", **(attrs or {})})
 
