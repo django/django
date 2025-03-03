@@ -22,6 +22,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{ secret_key }}'
 
+# SECURITY WARNING: keep the pepper value used in production secret!
+PASSWORD_PEPPERS = [
+    '{{ password_pepper }}',
+]
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
