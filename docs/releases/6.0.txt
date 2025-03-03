@@ -282,6 +282,28 @@ of each library are the first to add or confirm compatibility with Python 3.12:
 * ``sqlparse`` 0.5.0
 * ``tblib`` 3.0.0
 
+Custom ORM expressions should return params in a ``tuple``
+----------------------------------------------------------
+
+Prior to Django 6.0, :doc:`custom lookups </ref/models/lookups>` and
+:ref:`expressions <writing-your-own-query-expressions>` implementing the ``as_sql``
+method (and their underlying parts ``process_lhs`` and ``process_rhs``) were
+permitted to return a sequence of params in either a list or a tuple. To
+address the interoperability problems that resulted, the second element of
+``as_sql``'s return should now be a ``tuple``::
+
+  def as_sql(self, compiler, connection) -> tuple[str, tuple]: ...
+
+If your custom expressions support multiple versions of Django, you should
+adjust any pre-processing of parameters to be resilient against either tuples
+or lists, e.g. by preferring::
+
+  params = (*lhs_params, *rhs_params)
+
+rather than::
+
+  params = lhs_params + rhs_params
+
 Miscellaneous
 -------------
 
