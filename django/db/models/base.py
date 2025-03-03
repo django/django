@@ -33,6 +33,7 @@ from django.db.models.deletion import CASCADE, Collector
 from django.db.models.expressions import DatabaseDefault
 from django.db.models.fields.composite import CompositePrimaryKey
 from django.db.models.fields.related import (
+    ForeignObject,
     ForeignObjectRel,
     OneToOneField,
     lazy_related_operation,
@@ -680,6 +681,52 @@ class Model(AltersData, metaclass=ModelBase):
             if f.attname not in self.__dict__
         }
 
+    def _refresh_from_db_with_foreign_object(self):
+        """
+        Refreshes the current instance from the database, taking into account
+        ForeignObject fields and composite primary keys.
+        This is a private helper method and should only be invoked by
+        refresh_from_db().
+        """
+        from_queryset = self.__class__.objects
+
+        # Collect fields from ForeignObject and PK
+        composite_fields = [
+            field
+            for field in self._meta.fields
+            if isinstance(field, ForeignObject)
+            or (
+                hasattr(self._meta.pk, "fields")
+                and field.attname in [f.attname for f in self._meta.pk.fields]
+            )
+            or field.attname == self._meta.pk.attname
+        ]
+
+        # Raw data without avoiding the cache
+        original_values = {
+            field.attname: self.__dict__.get(field.attname)
+            for field in composite_fields
+            if self.__dict__.get(field.attname) is not None
+        }
+
+        if not original_values:
+            raise ValueError("Impossible to find the object: key not found.")
+
+        try:
+            # Query instance from DB
+            db_instance = from_queryset.get(**original_values)
+        except self.__class__.DoesNotExist:
+            raise self.__class__.DoesNotExist(
+                f"{self.__class__.__name__} matching query does not exist. "
+                f"Values: {original_values}"
+            )
+
+        # Update instance with data from DB
+        for field in self._meta.fields:
+            setattr(self, field.attname, getattr(db_instance, field.attname))
+
+        self._state.db = db_instance._state.db
+
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         """
         Reload field values from the database.
@@ -711,7 +758,6 @@ class Model(AltersData, metaclass=ModelBase):
                     'Found "%s" in fields argument. Relations and transforms '
                     "are not allowed in fields." % LOOKUP_SEP
                 )
-
         if from_queryset is None:
             hints = {"instance": self}
             from_queryset = self.__class__._base_manager.db_manager(using, hints=hints)
@@ -732,6 +778,9 @@ class Model(AltersData, metaclass=ModelBase):
                     if f.attname not in deferred_fields
                 }
             )
+
+        if any(type(field) is ForeignObject for field in self._meta.get_fields()):
+            return self._refresh_from_db_with_foreign_object()
 
         db_instance = db_instance_qs.get()
         non_loaded_fields = db_instance.get_deferred_fields()
