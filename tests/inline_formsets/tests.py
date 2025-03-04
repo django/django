@@ -1,7 +1,15 @@
 from django.forms.models import ModelForm, inlineformset_factory
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Child, Parent, Poem, Poet, School
+from .models import (
+    Child,
+    Parent,
+    Poem,
+    Poet,
+    School,
+    SingleInstanceModel,
+    ZeroInstancesModel,
+)
 
 
 class DeletionTests(TestCase):
@@ -215,3 +223,72 @@ class InlineFormsetFactoryTest(TestCase):
         )
         formset = PoemFormSet(None, instance=poet)
         formset.forms  # Trigger form instantiation to run the assert above.
+
+
+ChildFormSet = inlineformset_factory(
+    Parent,
+    Child,
+    fk_name="mother",
+    fields="__all__",
+    extra=1,
+)
+
+
+class InlineFormsetConstraintsValidationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.father = Parent.objects.create(name="James")
+        cls.school = School.objects.create(name="Hogwarts")
+
+    def test_validation_inline_fk_field_in_unique_constraint_expressions(self):
+        """
+        UniqueConstraint defined with expressions instead of fields should
+        be validated properly when one of the expression fields is an
+        InlineForeignKeyField (#35676).
+        """
+        mother = Parent.objects.create(name="Lily")
+        child = Child.objects.create(
+            name="Harry", father=self.father, mother=mother, school=self.school
+        )
+        data = {
+            "mothers_children-TOTAL_FORMS": "2",
+            "mothers_children-INITIAL_FORMS": "1",
+            "mothers_children-MIN_NUM_FORMS": "0",
+            "mothers_children-MAX_NUM_FORMS": "1000",
+            "mothers_children-0-id": str(child.pk),
+            "mothers_children-0-father": str(self.father.pk),
+            "mothers_children-0-school": str(self.school.pk),
+            "mothers_children-0-name": "Harry",
+            "mothers_children-1-id": "",
+            "mothers_children-1-father": str(self.father.pk),
+            "mothers_children-1-school": str(self.school.pk),
+            "mothers_children-1-name": "Mary",
+        }
+        formset = ChildFormSet(instance=mother, data=data)
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(
+            formset.errors,
+            [{}, {"__all__": ["Constraint “unique_parents” is violated."]}],
+        )
+
+    def test_validation_inline_fk_field_in_check_constraint_condition(self):
+        single = SingleInstanceModel.objects.create()
+        data = {
+            "child_set-TOTAL_FORMS": "1",
+            "child_set-INITIAL_FORMS": "0",
+            "child_set-MIN_NUM_FORMS": "0",
+            "child_set-MAX_NUM_FORMS": "1000",
+            "child_set-0-id": "",
+            "child_set-0-name": "name",
+        }
+        formset = inlineformset_factory(
+            SingleInstanceModel,
+            ZeroInstancesModel,
+            fields="__all__",
+        )(instance=single, data=data)
+        self.assertEqual(single.pk, 1)  # Constraint validation failure logic.
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(
+            formset.errors,
+            [{"__all__": ["Constraint “parent_1_no_child” is violated."]}],
+        )
