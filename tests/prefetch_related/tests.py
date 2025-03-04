@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
 from django.db.models import F, Prefetch, QuerySet, prefetch_related_objects
+from django.db.models.fields.fetch_modes import RAISE, fetch_mode
 from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
@@ -103,6 +104,11 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         normal_books = [a.first_book for a in Author.objects.all()]
         self.assertEqual(books, normal_books)
+
+    @fetch_mode(RAISE)
+    def test_fetch_mode_raise(self):
+        authors = list(Author.objects.prefetch_related("first_book"))
+        authors[0].first_book  # No exception, already loaded
 
     def test_foreignkey_reverse(self):
         with self.assertNumQueries(2):
