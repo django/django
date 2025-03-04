@@ -943,6 +943,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         self.assertIn("<a ", output)
 
     def test_data_model_ref_when_model_name_is_camel_case(self):
+        self.maxDiff = None
         rel = VideoStream._meta.get_field("release_event").remote_field
         widget = forms.Select()
         wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
@@ -957,7 +958,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
           </select>
           <a class="related-widget-wrapper-link add-related" id="add_id_stream"
              data-popup="yes" title="Add another release event"
-             href="/admin_widgets/releaseevent/add/?_to_field=album&amp;_popup=1">
+             href="/admin_widgets/releaseevent/add/?_to_field=album&amp;_popup=1&_source_model=admin_widgets.videostream">
             <img src="/static/admin/img/icon-addlink.svg" alt="" width="24" height="24">
           </a>
         </div>
@@ -1325,14 +1326,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSelectOptions(
             to_box,
             [
-                str(self.lisa.id),
-                str(self.peter.id),
                 str(self.arthur.id),
                 str(self.bob.id),
                 str(self.cliff.id),
                 str(self.jason.id),
                 str(self.jenny.id),
                 str(self.john.id),
+                str(self.lisa.id),
+                str(self.peter.id),
             ],
         )
         self.assertButtonsDisabled(
@@ -1358,14 +1359,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSelectOptions(
             from_box,
             [
-                str(self.lisa.id),
-                str(self.peter.id),
                 str(self.arthur.id),
                 str(self.bob.id),
                 str(self.cliff.id),
                 str(self.jason.id),
                 str(self.jenny.id),
                 str(self.john.id),
+                str(self.lisa.id),
+                str(self.peter.id),
             ],
         )
         self.assertSelectOptions(to_box, [])
@@ -1414,19 +1415,19 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSelectOptions(
             from_box,
             [
-                str(self.peter.id),
                 str(self.arthur.id),
                 str(self.cliff.id),
                 str(self.jenny.id),
+                str(self.peter.id),
             ],
         )
         self.assertSelectOptions(
             to_box,
             [
-                str(self.lisa.id),
                 str(self.bob.id),
                 str(self.jason.id),
                 str(self.john.id),
+                str(self.lisa.id),
             ],
         )
 
@@ -1463,12 +1464,12 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSelectOptions(
             from_box,
             [
-                str(self.peter.id),
                 str(self.arthur.id),
+                str(self.bob.id),
                 str(self.cliff.id),
                 str(self.jenny.id),
                 str(self.lisa.id),
-                str(self.bob.id),
+                str(self.peter.id),
             ],
         )
         self.assertSelectOptions(to_box, [str(self.jason.id), str(self.john.id)])
@@ -1481,19 +1482,19 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSelectOptions(
             from_box,
             [
-                str(self.peter.id),
+                str(self.bob.id),
                 str(self.jenny.id),
                 str(self.lisa.id),
-                str(self.bob.id),
+                str(self.peter.id),
             ],
         )
         self.assertSelectOptions(
             to_box,
             [
-                str(self.jason.id),
-                str(self.john.id),
                 str(self.arthur.id),
                 str(self.cliff.id),
+                str(self.jason.id),
+                str(self.john.id),
             ],
         )
 
@@ -1502,9 +1503,9 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(from_box, str(self.lisa.id))
 
         # Confirm they're selected after clicking inactive buttons: ticket #26575
-        self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
+        self.assertSelectedOptions(from_box, [str(self.lisa.id), str(self.peter.id)])
         self.selenium.find_element(By.ID, remove_button).click()
-        self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
+        self.assertSelectedOptions(from_box, [str(self.lisa.id), str(self.peter.id)])
 
         # Unselect the options ------------------------------------------------
         self.deselect_option(from_box, str(self.peter.id))
@@ -1629,9 +1630,9 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
                 self.assertSelectOptions(
                     to_box,
                     [
+                        str(self.jason.id),
                         str(self.lisa.id),
                         str(self.peter.id),
-                        str(self.jason.id),
                     ],
                 )
 
@@ -1641,7 +1642,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
                     from_box, [str(self.arthur.id), str(self.lisa.id)]
                 )
                 self.assertSelectOptions(
-                    to_box, [str(self.peter.id), str(self.jason.id)]
+                    to_box, [str(self.jason.id), str(self.peter.id)]
                 )
 
                 input.send_keys([Keys.BACK_SPACE])  # Clear text box
@@ -1657,7 +1658,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
                     ],
                 )
                 self.assertSelectOptions(
-                    to_box, [str(self.peter.id), str(self.jason.id)]
+                    to_box, [str(self.jason.id), str(self.peter.id)]
                 )
 
                 # Pressing enter on a filtered option sends it properly to
@@ -1668,7 +1669,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
                 self.assertSelectOptions(from_box, [str(self.jason.id)])
                 input.send_keys([Keys.ENTER])
                 self.assertSelectOptions(
-                    to_box, [str(self.peter.id), str(self.jason.id)]
+                    to_box, [str(self.jason.id), str(self.peter.id)]
                 )
                 input.send_keys([Keys.BACK_SPACE, Keys.BACK_SPACE])
 
@@ -1855,6 +1856,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         save_button_css_selector = ".submit-row > input[type=submit]"
         self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector).click()
         self.selenium.switch_to.window(main_window)
+
         # The field now contains the new user
         self.selenium.find_element(By.CSS_SELECTOR, "#id_user option[value=newuser]")
 
