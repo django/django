@@ -4,14 +4,13 @@ from unittest import mock
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.paginations import ALL_VAR, PAGE_VAR
 from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import (
-    ALL_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
     ORDER_VAR,
-    PAGE_VAR,
     SEARCH_VAR,
     TO_FIELD_VAR,
 )
@@ -22,19 +21,23 @@ from django.db.models import F, Field, IntegerField
 from django.db.models.functions import Upper
 from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
-from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test import (
+    TestCase,
+    ignore_warnings,
+    override_settings,
+    skipUnlessDBFeature,
+)
 from django.test.client import RequestFactory
 from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
 from django.urls import reverse
 from django.utils import formats
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .admin import (
     BandAdmin,
     ChildAdmin,
     ChordsBandAdmin,
     ConcertAdmin,
-    CustomPaginationAdmin,
-    CustomPaginator,
     DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin,
     DynamicListFilterChildAdmin,
@@ -504,7 +507,25 @@ class ChangeListTests(TestCase):
         self.assertEqual(b.load, 2)
         self.assertEqual(b.speed, 2)
 
+    # RemovedInDjango70Warning: Remove this test.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_custom_paginator(self):
+        from django.core.paginator import Paginator
+
+        class CustomPaginator(Paginator):
+            def __init__(
+                self, queryset, page_size, orphans=0, allow_empty_first_page=True
+            ):
+                super().__init__(
+                    queryset,
+                    5,
+                    orphans=2,
+                    allow_empty_first_page=allow_empty_first_page,
+                )
+
+        class CustomPaginationAdmin(ChildAdmin):
+            paginator = CustomPaginator
+
         new_parent = Parent.objects.create(name="parent")
         for i in range(1, 201):
             Child.objects.create(name="name %s" % i, parent=new_parent)
@@ -919,6 +940,8 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertIs(cl.queryset.query.distinct, True)
 
+    # RemovedInDjango70Warning: Remove this test.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_pagination(self):
         """
         Regression tests for #12893: Pagination in admins changelist doesn't
@@ -1662,6 +1685,8 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         self.assertEqual(response.context_data["cl"].search_fields, ("name", "age"))
 
+    # RemovedInDjango70Warning: Remove this test.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_pagination_page_range(self):
         """
         Regression tests for ticket #15653: ensure the number of pages
@@ -1695,8 +1720,8 @@ class ChangeListTests(TestCase):
                     Group.objects.create(name="test band")
 
                 # setting page number and calculating page range
-                cl.page_num = number
                 cl.get_results(request)
+                cl.page_num = number
                 self.assertEqual(list(pagination(cl)["page_range"]), expected)
 
     def test_object_tools_displayed_no_add_permission(self):
@@ -1821,6 +1846,116 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request("/", self.superuser)
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.get_ordering_field_columns(), {2: "asc"})
+
+    # RemovedInDjango70Warning.
+    def test_page_num_warning(self):
+        msg = (
+            "ChangeList().page_num attribute is deprecated. "
+            "use pagination.page_num instead."
+        )
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            page_num = cl.page_num
+        self.assertEqual(page_num, 1)
+
+    # RemovedInDjango70Warning.
+    def test_show_all_attribute_warning(self):
+        msg = (
+            "ChangeList().show_all attribute is deprecated. "
+            "use pagination.show_all instead."
+        )
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            show_all = cl.show_all
+        self.assertEqual(show_all, ALL_VAR in request.GET)
+
+    # RemovedInDjango70Warning.
+    def test_can_show_all_attribute_warning(self):
+        msg = (
+            "ChangeList().can_show_all attribute is deprecated. "
+            "use pagination.can_show_all instead."
+        )
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            can_show_all = cl.can_show_all
+        self.assertEqual(
+            can_show_all, cl.pagination.paginator.count <= cl.list_max_show_all
+        )
+
+    # RemovedInDjango70Warning.
+    def test_multi_page_attribute_warning(self):
+        msg = (
+            "ChangeList().multi_page attribute is deprecated. "
+            "use pagination.multi_page instead."
+        )
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            multi_page = cl.multi_page
+        self.assertEqual(multi_page, cl.pagination.paginator.count > cl.list_per_page)
+
+    # RemovedInDjango70Warning.
+    def test_paginator_attribute_warning(self):
+        from django.core.paginator import Paginator
+
+        msg = (
+            "ChangeList().paginator attribute is deprecated. "
+            "use pagination.paginator instead."
+        )
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            paginator = cl.paginator
+        self.assertEqual(isinstance(paginator, Paginator), True)
+
+    # RemovedInDjango70Warning.
+    def test_pagination_warning(self):
+        from django.contrib.admin.templatetags.admin_list import pagination
+
+        msg = (
+            "pagination is deprecated. "
+            "use django.contrib.admin.paginations.Pagination.pagination_context "
+            "instead. Pagination now provides pagination_required, page_range, "
+            "show_all_url(need_show_all_link) as attributes."
+        )
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            pagination(cl)
+
+    # RemovedInDjango70Warning.
+    def test_paginator_number_tag_warning(self):
+        from django.template import Context, Template
+
+        msg = (
+            "paginator_number is deprecated. "
+            "use django.contrib.admin.paginations.Pagination.render_page "
+            "instead. paginator_number template tag has been "
+            "replaced by an method in the Pagination class."
+        )
+        template = Template("{% load admin_list %}{% paginator_number cl 1 %}")
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        context = Context({"cl": cl})
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            template.render(context)
 
 
 class GetAdminLogTests(TestCase):
