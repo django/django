@@ -621,7 +621,7 @@ What's next after creating a pull request?
 
 After a ticket has a branch, it needs to be reviewed by a second set of eyes.
 After submitting a pull request, update the ticket metadata by setting the
-flags on the ticket to say "has patch", "doesn't need tests", etc, so others
-can find it for review. Contributing doesn't necessarily always mean writing
-code from scratch. Reviewing open pull requests is also a very helpful
+flags on the ticket to say "has pull request", "doesn't need tests", etc, so
+others can find it for review. Contributing doesn't necessarily always mean
+writing code from scratch. Reviewing open pull requests is also a very helpful
 contribution. See :doc:`/internals/contributing/triaging-tickets` for details.
