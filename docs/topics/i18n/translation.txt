@@ -48,12 +48,12 @@ as a shorter alias, ``_``, to save typing.
 
 .. note::
     Python's standard library ``gettext`` module installs ``_()`` into the
-    global namespace, as an alias for ``gettext()``. In Django, we have chosen
+    built-in namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
 
     #. Sometimes, you should use :func:`~django.utils.translation.gettext_lazy`
        as the default translation method for a particular file. Without ``_()``
-       in the global namespace, the developer has to think about which is the
+       in the built-in namespace, the developer has to think about which is the
        most appropriate translation function.
 
     #. The underscore character (``_``) is used to represent "the previous
