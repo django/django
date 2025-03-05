@@ -19,6 +19,7 @@ from django.contrib.admin.utils import (
 )
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.template.defaulttags import querystring
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -150,7 +151,11 @@ class SimpleListFilter(FacetsMixin, ListFilter):
         facet_counts = self.get_facet_queryset(changelist) if add_facets else None
         yield {
             "selected": self.value() is None,
-            "query_string": changelist.get_query_string(remove=[self.parameter_name]),
+            "query_string": querystring(
+                None,
+                changelist.filter_params,
+                **{self.parameter_name: None},
+            ),
             "display": _("All"),
         }
         for i, (lookup, title) in enumerate(self.lookup_choices):
@@ -161,8 +166,10 @@ class SimpleListFilter(FacetsMixin, ListFilter):
                     title = f"{title} (-)"
             yield {
                 "selected": self.value() == str(lookup),
-                "query_string": changelist.get_query_string(
-                    {self.parameter_name: lookup}
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.parameter_name: lookup},
                 ),
                 "display": title,
             }
@@ -290,8 +297,10 @@ class RelatedFieldListFilter(FieldListFilter):
         facet_counts = self.get_facet_queryset(changelist) if add_facets else None
         yield {
             "selected": self.lookup_val is None and not self.lookup_val_isnull,
-            "query_string": changelist.get_query_string(
-                remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]
+            "query_string": querystring(
+                None,
+                changelist.filter_params,
+                **{self.lookup_kwarg: None, self.lookup_kwarg_isnull: None},
             ),
             "display": _("All"),
         }
@@ -303,8 +312,10 @@ class RelatedFieldListFilter(FieldListFilter):
             yield {
                 "selected": self.lookup_val is not None
                 and str(pk_val) in self.lookup_val,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: pk_val}, [self.lookup_kwarg_isnull]
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg_isnull: None, self.lookup_kwarg: pk_val},
                 ),
                 "display": val,
             }
@@ -315,8 +326,10 @@ class RelatedFieldListFilter(FieldListFilter):
                 empty_title = f"{empty_title} ({count})"
             yield {
                 "selected": bool(self.lookup_val_isnull),
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg_isnull: "True"}, [self.lookup_kwarg]
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg: None, self.lookup_kwarg_isnull: "True"},
                 ),
                 "display": empty_title,
             }
@@ -372,8 +385,10 @@ class BooleanFieldListFilter(FieldListFilter):
                     title = f"{title} ({count})"
             yield {
                 "selected": self.lookup_val == lookup and not self.lookup_val2,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg2]
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg2: None, self.lookup_kwarg: lookup},
                 ),
                 "display": title,
             }
@@ -384,8 +399,10 @@ class BooleanFieldListFilter(FieldListFilter):
                 display = f"{display} ({count})"
             yield {
                 "selected": self.lookup_val2 == "True",
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg2: "True"}, [self.lookup_kwarg]
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg: None, self.lookup_kwarg2: "True"},
                 ),
                 "display": display,
             }
@@ -427,8 +444,10 @@ class ChoicesFieldListFilter(FieldListFilter):
         facet_counts = self.get_facet_queryset(changelist) if add_facets else None
         yield {
             "selected": self.lookup_val is None,
-            "query_string": changelist.get_query_string(
-                remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]
+            "query_string": querystring(
+                None,
+                changelist.filter_params,
+                **{self.lookup_kwarg: None, self.lookup_kwarg_isnull: None},
             ),
             "display": _("All"),
         }
@@ -443,16 +462,20 @@ class ChoicesFieldListFilter(FieldListFilter):
             yield {
                 "selected": self.lookup_val is not None
                 and str(lookup) in self.lookup_val,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg_isnull: None, self.lookup_kwarg: lookup},
                 ),
                 "display": title,
             }
         if none_title:
             yield {
                 "selected": bool(self.lookup_val_isnull),
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg_isnull: "True"}, [self.lookup_kwarg]
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg: None, self.lookup_kwarg_isnull: "True"},
                 ),
                 "display": none_title,
             }
@@ -543,14 +566,14 @@ class DateFieldListFilter(FieldListFilter):
         facet_counts = self.get_facet_queryset(changelist) if add_facets else None
         for i, (title, param_dict) in enumerate(self.links):
             param_dict_str = {key: str(value) for key, value in param_dict.items()}
+            params = {self.field_generic: None}
+            params.update(param_dict_str)
             if add_facets:
                 count = facet_counts[f"{i}__c"]
                 title = f"{title} ({count})"
             yield {
                 "selected": self.date_params == param_dict_str,
-                "query_string": changelist.get_query_string(
-                    param_dict_str, [self.field_generic]
-                ),
+                "query_string": querystring(None, changelist.filter_params, **params),
                 "display": title,
             }
 
@@ -602,8 +625,10 @@ class AllValuesFieldListFilter(FieldListFilter):
         facet_counts = self.get_facet_queryset(changelist) if add_facets else None
         yield {
             "selected": self.lookup_val is None and self.lookup_val_isnull is None,
-            "query_string": changelist.get_query_string(
-                remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]
+            "query_string": querystring(
+                None,
+                changelist.filter_params,
+                **{self.lookup_kwarg: None, self.lookup_kwarg_isnull: None},
             ),
             "display": _("All"),
         }
@@ -620,16 +645,20 @@ class AllValuesFieldListFilter(FieldListFilter):
             val = str(val)
             yield {
                 "selected": self.lookup_val is not None and val in self.lookup_val,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: val}, [self.lookup_kwarg_isnull]
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg_isnull: None, self.lookup_kwarg: val},
                 ),
                 "display": f"{val} ({count})" if add_facets else val,
             }
         if include_none:
             yield {
                 "selected": bool(self.lookup_val_isnull),
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg_isnull: "True"}, [self.lookup_kwarg]
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg: None, self.lookup_kwarg_isnull: "True"},
                 ),
                 "display": empty_title,
             }
@@ -709,8 +738,10 @@ class EmptyFieldListFilter(FieldListFilter):
                     title = f"{title} ({count})"
             yield {
                 "selected": self.lookup_val == lookup,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}
+                "query_string": querystring(
+                    None,
+                    changelist.filter_params,
+                    **{self.lookup_kwarg: lookup},
                 ),
                 "display": title,
             }
