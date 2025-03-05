@@ -62,7 +62,7 @@ class name.
 
 .. class:: Debug(msg, hint=None, obj=None, id=None)
 .. class:: Info(msg, hint=None, obj=None, id=None)
-.. class:: Warning(msg, hint=None obj=None, id=None)
+.. class:: Warning(msg, hint=None, obj=None, id=None)
 .. class:: Error(msg, hint=None, obj=None, id=None)
 .. class:: Critical(msg, hint=None, obj=None, id=None)
 
