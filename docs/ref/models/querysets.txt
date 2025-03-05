@@ -2428,6 +2428,9 @@ This has a number of caveats though:
   retrieved on certain databases (currently PostgreSQL, MariaDB, and SQLite
   3.35+). On other databases, it will not be set.
 * It does not work with many-to-many relationships.
+* If the model has :attr:`~django.db.models.Options.order_with_respect_to` set,
+  the ``_order`` field will be automatically populated for all objects based
+  on existing objects in the database in the order they are provided.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
   manually set primary key can be inserted first. If you want to insert objects

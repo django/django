@@ -126,3 +126,87 @@ class BaseOrderWithRespectToTests:
                 ),
             ):
                 self.q1.set_answer_order([3, 1, 2, 4])
+
+    def test_bulk_create_with_empty_parent(self):
+        """
+        bulk_create() should properly set _order when parent has no existing children.
+        """
+        question = self.Question.objects.create(text="Test Question")
+        answers = [self.Answer(question=question, text=f"Answer {i}") for i in range(3)]
+        created_answers = self.Answer.objects.bulk_create(answers)
+
+        self.assertEqual(len(created_answers), 3)
+        for i, answer in enumerate(created_answers):
+            self.assertEqual(answer._order, i)
+
+    def test_bulk_create_with_existing_children(self):
+        """
+        bulk_create() should continue _order sequence from existing children.
+        """
+        question = self.Question.objects.create(text="Test Question")
+        self.Answer.objects.create(question=question, text="Existing 1")
+        self.Answer.objects.create(question=question, text="Existing 2")
+
+        new_answers = [
+            self.Answer(question=question, text=f"New Answer {i}") for i in range(2)
+        ]
+        created_answers = self.Answer.objects.bulk_create(new_answers)
+
+        self.assertEqual(len(created_answers), 2)
+        self.assertEqual(created_answers[0]._order, 2)
+        self.assertEqual(created_answers[1]._order, 3)
+
+    def test_bulk_create_multiple_parents(self):
+        """
+        bulk_create() should maintain separate _order sequences for different parents.
+        """
+        question1 = self.Question.objects.create(text="Question 1")
+        question2 = self.Question.objects.create(text="Question 2")
+
+        answers = [
+            self.Answer(question=question1, text="Q1 Answer 1"),
+            self.Answer(question=question2, text="Q2 Answer 1"),
+            self.Answer(question=question1, text="Q1 Answer 2"),
+            self.Answer(question=question2, text="Q2 Answer 2"),
+        ]
+        created_answers = self.Answer.objects.bulk_create(answers)
+
+        q1_answers = [a for a in created_answers if a.question == question1]
+        q2_answers = [a for a in created_answers if a.question == question2]
+
+        q1_answers.sort(key=lambda x: x._order)
+        q2_answers.sort(key=lambda x: x._order)
+
+        self.assertEqual(q1_answers[0]._order, 0)
+        self.assertEqual(q1_answers[1]._order, 1)
+        self.assertEqual(q2_answers[0]._order, 0)
+        self.assertEqual(q2_answers[1]._order, 1)
+
+    def test_bulk_create_mixed_scenario(self):
+        """
+        bulk_create() should handle a mix of parents with and without existing children.
+        """
+        question1 = self.Question.objects.create(text="Question 1")
+        question2 = self.Question.objects.create(text="Question 2")
+
+        # Create initial answers
+        self.Answer.objects.create(question=question1, text="Q1 Existing")
+        self.Answer.objects.create(question=question2, text="Q2 Existing 1")
+        self.Answer.objects.create(question=question2, text="Q2 Existing 2")
+
+        new_answers = [
+            self.Answer(question=question1, text="Q1 New 1"),
+            self.Answer(question=question2, text="Q2 New 1"),
+            self.Answer(question=question1, text="Q1 New 2"),
+        ]
+        created_answers = self.Answer.objects.bulk_create(new_answers)
+
+        q1_new_answers = [a for a in created_answers if a.question == question1]
+        q2_new_answers = [a for a in created_answers if a.question == question2]
+
+        q1_new_answers.sort(key=lambda x: x._order)
+        q2_new_answers.sort(key=lambda x: x._order)
+
+        self.assertEqual(q1_new_answers[0]._order, 1)
+        self.assertEqual(q1_new_answers[1]._order, 2)
+        self.assertEqual(q2_new_answers[0]._order, 2)
