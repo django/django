@@ -32,8 +32,6 @@ The short version of the steps involved is:
 
 #. Update version numbers and create the release package(s).
 
-#. Upload the package(s) to the ``djangoproject.com`` server.
-
 #. Verify package(s) signatures, check if they can be installed, and ensure
    minimal functionality.
 
@@ -65,7 +63,6 @@ permissions.
   * hashing tools (typically ``md5sum``, ``sha1sum``, and ``sha256sum`` on
     Linux, or ``md5`` and ``shasum`` on macOS)
   * python
-  * ssh
 
 * A GPG key pair. Ensure that the private part of this key is securely stored.
   The public part needs to be uploaded to your GitHub account, and also to the
@@ -120,8 +117,6 @@ permissions.
      [https://www.transifex.com]
        rest_hostname = https://rest.api.transifex.com
        token = # API token
-
-* Access to the ``djangoproject.com`` server to upload files (using ``scp``).
 
 * Access to the Django admin on ``djangoproject.com`` as a "Site maintainer".
 
@@ -475,7 +470,7 @@ issuing **multiple releases**, repeat these steps for each release.
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
 #. Run ``python -m build`` to generate the release packages. This will create
-   the release packages in a ``dist/`` directory.
+   the release packages (tarball and wheel) in a ``dist/`` directory.
 
 #. Generate the hashes of the release packages:
 
@@ -521,8 +516,8 @@ issuing **multiple releases**, repeat these steps for each release.
     Release packages
     ================
 
-    https://www.djangoproject.com/m/releases/<<MAJOR VERSION>>/<<RELEASE TAR.GZ FILENAME>>
-    https://www.djangoproject.com/m/releases/<<MAJOR VERSION>>/<<RELEASE WHL FILENAME>>
+    https://www.djangoproject.com/download/<<VERSION>>/tarball/
+    https://www.djangoproject.com/download/<<VERSION>>/wheel/
 
     MD5 checksums
     =============
@@ -547,26 +542,30 @@ issuing **multiple releases**, repeat these steps for each release.
    ``Django-<version>.checksum.txt.asc`` which you can then verify using ``gpg
    --verify Django-<version>.checksum.txt.asc``.
 
+#. Create a new ``Release`` in the admin__. If this is a security release, this
+   should be done 15 minutes before the announced release time, no sooner.):
+
+   Version
+     Must match the version number present in the tarball
+     (``django-<version>.tar.gz``). For example: "4.1.1" or "4.2rc1", etc.
+
+   LTS
+     Check if the release is part of an :abbr:`LTS (Long Term Support)` branch
+
+   Dates
+     Leave both dates empty (so the release is not published on the site)
+
+   Artifacts
+     Upload the tarball (``django-<version>.tar.gz``),
+     wheel (``django-<version>-py3-none.whl``),
+     and checksum (``django-<version>.checksum.txt``) files created earlier.
+
+   __ https://www.djangoproject.com/admin/releases/release/add/
+
 Making the release(s) available to the public
 =============================================
 
 Now you're ready to actually put the release out there. To do this:
-
-#. Upload the checksum file(s):
-
-   .. code-block:: shell
-
-        $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
-
-   (If this is a security release, what follows should be done 15 minutes
-   before the announced release time, no sooner.)
-
-#. Upload the release package(s) to the djangoproject server, replacing
-   A.B. with the appropriate version number, e.g. 4.1 for a 4.1.x release:
-
-   .. code-block:: shell
-
-        $ scp Django-* djangoproject.com:/home/www/www/media/releases/A.B
 
 #. Test that the release packages install correctly using ``pip``. Here's one
    simple method (this just tests that the binaries are available, that they
@@ -580,7 +579,7 @@ Now you're ready to actually put the release out there. To do this:
 
         $ python -m venv django-pip-tarball
         $ . django-pip-tarball/bin/activate
-        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
+        $ python -m pip install https://www.djangoproject.com/download/$RELEASE_VERSION/tarball/
         $ django-admin startproject test_tarball
         $ cd test_tarball
         $ ./manage.py --help  # Ensure executable bits
@@ -592,7 +591,7 @@ Now you're ready to actually put the release out there. To do this:
 
         $ python -m venv django-pip-wheel
         $ . django-pip-wheel/bin/activate
-        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
+        $ python -m pip install https://www.djangoproject.com/download/$RELEASE_VERSION/wheel/
         $ django-admin startproject test_wheel
         $ cd test_wheel
         $ ./manage.py --help  # Ensure executable bits
@@ -615,10 +614,8 @@ Now you're ready to actually put the release out there. To do this:
 
        $ twine upload --repository django dist/*
 
-#. Go to the `Add release page in the admin`__, enter the new release number
-   exactly as it appears in the name of the tarball
-   (``Django-<version>.tar.gz``). So for example enter "4.1.1" or "4.2rc1",
-   etc. If the release is part of an LTS branch, mark it so.
+#. Update the newly created ``Release`` in the admin__ and set its release date
+   to the current day.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 
