@@ -127,6 +127,10 @@ Python style
         """
         ...
 
+* Where applicable, use unpacking generalizations compliant with :pep:`448`,
+  such as merging mappings (``{**x, **y}``) or sequences (``[*a, *b]``). This
+  improves performance, readability, and maintainability while reducing errors.
+
 .. _coding-style-imports:
 
 Imports
