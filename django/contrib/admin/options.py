@@ -21,6 +21,7 @@ from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects,
     construct_change_message,
+    display_for_value,
     flatten_fieldsets,
     get_deleted_objects,
     lookup_spawns_duplicates,
@@ -1379,10 +1380,13 @@ class ModelAdmin(BaseModelAdmin):
             current_app=self.admin_site.name,
         )
         # Add a link to the object's change form if the user can edit the obj.
+        obj_display = display_for_value(str(obj), "-", quote=True)
         if self.has_change_permission(request, obj):
-            obj_repr = format_html('<a href="{}">{}</a>', urlquote(obj_url), obj)
+            obj_repr = format_html(
+                '<a href="{}">{}</a>', urlquote(obj_url), obj_display
+            )
         else:
-            obj_repr = str(obj)
+            obj_repr = obj_display
         msg_dict = {
             "name": opts.verbose_name,
             "obj": obj_repr,
@@ -1423,7 +1427,7 @@ class ModelAdmin(BaseModelAdmin):
             and self.save_as_continue
             and self.has_change_permission(request, obj)
         ):
-            msg = _("The {name} “{obj}” was added successfully.")
+            msg = _("The {name} {obj} was added successfully.")
             if self.has_change_permission(request, obj):
                 msg += " " + _("You may edit it again below.")
             self.message_user(request, format_html(msg, **msg_dict), messages.SUCCESS)
@@ -1442,7 +1446,7 @@ class ModelAdmin(BaseModelAdmin):
         elif "_addanother" in request.POST:
             msg = format_html(
                 _(
-                    "The {name} “{obj}” was added successfully. You may add another "
+                    "The {name} {obj} was added successfully. You may add another "
                     "{name} below."
                 ),
                 **msg_dict,
@@ -1460,9 +1464,7 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(redirect_url)
 
         else:
-            msg = format_html(
-                _("The {name} “{obj}” was added successfully."), **msg_dict
-            )
+            msg = format_html(_("The {name} {obj} was added successfully."), **msg_dict)
             self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_add(request, obj)
 
@@ -1503,14 +1505,17 @@ class ModelAdmin(BaseModelAdmin):
         preserved_filters = self.get_preserved_filters(request)
         preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
 
+        obj_display = display_for_value(str(obj), "-", quote=True)
         msg_dict = {
             "name": opts.verbose_name,
-            "obj": format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
+            "obj": format_html(
+                '<a href="{}">{}</a>', urlquote(request.path), obj_display
+            ),
         }
         if "_continue" in request.POST:
             msg = format_html(
                 _(
-                    "The {name} “{obj}” was changed successfully. You may edit it "
+                    "The {name} {obj} was changed successfully. You may edit it "
                     "again below."
                 ),
                 **msg_dict,
@@ -1530,7 +1535,7 @@ class ModelAdmin(BaseModelAdmin):
         elif "_addanother" in request.POST:
             msg = format_html(
                 _(
-                    "The {name} “{obj}” was changed successfully. You may add another "
+                    "The {name} {obj} was changed successfully. You may add another "
                     "{name} below."
                 ),
                 **msg_dict,
@@ -1552,7 +1557,7 @@ class ModelAdmin(BaseModelAdmin):
 
         else:
             msg = format_html(
-                _("The {name} “{obj}” was changed successfully."), **msg_dict
+                _("The {name} {obj} was changed successfully."), **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_change(request, obj)
@@ -1681,10 +1686,10 @@ class ModelAdmin(BaseModelAdmin):
 
         self.message_user(
             request,
-            _("The %(name)s “%(obj)s” was deleted successfully.")
+            _("The %(name)s %(obj)s was deleted successfully.")
             % {
                 "name": self.opts.verbose_name,
-                "obj": obj_display,
+                "obj": display_for_value(str(obj_display), "-", quote=True),
             },
             messages.SUCCESS,
         )
@@ -2214,6 +2219,7 @@ class ModelAdmin(BaseModelAdmin):
             "subtitle": None,
             "object_name": object_name,
             "object": obj,
+            "escaped_object": display_for_value(str(obj), "-", quote=True),
             "deleted_objects": deleted_objects,
             "model_count": dict(model_count).items(),
             "perms_lacking": perms_needed,
