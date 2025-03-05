@@ -176,7 +176,7 @@ class Index:
         ]
         # The length of the parts of the name is based on the default max
         # length of 30 characters.
-        hash_data = [table_name] + column_names_with_order + [self.suffix]
+        hash_data = [table_name, *column_names_with_order, self.suffix]
         self.name = "%s_%s_%s" % (
             table_name[:11],
             column_names[0][:7],

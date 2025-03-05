@@ -291,7 +291,7 @@ class ManyToOneRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return super().identity + (self.field_name,)
+        return (*super().identity, self.field_name)
 
     def get_related_field(self):
         """
@@ -382,7 +382,8 @@ class ManyToManyRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return super().identity + (
+        return (
+            *super().identity,
             self.through,
             make_hashable(self.through_fields),
             self.db_constraint,

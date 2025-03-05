@@ -107,7 +107,7 @@ class MultiPartParser:
         # For compatibility with low-level network APIs (with 32-bit integers),
         # the chunk size should be < 2^31, but still divisible by 4.
         possible_sizes = [x.chunk_size for x in upload_handlers if x.chunk_size]
-        self._chunk_size = min([2**31 - 4] + possible_sizes)
+        self._chunk_size = min([2**31 - 4, *possible_sizes])
 
         self._meta = META
         self._encoding = encoding or settings.DEFAULT_CHARSET

@@ -877,7 +877,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                     # object
                     else:
                         date_data = (getattr(form.cleaned_data[unique_for], lookup),)
-                    data = (form.cleaned_data[field],) + date_data
+                    data = (form.cleaned_data[field], *date_data)
                     # if we've already seen it then we have a uniqueness failure
                     if data in seen_data:
                         # poke error messages into the right places and mark
