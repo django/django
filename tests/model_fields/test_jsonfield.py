@@ -785,6 +785,11 @@ class TestQuerying(TestCase):
             [self.objs[5]],
         )
 
+    def test_shallow_list_negative_lookup(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__-2": 1}), [self.objs[5]]
+        )
+
     def test_shallow_obj_lookup(self):
         self.assertCountEqual(
             NullableJSONModel.objects.filter(value__a="b"),
@@ -817,9 +822,21 @@ class TestQuerying(TestCase):
             [self.objs[5]],
         )
 
+    def test_deep_negative_lookup_array(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__-1__0": 2}),
+            [self.objs[5]],
+        )
+
     def test_deep_lookup_mixed(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__d__1__f="g"),
+            [self.objs[4]],
+        )
+
+    def test_deep_negative_lookup_mixed(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__d__-1__f": "g"}),
             [self.objs[4]],
         )
 
