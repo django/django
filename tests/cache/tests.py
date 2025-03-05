@@ -1894,6 +1894,27 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
 
+    def test_redis_common_pool(self):
+        pool1 = cache._cache._get_connection_pool(write=False)
+        pool2 = cache._cache._get_connection_pool(write=False)
+        self.assertEqual(id(pool1), id(pool2))
+
+        @override_settings(
+            CACHES=caches_setting_for_tests(
+                base=RedisCache_params,
+                exclude=redis_excluded_caches,
+                OPTIONS={
+                    "db": 6,
+                    "socket_timeout": 0.1,
+                    "retry_on_timeout": True,
+                },
+            )
+        )
+        def get_connection_pool():
+            return cache._cache._get_connection_pool(write=False)
+
+        self.assertNotEqual(id(pool1), id(get_connection_pool()))
+
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
     def mkdtemp(self):
