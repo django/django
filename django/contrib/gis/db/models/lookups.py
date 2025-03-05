@@ -284,7 +284,7 @@ class RelateLookup(GISLookup):
         elif not isinstance(pattern, str) or not self.pattern_regex.match(pattern):
             raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
         sql, params = super().process_rhs(compiler, connection)
-        return sql, params + [pattern]
+        return sql, [*params, pattern]
 
 
 @BaseSpatialField.register_lookup

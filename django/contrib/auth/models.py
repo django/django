@@ -80,7 +80,7 @@ class Permission(models.Model):
         return "%s | %s" % (self.content_type, self.name)
 
     def natural_key(self):
-        return (self.codename,) + self.content_type.natural_key()
+        return (self.codename, *self.content_type.natural_key())
 
     natural_key.dependencies = ["contenttypes.contenttype"]
 

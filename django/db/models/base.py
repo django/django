@@ -232,7 +232,7 @@ class ModelBase(type):
 
         # Collect the parent links for multi-table inheritance.
         parent_links = {}
-        for base in reversed([new_class] + parents):
+        for base in reversed([new_class, *parents]):
             # Conceptually equivalent to `if base is Model`.
             if not hasattr(base, "_meta"):
                 continue
