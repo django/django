@@ -307,7 +307,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     def get_related_url(self, info, action, *args):
         return reverse(
-            "admin:%s_%s_%s" % (info + (action,)),
+            "admin:%s_%s_%s" % (*info, action),
             current_app=self.admin_site.name,
             args=args,
         )
@@ -582,9 +582,7 @@ class AutocompleteMixin:
             js=(
                 "admin/js/vendor/jquery/jquery%s.js" % extra,
                 "admin/js/vendor/select2/select2.full%s.js" % extra,
-            )
-            + i18n_file
-            + (
+                *i18n_file,
                 "admin/js/jquery.init.js",
                 "admin/js/autocomplete.js",
             ),
