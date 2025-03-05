@@ -854,6 +854,12 @@ class ManyToManyRawIdWidgetTest(TestCase):
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class RelatedFieldWidgetWrapperTests(SimpleTestCase):
+    def test_widget_wrapper_uses_fieldset(self):
+        rel = Individual._meta.get_field("parent").remote_field
+        widget = forms.TextInput()
+        wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
+        self.assertTrue(wrapper.use_fieldset)
+
     def test_no_can_add_related(self):
         rel = Individual._meta.get_field("parent").remote_field
         w = widgets.AdminRadioSelect()
