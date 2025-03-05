@@ -10,7 +10,7 @@ from django.db.models import Index
 from django.utils.regex_helper import _lazy_re_compile
 
 FieldInfo = namedtuple(
-    "FieldInfo", BaseFieldInfo._fields + ("pk", "has_json_constraint")
+    "FieldInfo", [*BaseFieldInfo._fields, "pk", "has_json_constraint"]
 )
 
 field_size_re = _lazy_re_compile(r"^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$")

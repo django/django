@@ -235,13 +235,13 @@ def fetch(resources=None, languages=None):
         ]
         # Transifex pull
         if languages is None:
-            run(cmd + ["--all"])
+            run([*cmd, "--all"])
             target_langs = sorted(
                 d for d in os.listdir(dir_) if not d.startswith("_") and d != "en"
             )
         else:
             for lang in languages:
-                run(cmd + ["-l", lang])
+                run([*cmd, "-l", lang])
             target_langs = languages
 
         target_langs = [LANG_OVERRIDES.get(d, d) for d in target_langs]
