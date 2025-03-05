@@ -22,6 +22,7 @@ from django.db.models import (
 )
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Left, Lower
+from django.forms import inlineformset_factory
 from django.test import skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -32,6 +33,7 @@ from .models import HotelReservation, IntegerArrayModel, RangesModel, Room, Scen
 try:
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import (
+        DateRangeField,
         DateTimeRangeField,
         IntegerRangeField,
         RangeBoundary,
@@ -1256,3 +1258,48 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         msg = "Constraint “ints_equal” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
             constraint.validate(RangesModel, RangesModel())
+
+    def test_form_validation_inline_fk_field_in_expressions(self):
+        class Reservation(Model):
+            room = ForeignKey(Room, CASCADE, related_name="reservations")
+            datespan = DateRangeField()
+
+            class Meta:
+                constraints = [
+                    ExclusionConstraint(
+                        name="exclude_overlapping_dates_room",
+                        expressions=[
+                            ("room", RangeOperators.EQUAL),
+                            ("datespan", RangeOperators.OVERLAPS),
+                        ],
+                    )
+                ]
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Reservation)
+
+        room = Room.objects.create(number=2048)
+        Reservation.objects.create(
+            room=room, datespan=DateRange("2025-01-01", "2025-01-03")
+        )
+        data = {
+            "reservations-TOTAL_FORMS": "2",
+            "reservations-INITIAL_FORMS": "1",
+            "reservations-MIN_NUM_FORMS": "0",
+            "reservations-MAX_NUM_FORMS": "1000",
+            "reservations-0-id": "1",
+            "reservations-0-datespan_0": "2025-01-01",
+            "reservations-0-datespan_1": "2025-01-03",
+            "reservations-1-id": "",
+            "reservations-1-datespan_0": "2025-01-01",
+            "reservations-1-datespan_1": "2025-01-03",
+        }
+        formset = inlineformset_factory(Room, Reservation, fields="__all__")(
+            data=data, instance=room
+        )
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(formset.errors[0], {})
+        self.assertEqual(
+            formset.errors[1],
+            {"__all__": ["Constraint “exclude_overlapping_dates_room” is violated."]},
+        )
