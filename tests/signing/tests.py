@@ -233,6 +233,66 @@ class TestTimestampSigner(SimpleTestCase):
             with self.assertRaises(signing.SignatureExpired):
                 signer.unsign(ts, max_age=10)
 
+    def test_max_age_always_enforced(self):
+        """Test that max_age is always enforced even with expiration_key."""
+        value = {"foo": "bar", "_session_expiry": 30}
+
+        with freeze_time(123456789):
+            signer = signing.TimestampSigner(key="predictable-key")
+            ts = signer.sign_object(value)
+
+        with freeze_time(123456799):  # 10 seconds later
+            # Should succeed because within both max_age and _session_expiry
+            self.assertEqual(
+                signer.unsign_object(ts, max_age=15, expiration_key="_session_expiry"),
+                value,
+            )
+
+            # Should fail because beyond max_age, even though within _session_expiry
+            with self.assertRaises(signing.SignatureExpired):
+                signer.unsign_object(ts, max_age=5, expiration_key="_session_expiry")
+
+    def test_expiration_key_adds_constraint(self):
+        """Test that expiration_key adds an additional time constraint."""
+        value = {"foo": "bar", "_session_expiry": 9}
+
+        with freeze_time(123456789):
+            signer = signing.TimestampSigner(
+                key="predictable-key",
+            )
+            ts = signer.sign_object(value)
+
+        with freeze_time(123456799):  # 10 seconds later
+            # Should fail because beyond _session_expiry, even though within max_age
+            with self.assertRaises(signing.SignatureExpired):
+                signer.unsign_object(ts, max_age=15, expiration_key="_session_expiry")
+
+    def test_both_constraints_respected(self):
+        """Test that both max_age and expiration_key constraints are checked."""
+        value = {"foo": "bar", "_session_expiry": 20}
+
+        with freeze_time(123456789):
+            signer = signing.TimestampSigner(
+                key="predictable-key",
+            )
+            ts = signer.sign_object(value)
+
+        with freeze_time(123456799):  # 10 seconds later
+            # Succeeds - within both constraints
+            self.assertEqual(
+                signer.unsign_object(ts, max_age=30, expiration_key="_session_expiry"),
+                value,
+            )
+
+            # Fails - beyond max_age
+            with self.assertRaises(signing.SignatureExpired):
+                signer.unsign_object(ts, max_age=5, expiration_key="_session_expiry")
+
+        with freeze_time(123456810):  # 21 seconds later
+            # Fails - beyond expiration_key
+            with self.assertRaises(signing.SignatureExpired):
+                signer.unsign_object(ts, max_age=30, expiration_key="_session_expiry")
+
 
 class TestBase62(SimpleTestCase):
     def test_base62(self):
