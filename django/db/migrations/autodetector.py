@@ -1233,7 +1233,7 @@ class MigrationAutodetector:
                 # Handle ForeignKey which can only have a single to_field.
                 remote_field_name = getattr(new_field.remote_field, "field_name", None)
                 if remote_field_name:
-                    to_field_rename_key = rename_key + (remote_field_name,)
+                    to_field_rename_key = (*rename_key, remote_field_name)
                     if to_field_rename_key in self.renamed_fields:
                         # Repoint both model and field name because to_field
                         # inclusion in ForeignKey.deconstruct() is based on
@@ -1249,14 +1249,14 @@ class MigrationAutodetector:
                     new_field.from_fields = tuple(
                         [
                             self.renamed_fields.get(
-                                from_rename_key + (from_field,), from_field
+                                (*from_rename_key, from_field), from_field
                             )
                             for from_field in from_fields
                         ]
                     )
                     new_field.to_fields = tuple(
                         [
-                            self.renamed_fields.get(rename_key + (to_field,), to_field)
+                            self.renamed_fields.get((*rename_key, to_field), to_field)
                             for to_field in new_field.to_fields
                         ]
                     )
