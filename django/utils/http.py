@@ -37,6 +37,7 @@ ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
+MAX_URL_LENGTH = 2048
 
 
 def urlencode(query, doseq=False):
@@ -272,7 +273,10 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
 def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
-    if url.startswith("///"):
+    if url.startswith("///") or len(url) > MAX_URL_LENGTH:
+        # urlparse does not perform validation of inputs. Unicode normalization
+        # is very slow on Windows and can be a DoS attack vector.
+        # https://docs.python.org/3/library/urllib.parse.html#url-parsing-security
         return False
     try:
         url_info = urlparse(url)

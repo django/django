@@ -11,7 +11,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import punycode
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
-from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
+from django.utils.http import MAX_URL_LENGTH, RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
@@ -39,7 +39,6 @@ VOID_ELEMENTS = frozenset(
     )
 )
 
-MAX_URL_LENGTH = 2048
 MAX_STRIP_TAGS_DEPTH = 50
 
 

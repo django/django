@@ -7,6 +7,7 @@ from urllib.parse import urlsplit, urlunsplit
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import punycode
+from django.utils.http import MAX_URL_LENGTH
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
@@ -155,7 +156,7 @@ class URLValidator(RegexValidator):
     message = _("Enter a valid URL.")
     schemes = ["http", "https", "ftp", "ftps"]
     unsafe_chars = frozenset("\t\r\n")
-    max_length = 2048
+    max_length = MAX_URL_LENGTH
 
     def __init__(self, schemes=None, **kwargs):
         super().__init__(**kwargs)
