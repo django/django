@@ -24,7 +24,9 @@ ACTION_FLAG_CHOICES = [
 class LogEntryManager(models.Manager):
     use_in_migrations = True
 
-    def log_actions(self, user_id, queryset, action_flag, change_message=""):
+    def log_actions(
+        self, user_id, queryset, action_flag, change_message="", *, single_object=False
+    ):
         if isinstance(change_message, list):
             change_message = json.dumps(change_message)
 
