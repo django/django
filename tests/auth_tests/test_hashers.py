@@ -12,6 +12,7 @@ from django.contrib.auth.hashers import (
     PBKDF2PasswordHasher,
     PBKDF2SHA1PasswordHasher,
     ScryptPasswordHasher,
+    Argon2PasswordHasher,
     acheck_password,
     check_password,
     get_hasher,
@@ -519,6 +520,22 @@ class TestUtilsHashPass(SimpleTestCase):
                 with self.subTest(hasher_class.__name__, salt=salt):
                     with self.assertRaisesMessage(ValueError, msg):
                         hasher.encode("password", salt)
+                        
+    def test_password_bytes(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            ScryptPasswordHasher,
+            Argon2PasswordHasher,
+            BCryptPasswordHasher,
+            BCryptSHA256PasswordHasher
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                encoded = hasher.encode(b"password", hasher.salt())
+                self.assertTrue(hasher.verify(b"password", encoded))
 
     def test_encode_password_required(self):
         hasher_classes = [

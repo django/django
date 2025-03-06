@@ -18,6 +18,7 @@ from django.utils.crypto import (
 )
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
+from django.utils.encoding import force_bytes
 
 UNUSABLE_PASSWORD_PREFIX = "!"  # This will never be a valid encoded hash
 UNUSABLE_PASSWORD_SUFFIX_LENGTH = (
@@ -396,8 +397,8 @@ class Argon2PasswordHasher(BasePasswordHasher):
         argon2 = self._load_library()
         params = self.params()
         data = argon2.low_level.hash_secret(
-            password.encode(),
-            salt.encode(),
+            force_bytes(password),
+            force_bytes(salt),
             time_cost=params.time_cost,
             memory_cost=params.memory_cost,
             parallelism=params.parallelism,
@@ -499,7 +500,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
-        password = password.encode()
+        password = force_bytes(password)
         # Hash the password prior to using bcrypt to prevent password
         # truncation as described in #20138.
         if self.digest is not None:
@@ -585,8 +586,8 @@ class ScryptPasswordHasher(BasePasswordHasher):
         r = r or self.block_size
         p = p or self.parallelism
         hash_ = hashlib.scrypt(
-            password.encode(),
-            salt=salt.encode(),
+            force_bytes(password),
+            salt=force_bytes(salt),
             n=n,
             r=r,
             p=p,
@@ -655,7 +656,7 @@ class MD5PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
-        hash = hashlib.md5((salt + password).encode()).hexdigest()
+        hash = hashlib.md5(force_bytes(salt) + force_bytes(password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def decode(self, encoded):
