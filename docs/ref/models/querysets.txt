@@ -2800,16 +2800,16 @@ number of authors that have contributed blog entries:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> Blog.objects.aggregate(Count("entry"))
-    {'entry__count': 16}
+    >>> Blog.objects.aggregate(Count("entry__authors"))
+    {'entry__authors__count': 16}
 
 By using a keyword argument to specify the aggregate function, you can
 control the name of the aggregation value that is returned:
 
 .. code-block:: pycon
 
-    >>> Blog.objects.aggregate(number_of_entries=Count("entry"))
-    {'number_of_entries': 16}
+    >>> Blog.objects.aggregate(number_of_authors=Count("entry__authors"))
+    {'number_of_authors': 16}
 
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
