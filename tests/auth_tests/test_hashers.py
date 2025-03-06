@@ -535,7 +535,7 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher = hasher_class()
             with self.subTest(hasher_class.__name__):
                 encoded = hasher.encode(b"password", hasher.salt())
-                self.assertTrue(hasher.verify(b"password", encoded))
+                self.assertIs(hasher.verify(b"password", encoded), True)
 
     def test_encode_password_required(self):
         hasher_classes = [
