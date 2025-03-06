@@ -36,6 +36,17 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+March 6, 2025 - :cve:`2025-26699`
+---------------------------------
+
+Potential denial-of-service in ``django.utils.text.wrap()``.
+`Full description
+<https://www.djangoproject.com/weblog/2025/mar/06/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <8dbb44d34271637099258391dfc79df33951b841>`
+* Django 5.0 :commit:`(patch) <4f2765232336b8ad0afd8017d9d912ae93470017>`
+* Django 4.2 :commit:`(patch) <e88f7376fe68dbf4ebaf11fad1513ce700b45860>`
+
 January 14, 2025 - :cve:`2024-56374`
 ------------------------------------
 
