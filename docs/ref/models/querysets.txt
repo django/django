@@ -2340,9 +2340,9 @@ whenever a request to a page has a side effect on your data. For more, see
       # Raises IntegrityError
 
   This is happening because it's trying to get or create "Chapter 1" through the
-  book "Ulysses", but it can't do any of them: the relation can't fetch that
-  chapter because it isn't related to that book, but it can't create it either
-  because ``title`` field should be unique.
+  book "Ulysses", but it can't do either: the relation can't fetch that chapter
+  because it isn't related to that book, but it can't create it either because
+  ``title`` field should be unique.
 
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
