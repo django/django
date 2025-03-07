@@ -214,6 +214,7 @@ class EmailMessage:
         headers=None,
         cc=None,
         reply_to=None,
+        provider=None,
     ):
         """
         Initialize a single email message (which can be sent to multiple
@@ -255,12 +256,16 @@ class EmailMessage:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
         self.connection = connection
+        self.provider = provider
 
     def get_connection(self, fail_silently=False):
         from django.core.mail import get_connection
 
         if not self.connection:
-            self.connection = get_connection(fail_silently=fail_silently)
+            self.connection = get_connection(
+                fail_silently=fail_silently,
+                provider=self.provider,
+            )
         return self.connection
 
     def message(self):
@@ -459,6 +464,7 @@ class EmailMultiAlternatives(EmailMessage):
         alternatives=None,
         cc=None,
         reply_to=None,
+        provider=None,
     ):
         """
         Initialize a single email message (which can be sent to multiple
@@ -475,6 +481,7 @@ class EmailMultiAlternatives(EmailMessage):
             headers,
             cc,
             reply_to,
+            provider,
         )
         self.alternatives = [
             EmailAlternative(*alternative) for alternative in (alternatives or [])
