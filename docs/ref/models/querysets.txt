@@ -2519,6 +2519,15 @@ The ``batch_size`` parameter controls how many objects are saved in a single
 query. The default is to update all objects in one batch, except for SQLite
 and Oracle which have restrictions on the number of variables used in a query.
 
+.. warning::  
+   When using MySQL, ``QuerySet.update()`` may execute two separate SQL queries  
+   (a ``SELECT`` followed by an ``UPDATE``) instead of a single ``UPDATE`` when  
+   filtering on related tables. This behavior occurs because MySQL does not support  
+   self-select updates.As a result, this can introduce **race conditions** if 
+   concurrent changes occur between the ``SELECT`` and ``UPDATE`` queries. 
+   To ensure atomicity, consider **using transactions** or **avoiding such filter conditions**.
+
+
 ``count()``
 ~~~~~~~~~~~
 
