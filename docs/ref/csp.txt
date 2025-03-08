@@ -4,7 +4,7 @@
 Content Security Policy (CSP)
 =============================
 
-.. versionadded:: 5.2
+.. versionadded:: 6.0
 
 .. module:: django.middleware.csp
    :synopsis: Middleware for Content Security Policy headers

@@ -2360,7 +2360,7 @@ have it to the value provided.
 ``SECURE_CSP``
 --------------
 
-.. versionadded:: 5.2
+.. versionadded:: 6.0
 
 Default: ``{}``
 
@@ -2374,7 +2374,7 @@ that do not already have it.
 ``SECURE_CSP_REPORT_ONLY``
 --------------------------
 
-.. versionadded:: 5.2
+.. versionadded:: 6.0
 
 Default: ``{}``
 

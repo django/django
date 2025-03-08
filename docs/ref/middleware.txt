@@ -616,7 +616,7 @@ Content Security Policy middleware
 
 .. class:: ContentSecurityPolicyMiddleware
 
-.. versionadded:: 5.2
+.. versionadded:: 6.0
 
 Adds support for Content Security Policy (CSP), which helps mitigate risks such as Cross-Site
 Scripting (XSS) and data injection attacks by controlling the sources of content that can be loaded
