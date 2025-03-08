@@ -2955,6 +2955,21 @@ enabled if a proxy which sets this header is in use.
 
 :setting:`USE_X_FORWARDED_HOST` takes priority over this setting.
 
+.. setting:: URLIZE_ASSUME_HTTPS
+
+``URLIZE_ASSUME_HTTPS``
+-----------------------
+
+.. versionadded:: 6.0
+.. deprecated:: 6.0
+
+Default: ``False``
+
+Set this transitional setting to ``True`` to opt into using HTTPS as the
+default protocol when none is provided in URLs processed by the
+:tfilter:`urlize` and :tfilter:`urlizetrunc` template filters during the Django
+6.x release cycle.
+
 .. setting:: WSGI_APPLICATION
 
 ``WSGI_APPLICATION``
@@ -3766,6 +3781,7 @@ Security
 
 * :setting:`SECRET_KEY`
 * :setting:`SECRET_KEY_FALLBACKS`
+* :setting:`URLIZE_ASSUME_HTTPS`
 * :setting:`X_FRAME_OPTIONS`
 
 Serialization
