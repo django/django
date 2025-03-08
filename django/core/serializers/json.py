@@ -14,7 +14,6 @@ from django.utils.duration import duration_iso_string
 from django.utils.functional import Promise
 from django.utils.timezone import is_aware
 
-
 class Serializer(PythonSerializer):
     """Convert a queryset to JSON."""
 
@@ -56,8 +55,11 @@ class Serializer(PythonSerializer):
 
     def getvalue(self):
         # Grandparent super
-        return super(PythonSerializer, self).getvalue()
-
+        value = super(PythonSerializer, 
+        self).getvalue()
+        if not value.endswith("\n"):
+          value += "\n"
+        return value
 
 class Deserializer(PythonDeserializer):
     """Deserialize a stream or string of JSON data."""
