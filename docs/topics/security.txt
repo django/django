@@ -291,7 +291,7 @@ User-uploaded content
 Content Security Policy (CSP)
 =============================
 
-.. versionadded:: 5.2
+.. versionadded:: 6.0
 
 Content Security Policy (CSP) is a powerful security feature that helps protect
 web applications against various types of attacks, particularly Cross-Site

@@ -37,6 +37,48 @@ compatible with Django 6.0.
 What's new in Django 6.0
 ========================
 
+Content Security Policy (CSP) Support
+-------------------------------------
+
+Django 6.0 introduces built-in :ref:`Content Security Policy (CSP)
+<security-csp>` support, making it easier to protect your application against
+various types of content injection attacks. CSP helps you specify which content
+sources are allowed to be loaded by the browser.
+
+To enable CSP, add the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` to your
+settings::
+
+  MIDDLEWARE = [
+      # ...
+      "django.middleware.csp.ContentSecurityPolicyMiddleware",
+      # ...
+  ]
+
+You can customize your CSP policy through Django settings:
+
+* :setting:`SECURE_CSP` for the enforced policy
+* :setting:`SECURE_CSP_REPORT_ONLY` for the report-only policy
+
+Here's an an example of a basic CSP config::
+
+  from django.conf import csp
+
+  SECURE_CSP = {
+      "DIRECTIVES": {
+          "default-src": [csp.SELF],
+          "script-src": [csp.SELF, csp.NONCE],
+          "style-src": [csp.SELF],
+          "img-src": [csp.SELF, "https:"],
+      }
+  }
+
+Per-view policy customization with can be achieved via the
+:func:`~django.views.decorators.csp.csp_disabled` and
+:func:`~django.views.decorators.csp.csp_override` decorators.
+
+See :ref:`Using CSP <using-csp>` for more usage details.
+
 Minor features
 --------------
 
