@@ -2905,9 +2905,23 @@ For example:
 
     {{ value|urlize }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
-``"Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproject.com</a>"``.
+If ``value`` is ``"Check out www.djangoproject.com"``, the output will be:
+
+.. code-block:: html+django
+
+    Check out <a href="http://www.djangoproject.com" rel="nofollow">www.djangoproject.com</a>
+
+.. deprecated:: 6.0
+
+    The default protocol when none is provided will change from HTTP to HTTPS
+    in Django 7.0. Hence, the output will become:
+
+    .. code-block:: html+django
+
+        Check out <a href="https://www.djangoproject.com" rel="nofollow">www.djangoproject.com</a>
+
+    Set the transitional setting :setting:`URLIZE_ASSUME_HTTPS` to ``True`` to
+    opt into using HTTPS during the Django 6.x release cycle.
 
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
@@ -2942,9 +2956,23 @@ For example:
 
     {{ value|urlizetrunc:15 }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
-``'Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproj…</a>'``.
+If ``value`` is ``"Check out www.djangoproject.com"``, the output would be:
+
+.. code-block:: html+django
+
+    Check out <a href="http://www.djangoproject.com" rel="nofollow">www.djangoproj…</a>
+
+.. deprecated:: 6.0
+
+    The default protocol when none is provided will change from HTTP to HTTPS
+    in Django 7.0. Hence, the output will become:
+
+    .. code-block:: html+django
+
+        Check out <a href="https://www.djangoproject.com" rel="nofollow">www.djangoproj…</a>
+
+    Set the transitional setting :setting:`URLIZE_ASSUME_HTTPS` to ``True`` to
+    opt into using HTTPS during the Django 6.x release cycle.
 
 As with urlize_, this filter should only be applied to plain text.
 
