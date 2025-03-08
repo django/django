@@ -408,6 +408,13 @@ Pagination
 * The new :attr:`django.core.paginator.Paginator.error_messages` argument
   allows customizing the error messages raised by :meth:`.Paginator.page`.
 
+Security
+~~~~~~~~
+
+* The :func:`~django.utils.html.urlize` template filter now supports using
+  ``https://`` as the default protocol via the new :setting:`URLIZE_ASSUME_HTTPS`
+  setting, improving security by ensuring URLs are accessed over HTTPS by default.
+
 Signals
 ~~~~~~~
 
@@ -601,6 +608,10 @@ Features deprecated in 5.0
 
 Miscellaneous
 -------------
+
+* Using ``http://`` as default protocol in :func:`~django.utils.html.urlize` is
+  deprecated in favor of ``https://``. Set ``URLIZE_ASSUME_HTTPS`` to ``True`` to
+  opt in to the new behavior, which will become the default in Django 5.1.
 
 * The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
   renderers are deprecated.

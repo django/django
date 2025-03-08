@@ -3,10 +3,12 @@
 import html
 import json
 import re
+import warnings
 from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
+from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.core.validators import EmailValidator
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
@@ -332,6 +334,19 @@ class Urlizer:
         nofollow=False,
         autoescape=False,
     ):
+        """
+        Handle the conversion of a single word to a URL if applicable.
+
+        Args:
+            word: The word to process.
+            safe_input: Whether the input is marked as safe.
+            trim_url_limit: Maximum length for displayed URLs.
+            nofollow: Whether to add rel="nofollow" to links.
+            autoescape: Whether to escape HTML in the output.
+
+        Returns:
+            Processed word, potentially converted to a link if it's a URL.
+        """
         if "." in word or "@" in word or ":" in word:
             # lead: Punctuation trimmed from the beginning of the word.
             # middle: State of the word.
@@ -340,10 +355,23 @@ class Urlizer:
             # Make URL we want to point to.
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ""
+
             if len(middle) <= MAX_URL_LENGTH and self.simple_url_re.match(middle):
                 url = smart_urlquote(html.unescape(middle))
             elif len(middle) <= MAX_URL_LENGTH and self.simple_url_2_re.match(middle):
-                url = smart_urlquote("http://%s" % html.unescape(middle))
+                protocol = (
+                    "https"
+                    if getattr(settings, "URLIZE_ASSUME_HTTPS", False)
+                    else "http"
+                )
+                if not settings.URLIZE_ASSUME_HTTPS:
+                    warnings.warn(
+                        "Using http as default protocol in urlize() is deprecated. "
+                        "Set URLIZE_ASSUME_HTTPS=True to use https.",
+                        DeprecationWarning,
+                        stacklevel=2,
+                    )
+                url = smart_urlquote(f"{protocol}://{html.unescape(middle)}")
             elif ":" not in middle and self.is_email_simple(middle):
                 local, domain = middle.rsplit("@", 1)
                 # Encode per RFC 6068 Section 2 (items 1, 4, 5). Defer any IDNA
@@ -352,6 +380,7 @@ class Urlizer:
                 domain = quote(domain, safe="")
                 url = self.mailto_template.format(local=local, domain=domain)
                 nofollow_attr = ""
+
             # Make link.
             if url:
                 trimmed = self.trim_url(middle, limit=trim_url_limit)
