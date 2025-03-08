@@ -12,8 +12,8 @@ Typo fixes and trivial documentation changes
 ============================================
 
 If you are fixing a really trivial issue, for example changing a word in the
-documentation, the preferred way to provide the patch is using GitHub pull
-requests without a Trac ticket.
+documentation, the preferred way is to open a pull request on GitHub without a
+Trac ticket.
 
 See the :doc:`working-with-git` for more details on how to use pull requests.
 
@@ -112,7 +112,7 @@ requirements:
   fixed and to prevent the problem from arising again. Also, if some tickets
   are relevant to the code that you've written, mention the ticket numbers in
   some comments in the test so that one can easily trace back the relevant
-  discussions after your patch gets committed, and the tickets get closed.
+  discussions in the future.
 
 * If the code adds a new feature, or modifies the behavior of an existing
   feature, the change should also contain documentation.
@@ -136,10 +136,10 @@ Regardless of the way you submit your work, follow these steps.
 * Make sure your code fulfills the requirements in our :ref:`contribution
   checklist <patch-review-checklist>`.
 
-* Check the "Has patch" box on the ticket and make sure the "Needs
-  documentation", "Needs tests", and "Patch needs improvement" boxes aren't
-  checked. This makes the ticket appear in the "Patches needing review" queue
-  on the `Development dashboard`_.
+* Check the "Has pull request" box on the ticket and make sure the "Needs
+  documentation", "Needs tests", and "Pull request needs improvement" boxes
+  aren't checked. This makes the ticket appear in the "PRs needing review"
+  queue on the `Development dashboard`_.
 
 .. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
@@ -147,7 +147,7 @@ Regardless of the way you submit your work, follow these steps.
 Contributions which require community feedback
 ==============================================
 
-A wider community discussion is required when a patch introduces new Django
+A wider community discussion is required when a change introduces new Django
 functionality and makes some sort of design decision. This is especially
 important if the approach involves a :ref:`deprecation <deprecating-a-feature>`
 or introduces breaking changes.
@@ -304,14 +304,14 @@ In each :term:`feature release <Feature release>`, all
 JavaScript contributions
 ========================
 
-For information on JavaScript contributions, see the :ref:`javascript-patches`
+For information on JavaScript contributions, see the :doc:`javascript`
 documentation.
 
-Optimization patches
+Optimization changes
 ====================
 
-Patches aiming to deliver a performance improvement should provide benchmarks
-showing the before and after impact of the patch and sharing the commands for
+Changes aiming to deliver a performance improvement should provide benchmarks
+showing the before and after impact of the change and sharing the commands for
 reviewers to reproduce.
 
 .. _django-asv-benchmarks:
@@ -338,20 +338,22 @@ If the pull request passes all the criteria below and is not your own, please
 set the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
-"Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
-and interest permits, mergers do final reviews of "Ready for checkin" tickets
-and will either commit the changes or bump it back to "Accepted" if further
-work needs to be done.
+"Pull request needs improvement", "Needs documentation", and/or "Needs tests".
+As time and interest permits, mergers do final reviews of "Ready for checkin"
+tickets and will either commit the changes or bump it back to "Accepted" if
+further work needs to be done.
 
 If you're looking to become a member of the `triage & review team
 <https://www.djangoproject.com/foundation/teams/#triage-review-team>`_, doing
 thorough reviews of contributions is a great way to earn trust.
 
-Looking for a patch to review? Check out the "Patches needing review" section
-of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
+Looking for a pull request to review? Check out the "PRs needing review"
+section of the `Django Development Dashboard`_.
 
 Looking to get your pull request reviewed? Ensure the Trac flags on the ticket
 are set so that the ticket appears in that queue.
+
+.. _Django Development Dashboard: https://dashboard.djangoproject.com/
 
 Documentation
 -------------
@@ -403,8 +405,8 @@ All tickets
 
 * Is the pull request a single squashed commit with a message that follows our
   :ref:`commit message format <committing-guidelines>`?
-* Are you the patch author and a new contributor? Please add yourself to the
-  :source:`AUTHORS` file and submit a `Contributor License Agreement`_.
+* Are you the pull request author and a new contributor? Please add yourself to
+  the :source:`AUTHORS` file and submit a `Contributor License Agreement`_.
 * Does this have an accepted ticket on Trac? All contributions require a ticket
   unless the :ref:`change is considered trivial <trivial-change>`.
 
