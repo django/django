@@ -40,6 +40,7 @@ from .models import (
     Character,
     Colour,
     ColourfulItem,
+    ConstraintsModel,
     CustomErrorMessage,
     CustomFF,
     CustomFieldForExclusionModel,
@@ -3718,3 +3719,40 @@ class ModelToDictTests(TestCase):
         # If data were a QuerySet, it would be reevaluated here and give "red"
         # instead of the original value.
         self.assertEqual(data, [blue])
+
+
+class ConstraintValidationTests(TestCase):
+    def test_unique_constraint_refs_excluded_field(self):
+        obj = ConstraintsModel.objects.create(name="product", price="1.00")
+        data = {
+            "id": "",
+            "name": obj.name,
+            "price": "1337.00",
+            "category": obj.category,
+        }
+        ConstraintsModelForm = modelform_factory(ConstraintsModel, fields="__all__")
+        ExcludeCategoryForm = modelform_factory(ConstraintsModel, exclude=["category"])
+        full_form = ConstraintsModelForm(data)
+        exclude_category_form = ExcludeCategoryForm(data)
+        self.assertTrue(exclude_category_form.is_valid())
+        self.assertFalse(full_form.is_valid())
+        self.assertEqual(
+            full_form.errors, {"__all__": ["This product already exists."]}
+        )
+
+    def test_check_constraint_refs_excluded_field(self):
+        data = {
+            "id": "",
+            "name": "priceless",
+            "price": "0.00",
+            "category": "category 1",
+        }
+        ConstraintsModelForm = modelform_factory(ConstraintsModel, fields="__all__")
+        ExcludePriceForm = modelform_factory(ConstraintsModel, exclude=["price"])
+        full_form = ConstraintsModelForm(data)
+        exclude_price_form = ExcludePriceForm(data)
+        self.assertTrue(exclude_price_form.is_valid())
+        self.assertFalse(full_form.is_valid())
+        self.assertEqual(
+            full_form.errors, {"__all__": ["Price must be greater than zero."]}
+        )
