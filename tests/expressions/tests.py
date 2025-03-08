@@ -84,6 +84,7 @@ from .models import (
     Employee,
     Experiment,
     Manager,
+    NamedCategory,
     Number,
     RemoteEmployee,
     Result,
@@ -2934,3 +2935,26 @@ class OrderByTests(SimpleTestCase):
             F("field").asc(nulls_first=False)
         with self.assertRaisesMessage(ValueError, msg):
             F("field").desc(nulls_last=False)
+
+
+class SubqueryTests(TestCase):
+    def test_outer_ref_order_by(self):
+        NamedCategory.objects.create(id=1, name="first")
+        NamedCategory.objects.create(id=4, name="fourth")
+        NamedCategory.objects.create(id=2, name="second")
+        NamedCategory.objects.create(id=3, name="third")
+        outer_query = NamedCategory.objects.all()
+
+        subquery = (
+            NamedCategory.objects.filter(pk=OuterRef("pk"))
+            .order_by("pk")
+            .values("name")
+        )
+
+        values = outer_query.annotate(sorted_name=Subquery(subquery)).order_by(
+            "sorted_name"
+        )
+
+        sorted_names = list(values.values_list("sorted_name", flat=True))
+
+        self.assertListEqual(sorted_names, ["first", "fourth", "second", "third"])
