@@ -4,6 +4,8 @@ from datetime import datetime
 from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape,
@@ -22,6 +24,7 @@ from django.utils.html import (
 from django.utils.safestring import mark_safe
 
 
+@override_settings(URLIZE_ASSUME_HTTPS=True)
 class TestUtilsHtml(SimpleTestCase):
     def check_output(self, function, value, output=None):
         """
@@ -369,17 +372,17 @@ class TestUtilsHtml(SimpleTestCase):
         tests = (
             (
                 "Search for google.com/?q=! and see.",
-                'Search for <a href="http://google.com/?q=">google.com/?q=</a>! and '
+                'Search for <a href="https://google.com/?q=">google.com/?q=</a>! and '
                 "see.",
             ),
             (
                 "Search for google.com/?q=1&lt! and see.",
-                'Search for <a href="http://google.com/?q=1%3C">google.com/?q=1&lt'
+                'Search for <a href="https://google.com/?q=1%3C">google.com/?q=1&lt'
                 "</a>! and see.",
             ),
             (
                 lazystr("Search for google.com/?q=!"),
-                'Search for <a href="http://google.com/?q=">google.com/?q=</a>!',
+                'Search for <a href="https://google.com/?q=">google.com/?q=</a>!',
             ),
             (
                 "http://www.foo.bar/",
@@ -388,7 +391,7 @@ class TestUtilsHtml(SimpleTestCase):
             (
                 "Look on www.نامه‌ای.com.",
                 "Look on <a "
-                'href="http://www.%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D8%A7%DB%8C.com"'
+                'href="https://www.%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D8%A7%DB%8C.com"'
                 ">www.نامه‌ای.com</a>.",
             ),
             ("foo@example.com", '<a href="mailto:foo@example.com">foo@example.com</a>'),
@@ -421,6 +424,19 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in tests:
             with self.subTest(value=value):
                 self.assertEqual(urlize(value), output)
+
+    @override_settings(URLIZE_ASSUME_HTTPS=False)
+    def test_urlize_http_default_warning(self):
+        msg = (
+            "The default protocol will be changed from HTTP to HTTPS in Django 7.0. "
+            "Set the URLIZE_ASSUME_HTTPS transitional setting to True to opt into "
+            "using HTTPS as the new default protocol."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            self.assertEqual(
+                urlize("Visit example.com"),
+                'Visit <a href="http://example.com">example.com</a>',
+            )
 
     def test_urlize_unchanged_inputs(self):
         tests = (
