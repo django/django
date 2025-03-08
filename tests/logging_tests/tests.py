@@ -248,7 +248,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertTrue(admin_email_handler.connection().fail_silently)
 
     @override_settings(
-        ADMINS=[("whatever admin", "admin@example.com")],
+        ADMINS=["admin@example.com"],
         EMAIL_SUBJECT_PREFIX="-SuperAwesomeSubject-",
     )
     def test_accepts_args(self):
@@ -280,7 +280,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
             admin_email_handler.filters = orig_filters
 
     @override_settings(
-        ADMINS=[("whatever admin", "admin@example.com")],
+        ADMINS=["admin@example.com"],
         EMAIL_SUBJECT_PREFIX="-SuperAwesomeSubject-",
         INTERNAL_IPS=["127.0.0.1"],
     )
@@ -319,7 +319,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
             admin_email_handler.filters = orig_filters
 
     @override_settings(
-        ADMINS=[("admin", "admin@example.com")],
+        ADMINS=["admin@example.com"],
         EMAIL_SUBJECT_PREFIX="",
         DEBUG=False,
     )
@@ -341,7 +341,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
-        ADMINS=[("admin", "admin@example.com")],
+        ADMINS=["admin@example.com"],
         DEBUG=False,
     )
     def test_uses_custom_email_backend(self):
@@ -372,7 +372,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
             admin_email_handler.email_backend = orig_email_backend
 
     @override_settings(
-        ADMINS=[("whatever admin", "admin@example.com")],
+        ADMINS=["admin@example.com"],
     )
     def test_emit_non_ascii(self):
         """
@@ -393,7 +393,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertIn("Report at %s" % url_path, msg.body)
 
     @override_settings(
-        MANAGERS=[("manager", "manager@example.com")],
+        MANAGERS=["manager@example.com"],
         DEBUG=False,
     )
     def test_customize_send_mail_method(self):
@@ -435,7 +435,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         admin_email_handler = self.get_admin_email_handler(self.logger)
         self.assertEqual(admin_email_handler.reporter_class, ExceptionReporter)
 
-    @override_settings(ADMINS=[("A.N.Admin", "admin@example.com")])
+    @override_settings(ADMINS=["admin@example.com"])
     def test_custom_exception_reporter_is_used(self):
         record = self.logger.makeRecord(
             "name", logging.ERROR, "function", "lno", "message", None, None
@@ -449,7 +449,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         msg = mail.outbox[0]
         self.assertEqual(msg.body, "message\n\ncustom traceback text")
 
-    @override_settings(ADMINS=[("admin", "admin@example.com")])
+    @override_settings(ADMINS=["admin@example.com"])
     def test_emit_no_form_tag(self):
         """HTML email doesn't contain forms."""
         handler = AdminEmailHandler(include_html=True)
@@ -567,7 +567,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
         )
 
     @override_settings(
-        ADMINS=[("admin", "admin@example.com")],
+        ADMINS=["admin@example.com"],
         DEBUG=False,
     )
     def test_suspicious_email_admins(self):
