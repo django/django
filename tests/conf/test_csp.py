@@ -15,8 +15,3 @@ class CSPConstantsTests(SimpleTestCase):
         self.assertEqual(csp.UNSAFE_HASHES, "'unsafe-hashes'")
         self.assertEqual(csp.UNSAFE_INLINE, "'unsafe-inline'")
         self.assertEqual(csp.WASM_UNSAFE_EVAL, "'wasm-unsafe-eval'")
-
-    def test_nonce_sentinel(self):
-        self.assertEqual(csp.Nonce(), csp.Nonce())
-        self.assertEqual(csp.NONCE, csp.Nonce())
-        self.assertEqual(repr(csp.Nonce()), "django.conf.csp.NONCE")

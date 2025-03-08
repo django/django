@@ -11,17 +11,10 @@ UNSAFE_HASHES = "'unsafe-hashes'"
 UNSAFE_INLINE = "'unsafe-inline'"
 WASM_UNSAFE_EVAL = "'wasm-unsafe-eval'"
 
-
-class Nonce:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-
-    def __repr__(self):
-        return "django.conf.csp.NONCE"
-
-
-NONCE = Nonce()
+# NOTE:
+# - `NONCE` is a sentinel value used as a placeholder to indicate where the
+#   generated nonce should be inserted in the CSP header.
+# - The CSP middleware detects this value and replaces it with a unique nonce
+#   generated per request.
+# - The value itself is arbitrary and should not be mistaken for a real nonce.
+NONCE = "<CSP_NONCE_SENTINEL>"
