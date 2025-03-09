@@ -367,7 +367,8 @@ class Urlizer:
                 if not settings.URLIZE_ASSUME_HTTPS:
                     warnings.warn(
                         "Using http as default protocol in urlize() is deprecated. "
-                        "Set URLIZE_ASSUME_HTTPS=True to use https.",
+                        "Set URLIZE_ASSUME_HTTPS=True to use https. "
+                        "This will be removed in Django 6.0.",
                         DeprecationWarning,
                         stacklevel=2,
                     )

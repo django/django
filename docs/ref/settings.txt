@@ -2970,8 +2970,8 @@ This setting helps prevent security issues by ensuring URLs are accessed over HT
 by default, which is especially important for password reset links and other
 security-sensitive URLs.
 
-.. deprecated:: 5.0
-    This transitional setting will be removed in Django 5.1, after which
+.. deprecated:: 5.2
+    This transitional setting will be removed in Django 6.0, after which
     ``https://`` will always be used as the default protocol.
 
 See also :setting:`SECURE_SSL_REDIRECT`.
