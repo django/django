@@ -312,6 +312,9 @@ If :attr:`.UniqueConstraint.fields` is set without a
 multiple fields, and to the :attr:`.Field.unique` error message when there is a
 single field.
 
+This message is not used when model forms :ref:`are validated against each
+other <validation-on-model-formsets>` for uniqueness in model formsets.
+
 .. versionchanged:: 5.2
 
     In older versions, the provided
