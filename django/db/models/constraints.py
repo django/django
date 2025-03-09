@@ -2,7 +2,7 @@ from enum import Enum
 from types import NoneType
 
 from django.core import checks
-from django.core.exceptions import FieldDoesNotExist, FieldError, ValidationError
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Exists, ExpressionList, F, RawSQL
@@ -206,13 +206,13 @@ class CheckConstraint(BaseConstraint):
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
         against = instance._get_field_expression_map(meta=model._meta, exclude=exclude)
-        try:
-            if not Q(self.condition).check(against, using=using):
-                raise ValidationError(
-                    self.get_violation_error_message(), code=self.violation_error_code
-                )
-        except FieldError:
-            pass
+        # Ignore constraints with excluded fields in condition.
+        if exclude and self._expression_refs_exclude(model, self.condition, exclude):
+            return
+        if not Q(self.condition).check(against, using=using):
+            raise ValidationError(
+                self.get_violation_error_message(), code=self.violation_error_code
+            )
 
     def __repr__(self):
         return "<%s: condition=%s name=%s%s%s>" % (
@@ -660,16 +660,18 @@ class UniqueConstraint(BaseConstraint):
                     code=self.violation_error_code,
                 )
         else:
+            # Ignore constraints with excluded fields in condition.
+            if exclude and self._expression_refs_exclude(
+                model, self.condition, exclude
+            ):
+                return
             against = instance._get_field_expression_map(
                 meta=model._meta, exclude=exclude
             )
-            try:
-                if (self.condition & Exists(queryset.filter(self.condition))).check(
-                    against, using=using
-                ):
-                    raise ValidationError(
-                        self.get_violation_error_message(),
-                        code=self.violation_error_code,
-                    )
-            except FieldError:
-                pass
+            if (self.condition & Exists(queryset.filter(self.condition))).check(
+                against, using=using
+            ):
+                raise ValidationError(
+                    self.get_violation_error_message(),
+                    code=self.violation_error_code,
+                )
