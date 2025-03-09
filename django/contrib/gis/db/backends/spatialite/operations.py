@@ -196,7 +196,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         minor, subminor).
         """
         version = self.spatialite_version()
-        return (version,) + get_version_tuple(version)
+        return (version, *get_version_tuple(version))
 
     def spatial_aggregate_name(self, agg_name):
         """
