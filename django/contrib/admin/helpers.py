@@ -461,6 +461,14 @@ class InlineAdminFormSet:
         return self.formset.total_form_count
 
     @property
+    def can_delete(self):
+        return (
+            self.formset.can_delete
+            and self.has_delete_permission
+            and any(inlineadminform.original is not None for inlineadminform in self)
+        )
+
+    @property
     def media(self):
         media = self.opts.media + self.formset.media
         for fs in self:
