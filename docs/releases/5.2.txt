@@ -390,13 +390,6 @@ Utilities
   of mappings, passing their contents as keyword arguments to
   :func:`~django.utils.html.format_html`.
 
-Security
-~~~~~~~~
-
-* The :func:`~django.utils.html.urlize` template filter now supports using
-  ``https://`` as the default protocol via the new :setting:`URLIZE_ASSUME_HTTPS`
-  setting, improving security by ensuring URLs are accessed over HTTPS by default.
-
 .. _backwards-incompatible-5.2:
 
 Backwards incompatible changes in 5.2
@@ -484,10 +477,6 @@ Features deprecated in 5.2
 
 Miscellaneous
 -------------
-
-* Using ``http://`` as default protocol in :func:`~django.utils.html.urlize` is
-  deprecated in favor of ``https://``. Set ``URLIZE_ASSUME_HTTPS`` to ``True`` to
-  opt in to the new behavior, which will become the default in Django 6.0.
 
 * The ``all`` argument for the ``django.contrib.staticfiles.finders.find()``
   function is deprecated in favor of the ``find_all`` argument.
