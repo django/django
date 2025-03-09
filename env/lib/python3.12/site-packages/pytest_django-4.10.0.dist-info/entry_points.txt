@@ -1,0 +1,2 @@
+[pytest11]
+django = pytest_django.plugin

@@ -1,0 +1,98 @@
+Metadata-Version: 2.1
+Name: Django
+Version: 5.1.7
+Summary: A high-level Python web framework that encourages rapid development and clean, pragmatic design.
+Author-email: Django Software Foundation <foundation@djangoproject.com>
+License: BSD-3-Clause
+Project-URL: Homepage, https://www.djangoproject.com/
+Project-URL: Documentation, https://docs.djangoproject.com/
+Project-URL: Release notes, https://docs.djangoproject.com/en/stable/releases/
+Project-URL: Funding, https://www.djangoproject.com/fundraising/
+Project-URL: Source, https://github.com/django/django
+Project-URL: Tracker, https://code.djangoproject.com/
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Internet :: WWW/HTTP :: WSGI
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+License-File: LICENSE.python
+License-File: AUTHORS
+Requires-Dist: asgiref<4,>=3.8.1
+Requires-Dist: sqlparse>=0.3.1
+Requires-Dist: tzdata; sys_platform == "win32"
+Provides-Extra: argon2
+Requires-Dist: argon2-cffi>=19.1.0; extra == "argon2"
+Provides-Extra: bcrypt
+Requires-Dist: bcrypt; extra == "bcrypt"
+
+======
+Django
+======
+
+Django is a high-level Python web framework that encourages rapid development
+and clean, pragmatic design. Thanks for checking it out.
+
+All documentation is in the "``docs``" directory and online at
+https://docs.djangoproject.com/en/stable/. If you're just getting started,
+here's how we recommend you read the docs:
+
+* First, read ``docs/intro/install.txt`` for instructions on installing Django.
+
+* Next, work through the tutorials in order (``docs/intro/tutorial01.txt``,
+  ``docs/intro/tutorial02.txt``, etc.).
+
+* If you want to set up an actual deployment server, read
+  ``docs/howto/deployment/index.txt`` for instructions.
+
+* You'll probably want to read through the topical guides (in ``docs/topics``)
+  next; from there you can jump to the HOWTOs (in ``docs/howto``) for specific
+  problems, and check out the reference (``docs/ref``) for gory details.
+
+* See ``docs/README`` for instructions on building an HTML version of the docs.
+
+Docs are updated rigorously. If you find any problems in the docs, or think
+they should be clarified in any way, please take 30 seconds to fill out a
+ticket here: https://code.djangoproject.com/newticket
+
+To get more help:
+
+* Join the ``#django`` channel on ``irc.libera.chat``. Lots of helpful people
+  hang out there. `Webchat is available <https://web.libera.chat/#django>`_.
+
+* Join the `Django Discord community <https://chat.djangoproject.com>`_.
+
+* Join the community on the `Django Forum <https://forum.djangoproject.com/>`_.
+
+To contribute to Django:
+
+* Check out https://docs.djangoproject.com/en/dev/internals/contributing/ for
+  information about getting involved.
+
+To run Django's test suite:
+
+* Follow the instructions in the "Unit tests" section of
+  ``docs/internals/contributing/writing-code/unit-tests.txt``, published online at
+  https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
+
+Supporting the Development of Django
+====================================
+
+Django's development depends on your contributions.
+
+If you depend on Django, remember to support the Django Software Foundation: https://www.djangoproject.com/fundraising/

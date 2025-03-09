@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-views-index' %}">{% translate 'Views' %}</a>
+&rsaquo; {{ name }}
+</div>
+{% endblock %}
+{% block title %}{% blocktranslate %}View: {{ name }}{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+
+<h1>{{ name }}</h1>
+
+<h2 class="subhead">{{ summary|striptags }}</h2>
+
+{{ body }}
+
+{% if meta.Context %}
+<h3>{% translate 'Context:' %}</h3>
+<p>{{ meta.Context }}</p>
+{% endif %}
+
+{% if meta.Templates %}
+<h3>{% translate 'Templates:' %}</h3>
+<p>{{ meta.Templates }}</p>
+{% endif %}
+
+<p><a href="{% url 'django-admindocs-views-index' %}">&lsaquo; {% translate 'Back to View documentation' %}</a></p>
+{% endblock %}

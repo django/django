@@ -1,5 +1,7 @@
 import pytest
-from django.db import connection  
+
+from django.db import connection
+
 
 @pytest.mark.django_db
 def test_last_insert_id():
@@ -7,7 +9,7 @@ def test_last_insert_id():
     with connection.cursor() as cursor:
         table_name = "test_table"
         pk_name = "id"
-        
+
         last_id = connection.ops.last_insert_id(cursor, table_name, pk_name)
-        
+
         assert isinstance(last_id, int)
