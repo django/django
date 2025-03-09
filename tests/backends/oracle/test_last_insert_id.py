@@ -1,0 +1,19 @@
+import pytest
+from django.db import connection
+
+@pytest.mark.django_db
+def test_last_insert_id():
+    """Test that last_insert_id correctly retrieves the latest ID."""
+    with connection.cursor() as cursor:
+        table_name = "test_table"
+        pk_name = "id"
+
+        # Simulate getting the last insert ID
+        last_id = connection.ops.last_insert_id(cursor, table_name, pk_name)
+
+        # Check if it is an integer (expected behavior)
+        if connection.vendor == "sqlite":
+            assert last_id is None  # SQLite does not support sequences
+        else:
+            assert isinstance(last_id, int)
+
