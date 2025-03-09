@@ -340,10 +340,10 @@ END;
         return statement
 
     def last_insert_id(self, cursor, table_name, pk_name):
-            sq_name = self._get_sequence_name(cursor, strip_quotes(table_name), pk_name)
-            query = f'SELECT "{sq_name}".CURRVAL FROM dual'
-            cursor.execute(query)
-            return cursor.fetchone()[0]
+        sq_name = self._get_sequence_name(cursor, strip_quotes(table_name), pk_name)
+        query = f'SELECT "{sq_name}".CURRVAL FROM dual'
+        cursor.execute(query)
+        return cursor.fetchone()[0]
 
 
     def lookup_cast(self, lookup_type, internal_type=None):
