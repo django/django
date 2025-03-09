@@ -194,6 +194,11 @@ Models
   values concatenated into a string, separated by the ``delimiter`` string.
   This aggregate was previously supported only for PostgreSQL.
 
+* The :meth:`~django.db.models.Model.save` method now raises a specialized
+  :exc:`Model.NotUpdated <django.db.models.Model.NotUpdated>` exception, when
+  :ref:`a forced update <ref-models-force-insert>` results in no affected rows,
+  instead of a generic :exc:`django.db.DatabaseError`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
