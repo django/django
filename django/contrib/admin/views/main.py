@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime, timedelta
 
 from django import forms
@@ -31,8 +32,9 @@ from django.core.paginator import InvalidPage
 from django.db.models import F, Field, ManyToOneRel, OrderBy
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Combinable
+from django.template.defaulttags import querystring
 from django.urls import reverse
-from django.utils.http import urlencode
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext
 
@@ -125,15 +127,19 @@ class ChangeList:
             )
         self.to_field = to_field
         self.params = dict(request.GET.items())
-        self.filter_params = dict(request.GET.lists())
+        self.filter_params = request.GET.copy()
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
             del self.filter_params[PAGE_VAR]
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
             del self.filter_params[ERROR_FLAG]
-        self.remove_facet_link = self.get_query_string(remove=[IS_FACETS_VAR])
-        self.add_facet_link = self.get_query_string({IS_FACETS_VAR: True})
+        self.remove_facet_link = querystring(
+            None, self.filter_params, **{IS_FACETS_VAR: None}
+        )
+        self.add_facet_link = querystring(
+            None, self.filter_params, **{IS_FACETS_VAR: True}
+        )
 
         if self.is_popup:
             self.list_editable = ()
@@ -161,7 +167,7 @@ class ChangeList:
         """
         Return all params except IGNORED_PARAMS.
         """
-        params = params or self.filter_params
+        params = params or dict(self.filter_params.lists())
         lookup_params = params.copy()  # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
@@ -275,6 +281,14 @@ class ChangeList:
             raise IncorrectLookupParameters(e) from e
 
     def get_query_string(self, new_params=None, remove=None):
+        from django.utils.http import urlencode
+
+        warnings.warn(
+            "ChangeList.get_query_string() is deprecated. "
+            "use django.template.defaulttags.querystring instead.",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
         if new_params is None:
             new_params = {}
         if remove is None:
@@ -574,9 +588,12 @@ class ChangeList:
         )
 
         # Set query string for clearing all filters.
-        self.clear_all_filters_qs = self.get_query_string(
-            new_params=remaining_lookup_params,
-            remove=self.get_filters_params(),
+        params = {param: None for param in self.get_filters_params()}
+        params.update(remaining_lookup_params)
+        self.clear_all_filters_qs = querystring(
+            None,
+            self.filter_params,
+            **params,
         )
         # Remove duplicates from results, if necessary
         if filters_may_have_duplicates | search_may_have_duplicates:
