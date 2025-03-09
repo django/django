@@ -17,6 +17,7 @@ from django.core.exceptions import (
     FieldError,
     MultipleObjectsReturned,
     ObjectDoesNotExist,
+    ObjectNotUpdated,
     ValidationError,
 )
 from django.db import (
@@ -167,6 +168,23 @@ class ModelBase(type):
                         if hasattr(x, "_meta") and not x._meta.abstract
                     )
                     or (MultipleObjectsReturned,),
+                    module,
+                    attached_to=new_class,
+                ),
+            )
+            new_class.add_to_class(
+                "NotUpdated",
+                subclass_exception(
+                    "NotUpdated",
+                    tuple(
+                        x.NotUpdated
+                        for x in parents
+                        if hasattr(x, "_meta") and not x._meta.abstract
+                    )
+                    # Subclass DatabaseError as well for backward compatibility
+                    # reasons as __subclasshook__ is not taken into account on
+                    # exception handling.
+                    or (ObjectNotUpdated, DatabaseError),
                     module,
                     attached_to=new_class,
                 ),
@@ -1073,9 +1091,11 @@ class Model(AltersData, metaclass=ModelBase):
                 base_qs, using, pk_val, values, update_fields, forced_update
             )
             if force_update and not updated:
-                raise DatabaseError("Forced update did not affect any rows.")
+                raise self.NotUpdated("Forced update did not affect any rows.")
             if update_fields and not updated:
-                raise DatabaseError("Save with update_fields did not affect any rows.")
+                raise self.NotUpdated(
+                    "Save with update_fields did not affect any rows."
+                )
         if not updated:
             if meta.order_with_respect_to:
                 # If this is a model with an order_with_respect_to

@@ -601,6 +601,12 @@ You can pass ``force_insert=(models.Model,)`` to force an ``INSERT`` statement
 for all parents. By default, ``force_insert=True`` only forces the insertion of
 a new row for the current model.
 
+.. versionchanged:: 6.0
+
+    When a forced update does not affect any rows a
+    :exc:`~django.db.models.Model.NotUpdated` exception is raised. On previous
+    versions a generic :exc:`django.db.DatabaseError` was raised.
+
 It should be very rare that you'll need to use these parameters. Django will
 almost always do the right thing and trying to override that will lead to
 errors that are difficult to track down. This feature is for advanced use
