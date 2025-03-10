@@ -535,6 +535,48 @@ database migrations such as ``__init__()``, ``deconstruct()``, and
 which reference the field exist. For example, after squashing migrations and
 removing the old ones, you should be able to remove the field completely.
 
+.. _moving-model-between-apps:
+
+Moving a model between apps
+===========================
+
+.. versionadded:: 5.2
+
+Django handles the process of transferring models from one app to another. This
+involves recognizing the moved model and automatically generating the necessary
+migrations.
+
+To move a model ``MyModel`` from ``app1`` to ``app2``:
+
+#. Move the ``MyModel`` class definition from ``app1`` to ``app2``.
+#. Ensure all ``MyModel`` references point to the new model location.
+#. Run :djadmin:`makemigrations`.
+
+This generates the multiple migration files which do the following:
+
+#. In ``app1``, a migration to rename ``MyModel``'s database table to
+   ``app2_mymodel``. This is only if ``MyModel`` does not define a
+   ``Meta.db_table`` in ``app2`` that matches the old table name of ``app1``.
+   In other words, this is only if the table name is implicit.
+
+#. In ``app2``, a migration to create ``MyModel`` in ``app2`` with the option
+   ``managed=False``. At this point, the project has two models pointing to the
+   same table.
+
+#. In ``app1``, a migration to mark ``MyModel`` in ``app1`` as
+   ``managed=False``. This later makes it possible to remove the old model
+   without deleting the table.
+
+#. In ``app2``, a migration to mark ``MyModel`` in ``app2`` as ``managed=True``.
+
+#. In ``app1``, a migration to delete ``MyModel`` from ``app1``.
+
+.. admonition:: Moving models that use multi-table inheritance is not supported
+
+    A model that uses :ref:`multi-table inheritance <multi-table-inheritance>`
+    must be moved together with all inherited models.
+
+
 .. _data-migrations:
 
 Data Migrations
