@@ -15,6 +15,7 @@ from contextlib import nullcontext
 from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, transaction
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.fields.fetch_modes import get_fetch_mode
 from django.utils import tree
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
@@ -206,6 +207,9 @@ class DeferredAttribute:
     def __init__(self, field):
         self.field = field
 
+    def __set_name__(self, owner, name):
+        self.name = name
+
     def __get__(self, instance, cls=None):
         """
         Retrieve and caches the value from the datastore on the first lookup.
@@ -224,7 +228,8 @@ class DeferredAttribute:
                     raise AttributeError(
                         "Cannot read a generated field from an unsaved model."
                     )
-                instance.refresh_from_db(fields=[field_name])
+
+                get_fetch_mode()(self, instance)
             else:
                 data[field_name] = val
         return data[field_name]
@@ -240,6 +245,20 @@ class DeferredAttribute:
         if self.field.primary_key and self.field != link_field:
             return getattr(instance, link_field.attname)
         return None
+
+    def fetch_one(self, instance):
+        instance.refresh_from_db(fields=[self.field.attname])
+
+    def fetch_many(self, instances):
+        attname = self.field.attname
+        value_by_pk = {
+            pk: value
+            for pk, value in self.field.model._base_manager.db_manager()
+            .filter(pk__in={i.pk for i in instances})
+            .values_list("pk", attname)
+        }
+        for instance in instances:
+            setattr(instance, attname, value_by_pk[instance.pk])
 
 
 class class_or_instance_method:

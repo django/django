@@ -1,4 +1,6 @@
+from django.core.exceptions import FieldFetchBlocked
 from django.db import IntegrityError, connection, transaction
+from django.db.models import FETCH_PEERS, RAISE, fetch_mode
 from django.test import TestCase
 
 from .models import (
@@ -615,3 +617,39 @@ class OneToOneTests(TestCase):
                 instances=places,
                 querysets=[Bar.objects.all(), Bar.objects.all()],
             )
+
+    @fetch_mode(FETCH_PEERS)
+    def test_fetch_mode_fetch_peers_forward(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        r1, r2 = Restaurant.objects.all()
+        with self.assertNumQueries(1):
+            r1.place
+        with self.assertNumQueries(0):
+            r2.place
+
+    @fetch_mode(FETCH_PEERS)
+    def test_fetch_mode_fetch_peers_reverse(self):
+        Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        p1, p2 = Place.objects.all()
+        with self.assertNumQueries(1):
+            p1.restaurant
+        with self.assertNumQueries(0):
+            p2.restaurant
+
+    @fetch_mode(RAISE)
+    def test_fetch_mode_raise_forward(self):
+        r = Restaurant.objects.get(pk=self.r1.pk)
+        msg = "Fetching of Restaurant.place blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg):
+            r.place
+
+    @fetch_mode(RAISE)
+    def test_fetch_mode_raise_reverse(self):
+        p = Place.objects.get(pk=self.p1.pk)
+        msg = "Fetching of Place.restaurant blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg):
+            p.restaurant
