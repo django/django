@@ -173,10 +173,7 @@ class Element:
         if self.children:
             output += ">\n"
             output += "".join(
-                [
-                    html.escape(c) if isinstance(c, str) else str(c)
-                    for c in self.children
-                ]
+                html.escape(c) if isinstance(c, str) else str(c) for c in self.children
             )
             output += "\n</%s>" % self.name
         else:
@@ -193,7 +190,7 @@ class RootElement(Element):
 
     def __str__(self):
         return "".join(
-            [html.escape(c) if isinstance(c, str) else str(c) for c in self.children]
+            html.escape(c) if isinstance(c, str) else str(c) for c in self.children
         )
 
 

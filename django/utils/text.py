@@ -136,7 +136,7 @@ class TruncateHTMLParser(HTMLParser):
         try:
             super().feed(data)
         except self.TruncationCompleted:
-            self.output += "".join([f"</{tag}>" for tag in self.tags])
+            self.output += "".join(f"</{tag}>" for tag in self.tags)
             self.tags.clear()
             self.reset()
         else:

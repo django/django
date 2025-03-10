@@ -185,7 +185,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             and transaction_mode.upper() not in self.transaction_modes
         ):
             allowed_transaction_modes = ", ".join(
-                [f"{mode!r}" for mode in sorted(self.transaction_modes)]
+                f"{mode!r}" for mode in sorted(self.transaction_modes)
             )
             raise ImproperlyConfigured(
                 f"settings.DATABASES[{self.alias!r}]['OPTIONS']['transaction_mode'] "

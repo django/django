@@ -360,10 +360,8 @@ class ModelDetailView(BaseAdminDocsView):
                     # join it with '='. Use repr() so that strings will be
                     # correctly displayed.
                     print_arguments = ", ".join(
-                        [
-                            "=".join([arg_el[0], *map(repr, arg_el[1:])])
-                            for arg_el in arguments
-                        ]
+                        "=".join([arg_el[0], *map(repr, arg_el[1:])])
+                        for arg_el in arguments
                     )
                     methods.append(
                         {

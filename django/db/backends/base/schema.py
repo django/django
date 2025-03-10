@@ -1832,7 +1832,7 @@ class BaseDatabaseSchemaEditor:
                 self.deferred_sql.append(sql)
             return None
         constraint = self.sql_unique_constraint % {
-            "columns": ", ".join([self.quote_name(field.column) for field in fields]),
+            "columns": ", ".join(self.quote_name(field.column) for field in fields),
             "deferrable": self._deferrable_constraint_sql(deferrable),
         }
         return self.sql_constraint % {

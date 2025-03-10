@@ -133,7 +133,7 @@ class Command(BaseCommand):
                 known_models.append(model_name)
 
                 if len(primary_key_columns) > 1:
-                    fields = ", ".join([f"'{col}'" for col in primary_key_columns])
+                    fields = ", ".join(f"'{col}'" for col in primary_key_columns)
                     yield f"    pk = models.CompositePrimaryKey({fields})"
 
                 used_column_names = []  # Holds column names used in the table so far

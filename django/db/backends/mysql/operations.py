@@ -441,10 +441,8 @@ class DatabaseOperations(BaseDatabaseOperations):
                 field_sql = "%(field)s = VALUE(%(field)s)"
 
             fields = ", ".join(
-                [
-                    field_sql % {"field": field}
-                    for field in map(self.quote_name, update_fields)
-                ]
+                field_sql % {"field": field}
+                for field in map(self.quote_name, update_fields)
             )
             return conflict_suffix_sql % {"fields": fields}
         return super().on_conflict_suffix_sql(

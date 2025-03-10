@@ -421,7 +421,7 @@ class KeyTransform(Transform):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         json_path = compile_json_path(key_transforms)
         datatype_values = ",".join(
-            [repr(datatype) for datatype in connection.ops.jsonfield_datatype_values]
+            repr(datatype) for datatype in connection.ops.jsonfield_datatype_values
         )
         return (
             "(CASE WHEN JSON_TYPE(%s, %%s) IN (%s) "

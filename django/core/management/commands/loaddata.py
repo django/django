@@ -297,7 +297,7 @@ class Command(BaseCommand):
             "%s.%s"
             % (
                 fixture_name,
-                ".".join([ext for ext in combo if ext]),
+                ".".join(ext for ext in combo if ext),
             )
             for combo in product(databases, ser_fmts, cmp_fmts)
         }

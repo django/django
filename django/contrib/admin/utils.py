@@ -22,7 +22,7 @@ from django.utils.translation import override as translation_override
 
 QUOTE_MAP = {i: "_%02X" % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
-UNQUOTE_RE = _lazy_re_compile("_(?:%s)" % "|".join([x[1:] for x in UNQUOTE_MAP]))
+UNQUOTE_RE = _lazy_re_compile("_(?:%s)" % "|".join(x[1:] for x in UNQUOTE_MAP))
 
 
 class FieldIsAForeignKeyColumnName(Exception):

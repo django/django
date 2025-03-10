@@ -395,7 +395,7 @@ class MultiPartParser:
         file_name = file_name.rsplit("/")[-1]
         file_name = file_name.rsplit("\\")[-1]
         # Remove non-printable characters.
-        file_name = "".join([char for char in file_name if char.isprintable()])
+        file_name = "".join(char for char in file_name if char.isprintable())
 
         if file_name in {"", ".", ".."}:
             return None

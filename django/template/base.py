@@ -1013,7 +1013,7 @@ class NodeList(list):
     contains_nontext = False
 
     def render(self, context):
-        return SafeString("".join([node.render_annotated(context) for node in self]))
+        return SafeString("".join(node.render_annotated(context) for node in self))
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"

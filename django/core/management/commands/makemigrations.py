@@ -292,7 +292,7 @@ class Command(BaseCommand):
             ]
             if depending_migrations:
                 formatted_migrations = ", ".join(
-                    [f"'{migration}'" for migration in depending_migrations]
+                    f"'{migration}'" for migration in depending_migrations
                 )
                 raise CommandError(
                     f"Cannot update migration '{leaf_migration}' that migrations "

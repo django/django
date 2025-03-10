@@ -253,14 +253,14 @@ class IndexExpression(Func):
                 "Multiple references to %s can't be used in an indexed "
                 "expression."
                 % ", ".join(
-                    [wrapper_cls.__qualname__ for wrapper_cls in self.wrapper_classes]
+                    wrapper_cls.__qualname__ for wrapper_cls in self.wrapper_classes
                 )
             )
         if expressions[1 : len(wrappers) + 1] != wrappers:
             raise ValueError(
                 "%s must be topmost expressions in an indexed expression."
                 % ", ".join(
-                    [wrapper_cls.__qualname__ for wrapper_cls in self.wrapper_classes]
+                    wrapper_cls.__qualname__ for wrapper_cls in self.wrapper_classes
                 )
             )
         # Wrap expressions in parentheses if they are not column references.

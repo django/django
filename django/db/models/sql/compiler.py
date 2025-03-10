@@ -1669,7 +1669,7 @@ class SQLCompiler:
         for row in result:
             for value in row:
                 if not isinstance(value, str):
-                    yield " ".join([output_formatter(c) for c in value])
+                    yield " ".join(output_formatter(c) for c in value)
                 else:
                     yield value
 

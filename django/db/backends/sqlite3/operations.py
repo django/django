@@ -264,7 +264,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 style.SQL_FIELD(self.quote_name("name")),
                 style.SQL_KEYWORD("IN"),
                 ", ".join(
-                    ["'%s'" % sequence_info["table"] for sequence_info in sequences]
+                    "'%s'" % sequence_info["table"] for sequence_info in sequences
                 ),
             ),
         ]
@@ -426,10 +426,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "ON CONFLICT(%s) DO UPDATE SET %s" % (
                 ", ".join(map(self.quote_name, unique_fields)),
                 ", ".join(
-                    [
-                        f"{field} = EXCLUDED.{field}"
-                        for field in map(self.quote_name, update_fields)
-                    ]
+                    f"{field} = EXCLUDED.{field}"
+                    for field in map(self.quote_name, update_fields)
                 ),
             )
         return super().on_conflict_suffix_sql(

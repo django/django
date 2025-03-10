@@ -85,7 +85,7 @@ class JSONObject(Func):
     def join(self, args):
         pairs = zip(args[::2], args[1::2], strict=True)
         # Wrap 'key' in parentheses in case of postgres cast :: syntax.
-        return ", ".join([f"({key}) VALUE {value}" for key, value in pairs])
+        return ", ".join(f"({key}) VALUE {value}" for key, value in pairs)
 
     def as_native(self, compiler, connection, *, returning, **extra_context):
         return self.as_sql(
