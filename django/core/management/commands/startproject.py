@@ -10,6 +10,7 @@ class Command(TemplateCommand):
         "name in the current directory or optionally in the given directory."
     )
     missing_args_message = "You must provide a project name."
+    requires_settings = False
 
     def handle(self, **options):
         project_name = options.pop("name")
