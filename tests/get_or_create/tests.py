@@ -213,6 +213,14 @@ class GetOrCreateTests(TestCase):
         )
         self.assertFalse(created)
 
+    def test_get_or_create_on_related_queryset(self):
+        p = Publisher.objects.create(name="Acme Publishing")
+        # Create a book through the publisher.
+        book, created = p.books.all().get_or_create(name="The Book of Ed & Fred")
+        self.assertTrue(created)
+        # The publisher should have one book.
+        self.assertEqual(p.books.count(), 1)
+
 
 class GetOrCreateTestsWithManualPKs(TestCase):
     @classmethod
@@ -602,6 +610,14 @@ class UpdateOrCreateTests(TestCase):
                 self.assertIn(connection.ops.quote_name("updated"), update_sql)
                 # Name should not be updated.
                 self.assertNotIn(connection.ops.quote_name("name"), update_sql)
+
+    def test_update_or_create_on_related_queryset(self):
+        p = Publisher.objects.create(name="Acme Publishing")
+        # Create a book through the publisher.
+        book, created = p.books.all().update_or_create(name="The Book of Ed & Fred")
+        self.assertTrue(created)
+        # The publisher should have one book.
+        self.assertEqual(p.books.count(), 1)
 
 
 class UpdateOrCreateTestsWithManualPKs(TestCase):

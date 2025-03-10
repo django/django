@@ -927,6 +927,7 @@ class QuerySet(AltersData):
         Return a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
+        self._possibly_inject_fk_val(kwargs)
         # The get() needs to be targeted at the write database in order
         # to avoid potential transaction consistency problems.
         self._for_write = True
@@ -968,7 +969,7 @@ class QuerySet(AltersData):
         update_defaults = defaults or {}
         if create_defaults is None:
             create_defaults = update_defaults
-
+        self._possibly_inject_fk_val(kwargs)
         self._for_write = True
         with transaction.atomic(using=self.db):
             # Lock the row so that a concurrent update is blocked until
@@ -1039,6 +1040,16 @@ class QuerySet(AltersData):
                 )
             )
         return params
+
+    def _possibly_inject_fk_val(self, kwargs):
+        """
+        Inject the foreign key field value into kwargs if the field is known
+        from a related manager context via _known_related_objects.
+        """
+        if self._known_related_objects:
+            field, related_objects = next(iter(self._known_related_objects.items()))
+            rel_obj = next(iter(related_objects.values()))
+            kwargs[field.name] = rel_obj
 
     def _earliest(self, *fields):
         """
