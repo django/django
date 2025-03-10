@@ -11,6 +11,7 @@ from django.template.base import (
     Token,
     TokenType,
     Variable,
+    VariableDoesNotExist,
 )
 from django.template.defaultfilters import register as filter_library
 from django.test import SimpleTestCase
@@ -169,3 +170,49 @@ class ParserTests(SimpleTestCase):
             '1|two_one_opt_arg:"1"',
         ):
             FilterExpression(expr, parser)
+
+    def test_filter_numeric_argument_parsing(self):
+        p = Parser("", builtins=[filter_library])
+
+        cases = {
+            "5": 5,
+            "-5": -5,
+            "5.2": 5.2,
+            ".4": 0.4,
+            "5.2e3": 5200.0,  # 5.2 × 10³ = 5200.0.
+            "5.2E3": 5200.0,  # Case-insensitive.
+            "5.2e-3": 0.0052,  # Negative exponent.
+            "-1.5E4": -15000.0,
+            "+3.0e2": 300.0,
+            ".5e2": 50.0,  # 0.5 × 10² = 50.0
+        }
+        for num, expected in cases.items():
+            with self.subTest(num=num):
+                self.assertEqual(FilterExpression(num, p).resolve({}), expected)
+                self.assertEqual(
+                    FilterExpression(f"0|default:{num}", p).resolve({}), expected
+                )
+
+        invalid_numbers = [
+            "abc123",
+            "123abc",
+            "foo",
+            "error",
+            "1e",
+            "e400",
+            "1e.2",
+            "1e2.",
+            "1e2.0",
+            "1e2a",
+            "1e2e3",
+            "1e-",
+            "1e-a",
+        ]
+
+        for num in invalid_numbers:
+            with self.subTest(num=num):
+                self.assertIsNone(
+                    FilterExpression(num, p).resolve({}, ignore_failures=True)
+                )
+                with self.assertRaises(VariableDoesNotExist):
+                    FilterExpression(f"0|default:{num}", p).resolve({})
