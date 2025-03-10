@@ -202,7 +202,9 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* The :func:`~django.utils.html.urlize` template filter now supports using
+  ``https://`` as the default protocol via the new :setting:`URLIZE_ASSUME_HTTPS`
+  setting, improving security by ensuring URLs are accessed over HTTPS by default.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -297,6 +299,10 @@ Features deprecated in 6.0
 
 Miscellaneous
 -------------
+
+* Using ``http://`` as default protocol in :func:`~django.utils.html.urlize` is
+  deprecated in favor of ``https://``. Set ``URLIZE_ASSUME_HTTPS`` to ``True`` to
+  opt in to the new behavior, which will become the default in Django 6.2.
 
 * ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
   ``serialize_db_to_string()`` instead.
