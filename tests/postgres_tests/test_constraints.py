@@ -797,6 +797,17 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             ),
             exclude={"datespan", "start", "end", "room"},
         )
+        # Constraints with excluded fields in condition are ignored.
+        constraint.validate(
+            HotelReservation,
+            HotelReservation(
+                datespan=(datetimes[1].date(), datetimes[2].date()),
+                start=datetimes[1],
+                end=datetimes[2],
+                room=room102,
+            ),
+            exclude={"cancelled"},
+        )
 
     def test_range_overlaps_custom(self):
         class TsTzRange(Func):
