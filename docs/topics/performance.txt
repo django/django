@@ -212,9 +212,9 @@ Laziness in Django
 ------------------
 
 Django is itself quite lazy. A good example of this can be found in the
-evaluation of ``QuerySets``. :ref:`QuerySets are lazy <querysets-are-lazy>`.
+evaluation of ``QuerySet``\s. :ref:`QuerySets are lazy <querysets-are-lazy>`.
 Thus a ``QuerySet`` can be created, passed around and combined with other
-``QuerySets``, without actually incurring any trips to the database to fetch
+``QuerySet``\s, without actually incurring any trips to the database to fetch
 the items it describes. What gets passed around is the ``QuerySet`` object, not
 the collection of items that - eventually - will be required from the database.
 
