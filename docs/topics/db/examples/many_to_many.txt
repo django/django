@@ -36,7 +36,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
 What follows are examples of operations that can be performed using the Python
 API facilities.
 
-Create a few ``Publications``:
+Create a few ``Publication`` instances:
 
 .. code-block:: pycon
 
@@ -74,7 +74,7 @@ Associate the ``Article`` with a ``Publication``:
 
     >>> a1.publications.add(p1)
 
-Create another ``Article``, and set it to appear in the ``Publications``:
+Create another ``Article``, and set it to appear in its publications:
 
 .. code-block:: pycon
 
@@ -196,7 +196,8 @@ involved is a little complex):
     >>> Article.objects.exclude(publications=p2)
     <QuerySet [<Article: Django lets you build web apps easily>]>
 
-If we delete a ``Publication``, its ``Articles`` won't be able to access it:
+If we delete a ``Publication``, its related ``Article`` instances won't be able
+to access it:
 
 .. code-block:: pycon
 
@@ -207,7 +208,8 @@ If we delete a ``Publication``, its ``Articles`` won't be able to access it:
     >>> a1.publications.all()
     <QuerySet []>
 
-If we delete an ``Article``, its ``Publications`` won't be able to access it:
+If we delete an ``Article``, its related ``Publication`` instances won't be
+able to access it:
 
 .. code-block:: pycon
 
@@ -303,8 +305,8 @@ Recreate the ``Article`` and ``Publication`` we have deleted:
     >>> a2.save()
     >>> a2.publications.add(p1, p2, p3)
 
-Bulk delete some ``Publications`` - references to deleted publications should
-go:
+Bulk delete some ``Publication`` instances, and the references to deleted
+publications will no longer be included in the related entries:
 
 .. code-block:: pycon
 

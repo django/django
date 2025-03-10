@@ -164,8 +164,8 @@ To access the new value saved this way, the object must be reloaded::
    reporter.refresh_from_db()
 
 As well as being used in operations on single instances as above, ``F()`` can
-be used on ``QuerySets`` of object instances, with ``update()``. This reduces
-the two queries we were using above - the ``get()`` and the
+be used with ``update()`` to perform bulk updates on a ``QuerySet``. This
+reduces the two queries we were using above - the ``get()`` and the
 :meth:`~Model.save()` - to just one::
 
     reporter = Reporters.objects.filter(name="Tintin")
