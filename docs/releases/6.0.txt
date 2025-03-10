@@ -194,6 +194,14 @@ Models
   values concatenated into a string, separated by the ``delimiter`` string.
   This aggregate was previously supported only for PostgreSQL.
 
+Pagination
+~~~~~~~~~~
+
+* The new :class:`~django.core.paginator.AsyncPaginator` and
+  :class:`~django.core.paginator.AsyncPage` provide async implementations of
+  :class:`~django.core.paginator.Paginator` and
+  :class:`~django.core.paginator.Page` respectively.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
