@@ -45,3 +45,16 @@ QUnit.test('preserve scroll position', function(assert) {
     assert.equal(toSelectBox.options.length, selectedOptions.length);
     assert.notEqual(fromSelectBox.scrollTop, 0);
 });
+
+QUnit.test('retain optgroups', function(assert) {
+    const $ = django.jQuery;
+    $('<select id="id"></select>').appendTo('#qunit-fixture');
+    const grp = $('<optgroup label="group one">').appendTo('#id');
+    $('<option value="0">A</option>').appendTo(grp);
+    $('</optgroup>').appendTo('#id');
+    $('<option value="1">B</option>').appendTo('#id');
+    SelectBox.init('id');
+    SelectBox.redisplay('id');
+    assert.equal($('#id option').length, 2);
+    assert.equal($('#id optgroup').length, 1);
+});
