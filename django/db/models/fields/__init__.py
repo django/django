@@ -82,6 +82,7 @@ class NOT_PROVIDED:
 
 # The values to use for "blank" in SelectFields. Will be appended to the start
 # of most "choices" lists.
+# ToDo: write deprecation notice per Trac issue #35870.
 BLANK_CHOICE_DASH = [("", "---------")]
 
 
@@ -1057,7 +1058,7 @@ class Field(RegisterLookupMixin):
     def get_choices(
         self,
         include_blank=True,
-        blank_choice=BLANK_CHOICE_DASH,
+        blank_choice=None,
         limit_choices_to=None,
         ordering=(),
     ):
@@ -1065,6 +1066,8 @@ class Field(RegisterLookupMixin):
         Return choices with a default blank choices included, for use
         as <select> choices for this field.
         """
+        if blank_choice is None:
+            blank_choice = [("", settings.BLANK_CHOICE_LABEL)]
         if self.choices is not None:
             if include_blank:
                 return BlankChoiceIterator(self.choices, blank_choice)
