@@ -39,8 +39,7 @@ class Serializer(PythonSerializer):
         if self.options.get("indent"):
             self.stream.write("\n")
         self.stream.write("]")
-        if self.options.get("indent"):
-            self.stream.write("\n")
+        self.stream.write("\n")
 
     def end_object(self, obj):
         # self._current has the field data
