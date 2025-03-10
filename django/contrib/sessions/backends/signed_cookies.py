@@ -13,9 +13,9 @@ class SessionStore(SessionBase):
             return signing.loads(
                 self.session_key,
                 serializer=self.serializer,
-                # This doesn't handle non-default expiry dates, see #19201
                 max_age=self.get_session_cookie_age(),
                 salt="django.contrib.sessions.backends.signed_cookies",
+                expiration_key="_session_expiry",
             )
         except Exception:
             # BadSignature, ValueError, or unpickling exceptions. If any of
