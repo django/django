@@ -1836,7 +1836,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
             limit_choices_to={"is_staff": True},
         )
 
-    causes the corresponding field on the ``ModelForm`` to list only ``Users``
+    causes the corresponding field on the ``ModelForm`` to list only ``User``\s
     that have ``is_staff=True``. This may be helpful in the Django admin.
 
     The callable form can be helpful, for instance, when used in conjunction
