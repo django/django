@@ -72,6 +72,27 @@ class ParserTests(SimpleTestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             FilterExpression("article._hidden|upper", p)
 
+    def test_cannot_parse_characters(self):
+        p = Parser("", builtins=[filter_library])
+        for filter_expression, characters in [
+            ('<>|default:"Default"|upper', '|<>||default:"Default"|upper'),
+            ("test|<>|upper", "test||<>||upper"),
+        ]:
+            with self.subTest(filter_expression=filter_expression):
+                with self.assertRaisesMessage(
+                    TemplateSyntaxError,
+                    f"Could not parse some characters: {characters}",
+                ):
+                    FilterExpression(filter_expression, p)
+
+    def test_cannot_find_variable(self):
+        p = Parser("", builtins=[filter_library])
+        with self.assertRaisesMessage(
+            TemplateSyntaxError,
+            'Could not find variable at start of |default:"Default"',
+        ):
+            FilterExpression('|default:"Default"', p)
+
     def test_variable_parsing(self):
         c = {"article": {"section": "News"}}
         self.assertEqual(Variable("article.section").resolve(c), "News")
