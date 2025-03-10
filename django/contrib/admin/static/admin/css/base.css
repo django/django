@@ -118,6 +118,15 @@ a:focus {
     text-decoration: underline;
 }
 
+a:not(
+    [role="button"],
+    #header a,
+    #nav-sidebar a,
+    #content-main.app-list a
+) {
+    text-decoration: underline;
+}
+
 a img {
     border: none;
 }
