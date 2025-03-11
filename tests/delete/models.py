@@ -136,6 +136,29 @@ class Avatar(models.Model):
     desc = models.TextField(null=True)
 
 
+class LargeDeleteReferent(models.Model):
+    pass
+
+
+class LargeDeleteReferrer(models.Model):
+    protect = models.ForeignKey(
+        LargeDeleteReferent,
+        on_delete=models.PROTECT,
+        related_name="protecting",
+    )
+    cascade = models.ForeignKey(
+        LargeDeleteReferent,
+        on_delete=models.CASCADE,
+        related_name="cascading",
+    )
+    set_null = models.ForeignKey(
+        LargeDeleteReferent,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="setting_null",
+    )
+
+
 # This model is used to test a duplicate query regression (#25685)
 class AvatarProxy(Avatar):
     class Meta:

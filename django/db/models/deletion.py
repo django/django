@@ -1,7 +1,7 @@
 from collections import Counter, defaultdict
-from functools import partial, reduce
+from functools import partial
 from itertools import chain
-from operator import attrgetter, or_
+from operator import attrgetter
 
 from django.db import IntegrityError, connections, models, transaction
 from django.db.models import query_utils, signals, sql
@@ -480,9 +480,8 @@ class Collector:
                         updates.append(instances)
                     else:
                         objs.extend(instances)
-                if updates:
-                    combined_updates = reduce(or_, updates)
-                    combined_updates.update(**{field.name: value})
+                for update in updates:
+                    update.update(**{field.name: value})
                 if objs:
                     model = objs[0].__class__
                     query = sql.UpdateQuery(model)

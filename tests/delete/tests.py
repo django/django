@@ -1,10 +1,13 @@
+import re
 from math import ceil
+from unittest import mock
 
 from django.db import connection, models
 from django.db.models import ProtectedError, Q, RestrictedError
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from .models import (
     B1,
@@ -23,6 +26,7 @@ from .models import (
     GenericDeleteBottom,
     HiddenUser,
     HiddenUserProfile,
+    LargeDeleteReferent,
     M,
     M2MFrom,
     M2MTo,
@@ -544,6 +548,41 @@ class DeletionTests(TestCase):
         self.assertNumQueries(expected_num_queries, s.delete)
         self.assertFalse(S.objects.exists())
         self.assertFalse(T.objects.exists())
+
+    def test_large_delete_batch_size(self):
+        # Deleting rows should batch queries to avoid using more SQL parameters
+        # than the DBMS allows. This should apply to both the direct deletion
+        # statement and any selects/deletes/updates to models with references
+        # back to the table being deleted, needed for their on_delete options.
+
+        # Direct deletions are batched by constant GET_ITERATOR_CHUNK_SIZE,
+        # but related queries go off the backend's bulk_batch_size which is
+        # expected to return something suitable to avoid hitting param limits.
+        # Override the bulk_batch_size so we aren't dependent on backend, set
+        # to match the constant size as we won't be able to get all our queries
+        # any smaller than that.
+        BATCH_SIZE = GET_ITERATOR_CHUNK_SIZE
+        TEST_SIZE = BATCH_SIZE * 2
+        with mock.patch.object(
+            connection.ops, "bulk_batch_size", return_value=BATCH_SIZE
+        ):
+
+            objs = [LargeDeleteReferent() for i in range(TEST_SIZE)]
+            LargeDeleteReferent.objects.bulk_create(objs)
+            with CaptureQueriesContext(connection) as queries:
+                LargeDeleteReferent.objects.all().delete()
+
+        # None of the queries involved in the deletion should have used more
+        # parameters than a batch's worth. We can't directly count the params
+        # as DebugCursorWrapper doesn't keep that information, but we can guess
+        # by counting the number of ids in IN (...) clauses.
+        for query in queries.captured_queries:
+            sql = query["sql"]
+            params_count = sum(
+                match.group().count(",") + 1
+                for match in re.finditer(r"IN \(([^)]*)\)", sql)
+            )
+            self.assertLessEqual(params_count, BATCH_SIZE, "Too many params: %s" % sql)
 
     def test_delete_with_keeping_parents(self):
         child = RChild.objects.create()
