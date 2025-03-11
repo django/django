@@ -633,19 +633,18 @@ constant_string = constant_string.replace("\n", "")
 
 filter_raw_string = r"""
 ^(?P<constant>%(constant)s)|
-^(?P<var>[%(var_chars)s]+|%(num)s)|
+^(?P<var>[%(var_chars)s]+)|
  (?:\s*%(filter_sep)s\s*
      (?P<filter_name>\w+)
          (?:%(arg_sep)s
              (?:
               (?P<constant_arg>%(constant)s)|
-              (?P<var_arg>[%(var_chars)s]+|%(num)s)
+              (?P<var_arg>[%(var_chars)s]+)
              )
          )?
  )""" % {
     "constant": constant_string,
-    "num": r"[-+.]?\d[\d.e]*",
-    "var_chars": r"\w\.",
+    "var_chars": r"\w\.\+-",
     "filter_sep": re.escape(FILTER_SEPARATOR),
     "arg_sep": re.escape(FILTER_ARGUMENT_SEPARATOR),
 }
