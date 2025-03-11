@@ -489,7 +489,8 @@ class SerializerAPITests(SimpleTestCase):
         self.assertIs(serializer.stream_class, File)
         self.assertIsInstance(serializer.stream, File)
         self.assertEqual(
-            data, '[{"model": "serializers.score", "pk": 1, "fields": {"score": 3.4}}]'
+            data,
+            '[{"model": "serializers.score", "pk": 1, "fields": {"score": 3.4}}]\n',
         )
 
 
