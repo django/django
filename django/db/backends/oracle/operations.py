@@ -24,6 +24,7 @@ from django.utils.regex_helper import _lazy_re_compile
 from .base import Database
 from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
 
+
 class DatabaseOperations(BaseDatabaseOperations):
     # Oracle uses NUMBER(5), NUMBER(11), and NUMBER(19) for integer fields.
     # SmallIntegerField uses NUMBER(11) instead of NUMBER(5), which is used by
@@ -343,7 +344,7 @@ END;
 
         template = 'SELECT "%s".currval' + self.connection.features.bare_select_suffix
         cursor.execute(template % sq_name)
-        
+
         return cursor.fetchone()[0]
 
     def lookup_cast(self, lookup_type, internal_type=None):

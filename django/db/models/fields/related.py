@@ -1679,13 +1679,33 @@ class ManyToManyField(RelatedField):
                             possible_field_names.append(f.name)
                     if possible_field_names:
                         hint = (
-                            "Did you mean one of the following foreign keys to '%s': "
-                            "%s?"
+                            "Did you mean one of the following foreign keys to '%s': %s?"
                             % (
-                                related_model._meta.object_name,
+                                related_model if isinstance(related_model, str) else related_model._meta.object_name,
                                 ", ".join(possible_field_names),
                             )
                         )
+
+                        if (
+                            isinstance(field, ForeignKey)
+                            and getattr(field.remote_field, "model", None)
+                            == related_model
+                        ):
+                            related_object_name = (
+                                related_model if isinstance(related_model, str) else related_model._meta.object_name
+                            )
+                            errors.append(
+                                checks.Error(
+                                    "'%s.%s' is not a foreign key to '%s'."
+                                    % (
+                                        through._meta.object_name,
+                                        field_name,
+                                        related_object_name,
+                                    ),
+                                    hint=hint,  
+                                    obj=self,
+                                )
+                            )
                     else:
                         hint = None
 

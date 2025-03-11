@@ -1,6 +1,7 @@
 import warnings
-from django.test import TestCase
+
 from django.db import connection
+from django.test import TestCase
 
 
 class OracleDeprecationTests(TestCase):
@@ -25,8 +26,7 @@ class OracleDeprecationTests(TestCase):
 
             self.assertTrue(
                 any(
-                    "The 'use_returning_into' option is deprecated"
-                    in str(warn.message)
+                    "The 'use_returning_into' option is deprecated" in str(warn.message)
                     for warn in w
                 ),
                 "Deprecation warning message is incorrect.",

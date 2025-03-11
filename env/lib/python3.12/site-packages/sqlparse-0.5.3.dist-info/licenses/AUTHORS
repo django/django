@@ -1,0 +1,86 @@
+python-sqlparse is written and maintained by Andi Albrecht <albrecht.andi@gmail.com>.
+
+This module contains code (namely the lexer and filter mechanism) from
+the pygments project that was written by Georg Brandl.
+
+This module contains code (Python 2/3 compatibility) from the six
+project: https://bitbucket.org/gutworth/six.
+
+Alphabetical list of contributors:
+* Adam Greenhall <agreenhall@lyft.com>
+* Adam Johnson <me@adamj.eu>
+* Aki Ariga <chezou+github@gmail.com>
+* Alexander Beedie <ayembee@gmail.com>
+* Alexey Malyshev <nostrict@gmail.com>
+* ali-tny <aliteeney@googlemail.com>
+* andrew deryabin <github@djsf.com>
+* Andrew Tipton <andrew.tipton@compareglobalgroup.com>
+* atronah <atronah.ds@gmail.com>
+* casey <casey@cloudera.com>
+* Cauê Beloni <cbeloni@gmail.com>
+* Christian Clauss <cclauss@me.com>
+* circld <circld1@gmail.com>
+* Corey Zumar <corey.zumar@databricks.com>
+* Cristian Orellana <cristiano@groupon.com>
+* Dag Wieers <dag@wieers.com>
+* Daniel Harding <dharding@living180.net>
+* Darik Gamble <darik.gamble@gmail.com>
+* Demetrio92 <Demetrio.Rodriguez.T@gmail.com>
+* Dennis Taylor <dennis.taylor@clio.com>
+* Dvořák Václav <Vaclav.Dvorak@ysoft.com>
+* Erik Cederstrand <erik@adamatics.com>
+* Florian Bauer <florian.bauer@zmdi.com>
+* Fredy Wijaya <fredy.wijaya@gmail.com>
+* Gavin Wahl <gwahl@fusionbox.com>
+* Georg Traar <georg@crate.io>
+* griff <70294474+griffatrasgo@users.noreply.github.com>
+* Hugo van Kemenade <hugovk@users.noreply.github.com>
+* hurcy <cinyoung.hur@gmail.com>
+* Ian Robertson <ian.robertson@capitalone.com>
+* Igor Khrol <igor.khrol@automattic.com>
+* JacekPliszka <Jacek.Pliszka@gmail.com>
+* JavierPan <PeterSandwich@users.noreply.github.com>
+* Jean-Martin Archer <jm@jmartin.ca>
+* Jesús Leganés Combarro "Piranna" <piranna@gmail.com>
+* Johannes Hoff <johshoff@gmail.com>
+* John Bodley <john.bodley@airbnb.com>
+* Jon Dufresne <jon.dufresne@gmail.com>
+* Josh Soref <jsoref@users.noreply.github.com>
+* Kevin Jing Qiu <kevin.jing.qiu@gmail.com>
+* koljonen <koljonen@outlook.com>
+* Likai Liu <liulk@likai.org>
+* Long Le Xich <codenamelxl@users.noreply.github.com>
+* mathilde.oustlant <mathilde.oustlant@ext.cdiscount.com>
+* Michael Schuller <chick@mschuller.net>
+* Mike Amy <cocoade@googlemail.com>
+* mulos <daniel.strackbein@gmail.com>
+* Oleg Broytman <phd@phdru.name>
+* osmnv <80402144+osmnv@users.noreply.github.com>
+* Patrick Schemitz <patrick.schemitz@digitalbriefkasten.de>
+* Pi Delport <pjdelport@gmail.com>
+* Prudhvi Vatala <pvatala@gmail.com>
+* quest <quest@wonky.windwards.net>
+* Robert Nix <com.github@rnix.org>
+* Rocky Meza <rmeza@fusionbox.com>
+* Romain Rigaux <romain.rigaux@gmail.com>
+* Rowan Seymour <rowanseymour@gmail.com>
+* Ryan Wooden <rygwdn@gmail.com>
+* saaj <id@saaj.me>
+* Shen Longxing <shenlongxing2012@gmail.com>
+* Simon Heisterkamp <she@delegate.dk>
+* Sjoerd Job Postmus
+* skryzh <sergeikryzh95@gmail.com>
+* Soloman Weng <soloman1124@gmail.com>
+* spigwitmer <itgpmc@gmail.com>
+* Tao Wang <twang2218@gmail.com>
+* Tenghuan <tenghuanhe@gmail.com>
+* Tim Graham <timograham@gmail.com>
+* Victor Hahn <info@victor-hahn.de>
+* Victor Uriarte <vmuriart@gmail.com>
+* Ville Skyttä <ville.skytta@iki.fi>
+* vthriller <farreva232@yandex.ru>
+* wayne.wuw <wayne.wuw@alibaba-inc.com>
+* Will Jones <willjones127@gmail.com>
+* William Ivanski <william.ivanski@gmail.com>
+* Yago Riveiro <yago.riveiro@gmail.com>
+* Zi-Xuan Fu <r33s3n6@gmail.com>

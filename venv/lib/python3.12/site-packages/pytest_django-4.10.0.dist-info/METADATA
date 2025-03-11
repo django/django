@@ -1,0 +1,162 @@
+Metadata-Version: 2.2
+Name: pytest-django
+Version: 4.10.0
+Summary: A Django plugin for pytest.
+Author-email: Andreas Pelme <andreas@pelme.se>
+Maintainer-email: Andreas Pelme <andreas@pelme.se>
+License: pytest-django is released under the BSD (3-clause) license
+        ----------------------------------------------------------
+        Copyright (c) 2015-2018, pytest-django authors (see AUTHORS file)
+        All rights reserved.
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+         * Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+         * Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+         * The names of its contributors may not be used to endorse or promote products
+           derived from this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+        ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+        ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+        (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+        LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+        ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+        (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+        SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+        
+        
+        This version of pytest-django is a fork of pytest_django created by Ben Firshman.
+        ---------------------------------------------------------------------------------
+        Copyright (c) 2009, Ben Firshman
+        All rights reserved.
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+         * Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+         * Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+         * The names of its contributors may not be used to endorse or promote products
+           derived from this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+        ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+        ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+        (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+        LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+        ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+        (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+        SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+        
+Project-URL: Documentation, https://pytest-django.readthedocs.io/
+Project-URL: Repository, https://github.com/pytest-dev/pytest-django
+Project-URL: Changelog, https://pytest-django.readthedocs.io/en/latest/changelog.html
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 4.2
+Classifier: Framework :: Django :: 5.0
+Classifier: Framework :: Django :: 5.1
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Testing
+Requires-Python: >=3.8
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+License-File: AUTHORS
+Requires-Dist: pytest>=7.0.0
+Provides-Extra: docs
+Requires-Dist: sphinx; extra == "docs"
+Requires-Dist: sphinx_rtd_theme; extra == "docs"
+Provides-Extra: testing
+Requires-Dist: Django; extra == "testing"
+Requires-Dist: django-configurations>=2.0; extra == "testing"
+
+.. image:: https://img.shields.io/pypi/v/pytest-django.svg?style=flat
+    :alt: PyPI Version
+    :target: https://pypi.python.org/pypi/pytest-django
+
+.. image:: https://img.shields.io/pypi/pyversions/pytest-django.svg
+    :alt: Supported Python versions
+    :target: https://pypi.python.org/pypi/pytest-django
+
+.. image:: https://github.com/pytest-dev/pytest-django/workflows/main/badge.svg
+    :alt: Build Status
+    :target: https://github.com/pytest-dev/pytest-django/actions
+
+.. image:: https://img.shields.io/pypi/djversions/pytest-django.svg
+   :alt: Supported Django versions
+   :target: https://pypi.org/project/pytest-django/
+
+.. image:: https://img.shields.io/codecov/c/github/pytest-dev/pytest-django.svg?style=flat
+    :alt: Coverage
+    :target: https://codecov.io/gh/pytest-dev/pytest-django
+
+Welcome to pytest-django!
+=========================
+
+pytest-django allows you to test your Django project/applications with the
+`pytest testing tool <https://pytest.org/>`_.
+
+* `Quick start / tutorial
+  <https://pytest-django.readthedocs.io/en/latest/tutorial.html>`_
+* `Changelog <https://pytest-django.readthedocs.io/en/latest/changelog.html>`_
+* Full documentation: https://pytest-django.readthedocs.io/en/latest/
+* `Contribution docs
+  <https://pytest-django.readthedocs.io/en/latest/contributing.html>`_
+* Version compatibility:
+
+  * Django: 4.2, 5.0, 5.1 and latest main branch (compatible at the time
+    of each release)
+  * Python: CPython>=3.8 or PyPy 3
+  * pytest: >=7.0
+
+  For compatibility with older versions, use previous pytest-django releases.
+
+* Licence: BSD
+* `All contributors <https://github.com/pytest-dev/pytest-django/contributors>`_
+* GitHub repository: https://github.com/pytest-dev/pytest-django
+* `Issue tracker <https://github.com/pytest-dev/pytest-django/issues>`_
+* `Python Package Index (PyPI) <https://pypi.python.org/pypi/pytest-django/>`_
+
+Install pytest-django
+---------------------
+
+::
+
+    pip install pytest-django
+
+Why would I use this instead of Django's `manage.py test` command?
+------------------------------------------------------------------
+
+Running your test suite with pytest-django allows you to tap into the features
+that are already present in pytest. Here are some advantages:
+
+* `Manage test dependencies with pytest fixtures. <https://pytest.org/en/latest/how-to/fixtures.html>`_
+* Less boilerplate tests: no need to import unittest, create a subclass with methods. Write tests as regular functions.
+* Database re-use: no need to re-create the test database for every test run.
+* Run tests in multiple processes for increased speed (with the pytest-xdist plugin).
+* Make use of other `pytest plugins <https://pytest.org/en/latest/how-to/plugins.html>`_.
+* Works with both worlds: Existing unittest-style TestCase's still work without any modifications.
+
+See the `pytest documentation <https://pytest.org/en/latest/>`_ for more information on pytest itself.
