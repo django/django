@@ -293,7 +293,8 @@ of each library are the first to add or confirm compatibility with Python 3.12:
 Miscellaneous
 -------------
 
-* ...
+* The :ref:`JSON <serialization-formats-json>` serializer now writes a newline
+  at the end of the output, even without the ``indent`` option set.
 
 .. _deprecated-features-6.0:
 
