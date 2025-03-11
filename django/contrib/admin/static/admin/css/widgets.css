@@ -352,8 +352,11 @@ table p.datetime {
 
 .datetimeshortcuts .date-icon {
     background: url(../img/icon-calendar.svg) 0 0 no-repeat;
-    background-size: 24px auto;
+    background-size: 16px auto;
     top: -1px;
+    width: 16px; 
+    height: 16px;      
+    display: inline-block;
 }
 
 .datetimeshortcuts a:focus .date-icon,
@@ -480,6 +483,9 @@ span.clearable-file-input label {
 
 .calendar td.today a {
     font-weight: 700;
+    background: var(--secondary);
+    color: var(--button-fg);
+
 }
 
 .calendar td a, .timelist a {
@@ -531,6 +537,9 @@ span.clearable-file-input label {
     height: 15px;
     text-indent: -9999px;
     padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
 }
 
 .calendarnav-previous {
@@ -545,7 +554,6 @@ span.clearable-file-input label {
 
 .calendar-cancel {
     margin: 0;
-    padding: 4px 0;
     font-size: 0.75rem;
     background: var(--close-button-bg);
     border-top: 1px solid var(--border-color);
@@ -571,14 +579,50 @@ ul.timelist, .timelist li {
     padding: 2px;
 }
 
+.datetimeshortcuts button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--link-fg);
+    cursor: pointer;
+}
+
+.datetimeshortcuts button:hover {
+    color: var(--link-hover-color);
+}
+
+.calendar-shortcuts button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--link-fg);
+    font: inherit;
+    cursor: pointer;
+}
+
+.calendar-shortcuts button:hover {
+    color: var(--link-hover-color);
+}
+
+.calendar-cancel button {
+    background: none;
+    border: none;
+    padding: 4px 0;
+    color: var(--button-fg);
+    font: inherit;
+    cursor: pointer;
+}
+
 /* EDIT INLINE */
 
 .inline-deletelink {
     float: right;
     text-indent: -9999px;
     background: url(../img/inline-delete.svg) 0 0 no-repeat;
-    width: 1.5rem;
-    height: 1.5rem;
+    background-size: 1rem 1rem; 
+    width: 1rem;                
+    height: 1rem;               
     border: 0px none;
     margin-bottom: .25rem;
 }

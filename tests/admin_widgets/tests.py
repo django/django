@@ -1214,7 +1214,7 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 
         now = datetime.now()
         for shortcut in shortcuts:
-            shortcut.find_element(By.TAG_NAME, "a").click()
+            shortcut.find_element(By.TAG_NAME, "button").click()
 
         # There is a time zone mismatch warning.
         # Warning: This would effectively fail if the TIME_ZONE defined in the
