@@ -166,9 +166,6 @@ Minor features
   * :meth:`.User.ahas_perm`
   * :meth:`.User.ahas_perms`
   * :meth:`.User.ahas_module_perms`
-  * :meth:`.User.aget_user_permissions`
-  * :meth:`.User.aget_group_permissions`
-  * :meth:`.User.ahas_perm`
   * :meth:`.ModelBackend.aauthenticate`
   * :meth:`.ModelBackend.aget_user_permissions`
   * :meth:`.ModelBackend.aget_group_permissions`
