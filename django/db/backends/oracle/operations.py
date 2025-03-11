@@ -340,6 +340,7 @@ END;
         return statement
 
     def last_insert_id(self, cursor, table_name, pk_name):
+        
         sq_name = self._get_sequence_name(cursor, strip_quotes(table_name), pk_name)
 
         template = 'SELECT "%s".currval' + self.connection.features.bare_select_suffix
