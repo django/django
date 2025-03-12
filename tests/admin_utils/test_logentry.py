@@ -254,12 +254,13 @@ class LogEntryTests(TestCase):
         content_type = ContentType.objects.get_for_model(self.a1)
         self.assertEqual(len(queryset), 3)
         with self.assertNumQueries(1):
-            LogEntry.objects.log_actions(
+            result = LogEntry.objects.log_actions(
                 self.user.pk,
                 queryset,
                 DELETION,
                 change_message=msg,
             )
+        self.assertEqual(len(result), len(queryset))
         logs = (
             LogEntry.objects.filter(action_flag=DELETION)
             .order_by("id")
@@ -283,8 +284,54 @@ class LogEntryTests(TestCase):
             )
             for obj in queryset
         ]
+        result_logs = [
+            (
+                entry.user_id,
+                entry.content_type_id,
+                str(entry.object_id),
+                entry.object_repr,
+                entry.action_flag,
+                entry.change_message,
+            )
+            for entry in result
+        ]
+        self.assertSequenceEqual(logs, result_logs)
         self.assertSequenceEqual(logs, expected_log_values)
         self.assertEqual(self.signals, [])
+
+    def test_log_actions_single_object_param(self):
+        queryset = Article.objects.filter(pk=self.a1.pk)
+        msg = "Deleted Something"
+        content_type = ContentType.objects.get_for_model(self.a1)
+        self.assertEqual(len(queryset), 1)
+        for single_object in (True, False):
+            self.signals = []
+            with self.subTest(single_object=single_object), self.assertNumQueries(1):
+                result = LogEntry.objects.log_actions(
+                    self.user.pk,
+                    queryset,
+                    DELETION,
+                    change_message=msg,
+                    single_object=single_object,
+                )
+                if single_object:
+                    self.assertIsInstance(result, LogEntry)
+                    entry = result
+                else:
+                    self.assertIsInstance(result, list)
+                    self.assertEqual(len(result), 1)
+                    entry = result[0]
+                self.assertEqual(entry.user_id, self.user.pk)
+                self.assertEqual(entry.content_type_id, content_type.id)
+                self.assertEqual(str(entry.object_id), str(self.a1.pk))
+                self.assertEqual(entry.object_repr, str(self.a1))
+                self.assertEqual(entry.action_flag, DELETION)
+                self.assertEqual(entry.change_message, msg)
+                expected_signals = [
+                    ("pre_save", entry),
+                    ("post_save", entry, True),
+                ]
+                self.assertEqual(self.signals, expected_signals)
 
     def test_recentactions_without_content_type(self):
         """
