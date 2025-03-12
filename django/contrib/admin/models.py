@@ -51,7 +51,9 @@ class LogEntryManager(models.Manager):
             change_message=change_message,
         )
 
-    def log_actions(self, user_id, queryset, action_flag, change_message=""):
+    def log_actions(
+        self, user_id, queryset, action_flag, change_message="", *, single_object=False
+    ):
         # RemovedInDjango60Warning.
         if type(self).log_action != LogEntryManager.log_action:
             warnings.warn(
@@ -94,7 +96,9 @@ class LogEntryManager(models.Manager):
         if len(log_entry_list) == 1:
             instance = log_entry_list[0]
             instance.save()
-            return instance
+            if single_object:
+                return instance
+            return [instance]
 
         return self.model.objects.bulk_create(log_entry_list)
 
