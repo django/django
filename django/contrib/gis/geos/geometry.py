@@ -353,7 +353,7 @@ class GEOSGeometryBase(GEOSBase):
         two Geometries match the elements in pattern.
         """
         if not isinstance(pattern, str) or len(pattern) > 9:
-            raise GEOSException("invalid intersection matrix pattern")
+            raise GEOSException("Invalid intersection matrix pattern.")
         return capi.geos_relatepattern(self.ptr, other.ptr, force_bytes(pattern))
 
     def touches(self, other):
@@ -506,7 +506,9 @@ class GEOSGeometryBase(GEOSBase):
             # source SRS.
             srid = None
         elif srid is None or srid < 0:
-            raise GEOSException("Calling transform() with no SRID set is not supported")
+            raise GEOSException(
+                "Calling transform() with no SRID set is not supported."
+            )
 
         # Creating an OGR Geometry, which is then transformed.
         g = gdal.OGRGeometry(self._ogr_ptr(), srid)
