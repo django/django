@@ -1179,7 +1179,7 @@ To query for missing keys, use the ``isnull`` lookup:
         ...     },
         ... )
         <Dog: Shep>
-        >>> Dogs.objects.annotate(
+        >>> Dog.objects.annotate(
         ...     first_breed=KT("data__breed__1"), owner_name=KT("data__owner__name")
         ... ).filter(first_breed__startswith="lhasa", owner_name="Bob")
         <QuerySet [<Dog: Shep>]>
