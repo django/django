@@ -1,18 +1,18 @@
-======================
+========================
 Form Field Guidelines
-======================
+========================
 
 .. _form-field-formats:
 
 Communicating Input Formats
-==========================
+============================
 
 When using form fields that expect specific formats (like dates, times, or JSON),
 it's important to communicate these requirements to your users. Here are some
 best practices:
 
 Using help_text
---------------
+----------------
 
 The ``help_text`` parameter is the recommended way to communicate format requirements::
 
@@ -25,7 +25,7 @@ The ``help_text`` parameter is the recommended way to communicate format require
     )
 
 Common Field Formats
-------------------
+---------------------
 
 Here are the default formats expected by various Django form fields:
 
@@ -39,7 +39,7 @@ Here are the default formats expected by various Django form fields:
 * IPAddressField: "192.168.0.1" (IPv4) or "2001:db8::1" (IPv6)
 
 Best Practices
-------------
+---------------
 
 1. Always communicate format requirements upfront through ``help_text`` or labels
 2. Consider using HTML5 input types where supported (e.g., ``type="date"``)
@@ -48,7 +48,7 @@ Best Practices
 5. Consider using widgets with built-in format guidance (e.g., date pickers)
 
 Example Implementation
--------------------
+-----------------------
 
 Here's a complete example showing how to implement these guidelines::
 
