@@ -63,19 +63,15 @@ Here's a complete example showing how to implement these guidelines:
         name = forms.CharField(help_text="Enter the event name")
         date = forms.DateField(
             help_text="Enter date in YYYY-MM-DD format",
-            error_messages={
-                "invalid": "Please enter a valid date in YYYY-MM-DD format.",
-            },
+            error_messages={"invalid": "Please enter a valid date in YYYY-MM-DD format."},
         )
         time = forms.TimeField(
             help_text="Enter time in HH:MM format (24-hour)",
-            error_messages={
-                "invalid": "Please enter a valid time in HH:MM format.",
-            },
+            error_messages={"invalid": "Please enter a valid time in HH:MM format."},
         )
         duration = forms.DurationField(
             help_text="Enter duration as HH:MM:SS",
             error_messages={
-                "invalid": "Please enter a valid duration (e.g., 01:30:00 for 1.5 hours).",
+                "invalid": "Please enter a valid duration (e.g., 01:30:00 for 1.5 hours)."
             },
         )
