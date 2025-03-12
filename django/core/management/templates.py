@@ -105,10 +105,10 @@ class TemplateCommand(BaseCommand):
             if app_or_project == "app":
                 self.validate_name(os.path.basename(top_dir), "directory")
             if not os.path.exists(top_dir):
-                raise CommandError(
-                    "Destination directory '%s' does not "
-                    "exist, please create it first." % top_dir
-                )
+                try:
+                    os.makedirs(top_dir)
+                except OSError as e:
+                    raise CommandError(e)
 
         # Find formatters, which are external executables, before input
         # from the templates can sneak into the path.
