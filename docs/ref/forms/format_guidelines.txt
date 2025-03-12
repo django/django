@@ -14,7 +14,9 @@ best practices:
 Using help_text
 ----------------
 
-The ``help_text`` parameter is the recommended way to communicate format requirements::
+The ``help_text`` parameter is the recommended way to communicate format requirements:
+
+.. code-block:: python
 
     date_field = forms.DateField(
         help_text="Enter date in YYYY-MM-DD format (e.g., 2024-03-21)"
@@ -29,14 +31,14 @@ Common Field Formats
 
 Here are the default formats expected by various Django form fields:
 
-* DateField: "YYYY-MM-DD" (ISO 8601 format)
-* TimeField: "HH:MM[:ss[.uuuuuu]]"
-* DateTimeField: "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
-* DurationField: "DD HH:MM:SS.uuuuuu" or "HH:MM:SS.uuuuuu"
+* DateField: :code:`YYYY-MM-DD` (ISO 8601 format)
+* TimeField: :code:`HH:MM[:ss[.uuuuuu]]`
+* DateTimeField: :code:`YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]`
+* DurationField: :code:`DD HH:MM:SS.uuuuuu` or :code:`HH:MM:SS.uuuuuu`
 * JSONField: Valid JSON string
-* UUIDField: "12345678-1234-5678-1234-567812345678"
+* UUIDField: :code:`12345678-1234-5678-1234-567812345678`
 * SlugField: URL-friendly string (only letters, numbers, underscores, or hyphens)
-* IPAddressField: "192.168.0.1" (IPv4) or "2001:db8::1" (IPv6)
+* IPAddressField: :code:`192.168.0.1` (IPv4) or :code:`2001:db8::1` (IPv6)
 
 Best Practices
 ---------------
