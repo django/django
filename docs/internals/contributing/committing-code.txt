@@ -11,8 +11,7 @@ contribute code to Django, look at :doc:`writing-code/working-with-git` instead.
 Handling pull requests
 ======================
 
-Since Django is hosted on GitHub, patches are provided in the form of pull
-requests.
+Django is hosted on GitHub and uses pull requests (PRs) for contributions.
 
 When committing a pull request, make sure each individual commit matches the
 commit guidelines described below. Contributors are expected to provide the
@@ -74,10 +73,10 @@ line.
 When rewriting the commit history of a pull request, the goal is to make
 Django's commit history as usable as possible:
 
-* If a patch contains back-and-forth commits, then rewrite those into one.
-  For example, if a commit adds some code and a second commit fixes stylistic
-  issues introduced in the first commit, those commits should be squashed
-  before merging.
+* If a contribution contains back-and-forth commits, then rewrite those into
+  one. For example, if a commit adds some code and a second commit fixes
+  stylistic issues introduced in the first commit, those commits should be
+  squashed before merging.
 
 * Separate changes to different commits by logical grouping: if you do a
   stylistic cleanup at the same time as you do other changes to a file,
@@ -89,7 +88,7 @@ Django's commit history as usable as possible:
 * Tests should pass and docs should build after each commit. Neither the
   tests nor the docs should emit warnings.
 
-* Trivial and small patches usually are best done in one commit. Medium to
+* Trivial and small changes usually are best done in one commit. Medium to
   large work may be split into multiple commits if it makes sense.
 
 Practicality beats purity, so it is up to each merger to decide how much
