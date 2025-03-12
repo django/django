@@ -1,0 +1,78 @@
+======================
+Form Field Guidelines
+======================
+
+.. _form-field-formats:
+
+Communicating Input Formats
+==========================
+
+When using form fields that expect specific formats (like dates, times, or JSON),
+it's important to communicate these requirements to your users. Here are some
+best practices:
+
+Using help_text
+--------------
+
+The ``help_text`` parameter is the recommended way to communicate format requirements::
+
+    date_field = forms.DateField(
+        help_text="Enter date in YYYY-MM-DD format (e.g., 2024-03-21)"
+    )
+
+    time_field = forms.TimeField(
+        help_text="Enter time in HH:MM[:ss[.uuuuuu]] format (e.g., 14:30 or 14:30:00)"
+    )
+
+Common Field Formats
+------------------
+
+Here are the default formats expected by various Django form fields:
+
+* DateField: "YYYY-MM-DD" (ISO 8601 format)
+* TimeField: "HH:MM[:ss[.uuuuuu]]"
+* DateTimeField: "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]"
+* DurationField: "DD HH:MM:SS.uuuuuu" or "HH:MM:SS.uuuuuu"
+* JSONField: Valid JSON string
+* UUIDField: "12345678-1234-5678-1234-567812345678"
+* SlugField: URL-friendly string (only letters, numbers, underscores, or hyphens)
+* IPAddressField: "192.168.0.1" (IPv4) or "2001:db8::1" (IPv6)
+
+Best Practices
+------------
+
+1. Always communicate format requirements upfront through ``help_text`` or labels
+2. Consider using HTML5 input types where supported (e.g., ``type="date"``)
+3. Provide example values to help users understand the expected format
+4. Use clear error messages that indicate the expected format
+5. Consider using widgets with built-in format guidance (e.g., date pickers)
+
+Example Implementation
+-------------------
+
+Here's a complete example showing how to implement these guidelines::
+
+    from django import forms
+
+    class EventForm(forms.Form):
+        name = forms.CharField(
+            help_text="Enter the event name"
+        )
+        date = forms.DateField(
+            help_text="Enter date in YYYY-MM-DD format",
+            error_messages={
+                'invalid': 'Please enter a valid date in YYYY-MM-DD format.'
+            }
+        )
+        time = forms.TimeField(
+            help_text="Enter time in HH:MM format (24-hour)",
+            error_messages={
+                'invalid': 'Please enter a valid time in HH:MM format.'
+            }
+        )
+        duration = forms.DurationField(
+            help_text="Enter duration as HH:MM:SS",
+            error_messages={
+                'invalid': 'Please enter a valid duration (e.g., 01:30:00 for 1.5 hours).'
+            }
+        )
