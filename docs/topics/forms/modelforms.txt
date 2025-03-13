@@ -1099,16 +1099,42 @@ than that of a "normal" formset. The only difference is that we call
 ``formset.save()`` to save the data into the database. (This was described
 above, in :ref:`saving-objects-in-the-formset`.)
 
+.. _validation-on-model-formsets:
+
+Validation on model formsets
+----------------------------
+
+Individual forms in a model formset are validated :ref:`like any other model
+form <validation-on-modelform>`, and :ref:`validation rules for regular
+formsets <formset-validation>` apply on the formset, but model formsets apply
+additional validation as well.
+
+Valid forms are validated against each other for
+:attr:`~django.db.models.Field.unique`,
+:attr:`~django.db.models.Options.unique_together` and
+``unique_for_date|month|year`` constraints.
+:class:`~django.db.models.UniqueConstraint`\s defined with ``fields`` and no
+``condition`` are also validated across forms, but their specific
+:attr:`~django.db.models.UniqueConstraint.violation_error_message` is not
+used. Instead, an automatically generated message, such as "Please correct
+the duplicate data for field1 and field2, which must be unique" is displayed
+with the actual field names.
+
+Other constraints, including ``UniqueConstraint``\s with defined ``condition``
+or ``expressions`` and ``ExclusionConstraint``\s, are only validated against
+existing instances, including those marked for deletion. They are not checked
+across forms in the formset. As a result, saving such formsets may raise an
+``IntegrityError`` if new instances violate these constraints. Consider
+performing additional validation before saving.
+
 .. _model-formsets-overriding-clean:
 
 Overriding ``clean()`` on a ``ModelFormSet``
 --------------------------------------------
 
-Just like with ``ModelForms``, by default the ``clean()`` method of a
-``ModelFormSet`` will validate that none of the items in the formset violate
-the unique constraints on your model (either ``unique``, ``unique_together`` or
-``unique_for_date|month|year``).  If you want to override the ``clean()`` method
-on a ``ModelFormSet`` and maintain this validation, you must call the parent
+By default the ``clean()`` method of a model formset is responsible for
+uniqueness checks across forms. If you want to override the ``clean()`` method
+on a model formset and maintain this validation, you must call the parent
 class's ``clean`` method::
 
     from django.forms import BaseModelFormSet
@@ -1125,7 +1151,7 @@ class's ``clean`` method::
 Also note that by the time you reach this step, individual model instances
 have already been created for each ``Form``. Modifying a value in
 ``form.cleaned_data`` is not sufficient to affect the saved value. If you wish
-to modify a value in ``ModelFormSet.clean()`` you must modify
+to modify a value in ``BaseModelFormSet.clean()`` you must modify
 ``form.instance``::
 
     from django.forms import BaseModelFormSet
