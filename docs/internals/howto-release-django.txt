@@ -580,7 +580,7 @@ Now you're ready to actually put the release out there. To do this:
 
         $ python -m venv django-pip-tarball
         $ . django-pip-tarball/bin/activate
-        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
+        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/django-$RELEASE_VERSION.tar.gz
         $ django-admin startproject test_tarball
         $ cd test_tarball
         $ ./manage.py --help  # Ensure executable bits
@@ -592,7 +592,7 @@ Now you're ready to actually put the release out there. To do this:
 
         $ python -m venv django-pip-wheel
         $ . django-pip-wheel/bin/activate
-        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
+        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/django-$RELEASE_VERSION-py3-none-any.whl
         $ django-admin startproject test_wheel
         $ cd test_wheel
         $ ./manage.py --help  # Ensure executable bits
@@ -617,7 +617,7 @@ Now you're ready to actually put the release out there. To do this:
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball
-   (``Django-<version>.tar.gz``). So for example enter "4.1.1" or "4.2rc1",
+   (``django-<version>.tar.gz``). So for example enter "4.1.1" or "4.2rc1",
    etc. If the release is part of an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
