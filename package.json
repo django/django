@@ -12,12 +12,18 @@
 <<<<<<< HEAD
     "eslint": "^9.19.0",
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 1f521a330b8fe8c577ec5ff65b7fcc582ae6c9ea
 =======
     "@eslint/js": "^9.21.0",
     "eslint": "^9.21.0",
 >>>>>>> 90e1ff847d625142978ae0cd5a9d35d1d926df12
+<<<<<<< HEAD
 >>>>>>> 0ccb4fb91c7b7110a2f22b10a5316ddf149649e5
+=======
+>>>>>>> 1f521a330b8fe8c577ec5ff65b7fcc582ae6c9ea
     "globals": "^15.15.0",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.5.0",
