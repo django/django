@@ -18,6 +18,7 @@ from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.version import get_docs_version
+from django.views.context import get_context  # importing context
 from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
 
 # Minimal Django templates engine to render the error templates
@@ -391,6 +392,7 @@ class ExceptionReporter:
             "request_meta": self.filter.get_safe_request_meta(self.request),
             "request_COOKIES_items": self.filter.get_safe_cookies(self.request).items(),
             "user_str": user_str,
+            "context": get_context(),  # storing the dictionary with name context
             "filtered_POST_items": list(
                 self.filter.get_post_parameters(self.request).items()
             ),
@@ -425,7 +427,9 @@ class ExceptionReporter:
         """Return HTML version of debug 500 HTTP error page."""
         with self.html_template_path.open(encoding="utf-8") as fh:
             t = DEBUG_ENGINE.from_string(fh.read())
-        c = Context(self.get_traceback_data(), use_l10n=False)
+        c = Context(
+            self.get_traceback_data(), use_l10n=False
+        )  # these stored context  will be used through this
         return t.render(c)
 
     def get_traceback_text(self):

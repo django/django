@@ -10,11 +10,11 @@
   },
   "devDependencies": {
     "eslint": "^9.19.0",
-    "puppeteer": "^24.1.1",
-    "globals": "^15.14.0",
+    "globals": "^15.15.0",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.5.0",
     "grunt-contrib-qunit": "^10.1.1",
+    "puppeteer": "^24.1.1",
     "qunit": "^2.24.1"
   }
 }
