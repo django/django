@@ -1,5 +1,5 @@
 {
-  "name": "Django",
+  "name": "django",
   "private": true,
   "scripts": {
     "pretest": "eslint .",
@@ -9,12 +9,30 @@
     "npm": ">=1.3.0"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "eslint": "^9.19.0",
+<<<<<<< HEAD
+=======
+=======
+    "@eslint/js": "^9.21.0",
+    "eslint": "^9.21.0",
+>>>>>>> 90e1ff847d625142978ae0cd5a9d35d1d926df12
+>>>>>>> 0ccb4fb91c7b7110a2f22b10a5316ddf149649e5
     "globals": "^15.15.0",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.5.0",
     "grunt-contrib-qunit": "^10.1.1",
     "puppeteer": "^24.1.1",
     "qunit": "^2.24.1"
-  }
+  },
+  "version": "1.0.0",
+  "main": "Gruntfile.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
