@@ -700,10 +700,10 @@ will be localized.
 Form inheritance
 ----------------
 
-As with basic forms, you can extend and reuse ``ModelForms`` by inheriting
-them. This is useful if you need to declare extra fields or extra methods on a
-parent class for use in a number of forms derived from models. For example,
-using the previous ``ArticleForm`` class:
+As with basic forms, you can extend and reuse ``ModelForm`` classes by
+inheriting them. This is useful if you need to declare extra fields or extra
+methods on a parent class for use in a number of forms derived from models.
+For example, using the previous ``ArticleForm`` class:
 
 .. code-block:: pycon
 
@@ -983,7 +983,7 @@ value (``instances``, in the above example).
 When fields are missing from the form (for example because they have been
 excluded), these fields will not be set by the ``save()`` method. You can find
 more information about this restriction, which also holds for regular
-``ModelForms``, in `Selecting the fields to use`_.
+model forms, in `Selecting the fields to use`_.
 
 Pass ``commit=False`` to return the unsaved model instances:
 
@@ -1104,7 +1104,7 @@ above, in :ref:`saving-objects-in-the-formset`.)
 Overriding ``clean()`` on a ``ModelFormSet``
 --------------------------------------------
 
-Just like with ``ModelForms``, by default the ``clean()`` method of a
+Just like with a ``ModelForm``, by default the ``clean()`` method of a
 ``ModelFormSet`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
 ``unique_for_date|month|year``).  If you want to override the ``clean()`` method
