@@ -135,8 +135,8 @@ described here.
 
 .. admonition:: You can't share pickles between versions
 
-    Pickles of ``QuerySets`` are only valid for the version of Django that
-    was used to generate them. If you generate a pickle using Django
+    Pickles of ``QuerySet`` objects are only valid for the version of Django
+    that was used to generate them. If you generate a pickle using Django
     version N, there is no guarantee that pickle will be readable with
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
@@ -1217,8 +1217,8 @@ the items, it will find them in a prefetched ``QuerySet`` cache that was
 populated in a single query.
 
 That is, all the relevant toppings will have been fetched in a single query,
-and used to make ``QuerySets`` that have a pre-filled cache of the relevant
-results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
+and used to make ``QuerySet`` instances that have a pre-filled cache of the
+relevant results; these are then used in the ``self.toppings.all()`` calls.
 
 The additional queries in ``prefetch_related()`` are executed after the
 ``QuerySet`` has begun to be evaluated and the primary query has been executed.
@@ -1242,16 +1242,16 @@ function.
 
 Note that the result cache of the primary ``QuerySet`` and all specified related
 objects will then be fully loaded into memory. This changes the typical
-behavior of ``QuerySets``, which normally try to avoid loading all objects into
-memory before they are needed, even after a query has been executed in the
+behavior of a ``QuerySet``, which normally tries to avoid loading all objects
+into memory before they are needed, even after a query has been executed in the
 database.
 
 .. note::
 
-    Remember that, as always with ``QuerySets``, any subsequent chained methods
-    which imply a different database query will ignore previously cached
-    results, and retrieve data using a fresh database query. So, if you write
-    the following:
+    Remember that, as always with ``QuerySet`` objects, any subsequent chained
+    methods which imply a different database query will ignore previously
+    cached results, and retrieve data using a fresh database query. So, if you
+    write the following:
 
     .. code-block:: pycon
 

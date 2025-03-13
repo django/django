@@ -826,7 +826,7 @@ Substring matching and case sensitivity
 
 For all SQLite versions, there is some slightly counterintuitive behavior when
 attempting to match some types of strings.  These are triggered when using the
-:lookup:`iexact` or :lookup:`contains` filters in Querysets. The behavior
+:lookup:`iexact` or :lookup:`contains` filters in querysets. The behavior
 splits into two cases:
 
 1. For substring matching, all matches are done case-insensitively. That is a
@@ -1223,8 +1223,8 @@ string, and the data is silently converted to reflect this assumption.
 ``TextField`` limitations
 -------------------------
 
-The Oracle backend stores ``TextFields`` as ``NCLOB`` columns. Oracle imposes
-some limitations on the usage of such LOB columns in general:
+The Oracle backend stores each ``TextField`` as an ``NCLOB`` column. Oracle
+imposes some limitations on the usage of such LOB columns in general:
 
 * LOB columns may not be used as primary keys.
 
