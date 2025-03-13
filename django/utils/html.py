@@ -11,6 +11,7 @@ from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsp
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.core.validators import EmailValidator
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
@@ -334,19 +335,6 @@ class Urlizer:
         nofollow=False,
         autoescape=False,
     ):
-        """
-        Handle the conversion of a single word to a URL if applicable.
-
-        Args:
-            word: The word to process.
-            safe_input: Whether the input is marked as safe.
-            trim_url_limit: Maximum length for displayed URLs.
-            nofollow: Whether to add rel="nofollow" to links.
-            autoescape: Whether to escape HTML in the output.
-
-        Returns:
-            Processed word, potentially converted to a link if it's a URL.
-        """
         if "." in word or "@" in word or ":" in word:
             # lead: Punctuation trimmed from the beginning of the word.
             # middle: State of the word.
@@ -355,10 +343,11 @@ class Urlizer:
             # Make URL we want to point to.
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ""
-
             if len(middle) <= MAX_URL_LENGTH and self.simple_url_re.match(middle):
                 url = smart_urlquote(html.unescape(middle))
             elif len(middle) <= MAX_URL_LENGTH and self.simple_url_2_re.match(middle):
+                # RemovedInDjango70Warning: When the deprecation ends, replace with:
+                # url = smart_urlquote("https://%s" % html.unescape(middle))
                 protocol = (
                     "https"
                     if getattr(settings, "URLIZE_ASSUME_HTTPS", False)
@@ -368,8 +357,8 @@ class Urlizer:
                     warnings.warn(
                         "Using http as default protocol in urlize() is deprecated. "
                         "Set URLIZE_ASSUME_HTTPS=True to use https. "
-                        "This will be removed in Django 6.2.",
-                        DeprecationWarning,
+                        "This will be removed in Django 7.0.",
+                        RemovedInDjango70Warning,
                         stacklevel=2,
                     )
                 url = smart_urlquote(f"{protocol}://{html.unescape(middle)}")
@@ -381,7 +370,6 @@ class Urlizer:
                 domain = quote(domain, safe="")
                 url = self.mailto_template.format(local=local, domain=domain)
                 nofollow_attr = ""
-
             # Make link.
             if url:
                 trimmed = self.trim_url(middle, limit=trim_url_limit)

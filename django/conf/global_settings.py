@@ -664,5 +664,8 @@ SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False
 
 # Whether to use HTTPS as the default protocol in urlize() when no protocol is provided.
-# This setting is deprecated and will be removed in Django 6.2.
+# RemovedInDjango70Warning: It's a transitional setting helpful in early
+# adoption of HTTPS as the new default protocol in urlize() when no
+# protocol is provided.
+# Set to True to assume HTTPS during the Django 6.x release cycle.
 URLIZE_ASSUME_HTTPS = False

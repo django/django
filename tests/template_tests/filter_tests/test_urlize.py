@@ -2,6 +2,8 @@ from unittest import mock
 
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazy
 from django.utils.html import Urlizer
 from django.utils.safestring import mark_safe
@@ -110,6 +112,7 @@ class UrlizeTests(SimpleTestCase):
 
 
 class FunctionTests(SimpleTestCase):
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_urls(self):
         self.assertEqual(
             urlize("http://google.com"),
@@ -132,6 +135,7 @@ class FunctionTests(SimpleTestCase):
             '<a href="http://djangoproject.org/" rel="nofollow">djangoproject.org/</a>',
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_url_split_chars(self):
         # Quotes (single and double) and angle brackets shouldn't be considered
         # part of URLs.
@@ -181,6 +185,7 @@ class FunctionTests(SimpleTestCase):
             "</a>",
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_urlencoded(self):
         self.assertEqual(
             urlize("www.mystore.com/30%OffCoupons!"),
@@ -215,6 +220,7 @@ class FunctionTests(SimpleTestCase):
             'rel="nofollow">https://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_nofollow(self):
         """
         #12183 - Check urlize adds nofollow properly - see #12183
@@ -225,6 +231,7 @@ class FunctionTests(SimpleTestCase):
             '<a href="http://www.bar.com" rel="nofollow">www.bar.com</a>',
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_idn(self):
         """
         #13704 - Check urlize handles IDN correctly
@@ -267,6 +274,7 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(urlize("http://.google.com"), "http://.google.com")
         self.assertEqual(urlize("http://@foo.com"), "http://@foo.com")
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_tlds(self):
         """
         #16656 - Check urlize accepts more TLDs
@@ -345,6 +353,7 @@ class FunctionTests(SimpleTestCase):
             "http://example.com?x=&amp</a>.;...;",
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_brackets(self):
         """
         #19070 - Check urlize handles brackets properly
@@ -436,6 +445,7 @@ class FunctionTests(SimpleTestCase):
             "phone us at +xx.yy",
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_exclamation_marks(self):
         """
         #23715 - Check urlize correctly handles exclamation marks after TLDs
@@ -465,6 +475,7 @@ class FunctionTests(SimpleTestCase):
     def test_non_string_input(self):
         self.assertEqual(urlize(123), "123")
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_autoescape(self):
         self.assertEqual(
             urlize('foo<a href=" google.com ">bar</a>buz'),
@@ -472,6 +483,7 @@ class FunctionTests(SimpleTestCase):
             "</a> &quot;&gt;bar&lt;/a&gt;buz",
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_autoescape_off(self):
         self.assertEqual(
             urlize('foo<a href=" google.com ">bar</a>buz', autoescape=False),
@@ -479,6 +491,7 @@ class FunctionTests(SimpleTestCase):
             "bar</a>buz",
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_lazystring(self):
         prepend_www = lazy(lambda url: "www." + url, str)
         self.assertEqual(

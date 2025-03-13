@@ -1,5 +1,7 @@
 from django.template.defaultfilters import urlizetrunc
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -90,6 +92,7 @@ class FunctionTests(SimpleTestCase):
     def test_non_string_input(self):
         self.assertEqual(urlizetrunc(123, 1), "123")
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_autoescape(self):
         self.assertEqual(
             urlizetrunc('foo<a href=" google.com ">bar</a>buz', 10),
@@ -97,6 +100,7 @@ class FunctionTests(SimpleTestCase):
             "</a> &quot;&gt;bar&lt;/a&gt;buz",
         )
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_autoescape_off(self):
         self.assertEqual(
             urlizetrunc('foo<a href=" google.com ">bar</a>buz', 9, autoescape=False),

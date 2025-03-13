@@ -4,6 +4,8 @@ from datetime import datetime
 from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape,
@@ -365,6 +367,7 @@ class TestUtilsHtml(SimpleTestCase):
             class HtmlClass:
                 pass
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_urlize(self):
         tests = (
             (
@@ -466,9 +469,10 @@ class TestUtilsHtml(SimpleTestCase):
         """
         with self.settings(URLIZE_ASSUME_HTTPS=False):
             with self.assertWarnsMessage(
-                DeprecationWarning,
+                RemovedInDjango70Warning,
                 "Using http as default protocol in urlize() is deprecated. "
-                "Set URLIZE_ASSUME_HTTPS=True to use https.",
+                "Set URLIZE_ASSUME_HTTPS=True to use https. "
+                "This will be removed in Django 7.0.",
             ):
                 urlize("Visit example.com")
 

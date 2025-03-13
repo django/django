@@ -764,28 +764,6 @@ escaping HTML.
     Ensure the ``__str__()`` method does indeed return text that doesn't
     require HTML escaping.
 
-.. function:: urlize(text, trim_url_limit=None, nofollow=False, autoescape=False)
-
-    Converts URLs and email addresses in text into clickable links.
-
-    :param text: The text to convert into clickable links.
-    :param trim_url_limit: If set, URLs longer than this limit will be truncated.
-    :param nofollow: If ``True``, output links will include a ``rel="nofollow"`` attribute.
-    :param autoescape: If ``True``, input text will be HTML-escaped before processing.
-    :return: String containing URLs converted to clickable links.
-
-    Example::
-
-        from django.utils.html import urlize
-
-        text = "Check out www.djangoproject.com"
-        result = urlize(text)
-        # 'Check out <a href="http://www.djangoproject.com">www.djangoproject.com</a>'
-
-    .. note::
-        This function is also available as the ``urlize`` template filter in
-        Django's template language.
-
 ``django.utils.http``
 =====================
 
