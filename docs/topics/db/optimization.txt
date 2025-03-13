@@ -427,7 +427,7 @@ objects to reduce the number of SQL queries. For example::
     my_band.members.add(me)
     my_band.members.add(my_friend)
 
-...where ``Bands`` and ``Artists`` have a many-to-many relationship.
+...where ``Band`` and ``Artist`` are models with a many-to-many relationship.
 
 When inserting different pairs of objects into
 :class:`~django.db.models.ManyToManyField` or when the custom
@@ -470,7 +470,7 @@ objects to reduce the number of SQL queries. For example::
     my_band.members.remove(me)
     my_band.members.remove(my_friend)
 
-...where ``Bands`` and ``Artists`` have a many-to-many relationship.
+...where ``Band`` and ``Artist`` are models with a many-to-many relationship.
 
 When removing different pairs of objects from :class:`ManyToManyFields
 <django.db.models.ManyToManyField>`, use
