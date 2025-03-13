@@ -146,6 +146,12 @@ Transactions do not yet work in async mode. If you have a piece of code that
 needs transactions behavior, we recommend you write that piece as a single
 synchronous function and call it using :func:`sync_to_async`.
 
+Django level :ref:`persistent database
+connections<persistent-database-connections>`, set via
+:setting:`CONN_MAX_AGE`, should be disabled in async mode. You can use the
+connection pooling options of your database backend, where available, or
+investigate a third-party connection pooling option, if required.
+
 .. _async_performance:
 
 Performance

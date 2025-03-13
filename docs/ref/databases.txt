@@ -40,6 +40,10 @@ database connection at the end of each request. To enable persistent
 connections, set :setting:`CONN_MAX_AGE` to a positive integer of seconds. For
 unlimited persistent connections, set it to ``None``.
 
+Persistent connections should be disabled when using ASGI. You can use your
+backend's connection pooling, where available, or investigate a third-party
+connection pooling option if required.
+
 Connection management
 ~~~~~~~~~~~~~~~~~~~~~
 
