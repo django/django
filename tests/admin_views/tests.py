@@ -6448,6 +6448,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         ActionChains(self.selenium).move_to_element(delete_parent).click().perform()
         self.wait_for_and_switch_to_popup()
         self.selenium.find_element(By.XPATH, '//input[@value="Yes, I’m sure"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_parent"))
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
@@ -6582,6 +6583,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         self.selenium.find_element(By.ID, "id_title").send_keys("test3")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 3, 1)
         self.selenium.switch_to.window(popup_window_test2)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test3").id)
@@ -6590,6 +6592,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 2, 1)
         self.selenium.switch_to.window(popup_window_test)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test2").id)
@@ -6598,6 +6601,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(base_window)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test").id)
@@ -6833,15 +6837,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + add_url)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 1")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and add another"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and add another"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 1)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 2")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and add another"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and add another"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 2)
 
     def test_redirect_on_add_view_continue_button(self):
@@ -6854,9 +6860,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + add_url)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 1")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and continue editing"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and continue editing"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 1)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input_value = name_input.get_attribute("value")
