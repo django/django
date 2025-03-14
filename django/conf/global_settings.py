@@ -662,3 +662,10 @@ SECURE_REDIRECT_EXEMPT = []
 SECURE_REFERRER_POLICY = "same-origin"
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False
+
+# Whether to use HTTPS as the default protocol in urlize() when no protocol is provided.
+# RemovedInDjango70Warning: It's a transitional setting helpful in early
+# adoption of HTTPS as the new default protocol in urlize() when no
+# protocol is provided.
+# Set to True to assume HTTPS during the Django 6.x release cycle.
+URLIZE_ASSUME_HTTPS = False

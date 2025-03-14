@@ -3,12 +3,15 @@
 import html
 import json
 import re
+import warnings
 from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
+from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.core.validators import EmailValidator
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
@@ -343,7 +346,22 @@ class Urlizer:
             if len(middle) <= MAX_URL_LENGTH and self.simple_url_re.match(middle):
                 url = smart_urlquote(html.unescape(middle))
             elif len(middle) <= MAX_URL_LENGTH and self.simple_url_2_re.match(middle):
-                url = smart_urlquote("http://%s" % html.unescape(middle))
+                # RemovedInDjango70Warning: When the deprecation ends, replace with:
+                # url = smart_urlquote("https://%s" % html.unescape(middle))
+                protocol = (
+                    "https"
+                    if getattr(settings, "URLIZE_ASSUME_HTTPS", False)
+                    else "http"
+                )
+                if not settings.URLIZE_ASSUME_HTTPS:
+                    warnings.warn(
+                        "Using http as default protocol in urlize() is deprecated. "
+                        "Set URLIZE_ASSUME_HTTPS=True to use https. "
+                        "This will be removed in Django 7.0.",
+                        RemovedInDjango70Warning,
+                        stacklevel=2,
+                    )
+                url = smart_urlquote(f"{protocol}://{html.unescape(middle)}")
             elif ":" not in middle and self.is_email_simple(middle):
                 local, domain = middle.rsplit("@", 1)
                 # Encode per RFC 6068 Section 2 (items 1, 4, 5). Defer any IDNA

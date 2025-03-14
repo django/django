@@ -2909,6 +2909,13 @@ If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
 ``"Check out <a href="http://www.djangoproject.com"
 rel="nofollow">www.djangoproject.com</a>"``.
 
+.. deprecated:: 6.0
+
+    The default protocol when none is provided will change from ``http://`` to
+    ``https://`` in Django 7.0. Set :setting:`URLIZE_ASSUME_HTTPS` transitional
+    setting to ``True`` to opt into using ``https`` during the Django 6.x
+    release cycle.
+
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
 ``"Send questions to foo@example.com"``, the output will be
@@ -2945,6 +2952,13 @@ For example:
 If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
 ``'Check out <a href="http://www.djangoproject.com"
 rel="nofollow">www.djangoproj…</a>'``.
+
+.. deprecated:: 6.0
+
+    The default protocol when none is provided will change from ``http://`` to
+    ``https://`` in Django 7.0. Set :setting:`URLIZE_ASSUME_HTTPS` transitional
+    setting to ``True`` to opt into using ``https`` during the Django 6.x
+    release cycle.
 
 As with urlize_, this filter should only be applied to plain text.
 

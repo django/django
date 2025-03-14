@@ -1,5 +1,7 @@
 from django.template.defaultfilters import urlizetrunc
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -48,6 +50,9 @@ class UrlizetruncTests(SimpleTestCase):
         )
 
 
+# RemovedInDjango70Warning: When the deprecation ends, replace "http://"
+# with "https://" in expected urlize outputs when no protocol provided.
+@ignore_warnings(category=RemovedInDjango70Warning)
 class FunctionTests(SimpleTestCase):
     def test_truncate(self):
         uri = "http://31characteruri.com/test/"

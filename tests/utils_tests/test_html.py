@@ -4,6 +4,8 @@ from datetime import datetime
 from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape,
@@ -365,6 +367,7 @@ class TestUtilsHtml(SimpleTestCase):
             class HtmlClass:
                 pass
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_urlize(self):
         tests = (
             (
@@ -421,6 +424,80 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in tests:
             with self.subTest(value=value):
                 self.assertEqual(urlize(value), output)
+
+    def test_urlize_assume_https(self):
+        tests = (
+            (
+                "Visit example.com",
+                'Visit <a href="https://example.com">example.com</a>',
+            ),
+            (
+                "Multiple domains: example.com and test.org",
+                'Multiple domains: <a href="https://example.com">example.com</a> and '
+                '<a href="https://test.org">test.org</a>',
+            ),
+            # Test that explicit protocols are preserved
+            (
+                "Compare http://example.com and example.org",
+                'Compare <a href="http://example.com">http://example.com</a> and '
+                '<a href="https://example.org">example.org</a>',
+            ),
+            # Special characters are HTML-encoded in href but not in text
+            (
+                "Visit example.com/path?param=value&other=123",
+                'Visit <a href="https://example.com/path?param=value&amp;other=123">'
+                "example.com/path?param=value&other=123</a>",
+            ),
+            # Unicode domains are percent-encoded in href but not in text
+            (
+                "Visit 例子.com",
+                'Visit <a href="https://%E4%BE%8B%E5%AD%90.com">例子.com</a>',
+            ),
+        )
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # for value, expected in tests:
+        #     with self.subTest(value=value):
+        #         self.assertEqual(urlize(value), expected)
+        with self.settings(URLIZE_ASSUME_HTTPS=True):
+            for value, expected in tests:
+                with self.subTest(value=value):
+                    self.assertEqual(urlize(value), expected)
+
+    def test_urlize_http_default_warning(self):
+        """
+        Using http:// as default protocol raises a deprecation warning when
+        URLIZE_ASSUME_HTTPS is False.
+        """
+        with self.settings(URLIZE_ASSUME_HTTPS=False):
+            with self.assertWarnsMessage(
+                RemovedInDjango70Warning,
+                "Using http as default protocol in urlize() is deprecated. "
+                "Set URLIZE_ASSUME_HTTPS=True to use https. "
+                "This will be removed in Django 7.0.",
+            ):
+                urlize("Visit example.com")
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove completely.
+    def test_urlize_email_unchanged(self):
+        """
+        Test that email handling is unchanged by the URLIZE_ASSUME_HTTPS setting.
+        """
+        tests = (
+            (
+                "Email me at user@example.com",
+                'Email me at <a href="mailto:user@example.com">user@example.com</a>',
+            ),
+            (
+                "Contact: test.user+label@example.com",
+                'Contact: <a href="mailto:test.user%2Blabel@example.com">'
+                "test.user+label@example.com</a>",
+            ),
+        )
+        for urlize_https in (True, False):
+            with self.settings(URLIZE_ASSUME_HTTPS=urlize_https):
+                for value, expected in tests:
+                    with self.subTest(value=value, urlize_https=urlize_https):
+                        self.assertEqual(urlize(value), expected)
 
     def test_urlize_unchanged_inputs(self):
         tests = (

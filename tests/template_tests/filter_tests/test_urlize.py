@@ -2,6 +2,8 @@ from unittest import mock
 
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazy
 from django.utils.html import Urlizer
 from django.utils.safestring import mark_safe
@@ -109,6 +111,9 @@ class UrlizeTests(SimpleTestCase):
         )
 
 
+# RemovedInDjango70Warning: When the deprecation ends, replace "http://"
+# with "https://" in expected urlize outputs when no protocol provided.
+@ignore_warnings(category=RemovedInDjango70Warning)
 class FunctionTests(SimpleTestCase):
     def test_urls(self):
         self.assertEqual(
