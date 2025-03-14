@@ -1,3 +1,6 @@
+import re
+
+from django.db.backends.postgresql.psycopg_any import is_psycopg3
 from django.db.models import (
     CharField,
     Expression,
@@ -10,6 +13,24 @@ from django.db.models import (
 )
 from django.db.models.expressions import CombinedExpression, register_combinable_fields
 from django.db.models.functions import Cast, Coalesce
+
+_SEARCH_SPEC_CHARS = r"['\0\[\]()|&:*!@<>\\]"
+_spec_chars_re = re.compile(_SEARCH_SPEC_CHARS)
+multiple_spaces_re = re.compile(r"\s{2,}")
+
+
+def normalize_spaces(val: str):
+    """Converts multiple spaces to single and strips from both sides"""
+    if not val:
+        return None
+    return multiple_spaces_re.sub(" ", val.strip())
+
+
+def psql_escape(query: str):
+    # replace unsafe chars with space
+    query = _spec_chars_re.sub(" ", query)
+    query = normalize_spaces(query)  # convert multiple spaces to single
+    return query
 
 
 class SearchVectorExact(Lookup):
@@ -203,6 +224,9 @@ class SearchQuery(SearchQueryCombinable, Func):
         invert=False,
         search_type="plain",
     ):
+        if isinstance(value, LexemeCombinable):
+            search_type = "raw"
+
         self.function = self.SEARCH_TYPES.get(search_type)
         if self.function is None:
             raise ValueError("Unknown search_type argument '%s'." % search_type)
@@ -360,6 +384,14 @@ class TrigramSimilarity(TrigramBase):
     function = "SIMILARITY"
 
 
+class TrigramWordSimilarity(TrigramWordBase):
+    function = "WORD_SIMILARITY"
+
+
+class TrigramStrictWordSimilarity(TrigramWordBase):
+    function = "STRICT_WORD_SIMILARITY"
+
+
 class TrigramDistance(TrigramBase):
     function = ""
     arg_joiner = " <-> "
@@ -375,9 +407,116 @@ class TrigramStrictWordDistance(TrigramWordBase):
     arg_joiner = " <<<-> "
 
 
-class TrigramWordSimilarity(TrigramWordBase):
-    function = "WORD_SIMILARITY"
+class LexemeCombinable:
+    BITAND = "&"
+    BITOR = "|"
+
+    def _combine(self, other, connector, node=None):
+        if not isinstance(other, LexemeCombinable):
+            raise TypeError(
+                "A Lexeme can only be combined with another Lexeme, "
+                f"got {other.__class__.__name__}."
+            )
+        return CombinedLexeme(self, connector, other)
+
+    # On Combinable, these are not implemented to reduce confusion with Q. In
+    # this case we are actually (ab)using them to do logical combination so
+    # it's consistent with other usage in Django.
+    def bitor(self, other):
+        return self._combine(other, self.BITOR)
+
+    def bitand(self, other):
+        return self._combine(other, self.BITAND)
+
+    def __or__(self, other):
+        return self.bitor(other)
+
+    def __and__(self, other):
+        return self.bitand(other)
+
+    def __ror__(self, other):
+        return self.bitor(other)
+
+    def __rand__(self, other):
+        return self.bitand(other)
 
 
-class TrigramStrictWordSimilarity(TrigramWordBase):
-    function = "STRICT_WORD_SIMILARITY"
+class Lexeme(LexemeCombinable, Value):
+    _output_field = SearchQueryField()
+
+    def __init__(
+        self, value, output_field=None, *, invert=False, prefix=False, weight=None
+    ):
+        if weight is not None and (
+            not isinstance(weight, str) or weight.lower() not in {"a", "b", "c", "d"}
+        ):
+            raise ValueError(
+                f"Weight must be one of 'A', 'B', 'C', and 'D', got '{weight}'."
+            )
+
+        self.prefix = prefix
+        self.invert = invert
+        self.weight = weight
+        super().__init__(value, output_field=output_field)
+
+    def process_rhs(self, compiler, connection):
+        escaped_value = psql_escape(self.value)
+        if is_psycopg3:
+            from psycopg.adapt import Dumper
+
+            class StringDumper(Dumper):
+                def dump(self, obj):
+                    return bytes(obj, "utf-8")
+
+            param = StringDumper(str).quote(escaped_value).decode()
+        else:
+            from psycopg2.extensions import adapt
+
+            param = adapt(escaped_value).getquoted().decode("latin-1")
+
+        label = ""
+        if self.prefix:
+            label += "*"
+        if self.weight:
+            label += self.weight
+
+        if label:
+            param = f"{param}:{label}"
+        if self.invert:
+            param = f"!{param}"
+
+        return "%s", (param,)
+
+    def as_sql(self, compiler, connection):
+        return self.process_rhs(compiler, connection)
+
+    def __invert__(self):
+        cloned = super().copy()
+        cloned.invert = not self.invert
+        return cloned
+
+
+class CombinedLexeme(LexemeCombinable, CombinedExpression):
+    _output_field = SearchQueryField()
+
+    def as_sql(self, compiler, connection):
+        value_params = []
+        lsql, params = compiler.compile(self.lhs)
+        value_params.extend(params)
+
+        rsql, params = compiler.compile(self.rhs)
+        value_params.extend(params)
+
+        combined_sql = f"({lsql} {self.connector} {rsql})"
+        combined_value = combined_sql % tuple(value_params)
+        return "%s", (combined_value,)
+
+    def __invert__(self):
+        # Swap the connector and invert the lhs and rhs.
+        # This generates a query that's equivalent to what we expect
+        # thanks to De Morgan's theorem
+        cloned = super().copy()
+        cloned.connector = self.BITAND if self.connector == self.BITOR else self.BITOR
+        cloned.lhs = ~self.lhs
+        cloned.rhs = ~self.rhs
+        return cloned
