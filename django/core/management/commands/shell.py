@@ -185,8 +185,8 @@ class Command(BaseCommand):
             else:
                 module = None
                 name = path
-
-            auto_imports[module].append((name, obj))
+            if (name, obj) not in auto_imports[module]:
+                auto_imports[module].append((name, obj))
 
         namespace = {
             name: obj for items in auto_imports.values() for name, obj in items
