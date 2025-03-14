@@ -50,10 +50,10 @@ specific template and custom headers, you can use the following approach::
 
     # Then, create a multipart email instance.
     msg = EmailMultiAlternatives(
-        "Subject here",
-        text_content,
-        "from@example.com",
-        ["to@example.com"],
+        subject="Subject here",
+        body=text_content,
+        from_email="from@example.com",
+        to=["to@example.com"],
         headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )
 
@@ -76,7 +76,7 @@ a secure connection is used.
 ``send_mail()``
 ===============
 
-.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
+.. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
 In most cases, you can send email using ``django.core.mail.send_mail()``.
 
@@ -90,6 +90,10 @@ are required.
 * ``recipient_list``: A list of strings, each an email address. Each
   member of ``recipient_list`` will see the other recipients in the "To:"
   field of the email message.
+
+The other parameters are optional, and must be given as keyword arguments
+if used.
+
 * ``fail_silently``: A boolean. When it's ``False``, ``send_mail()`` will raise
   an :exc:`smtplib.SMTPException` if an error occurs. See the :mod:`smtplib`
   docs for a list of possible exceptions, all of which are subclasses of
@@ -112,10 +116,19 @@ are required.
 The return value will be the number of successfully delivered messages (which
 can be ``0`` or ``1`` since it can only send one message).
 
+.. deprecated:: 6.0
+
+    Earlier Django versions allowed positional arguments for the optional
+    parameters (``fail_silently`` and later). This generates a deprecation
+    warning in Django 6.0, and will cause a ``TypeError`` starting in
+    Django 7.0. To update your code, change (for example)
+    ``send_mail(..., True)`` to ``send_mail(..., fail_silently=True)``.
+
+
 ``send_mass_mail()``
 ====================
 
-.. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+.. function:: send_mass_mail(datatuple, *, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
 ``django.core.mail.send_mass_mail()`` is intended to handle mass emailing.
 
@@ -123,8 +136,18 @@ can be ``0`` or ``1`` since it can only send one message).
 
     (subject, message, from_email, recipient_list)
 
-``fail_silently``, ``auth_user`` and ``auth_password`` have the same functions
-as in :meth:`~django.core.mail.send_mail()`.
+``fail_silently``, ``auth_user`` and ``auth_password`` and ``connection`` have
+the same functions as in :meth:`~django.core.mail.send_mail()`. They must be
+given as keyword arguments.
+
+.. deprecated:: 6.0
+
+    Earlier Django versions allowed positional arguments for the optional
+    parameters (``fail_silently`` and later). This generates a deprecation
+    warning in Django 6.0, and will cause a ``TypeError`` starting in
+    Django 7.0. To update your code, change (for example)
+    ``send_mass_mail(datatuple, True)`` to
+    ``send_mass_mail(datatuple, fail_silently=True)``.
 
 Each separate element of ``datatuple`` results in a separate email message.
 As in :meth:`~django.core.mail.send_mail()`, recipients in the same
@@ -164,7 +187,7 @@ a single connection for all of its messages. This makes
 ``mail_admins()``
 =================
 
-.. function:: mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
+.. function:: mail_admins(subject, message, *, fail_silently=False, connection=None, html_message=None)
 
 ``django.core.mail.mail_admins()`` is a shortcut for sending an email to the
 site admins, as defined in the :setting:`ADMINS` setting.
@@ -182,14 +205,31 @@ If ``html_message`` is provided, the resulting email will be a
 :mimetype:`text/plain` content type and ``html_message`` as the
 :mimetype:`text/html` content type.
 
+.. deprecated:: 6.0
+
+    Earlier Django versions allowed positional arguments for the optional
+    parameters (``fail_silently`` and later). This generates a deprecation
+    warning in Django 6.0, and will cause a ``TypeError`` starting in
+    Django 7.0. To update your code, change (for example)
+    ``mail_admins(..., True)`` to ``mail_admins(..., fail_silently=True)``.
+
+
 ``mail_managers()``
 ===================
 
-.. function:: mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
+.. function:: mail_managers(subject, message, *, fail_silently=False, connection=None, html_message=None)
 
 ``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an email to the site managers, as defined in the :setting:`MANAGERS`
 setting.
+
+.. deprecated:: 6.0
+
+    Earlier Django versions allowed positional arguments for the optional
+    parameters (``fail_silently`` and later). This generates a deprecation
+    warning in Django 6.0, and will cause a ``TypeError`` starting in
+    Django 7.0. To update your code, change (for example)
+    ``mail_managers(..., True)`` to ``mail_managers(..., fail_silently=True)``.
 
 Examples
 ========
@@ -294,7 +334,7 @@ email backend API :ref:`provides an alternative
 .. class:: EmailMessage
 
 The :class:`~django.core.mail.EmailMessage` class is initialized with the
-following parameters (in the given order, if positional arguments are used).
+following parameters.
 All parameters are optional and can be set at any time prior to calling the
 ``send()`` method.
 
@@ -308,14 +348,16 @@ All parameters are optional and can be set at any time prior to calling the
 
 * ``to``: A list or tuple of recipient addresses.
 
+All other parameters must be given as keyword arguments, if used.
+
+* ``cc``: A list or tuple of recipient addresses used in the "Cc" header
+  when sending the email.
+
 * ``bcc``: A list or tuple of addresses used in the "Bcc" header when
   sending the email.
 
-* ``connection``: An :ref:`email backend <topic-email-backends>` instance. Use
-  this parameter if you are sending the ``EmailMessage`` via ``send()`` and you
-  want to use the same connection for multiple messages. If omitted, a new
-  connection is created when ``send()`` is called. This parameter is ignored
-  when using :ref:`send_messages() <topics-sending-multiple-emails>`.
+* ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
+  header when sending the email.
 
 * ``attachments``: A list of attachments to put on the message. These can
   be instances of :class:`~email.mime.base.MIMEBase` or
@@ -332,22 +374,33 @@ All parameters are optional and can be set at any time prior to calling the
   caller to ensure header names and values are in the correct format for
   an email message. The corresponding attribute is ``extra_headers``.
 
-* ``cc``: A list or tuple of recipient addresses used in the "Cc" header
-  when sending the email.
+* ``connection``: An :ref:`email backend <topic-email-backends>` instance. Use
+  this parameter if you are sending the ``EmailMessage`` via ``send()`` and you
+  want to use the same connection for multiple messages. If omitted, a new
+  connection is created when ``send()`` is called. This parameter is ignored
+  when using :ref:`send_messages() <topics-sending-multiple-emails>`.
 
-* ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
-  header when sending the email.
+
+.. deprecated:: 6.0
+
+    Earlier Django versions allowed positional arguments for *all* parameters.
+    Starting in Django 6.0, only ``subject``, ``body``, ``from_email`` and
+    ``to`` can be given as positional arguments. Other positional arguments
+    generate a deprecation warning in Django 6.0, and will cause a ``TypeError``
+    starting in Django 7.0. To update your code, change to keyword arguments.
+    (For clarity, using keywords is suggested for all arguments, but it is only
+    required for ``cc``, ``bcc`` and later.)
 
 For example::
 
     from django.core.mail import EmailMessage
 
     email = EmailMessage(
-        "Hello",
-        "Body goes here",
-        "from@example.com",
-        ["to1@example.com", "to2@example.com"],
-        ["bcc@example.com"],
+        subject="Hello",
+        body="Body goes here",
+        from_email="from@example.com",
+        to=["to1@example.com", "to2@example.com"],
+        bcc=["bcc@example.com"],
         reply_to=["another@example.com"],
         headers={"Message-ID": "foo"},
     )

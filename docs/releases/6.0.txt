@@ -309,6 +309,26 @@ Miscellaneous
 Features deprecated in 6.0
 ==========================
 
+Email
+-----
+
+.. currentmodule:: django.core.mail
+
+* :mod:`django.core.mail` APIs now require keyword arguments for their
+  less-commonly-used parameters. Using positional arguments will generate
+  a deprecation warning in Django 6.0, and will cause a ``TypeError`` starting
+  in Django 7.0. Update your code to use keyword arguments for:
+
+  * all *optional* arguments (``fail_silently`` and later) to the functional
+    APIs: :func:`send_mail`, :func:`send_mass_mail`, :func:`mail_admins`,
+    :func:`mail_managers`, and :func:`get_connection`.
+  * all arguments *except* the first four (``subject``, ``body``,
+    ``from_email``, and ``to``) when creating an :class:`EmailMessage` or
+    :class:`EmailMultiAlternatives` object. (It's OK to use keywords for the
+    first four, too, but isn't required.)
+
+.. currentmodule:: None
+
 Miscellaneous
 -------------
 

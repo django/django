@@ -17,6 +17,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
+from django.utils.deprecation import RemovedInDjango70Warning, deprecate_posargs
 from django.utils.encoding import force_bytes, force_str, punycode
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
@@ -202,12 +203,24 @@ class EmailMessage:
     mixed_subtype = "mixed"
     encoding = None  # None => use settings default
 
+    @deprecate_posargs(
+        RemovedInDjango70Warning,
+        moved=[
+            "bcc",
+            "connection",
+            "attachments",
+            "headers",
+            "cc",
+            "reply_to",
+        ],
+    )
     def __init__(
         self,
         subject="",
         body="",
         from_email=None,
         to=None,
+        *,
         bcc=None,
         connection=None,
         attachments=None,
@@ -446,12 +459,25 @@ class EmailMultiAlternatives(EmailMessage):
 
     alternative_subtype = "alternative"
 
+    @deprecate_posargs(
+        RemovedInDjango70Warning,
+        moved=[
+            "bcc",
+            "connection",
+            "attachments",
+            "headers",
+            "alternatives",
+            "cc",
+            "reply_to",
+        ],
+    )
     def __init__(
         self,
         subject="",
         body="",
         from_email=None,
         to=None,
+        *,
         bcc=None,
         connection=None,
         attachments=None,
@@ -465,16 +491,16 @@ class EmailMultiAlternatives(EmailMessage):
         recipients).
         """
         super().__init__(
-            subject,
-            body,
-            from_email,
-            to,
-            bcc,
-            connection,
-            attachments,
-            headers,
-            cc,
-            reply_to,
+            subject=subject,
+            body=body,
+            from_email=from_email,
+            to=to,
+            bcc=bcc,
+            connection=connection,
+            attachments=attachments,
+            headers=headers,
+            cc=cc,
+            reply_to=reply_to,
         )
         self.alternatives = [
             EmailAlternative(*alternative) for alternative in (alternatives or [])
