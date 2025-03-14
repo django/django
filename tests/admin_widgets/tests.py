@@ -22,6 +22,7 @@ from django.db.models import (
     ManyToManyField,
     UUIDField,
 )
+from django.forms.renderers import BaseRenderer
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.selenium import screenshot_cases
 from django.test.utils import requires_tz_support
@@ -963,6 +964,78 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         </div>
         """
         self.assertHTMLEqual(output, expected)
+
+    def test_get_context_with_default_renderer(self):
+        """Test get_context() works with default (None) renderer"""
+        rel = Album._meta.get_field("band").remote_field
+        widget = forms.Select()
+        wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
+        context = wrapper.get_context("field_name", "value")
+        self.assertIn("rendered_widget", context)
+        self.assertIsNotNone(context["rendered_widget"])
+
+    def test_get_context_with_custom_renderer(self):
+        """Test get_context() works with a custom renderer"""
+
+        class MockRenderer(BaseRenderer):
+            """Mock renderer for testing renderer-related functionality"""
+
+            def render(self, template_name, context, request=None):
+                return f"Rendered by MockRenderer: {template_name}"
+
+        rel = Album._meta.get_field("band").remote_field
+        widget = forms.Select()
+        wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
+
+        mock_renderer = MockRenderer()
+        context = wrapper.get_context("field_name", "value", renderer=mock_renderer)
+
+        self.assertIn("rendered_widget", context)
+        self.assertIsNotNone(context["rendered_widget"])
+
+    def test_renderer_with_different_widget_types(self):
+        """Test renderer works with various widget types"""
+        test_widgets = [forms.Select(), forms.TextInput(), forms.HiddenInput()]
+
+        rel = Album._meta.get_field("band").remote_field
+
+        for test_widget in test_widgets:
+            with self.subTest(widget_type=type(test_widget).__name__):
+
+                class MockRenderer(BaseRenderer):
+                    """Mock renderer for testing renderer-related functionality"""
+
+                    def __init__(self):
+                        self.used = False
+
+                    def render(self, template_name, context, request=None):
+                        self.used = True
+                        return f"Rendered by MockRenderer: {template_name}"
+
+                wrapper = widgets.RelatedFieldWidgetWrapper(
+                    test_widget, rel, widget_admin_site
+                )
+
+                mock_renderer = MockRenderer()
+                context = wrapper.get_context(
+                    "field_name", "value", renderer=mock_renderer
+                )
+
+                self.assertIn("rendered_widget", context)
+                self.assertIsNotNone(context["rendered_widget"])
+                # Verify that the renderer was actually used
+                self.assertTrue(mock_renderer.used)
+
+    def test_renderer_backward_compatibility(self):
+        """Ensure existing code continues to work without renderer"""
+        rel = Album._meta.get_field("band").remote_field
+        widget = forms.Select()
+        wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
+
+        # Should not raise any TypeError
+        context = wrapper.get_context("field_name", "value")
+        self.assertIn("rendered_widget", context)
+        self.assertIsNotNone(context["rendered_widget"])
 
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
