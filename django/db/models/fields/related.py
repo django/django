@@ -1707,13 +1707,18 @@ class ManyToManyField(RelatedField):
                             and getattr(field.remote_field, "model", None)
                             == related_model
                         ):
+                            related_object_name = (
+                                related_model
+                                if isinstance(related_model, str)
+                                else related_model._meta.object_name
+                            )
                             errors.append(
                                 checks.Error(
                                     "'%s.%s' is not a foreign key to '%s'."
                                     % (
                                         through._meta.object_name,
                                         field_name,
-                                        related_model._meta.object_name,
+                                        related_object_name,
                                     ),
                                     hint=hint,
                                     obj=self,
