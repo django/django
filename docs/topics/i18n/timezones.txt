@@ -206,7 +206,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
         {% csrf_token %}
         <label for="timezone">Time zone:</label>
         <select name="timezone">
-            {% for city, tz in timezones %}
+            {% for city, tz in timezones.items %}
             <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected{% endif %}>{{ city }}</option>
             {% endfor %}
         </select>
