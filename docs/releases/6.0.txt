@@ -72,6 +72,9 @@ Minor features
   function rotates a geometry by a specified angle around the origin or a
   specified point.
 
+* changed log level from ERROR to WARNING in BaseGeometryWidget.deserialize()
+  to reduce noise in error logs when deserializing malformed geometry.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

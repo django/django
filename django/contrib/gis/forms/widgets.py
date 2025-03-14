@@ -37,7 +37,7 @@ class BaseGeometryWidget(Widget):
         try:
             return GEOSGeometry(value)
         except (GEOSException, ValueError, TypeError) as err:
-            logger.error("Error creating geometry from value '%s' (%s)", value, err)
+            logger.warning("Error creating geometry from value '%s' (%s)", value, err)
         return None
 
     def get_context(self, name, value, attrs):
