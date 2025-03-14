@@ -37,6 +37,56 @@ compatible with Django 6.0.
 What's new in Django 6.0
 ========================
 
+Model field fetch modes
+-----------------------
+
+The on-demand fetching behavior of model fields is now configurable with
+:doc:`fetch modes </topics/db/fetch-modes>`. Django provides three fetch
+modes:
+
+1. ``FETCH_ONE``, the default, fetches a missing field for the current instance
+   only. This mode represents Django’s existing behavior.
+
+2. ``FETCH_PEERS`` fetches a missing field for all instances that came from
+   the same :class:`~django.db.models.query.QuerySet`.
+
+   This mode can reduce most cases of the “N+1 queries problem” to two queries.
+
+3. ``RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
+   exception. Use this mode to prevent unintentional queries in
+   performance-critical sections.
+
+Set the global default fetch mode with
+:func:`~django.db.models.set_default_fetch_mode`:
+
+.. code-block:: python
+
+    from django.apps import AppConfig
+    from django.db.models import set_default_fetch_mode, FETCH_PEERS
+
+
+    class ExampleConfig(AppConfig):
+        ...
+
+        def ready(self):
+            set_default_fetch_mode(FETCH_PEERS)
+
+Or, set the fetch mode for one code section with
+:func:`~django.db.models.fetch_mode`, which acts as both a function decorator
+and context manager:
+
+.. code-block:: python
+
+    from django.db.models import fetch_mode, RAISE
+
+
+    def dashboard(request):
+        ...
+        # Raise a FieldFetchBlocked exception for any on-demand queries
+        # attempted during template rendering
+        with fetch_mode(RAISE):
+            return render(request, "dashboard.html", context)
+
 Minor features
 --------------
 

@@ -219,6 +219,15 @@ them:
 * in view code or other layers, possibly making use of
   :func:`~django.db.models.prefetch_related_objects` where needed.
 
+Use the ``FETCH_PEERS`` fetch mode
+----------------------------------
+
+Use the :attr:`~django.db.models.FETCH_PEERS` fetch mode to reduce the number
+of queries when fetching fields on-demand for multiple instances. This can
+mitigate a lack of :meth:`~django.db.models.query.QuerySet.select_related` or
+:meth:`~django.db.models.query.QuerySet.prefetch_related` usage when it’s hard
+to predict which fields will be accessed.
+
 Don't retrieve things you don't need
 ====================================
 
