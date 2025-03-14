@@ -22,6 +22,7 @@ class DjangoTemplates(BaseEngine):
         options.setdefault("autoescape", True)
         options.setdefault("debug", settings.DEBUG)
         options.setdefault("file_charset", "utf-8")
+        options.setdefault("multiline", False)
         libraries = options.get("libraries", {})
         options["libraries"] = self.get_templatetag_libraries(libraries)
         super().__init__(params)
