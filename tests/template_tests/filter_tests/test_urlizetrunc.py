@@ -50,6 +50,9 @@ class UrlizetruncTests(SimpleTestCase):
         )
 
 
+# RemovedInDjango70Warning: When the deprecation ends, replace "http://"
+# with "https://" in expected urlize outputs when no protocol provided.
+@ignore_warnings(category=RemovedInDjango70Warning)
 class FunctionTests(SimpleTestCase):
     def test_truncate(self):
         uri = "http://31characteruri.com/test/"
@@ -92,7 +95,6 @@ class FunctionTests(SimpleTestCase):
     def test_non_string_input(self):
         self.assertEqual(urlizetrunc(123, 1), "123")
 
-    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_autoescape(self):
         self.assertEqual(
             urlizetrunc('foo<a href=" google.com ">bar</a>buz', 10),
@@ -100,7 +102,6 @@ class FunctionTests(SimpleTestCase):
             "</a> &quot;&gt;bar&lt;/a&gt;buz",
         )
 
-    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_autoescape_off(self):
         self.assertEqual(
             urlizetrunc('foo<a href=" google.com ">bar</a>buz', 9, autoescape=False),

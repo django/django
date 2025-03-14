@@ -426,9 +426,6 @@ class TestUtilsHtml(SimpleTestCase):
                 self.assertEqual(urlize(value), output)
 
     def test_urlize_assume_https(self):
-        """
-        urlize() uses https:// as default protocol when URLIZE_ASSUME_HTTPS is True.
-        """
         tests = (
             (
                 "Visit example.com",
@@ -457,6 +454,10 @@ class TestUtilsHtml(SimpleTestCase):
                 'Visit <a href="https://%E4%BE%8B%E5%AD%90.com">例子.com</a>',
             ),
         )
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # for value, expected in tests:
+        #     with self.subTest(value=value):
+        #         self.assertEqual(urlize(value), expected)
         with self.settings(URLIZE_ASSUME_HTTPS=True):
             for value, expected in tests:
                 with self.subTest(value=value):
@@ -476,6 +477,7 @@ class TestUtilsHtml(SimpleTestCase):
             ):
                 urlize("Visit example.com")
 
+    # RemovedInDjango70Warning: When the deprecation ends, remove completely.
     def test_urlize_email_unchanged(self):
         """
         Test that email handling is unchanged by the URLIZE_ASSUME_HTTPS setting.

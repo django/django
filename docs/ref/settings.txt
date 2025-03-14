@@ -2967,8 +2967,8 @@ Default: ``False``
 
 Set this transitional setting to ``True`` to opt into using ``https://`` as the
 default protocol when none is provided in URLs processed by the
-:tfilter:`urlize` template filter during the Django 6.x release
-cycle.
+:tfilter:`urlize` and :tfilter:`urlizetrunc` template filter during the Django
+6.x release cycle.
 
 .. setting:: WSGI_APPLICATION
 
