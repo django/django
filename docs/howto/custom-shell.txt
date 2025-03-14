@@ -55,7 +55,8 @@ Running this customized ``shell`` command with ``verbosity=2`` would show:
       from django.urls import resolve, reverse
 
 If an overridden ``shell`` command includes paths that cannot be imported,
-these errors are shown when ``verbosity`` is set to ``1`` or higher.
+these errors are shown when ``verbosity`` is set to ``1`` or higher. Duplicate
+imports are automatically handled.
 
 Note that automatic imports can be disabled for a specific ``shell`` session
 using the :option:`--no-imports <shell --no-imports>` flag. To permanently
