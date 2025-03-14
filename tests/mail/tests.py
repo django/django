@@ -18,7 +18,9 @@ from ssl import SSLError
 from textwrap import dedent
 from unittest import mock, skipUnless
 
+from django.conf import settings
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import (
     DNS_NAME,
     BadHeaderError,
@@ -33,8 +35,9 @@ from django.core.mail import (
 )
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import sanitize_address
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.test.utils import requires_tz_support
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.translation import gettext_lazy
 
 try:
@@ -1046,13 +1049,20 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             email_msg.attach("file.txt", mimetype="application/pdf")
 
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.dummy.EmailBackend",
+            },
+        }
+    )
     def test_dummy_backend(self):
         """
         Make sure that dummy backends returns correct number of sent messages
         """
-        connection = dummy.EmailBackend()
+        backend = mail.get_connection()
         email = EmailMessage(to=["to@example.com"])
-        self.assertEqual(connection.send_messages([email, email, email]), 3)
+        self.assertEqual(backend.send_messages([email, email, email]), 3)
 
     def test_arbitrary_keyword(self):
         """
@@ -1105,7 +1115,11 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
-        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
+            },
+        },
         ADMINS=[("nobody", "nobody@example.com")],
         MANAGERS=[("nobody", "nobody@example.com")],
     )
@@ -1629,12 +1643,233 @@ class PythonGlobalState(SimpleTestCase):
         self.assertIn("Content-Transfer-Encoding: base64", txt.as_string())
 
 
+# RemovedInDjango70Warning.
+@override_settings(
+    EMAIL_PROVIDERS={
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": "smtp.example.com",
+                "port": 487,
+                "username": "noreply",
+                "password": "secret",
+                "use_tls": True,
+                "timeout": 42,
+            },
+        },
+    }
+)
+class ConsumingDeprecatedEmailSettingsTests(SimpleTestCase):
+    def test_third_party_app_consuming_deprecated_configuration(self):
+        self.assertEqual(
+            settings.EMAIL_BACKEND,
+            "django.core.mail.backends.smtp.EmailBackend",
+        )
+        self.assertEqual(settings.EMAIL_HOST, "smtp.example.com")
+        self.assertEqual(settings.EMAIL_PORT, 487)
+        self.assertEqual(settings.EMAIL_HOST_USER, "noreply")
+        self.assertEqual(settings.EMAIL_HOST_PASSWORD, "secret")
+        self.assertTrue(settings.EMAIL_USE_TLS)
+        self.assertFalse(settings.EMAIL_USE_SSL)
+        self.assertEqual(settings.EMAIL_TIMEOUT, 42)
+
+    def test_backend_configuration_mismatch(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "EMAIL_BACKEND and EMAIL_PROVIDERS are mutually exclusive.",
+        ):
+            with self.settings(
+                EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+            ):
+                pass
+
+    def test_host_configuration_mismatch(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "EMAIL_HOST and EMAIL_PROVIDERS are mutually exclusive.",
+        ):
+            with self.settings(
+                EMAIL_HOST="other.example.com",
+            ):
+                pass
+
+    def test_user_configuration_mismatch(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "EMAIL_HOST_USER and EMAIL_PROVIDERS are mutually exclusive.",
+        ):
+            with self.settings(
+                EMAIL_HOST_USER="scaramouche",
+            ):
+                pass
+
+    def test_password_configuration_mismatch(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "EMAIL_HOST_PASSWORD and EMAIL_PROVIDERS are mutually exclusive.",
+        ):
+            with self.settings(
+                EMAIL_HOST_PASSWORD="secret",
+            ):
+                pass
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.filebased.EmailBackend",
+                "OPTIONS": {"file_path": "/tmp/foo"},
+            },
+        }
+    )
+    def test_file_path_configuration_mismatch(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "EMAIL_FILE_PATH and EMAIL_PROVIDERS are mutually exclusive.",
+        ):
+            with self.settings(
+                EMAIL_FILE_PATH="/tmp/bar",
+            ):
+                pass
+
+
+@ignore_warnings(category=RemovedInDjango70Warning)
+class UsingDeprecatedEmailSettingsTests(SimpleTestCase):
+    def assertPathEqual(self, path1, path2):
+        if sys.platform == "win32":
+            path1 = path1[2:] if path1.startswith("D:") else path1
+            path2 = path2[2:] if path2.startswith("D:") else path2
+        self.assertEqual(os.path.normpath(path1), os.path.normpath(path2))
+
+    def test_deprecated_host_configuration(self):
+        with self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "EMAIL_BACKEND is deprecated. "
+            "Use EMAIL_PROVIDERS['default']['BACKEND'] instead.",
+        ):
+            with self.settings(
+                EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend",
+                EMAIL_HOST="smtp.example.com",
+                EMAIL_PORT=9876,
+                EMAIL_USE_SSL=True,
+            ):
+                connection = mail.get_connection()
+                self.assertIsInstance(connection, smtp.EmailBackend)
+                self.assertEqual(connection.host, "smtp.example.com")
+                self.assertEqual(connection.port, 9876)
+                self.assertTrue(connection.use_ssl)
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend",
+        EMAIL_HOST="mail.example.com",
+        EMAIL_PORT=9876,
+    )
+    def test_deprecated_smtp_settings(self):
+        with self.subTest("kwarg params to get_connection() override settings"):
+            connection = mail.get_connection(host="other.example.net")
+            self.assertIsInstance(connection, smtp.EmailBackend)
+            self.assertEqual(connection.host, "other.example.net")
+            self.assertEqual(connection.port, 9876)
+
+        with self.subTest("specific backend overrides EMAIL_BACKEND setting"):
+            connection = mail.get_connection(
+                "django.core.mail.backends.smtp.EmailBackend",
+                host="other.example.net",
+            )
+            self.assertIsInstance(connection, smtp.EmailBackend)
+            self.assertEqual(connection.host, "other.example.net")
+            self.assertEqual(connection.port, 9876)
+
+    @override_settings(
+        EMAIL_BACKEND="mail.custombackend.EmailBackend",
+        THIRD_PARTY_WRAPPED_BACKEND="django.core.mail.backends.smtp.EmailBackend",
+        EMAIL_HOST="smtp.example.com",
+        EMAIL_HOST_USER="noreply",
+        EMAIL_HOST_PASSWORD="secret",
+    )
+    def test_third_party_wrapping_smtp_backend(self):
+        # A wrapper backend does something like this:
+        wrapped = mail.get_connection(settings.THIRD_PARTY_WRAPPED_BACKEND)
+        # And it expects its wrapped connection to be initialized properly:
+        self.assertIsInstance(wrapped, smtp.EmailBackend)
+        self.assertEqual(wrapped.host, "smtp.example.com")  # from settings
+        self.assertEqual(wrapped.port, 25)  # from defaults
+        self.assertEqual(wrapped.username, "noreply")  # from settings
+        self.assertEqual(wrapped.password, "secret")  # from settings
+
+    @override_settings(
+        EMAIL_BACKEND="mail.custombackend.EmailBackend",
+        THIRD_PARTY_WRAPPED_BACKEND="django.core.mail.backends.filebased.EmailBackend",
+        EMAIL_FILE_PATH="/tmp/foo",
+    )
+    def test_third_party_wrapping_filebased_backend(self):
+        # A wrapper backend does something like this:
+        wrapped = mail.get_connection(settings.THIRD_PARTY_WRAPPED_BACKEND)
+        # And it expects its wrapped connection to be initialized properly:
+        self.assertIsInstance(wrapped, filebased.EmailBackend)
+        self.assertPathEqual(wrapped.file_path, "/tmp/foo")  # from settings
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.dummy.EmailBackend",
+            },
+        },
+    )
+    def test_third_party_app_using_deprecated_backend_configuration(self):
+        self.assertEqual(
+            settings.EMAIL_BACKEND,
+            "django.core.mail.backends.dummy.EmailBackend",
+        )
+        self.assertIsInstance(mail.get_connection(), dummy.EmailBackend)
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.filebased.EmailBackend",
+        EMAIL_FILE_PATH="/tmp/foo",
+    )
+    def test_deprecated_filebased_settings_still_work(self):
+        connection = mail.get_connection()
+        self.assertIsInstance(connection, filebased.EmailBackend)
+        self.assertPathEqual(connection.file_path, "/tmp/foo")
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.filebased.EmailBackend",
+        EMAIL_FILE_PATH="/tmp/foo",
+    )
+    def test_deprecated_filebased_settings_with_get_connection_kwargs(self):
+        # kwarg params to get_connection() override settings
+        connection = mail.get_connection(file_path="/tmp/bar")
+        self.assertIsInstance(connection, filebased.EmailBackend)
+        self.assertPathEqual(connection.file_path, "/tmp/bar")  # from kwargs
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.dummy.EmailBackend",
+        EMAIL_FILE_PATH="/tmp/foo",
+    )
+    def test_get_connection_specified_filebased_backend(self):
+        # specific backend overrides EMAIL_BACKEND setting; kwargs work as above
+        connection = mail.get_connection(
+            "django.core.mail.backends.filebased.EmailBackend",
+            file_path="/tmp/bar",
+        )
+        self.assertIsInstance(connection, filebased.EmailBackend)
+        self.assertPathEqual(connection.file_path, "/tmp/bar")  # from kwargs
+
+
 class BaseEmailBackendTests(MailTestsMixin):
     email_backend = None
 
     @classmethod
     def setUpClass(cls):
-        cls.enterClassContext(override_settings(EMAIL_BACKEND=cls.email_backend))
+        cls.enterClassContext(
+            override_settings(
+                EMAIL_PROVIDERS={
+                    "default": {
+                        "BACKEND": cls.email_backend,
+                        "OPTIONS": {},
+                    },
+                }
+            )
+        )
         super().setUpClass()
 
     def get_mailbox_content(self):
@@ -1976,8 +2211,9 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
         """
         Make sure that the locmen backend populates the outbox.
         """
-        connection = locmem.EmailBackend()
-        connection2 = locmem.EmailBackend()
+        connection = mail.get_connection()
+        self.assertIsInstance(connection, locmem.EmailBackend)
+        connection2 = mail.get_connection()
         email = EmailMessage(to=["to@example.com"])
         connection.send_messages([email])
         connection2.send_messages([email])
@@ -2009,7 +2245,14 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         super().setUp()
         self.tmp_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        _settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        _settings_override = override_settings(
+            EMAIL_PROVIDERS={
+                "default": {
+                    "BACKEND": self.email_backend,
+                    "OPTIONS": {"file_path": self.tmp_dir},
+                },
+            }
+        )
         _settings_override.enable()
         self.addCleanup(_settings_override.disable)
 
@@ -2063,6 +2306,20 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.assertEqual(len(os.listdir(self.tmp_dir)), 3)
 
         connection.close()
+
+    def test_missing_file_path_raises_exception(self):
+        with self.settings(
+            EMAIL_PROVIDERS={
+                "default": {
+                    "BACKEND": self.email_backend,
+                }
+            }
+        ):
+            with self.assertRaisesMessage(
+                ImproperlyConfigured,
+                '"file_path" not specified in EMAIL_PROVIDERS["default"]["OPTIONS"]',
+            ):
+                mail.get_connection()
 
 
 class FileBackendPathLibTests(FileBackendTests):
@@ -2169,8 +2426,15 @@ class SMTPBackendTestsBase(SimpleTestCase):
             port=port,
         )
         cls._settings_override = override_settings(
-            EMAIL_HOST=cls.smtp_controller.hostname,
-            EMAIL_PORT=cls.smtp_controller.port,
+            EMAIL_PROVIDERS={
+                "default": {
+                    "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                    "OPTIONS": {
+                        "host": cls.smtp_controller.hostname,
+                        "port": cls.smtp_controller.port,
+                    },
+                },
+            }
         )
         cls._settings_override.enable()
         cls.addClassCleanup(cls._settings_override.disable)
@@ -2201,39 +2465,41 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         return self.smtp_handler.smtp_envelopes
 
     @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password",
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "username": "not empty username",
+                    "password": "not empty password",
+                },
+            },
+        }
     )
-    def test_email_authentication_use_settings(self):
-        backend = smtp.EmailBackend()
-        self.assertEqual(backend.username, "not empty username")
-        self.assertEqual(backend.password, "not empty password")
+    def test_email_authentication_options(self):
+        with self.subTest("use settings"):
+            backend = mail.get_connection()
+            self.assertEqual(backend.username, "not empty username")
+            self.assertEqual(backend.password, "not empty password")
 
-    @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password",
-    )
-    def test_email_authentication_override_settings(self):
-        backend = smtp.EmailBackend(username="username", password="password")
-        self.assertEqual(backend.username, "username")
-        self.assertEqual(backend.password, "password")
+        with self.subTest("override settings"):
+            backend = mail.get_connection(username="username", password="password")
+            self.assertEqual(backend.username, "username")
+            self.assertEqual(backend.password, "password")
 
-    @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password",
-    )
-    def test_email_disabled_authentication(self):
-        backend = smtp.EmailBackend(username="", password="")
-        self.assertEqual(backend.username, "")
-        self.assertEqual(backend.password, "")
+        with self.subTest("disabled authentication"):
+            backend = mail.get_connection(username="", password="")
+            self.assertEqual(backend.username, "")
+            self.assertEqual(backend.password, "")
 
     def test_auth_attempted(self):
         """
         Opening the backend with non empty username/password tries
         to authenticate against the SMTP server.
         """
-        backend = smtp.EmailBackend(
-            username="not empty username", password="not empty password"
+        backend = mail.get_connection(
+            **settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+            username="not empty username",
+            password="not empty password",
         )
         with self.assertRaisesMessage(
             SMTPException, "SMTP AUTH extension not supported by server."
@@ -2245,85 +2511,164 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         """
         open() returns whether it opened a connection.
         """
-        backend = smtp.EmailBackend(username="", password="")
+        backend = mail.get_connection(username="", password="")
         self.assertIsNone(backend.connection)
         opened = backend.open()
         backend.close()
         self.assertIs(opened, True)
 
     def test_reopen_connection(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         # Simulate an already open connection.
         backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
 
-    @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection(
+            **settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+            use_tls=True,
+        )
         self.assertTrue(backend.use_tls)
 
-    @override_settings(EMAIL_USE_TLS=True)
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "use_tls": True,
+                },
+            },
+        }
+    )
     def test_email_tls_override_settings(self):
-        backend = smtp.EmailBackend(use_tls=False)
+        backend = mail.get_connection(use_tls=False)
         self.assertFalse(backend.use_tls)
 
     def test_email_tls_default_disabled(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         self.assertFalse(backend.use_tls)
 
     def test_ssl_tls_mutually_exclusive(self):
         msg = (
-            "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
+            "use_tls/use_ssl are mutually exclusive, so only set "
             "one of those settings to True."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            smtp.EmailBackend(use_ssl=True, use_tls=True)
+            mail.get_connection(use_ssl=True, use_tls=True)
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "use_ssl": True,
+                },
+            },
+        }
+    )
     def test_email_ssl_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         self.assertTrue(backend.use_ssl)
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "use_ssl": True,
+                },
+            },
+        }
+    )
     def test_email_ssl_override_settings(self):
-        backend = smtp.EmailBackend(use_ssl=False)
+        backend = mail.get_connection(use_ssl=False)
         self.assertFalse(backend.use_ssl)
 
     def test_email_ssl_default_disabled(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         self.assertFalse(backend.use_ssl)
 
-    @override_settings(EMAIL_SSL_CERTFILE="foo")
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "ssl_certfile": "foo",
+                },
+            },
+        }
+    )
     def test_email_ssl_certfile_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         self.assertEqual(backend.ssl_certfile, "foo")
 
-    @override_settings(EMAIL_SSL_CERTFILE="foo")
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "ssl_certfile": "foo",
+                },
+            },
+        }
+    )
     def test_email_ssl_certfile_override_settings(self):
-        backend = smtp.EmailBackend(ssl_certfile="bar")
+        backend = mail.get_connection(ssl_certfile="bar")
         self.assertEqual(backend.ssl_certfile, "bar")
 
     def test_email_ssl_certfile_default_disabled(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         self.assertIsNone(backend.ssl_certfile)
 
-    @override_settings(EMAIL_SSL_KEYFILE="foo")
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "ssl_keyfile": "foo",
+                },
+            },
+        }
+    )
     def test_email_ssl_keyfile_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         self.assertEqual(backend.ssl_keyfile, "foo")
 
-    @override_settings(EMAIL_SSL_KEYFILE="foo")
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "ssl_keyfile": "foo",
+                },
+            },
+        }
+    )
     def test_email_ssl_keyfile_override_settings(self):
-        backend = smtp.EmailBackend(ssl_keyfile="bar")
+        backend = mail.get_connection(ssl_keyfile="bar")
         self.assertEqual(backend.ssl_keyfile, "bar")
 
     def test_email_ssl_keyfile_default_disabled(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         self.assertIsNone(backend.ssl_keyfile)
 
-    @override_settings(EMAIL_USE_TLS=True)
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "use_tls": True,
+                },
+            },
+        }
+    )
     def test_email_tls_attempts_starttls(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection(
+            **dict(
+                settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                port=self.smtp_controller.port,
+            )
+        )
         self.assertTrue(backend.use_tls)
         with self.assertRaisesMessage(
             SMTPException, "STARTTLS extension not supported by server."
@@ -2331,9 +2676,23 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
             with backend:
                 pass
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "use_ssl": True,
+                },
+            },
+        }
+    )
     def test_email_ssl_attempts_ssl_connection(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection(
+            **dict(
+                settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                port=self.smtp_controller.port,
+            )
+        )
         self.assertTrue(backend.use_ssl)
         with self.assertRaises(SSLError):
             with backend:
@@ -2358,10 +2717,49 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(myemailbackend.connection.timeout, 42)
         myemailbackend.close()
 
-    @override_settings(EMAIL_TIMEOUT=10)
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "timeout": 10,
+                },
+            },
+        }
+    )
     def test_email_timeout_override_settings(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection(**settings.EMAIL_PROVIDERS["default"]["OPTIONS"])
         self.assertEqual(backend.timeout, 10)
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": settings.EMAIL_PROVIDERS["default"],
+            "alternative": {
+                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "OPTIONS": {
+                    "host": "smtp.example.com",
+                    "port": 587,
+                    "username": "noreply",
+                    "password": "secret",
+                    "use_tls": True,
+                    "ssl_keyfile": "foo",
+                    "ssl_certfile": "bar",
+                    "timeout": 10,
+                },
+            },
+        }
+    )
+    def test_email_alternative_provider(self):
+        self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
+        connection = mail.get_connection(provider="alternative")
+        self.assertEqual(connection.host, "smtp.example.com")
+        self.assertEqual(connection.port, 587)
+        self.assertEqual(connection.username, "noreply")
+        self.assertEqual(connection.password, "secret")
+        self.assertTrue(connection.use_tls)
+        self.assertEqual(connection.ssl_keyfile, "foo")
+        self.assertEqual(connection.ssl_certfile, "bar")
+        self.assertEqual(connection.timeout, 10)
 
     def test_email_msg_uses_crlf(self):
         """#23063 -- RFC-compliant messages are sent over SMTP."""
@@ -2403,7 +2801,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         send_messages() shouldn't try to send messages if open() raises an
         exception after initializing the connection.
         """
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         # Simulate connection initialization success and a subsequent
         # connection exception.
         backend.connection = mock.Mock(spec=object())
@@ -2412,13 +2810,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.send_messages([email]), 0)
 
     def test_send_messages_empty_list(self):
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         backend.connection = mock.Mock(spec=object())
         self.assertEqual(backend.send_messages([]), 0)
 
     def test_send_messages_zero_sent(self):
         """A message isn't sent if it doesn't have any recipients."""
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         backend.connection = mock.Mock(spec=object())
         email = EmailMessage("Subject", "Content", "from@example.com", to=[])
         sent = backend.send_messages([email])
@@ -2429,7 +2827,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         Verify invalid addresses can't sneak into SMTP commands through
         EmailMessage.all_recipients() (which is distinct from message header fields).
         """
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         backend.connection = mock.Mock()
         for email_address in (
             # Invalid address with two @ signs.
@@ -2465,7 +2863,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
                 "To": "Discussão Django <django@discussão.example.org>",
             },
         )
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         backend.send_messages([email])
         envelope = self.get_smtp_envelopes()[0]
         self.assertEqual(envelope["mail_from"], "lists@xn--discusso-xza.example.org")
@@ -2490,7 +2888,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
             cc=['"ශ්‍රී" <cc@xn--nxasmm1c.example.com>'],
             bcc=['"نامه‌ای." <bcc@xn--mgba3gch31f060k.example.com>'],
         )
-        backend = smtp.EmailBackend()
+        backend = mail.get_connection()
         backend.send_messages([email])
         envelope = self.get_smtp_envelopes()[0]
         self.assertEqual(envelope["mail_from"], "from@xn--fa-hia.example.com")
@@ -2509,7 +2907,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.backend = smtp.EmailBackend(username="", password="")
+        cls.backend = mail.get_connection()
         cls.smtp_controller.stop()
 
     @classmethod
