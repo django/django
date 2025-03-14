@@ -231,7 +231,7 @@ class CreateModel(ModelOperation):
                 return [
                     replace(
                         self,
-                        fields=self.fields + [(operation.name, operation.field)],
+                        fields=[*self.fields, (operation.name, operation.field)],
                     ),
                 ]
             elif isinstance(operation, AlterField):

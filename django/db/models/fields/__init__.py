@@ -1788,8 +1788,9 @@ class DecimalField(Field):
 
     @cached_property
     def validators(self):
-        return super().validators + [
-            validators.DecimalValidator(self.max_digits, self.decimal_places)
+        return [
+            *super().validators,
+            validators.DecimalValidator(self.max_digits, self.decimal_places),
         ]
 
     @cached_property

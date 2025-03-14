@@ -71,7 +71,7 @@ class ResolverMatch:
             self._func_path = func.__module__ + "." + func.__name__
 
         view_path = url_name or self._func_path
-        self.view_name = ":".join(self.namespaces + [view_path])
+        self.view_name = ":".join([*self.namespaces, view_path])
 
     def __getitem__(self, index):
         return (self.func, self.args, self.kwargs)[index]
@@ -691,8 +691,8 @@ class URLResolver:
                             sub_match_args,
                             sub_match_dict,
                             sub_match.url_name,
-                            [self.app_name] + sub_match.app_names,
-                            [self.namespace] + sub_match.namespaces,
+                            [self.app_name, *sub_match.app_names],
+                            [self.namespace, *sub_match.namespaces],
                             self._join_route(current_route, sub_match.route),
                             tried,
                             captured_kwargs=sub_match.captured_kwargs,
