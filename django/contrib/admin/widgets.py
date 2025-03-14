@@ -4,12 +4,14 @@ Form Widget classes specific to the Django admin site.
 
 import copy
 import json
+from typing import Any, Dict, Optional
 
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import CASCADE, UUIDField
+from django.forms.renderers import BaseRenderer
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
@@ -312,12 +314,40 @@ class RelatedFieldWidgetWrapper(forms.Widget):
             args=args,
         )
 
-    def get_context(self, name, value, attrs):
+    def get_context(
+        self,
+        name: str,
+        value: Any,
+        attrs: Optional[Dict[str, Any]] = None,
+        renderer: Optional[BaseRenderer] = None,
+    ) -> Dict[str, Any]:
+        """
+        Generate context for the widget, supporting optional custom renderer.
+
+        This method ensures that the underlying widget respects the provided
+        renderer, improving flexibility in widget rendering.
+
+        Args:
+            name: Field name
+            value: Current field value
+            attrs: HTML attributes
+            renderer: Optional custom renderer
+
+        Returns:
+            Context dictionary for template rendering
+        """
+        # Ensure attrs is a dictionary to prevent potential None-related errors
+        attrs = attrs or {}
+
+        # IMPORTANT: Lazy import to avoid circular dependencies
         from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
 
+        # Retrieve model and related field metadata
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         related_field_name = self.rel.get_related_field().name
+
+        # Construct URL parameters for popup and related field
         url_params = "&".join(
             "%s=%s" % param
             for param in [
@@ -325,8 +355,13 @@ class RelatedFieldWidgetWrapper(forms.Widget):
                 (IS_POPUP_VAR, 1),
             ]
         )
+
+        # Render widget with optional renderer
+        rendered_widget = self.widget.render(name, value, attrs, renderer=renderer)
+
+        # Construct context dictionary
         context = {
-            "rendered_widget": self.widget.render(name, value, attrs),
+            "rendered_widget": rendered_widget,
             "is_hidden": self.is_hidden,
             "name": name,
             "url_params": url_params,
