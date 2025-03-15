@@ -1667,7 +1667,7 @@ If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
 
 Removes all values of arg from the given string.
 
-For example in t a template:
+For example, in a template:
 
 .. code-block:: html+django
 
