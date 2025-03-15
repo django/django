@@ -210,9 +210,13 @@ class GenericForeignKey(FieldCacheMixin, Field):
                     model,
                 )
 
+        def prefetch_instance_key(obj):
+            if not obj._meta.is_composite_pk:
+                return obj._meta.pk_fields[0].get_prep_value(obj.pk), obj.__class__
+
         return (
             ret_val,
-            lambda obj: (obj.pk, obj.__class__),
+            prefetch_instance_key,
             gfk_key,
             True,
             self.name,
