@@ -1145,7 +1145,7 @@ function setDocument( node ) {
 		( subWindow = document.defaultView ) && subWindow.top !== subWindow ) {
 
 		// Support: IE 9 - 11+, Edge 12 - 18+
-		subWindow.addEventListener( "unload", unloadHandler );
+		subWindow.addEventListener( "pagehide", unloadHandler );
 	}
 
 	// Support: IE <10
