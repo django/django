@@ -1387,6 +1387,11 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    def test_username_field_must_be_unique(self):
+        """Test that USERNAME_FIELD must be unique."""
+        username_field = User._meta.get_field(User.USERNAME_FIELD)
+        self.assertTrue(username_field.unique, "USERNAME_FIELD must be unique")
+
 
 class MultiDBCreatesuperuserTestCase(TestCase):
     databases = {"default", "other"}

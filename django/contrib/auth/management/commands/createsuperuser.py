@@ -300,6 +300,16 @@ class Command(BaseCommand):
 
     def _validate_username(self, username, verbose_field_name, database):
         """Validate username. If invalid, return a string error message."""
+
+        # Check if USERNAME_FIELD allows null values
+        username_field = self.UserModel._meta.get_field(self.UserModel.USERNAME_FIELD)
+
+        if username_field.null:
+            return f"Error: {verbose_field_name} cannot be null when using the createsuperuser command."
+
+        if username_field.blank and not username:
+            return f"{capfirst(verbose_field_name)} cannot be blank."
+
         if self.username_is_unique:
             try:
                 self.UserModel._default_manager.db_manager(database).get_by_natural_key(
