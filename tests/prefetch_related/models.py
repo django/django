@@ -216,6 +216,18 @@ class Comment(models.Model):
         ordering = ["id"]
 
 
+class CustomUUIDField(models.UUIDField):
+    """For #34819 regression test."""
+
+    def get_prep_value(self, value):
+        return str(value)
+
+
+class ArticleCustomUUID(models.Model):
+    id = CustomUUIDField(primary_key=True, default=uuid.uuid4)
+    name = models.CharField(max_length=30)
+
+
 # Models for lookup ordering tests
 
 
