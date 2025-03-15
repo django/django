@@ -248,6 +248,34 @@ class MultiValueDictTests(SimpleTestCase):
                 MultiValueDict().update(value)
 
 
+class ImmutableMultiValueDictTests(SimpleTestCase):
+
+    def test_immutability(self):
+        q = MultiValueDict(mutable=False)
+        with self.assertRaises(AttributeError):
+            q.__setitem__("something", "bar")
+        with self.assertRaises(AttributeError):
+            q.setlist("foo", ["bar"])
+        with self.assertRaises(AttributeError):
+            q.appendlist("foo", ["bar"])
+        with self.assertRaises(AttributeError):
+            q.update({"foo": "bar"})
+        with self.assertRaises(AttributeError):
+            q.pop("foo")
+        with self.assertRaises(AttributeError):
+            q.popitem()
+        with self.assertRaises(AttributeError):
+            q.clear()
+
+    def test_mutable_copy(self):
+        """A copy of an immutable MultiValueDict is mutable."""
+        q = MultiValueDict(mutable=False).copy()
+        with self.assertRaises(KeyError):
+            q.__getitem__("foo")
+        q["name"] = "john"
+        self.assertEqual(q["name"], "john")
+
+
 class ImmutableListTests(SimpleTestCase):
     def test_sort(self):
         d = ImmutableList(range(10))
