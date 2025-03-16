@@ -212,6 +212,10 @@ Models
 * :class:`~django.db.models.JSONField` now supports
   :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
 
+* The new :class:`~django.db.models.AnyValue` aggregate returns an arbitrary
+  value from the non-null input values. This is supported on SQLite, MySQL,
+  Oracle, and PostgreSQL 16+.
+
 Pagination
 ~~~~~~~~~~
 
