@@ -180,9 +180,12 @@ class GeneratedFieldTestMixin:
 
     def test_unsaved_error(self):
         m = self.base_model(a=1, b=2)
+        manual_pk_obj = GeneratedModelNonAutoPk(id=101, a="a")
         msg = "Cannot read a generated field from an unsaved model."
         with self.assertRaisesMessage(AttributeError, msg):
             m.field
+        with self.assertRaisesMessage(AttributeError, msg):
+            manual_pk_obj.b
 
     def test_full_clean(self):
         m = self.base_model(a=1, b=2)
