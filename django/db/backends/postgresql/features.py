@@ -162,3 +162,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_nulls_distinct_unique_constraints = property(
         operator.attrgetter("is_postgresql_15")
     )
+
+    supports_any_value = property(operator.attrgetter("is_postgresql_16"))
