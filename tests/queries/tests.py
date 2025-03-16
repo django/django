@@ -1982,6 +1982,11 @@ class Queries5Tests(TestCase):
             Employment.objects.filter(employer__in=[company, Company(name="unsaved")])
         with self.assertRaisesMessage(ValueError, msg):
             StaffUser.objects.filter(staff=Staff(name="unsaved"))
+        with self.assertRaisesMessage(ValueError, msg):
+            ExtraInfo.objects.filter(date=DateTimePK())
+        company.pk = None  # Cloned instance.
+        with self.assertRaisesMessage(ValueError, msg):
+            Employment.objects.filter(employer=company)
 
 
 class SelectRelatedTests(TestCase):
@@ -3360,6 +3365,11 @@ class ExcludeTests(TestCase):
             Employment.objects.exclude(employer__in=[company, Company(name="unsaved")])
         with self.assertRaisesMessage(ValueError, msg):
             StaffUser.objects.exclude(staff=Staff(name="unsaved"))
+        with self.assertRaisesMessage(ValueError, msg):
+            ExtraInfo.objects.exclude(date=DateTimePK())
+        company.pk = None  # Cloned instance.
+        with self.assertRaisesMessage(ValueError, msg):
+            Employment.objects.exclude(employer=company)
 
 
 class ExcludeTest17600(TestCase):
