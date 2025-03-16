@@ -147,3 +147,7 @@ class RelatedModel(models.Model):
 class DbDefaultModel(models.Model):
     name = models.CharField(max_length=10)
     created_at = models.DateTimeField(db_default=Now())
+
+
+class DbDefaultPrimaryKey(models.Model):
+    id = models.DateTimeField(primary_key=True, db_default=Now())
