@@ -204,6 +204,9 @@ Models
 * :meth:`.QuerySet.raw` now supports models with a
   :class:`~django.db.models.CompositePrimaryKey`.
 
+* Added support for :class:`~django.db.models.AnyValue` for SQLite, MySQL,
+  Oracle, and PostgreSQL 16.0+.
+
 Pagination
 ~~~~~~~~~~
 
