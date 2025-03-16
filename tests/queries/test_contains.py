@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from .models import DumbCategory, NamedCategory, ProxyCategory
+from .models import DateTimePK, DumbCategory, NamedCategory, ProxyCategory
 
 
 class ContainsTests(TestCase):
@@ -10,9 +10,15 @@ class ContainsTests(TestCase):
         cls.proxy_category = ProxyCategory.objects.create()
 
     def test_unsaved_obj(self):
+        clone = DateTimePK.objects.create()
+        clone.pk = None
         msg = "QuerySet.contains() cannot be used on unsaved objects."
         with self.assertRaisesMessage(ValueError, msg):
             DumbCategory.objects.contains(DumbCategory())
+        with self.assertRaisesMessage(ValueError, msg):
+            DateTimePK.objects.contains(DateTimePK())
+        with self.assertRaisesMessage(ValueError, msg):
+            DateTimePK.objects.contains(clone)
 
     def test_obj_type(self):
         msg = "'obj' must be a model instance."
