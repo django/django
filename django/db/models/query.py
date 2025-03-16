@@ -23,7 +23,7 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, F, Value, When
+from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
@@ -789,7 +789,10 @@ class QuerySet(AltersData):
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_without_pk, objs_with_pk = partition(lambda o: o._is_pk_set(), objs)
+            objs_without_pk, objs_with_pk = partition(
+                lambda o: o._is_pk_set() and not isinstance(o.pk, DatabaseDefault),
+                objs,
+            )
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
