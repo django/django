@@ -61,6 +61,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         END;
     """
     supports_callproc_kwargs = True
+    supports_any_value = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_ignore_conflicts = False
