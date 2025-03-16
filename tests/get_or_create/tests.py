@@ -259,7 +259,7 @@ class GetOrCreateTransactionTests(TransactionTestCase):
         otherwise the exception is never raised.
         """
         try:
-            Profile.objects.get_or_create(person=Person(id=1))
+            Profile.objects.get_or_create()
         except IntegrityError:
             pass
         else:

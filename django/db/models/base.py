@@ -1183,13 +1183,7 @@ class Model(AltersData, metaclass=ModelBase):
                 obj = getattr(self, field.name, None)
                 if not obj:
                     continue
-                # A pk may have been assigned manually to a model instance not
-                # saved to the database (or auto-generated in a case like
-                # UUIDField), but we allow the save to proceed and rely on the
-                # database to raise an IntegrityError if applicable. If
-                # constraints aren't supported by the database, there's the
-                # unavoidable risk of data corruption.
-                if not obj._is_pk_set():
+                if obj._state.adding or not obj._is_pk_set():
                     # Remove the object from a related instance cache.
                     if not field.remote_field.multiple:
                         field.remote_field.delete_cached_value(obj)
@@ -1217,7 +1211,7 @@ class Model(AltersData, metaclass=ModelBase):
                 and hasattr(field, "fk_field")
             ):
                 obj = field.get_cached_value(self, default=None)
-                if obj and not obj._is_pk_set():
+                if obj and (obj._state.adding or not obj._is_pk_set()):
                     raise ValueError(
                         f"{operation_name}() prohibited to prevent data loss due to "
                         f"unsaved related object '{field.name}'."

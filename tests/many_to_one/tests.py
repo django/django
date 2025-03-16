@@ -654,6 +654,15 @@ class ManyToOneTests(TestCase):
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
+    def test_unsaved_related_instance_with_supplied_custom_primary_key(self):
+        p = ParentStringPrimaryKey(name="supplied-primary-key")
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related object "
+            "'parent'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            ChildStringPrimaryKeyParent.objects.create(parent=p)
+
     def test_save_parent_after_assign(self):
         category = Category(name="cats")
         record = Record(category=category)
