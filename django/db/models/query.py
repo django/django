@@ -33,7 +33,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.functional import cached_property, partition
+from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
 MAX_GET_RESULTS = 21
@@ -670,11 +670,20 @@ class QuerySet(AltersData):
     acreate.alters_data = True
 
     def _prepare_for_bulk_create(self, objs):
+        objs_with_pk, objs_without_pk = [], []
         for obj in objs:
-            if not obj._is_pk_set():
-                # Populate new PK values.
+            if isinstance(obj.pk, DatabaseDefault):
+                objs_without_pk.append(obj)
+            elif obj._is_pk_set():
+                objs_with_pk.append(obj)
+            else:
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
+                if obj._is_pk_set():
+                    objs_with_pk.append(obj)
+                else:
+                    objs_without_pk.append(obj)
             obj._prepare_related_fields_for_save(operation_name="bulk_create")
+        return objs_with_pk, objs_without_pk
 
     def _check_bulk_create_options(
         self, ignore_conflicts, update_conflicts, update_fields, unique_fields
@@ -787,12 +796,8 @@ class QuerySet(AltersData):
         self._for_write = True
         fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
-        self._prepare_for_bulk_create(objs)
+        objs_with_pk, objs_without_pk = self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_without_pk, objs_with_pk = partition(
-                lambda o: o._is_pk_set() and not isinstance(o.pk, DatabaseDefault),
-                objs,
-            )
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
