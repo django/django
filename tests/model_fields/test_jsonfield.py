@@ -785,6 +785,7 @@ class TestQuerying(TestCase):
             [self.objs[5]],
         )
 
+    @skipUnlessDBFeature("supports_json_negative_indexing")
     def test_shallow_list_negative_lookup(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(**{"value__-2": 1}), [self.objs[5]]
@@ -822,6 +823,7 @@ class TestQuerying(TestCase):
             [self.objs[5]],
         )
 
+    @skipUnlessDBFeature("supports_json_negative_indexing")
     def test_deep_negative_lookup_array(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(**{"value__-1__0": 2}),
@@ -834,6 +836,7 @@ class TestQuerying(TestCase):
             [self.objs[4]],
         )
 
+    @skipUnlessDBFeature("supports_json_negative_indexing")
     def test_deep_negative_lookup_mixed(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(**{"value__d__-1__f": "g"}),
