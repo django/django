@@ -21,9 +21,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_table_comment = None
     sql_alter_column_comment = None
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Explicitly initialize must_check_constraints
+        self.must_check_constraints = False
+
     def __enter__(self):
-        # Some SQLite schema alterations need foreign key constraints to be
-        # disabled. Enforce it here for the duration of the schema edition.
+        # Disable constraint checking
         if not self.connection.disable_constraint_checking():
             raise NotSupportedError(
                 "SQLite schema editor cannot be used while foreign key "
@@ -32,12 +36,24 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 "SQLite does not support disabling them in the middle of "
                 "a multi-statement transaction."
             )
+        # Reset must_check_constraints for each schema editing session
+        self.must_check_constraints = False
         return super().__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.connection.check_constraints()
-        super().__exit__(exc_type, exc_value, traceback)
-        self.connection.enable_constraint_checking()
+        try:
+            # Only check constraints if SQL was executed
+            if self.must_check_constraints:
+                self.connection.check_constraints()
+        finally:
+            # Always ensure constraint checking is re-enabled
+            super().__exit__(exc_type, exc_value, traceback)
+            self.connection.enable_constraint_checking()
+
+    def execute(self, *args, **kwargs):
+        # Flag that SQL was executed, triggering potential constraint check
+        self.must_check_constraints = True
+        return super().execute(*args, **kwargs)
 
     def quote_value(self, value):
         # The backend "mostly works" without this function and there are use
