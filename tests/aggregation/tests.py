@@ -2462,3 +2462,11 @@ class JSONArrayAggTests(TestCase):
         msg = "JSONArrayAgg(filter) is not supported on this database backend."
         with self.assertRaisesMessage(NotSupportedError, msg):
             Author.objects.aggregate(arrayagg=JSONArrayAgg("age", filter=Q(age__gt=35)))
+
+
+@skipIfDBFeature("supports_json_field")
+class JSONArrayAggNotSupportedTests(TestCase):
+    def test_not_supported(self):
+        msg = "JSONFields are not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("contact__name"))
