@@ -3,6 +3,7 @@ Tests for Django's bundled context processors.
 """
 
 from django.conf import csp
+from django.middleware.csp import HEADER
 from django.test import SimpleTestCase, TestCase, override_settings
 
 
@@ -132,8 +133,8 @@ class CSPContextProcessorTests(TestCase):
 
     def test_csp_nonce_in_header(self):
         response = self.client.get("/csp_nonce/")
-        self.assertIn(csp.HEADER, response.headers)
-        csp_header = response.headers[csp.HEADER]
+        self.assertIn(HEADER, response.headers)
+        csp_header = response.headers[HEADER]
         nonce = response.context["CSP_NONCE"]
         self.assertIn(f"'nonce-{nonce}'", csp_header)
 

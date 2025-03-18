@@ -1,6 +1,10 @@
 from django.conf import csp
 from django.http import HttpRequest, HttpResponse
-from django.middleware.csp import ContentSecurityPolicyMiddleware
+from django.middleware.csp import (
+    HEADER,
+    HEADER_REPORT_ONLY,
+    ContentSecurityPolicyMiddleware,
+)
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
@@ -215,10 +219,14 @@ class CSPGetPolicyTest(SimpleTestCase):
     ROOT_URLCONF="middleware.urls",
 )
 class CSPMiddlewareTest(SimpleTestCase):
+    def test_constants(self):
+        self.assertEqual(HEADER, "Content-Security-Policy")
+        self.assertEqual(HEADER_REPORT_ONLY, "Content-Security-Policy-Report-Only")
+
     def test_csp_defaults_off(self):
         response = self.client.get("/csp-base/")
-        self.assertNotIn(csp.HEADER, response)
-        self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
+        self.assertNotIn(HEADER, response)
+        self.assertNotIn(HEADER_REPORT_ONLY, response)
 
     @override_settings(SECURE_CSP=basic_config)
     def test_csp_basic(self):
@@ -227,8 +235,8 @@ class CSPMiddlewareTest(SimpleTestCase):
         "Content-Security-Policy" header to the response.
         """
         response = self.client.get("/csp-base/")
-        self.assertEqual(response[csp.HEADER], basic_policy)
-        self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
+        self.assertEqual(response[HEADER], basic_policy)
+        self.assertNotIn(HEADER_REPORT_ONLY, response)
 
     @override_settings(
         SECURE_CSP={
@@ -242,7 +250,7 @@ class CSPMiddlewareTest(SimpleTestCase):
         response = self.client.get("/csp-nonce/")
         nonce = response.content.decode()
         self.assertTrue(len(nonce) > 0)
-        self.assertEqual(response[csp.HEADER], f"default-src 'self' 'nonce-{nonce}'")
+        self.assertEqual(response[HEADER], f"default-src 'self' 'nonce-{nonce}'")
 
     @override_settings(
         SECURE_CSP={
@@ -256,7 +264,7 @@ class CSPMiddlewareTest(SimpleTestCase):
         response = self.client.get("/csp-base/")
         nonce = response.content.decode()
         self.assertIsNotNone(nonce)
-        self.assertEqual(response[csp.HEADER], basic_policy)
+        self.assertEqual(response[HEADER], basic_policy)
 
     @override_settings(SECURE_CSP_REPORT_ONLY=basic_config)
     def test_csp_report_only_basic(self):
@@ -265,8 +273,8 @@ class CSPMiddlewareTest(SimpleTestCase):
         "Content-Security-Policy-Report-Only" header to the response.
         """
         response = self.client.get("/csp-base/")
-        self.assertEqual(response[csp.HEADER_REPORT_ONLY], basic_policy)
-        self.assertNotIn(csp.HEADER, response)
+        self.assertEqual(response[HEADER_REPORT_ONLY], basic_policy)
+        self.assertNotIn(HEADER, response)
 
     @override_settings(
         SECURE_CSP=basic_config,
@@ -278,8 +286,8 @@ class CSPMiddlewareTest(SimpleTestCase):
         adds both headers to the response.
         """
         response = self.client.get("/csp-base/")
-        self.assertEqual(response[csp.HEADER], basic_policy)
-        self.assertEqual(response[csp.HEADER_REPORT_ONLY], basic_policy)
+        self.assertEqual(response[HEADER], basic_policy)
+        self.assertEqual(response[HEADER_REPORT_ONLY], basic_policy)
 
     @override_settings(
         DEBUG=True,
@@ -291,8 +299,8 @@ class CSPMiddlewareTest(SimpleTestCase):
         Test that the CSP headers are not added to the debug view.
         """
         response = self.client.get("/csp-404/")
-        self.assertNotIn(csp.HEADER, response)
-        self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
+        self.assertNotIn(HEADER, response)
+        self.assertNotIn(HEADER_REPORT_ONLY, response)
 
     @override_settings(
         DEBUG=True,
@@ -304,8 +312,8 @@ class CSPMiddlewareTest(SimpleTestCase):
         Test that the CSP headers are not added to the debug view.
         """
         response = self.client.get("/csp-500/")
-        self.assertNotIn(csp.HEADER, response)
-        self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
+        self.assertNotIn(HEADER, response)
+        self.assertNotIn(HEADER_REPORT_ONLY, response)
 
 
 @override_settings(
@@ -320,42 +328,40 @@ class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
         Test the base state.
         """
         response = self.client.get("/csp-base/")
-        self.assertEqual(response[csp.HEADER], basic_policy)
-        self.assertEqual(response[csp.HEADER_REPORT_ONLY], basic_policy)
+        self.assertEqual(response[HEADER], basic_policy)
+        self.assertEqual(response[HEADER_REPORT_ONLY], basic_policy)
 
     def test_csp_disabled_both(self):
         """
         Test that `csp_disabled` will clear both headers.
         """
         response = self.client.get("/csp-disabled/")
-        self.assertNotIn(csp.HEADER, response)
-        self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
+        self.assertNotIn(HEADER, response)
+        self.assertNotIn(HEADER_REPORT_ONLY, response)
 
     def test_csp_disabled_decorator(self):
         """
         Test that `csp_disabled` will clear the enforced header.
         """
         response = self.client.get("/csp-disabled-enforced/")
-        self.assertNotIn(csp.HEADER, response)
-        self.assertEqual(response[csp.HEADER_REPORT_ONLY], basic_policy)
+        self.assertNotIn(HEADER, response)
+        self.assertEqual(response[HEADER_REPORT_ONLY], basic_policy)
 
     def test_csp_disabled_report_only_decorator(self):
         """
         Test that `csp_disabled` will clear the report-only header.
         """
         response = self.client.get("/csp-disabled-report-only/")
-        self.assertNotIn(csp.HEADER_REPORT_ONLY, response)
-        self.assertEqual(response[csp.HEADER], basic_policy)
+        self.assertNotIn(HEADER_REPORT_ONLY, response)
+        self.assertEqual(response[HEADER], basic_policy)
 
     def test_csp_override_enforced_decorator(self):
         """
         Test the `csp_override` decorator overrides the CSP enforced Django settings.
         """
         response = self.client.get("/override-csp-enforced/")
-        self.assertEqual(
-            response[csp.HEADER], "default-src 'self'; img-src 'self' data:"
-        )
-        self.assertEqual(response[csp.HEADER_REPORT_ONLY], basic_policy)
+        self.assertEqual(response[HEADER], "default-src 'self'; img-src 'self' data:")
+        self.assertEqual(response[HEADER_REPORT_ONLY], basic_policy)
 
     def test_csp_override_report_only_decorator(self):
         """
@@ -363,18 +369,16 @@ class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
         """
         response = self.client.get("/override-csp-report-only/")
         self.assertEqual(
-            response[csp.HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
+            response[HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
         )
-        self.assertEqual(response[csp.HEADER], basic_policy)
+        self.assertEqual(response[HEADER], basic_policy)
 
     def test_csp_override_both_decorator(self):
         """
         Test the `csp_override` decorator overrides both CSP Django settings.
         """
         response = self.client.get("/override-csp-both/")
+        self.assertEqual(response[HEADER], "default-src 'self'; img-src 'self' data:")
         self.assertEqual(
-            response[csp.HEADER], "default-src 'self'; img-src 'self' data:"
-        )
-        self.assertEqual(
-            response[csp.HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
+            response[HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
         )

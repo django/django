@@ -4,8 +4,6 @@ from django.test import SimpleTestCase
 
 class CSPConstantsTests(SimpleTestCase):
     def test_constants(self):
-        self.assertEqual(csp.HEADER, "Content-Security-Policy")
-        self.assertEqual(csp.HEADER_REPORT_ONLY, "Content-Security-Policy-Report-Only")
         self.assertEqual(csp.NONE, "'none'")
         self.assertEqual(csp.REPORT_SAMPLE, "'report-sample'")
         self.assertEqual(csp.SELF, "'self'")
