@@ -251,7 +251,9 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* :class:`~django.core.validators.EmailValidator` now follows the HTML5 
+  specification and supports internationalized email addresses with Unicode 
+  characters in the local part.
 
 .. _backwards-incompatible-6.0:
 

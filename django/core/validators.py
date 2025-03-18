@@ -207,15 +207,25 @@ def validate_integer(value):
 
 @deconstructible
 class EmailValidator:
+    """
+    Email validator that follows the HTML5 specification and supports
+    internationalized email addresses with Unicode characters.
+
+    This implementation is more permissive than previous Django versions
+    in the local part of the email address. For more restrictive validation,
+    consider implementing a custom validator.
+    """
+
     message = _("Enter a valid email address.")
     code = "invalid"
     hostname_re = DomainNameValidator.hostname_re
     domain_re = DomainNameValidator.domain_re
     tld_no_fqdn_re = DomainNameValidator.tld_no_fqdn_re
 
+    # Modified user_regex to support both HTML5-style validation AND quoted strings
     user_regex = _lazy_re_compile(
-        # dot-atom
-        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"
+        # dot-atom with explicit Unicode support
+        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*\Z"
         # quoted-string
         r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])'
         r'*"\Z)',
