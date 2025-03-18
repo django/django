@@ -321,6 +321,10 @@ Miscellaneous
 * The PostgreSQL ``OrderableAggMixin`` is deprecated in favor of the
   ``order_by`` attribute now available on the ``Aggregate`` class.
 
+* In ``django.core.paginator.Paginator`` and
+   ``django.core.paginator.AsyncPaginator``, the condition where
+   ``per_page`` is less than or equal to ``orphans`` is no longer allowed.
+
 Features removed in 6.0
 =======================
 

@@ -23,6 +23,10 @@ details on these changes.
 * The ``django.contrib.postgres.aggregates.mixins.OrderableAggMixin`` class
   will be removed.
 
+* In ``django.core.paginator.Paginator`` and
+   ``django.core.paginator.AsyncPaginator``, the condition where
+   ``per_page`` is less than or equal to ``orphans`` is no longer allowed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
