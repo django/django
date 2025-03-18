@@ -225,7 +225,8 @@ class EmailValidator:
     # Modified user_regex to support both HTML5-style validation AND quoted strings
     user_regex = _lazy_re_compile(
         # dot-atom with explicit Unicode support
-        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*\Z"
+        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+"
+        r"(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*\Z"
         # quoted-string
         r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])'
         r'*"\Z)',
