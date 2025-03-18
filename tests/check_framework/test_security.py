@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.checks.messages import Error, Warning
-from django.core.checks.security import base, csrf, sessions
+from django.core.checks.security import base, csp, csrf, sessions
 from django.core.management.utils import get_random_secret_key
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -678,3 +678,61 @@ class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
     )
     def test_with_invalid_coop(self):
         self.assertEqual(base.check_cross_origin_opener_policy(None), [base.E024])
+
+
+class CSPDirectivesCheckTests(SimpleTestCase):
+    """Tests for the CSP directives check function."""
+
+    @override_settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY=None)
+    def test_secure_csp_none(self):
+        """Check should pass when both CSP settings are None."""
+        errors = csp.check_csp_directives(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(SECURE_CSP={}, SECURE_CSP_REPORT_ONLY={})
+    def test_secure_csp_empty_dict(self):
+        """Check should pass when both CSP settings are an empty dict."""
+        errors = csp.check_csp_directives(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(
+        SECURE_CSP={"DIRECTIVES": {}}, SECURE_CSP_REPORT_ONLY={"DIRECTIVES": {}}
+    )
+    def test_secure_csp_valid(self):
+        """Check should pass when both CSP settings have DIRECTIVES keys."""
+        errors = csp.check_csp_directives(None)
+        self.assertEqual(errors, [])
+
+    def test_secure_csp_mixed_settings(self):
+        """Check should pass when only one setting is used but it's valid."""
+        with self.settings(SECURE_CSP={"DIRECTIVES": {}}, SECURE_CSP_REPORT_ONLY=None):
+            errors = csp.check_csp_directives(None)
+            self.assertEqual(errors, [])
+
+        with self.settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY={"DIRECTIVES": {}}):
+            errors = csp.check_csp_directives(None)
+            self.assertEqual(errors, [])
+
+    def test_secure_csp_not_dict(self):
+        """Check should fail when either CSP setting is not a dict."""
+        with self.settings(SECURE_CSP="not-a-dict", SECURE_CSP_REPORT_ONLY=None):
+            errors = csp.check_csp_directives(None)
+            self.assertEqual(errors, [csp.W026])
+
+        with self.settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY="not-a-dict"):
+            errors = csp.check_csp_directives(None)
+            self.assertEqual(errors, [csp.W026])
+
+    def test_secure_csp_missing_directives(self):
+        """Check should fail when either CSP setting lacks a DIRECTIVES key."""
+        with self.settings(
+            SECURE_CSP={"NOT_DIRECTIVES": {}}, SECURE_CSP_REPORT_ONLY=None
+        ):
+            errors = csp.check_csp_directives(None)
+            self.assertEqual(errors, [csp.W026])
+
+        with self.settings(
+            SECURE_CSP=None, SECURE_CSP_REPORT_ONLY={"NOT_DIRECTIVES": {}}
+        ):
+            errors = csp.check_csp_directives(None)
+            self.assertEqual(errors, [csp.W026])
