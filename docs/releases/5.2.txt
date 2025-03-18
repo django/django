@@ -387,6 +387,13 @@ Utilities
   of mappings, passing their contents as keyword arguments to
   :func:`~django.utils.html.format_html`.
 
+Validators
+~~~~~~~~~~
+
+* :class:`~django.core.validators.EmailValidator` now follows the HTML5 
+  specification and supports internationalized email addresses with Unicode 
+  characters in the local part.
+
 .. _backwards-incompatible-5.2:
 
 Backwards incompatible changes in 5.2

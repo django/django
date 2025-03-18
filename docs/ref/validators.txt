@@ -133,7 +133,7 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param code: If not ``None``, overrides :attr:`code`.
     :param allowlist: If not ``None``, overrides :attr:`allowlist`.
 
-    .. versionchanged:: 6.0 
+    .. versionchanged:: 5.2
 
        The validator now follows the HTML5 specification and supports
        internationalized email addresses with Unicode characters in the
