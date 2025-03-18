@@ -62,14 +62,14 @@ You can customize your CSP policy through Django settings:
 
 Here's an an example of a basic CSP config::
 
-  from django.conf import csp
+  from django.middleware.constants import CSP
 
   SECURE_CSP = {
       "DIRECTIVES": {
-          "default-src": [csp.SELF],
-          "script-src": [csp.SELF, csp.NONCE],
-          "style-src": [csp.SELF],
-          "img-src": [csp.SELF, "https:"],
+          "default-src": [CSP.SELF],
+          "script-src": [CSP.SELF, CSP.NONCE],
+          "style-src": [CSP.SELF],
+          "img-src": [CSP.SELF, "https:"],
       }
   }
 

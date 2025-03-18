@@ -1,5 +1,5 @@
-from django.conf import csp
 from django.http import HttpRequest, HttpResponse
+from django.middleware.constants import CSP
 from django.middleware.csp import (
     HEADER,
     HEADER_REPORT_ONLY,
@@ -10,12 +10,12 @@ from django.test.utils import override_settings
 
 basic_config = {
     "DIRECTIVES": {
-        "default-src": [csp.SELF],
+        "default-src": [CSP.SELF],
     }
 }
 alt_config = {
     "DIRECTIVES": {
-        "default-src": [csp.SELF, csp.UNSAFE_INLINE],
+        "default-src": [CSP.SELF, CSP.UNSAFE_INLINE],
     }
 }
 basic_policy = "default-src 'self'"
@@ -39,8 +39,8 @@ class CSPBuildPolicyTest(SimpleTestCase):
     def test_config_multiple_directives(self):
         policy = {
             "DIRECTIVES": {
-                "default-src": [csp.SELF],
-                "script-src": [csp.NONE],
+                "default-src": [CSP.SELF],
+                "script-src": [CSP.NONE],
             }
         }
         self.assertPolicyEqual(
@@ -51,14 +51,14 @@ class CSPBuildPolicyTest(SimpleTestCase):
         """
         Test that a single value can be passed as a string.
         """
-        policy = {"DIRECTIVES": {"default-src": csp.SELF}}
+        policy = {"DIRECTIVES": {"default-src": CSP.SELF}}
         self.assertPolicyEqual(self.build_policy(policy), "default-src 'self'")
 
     def test_config_value_as_tuple(self):
         """
         Test that a tuple can be passed as a value.
         """
-        policy = {"DIRECTIVES": {"default-src": (csp.SELF, "foo.com")}}
+        policy = {"DIRECTIVES": {"default-src": (CSP.SELF, "foo.com")}}
         self.assertPolicyEqual(self.build_policy(policy), "default-src 'self' foo.com")
 
     def test_config_value_none(self):
@@ -68,13 +68,13 @@ class CSPBuildPolicyTest(SimpleTestCase):
         Useful in cases where the CSP config is scripted in some way or
         explicitly not wanting to set a directive.
         """
-        policy = {"DIRECTIVES": {"default-src": [csp.SELF], "script-src": None}}
+        policy = {"DIRECTIVES": {"default-src": [CSP.SELF], "script-src": None}}
         self.assertPolicyEqual(self.build_policy(policy), basic_policy)
 
     def test_config_value_boolean_true(self):
         policy = {
             "DIRECTIVES": {
-                "default-src": [csp.SELF],
+                "default-src": [CSP.SELF],
                 "block-all-mixed-content": True,
             }
         }
@@ -85,7 +85,7 @@ class CSPBuildPolicyTest(SimpleTestCase):
     def test_config_value_boolean_false(self):
         policy = {
             "DIRECTIVES": {
-                "default-src": [csp.SELF],
+                "default-src": [CSP.SELF],
                 "block-all-mixed-content": False,
             }
         }
@@ -94,7 +94,7 @@ class CSPBuildPolicyTest(SimpleTestCase):
     def test_config_value_multiple_boolean(self):
         policy = {
             "DIRECTIVES": {
-                "default-src": [csp.SELF],
+                "default-src": [CSP.SELF],
                 "block-all-mixed-content": True,
                 "upgrade-insecure-requests": True,
             }
@@ -106,7 +106,7 @@ class CSPBuildPolicyTest(SimpleTestCase):
 
     def test_config_with_nonce_arg(self):
         """
-        Test when the `csp.NONCE` is not in the defined policy, the nonce
+        Test when the `CSP.NONCE` is not in the defined policy, the nonce
         argument has no effect.
         """
         self.assertPolicyEqual(
@@ -115,7 +115,7 @@ class CSPBuildPolicyTest(SimpleTestCase):
 
     def test_config_with_nonce(self):
         policy = {
-            "DIRECTIVES": {"default-src": [csp.SELF, csp.NONCE]},
+            "DIRECTIVES": {"default-src": [CSP.SELF, CSP.NONCE]},
         }
         self.assertPolicyEqual(
             self.build_policy(policy, nonce="abc123"),
@@ -125,8 +125,8 @@ class CSPBuildPolicyTest(SimpleTestCase):
     def test_config_with_multiple_nonces(self):
         policy = {
             "DIRECTIVES": {
-                "default-src": [csp.SELF, csp.NONCE],
-                "script-src": [csp.SELF, csp.NONCE],
+                "default-src": [CSP.SELF, CSP.NONCE],
+                "script-src": [CSP.SELF, CSP.NONCE],
             },
         }
         self.assertPolicyEqual(
@@ -240,7 +240,7 @@ class CSPMiddlewareTest(SimpleTestCase):
 
     @override_settings(
         SECURE_CSP={
-            "DIRECTIVES": {"default-src": [csp.SELF, csp.NONCE]},
+            "DIRECTIVES": {"default-src": [CSP.SELF, CSP.NONCE]},
         }
     )
     def test_csp_basic_with_nonce(self):
@@ -254,7 +254,7 @@ class CSPMiddlewareTest(SimpleTestCase):
 
     @override_settings(
         SECURE_CSP={
-            "DIRECTIVES": {"default-src": [csp.SELF, csp.NONCE]},
+            "DIRECTIVES": {"default-src": [CSP.SELF, CSP.NONCE]},
         }
     )
     def test_csp_basic_with_nonce_but_unused(self):

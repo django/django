@@ -1,13 +1,13 @@
 from asgiref.sync import iscoroutinefunction
 
-from django.conf import csp
 from django.http import HttpRequest, HttpResponse
+from django.middleware.constants import CSP
 from django.test import SimpleTestCase
 from django.views.decorators.csp import csp_disabled, csp_override
 
 basic_config = {
     "DIRECTIVES": {
-        "default-src": [csp.SELF],
+        "default-src": [CSP.SELF],
     }
 }
 

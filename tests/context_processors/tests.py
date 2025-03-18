@@ -2,7 +2,7 @@
 Tests for Django's bundled context processors.
 """
 
-from django.conf import csp
+from django.middleware.constants import CSP
 from django.middleware.csp import HEADER
 from django.test import SimpleTestCase, TestCase, override_settings
 
@@ -118,7 +118,7 @@ class DebugContextProcessorTests(TestCase):
     ],
     SECURE_CSP={
         "DIRECTIVES": {
-            "script-src": [csp.SELF, csp.NONCE],
+            "script-src": [CSP.SELF, CSP.NONCE],
         }
     },
 )

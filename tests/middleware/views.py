@@ -1,7 +1,7 @@
 import sys
 
-from django.conf import csp
 from django.http import HttpResponse
+from django.middleware.constants import CSP
 from django.utils.decorators import method_decorator
 from django.views.debug import technical_500_response
 from django.views.decorators.common import no_append_slash
@@ -45,8 +45,8 @@ def csp_disabled_ro(request):
 
 csp_policy_override = {
     "DIRECTIVES": {
-        "default-src": [csp.SELF],
-        "img-src": [csp.SELF, "data:"],
+        "default-src": [CSP.SELF],
+        "img-src": [CSP.SELF, "data:"],
     }
 }
 

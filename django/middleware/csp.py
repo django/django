@@ -3,7 +3,8 @@ import os
 from functools import partial
 from http import client as http_client
 
-from django.conf import csp, settings
+from django.conf import settings
+from django.middleware.constants import CSP
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
@@ -81,12 +82,12 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
                 continue
             if not isinstance(value, list | tuple):
                 value = [value]
-            if csp.NONCE in value:
+            if CSP.NONCE in value:
                 if nonce:
-                    value = [f"'nonce-{nonce}'" if v == csp.NONCE else v for v in value]
+                    value = [f"'nonce-{nonce}'" if v == CSP.NONCE else v for v in value]
                 else:
                     # Remove the `NONCE` sentinel value if no nonce is provided.
-                    value = [v for v in value if v != csp.NONCE]
+                    value = [v for v in value if v != CSP.NONCE]
             if len(value):
                 # Support boolean directives, like `upgrade-insecure-requests`.
                 if value[0] is True:

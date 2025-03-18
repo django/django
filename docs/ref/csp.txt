@@ -25,7 +25,7 @@ To enable CSP in your Django project:
 
       MIDDLEWARE = [
           # ...
-          "django.middleware.csp.ContentSecurityPolicyMiddleware",
+          "django.middleware.CSP.ContentSecurityPolicyMiddleware",
           # ...
       ]
 
@@ -34,11 +34,11 @@ To enable CSP in your Django project:
    <csp-settings>` provides more detailed explanation on the differences between
    these two settings::
 
-      from django.conf import csp
+      from django.middleware.constants import CSP
 
       SECURE_CSP = {
           "DIRECTIVES": {
-              "default-src": [csp.SELF],
+              "default-src": [CSP.SELF],
               # Add more directives as needed
           }
       }
@@ -46,7 +46,7 @@ To enable CSP in your Django project:
       # Or for report-only mode:
       SECURE_CSP_REPORT_ONLY = {
           "DIRECTIVES": {
-              "default-src": [csp.SELF],
+              "default-src": [CSP.SELF],
               # Add more directives as needed
               "report-uri": "/path/to/reports-endpoint/",
           }
@@ -96,22 +96,22 @@ containing CSP directives and their corresponding policies.
 Here's a comprehensive example that demonstrates a decent starting point for
 many applications::
 
-    from django.conf import csp
+    from django.middleware.constants import CSP
 
     SECURE_CSP = {
         "DIRECTIVES": {
-            "default-src": [csp.SELF],
-            "base-uri": [csp.SELF],
-            "connect-src": [csp.SELF],
-            "font-src": [csp.SELF],
-            "form-action": [csp.SELF],
-            "frame-ancestors": [csp.NONE],
-            "frame-src": [csp.NONE],
-            "img-src": [csp.SELF],
-            "media-src": [csp.SELF],
-            "object-src": [csp.NONE],
-            "script-src": [csp.SELF],
-            "style-src": [csp.SELF],
+            "default-src": [CSP.SELF],
+            "base-uri": [CSP.SELF],
+            "connect-src": [CSP.SELF],
+            "font-src": [CSP.SELF],
+            "form-action": [CSP.SELF],
+            "frame-ancestors": [CSP.NONE],
+            "frame-src": [CSP.NONE],
+            "img-src": [CSP.SELF],
+            "media-src": [CSP.SELF],
+            "object-src": [CSP.NONE],
+            "script-src": [CSP.SELF],
+            "style-src": [CSP.SELF],
             "upgrade-insecure-requests": True,
         }
     }
@@ -135,19 +135,19 @@ Explanation of the CSP Directives
 * ``form-action``: Limits where forms can be submitted. Add external form
   handlers (e.g., payment gateways) if required.
 * ``frame-ancestors``: Prevents embedding your site in an iframe by default.
-  Use ``csp.NONE`` to block all embedding or add specific trusted domains.
+  Use ``CSP.NONE`` to block all embedding or add specific trusted domains.
 * ``frame-src``: Restricts the origins for iframe or embedded content. Use
-  ``csp.NONE`` to disallow embedding unless explicitly required.
+  ``CSP.NONE`` to disallow embedding unless explicitly required.
 * ``img-src``: Controls where images can be loaded from. Add trusted image
   CDNs or external sources if needed.
 * ``media-src``: Limits the origins for audio and video content. Add external
   platforms if media is hosted offsite.
 * ``object-src``: Blocks ``<object>``, ``<embed>``, and ``<applet>`` tags,
-  which are often unnecessary and pose security risks. Use ``csp.NONE`` unless
+  which are often unnecessary and pose security risks. Use ``CSP.NONE`` unless
   required.
 * ``script-src``: Specifies where JavaScript can be loaded from. Consider
-  using ``csp.NONCE`` for inline scripts to enhance security.
-* ``style-src``: Specifies where CSS can be loaded from. Use ``csp.NONCE``
+  using ``CSP.NONCE`` for inline scripts to enhance security.
+* ``style-src``: Specifies where CSS can be loaded from. Use ``CSP.NONCE``
   for inline styles.
 * ``upgrade-insecure-requests``: Automatically upgrades all HTTP requests to
   HTTPS. Ensure all resources are HTTPS-compatible to avoid disruptions.
@@ -211,15 +211,15 @@ class-based views<decorating-class-based-views>`.
     customize which header is overridden. By default, both headers are
     overridden. Example::
 
-        from django.conf import csp
         from django.http import HttpResponse
+        from django.middleware.constants import CSP
         from django.views.decorators.csp import csp_override
 
 
         @csp_override(
             {
-                "default-src": [csp.SELF],
-                "img-src": [csp.SELF, "data:"],
+                "default-src": [CSP.SELF],
+                "img-src": [CSP.SELF, "data:"],
             }
         )
         def my_view(request):
@@ -228,8 +228,8 @@ class-based views<decorating-class-based-views>`.
 
         @csp_override(
             {
-                "default-src": [csp.SELF],
-                "img-src": [csp.SELF, "data:"],
+                "default-src": [CSP.SELF],
+                "img-src": [CSP.SELF, "data:"],
             },
             report_only=False,
         )
@@ -239,8 +239,8 @@ class-based views<decorating-class-based-views>`.
 
         @csp_override(
             {
-                "default-src": [csp.SELF],
-                "img-src": [csp.SELF, "data:"],
+                "default-src": [CSP.SELF],
+                "img-src": [CSP.SELF, "data:"],
             },
             enforced=False,
         )
@@ -266,19 +266,19 @@ offering a balance between functionality and security.
 
 To use nonces in your CSP policy:
 
-1. Include the ``csp.NONCE`` value in your CSP settings. This only applies to
+1. Include the ``CSP.NONCE`` value in your CSP settings. This only applies to
    ``script-src`` or ``style-src``::
 
-      from django.conf import csp
+      from django.middleware.constants import CSP
 
       SECURE_CSP = {
           "DIRECTIVES": {
-              "default-src": [csp.SELF],
+              "default-src": [CSP.SELF],
               # Allows self-hosted scripts and script tags with the matching
               # `nonce=` attribute
-              "script-src": [csp.SELF, csp.NONCE],
+              "script-src": [CSP.SELF, CSP.NONCE],
               # Example of the less secure ``unsafe-inline`` option
-              "style-src": [csp.SELF, csp.UNSAFE_INLINE],
+              "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
           }
       }
 
@@ -315,7 +315,7 @@ header for each request.
     the response. This ensures the nonce is generated and included only when
     necessary.
 
-    If the Django CSP settings do not explicitly include the ``csp.NONCE``
+    If the Django CSP settings do not explicitly include the ``CSP.NONCE``
     directive and ``request.csp_nonce`` is accessed in a template, the nonce
     will appear in the content but not in the CSP header. This discrepancy may
     lead to confusion or unexpected behavior.
@@ -323,7 +323,7 @@ header for each request.
     To avoid such issues:
 
     * Ensure that the CSP policy in your headers explicitly includes the
-      ``csp.NONCE`` directive when using nonces in your templates.
+      ``CSP.NONCE`` directive when using nonces in your templates.
     * Verify that both your CSP header and content are aligned for proper
       security enforcement.
 
