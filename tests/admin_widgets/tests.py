@@ -970,7 +970,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         rel = Album._meta.get_field("band").remote_field
         widget = forms.Select()
         wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
-        context = wrapper.get_context("field_name", "value")
+        context = wrapper.get_context("field_name", "value", attrs={})
         self.assertIn("rendered_widget", context)
         self.assertIsNotNone(context["rendered_widget"])
 
@@ -988,7 +988,9 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
 
         mock_renderer = MockRenderer()
-        context = wrapper.get_context("field_name", "value", renderer=mock_renderer)
+        context = wrapper.get_context(
+            "field_name", "value", attrs={}, renderer=mock_renderer
+        )
 
         self.assertIn("rendered_widget", context)
         self.assertIsNotNone(context["rendered_widget"])
@@ -1018,7 +1020,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
 
                 mock_renderer = MockRenderer()
                 context = wrapper.get_context(
-                    "field_name", "value", renderer=mock_renderer
+                    "field_name", "value", attrs={}, renderer=mock_renderer
                 )
 
                 self.assertIn("rendered_widget", context)
@@ -1033,7 +1035,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
 
         # Should not raise any TypeError
-        context = wrapper.get_context("field_name", "value")
+        context = wrapper.get_context("field_name", "value", attrs={})
         self.assertIn("rendered_widget", context)
         self.assertIsNotNone(context["rendered_widget"])
 
