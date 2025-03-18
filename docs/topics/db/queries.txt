@@ -1247,10 +1247,15 @@ contained in the top-level of the field. For example:
     <Dog: Meg>
     >>> Dog.objects.create(name="Fred", data={})
     <Dog: Fred>
+    >>> Dog.objects.create(
+    ...     name="Merry", data={"breed": "pekingese", "tricks": ["fetch", "dance"]}
+    ... )
     >>> Dog.objects.filter(data__contains={"owner": "Bob"})
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
     >>> Dog.objects.filter(data__contains={"breed": "collie"})
     <QuerySet [<Dog: Meg>]>
+    >>> Dog.objects.filter(data__contains={"tricks": ["dance"]})
+    <QuerySet [<Dog: Merry>]>
 
 .. admonition:: Oracle and SQLite
 
@@ -1273,10 +1278,17 @@ subset of those in the value passed. For example:
     <Dog: Meg>
     >>> Dog.objects.create(name="Fred", data={})
     <Dog: Fred>
+    >>> Dog.objects.create(
+    ...     name="Merry", data={"breed": "pekingese", "tricks": ["fetch", "dance"]}
+    ... )
     >>> Dog.objects.filter(data__contained_by={"breed": "collie", "owner": "Bob"})
     <QuerySet [<Dog: Meg>, <Dog: Fred>]>
     >>> Dog.objects.filter(data__contained_by={"breed": "collie"})
     <QuerySet [<Dog: Fred>]>
+    >>> Dog.objects.filter(
+    ...     data__contained_by={"breed": "pekingese", "tricks": ["dance", "fetch", "hug"]}
+    ... )
+    <QuerySet [<Dog: Merry>, <Dog: Fred>]>
 
 .. admonition:: Oracle and SQLite
 
