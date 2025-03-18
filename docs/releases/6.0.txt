@@ -333,6 +333,10 @@ Miscellaneous
   never used the name portion. To include a name, format the address string as
   ``'"Name" <address>'`` or use Python's :func:`email.utils.formataddr`.
 
+* Support for the ``orphans`` argument being larger than or equal to the
+  ``per_page`` argument of :class:`django.core.paginator.Paginator` and
+  :class:`django.core.paginator.AsyncPaginator` is deprecated.
+
 Features removed in 6.0
 =======================
 

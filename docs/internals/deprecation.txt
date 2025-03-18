@@ -31,6 +31,10 @@ details on these changes.
 * Support for setting the ``ADMINS`` or ``MANAGERS`` settings to a list of
   (name, address) tuples will be removed.
 
+* The ``orphans`` argument being larger than or equal to the ``per_page``
+  argument of ``django.core.paginator.Paginator`` and
+  ``django.core.paginator.AsyncPaginator`` will no longer be allowed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
