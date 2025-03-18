@@ -1278,7 +1278,7 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 ``GeneratedField``
 ------------------
 
-.. class:: GeneratedField(expression, output_field, db_persist=None, **kwargs)
+.. class:: GeneratedField(*, expression, output_field, db_persist, **kwargs)
 
 A field that is always computed based on other fields in the model. This field
 is managed and updated by the database itself. Uses the ``GENERATED ALWAYS``
