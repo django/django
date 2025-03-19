@@ -322,6 +322,12 @@ Models
   value from the non-null input values. This is supported on SQLite, MySQL,
   Oracle, and PostgreSQL 16+.
 
+* :class:`~django.db.models.GeneratedField` are now refreshed from the database
+  after :meth:`~django.db.models.Model.save` on backends that support the
+  ``RETURNING`` clause (SQLite, Postgres, and Oracle). On backends that don't
+  support it (MySQL and MariaDB), the fields are marked as deferred to trigger
+  a refresh on subsequent accesses.
+
 Pagination
 ~~~~~~~~~~
 
