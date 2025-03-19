@@ -1094,12 +1094,28 @@ class Model(AltersData, metaclass=ModelBase):
             ]
             forced_update = update_fields or force_update
             pk_val = self._get_pk_val(meta)
-            updated = self._do_update(
-                base_qs, using, pk_val, values, update_fields, forced_update
+            returning_fields = [
+                f
+                for f in meta.local_concrete_fields
+                if (
+                    f.generated
+                    and f.referenced_fields.intersection(non_pks_non_generated)
+                )
+            ]
+            results = self._do_update(
+                base_qs,
+                using,
+                pk_val,
+                values,
+                update_fields,
+                forced_update,
+                returning_fields,
             )
-            if force_update and not updated:
+            if updated := bool(results):
+                self._assign_returned_values(results[0], returning_fields)
+            elif force_update:
                 raise self.NotUpdated("Forced update did not affect any rows.")
-            if update_fields and not updated:
+            elif update_fields:
                 raise self.NotUpdated(
                     "Save with update_fields did not affect any rows."
                 )
@@ -1131,11 +1147,19 @@ class Model(AltersData, metaclass=ModelBase):
                 cls._base_manager, using, fields, returning_fields, raw
             )
             if results:
-                for value, field in zip(results[0], returning_fields):
-                    setattr(self, field.attname, value)
+                self._assign_returned_values(results[0], returning_fields)
         return updated
 
-    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
+    def _do_update(
+        self,
+        base_qs,
+        using,
+        pk_val,
+        values,
+        update_fields,
+        forced_update,
+        returning_fields,
+    ):
         """
         Try to update the model. Return True if the model was updated (if an
         update query was done and a matching row was found in the DB).
@@ -1147,22 +1171,23 @@ class Model(AltersData, metaclass=ModelBase):
             # case we just say the update succeeded. Another case ending up
             # here is a model with just PK - in that case check that the PK
             # still exists.
-            return update_fields is not None or filtered.exists()
+            if update_fields is not None or filtered.exists():
+                return [()]
+            return []
         if self._meta.select_on_save and not forced_update:
-            return (
-                filtered.exists()
-                and
-                # It may happen that the object is deleted from the DB right
-                # after this check, causing the subsequent UPDATE to return
-                # zero matching rows. The same result can occur in some rare
-                # cases when the database returns zero despite the UPDATE being
-                # executed successfully (a row is matched and updated). In
-                # order to distinguish these two cases, the object's existence
-                # in the database is again checked for if the UPDATE query
-                # returns 0.
-                (filtered._update(values) > 0 or filtered.exists())
-            )
-        return filtered._update(values) > 0
+            # It may happen that the object is deleted from the DB right after
+            # this check, causing the subsequent UPDATE to return zero matching
+            # rows. The same result can occur in some rare cases when the
+            # database returns zero despite the UPDATE being executed
+            # successfully (a row is matched and updated). In order to
+            # distinguish these two cases, the object's existence in the
+            # database is again checked for if the UPDATE query returns 0.
+            if not filtered.exists():
+                return []
+            if results := filtered._update(values, returning_fields):
+                return results
+            return [()] if filtered.exists() else []
+        return filtered._update(values, returning_fields)
 
     def _do_insert(self, manager, using, fields, returning_fields, raw):
         """
@@ -1176,6 +1201,10 @@ class Model(AltersData, metaclass=ModelBase):
             using=using,
             raw=raw,
         )
+
+    def _assign_returned_values(self, returned_values, returning_fields):
+        for value, field in zip(returned_values, returning_fields):
+            setattr(self, field.attname, value)
 
     def _prepare_related_fields_for_save(self, operation_name, fields=None):
         # Ensure that a model instance without a PK hasn't been assigned to

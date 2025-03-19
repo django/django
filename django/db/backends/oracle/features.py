@@ -19,6 +19,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_of = True
     select_for_update_of_column = True
     can_return_columns_from_insert = True
+    can_return_rows_from_update = True
     supports_subqueries_in_group_by = False
     ignores_unnecessary_order_by_in_subqueries = False
     supports_tuple_comparison_against_subquery = False
