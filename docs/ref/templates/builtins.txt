@@ -964,8 +964,14 @@ output (as a string) inside a variable. This is useful if you want to use
 
 Outputs a URL-encoded formatted query string based on the provided parameters.
 
-This tag requires a :class:`~django.http.QueryDict` instance, which defaults to
-:attr:`request.GET <django.http.HttpRequest.GET>` if none is provided.
+This tag accepts positional arguments, which must be mappings (such as
+:class:`~django.http.QueryDict` or :class:`dict`). If no positional arguments
+are provided, :attr:`request.GET <django.http.HttpRequest.GET>` is used as the
+default to construct the query string.
+
+Positional arguments are processed sequentially, while keyword arguments are
+treated as key-value pairs, applied last. Later arguments take precedence over
+earlier ones, ensuring the most recent pairs are reflected in the final result.
 
 The result always includes a leading ``"?"`` since this tag is mainly used for
 links, and an empty result could prevent the page from reloading as expected.
@@ -1033,16 +1039,33 @@ Handling lists
 If ``my_list`` is ``["red", "blue"]``, the output will be
 ``?color=red&color=blue``, preserving the list structure in the query string.
 
-Custom QueryDict
-~~~~~~~~~~~~~~~~
+Customizing the base QueryDict
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can pass custom ``QueryDict`` or ``dict`` instances as positional arguments
+to replace ``request.GET``. When multiple arguments are provided, key-value
+pairs from later arguments take precedence over earlier ones.
+
+For example, if ``my_query_dict`` is ``<QueryDict: {'color': ['blue'], 'size':
+['S']}>`` and ``my_dict`` is ``{'color': 'orange', 'fabric': 'silk', 'type':
+'dress'}``, this outputs ``?color=orange&size=S&fabric=silk``.
 
 .. code-block:: html+django
 
-    {% querystring my_query_dict %}
+    {% querystring my_query_dict my_dict size="S" type=None %}
 
-You can provide a custom ``QueryDict`` to be used instead of ``request.GET``.
-So if ``my_query_dict`` is ``<QueryDict: {'color': ['blue']}>``, this outputs
-``?color=blue``. If ``my_query_dict`` is empty, the output will be ``?``.
+If all keys are removed by setting them to ``None``, this outputs ``?``:
+
+.. code-block:: html+django
+
+    {% querystring my_query_dict my_dict color=None size=None fabric=None type=None %}
+
+Similarly, if all positional arguments are empty and keyword arguments do not
+contribute any new params, the output will also be ``?``.
+
+.. versionchanged:: 6.0
+
+    Support for multiple positional mapping arguments was added.
 
 Dynamic usage
 ~~~~~~~~~~~~~
