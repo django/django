@@ -69,8 +69,6 @@ Some examples
 
     # Create a new company using expressions.
     >>> company = Company.objects.create(name="Google", ticker=Upper(Value("goog")))
-    # Be sure to refresh it if you need to access the field.
-    >>> company.refresh_from_db()
     >>> company.ticker
     'GOOG'
 
@@ -157,12 +155,6 @@ know about it - it is dealt with entirely by the database. All Python does,
 through Django's ``F()`` class, is create the SQL syntax to refer to the field
 and describe the operation.
 
-To access the new value saved this way, the object must be reloaded::
-
-   reporter = Reporters.objects.get(pk=reporter.pk)
-   # Or, more succinctly:
-   reporter.refresh_from_db()
-
 As well as being used in operations on single instances as above, ``F()`` can
 be used with ``update()`` to perform bulk updates on a ``QuerySet``. This
 reduces the two queries we were using above - the ``get()`` and the
@@ -199,7 +191,6 @@ array-slicing syntax. The indices are 0-based and the ``step`` argument to
     >>> writer = Writers.objects.get(name="Priyansh")
     >>> writer.name = F("name")[1:5]
     >>> writer.save()
-    >>> writer.refresh_from_db()
     >>> writer.name
     'riya'
 
@@ -221,23 +212,27 @@ robust: it will only ever update the field based on the value of the field in
 the database when the :meth:`~Model.save` or ``update()`` is executed, rather
 than based on its value when the instance was retrieved.
 
-``F()`` assignments persist after ``Model.save()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``F()`` assignments are refreshed after ``Model.save()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``F()`` objects assigned to model fields persist after saving the model
-instance and will be applied on each :meth:`~Model.save`. For example::
+``F()`` objects assigned to model fields are refreshed from the database on
+:meth:`~Model.save` on backends that support it without incurring a subsequent
+query (SQLite, PostgreSQL, and Oracle) and deferred otherwise (MySQL or
+MariaDB). For example:
 
-    reporter = Reporters.objects.get(name="Tintin")
-    reporter.stories_filed = F("stories_filed") + 1
-    reporter.save()
+.. code-block:: pycon
 
-    reporter.name = "Tintin Jr."
-    reporter.save()
+    >>> reporter = Reporters.objects.get(name="Tintin")
+    >>> reporter.stories_filed = F("stories_filed") + 1
+    >>> reporter.save()
+    >>> reporter.stories_filed  # This triggers a refresh query on MySQL/MariaDB.
+    14  # Assuming the database value was 13 when the object was saved.
 
-``stories_filed`` will be updated twice in this case. If it's initially ``1``,
-the final value will be ``3``. This persistence can be avoided by reloading the
-model object after saving it, for example, by using
-:meth:`~Model.refresh_from_db`.
+.. versionchanged:: 6.0
+
+    In previous versions of Django, ``F()`` objects were not refreshed from the
+    database on :meth:`~Model.save` which resulted in them being evaluated and
+    persisted every time the instance was saved.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~

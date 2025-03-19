@@ -331,7 +331,8 @@ Models
   value from the non-null input values. This is supported on SQLite, MySQL,
   Oracle, and PostgreSQL 16+.
 
-* :class:`~django.db.models.GeneratedField`\s are now refreshed from the
+* :class:`~django.db.models.GeneratedField`\s and :ref:`fields assigned
+  expressions <avoiding-race-conditions-using-f>` are now refreshed from the
   database after :meth:`~django.db.models.Model.save` on backends that support
   the ``RETURNING`` clause (SQLite, PostgreSQL, and Oracle). On backends that
   don't support it (MySQL and MariaDB), the fields are marked as deferred to
