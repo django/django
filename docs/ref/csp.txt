@@ -54,6 +54,87 @@ To enable CSP in your Django project:
 
 .. _csp-settings:
 
+.. _csp-constants:
+
+CSP Constants
+=============
+
+Django provides a set of predefined constants for use in CSP directives through the
+:class:`~django.middleware.constants.CSP` enum.  Using these constants instead of
+raw strings helps prevent typos and ensures correct formatting of directive values.
+
+.. module:: django.middleware.constants
+   :synopsis: Constants for Content Security Policy
+
+.. class:: CSP
+
+    An enum containing CSP directive values as defined in the CSP specification.
+    Using these constants instead of raw strings helps prevent typos and ensures
+    correct formatting of directive values.
+
+    .. attribute:: NONE
+
+        Represents ``'none'`` - blocks all content of the specified type
+
+    .. attribute:: REPORT_SAMPLE
+
+        Represents ``'report-sample'`` - allows the browser to include a sample
+        of the violating content in violation reports
+
+    .. attribute:: SELF
+
+        Represents ``'self'`` - allows content from the same origin
+
+    .. attribute:: STRICT_DYNAMIC
+
+        Represents ``'strict-dynamic'`` - tells the browser to trust scripts
+        that have been loaded by a script that was loaded with a proper nonce
+        or hash, allowing the trusted script to load additional scripts
+        dynamically
+
+    .. attribute:: UNSAFE_EVAL
+
+        Represents ``'unsafe-eval'`` - allows the use of ``eval()``
+
+    .. attribute:: UNSAFE_HASHES
+
+        Represents ``'unsafe-hashes'`` - allows inline event handlers, style
+        attributes, and JavaScript: URLs to execute if their hash matches one
+        specified in a hash-source in the policy
+
+    .. attribute:: UNSAFE_INLINE
+
+        Represents ``'unsafe-inline'`` - allows inline scripts and styles
+
+    .. attribute:: WASM_UNSAFE_EVAL
+
+        Represents ``'wasm-unsafe-eval'`` - allows the loading and execution of
+        WebAssembly modules
+
+    .. attribute:: NONCE
+
+        Special placeholder value (``<CSP_NONCE_SENTINEL>``) that is used in
+        your CSP configuration to enable nonce functionality. The middleware
+        specifically looks for this exact value and replaces it with an actual
+        nonce value during request processing.
+
+        This is not a standard CSP directive value, but a Django-specific
+        placeholder that is by the middleware when you use nonces in your
+        ``script-src`` or ``style-src`` directives.
+
+Example usage::
+
+    from django.middleware.constants import CSP
+
+    SECURE_CSP = {
+        "DIRECTIVES": {
+            "default-src": [CSP.SELF],
+            "script-src": [CSP.SELF, CSP.NONCE],
+            "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
+            "object-src": [CSP.NONE],
+        }
+    }
+
 CSP Settings
 ============
 
@@ -120,7 +201,7 @@ Explanation of the CSP Directives
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * ``default-src``: Restricts all content to self-hosted by default. Add
   trusted third-party resources (e.g., CDNs or APIs) here if required.
-  
+
   * ``default-src`` serves as a fallback for other fetch directives (e.g.,
     ``script-src``, ``img-src``, and their more specific variants) if they are
     not explicitly defined. To maintain security, it is recommended to keep
@@ -263,6 +344,10 @@ inline scripts, such as those introduced through Cross-Site Scripting (XSS)
 attacks. CSP nonces allow you to safely use inline scripts or styles in your
 application without the need to use the less secure ``unsafe-inline`` directive,
 offering a balance between functionality and security.
+
+The :attr:`django.middleware.constants.CSP.NONCE` constant is required when
+configuring nonce usage. The middleware checks for this value in your
+directives to know where to insert the generated nonce.
 
 To use nonces in your CSP policy:
 

@@ -8,7 +8,6 @@ class CSPConstantsTests(SimpleTestCase):
         self.assertEqual(CSP.REPORT_SAMPLE, "'report-sample'")
         self.assertEqual(CSP.SELF, "'self'")
         self.assertEqual(CSP.STRICT_DYNAMIC, "'strict-dynamic'")
-        self.assertEqual(CSP.UNSAFE_ALLOW_REDIRECTS, "'unsafe-allow-redirects'")
         self.assertEqual(CSP.UNSAFE_EVAL, "'unsafe-eval'")
         self.assertEqual(CSP.UNSAFE_HASHES, "'unsafe-hashes'")
         self.assertEqual(CSP.UNSAFE_INLINE, "'unsafe-inline'")

@@ -32,7 +32,6 @@ class CSP(str, Enum):
     REPORT_SAMPLE = "'report-sample'"
     SELF = "'self'"
     STRICT_DYNAMIC = "'strict-dynamic'"
-    UNSAFE_ALLOW_REDIRECTS = "'unsafe-allow-redirects'"
     UNSAFE_EVAL = "'unsafe-eval'"
     UNSAFE_HASHES = "'unsafe-hashes'"
     UNSAFE_INLINE = "'unsafe-inline'"
