@@ -1315,12 +1315,6 @@ materialized view.
     PostgreSQL only supports persisted columns. Oracle only supports virtual
     columns.
 
-.. admonition:: Refresh the data
-
-    Since the database computes the value, the object must be reloaded to
-    access the new value after :meth:`~Model.save`, for example, by using
-    :meth:`~Model.refresh_from_db`.
-
 .. admonition:: Database limitations
 
     There are many database-specific restrictions on generated fields that
@@ -1337,6 +1331,12 @@ materialized view.
 .. _Oracle: https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLE.html#GUID-F9CE0CC3-13AE-4744-A43C-EAC7A71AAAB6__BABIIGBD
 .. _PostgreSQL: https://www.postgresql.org/docs/current/ddl-generated-columns.html
 .. _SQLite: https://www.sqlite.org/gencol.html#limitations
+
+.. versionchanged:: 6.0
+
+    ``GeneratedField``\s are now automatically refreshed from the database on
+    backends that support it (SQLite, PostgreSQL, and Oracle) and marked as
+    deferred otherwise.
 
 ``GenericIPAddressField``
 -------------------------

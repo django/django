@@ -331,6 +331,12 @@ Models
   value from the non-null input values. This is supported on SQLite, MySQL,
   Oracle, and PostgreSQL 16+.
 
+* :class:`~django.db.models.GeneratedField`\s are now refreshed from the
+  database after :meth:`~django.db.models.Model.save` on backends that support
+  the ``RETURNING`` clause (SQLite, PostgreSQL, and Oracle). On backends that
+  don't support it (MySQL and MariaDB), the fields are marked as deferred to
+  trigger a refresh on subsequent accesses.
+
 Pagination
 ~~~~~~~~~~
 
@@ -419,6 +425,9 @@ backends.
   ``fetch_returned_insert_rows()`` expects both a ``cursor`` and
   ``returning_params`` to be provided just like
   ``fetch_returned_insert_columns()`` did.
+
+* If the database supports ``UPDATE … RETURNING`` statements, backends can set
+  ``DatabaseFeatures.can_return_rows_from_update=True``.
 
 Dropped support for MariaDB 10.5
 --------------------------------
