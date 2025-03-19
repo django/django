@@ -9,7 +9,7 @@ from unittest import skipUnless
 from django import forms
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin import widgets
+from django.contrib.admin import AdminSite, ModelAdmin, widgets
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
@@ -22,7 +22,7 @@ from django.db.models import (
     ManyToManyField,
     UUIDField,
 )
-from django.forms.renderers import BaseRenderer
+from django.forms.renderers import BaseRenderer, DjangoTemplates
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.selenium import screenshot_cases
 from django.test.utils import requires_tz_support
@@ -854,7 +854,7 @@ class ManyToManyRawIdWidgetTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
-class RelatedFieldWidgetWrapperTests(SimpleTestCase):
+class RelatedFieldWidgetWrapperTests(TestCase):
     def test_no_can_add_related(self):
         rel = Individual._meta.get_field("parent").remote_field
         w = widgets.AdminRadioSelect()
@@ -1038,6 +1038,28 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         context = wrapper.get_context("field_name", "value", attrs={})
         self.assertIn("rendered_widget", context)
         self.assertIsNotNone(context["rendered_widget"])
+
+    def test_custom_renderer(self):
+        class MockRequest:
+            pass
+
+        class CustomRenderer(DjangoTemplates):
+            def render(self, template_name, context, request=None):
+                template = self.get_template(template_name)
+                if template_name == "django/forms/widgets/select.html":
+                    return (
+                        template.render(context, request=request).strip()
+                        + "<div>Extra</div>"
+                    )
+                return template.render(context, request=request).strip()
+
+        site = AdminSite()
+        ma = ModelAdmin(User, site)
+
+        request = MockRequest()
+        UserForm = ma.get_form(request)
+        form = UserForm({}, renderer=CustomRenderer())
+        self.assertInHTML("<div>Extra</div>", form.render())
 
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")

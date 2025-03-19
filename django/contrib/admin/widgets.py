@@ -316,8 +316,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
 
         attrs = attrs or {}
-        if renderer is None:
-            renderer = getattr(self.widget, "renderer", None)
+        effective_renderer = renderer or getattr(self.widget, "renderer", None)
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         related_field_name = self.rel.get_related_field().name
@@ -330,7 +329,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         )
         context = {
             "rendered_widget": self.widget.render(
-                name, value, attrs, renderer=renderer
+                name, value, attrs, renderer=effective_renderer
             ),
             "is_hidden": self.is_hidden,
             "name": name,
