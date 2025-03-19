@@ -236,6 +236,10 @@ Templates
 * The :ttag:`querystring` template tag now consistently prefixes the returned
   query string with a ``?``, ensuring reliable link generation behavior.
 
+* The :ttag:`querystring` template tag now accepts multiple positional
+  arguments, which must be mappings, such as :class:`~django.http.QueryDict`
+  or :class:`dict`.
+
 Tests
 ~~~~~
 
