@@ -1102,6 +1102,11 @@ class Model(AltersData, metaclass=ModelBase):
                     and f.referenced_fields.intersection(non_pks_non_generated)
                 )
             ]
+            for field, _model, value in values:
+                if (update_fields is None or field.name in update_fields) and hasattr(
+                    value, "resolve_expression"
+                ):
+                    returning_fields.append(field)
             results = self._do_update(
                 base_qs,
                 using,
@@ -1142,7 +1147,15 @@ class Model(AltersData, metaclass=ModelBase):
                 for f in meta.local_concrete_fields
                 if not f.generated and (pk_set or f is not meta.auto_field)
             ]
-            returning_fields = meta.db_returning_fields
+            returning_fields = list(meta.db_returning_fields)
+            for field in fields:
+                value = (
+                    getattr(self, field.attname) if raw else field.pre_save(self, False)
+                )
+                if hasattr(value, "resolve_expression"):
+                    returning_fields.append(field)
+                elif field.db_returning:
+                    returning_fields.remove(field)
             results = self._do_insert(
                 cls._base_manager, using, fields, returning_fields, raw
             )
@@ -1203,8 +1216,13 @@ class Model(AltersData, metaclass=ModelBase):
         )
 
     def _assign_returned_values(self, returned_values, returning_fields):
-        for value, field in zip(returned_values, returning_fields):
+        returning_fields_iter = iter(returning_fields)
+        for value, field in zip(returned_values, returning_fields_iter):
             setattr(self, field.attname, value)
+        # Defer all fields that were meant to be updated with their database
+        # resolved values but couldn't as they are effectively stale.
+        for field in returning_fields_iter:
+            self.__dict__.pop(field.attname, None)
 
     def _prepare_related_fields_for_save(self, operation_name, fields=None):
         # Ensure that a model instance without a PK hasn't been assigned to
