@@ -201,8 +201,9 @@ Models
   :ref:`a forced update <ref-models-force-insert>` results in no affected rows,
   instead of a generic :exc:`django.db.DatabaseError`.
 
-* :class:`~django.db.models.GeneratedField` are now refreshed from the database
-  on :meth:`~django.db.models.Model.save` on backends that support the
+* :class:`~django.db.models.GeneratedField` and :ref:`fields assigned
+  expressions <avoiding-race-conditions-using-f>` are now refreshed from the
+  database on :meth:`~django.db.models.Model.save` on backends that support the
   ``RETURNING`` clause (SQLite, Postgres, and Oracle). On backends that don't
   support it (MySQL and MariaDB), the fields are marked as deferred to trigger
   a refresh on subsequent accesses.
