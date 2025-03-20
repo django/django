@@ -947,7 +947,7 @@ multithreaded by default.
 Uses IPv6 for the development server. This changes the default IP address from
 ``127.0.0.1`` to ``::1``.
 
-.. envvar:: HIDE_PRODUCTION_WARNING
+.. envvar:: DJANGO_RUNSERVER_HIDE_WARNING
 
 .. versionadded:: 5.2
 
