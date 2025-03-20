@@ -967,9 +967,8 @@ Outputs a URL-encoded formatted query string based on the provided parameters.
 This tag requires a :class:`~django.http.QueryDict` instance, which defaults to
 :attr:`request.GET <django.http.HttpRequest.GET>` if none is provided.
 
-If the :class:`~django.http.QueryDict` is empty and no additional parameters
-are provided, an empty string is returned. Otherwise, the result includes a
-leading ``"?"``.
+The result always includes a leading ``"?"`` since this tag is mainly used for
+links, and an empty result could prevent the page from reloading as expected.
 
 .. admonition:: Using ``request.GET`` as default
 
@@ -979,6 +978,10 @@ leading ``"?"``.
     ``request`` object into the template context, or provide a ``QueryDict``
     instance to this tag.
 
+.. versionchanged:: 6.0
+
+    A ``?`` was prepended to the query string for empty results.
+
 Basic usage
 ~~~~~~~~~~~
 
@@ -986,8 +989,9 @@ Basic usage
 
     {% querystring %}
 
-Outputs the current query string verbatim. So if the query string is
-``?color=green``, the output would be ``?color=green``.
+Outputs the current query string verbatim. So if the query string in the
+request is ``?color=green``, the output would be ``?color=green``. If the
+current query string is empty, the output will be ``?``.
 
 .. code-block:: html+django
 
@@ -1038,7 +1042,7 @@ Custom QueryDict
 
 You can provide a custom ``QueryDict`` to be used instead of ``request.GET``.
 So if ``my_query_dict`` is ``<QueryDict: {'color': ['blue']}>``, this outputs
-``?color=blue``.
+``?color=blue``. If ``my_query_dict`` is empty, the output will be ``?``.
 
 Dynamic usage
 ~~~~~~~~~~~~~
