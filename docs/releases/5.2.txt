@@ -276,7 +276,8 @@ Management Commands
 
 * A new warning is displayed when running :djadmin:`runserver`, indicating that
   it is unsuitable for production. This warning can be suppressed by setting
-  the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to ``"true"``.
+  the :envvar:`DJANGO_RUNSERVER_HIDE_WARNING` environment variable to
+  ``"true"``.
 
 * The :djadmin:`makemigrations` and :djadmin:`migrate` commands  have a new
   ``Command.autodetector`` attribute for subclasses to override in order to use
