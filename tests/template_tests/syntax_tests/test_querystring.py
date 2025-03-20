@@ -13,31 +13,27 @@ class QueryStringTagTests(SimpleTestCase):
         output = self.engine.render_to_string(template_name, context)
         self.assertEqual(output, expected)
 
-    @setup({"test_querystring_empty_get_params": "{% querystring %}"})
+    @setup({"querystring_empty_get_params": "{% querystring %}"})
     def test_querystring_empty_get_params(self):
         context = RequestContext(self.request_factory.get("/"))
-        self.assertRenderEqual(
-            "test_querystring_empty_get_params", context, expected=""
-        )
+        self.assertRenderEqual("querystring_empty_get_params", context, expected="")
 
-    @setup({"test_querystring_remove_all_params": "{% querystring a=None %}"})
+    @setup({"querystring_remove_all_params": "{% querystring a=None %}"})
     def test_querystring_remove_all_params(self):
         non_empty_context = RequestContext(self.request_factory.get("/?a=b"))
         empty_context = RequestContext(self.request_factory.get("/"))
         for context, expected in [(non_empty_context, "?"), (empty_context, "")]:
             with self.subTest(expected=expected):
                 self.assertRenderEqual(
-                    "test_querystring_remove_all_params",
-                    context,
-                    expected,
+                    "querystring_remove_all_params", context, expected
                 )
 
-    @setup({"test_querystring_non_empty_get_params": "{% querystring %}"})
+    @setup({"querystring_non_empty_get_params": "{% querystring %}"})
     def test_querystring_non_empty_get_params(self):
         request = self.request_factory.get("/", {"a": "b"})
         context = RequestContext(request)
         self.assertRenderEqual(
-            "test_querystring_non_empty_get_params", context, expected="?a=b"
+            "querystring_non_empty_get_params", context, expected="?a=b"
         )
 
     @setup({"querystring_multiple": "{% querystring %}"})
@@ -46,16 +42,14 @@ class QueryStringTagTests(SimpleTestCase):
         context = RequestContext(request)
         self.assertRenderEqual("querystring_multiple", context, expected="?x=y&amp;a=b")
 
-    @setup({"test_querystring_empty_params": "{% querystring qd %}"})
+    @setup({"querystring_empty_params": "{% querystring qd %}"})
     def test_querystring_empty_params(self):
         cases = [None, {}, QueryDict()]
         request = self.request_factory.get("/")
         for param in cases:
             with self.subTest(param=param):
                 context = RequestContext(request, {"qd": param})
-                self.assertRenderEqual(
-                    "test_querystring_empty_params", context, expected=""
-                )
+                self.assertRenderEqual("querystring_empty_params", context, expected="")
 
     @setup({"querystring_replace": "{% querystring a=1 %}"})
     def test_querystring_replace(self):
