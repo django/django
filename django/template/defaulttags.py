@@ -1191,6 +1191,8 @@ def querystring(context, query_dict=None, **kwargs):
     * Use with pagination: `{% querystring page=page_obj.next_page_number %}`
     * User a custom ``QueryDict``: `{% querystring my_query_dict foo=3 %}`
 
+    Return a query string prefixed with `?`.
+
     """
     if query_dict is None:
         query_dict = context.request.GET
@@ -1203,9 +1205,7 @@ def querystring(context, query_dict=None, **kwargs):
             params.setlist(key, value)
         else:
             params[key] = value
-    if not params and not query_dict:
-        return ""
-    query_string = params.urlencode()
+    query_string = params.urlencode() if params else ""
     return f"?{query_string}"
 
 
