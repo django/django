@@ -1182,6 +1182,8 @@ def querystring(context, query_dict=None, **kwargs):
     `request.GET`). Keyword arguments are processed sequentially, with later
     arguments taking precedence.
 
+    A query string prefixed with `?` is returned.
+
     For example::
 
         {# Set a parameter on top of `request.GET` #}
@@ -1207,9 +1209,7 @@ def querystring(context, query_dict=None, **kwargs):
             params.setlist(key, value)
         else:
             params[key] = value
-    if not params and not query_dict:
-        return ""
-    query_string = params.urlencode()
+    query_string = params.urlencode() if params else ""
     return f"?{query_string}"
 
 
