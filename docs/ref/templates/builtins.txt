@@ -996,17 +996,6 @@ Outputs the current query string verbatim. So if the query string is
 Outputs the current query string with the addition of the ``size`` parameter.
 Following the previous example, the output would be ``?color=green&size=M``.
 
-Custom QueryDict
-~~~~~~~~~~~~~~~~
-
-.. code-block:: html+django
-
-    {% querystring my_query_dict %}
-
-You can provide a custom ``QueryDict`` to be used instead of ``request.GET``.
-So if ``my_query_dict`` is ``<QueryDict: {'color': ['blue']}>``, this outputs
-``?color=blue``.
-
 Setting items
 ~~~~~~~~~~~~~
 
@@ -1039,6 +1028,17 @@ Handling lists
 
 If ``my_list`` is ``["red", "blue"]``, the output will be
 ``?color=red&color=blue``, preserving the list structure in the query string.
+
+Custom QueryDict
+~~~~~~~~~~~~~~~~
+
+.. code-block:: html+django
+
+    {% querystring my_query_dict %}
+
+You can provide a custom ``QueryDict`` to be used instead of ``request.GET``.
+So if ``my_query_dict`` is ``<QueryDict: {'color': ['blue']}>``, this outputs
+``?color=blue``.
 
 Dynamic usage
 ~~~~~~~~~~~~~
