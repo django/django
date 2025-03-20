@@ -1630,7 +1630,7 @@ class ManageRunserver(SimpleTestCase):
             self.output.getvalue(),
         )
 
-    @mock.patch.dict(os.environ, {"HIDE_PRODUCTION_WARNING": "true"})
+    @mock.patch.dict(os.environ, {"DJANGO_RUNSERVER_HIDE_WARNING": "true"})
     def test_hide_production_warning_with_environment_variable(self):
         self.cmd.addr = "0"
         self.cmd._raw_ipv6 = False
