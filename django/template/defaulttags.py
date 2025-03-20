@@ -1175,24 +1175,25 @@ def now(parser, token):
 @register.simple_tag(name="querystring", takes_context=True)
 def querystring(context, query_dict=None, **kwargs):
     """
-    Add, remove, and change parameters of a ``QueryDict`` and return the result
-    as a query string. If the ``query_dict`` argument is not provided, default
-    to ``request.GET``.
+    Build a query string using `query_dict` and `kwargs` arguments.
+
+    This tag constructs a new query string by adding, removing, or modifying
+    parameters, starting from the given `query_dict` (defaulting to
+    `request.GET`). Keyword arguments are processed sequentially, with later
+    arguments taking precedence.
 
     For example::
 
+        {# Set a parameter on top of `request.GET` #}
         {% querystring foo=3 %}
 
-    To remove a key::
-
+        {# Remove a key from `request.GET` #}
         {% querystring foo=None %}
 
-    To use with pagination::
-
+        {# Use with pagination #}
         {% querystring page=page_obj.next_page_number %}
 
-    A custom ``QueryDict`` can also be used::
-
+        {# Use a custom ``QueryDict`` #}
         {% querystring my_query_dict foo=3 %}
     """
     if query_dict is None:
