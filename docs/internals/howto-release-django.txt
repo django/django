@@ -592,6 +592,38 @@ You're almost done! All that's left to do now is:
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.
 
+#. If this was a pre-release, the translation catalogs need to be updated:
+
+   #. Make a new branch from the recently released stable branch:
+
+      .. code-block:: shell
+
+         git checkout stable/A.B.x
+         git checkout -b update-translations-catalog-A.B.x
+
+   #. Ensure that the release's dedicated virtual environment is enabled and
+      run the following:
+
+      .. code-block:: shell
+
+         $ cd django
+         $ django-admin makemessages -l en --domain=djangojs --domain=django
+         processing locale en
+
+   #. Review the diff before pushing and avoid committing changes to the
+      ``.po`` files without any new translations (:commit:`example commit
+      <d2b1ec551567c208abfdd21b27ff6d08ae1a6371>`).
+
+   #. Make a pull request against the corresponding stable branch and merge
+      once approved.
+
+   #. Forward port the updated source translations to the ``main`` branch
+      (:commit:`example commit <aed303aff57ac990894b6354af001b0e8ea55f71>`).
+
+#. If this was an ``rc`` pre-release, call for translations for the upcoming
+   release in the `Django Forum - Internationalization category
+   <https://forum.djangoproject.com/c/internals/i18n/14>`_.
+
 .. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
 
 New stable branch tasks
