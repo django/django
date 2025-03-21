@@ -19,6 +19,7 @@ from .models import (
     SchemeIncludedURL,
 )
 from .models import Site as MockSite
+from .models import UUIDModel
 
 
 @override_settings(ROOT_URLCONF="contenttypes_tests.urls")
@@ -263,3 +264,12 @@ class ShortcutViewTests(TestCase):
         obj = FooWithBrokenAbsoluteUrl.objects.create(name="john")
         with self.assertRaises(AttributeError):
             shortcut(self.request, user_ct.id, obj.id)
+
+    def test_invalid_uuid_pk_raises_404(self):
+        content_type = ContentType.objects.get_for_model(UUIDModel)
+        invalid_uuid = "1234-zzzz-5678-0000-invaliduuid"
+        with self.assertRaisesMessage(
+            Http404,
+            f"Content type {content_type.id} object {invalid_uuid} doesn’t exist",
+        ):
+            shortcut(self.request, content_type.id, invalid_uuid)
