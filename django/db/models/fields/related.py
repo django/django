@@ -902,17 +902,21 @@ class ForeignObject(RelatedField):
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
         super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
-        setattr(cls, self.name, self.forward_related_accessor_class(self))
+        descriptor = self.forward_related_accessor_class(self)
+        setattr(cls, self.name, descriptor)
+        descriptor.__set_name__(cls, self.name)
 
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
         # and swapped models don't get a related descriptor.
         if not self.remote_field.hidden and not related.related_model._meta.swapped:
+            descriptor = self.related_accessor_class(related)
             setattr(
                 cls._meta.concrete_model,
                 related.accessor_name,
-                self.related_accessor_class(related),
+                descriptor,
             )
+            descriptor.__set_name__(cls, related.accessor_name)
             # While 'limit_choices_to' might be a callable, simply pass
             # it along for later - this is too early because it's still
             # model load time.
@@ -1979,11 +1983,9 @@ class ManyToManyField(RelatedField):
         # Internal M2Ms (i.e., those with a related name ending with '+')
         # and swapped models don't get a related descriptor.
         if not self.remote_field.hidden and not related.related_model._meta.swapped:
-            setattr(
-                cls,
-                related.accessor_name,
-                ManyToManyDescriptor(self.remote_field, reverse=True),
-            )
+            descriptor = ManyToManyDescriptor(self.remote_field, reverse=True)
+            setattr(cls, related.accessor_name, descriptor)
+            descriptor.__set_name__(cls, related.accessor_name)
 
         # Set up the accessors for the column names on the m2m table.
         self.m2m_column_name = partial(self._get_m2m_attr, related, "column")
