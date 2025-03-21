@@ -938,6 +938,12 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
     def test_config_query_implicit(self):
         searched = Line.objects.annotate(
             search=SearchVector("scene__setting", "dialogue", config="french"),
+        ).filter(search=SearchQuery(Lexeme("cadeaux")))
+
+        self.assertSequenceEqual(searched, [self.french])
+
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue", config="french"),
         ).filter(search=Lexeme("cadeaux"))
 
         self.assertSequenceEqual(searched, [self.french])
@@ -951,6 +957,13 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
         self.assertSequenceEqual(searched, [self.french])
 
     def test_config_from_field_implicit(self):
+        searched = Line.objects.annotate(
+            search=SearchVector(
+                "scene__setting", "dialogue", config=F("dialogue_config")
+            ),
+        ).filter(search=SearchQuery(Lexeme("cadeaux")))
+        self.assertSequenceEqual(searched, [self.french])
+
         searched = Line.objects.annotate(
             search=SearchVector(
                 "scene__setting", "dialogue", config=F("dialogue_config")
