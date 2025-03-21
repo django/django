@@ -611,6 +611,17 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(string, "models.FilePathField(path=%r)" % path_like.path)
 
+    def test_serialize_zoneinfo(self):
+        self.assertSerializedEqual(zoneinfo.ZoneInfo("Asia/Kolkata"))
+        self.assertSerializedResultEqual(
+            zoneinfo.ZoneInfo("Asia/Kolkata"),
+            ('ZoneInfo("Asia/Kolkata")', {"from zoneinfo import ZoneInfo"}),
+        )
+        self.assertSerializedResultEqual(
+            zoneinfo.ZoneInfo("Europe/Paris"),
+            ('ZoneInfo("Europe/Paris")', {"from zoneinfo import ZoneInfo"}),
+        )
+
     def test_serialize_functions(self):
         with self.assertRaisesMessage(ValueError, "Cannot serialize function: lambda"):
             self.assertSerializedEqual(lambda x: 42)

@@ -10,6 +10,7 @@ import pathlib
 import re
 import types
 import uuid
+import zoneinfo
 
 from django.conf import SettingsReference
 from django.db import models
@@ -307,6 +308,11 @@ class SettingsReferenceSerializer(BaseSerializer):
         }
 
 
+class ZoneInfoSerializer(BaseSerializer):
+    def serialize(self):
+        return 'ZoneInfo("%s")' % self.value.key, {"from zoneinfo import ZoneInfo"}
+
+
 class TupleSerializer(BaseSequenceSerializer):
     def _format(self):
         # When len(value)==0, the empty tuple should be serialized as "()",
@@ -361,6 +367,7 @@ class Serializer:
         uuid.UUID: UUIDSerializer,
         pathlib.PurePath: PathSerializer,
         os.PathLike: PathLikeSerializer,
+        zoneinfo.ZoneInfo: ZoneInfoSerializer,
     }
 
     @classmethod
