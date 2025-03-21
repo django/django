@@ -1,3 +1,4 @@
+from datetime import datetime
 from math import ceil
 from operator import attrgetter
 
@@ -23,6 +24,7 @@ from .models import (
     BigAutoFieldModel,
     Country,
     DbDefaultModel,
+    DbDefaultPrimaryKey,
     FieldsWithDbColumns,
     NoFields,
     NullableFields,
@@ -866,3 +868,8 @@ class BulkCreateTests(TestCase):
             ctx[0]["sql"].count(created_at_quoted_name),
             2 if connection.features.can_return_rows_from_bulk_insert else 1,
         )
+
+    @skipUnlessDBFeature("can_return_rows_from_bulk_insert")
+    def test_db_default_primary_key(self):
+        (obj,) = DbDefaultPrimaryKey.objects.bulk_create([DbDefaultPrimaryKey()])
+        self.assertIsInstance(obj.id, datetime)
