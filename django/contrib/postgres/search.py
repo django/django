@@ -37,9 +37,17 @@ class SearchVectorExact(Lookup):
     lookup_name = "exact"
 
     def process_rhs(self, qn, connection):
+        config = getattr(self.lhs, "config", None)
+
         if not isinstance(self.rhs, (SearchQuery, CombinedSearchQuery)):
-            config = getattr(self.lhs, "config", None)
             self.rhs = SearchQuery(self.rhs, config=config)
+
+        elif self.rhs.config is None and any(
+            isinstance(expression, LexemeCombinable)
+            for expression in self.rhs.source_expressions
+        ):
+            self.rhs = SearchQuery(*self.rhs.source_expressions, config=config)
+
         rhs, rhs_params = super().process_rhs(qn, connection)
         return rhs, rhs_params
 
