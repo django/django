@@ -199,6 +199,14 @@ class Template:
         except Exception as e:
             if self.engine.debug:
                 e.template_debug = self.get_exception_info(e, e.token)
+            if (
+                isinstance(e, TemplateSyntaxError)
+                and self.origin.name != UNKNOWN_SOURCE
+                and e.args
+            ):
+                raw_message = e.args[0]
+                e.raw_error_message = raw_message
+                e.args = (f"Template: {self.origin.name}, {raw_message}", *e.args[1:])
             raise
 
     def get_exception_info(self, exception, token):
