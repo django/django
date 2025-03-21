@@ -42,3 +42,11 @@ msgstr[1] "%s Resultate"
 
 msgid "Image"
 msgstr "Bild"
+
+msgid "empty"
+msgid_plural "empty"
+msgstr[0] ""
+
+msgid "%s element"
+msgid_plural "%s element"
+msgstr[0] ""
