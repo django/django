@@ -928,12 +928,37 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
 
         self.assertSequenceEqual(searched, [self.verse0, self.verse1])
 
-    def test_french(self):
+    def test_french_explicit(self):
         searched = Line.objects.annotate(
-            search=SearchVector("scene__setting", "dialogue"),
-        ).filter(search=SearchQuery(Lexeme("cadeau"), config="french"))
+            search=SearchVector("scene__setting", "dialogue", config="french"),
+        ).filter(search=SearchQuery(Lexeme("cadeaux"), config="french"))
 
         self.assertSequenceEqual(searched, [self.french])
+
+    def test_french_implicit(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue", config="french"),
+        ).filter(search=SearchQuery(Lexeme("cadeaux")))
+
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_explicit_equals_implicit(self):
+        self.maxDiff = None
+
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue", config="french"),
+        ).filter(search=SearchQuery(Lexeme("cadeaux"), config="french"))
+
+        searched2 = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue", config="french"),
+        ).filter(search=SearchQuery(Lexeme("cadeaux")))
+
+        sql, params = searched.query.get_compiler(connection.alias).as_sql()
+
+        sql2, params2 = searched2.query.get_compiler(connection.alias).as_sql()
+
+        self.assertEqual(sql, sql2)
+        self.assertEqual(params, params2)
 
     def test_invalid_combinations(self):
         msg = "A Lexeme can only be combined with another Lexeme, got NoneType."
