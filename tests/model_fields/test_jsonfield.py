@@ -785,6 +785,12 @@ class TestQuerying(TestCase):
             [self.objs[5]],
         )
 
+    @skipIfDBFeature("supports_json_negative_indexing")
+    def test_unsupported_negative_lookup(self):
+        msg = "negative indexing is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            NullableJSONModel.objects.filter(**{"value__-2": 1}).get()
+
     @skipUnlessDBFeature("supports_json_negative_indexing")
     def test_shallow_list_negative_lookup(self):
         self.assertSequenceEqual(

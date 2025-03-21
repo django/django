@@ -811,5 +811,12 @@ class BaseDatabaseOperations:
                 path.append(".")
                 path.append(json.dumps(key_transform))
             else:
+                if (
+                    num < 0
+                    and not self.connection.features.supports_json_negative_indexing
+                ):
+                    raise NotSupportedError(
+                        "negative indexing is not supported on this database backend."
+                    )
                 path.append(self.format_json_path_numeric_index(num))
         return "".join(path)
