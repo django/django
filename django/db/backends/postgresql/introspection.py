@@ -5,8 +5,8 @@ from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
 from django.db.models import Index
 
-FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("is_autofield", "comment"))
-TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
+FieldInfo = namedtuple("FieldInfo", [*BaseFieldInfo._fields, "is_autofield", "comment"])
+TableInfo = namedtuple("TableInfo", [*BaseTableInfo._fields, "comment"])
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):

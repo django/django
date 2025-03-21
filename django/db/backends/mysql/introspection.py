@@ -11,15 +11,21 @@ from django.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple(
     "FieldInfo",
-    BaseFieldInfo._fields
-    + ("extra", "is_unsigned", "has_json_constraint", "comment", "data_type"),
+    [
+        *BaseFieldInfo._fields,
+        "extra",
+        "is_unsigned",
+        "has_json_constraint",
+        "comment",
+        "data_type",
+    ],
 )
 InfoLine = namedtuple(
     "InfoLine",
     "col_name data_type max_len num_prec num_scale extra column_default "
     "collation is_unsigned comment",
 )
-TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
+TableInfo = namedtuple("TableInfo", [*BaseTableInfo._fields, "comment"])
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
