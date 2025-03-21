@@ -39,7 +39,7 @@ Sample code:
 >>> s = '<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
 >>> t = template.Template(s)
 
-(t is now a compiled template, and its render() method can be called multiple
+(It is now a compiled template, and its render() method can be called multiple
 times with multiple contexts)
 
 >>> c = template.Context({'test':True, 'varvalue': 'Hello'})
