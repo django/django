@@ -106,9 +106,16 @@ class RelatedLookupMixin:
             # doesn't have validation for non-integers, so we must run validation
             # using the target field.
             if self.prepare_rhs and hasattr(self.lhs.output_field, "path_infos"):
-                # Get the target field. We can safely assume there is only one
-                # as we don't get to the direct value branch otherwise.
-                target_field = self.lhs.output_field.path_infos[-1].target_fields[-1]
+                if hasattr(self.lhs.output_field, "get_effective_target_field"):
+                    # If the output_field specifies a field to prepare the rhs with,
+                    # use it.
+                    target_field = self.lhs.output_field.get_effective_target_field()
+                else:
+                    # Get the target field. We can safely assume there is only one
+                    # as we don't get to the direct value branch otherwise.
+                    target_field = self.lhs.output_field.path_infos[-1].target_fields[
+                        -1
+                    ]
                 self.rhs = target_field.get_prep_value(self.rhs)
 
         return super().get_prep_lookup()

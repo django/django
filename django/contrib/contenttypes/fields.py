@@ -288,6 +288,13 @@ class GenericRel(ForeignObjectRel):
             on_delete=DO_NOTHING,
         )
 
+    def get_effective_target_field(self):
+        """
+        Return the field used to prepare lookup values when this relation is
+        the target of a related exact lookup.
+        """
+        return self.path_infos[0].from_opts.pk
+
 
 class GenericRelation(ForeignObject):
     """
@@ -482,6 +489,13 @@ class GenericRelation(ForeignObject):
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
         return str([instance.pk for instance in qs])
+
+    def get_effective_target_field(self):
+        """
+        Return the field used to prepare lookup values when this relation is
+        the target of a related exact lookup.
+        """
+        return self.path_infos[0].from_opts.pk
 
     def contribute_to_class(self, cls, name, **kwargs):
         kwargs["private_only"] = True
