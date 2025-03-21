@@ -170,7 +170,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Common utilities, such as ``django.conf.settings``, are now automatically
+  imported to the :djadmin:`shell` by default.
 
 Migrations
 ~~~~~~~~~~
