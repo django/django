@@ -1,3 +1,5 @@
+import uuid
+
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,11 +20,63 @@ def shortcut(request, content_type_id, object_id):
                 _("Content type %(ct_id)s object has no associated model")
                 % {"ct_id": content_type_id}
             )
-        obj = content_type.get_object_for_this_type(pk=object_id)
-    except (ObjectDoesNotExist, ValueError):
+
+        model_class = content_type.model_class()
+
+        # Determine if the model uses UUID as primary key
+        is_uuid_model = model_class._meta.pk.get_internal_type() == "UUIDField"
+
+        if is_uuid_model:
+            try:
+                # Validate UUID format first
+                uuid_obj = uuid.UUID(str(object_id))
+
+                # Try to retrieve the object using the validated UUID
+                try:
+                    obj = model_class._default_manager.get(pk=uuid_obj)
+                except model_class.DoesNotExist:
+                    # If the object doesn't exist, raise a 404
+                    raise Http404(
+                        _("Content type %(ct_id)s object %(obj_id)s doesn't exist")
+                        % {"ct_id": content_type_id, "obj_id": object_id}
+                    )
+            except ValueError:
+                # If UUID validation fails, raise a 404
+                raise Http404(
+                    _("Invalid object identifier %(obj_id)s") % {"obj_id": object_id}
+                )
+        else:
+            # For non-UUID models, use a more robust object retrieval
+            try:
+                # First, check if the object_id can be converted to the primary key type
+                try:
+                    pk_field = model_class._meta.pk
+                    converted_pk = pk_field.to_python(object_id)
+                except (ValueError, TypeError):
+                    # If conversion fails, raise 404
+                    raise Http404(
+                        _("Invalid object identifier %(obj_id)s")
+                        % {"obj_id": object_id}
+                    )
+
+                # Then try to retrieve the object
+                try:
+                    obj = model_class._default_manager.get(pk=converted_pk)
+                except model_class.DoesNotExist:
+                    raise Http404(
+                        _("Content type %(ct_id)s object %(obj_id)s doesn't exist")
+                        % {"ct_id": content_type_id, "obj_id": object_id}
+                    )
+            except Exception:
+                # Catch any other unexpected errors
+                raise Http404(
+                    _("Content type %(ct_id)s object %(obj_id)s doesn't exist")
+                    % {"ct_id": content_type_id, "obj_id": object_id}
+                )
+
+    except ContentType.DoesNotExist:
         raise Http404(
-            _("Content type %(ct_id)s object %(obj_id)s doesn’t exist")
-            % {"ct_id": content_type_id, "obj_id": object_id}
+            _("Content type %(ct_id)s doesn’t exist") % {"ct_id": content_type_id}
         )
 
     try:
