@@ -233,6 +233,9 @@ Templates
 * The new variable ``forloop.length`` is now available within a :ttag:`for`
   loop.
 
+* The :ttag:`querystring` template tag now consistently prefixes the returned
+  query string with a ``?``, ensuring reliable link generation behavior.
+
 Tests
 ~~~~~
 

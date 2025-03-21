@@ -1174,26 +1174,25 @@ def now(parser, token):
 
 @register.simple_tag(name="querystring", takes_context=True)
 def querystring(context, query_dict=None, **kwargs):
-    """
-    Add, remove, and change parameters of a ``QueryDict`` and return the result
-    as a query string. If the ``query_dict`` argument is not provided, default
-    to ``request.GET``.
+    """Return a query string built from the given arguments.
 
-    For example::
+    This tag constructs a query string by adding, removing, or modifying
+    parameters from the given `query_dict` and other keyword arguments.
 
-        {% querystring foo=3 %}
+    If `query_dict` is `None`, `request.GET` is used as the starting point.
 
-    To remove a key::
+    The keyword arguments are processed sequentially and will override existing
+    keys, with later arguments taking precedence.
 
-        {% querystring foo=None %}
+    For example:
 
-    To use with pagination::
+    * Set a parameter on top of `request.GET`: `{% querystring foo=3 %}`
+    * Remove a key from `request.GET`: `{% querystring foo=None %}`
+    * Use with pagination: `{% querystring page=page_obj.next_page_number %}`
+    * User a custom ``QueryDict``: `{% querystring my_query_dict foo=3 %}`
 
-        {% querystring page=page_obj.next_page_number %}
+    Return a query string prefixed with `?`.
 
-    A custom ``QueryDict`` can also be used::
-
-        {% querystring my_query_dict foo=3 %}
     """
     if query_dict is None:
         query_dict = context.request.GET
@@ -1206,9 +1205,7 @@ def querystring(context, query_dict=None, **kwargs):
             params.setlist(key, value)
         else:
             params[key] = value
-    if not params and not query_dict:
-        return ""
-    query_string = params.urlencode()
+    query_string = params.urlencode() if params else ""
     return f"?{query_string}"
 
 
