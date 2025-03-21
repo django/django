@@ -302,3 +302,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return "ONLY_FULL_GROUP_BY" not in self.connection.sql_mode
         return True
+
+    @cached_property
+    def supports_json_negative_indexing(self):
+        is_mariadb = self.connection.mysql_is_mariadb
+        return is_mariadb and self.connection.mysql_version >= (10, 9)
