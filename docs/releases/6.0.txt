@@ -90,7 +90,9 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The signed cookies session backend now supports custom session expiry
+  through the :meth:`.SessionBase.set_expiry` method. Previously the method
+  had no effect when using this backend.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -215,7 +217,12 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* The :func:`~django.core.signing.loads` function and
+  :meth:`~django.core.signing.TimestampSigner.unsign_object` method now accept
+  a ``return_timestamp`` parameter which, when set to ``True``, returns a
+  tuple containing both the unsigned object and the timestamp. The parameter
+  defaults to ``False``, maintaining backward compatibility with existing
+  code.
 
 Serialization
 ~~~~~~~~~~~~~
