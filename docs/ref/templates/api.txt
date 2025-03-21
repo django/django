@@ -48,7 +48,7 @@ attribute of that backend and any attribute defaults mentioned below are
 overridden by what's passed by
 :class:`~django.template.backends.django.DjangoTemplates`.
 
-.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True)
+.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True, multiline=False)
 
     When instantiating an ``Engine`` all arguments must be passed as keyword
     arguments:
@@ -138,6 +138,13 @@ overridden by what's passed by
 
       Tags and filters from built-in libraries can be used without first calling
       the :ttag:`{% load %}<load>` tag.
+
+    * ``'multiline'`` controls whether multiline support is enabled in
+      templates. For new projects this is set to ``True``, and this is the
+      recommended setting. Multiline support in templates means that newline
+      between ``{%`` and ``%}`` in templates is allowed.
+
+      It defaults to ``False``.
 
 .. staticmethod:: Engine.get_default()
 
