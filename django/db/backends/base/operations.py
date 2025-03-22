@@ -208,13 +208,6 @@ class BaseDatabaseOperations:
         else:
             return ["DISTINCT"], []
 
-    def fetch_returned_insert_columns(self, cursor, returning_params):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the newly created data.
-        """
-        return cursor.fetchone()
-
     def force_group_by(self):
         """
         Return a GROUP BY clause to use with a HAVING clause when no grouping
@@ -358,11 +351,12 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_columns(self, fields):
+    def returning_columns(self, fields):
         """
-        For backends that support returning columns as part of an insert query,
-        return the SQL and params to append to the INSERT query. The returned
-        fragment should contain a format string to hold the appropriate column.
+        For backends that support returning columns as part of an insert or
+        update query, return the SQL and params to append to the query.
+        The returned fragment should contain a format string to hold the
+        appropriate column.
         """
         if not fields:
             return "", ()
@@ -376,10 +370,10 @@ class BaseDatabaseOperations:
         ]
         return "RETURNING %s" % ", ".join(columns), ()
 
-    def fetch_returned_insert_rows(self, cursor):
+    def fetch_returned_rows(self, cursor, returning_params):
         """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the tuple of returned data.
+        Given a cursor object for a DML query with a RETURNING statement,
+        return the selected returning rows of tuples.
         """
         return cursor.fetchall()
 
