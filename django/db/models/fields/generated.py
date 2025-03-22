@@ -15,7 +15,7 @@ class GeneratedField(Field):
     _query = None
     output_field = None
 
-    def __init__(self, *, expression, output_field, db_persist=None, **kwargs):
+    def __init__(self, *, expression, output_field, db_persist, **kwargs):
         if kwargs.setdefault("editable", False):
             raise ValueError("GeneratedField cannot be editable.")
         if not kwargs.setdefault("blank", True):
