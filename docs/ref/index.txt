@@ -21,6 +21,7 @@ API Reference
    migration-operations
    models/index
    paginator
+   parsers
    request-response
    schema-editor
    settings
