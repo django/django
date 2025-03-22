@@ -282,6 +282,12 @@ class AdvancedTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             DataPoint.objects.update(is_active=~F("name"))
 
+    def test_update_returning(self):
+        rows = DataPoint.objects.order_by("id").update(
+            {"is_active": False}, returning=["id", "is_active"]
+        )
+        self.assertEqual(rows, [(1, False), (2, False), (3, False)])
+
 
 @unittest.skipUnless(
     connection.vendor == "mysql",
