@@ -276,7 +276,7 @@ this. For a small app like polls, this process isn't too difficult.
             # ...
             "django": (
                 "https://docs.djangoproject.com/en/stable/",
-                "https://docs.djangoproject.com/en/stable/_objects/",
+                None,
             ),
         }
 
