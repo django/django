@@ -4,12 +4,13 @@ import re
 import sys
 import warnings
 from collections import namedtuple
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from itertools import cycle as itertools_cycle
 from itertools import groupby
 
 from django.conf import settings
+from django.http import QueryDict
 from django.utils import timezone
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -1173,42 +1174,54 @@ def now(parser, token):
 
 
 @register.simple_tag(name="querystring", takes_context=True)
-def querystring(context, query_dict=None, **kwargs):
+def querystring(context, *args, **kwargs):
+    """Return a query string built from the given arguments.
+
+    This tag constructs a query string by adding, removing, or modifying
+    parameters from the given positional and keyword arguments.
+
+    Positional arguments must be mappings (such as `QueryDict` or `dict`), and
+    keyword arguments are treated as an extra, final mapping. If no positional
+    arguments are provided, `request.GET` is used as the starting point.
+
+    These mappings are processed sequentially and will override existing keys,
+    with later arguments taking precedence.
+
+    For example:
+
+    * Set a parameter on top of `request.GET`: `{% querystring foo=3 %}`
+    * Remove a key from `request.GET`: `{% querystring foo=None %}`
+    * Use with pagination: `{% querystring page=page_obj.next_page_number %}`
+    * User a custom ``QueryDict``: `{% querystring my_query_dict foo=3 %}`
+
+    Return a query string prefixed with `?`.
+
+    Raise TemplateSyntaxError if a positional argument is not a mapping or if
+    keys are not strings.
+
     """
-    Add, remove, and change parameters of a ``QueryDict`` and return the result
-    as a query string. If the ``query_dict`` argument is not provided, default
-    to ``request.GET``.
-
-    For example::
-
-        {% querystring foo=3 %}
-
-    To remove a key::
-
-        {% querystring foo=None %}
-
-    To use with pagination::
-
-        {% querystring page=page_obj.next_page_number %}
-
-    A custom ``QueryDict`` can also be used::
-
-        {% querystring my_query_dict foo=3 %}
-    """
-    if query_dict is None:
-        query_dict = context.request.GET
-    params = query_dict.copy()
-    for key, value in kwargs.items():
-        if value is None:
-            if key in params:
-                del params[key]
-        elif isinstance(value, Iterable) and not isinstance(value, str):
-            params.setlist(key, value)
-        else:
-            params[key] = value
-    if not params and not query_dict:
-        return ""
-    query_string = params.urlencode()
+    if not args:
+        args = [context.request.GET]
+    params = QueryDict(mutable=True)
+    for d in [*args, kwargs]:
+        if not isinstance(d, Mapping):
+            raise TemplateSyntaxError(
+                "querystring requires mappings for positional arguments (got "
+                "%r instead)." % d
+            )
+        for key, value in d.items():
+            if not isinstance(key, str):
+                raise TemplateSyntaxError(
+                    "querystring requires strings for mapping keys (got %r "
+                    "instead)." % key
+                )
+            if value is None:
+                params.pop(key, None)
+            elif isinstance(value, Iterable) and not isinstance(value, str):
+                params.setlist(key, value)
+            else:
+                params[key] = value
+    query_string = params.urlencode() if params else ""
     return f"?{query_string}"
 
 
