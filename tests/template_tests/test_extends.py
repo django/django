@@ -3,7 +3,7 @@ import os
 from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from .utils import ROOT, setup
+from .utils import ROOT, TEMPLATE_DIR, setup
 
 RECURSIVE = os.path.join(ROOT, "recursive_templates")
 
@@ -195,3 +195,17 @@ class ExtendsBehaviorTests(SimpleTestCase):
         msg = "{% extends 'base.html' %} must be the first tag in the template."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Engine().from_string(template_string)
+
+    def test_extends_got_relative_path(self):
+        template_string = "{% extends './index.html' %}"
+        msg = "index"
+        template = (
+            Engine(dirs=[TEMPLATE_DIR]).from_string(template_string).render(Context({}))
+        )
+        self.assertEqual(template.strip(), msg)
+
+    def test_extends_got_relative_path_with_template_file(self):
+        msg = "The relative path ''../index.html'' points outside"
+        "the file hierarchy that template 'test_extends_relative_path.html' is in."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            Engine(dirs=[TEMPLATE_DIR]).get_template("test_extends_relative_path.html")
