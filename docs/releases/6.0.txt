@@ -183,6 +183,9 @@ Models
 
 * :doc:`Constraints </ref/models/constraints>` now implement a ``check()``
   method that is already registered with the check framework.
+* If the model has :attr:`~django.db.models.Options.order_with_respect_to` set,
+  the ``_order`` field will be automatically populated for all objects based
+  on existing objects in the database in the order they are provided.
 
 * The new ``order_by`` argument for :class:`~django.db.models.Aggregate` allows
   specifying the ordering of the elements in the result.
