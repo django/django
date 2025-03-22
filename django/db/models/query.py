@@ -6,6 +6,7 @@ import copy
 import operator
 import warnings
 from itertools import chain, islice
+from typing import overload
 
 from asgiref.sync import sync_to_async
 
@@ -1208,7 +1209,24 @@ class QuerySet(AltersData):
 
     _raw_delete.alters_data = True
 
-    def update(self, **kwargs):
+    # Existing signature with keyword only updates.
+    @overload
+    def update(self, **updates) -> int: ...
+
+    # New signature with positional only updates to preserve backward
+    # compatibility with update(updates={"something"}) for models with
+    # an "updates" field.
+    @overload
+    def update(self, updates: dict, /) -> int: ...
+
+    # New signature with positional only updates and returning support which
+    # also allows paves the way for other options in the future if needs be.
+    @overload
+    def update(
+        self, updates: dict, *, returning: list[str] | tuple[str]
+    ) -> list[tuple]: ...
+
+    def update(self, *args, **kwargs):
         """
         Update all elements in the current QuerySet, setting all the given
         fields to the appropriate values.
@@ -1216,9 +1234,38 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("update")
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
+        returning_fields = None
+        if args:
+            update_values = args[0]
+            returning = kwargs.pop("returning", None)
+            if len(args) > 1 or kwargs or not isinstance(update_values, dict):
+                raise TypeError(
+                    "Fields to update must be either specified as positional "
+                    "dict argument or through **kwargs."
+                )
+            if returning is not None:
+                if not isinstance(returning, (tuple, list)):
+                    raise TypeError(
+                        "returning must be either a tuple or list of fields."
+                    )
+                get_field = self.model._meta.get_field
+                returning_fields = []
+                for field_name in returning:
+                    field = get_field(field_name)
+                    if field.model is not self.model:
+                        raise exceptions.FieldError(
+                            f"Can't return field {field.name} "
+                            f"from multi-table inherited model "
+                            f"{field.model._meta.label}."
+                        )
+                    returning_fields.append(field)
+        else:
+            update_values = kwargs
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
-        query.add_update_values(kwargs)
+        query.add_update_values(update_values)
+        if returning_fields is not None and query.related_updates:
+            raise ValueError("Can't return fields for updates involving MTI.")
 
         # Inline annotations in order_by(), if possible.
         new_order_by = []
@@ -1242,8 +1289,18 @@ class QuerySet(AltersData):
 
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
+        compiler = query.get_compiler(self.db)
         with transaction.mark_for_rollback_on_error(using=self.db):
-            rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+            if returning_fields is not None:
+                if not compiler.connection.features.can_return_rows_from_update:
+                    raise NotSupportedError(
+                        "This backend doesn't support returning rows from updates."
+                    )
+                rows = list(
+                    map(tuple, compiler.execute_returning_sql(returning_fields))
+                )
+            else:
+                rows = compiler.execute_sql(ROW_COUNT)
         self._result_cache = None
         return rows
 
