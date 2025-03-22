@@ -252,7 +252,7 @@ def construct_relative_path(
     name based on the current_template_name.
     """
     new_name = relative_name.strip("'\"")
-    if not new_name.startswith(("./", "../")):
+    if not new_name.startswith(("./", "../")) or current_template_name is None:
         # relative_name is a variable or a literal that doesn't contain a
         # relative path.
         return relative_name

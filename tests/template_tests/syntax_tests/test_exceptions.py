@@ -1,4 +1,4 @@
-from django.template import TemplateDoesNotExist, TemplateSyntaxError
+from django.template import Context, Template, TemplateDoesNotExist, TemplateSyntaxError
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -64,3 +64,11 @@ class ExceptionsTests(SimpleTestCase):
         """
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string("exception05")
+
+    def test_template_does_not_exist(self):
+        files = ["nonexistent.html", "./nonexistent.html", "../nonexistent.html"]
+        for template_name in files:
+            with self.subTest(template_name=template_name):
+                template = Template(f"{{% extends '{template_name}' %}}")
+                with self.assertRaises(TemplateDoesNotExist):
+                    template.render(Context({}))
