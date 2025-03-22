@@ -402,6 +402,18 @@ backends.
 * :class:`~django.db.backends.base.schema.BaseDatabaseSchemaEditor` and
   PostgreSQL backends no longer use ``CASCADE`` when dropping a column.
 
+* ``DatabaseOperations.return_insert_columns()`` and
+  ``DatabaseOperations.fetch_returned_insert_rows()`` methods are renamed to
+  ``returning_columns()`` and ``fetch_returned_rows()``, respectively, to
+  denote they can be used in the context ``UPDATE … RETURNING`` statements as
+  well as ``INSERT … RETURNING``.
+
+* The ``DatabaseOperations.fetch_returned_insert_columns()`` method is removed
+  and the ``fetch_returned_rows()`` method replacing
+  ``fetch_returned_insert_rows()`` expects both a ``cursor`` and
+  ``returning_params`` to be provided just like
+  ``fetch_returned_insert_columns()`` did.
+
 Dropped support for MariaDB 10.5
 --------------------------------
 
