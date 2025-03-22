@@ -16,7 +16,7 @@ def get_normalized_value(value, lhs):
     from django.db.models import Model
 
     if isinstance(value, Model):
-        if not value._is_pk_set():
+        if value._state.adding or not value._is_pk_set():
             raise ValueError("Model instances passed to related filters must be saved.")
         value_list = []
         sources = composite.unnest(lhs.output_field.path_infos[-1].target_fields)
