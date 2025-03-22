@@ -1599,6 +1599,44 @@ class ExpressionsNumericTests(TestCase):
         n.refresh_from_db()
         self.assertEqual(n.decimal_value, Decimal("0.1"))
 
+    def test_decimal_division_precision(self):
+        """Test that division with Decimal preserves precision"""
+        obj = Number.objects.create(integer=2)
+        qs = Number.objects.annotate(
+            ratio=ExpressionWrapper(
+                F("integer") / Value(3.0),
+                output_field=DecimalField(max_digits=10, decimal_places=4),
+            )
+        ).filter(pk=obj.pk)
+        self.assertAlmostEqual(
+            float(qs.get().ratio),
+            float(Decimal("2") / Decimal("3")),
+            places=4,
+            msg="Division should preserve decimal precision",
+        )
+
+    def test_decimal_division_types(self):
+        """Test that division with Decimal preserves numeric type"""
+        Number.objects.all().delete()
+        for num, den, expected in [
+            (2, Decimal("3"), "0.6667"),
+        ]:
+            with self.subTest(num=num, den=den):
+                Number.objects.create(integer=num)
+                qs = Number.objects.annotate(
+                    ratio=ExpressionWrapper(
+                        F("integer") / Value(den, output_field=DecimalField()),
+                        output_field=DecimalField(max_digits=10, decimal_places=4),
+                    )
+                )
+                result = qs.get()
+                self.assertAlmostEqual(
+                    float(result.ratio),
+                    float(expected),
+                    places=4,
+                    msg=f"Divide {num} by {den} should give result: {expected}",
+                )
+
 
 class ExpressionOperatorTests(TestCase):
     @classmethod
