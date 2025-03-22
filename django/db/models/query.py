@@ -961,25 +961,50 @@ class QuerySet(AltersData):
         requires_casting = connection.features.requires_casted_case_in_updates
         batches = (objs[i : i + batch_size] for i in range(0, len(objs), batch_size))
         updates = []
+        resolvable_fields = set()
         for batch_objs in batches:
             update_kwargs = {}
             for field in fields:
                 when_statements = []
                 for obj in batch_objs:
                     attr = getattr(obj, field.attname)
-                    if not hasattr(attr, "resolve_expression"):
+                    if hasattr(attr, "resolve_expression"):
+                        resolvable_fields.add(field.attname)
+                    else:
                         attr = Value(attr, output_field=field)
                     when_statements.append(When(pk=obj.pk, then=attr))
                 case_statement = Case(*when_statements, output_field=field)
                 if requires_casting:
                     case_statement = Cast(case_statement, output_field=field)
                 update_kwargs[field.attname] = case_statement
-            updates.append(([obj.pk for obj in batch_objs], update_kwargs))
+            updates.append(({obj.pk: obj for obj in batch_objs}, update_kwargs))
         rows_updated = 0
         queryset = self.using(self.db)
         with transaction.atomic(using=self.db, savepoint=False):
-            for pks, update_kwargs in updates:
-                rows_updated += queryset.filter(pk__in=pks).update(**update_kwargs)
+            if resolvable_fields and connection.features.can_return_rows_from_update:
+                resolvable_fields = list(resolvable_fields)
+                returning_fields = [
+                    *(field.name for field in opts.pk_fields),
+                    *resolvable_fields,
+                ]
+                pk_fields_len = len(opts.pk_fields)
+                pk_slice = slice(0, pk_fields_len) if pk_fields_len > 1 else 0
+                update_slice = slice(pk_fields_len, None)
+                for objs, update_kwargs in updates:
+                    rows = queryset.filter(pk__in=list(objs)).update(
+                        update_kwargs, returning_values_list=returning_fields
+                    )
+                    for row in rows:
+                        pk = row[pk_slice]
+                        obj = objs[pk]
+                        for attname, value in zip(resolvable_fields, row[update_slice]):
+                            setattr(obj, attname, value)
+                    rows_updated += len(rows)
+            else:
+                for pks, update_kwargs in updates:
+                    rows_updated += queryset.filter(pk__in=list(pks)).update(
+                        **update_kwargs
+                    )
         return rows_updated
 
     bulk_update.alters_data = True
