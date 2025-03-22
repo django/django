@@ -218,6 +218,19 @@ Usage example:
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
 
+.. warning::
+
+    In order to prevent XSS attacks, the string value of this field is not
+    marked as safe. Although the ``start_sel`` and ``stop_sel`` parameters
+    default to ``<b>`` and ``</b>``, it is dangerous to mark the headline as
+    safe or to pass it to the :tfilter:`safe` template filter, especially if
+    the value is from an untrusted source.
+
+    Tested versions of PostgreSQL will not remove or escape HTML tags from the
+    headline if ``highlight_all`` is ``True``. If ``highlight_all`` is
+    ``False``, then HTML tags will be removed from the headline. This behavior
+    is undocumented, and must not be relied upon.
+
 .. _highlighting search results: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-HEADLINE
 
 .. _postgresql-fts-search-configuration:
