@@ -160,13 +160,13 @@ class DateHierarchyTests(TestCase):
         tests = (
             ({}, [["year=2017"], ["year=2018"]]),
             ({"year": 2016}, []),
-            ({"year": 2017}, [["month=10", "year=2017"], ["month=12", "year=2017"]]),
+            ({"year": 2017}, [["year=2017", "month=10"], ["year=2017", "month=12"]]),
             ({"year": 2017, "month": 9}, []),
             (
                 {"year": 2017, "month": 12},
                 [
-                    ["day=15", "month=12", "year=2017"],
-                    ["day=31", "month=12", "year=2017"],
+                    ["year=2017", "month=12", "day=15"],
+                    ["year=2017", "month=12", "day=31"],
                 ],
             ),
         )
@@ -206,16 +206,16 @@ class DateHierarchyTests(TestCase):
             (
                 {"year": 2017},
                 [
-                    ["month=10", "year=2017"],
-                    ["month=12", "year=2017"],
+                    ["year=2017", "month=10"],
+                    ["year=2017", "month=12"],
                 ],
             ),
             ({"year": 2017, "month": 9}, []),
             (
                 {"year": 2017, "month": 12},
                 [
-                    ["day=15", "month=12", "year=2017"],
-                    ["day=31", "month=12", "year=2017"],
+                    ["year=2017", "month=12", "day=15"],
+                    ["year=2017", "month=12", "day=31"],
                 ],
             ),
         ]

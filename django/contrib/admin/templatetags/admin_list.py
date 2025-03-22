@@ -20,6 +20,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.template import Library
+from django.template.defaulttags import querystring
 from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
@@ -46,7 +47,7 @@ def paginator_number(cl, i):
     else:
         return format_html(
             '<a href="{}"{}>{}</a> ',
-            cl.get_query_string({PAGE_VAR: i}),
+            querystring(None, cl.filter_params, **{PAGE_VAR: i}),
             mark_safe(' class="end"' if i == cl.paginator.num_pages else ""),
             i,
         )
@@ -64,7 +65,8 @@ def pagination(cl):
     return {
         "cl": cl,
         "pagination_required": pagination_required,
-        "show_all_url": need_show_all_link and cl.get_query_string({ALL_VAR: ""}),
+        "show_all_url": need_show_all_link
+        and querystring(None, cl.filter_params, **{ALL_VAR: ""}),
         "page_range": page_range,
         "ALL_VAR": ALL_VAR,
         "1": 1,
@@ -169,9 +171,15 @@ def result_headers(cl):
             "sorted": is_sorted,
             "ascending": order_type == "asc",
             "sort_priority": sort_priority,
-            "url_primary": cl.get_query_string({ORDER_VAR: ".".join(o_list_primary)}),
-            "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove)}),
-            "url_toggle": cl.get_query_string({ORDER_VAR: ".".join(o_list_toggle)}),
+            "url_primary": querystring(
+                None, cl.filter_params, **{ORDER_VAR: ".".join(o_list_primary)}
+            ),
+            "url_remove": querystring(
+                None, cl.filter_params, **{ORDER_VAR: ".".join(o_list_remove)}
+            ),
+            "url_toggle": querystring(
+                None, cl.filter_params, **{ORDER_VAR: ".".join(o_list_toggle)}
+            ),
             "class_attrib": (
                 format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
             ),
@@ -386,7 +394,9 @@ def date_hierarchy(cl):
         day_lookup = cl.params.get(day_field)
 
         def link(filters):
-            return cl.get_query_string(filters, [field_generic])
+            params = {field_generic: None}
+            params.update(filters)
+            return querystring(None, cl.filter_params, **params)
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
