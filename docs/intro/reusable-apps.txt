@@ -264,6 +264,26 @@ this. For a small app like polls, this process isn't too difficult.
    you add some files to it. Many Django apps also provide their documentation
    online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
+   Many Python projects, including Django and Python itself, use `Sphinx
+   <https://www.sphinx-doc.org/en/master/usage/quickstart.html>`_ to build
+   their documentation. If you choose to use Sphinx you can link back to the
+   Django documentation by configuring `Intersphinx
+   <https://www.sphinx-doc.org/en/master/usage/quickstart.html#intersphinx>`_
+   and including a value for Django in your project's ``intersphinx_mapping``
+   value::
+
+        intersphinx_mapping = {
+            # ...
+            "django": (
+                "https://docs.djangoproject.com/en/stable/",
+                "https://docs.djangoproject.com/en/stable/_objects/",
+            ),
+        }
+
+   With that in place, you can then cross-link to specific entries, in the
+   same way as in the Django docs, such as
+   "``:attr:`django.test.TransactionTestCase.databases```".
+
 #. Check that the :pypi:`build` package is installed (``python -m pip install
    build``) and try building your package by running ``python -m build`` inside
    ``django-polls``. This creates a directory called ``dist`` and builds your
