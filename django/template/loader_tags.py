@@ -257,6 +257,13 @@ def construct_relative_path(
         # relative path.
         return relative_name
 
+    if current_template_name is None:
+        # Unknown origin (e.g. Template('...').render(Context({...})).
+        raise TemplateSyntaxError(
+            f"The relative path {relative_name} cannot be evaluated due to "
+            "an unknown template origin."
+        )
+
     new_name = posixpath.normpath(
         posixpath.join(
             posixpath.dirname(current_template_name.lstrip("/")),
