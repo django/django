@@ -6338,6 +6338,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_views_article_changelist")
         )
+
         # Change popup
         self.selenium.find_element(By.ID, "change_id_form-0-section").click()
         self.wait_for_and_switch_to_popup()
@@ -6369,6 +6370,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_for_text("#content h1", "Add section")
         self.selenium.find_element(By.ID, "id_name").send_keys("new section")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_form-0-section"))
