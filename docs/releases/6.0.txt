@@ -199,6 +199,9 @@ Models
   :ref:`a forced update <ref-models-force-insert>` results in no affected rows,
   instead of a generic :exc:`django.db.DatabaseError`.
 
+* Added support for :class:`~django.db.models.AnyValue` for SQLite, MySQL,
+  Oracle, and PostgreSQL 16.0+.
+
 Pagination
 ~~~~~~~~~~
 
