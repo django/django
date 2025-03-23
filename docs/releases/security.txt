@@ -36,6 +36,153 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+March 6, 2025 - :cve:`2025-26699`
+---------------------------------
+
+Potential denial-of-service in ``django.utils.text.wrap()``.
+`Full description
+<https://www.djangoproject.com/weblog/2025/mar/06/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <8dbb44d34271637099258391dfc79df33951b841>`
+* Django 5.0 :commit:`(patch) <4f2765232336b8ad0afd8017d9d912ae93470017>`
+* Django 4.2 :commit:`(patch) <e88f7376fe68dbf4ebaf11fad1513ce700b45860>`
+
+January 14, 2025 - :cve:`2024-56374`
+------------------------------------
+
+Potential denial-of-service vulnerability in IPv6 validation.
+`Full description
+<https://www.djangoproject.com/weblog/2025/jan/14/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <4806731e58f3e8700a3c802e77899d54ac6021fe>`
+* Django 5.0 :commit:`(patch) <e8d4a2005955dcf962193600b53bf461b190b455>`
+* Django 4.2 :commit:`(patch) <ad866a1ca3e7d60da888d25d27e46a8adb2ed36e>`
+
+December 4, 2024 - :cve:`2024-53907`
+------------------------------------
+
+Potential denial-of-service in ``django.utils.html.strip_tags()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/dec/04/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <bbc74a7f7eb7335e913bdb4787f22e83a9be947e>`
+* Django 5.0 :commit:`(patch) <a5a89ea28cc550c1b29b03f9e14ef3c128ec1e84>`
+* Django 4.2 :commit:`(patch) <790eb058b0716c536a2f2e8d1c6d5079d776c22b>`
+
+December 4, 2024 - :cve:`2024-53908`
+------------------------------------
+
+Potential SQL injection in ``HasKey(lhs, rhs)`` on Oracle.
+`Full description
+<https://www.djangoproject.com/weblog/2024/dec/04/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <6943d61818e63e77b65d8b1ae65941e8f04bd87b>`
+* Django 5.0 :commit:`(patch) <ff08bb6c70aa45f83a5ef3bd0b601c7c9d1a7642>`
+* Django 4.2 :commit:`(patch) <7376bcbf508883282ffcc0f0fac5cf0ed2d6cbc5>`
+
+September 3, 2024 - :cve:`2024-45231`
+-------------------------------------
+
+Potential user email enumeration via response status on password reset.
+`Full description
+<https://www.djangoproject.com/weblog/2024/sep/03/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <3c733c78d6f8e50296d6e248968b6516c92a53ca>`
+* Django 5.0 :commit:`(patch) <96d84047715ea1715b4bd1594e46122b8a77b9e2>`
+* Django 4.2 :commit:`(patch) <bf4888d317ba4506d091eeac6e8b4f1fcc731199>`
+
+September 3, 2024 - :cve:`2024-45230`
+-------------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/sep/03/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <022ab0a75c76ab2ea31dfcc5f2cf5501e378d397>`
+* Django 5.0 :commit:`(patch) <813de2672bd7361e9a453ab62cd6e52f96b6525b>`
+* Django 4.2 :commit:`(patch) <d147a8ebbdf28c17cafbbe2884f0bc57e2bf82e2>`
+
+August 6, 2024 - :cve:`2024-42005`
+----------------------------------
+
+Potential SQL injection in ``QuerySet.values()`` and ``values_list()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <32ebcbf2e1fe3e5ba79a6554a167efce81f7422d>`
+* Django 4.2 :commit:`(patch) <f4af67b9b41e0f4c117a8741da3abbd1c869ab28>`
+
+August 6, 2024 - :cve:`2024-41991`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()`` and
+``AdminURLFieldWidget``. `Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <523da8771bce321023f490f70d71a9e973ddc927>`
+* Django 4.2 :commit:`(patch) <efea1ef7e2190e3f77ca0651b5458297bc0f6a9f>`
+
+August 6, 2024 - :cve:`2024-41990`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <7b7b909579c8311c140c89b8a9431bf537febf93>`
+* Django 4.2 :commit:`(patch) <d0a82e26a74940bf0c78204933c3bdd6a283eb88>`
+
+August 6, 2024 - :cve:`2024-41989`
+----------------------------------
+
+Potential memory exhaustion in ``django.utils.numberformat.floatformat()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <27900fe56f3d3cabb4aeb6ccb82f92bab29073a8>`
+* Django 4.2 :commit:`(patch) <fc76660f589ac07e45e9cd34ccb8087aeb11904b>`
+
+July 9, 2024 - :cve:`2024-39614`
+--------------------------------
+
+Potential denial-of-service in
+``django.utils.translation.get_supported_language_variant()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <8e7a44e4bec0f11474699c3111a5e0a45afe7f49>`
+* Django 4.2 :commit:`(patch) <17358fb35fb7217423d4c4877ccb6d1a3a40b1c3>`
+
+July 9, 2024 - :cve:`2024-39330`
+--------------------------------
+
+Potential directory-traversal in ``django.core.files.storage.Storage.save()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <9f4f63e9ebb7bf6cb9547ee4e2526b9b96703270>`
+* Django 4.2 :commit:`(patch) <2b00edc0151a660d1eb86da4059904a0fc4e095e>`
+
+July 9, 2024 - :cve:`2024-39329`
+--------------------------------
+
+Username enumeration through timing difference for users with unusable
+passwords. `Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <07cefdee4a9d1fcd9a3a631cbd07c78defd1923b>`
+* Django 4.2 :commit:`(patch) <156d3186c96e3ec2ca73b8b25dc2ef366e38df14>`
+
+July 9, 2024 - :cve:`2024-38875`
+--------------------------------
+
+Potential denial-of-service in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <7285644640f085f41d60ab0c8ae4e9153f0485db>`
+* Django 4.2 :commit:`(patch) <79f368764295df109a37192f6182fb6f361d85b5>`
+
 March 4, 2024 - :cve:`2024-27351`
 ---------------------------------
 

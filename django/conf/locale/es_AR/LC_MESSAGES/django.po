@@ -3,16 +3,16 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
-# Natalia (Django Fellow), 2023
+# Natalia, 2023
 # poli <poli@devartis.com>, 2014
-# Ramiro Morales, 2013-2023
+# Ramiro Morales, 2013-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Natalia (Django Fellow), 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 06:49+0000\n"
+"Last-Translator: Ramiro Morales, 2013-2024\n"
 "Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -347,6 +347,9 @@ msgstr "Esa página no contiene resultados"
 msgid "Enter a valid value."
 msgstr "Introduzca un valor válido."
 
+msgid "Enter a valid domain name."
+msgstr "Introduzca un nombre de dominio válido."
+
 msgid "Enter a valid URL."
 msgstr "Introduzca una URL válida."
 
@@ -368,14 +371,18 @@ msgstr ""
 "Introduzca un “slug” compuesto por letras Unicode, números, guiones bajos o "
 "guiones."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Introduzca una dirección IPv4 válida."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Introduzca una dirección de %(protocol)s válida."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Introduzca una dirección IPv6 válida."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Introduzca una dirección IPv4 o IPv6 válida."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 o IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Introduzca sólo dígitos separados por comas."

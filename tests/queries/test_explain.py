@@ -19,8 +19,11 @@ class ExplainTests(TestCase):
             Tag.objects.filter(name="test").prefetch_related("children"),
             Tag.objects.filter(name="test").annotate(Count("children")),
             Tag.objects.filter(name="test").values_list("name"),
-            Tag.objects.order_by().union(Tag.objects.order_by().filter(name="test")),
         ]
+        if connection.features.supports_select_union:
+            querysets.append(
+                Tag.objects.order_by().union(Tag.objects.order_by().filter(name="test"))
+            )
         if connection.features.has_select_for_update:
             querysets.append(Tag.objects.select_for_update().filter(name="test"))
         supported_formats = connection.features.supported_explain_formats
@@ -87,15 +90,27 @@ class ExplainTests(TestCase):
         ]
         if connection.features.is_postgresql_16:
             test_options.append({"generic_plan": True})
+        if connection.features.is_postgresql_17:
+            test_options.append({"memory": True})
+            test_options.append({"serialize": "TEXT", "analyze": True})
+            test_options.append({"serialize": "text", "analyze": True})
+            test_options.append({"serialize": "BINARY", "analyze": True})
+            test_options.append({"serialize": "binary", "analyze": True})
         for options in test_options:
             with self.subTest(**options), transaction.atomic():
                 with CaptureQueriesContext(connection) as captured_queries:
                     qs.explain(format="text", **options)
                 self.assertEqual(len(captured_queries), 1)
                 for name, value in options.items():
-                    option = "{} {}".format(name.upper(), "true" if value else "false")
+                    if isinstance(value, str):
+                        option = "{} {}".format(name.upper(), value.upper())
+                    else:
+                        option = "{} {}".format(
+                            name.upper(), "true" if value else "false"
+                        )
                     self.assertIn(option, captured_queries[0]["sql"])
 
+    @skipUnlessDBFeature("supports_select_union")
     def test_multi_page_text_explain(self):
         if "TEXT" not in connection.features.supported_explain_formats:
             self.skipTest("This backend does not support TEXT format.")

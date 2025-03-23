@@ -43,8 +43,10 @@ TIME_ZONE = "America/Chicago"
 # If you set this to True, Django will use timezone-aware datetimes.
 USE_TZ = True
 
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
+# Language code for this installation. Valid choices can be found here:
+# https://www.iana.org/assignments/language-subtag-registry/
+# If LANGUAGE_CODE is not listed in LANGUAGES (below), the project must
+# provide the necessary translations and locale definitions.
 LANGUAGE_CODE = "en-us"
 
 # Languages we provide translations for, out of the box.
@@ -215,11 +217,6 @@ TEMPLATES = []
 
 # Default form rendering class.
 FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
-
-# RemovedInDjango60Warning: It's a transitional setting helpful in early
-# adoption of "https" as the new default value of forms.URLField.assume_scheme.
-# Set to True to assume "https" during the Django 5.x release cycle.
-FORMS_URLFIELD_ASSUME_HTTPS = False
 
 # Default email address to use for various automated correspondence from
 # the site managers.
@@ -665,3 +662,8 @@ SECURE_REDIRECT_EXEMPT = []
 SECURE_REFERRER_POLICY = "same-origin"
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False
+
+# RemovedInDjango70Warning: A transitional setting helpful in early adoption of
+# HTTPS as the default protocol in urlize and urlizetrunc when no protocol is
+# provided. Set to True to assume HTTPS during the Django 6.x release cycle.
+URLIZE_ASSUME_HTTPS = False

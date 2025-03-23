@@ -85,7 +85,7 @@ Tell Django where to look for fixture files
 -------------------------------------------
 
 By default, Django looks for fixtures in the ``fixtures`` directory inside each
-app for, so the command ``loaddata sample`` will find the file
+app, so the command ``loaddata sample`` will find the file
 ``my_app/fixtures/sample.json``. This works with relative paths as well, so
 ``loaddata my_app/sample`` will find the file
 ``my_app/fixtures/my_app/sample.json``.
@@ -93,7 +93,7 @@ app for, so the command ``loaddata sample`` will find the file
 Django also looks for fixtures in the list of directories provided in the
 :setting:`FIXTURE_DIRS` setting.
 
-To completely prevent default search form happening, use an absolute path to
+To completely prevent default search from happening, use an absolute path to
 specify the location of your fixture file, e.g. ``loaddata /path/to/sample``.
 
 .. admonition:: Namespace your fixture files

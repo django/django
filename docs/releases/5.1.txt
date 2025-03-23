@@ -1,8 +1,8 @@
-============================================
-Django 5.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 5.1 release notes
+========================
 
-*Expected August 2024*
+*August 7, 2024*
 
 Welcome to Django 5.1!
 
@@ -18,18 +18,19 @@ project.
 Python compatibility
 ====================
 
-Django 5.1 supports Python 3.10, 3.11, and 3.12. We **highly recommend** and
-only officially support the latest release of each series.
+Django 5.1 supports Python 3.10, 3.11, 3.12, and 3.13 (as of 5.1.3). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-5.1:
 
 What's new in Django 5.1
 ========================
 
-``{% query_string %}`` template tag
+``{% querystring %}`` template tag
 -----------------------------------
 
-Django 5.1 introduces the :ttag:`{% query_string %} <query_string>` template
+Django 5.1 introduces the :ttag:`{% querystring %} <querystring>` template
 tag, simplifying the modification of query parameters in URLs, making it easier
 to generate links that maintain existing query parameters while adding or
 changing specific ones.
@@ -53,7 +54,7 @@ When switching to using this new template tag, the above magically becomes:
 
 .. code-block:: html+django
 
-    <a href="{% query_string page=page.next_page_number %}">Next page</a>
+    <a href="{% querystring page=page.next_page_number %}">Next page</a>
 
 PostgreSQL Connection Pools
 ---------------------------
@@ -91,11 +92,14 @@ redirects all unauthenticated requests to a login page. Views can allow
 unauthenticated requests by using the new
 :func:`~django.contrib.auth.decorators.login_not_required` decorator.
 
-The :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` respects
-the ``login_url`` and ``redirect_field_name`` values set via the
+``LoginRequiredMiddleware`` respects the ``login_url`` and
+``redirect_field_name`` values set via the
 :func:`~.django.contrib.auth.decorators.login_required` decorator, but does not
 support setting ``login_url`` or ``redirect_field_name`` via the
 :class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
+
+To enable this, add ``"django.contrib.auth.middleware.LoginRequiredMiddleware"``
+to your :setting:`MIDDLEWARE` setting.
 
 Minor features
 --------------
@@ -112,14 +116,14 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   720,000 to 870,000.
 
-* The default ``parallelism`` of the ``ScryptPasswordHasher`` is 
-  increased from 1 to 5, to follow OWASP recommendations.
+* The default ``parallelism`` of the ``ScryptPasswordHasher`` is increased from
+  1 to 5, to follow OWASP recommendations.
 
-* :class:`~django.contrib.auth.forms.BaseUserCreationForm` and
-  :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now support
-  disabling password-based authentication by setting an unusable password on
-  form save. This is now available in the admin when visiting the user creation
-  and password change pages.
+* The new :class:`~django.contrib.auth.forms.AdminUserCreationForm` and
+  the existing :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now
+  support disabling password-based authentication by setting an unusable
+  password on form save. This is now available in the admin when visiting the
+  user creation and password change pages.
 
 * :func:`~.django.contrib.auth.decorators.login_required`,
   :func:`~.django.contrib.auth.decorators.permission_required`, and
@@ -393,6 +397,14 @@ Miscellaneous
   saving the image to storage. If your storage backend resizes images, the
   ``width_field`` and ``height_field`` will not match the width and height of
   the image.
+
+* The minimum supported version of ``asgiref`` is increased from 3.7.0 to
+  3.8.1.
+
+* To improve performance, the ``delete_selected`` admin action now uses
+  ``QuerySet.bulk_create()`` when creating multiple ``LogEntry`` objects. As a
+  result, ``pre_save`` and ``post_save`` signals for ``LogEntry`` are not sent
+  when multiple objects are deleted via this admin action.
 
 .. _deprecated-features-5.1:
 

@@ -10,7 +10,7 @@ URL. The canonical way to enable cache middleware is to set
         'django.middleware.cache.FetchFromCacheMiddleware'
     ]
 
-This is counter-intuitive, but correct: ``UpdateCacheMiddleware`` needs to run
+This is counterintuitive, but correct: ``UpdateCacheMiddleware`` needs to run
 last during the response phase, which processes middleware bottom-up;
 ``FetchFromCacheMiddleware`` needs to run last during the request phase, which
 processes middleware top-down.

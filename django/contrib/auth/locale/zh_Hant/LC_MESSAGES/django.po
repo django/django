@@ -3,20 +3,23 @@
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Claude Paroz <claude@2xlibre.net>, 2016
+# yubike, 2024
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # tcc <tcchou@tcchou.org>, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017,2019
+# YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2013
+# yubike, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-18 09:03+0000\n"
-"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: YAO WEN LIANG, 2024\n"
+"Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,12 +40,22 @@ msgstr "重要日期"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "主鍵 %(key)r 的 %(name)s 物件不存在。"
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "提交的表單資料有衝突。請再試一次。"
+
 msgid "Password changed successfully."
 msgstr "密碼修改成功"
+
+msgid "Password-based authentication was disabled."
+msgstr "基於密碼的驗證已停用。"
 
 #, python-format
 msgid "Change password: %s"
 msgstr "修改密碼: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "設定密碼: %s"
 
 msgid "Authentication and Authorization"
 msgstr "認證與授權"
@@ -57,10 +70,24 @@ msgid "No password set."
 msgstr "無設定密碼。"
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr "無效的密碼格式或不知名的雜湊演算法。"
+msgstr "無效的密碼格式或未知的雜湊演算法。"
+
+msgid "Reset password"
+msgstr "重設密碼"
+
+msgid "Set password"
+msgstr "設定密碼"
 
 msgid "The two password fields didn’t match."
-msgstr "兩個密碼欄位不相符。"
+msgstr "輸入的兩個密碼不一致。"
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"用戶是否能夠使用密碼進行認證。如果禁用，他們仍可能能夠使用其他後端進行認證，"
+"例如單一登入或LDAP。"
 
 msgid "Password"
 msgstr "密碼"
@@ -69,14 +96,24 @@ msgid "Password confirmation"
 msgstr "密碼確認"
 
 msgid "Enter the same password as before, for verification."
-msgstr "為檢查用，請輸入與前面相同的密碼。"
+msgstr "輸入與之前相同的密碼以進行驗證。"
+
+msgid "Password-based authentication"
+msgstr "基於密碼的驗證"
+
+msgid "Enabled"
+msgstr "啟用"
+
+msgid "Disabled"
+msgstr "停用"
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
-msgstr ""
-"原始密碼尚未儲存，因此無法存取此帳號的密碼，但你可以透過<a href=\"{}\">這個表"
-"單</a>來變更密碼。"
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr "原始密碼不會被儲存，因此無法查看用戶的密碼。"
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr "通過設定密碼為此用戶啟用基於密碼的認證。"
 
 #, python-format
 msgid ""
@@ -102,9 +139,6 @@ msgstr "你的舊密碼不正確。請重新輸入。"
 msgid "Old password"
 msgstr "舊密碼"
 
-msgid "Password (again)"
-msgstr "密碼(重複)"
-
 msgid "algorithm"
 msgstr "演算法"
 
@@ -112,22 +146,22 @@ msgid "iterations"
 msgstr "迭代"
 
 msgid "salt"
-msgstr "隨機值"
+msgstr "鹽值"
 
 msgid "hash"
-msgstr "哈希碼"
+msgstr "哈希"
 
 msgid "variety"
-msgstr "變種"
+msgstr "類型"
 
 msgid "version"
 msgstr "版本"
 
 msgid "memory cost"
-msgstr "記憶體用量"
+msgstr "記憶體成本"
 
 msgid "time cost"
-msgstr "耗時"
+msgstr "時間成本"
 
 msgid "parallelism"
 msgstr "平行性"
@@ -137,6 +171,9 @@ msgstr "作用因素"
 
 msgid "checksum"
 msgstr "校驗"
+
+msgid "block size"
+msgstr "區塊大小"
 
 msgid "name"
 msgstr "名稱"
@@ -165,12 +202,12 @@ msgstr "超級使用者狀態"
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
-msgstr "指定是否使用者可以登入到這個管理網站"
+msgstr "指定這個用戶擁有所有權限，無需特別指定。"
 
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
-msgstr "此為帳號可加入的群組。其所屬的群組將授予該帳號對應的權限。"
+msgstr "此用戶所屬的群組。用戶將獲得其所屬每個群組的所有權限。"
 
 msgid "user permissions"
 msgstr "使用者權限"
@@ -182,7 +219,7 @@ msgid "username"
 msgstr "使用者名稱"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "必要的。150 個字或更少，只包含字母、數字和 @/./+/-/_。"
+msgstr "必填。長度為150個字或以下，僅限字母、數字和 @/./+/-/_。"
 
 msgid "A user with that username already exists."
 msgstr "一個相同名稱的使用者已經存在。"
@@ -194,13 +231,13 @@ msgid "last name"
 msgstr "姓氏"
 
 msgid "email address"
-msgstr "電子信箱"
+msgstr "電子郵件"
 
 msgid "staff status"
 msgstr "工作人員狀態"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr "指定是否使用者可以登入此管理網站。"
+msgstr "指定用戶是否可以登入此管理網站。"
 
 msgid "active"
 msgstr "有效"
@@ -208,7 +245,7 @@ msgstr "有效"
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "指定使用者是否有效。請取消選擇而不是刪除帳號。"
+msgstr "指定是否將此用戶視為活躍用戶。取消選擇此選項而不是刪除帳戶。"
 
 msgid "date joined"
 msgstr "加入日期"
@@ -226,7 +263,7 @@ msgid ""
 msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
-msgstr[0] "這個密碼過短。請至少使用 %(min_length)d 個字元。"
+msgstr[0] "此密碼過短。請至少使用 %(min_length)d 個字元。"
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -241,7 +278,7 @@ msgid "Your password can’t be too similar to your other personal information."
 msgstr "你的密碼不能與其他個人資訊太相近。"
 
 msgid "This password is too common."
-msgstr "這個密碼太普通。"
+msgstr "這個密碼太常見了。"
 
 msgid "Your password can’t be a commonly used password."
 msgstr "你不能使用常見的密碼。"
@@ -250,42 +287,42 @@ msgid "This password is entirely numeric."
 msgstr "這個密碼只包含數字。"
 
 msgid "Your password can’t be entirely numeric."
-msgstr "你的密碼不能完全是數字。"
+msgstr "你的密碼不能全都是數字。"
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "在 %(site_name)s 進行密碼重置"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
-msgstr "輸入合法的使用者名稱。只能包含英語字母、數字和 @/./+/-/_ 字元。"
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr "輸入合法的使用者名稱。只能包含大寫和小寫字母、數字和 @/./+/-/_ 符號。"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
-msgstr "輸入合法的使用者名稱。只能包含字母、數字和 @/./+/-/_ 字元。"
+msgstr "輸入合法的使用者名稱。只能包含字母、數字和 @/./+/-/_ 符號。"
 
 msgid "Logged out"
 msgstr "登出"
 
 msgid "Password reset"
-msgstr "密碼重設"
+msgstr "重設密碼"
 
 msgid "Password reset sent"
-msgstr "已送出密碼重設"
+msgstr "密碼重設連結已發送"
 
 msgid "Enter new password"
-msgstr "輸入新的密碼"
+msgstr "輸入新密碼"
 
 msgid "Password reset unsuccessful"
 msgstr "密碼重設失敗"
 
 msgid "Password reset complete"
-msgstr "密碼重設成功"
+msgstr "密碼重設完成"
 
 msgid "Password change"
-msgstr "變更密碼"
+msgstr "修改密碼"
 
 msgid "Password change successful"
-msgstr "成功變更密碼"
+msgstr "成功修改密碼"

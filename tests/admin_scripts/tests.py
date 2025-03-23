@@ -16,8 +16,12 @@ import unittest
 from io import StringIO
 from unittest import mock
 
+from user_commands.utils import AssertFormatterFailureCaughtContext
+
 from django import conf, get_version
 from django.conf import settings
+from django.core.checks import Error, Tags, register
+from django.core.checks.registry import registry
 from django.core.management import (
     BaseCommand,
     CommandError,
@@ -25,6 +29,7 @@ from django.core.management import (
     color,
     execute_from_command_line,
 )
+from django.core.management.base import LabelCommand, SystemCheckError
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management.commands.testserver import Command as TestserverCommand
@@ -33,7 +38,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY313
+from django.utils.version import PY313, get_docs_version
 from django.views.static import serve
 
 from . import urls
@@ -1597,6 +1602,15 @@ class ManageRunserver(SimpleTestCase):
             "Starting development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
+        docs_version = get_docs_version()
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
+            self.output.getvalue(),
+        )
 
     def test_on_bind(self):
         self.cmd.addr = "127.0.0.1"
@@ -1604,6 +1618,34 @@ class ManageRunserver(SimpleTestCase):
         self.cmd.on_bind("14437")
         self.assertIn(
             "Starting development server at http://127.0.0.1:14437/",
+            self.output.getvalue(),
+        )
+        docs_version = get_docs_version()
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
+            self.output.getvalue(),
+        )
+
+    @mock.patch.dict(os.environ, {"DJANGO_RUNSERVER_HIDE_WARNING": "true"})
+    def test_hide_production_warning_with_environment_variable(self):
+        self.cmd.addr = "0"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("8000")
+        self.assertIn(
+            "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+        docs_version = get_docs_version()
+        self.assertNotIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
             self.output.getvalue(),
         )
 
@@ -1693,7 +1735,53 @@ class ManageRunserver(SimpleTestCase):
             stdout=self.output,
         )
         self.assertIn("Performing system checks...", self.output.getvalue())
-        mocked_check.assert_called()
+        mocked_check.assert_has_calls(
+            [mock.call(tags=set()), mock.call(display_num_errors=True)]
+        )
+
+    def test_custom_system_checks(self):
+        original_checks = registry.registered_checks.copy()
+
+        @register(Tags.signals)
+        def my_check(app_configs, **kwargs):
+            return [Error("my error")]
+
+        class CustomException(Exception):
+            pass
+
+        self.addCleanup(setattr, registry, "registered_checks", original_checks)
+
+        class CustomRunserverCommand(RunserverCommand):
+            """Rather than mock run(), raise immediately after system checks run."""
+
+            def check_migrations(self, *args, **kwargs):
+                raise CustomException
+
+        class CustomRunserverCommandWithSignalsChecks(CustomRunserverCommand):
+            requires_system_checks = [Tags.signals]
+
+        command = CustomRunserverCommandWithSignalsChecks()
+        with self.assertRaises(SystemCheckError):
+            call_command(
+                command,
+                use_reloader=False,
+                skip_checks=False,
+                stdout=StringIO(),
+                stderr=StringIO(),
+            )
+
+        class CustomMigrateCommandWithSecurityChecks(CustomRunserverCommand):
+            requires_system_checks = [Tags.security]
+
+        command = CustomMigrateCommandWithSecurityChecks()
+        with self.assertRaises(CustomException):
+            call_command(
+                command,
+                use_reloader=False,
+                skip_checks=False,
+                stdout=StringIO(),
+                stderr=StringIO(),
+            )
 
 
 class ManageRunserverMigrationWarning(TestCase):
@@ -2243,6 +2331,20 @@ class CommandTypes(AdminScriptTestCase):
             "('settings', None), ('traceback', False), ('verbosity', 1)]",
         )
 
+    def test_custom_label_command_custom_missing_args_message(self):
+        class Command(LabelCommand):
+            missing_args_message = "Missing argument."
+
+        with self.assertRaisesMessage(CommandError, "Error: Missing argument."):
+            call_command(Command())
+
+    def test_custom_label_command_none_missing_args_message(self):
+        class Command(LabelCommand):
+            missing_args_message = None
+
+        with self.assertRaisesMessage(CommandError, ""):
+            call_command(Command())
+
     def test_suppress_base_options_command_help(self):
         args = ["suppress_base_options_command", "--help"]
         out, err = self.run_manage(args)
@@ -2304,8 +2406,8 @@ class Discovery(SimpleTestCase):
 class CommandDBOptionChoiceTests(SimpleTestCase):
     def test_invalid_choice_db_option(self):
         expected_error = (
-            "Error: argument --database: invalid choice: "
-            "'deflaut' (choose from 'default', 'other')"
+            r"Error: argument --database: invalid choice: 'deflaut' "
+            r"\(choose from '?default'?, '?other'?\)"
         )
         args = [
             "changepassword",
@@ -2326,7 +2428,7 @@ class CommandDBOptionChoiceTests(SimpleTestCase):
         ]
 
         for arg in args:
-            with self.assertRaisesMessage(CommandError, expected_error):
+            with self.assertRaisesRegex(CommandError, expected_error):
                 call_command(arg, "--database", "deflaut", verbosity=0)
 
 
@@ -2890,6 +2992,16 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
                     stat.S_IMODE(os.stat(file_path).st_mode),
                     expected_mode,
                 )
+
+    def test_failure_to_format_code(self):
+        with AssertFormatterFailureCaughtContext(self) as ctx:
+            call_command(
+                "startapp",
+                "mynewapp",
+                directory=self.test_dir,
+                stdout=ctx.stdout,
+                stderr=ctx.stderr,
+            )
 
 
 class StartApp(AdminScriptTestCase):

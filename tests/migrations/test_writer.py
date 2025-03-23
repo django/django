@@ -22,7 +22,8 @@ from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
 from django.db.migrations.serializer import BaseSerializer
 from django.db.migrations.writer import MigrationWriter, OperationWriter
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import extend_sys_path
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_default_timezone, get_fixed_timezone
@@ -643,6 +644,13 @@ class WriterTests(SimpleTestCase):
             ("datetime.datetime(2014, 1, 1, 1, 1)", {"import datetime"}),
         )
         self.assertSerializedResultEqual(
+            datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.UTC),
+            (
+                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
+                {"import datetime"},
+            ),
+        )
+        self.assertSerializedResultEqual(
             datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc),
             (
                 "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
@@ -954,6 +962,29 @@ class WriterTests(SimpleTestCase):
                 writer = MigrationWriter(migration)
                 self.assertEqual(writer.path, expected_path)
 
+    @override_settings(
+        MIGRATION_MODULES={"namespace_app": "namespace_app.migrations"},
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.distributed_app_location_2.namespace_app"
+        ],
+    )
+    def test_migration_path_distributed_namespace(self):
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        test_apps_dir = os.path.join(base_dir, "migrations", "migrations_test_apps")
+        expected_msg = (
+            "Could not locate an appropriate location to create "
+            "migrations package namespace_app.migrations. Make sure the toplevel "
+            "package exists and can be imported."
+        )
+        with extend_sys_path(
+            os.path.join(test_apps_dir, "distributed_app_location_1"),
+            os.path.join(test_apps_dir, "distributed_app_location_2"),
+        ):
+            migration = migrations.Migration("0001_initial", "namespace_app")
+            writer = MigrationWriter(migration)
+            with self.assertRaisesMessage(ValueError, expected_msg):
+                writer.path
+
     def test_custom_operation(self):
         migration = type(
             "Migration",
@@ -1018,7 +1049,7 @@ class WriterTests(SimpleTestCase):
                         "myfield",
                         models.DateTimeField(
                             default=datetime.datetime(
-                                2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc
+                                2012, 1, 1, 1, 1, tzinfo=datetime.UTC
                             ),
                         ),
                     ),
@@ -1042,7 +1073,7 @@ class WriterTests(SimpleTestCase):
         Test comments at top of file.
         """
         migration = type("Migration", (migrations.Migration,), {"operations": []})
-        dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=datetime.timezone.utc)
+        dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=datetime.UTC)
         with mock.patch("django.db.migrations.writer.now", lambda: dt):
             for include_header in (True, False):
                 with self.subTest(include_header=include_header):
@@ -1114,3 +1145,22 @@ class WriterTests(SimpleTestCase):
             ValueError, "'TestModel1' must inherit from 'BaseSerializer'."
         ):
             MigrationWriter.register_serializer(complex, TestModel1)
+
+    def test_composite_pk_import(self):
+        migration = type(
+            "Migration",
+            (migrations.Migration,),
+            {
+                "operations": [
+                    migrations.AddField(
+                        "foo",
+                        "bar",
+                        models.CompositePrimaryKey("foo_id", "bar_id"),
+                    ),
+                ],
+            },
+        )
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        self.assertEqual(output.count("import"), 1)
+        self.assertIn("from django.db import migrations, models", output)

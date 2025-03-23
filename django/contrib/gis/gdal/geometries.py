@@ -1,46 +1,45 @@
 """
- The OGRGeometry is a wrapper for using the OGR Geometry class
- (see https://gdal.org/api/ogrgeometry_cpp.html#_CPPv411OGRGeometry).
- OGRGeometry may be instantiated when reading geometries from OGR Data Sources
- (e.g. SHP files), or when given OGC WKT (a string).
+The OGRGeometry is a wrapper for using the OGR Geometry class
+(see https://gdal.org/api/ogrgeometry_cpp.html#_CPPv411OGRGeometry).
+OGRGeometry may be instantiated when reading geometries from OGR Data Sources
+(e.g. SHP files), or when given OGC WKT (a string).
 
- While the 'full' API is not present yet, the API is "pythonic" unlike
- the traditional and "next-generation" OGR Python bindings.  One major
- advantage OGR Geometries have over their GEOS counterparts is support
- for spatial reference systems and their transformation.
+While the 'full' API is not present yet, the API is "pythonic" unlike
+the traditional and "next-generation" OGR Python bindings.  One major
+advantage OGR Geometries have over their GEOS counterparts is support
+for spatial reference systems and their transformation.
 
- Example:
-  >>> from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
-  >>> wkt1, wkt2 = 'POINT(-90 30)', 'POLYGON((0 0, 5 0, 5 5, 0 5)'
-  >>> pnt = OGRGeometry(wkt1)
-  >>> print(pnt)
-  POINT (-90 30)
-  >>> mpnt = OGRGeometry(OGRGeomType('MultiPoint'), SpatialReference('WGS84'))
-  >>> mpnt.add(wkt1)
-  >>> mpnt.add(wkt1)
-  >>> print(mpnt)
-  MULTIPOINT (-90 30,-90 30)
-  >>> print(mpnt.srs.name)
-  WGS 84
-  >>> print(mpnt.srs.proj)
-  +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> mpnt.transform(SpatialReference('NAD27'))
-  >>> print(mpnt.proj)
-  +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
-  >>> print(mpnt)
-  MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248 29.99979788655764)
+Example:
+ >>> from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
+ >>> wkt1, wkt2 = 'POINT(-90 30)', 'POLYGON((0 0, 5 0, 5 5, 0 5)'
+ >>> pnt = OGRGeometry(wkt1)
+ >>> print(pnt)
+ POINT (-90 30)
+ >>> mpnt = OGRGeometry(OGRGeomType('MultiPoint'), SpatialReference('WGS84'))
+ >>> mpnt.add(wkt1)
+ >>> mpnt.add(wkt1)
+ >>> print(mpnt)
+ MULTIPOINT (-90 30,-90 30)
+ >>> print(mpnt.srs.name)
+ WGS 84
+ >>> print(mpnt.srs.proj)
+ +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
+ >>> mpnt.transform(SpatialReference('NAD27'))
+ >>> print(mpnt.proj)
+ +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
+ >>> print(mpnt)
+ MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248 29.99979788655764)
 
-  The OGRGeomType class is to make it easy to specify an OGR geometry type:
-  >>> from django.contrib.gis.gdal import OGRGeomType
-  >>> gt1 = OGRGeomType(3) # Using an integer for the type
-  >>> gt2 = OGRGeomType('Polygon') # Using a string
-  >>> gt3 = OGRGeomType('POLYGON') # It's case-insensitive
-  >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
-  True True
+ The OGRGeomType class is to make it easy to specify an OGR geometry type:
+ >>> from django.contrib.gis.gdal import OGRGeomType
+ >>> gt1 = OGRGeomType(3) # Using an integer for the type
+ >>> gt2 = OGRGeomType('Polygon') # Using a string
+ >>> gt3 = OGRGeomType('POLYGON') # It's case-insensitive
+ >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
+ True True
 """
 
 import sys
-import warnings
 from binascii import b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
@@ -52,7 +51,6 @@ from django.contrib.gis.gdal.prototypes import geom as capi
 from django.contrib.gis.gdal.prototypes import srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_bytes
 
 
@@ -64,6 +62,7 @@ class OGRGeometry(GDALBase):
     """Encapsulate an OGR geometry."""
 
     destructor = capi.destroy_geom
+    geos_support = True
 
     def __init__(self, geom_input, srs=None):
         """Initialize Geometry on either WKT or an OGR pointer as input."""
@@ -214,16 +213,6 @@ class OGRGeometry(GDALBase):
         "Return the coordinate dimension of the Geometry."
         return capi.get_coord_dim(self.ptr)
 
-    # RemovedInDjango60Warning
-    @coord_dim.setter
-    def coord_dim(self, dim):
-        "Set the coordinate dimension of this Geometry."
-        msg = "coord_dim setter is deprecated. Use set_3d() instead."
-        warnings.warn(msg, RemovedInDjango60Warning, stacklevel=2)
-        if dim not in (2, 3):
-            raise ValueError("Geometry dimension must be either 2 or 3")
-        capi.set_coord_dim(self.ptr, dim)
-
     @property
     def geom_count(self):
         "Return the number of elements in this Geometry."
@@ -304,6 +293,19 @@ class OGRGeometry(GDALBase):
                 f"Input to 'set_measured' must be a boolean, got '{value!r}'."
             )
 
+    @property
+    def has_curve(self):
+        """Return True if the geometry is or has curve geometry."""
+        return capi.has_curve_geom(self.ptr, 0)
+
+    def get_linear_geometry(self):
+        """Return a linear version of this geometry."""
+        return OGRGeometry(capi.get_linear_geom(self.ptr, 0, None))
+
+    def get_curve_geometry(self):
+        """Return a curve version of this geometry."""
+        return OGRGeometry(capi.get_curve_geom(self.ptr, None))
+
     # #### SpatialReference-related Properties ####
 
     # The SRS property
@@ -360,9 +362,14 @@ class OGRGeometry(GDALBase):
     @property
     def geos(self):
         "Return a GEOSGeometry object from this OGRGeometry."
-        from django.contrib.gis.geos import GEOSGeometry
+        if self.geos_support:
+            from django.contrib.gis.geos import GEOSGeometry
 
-        return GEOSGeometry(self._geos_ptr(), self.srid)
+            return GEOSGeometry(self._geos_ptr(), self.srid)
+        else:
+            from django.contrib.gis.geos import GEOSException
+
+            raise GEOSException(f"GEOS does not support {self.__class__.__qualname__}.")
 
     @property
     def gml(self):
@@ -727,6 +734,18 @@ class Polygon(OGRGeometry):
         return sum(self[i].point_count for i in range(self.geom_count))
 
 
+class CircularString(LineString):
+    geos_support = False
+
+
+class CurvePolygon(Polygon):
+    geos_support = False
+
+
+class CompoundCurve(OGRGeometry):
+    geos_support = False
+
+
 # Geometry Collection base class.
 class GeometryCollection(OGRGeometry):
     "The Geometry Collection class."
@@ -788,6 +807,14 @@ class MultiPolygon(GeometryCollection):
     pass
 
 
+class MultiSurface(GeometryCollection):
+    geos_support = False
+
+
+class MultiCurve(GeometryCollection):
+    geos_support = False
+
+
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
 GEO_CLASSES = {
     1: Point,
@@ -797,7 +824,17 @@ GEO_CLASSES = {
     5: MultiLineString,
     6: MultiPolygon,
     7: GeometryCollection,
+    8: CircularString,
+    9: CompoundCurve,
+    10: CurvePolygon,
+    11: MultiCurve,
+    12: MultiSurface,
     101: LinearRing,
+    1008: CircularString,  # CIRCULARSTRING Z
+    1009: CompoundCurve,  # COMPOUNDCURVE Z
+    1010: CurvePolygon,  # CURVEPOLYGON Z
+    1011: MultiCurve,  # MULTICURVE Z
+    1012: MultiSurface,  # MULTICURVE Z
     2001: Point,  # POINT M
     2002: LineString,  # LINESTRING M
     2003: Polygon,  # POLYGON M
@@ -805,6 +842,11 @@ GEO_CLASSES = {
     2005: MultiLineString,  # MULTILINESTRING M
     2006: MultiPolygon,  # MULTIPOLYGON M
     2007: GeometryCollection,  # GEOMETRYCOLLECTION M
+    2008: CircularString,  # CIRCULARSTRING M
+    2009: CompoundCurve,  # COMPOUNDCURVE M
+    2010: CurvePolygon,  # CURVEPOLYGON M
+    2011: MultiCurve,  # MULTICURVE M
+    2012: MultiSurface,  # MULTICURVE M
     3001: Point,  # POINT ZM
     3002: LineString,  # LINESTRING ZM
     3003: Polygon,  # POLYGON ZM
@@ -812,6 +854,11 @@ GEO_CLASSES = {
     3005: MultiLineString,  # MULTILINESTRING ZM
     3006: MultiPolygon,  # MULTIPOLYGON ZM
     3007: GeometryCollection,  # GEOMETRYCOLLECTION ZM
+    3008: CircularString,  # CIRCULARSTRING ZM
+    3009: CompoundCurve,  # COMPOUNDCURVE ZM
+    3010: CurvePolygon,  # CURVEPOLYGON ZM
+    3011: MultiCurve,  # MULTICURVE ZM
+    3012: MultiSurface,  # MULTISURFACE ZM
     1 + OGRGeomType.wkb25bit: Point,  # POINT Z
     2 + OGRGeomType.wkb25bit: LineString,  # LINESTRING Z
     3 + OGRGeomType.wkb25bit: Polygon,  # POLYGON Z

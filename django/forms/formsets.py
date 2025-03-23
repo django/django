@@ -570,7 +570,12 @@ def formset_factory(
         "validate_max": validate_max,
         "renderer": renderer,
     }
-    return type(form.__name__ + "FormSet", (formset,), attrs)
+    form_name = form.__name__
+    if form_name.endswith("Form"):
+        formset_name = form_name + "Set"
+    else:
+        formset_name = form_name + "FormSet"
+    return type(formset_name, (formset,), attrs)
 
 
 def all_valid(formsets):

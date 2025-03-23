@@ -5,7 +5,6 @@ from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
 from django.urls import NoReverseMatch
 from django.utils import translation
-from django.utils.html import escape
 
 
 class TemplateTestMixin:
@@ -158,9 +157,31 @@ class TemplateTestMixin:
             template.render(context)
         if self.debug_engine:
             self.assertEqual(
-                cm.exception.template_debug["during"],
-                escape('{% include "missing.html" %}'),
+                cm.exception.template_debug["before"],
+                '{% block content %}{% include "index.html" %}',
             )
+            self.assertEqual(
+                cm.exception.template_debug["during"],
+                '{% include "missing.html" %}',
+            )
+            self.assertEqual(
+                cm.exception.template_debug["after"],
+                '{% include "index.html" %}{% endblock %}\n',
+            )
+            self.assertEqual(
+                cm.exception.template_debug["source_lines"][0],
+                (1, '{% extends "test_extends_block_error_parent.html" %}\n'),
+            )
+            self.assertEqual(
+                cm.exception.template_debug["source_lines"][1],
+                (
+                    2,
+                    '{% block content %}{% include "index.html" %}'
+                    '{% include "missing.html" %}'
+                    '{% include "index.html" %}{% endblock %}\n',
+                ),
+            )
+            self.assertEqual(cm.exception.template_debug["source_lines"][2], (3, ""))
 
     def test_super_errors(self):
         """

@@ -89,6 +89,23 @@ class RelativeFieldTests(SimpleTestCase):
         field = Model._meta.get_field("m2m")
         self.assertEqual(field.check(from_model=Model), [])
 
+    @isolate_apps("invalid_models_tests")
+    def test_auto_created_through_model(self):
+        class OtherModel(models.Model):
+            pass
+
+        class M2MModel(models.Model):
+            many_to_many_rel = models.ManyToManyField(OtherModel)
+
+        class O2OModel(models.Model):
+            one_to_one_rel = models.OneToOneField(
+                "invalid_models_tests.M2MModel_many_to_many_rel",
+                on_delete=models.CASCADE,
+            )
+
+        field = O2OModel._meta.get_field("one_to_one_rel")
+        self.assertEqual(field.check(from_model=O2OModel), [])
+
     def test_many_to_many_with_useless_options(self):
         class Model(models.Model):
             name = models.CharField(max_length=20)
@@ -419,6 +436,84 @@ class RelativeFieldTests(SimpleTestCase):
                     "ManyToManyFields cannot be unique.",
                     obj=field,
                     id="fields.E330",
+                ),
+            ],
+        )
+
+    def test_foreignkey_to_model_with_composite_primary_key(self):
+        class Parent(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+        class Child(models.Model):
+            rel_class_parent = models.ForeignKey(
+                Parent, on_delete=models.CASCADE, related_name="child_class_set"
+            )
+            rel_string_parent = models.ForeignKey(
+                "Parent", on_delete=models.CASCADE, related_name="child_string_set"
+            )
+
+        field = Child._meta.get_field("rel_string_parent")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "Field defines a relation to the CompositePrimaryKey of model "
+                    "'Parent' which is not supported.",
+                    obj=field,
+                    id="fields.E347",
+                ),
+            ],
+        )
+        field = Child._meta.get_field("rel_class_parent")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "Field defines a relation to the CompositePrimaryKey of model "
+                    "'Parent' which is not supported.",
+                    obj=field,
+                    id="fields.E347",
+                ),
+            ],
+        )
+
+    def test_many_to_many_to_model_with_composite_primary_key(self):
+        class Parent(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+        class Child(models.Model):
+            rel_class_parent = models.ManyToManyField(
+                Parent, related_name="child_class_set"
+            )
+            rel_string_parent = models.ManyToManyField(
+                "Parent", related_name="child_string_set"
+            )
+
+        field = Child._meta.get_field("rel_string_parent")
+        self.assertEqual(
+            field.check(from_model=Child),
+            [
+                Error(
+                    "Field defines a relation to the CompositePrimaryKey of model "
+                    "'Parent' which is not supported.",
+                    obj=field,
+                    id="fields.E347",
+                ),
+            ],
+        )
+        field = Child._meta.get_field("rel_class_parent")
+        self.assertEqual(
+            field.check(from_model=Child),
+            [
+                Error(
+                    "Field defines a relation to the CompositePrimaryKey of model "
+                    "'Parent' which is not supported.",
+                    obj=field,
+                    id="fields.E347",
                 ),
             ],
         )
@@ -918,6 +1013,57 @@ class RelativeFieldTests(SimpleTestCase):
                     "is abstract.",
                     id="fields.E300",
                     obj=field,
+                ),
+            ],
+        )
+
+    def test_to_fields_with_composite_primary_key(self):
+        class Parent(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+        class Child(models.Model):
+            a = models.IntegerField()
+            b = models.IntegerField()
+            parent = models.ForeignObject(
+                Parent,
+                on_delete=models.SET_NULL,
+                from_fields=("a", "b"),
+                to_fields=("pk", "version"),
+            )
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "Field defines a relation to the CompositePrimaryKey of model "
+                    "'Parent' which is not supported.",
+                    obj=field,
+                    id="fields.E347",
+                ),
+            ],
+        )
+
+    def test_to_field_to_composite_primery_key(self):
+        class Parent(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, on_delete=models.CASCADE, to_field="pk")
+
+        field = Child._meta.get_field("parent")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "Field defines a relation to the CompositePrimaryKey of model "
+                    "'Parent' which is not supported.",
+                    obj=field,
+                    id="fields.E347",
                 ),
             ],
         )

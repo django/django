@@ -1,3 +1,4 @@
+import logging
 import unicodedata
 
 from django import forms
@@ -14,8 +15,10 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.debug import sensitive_variables
 
 UserModel = get_user_model()
+logger = logging.getLogger("django.contrib.auth")
 
 
 def _unicode_ci_compare(s1, s2):
@@ -96,36 +99,74 @@ class UsernameField(forms.CharField):
 class SetPasswordMixin:
     """
     Form mixin that validates and sets a password for a user.
-
-    This mixin also support setting an unusable password for a user.
     """
 
     error_messages = {
         "password_mismatch": _("The two password fields didn’t match."),
     }
-    usable_password_help_text = _(
-        "Whether the user will be able to authenticate using a password or not. "
-        "If disabled, they may still be able to authenticate using other backends, "
-        "such as Single Sign-On or LDAP."
-    )
 
     @staticmethod
     def create_password_fields(label1=_("Password"), label2=_("Password confirmation")):
         password1 = forms.CharField(
             label=label1,
-            required=False,
+            required=True,
             strip=False,
             widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
             help_text=password_validation.password_validators_help_text_html(),
         )
         password2 = forms.CharField(
             label=label2,
-            required=False,
+            required=True,
             widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
             strip=False,
             help_text=_("Enter the same password as before, for verification."),
         )
         return password1, password2
+
+    @sensitive_variables("password1", "password2")
+    def validate_passwords(
+        self,
+        password1_field_name="password1",
+        password2_field_name="password2",
+    ):
+        password1 = self.cleaned_data.get(password1_field_name)
+        password2 = self.cleaned_data.get(password2_field_name)
+
+        if password1 and password2 and password1 != password2:
+            error = ValidationError(
+                self.error_messages["password_mismatch"],
+                code="password_mismatch",
+            )
+            self.add_error(password2_field_name, error)
+
+    @sensitive_variables("password")
+    def validate_password_for_user(self, user, password_field_name="password2"):
+        password = self.cleaned_data.get(password_field_name)
+        if password:
+            try:
+                password_validation.validate_password(password, user)
+            except ValidationError as error:
+                self.add_error(password_field_name, error)
+
+    def set_password_and_save(self, user, password_field_name="password1", commit=True):
+        user.set_password(self.cleaned_data[password_field_name])
+        if commit:
+            user.save()
+        return user
+
+
+class SetUnusablePasswordMixin:
+    """
+    Form mixin that allows setting an unusable password for a user.
+
+    This mixin should be used in combination with `SetPasswordMixin`.
+    """
+
+    usable_password_help_text = _(
+        "Whether the user will be able to authenticate using a password or not. "
+        "If disabled, they may still be able to authenticate using other backends, "
+        "such as Single Sign-On or LDAP."
+    )
 
     @staticmethod
     def create_usable_password_field(help_text=usable_password_help_text):
@@ -138,6 +179,7 @@ class SetPasswordMixin:
             help_text=help_text,
         )
 
+    @sensitive_variables("password1", "password2")
     def validate_passwords(
         self,
         password1_field_name="password1",
@@ -148,48 +190,40 @@ class SetPasswordMixin:
             self.cleaned_data.pop(usable_password_field_name, None) != "false"
         )
         self.cleaned_data["set_usable_password"] = usable_password
+
+        if not usable_password:
+            return
+
         password1 = self.cleaned_data.get(password1_field_name)
         password2 = self.cleaned_data.get(password2_field_name)
 
-        if not usable_password:
-            return self.cleaned_data
-
-        if not password1:
+        if not password1 and password1_field_name not in self.errors:
             error = ValidationError(
                 self.fields[password1_field_name].error_messages["required"],
                 code="required",
             )
             self.add_error(password1_field_name, error)
 
-        if not password2:
+        if not password2 and password2_field_name not in self.errors:
             error = ValidationError(
                 self.fields[password2_field_name].error_messages["required"],
                 code="required",
             )
             self.add_error(password2_field_name, error)
 
-        if password1 and password2 and password1 != password2:
-            error = ValidationError(
-                self.error_messages["password_mismatch"],
-                code="password_mismatch",
-            )
-            self.add_error(password2_field_name, error)
+        super().validate_passwords(password1_field_name, password2_field_name)
 
-    def validate_password_for_user(self, user, password_field_name="password2"):
-        password = self.cleaned_data.get(password_field_name)
-        if password and self.cleaned_data["set_usable_password"]:
-            try:
-                password_validation.validate_password(password, user)
-            except ValidationError as error:
-                self.add_error(password_field_name, error)
-
-    def set_password_and_save(self, user, password_field_name="password1", commit=True):
+    def validate_password_for_user(self, user, **kwargs):
         if self.cleaned_data["set_usable_password"]:
-            user.set_password(self.cleaned_data[password_field_name])
+            super().validate_password_for_user(user, **kwargs)
+
+    def set_password_and_save(self, user, commit=True, **kwargs):
+        if self.cleaned_data["set_usable_password"]:
+            user = super().set_password_and_save(user, **kwargs, commit=commit)
         else:
             user.set_unusable_password()
-        if commit:
-            user.save()
+            if commit:
+                user.save()
         return user
 
 
@@ -197,10 +231,12 @@ class BaseUserCreationForm(SetPasswordMixin, forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username and
     password.
+
+    This is the documented base class for customizing the user creation form.
+    It should be kept mostly unchanged to ensure consistency and compatibility.
     """
 
     password1, password2 = SetPasswordMixin.create_password_fields()
-    usable_password = SetPasswordMixin.create_usable_password_field()
 
     class Meta:
         model = User
@@ -321,6 +357,7 @@ class AuthenticationForm(forms.Form):
         if self.fields["username"].label is None:
             self.fields["username"].label = capfirst(self.username_field.verbose_name)
 
+    @sensitive_variables()
     def clean(self):
         username = self.cleaned_data.get("username")
         password = self.cleaned_data.get("password")
@@ -393,7 +430,12 @@ class PasswordResetForm(forms.Form):
             html_email = loader.render_to_string(html_email_template_name, context)
             email_message.attach_alternative(html_email, "text/html")
 
-        email_message.send()
+        try:
+            email_message.send()
+        except Exception:
+            logger.exception(
+                "Failed to send password reset email to %s", context["user"].pk
+            )
 
     def get_users(self, email):
         """Given an email, return matching user(s) who should receive a reset.
@@ -442,11 +484,12 @@ class PasswordResetForm(forms.Form):
         email_field_name = UserModel.get_email_field_name()
         for user in self.get_users(email):
             user_email = getattr(user, email_field_name)
+            user_pk_bytes = force_bytes(UserModel._meta.pk.value_to_string(user))
             context = {
                 "email": user_email,
                 "domain": domain,
                 "site_name": site_name,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                "uid": urlsafe_base64_encode(user_pk_bytes),
                 "user": user,
                 "token": token_generator.make_token(user),
                 "protocol": "https" if use_https else "http",
@@ -507,6 +550,7 @@ class PasswordChangeForm(SetPasswordForm):
 
     field_order = ["old_password", "new_password1", "new_password2"]
 
+    @sensitive_variables("old_password")
     def clean_old_password(self):
         """
         Validate that the old_password field is correct.
@@ -520,13 +564,13 @@ class PasswordChangeForm(SetPasswordForm):
         return old_password
 
 
-class AdminPasswordChangeForm(SetPasswordMixin, forms.Form):
+class AdminPasswordChangeForm(SetUnusablePasswordMixin, SetPasswordMixin, forms.Form):
     """
     A form used to change the password of a user in the admin interface.
     """
 
     required_css_class = "required"
-    usable_password_help_text = SetPasswordMixin.usable_password_help_text + (
+    usable_password_help_text = SetUnusablePasswordMixin.usable_password_help_text + (
         '<ul id="id_unusable_warning" class="messagelist"><li class="warning">'
         "If disabled, the current password for this user will be lost.</li></ul>"
     )
@@ -537,8 +581,10 @@ class AdminPasswordChangeForm(SetPasswordMixin, forms.Form):
         super().__init__(*args, **kwargs)
         self.fields["password1"].widget.attrs["autofocus"] = True
         if self.user.has_usable_password():
+            self.fields["password1"].required = False
+            self.fields["password2"].required = False
             self.fields["usable_password"] = (
-                SetPasswordMixin.create_usable_password_field(
+                SetUnusablePasswordMixin.create_usable_password_field(
                     self.usable_password_help_text
                 )
             )
@@ -558,3 +604,13 @@ class AdminPasswordChangeForm(SetPasswordMixin, forms.Form):
         if "set_usable_password" in data or "password1" in data and "password2" in data:
             return ["password"]
         return []
+
+
+class AdminUserCreationForm(SetUnusablePasswordMixin, UserCreationForm):
+
+    usable_password = SetUnusablePasswordMixin.create_usable_password_field()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["password1"].required = False
+        self.fields["password2"].required = False

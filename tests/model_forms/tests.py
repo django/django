@@ -1,5 +1,6 @@
 import datetime
 import os
+import shutil
 from decimal import Decimal
 from unittest import mock, skipUnless
 
@@ -21,11 +22,10 @@ from django.forms.models import (
     modelform_factory,
 )
 from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase, ignore_warnings, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils.choices import BlankChoiceIterator
-from django.utils.deprecation import RemovedInDjango60Warning
-from django.utils.version import PYPY
+from django.utils.version import PY314, PYPY
 
 from .models import (
     Article,
@@ -40,6 +40,7 @@ from .models import (
     Character,
     Colour,
     ColourfulItem,
+    ConstraintsModel,
     CustomErrorMessage,
     CustomFF,
     CustomFieldForExclusionModel,
@@ -72,6 +73,7 @@ from .models import (
     Triple,
     Writer,
     WriterProfile,
+    temp_storage_dir,
     test_images,
 )
 
@@ -372,7 +374,6 @@ class ModelFormBaseTest(TestCase):
         obj = form.save()
         self.assertEqual(obj.name, "")
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_save_blank_null_unique_charfield_saves_null(self):
         form_class = modelform_factory(
             model=NullableUniqueCharFieldModel, fields="__all__"
@@ -911,13 +912,6 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(m2.date_published, datetime.date(2010, 1, 1))
 
 
-# RemovedInDjango60Warning.
-# It's a temporary workaround for the deprecation period.
-class HttpsURLField(forms.URLField):
-    def __init__(self, **kwargs):
-        super().__init__(assume_scheme="https", **kwargs)
-
-
 class FieldOverridesByFormMetaForm(forms.ModelForm):
     class Meta:
         model = Category
@@ -941,7 +935,7 @@ class FieldOverridesByFormMetaForm(forms.ModelForm):
             }
         }
         field_classes = {
-            "url": HttpsURLField,
+            "url": forms.URLField,
         }
 
 
@@ -2227,6 +2221,15 @@ class ModelMultipleChoiceFieldTests(TestCase):
         f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all())
         self.assertNumQueries(1, f.clean, [p.pk for p in persons[1:11:2]])
 
+    def test_model_multiple_choice_null_characters(self):
+        f = forms.ModelMultipleChoiceField(queryset=ExplicitPK.objects.all())
+        msg = "Null characters are not allowed."
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(["\x00something"])
+
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(["valid", "\x00something"])
+
     def test_model_multiple_choice_run_validators(self):
         """
         ModelMultipleChoiceField run given validators (#14144).
@@ -2473,6 +2476,12 @@ class ModelOneToOneFieldTests(TestCase):
 
 
 class FileAndImageFieldTests(TestCase):
+    def setUp(self):
+        if os.path.exists(temp_storage_dir):
+            shutil.rmtree(temp_storage_dir)
+        os.mkdir(temp_storage_dir)
+        self.addCleanup(shutil.rmtree, temp_storage_dir)
+
     def test_clean_false(self):
         """
         If the ``clean`` method on a non-required FileField receives False as
@@ -2901,7 +2910,6 @@ class ModelOtherFieldTests(SimpleTestCase):
             },
         )
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_url_on_modelform(self):
         "Check basic URL field validation on model forms"
 
@@ -2925,32 +2933,6 @@ class ModelOtherFieldTests(SimpleTestCase):
             HomepageForm({"url": "http://www.example.com:8000/test"}).is_valid()
         )
         self.assertTrue(HomepageForm({"url": "http://example.com/foo/bar"}).is_valid())
-
-    def test_url_modelform_assume_scheme_warning(self):
-        msg = (
-            "The default scheme will be changed from 'http' to 'https' in Django "
-            "6.0. Pass the forms.URLField.assume_scheme argument to silence this "
-            "warning, or set the FORMS_URLFIELD_ASSUME_HTTPS transitional setting to "
-            "True to opt into using 'https' as the new default scheme."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-
-            class HomepageForm(forms.ModelForm):
-                class Meta:
-                    model = Homepage
-                    fields = "__all__"
-
-    def test_url_modelform_assume_scheme_early_adopt_https(self):
-        msg = "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
-        with (
-            self.assertWarnsMessage(RemovedInDjango60Warning, msg),
-            self.settings(FORMS_URLFIELD_ASSUME_HTTPS=True),
-        ):
-
-            class HomepageForm(forms.ModelForm):
-                class Meta:
-                    model = Homepage
-                    fields = "__all__"
 
     def test_modelform_non_editable_field(self):
         """
@@ -2978,9 +2960,6 @@ class ModelOtherFieldTests(SimpleTestCase):
         """
 
         class HomepageForm(forms.ModelForm):
-            # RemovedInDjango60Warning.
-            url = forms.URLField(assume_scheme="https")
-
             class Meta:
                 model = Homepage
                 fields = "__all__"
@@ -3031,10 +3010,11 @@ class OtherModelFormTests(TestCase):
                 return ", ".join(c.name for c in obj.colours.all())
 
         field = ColorModelChoiceField(ColourfulItem.objects.prefetch_related("colours"))
-        # CPython calls ModelChoiceField.__len__() when coercing to tuple. PyPy
-        # doesn't call __len__() and so .count() isn't called on the QuerySet.
-        # The following would trigger an extra query if prefetch were ignored.
-        with self.assertNumQueries(2 if PYPY else 3):
+        # CPython < 3.14 calls ModelChoiceField.__len__() when coercing to
+        # tuple. PyPy and Python 3.14+ don't call __len__() and so .count()
+        # isn't called on the QuerySet. The following would trigger an extra
+        # query if prefetch were ignored.
+        with self.assertNumQueries(2 if PYPY or PY314 else 3):
             self.assertEqual(
                 tuple(field.choices),
                 (
@@ -3190,11 +3170,13 @@ class ModelFormCustomErrorTests(SimpleTestCase):
         errors = CustomErrorMessageForm(data).errors
         self.assertHTMLEqual(
             str(errors["name1"]),
-            '<ul class="errorlist"><li>Form custom error message.</li></ul>',
+            '<ul class="errorlist" id="id_name1_error">'
+            "<li>Form custom error message.</li></ul>",
         )
         self.assertHTMLEqual(
             str(errors["name2"]),
-            '<ul class="errorlist"><li>Model custom error message.</li></ul>',
+            '<ul class="errorlist" id="id_name2_error">'
+            "<li>Model custom error message.</li></ul>",
         )
 
     def test_model_clean_error_messages(self):
@@ -3203,14 +3185,15 @@ class ModelFormCustomErrorTests(SimpleTestCase):
         self.assertFalse(form.is_valid())
         self.assertHTMLEqual(
             str(form.errors["name1"]),
-            '<ul class="errorlist"><li>Model.clean() error messages.</li></ul>',
+            '<ul class="errorlist" id="id_name1_error">'
+            "<li>Model.clean() error messages.</li></ul>",
         )
         data = {"name1": "FORBIDDEN_VALUE2", "name2": "ABC"}
         form = CustomErrorMessageForm(data)
         self.assertFalse(form.is_valid())
         self.assertHTMLEqual(
             str(form.errors["name1"]),
-            '<ul class="errorlist">'
+            '<ul class="errorlist" id="id_name1_error">'
             "<li>Model.clean() error messages (simpler syntax).</li></ul>",
         )
         data = {"name1": "GLOBAL_ERROR", "name2": "ABC"}
@@ -3736,3 +3719,40 @@ class ModelToDictTests(TestCase):
         # If data were a QuerySet, it would be reevaluated here and give "red"
         # instead of the original value.
         self.assertEqual(data, [blue])
+
+
+class ConstraintValidationTests(TestCase):
+    def test_unique_constraint_refs_excluded_field(self):
+        obj = ConstraintsModel.objects.create(name="product", price="1.00")
+        data = {
+            "id": "",
+            "name": obj.name,
+            "price": "1337.00",
+            "category": obj.category,
+        }
+        ConstraintsModelForm = modelform_factory(ConstraintsModel, fields="__all__")
+        ExcludeCategoryForm = modelform_factory(ConstraintsModel, exclude=["category"])
+        full_form = ConstraintsModelForm(data)
+        exclude_category_form = ExcludeCategoryForm(data)
+        self.assertTrue(exclude_category_form.is_valid())
+        self.assertFalse(full_form.is_valid())
+        self.assertEqual(
+            full_form.errors, {"__all__": ["This product already exists."]}
+        )
+
+    def test_check_constraint_refs_excluded_field(self):
+        data = {
+            "id": "",
+            "name": "priceless",
+            "price": "0.00",
+            "category": "category 1",
+        }
+        ConstraintsModelForm = modelform_factory(ConstraintsModel, fields="__all__")
+        ExcludePriceForm = modelform_factory(ConstraintsModel, exclude=["price"])
+        full_form = ConstraintsModelForm(data)
+        exclude_price_form = ExcludePriceForm(data)
+        self.assertTrue(exclude_price_form.is_valid())
+        self.assertFalse(full_form.is_valid())
+        self.assertEqual(
+            full_form.errors, {"__all__": ["Price must be greater than zero."]}
+        )

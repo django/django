@@ -4,16 +4,16 @@ import warnings
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
 
 
-class RemovedInDjango60Warning(DeprecationWarning):
+class RemovedInDjango61Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango61Warning(PendingDeprecationWarning):
+class RemovedInDjango70Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango60Warning
-RemovedAfterNextVersionWarning = RemovedInDjango61Warning
+RemovedInNextVersionWarning = RemovedInDjango61Warning
+RemovedAfterNextVersionWarning = RemovedInDjango70Warning
 
 
 class warn_about_renamed_method:
@@ -81,16 +81,6 @@ class RenameMethodsBase(type):
                     setattr(base, old_method_name, wrapper(new_method))
 
         return new_class
-
-
-class DeprecationInstanceCheck(type):
-    def __instancecheck__(self, instance):
-        warnings.warn(
-            "`%s` is deprecated, use `%s` instead." % (self.__name__, self.alternative),
-            self.deprecation_warning,
-            2,
-        )
-        return super().__instancecheck__(instance)
 
 
 class MiddlewareMixin:

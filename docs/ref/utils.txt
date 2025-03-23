@@ -331,6 +331,32 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
     See https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
 
+``Stylesheet``
+--------------
+
+.. versionadded:: 5.2
+
+.. class:: Stylesheet(url, mimetype="", media="screen")
+
+    Represents an RSS stylesheet.
+
+    .. attribute:: url
+
+        Required argument. The URL where the stylesheet is located.
+
+    .. attribute:: mimetype
+
+        An optional string containing the MIME type of the stylesheet. If not
+        specified, Django will attempt to guess it by using Python's
+        :py:func:`mimetypes.guess_type()`. Use ``mimetype=None`` if you don't
+        want your stylesheet to have a MIME type specified.
+
+    .. attribute:: media
+
+        An optional string which will be used as the ``media`` attribute of
+        the stylesheet. Defaults to ``"screen"``. Use ``media=None`` if you
+        don't want your stylesheet to have a ``media`` attribute.
+
 ``SyndicationFeed``
 -------------------
 
@@ -339,7 +365,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     Base class for all syndication feeds. Subclasses should provide
     ``write()``.
 
-    .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs)
+    .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, stylesheets=None, **kwargs)
 
         Initialize the feed with the given dictionary of metadata, which applies
         to the entire feed.
@@ -347,8 +373,15 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         Any extra keyword arguments you pass to ``__init__`` will be stored in
         ``self.feed``.
 
-        All parameters should be strings, except ``categories``, which should
-        be a sequence of strings.
+        All parameters should be strings, except for two:
+
+        * ``categories`` should be a sequence of strings.
+        * ``stylesheets`` should be a sequence of either strings or
+          :class:`Stylesheet` instances.
+
+        .. versionchanged:: 5.2
+
+            The ``stylesheets`` argument was added.
 
     .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
 
@@ -366,6 +399,13 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     .. method:: add_root_elements(handler)
 
         Add elements in the root (i.e. feed/channel) element.
+        Called from ``write()``.
+
+    .. method:: add_stylesheets(self, handler)
+
+        .. versionadded:: 5.2
+
+        Add stylesheet information to the document.
         Called from ``write()``.
 
     .. method:: item_attributes(item)
@@ -481,7 +521,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     The cached value can be treated like an ordinary attribute of the instance::
 
         # clear it, requiring re-computation next time it's called
-        del person.friends  # or delattr(person, "friends")
+        person.__dict__.pop("friends", None)
 
         # set a value manually, that will persist on the instance until cleared
         person.friends = ["Huckleberry Finn", "Tom Sawyer"]
@@ -647,11 +687,6 @@ escaping HTML.
     through :func:`conditional_escape` which (ultimately) calls
     :func:`~django.utils.encoding.force_str` on the values.
 
-    .. deprecated:: 5.0
-
-        Support for calling ``format_html()`` without passing args or kwargs is
-        deprecated.
-
 .. function:: format_html_join(sep, format_string, args_generator)
 
     A wrapper of :func:`format_html`, for the common case of a group of
@@ -659,10 +694,29 @@ escaping HTML.
     joined using ``sep``. ``sep`` is also passed through
     :func:`conditional_escape`.
 
-    ``args_generator`` should be an iterator that returns the sequence of
-    ``args`` that will be passed to :func:`format_html`. For example::
+    ``args_generator`` should be an iterator that yields arguments to pass to
+    :func:`format_html`, either sequences of positional arguments or mappings of
+    keyword arguments.
 
-        format_html_join("\n", "<li>{} {}</li>", ((u.first_name, u.last_name) for u in users))
+    For example, tuples can be used for positional arguments::
+
+        format_html_join(
+            "\n",
+            "<li>{} {}</li>",
+            ((u.first_name, u.last_name) for u in users),
+        )
+
+    Or dictionaries can be used for keyword arguments::
+
+        format_html_join(
+            "\n",
+            '<li data-id="{id}">{id} {title}</li>',
+            ({"id": b.id, "title": b.title} for b in books),
+        )
+
+    .. versionchanged:: 5.2
+
+        Support for mappings in ``args_generator`` was added.
 
 .. function:: json_script(value, element_id=None, encoder=None)
 
@@ -1106,6 +1160,11 @@ For a complete discussion on the usage of the following see the
     selecting a more generic variant. For example, ``'es'`` is returned if
     ``lang_code`` is ``'es-ar'`` and ``'es'`` is in :setting:`LANGUAGES` but
     ``'es-ar'`` isn't.
+
+    ``lang_code`` has a maximum accepted length of 500 characters. A
+    :exc:`LookupError` is raised if ``lang_code`` exceeds this limit and
+    ``strict`` is ``True``, or if there is no generic variant and ``strict``
+    is ``False``.
 
     If ``strict`` is ``False`` (the default), a country-specific variant may
     be returned when neither the language code nor its generic variant is found.

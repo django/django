@@ -5,14 +5,16 @@
 # Emin Mastizada <emin@linux.com>, 2018,2020
 # Emin Mastizada <emin@linux.com>, 2016
 # Nicat Məmmədov <n1c4t97@gmail.com>, 2022
+# Nijat Mammadov, 2024
+# Sevdimali <sevdimaliisayev@mail.ru>, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2022-07-25 08:09+0000\n"
-"Last-Translator: Nicat Məmmədov <n1c4t97@gmail.com>\n"
-"Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: Sevdimali <sevdimaliisayev@mail.ru>, 2024\n"
+"Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,12 +35,22 @@ msgstr "Vacib tarixlər"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Əsas %(key)r açarı ilə %(name)s obyekti mövcud deyil."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Konfliktli form məlumatları daxil edildi. Təkrar cəhd edin."
+
 msgid "Password changed successfully."
 msgstr "Şifrə uğurla dəyişdirildi."
+
+msgid "Password-based authentication was disabled."
+msgstr "Şifrə əsaslı autentifikasiyanı ləğv edildi."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Şifrəni dəyiş: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Şifrə təyin et: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Təsdiqləmə və Səlahiyyət"
@@ -47,7 +59,7 @@ msgid "password"
 msgstr "şifrə"
 
 msgid "last login"
-msgstr "son dəfə daxil olub"
+msgstr "son daxilolma"
 
 msgid "No password set."
 msgstr "Şifrə təyin olunmayıb."
@@ -55,8 +67,23 @@ msgstr "Şifrə təyin olunmayıb."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Xətalı şifrə formatı və ya bilinməyən heş alqoritması."
 
+msgid "Reset password"
+msgstr "Şifrəni sıfırla"
+
+msgid "Set password"
+msgstr "Şifrə təyin et"
+
 msgid "The two password fields didn’t match."
 msgstr "Şifrə xanalarının dəyərləri eyni deyil."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"İstifadəçinin şifrə ilə autentifikasiya edib-etməyəcəyi. Əgər deaktiv "
+"edilsə, onlar yenə də Single Sign-On və ya LDAP kimi digər backend-lərdən "
+"istifadə edərək autentifikasiya edə bilərlər."
 
 msgid "Password"
 msgstr "Şifrə"
@@ -67,13 +94,26 @@ msgstr "Şifrənin təsdiqi"
 msgid "Enter the same password as before, for verification."
 msgstr "Təsdiqləmək üçün əvvəlki ilə eyni şifrəni daxil edin."
 
+msgid "Password-based authentication"
+msgstr "Şifrə əsaslı autentifikasiya"
+
+msgid "Enabled"
+msgstr "Aktivləşdi"
+
+msgid "Disabled"
+msgstr "Ləğv edildi"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"Şifrələr açıq formada saxlanılmadığı üçün bu istifadəçinin şifrəsini görmək "
-"mümkün deyil, amma <a href=\"{}\">bu formadan</a> istifadə edərək şifrəni "
-"dəyişə bilərsiz."
+"Şifrələr mətn və ya olduğu kimi saxlanılmır, buna görə də istifadəçinin "
+"şifrəsini görmək mümkün deyil."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Bu istifadəçi üçün şifrə təyin edərək şifrə əsaslı autentifikasiyanı aktiv "
+"edin."
 
 #, python-format
 msgid ""
@@ -101,14 +141,11 @@ msgstr "Köhnə şifrəni yanlış daxil etdiniz. Zəhmət olmasa bir daha yoxla
 msgid "Old password"
 msgstr "Köhnə şifrə"
 
-msgid "Password (again)"
-msgstr "Şifrə (bir daha)"
-
 msgid "algorithm"
 msgstr "alqoritm"
 
 msgid "iterations"
-msgstr "təkrarlama"
+msgstr "təkrarlanmalar"
 
 msgid "salt"
 msgstr "duz"
@@ -123,10 +160,10 @@ msgid "version"
 msgstr "versiya"
 
 msgid "memory cost"
-msgstr "yaddaş xərci"
+msgstr "yaddaş məsrəfi"
 
 msgid "time cost"
-msgstr "vaxt xərci"
+msgstr "vaxt məsrəfi"
 
 msgid "parallelism"
 msgstr "paralellik"
@@ -138,7 +175,7 @@ msgid "checksum"
 msgstr "yoxlama dəyəri"
 
 msgid "block size"
-msgstr ""
+msgstr "blok ölçüsü"
 
 msgid "name"
 msgstr "ad"
@@ -167,17 +204,17 @@ msgstr "superistifadəçi statusu"
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
-msgstr "İstifadəçiyə bütün icazələri verir."
+msgstr "Bu istifadəçinin bütün icazələrə malik olduğunu bildirir."
 
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
-"Bu istifadəçinin aid olduğu qruplar. İstifadə bu qruplardan hər birinə "
+"Bu istifadəçinin aid olduğu qruplar. İstifadəçi bu qruplardan hər birinə "
 "verilən bütün icazələri alacaq."
 
 msgid "user permissions"
-msgstr "səlahiyyətləri"
+msgstr "istifadəçi səlahiyyətləri"
 
 msgid "Specific permissions for this user."
 msgstr "Bu istifadəçiyə aid xüsusi icazələr."
@@ -186,7 +223,7 @@ msgid "username"
 msgstr "istifadəçi adı"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Tələb edilir. Ən az 150 simvol. Ancaq hərf, rəqəm və @/./+/-/_."
+msgstr "Vacibdir. Ən az 150 simvol. Ancaq hərf, rəqəm və @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Bu istifadəçi adı altında başqa istifadəçi var."
@@ -204,10 +241,10 @@ msgid "staff status"
 msgstr "admin statusu"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr "İstifadəçinin admin panelinə daxil olub, olmayacağını təyin edir."
+msgstr "İstifadəçinin admin panelinə daxil olub-olmayacağını təyin edir."
 
 msgid "active"
-msgstr "Aktiv"
+msgstr "aktiv"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
@@ -234,7 +271,7 @@ msgid_plural ""
 "characters."
 msgstr[0] "Bu parol çox qısadır. Ən az %(min_length)d işarə olmalıdır."
 msgstr[1] ""
-"Bu şifrə çox qısadır. Ən az %(min_length)d simvoldan ibarət olmalıdır."
+"Bu şifrə çox qısadır. Ən azı %(min_length)d simvoldan ibarət olmalıdır."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -266,18 +303,19 @@ msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s, şifrənin sıfırlanması"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Düzgün istifadəçi adı daxil edin. Bu dəyən ancaq İngiliscə hərflərdən, rəqəm "
-"və @/./+/-/_ işarətlərindən ibarət ola bilər."
+"Düzgün istifadəçi adı daxil edin. Bu dəyər yalnız diakritik olmayan kiçik (a-"
+"z) və böyük (A-Z) hərflərdən, rəqəmlərdən və @/./+/-/_ simvollardan ibarət "
+"ola bilər."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
-"Düzgün istifadəçi adı daxil edin. Bu dəyən ancaq hərf, rəqəm və @/./+/-/_ "
-"işarətlərindən ibarət ola bilər."
+"Düzgün istifadəçi adı daxil edin. Bu dəyər ancaq hərf, rəqəm və @/./+/-/_ "
+"simvollarından ibarət ola bilər."
 
 msgid "Logged out"
 msgstr "Çıxdınız"

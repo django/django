@@ -33,6 +33,20 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
     See :meth:`~django.db.models.query.QuerySet.get()`.
 
+``ObjectNotUpdated``
+--------------------
+
+.. versionadded:: 6.0
+
+.. exception:: ObjectNotUpdated
+
+    The base class for :exc:`Model.NotUpdated
+    <django.db.models.Model.NotUpdated>` exceptions. A ``try/except`` for
+    ``ObjectNotUpdated`` will catch
+    :exc:`~django.db.models.Model.NotUpdated` exceptions for all models.
+
+    See :meth:`~django.db.models.Model.save()`.
+
 ``EmptyResultSet``
 ------------------
 

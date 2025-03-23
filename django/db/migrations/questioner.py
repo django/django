@@ -111,17 +111,19 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         for i, choice in enumerate(choices):
             self.prompt_output.write(" %s) %s" % (i + 1, choice))
         self.prompt_output.write("Select an option: ", ending="")
-        result = input()
         while True:
             try:
+                result = input()
                 value = int(result)
             except ValueError:
                 pass
+            except KeyboardInterrupt:
+                self.prompt_output.write("\nCancelled.")
+                sys.exit(1)
             else:
                 if 0 < value <= len(choices):
                     return value
             self.prompt_output.write("Please select a valid option: ", ending="")
-            result = input()
 
     def _ask_default(self, default=""):
         """
@@ -148,7 +150,11 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             else:
                 prompt = ">>> "
             self.prompt_output.write(prompt, ending="")
-            code = input()
+            try:
+                code = input()
+            except KeyboardInterrupt:
+                self.prompt_output.write("\nCancelled.")
+                sys.exit(1)
             if not code and default:
                 code = default
             if not code:
@@ -160,8 +166,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             else:
                 try:
                     return eval(code, {}, {"datetime": datetime, "timezone": timezone})
-                except (SyntaxError, NameError) as e:
-                    self.prompt_output.write("Invalid input: %s" % e)
+                except Exception as e:
+                    self.prompt_output.write(f"{e.__class__.__name__}: {e}")
 
     def ask_not_null_addition(self, field_name, model_name):
         """Adding a NOT NULL field to a model."""

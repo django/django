@@ -34,6 +34,12 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 
 .. class:: CommonMiddleware
 
+    .. attribute:: response_redirect_class
+
+        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
+        ``CommonMiddleware`` and override the attribute to customize the redirects
+        issued by the middleware.
+
 Adds a few conveniences for perfectionists:
 
 * Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
@@ -74,12 +80,6 @@ Adds a few conveniences for perfectionists:
         return HttpResponse()
 
 * Sets the ``Content-Length`` header for non-streaming responses.
-
-.. attribute:: CommonMiddleware.response_redirect_class
-
-Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
-``CommonMiddleware`` and override the attribute to customize the redirects
-issued by the middleware.
 
 .. class:: BrokenLinkEmailsMiddleware
 
@@ -153,6 +153,9 @@ header, the middleware adds one if needed. If the response has an ``ETag`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
 
+You can handle conditional GET operations with individual views using the
+:func:`~django.views.decorators.http.conditional_page()` decorator.
+
 Locale middleware
 -----------------
 
@@ -161,15 +164,15 @@ Locale middleware
 
 .. class:: LocaleMiddleware
 
+    .. attribute:: LocaleMiddleware.response_redirect_class
+
+        Defaults to :class:`~django.http.HttpResponseRedirect`. Subclass
+        ``LocaleMiddleware`` and override the attribute to customize the
+        redirects issued by the middleware.
+
 Enables language selection based on data from the request. It customizes
 content for each user. See the :doc:`internationalization documentation
 </topics/i18n/translation>`.
-
-.. attribute:: LocaleMiddleware.response_redirect_class
-
-Defaults to :class:`~django.http.HttpResponseRedirect`. Subclass
-``LocaleMiddleware`` and override the attribute to customize the redirects
-issued by the middleware.
 
 Message middleware
 ------------------
@@ -497,55 +500,78 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 
 .. class:: LoginRequiredMiddleware
 
-.. versionadded:: 5.1
+    Subclass the middleware and override the following attributes and methods
+    to customize behavior for unauthenticated requests.
 
-Redirects all unauthenticated requests to a login page. For admin views, this
-redirects to the admin login. For all other views, this will redirect to
-:setting:`settings.LOGIN_URL <LOGIN_URL>`. This can be customized by using the
-:func:`~.django.contrib.auth.decorators.login_required` decorator and setting
-``login_url`` or ``redirect_field_name`` for the view. For example::
+    .. attribute:: redirect_field_name
+
+        Defaults to ``"next"``.
+
+    .. method:: get_login_url()
+
+        Returns the URL that unauthenticated requests will be redirected to. This
+        result is either the ``login_url`` set on the
+        :func:`~django.contrib.auth.decorators.login_required` decorator (if not
+        ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+
+    .. method:: get_redirect_field_name()
+
+        Returns the name of the query parameter that contains the URL the user
+        should be redirected to after a successful login. This result is either
+        the ``redirect_field_name`` set on the
+        :func:`~.django.contrib.auth.decorators.login_required` decorator (if not
+        ``None``), or :attr:`redirect_field_name`. If ``None`` is returned, a query
+        parameter won't be added.
+
+Redirects all unauthenticated requests to a login page, except for views
+excluded with :func:`~.django.contrib.auth.decorators.login_not_required`. The
+login page defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`, but can be
+customized.
+
+Enable this middleware by adding it to the :setting:`MIDDLEWARE` setting
+**after** :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`::
+
+    MIDDLEWARE = [
+        "...",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        "...",
+    ]
+
+Make a view public, allowing unauthenticated requests, with
+:func:`~.django.contrib.auth.decorators.login_not_required`. For example::
+
+       from django.contrib.auth.decorators import login_not_required
+
+
+       @login_not_required
+       def contact_us(request): ...
+
+Customize the login URL or field name for authenticated views with the
+:func:`~.django.contrib.auth.decorators.login_required` decorator to set
+``login_url`` or ``redirect_field_name`` respectively. For example::
+
+    from django.contrib.auth.decorators import login_required
+    from django.utils.decorators import method_decorator
+    from django.views.generic import View
+
+
+    @login_required(login_url="/books/login/", redirect_field_name="redirect_to")
+    def book_dashboard(request): ...
+
 
     @method_decorator(
-        login_required(login_url="/login/", redirect_field_name="redirect_to"),
+        login_required(login_url="/books/login/", redirect_field_name="redirect_to"),
         name="dispatch",
     )
-    class MyView(View):
+    class BookMetrics(View):
         pass
-
-
-    @login_required(login_url="/login/", redirect_field_name="redirect_to")
-    def my_view(request): ...
-
-Views using the :func:`~django.contrib.auth.decorators.login_not_required`
-decorator are exempt from this requirement.
 
 .. admonition:: Ensure that your login view does not require a login.
 
     To prevent infinite redirects, ensure you have
     :ref:`enabled unauthenticated requests
     <disable-login-required-middleware-for-views>` to your login view.
-
-**Methods and Attributes**
-
-.. attribute:: redirect_field_name
-
-    Defaults to ``"next"``.
-
-.. method:: get_login_url()
-
-    Returns the URL that unauthenticated requests will be redirected to. If
-    defined, this returns the ``login_url`` set on the
-    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
-    to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
-
-.. method:: get_redirect_field_name()
-
-    Returns the name of the query parameter that contains the URL the user
-    should be redirected to after a successful login. If defined, this returns
-    the ``redirect_field_name`` set on the
-    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
-    to :attr:`redirect_field_name`. If ``None`` is returned, a query parameter
-    won't be added.
 
 .. class:: RemoteUserMiddleware
 
@@ -568,6 +594,9 @@ CSRF protection middleware
 Adds protection against Cross Site Request Forgeries by adding hidden form
 fields to POST forms and checking requests for the correct value. See the
 :doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
+
+You can add Cross Site Request Forgery protection to individual views using the
+:func:`~django.views.decorators.csrf.csrf_protect()` decorator.
 
 ``X-Frame-Options`` middleware
 ------------------------------
@@ -650,8 +679,6 @@ Here are some hints about the ordering of various Django middleware classes:
    After ``SessionMiddleware``: uses session storage.
 
 #. :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
-
-   .. versionadded:: 5.1
 
    After ``AuthenticationMiddleware``: uses user object.
 

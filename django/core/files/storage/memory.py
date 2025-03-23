@@ -45,10 +45,9 @@ class InMemoryFileNode(ContentFile, TimingMixin):
     modification, and access times.
     """
 
-    def __init__(self, content="", name=""):
-        self.file = None
+    def __init__(self, content="", name=None):
+        super().__init__(content, name)
         self._content_type = type(content)
-        self._initialize_stream()
         self._initialize_times()
 
     def open(self, mode):
@@ -142,7 +141,11 @@ class InMemoryDirNode(TimingMixin):
         if create_if_missing:
             self._update_accessed_time()
             self._update_modified_time()
-            return self._children.setdefault(path_segment, child_cls())
+            if child_cls is InMemoryFileNode:
+                child = child_cls(name=path_segment)
+            else:
+                child = child_cls()
+            return self._children.setdefault(path_segment, child)
         return self._children.get(path_segment)
 
     def listdir(self):

@@ -135,8 +135,8 @@ described here.
 
 .. admonition:: You can't share pickles between versions
 
-    Pickles of ``QuerySets`` are only valid for the version of Django that
-    was used to generate them. If you generate a pickle using Django
+    Pickles of ``QuerySet`` objects are only valid for the version of Django
+    that was used to generate them. If you generate a pickle using Django
     version N, there is no guarantee that pickle will be readable with
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
@@ -258,10 +258,14 @@ you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 .. method:: annotate(*args, **kwargs)
 
 Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
-expressions </ref/models/expressions>`. An expression may be a simple value, a
-reference to a field on the model (or any related models), or an aggregate
-expression (averages, sums, etc.) that has been computed over the objects that
-are related to the objects in the ``QuerySet``.
+expressions </ref/models/expressions>` or :class:`~django.db.models.Q` objects.
+Each object can be annotated with:
+
+* a simple value,  via ``Value()``;
+* a reference to a field on the model (or any related models), via ``F()``;
+* a boolean, via ``Q()``; or
+* a result from an aggregate expression (averages, sums, etc.) computed over
+  the objects that are related to the objects in the ``QuerySet``.
 
 Each argument to ``annotate()`` is an annotation that will be added
 to each object in the ``QuerySet`` that is returned.
@@ -745,6 +749,11 @@ You can also refer to fields on related models with reverse relations through
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
 
+.. versionchanged:: 5.2
+
+    The ``SELECT`` clause generated when using ``values()`` was updated to
+    respect the order of the specified ``*fields`` and ``**expressions``.
+
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
@@ -834,6 +843,11 @@ not having any author:
     ``values_list()`` will return ``True``, ``False``, and ``None`` instead of
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
+
+.. versionchanged:: 5.2
+
+    The ``SELECT`` clause generated when using ``values_list()`` was updated to
+    respect the order of the specified ``*fields``.
 
 ``dates()``
 ~~~~~~~~~~~
@@ -1203,8 +1217,8 @@ the items, it will find them in a prefetched ``QuerySet`` cache that was
 populated in a single query.
 
 That is, all the relevant toppings will have been fetched in a single query,
-and used to make ``QuerySets`` that have a pre-filled cache of the relevant
-results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
+and used to make ``QuerySet`` instances that have a pre-filled cache of the
+relevant results; these are then used in the ``self.toppings.all()`` calls.
 
 The additional queries in ``prefetch_related()`` are executed after the
 ``QuerySet`` has begun to be evaluated and the primary query has been executed.
@@ -1228,16 +1242,16 @@ function.
 
 Note that the result cache of the primary ``QuerySet`` and all specified related
 objects will then be fully loaded into memory. This changes the typical
-behavior of ``QuerySets``, which normally try to avoid loading all objects into
-memory before they are needed, even after a query has been executed in the
+behavior of a ``QuerySet``, which normally tries to avoid loading all objects
+into memory before they are needed, even after a query has been executed in the
 database.
 
 .. note::
 
-    Remember that, as always with ``QuerySets``, any subsequent chained methods
-    which imply a different database query will ignore previously cached
-    results, and retrieve data using a fresh database query. So, if you write
-    the following:
+    Remember that, as always with ``QuerySet`` objects, any subsequent chained
+    methods which imply a different database query will ignore previously
+    cached results, and retrieve data using a fresh database query. So, if you
+    write the following:
 
     .. code-block:: pycon
 
@@ -1589,9 +1603,7 @@ of the arguments is required, but you should use at least one of them.
       FROM blog_blog;
 
   Note that the parentheses required by most database engines around
-  subqueries are not required in Django's ``select`` clauses. Also note
-  that some database backends, such as some MySQL versions, don't support
-  subqueries.
+  subqueries are not required in Django's ``select`` clauses.
 
   In some rare cases, you might wish to pass parameters to the SQL
   fragments in ``extra(select=...)``. For this purpose, use the
@@ -2325,9 +2337,9 @@ whenever a request to a page has a side effect on your data. For more, see
       # Raises IntegrityError
 
   This is happening because it's trying to get or create "Chapter 1" through the
-  book "Ulysses", but it can't do any of them: the relation can't fetch that
-  chapter because it isn't related to that book, but it can't create it either
-  because ``title`` field should be unique.
+  book "Ulysses", but it can't do either: the relation can't fetch that chapter
+  because it isn't related to that book, but it can't create it either because
+  ``title`` field should be unique.
 
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -2792,16 +2804,16 @@ number of authors that have contributed blog entries:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> Blog.objects.aggregate(Count("entry"))
-    {'entry__count': 16}
+    >>> Blog.objects.aggregate(Count("entry__authors"))
+    {'entry__authors__count': 16}
 
 By using a keyword argument to specify the aggregate function, you can
 control the name of the aggregation value that is returned:
 
 .. code-block:: pycon
 
-    >>> Blog.objects.aggregate(number_of_entries=Count("entry"))
-    {'number_of_entries': 16}
+    >>> Blog.objects.aggregate(number_of_authors=Count("entry__authors"))
+    {'number_of_authors': 16}
 
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
@@ -3098,9 +3110,10 @@ adverse effects on your database. For example, the ``ANALYZE`` flag supported
 by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
 there are triggers or if a function is called, even for a ``SELECT`` query.
 
-.. versionchanged:: 5.1
+.. versionchanged:: 5.2
 
-    Support for the ``generic_plan`` option on PostgreSQL 16+ was added.
+    Support for the ``memory`` and ``serialize`` options on PostgreSQL 17+ was
+    added.
 
 .. _field-lookups:
 
@@ -4036,6 +4049,25 @@ by the aggregate.
         Optional. By default, ``Variance`` returns the population variance.
         However, if ``sample=True``, the return value will be the sample
         variance.
+
+``StringAgg``
+~~~~~~~~~~~~~
+
+.. versionadded:: 6.0
+
+.. class:: StringAgg(expression, delimiter, output_field=None, distinct=False, filter=None, order_by=None, default=None, **extra)
+
+    Returns the input values concatenated into a string, separated by the
+    ``delimiter`` string, or ``default`` if there are no values.
+
+    * Default alias: ``<field>__stringagg``
+    * Return type: ``string`` or ``output_field`` if supplied. If the
+      queryset or grouping is empty, ``default`` is returned.
+
+    .. attribute:: delimiter
+
+        A ``Value`` or expression representing the string that should separate
+        each of the values. For example, ``Value(",")``.
 
 Query-related tools
 ===================

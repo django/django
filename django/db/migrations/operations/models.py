@@ -1,8 +1,11 @@
+from copy import copy
+
 from django.db import models
 from django.db.migrations.operations.base import Operation, OperationCategory
 from django.db.migrations.state import ModelState
 from django.db.migrations.utils import field_references, resolve_relation
 from django.db.models.options import normalize_together
+from django.utils.copy import replace
 from django.utils.functional import cached_property
 
 from .fields import AddField, AlterField, FieldOperation, RemoveField, RenameField
@@ -95,6 +98,17 @@ class CreateModel(ModelOperation):
         model = to_state.apps.get_model(app_label, self.name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
+            # While the `index_together` option has been deprecated some
+            # historical migrations might still have references to them.
+            # This can be moved to the schema editor once it's adapted to
+            # from model states instead of rendered models (#29898).
+            to_model_state = to_state.models[app_label, self.name_lower]
+            if index_together := to_model_state.options.get("index_together"):
+                schema_editor.alter_index_together(
+                    model,
+                    set(),
+                    index_together,
+                )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.name)
@@ -145,15 +159,7 @@ class CreateModel(ModelOperation):
             isinstance(operation, RenameModel)
             and self.name_lower == operation.old_name_lower
         ):
-            return [
-                CreateModel(
-                    operation.new_name,
-                    fields=self.fields,
-                    options=self.options,
-                    bases=self.bases,
-                    managers=self.managers,
-                ),
-            ]
+            return [replace(self, name=operation.new_name)]
         elif (
             isinstance(operation, AlterModelOptions)
             and self.name_lower == operation.name_lower
@@ -162,26 +168,33 @@ class CreateModel(ModelOperation):
             for key in operation.ALTER_OPTION_KEYS:
                 if key not in operation.options:
                     options.pop(key, None)
-            return [
-                CreateModel(
-                    self.name,
-                    fields=self.fields,
-                    options=options,
-                    bases=self.bases,
-                    managers=self.managers,
-                ),
-            ]
+            return [replace(self, options=options)]
         elif (
             isinstance(operation, AlterModelManagers)
             and self.name_lower == operation.name_lower
         ):
+            return [replace(self, managers=operation.managers)]
+        elif (
+            isinstance(operation, AlterModelTable)
+            and self.name_lower == operation.name_lower
+        ):
             return [
-                CreateModel(
-                    self.name,
-                    fields=self.fields,
-                    options=self.options,
-                    bases=self.bases,
-                    managers=operation.managers,
+                replace(
+                    self,
+                    options={**self.options, "db_table": operation.table},
+                ),
+            ]
+        elif (
+            isinstance(operation, AlterModelTableComment)
+            and self.name_lower == operation.name_lower
+        ):
+            return [
+                replace(
+                    self,
+                    options={
+                        **self.options,
+                        "db_table_comment": operation.table_comment,
+                    },
                 ),
             ]
         elif (
@@ -189,15 +202,12 @@ class CreateModel(ModelOperation):
             and self.name_lower == operation.name_lower
         ):
             return [
-                CreateModel(
-                    self.name,
-                    fields=self.fields,
+                replace(
+                    self,
                     options={
                         **self.options,
                         **{operation.option_name: operation.option_value},
                     },
-                    bases=self.bases,
-                    managers=self.managers,
                 ),
             ]
         elif (
@@ -205,15 +215,12 @@ class CreateModel(ModelOperation):
             and self.name_lower == operation.name_lower
         ):
             return [
-                CreateModel(
-                    self.name,
-                    fields=self.fields,
+                replace(
+                    self,
                     options={
                         **self.options,
                         "order_with_respect_to": operation.order_with_respect_to,
                     },
-                    bases=self.bases,
-                    managers=self.managers,
                 ),
             ]
         elif (
@@ -222,25 +229,19 @@ class CreateModel(ModelOperation):
         ):
             if isinstance(operation, AddField):
                 return [
-                    CreateModel(
-                        self.name,
+                    replace(
+                        self,
                         fields=self.fields + [(operation.name, operation.field)],
-                        options=self.options,
-                        bases=self.bases,
-                        managers=self.managers,
                     ),
                 ]
             elif isinstance(operation, AlterField):
                 return [
-                    CreateModel(
-                        self.name,
+                    replace(
+                        self,
                         fields=[
                             (n, operation.field if n == operation.name else v)
                             for n, v in self.fields
                         ],
-                        options=self.options,
-                        bases=self.bases,
-                        managers=self.managers,
                     ),
                 ]
             elif isinstance(operation, RemoveField):
@@ -265,16 +266,14 @@ class CreateModel(ModelOperation):
                 if order_with_respect_to == operation.name_lower:
                     del options["order_with_respect_to"]
                 return [
-                    CreateModel(
-                        self.name,
+                    replace(
+                        self,
                         fields=[
                             (n, v)
                             for n, v in self.fields
                             if n.lower() != operation.name_lower
                         ],
                         options=options,
-                        bases=self.bases,
-                        managers=self.managers,
                     ),
                 ]
             elif isinstance(operation, RenameField):
@@ -293,15 +292,13 @@ class CreateModel(ModelOperation):
                 if order_with_respect_to == operation.old_name:
                     options["order_with_respect_to"] = operation.new_name
                 return [
-                    CreateModel(
-                        self.name,
+                    replace(
+                        self,
                         fields=[
                             (operation.new_name if n == operation.old_name else n, v)
                             for n, v in self.fields
                         ],
                         options=options,
-                        bases=self.bases,
-                        managers=self.managers,
                     ),
                 ]
         elif (
@@ -310,9 +307,8 @@ class CreateModel(ModelOperation):
         ):
             if isinstance(operation, AddIndex):
                 return [
-                    CreateModel(
-                        self.name,
-                        fields=self.fields,
+                    replace(
+                        self,
                         options={
                             **self.options,
                             "indexes": [
@@ -320,8 +316,6 @@ class CreateModel(ModelOperation):
                                 operation.index,
                             ],
                         },
-                        bases=self.bases,
-                        managers=self.managers,
                     ),
                 ]
             elif isinstance(operation, RemoveIndex):
@@ -331,22 +325,18 @@ class CreateModel(ModelOperation):
                     if index.name != operation.name
                 ]
                 return [
-                    CreateModel(
-                        self.name,
-                        fields=self.fields,
+                    replace(
+                        self,
                         options={
                             **self.options,
                             "indexes": options_indexes,
                         },
-                        bases=self.bases,
-                        managers=self.managers,
                     ),
                 ]
             elif isinstance(operation, AddConstraint):
                 return [
-                    CreateModel(
-                        self.name,
-                        fields=self.fields,
+                    replace(
+                        self,
                         options={
                             **self.options,
                             "constraints": [
@@ -354,8 +344,6 @@ class CreateModel(ModelOperation):
                                 operation.constraint,
                             ],
                         },
-                        bases=self.bases,
-                        managers=self.managers,
                     ),
                 ]
             elif isinstance(operation, RemoveConstraint):
@@ -365,15 +353,12 @@ class CreateModel(ModelOperation):
                     if constraint.name != operation.name
                 ]
                 return [
-                    CreateModel(
-                        self.name,
-                        fields=self.fields,
+                    replace(
+                        self,
                         options={
                             **self.options,
                             "constraints": options_constraints,
                         },
-                        bases=self.bases,
-                        managers=self.managers,
                     ),
                 ]
         return super().reduce(operation, app_label)
@@ -460,11 +445,11 @@ class RenameModel(ModelOperation):
                     model = new_model
                     related_key = (app_label, self.new_name_lower)
                 else:
-                    model = related_object.related_model
                     related_key = (
                         related_object.related_model._meta.app_label,
                         related_object.related_model._meta.model_name,
                     )
+                    model = to_state.apps.get_model(*related_key)
                 to_field = to_state.apps.get_model(*related_key)._meta.get_field(
                     related_object.field.name
                 )
@@ -524,12 +509,7 @@ class RenameModel(ModelOperation):
             isinstance(operation, RenameModel)
             and self.new_name_lower == operation.old_name_lower
         ):
-            return [
-                RenameModel(
-                    self.old_name,
-                    operation.new_name,
-                ),
-            ]
+            return [replace(self, new_name=operation.new_name)]
         # Skip `ModelOperation.reduce` as we want to run `references_model`
         # against self.new_name.
         return super(ModelOperation, self).reduce(
@@ -668,12 +648,13 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
         if self.allow_migrate_model(schema_editor.connection.alias, new_model):
-            old_model = from_state.apps.get_model(app_label, self.name)
+            from_model_state = from_state.models[app_label, self.name_lower]
+            to_model_state = to_state.models[app_label, self.name_lower]
             alter_together = getattr(schema_editor, "alter_%s" % self.option_name)
             alter_together(
                 new_model,
-                getattr(old_model._meta, self.option_name, set()),
-                getattr(new_model._meta, self.option_name, set()),
+                from_model_state.options.get(self.option_name) or set(),
+                to_model_state.options.get(self.option_name) or set(),
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -946,8 +927,9 @@ class AddIndex(IndexOperation):
         if isinstance(operation, RemoveIndex) and self.index.name == operation.name:
             return []
         if isinstance(operation, RenameIndex) and self.index.name == operation.old_name:
-            self.index.name = operation.new_name
-            return [AddIndex(model_name=self.model_name, index=self.index)]
+            index = copy(self.index)
+            index.name = operation.new_name
+            return [replace(self, index=index)]
         return super().reduce(operation, app_label)
 
 
@@ -1139,14 +1121,7 @@ class RenameIndex(IndexOperation):
             and operation.old_name
             and self.new_name_lower == operation.old_name_lower
         ):
-            return [
-                RenameIndex(
-                    self.model_name,
-                    new_name=operation.new_name,
-                    old_name=self.old_name,
-                    old_fields=self.old_fields,
-                )
-            ]
+            return [replace(self, new_name=operation.new_name)]
         return super().reduce(operation, app_label)
 
 
@@ -1198,6 +1173,12 @@ class AddConstraint(IndexOperation):
             and self.constraint.name == operation.name
         ):
             return []
+        if (
+            isinstance(operation, AlterConstraint)
+            and self.model_name_lower == operation.model_name_lower
+            and self.constraint.name == operation.name
+        ):
+            return [replace(self, constraint=operation.constraint)]
         return super().reduce(operation, app_label)
 
 
@@ -1242,3 +1223,51 @@ class RemoveConstraint(IndexOperation):
     @property
     def migration_name_fragment(self):
         return "remove_%s_%s" % (self.model_name_lower, self.name.lower())
+
+
+class AlterConstraint(IndexOperation):
+    category = OperationCategory.ALTERATION
+    option_name = "constraints"
+
+    def __init__(self, model_name, name, constraint):
+        self.model_name = model_name
+        self.name = name
+        self.constraint = constraint
+
+    def state_forwards(self, app_label, state):
+        state.alter_constraint(
+            app_label, self.model_name_lower, self.name, self.constraint
+        )
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [],
+            {
+                "model_name": self.model_name,
+                "name": self.name,
+                "constraint": self.constraint,
+            },
+        )
+
+    def describe(self):
+        return f"Alter constraint {self.name} on {self.model_name}"
+
+    @property
+    def migration_name_fragment(self):
+        return "alter_%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+
+    def reduce(self, operation, app_label):
+        if (
+            isinstance(operation, (AlterConstraint, RemoveConstraint))
+            and self.model_name_lower == operation.model_name_lower
+            and self.name == operation.name
+        ):
+            return [operation]
+        return super().reduce(operation, app_label)

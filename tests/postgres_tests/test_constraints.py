@@ -14,6 +14,7 @@ from django.db.models import (
     F,
     ForeignKey,
     Func,
+    GeneratedField,
     IntegerField,
     Model,
     Q,
@@ -32,6 +33,7 @@ try:
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import (
         DateTimeRangeField,
+        IntegerRangeField,
         RangeBoundary,
         RangeOperators,
     )
@@ -307,7 +309,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
 
     def test_invalid_expressions(self):
         msg = "The expressions must be a list of 2-tuples."
-        for expressions in (["foo"], [("foo")], [("foo_1", "foo_2", "foo_3")]):
+        for expressions in (["foo"], [("foo",)], [("foo_1", "foo_2", "foo_3")]):
             with self.subTest(expressions), self.assertRaisesMessage(ValueError, msg):
                 ExclusionConstraint(
                     index_type="GIST",
@@ -795,6 +797,17 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             ),
             exclude={"datespan", "start", "end", "room"},
         )
+        # Constraints with excluded fields in condition are ignored.
+        constraint.validate(
+            HotelReservation,
+            HotelReservation(
+                datespan=(datetimes[1].date(), datetimes[2].date()),
+                start=datetimes[1],
+                end=datetimes[2],
+                room=room102,
+            ),
+            exclude={"cancelled"},
+        )
 
     def test_range_overlaps_custom(self):
         class TsTzRange(Func):
@@ -865,6 +878,38 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         constraint.validate(RangesModel, RangesModel(ints=(10, 19)))
         constraint.validate(RangesModel, RangesModel(ints=(51, 60)))
         constraint.validate(RangesModel, RangesModel(ints=(10, 20)), exclude={"ints"})
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    @isolate_apps("postgres_tests")
+    def test_validate_generated_field_range_adjacent(self):
+        class RangesModelGeneratedField(Model):
+            ints = IntegerRangeField(blank=True, null=True)
+            ints_generated = GeneratedField(
+                expression=F("ints"),
+                output_field=IntegerRangeField(null=True),
+                db_persist=True,
+            )
+
+        with connection.schema_editor() as editor:
+            editor.create_model(RangesModelGeneratedField)
+
+        constraint = ExclusionConstraint(
+            name="ints_adjacent",
+            expressions=[("ints_generated", RangeOperators.ADJACENT_TO)],
+            violation_error_code="custom_code",
+            violation_error_message="Custom error message.",
+        )
+        RangesModelGeneratedField.objects.create(ints=(20, 50))
+
+        range_obj = RangesModelGeneratedField(ints=(3, 20))
+        with self.assertRaisesMessage(ValidationError, "Custom error message."):
+            constraint.validate(RangesModelGeneratedField, range_obj)
+
+        # Excluding referenced or generated field should skip validation.
+        constraint.validate(RangesModelGeneratedField, range_obj, exclude={"ints"})
+        constraint.validate(
+            RangesModelGeneratedField, range_obj, exclude={"ints_generated"}
+        )
 
     def test_validate_with_custom_code_and_condition(self):
         constraint = ExclusionConstraint(
@@ -1213,3 +1258,12 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             constraint_name,
             self.get_constraints(ModelWithExclusionConstraint._meta.db_table),
         )
+
+    def test_database_default(self):
+        constraint = ExclusionConstraint(
+            name="ints_equal", expressions=[("ints", RangeOperators.EQUAL)]
+        )
+        RangesModel.objects.create()
+        msg = "Constraint “ints_equal” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel())

@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abduqadir Abliz <sahranbay@gmail.com>, 2023
+# Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024
 # Azat, 2023
 # Murat Orhun <oku.orhun@gmail.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-12-04 08:09+0000\n"
-"Last-Translator: Azat, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 08:09+0000\n"
+"Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,12 +31,22 @@ msgstr "مۇھىم چېسلا"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r ئاساسىي ئاچقۇچى بار %(name)s ئوبيېكت مەۋجۇت ئەمەس."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "تاپشۇرغان جەدۋەل سانلىق مەلۇماتىدا توقۇنۇش بار. قايتا سىناڭ."
+
 msgid "Password changed successfully."
 msgstr "پارول مۇۋەپپەقىيەتلىك ئۆزگەرتىلدى."
+
+msgid "Password-based authentication was disabled."
+msgstr "ئىم ئاساسىدىكى دەلىللەش چەكلەنگەن."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "پارول ئۆزگەرتىش: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "ئىم تەڭشەك %s"
 
 msgid "Authentication and Authorization"
 msgstr "دەلىللەش ۋە ھوقۇق بېرىش"
@@ -54,8 +64,23 @@ msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 "ئىناۋەتسىز پارول پىچىمى ياكى يوچۇن مۇكەممەللىكىنى تەكشۈرۈش ھېسابلاش ئۇسۇلى."
 
+msgid "Reset password"
+msgstr "ئىم ئەسلىگە قايتۇر"
+
+msgid "Set password"
+msgstr "ئىم تەڭشەك"
+
 msgid "The two password fields didn’t match."
 msgstr "ئىككى پارول بۆلىكى ماس كەلمىدى."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"ئىشلەتكۈچى ئىم ئارقىلىق دەلىللەشنى ئىشلىتەلەمدۇ يوق. ئەگەر چەكلەنسە، ئۇلار "
+"يەنىلا باشقا ئارقا ئۇچ پىروگراممىسى يەنى يەككە تىزىمغا كىرىش ياكى LDAP "
+"ئارقىلىق دەلىللىيەلەيدۇ."
 
 msgid "Password"
 msgstr "پارول"
@@ -66,13 +91,23 @@ msgstr "پارول جەزملەش"
 msgid "Enter the same password as before, for verification."
 msgstr "دەلىللەش ئۈچۈن، ئىلگىرىكى ئوخشاش ئىمنى قايتا كىرگۈزۈڭ."
 
+msgid "Password-based authentication"
+msgstr "ئىم ئاساسىدىكى دەلىللەش"
+
+msgid "Enabled"
+msgstr "قوزغىتىلدى"
+
+msgid "Disabled"
+msgstr "چەكلەندى"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr "ئەسلى ئىم ساقلانمىدى، شۇڭلاشقا ئىشلەتكۈچى ئىمنى كۆرسىتەلمەيدۇ."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
 msgstr ""
-"ئەسلى پارول سىستېمىغا ساقلانمايدۇ، شۇڭلاشقا بۇ ئىشلەتكۈچى ئىشلەتكەن پارولىنى "
-"كۆرگىلى بولمايدۇ، ئەمما <a href=\"{}\">بۇ جەدۋەل</a> نى ئىشلىتىپ پارولنى "
-"ئۆزگەرتەلەيسىز."
+"بۇ ئىشلەتكۈچىگە ئىم تەڭشەش ئارقىلىق ئىم ئاساسىدىكى دەلىللەشنى قوزغىتىدۇ."
 
 #, python-format
 msgid ""
@@ -99,9 +134,6 @@ msgstr "كونا پارولنى توغرا كىرگۈزمىدىڭىز. قايت�
 
 msgid "Old password"
 msgstr "كونا پارول"
-
-msgid "Password (again)"
-msgstr "پارول (قايتا)"
 
 msgid "algorithm"
 msgstr "ئالگورىزىم"

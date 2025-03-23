@@ -68,6 +68,8 @@ class BaseForm(RenderableFormMixin):
     template_name_ul = "django/forms/ul.html"
     template_name_label = "django/forms/label.html"
 
+    bound_field_class = None
+
     def __init__(
         self,
         data=None,
@@ -81,6 +83,7 @@ class BaseForm(RenderableFormMixin):
         field_order=None,
         use_required_attribute=None,
         renderer=None,
+        bound_field_class=None,
     ):
         self.is_bound = data is not None or files is not None
         self.data = MultiValueDict() if data is None else data
@@ -123,6 +126,12 @@ class BaseForm(RenderableFormMixin):
                 if isinstance(self.default_renderer, type):
                     renderer = renderer()
         self.renderer = renderer
+
+        self.bound_field_class = (
+            bound_field_class
+            or self.bound_field_class
+            or getattr(self.renderer, "bound_field_class", None)
+        )
 
     def order_fields(self, field_order):
         """
@@ -298,7 +307,10 @@ class BaseForm(RenderableFormMixin):
                         error_class="nonfield", renderer=self.renderer
                     )
                 else:
-                    self._errors[field] = self.error_class(renderer=self.renderer)
+                    self._errors[field] = self.error_class(
+                        renderer=self.renderer,
+                        field_id=self[field].auto_id,
+                    )
             self._errors[field].extend(error_list)
             if field in self.cleaned_data:
                 del self.cleaned_data[field]
@@ -313,7 +325,7 @@ class BaseForm(RenderableFormMixin):
         """
         Clean all of self.data and populate self._errors and self.cleaned_data.
         """
-        self._errors = ErrorDict()
+        self._errors = ErrorDict(renderer=self.renderer)
         if not self.is_bound:  # Stop further processing.
             return
         self.cleaned_data = {}
@@ -419,6 +431,7 @@ class BaseForm(RenderableFormMixin):
 
 class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     "A collection of Fields, plus their associated data."
+
     # This is a separate class from BaseForm in order to abstract the way
     # self.fields is specified. This class (Form) is the one that does the
     # fancy metaclass stuff purely for the semantic sugar -- it allows one

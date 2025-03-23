@@ -76,8 +76,8 @@ In addition to the officially supported databases, there are :ref:`backends
 provided by 3rd parties <third-party-notes>` that allow you to use other
 databases with Django.
 
-In addition to a database backend, you'll need to make sure your Python
-database bindings are installed.
+To use another database other than SQLite, you'll need to make sure that the
+appropriate Python database bindings are installed:
 
 * If you're using PostgreSQL, you'll need the `psycopg`_ or `psycopg2`_
   package. Refer to the :ref:`PostgreSQL notes <postgresql-notes>` for further
@@ -96,6 +96,33 @@ database bindings are installed.
 
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
+
+And ensure that the following keys in the ``'default'`` item of the
+:setting:`DATABASES` dictionary match your database connection settings:
+
+* :setting:`ENGINE <DATABASE-ENGINE>` -- Either
+  ``'django.db.backends.sqlite3'``,
+  ``'django.db.backends.postgresql'``,
+  ``'django.db.backends.mysql'``, or
+  ``'django.db.backends.oracle'``. Other backends are :ref:`also available
+  <third-party-notes>`.
+
+* :setting:`NAME` -- The name of your database. If you’re using SQLite, the
+  database will be a file on your computer. In that case, ``NAME`` should be
+  the full absolute path, including the filename of that file. You don’t need
+  to create anything beforehand; the database file will be created
+  automatically when needed. The default value, ``BASE_DIR / 'db.sqlite3'``,
+  will store the file in your project directory.
+
+.. admonition:: For databases other than SQLite
+
+    If you are not using SQLite as your database, additional settings such as
+    :setting:`USER`, :setting:`PASSWORD`, and :setting:`HOST` must be added.
+    For more details, see the reference documentation for :setting:`DATABASES`.
+
+    Also, make sure that you've created the database by this point. Do that
+    with "``CREATE DATABASE database_name;``" within your database's
+    interactive prompt.
 
 If you plan to use Django's ``manage.py migrate`` command to automatically
 create database tables for your models (after first installing Django and

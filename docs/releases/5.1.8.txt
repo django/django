@@ -1,0 +1,14 @@
+==========================
+Django 5.1.8 release notes
+==========================
+
+*Expected April 2, 2025*
+
+Django 5.1.8 fixes several bugs in 5.1.7.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.1.7 where the removal of the ``single_object``
+  parameter unintentionally altered the signature and return type of
+  ``LogEntryManager.log_actions()`` (:ticket:`36234`).

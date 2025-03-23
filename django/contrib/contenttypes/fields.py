@@ -1,6 +1,5 @@
 import functools
 import itertools
-import warnings
 from collections import defaultdict
 
 from asgiref.sync import sync_to_async
@@ -21,7 +20,6 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.sql import AND
 from django.db.models.sql.where import WhereNode
 from django.db.models.utils import AltersData
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 
@@ -158,17 +156,6 @@ class GenericForeignKey(FieldCacheMixin, Field):
         else:
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
-
-    def get_prefetch_queryset(self, instances, queryset=None):
-        warnings.warn(
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        if queryset is None:
-            return self.get_prefetch_querysets(instances)
-        return self.get_prefetch_querysets(instances, [queryset])
 
     def get_prefetch_querysets(self, instances, querysets=None):
         custom_queryset_dict = {}
@@ -402,6 +389,20 @@ class GenericRelation(ForeignObject):
             )
         ]
 
+    def get_local_related_value(self, instance):
+        return self.get_instance_value_for_fields(instance, self.foreign_related_fields)
+
+    def get_foreign_related_value(self, instance):
+        # We (possibly) need to convert object IDs to the type of the
+        # instances' PK in order to match up instances during prefetching.
+        return tuple(
+            foreign_field.to_python(val)
+            for foreign_field, val in zip(
+                self.foreign_related_fields,
+                self.get_instance_value_for_fields(instance, self.local_related_fields),
+            )
+        )
+
     def _get_path_info_with_parent(self, filtered_relation):
         """
         Return the path that joins the current model through any parent models.
@@ -625,17 +626,6 @@ def create_generic_related_manager(superclass, rel):
             except (AttributeError, KeyError):
                 queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
-
-        def get_prefetch_queryset(self, instances, queryset=None):
-            warnings.warn(
-                "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-                "instead.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            if queryset is None:
-                return self.get_prefetch_querysets(instances)
-            return self.get_prefetch_querysets(instances, [queryset])
 
         def get_prefetch_querysets(self, instances, querysets=None):
             if querysets and len(querysets) != 1:

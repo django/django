@@ -7,7 +7,7 @@ import tempfile
 import threading
 from io import StringIO
 from pathlib import Path
-from unittest import mock, skipIf, skipUnless
+from unittest import mock, skipIf
 
 from asgiref.sync import async_to_sync, iscoroutinefunction
 
@@ -24,7 +24,6 @@ from django.urls.converters import IntConverter
 from django.utils.functional import SimpleLazyObject
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
-from django.utils.version import PY311
 from django.views.debug import (
     CallableSettingWrapper,
     ExceptionCycleWarning,
@@ -398,6 +397,15 @@ class DebugViewTests(SimpleTestCase):
             response, "<h1>The install worked successfully! Congratulations!</h1>"
         )
 
+    @override_settings(
+        ROOT_URLCONF="view_tests.default_urls", FORCE_SCRIPT_NAME="/FORCED_PREFIX"
+    )
+    def test_default_urlconf_script_name(self):
+        response = self.client.request(**{"path": "/FORCED_PREFIX/"})
+        self.assertContains(
+            response, "<h1>The install worked successfully! Congratulations!</h1>"
+        )
+
     @override_settings(ROOT_URLCONF="view_tests.regression_21530_urls")
     def test_regression_21530(self):
         """
@@ -686,7 +694,6 @@ class ExceptionReporterTests(SimpleTestCase):
             text,
         )
 
-    @skipUnless(PY311, "Exception notes were added in Python 3.11.")
     def test_exception_with_notes(self):
         request = self.rf.get("/test_view/")
         try:
@@ -797,7 +804,6 @@ class ExceptionReporterTests(SimpleTestCase):
         or os.environ.get("PYTHONNODEBUGRANGES", False),
         "Fine-grained error locations are disabled.",
     )
-    @skipUnless(PY311, "Fine-grained error locations were added in Python 3.11.")
     def test_highlight_error_position(self):
         request = self.rf.get("/test_view/")
         try:
@@ -1445,7 +1451,7 @@ class ExceptionReportTestMixin:
         """
         Asserts that potentially sensitive info are displayed in the email report.
         """
-        with self.settings(ADMINS=[("Admin", "admin@fattie-breakie.com")]):
+        with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post("/some_url/", self.breakfast_data)
             if iscoroutinefunction(view):
@@ -1463,7 +1469,7 @@ class ExceptionReportTestMixin:
             self.assertNotIn("worcestershire", body_plain)
 
             # Frames vars are shown in html email reports.
-            body_html = str(email.alternatives[0][0])
+            body_html = str(email.alternatives[0].content)
             self.assertIn("cooked_eggs", body_html)
             self.assertIn("scrambled", body_html)
             self.assertIn("sauce", body_html)
@@ -1481,7 +1487,7 @@ class ExceptionReportTestMixin:
         """
         Asserts that certain sensitive info are not displayed in the email report.
         """
-        with self.settings(ADMINS=[("Admin", "admin@fattie-breakie.com")]):
+        with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post("/some_url/", self.breakfast_data)
             if iscoroutinefunction(view):
@@ -1499,7 +1505,7 @@ class ExceptionReportTestMixin:
             self.assertNotIn("worcestershire", body_plain)
 
             # Frames vars are shown in html email reports.
-            body_html = str(email.alternatives[0][0])
+            body_html = str(email.alternatives[0].content)
             self.assertIn("cooked_eggs", body_html)
             self.assertIn("scrambled", body_html)
             self.assertIn("sauce", body_html)
@@ -1524,7 +1530,7 @@ class ExceptionReportTestMixin:
         """
         Asserts that no variables or POST parameters are displayed in the email report.
         """
-        with self.settings(ADMINS=[("Admin", "admin@fattie-breakie.com")]):
+        with self.settings(ADMINS=["admin@example.com"]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post("/some_url/", self.breakfast_data)
             view(request)
@@ -1552,6 +1558,14 @@ class ExceptionReporterFilterTests(
     """
 
     rf = RequestFactory()
+    sensitive_settings = [
+        "SECRET_KEY",
+        "SECRET_KEY_FALLBACKS",
+        "PASSWORD",
+        "API_KEY",
+        "SOME_TOKEN",
+        "MY_AUTH",
+    ]
 
     def test_non_sensitive_request(self):
         """
@@ -1774,42 +1788,30 @@ class ExceptionReporterFilterTests(
         The debug page should not show some sensitive settings
         (password, secret key, ...).
         """
-        sensitive_settings = [
-            "SECRET_KEY",
-            "SECRET_KEY_FALLBACKS",
-            "PASSWORD",
-            "API_KEY",
-            "AUTH_TOKEN",
-        ]
-        for setting in sensitive_settings:
-            with self.settings(DEBUG=True, **{setting: "should not be displayed"}):
-                response = self.client.get("/raises500/")
-                self.assertNotContains(
-                    response, "should not be displayed", status_code=500
-                )
+        for setting in self.sensitive_settings:
+            with self.subTest(setting=setting):
+                with self.settings(DEBUG=True, **{setting: "should not be displayed"}):
+                    response = self.client.get("/raises500/")
+                    self.assertNotContains(
+                        response, "should not be displayed", status_code=500
+                    )
 
     def test_settings_with_sensitive_keys(self):
         """
         The debug page should filter out some sensitive information found in
         dict settings.
         """
-        sensitive_settings = [
-            "SECRET_KEY",
-            "SECRET_KEY_FALLBACKS",
-            "PASSWORD",
-            "API_KEY",
-            "AUTH_TOKEN",
-        ]
-        for setting in sensitive_settings:
+        for setting in self.sensitive_settings:
             FOOBAR = {
                 setting: "should not be displayed",
                 "recursive": {setting: "should not be displayed"},
             }
-            with self.settings(DEBUG=True, FOOBAR=FOOBAR):
-                response = self.client.get("/raises500/")
-                self.assertNotContains(
-                    response, "should not be displayed", status_code=500
-                )
+            with self.subTest(setting=setting):
+                with self.settings(DEBUG=True, FOOBAR=FOOBAR):
+                    response = self.client.get("/raises500/")
+                    self.assertNotContains(
+                        response, "should not be displayed", status_code=500
+                    )
 
     def test_cleanse_setting_basic(self):
         reporter_filter = SafeExceptionReporterFilter()
@@ -1883,10 +1885,26 @@ class ExceptionReporterFilterTests(
         )
 
     def test_request_meta_filtering(self):
-        request = self.rf.get("/", headers={"secret-header": "super_secret"})
+        headers = {
+            "API_URL": "super secret",
+            "A_SIGNATURE_VALUE": "super secret",
+            "MY_KEY": "super secret",
+            "PASSWORD": "super secret",
+            "SECRET_VALUE": "super secret",
+            "SOME_TOKEN": "super secret",
+            "THE_AUTH": "super secret",
+        }
+        request = self.rf.get("/", headers=headers)
         reporter_filter = SafeExceptionReporterFilter()
+        cleansed_headers = reporter_filter.get_safe_request_meta(request)
+        for header in headers:
+            with self.subTest(header=header):
+                self.assertEqual(
+                    cleansed_headers[f"HTTP_{header}"],
+                    reporter_filter.cleansed_substitute,
+                )
         self.assertEqual(
-            reporter_filter.get_safe_request_meta(request)["HTTP_SECRET_HEADER"],
+            cleansed_headers["HTTP_COOKIE"],
             reporter_filter.cleansed_substitute,
         )
 
@@ -1910,9 +1928,7 @@ class ExceptionReporterFilterTests(
 
 class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
     cleansed_substitute = "XXXXXXXXXXXXXXXXXXXX"
-    hidden_settings = _lazy_re_compile(
-        "API|TOKEN|KEY|SECRET|PASS|SIGNATURE|DATABASE_URL", flags=re.I
-    )
+    hidden_settings = _lazy_re_compile("PASS|DATABASE", flags=re.I)
 
 
 @override_settings(

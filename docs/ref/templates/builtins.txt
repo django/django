@@ -423,9 +423,14 @@ Variable                    Description
                             loop (0-indexed)
 ``forloop.first``           True if this is the first time through the loop
 ``forloop.last``            True if this is the last time through the loop
+``forloop.length``          The length of the loop
 ``forloop.parentloop``      For nested loops, this is the loop surrounding
                             the current one
 ==========================  ===============================================
+
+.. versionchanged:: 6.0
+
+    The variable ``forloop.length`` was added.
 
 ``for`` ... ``empty``
 ---------------------
@@ -952,77 +957,108 @@ output (as a string) inside a variable. This is useful if you want to use
     {% now "Y" as current_year %}
     {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
-.. templatetag:: query_string
+.. templatetag:: querystring
 
-``query_string``
+``querystring``
 ----------------
 
-.. versionadded:: 5.1
+Outputs a URL-encoded formatted query string based on the provided parameters.
 
-Outputs the query string from a given :class:`~django.http.QueryDict` instance,
-if provided, or ``request.GET`` if not and the
-``django.template.context_processors.request`` context processor is enabled.
-If the ``QueryDict`` is empty, then the output will be an empty string.
-Otherwise, the query string will be returned with a leading ``"?"``.
+This tag requires a :class:`~django.http.QueryDict` instance, which defaults to
+:attr:`request.GET <django.http.HttpRequest.GET>` if none is provided.
 
-If not using the ``django.template.context_processors.request`` context
-processor, you must pass either the ``request`` into the template context or a
-``QueryDict`` instance into this tag.
+If the :class:`~django.http.QueryDict` is empty and no additional parameters
+are provided, an empty string is returned. Otherwise, the result includes a
+leading ``"?"``.
 
-The following example outputs the current query string verbatim. So if the
-query string is ``?color=green&size=M``, the output would be
-``?color=green&size=M``:
+.. admonition:: Using ``request.GET`` as default
 
-.. code-block:: html+django
+    To use ``request.GET`` as the default ``QueryDict`` instance, the
+    ``django.template.context_processors.request`` context processor should be
+    enabled. If it's not enabled, you must either explicitly pass the
+    ``request`` object into the template context, or provide a ``QueryDict``
+    instance to this tag.
 
-    {% query_string %}
-
-You can also pass in a custom ``QueryDict`` that will be used instead of
-``request.GET``:
+Basic usage
+~~~~~~~~~~~
 
 .. code-block:: html+django
 
-    {% query_string my_query_dict %}
+    {% querystring %}
 
-Each keyword argument will be added to the query string, replacing any existing
-value for that key. With the query string ``?color=blue``, the following would
-result in ``?color=red&size=S``:
-
-.. code-block:: html+django
-
-    {% query_string color="red" size="S" %}
-
-It is possible to remove parameters by passing ``None`` as a value. With the
-query string ``?color=blue&size=M``, the following would result in ``?size=M``:
+Outputs the current query string verbatim. So if the query string is
+``?color=green``, the output would be ``?color=green``.
 
 .. code-block:: html+django
 
-    {% query_string color=None %}
+    {% querystring size="M" %}
 
-If the given parameter is a list, the value will remain as a list. For example,
-if ``my_list`` is set to ``["red", "blue"]``, the following would result in
-``?color=red&color=blue``:
+Outputs the current query string with the addition of the ``size`` parameter.
+Following the previous example, the output would be ``?color=green&size=M``.
+
+Custom QueryDict
+~~~~~~~~~~~~~~~~
 
 .. code-block:: html+django
 
-    {% query_string color=my_list %}
+    {% querystring my_query_dict %}
+
+You can provide a custom ``QueryDict`` to be used instead of ``request.GET``.
+So if ``my_query_dict`` is ``<QueryDict: {'color': ['blue']}>``, this outputs
+``?color=blue``.
+
+Setting items
+~~~~~~~~~~~~~
+
+.. code-block:: html+django
+
+    {% querystring color="red" size="S" %}
+
+Adds or modifies parameters in the query string. Each keyword argument will be
+added to the query string, replacing any existing value for that key. For
+instance, if the current query string is ``?color=green``, the output will be
+``?color=red&size=S``.
+
+Removing items
+~~~~~~~~~~~~~~
+
+.. code-block:: html+django
+
+    {% querystring color=None %}
+
+Passing ``None`` as the value removes the parameter from the query string. For
+example, if the current query string is ``?color=green&size=M``, the output
+will be ``?size=M``.
+
+Handling lists
+~~~~~~~~~~~~~~
+
+.. code-block:: html+django
+
+    {% querystring color=my_list %}
+
+If ``my_list`` is ``["red", "blue"]``, the output will be
+``?color=red&color=blue``, preserving the list structure in the query string.
+
+Dynamic usage
+~~~~~~~~~~~~~
 
 A common example of using this tag is to preserve the current query string when
 displaying a page of results, while adding a link to the next and previous
-pages of results. For example, if the paginator is currently on page 3, and
-the current query string is ``?color=blue&size=M&page=3``, the following code
-would output ``?color=blue&size=M&page=4``:
+pages of results. For example, if the paginator is currently on page 3, and the
+current query string is ``?color=blue&size=M&page=3``, the following code would
+output ``?color=blue&size=M&page=4``:
 
 .. code-block:: html+django
 
-    {% query_string page=page.next_page_number %}
+    {% querystring page=page.next_page_number %}
 
-You can also store the value in a variable, for example, if you need multiple
-links to the same page with syntax such as:
+You can also store the value in a variable. For example, if you need multiple
+links to the same page, define it as:
 
 .. code-block:: html+django
 
-    {% query_string page=page.next_page_number as next_page %}
+    {% querystring page=page.next_page_number as next_page %}
 
 .. templatetag:: regroup
 
@@ -2850,8 +2886,8 @@ If ``value`` is ``"https://www.example.org/"``, the output will be
 Converts URLs and email addresses in text into clickable links.
 
 This template tag works on links prefixed with ``http://``, ``https://``, or
-``www.``. For example, ``https://goo.gl/aia1t`` will get converted but
-``goo.gl/aia1t`` won't.
+``www.``. For example, ``https://djangocon.eu`` will get converted but
+``djangocon.eu`` won't.
 
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
@@ -2869,9 +2905,23 @@ For example:
 
     {{ value|urlize }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
-``"Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproject.com</a>"``.
+If ``value`` is ``"Check out www.djangoproject.com"``, the output will be:
+
+.. code-block:: html+django
+
+    Check out <a href="http://www.djangoproject.com" rel="nofollow">www.djangoproject.com</a>
+
+.. deprecated:: 6.0
+
+    The default protocol when none is provided will change from HTTP to HTTPS
+    in Django 7.0. Hence, the output will become:
+
+    .. code-block:: html+django
+
+        Check out <a href="https://www.djangoproject.com" rel="nofollow">www.djangoproject.com</a>
+
+    Set the transitional setting :setting:`URLIZE_ASSUME_HTTPS` to ``True`` to
+    opt into using HTTPS during the Django 6.x release cycle.
 
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
@@ -2906,9 +2956,23 @@ For example:
 
     {{ value|urlizetrunc:15 }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
-``'Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproj…</a>'``.
+If ``value`` is ``"Check out www.djangoproject.com"``, the output would be:
+
+.. code-block:: html+django
+
+    Check out <a href="http://www.djangoproject.com" rel="nofollow">www.djangoproj…</a>
+
+.. deprecated:: 6.0
+
+    The default protocol when none is provided will change from HTTP to HTTPS
+    in Django 7.0. Hence, the output will become:
+
+    .. code-block:: html+django
+
+        Check out <a href="https://www.djangoproject.com" rel="nofollow">www.djangoproj…</a>
+
+    Set the transitional setting :setting:`URLIZE_ASSUME_HTTPS` to ``True`` to
+    opt into using HTTPS during the Django 6.x release cycle.
 
 As with urlize_, this filter should only be applied to plain text.
 
@@ -3056,7 +3120,7 @@ slightly different call:
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
-    <img src="{{ myphoto }}">
+    <img src="{{ myphoto }}" alt="Hi!">
 
 .. admonition:: Using Jinja2 templates?
 

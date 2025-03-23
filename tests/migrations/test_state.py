@@ -1131,6 +1131,22 @@ class StateTests(SimpleTestCase):
         self.assertIsNone(order_field.related_model)
         self.assertIsInstance(order_field, models.PositiveSmallIntegerField)
 
+    def test_get_order_field_after_removed_order_with_respect_to_field(self):
+        new_apps = Apps()
+
+        class HistoricalRecord(models.Model):
+            _order = models.PositiveSmallIntegerField()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        model_state = ModelState.from_model(HistoricalRecord)
+        model_state.options["order_with_respect_to"] = None
+        order_field = model_state.get_field("_order")
+        self.assertIsNone(order_field.related_model)
+        self.assertIsInstance(order_field, models.PositiveSmallIntegerField)
+
     def test_manager_refer_correct_model_version(self):
         """
         #24147 - Managers refer to the correct version of a
@@ -1189,6 +1205,28 @@ class StateTests(SimpleTestCase):
         ProjectState.from_apps(new_apps)
         choices_field = Author._meta.get_field("choice")
         self.assertEqual(list(choices_field.choices), choices)
+
+    def test_composite_pk_state(self):
+        new_apps = Apps(["migrations"])
+
+        class Foo(models.Model):
+            pk = models.CompositePrimaryKey("account_id", "id")
+            account_id = models.SmallIntegerField()
+            id = models.SmallIntegerField()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        project_state = ProjectState.from_apps(new_apps)
+        model_state = project_state.models["migrations", "foo"]
+        self.assertEqual(len(model_state.options), 2)
+        self.assertEqual(model_state.options["constraints"], [])
+        self.assertEqual(model_state.options["indexes"], [])
+        self.assertEqual(len(model_state.fields), 3)
+        self.assertIn("pk", model_state.fields)
+        self.assertIn("account_id", model_state.fields)
+        self.assertIn("id", model_state.fields)
 
 
 class StateRelationsTests(SimpleTestCase):

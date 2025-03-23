@@ -16,7 +16,7 @@ from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils.functional import LazyObject, Promise
-from django.utils.version import PY311, get_docs_version
+from django.utils.version import get_docs_version
 
 FUNCTION_TYPES = (types.FunctionType, types.BuiltinFunctionType, types.MethodType)
 
@@ -81,8 +81,8 @@ class DatetimeDatetimeSerializer(BaseSerializer):
     """For datetime.datetime."""
 
     def serialize(self):
-        if self.value.tzinfo is not None and self.value.tzinfo != datetime.timezone.utc:
-            self.value = self.value.astimezone(datetime.timezone.utc)
+        if self.value.tzinfo is not None and self.value.tzinfo != datetime.UTC:
+            self.value = self.value.astimezone(datetime.UTC)
         imports = ["import datetime"]
         return repr(self.value), set(imports)
 
@@ -140,11 +140,7 @@ class EnumSerializer(BaseSerializer):
         enum_class = self.value.__class__
         module = enum_class.__module__
         if issubclass(enum_class, enum.Flag):
-            if PY311:
-                members = list(self.value)
-            else:
-                members, _ = enum._decompose(enum_class, self.value)
-                members = reversed(members)
+            members = list(self.value)
         else:
             members = (self.value,)
         return (

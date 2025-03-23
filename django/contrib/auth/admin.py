@@ -5,8 +5,8 @@ from django.contrib.admin.utils import unquote
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm,
+    AdminUserCreationForm,
     UserChangeForm,
-    UserCreationForm,
 )
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
@@ -71,7 +71,7 @@ class UserAdmin(admin.ModelAdmin):
         ),
     )
     form = UserChangeForm
-    add_form = UserCreationForm
+    add_form = AdminUserCreationForm
     change_password_form = AdminPasswordChangeForm
     list_display = ("username", "email", "first_name", "last_name", "is_staff")
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
@@ -106,9 +106,7 @@ class UserAdmin(admin.ModelAdmin):
             ),
         ] + super().get_urls()
 
-    # RemovedInDjango60Warning: when the deprecation ends, replace with:
-    # def lookup_allowed(self, lookup, value, request):
-    def lookup_allowed(self, lookup, value, request=None):
+    def lookup_allowed(self, lookup, value, request):
         # Don't allow lookups involving passwords.
         return not lookup.startswith("password") and super().lookup_allowed(
             lookup, value, request
@@ -117,6 +115,9 @@ class UserAdmin(admin.ModelAdmin):
     @sensitive_post_parameters_m
     @csrf_protect_m
     def add_view(self, request, form_url="", extra_context=None):
+        if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
+            return self._add_view(request, form_url, extra_context)
+
         with transaction.atomic(using=router.db_for_write(self.model)):
             return self._add_view(request, form_url, extra_context)
 

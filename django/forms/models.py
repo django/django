@@ -11,6 +11,7 @@ from django.core.exceptions import (
     ImproperlyConfigured,
     ValidationError,
 )
+from django.core.validators import ProhibitNullCharactersValidator
 from django.db.models.utils import AltersData
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
@@ -23,6 +24,7 @@ from django.forms.widgets import (
     SelectMultiple,
 )
 from django.utils.choices import BaseChoiceIterator
+from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -368,10 +370,12 @@ class BaseModelForm(BaseForm, AltersData):
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
-        # self._validate_unique will be set to True by BaseModelForm.clean().
-        # It is False by default so overriding self.clean() and failing to call
-        # super will stop validate_unique from being called.
+        # self._validate_(unique|constraints) will be set to True by
+        # BaseModelForm.clean(). It is False by default so overriding
+        # self.clean() and failing to call super will stop
+        # validate_(unique|constraints) from being called.
         self._validate_unique = False
+        self._validate_constraints = False
         super().__init__(
             data,
             files,
@@ -434,6 +438,7 @@ class BaseModelForm(BaseForm, AltersData):
 
     def clean(self):
         self._validate_unique = True
+        self._validate_constraints = True
         return self.cleaned_data
 
     def _update_errors(self, errors):
@@ -493,13 +498,17 @@ class BaseModelForm(BaseForm, AltersData):
             self._update_errors(e)
 
         try:
-            self.instance.full_clean(exclude=exclude, validate_unique=False)
+            self.instance.full_clean(
+                exclude=exclude, validate_unique=False, validate_constraints=False
+            )
         except ValidationError as e:
             self._update_errors(e)
 
-        # Validate uniqueness if needed.
+        # Validate uniqueness and constraints if needed.
         if self._validate_unique:
             self.validate_unique()
+        if self._validate_constraints:
+            self.validate_constraints()
 
     def validate_unique(self):
         """
@@ -509,6 +518,17 @@ class BaseModelForm(BaseForm, AltersData):
         exclude = self._get_validation_exclusions()
         try:
             self.instance.validate_unique(exclude=exclude)
+        except ValidationError as e:
+            self._update_errors(e)
+
+    def validate_constraints(self):
+        """
+        Call the instance's validate_constraints() method and update the form's
+        validation errors if any were raised.
+        """
+        exclude = self._get_validation_exclusions()
+        try:
+            self.instance.validate_constraints(exclude=exclude)
         except ValidationError as e:
             self._update_errors(e)
 
@@ -834,8 +854,8 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                     (
                         d._get_pk_val()
                         if hasattr(d, "_get_pk_val")
-                        # Prevent "unhashable type: list" errors later on.
-                        else tuple(d) if isinstance(d, list) else d
+                        # Prevent "unhashable type" errors later on.
+                        else make_hashable(d)
                     )
                     for d in row_data
                 )
@@ -933,7 +953,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
             # 1. The object is an unexpected empty model, created by invalid
             #    POST data such as an object outside the formset's queryset.
             # 2. The object was already deleted from the database.
-            if obj.pk is None:
+            if not obj._is_pk_set():
                 continue
             if form in forms_to_delete:
                 self.deleted_objects.append(obj)
@@ -1101,7 +1121,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         self.save_as_new = save_as_new
         if queryset is None:
             queryset = self.model._default_manager
-        if self.instance.pk is not None:
+        if self.instance._is_pk_set():
             qs = queryset.filter(**{self.fk.name: self.instance})
         else:
             qs = queryset.none()
@@ -1486,6 +1506,10 @@ class ModelChoiceField(ChoiceField):
         self.limit_choices_to = limit_choices_to  # limit the queryset later.
         self.to_field_name = to_field_name
 
+    def validate_no_null_characters(self, value):
+        non_null_character_validator = ProhibitNullCharactersValidator()
+        return non_null_character_validator(value)
+
     def get_limit_choices_to(self):
         """
         Return ``limit_choices_to`` for this form field.
@@ -1550,12 +1574,18 @@ class ModelChoiceField(ChoiceField):
     def to_python(self, value):
         if value in self.empty_values:
             return None
+        self.validate_no_null_characters(value)
         try:
             key = self.to_field_name or "pk"
             if isinstance(value, self.queryset.model):
                 value = getattr(value, key)
             value = self.queryset.get(**{key: value})
-        except (ValueError, TypeError, self.queryset.model.DoesNotExist):
+        except (
+            ValueError,
+            TypeError,
+            self.queryset.model.DoesNotExist,
+            ValidationError,
+        ):
             raise ValidationError(
                 self.error_messages["invalid_choice"],
                 code="invalid_choice",
@@ -1630,9 +1660,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
                 code="invalid_list",
             )
         for pk in value:
+            self.validate_no_null_characters(pk)
             try:
                 self.queryset.filter(**{key: pk})
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, ValidationError):
                 raise ValidationError(
                     self.error_messages["invalid_pk_value"],
                     code="invalid_pk_value",

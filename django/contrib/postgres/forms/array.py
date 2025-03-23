@@ -228,7 +228,7 @@ class SplitArrayField(forms.Field):
                         params={"nth": index + 1},
                     )
                 )
-                cleaned_data.append(None)
+                cleaned_data.append(item)
             else:
                 errors.append(None)
         cleaned_data, null_index = self._remove_trailing_nulls(cleaned_data)

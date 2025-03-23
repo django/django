@@ -1,7 +1,7 @@
 """
 PostgreSQL database backend for Django.
 
-Requires psycopg2 >= 2.8.4 or psycopg >= 3.1.8
+Requires psycopg2 >= 2.9.9 or psycopg >= 3.1.12
 """
 
 import asyncio
@@ -34,13 +34,13 @@ def psycopg_version():
     return get_version_tuple(version)
 
 
-if psycopg_version() < (2, 8, 4):
+if psycopg_version() < (2, 9, 9):
     raise ImproperlyConfigured(
-        f"psycopg2 version 2.8.4 or newer is required; you have {Database.__version__}"
+        f"psycopg2 version 2.9.9 or newer is required; you have {Database.__version__}"
     )
-if (3,) <= psycopg_version() < (3, 1, 8):
+if (3,) <= psycopg_version() < (3, 1, 12):
     raise ImproperlyConfigured(
-        f"psycopg version 3.1.8 or newer is required; you have {Database.__version__}"
+        f"psycopg version 3.1.12 or newer is required; you have {Database.__version__}"
     )
 
 
@@ -84,24 +84,6 @@ def _get_varchar_column(data):
     if data["max_length"] is None:
         return "varchar"
     return "varchar(%(max_length)s)" % data
-
-
-def ensure_timezone(connection, ops, timezone_name):
-    conn_timezone_name = connection.info.parameter_status("TimeZone")
-    if timezone_name and conn_timezone_name != timezone_name:
-        with connection.cursor() as cursor:
-            cursor.execute(ops.set_time_zone_sql(), [timezone_name])
-        return True
-    return False
-
-
-def ensure_role(connection, ops, role_name):
-    if role_name:
-        with connection.cursor() as cursor:
-            sql = ops.compose_sql("SET ROLE %s", [role_name])
-            cursor.execute(sql)
-        return True
-    return False
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -364,21 +346,35 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.close_pool()
         if self.connection is None:
             return False
-        return ensure_timezone(self.connection, self.ops, self.timezone_name)
+        return self._configure_timezone(self.connection)
+
+    def _configure_timezone(self, connection):
+        conn_timezone_name = connection.info.parameter_status("TimeZone")
+        timezone_name = self.timezone_name
+        if timezone_name and conn_timezone_name != timezone_name:
+            with connection.cursor() as cursor:
+                cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
+            return True
+        return False
+
+    def _configure_role(self, connection):
+        if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
+            with connection.cursor() as cursor:
+                sql = self.ops.compose_sql("SET ROLE %s", [new_role])
+                cursor.execute(sql)
+            return True
+        return False
 
     def _configure_connection(self, connection):
         # This function is called from init_connection_state and from the
-        # psycopg pool itself after a connection is opened. Make sure that
-        # whatever is done here does not access anything on self aside from
-        # variables.
+        # psycopg pool itself after a connection is opened.
 
         # Commit after setting the time zone.
-        commit_tz = ensure_timezone(connection, self.ops, self.timezone_name)
+        commit_tz = self._configure_timezone(connection)
         # Set the role on the connection. This is useful if the credential used
         # to login is not the same as the role that owns database resources. As
         # can be the case when using temporary or ephemeral credentials.
-        role_name = self.settings_dict["OPTIONS"].get("assume_role")
-        commit_role = ensure_role(connection, self.ops, role_name)
+        commit_role = self._configure_role(connection)
 
         return commit_role or commit_tz
 

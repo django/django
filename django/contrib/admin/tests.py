@@ -6,6 +6,9 @@ from django.test.selenium import SeleniumTestCase
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
 
+# Make unittest ignore frames in this module when reporting failures.
+__unittest = True
+
 
 class CSPMiddleware(MiddlewareMixin):
     """The admin's JavaScript should be compatible with CSP."""
@@ -120,13 +123,21 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         Block until a new page has loaded and is ready.
         """
+        from selenium.common.exceptions import WebDriverException
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
 
         old_page = self.selenium.find_element(By.TAG_NAME, "html")
         yield
         # Wait for the next page to be loaded
-        self.wait_until(ec.staleness_of(old_page), timeout=timeout)
+        try:
+            self.wait_until(ec.staleness_of(old_page), timeout=timeout)
+        except WebDriverException:
+            # Issue in version 113+ of Chrome driver where a WebDriverException
+            # error is raised rather than a StaleElementReferenceException, see:
+            # https://issues.chromium.org/issues/42323468
+            pass
+
         self.wait_page_ready(timeout=timeout)
 
     def admin_login(self, username, password, login_url="/admin/"):
@@ -215,19 +226,16 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         self._assertOptionsValues("%s > option:checked" % selector, values)
 
-    def has_css_class(self, selector, klass):
+    def is_disabled(self, selector):
         """
-        Return True if the element identified by `selector` has the CSS class
-        `klass`.
+        Return True if the element identified by `selector` has the `disabled`
+        attribute.
         """
         from selenium.webdriver.common.by import By
 
         return (
-            self.selenium.find_element(
-                By.CSS_SELECTOR,
-                selector,
+            self.selenium.find_element(By.CSS_SELECTOR, selector).get_attribute(
+                "disabled"
             )
-            .get_attribute("class")
-            .find(klass)
-            != -1
+            == "true"
         )

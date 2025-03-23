@@ -19,7 +19,6 @@ from django.core.management.utils import (
 )
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils.functional import cached_property
-from django.utils.jslex import prepare_js_for_gettext
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import get_text_list
 from django.utils.translation import templatize
@@ -35,13 +34,13 @@ def check_programs(*programs):
     for program in programs:
         if find_command(program) is None:
             raise CommandError(
-                "Can't find %s. Make sure you have GNU gettext tools 0.15 or "
-                "newer installed." % program
+                f"Can't find {program}. Make sure you have GNU gettext tools "
+                "0.19 or newer installed."
             )
 
 
 def is_valid_locale(locale):
-    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z].*$", locale)
+    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z0-9].*$", locale)
 
 
 @total_ordering
@@ -80,9 +79,7 @@ class BuildFile:
 
     @cached_property
     def is_templatized(self):
-        if self.domain == "djangojs":
-            return self.command.gettext_version < (0, 18, 3)
-        elif self.domain == "django":
+        if self.domain == "django":
             file_ext = os.path.splitext(self.translatable.file)[1]
             return file_ext != ".py"
         return False
@@ -99,11 +96,7 @@ class BuildFile:
         """
         if not self.is_templatized:
             return self.path
-        extension = {
-            "djangojs": "c",
-            "django": "py",
-        }.get(self.domain)
-        filename = "%s.%s" % (self.translatable.file, extension)
+        filename = f"{self.translatable.file}.py"
         return os.path.join(self.translatable.dirpath, filename)
 
     def preprocess(self):
@@ -117,9 +110,7 @@ class BuildFile:
         with open(self.path, encoding="utf-8") as fp:
             src_data = fp.read()
 
-        if self.domain == "djangojs":
-            content = prepare_js_for_gettext(src_data)
-        elif self.domain == "django":
+        if self.domain == "django":
             content = templatize(src_data, origin=self.path[2:])
 
         with open(self.work_path, "w", encoding="utf-8") as fp:
@@ -349,11 +340,6 @@ class Command(BaseCommand):
             self.msgattrib_options = self.msgattrib_options[:] + ["--no-location"]
             self.xgettext_options = self.xgettext_options[:] + ["--no-location"]
         if options["add_location"]:
-            if self.gettext_version < (0, 19):
-                raise CommandError(
-                    "The --add-location option requires gettext 0.19 or later. "
-                    "You have %s." % ".".join(str(x) for x in self.gettext_version)
-                )
             arg_add_location = "--add-location=%s" % options["add_location"]
             self.msgmerge_options = self.msgmerge_options[:] + [arg_add_location]
             self.msguniq_options = self.msguniq_options[:] + [arg_add_location]
@@ -636,12 +622,11 @@ class Command(BaseCommand):
             build_files.append(build_file)
 
         if self.domain == "djangojs":
-            is_templatized = build_file.is_templatized
             args = [
                 "xgettext",
                 "-d",
                 self.domain,
-                "--language=%s" % ("C" if is_templatized else "JavaScript",),
+                "--language=JavaScript",
                 "--keyword=gettext_noop",
                 "--keyword=gettext_lazy",
                 "--keyword=ngettext_lazy:1,2",

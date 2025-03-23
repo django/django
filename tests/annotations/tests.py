@@ -1,7 +1,9 @@
 import datetime
 from decimal import Decimal
+from unittest import skipUnless
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.db import connection
 from django.db.models import (
     BooleanField,
     Case,
@@ -15,6 +17,7 @@ from django.db.models import (
     FloatField,
     Func,
     IntegerField,
+    JSONField,
     Max,
     OuterRef,
     Q,
@@ -43,6 +46,7 @@ from .models import (
     Company,
     DepartmentStore,
     Employee,
+    JsonModel,
     Publisher,
     Store,
     Ticket,
@@ -568,6 +572,16 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(book["other_rating"], 4)
         self.assertEqual(book["other_isbn"], "155860191")
 
+    def test_values_fields_annotations_order(self):
+        qs = Book.objects.annotate(other_rating=F("rating") - 1).values(
+            "other_rating", "rating"
+        )
+        book = qs.get(pk=self.b1.pk)
+        self.assertEqual(
+            list(book.items()),
+            [("other_rating", self.b1.rating - 1), ("rating", self.b1.rating)],
+        )
+
     def test_values_with_pk_annotation(self):
         # annotate references a field in values() with pk
         publishers = Publisher.objects.values("id", "book__rating").annotate(
@@ -955,6 +969,24 @@ class NonAggregateAnnotationTestCase(TestCase):
         ):
             Book.objects.annotate(BooleanField(), Value(False), is_book=True)
 
+    def test_complex_annotations_must_have_an_alias(self):
+        complex_annotations = [
+            F("rating") * F("price"),
+            Value("title"),
+            Case(When(pages__gte=400, then=Value("Long")), default=Value("Short")),
+            Subquery(
+                Book.objects.filter(publisher_id=OuterRef("pk"))
+                .order_by("-pubdate")
+                .values("name")[:1]
+            ),
+            Exists(Book.objects.filter(publisher_id=OuterRef("pk"))),
+        ]
+        msg = "Complex annotations require an alias"
+        for annotation in complex_annotations:
+            with self.subTest(annotation=annotation):
+                with self.assertRaisesMessage(TypeError, msg):
+                    Book.objects.annotate(annotation)
+
     def test_chaining_annotation_filter_with_m2m(self):
         qs = (
             Author.objects.filter(
@@ -1156,6 +1188,23 @@ class NonAggregateAnnotationTestCase(TestCase):
             with self.subTest(crafted_alias):
                 with self.assertRaisesMessage(ValueError, msg):
                     Book.objects.annotate(**{crafted_alias: Value(1)})
+
+    @skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
+    @skipUnlessDBFeature("supports_json_field")
+    def test_set_returning_functions(self):
+        class JSONBPathQuery(Func):
+            function = "jsonb_path_query"
+            output_field = JSONField()
+            set_returning = True
+
+        test_model = JsonModel.objects.create(
+            data={"key": [{"id": 1, "name": "test1"}, {"id": 2, "name": "test2"}]}, id=1
+        )
+        qs = JsonModel.objects.annotate(
+            table_element=JSONBPathQuery("data", Value("$.key[*]"))
+        ).filter(pk=test_model.pk)
+
+        self.assertEqual(qs.count(), len(qs))
 
 
 class AliasTests(TestCase):

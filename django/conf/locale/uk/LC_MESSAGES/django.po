@@ -11,6 +11,7 @@
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Mikhail Kolesnik <mike@openbunker.org>, 2015
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
+# Natalia, 2024
 # Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013-2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
@@ -21,10 +22,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
-"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2023\n"
-"Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 06:49+0000\n"
+"Last-Translator: Natalia, 2024\n"
+"Language-Team: Ukrainian (http://app.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -311,6 +312,9 @@ msgstr "Татарська"
 msgid "Udmurt"
 msgstr "Удмуртська"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Українська"
 
@@ -358,6 +362,9 @@ msgstr "Сторінка не містить результатів"
 msgid "Enter a valid value."
 msgstr "Введіть коректне значення."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Введіть коректний URL."
 
@@ -379,14 +386,18 @@ msgstr ""
 "Введіть коректне значення 'slug' (короткого заголовку), що може містити "
 "тільки літери, числа, символи підкреслювання або дефіси."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Введіть коректну IPv4 адресу."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Введіть дійсну IPv6 адресу."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Введіть дійсну IPv4 чи IPv6 адресу."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Введіть тільки цифри, що розділені комами."
@@ -407,6 +418,12 @@ msgstr "Переконайтеся, що це значення більше чи
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
 
 #, python-format
@@ -799,7 +816,7 @@ msgid "Enter a complete value."
 msgstr "Введіть значення повністю."
 
 msgid "Enter a valid UUID."
-msgstr "Введіть коректне значення UUID,"
+msgstr "Введіть коректне значення UUID."
 
 msgid "Enter a valid JSON."
 msgstr "Введіть коректний JSON."

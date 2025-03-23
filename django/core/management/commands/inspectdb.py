@@ -106,9 +106,12 @@ class Command(BaseCommand):
                         connection.introspection.get_primary_key_columns(
                             cursor, table_name
                         )
+                        or []
                     )
                     primary_key_column = (
-                        primary_key_columns[0] if primary_key_columns else None
+                        primary_key_columns[0]
+                        if len(primary_key_columns) == 1
+                        else None
                     )
                     unique_columns = [
                         c["columns"][0]
@@ -128,6 +131,11 @@ class Command(BaseCommand):
                 yield ""
                 yield "class %s(models.Model):" % model_name
                 known_models.append(model_name)
+
+                if len(primary_key_columns) > 1:
+                    fields = ", ".join([f"'{col}'" for col in primary_key_columns])
+                    yield f"    pk = models.CompositePrimaryKey({fields})"
+
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
                 used_relations = set()  # Holds foreign relations used in the table.
@@ -151,12 +159,6 @@ class Command(BaseCommand):
                     # Add primary_key and unique, if necessary.
                     if column_name == primary_key_column:
                         extra_params["primary_key"] = True
-                        if len(primary_key_columns) > 1:
-                            comment_notes.append(
-                                "The composite primary key (%s) found, that is not "
-                                "supported. The first column is selected."
-                                % ", ".join(primary_key_columns)
-                            )
                     elif column_name in unique_columns:
                         extra_params["unique"] = True
 

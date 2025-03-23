@@ -186,6 +186,14 @@ Configurable attributes
 
     It must be unique across a Django project.
 
+    .. warning::
+
+        Changing this attribute after migrations have been applied for an
+        application will result in breaking changes to a project or, in the
+        case of a reusable app, any existing installs of that app. This is
+        because ``AppConfig.label`` is used in database tables and migration
+        files when referencing an app in the dependencies list.
+
 .. attribute:: AppConfig.verbose_name
 
     Human-readable name for the application, e.g. "Administration".

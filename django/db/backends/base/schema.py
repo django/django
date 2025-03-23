@@ -13,7 +13,8 @@ from django.db.backends.ddl_references import (
     Table,
 )
 from django.db.backends.utils import names_digest, split_identifier, truncate_name
-from django.db.models import NOT_PROVIDED, Deferrable, Index
+from django.db.models import Deferrable, Index
+from django.db.models.fields.composite import CompositePrimaryKey
 from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
@@ -94,7 +95,7 @@ class BaseDatabaseSchemaEditor:
     sql_alter_column_default = "ALTER COLUMN %(column)s SET DEFAULT %(default)s"
     sql_alter_column_no_default = "ALTER COLUMN %(column)s DROP DEFAULT"
     sql_alter_column_no_default_null = sql_alter_column_no_default
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s CASCADE"
+    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_rename_column = (
         "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
     )
@@ -106,6 +107,7 @@ class BaseDatabaseSchemaEditor:
     sql_check_constraint = "CHECK (%(check)s)"
     sql_delete_constraint = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
     sql_constraint = "CONSTRAINT %(name)s %(constraint)s"
+    sql_pk_constraint = "PRIMARY KEY (%(columns)s)"
 
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = sql_delete_constraint
@@ -164,7 +166,7 @@ class BaseDatabaseSchemaEditor:
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             for sql in self.deferred_sql:
-                self.execute(sql)
+                self.execute(sql, None)
         if self.atomic_migration:
             self.atomic.__exit__(exc_type, exc_value, traceback)
 
@@ -265,16 +267,34 @@ class BaseDatabaseSchemaEditor:
                 )
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
-        constraints = [
-            constraint.constraint_sql(model, self)
-            for constraint in model._meta.constraints
-        ]
+        # The BaseConstraint DDL creation methods such as constraint_sql(),
+        # create_sql(), and delete_sql(), were not designed in a way that
+        # separate SQL from parameters which make their generated SQL unfit to
+        # be used in a context where parametrization is delegated to the
+        # backend.
+        constraint_sqls = []
+        if params:
+            # If parameters are present (e.g. a DEFAULT clause on backends that
+            # allow parametrization) defer constraint creation so they are not
+            # mixed with SQL meant to be parametrized.
+            for constraint in model._meta.constraints:
+                self.deferred_sql.append(constraint.create_sql(model, self))
+        else:
+            constraint_sqls.extend(
+                constraint.constraint_sql(model, self)
+                for constraint in model._meta.constraints
+            )
+
+        pk = model._meta.pk
+        if isinstance(pk, CompositePrimaryKey):
+            constraint_sqls.append(self._pk_constraint_sql(pk.columns))
+
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(
-                str(constraint)
-                for constraint in (*column_sqls, *constraints)
-                if constraint
+                str(statement)
+                for statement in (*column_sqls, *constraint_sqls)
+                if statement
             ),
         }
         if model._meta.db_tablespace:
@@ -293,12 +313,10 @@ class BaseDatabaseSchemaEditor:
         yield column_db_type
         if collation := field_db_params.get("collation"):
             yield self._collate_sql(collation)
-        if self.connection.features.supports_comments_inline and field.db_comment:
-            yield self._comment_sql(field.db_comment)
         # Work out nullability.
         null = field.null
         # Add database default.
-        if field.db_default is not NOT_PROVIDED:
+        if field.has_db_default():
             default_sql, default_params = self.db_default_sql(field)
             yield f"DEFAULT {default_sql}"
             params.extend(default_params)
@@ -353,6 +371,8 @@ class BaseDatabaseSchemaEditor:
             and field.unique
         ):
             yield self.connection.ops.tablespace_sql(tablespace, inline=True)
+        if self.connection.features.supports_comments_inline and field.db_comment:
+            yield self._comment_sql(field.db_comment)
 
     def column_sql(self, model, field, include_default=False):
         """
@@ -755,7 +775,7 @@ class BaseDatabaseSchemaEditor:
         self.execute(sql, params or None)
         # Drop the default if we need to
         if (
-            field.db_default is NOT_PROVIDED
+            not field.has_db_default()
             and not self.skip_default_on_alter(field)
             and self.effective_default(field) is not None
         ):
@@ -1088,15 +1108,15 @@ class BaseDatabaseSchemaEditor:
             actions.append(fragment)
             post_actions.extend(other_actions)
 
-        if new_field.db_default is not NOT_PROVIDED:
+        if new_field.has_db_default():
             if (
-                old_field.db_default is NOT_PROVIDED
+                not old_field.has_db_default()
                 or new_field.db_default != old_field.db_default
             ):
                 actions.append(
                     self._alter_column_database_default_sql(model, old_field, new_field)
                 )
-        elif old_field.db_default is not NOT_PROVIDED:
+        elif old_field.has_db_default():
             actions.append(
                 self._alter_column_database_default_sql(
                     model, old_field, new_field, drop=True
@@ -1110,11 +1130,7 @@ class BaseDatabaseSchemaEditor:
         #  4. Drop the default again.
         # Default change?
         needs_database_default = False
-        if (
-            old_field.null
-            and not new_field.null
-            and new_field.db_default is NOT_PROVIDED
-        ):
+        if old_field.null and not new_field.null and not new_field.has_db_default():
             old_default = self.effective_default(old_field)
             new_default = self.effective_default(new_field)
             if (
@@ -1133,7 +1149,7 @@ class BaseDatabaseSchemaEditor:
                 null_actions.append(fragment)
         # Only if we have a default and there is a change from NULL to NOT NULL
         four_way_default_alteration = (
-            new_field.has_default() or new_field.db_default is not NOT_PROVIDED
+            new_field.has_default() or new_field.has_db_default()
         ) and (old_field.null and not new_field.null)
         if actions or null_actions:
             if not four_way_default_alteration:
@@ -1155,7 +1171,7 @@ class BaseDatabaseSchemaEditor:
                     params,
                 )
             if four_way_default_alteration:
-                if new_field.db_default is NOT_PROVIDED:
+                if not new_field.has_db_default():
                     default_sql = "%s"
                     params = [new_default]
                 else:
@@ -1985,6 +2001,11 @@ class BaseDatabaseSchemaEditor:
                 if not exclude or name not in exclude:
                     result.append(name)
         return result
+
+    def _pk_constraint_sql(self, columns):
+        return self.sql_pk_constraint % {
+            "columns": ", ".join(self.quote_name(column) for column in columns)
+        }
 
     def _delete_primary_key(self, model, strict=False):
         constraint_names = self._constraint_names(model, primary_key=True)

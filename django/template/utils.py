@@ -102,10 +102,9 @@ def get_app_template_dirs(dirname):
     dirname is the name of the subdirectory containing templates inside
     installed applications.
     """
-    template_dirs = [
-        Path(app_config.path) / dirname
-        for app_config in apps.get_app_configs()
-        if app_config.path and (Path(app_config.path) / dirname).is_dir()
-    ]
     # Immutable return value because it will be cached and shared by callers.
-    return tuple(template_dirs)
+    return tuple(
+        path
+        for app_config in apps.get_app_configs()
+        if app_config.path and (path := Path(app_config.path) / dirname).is_dir()
+    )

@@ -11,7 +11,25 @@ Django provides convenient ways to access the default storage class:
 
 .. data:: storages
 
-    Storage instances as defined by :setting:`STORAGES`.
+    A dictionary-like object that allows retrieving a storage instance using
+    its alias as defined by :setting:`STORAGES`.
+
+    ``storages`` has an attribute ``backends``, which defaults to the raw value
+    provided in :setting:`STORAGES`.
+
+    Additionally, ``storages`` provides a ``create_storage()`` method that
+    accepts the dictionary used in :setting:`STORAGES` for a backend, and
+    returns a storage instance based on that backend definition. This may be
+    useful for third-party packages needing to instantiate storages in tests:
+
+    .. code-block:: pycon
+
+        >>> from django.core.files.storage import storages
+        >>> storages.backends
+        {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+         'custom': {'BACKEND': 'package.storage.CustomStorage'}}
+        >>> storage_instance = storages.create_storage({"BACKEND": "package.storage.CustomStorage"})
 
 .. class:: DefaultStorage
 
@@ -61,8 +79,6 @@ The ``FileSystemStorage`` class
         saved. Defaults to :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
 
     .. attribute:: allow_overwrite
-
-        .. versionadded:: 5.1
 
         Flag to control allowing saving a new file over an existing one.
         Defaults to ``False``.
@@ -129,8 +145,7 @@ The ``Storage`` class
     .. method:: exists(name)
 
         Returns ``True`` if a file referenced by the given name already exists
-        in the storage system, or ``False`` if the name is available for a new
-        file.
+        in the storage system.
 
     .. method:: get_accessed_time(name)
 

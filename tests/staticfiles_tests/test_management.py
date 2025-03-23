@@ -124,6 +124,11 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
             searched_locations,
         )
 
+    def test_missing_args_message(self):
+        msg = "Enter at least one staticfile."
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command("findstatic")
+
 
 class TestConfiguration(StaticFilesTestCase):
     def test_location_empty(self):
@@ -563,7 +568,7 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
         storage = DummyStorage()
         self.assertEqual(
             storage.get_modified_time("name"),
-            datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc),
+            datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC),
         )
         with self.assertRaisesMessage(
             NotImplementedError, "This backend doesn't support absolute paths."

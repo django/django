@@ -41,7 +41,8 @@ If you're not using the default project template, here are the requirements:
    <TEMPLATES-OPTIONS>`.
 
 #. If you've customized the :setting:`MIDDLEWARE` setting,
-   :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
+   :class:`django.contrib.sessions.middleware.SessionMiddleware`,
+   :class:`django.contrib.auth.middleware.AuthenticationMiddleware`, and
    :class:`django.contrib.messages.middleware.MessageMiddleware` must be
    included.
 
@@ -336,7 +337,8 @@ subclass::
     If neither ``fields`` nor :attr:`~ModelAdmin.fieldsets` options are present,
     Django will default to displaying each field that isn't an ``AutoField`` and
     has ``editable=True``, in a single fieldset, in the same order as the fields
-    are defined in the model.
+    are defined in the model, followed by any fields defined in
+    :attr:`~ModelAdmin.readonly_fields`.
 
 .. attribute:: ModelAdmin.fieldsets
 
@@ -430,22 +432,26 @@ subclass::
         collapsed, using an expandable widget with a toggle for switching
         their visibility.
 
-        .. versionchanged:: 5.1
-
-            ``fieldsets`` using the ``collapse`` class now use ``<details>``
-            and ``<summary>`` elements, provided they define a ``name``.
-
     * ``description``
         A string of optional extra text to be displayed at the top of each
-        fieldset, under the heading of the fieldset. This string is not
-        rendered for :class:`~django.contrib.admin.TabularInline` due to its
-        layout.
+        fieldset, under the heading of the fieldset.
 
         Note that this value is *not* HTML-escaped when it's displayed in
         the admin interface. This lets you include HTML if you so desire.
         Alternatively you can use plain text and
         :func:`django.utils.html.escape` to escape any HTML special
         characters.
+
+    .. admonition:: :class:`~django.contrib.admin.TabularInline` has limited
+        support for ``fieldsets``
+
+        Using ``fieldsets`` with :class:`~django.contrib.admin.TabularInline`
+        has limited functionality. You can specify which fields will be
+        displayed and their order within the ``TabularInline`` layout by
+        defining ``fields`` in the ``field_options`` dictionary.
+
+        All other features are not supported. This includes the use of ``name``
+        to define a title for a group of fields.
 
 .. attribute:: ModelAdmin.filter_horizontal
 
@@ -627,11 +633,6 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ["name", "decade_born_in"]
-
-    .. versionchanged:: 5.1
-
-        Support for using ``__`` lookups was added, when targeting related
-        fields.
 
     A few special cases to note about ``list_display``:
 
@@ -1455,6 +1456,27 @@ templates used by the :class:`ModelAdmin` views:
 
     See also :ref:`saving-objects-in-the-formset`.
 
+.. warning::
+
+    All hooks that return a ``ModelAdmin`` property return the property itself
+    rather than a copy of its value. Dynamically modifying the value can lead
+    to surprising results.
+
+    Let's take :meth:`ModelAdmin.get_readonly_fields` as an example::
+
+        class PersonAdmin(admin.ModelAdmin):
+            readonly_fields = ["name"]
+
+            def get_readonly_fields(self, request, obj=None):
+                readonly = super().get_readonly_fields(request, obj)
+                if not request.user.is_superuser:
+                    readonly.append("age")  # Edits the class attribute.
+                return readonly
+
+    This results in ``readonly_fields`` becoming
+    ``["name", "age", "age", ...]``, even for a superuser, as ``"age"`` is added
+    each time non-superuser visits the page.
+
 .. method:: ModelAdmin.get_ordering(request)
 
     The ``get_ordering`` method takes a ``request`` as parameter and
@@ -2219,6 +2241,7 @@ information.
     inlines to a model by specifying them in a ``ModelAdmin.inlines``::
 
         from django.contrib import admin
+        from myapp.models import Author, Book
 
 
         class BookInline(admin.TabularInline):
@@ -2229,6 +2252,9 @@ information.
             inlines = [
                 BookInline,
             ]
+
+
+        admin.site.register(Author, AuthorAdmin)
 
     Django provides two subclasses of ``InlineModelAdmin`` and they are:
 
@@ -2300,11 +2326,6 @@ The ``InlineModelAdmin`` class adds or customizes:
     is rendered for the inlines. Defaults to ``None``. As with classes
     configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
     class will be initially collapsed using an expandable widget.
-
-    .. versionchanged:: 5.1
-
-        ``fieldsets`` using the ``collapse`` class now use ``<details>`` and
-        ``<summary>`` elements, provided they define a ``name``.
 
 .. attribute:: InlineModelAdmin.extra
 
@@ -2462,6 +2483,10 @@ Take this model for instance::
     from django.db import models
 
 
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+
+
     class Friendship(models.Model):
         to_person = models.ForeignKey(
             Person, on_delete=models.CASCADE, related_name="friends"
@@ -2475,7 +2500,7 @@ you need to explicitly define the foreign key since it is unable to do so
 automatically::
 
     from django.contrib import admin
-    from myapp.models import Friendship
+    from myapp.models import Friendship, Person
 
 
     class FriendshipInline(admin.TabularInline):
@@ -2487,6 +2512,9 @@ automatically::
         inlines = [
             FriendshipInline,
         ]
+
+
+    admin.site.register(Person, PersonAdmin)
 
 Working with many-to-many models
 --------------------------------
@@ -2516,16 +2544,11 @@ If you want to display many-to-many relations using an inline, you can do
 so by defining an ``InlineModelAdmin`` object for the relationship::
 
     from django.contrib import admin
+    from myapp.models import Group
 
 
     class MembershipInline(admin.TabularInline):
         model = Group.members.through
-
-
-    class PersonAdmin(admin.ModelAdmin):
-        inlines = [
-            MembershipInline,
-        ]
 
 
     class GroupAdmin(admin.ModelAdmin):
@@ -2533,6 +2556,9 @@ so by defining an ``InlineModelAdmin`` object for the relationship::
             MembershipInline,
         ]
         exclude = ["members"]
+
+
+    admin.site.register(Group, GroupAdmin)
 
 There are two features worth noting in this example.
 
@@ -2587,6 +2613,13 @@ we can do this with inline admin models. Suppose we have the following models::
         group = models.ForeignKey(Group, on_delete=models.CASCADE)
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
+
+        class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["person", "group"], name="unique_person_group"
+                )
+            ]
 
 The first step in displaying this intermediate model in the admin is to
 define an inline class for the ``Membership`` model::
@@ -2827,6 +2860,32 @@ linked to the document in ``{% block dark-mode-vars %}``.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
+.. _extrabody:
+
+``extrabody`` block
+===================
+
+.. versionadded:: 5.2
+
+You can add custom HTML, JavaScript, or other content to appear just before the
+closing ``</body>`` tag of templates that extend ``admin/base.html`` by
+extending the ``extrabody`` block. For example, if you want an alert to appear
+on page load you could add a ``admin/base.html`` template override to your
+project:
+
+.. code-block:: html+django
+
+    {% extends 'admin/base.html' %}
+
+    {% block extrabody %}
+        {{ block.super }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.alert('Welcome!');
+            });
+        </script>
+    {% endblock extrabody %}
+
 ``AdminSite`` objects
 =====================
 
@@ -2927,6 +2986,13 @@ Templates can override or extend base admin templates as described in
 .. attribute:: AdminSite.logout_template
 
     Path to a custom template that will be used by the admin site logout view.
+
+.. attribute:: AdminSite.password_change_form
+
+    .. versionadded:: 6.0
+
+    Subclass of :class:`~django.contrib.auth.forms.PasswordChangeForm` that
+    will be used by the admin site password change view.
 
 .. attribute:: AdminSite.password_change_template
 

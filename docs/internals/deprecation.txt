@@ -7,6 +7,30 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-7.0:
+
+7.0
+---
+
+See the :ref:`Django 6.0 release notes <deprecated-features-6.0>` for more
+details on these changes.
+
+* The ``serialize`` keyword argument of
+  ``BaseDatabaseCreation.create_test_db()`` will be removed.
+
+* The ``django.contrib.postgres.aggregates.StringAgg`` class will be removed.
+
+* The ``django.contrib.postgres.aggregates.mixins.OrderableAggMixin`` class
+  will be removed.
+
+* The default protocol in ``urlize`` and ``urlizetrunc`` template filters will
+  change from HTTP to HTTPS.
+
+* The ``URLIZE_ASSUME_HTTPS`` transitional setting will be removed.
+
+* Support for setting the ``ADMINS`` or ``MANAGERS`` settings to a list of
+  (name, address) tuples will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
@@ -14,6 +38,18 @@ about each item can often be found in the release notes of two versions prior.
 
 See the :ref:`Django 5.2 release notes <deprecated-features-5.2>` for more
 details on these changes.
+
+* The ``all`` keyword argument of ``django.contrib.staticfiles.finders.find()``
+  will be removed.
+
+* The fallback to ``request.user`` when ``user`` is ``None`` in
+  ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
+  removed.
+
+* The ``ordering`` keyword argument of the PostgreSQL specific aggregation
+  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
+  ``django.contrib.postgres.aggregates.JSONBAgg``, and
+  ``django.contrib.postgres.aggregates.StringAgg`` will be removed.
 
 .. _deprecation-removed-in-6.0:
 

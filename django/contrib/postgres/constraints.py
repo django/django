@@ -76,7 +76,7 @@ class ExclusionConstraint(BaseConstraint):
             expressions.append(expression)
         return ExpressionList(*expressions).resolve_expression(query)
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
         references = set()
         for expr, _ in self.expressions:
             if isinstance(expr, str):
@@ -178,22 +178,16 @@ class ExclusionConstraint(BaseConstraint):
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
         queryset = model._default_manager.using(using)
-        replacement_map = instance._get_field_value_map(
+        replacement_map = instance._get_field_expression_map(
             meta=model._meta, exclude=exclude
         )
         replacements = {F(field): value for field, value in replacement_map.items()}
         lookups = []
-        for idx, (expression, operator) in enumerate(self.expressions):
+        for expression, operator in self.expressions:
             if isinstance(expression, str):
                 expression = F(expression)
-            if exclude:
-                if isinstance(expression, F):
-                    if expression.name in exclude:
-                        return
-                else:
-                    for expr in expression.flatten():
-                        if isinstance(expr, F) and expr.name in exclude:
-                            return
+            if exclude and self._expression_refs_exclude(model, expression, exclude):
+                return
             rhs_expression = expression.replace_expressions(replacements)
             if hasattr(expression, "get_expression_for_validation"):
                 expression = expression.get_expression_for_validation()
@@ -204,7 +198,7 @@ class ExclusionConstraint(BaseConstraint):
             lookups.append(lookup)
         queryset = queryset.filter(*lookups)
         model_class_pk = instance._get_pk_val(model._meta)
-        if not instance._state.adding and model_class_pk is not None:
+        if not instance._state.adding and instance._is_pk_set(model._meta):
             queryset = queryset.exclude(pk=model_class_pk)
         if not self.condition:
             if queryset.exists():
@@ -212,6 +206,11 @@ class ExclusionConstraint(BaseConstraint):
                     self.get_violation_error_message(), code=self.violation_error_code
                 )
         else:
+            # Ignore constraints with excluded fields in condition.
+            if exclude and self._expression_refs_exclude(
+                model, self.condition, exclude
+            ):
+                return
             if (self.condition & Exists(queryset.filter(self.condition))).check(
                 replacement_map, using=using
             ):

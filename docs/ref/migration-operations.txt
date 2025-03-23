@@ -195,15 +195,12 @@ if the field is nullable or if it has a default value that can be used to
 populate the recreated column. If the field is not nullable and does not have a
 default value, the operation is irreversible.
 
-.. admonition:: PostgreSQL
+.. versionchanged:: 6.0
 
-    ``RemoveField`` will also delete any additional database objects that are
-    related to the removed field (like views, for example). This is because the
-    resulting ``DROP COLUMN`` statement will include the ``CASCADE`` clause to
-    ensure `dependent objects outside the table are also dropped`_.
-
-.. _dependent objects outside the table are also dropped: https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-PARMS-CASCADE
-
+    :class:`~django.db.backends.base.schema.BaseDatabaseSchemaEditor` and
+    PostgreSQL backends no longer use ``CASCADE`` to delete dependent related
+    database objects, such as views. Any dependent objects that are not managed
+    by Django may need to be removed manually before running ``RemoveField``.
 
 ``AlterField``
 --------------
@@ -259,9 +256,8 @@ Exactly one of ``old_name`` and ``old_fields`` can be provided. ``old_fields``
 is an iterable of the strings, often corresponding to fields of
 ``index_together`` (pre-Django 5.1 option).
 
-On databases that don't support an index renaming statement (SQLite and MariaDB
-< 10.5.2), the operation will drop and recreate the index, which can be
-expensive.
+On databases that don't support an index renaming statement (SQLite), the
+operation will drop and recreate the index, which can be expensive.
 
 ``AddConstraint``
 -----------------
@@ -277,6 +273,16 @@ the model with ``model_name``.
 .. class:: RemoveConstraint(model_name, name)
 
 Removes the constraint named ``name`` from the model with ``model_name``.
+
+``AlterConstraint``
+-------------------
+
+.. versionadded:: 5.2
+
+.. class:: AlterConstraint(model_name, name, constraint)
+
+Alters the constraint named ``name`` of the model with ``model_name`` with the
+new ``constraint`` without affecting the database.
 
 Special Operations
 ==================
@@ -487,8 +493,6 @@ For an example using ``SeparateDatabaseAndState``, see
 
 Operation category
 ==================
-
-.. versionadded:: 5.1
 
 .. currentmodule:: django.db.migrations.operations.base
 

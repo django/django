@@ -29,7 +29,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_sitemap_not_callable(self):
         """A sitemap may not be callable."""
@@ -42,7 +42,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_paged_sitemap(self):
         """A sitemap may have multiple pages."""
@@ -54,7 +54,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 """.format(
             self.base_url, date.today()
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     @override_settings(
         TEMPLATES=[
@@ -76,7 +76,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_simple_sitemap_section(self):
         "A simple sitemap section can be rendered"
@@ -92,7 +92,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_no_section(self):
         response = self.client.get("/simple/sitemap-simple2.xml")
@@ -126,7 +126,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     @override_settings(
         TEMPLATES=[
@@ -148,7 +148,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_sitemap_last_modified(self):
         "Last-Modified header is set correctly"
@@ -268,7 +268,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
             "</urlset>"
         ) % date.today()
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_sitemap_get_urls_no_site_1(self):
         """
@@ -316,7 +316,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             self.base_url,
             date.today(),
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_x_robots_sitemap(self):
         response = self.client.get("/simple/index.xml")
@@ -346,7 +346,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
             "</urlset>"
         ).format(self.base_url, self.i18n_model.pk)
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     @override_settings(LANGUAGES=(("en", "English"), ("pt", "Portuguese")))
     def test_alternate_i18n_sitemap_index(self):
@@ -374,7 +374,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             f"{expected_urls}\n"
             f"</urlset>"
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     @override_settings(
         LANGUAGES=(("en", "English"), ("pt", "Portuguese"), ("es", "Spanish"))
@@ -404,7 +404,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             f"{expected_urls}\n"
             f"</urlset>"
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     @override_settings(LANGUAGES=(("en", "English"), ("pt", "Portuguese")))
     def test_alternate_i18n_sitemap_xdefault(self):
@@ -434,7 +434,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             f"{expected_urls}\n"
             f"</urlset>"
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     @override_settings(LANGUAGES=(("en", "English"), ("pt", "Portuguese")))
     def test_language_for_item_i18n_sitemap(self):
@@ -460,7 +460,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             f"{expected_urls}\n"
             f"</urlset>"
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     @override_settings(LANGUAGES=(("en", "English"), ("pt", "Portuguese")))
     def test_alternate_language_for_item_i18n_sitemap(self):
@@ -500,7 +500,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             f"{expected_urls}\n"
             f"</urlset>"
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_sitemap_without_entries(self):
         response = self.client.get("/sitemap-without-entries/sitemap.xml")
@@ -510,7 +510,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n\n'
             "</urlset>"
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_callable_sitemod_partial(self):
         """
@@ -535,8 +535,8 @@ class HTTPSitemapTests(SitemapTestsBase):
             "<loc>http://example.com/location/</loc></url>\n"
             "</urlset>"
         )
-        self.assertXMLEqual(index_response.content.decode(), expected_content_index)
-        self.assertXMLEqual(sitemap_response.content.decode(), expected_content_sitemap)
+        self.assertXMLEqual(index_response.text, expected_content_index)
+        self.assertXMLEqual(sitemap_response.text, expected_content_sitemap)
 
     def test_callable_sitemod_full(self):
         """
@@ -566,8 +566,8 @@ class HTTPSitemapTests(SitemapTestsBase):
             "<lastmod>2014-03-13</lastmod></url>\n"
             "</urlset>"
         )
-        self.assertXMLEqual(index_response.content.decode(), expected_content_index)
-        self.assertXMLEqual(sitemap_response.content.decode(), expected_content_sitemap)
+        self.assertXMLEqual(index_response.text, expected_content_index)
+        self.assertXMLEqual(sitemap_response.text, expected_content_sitemap)
 
     def test_callable_sitemod_no_items(self):
         index_response = self.client.get("/callable-lastmod-no-items/index.xml")
@@ -577,4 +577,4 @@ class HTTPSitemapTests(SitemapTestsBase):
         <sitemap><loc>http://example.com/simple/sitemap-callable-lastmod.xml</loc></sitemap>
         </sitemapindex>
         """
-        self.assertXMLEqual(index_response.content.decode(), expected_content_index)
+        self.assertXMLEqual(index_response.text, expected_content_index)

@@ -4,14 +4,14 @@
 # Bawar Jalal, 2021
 # Bawar Jalal, 2020-2021
 # Bawar Jalal, 2020
-# kosar tofiq <kosar.belana@gmail.com>, 2020-2021
+# Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020-2021
 # Swara <swara09@gmail.com>, 2022-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2024-01-12 06:49+0000\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
 "Last-Translator: Swara <swara09@gmail.com>, 2022-2024\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
@@ -347,6 +347,9 @@ msgstr "ئەو پەڕەیە هیچ ئەنجامێکی تێدا نییە"
 msgid "Enter a valid value."
 msgstr "نرخێکی دروست لەناودابنێ."
 
+msgid "Enter a valid domain name."
+msgstr "پاوەن/دۆمەینی دروست بنوسە."
+
 msgid "Enter a valid URL."
 msgstr "URL ی دروست لەناودابنێ."
 
@@ -368,14 +371,18 @@ msgstr ""
 "\"سلەگ\"ێکی دروست بنوسە کە پێکهاتووە لە پیتی یونیکۆد، ژمارە، هێڵی ژێرەوە، "
 "یان هێما."
 
-msgid "Enter a valid IPv4 address."
-msgstr "ناونیشانێکی IPv4 ی دروست لەناودابنێ."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "ناونیشانی %(protocol)s دروست بنوسە."
 
-msgid "Enter a valid IPv6 address."
-msgstr "ناونیشانێکی IPv64 ی دروست لەناودابنێ."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "ناونیشانێکی IPv4 یان IPv6 ی دروست لەناودابنێ."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 یان IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "تەنها ژمارە لەناودابنێ بە فاریزە جیاکرابێتەوە."

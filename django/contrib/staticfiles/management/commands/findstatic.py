@@ -19,7 +19,7 @@ class Command(LabelCommand):
 
     def handle_label(self, path, **options):
         verbosity = options["verbosity"]
-        result = finders.find(path, all=options["all"])
+        result = finders.find(path, find_all=options["all"])
         if verbosity >= 2:
             searched_locations = (
                 "\nLooking in the following locations:\n  %s"

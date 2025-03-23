@@ -4,12 +4,15 @@ import html
 import json
 import re
 import warnings
+from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
-from django.utils.deprecation import RemovedInDjango60Warning
-from django.utils.encoding import punycode
-from django.utils.functional import Promise, keep_lazy, keep_lazy_text
+from django.conf import settings
+from django.core.exceptions import SuspiciousOperation, ValidationError
+from django.core.validators import EmailValidator
+from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
@@ -37,6 +40,9 @@ VOID_ELEMENTS = frozenset(
         "spacer",
     )
 )
+
+MAX_URL_LENGTH = 2048
+MAX_STRIP_TAGS_DEPTH = 50
 
 
 @keep_lazy(SafeString)
@@ -126,12 +132,7 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     if not (args or kwargs):
-        # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # raise ValueError("args or kwargs must be provided.")
-        warnings.warn(
-            "Calling format_html() without passing args or kwargs is deprecated.",
-            RemovedInDjango60Warning,
-        )
+        raise TypeError("args or kwargs must be provided.")
     args_safe = map(conditional_escape, args)
     kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
@@ -153,7 +154,12 @@ def format_html_join(sep, format_string, args_generator):
     """
     return mark_safe(
         conditional_escape(sep).join(
-            format_html(format_string, *args) for args in args_generator
+            (
+                format_html(format_string, **args)
+                if isinstance(args, Mapping)
+                else format_html(format_string, *args)
+            )
+            for args in args_generator
         )
     )
 
@@ -202,15 +208,19 @@ def _strip_once(value):
 @keep_lazy_text
 def strip_tags(value):
     """Return the given HTML with all tags stripped."""
-    # Note: in typical case this loop executes _strip_once once. Loop condition
-    # is redundant, but helps to reduce number of executions of _strip_once.
     value = str(value)
+    # Note: in typical case this loop executes _strip_once twice (the second
+    # execution does not remove any more tags).
+    strip_tags_depth = 0
     while "<" in value and ">" in value:
+        if strip_tags_depth >= MAX_STRIP_TAGS_DEPTH:
+            raise SuspiciousOperation
         new_value = _strip_once(value)
         if value.count("<") == new_value.count("<"):
             # _strip_once wasn't able to detect more tags.
             break
         value = new_value
+        strip_tags_depth += 1
     return value
 
 
@@ -229,17 +239,16 @@ def smart_urlquote(url):
         # see also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + "~")
 
-    # Handle IDN before quoting.
     try:
         scheme, netloc, path, query, fragment = urlsplit(url)
     except ValueError:
         # invalid IPv6 URL (normally square brackets in hostname part).
         return unquote_quote(url)
 
-    try:
-        netloc = punycode(netloc)  # IDN -> ACE
-    except UnicodeError:  # invalid domain part
-        return unquote_quote(url)
+    # Handle IDN as percent-encoded UTF-8 octets, per WHATWG URL Specification
+    # section 3.5 and RFC 3986 section 3.2.2. Defer any IDNA to the user agent.
+    # See #36013.
+    netloc = unquote_quote(netloc)
 
     if query:
         # Separately unquoting key/value, so as to not mix querystring separators
@@ -255,6 +264,16 @@ def smart_urlquote(url):
     fragment = unquote_quote(fragment)
 
     return urlunsplit((scheme, netloc, path, query, fragment))
+
+
+class CountsDict(dict):
+    def __init__(self, *args, word, **kwargs):
+        super().__init__(*args, *kwargs)
+        self.word = word
+
+    def __missing__(self, key):
+        self[key] = self.word.count(key)
+        return self[key]
 
 
 class Urlizer:
@@ -292,18 +311,20 @@ class Urlizer:
         safe_input = isinstance(text, SafeData)
 
         words = self.word_split_re.split(str(text))
-        return "".join(
-            [
-                self.handle_word(
+        local_cache = {}
+        urlized_words = []
+        for word in words:
+            if (urlized_word := local_cache.get(word)) is None:
+                urlized_word = self.handle_word(
                     word,
                     safe_input=safe_input,
                     trim_url_limit=trim_url_limit,
                     nofollow=nofollow,
                     autoescape=autoescape,
                 )
-                for word in words
-            ]
-        )
+                local_cache[word] = urlized_word
+            urlized_words.append(urlized_word)
+        return "".join(urlized_words)
 
     def handle_word(
         self,
@@ -322,16 +343,33 @@ class Urlizer:
             # Make URL we want to point to.
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ""
-            if self.simple_url_re.match(middle):
+            if len(middle) <= MAX_URL_LENGTH and self.simple_url_re.match(middle):
                 url = smart_urlquote(html.unescape(middle))
-            elif self.simple_url_2_re.match(middle):
-                url = smart_urlquote("http://%s" % html.unescape(middle))
+            elif len(middle) <= MAX_URL_LENGTH and self.simple_url_2_re.match(middle):
+                unescaped_middle = html.unescape(middle)
+                # RemovedInDjango70Warning: When the deprecation ends, replace with:
+                # url = smart_urlquote(f"https://{unescaped_middle}")
+                protocol = (
+                    "https"
+                    if getattr(settings, "URLIZE_ASSUME_HTTPS", False)
+                    else "http"
+                )
+                if not settings.URLIZE_ASSUME_HTTPS:
+                    warnings.warn(
+                        "The default protocol will be changed from HTTP to "
+                        "HTTPS in Django 7.0. Set the URLIZE_ASSUME_HTTPS "
+                        "transitional setting to True to opt into using HTTPS as the "
+                        "new default protocol.",
+                        RemovedInDjango70Warning,
+                        stacklevel=2,
+                    )
+                url = smart_urlquote(f"{protocol}://{unescaped_middle}")
             elif ":" not in middle and self.is_email_simple(middle):
                 local, domain = middle.rsplit("@", 1)
-                try:
-                    domain = punycode(domain)
-                except UnicodeError:
-                    return word
+                # Encode per RFC 6068 Section 2 (items 1, 4, 5). Defer any IDNA
+                # to the user agent. See #36013.
+                local = quote(local, safe="")
+                domain = quote(domain, safe="")
                 url = self.mailto_template.format(local=local, domain=domain)
                 nofollow_attr = ""
             # Make link.
@@ -362,55 +400,81 @@ class Urlizer:
             return x
         return "%s…" % x[: max(0, limit - 1)]
 
+    @cached_property
+    def wrapping_punctuation_openings(self):
+        return "".join(dict(self.wrapping_punctuation).keys())
+
+    @cached_property
+    def trailing_punctuation_chars_no_semicolon(self):
+        return self.trailing_punctuation_chars.replace(";", "")
+
+    @cached_property
+    def trailing_punctuation_chars_has_semicolon(self):
+        return ";" in self.trailing_punctuation_chars
+
     def trim_punctuation(self, word):
         """
         Trim trailing and wrapping punctuation from `word`. Return the items of
         the new state.
         """
-        lead, middle, trail = "", word, ""
+        # Strip all opening wrapping punctuation.
+        middle = word.lstrip(self.wrapping_punctuation_openings)
+        lead = word[: len(word) - len(middle)]
+        trail = ""
+
         # Continue trimming until middle remains unchanged.
         trimmed_something = True
-        while trimmed_something:
+        counts = CountsDict(word=middle)
+        while trimmed_something and middle:
             trimmed_something = False
             # Trim wrapping punctuation.
             for opening, closing in self.wrapping_punctuation:
-                if middle.startswith(opening):
-                    middle = middle.removeprefix(opening)
-                    lead += opening
-                    trimmed_something = True
-                # Keep parentheses at the end only if they're balanced.
-                if (
-                    middle.endswith(closing)
-                    and middle.count(closing) == middle.count(opening) + 1
-                ):
-                    middle = middle.removesuffix(closing)
-                    trail = closing + trail
-                    trimmed_something = True
-            # Trim trailing punctuation (after trimming wrapping punctuation,
-            # as encoded entities contain ';'). Unescape entities to avoid
-            # breaking them by removing ';'.
-            middle_unescaped = html.unescape(middle)
-            stripped = middle_unescaped.rstrip(self.trailing_punctuation_chars)
-            if middle_unescaped != stripped:
-                punctuation_count = len(middle_unescaped) - len(stripped)
-                trail = middle[-punctuation_count:] + trail
-                middle = middle[:-punctuation_count]
+                if counts[opening] < counts[closing]:
+                    rstripped = middle.rstrip(closing)
+                    if rstripped != middle:
+                        strip = counts[closing] - counts[opening]
+                        trail = middle[-strip:]
+                        middle = middle[:-strip]
+                        trimmed_something = True
+                        counts[closing] -= strip
+
+            amp = middle.rfind("&")
+            if amp == -1:
+                rstripped = middle.rstrip(self.trailing_punctuation_chars)
+            else:
+                rstripped = middle.rstrip(self.trailing_punctuation_chars_no_semicolon)
+            if rstripped != middle:
+                trail = middle[len(rstripped) :] + trail
+                middle = rstripped
                 trimmed_something = True
+
+            if self.trailing_punctuation_chars_has_semicolon and middle.endswith(";"):
+                # Only strip if not part of an HTML entity.
+                potential_entity = middle[amp:]
+                escaped = html.unescape(potential_entity)
+                if escaped == potential_entity or escaped.endswith(";"):
+                    rstripped = middle.rstrip(self.trailing_punctuation_chars)
+                    trail_start = len(rstripped)
+                    amount_trailing_semicolons = len(middle) - len(middle.rstrip(";"))
+                    if amp > -1 and amount_trailing_semicolons > 1:
+                        # Leave up to most recent semicolon as might be an entity.
+                        recent_semicolon = middle[trail_start:].index(";")
+                        middle_semicolon_index = recent_semicolon + trail_start + 1
+                        trail = middle[middle_semicolon_index:] + trail
+                        middle = rstripped + middle[trail_start:middle_semicolon_index]
+                    else:
+                        trail = middle[trail_start:] + trail
+                        middle = rstripped
+                    trimmed_something = True
+
         return lead, middle, trail
 
     @staticmethod
     def is_email_simple(value):
         """Return True if value looks like an email address."""
-        # An @ must be in the middle of the value.
-        if "@" not in value or value.startswith("@") or value.endswith("@"):
-            return False
         try:
-            p1, p2 = value.split("@")
-        except ValueError:
-            # value contains more than one @.
-            return False
-        # Dot must be in p2 (e.g. example.com)
-        if "." not in p2 or p2.startswith("."):
+            EmailValidator(allowlist=[])(value)
+        except ValidationError:
             return False
         return True
 

@@ -206,7 +206,10 @@ class ForNode(Node):
             unpack = num_loopvars > 1
             # Create a forloop value in the context.  We'll update counters on each
             # iteration just below.
-            loop_dict = context["forloop"] = {"parentloop": parentloop}
+            loop_dict = context["forloop"] = {
+                "parentloop": parentloop,
+                "length": len_values,
+            }
             for i, item in enumerate(values):
                 # Shortcuts for current loop iteration number.
                 loop_dict["counter0"] = i
@@ -1169,8 +1172,8 @@ def now(parser, token):
     return NowNode(format_string, asvar)
 
 
-@register.simple_tag(takes_context=True)
-def query_string(context, query_dict=None, **kwargs):
+@register.simple_tag(name="querystring", takes_context=True)
+def querystring(context, query_dict=None, **kwargs):
     """
     Add, remove, and change parameters of a ``QueryDict`` and return the result
     as a query string. If the ``query_dict`` argument is not provided, default
@@ -1178,34 +1181,34 @@ def query_string(context, query_dict=None, **kwargs):
 
     For example::
 
-        {% query_string foo=3 %}
+        {% querystring foo=3 %}
 
     To remove a key::
 
-        {% query_string foo=None %}
+        {% querystring foo=None %}
 
     To use with pagination::
 
-        {% query_string page=page_obj.next_page_number %}
+        {% querystring page=page_obj.next_page_number %}
 
     A custom ``QueryDict`` can also be used::
 
-        {% query_string my_query_dict foo=3 %}
+        {% querystring my_query_dict foo=3 %}
     """
     if query_dict is None:
         query_dict = context.request.GET
-    query_dict = query_dict.copy()
+    params = query_dict.copy()
     for key, value in kwargs.items():
         if value is None:
-            if key in query_dict:
-                del query_dict[key]
+            if key in params:
+                del params[key]
         elif isinstance(value, Iterable) and not isinstance(value, str):
-            query_dict.setlist(key, value)
+            params.setlist(key, value)
         else:
-            query_dict[key] = value
-    if not query_dict:
+            params[key] = value
+    if not params and not query_dict:
         return ""
-    query_string = query_dict.urlencode()
+    query_string = params.urlencode()
     return f"?{query_string}"
 
 

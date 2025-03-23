@@ -168,6 +168,28 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name="WithSizeArrayModel",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "field",
+                    ArrayField(models.FloatField(), size=2, null=True, blank=True),
+                ),
+            ],
+            options={
+                "required_db_vendor": "postgresql",
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name="NullableIntegerArrayModel",
             fields=[
                 (
@@ -434,7 +456,7 @@ class Migration(migrations.Migration):
                         primary_key=True,
                     ),
                 ),
-                ("ints", IntegerRangeField(null=True, blank=True)),
+                ("ints", IntegerRangeField(null=True, blank=True, db_default=(5, 10))),
                 ("bigints", BigIntegerRangeField(null=True, blank=True)),
                 ("decimals", DecimalRangeField(null=True, blank=True)),
                 ("timestamps", DateTimeRangeField(null=True, blank=True)),

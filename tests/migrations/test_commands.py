@@ -2,12 +2,21 @@ import datetime
 import importlib
 import io
 import os
+import re
 import shutil
 import sys
+from pathlib import Path
 from unittest import mock
 
 from django.apps import apps
+from django.core.checks import Error, Tags, register
+from django.core.checks.registry import registry
 from django.core.management import CommandError, call_command
+from django.core.management.base import SystemCheckError
+from django.core.management.commands.makemigrations import (
+    Command as MakeMigrationsCommand,
+)
+from django.core.management.commands.migrate import Command as MigrateCommand
 from django.db import (
     ConnectionHandler,
     DatabaseError,
@@ -18,10 +27,13 @@ from django.db import (
 )
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
+from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.exceptions import InconsistentMigrationHistory
+from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
+from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import captured_stdout
+from django.test.utils import captured_stdout, extend_sys_path, isolate_apps
 from django.utils import timezone
 from django.utils.version import get_docs_version
 
@@ -89,6 +101,7 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @mock.patch("django.core.management.base.BaseCommand.check")
     @override_settings(
         INSTALLED_APPS=[
             "django.contrib.auth",
@@ -96,10 +109,33 @@ class MigrateTests(MigrationTestBase):
             "migrations.migrations_test_apps.migrated_app",
         ]
     )
-    def test_migrate_with_system_checks(self):
+    def test_migrate_with_system_checks(self, mocked_check):
         out = io.StringIO()
         call_command("migrate", skip_checks=False, no_color=True, stdout=out)
         self.assertIn("Apply all migrations: migrated_app", out.getvalue())
+        mocked_check.assert_called_once()
+
+    def test_migrate_with_custom_system_checks(self):
+        original_checks = registry.registered_checks.copy()
+
+        @register(Tags.signals)
+        def my_check(app_configs, **kwargs):
+            return [Error("my error")]
+
+        self.addCleanup(setattr, registry, "registered_checks", original_checks)
+
+        class CustomMigrateCommandWithSignalsChecks(MigrateCommand):
+            requires_system_checks = [Tags.signals]
+
+        command = CustomMigrateCommandWithSignalsChecks()
+        with self.assertRaises(SystemCheckError):
+            call_command(command, skip_checks=False, stderr=io.StringIO())
+
+        class CustomMigrateCommandWithSecurityChecks(MigrateCommand):
+            requires_system_checks = [Tags.security]
+
+        command = CustomMigrateCommandWithSecurityChecks()
+        call_command(command, skip_checks=False, stdout=io.StringIO())
 
     @override_settings(
         INSTALLED_APPS=[
@@ -853,7 +889,7 @@ class MigrateTests(MigrationTestBase):
         sqlmigrate outputs forward looking SQL.
         """
         out = io.StringIO()
-        call_command("sqlmigrate", "migrations", "0001", stdout=out)
+        call_command("sqlmigrate", "migrations", "0001", stdout=out, no_color=True)
 
         lines = out.getvalue().splitlines()
 
@@ -915,7 +951,14 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", verbosity=0)
 
         out = io.StringIO()
-        call_command("sqlmigrate", "migrations", "0001", stdout=out, backwards=True)
+        call_command(
+            "sqlmigrate",
+            "migrations",
+            "0001",
+            stdout=out,
+            backwards=True,
+            no_color=True,
+        )
 
         lines = out.getvalue().splitlines()
         try:
@@ -1091,6 +1134,30 @@ class MigrateTests(MigrationTestBase):
                 "-- THIS OPERATION CANNOT BE WRITTEN AS SQL",
             ],
         )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_sqlmigrate_transaction_keywords_not_colorized(self):
+        out = io.StringIO()
+        with mock.patch(
+            "django.core.management.color.supports_color", lambda *args: True
+        ):
+            call_command("sqlmigrate", "migrations", "0001", stdout=out, no_color=False)
+        self.assertNotIn("\x1b", out.getvalue())
+
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_operations"},
+        INSTALLED_APPS=["django.contrib.auth"],
+    )
+    def test_sqlmigrate_system_checks_colorized(self):
+        with (
+            mock.patch(
+                "django.core.management.color.supports_color", lambda *args: True
+            ),
+            self.assertRaisesMessage(SystemCheckError, "\x1b"),
+        ):
+            call_command(
+                "sqlmigrate", "migrations", "0001", skip_checks=False, no_color=False
+            )
 
     @override_settings(
         INSTALLED_APPS=[
@@ -1729,6 +1796,25 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", stdout=out)
         self.assertIn("0001_initial.py", out.getvalue())
 
+    def test_makemigrations_no_init_ambiguous(self):
+        """
+        Migration directories without an __init__.py file are not allowed if
+        there are multiple namespace search paths that resolve to them.
+        """
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_no_init"
+        ) as migration_dir:
+            # Copy the project directory into another place under sys.path.
+            app_dir = Path(migration_dir).parent
+            os.remove(app_dir / "__init__.py")
+            project_dir = app_dir.parent
+            dest = project_dir.parent / "other_dir_in_path"
+            shutil.copytree(project_dir, dest)
+            with extend_sys_path(str(dest)):
+                call_command("makemigrations", stdout=out)
+        self.assertEqual("No changes detected\n", out.getvalue())
+
     def test_makemigrations_migrations_announce(self):
         """
         makemigrations announces the migration at the default verbosity level.
@@ -2239,6 +2325,19 @@ class MakeMigrationsTests(MigrationTestBase):
         merge_file = os.path.join(migration_dir, "0003_merge.py")
         self.assertEqual(out.getvalue(), f"{merge_file}\n")
         self.assertIn(f"Created new merge migration {merge_file}", err.getvalue())
+
+    def test_makemigrations_failure_to_format_code(self):
+        self.assertFormatterFailureCaught("makemigrations", "migrations")
+
+    def test_merge_makemigrations_failure_to_format_code(self):
+        self.assertFormatterFailureCaught("makemigrations", "migrations", empty=True)
+        self.assertFormatterFailureCaught(
+            "makemigrations",
+            "migrations",
+            merge=True,
+            interactive=False,
+            module="migrations.test_migrations_conflict",
+        )
 
     def test_makemigrations_migrations_modules_path_not_exist(self):
         """
@@ -2843,6 +2942,181 @@ class SquashMigrationsTests(MigrationTestBase):
             "  you can delete them.\n" % squashed_migration_file,
         )
 
+    def test_squashmigrations_replacement_cycle(self):
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_squashed_loop"
+        ):
+            # Hits a squash replacement cycle check error, but the actual failure is
+            # dependent on the order in which the files are read on disk.
+            with self.assertRaisesRegex(
+                CommandError,
+                r"Cyclical squash replacement found, starting at"
+                r" \('migrations', '2_(squashed|auto)'\)",
+            ):
+                call_command(
+                    "migrate", "migrations", "--plan", interactive=False, stdout=out
+                )
+
+    def test_squashmigrations_squashes_already_squashed(self):
+        out = io.StringIO()
+
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_squashed_complex"
+        ):
+            call_command(
+                "squashmigrations",
+                "migrations",
+                "3_squashed_5",
+                "--squashed-name",
+                "double_squash",
+                stdout=out,
+                interactive=False,
+            )
+
+            loader = MigrationLoader(connection)
+            migration = loader.disk_migrations[("migrations", "0001_double_squash")]
+            # Confirm the replaces mechanism holds the squashed migration
+            # (and not what it squashes, as the squash operations are what
+            # end up being used).
+            self.assertEqual(
+                migration.replaces,
+                [
+                    ("migrations", "1_auto"),
+                    ("migrations", "2_auto"),
+                    ("migrations", "3_squashed_5"),
+                ],
+            )
+
+            out = io.StringIO()
+            call_command(
+                "migrate", "migrations", "--plan", interactive=False, stdout=out
+            )
+
+            migration_plan = re.findall("migrations.(.+)\n", out.getvalue())
+            self.assertEqual(migration_plan, ["0001_double_squash", "6_auto", "7_auto"])
+
+    def test_squash_partially_applied(self):
+        """
+        Replacement migrations are partially applied. Then we squash again and
+        verify that only unapplied migrations will be applied by "migrate".
+        """
+        out = io.StringIO()
+
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_squashed_partially_applied"
+        ):
+            # Apply first 2 migrations.
+            call_command("migrate", "migrations", "0002", interactive=False, stdout=out)
+
+            # Squash the 2 migrations, that we just applied + 1 more.
+            call_command(
+                "squashmigrations",
+                "migrations",
+                "0001",
+                "0003",
+                "--squashed-name",
+                "squashed_0001_0003",
+                stdout=out,
+                interactive=False,
+            )
+
+            # Update the 4th migration to depend on the squash(replacement) migration.
+            loader = MigrationLoader(connection)
+            migration = loader.disk_migrations[
+                ("migrations", "0004_remove_mymodel1_field_1_mymodel1_field_3_and_more")
+            ]
+            migration.dependencies = [("migrations", "0001_squashed_0001_0003")]
+            writer = MigrationWriter(migration)
+            with open(writer.path, "w", encoding="utf-8") as fh:
+                fh.write(writer.as_string())
+
+            # Squash the squash(replacement) migration with the 4th migration.
+            call_command(
+                "squashmigrations",
+                "migrations",
+                "0001_squashed_0001_0003",
+                "0004",
+                "--squashed-name",
+                "squashed_0001_0004",
+                stdout=out,
+                interactive=False,
+            )
+
+            loader = MigrationLoader(connection)
+            migration = loader.disk_migrations[
+                ("migrations", "0001_squashed_0001_0004")
+            ]
+            self.assertEqual(
+                migration.replaces,
+                [
+                    ("migrations", "0001_squashed_0001_0003"),
+                    (
+                        "migrations",
+                        "0004_remove_mymodel1_field_1_mymodel1_field_3_and_more",
+                    ),
+                ],
+            )
+
+            # Verify that only unapplied migrations will be applied.
+            out = io.StringIO()
+            call_command(
+                "migrate", "migrations", "--plan", interactive=False, stdout=out
+            )
+
+            migration_plan = re.findall("migrations.(.+)\n", out.getvalue())
+            self.assertEqual(
+                migration_plan,
+                [
+                    "0003_alter_mymodel2_unique_together",
+                    "0004_remove_mymodel1_field_1_mymodel1_field_3_and_more",
+                ],
+            )
+
+    def test_double_replaced_migrations_are_recorded(self):
+        """
+        All recursively replaced migrations should be recorded/unrecorded, when
+        migrating an app with double squashed migrations.
+        """
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_squashed_double"
+        ):
+            recorder = MigrationRecorder(connection)
+            applied_app_labels = [
+                app_label for app_label, _ in recorder.applied_migrations()
+            ]
+            self.assertNotIn("migrations", applied_app_labels)
+
+            call_command(
+                "migrate", "migrations", "--plan", interactive=False, stdout=out
+            )
+            migration_plan = re.findall("migrations.(.+)\n", out.getvalue())
+            # Only the top-level replacement migration should be applied.
+            self.assertEqual(migration_plan, ["0005_squashed_0003_and_0004"])
+
+            call_command("migrate", "migrations", interactive=False, verbosity=0)
+            applied_migrations = recorder.applied_migrations()
+            # Make sure all replaced migrations are recorded.
+            self.assertIn(("migrations", "0001_initial"), applied_migrations)
+            self.assertIn(("migrations", "0002_auto"), applied_migrations)
+            self.assertIn(
+                ("migrations", "0003_squashed_0001_and_0002"), applied_migrations
+            )
+            self.assertIn(("migrations", "0004_auto"), applied_migrations)
+            self.assertIn(
+                ("migrations", "0005_squashed_0003_and_0004"), applied_migrations
+            )
+
+            # Unapply all migrations from this app.
+            call_command(
+                "migrate", "migrations", "zero", interactive=False, verbosity=0
+            )
+            applied_app_labels = [
+                app_label for app_label, _ in recorder.applied_migrations()
+            ]
+            self.assertNotIn("migrations", applied_app_labels)
+
     def test_squashmigrations_initial_attribute(self):
         with self.temporary_migration_module(
             module="migrations.test_migrations"
@@ -3042,6 +3316,11 @@ class SquashMigrationsTests(MigrationTestBase):
             f"  as we could not safely copy their implementation.\n"
             f"  See the comment at the top of the squashed migration for details.\n"
             + black_warning,
+        )
+
+    def test_failure_to_format_code(self):
+        self.assertFormatterFailureCaught(
+            "squashmigrations", "migrations", "0002", interactive=False
         )
 
 
@@ -3276,3 +3555,62 @@ class OptimizeMigrationTests(MigrationTestBase):
         msg = "Cannot find a migration matching 'nonexistent' from app 'migrations'."
         with self.assertRaisesMessage(CommandError, msg):
             call_command("optimizemigration", "migrations", "nonexistent")
+
+    def test_failure_to_format_code(self):
+        self.assertFormatterFailureCaught("optimizemigration", "migrations", "0001")
+
+
+class CustomMigrationCommandTests(MigrationTestBase):
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations"},
+        INSTALLED_APPS=["migrations.migrations_test_apps.migrated_app"],
+    )
+    @isolate_apps("migrations.migrations_test_apps.migrated_app")
+    def test_makemigrations_custom_autodetector(self):
+        class CustomAutodetector(MigrationAutodetector):
+            def changes(self, *args, **kwargs):
+                return []
+
+        class CustomMakeMigrationsCommand(MakeMigrationsCommand):
+            autodetector = CustomAutodetector
+
+        class NewModel(models.Model):
+            class Meta:
+                app_label = "migrated_app"
+
+        out = io.StringIO()
+        command = CustomMakeMigrationsCommand(stdout=out)
+        call_command(command, "migrated_app", stdout=out)
+        self.assertIn("No changes detected", out.getvalue())
+
+    @override_settings(INSTALLED_APPS=["migrations.migrations_test_apps.migrated_app"])
+    @isolate_apps("migrations.migrations_test_apps.migrated_app")
+    def test_migrate_custom_autodetector(self):
+        class CustomAutodetector(MigrationAutodetector):
+            def changes(self, *args, **kwargs):
+                return []
+
+        class CustomMigrateCommand(MigrateCommand):
+            autodetector = CustomAutodetector
+
+        class NewModel(models.Model):
+            class Meta:
+                app_label = "migrated_app"
+
+        out = io.StringIO()
+        command = CustomMigrateCommand(stdout=out)
+
+        out = io.StringIO()
+        try:
+            call_command(command, verbosity=0)
+            call_command(command, stdout=out, no_color=True)
+            command_stdout = out.getvalue().lower()
+            self.assertEqual(
+                "operations to perform:\n"
+                "  apply all migrations: migrated_app\n"
+                "running migrations:\n"
+                "  no migrations to apply.\n",
+                command_stdout,
+            )
+        finally:
+            call_command(command, "migrated_app", "zero", verbosity=0)

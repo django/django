@@ -23,15 +23,16 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
     BaseExpression,
     Col,
+    ColPairs,
     Exists,
     F,
     OuterRef,
+    RawSQL,
     Ref,
     ResolvedOuterRef,
     Value,
 )
 from django.db.models.fields import Field
-from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
@@ -259,12 +260,12 @@ class Query(BaseExpression):
     select_for_update_of = ()
     select_for_no_key_update = False
     select_related = False
-    has_select_fields = False
     # Arbitrary limit for select_related to prevents infinite recursion.
     max_depth = 5
     # Holds the selects defined by a call to values() or values_list()
     # excluding annotation_select and extra_select.
     values_select = ()
+    selected = None
 
     # SQL annotation-related attributes.
     annotation_select_mask = None
@@ -490,6 +491,11 @@ class Query(BaseExpression):
             )
             or having
         )
+        set_returning_annotations = {
+            alias
+            for alias, annotation in self.annotation_select.items()
+            if getattr(annotation, "set_returning", False)
+        }
         # Decide if we need to use a subquery.
         #
         # Existing aggregations would cause incorrect results as
@@ -509,6 +515,7 @@ class Query(BaseExpression):
             or qualify
             or self.distinct
             or self.combinator
+            or set_returning_annotations
         ):
             from django.db.models.sql.subqueries import AggregateQuery
 
@@ -550,6 +557,9 @@ class Query(BaseExpression):
                         if annotation.get_group_by_cols():
                             annotation_mask.add(annotation_alias)
                     inner_query.set_annotation_mask(annotation_mask)
+                    # Annotations that possibly return multiple rows cannot
+                    # be masked as they might have an incidence on the query.
+                    annotation_mask |= set_returning_annotations
 
             # Add aggregates to the outer AggregateQuery. This requires making
             # sure all columns referenced by the aggregates are selected in the
@@ -565,8 +575,7 @@ class Query(BaseExpression):
                         col_alias = f"__col{index}"
                         col_ref = Ref(col_alias, col)
                         col_refs[col] = col_ref
-                        inner_query.annotations[col_alias] = col
-                        inner_query.append_annotation_mask([col_alias])
+                        inner_query.add_annotation(col, col_alias)
                     replacements[col] = col_ref
                 outer_query.annotations[alias] = aggregate.replace_expressions(
                     replacements
@@ -585,6 +594,7 @@ class Query(BaseExpression):
         else:
             outer_query = self
             self.select = ()
+            self.selected = None
             self.default_cols = False
             self.extra = {}
             if self.annotations:
@@ -617,8 +627,12 @@ class Query(BaseExpression):
         if result is None:
             result = empty_set_result
         else:
-            converters = compiler.get_converters(outer_query.annotation_select.values())
-            result = next(compiler.apply_converters((result,), converters))
+            cols = outer_query.annotation_select.values()
+            converters = compiler.get_converters(cols)
+            rows = compiler.apply_converters((result,), converters)
+            if compiler.has_composite_fields(cols):
+                rows = compiler.composite_fields_to_tuples(rows, cols)
+            result = next(rows)
 
         return dict(zip(outer_query.annotation_select, result))
 
@@ -649,13 +663,13 @@ class Query(BaseExpression):
                 for combined_query in q.combined_queries
             )
         q.clear_ordering(force=True)
-        if limit:
+        if limit is True:
             q.set_limits(high=1)
         q.add_annotation(Value(1), "a")
         return q
 
     def has_results(self, using):
-        q = self.exists(using)
+        q = self.exists()
         compiler = q.get_compiler(using=using)
         return compiler.has_results()
 
@@ -1011,11 +1025,21 @@ class Query(BaseExpression):
                 if alias == old_alias:
                     table_aliases[pos] = new_alias
                     break
+
+        # 3. Rename the direct external aliases and the ones of combined
+        # queries (union, intersection, difference).
         self.external_aliases = {
             # Table is aliased or it's being changed and thus is aliased.
             change_map.get(alias, alias): (aliased or alias in change_map)
             for alias, aliased in self.external_aliases.items()
         }
+        for combined_query in self.combined_queries:
+            external_change_map = {
+                alias: aliased
+                for alias, aliased in change_map.items()
+                if alias in combined_query.external_aliases
+            }
+            combined_query.change_aliases(external_change_map)
 
     def bump_prefix(self, other_query, exclude=None):
         """
@@ -1195,13 +1219,16 @@ class Query(BaseExpression):
         if select:
             self.append_annotation_mask([alias])
         else:
-            annotation_mask = (
-                value
-                for value in dict.fromkeys(self.annotation_select)
-                if value != alias
-            )
-            self.set_annotation_mask(annotation_mask)
+            self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
+        if self.selected:
+            self.selected[alias] = alias
+
+    @property
+    def _subquery_fields_len(self):
+        if self.has_select_fields:
+            return len(self.selected)
+        return len(self.model._meta.pk_fields)
 
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()
@@ -1369,7 +1396,7 @@ class Query(BaseExpression):
         # __exact is the default lookup if one isn't given.
         *transforms, lookup_name = lookups or ["exact"]
         for name in transforms:
-            lhs = self.try_transform(lhs, name)
+            lhs = self.try_transform(lhs, name, lookups)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
         lookup_class = lhs.get_lookup(lookup_name)
@@ -1403,7 +1430,7 @@ class Query(BaseExpression):
 
         return lookup
 
-    def try_transform(self, lhs, name):
+    def try_transform(self, lhs, name, lookups=None):
         """
         Helper method for build_lookup(). Try to fetch and initialize
         a transform for name parameter from lhs.
@@ -1420,9 +1447,14 @@ class Query(BaseExpression):
                 suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
             else:
                 suggestion = "."
+            if lookups is not None:
+                name_index = lookups.index(name)
+                unsupported_lookup = LOOKUP_SEP.join(lookups[name_index:])
+            else:
+                unsupported_lookup = name
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted%s" % (name, output_field.__name__, suggestion)
+                "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
     def build_filter(
@@ -1546,9 +1578,7 @@ class Query(BaseExpression):
             if len(targets) == 1:
                 col = self._get_col(targets[0], join_info.final_field, alias)
             else:
-                col = MultiColSource(
-                    alias, targets, join_info.targets, join_info.final_field
-                )
+                col = ColPairs(alias, targets, join_info.targets, join_info.final_field)
         else:
             col = self._get_col(targets[0], join_info.final_field, alias)
 
@@ -1592,7 +1622,7 @@ class Query(BaseExpression):
     def add_filter(self, filter_lhs, filter_rhs):
         self.add_q(Q((filter_lhs, filter_rhs)))
 
-    def add_q(self, q_object):
+    def add_q(self, q_object, reuse_all=False):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
@@ -1606,7 +1636,11 @@ class Query(BaseExpression):
         existing_inner = {
             a for a in self.alias_map if self.alias_map[a].join_type == INNER
         }
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        if reuse_all:
+            can_reuse = set(self.alias_map)
+        else:
+            can_reuse = self.used_aliases
+        clause, _ = self._add_q(q_object, can_reuse)
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
@@ -1680,12 +1714,12 @@ class Query(BaseExpression):
                             "relations outside the %r (got %r)."
                             % (filtered_relation.relation_name, lookup)
                         )
-                else:
-                    raise ValueError(
-                        "FilteredRelation's condition doesn't support nested "
-                        "relations deeper than the relation_name (got %r for "
-                        "%r)." % (lookup, filtered_relation.relation_name)
-                    )
+            if len(lookup_field_parts) > len(relation_field_parts) + 1:
+                raise ValueError(
+                    "FilteredRelation's condition doesn't support nested "
+                    "relations deeper than the relation_name (got %r for "
+                    "%r)." % (lookup, filtered_relation.relation_name)
+                )
         filtered_relation.condition = rename_prefix_from_q(
             filtered_relation.relation_name,
             alias,
@@ -1922,6 +1956,8 @@ class Query(BaseExpression):
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)
+            if join.filtered_relation and can_reuse is not None:
+                can_reuse.add(alias)
         return JoinInfo(final_field, targets, opts, joins, path, final_transformer)
 
     def trim_joins(self, targets, joins, path):
@@ -2154,6 +2190,7 @@ class Query(BaseExpression):
         self.select_related = False
         self.set_extra_mask(())
         self.set_annotation_mask(())
+        self.selected = None
 
     def clear_select_fields(self):
         """
@@ -2163,10 +2200,12 @@ class Query(BaseExpression):
         """
         self.select = ()
         self.values_select = ()
+        self.selected = None
 
     def add_select_col(self, col, name):
         self.select += (col,)
         self.values_select += (name,)
+        self.selected[name] = len(self.select) - 1
 
     def set_select(self, cols):
         self.default_cols = False
@@ -2417,12 +2456,23 @@ class Query(BaseExpression):
         if names is None:
             self.annotation_select_mask = None
         else:
-            self.annotation_select_mask = list(dict.fromkeys(names))
+            self.annotation_select_mask = set(names)
+            if self.selected:
+                # Prune the masked annotations.
+                self.selected = {
+                    key: value
+                    for key, value in self.selected.items()
+                    if not isinstance(value, str)
+                    or value in self.annotation_select_mask
+                }
+                # Append the unmasked annotations.
+                for name in names:
+                    self.selected[name] = name
         self._annotation_select_cache = None
 
     def append_annotation_mask(self, names):
         if self.annotation_select_mask is not None:
-            self.set_annotation_mask((*self.annotation_select_mask, *names))
+            self.set_annotation_mask(self.annotation_select_mask.union(names))
 
     def set_extra_mask(self, names):
         """
@@ -2435,13 +2485,19 @@ class Query(BaseExpression):
             self.extra_select_mask = set(names)
         self._extra_select_cache = None
 
+    @property
+    def has_select_fields(self):
+        return self.selected is not None
+
     def set_values(self, fields):
         self.select_related = False
         self.clear_deferred_loading()
         self.clear_select_fields()
-        self.has_select_fields = True
 
+        selected = {}
         if fields:
+            for field in fields:
+                self.check_alias(field)
             field_names = []
             extra_names = []
             annotation_names = []
@@ -2449,13 +2505,16 @@ class Query(BaseExpression):
                 # Shortcut - if there are no extra or annotations, then
                 # the values() clause must be just field names.
                 field_names = list(fields)
+                selected = dict(zip(fields, range(len(fields))))
             else:
                 self.default_cols = False
                 for f in fields:
-                    if f in self.extra_select:
+                    if extra := self.extra_select.get(f):
                         extra_names.append(f)
+                        selected[f] = RawSQL(*extra)
                     elif f in self.annotation_select:
                         annotation_names.append(f)
+                        selected[f] = f
                     elif f in self.annotations:
                         raise FieldError(
                             f"Cannot select the '{f}' alias. Use annotate() to "
@@ -2467,13 +2526,13 @@ class Query(BaseExpression):
                         # `f` is not resolvable.
                         if self.annotation_select:
                             self.names_to_path(f.split(LOOKUP_SEP), self.model._meta)
+                        selected[f] = len(field_names)
                         field_names.append(f)
             self.set_extra_mask(extra_names)
             self.set_annotation_mask(annotation_names)
-            selected = frozenset(field_names + extra_names + annotation_names)
         else:
             field_names = [f.attname for f in self.model._meta.concrete_fields]
-            selected = frozenset(field_names)
+            selected = dict.fromkeys(field_names, None)
         # Selected annotations must be known before setting the GROUP BY
         # clause.
         if self.group_by is True:
@@ -2496,6 +2555,7 @@ class Query(BaseExpression):
 
         self.values_select = tuple(field_names)
         self.add_fields(field_names, True)
+        self.selected = selected if fields else None
 
     @property
     def annotation_select(self):
@@ -2509,9 +2569,9 @@ class Query(BaseExpression):
             return {}
         elif self.annotation_select_mask is not None:
             self._annotation_select_cache = {
-                k: self.annotations[k]
-                for k in self.annotation_select_mask
-                if k in self.annotations
+                k: v
+                for k, v in self.annotations.items()
+                if k in self.annotation_select_mask
             }
             return self._annotation_select_cache
         else:

@@ -596,6 +596,24 @@ This example illustrates all possible attributes and methods for a
 
         ttl = 600  # Hard-coded Time To Live.
 
+        # STYLESHEETS -- Optional. To set, provide one of the following three.
+        # The framework looks for them in this order.
+
+        def stylesheets(self, obj):
+            """
+            Takes the object returned by get_object() and returns the feed's
+            stylesheets (as URL strings or as Stylesheet instances).
+            """
+
+        def stylesheets(self):
+            """
+            Returns the feed's stylesheets (as URL strings or Stylesheet
+            instances).
+            """
+
+        # Hardcoded stylesheets.
+        stylesheets = ["/stylesheet1.xsl", "stylesheet2.xsl"]
+
         # ITEMS -- One of the following three is required. The framework looks
         # for them in this order.
 
@@ -961,15 +979,25 @@ They share this interface:
     * ``feed_copyright``
     * ``feed_guid``
     * ``ttl``
+    * ``stylesheets``
 
     Any extra keyword arguments you pass to ``__init__`` will be stored in
     ``self.feed`` for use with `custom feed generators`_.
 
-    All parameters should be strings, except ``categories``, which should be a
-    sequence of strings. Beware that some control characters
-    are `not allowed <https://www.w3.org/International/questions/qa-controls>`_
-    in XML documents. If your content has some of them, you might encounter a
+    All parameters should be strings, except for two:
+
+    * ``categories`` should be a sequence of strings.
+    * ``stylesheets`` should be a sequence of either strings or
+      :class:`~django.utils.feedgenerator.Stylesheet` instances.
+
+    Beware that some control characters are
+    `not allowed <https://www.w3.org/International/questions/qa-controls>`_ in
+    XML documents. If your content has some of them, you might encounter a
     :exc:`ValueError` when producing the feed.
+
+    .. versionchanged:: 5.2
+
+        The ``stylesheets`` argument was added.
 
 :meth:`.SyndicationFeed.add_item`
     Add an item to the feed with the given parameters.
@@ -1095,3 +1123,90 @@ For example, you might start implementing an iTunes RSS feed generator like so::
 
 There's a lot more work to be done for a complete custom feed class, but the
 above example should demonstrate the basic idea.
+
+.. _feed-stylesheets:
+
+Feed stylesheets
+----------------
+
+.. versionadded:: 5.2
+
+If you wish to have your RSS feed render nicely in a browser, you will need to
+provide styling information for the XML file, typically in XSLT_ or CSS
+formats.
+
+You can add this to your RSS feed by setting the ``stylesheets`` attribute on
+the feed class.
+
+This can be a hardcoded URL::
+
+    from django.contrib.syndication.views import Feed
+
+
+    class FeedWithHardcodedStylesheet(Feed):
+        stylesheets = [
+            "https://example.com/rss_stylesheet.xslt",
+        ]
+
+You can also use Django's static files system::
+
+    from django.contrib.syndication.views import Feed
+    from django.templatetags.static import static
+
+
+    class FeedWithStaticFileStylesheet(Feed):
+        stylesheets = [
+            static("rss_styles.xslt"),
+        ]
+
+Another option is to have a view in your project that renders the XSLT
+document. You can then link it like so::
+
+    from django.contrib.syndication.views import Feed
+    from django.urls import reverse_lazy
+
+
+    class FeedWithStylesheetView(Feed):
+        stylesheets = [
+            reverse_lazy("your-custom-view-name"),
+        ]
+
+Django will normally try to guess the MIME type of the given URL based on its
+extension, but if that fails you can specify it using the
+:class:`~django.utils.feedgenerator.Stylesheet` class::
+
+    from django.contrib.syndication.views import Feed
+    from django.utils.feedgenerator import Stylesheet
+
+
+    class FeedWithHardcodedStylesheet(Feed):
+        stylesheets = [
+            Stylesheet("https://example.com/rss_stylesheet", mimetype="text/xsl"),
+        ]
+
+Similarly, if you'd like to use a different ``media`` attribute than ``screen``
+(Django's default), you can use the
+:class:`~django.utils.feedgenerator.Stylesheet` class again::
+
+    from django.contrib.syndication.views import Feed
+    from django.utils.feedgenerator import Stylesheet
+
+
+    class FeedWithHardcodedStylesheet(Feed):
+        stylesheets = [
+            Stylesheet("https://example.com/rss_stylesheet.xslt", media="print"),
+        ]
+
+Any of these options can be combined when using multiple stylesheets::
+
+    from django.contrib.syndication.views import Feed
+    from django.utils.feedgenerator import Stylesheet
+
+
+    class MultiStylesheetFeed(Feed):
+        stylesheets = [
+            "/stylesheet1.xsl",
+            Stylesheet("/stylesheet2.xsl"),
+        ]
+
+.. _xslt: https://developer.mozilla.org/en-US/docs/Web/XSLT/Transforming_XML_with_XSLT

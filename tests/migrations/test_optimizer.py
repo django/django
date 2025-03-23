@@ -1,48 +1,16 @@
 from django.db import migrations, models
 from django.db.migrations import operations
 from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.migrations.serializer import serializer_factory
 from django.db.models.functions import Abs
-from django.test import SimpleTestCase
 
 from .models import EmptyManager, UnicodeModel
+from .test_base import OptimizerTestBase
 
 
-class OptimizerTests(SimpleTestCase):
+class OptimizerTests(OptimizerTestBase):
     """
-    Tests the migration autodetector.
+    Tests the migration optimizer.
     """
-
-    def optimize(self, operations, app_label):
-        """
-        Handy shortcut for getting results + number of loops
-        """
-        optimizer = MigrationOptimizer()
-        return optimizer.optimize(operations, app_label), optimizer._iterations
-
-    def serialize(self, value):
-        return serializer_factory(value).serialize()[0]
-
-    def assertOptimizesTo(
-        self, operations, expected, exact=None, less_than=None, app_label=None
-    ):
-        result, iterations = self.optimize(operations, app_label or "migrations")
-        result = [self.serialize(f) for f in result]
-        expected = [self.serialize(f) for f in expected]
-        self.assertEqual(expected, result)
-        if exact is not None and iterations != exact:
-            raise self.failureException(
-                "Optimization did not take exactly %s iterations (it took %s)"
-                % (exact, iterations)
-            )
-        if less_than is not None and iterations >= less_than:
-            raise self.failureException(
-                "Optimization did not take less than %s iterations (it took %s)"
-                % (less_than, iterations)
-            )
-
-    def assertDoesNotOptimize(self, operations, **kwargs):
-        self.assertOptimizesTo(operations, operations, **kwargs)
 
     def test_none_app_label(self):
         optimizer = MigrationOptimizer()
@@ -150,6 +118,46 @@ class OptimizerTests(SimpleTestCase):
                         ("objects", models.Manager()),
                         ("things", models.Manager()),
                     ],
+                ),
+            ],
+        )
+
+    def test_create_alter_model_table(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", fields=[]),
+                migrations.AlterModelTable(
+                    name="foo",
+                    table="foo",
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    "Foo",
+                    fields=[],
+                    options={
+                        "db_table": "foo",
+                    },
+                ),
+            ],
+        )
+
+    def test_create_alter_model_table_comment(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", fields=[]),
+                migrations.AlterModelTableComment(
+                    name="foo",
+                    table_comment="A lovely table.",
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    "Foo",
+                    fields=[],
+                    options={
+                        "db_table_comment": "A lovely table.",
+                    },
                 ),
             ],
         )
@@ -1222,6 +1230,80 @@ class OptimizerTests(SimpleTestCase):
                 migrations.AddConstraint("Pony", gt_constraint),
                 migrations.RemoveConstraint("Pony", "other_name"),
             ],
+        )
+
+    def test_multiple_alter_constraints(self):
+        gt_constraint_violation_msg_added = models.CheckConstraint(
+            condition=models.Q(pink__gt=2),
+            name="pink_gt_2",
+            violation_error_message="ERROR",
+        )
+        gt_constraint_violation_msg_altered = models.CheckConstraint(
+            condition=models.Q(pink__gt=2),
+            name="pink_gt_2",
+            violation_error_message="error",
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_2", gt_constraint_violation_msg_added
+                ),
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_2", gt_constraint_violation_msg_altered
+                ),
+            ],
+            [
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_2", gt_constraint_violation_msg_altered
+                )
+            ],
+        )
+        other_constraint_violation_msg = models.CheckConstraint(
+            condition=models.Q(weight__gt=3),
+            name="pink_gt_3",
+            violation_error_message="error",
+        )
+        self.assertDoesNotOptimize(
+            [
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_2", gt_constraint_violation_msg_added
+                ),
+                migrations.AlterConstraint(
+                    "Pony", "pink_gt_3", other_constraint_violation_msg
+                ),
+            ]
+        )
+
+    def test_alter_remove_constraint(self):
+        self.assertOptimizesTo(
+            [
+                migrations.AlterConstraint(
+                    "Pony",
+                    "pink_gt_2",
+                    models.CheckConstraint(
+                        condition=models.Q(pink__gt=2), name="pink_gt_2"
+                    ),
+                ),
+                migrations.RemoveConstraint("Pony", "pink_gt_2"),
+            ],
+            [migrations.RemoveConstraint("Pony", "pink_gt_2")],
+        )
+
+    def test_add_alter_constraint(self):
+        constraint = models.CheckConstraint(
+            condition=models.Q(pink__gt=2), name="pink_gt_2"
+        )
+        constraint_with_error = models.CheckConstraint(
+            condition=models.Q(pink__gt=2),
+            name="pink_gt_2",
+            violation_error_message="error",
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.AddConstraint("Pony", constraint),
+                migrations.AlterConstraint("Pony", "pink_gt_2", constraint_with_error),
+            ],
+            [migrations.AddConstraint("Pony", constraint_with_error)],
         )
 
     def test_create_model_add_index(self):

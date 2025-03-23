@@ -19,6 +19,7 @@ from .models import (
     Child,
     ChildModel1,
     ChildModel2,
+    ExtraTerrestrial,
     Fashionista,
     FootNote,
     Holder,
@@ -349,7 +350,12 @@ class TestInline(TestDataMixin, TestCase):
         )
         response = self.client.get(url)
         self.assertInHTML(
-            '<th class="column-position hidden">Position</th>',
+            '<th class="column-position hidden">Position'
+            '<img src="/static/admin/img/icon-unknown.svg" '
+            'class="help help-tooltip" width="10" height="10" '
+            'alt="(Position help_text.)" '
+            'title="Position help_text.">'
+            "</th>",
             response.rendered_content,
         )
         self.assertInHTML(
@@ -379,13 +385,15 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">0</div></div>',
+            '<div class="readonly">0</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>',
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">1</div></div>',
+            '<div class="readonly">1</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>',
             response.rendered_content,
         )
 
@@ -407,13 +415,17 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
             '<div><div class="flex-container"><label>Position:</label>'
-            '<div class="readonly">0</div></div></div></div>',
+            '<div class="readonly">0</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>'
+            "</div></div>",
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
             '<div><div class="flex-container"><label>Position:</label>'
-            '<div class="readonly">1</div></div></div></div>',
+            '<div class="readonly">1</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>'
+            "</div></div>",
             response.rendered_content,
         )
 
@@ -448,7 +460,12 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<thead><tr><th class="original"></th>'
             '<th class="column-name required">Name</th>'
-            '<th class="column-position required hidden">Position</th>'
+            '<th class="column-position required hidden">Position'
+            '<img src="/static/admin/img/icon-unknown.svg" '
+            'class="help help-tooltip" width="10" height="10" '
+            'alt="(Position help_text.)" '
+            'title="Position help_text.">'
+            "</th>"
             "<th>Delete?</th></tr></thead>",
             response.rendered_content,
         )
@@ -1768,6 +1785,13 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
+    @override_settings(DEBUG=True)
+    def test_fieldset_context_fully_set(self):
+        url = reverse("admin:admin_inlines_photographer_add")
+        with self.assertRaisesMessage(AssertionError, "no logs"):
+            with self.assertLogs("django.template", "DEBUG"):
+                self.client.get(url)
+
     def test_inline_headings(self):
         response = self.client.get(reverse("admin:admin_inlines_photographer_add"))
         # Page main title.
@@ -1778,7 +1802,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
         # The second and third have the same "Advanced options" name, but the
         # second one has the "collapse" class.
         for x, classes in ((1, ""), (2, "collapse")):
-            heading_id = f"fieldset-0-advanced-options-{x}-heading"
+            heading_id = f"fieldset-0-{x}-heading"
             with self.subTest(heading_id=heading_id):
                 self.assertContains(
                     response,
@@ -1823,7 +1847,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
                 # Every fieldset defined for an inline's form.
                 for z, fieldset in enumerate(inline_admin_form):
                     if fieldset.name:
-                        heading_id = f"{prefix}-{y}-details-{z}-heading"
+                        heading_id = f"{prefix}-{y}-{z}-heading"
                         self.assertContains(
                             response,
                             f'<fieldset class="module aligned {fieldset.classes}" '
@@ -1858,6 +1882,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             username="super", password="secret", email="super@example.com"
         )
 
+    @screenshot_cases(["desktop_size", "mobile_size", "dark", "high_contrast"])
     def test_add_stackeds(self):
         """
         The "Add another XXX" link correctly adds items to the stacked formset.
@@ -1878,6 +1903,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         add_button.click()
         self.assertCountSeleniumElements(rows_selector, 4)
+        self.take_screenshot("added")
 
     def test_delete_stackeds(self):
         from selenium.webdriver.common.by import By
@@ -2395,28 +2421,107 @@ class SeleniumTests(AdminSeleniumTestCase):
             "admin:admin_inlines_courseproxy1_add",
             "admin:admin_inlines_courseproxy2_add",
         ]
-        css_selector = ".dynamic-class_set#class_set-%s h2"
+        css_available_selector = (
+            ".dynamic-class_set#class_set-%s .selector-available-title"
+        )
+        css_chosen_selector = ".dynamic-class_set#class_set-%s .selector-chosen-title"
 
         for url_name in tests:
             with self.subTest(url=url_name):
                 self.selenium.get(self.live_server_url + reverse(url_name))
                 # First inline shows the verbose_name.
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 0
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 0
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 0
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Added inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 1
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 1
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 1
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Third inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 2
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 2
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 2
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
+
+    def test_tabular_inline_layout(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_inlines_photographer_add")
+        )
+        tabular_inline = self.selenium.find_element(
+            By.CSS_SELECTOR, "[data-inline-type='tabular']"
+        )
+        headers = tabular_inline.find_elements(By.TAG_NAME, "th")
+        self.assertEqual(
+            [h.get_attribute("innerText") for h in headers],
+            [
+                "",
+                "IMAGE",
+                "TITLE",
+                "DESCRIPTION",
+                "CREATION DATE",
+                "UPDATE DATE",
+                "UPDATED BY",
+                "DELETE?",
+            ],
+        )
+        # There are no fieldset section names rendered.
+        self.assertNotIn("Details", tabular_inline.text)
+        # There are no fieldset section descriptions rendered.
+        self.assertNotIn("First group", tabular_inline.text)
+        self.assertNotIn("Second group", tabular_inline.text)
+        self.assertNotIn("Third group", tabular_inline.text)
+        # There are no fieldset classes applied.
+        self.assertEqual(
+            tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
+            [],
+        )
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_delete_layout(self):
+        from selenium.webdriver.common.by import By
+
+        user = User.objects.create_user("testing", password="password", is_staff=True)
+        et_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ExtraTerrestrial),
+        )
+        s_permission = Permission.objects.filter(
+            codename__in=["view_sighting", "add_sighting"],
+            content_type=ContentType.objects.get_for_model(Sighting),
+        )
+        user.user_permissions.add(*et_permission, *s_permission)
+        self.admin_login(username="testing", password="password")
+        cf = ExtraTerrestrial.objects.create(name="test")
+        url = reverse("admin:admin_inlines_extraterrestrial_change", args=(cf.pk,))
+        self.selenium.get(self.live_server_url + url)
+        headers = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module thead tr th"
+        )
+        self.assertHTMLEqual(headers[-1].get_attribute("outerHTML"), "<th></th>")
+        delete = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            "fieldset.module tbody tr.dynamic-sighting_set:not(.original) td.delete",
+        )
+        self.assertIn(
+            '<a role="button" class="inline-deletelink" href="#">',
+            delete.get_attribute("innerHTML"),
+        )
+        self.take_screenshot("loaded")

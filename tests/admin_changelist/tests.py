@@ -364,6 +364,33 @@ class ChangeListTests(TestCase):
             table_output,
         )
 
+    def test_action_checkbox_for_model_with_dunder_html(self):
+        grandchild = GrandChild.objects.create(name="name")
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+        m = GrandChildAdmin(GrandChild, custom_site)
+        cl = m.get_changelist_instance(request)
+        cl.formset = None
+        template = Template(
+            "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
+        )
+        context = Context({"cl": cl, "opts": GrandChild._meta})
+        table_output = template.render(context)
+        link = reverse(
+            "admin:admin_changelist_grandchild_change", args=(grandchild.id,)
+        )
+        row_html = build_tbody_html(
+            grandchild,
+            link,
+            "name",
+            '<td class="field-parent__name">-</td>'
+            '<td class="field-parent__parent__name">-</td>',
+        )
+        self.assertNotEqual(
+            table_output.find(row_html),
+            -1,
+            "Failed to find expected row element: %s" % table_output,
+        )
+
     def test_result_list_editable_html(self):
         """
         Regression tests for #11791: Inclusion tag result_list generates a
@@ -833,6 +860,47 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
+    def test_search_with_exact_lookup_for_non_string_field(self):
+        child = Child.objects.create(name="Asher", age=11)
+        model_admin = ChildAdmin(Child, custom_site)
+
+        for search_term, expected_result in [
+            ("11", [child]),
+            ("Asher", [child]),
+            ("1", []),
+            ("A", []),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                # 1 query for filtered result, 1 for filtered count, 1 for total count.
+                with self.assertNumQueries(3):
+                    cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
+    def test_search_with_exact_lookup_relationship_field(self):
+        child = Child.objects.create(name="I am a child", age=11)
+        grandchild = GrandChild.objects.create(name="I am a grandchild", parent=child)
+        model_admin = GrandChildAdmin(GrandChild, custom_site)
+
+        request = self.factory.get("/", data={SEARCH_VAR: "'I am a child'"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [grandchild])
+        for search_term, expected_result in [
+            ("11", [grandchild]),
+            ("'I am a child'", [grandchild]),
+            ("1", []),
+            ("A", []),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
     def test_no_distinct_for_m2m_in_list_filter_without_params(self):
         """
         If a ManyToManyField is in list_filter but isn't in any lookup params,
@@ -988,6 +1056,36 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         link = reverse("admin:admin_changelist_parent_change", args=(p.pk,))
         self.assertNotContains(response, '<a href="%s">' % link)
+
+    def test_link_field_display_links(self):
+        self.client.force_login(self.superuser)
+        g = Genre.objects.create(
+            name="Blues",
+            file="documents/blues_history.txt",
+            url="http://blues_history.com",
+        )
+        response = self.client.get(reverse("admin:admin_changelist_genre_changelist"))
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_changelist/genre/%s/change/">'
+            "documents/blues_history.txt</a>" % g.pk,
+        )
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_changelist/genre/%s/change/">'
+            "http://blues_history.com</a>" % g.pk,
+        )
+
+    def test_blank_str_display_links(self):
+        self.client.force_login(self.superuser)
+        gc = GrandChild.objects.create(name="          ")
+        response = self.client.get(
+            reverse("admin:admin_changelist_grandchild_changelist")
+        )
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_changelist/grandchild/%s/change/">-</a>' % gc.pk,
+        )
 
     def test_clear_all_filters_link(self):
         self.client.force_login(self.superuser)
@@ -1237,6 +1335,24 @@ class ChangeListTests(TestCase):
             # Check only the first few characters since the UUID may have dashes.
             self.assertIn(str(a.pk)[:8], context.captured_queries[4]["sql"])
 
+    def test_list_editable_error_title(self):
+        a = Swallow.objects.create(origin="Swallow A", load=4, speed=1)
+        Swallow.objects.create(origin="Swallow B", load=2, speed=2)
+        data = {
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "2",
+            "form-MIN_NUM_FORMS": "0",
+            "form-MAX_NUM_FORMS": "1000",
+            "form-0-uuid": str(a.pk),
+            "form-0-load": "invalid",
+            "_save": "Save",
+        }
+        superuser = self._create_superuser("superuser")
+        self.client.force_login(superuser)
+        changelist_url = reverse("admin:admin_changelist_swallow_changelist")
+        response = self.client.post(changelist_url, data=data)
+        self.assertContains(response, "Error: Select swallow to change")
+
     def test_deterministic_order_for_unordered_model(self):
         """
         The primary key is used in the ordering of the changelist's results to
@@ -1282,6 +1398,20 @@ class ChangeListTests(TestCase):
         check_results_order()
         UnorderedObjectAdmin.ordering = ["id", "bool"]
         check_results_order(ascending=True)
+
+    def test_ordering_from_model_meta(self):
+        Swallow.objects.create(origin="Swallow A", load=4, speed=2)
+        Swallow.objects.create(origin="Swallow B", load=2, speed=1)
+        Swallow.objects.create(origin="Swallow C", load=5, speed=1)
+        m = SwallowAdmin(Swallow, custom_site)
+        request = self._mocked_authenticated_request("/swallow/?o=", self.superuser)
+        changelist = m.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertQuerySetEqual(
+            queryset,
+            [(1.0, 2.0), (1.0, 5.0), (2.0, 4.0)],
+            lambda s: (s.speed, s.load),
+        )
 
     def test_deterministic_order_for_model_ordered_by_its_manager(self):
         """
@@ -1581,7 +1711,7 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         self.assertIn('<ul class="object-tools">', response.rendered_content)
         # The "Add" button inside the object-tools shouldn't appear.
-        self.assertNotIn("Add ", response.rendered_content)
+        self.assertNotIn("Add event", response.rendered_content)
 
     def test_search_help_text(self):
         superuser = self._create_superuser("superuser")
@@ -1715,7 +1845,7 @@ class GetAdminLogTests(TestCase):
         """{% get_admin_log %} works without specifying a user."""
         user = User(username="jondoe", password="secret", email="super@example.com")
         user.save()
-        LogEntry.objects.log_actions(user.pk, [user], 1, single_object=True)
+        LogEntry.objects.log_actions(user.pk, [user], 1)
         context = Context({"log_entries": LogEntry.objects.all()})
         t = Template(
             "{% load log %}"

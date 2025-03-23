@@ -3,19 +3,16 @@ from unittest import mock
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
-from django.db.models import Prefetch, QuerySet, prefetch_related_objects
-from django.db.models.fields.related import ForwardManyToOneDescriptor
-from django.db.models.query import get_prefetcher, prefetch_one_level
+from django.db.models import F, Prefetch, QuerySet, prefetch_related_objects
+from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
     TestCase,
-    ignore_warnings,
     override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -364,7 +361,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
                     Query,
                     "add_q",
                     autospec=True,
-                    side_effect=lambda self, q: add_q(self, q),
+                    side_effect=lambda self, q, reuse_all: add_q(self, q),
                 ) as add_q_mock:
                     list(Book.objects.prefetch_related(relation))
                     self.assertEqual(add_q_mock.call_count, 1)
@@ -394,6 +391,46 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.prefetch_related("authors").iterator()
+
+    def test_m2m_join_reuse(self):
+        FavoriteAuthors.objects.bulk_create(
+            [
+                FavoriteAuthors(
+                    author=self.author1, likes_author=self.author3, is_active=True
+                ),
+                FavoriteAuthors(
+                    author=self.author1,
+                    likes_author=self.author4,
+                    is_active=False,
+                ),
+                FavoriteAuthors(
+                    author=self.author2, likes_author=self.author3, is_active=True
+                ),
+                FavoriteAuthors(
+                    author=self.author2, likes_author=self.author4, is_active=True
+                ),
+            ]
+        )
+        with self.assertNumQueries(2):
+            authors = list(
+                Author.objects.filter(
+                    pk__in=[self.author1.pk, self.author2.pk]
+                ).prefetch_related(
+                    Prefetch(
+                        "favorite_authors",
+                        queryset=(
+                            Author.objects.annotate(
+                                active_favorite=F("likes_me__is_active"),
+                            ).filter(active_favorite=True)
+                        ),
+                        to_attr="active_favorite_authors",
+                    )
+                )
+            )
+        self.assertEqual(authors[0].active_favorite_authors, [self.author3])
+        self.assertEqual(
+            authors[1].active_favorite_authors, [self.author3, self.author4]
+        )
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -1049,7 +1086,7 @@ class CustomPrefetchTests(TestCase):
             Query,
             "add_q",
             autospec=True,
-            side_effect=lambda self, q: add_q(self, q),
+            side_effect=lambda self, q, reuse_all: add_q(self, q),
         ) as add_q_mock:
             list(
                 House.objects.prefetch_related(
@@ -1256,6 +1293,20 @@ class GenericRelationTests(TestCase):
                     (self.book2.pk, ct.pk, self.book2),
                 ],
             )
+
+    def test_reverse_generic_relation(self):
+        # Create two distinct bookmarks to ensure the bookmark and
+        # tagged item models primary are offset.
+        first_bookmark = Bookmark.objects.create()
+        second_bookmark = Bookmark.objects.create()
+        TaggedItem.objects.create(
+            content_object=first_bookmark, favorite=second_bookmark
+        )
+        with self.assertNumQueries(2):
+            obj = TaggedItem.objects.prefetch_related("favorite_bookmarks").get()
+        with self.assertNumQueries(0):
+            prefetched_bookmarks = obj.favorite_bookmarks.all()
+            self.assertQuerySetEqual(prefetched_bookmarks, [second_bookmark])
 
 
 class MultiTableInheritanceTest(TestCase):
@@ -1999,56 +2050,17 @@ class PrefetchLimitTests(TestDataMixin, TestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Book.objects.prefetch_related(Prefetch("authors", authors[1:])))
 
-
-class DeprecationTests(TestCase):
-    def test_get_current_queryset_warning(self):
-        msg = (
-            "Prefetch.get_current_queryset() is deprecated. Use "
-            "get_current_querysets() instead."
-        )
-        authors = Author.objects.all()
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            self.assertEqual(
-                Prefetch("authors", authors).get_current_queryset(1),
-                authors,
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_empty_order(self):
+        authors = Author.objects.order_by()
+        with self.assertNumQueries(3):
+            books = list(
+                Book.objects.prefetch_related(
+                    Prefetch("authors", authors),
+                    Prefetch("authors", authors[:1], to_attr="authors_sliced"),
+                )
             )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            self.assertIsNone(Prefetch("authors").get_current_queryset(1))
-
-    @ignore_warnings(category=RemovedInDjango60Warning)
-    def test_prefetch_one_level_fallback(self):
-        class NoGetPrefetchQuerySetsDescriptor(ForwardManyToOneDescriptor):
-            def get_prefetch_queryset(self, instances, queryset=None):
-                if queryset is None:
-                    return super().get_prefetch_querysets(instances)
-                return super().get_prefetch_querysets(instances, [queryset])
-
-            def __getattribute__(self, name):
-                if name == "get_prefetch_querysets":
-                    raise AttributeError
-                return super().__getattribute__(name)
-
-        house = House.objects.create()
-        room = Room.objects.create(house=house)
-        house.main_room = room
-        house.save()
-
-        # prefetch_one_level() fallbacks to get_prefetch_queryset().
-        prefetcher = NoGetPrefetchQuerySetsDescriptor(Room._meta.get_field("house"))
-        obj_list, additional_lookups = prefetch_one_level(
-            [room],
-            prefetcher,
-            Prefetch("house", House.objects.all()),
-            0,
-        )
-        self.assertEqual(obj_list, [house])
-        self.assertEqual(additional_lookups, [])
-
-        obj_list, additional_lookups = prefetch_one_level(
-            [room],
-            prefetcher,
-            Prefetch("house"),
-            0,
-        )
-        self.assertEqual(obj_list, [house])
-        self.assertEqual(additional_lookups, [])
+        for book in books:
+            with self.subTest(book=book):
+                self.assertEqual(len(book.authors_sliced), 1)
+                self.assertIn(book.authors_sliced[0], list(book.authors.all()))

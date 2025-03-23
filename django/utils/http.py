@@ -2,7 +2,7 @@ import base64
 import re
 import unicodedata
 from binascii import Error as BinasciiError
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import formatdate
 from urllib.parse import quote, unquote
 from urllib.parse import urlencode as original_urlencode
@@ -115,7 +115,7 @@ def parse_http_date(date):
     try:
         year = int(m["year"])
         if year < 100:
-            current_year = datetime.now(tz=timezone.utc).year
+            current_year = datetime.now(tz=UTC).year
             current_century = current_year - (current_year % 100)
             if year - (current_year % 100) > 50:
                 # year that appears to be more than 50 years in the future are
@@ -128,7 +128,7 @@ def parse_http_date(date):
         hour = int(m["hour"])
         min = int(m["min"])
         sec = int(m["sec"])
-        result = datetime(year, month, day, hour, min, sec, tzinfo=timezone.utc)
+        result = datetime(year, month, day, hour, min, sec, tzinfo=UTC)
         return int(result.timestamp())
     except Exception as exc:
         raise ValueError("%r is not a valid date" % date) from exc
@@ -362,10 +362,19 @@ def content_disposition_header(as_attachment, filename):
         disposition = "attachment" if as_attachment else "inline"
         try:
             filename.encode("ascii")
+            is_ascii = True
+        except UnicodeEncodeError:
+            is_ascii = False
+        # Quoted strings can contain horizontal tabs, space characters, and
+        # characters from 0x21 to 0x7e, except 0x22 (`"`) and 0x5C (`\`) which
+        # can still be expressed but must be escaped with their own `\`.
+        # https://datatracker.ietf.org/doc/html/rfc9110#name-quoted-strings
+        quotable_characters = r"^[\t \x21-\x7e]*$"
+        if is_ascii and re.match(quotable_characters, filename):
             file_expr = 'filename="{}"'.format(
                 filename.replace("\\", "\\\\").replace('"', r"\"")
             )
-        except UnicodeEncodeError:
+        else:
             file_expr = "filename*=utf-8''{}".format(quote(filename))
         return f"{disposition}; {file_expr}"
     elif as_attachment:

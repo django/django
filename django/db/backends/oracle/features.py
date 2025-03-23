@@ -1,6 +1,5 @@
 from django.db import DatabaseError, InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.db.backends.oracle.oracledb_any import is_oracledb
 from django.utils.functional import cached_property
 
 
@@ -46,6 +45,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # does by uppercasing all identifiers.
     ignores_table_name_case = True
     supports_index_on_text_field = False
+    supports_aggregate_order_by_clause = True
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE "TEST_PROCEDURE" AS
             V_I INTEGER;
@@ -116,6 +116,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
                 "expressions_window.tests.WindowFunctionTests."
                 "test_row_number_no_ordering",
+                "prefetch_related.tests.PrefetchLimitTests.test_empty_order",
             },
             "Oracle doesn't support changing collations on indexed columns (#33671).": {
                 "migrations.test_operations.OperationTests."
@@ -138,15 +139,24 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
-        if is_oracledb and self.connection.oracledb_version >= (2, 1, 2):
+        if self.connection.is_pool:
             skips.update(
                 {
-                    "python-oracledb 2.1.2+ no longer hides 'ORA-1403: no data found' "
-                    "exceptions raised in database triggers.": {
+                    "Pooling does not support persistent connections": {
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_enabled",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_enabled_errors_occurred",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_disabled",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_set_autocommit_health_checks_enabled",
+                        "servers.tests.LiveServerTestCloseConnectionTest."
+                        "test_closes_connections",
                         "backends.oracle.tests.TransactionalTests."
-                        "test_hidden_no_data_found_exception"
+                        "test_password_with_at_sign",
                     },
-                },
+                }
             )
         return skips
 
@@ -205,9 +215,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.oracle_version >= (23,)
 
     @cached_property
-    def supports_bulk_insert_with_multiple_rows(self):
-        return self.connection.oracle_version >= (23,)
-
-    @cached_property
     def bare_select_suffix(self):
         return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"
+
+    @cached_property
+    def supports_tuple_lookups(self):
+        # Support is known to be missing on 23.2 but available on 23.4.
+        return self.connection.oracle_version >= (23, 4)

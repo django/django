@@ -63,6 +63,11 @@ control caching behavior on particular views.
 
 .. function:: condition(etag_func=None, last_modified_func=None)
 
+.. function:: conditional_page()
+
+    This decorator provides the conditional GET operation handling of
+    :class:`~django.middleware.http.ConditionalGetMiddleware` to a view.
+
 .. function:: etag(etag_func)
 
 .. function:: last_modified(last_modified_func)

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018-2019
-# Igor Jerosimić, 2019-2021,2023
+# Igor Jerosimić, 2019-2021,2023-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Igor Jerosimić, 2019-2021,2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Igor Jerosimić, 2019-2021,2023-2024\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -348,6 +348,9 @@ msgstr "Тражена страна не садржи резултате"
 msgid "Enter a valid value."
 msgstr "Унесите исправну вредност."
 
+msgid "Enter a valid domain name."
+msgstr "Унесите исправно име домена."
+
 msgid "Enter a valid URL."
 msgstr "Унесите исправан URL."
 
@@ -371,14 +374,18 @@ msgstr ""
 "Унесите исправан \"слаг\", који се састоји од Уникод слова, бројки, доњих "
 "црта или цртица."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Унесите исправну IPv4 адресу."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Унесите исправну адресу %(protocol)s."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Унесите исправну IPv6 адресу."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Унесите исправну IPv4 или IPv6 адресу."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 или IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Унесите само цифре раздвојене запетама."

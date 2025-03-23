@@ -21,6 +21,7 @@ from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
+from django.utils.functional import cached_property
 from django.utils.http import content_disposition_header, http_date
 from django.utils.regex_helper import _lazy_re_compile
 
@@ -239,8 +240,8 @@ class HttpResponseBase:
         if expires is not None:
             if isinstance(expires, datetime.datetime):
                 if timezone.is_naive(expires):
-                    expires = timezone.make_aware(expires, datetime.timezone.utc)
-                delta = expires - datetime.datetime.now(tz=datetime.timezone.utc)
+                    expires = timezone.make_aware(expires, datetime.UTC)
+                delta = expires - datetime.datetime.now(tz=datetime.UTC)
                 # Add one second so the date matches exactly (a fraction of
                 # time gets lost between converting to a timedelta and
                 # then the date string).
@@ -408,6 +409,11 @@ class HttpResponse(HttpResponseBase):
             content = self.make_bytes(value)
         # Create a list of properly encoded bytestrings to support write().
         self._container = [content]
+        self.__dict__.pop("text", None)
+
+    @cached_property
+    def text(self):
+        return self.content.decode(self.charset or "utf-8")
 
     def __iter__(self):
         return iter(self._container)
@@ -461,6 +467,12 @@ class StreamingHttpResponse(HttpResponseBase):
         )
 
     @property
+    def text(self):
+        raise AttributeError(
+            "This %s instance has no `text` attribute." % self.__class__.__name__
+        )
+
+    @property
     def streaming_content(self):
         if self.is_async:
             # pull to lexical scope to capture fixed reference in case
@@ -498,6 +510,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 "StreamingHttpResponse must consume asynchronous iterators in order to "
                 "serve them synchronously. Use a synchronous iterator instead.",
                 Warning,
+                stacklevel=2,
             )
 
             # async iterator. Consume in async_to_sync and map back.
@@ -518,6 +531,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 "StreamingHttpResponse must consume synchronous iterators in order to "
                 "serve them asynchronously. Use an asynchronous iterator instead.",
                 Warning,
+                stacklevel=2,
             )
             # sync iterator. Consume via sync_to_async and yield via async
             # generator.
@@ -613,10 +627,12 @@ class FileResponse(StreamingHttpResponse):
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ["http", "https", "ftp"]
 
-    def __init__(self, redirect_to, *args, **kwargs):
+    def __init__(self, redirect_to, preserve_request=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
         parsed = urlsplit(str(redirect_to))
+        if preserve_request:
+            self.status_code = self.status_code_preserve_request
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect(
                 "Unsafe redirect to URL with protocol '%s'" % parsed.scheme
@@ -638,10 +654,12 @@ class HttpResponseRedirectBase(HttpResponse):
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
+    status_code_preserve_request = 307
 
 
 class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
     status_code = 301
+    status_code_preserve_request = 308
 
 
 class HttpResponseNotModified(HttpResponse):

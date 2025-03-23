@@ -425,10 +425,48 @@ Methods
     Returns ``True`` if the request is secure; that is, if it was made with
     HTTPS.
 
+.. method:: HttpRequest.get_preferred_type(media_types)
+
+    .. versionadded:: 5.2
+
+    Returns the preferred mime type from ``media_types``, based on the
+    ``Accept`` header, or ``None`` if the client does not accept any of the
+    provided types.
+
+    Assuming the client sends an ``Accept`` header of
+    ``text/html,application/json;q=0.8``:
+
+    .. code-block:: pycon
+
+        >>> request.get_preferred_type(["text/html", "application/json"])
+        "text/html"
+        >>> request.get_preferred_type(["application/json", "text/plain"])
+        "application/json"
+        >>> request.get_preferred_type(["application/xml", "text/plain"])
+        None
+
+    Most browsers send ``Accept: */*`` by default, meaning they don't have a
+    preference, in which case the first item in ``media_types`` would be
+    returned.
+
+    Setting an explicit ``Accept`` header in API requests can be useful for
+    returning a different content type for those consumers only. See
+    :ref:`content-negotiation-example` for an example of returning
+    different content based on the ``Accept`` header.
+
+    .. note::
+
+        If a response varies depending on the content of the ``Accept`` header
+        and you are using some form of caching like Django's
+        :mod:`cache middleware <django.middleware.cache>`, you should decorate
+        the view with :func:`vary_on_headers('Accept')
+        <django.views.decorators.vary.vary_on_headers>` so that the responses
+        are properly cached.
+
 .. method:: HttpRequest.accepts(mime_type)
 
-    Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
-    argument:
+    Returns ``True`` if the request's ``Accept`` header matches the
+    ``mime_type`` argument:
 
     .. code-block:: pycon
 
@@ -436,17 +474,10 @@ Methods
         True
 
     Most browsers send ``Accept: */*`` by default, so this would return
-    ``True`` for all content types. Setting an explicit ``Accept`` header in
-    API requests can be useful for returning a different content type for those
-    consumers only. See :ref:`content-negotiation-example` of using
-    ``accepts()`` to return different content to API consumers.
+    ``True`` for all content types.
 
-    If a response varies depending on the content of the ``Accept`` header and
-    you are using some form of caching like Django's :mod:`cache middleware
-    <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('Accept')
-    <django.views.decorators.vary.vary_on_headers>` so that the responses are
-    properly cached.
+    See :ref:`content-negotiation-example` for an example of using
+    ``accepts()`` to return different content based on the ``Accept`` header.
 
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
@@ -523,11 +554,20 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.__getitem__(key)
 
-    Returns the value for the given key. If the key has more than one value,
-    it returns the last value. Raises
+    Returns the last value for the given key; or an empty list (``[]``) if the
+    key exists but has no values. Raises
     ``django.utils.datastructures.MultiValueDictKeyError`` if the key does not
     exist. (This is a subclass of Python's standard :exc:`KeyError`, so you can
     stick to catching ``KeyError``.)
+
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3", mutable=True)
+        >>> q.__getitem__("a")
+        '3'
+        >>> q.__setitem__("b", [])
+        >>> q.__getitem__("b")
+        []
 
 .. method:: QueryDict.__setitem__(key, value)
 
@@ -802,6 +842,13 @@ Attributes
 
     A bytestring representing the content, encoded from a string if necessary.
 
+.. attribute:: HttpResponse.text
+
+    .. versionadded:: 5.2
+
+    A string representation of :attr:`HttpResponse.content`, decoded using the
+    response's :attr:`HttpResponse.charset` (defaulting to ``UTF-8`` if empty).
+
 .. attribute:: HttpResponse.cookies
 
     A :py:obj:`http.cookies.SimpleCookie` object holding the cookies included
@@ -1032,18 +1079,32 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     (e.g. ``'https://www.yahoo.com/search/'``), an absolute path with no domain
     (e.g. ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that
     last case, the client browser will reconstruct the full URL itself
-    according to the current path. See :class:`HttpResponse` for other optional
-    constructor arguments. Note that this returns an HTTP status code 302.
+    according to the current path.
+
+    The constructor accepts an optional ``preserve_request`` keyword argument
+    that defaults to ``False``, producing a response with a 302 status code. If
+    ``preserve_request`` is ``True``, the status code will be 307 instead.
+
+    See :class:`HttpResponse` for other optional constructor arguments.
 
     .. attribute:: HttpResponseRedirect.url
 
         This read-only attribute represents the URL the response will redirect
         to (equivalent to the ``Location`` response header).
 
+    .. versionchanged:: 5.2
+
+        The ``preserve_request`` argument was added.
+
 .. class:: HttpResponsePermanentRedirect
 
     Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
     (HTTP status code 301) instead of a "found" redirect (status code 302).
+    When ``preserve_request=True``, the response's status code is 308.
+
+    .. versionchanged:: 5.2
+
+        The ``preserve_request`` argument was added.
 
 .. class:: HttpResponseNotModified
 
@@ -1240,6 +1301,9 @@ with the following notable differences:
 * It has no ``content`` attribute. Instead, it has a
   :attr:`~StreamingHttpResponse.streaming_content` attribute. This can be used
   in middleware to wrap the response iterable, but should not be consumed.
+
+* It has no ``text`` attribute, as it would require iterating the response
+  object.
 
 * You cannot use the file-like object ``tell()`` or ``write()`` methods.
   Doing so will raise an exception.
