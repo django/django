@@ -2,10 +2,12 @@ import pickle
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core import checks
 from django.db import models
 from django.test import SimpleTestCase, TestCase
 from django.utils.choices import CallableChoiceIterator
 from django.utils.functional import lazy
+from django.core import checks
 
 from .models import (
     Bar,
@@ -18,6 +20,7 @@ from .models import (
     WhizIter,
     WhizIterEmpty,
 )
+
 
 
 class Nested:
@@ -436,4 +439,73 @@ class GetChoicesLimitChoicesToTests(TestCase):
         self.assertChoicesEqual(
             field.get_choices(include_blank=False, limit_choices_to={}),
             [self.bar1, self.bar2],
+        )
+
+class ManyToManyFieldCheckTests(TestCase):
+    def test_invalid_to_with_through_fields(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foos = models.ManyToManyField(
+                to="Fo",  # Invalid
+                through="FooBar",
+                through_fields=("bar", "foo")
+            )
+
+        class FooBar(models.Model):
+            foo = models.ForeignKey("Foo", on_delete=models.CASCADE)
+            bar = models.ForeignKey("Bar", on_delete=models.CASCADE)
+
+        errors = Bar.check()
+        expected_errors = [
+            checks.Error(
+                "Field defines a relation with model 'Fo', which is either not installed, or is abstract.",
+                obj=Bar._meta.get_field("foos"),
+                id="fields.E300",
+            ),
+            checks.Error(
+                "'FooBar.foo' is not a foreign key to 'Fo'.",
+                obj=Bar._meta.get_field("foos"),
+                id="fields.E339",
+            ),
+        ]
+        self.assertTrue(
+            all(any(e.msg == exp.msg and e.id == exp.id for e in errors) for exp in expected_errors),
+            f"Expected errors {expected_errors}, but got {errors}"
+        )
+
+
+class ManyToManyFieldCheckTests(TestCase):
+    def test_invalid_to_with_through_fields(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foos = models.ManyToManyField(
+                to="Fo",  # Invalid
+                through="FooBar",
+                through_fields=("bar", "foo")
+            )
+
+        class FooBar(models.Model):
+            foo = models.ForeignKey("Foo", on_delete=models.CASCADE)
+            bar = models.ForeignKey("Bar", on_delete=models.CASCADE)
+
+        errors = Bar.check()
+        expected_errors = [
+            checks.Error(
+                "Field defines a relation with model 'Fo', which is either not installed, or is abstract.",
+                obj=Bar._meta.get_field("foos"),
+                id="fields.E300",
+            ),
+            checks.Error(
+                "'FooBar.foo' is not a foreign key to 'Fo'.",
+                obj=Bar._meta.get_field("foos"),
+                id="fields.E339",
+            ),
+        ]
+        self.assertTrue(
+            all(any(e.msg == exp.msg and e.id == exp.id for e in errors) for exp in expected_errors),
+            f"Expected errors {expected_errors}, but got {errors}"
         )

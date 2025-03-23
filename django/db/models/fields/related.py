@@ -605,7 +605,10 @@ class ForeignObject(RelatedField):
         return errors
 
     def _check_to_fields_composite_pk(self):
-        from django.db.models.fields.composite import CompositePrimaryKey
+        try:
+            from django.db.models import CompositePrimaryKey
+        except ImportError:
+            CompositePrimaryKey = None
 
         # Skip nonexistent models.
         if isinstance(self.remote_field.model, str):
@@ -622,7 +625,7 @@ class ForeignObject(RelatedField):
             except exceptions.FieldDoesNotExist:
                 pass
             else:
-                if isinstance(field, CompositePrimaryKey):
+                if CompositePrimaryKey and isinstance(field, CompositePrimaryKey):
                     errors.append(
                         checks.Error(
                             "Field defines a relation to the CompositePrimaryKey of "
@@ -1478,7 +1481,7 @@ class ManyToManyField(RelatedField):
         return warnings
 
     def _check_relationship_model(self, from_model=None, **kwargs):
-        from django.db.models.fields.composite import CompositePrimaryKey
+        from django.db.models import CompositePrimaryKey  # Ensure the correct import path
 
         if hasattr(self.remote_field.through, "_meta"):
             qualified_model_name = "%s.%s" % (
@@ -1707,20 +1710,23 @@ class ManyToManyField(RelatedField):
                             and getattr(field.remote_field, "model", None)
                             == related_model
                         ):
+                            related_object_name = (
+                                related_model
+                                if isinstance(related_model, str)
+                                else related_model._meta.object_name
+                            )
                             errors.append(
                                 checks.Error(
-                                    "'%s.%s' is not a foreign key to '%s'."
-                                    % (
+                                    "'%s.%s' is not a foreign key to '%s'." % (
                                         through._meta.object_name,
                                         field_name,
-                                        related_model._meta.object_name,
+                                        related_object_name,
                                     ),
                                     hint=hint,
                                     obj=self,
                                     id="fields.E339",
                                 )
                             )
-
         return errors
 
     def _check_table_uniqueness(self, **kwargs):
