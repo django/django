@@ -7,14 +7,10 @@
 <body>
     <h1>CSP Nonce Test</h1>
     
-    {% if CSP_NONCE %}
-        <p>CSP Nonce is present: {{ CSP_NONCE }}</p>
-        <script nonce="{{ CSP_NONCE }}">
-            console.log("This script is allowed to run due to the nonce.");
-        </script>
-    {% else %}
-        <p>CSP nonce is not present in the context.</p>
-    {% endif %}
+    <p>CSP Nonce is present: {{ CSP_NONCE }}</p>
+    <script nonce="{{ CSP_NONCE }}">
+        console.log("This script is allowed to run due to the nonce.");
+    </script>
 
     <script>
         console.log("This script might be blocked by CSP if nonce is required.");

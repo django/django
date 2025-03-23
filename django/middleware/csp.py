@@ -1,27 +1,48 @@
 import base64
 import os
-from functools import partial
 from http import client as http_client
 
 from django.conf import settings
 from django.middleware.constants import CSP
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, empty
 
 HEADER = "Content-Security-Policy"
 HEADER_REPORT_ONLY = "Content-Security-Policy-Report-Only"
 
 
-class ContentSecurityPolicyMiddleware(MiddlewareMixin):
-    @staticmethod
-    def _make_nonce(request):
-        # Ensure that any subsequent calls to request.csp_nonce return the same value
-        if not getattr(request, "_csp_nonce", None):
-            request._csp_nonce = base64.b64encode(os.urandom(16)).decode("ascii")
-        return request._csp_nonce
+class LazyNonce(SimpleLazyObject):
+    """
+    Lazily generates a cryptographically secure nonce string, for use in CSP headers.
 
+    The nonce is only generated when first accessed (e.g., via string
+    interpolation or inside a template).
+
+    The nonce will evaluate as `True` if it has been generated, and `False` if
+    it has not. This is useful for third-party Django libraries that want to
+    support CSP without requiring it.
+
+    Example Django template usage:
+
+        <script{% if request.csp_nonce %} nonce="{{ request.csp_nonce }}"...{% endif %}>
+
+    The `{% if %}` block will only render if the nonce has been evaluated elsewhere.
+
+    """
+
+    def __init__(self):
+        super().__init__(self._generate)
+
+    def _generate(self):
+        return base64.b64encode(os.urandom(16)).decode("ascii")
+
+    def __bool__(self):
+        return self._wrapped is not empty
+
+
+class ContentSecurityPolicyMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        request.csp_nonce = SimpleLazyObject(partial(self._make_nonce, request))
+        request.csp_nonce = LazyNonce()
 
     def process_response(self, request, response):
         # In DEBUG mode, exclude CSP headers for specific status codes that
@@ -65,7 +86,8 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
             config = (
                 getattr(response, "_csp_config", None) or settings.SECURE_CSP or None
             )
-        nonce = getattr(request, "_csp_nonce", None)
+        # Only provide the nonce if it exists on the request and is not empty.
+        nonce = getattr(request, "csp_nonce", None) or None
         return (config, nonce)
 
     # TODO: Make this cache-able?

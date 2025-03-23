@@ -4,9 +4,11 @@ from django.middleware.csp import (
     HEADER,
     HEADER_REPORT_ONLY,
     ContentSecurityPolicyMiddleware,
+    LazyNonce,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
+from django.utils.functional import empty
 
 basic_config = {
     "DIRECTIVES": {
@@ -140,8 +142,6 @@ class CSPBuildPolicyTest(SimpleTestCase):
 
 
 class CSPGetPolicyTest(SimpleTestCase):
-    nonce = "test-nonce"
-
     def get_policy(self, request, response, report_only=False):
         return ContentSecurityPolicyMiddleware.get_policy(
             request, response, report_only
@@ -150,67 +150,75 @@ class CSPGetPolicyTest(SimpleTestCase):
     def test_default(self):
         request = HttpRequest()
         response = HttpResponse()
+        nonce = LazyNonce()
+        request.csp_nonce = nonce
         self.assertEqual(self.get_policy(request, response), (None, None))
-        request._csp_nonce = self.nonce
-        self.assertEqual(self.get_policy(request, response), (None, self.nonce))
+        str(nonce)  # Force the nonce to be generated.
+        self.assertEqual(self.get_policy(request, response), (None, nonce))
 
     def test_default_report_only(self):
         request = HttpRequest()
         response = HttpResponse()
+        nonce = LazyNonce()
+        request.csp_nonce = nonce
         self.assertEqual(
             self.get_policy(request, response, report_only=True), (None, None)
         )
-        request._csp_nonce = self.nonce
-        self.assertEqual(self.get_policy(request, response), (None, self.nonce))
+        str(nonce)  # Force the nonce to be generated.
+        self.assertEqual(self.get_policy(request, response), (None, nonce))
 
     def test_settings(self):
         request = HttpRequest()
         response = HttpResponse()
+        nonce = LazyNonce()
+        request.csp_nonce = nonce
         with self.settings(SECURE_CSP=basic_config):
             self.assertEqual(self.get_policy(request, response), (basic_config, None))
-            request._csp_nonce = self.nonce
-            self.assertEqual(
-                self.get_policy(request, response), (basic_config, self.nonce)
-            )
+            str(nonce)  # Force the nonce to be generated.
+            self.assertEqual(self.get_policy(request, response), (basic_config, nonce))
 
     def test_settings_report_only(self):
         request = HttpRequest()
         response = HttpResponse()
+        nonce = LazyNonce()
+        request.csp_nonce = nonce
         with self.settings(SECURE_CSP_REPORT_ONLY=basic_config):
             self.assertEqual(
                 self.get_policy(request, response, report_only=True),
                 (basic_config, None),
             )
-            request._csp_nonce = self.nonce
+            str(nonce)  # Force the nonce to be generated.
             self.assertEqual(
                 self.get_policy(request, response, report_only=True),
-                (basic_config, self.nonce),
+                (basic_config, nonce),
             )
 
     def test_response_override(self):
         request = HttpRequest()
         response = HttpResponse()
         response._csp_config = basic_config
+        nonce = LazyNonce()
+        request.csp_nonce = nonce
         with self.settings(SECURE_CSP=alt_config):
             self.assertEqual(self.get_policy(request, response), (basic_config, None))
-            request._csp_nonce = self.nonce
-            self.assertEqual(
-                self.get_policy(request, response), (basic_config, self.nonce)
-            )
+            str(nonce)  # Force the nonce to be generated.
+            self.assertEqual(self.get_policy(request, response), (basic_config, nonce))
 
     def test_response_override_report_only(self):
         request = HttpRequest()
         response = HttpResponse()
         response._csp_config_ro = basic_config
+        nonce = LazyNonce()
+        request.csp_nonce = nonce
         with self.settings(SECURE_CSP=alt_config):
             self.assertEqual(
                 self.get_policy(request, response, report_only=True),
                 (basic_config, None),
             )
-            request._csp_nonce = self.nonce
+            str(nonce)  # Force the nonce to be generated.
             self.assertEqual(
                 self.get_policy(request, response, report_only=True),
-                (basic_config, self.nonce),
+                (basic_config, nonce),
             )
 
 
@@ -249,7 +257,7 @@ class CSPMiddlewareTest(SimpleTestCase):
         """
         response = self.client.get("/csp-nonce/")
         nonce = response.content.decode()
-        self.assertTrue(len(nonce) > 0)
+        self.assertTrue(nonce)
         self.assertEqual(response[HEADER], f"default-src 'self' 'nonce-{nonce}'")
 
     @override_settings(
@@ -382,3 +390,28 @@ class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
         self.assertEqual(
             response[HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
         )
+
+
+class LazyNonceTests(SimpleTestCase):
+    def test_generates_on_usage(self):
+        nonce = LazyNonce()
+        self.assertFalse(nonce)
+        self.assertIs(nonce._wrapped, empty)
+
+        # Force usage, similar to template rendering, to generate the nonce.
+        val = str(nonce)
+
+        self.assertTrue(nonce)
+        self.assertEqual(nonce, val)
+        self.assertIsInstance(nonce, str)
+        self.assertEqual(len(val), 24)  # Based on base64 encoding of 16 bytes.
+
+        # Also test the wrapped value.
+        self.assertEqual(nonce._wrapped, val)
+
+    def test_returns_same_value(self):
+        nonce = LazyNonce()
+        first = str(nonce)
+        second = str(nonce)
+
+        self.assertEqual(first, second)
