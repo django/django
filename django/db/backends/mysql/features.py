@@ -65,6 +65,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = True
 
+    supports_json_negative_indexing = False
+
     @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
@@ -302,8 +304,3 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return "ONLY_FULL_GROUP_BY" not in self.connection.sql_mode
         return True
-
-    @cached_property
-    def supports_json_negative_indexing(self):
-        is_mariadb = self.connection.mysql_is_mariadb
-        return is_mariadb and self.connection.mysql_version >= (10, 9)

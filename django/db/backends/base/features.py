@@ -351,6 +351,8 @@ class BaseDatabaseFeatures:
     json_key_contains_list_matching_requires_list = False
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
+    # Does the backend support negative JSON indexing?
+    supports_json_negative_indexing = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True
@@ -428,13 +430,6 @@ class BaseDatabaseFeatures:
             (count,) = cursor.fetchone()
             cursor.execute("DROP TABLE ROLLBACK_TEST")
         return count == 0
-
-    @cached_property
-    def supports_json_negative_indexing(self):
-        """
-        Does the backend support negative JSON indexing?
-        """
-        return True
 
     def allows_group_by_selected_pks_on_model(self, model):
         if not self.allows_group_by_selected_pks:
