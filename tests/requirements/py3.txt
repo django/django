@@ -2,7 +2,7 @@ aiosmtpd
 asgiref >= 3.8.1
 argon2-cffi >= 19.2.0
 bcrypt
-black
+black == 24.10.0
 docutils >= 0.19
 geoip2
 jinja2 >= 2.11.0
