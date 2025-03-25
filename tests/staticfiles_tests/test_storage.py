@@ -360,6 +360,18 @@ class TestHashedFiles:
         self.assertEqual("Post-processing 'nonutf8.css' failed!\n\n", err.getvalue())
         self.assertPostCondition()
 
+    def test_leading_slash(self):
+        self.assertStaticRenders("/test/file.txt", "/static/test/file.dad0999e4f8f.txt")
+        self.assertStaticRenders(
+            "/test/file.txt", "/static/test/file.dad0999e4f8f.txt", asvar=True
+        )
+        self.assertStaticRenders(
+            "/cached/styles.css", "/static/cached/styles.5e0040571e1a.css"
+        )
+        self.assertStaticRenders("/path/", "/static/path/")
+        self.assertStaticRenders("/path/?query", "/static/path/?query")
+        self.assertPostCondition()
+
 
 @override_settings(
     STORAGES={
