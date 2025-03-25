@@ -33,6 +33,14 @@ def psql_escape(query: str):
     return query
 
 
+if is_psycopg3:
+    from psycopg.adapt import Dumper
+
+    class UTF8Dumper(Dumper):
+        def dump(self, obj):
+            return bytes(obj, "utf-8")
+
+
 class SearchVectorExact(Lookup):
     lookup_name = "exact"
 
@@ -470,13 +478,7 @@ class Lexeme(LexemeCombinable, Value):
     def process_rhs(self, compiler, connection):
         escaped_value = psql_escape(self.value)
         if is_psycopg3:
-            from psycopg.adapt import Dumper
-
-            class StringDumper(Dumper):
-                def dump(self, obj):
-                    return bytes(obj, "utf-8")
-
-            param = StringDumper(str).quote(escaped_value).decode()
+            param = UTF8Dumper(str).quote(escaped_value).decode()
         else:
             from psycopg2.extensions import adapt
 
