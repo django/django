@@ -20,9 +20,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "field",
-                    django.contrib.postgres.fields.ArrayField(
-                        models.IntegerField(), size=None
-                    ),
+                    django.contrib.postgres.fields.ArrayField(models.IntegerField()),
                 ),
             ],
             options={},
