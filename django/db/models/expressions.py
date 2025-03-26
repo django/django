@@ -756,18 +756,55 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         return combined_type()
 
     def as_sql(self, compiler, connection):
+        sql, params = self._compile_expressions(compiler)
+        sql = self._handle_operator(sql, connection)
+        return f"({sql})", params
+
+    def _is_integer_field(self, expr):
+        try:
+            return isinstance(expr.output_field, fields.IntegerField)
+        except AttributeError:
+            return False
+
+    def _is_duration_field(self, expr):
+        try:
+            return isinstance(expr.output_field, fields.DurationField)
+        except AttributeError:
+            return False
+
+    def _compile_expressions(self, compiler):
         expressions = []
-        expression_params = []
-        sql, params = compiler.compile(self.lhs)
-        expressions.append(sql)
-        expression_params.extend(params)
-        sql, params = compiler.compile(self.rhs)
-        expressions.append(sql)
-        expression_params.extend(params)
-        # order of precedence
-        expression_wrapper = "(%s)"
-        sql = connection.ops.combine_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
+        params = []
+        for expr in [self.lhs, self.rhs]:
+            sql, param = compiler.compile(expr)
+            expressions.append(sql)
+            params.extend(param)
+        return expressions, params
+
+    def _handle_operator(self, expressions, connection):
+        if self.connector == "/":
+            sql = self._handle_division(expressions, connection)
+        else:
+            sql = connection.ops.combine_expression(self.connector, expressions)
+        return sql
+
+    def _handle_division(self, expressions, connection):
+        is_duration = any(self._is_duration_field(e) for e in [self.lhs, self.rhs])
+        is_decimal = any(
+            isinstance(
+                getattr(e, "output_field", None),
+                (fields.DecimalField, fields.FloatField),
+            )
+            for e in [self.lhs, self.rhs]
+        )
+        is_integer = all(self._is_integer_field(e) for e in [self.lhs, self.rhs])
+
+        if is_duration:
+            return f"{expressions[0]} / {expressions[1]}"
+        elif is_decimal or is_integer and connection.vendor != "sqlite":
+            return connection.ops.combine_expression(self.connector, expressions)
+        else:
+            return f"{expressions[0]} / {expressions[1]}"
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
