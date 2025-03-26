@@ -2,9 +2,10 @@
 Django 5.1.8 release notes
 ==========================
 
-*Expected April 2, 2025*
+*April 2, 2025*
 
-Django 5.1.8 fixes several bugs in 5.1.7.
+Django 5.1.8 fixes a security issue with severity "moderate" and several bugs
+in 5.1.7.
 
 Bugfixes
 ========
