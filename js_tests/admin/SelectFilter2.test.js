@@ -19,7 +19,7 @@ QUnit.test('init', function(assert) {
     assert.equal($('.selector-chooseall').prop("tagName"), "BUTTON");
     assert.equal($('.selector-add').text(), "Choose selected things");
     assert.equal($('.selector-add').prop("tagName"), "BUTTON");
-    assert.equal($('.selector-remove').text(), "Remove selected chosen things");
+    assert.equal($('.selector-remove').text(), "Remove selected things");
     assert.equal($('.selector-remove').prop("tagName"), "BUTTON");
     assert.equal($('.selector-clearall').text(), "Remove all things");
     assert.equal($('.selector-clearall').prop("tagName"), "BUTTON");

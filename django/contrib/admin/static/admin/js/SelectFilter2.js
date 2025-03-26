@@ -88,7 +88,7 @@ Requires core.js and SelectBox.js.
             const remove_button = quickElement(
                 'button',
                 quickElement('li', selector_chooser),
-                interpolate(gettext('Remove selected chosen %s'), [field_name]),
+                interpolate(gettext('Remove selected %s'), [field_name]),
                 'id', field_id + '_remove',
                 'class', 'selector-remove'
             );
