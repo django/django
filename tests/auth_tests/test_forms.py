@@ -23,6 +23,7 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_login_failed
+from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ValidationError
@@ -1428,9 +1429,7 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
             "pbkdf2_sha256$100000$a6Pucb1qSFcD$WmCkn9Hqidj48NVe5x0FEM6A9YiOqQcl/83m2Z5u"
             "dm0="
         )
-        self.assertHTMLEqual(
-            widget.render("name", value, {"id": "id_password"}),
-            '<div id="id_password">'
+        hashed_html = (
             "  <p>"
             "    <strong>algorithm</strong>: <bdi>pbkdf2_sha256</bdi>"
             "    <strong>iterations</strong>: <bdi>100000</bdi>"
@@ -1438,8 +1437,40 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
             "    <strong>hash</strong>: "
             "       <bdi>WmCkn9**************************************</bdi>"
             "  </p>"
+        )
+        self.assertHTMLEqual(render_password_as_hash(value), hashed_html)
+        self.assertHTMLEqual(
+            widget.render("name", value, {"id": "id_password"}),
+            f'<div id="id_password">{hashed_html}'
             '  <p><a class="button" href="../password/">Reset password</a></p>'
             "</div>",
+        )
+
+    def test_render_no_password(self):
+        widget = ReadOnlyPasswordHashWidget()
+        hashed_html = "<p><strong>No password set.</p>"
+        self.assertHTMLEqual(render_password_as_hash(None), hashed_html)
+        self.assertHTMLEqual(
+            widget.render("name", None, {}),
+            f'<div>{hashed_html}<p><a class="button" href="../password/">'
+            'Set password</a></p></div>',
+        )
+
+    @override_settings(
+        PASSWORD_HASHERS=["django.contrib.auth.hashers.PBKDF2PasswordHasher"]
+    )
+    def test_render_invalid_password_format(self):
+        widget = ReadOnlyPasswordHashWidget()
+        value = "pbkdf2_sh"
+        hashed_html = (
+            "<p><strong>Invalid password format or unknown hashing algorithm."
+            "</strong></p>"
+        )
+        self.assertHTMLEqual(render_password_as_hash(value), hashed_html)
+        self.assertHTMLEqual(
+            widget.render("name", value, {}),
+            f'<div>{hashed_html}<p><a class="button" href="../password/">'
+            'Reset password</a></p></div>',
         )
 
     def test_readonly_field_has_changed(self):
