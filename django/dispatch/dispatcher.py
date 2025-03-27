@@ -28,8 +28,12 @@ class Signal:
 
     Internal attributes:
 
-        receivers
-            { receiverkey (id) : weakref(receiver) }
+        receivers:
+            [((id(receiver), id(sender))), ref(receiver), is_async)]
+        sender_refs:
+            {(id(receiver), id(sender)): ref(sender)}
+        sender_receivers_cache:
+            WeakKeyDictionary[sender, list[receiver]]
     """
 
     def __init__(self, use_caching=False):
@@ -37,6 +41,7 @@ class Signal:
         Create a new signal.
         """
         self.receivers = []
+        self.sender_refs = {}
         self.lock = threading.Lock()
         self.use_caching = use_caching
         # For convenience we create empty caches even if they are not used.
@@ -108,12 +113,25 @@ class Signal:
                 ref = weakref.WeakMethod
                 receiver_object = receiver.__self__
             receiver = ref(receiver)
-            weakref.finalize(receiver_object, self._remove_receiver)
+            weakref.finalize(receiver_object, self._flag_dead_receivers)
+
+        # Keep a weakref to sender if possible to ensure associated
+        # receivers are cleared if it gets garbage collected. This ensures
+        # there is no id(sender) collisions for distinct senders with
+        # non-overlapping lifetimes.
+        sender_ref = None
+        if sender is not None:
+            try:
+                sender_ref = weakref.ref(sender, self._flag_dead_receivers)
+            except TypeError:
+                pass
 
         with self.lock:
             self._clear_dead_receivers()
             if not any(r_key == lookup_key for r_key, _, _ in self.receivers):
                 self.receivers.append((lookup_key, receiver, is_async))
+                if sender_ref is not None:
+                    self.sender_refs[lookup_key] = sender_ref
             self.sender_receivers_cache.clear()
 
     def disconnect(self, receiver=None, sender=None, dispatch_uid=None):
@@ -407,11 +425,29 @@ class Signal:
         # Note: caller is assumed to hold self.lock.
         if self._dead_receivers:
             self._dead_receivers = False
-            self.receivers = [
-                r
-                for r in self.receivers
-                if not (isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
-            ]
+            receivers = []
+            for receiver in self.receivers:
+                dead_receiver = False
+                if (
+                    isinstance(
+                        receiver_ref := receiver[1],
+                        weakref.ReferenceType,
+                    )
+                    and receiver_ref() is None
+                ):
+                    dead_receiver = True
+                if (
+                    isinstance(
+                        sender_ref := self.sender_refs.get(lookup_key := receiver[0]),
+                        weakref.ReferenceType,
+                    )
+                    and sender_ref() is None
+                ):
+                    self.sender_refs.pop(lookup_key)
+                    dead_receiver = True
+                if not dead_receiver:
+                    receivers.append(receiver)
+            self.receivers = receivers
 
     def _live_receivers(self, sender):
         """
@@ -459,11 +495,11 @@ class Signal:
                     non_weak_sync_receivers.append(receiver)
         return non_weak_sync_receivers, non_weak_async_receivers
 
-    def _remove_receiver(self, receiver=None):
+    def _flag_dead_receivers(self, reference=None):
         # Mark that the self.receivers list has dead weakrefs. If so, we will
         # clean those up in connect, disconnect and _live_receivers while
         # holding self.lock. Note that doing the cleanup here isn't a good
-        # idea, _remove_receiver() will be called as side effect of garbage
+        # idea, _flag_dead_receivers() will be called as side effect of garbage
         # collection, and so the call can happen while we are already holding
         # self.lock.
         self._dead_receivers = True
