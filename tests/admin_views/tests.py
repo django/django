@@ -2683,8 +2683,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<label>Extra form field:</label>")
         self.assertContains(
             response,
-            '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close'
-            "</a>",
+            '<a role="button" href="/test_admin/admin/admin_views/article/" '
+            'class="closelink">Close</a>',
         )
         self.assertEqual(response.context["title"], "View article")
         post = self.client.post(article_change_url, change_dict)
@@ -2835,8 +2835,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(
             response,
-            '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close'
-            "</a>",
+            '<a role="button" href="/test_admin/admin9/admin_views/article/" '
+            'class="closelink">Close</a>',
         )
 
     def test_change_view_save_as_new(self):
@@ -4056,7 +4056,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             args=(quote(self.pk),),
         )
         self.assertContains(
-            response, '<a href="%s" class="historylink"' % escape(expected_link)
+            response,
+            '<a role="button" href="%s" class="historylink"' % escape(expected_link),
         )
 
     def test_redirect_on_add_view_continue_button(self):
@@ -8313,13 +8314,14 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the history link.
         history_link = re.search(
-            '<a href="(.*?)" class="historylink">History</a>', response.text
+            '<a role="button" href="(.*?)" class="historylink">History</a>',
+            response.text,
         )
         self.assertURLEqual(history_link[1], self.get_history_url())
 
         # Check the delete link.
         delete_link = re.search(
-            '<a href="(.*?)" class="deletelink">Delete</a>', response.text
+            '<a role="button" href="(.*?)" class="deletelink">Delete</a>', response.text
         )
         self.assertURLEqual(delete_link[1], self.get_delete_url())
 
@@ -8359,7 +8361,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.client.force_login(viewuser)
         response = self.client.get(self.get_change_url())
         close_link = re.search(
-            '<a href="(.*?)" class="closelink">Close</a>', response.text
+            '<a role="button" href="(.*?)" class="closelink">Close</a>', response.text
         )
         close_link = close_link[1].replace("&amp;", "&")
         self.assertURLEqual(close_link, self.get_changelist_url())

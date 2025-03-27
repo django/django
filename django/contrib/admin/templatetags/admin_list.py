@@ -45,7 +45,7 @@ def paginator_number(cl, i):
         return format_html('<span class="this-page">{}</span> ', i)
     else:
         return format_html(
-            '<a href="{}"{}>{}</a> ',
+            '<a role="button" href="{}"{}>{}</a> ',
             cl.get_query_string({PAGE_VAR: i}),
             mark_safe(' class="end"' if i == cl.paginator.num_pages else ""),
             i,
