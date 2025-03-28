@@ -535,7 +535,7 @@ select[multiple] {
 
 /* FORM BUTTONS */
 
-.button, input[type=submit], input[type=button], .submit-row input, a.button {
+.button, input[type=submit], input[type=button], .submit-row input, button.button {
     background: var(--button-bg);
     padding: 10px 15px;
     border: none;
@@ -782,6 +782,7 @@ a.deletelink:focus, a.deletelink:hover {
     padding-left: 0;
     float: right;
     position: relative;
+    margin-top: -48px;
 }
 
 .object-tools li {
@@ -829,8 +830,27 @@ a.deletelink:focus, a.deletelink:hover {
     background-image: url(../img/tooltag-add.svg);
 }
 
-.object-tools:has(a.addlink) {
-    margin-top: -48px;
+button.addlink {
+    background: none;
+    border: none;
+    padding-left: 16px;
+    background: url(../img/icon-addlink.svg) 0 1px no-repeat;
+    cursor: pointer;
+    color: var(--link-fg);
+}
+
+button.deletelink {
+    background: none;
+    border: none;
+    padding-left: 16px;
+    background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
+    cursor: pointer;
+    color: var(--link-fg);
+}
+
+button.addlink:hover,
+button.deletelink:hover {
+    color: var(--link-hover-color);
 }
 
 /* OBJECT HISTORY */
