@@ -8,6 +8,7 @@ from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
     NestedObjects,
     build_q_object_from_lookup_parameters,
+    convert_to_nbsp,
     display_for_field,
     display_for_value,
     flatten,
@@ -265,6 +266,35 @@ class UtilsTests(SimpleTestCase):
             with self.subTest(empty_value=value):
                 display_value = display_for_value(value, self.empty_value)
                 self.assertEqual(display_value, self.empty_value)
+
+    def test_list_display_for_value_blank_str(self):
+        cases = [
+            ("   ", "   "),
+            ("     test", "     test"),
+            ("test       ", "test       "),
+            ("  test  ", "  test  "),
+        ]
+        for value, expect_display_value in cases:
+            with self.subTest(value=value):
+                display_value = display_for_value(value, self.empty_value)
+                self.assertEqual(display_value, f"“{expect_display_value}”")
+                display_value = display_for_value(
+                    value, self.empty_value, avoid_quote=True
+                )
+                self.assertEqual(display_value, expect_display_value)
+
+    def test_convert_to_nbsp(self):
+        cases = [
+            ("Summer", "Summer"),
+            ("  Winter Snowman", "  Winter Snowman"),
+            (" Spring   ", " Spring   "),
+            ("Autumn    ", "Autumn    "),
+            ("          ", "          "),
+        ]
+        for value, expect_converted_value in cases:
+            with self.subTest(value=value):
+                converted_value = convert_to_nbsp(value)
+                self.assertEqual(converted_value, expect_converted_value)
 
     def test_label_for_field(self):
         """

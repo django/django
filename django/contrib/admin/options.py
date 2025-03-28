@@ -21,6 +21,7 @@ from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects,
     construct_change_message,
+    display_for_value,
     flatten_fieldsets,
     get_deleted_objects,
     lookup_spawns_duplicates,
@@ -1381,10 +1382,13 @@ class ModelAdmin(BaseModelAdmin):
             current_app=self.admin_site.name,
         )
         # Add a link to the object's change form if the user can edit the obj.
+        obj_display = display_for_value(str(obj), "-", avoid_quote=True)
         if self.has_change_permission(request, obj):
-            obj_repr = format_html('<a href="{}">{}</a>', urlquote(obj_url), obj)
+            obj_repr = format_html(
+                '<a href="{}">{}</a>', urlquote(obj_url), obj_display
+            )
         else:
-            obj_repr = str(obj)
+            obj_repr = obj_display
         msg_dict = {
             "name": opts.verbose_name,
             "obj": obj_repr,
@@ -1505,9 +1509,12 @@ class ModelAdmin(BaseModelAdmin):
         preserved_filters = self.get_preserved_filters(request)
         preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
 
+        obj_display = display_for_value(str(obj), "-", avoid_quote=True)
         msg_dict = {
             "name": opts.verbose_name,
-            "obj": format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
+            "obj": format_html(
+                '<a href="{}">{}</a>', urlquote(request.path), obj_display
+            ),
         }
         if "_continue" in request.POST:
             msg = format_html(
@@ -1686,7 +1693,7 @@ class ModelAdmin(BaseModelAdmin):
             _("The %(name)s “%(obj)s” was deleted successfully.")
             % {
                 "name": self.opts.verbose_name,
-                "obj": obj_display,
+                "obj": display_for_value(str(obj_display), "-", avoid_quote=True),
             },
             messages.SUCCESS,
         )
@@ -2209,13 +2216,13 @@ class ModelAdmin(BaseModelAdmin):
             title = _("Cannot delete %(name)s") % {"name": object_name}
         else:
             title = _("Delete")
-
         context = {
             **self.admin_site.each_context(request),
             "title": title,
             "subtitle": None,
             "object_name": object_name,
             "object": obj,
+            "escaped_object": display_for_value(str(obj), "-", avoid_quote=True),
             "deleted_objects": deleted_objects,
             "model_count": dict(model_count).items(),
             "perms_lacking": perms_needed,
