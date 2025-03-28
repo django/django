@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2024
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2025
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013,2015-2020
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2025\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,8 +34,8 @@ msgstr "%(count)d %(items)s blev slettet."
 msgid "Cannot delete %(name)s"
 msgstr "Kan ikke slette %(name)s "
 
-msgid "Are you sure?"
-msgstr "Er du sikker?"
+msgid "Delete multiple objects"
+msgstr "Slet flere objekter"
 
 msgid "Administration"
 msgstr "Administration"
@@ -263,6 +263,9 @@ msgstr[1] "Alle %(total_count)s valgt"
 msgid "0 of %(cnt)s selected"
 msgstr "0 af %(cnt)s valgt"
 
+msgid "Delete"
+msgstr "Slet"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Ændringshistorik: %s"
@@ -346,6 +349,15 @@ msgstr "Sti"
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
 
+msgid "Model name"
+msgstr "Modelnavn"
+
+msgid "Add link"
+msgstr "Tilføj link"
+
+msgid "Change or view list link"
+msgstr "Ret eller vis liste-link"
+
 msgid "Add"
 msgstr "Tilføj"
 
@@ -355,15 +367,12 @@ msgstr "Vis"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Du har ikke rettigheder til at se eller redigere noget."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Indtast først et brugernavn og en adgangskode. Derefter får du yderligere "
-"redigeringsmuligheder."
+"Efter du har oprettet en bruger får du yderligere redigeringsmuligheder."
 
-msgid "Enter a username and password."
-msgstr "Indtast et brugernavn og en adgangskode."
+msgid "Error:"
+msgstr "Fejl:"
 
 msgid "Change password"
 msgstr "Skift adgangskode"
@@ -449,9 +458,6 @@ msgstr "Skift tema (nuværende tema: lyst)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Skift tema (nuværende tema: mørkt)"
 
-msgid "Delete"
-msgstr "Slet"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -486,9 +492,6 @@ msgstr "Ja, jeg er sikker"
 
 msgid "No, take me back"
 msgstr "Nej, tag mig tilbage"
-
-msgid "Delete multiple objects"
-msgstr "Slet flere objekter"
 
 #, python-format
 msgid ""
@@ -564,8 +567,8 @@ msgstr ""
 "Du er logget ind som %(username)s, men du har ikke tilladelse til at tilgå "
 "denne site. Vil du logge ind med en anden brugerkonto?"
 
-msgid "Forgotten your password or username?"
-msgstr "Har du glemt din adgangskode eller dit brugernavn?"
+msgid "Forgotten your login credentials?"
+msgstr "Har du glemt dine login-brugeroplysninger?"
 
 msgid "Toggle navigation"
 msgstr "Vis/skjul navigation"
@@ -731,8 +734,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Gå venligst til denne side og vælg en ny adgangskode:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Hvis du skulle have glemt dit brugernavn er det:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Hvis du har glemt dem, er du:"
 
 msgid "Thanks for using our site!"
 msgstr "Tak fordi du brugte vores website!"
