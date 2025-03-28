@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2023
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2020
 # rodin <romihardiyanto@gmail.com>, 2011-2012
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +27,8 @@ msgstr "%s yang tersedia"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Berikut adalah daftar %s yang tersedia. Anda dapat memilih satu atau lebih "
-"dengan memilihnya pada kotak di bawah, lalu mengeklik tanda panah \"Pilih\" "
-"di antara kedua kotak."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -41,18 +37,17 @@ msgstr "Ketik pada kotak ini untuk menyaring daftar %s yang tersedia."
 msgid "Filter"
 msgstr "Filter"
 
-msgid "Choose all"
-msgstr "Pilih semua"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Pilih untuk memilih seluruh %s sekaligus."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Pilih"
-
-msgid "Remove"
-msgstr "Hapus"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -60,23 +55,19 @@ msgstr "%s terpilih"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Berikut adalah daftar %s yang terpilih. Anda dapat menghapus satu atau lebih "
-"dengan memilihnya pada kotak di bawah, lalu mengeklik tanda panah \"Hapus\" "
-"di antara kedua kotak."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Ketik di dalam kotak utnuk menyaring daftar dar %s terpilih."
 
-msgid "Remove all"
-msgstr "Hapus semua"
+msgid "(click to clear)"
+msgstr ""
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Klik untuk menghapus semua pilihan %s sekaligus."
+msgid "Remove all %s"
+msgstr ""
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -242,53 +233,53 @@ msgid "Dec"
 msgstr "Des"
 
 msgid "Sunday"
-msgstr ""
+msgstr "Ahad"
 
 msgid "Monday"
-msgstr ""
+msgstr "Senin"
 
 msgid "Tuesday"
-msgstr ""
+msgstr "Selasa"
 
 msgid "Wednesday"
-msgstr ""
+msgstr "Rabu"
 
 msgid "Thursday"
-msgstr ""
+msgstr "Kamis"
 
 msgid "Friday"
-msgstr ""
+msgstr "Jum'at"
 
 msgid "Saturday"
-msgstr ""
+msgstr "Sabtu"
 
 msgctxt "abbrev. day Sunday"
 msgid "Sun"
-msgstr ""
+msgstr "Ahd"
 
 msgctxt "abbrev. day Monday"
 msgid "Mon"
-msgstr ""
+msgstr "Sen"
 
 msgctxt "abbrev. day Tuesday"
 msgid "Tue"
-msgstr ""
+msgstr "Sel"
 
 msgctxt "abbrev. day Wednesday"
 msgid "Wed"
-msgstr ""
+msgstr "Rab"
 
 msgctxt "abbrev. day Thursday"
 msgid "Thur"
-msgstr ""
+msgstr "Kam"
 
 msgctxt "abbrev. day Friday"
 msgid "Fri"
-msgstr ""
+msgstr "Jum"
 
 msgctxt "abbrev. day Saturday"
 msgid "Sat"
-msgstr ""
+msgstr "Sab"
 
 msgctxt "one letter Sunday"
 msgid "S"
@@ -317,9 +308,3 @@ msgstr "J"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Bentangkan"
-
-msgid "Hide"
-msgstr "Ciutkan"
