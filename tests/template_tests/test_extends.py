@@ -1,9 +1,10 @@
 import os
+import warnings
 
 from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
-from .utils import ROOT, setup
+from .utils import ROOT, TEMPLATE_DIR, setup
 
 RECURSIVE = os.path.join(ROOT, "recursive_templates")
 
@@ -195,3 +196,32 @@ class ExtendsBehaviorTests(SimpleTestCase):
         msg = "{% extends 'base.html' %} must be the first tag in the template."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Engine().from_string(template_string)
+
+    @override_settings(DEBUG=True)
+    def test_non_whitespace_text_used_after_extends_tag(self):
+        template_string = "{% extends 'index.html' %} some text"
+        msg = (
+            "Non-whitespace text used along with {% extends %} tag."
+            "The text will be ignored."
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            Engine().from_string(template_string)
+            self.assertTrue(any(msg == str(temp.message) for temp in w))
+
+    @override_settings(DEBUG=True)
+    def test_whitespace_text_used_with_extends_tag(self):
+        template_string = "{% extends 'index.html' %}         "
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            Engine().from_string(template_string)
+            self.assertEqual(w, [])
+
+    @override_settings(DEBUG=True)
+    def test_non_whitespace_text_used_before_extends_tag(self):
+        template_string = "some text {% extends 'index.html' %}"
+        with warnings.catch_warnings(record=True) as w:
+            template = Engine(dirs=[TEMPLATE_DIR]).from_string(template_string)
+            temp = template.render(Context({}))
+        self.assertEqual(temp.strip(), "some text index")
+        self.assertEqual(w, [])
