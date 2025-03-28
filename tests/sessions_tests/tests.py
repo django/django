@@ -1245,13 +1245,11 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
     async def test_cycle_async(self):
         pass
 
-    @unittest.expectedFailure
     def test_actual_expiry(self):
-        # The cookie backend doesn't handle non-default expiry dates, see #19201
         super().test_actual_expiry()
 
     async def test_actual_expiry_async(self):
-        pass
+        await super().test_actual_expiry_async()
 
     def test_unpickling_exception(self):
         # signed_cookies backend should handle unpickle exceptions gracefully

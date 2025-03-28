@@ -159,6 +159,12 @@ and the :setting:`SECRET_KEY` setting.
 
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
 
+.. versionchanged:: 6.0
+
+   The signed cookies backend now supports custom expiry times via
+   :meth:`~backends.base.SessionBase.set_expiry`.
+   Previously, these calls were silently ignored.
+
 Using sessions in views
 =======================
 
