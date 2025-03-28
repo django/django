@@ -2988,6 +2988,15 @@ unique field in the order that is specified without conflicts. For example::
     ``order_by()`` clause will be ignored if it contains annotations, inherited
     fields, or lookups spanning relations.
 
+.. warning::
+
+    MySQL does not support self-select updates. As a result, on MySQL
+    ``QuerySet.update()`` may execute a ``SELECT`` followed by an ``UPDATE``
+    instead of a single ``UPDATE`` when filtering on related tables, which can
+    introduce a race condition if concurrent changes occur between the
+    queries. To ensure atomicity, consider using transactions or avoiding such
+    filter conditions.
+
 ``delete()``
 ~~~~~~~~~~~~
 
