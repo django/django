@@ -737,6 +737,30 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(len(request.FILES), 1)
         self.assertIsInstance((request.FILES["File"]), InMemoryUploadedFile)
 
+    def test_POST_multipart_with_empty_filename(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="File"; filename=""',
+                    "Content-Type: application/octet-stream",
+                    "",
+                    "DATA",
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(len(request.FILES), 1)
+        self.assertIsInstance((request.FILES["File"]), InMemoryUploadedFile)
+
     def test_base64_invalid_encoding(self):
         payload = FakePayload(
             "\r\n".join(
