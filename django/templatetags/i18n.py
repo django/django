@@ -11,7 +11,10 @@ register = Library()
 
 
 class GetAvailableLanguagesNode(Node):
+    __slots__ = ("variable",)
+
     def __init__(self, variable):
+        super().__init__()
         self.variable = variable
 
     def render(self, context):
@@ -22,7 +25,10 @@ class GetAvailableLanguagesNode(Node):
 
 
 class GetLanguageInfoNode(Node):
+    __slots__ = ("lang_code", "variable")
+
     def __init__(self, lang_code, variable):
+        super().__init__()
         self.lang_code = lang_code
         self.variable = variable
 
@@ -33,7 +39,10 @@ class GetLanguageInfoNode(Node):
 
 
 class GetLanguageInfoListNode(Node):
+    __slots__ = ("languages", "variable")
+
     def __init__(self, languages, variable):
+        super().__init__()
         self.languages = languages
         self.variable = variable
 
@@ -52,7 +61,10 @@ class GetLanguageInfoListNode(Node):
 
 
 class GetCurrentLanguageNode(Node):
+    __slots__ = ("variable",)
+
     def __init__(self, variable):
+        super().__init__()
         self.variable = variable
 
     def render(self, context):
@@ -61,7 +73,10 @@ class GetCurrentLanguageNode(Node):
 
 
 class GetCurrentLanguageBidiNode(Node):
+    __slots__ = ("variable",)
+
     def __init__(self, variable):
+        super().__init__()
         self.variable = variable
 
     def render(self, context):
@@ -70,9 +85,12 @@ class GetCurrentLanguageBidiNode(Node):
 
 
 class TranslateNode(Node):
+    __slots__ = ("noop", "asvar", "message_context", "filter_expression")
+
     child_nodelists = ()
 
     def __init__(self, filter_expression, noop, asvar=None, message_context=None):
+        super().__init__()
         self.noop = noop
         self.asvar = asvar
         self.message_context = message_context
@@ -102,6 +120,18 @@ class TranslateNode(Node):
 
 
 class BlockTranslateNode(Node):
+    __slots__ = (
+        "extra_context",
+        "singular",
+        "plural",
+        "countervar",
+        "counter",
+        "message_context",
+        "trimmed",
+        "asvar",
+        "tag_name",
+    )
+
     def __init__(
         self,
         extra_context,
@@ -114,6 +144,7 @@ class BlockTranslateNode(Node):
         asvar=None,
         tag_name="blocktranslate",
     ):
+        super().__init__()
         self.extra_context = extra_context
         self.singular = singular
         self.plural = plural
@@ -205,7 +236,10 @@ class BlockTranslateNode(Node):
 
 
 class LanguageNode(Node):
+    __slots__ = ("nodelist", "language")
+
     def __init__(self, nodelist, language):
+        super().__init__()
         self.nodelist = nodelist
         self.language = language
 

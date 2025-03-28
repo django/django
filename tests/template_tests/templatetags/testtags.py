@@ -5,6 +5,7 @@ register = Library()
 
 class EchoNode(Node):
     def __init__(self, contents):
+        super().__init__()
         self.contents = contents
 
     def render(self, context):
