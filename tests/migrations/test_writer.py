@@ -1164,3 +1164,33 @@ class WriterTests(SimpleTestCase):
         output = writer.as_string()
         self.assertEqual(output.count("import"), 1)
         self.assertIn("from django.db import migrations, models", output)
+
+    def test_run_before(self):
+        migration = type(
+            "Migration",
+            (migrations.Migration,),
+            {"operations": [], "run_before": [("foo", "0001_bar")]},
+        )
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        self.assertIn("run_before = [('foo', '0001_bar')]", output)
+
+    def test_atomic_is_true(self):
+        migration = type(
+            "Migration",
+            (migrations.Migration,),
+            {"operations": []},
+        )
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        self.assertNotIn("atomic = True", output)
+
+    def test_atomic_is_false(self):
+        migration = type(
+            "Migration",
+            (migrations.Migration,),
+            {"operations": [], "atomic": False},
+        )
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        self.assertIn("atomic = False", output)
