@@ -2,7 +2,7 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023-2024
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023-2025
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2017,2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # 85794379431c3e0f5c85c0e72a78d45b_658ddd9, 2013
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023-2025\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,11 +61,11 @@ msgstr "adgangskode"
 msgid "last login"
 msgstr "sidst logget ind"
 
-msgid "No password set."
-msgstr "Ingen adgangskode valgt."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ugyldigt adgangskodeformat eller hashing-algoritme."
+
+msgid "No password set."
+msgstr "Ingen adgangskode valgt."
 
 msgid "Reset password"
 msgstr "Nulstil adgangskode"
@@ -76,15 +76,6 @@ msgstr "Sæt adgangskode"
 msgid "The two password fields didn’t match."
 msgstr "De to adgangskoder var ikke identiske."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Om brugeren kan logge ind med adgangskode eller ej. Hvis deaktiveret kan "
-"brugeren muligvis stadig logge ind vha. andre backends så som Single Sign-On "
-"eller LDAP."
-
 msgid "Password"
 msgstr "Adgangskode"
 
@@ -93,6 +84,15 @@ msgstr "Bekræftelse af adgangskode"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Indtast den samme adgangskode som før, for bekræftelse."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Om brugeren kan logge ind med adgangskode eller ej. Hvis deaktiveret kan "
+"brugeren muligvis stadig logge ind vha. andre backends så som Single Sign-On "
+"eller LDAP."
 
 msgid "Password-based authentication"
 msgstr "Adgangskodebaseret autentificering"
@@ -265,16 +265,11 @@ msgid "users"
 msgstr "brugere"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Denne adgangskode er for kort. Den skal indeholde mindst %(min_length)d tegn."
-msgstr[1] ""
-"Denne adgangskode er for kort. Den skal indeholde mindst %(min_length)d tegn."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Denne adgangskode er for kort. Den skal indeholde mindst %d tegn."
+msgstr[1] "Denne adgangskode er for kort. Den skal indeholde mindst %d tegn."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
