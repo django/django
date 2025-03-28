@@ -689,6 +689,22 @@ class OverwritingStorageTests(FileStorageTests):
         self.assertEqual(stored_name, "test_l.txt")
         self.assertEqual(len(stored_name), 10)
 
+    def test_file_name_truncation_with_dotted_name_custom_strategy(self):
+        class DottedFileNameStorage(FileSystemStorage):
+            def get_filename_extensions(self, filename):
+                ext = filename.split(".")[-1]
+                return f".{ext}"
+
+        storage = DottedFileNameStorage(
+            location=self.temp_dir, base_url="/test_media_url/", allow_overwrite=True
+        )
+        name = "test.long.dotted.name.txt"
+        file = ContentFile(b"content")
+        stored_name = storage.save(name, file, max_length=10)
+        self.addCleanup(storage.delete, stored_name)
+        self.assertEqual(stored_name, "test.l.txt")
+        self.assertEqual(len(stored_name), 10)
+
     def test_file_name_truncation_extension_too_long(self):
         name = "file_name.longext"
         file = ContentFile(b"content")
