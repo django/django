@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2020-2021,2023-2024
+# Igor Jerosimić, 2020-2021,2023-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Igor Jerosimić, 2020-2021,2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2020-2021,2023-2025\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -59,11 +59,11 @@ msgstr "лозинка"
 msgid "last login"
 msgstr "последња пријава"
 
-msgid "No password set."
-msgstr "Лозинка није унета."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Инвалидан формат лозинке или непознат hashing алгоритам."
+
+msgid "No password set."
+msgstr "Лозинка није унета."
 
 msgid "Reset password"
 msgstr "Ресетуј лозинку"
@@ -74,15 +74,6 @@ msgstr "Постави лозинку"
 msgid "The two password fields didn’t match."
 msgstr "Два поља за лозинке се не поклапају."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Да ли ће корисник моћи да се аутентификује помоћу лозинке или не. Ако је "
-"онемогућено, можда ће и даље моћи да се аутентификују помоћу других "
-"позадинских делова, као што су једнократно пријављивање (SSO) или LDAP."
-
 msgid "Password"
 msgstr "Лозинка"
 
@@ -91,6 +82,15 @@ msgstr "Потврда лозинке"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Унесите исту лозинку као малопре ради верификације."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Да ли ће корисник моћи да се аутентификује помоћу лозинке или не. Ако је "
+"онемогућено, можда ће и даље моћи да се аутентификују помоћу других "
+"позадинских делова, као што су једнократно пријављивање (SSO) или LDAP."
 
 msgid "Password-based authentication"
 msgstr "Потврда идентитета заснована на лозинки"
@@ -264,20 +264,12 @@ msgid "users"
 msgstr "корисници"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d карактер."
-msgstr[1] ""
-"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d "
-"карактера."
-msgstr[2] ""
-"Ова лозинка је превише кратка, мора садржати најмање %(min_length)d "
-"карактера."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Ова лозинка је прекратка. Мора да садржи најмање %d знак."
+msgstr[1] "Ова лозинка је прекратка. Мора да садржи најмање %d знака."
+msgstr[2] "Ова лозинка је прекратка. Мора да садржи најмање %d знакова."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
