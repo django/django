@@ -46,6 +46,13 @@ class ParserTests(SimpleTestCase):
             '<Lexer template_string="{% for i in 1 %}{{ a...", verbatim=False>',
         )
 
+    def test_repr_multiline(self):
+        lexer = Lexer("{% \nfor i in 1\n %}{{ a }}\n{% \nendfor \n%}", multiline=True)
+        self.assertEqual(
+            repr(lexer),
+            '<Lexer template_string="{% for i in 1 %}{{...", verbatim=False>',
+        )
+
     def test_filter_parsing(self):
         c = {"article": {"section": "News"}}
         p = Parser("", builtins=[filter_library])
