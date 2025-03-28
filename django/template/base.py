@@ -53,9 +53,11 @@ times with multiple contexts)
 import inspect
 import logging
 import re
+import warnings
 from enum import Enum
 
 from django.template.context import BaseContext
+from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.regex_helper import _lazy_re_compile
@@ -148,6 +150,8 @@ class Template:
         if origin is None:
             origin = Origin(UNKNOWN_SOURCE)
         self.name = name
+        if self.name:
+            engine.current_template_name = self.name
         self.origin = origin
         self.engine = engine
         self.source = str(template_string)  # May be lazy.
@@ -484,7 +488,9 @@ class Parser:
                         token, "Empty variable tag on line %d" % token.lineno
                     )
                 try:
-                    filter_expression = self.compile_filter(token.contents)
+                    filter_expression = self.compile_filter(
+                        token.contents, token.lineno
+                    )
                 except TemplateSyntaxError as e:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
@@ -602,11 +608,11 @@ class Parser:
         self.tags.update(lib.tags)
         self.filters.update(lib.filters)
 
-    def compile_filter(self, token):
+    def compile_filter(self, token, lineno=None):
         """
         Convenient wrapper for FilterExpression
         """
-        return FilterExpression(token, self)
+        return FilterExpression(token, self, lineno)
 
     def find_filter(self, filter_name):
         if filter_name in self.filters:
@@ -667,10 +673,11 @@ class FilterExpression:
         <Variable: 'variable'>
     """
 
-    __slots__ = ("token", "filters", "var", "is_var")
+    __slots__ = ("token", "filters", "var", "is_var", "lineno")
 
-    def __init__(self, token, parser):
+    def __init__(self, token, parser, lineno=None):
         self.token = token
+        self.lineno = lineno
         matches = filter_re.finditer(token)
         var_obj = None
         filters = []
@@ -685,7 +692,7 @@ class FilterExpression:
             if var_obj is None:
                 if constant := match["constant"]:
                     try:
-                        var_obj = Variable(constant).resolve({})
+                        var_obj = Variable(constant, self.lineno).resolve({})
                     except VariableDoesNotExist:
                         var_obj = None
                 elif (var := match["var"]) is None:
@@ -693,14 +700,16 @@ class FilterExpression:
                         "Could not find variable at start of %s." % token
                     )
                 else:
-                    var_obj = Variable(var)
+                    var_obj = Variable(var, self.lineno)
             else:
                 filter_name = match["filter_name"]
                 args = []
                 if constant_arg := match["constant_arg"]:
-                    args.append((False, Variable(constant_arg).resolve({})))
+                    args.append(
+                        (False, Variable(constant_arg, self.lineno).resolve({}))
+                    )
                 elif var_arg := match["var_arg"]:
-                    args.append((True, Variable(var_arg)))
+                    args.append((True, Variable(var_arg, self.lineno)))
                 filter_func = parser.find_filter(filter_name)
                 self.args_check(filter_name, filter_func, args)
                 filters.append((filter_func, args))
@@ -798,14 +807,15 @@ class Variable:
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
 
-    __slots__ = ("var", "literal", "lookups", "translate", "message_context")
+    __slots__ = ("var", "literal", "lookups", "translate", "message_context", "lineno")
 
-    def __init__(self, var):
+    def __init__(self, var, lineno=None):
         self.var = var
         self.literal = None
         self.lookups = None
         self.translate = False
         self.message_context = None
+        self.lineno = lineno
 
         if not isinstance(var, str):
             raise TypeError("Variable must be a string or number, got %s" % type(var))
@@ -845,6 +855,18 @@ class Variable:
                         "not begin with underscores: '%s'" % var
                     )
                 self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
+
+                if "" in self.lookups:
+                    from .engine import Engine
+
+                    engine = Engine.get_default()
+                    warnings.warn(
+                        "Double-dot lookup (e.g. '%s') in template %s[%d]"
+                        " is deprecated."
+                        % (var, engine.current_template_name, self.lineno),
+                        RemovedInDjango61Warning,
+                        stacklevel=2,
+                    )
 
     def resolve(self, context):
         """Resolve this variable against a given context."""
