@@ -104,7 +104,8 @@ class UserAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.user_change_password),
                 name="auth_user_password_change",
             ),
-        ] + super().get_urls()
+            *super().get_urls(),
+        ]
 
     def lookup_allowed(self, lookup, value, request):
         # Don't allow lookups involving passwords.

@@ -127,6 +127,10 @@ Python style
         """
         ...
 
+* Prefer :pep:`448` unpacking generalizations instead of concatenating
+  iterables with e.g. the ``+`` operator. It is faster and is more comfortable
+  to read. The ``RUF005`` rule of the `Ruff`_ linter can flag these for you.
+
 .. _coding-style-imports:
 
 Imports
@@ -507,3 +511,4 @@ For details about the JavaScript code style used by Django, see
 :doc:`javascript`.
 
 .. _editorconfig: https://editorconfig.org/
+.. _ruff: https://docs.astral.sh/ruff/
