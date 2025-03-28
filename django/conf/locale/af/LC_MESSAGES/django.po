@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019-2020,2022-2023
+# F Wolff <friedel@translate.org.za>, 2019-2020,2022-2025
 # Stephen Cox <stephencoxmail@gmail.com>, 2011-2012
 # unklphil <villiers.strauss@gmail.com>, 2014,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2022-2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2022-2025\n"
 "Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
@@ -345,6 +345,9 @@ msgstr "Daai bladsy bevat geen resultate nie"
 msgid "Enter a valid value."
 msgstr "Gee ’n geldige waarde."
 
+msgid "Enter a valid domain name."
+msgstr "Gee ’n geldige domeinnaam."
+
 msgid "Enter a valid URL."
 msgstr "Gee ’n geldige URL."
 
@@ -368,14 +371,18 @@ msgstr ""
 "Gee ’n geldige “slak” wat bestaan ​​uit Unicode-letters, syfers, onderstreep "
 "of koppelteken."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Gee ’n geldige IPv4-adres."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Gee ’n geldige %(protocol)s-adres"
 
-msgid "Enter a valid IPv6 address."
-msgstr "Gee ’n geldige IPv6-adres."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Gee ’n geldige IPv4- of IPv6-adres."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 of IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Gee slegs syfers wat deur kommas geskei is."
@@ -403,6 +410,9 @@ msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
+"Maak seker dié waarde is 'n veelvoud van stapgrootte %(limit_value)s, "
+"beginnende by %(offset)s, bv. %(offset)s, %(valid_value1)s, "
+"%(valid_value2)s, ens. "
 
 #, python-format
 msgid ""
@@ -682,8 +692,8 @@ msgid "Value must be valid JSON."
 msgstr "Waarde moet geldige JSON wees."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s-objek met %(field)s %(value)r bestaan nie."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s-objek met %(field)s %(value)r is nie ’n geldige keuse nie."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Vreemde sleutel (tipe bepaal deur verwante veld)"

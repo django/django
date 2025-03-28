@@ -3,21 +3,26 @@
 # Translators:
 # André Bouatchidzé <a@anbz.net>, 2013-2015
 # David A. <avsd05@gmail.com>, 2011
+# David A. <avsd05@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-18 00:36+0000\n"
-"Last-Translator: Ramiro Morales\n"
-"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, 2011\n"
+"Language-Team: Georgian (http://app.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ka\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "არჩეული %(verbose_name_plural)s-ის წაშლა"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -27,12 +32,8 @@ msgstr "%(count)d %(items)s წარმატებით წაიშალა
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s ვერ იშლება"
 
-msgid "Are you sure?"
-msgstr "დარწმუნებული ხართ?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "არჩეული %(verbose_name_plural)s-ის წაშლა"
+msgid "Delete multiple objects"
+msgstr "რამდენიმე ობიექტის წაშლა"
 
 msgid "Administration"
 msgstr "ადმინისტრირება"
@@ -59,16 +60,22 @@ msgid "Past 7 days"
 msgstr "ბოლო 7 დღე"
 
 msgid "This month"
-msgstr "მიმდინარე თვე"
+msgstr "ამ თვეში"
 
 msgid "This year"
-msgstr "მიმდინარე წელი"
+msgstr "წელს"
 
 msgid "No date"
-msgstr ""
+msgstr "თარიღის გარეშე"
 
 msgid "Has date"
-msgstr ""
+msgstr "აქვს თარიღი"
+
+msgid "Empty"
+msgstr "ცარიელი"
+
+msgid "Not empty"
+msgstr "ცარიელი არაა"
 
 #, python-format
 msgid ""
@@ -79,7 +86,7 @@ msgstr ""
 "იქონიეთ მხედველობაში, რომ ორივე ველი ითვალისწინებს მთავრულს."
 
 msgid "Action:"
-msgstr "მოქმედება:"
+msgstr "ქმედება:"
 
 #, python-format
 msgid "Add another %(verbose_name)s"
@@ -89,22 +96,22 @@ msgid "Remove"
 msgstr "წაშლა"
 
 msgid "Addition"
-msgstr ""
+msgstr "დამატება"
 
 msgid "Change"
-msgstr "შეცვლა"
+msgstr "ცვლილება"
 
 msgid "Deletion"
-msgstr ""
+msgstr "წაშლა"
 
 msgid "action time"
-msgstr "მოქმედების დრო"
+msgstr "ქმედების დრო"
 
 msgid "user"
-msgstr ""
+msgstr "მომხმარებელი"
 
 msgid "content type"
-msgstr ""
+msgstr "შემცველობის ტიპი"
 
 msgid "object id"
 msgstr "ობიექტის id"
@@ -112,56 +119,56 @@ msgstr "ობიექტის id"
 #. Translators: 'repr' means representation
 #. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
-msgstr "ობიექტის წარმ."
+msgstr "ობიექტის წარმ"
 
 msgid "action flag"
-msgstr "მოქმედების დროშა"
+msgstr "ქმედების ალამი"
 
 msgid "change message"
 msgstr "შეცვლის შეტყობინება"
 
 msgid "log entry"
-msgstr "ლოგის ერთეული"
+msgstr "ჟურნალის ჩანაწერი"
 
 msgid "log entries"
-msgstr "ლოგის ერთეულები"
+msgstr "ჟურნალის ჩანაწერები"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "დამატებულია \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr "“%(object)s” დაემატა."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "შეცვლილია \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "შეიცვალა “%(object)s” — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "წაშლილია \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr "“%(object)s.” წაიშალა"
 
 msgid "LogEntry Object"
 msgstr "ჟურნალის ჩანაწერის ობიექტი"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr ""
+msgid "Added {name} “{object}”."
+msgstr "დაემატა {name} “{object}”."
 
 msgid "Added."
-msgstr ""
+msgstr "დამატებულია."
 
 msgid "and"
 msgstr "და"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "დაემატა {fields} {name}-სთვის “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "{fields} შეიცვალა."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgid "Deleted {name} “{object}”."
+msgstr "წაიშალა {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "არცერთი ველი არ შეცვლილა."
@@ -169,12 +176,14 @@ msgstr "არცერთი ველი არ შეცვლილა."
 msgid "None"
 msgstr "არცერთი"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+msgid "Select this object for an action - {}"
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
 msgid "You may edit it again below."
@@ -182,28 +191,22 @@ msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -214,14 +217,14 @@ msgstr ""
 "ობიექტი არჩეული არ არის."
 
 msgid "No action selected."
-msgstr "მოქმედება არჩეული არ არის."
+msgstr "ქმედება არჩეული არაა."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" წარმატებით წაიშალა."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -230,11 +233,11 @@ msgstr "დავამატოთ %s"
 
 #, python-format
 msgid "Change %s"
-msgstr "შევცვალოთ %s"
+msgstr "%s-ის შეცვლა"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "%s-ის ნახვა"
 
 msgid "Database error"
 msgstr "მონაცემთა ბაზის შეცდომა"
@@ -255,12 +258,16 @@ msgstr[1] "%(total_count)s-ია არჩეული"
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s-დან არცერთი არჩეული არ არის"
 
+msgid "Delete"
+msgstr "წაშლა"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "ცვლილებების ისტორია: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -290,11 +297,11 @@ msgstr "%(app)s ადმინისტრირება"
 msgid "Page not found"
 msgstr "გვერდი ვერ მოიძებნა"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "უკაცრავად, მოთხოვნილი გვერდი ვერ მოიძებნა."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
-msgstr "საწყისი გვერდი"
+msgstr "მთავარი"
 
 msgid "Server error"
 msgstr "სერვერის შეცდომა"
@@ -306,11 +313,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "სერვერის შეცდომა <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"მოხდა შეცდომა. ინფორმაცია მასზე გადაეცა საიტის ადმინისტრატორებს ელ. ფოსტით "
-"და ის უნდა შესწორდეს უმოკლეს ვადებში. გმადლობთ მოთმინებისთვის."
 
 msgid "Run the selected action"
 msgstr "არჩეული მოქმედების შესრულება"
@@ -326,31 +331,68 @@ msgid "Select all %(total_count)s %(module_name)s"
 msgstr "ყველა %(total_count)s %(module_name)s-ის მონიშვნა"
 
 msgid "Clear selection"
-msgstr "მონიშვნის გასუფთავება"
+msgstr "მონიშნულის გასუფთავება"
 
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
+msgid "Breadcrumbs"
+msgstr "ნამცეცები"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "მოდელები %(name)s აპლიკაციაში"
+
+msgid "Model name"
 msgstr ""
-"ჯერ შეიყვანეთ მომხმარებლის სახელი და პაროლი. ამის შემდეგ თქვენ გექნებათ "
-"მომხმარებლის სხვა ოპციების რედაქტირების შესაძლებლობა."
 
-msgid "Enter a username and password."
-msgstr "შეიყვანეთ მომხმარებლის სახელი და პაროლი"
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
+msgid "Add"
+msgstr "დამატება"
+
+msgid "View"
+msgstr "ხედი"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr ""
+
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "პაროლის შეცვლა"
 
-msgid "Please correct the error below."
-msgstr ""
+msgid "Set password"
+msgstr "პაროლის დაყენება"
 
-msgid "Please correct the errors below."
-msgstr "გთხოვთ, შეასწოროთ ქვემოთმოყვანილი შეცდომები."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "შეიყვანეთ ახალი პაროლი მომხმარებლისათვის <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr "მთავარ შემცველობაზე გადასვლა"
 
 msgid "Welcome,"
 msgstr "კეთილი იყოს თქვენი მობრძანება,"
@@ -377,6 +419,15 @@ msgstr "წარმოდგენა საიტზე"
 msgid "Filter"
 msgstr "ფილტრი"
 
+msgid "Hide counts"
+msgstr "რაოდენობების დამალვა"
+
+msgid "Show counts"
+msgstr "რაოდენობების ჩვენება"
+
+msgid "Clear all filters"
+msgstr "ყველა ფილტრის გასუფთავება"
+
 msgid "Remove from sorting"
 msgstr "დალაგებიდან მოშორება"
 
@@ -387,8 +438,14 @@ msgstr "დალაგების პრიორიტეტი: %(priority_n
 msgid "Toggle sorting"
 msgstr "დალაგების გადართვა"
 
-msgid "Delete"
-msgstr "წავშალოთ"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -419,14 +476,11 @@ msgstr ""
 msgid "Objects"
 msgstr "ობიექტები"
 
-msgid "Yes, I'm sure"
-msgstr "კი, ნამდვილად"
+msgid "Yes, I’m sure"
+msgstr "დიახ, დარწმუნებული ვარ"
 
 msgid "No, take me back"
 msgstr "არა, დამაბრუნეთ უკან"
-
-msgid "Delete multiple objects"
-msgstr "რამდენიმე ობიექტის წაშლა"
 
 #, python-format
 msgid ""
@@ -453,11 +507,8 @@ msgstr ""
 "დარწმუნებული ხართ, რომ გსურთ %(objects_name)s ობიექტის წაშლა? ყველა შემდეგი "
 "ობიექტი, და მათზე დამოკიდებული ჩანაწერები წაშლილი იქნება:"
 
-msgid "View"
-msgstr ""
-
 msgid "Delete?"
-msgstr "წავშალოთ?"
+msgstr "წავშალო?"
 
 #, python-format
 msgid " By %(filter_title)s "
@@ -466,36 +517,32 @@ msgstr " %(filter_title)s მიხედვით "
 msgid "Summary"
 msgstr "შეჯამება"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "მოდელები %(name)s აპლიკაციაში"
-
-msgid "Add"
-msgstr "დამატება"
-
-msgid "You don't have permission to view or edit anything."
-msgstr ""
-
 msgid "Recent actions"
-msgstr ""
+msgstr "უკანასკნელი ქმედებები"
 
 msgid "My actions"
-msgstr ""
+msgstr "ჩემი ქმედებები"
 
 msgid "None available"
-msgstr "არ არის მისაწვდომი"
+msgstr "ხელმისაწვდომი არაფერია"
+
+msgid "Added:"
+msgstr "დამატებულია:"
+
+msgid "Changed:"
+msgstr "შეცვლილი:"
+
+msgid "Deleted:"
+msgstr "წაიშალა:"
 
 msgid "Unknown content"
 msgstr "უცნობი შიგთავსი"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"თქვენი მონაცემთა ბაზის ინსტალაცია არაკორექტულია. დარწმუნდით, რომ მონაცემთა "
-"ბაზის შესაბამისი ცხრილები შექმნილია, და მონაცემთა ბაზის წაკითხვა შეუძლია "
-"შესაბამის მომხმარებელს."
 
 #, python-format
 msgid ""
@@ -503,8 +550,20 @@ msgid ""
 "page. Would you like to login to a different account?"
 msgstr ""
 
-msgid "Forgotten your password or username?"
-msgstr "დაგავიწყდათ თქვენი პაროლი ან მომხმარებლის სახელი?"
+msgid "Forgotten your login credentials?"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr "ნავიგაციის გადართვა"
+
+msgid "Sidebar"
+msgstr "გვერდითი პანელი"
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr "ნავიგაციის ელემენტების გაფილტვრა"
 
 msgid "Date/time"
 msgstr "თარიღი/დრო"
@@ -513,23 +572,26 @@ msgid "User"
 msgstr "მომხმარებელი"
 
 msgid "Action"
-msgstr "მოქმედება"
+msgstr "ქმედება"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "ელემენტი"
+msgstr[1] "ჩანაწერები"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"ამ ობიექტს ცვლილებების ისტორია არა აქვს. როგორც ჩანს, იგი არ იყო დამატებული "
-"ადმინისტრირების საიტის მეშვეობით."
 
 msgid "Show all"
 msgstr "ვაჩვენოთ ყველა"
 
 msgid "Save"
-msgstr "შევინახოთ"
+msgstr "შენახვა"
 
 msgid "Popup closing…"
-msgstr ""
+msgstr "მხტუნარას დახურვა…"
 
 msgid "Search"
 msgstr "ძებნა"
@@ -545,19 +607,19 @@ msgid "%(full_result_count)s total"
 msgstr "სულ %(full_result_count)s"
 
 msgid "Save as new"
-msgstr "შევინახოთ, როგორც ახალი"
+msgstr "შენახვა, როგორც ახლის"
 
 msgid "Save and add another"
-msgstr "შევინახოთ და დავამატოთ ახალი"
+msgstr "შენახვა და კიდევ დამატება"
 
 msgid "Save and continue editing"
-msgstr "შევინახოთ და გავაგრძელოთ რედაქტირება"
+msgstr "შენახვა და ჩასწორების დამატება"
 
 msgid "Save and view"
-msgstr ""
+msgstr "შენახვა და ნახვა"
 
 msgid "Close"
-msgstr ""
+msgstr "დახურვა"
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -565,14 +627,18 @@ msgstr "მონიშნული %(model)s-ის შეცვლა"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "კიდევ ერთი %(model)s-ის დამატება"
 
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "მონიშნული %(model)s-ის წაშლა"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "გმადლობთ, რომ დღეს ამ საიტთან მუშაობას დაუთმეთ დრო."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "მონიშნული %(model)s-ის ნახვა"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "ხელახლა შესვლა"
@@ -584,17 +650,15 @@ msgid "Your password was changed."
 msgstr "თქვენი პაროლი შეიცვალა."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"გთხოვთ, უსაფრთხოების დაცვის მიზნით, შეიყვანოთ თქვენი ძველი პაროლი, შემდეგ კი "
-"ახალი პაროლი ორჯერ, რათა დარწმუნდეთ, რომ იგი შეყვანილია სწორად."
 
 msgid "Change my password"
-msgstr "შევცვალოთ ჩემი პაროლი"
+msgstr "პაროლის შეცვლა"
 
 msgid "Password reset"
-msgstr "პაროლის აღდგენა"
+msgstr "პაროლის ჩამოყრა"
 
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
@@ -602,7 +666,7 @@ msgstr ""
 "შეხვიდეთ სისტემაში."
 
 msgid "Password reset confirmation"
-msgstr "პაროლი შეცვლის დამოწმება"
+msgstr "პაროლი ჩამოყრის დადასტურება"
 
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
@@ -615,7 +679,7 @@ msgid "New password:"
 msgstr "ახალი პაროლი:"
 
 msgid "Confirm password:"
-msgstr "პაროლის დამოწმება:"
+msgstr "პაროლის დადასტურება:"
 
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
@@ -625,12 +689,12 @@ msgstr ""
 "გამოყენებული. გთხოვთ, კიდევ ერთხელ სცადოთ პაროლის აღდგენა."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 
@@ -645,8 +709,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "გთხოვთ, გადახვიდეთ შემდეგ გვერდზე და აირჩიოთ ახალი პაროლი:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "თქვენი მომხმარებლის სახელი (თუ დაგავიწყდათ):"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "გმადლობთ, რომ იყენებთ ჩვენს საიტს!"
@@ -656,24 +720,25 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s საიტის გუნდი"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"დაგავიწყდათ თქვენი პაროლი? შეიყვანეთ თქვენი ელ. ფოსტის მისამართი ქვემოთ და "
-"ჩვენ გამოგიგზავნით მითითებებს ახალი პაროლის დასაყენებლად."
 
 msgid "Email address:"
-msgstr "ელ. ფოსტის მისამართი:"
+msgstr "ელფოსტის მისამართი:"
 
 msgid "Reset my password"
 msgstr "აღვადგინოთ ჩემი პაროლი"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "ყველა თარიღი"
 
 #, python-format
 msgid "Select %s"
-msgstr "ავირჩიოთ %s"
+msgstr "აირჩიეთ %s"
 
 #, python-format
 msgid "Select %s to change"
@@ -684,7 +749,7 @@ msgid "Select %s to view"
 msgstr ""
 
 msgid "Date:"
-msgstr "თარიღი;"
+msgstr "თარიღი:"
 
 msgid "Time:"
 msgstr "დრო:"

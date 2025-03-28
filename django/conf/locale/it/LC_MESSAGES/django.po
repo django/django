@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Andrea Guerra, 2024
 # 0d21a39e384d88c2313b89b5042c04cb, 2017
 # Carlo Miron <carlo@miron.it>, 2011
 # Carlo Miron <carlo@miron.it>, 2014
@@ -24,10 +25,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
-"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023\n"
-"Language-Team: Italian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Andrea Guerra, 2024\n"
+"Language-Team: Italian (http://app.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -311,6 +312,9 @@ msgstr "Tatar"
 msgid "Udmurt"
 msgstr "Udmurt"
 
+msgid "Uyghur"
+msgstr "Uiguro"
+
 msgid "Ukrainian"
 msgstr "Ucraino"
 
@@ -358,6 +362,9 @@ msgstr "Quella pagina non presenta alcun risultato"
 msgid "Enter a valid value."
 msgstr "Inserisci un valore valido."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Inserisci un URL valido."
 
@@ -381,14 +388,18 @@ msgstr ""
 "Inserisci uno 'slug' valido contenente lettere, cifre, sottolineati o "
 "trattini."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Inserisci un indirizzo IPv4 valido."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Inserisci un indirizzo IPv6 valido."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Inserisci un indirizzo IPv4 o IPv6 valido."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Inserisci solo cifre separate da virgole."
@@ -411,6 +422,15 @@ msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
 "Assicurarsi che questo valore sia un multiplo della dimensione di passo "
 "%(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Assicurati che questo valore sia un multiplo della dimensione di passo "
+"%(limit_value)s, iniziando da %(offset)s, p.es. %(offset)s, "
+"%(valid_value1)s, %(valid_value2)s, e così via."
 
 #, python-format
 msgid ""
@@ -699,8 +719,8 @@ msgid "Value must be valid JSON."
 msgstr "Il valore deve essere un JSON valido."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "L'istanza del modello %(model)s con %(field)s %(value)r non esiste."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (tipo determinato dal campo collegato)"

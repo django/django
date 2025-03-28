@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2020-2021,2023-2024
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2020-2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 08:09+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, "
-"2016-2017,2020-2021,2023-2024\n"
+"2016-2017,2020-2021,2023-2025\n"
 "Language-Team: Lower Sorbian (http://app.transifex.com/django/django/"
 "language/dsb/)\n"
 "MIME-Version: 1.0\n"
@@ -58,11 +58,11 @@ msgstr "gronidło"
 msgid "last login"
 msgstr "slědne pśizjawjenje"
 
-msgid "No password set."
-msgstr "Žedno gronidło nastajone."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Njepłaśiwy gronidłowy format abo njeznaty kontrolny algoritmus."
+
+msgid "No password set."
+msgstr "Žedno gronidło nastajone."
 
 msgid "Reset password"
 msgstr "Gronidło slědk stajiś"
@@ -73,15 +73,6 @@ msgstr "Gronidło póstajis"
 msgid "The two password fields didn’t match."
 msgstr "Dwě gronidlowej póli njejstej jadnakej."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Lěc wužywaŕ móžo z gronidłom awtentificěrowaś abo nic. Jolic to jo "
-"znjemóžnjone, jo hyšći móžno, z pomocu drugich backendami awtentificěrowaś, "
-"na pśikład Single Sign-On abo LDAP."
-
 msgid "Password"
 msgstr "Gronidło"
 
@@ -90,6 +81,15 @@ msgstr "Gronidłowe wobkšuśenje"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Zapódajśo to samske gronidło, za pśespytanje."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Lěc wužywaŕ móžo z gronidłom awtentificěrowaś abo nic. Jolic to jo "
+"znjemóžnjone, jo hyšći móžno, z pomocu drugich backendami awtentificěrowaś, "
+"na pśikład Single Sign-On abo LDAP."
 
 msgid "Password-based authentication"
 msgstr "Awtentifikacija na zakłaźe gronidła"
@@ -264,24 +264,17 @@ msgid "users"
 msgstr "wužywarje"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuško "
-"wopśimowaś."
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %d znamuško wopśimowaś."
 msgstr[1] ""
-"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamušce "
-"wopśimowaś."
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %d znamušce wopśimowaś."
 msgstr[2] ""
-"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuška "
-"wopśimowaś."
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %d znamuška wopśimowaś."
 msgstr[3] ""
-"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuškow "
-"wopśimowaś."
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %d znamuškow wopśimowaś."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

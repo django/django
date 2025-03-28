@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2019,2021,2023-2024
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2019,2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 08:09+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, "
-"2016-2017,2019,2021,2023-2024\n"
+"2016-2017,2019,2021,2023-2025\n"
 "Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
@@ -58,11 +58,11 @@ msgstr "hesło"
 msgid "last login"
 msgstr "poslednje přizjewjenje"
 
-msgid "No password set."
-msgstr "Žane hesło nastajene."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Njepłaćiwy hesłowy format abo njeznaty kontrolny algoritmus."
+
+msgid "No password set."
+msgstr "Žane hesło nastajene."
 
 msgid "Reset password"
 msgstr "Hesło wróćo stajić"
@@ -73,15 +73,6 @@ msgstr "Hesło postajić"
 msgid "The two password fields didn’t match."
 msgstr "Dwě heslowej poli sej njewotpowědujetej."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Hač wužiwar móže z hesłom awtentifikować abo nic. Jeli to je znjemóžnjene, "
-"je hišće móžno, z druhimi backendami awtentifikować, na přikład Single Sign-"
-"On abo LDAP."
-
 msgid "Password"
 msgstr "Hesło"
 
@@ -90,6 +81,15 @@ msgstr "Hesłowe wobkrućenje"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Zapodajće samsne hesło kaž do toho, za přepruwowanje."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Hač wužiwar móže z hesłom awtentifikować abo nic. Jeli to je znjemóžnjene, "
+"je hišće móžno, z druhimi backendami awtentifikować, na přikład Single Sign-"
+"On abo LDAP."
 
 msgid "Password-based authentication"
 msgstr "Awtentifikacija na zakładźe hesła"
@@ -262,24 +262,13 @@ msgid "users"
 msgstr "wužiwarjo"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Tute hesło je překrótke. Dyrbi znajmjeńša %(min_length)d znamješko "
-"wobsahować."
-msgstr[1] ""
-"Tute hesło je překrótke. Dyrbi znajmjeńša %(min_length)d znamješce "
-"wobsahować."
-msgstr[2] ""
-"Tute hesło je překrótke. Dyrbi znajmjeńša %(min_length)d znamješka "
-"wobsahować."
-msgstr[3] ""
-"Tute hesło je překrótke. Dyrbi znajmjeńša %(min_length)d znamješkow "
-"wobsahować."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Tute hesło je překrótke. Dyrbi znajmjeńša %d znamješko wobsahować."
+msgstr[1] "Tute hesło je překrótke. Dyrbi znajmjeńša %d znamješce wobsahować."
+msgstr[2] "Tute hesło je překrótke. Dyrbi znajmjeńša %d znamješka wobsahować."
+msgstr[3] "Tute hesło je překrótke. Dyrbi znajmjeńša %d znamješkow wobsahować."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik Bleta <besnik@programeshqip.org>, 2023
+# Besnik Bleta <besnik@programeshqip.org>, 2023,2025
 # Besnik Bleta <besnik@programeshqip.org>, 2017-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-19 09:22+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2023\n"
-"Language-Team: Albanian (http://www.transifex.com/django/django/language/"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2023,2025\n"
+"Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,17 +23,17 @@ msgstr "Zgjerime PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr "Objekti %(nth)s te vargu nuk u vleftësua:"
+msgstr "Objekti %(nth)s te matrica s’u vleftësua:"
 
 msgid "Nested arrays must have the same length."
-msgstr "Vargjet brenda vargjesh duhet të kenë të njëjtën gjatësi."
+msgstr ""
 
 msgid "Map of strings to strings/nulls"
 msgstr "Hartë vargjesh te strings/nulls"
 
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
-msgstr "Vlera e “%(key)s” s’është varg ose nul."
+msgstr "Vlera e “%(key)s” s’është varg ose “nul”."
 
 msgid "Could not load JSON data."
 msgstr "S’u ngarkuan dot të dhëna JSON."

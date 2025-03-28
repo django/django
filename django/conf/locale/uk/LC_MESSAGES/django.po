@@ -3,9 +3,9 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011,2022
-# Denis Podlesniy <haos616@gmail.com>, 2016
+# Denys Pidlisnyi <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014-2015,2017
-# Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2023
+# Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2023,2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2014
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -22,9 +22,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 06:49+0000\n"
-"Last-Translator: Natalia, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, "
+"2019,2021-2023,2025\n"
 "Language-Team: Ukrainian (http://app.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -313,7 +314,7 @@ msgid "Udmurt"
 msgstr "Удмуртська"
 
 msgid "Uyghur"
-msgstr ""
+msgstr " Уйгурська"
 
 msgid "Ukrainian"
 msgstr "Українська"
@@ -363,7 +364,7 @@ msgid "Enter a valid value."
 msgstr "Введіть коректне значення."
 
 msgid "Enter a valid domain name."
-msgstr ""
+msgstr "Введіть правильне доменне ім'я."
 
 msgid "Enter a valid URL."
 msgstr "Введіть коректний URL."
@@ -388,16 +389,16 @@ msgstr ""
 
 #, python-format
 msgid "Enter a valid %(protocol)s address."
-msgstr ""
+msgstr "Введіть правильну %(protocol)s адресу."
 
 msgid "IPv4"
-msgstr ""
+msgstr "IPv4"
 
 msgid "IPv6"
-msgstr ""
+msgstr "IPv6"
 
 msgid "IPv4 or IPv6"
-msgstr ""
+msgstr "IPv4 або IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Введіть тільки цифри, що розділені комами."
@@ -418,13 +419,16 @@ msgstr "Переконайтеся, що це значення більше чи
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
-msgstr ""
+msgstr "Переконайтеся, що значення є кратним розміру кроку %(limit_value)s."
 
 #, python-format
 msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
+"Переконайтеся, що значення є кратним розміру кроку %(limit_value)s, "
+"починаючи з %(offset)s. Наприклад, %(offset)s, %(valid_value1)s, "
+"%(valid_value2)s і т. д."
 
 #, python-format
 msgid ""
@@ -523,7 +527,7 @@ msgstr "%(model_name)s з таким %(field_labels)s вже існує."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr ""
+msgstr "Порушено обмеження \"%(name)s\"."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -719,8 +723,8 @@ msgid "Value must be valid JSON."
 msgstr "Значення має бути коректним JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Екземпляр %(model)s з %(field)s %(value)r не існує."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Зовнішній ключ (тип визначається відповідно поля)"
