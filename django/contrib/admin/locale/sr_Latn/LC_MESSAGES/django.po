@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2019
+# Aco Jugo, 2024
+# Igor Jerosimić, 2019,2024-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-06-27 12:37+0000\n"
-"Last-Translator: Igor Jerosimić\n"
-"Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr@latin/)\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2019,2024-2025\n"
+"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,226 +20,292 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#, python-format
-msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Uspešno obrisano: %(count)d %(items)s."
-
-#, python-format
-msgid "Cannot delete %(name)s"
-msgstr "Nesuspelo brisanje %(name)s"
-
-msgid "Are you sure?"
-msgstr "Da li ste sigurni?"
-
+#: contrib/admin/actions.py:17
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Briši označene objekte klase %(verbose_name_plural)s"
 
+#: contrib/admin/actions.py:52
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Uspešno obrisano: %(count)d %(items)s."
+
+#: contrib/admin/actions.py:62 contrib/admin/options.py:2250
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Nesuspelo brisanje %(name)s"
+
+#: contrib/admin/actions.py:64
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:17
+msgid "Delete multiple objects"
+msgstr "Brisanje više objekata"
+
+#: contrib/admin/apps.py:13
 msgid "Administration"
 msgstr "Administracija"
 
+#: contrib/admin/filters.py:154 contrib/admin/filters.py:296
+#: contrib/admin/filters.py:365 contrib/admin/filters.py:433
+#: contrib/admin/filters.py:608 contrib/admin/filters.py:702
 msgid "All"
 msgstr "Svi"
 
+#: contrib/admin/filters.py:366
 msgid "Yes"
 msgstr "Da"
 
+#: contrib/admin/filters.py:367
 msgid "No"
 msgstr "Ne"
 
+#: contrib/admin/filters.py:381
 msgid "Unknown"
 msgstr "Nepoznato"
 
+#: contrib/admin/filters.py:491
 msgid "Any date"
 msgstr "Svi datumi"
 
+#: contrib/admin/filters.py:493
 msgid "Today"
 msgstr "Danas"
 
+#: contrib/admin/filters.py:500
 msgid "Past 7 days"
 msgstr "Poslednjih 7 dana"
 
+#: contrib/admin/filters.py:507
 msgid "This month"
 msgstr "Ovaj mesec"
 
+#: contrib/admin/filters.py:514
 msgid "This year"
 msgstr "Ova godina"
 
+#: contrib/admin/filters.py:524
 msgid "No date"
 msgstr "Nema datuma"
 
+#: contrib/admin/filters.py:525
 msgid "Has date"
 msgstr "Ima datum"
 
+#: contrib/admin/filters.py:703
+msgid "Empty"
+msgstr "Prazno"
+
+#: contrib/admin/filters.py:704
+msgid "Not empty"
+msgstr "Nije prazno"
+
+#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
-"Please enter the correct %(username)s and password for a staff account. Note "
-"that both fields may be case-sensitive."
-msgstr ""
-"Molim vas unesite ispravno %(username)s i lozinku. Obratite pažnju da mala i "
-"velika slova predstavljaju različite karaktere."
+"Please enter the correct %(username)s and password for a staff account. Note"
+" that both fields may be case-sensitive."
+msgstr "Molim vas unesite ispravno %(username)s i lozinku. Obratite pažnju da mala i velika slova predstavljaju različite karaktere."
 
+#: contrib/admin/helpers.py:31
 msgid "Action:"
 msgstr "Radnja:"
 
+#: contrib/admin/helpers.py:433
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Dodaj još jedan objekat klase %(verbose_name)s."
 
+#: contrib/admin/helpers.py:437
 msgid "Remove"
 msgstr "Obriši"
 
+#: contrib/admin/models.py:20
 msgid "Addition"
 msgstr "Dodavanja"
 
+#: contrib/admin/models.py:21 contrib/admin/templates/admin/app_list.html:38
+#: contrib/admin/templates/admin/edit_inline/stacked.html:20
+#: contrib/admin/templates/admin/edit_inline/tabular.html:40
 msgid "Change"
 msgstr "Izmeni"
 
+#: contrib/admin/models.py:22
 msgid "Deletion"
 msgstr "Brisanja"
 
+#: contrib/admin/models.py:108
 msgid "action time"
 msgstr "vreme radnje"
 
+#: contrib/admin/models.py:115
 msgid "user"
 msgstr "korisnik"
 
+#: contrib/admin/models.py:120
 msgid "content type"
 msgstr "tip sadržaja"
 
+#: contrib/admin/models.py:124
 msgid "object id"
 msgstr "id objekta"
 
 #. Translators: 'repr' means representation
 #. (https://docs.python.org/library/functions.html#repr)
+#: contrib/admin/models.py:127
 msgid "object repr"
 msgstr "opis objekta"
 
+#: contrib/admin/models.py:129
 msgid "action flag"
 msgstr "oznaka radnje"
 
+#: contrib/admin/models.py:132
 msgid "change message"
 msgstr "opis izmene"
 
+#: contrib/admin/models.py:137
 msgid "log entry"
 msgstr "zapis u logovima"
 
+#: contrib/admin/models.py:138
 msgid "log entries"
 msgstr "zapisi u logovima"
 
+#: contrib/admin/models.py:147
 #, python-format
-msgid "Added \"%(object)s\"."
+msgid "Added “%(object)s”."
 msgstr "Dodat objekat klase „%(object)s“."
 
+#: contrib/admin/models.py:149
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
 msgstr "Promenjen objekat klase „%(object)s“ - %(changes)s"
 
+#: contrib/admin/models.py:154
 #, python-format
-msgid "Deleted \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
 msgstr "Uklonjen objekat klase „%(object)s“."
 
+#: contrib/admin/models.py:156
 msgid "LogEntry Object"
 msgstr "Objekat unosa loga"
 
+#: contrib/admin/models.py:185
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr "Dodat objekat {name} \"{object}\"."
 
+#: contrib/admin/models.py:190
 msgid "Added."
 msgstr "Dodato."
 
+#: contrib/admin/models.py:198 contrib/admin/options.py:2504
 msgid "and"
 msgstr "i"
 
+#: contrib/admin/models.py:205
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr "Izmenjena polja {fields} za {name} \"{object}\"."
 
+#: contrib/admin/models.py:211
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Izmenjena polja {fields}."
 
+#: contrib/admin/models.py:221
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr "Obrisan objekat {name} \"{object}\"."
 
+#: contrib/admin/models.py:227
 msgid "No fields changed."
 msgstr "Bez izmena u poljima."
 
+#: contrib/admin/options.py:248 contrib/admin/options.py:292
 msgid "None"
 msgstr "Ništa"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
+#: contrib/admin/options.py:344
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "Držite „Control“, ili „Command“ na Mac-u da biste obeležili više od jedne stavke."
 
+#: contrib/admin/options.py:1031
+msgid "Select this object for an action - {}"
+msgstr "Izaberi ovaj objekat za radnju - {}"
+
+#: contrib/admin/options.py:1469 contrib/admin/options.py:1507
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgid "The {name} “{obj}” was added successfully."
+msgstr "Objekat {name} \"{obj}\" uspešno dodat."
 
+#: contrib/admin/options.py:1471
 msgid "You may edit it again below."
-msgstr ""
+msgstr "Možete ga izmeniti opet ispod"
 
+#: contrib/admin/options.py:1488
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "Objekat {name} \"{obj}\" uspešno dodat. Možete dodati još jedan {name} ispod."
+
+#: contrib/admin/options.py:1556
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "Objekat {name} \"{obj}\" uspešno izmenjen. Možete ga opet izmeniti ispod."
+
+#: contrib/admin/options.py:1576
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "Objekat {name} \"{obj}\" uspešno izmenjen. Možete dodati još jedan {name} ispod."
 
+#: contrib/admin/options.py:1598
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "Objekat {name} \"{obj}\" uspešno izmenjen."
 
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
-
+#: contrib/admin/options.py:1676 contrib/admin/options.py:2066
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Potrebno je izabrati objekte da bi se izvršila akcija nad njima. Nijedan "
-"objekat nije promenjen."
+msgstr "Potrebno je izabrati objekte da bi se izvršila akcija nad njima. Nijedan objekat nije promenjen."
 
+#: contrib/admin/options.py:1696
 msgid "No action selected."
 msgstr "Nije izabrana nijedna akcija."
 
+#: contrib/admin/options.py:1727
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Objekat „%(obj)s“ klase %(name)s uspešno je obrisan."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "Objekat „%(obj)s“ klase %(name)s je uspešno obrisan."
 
+#: contrib/admin/options.py:1829
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr ""
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s sa identifikacijom \"%(key)s\" ne postoji. Možda je izbrisan?"
 
+#: contrib/admin/options.py:1945
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj objekat klase %s"
 
+#: contrib/admin/options.py:1947
 #, python-format
 msgid "Change %s"
 msgstr "Izmeni objekat klase %s"
 
+#: contrib/admin/options.py:1949
 #, python-format
 msgid "View %s"
 msgstr "Pregled %s"
 
+#: contrib/admin/options.py:2036
 msgid "Database error"
 msgstr "Greška u bazi podataka"
 
+#: contrib/admin/options.py:2126
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -247,6 +313,7 @@ msgstr[0] "Uspešno promenjen %(count)s %(name)s."
 msgstr[1] "Uspešno promenjena %(count)s %(name)s."
 msgstr[2] "Uspešno promenjenih %(count)s %(name)s."
 
+#: contrib/admin/options.py:2157
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -254,286 +321,480 @@ msgstr[0] "%(total_count)s izabran"
 msgstr[1] "Sva %(total_count)s izabrana"
 msgstr[2] "Svih %(total_count)s izabranih"
 
+#: contrib/admin/options.py:2163
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 od %(cnt)s izabrano"
 
+#: contrib/admin/options.py:2252
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+#: contrib/admin/templates/admin/submit_line.html:14
+msgid "Delete"
+msgstr "Obriši"
+
+#: contrib/admin/options.py:2308
 #, python-format
 msgid "Change history: %s"
 msgstr "Istorijat izmena: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#: contrib/admin/options.py:2498
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(class_name)s %(instance)s"
 
+#: contrib/admin/options.py:2507
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
-msgstr ""
+msgstr "Da bi izbrisali %(class_name)s%(instance)s potrebno je brisati i sledeće zaštićene povezane objekte: %(related_objects)s"
 
+#: contrib/admin/sites.py:40 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Django administracija sajta"
 
+#: contrib/admin/sites.py:43 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Django administracija"
 
+#: contrib/admin/sites.py:46
 msgid "Site administration"
 msgstr "Administracija sistema"
 
+#: contrib/admin/sites.py:431 contrib/admin/templates/admin/login.html:64
+#: contrib/admin/templates/registration/password_reset_complete.html:15
+#: contrib/admin/tests.py:146
 msgid "Log in"
 msgstr "Prijava"
 
+#: contrib/admin/sites.py:586
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s administracija"
 
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Stranica nije pronađena"
 
-msgid "We're sorry, but the requested page could not be found."
+#: contrib/admin/templates/admin/404.html:10
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Žao nam je, tražena stranica nije pronađena."
 
+#: contrib/admin/templates/admin/500.html:6
+#: contrib/admin/templates/admin/app_index.html:10
+#: contrib/admin/templates/admin/auth/user/change_password.html:15
+#: contrib/admin/templates/admin/base.html:75
+#: contrib/admin/templates/admin/change_form.html:19
+#: contrib/admin/templates/admin/change_list.html:33
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:14
+#: contrib/admin/templates/admin/invalid_setup.html:6
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:13
+#: contrib/admin/templates/registration/password_change_form.html:16
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_confirm.html:8
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:8
 msgid "Home"
 msgstr "Početna"
 
+#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Greška na serveru"
 
+#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Greška na serveru (500)"
 
+#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Greška na serveru <em>(500)</em>"
 
+#: contrib/admin/templates/admin/500.html:15
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
-msgstr ""
+msgstr "Desila se greška. Prijavljena je administratorima sajta preko e-pošte i trebalo bi da uskoro bude ispravljena. Hvala Vam na strpljenju."
 
+#: contrib/admin/templates/admin/actions.html:8
 msgid "Run the selected action"
 msgstr "Pokreni odabranu radnju"
 
+#: contrib/admin/templates/admin/actions.html:8
 msgid "Go"
 msgstr "Počni"
 
+#: contrib/admin/templates/admin/actions.html:16
 msgid "Click here to select the objects across all pages"
 msgstr "Izaberi sve objekte na ovoj stranici."
 
+#: contrib/admin/templates/admin/actions.html:16
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Izaberi sve %(module_name)s od %(total_count)s ukupno."
 
+#: contrib/admin/templates/admin/actions.html:18
 msgid "Clear selection"
 msgstr "Poništi izbor"
 
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr ""
-"Prvo unesite korisničko ime i lozinku. Potom ćete moći da menjate još "
-"korisničkih podešavanja."
+#: contrib/admin/templates/admin/app_index.html:8
+#: contrib/admin/templates/admin/base.html:72
+msgid "Breadcrumbs"
+msgstr "Mrvice"
 
-msgid "Enter a username and password."
-msgstr "Unesite korisničko ime i lozinku"
+#: contrib/admin/templates/admin/app_list.html:8
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modeli u aplikaciji %(name)s"
 
+#: contrib/admin/templates/admin/app_list.html:12
+msgid "Model name"
+msgstr "Ime modela"
+
+#: contrib/admin/templates/admin/app_list.html:13
+msgid "Add link"
+msgstr "Dodaj vezu"
+
+#: contrib/admin/templates/admin/app_list.html:14
+msgid "Change or view list link"
+msgstr "Pogledaj ili promeni vezu liste"
+
+#: contrib/admin/templates/admin/app_list.html:29
+msgid "Add"
+msgstr "Dodaj"
+
+#: contrib/admin/templates/admin/app_list.html:36
+#: contrib/admin/templates/admin/edit_inline/stacked.html:20
+#: contrib/admin/templates/admin/edit_inline/tabular.html:40
+msgid "View"
+msgstr "Pregled"
+
+#: contrib/admin/templates/admin/app_list.html:50
+msgid "You don’t have permission to view or edit anything."
+msgstr "Nemate dozvole da pogledate ili izmenite bilo šta."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "Nakon što napravite korisnika, moći ćete da izmenite više korisničkih opcija."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:5
+#: contrib/admin/templates/admin/change_form.html:4
+#: contrib/admin/templates/admin/change_list.html:4
+#: contrib/admin/templates/admin/login.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+msgid "Error:"
+msgstr "Greška:"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:19
+#: contrib/admin/templates/admin/auth/user/change_password.html:71
+#: contrib/admin/templates/admin/base.html:56
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:7
 msgid "Change password"
 msgstr "Promena lozinke"
 
+#: contrib/admin/templates/admin/auth/user/change_password.html:19
+msgid "Set password"
+msgstr "Postavi lozinku"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:30
+#: contrib/admin/templates/admin/change_form.html:45
+#: contrib/admin/templates/admin/change_list.html:54
+#: contrib/admin/templates/admin/login.html:24
+#: contrib/admin/templates/registration/password_change_form.html:27
 msgid "Please correct the error below."
-msgstr ""
+msgid_plural "Please correct the errors below."
+msgstr[0] "Molimo ispravite grešku ispod."
+msgstr[1] "Molimo ispravite greške ispod."
+msgstr[2] "Molimo ispravite greške ispod."
 
-msgid "Please correct the errors below."
-msgstr ""
-
+#: contrib/admin/templates/admin/auth/user/change_password.html:34
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Unesite novu lozinku za korisnika <strong>%(username)s</strong>."
 
+#: contrib/admin/templates/admin/auth/user/change_password.html:36
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr " Ova akcija će<strong>omogućiti</strong> autentifikaciju zasnovanu na lozinki za ovog korisnika."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:72
+msgid "Disable password-based authentication"
+msgstr "Onemogući autentifikaciju zasnovanu na lozinki"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:74
+msgid "Enable password-based authentication"
+msgstr "Omogući autentifikaciju zasnovanu na lozinki"
+
+#: contrib/admin/templates/admin/base.html:27
+msgid "Skip to main content"
+msgstr "Pređi na glavni sadržaj"
+
+#: contrib/admin/templates/admin/base.html:42
 msgid "Welcome,"
 msgstr "Dobrodošli,"
 
+#: contrib/admin/templates/admin/base.html:47
 msgid "View site"
 msgstr "Pogledaj sajt"
 
+#: contrib/admin/templates/admin/base.html:52
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:7
 msgid "Documentation"
 msgstr "Dokumentacija"
 
+#: contrib/admin/templates/admin/base.html:60
+#: contrib/admin/templates/registration/password_change_done.html:7
+#: contrib/admin/templates/registration/password_change_form.html:10
 msgid "Log out"
 msgstr "Odjava"
 
+#: contrib/admin/templates/admin/change_form.html:22
+#: contrib/admin/templates/admin/change_list_object_tools.html:8
 #, python-format
 msgid "Add %(name)s"
 msgstr "Dodaj objekat klase %(name)s"
 
+#: contrib/admin/templates/admin/change_form_object_tools.html:5
+#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Istorijat"
 
+#: contrib/admin/templates/admin/change_form_object_tools.html:7
+#: contrib/admin/templates/admin/edit_inline/stacked.html:22
+#: contrib/admin/templates/admin/edit_inline/tabular.html:42
 msgid "View on site"
 msgstr "Pregled na sajtu"
 
+#: contrib/admin/templates/admin/change_list.html:79
 msgid "Filter"
 msgstr "Filter"
 
+#: contrib/admin/templates/admin/change_list.html:82
+msgid "Hide counts"
+msgstr "Sakrij brojanje"
+
+#: contrib/admin/templates/admin/change_list.html:83
+msgid "Show counts"
+msgstr "Prikaži brojanje"
+
+#: contrib/admin/templates/admin/change_list.html:86
+msgid "Clear all filters"
+msgstr "Obriši sve filtere"
+
+#: contrib/admin/templates/admin/change_list_results.html:16
 msgid "Remove from sorting"
 msgstr "Izbaci iz sortiranja"
 
+#: contrib/admin/templates/admin/change_list_results.html:17
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Prioritet sortiranja: %(priority_number)s"
 
+#: contrib/admin/templates/admin/change_list_results.html:18
 msgid "Toggle sorting"
 msgstr "Uključi/isključi sortiranje"
 
-msgid "Delete"
-msgstr "Obriši"
+#: contrib/admin/templates/admin/color_theme_toggle.html:3
+msgid "Toggle theme (current theme: auto)"
+msgstr "Uključi/isključi temu (trenutna tema: auto)"
 
+#: contrib/admin/templates/admin/color_theme_toggle.html:4
+msgid "Toggle theme (current theme: light)"
+msgstr "Uključi/isključi temu (trenutna tema: svetla)"
+
+#: contrib/admin/templates/admin/color_theme_toggle.html:5
+msgid "Toggle theme (current theme: dark)"
+msgstr "Uključi/isključi temu (trenutna tema: tamna)"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:25
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr ""
-"Uklanjanje %(object_name)s „%(escaped_object)s“ povlači uklanjanje svih "
-"objekata koji su povezani sa ovim objektom, ali vaš nalog nema dozvole za "
-"brisanje sledećih tipova objekata:"
+msgstr "Uklanjanje %(object_name)s „%(escaped_object)s“ povlači uklanjanje svih objekata koji su povezani sa ovim objektom, ali vaš nalog nema dozvole za brisanje sledećih tipova objekata:"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:30
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
-"following protected related objects:"
-msgstr ""
-"Da bi izbrisali izabran %(object_name)s „%(escaped_object)s“ potrebno je "
-"brisati i sledeće zaštićene povezane objekte:"
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
+" following protected related objects:"
+msgstr "Da bi izbrisali izabran %(object_name)s „%(escaped_object)s“ potrebno je brisati i sledeće zaštićene povezane objekte:"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr ""
-"Da sigurni da želite da obrišete %(object_name)s „%(escaped_object)s“? "
-"Sledeći objekti koji su u vezi sa ovim objektom će takođe biti obrisani:"
+msgstr "Da sigurni da želite da obrišete %(object_name)s „%(escaped_object)s“? Sledeći objekti koji su u vezi sa ovim objektom će takođe biti obrisani:"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:37
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:31
 msgid "Objects"
-msgstr ""
+msgstr "Objekti"
 
-msgid "Yes, I'm sure"
+#: contrib/admin/templates/admin/delete_confirmation.html:44
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:42
+msgid "Yes, I’m sure"
 msgstr "Da, siguran sam"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:45
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:43
 msgid "No, take me back"
-msgstr ""
+msgstr "Ne, hoću nazad"
 
-msgid "Delete multiple objects"
-msgstr "Brisanje više objekata"
-
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:23
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Da bi izbrisali izabrane %(objects_name)s potrebno je brisati i zaštićene "
-"povezane objekte, međutim vaš nalog nema dozvole za brisanje sledećih tipova "
-"objekata:"
+msgstr "Da bi izbrisali izabrane %(objects_name)s potrebno je brisati i zaštićene povezane objekte, međutim vaš nalog nema dozvole za brisanje sledećih tipova objekata:"
 
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
-msgstr ""
-"Da bi izbrisali izabrane %(objects_name)s potrebno je brisati i sledeće "
-"zaštićene povezane objekte:"
+msgstr "Da bi izbrisali izabrane %(objects_name)s potrebno je brisati i sledeće zaštićene povezane objekte:"
 
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:29
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
-msgstr ""
-"Da li ste sigurni da želite da izbrišete izabrane %(objects_name)s? Svi "
-"sledeći objekti i objekti sa njima povezani će biti izbrisani:"
+msgstr "Da li ste sigurni da želite da izbrišete izabrane %(objects_name)s? Svi sledeći objekti i objekti sa njima povezani će biti izbrisani:"
 
-msgid "View"
-msgstr "Pregled"
-
+#: contrib/admin/templates/admin/edit_inline/tabular.html:26
 msgid "Delete?"
 msgstr "Brisanje?"
 
+#: contrib/admin/templates/admin/filter.html:4
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " %(filter_title)s "
 
+#: contrib/admin/templates/admin/includes/object_delete_summary.html:2
 msgid "Summary"
-msgstr ""
+msgstr "Sumarno"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr ""
-
-msgid "Add"
-msgstr "Dodaj"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "Nemate dozvolu da pogledate ili izmenite bilo šta."
-
+#: contrib/admin/templates/admin/index.html:23
 msgid "Recent actions"
-msgstr ""
+msgstr "Skorašnje akcije"
 
+#: contrib/admin/templates/admin/index.html:24
 msgid "My actions"
-msgstr ""
+msgstr "Moje akcije"
 
+#: contrib/admin/templates/admin/index.html:28
 msgid "None available"
 msgstr "Nema podataka"
 
+#: contrib/admin/templates/admin/index.html:33
+msgid "Added:"
+msgstr "Dodato:"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Changed:"
+msgstr "Izmenjeno:"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Deleted:"
+msgstr "Obrisano:"
+
+#: contrib/admin/templates/admin/index.html:43
 msgid "Unknown content"
 msgstr "Nepoznat sadržaj"
 
+#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"Nešto nije uredu sa vašom bazom podataka. Proverite da li postoje "
-"odgovarajuće tabele i da li odgovarajući korisnik ima pristup bazi."
+"Something’s wrong with your database installation. Make sure the appropriate"
+" database tables have been created, and make sure the database is readable "
+"by the appropriate user."
+msgstr "Nešto nije uredu sa vašom bazom podataka. Proverite da li postoje odgovarajuće tabele i da li odgovarajući korisnik ima pristup bazi."
 
+#: contrib/admin/templates/admin/login.html:40
 #, python-format
 msgid ""
-"You are authenticated as %(username)s, but are not authorized to access this "
-"page. Would you like to login to a different account?"
-msgstr ""
+"You are authenticated as %(username)s, but are not authorized to access this"
+" page. Would you like to login to a different account?"
+msgstr "Prijavljeni ste kao %(username)s, ali nemate ovlašćenja da pristupite ovoj strani. Da li želite da se prijavite pod nekim drugim nalogom?"
 
-msgid "Forgotten your password or username?"
-msgstr "Zaboravili ste lozinku ili korisničko ime?"
+#: contrib/admin/templates/admin/login.html:60
+msgid "Forgotten your login credentials?"
+msgstr "Zaboravili ste svoje akreditive za prijavu?"
 
+#: contrib/admin/templates/admin/nav_sidebar.html:2
+msgid "Toggle navigation"
+msgstr "Uključi/isključi meni"
+
+#: contrib/admin/templates/admin/nav_sidebar.html:3
+msgid "Sidebar"
+msgstr "Bočna traka"
+
+#: contrib/admin/templates/admin/nav_sidebar.html:5
+msgid "Start typing to filter…"
+msgstr "Počnite da kucate da biste filtrirali…"
+
+#: contrib/admin/templates/admin/nav_sidebar.html:6
+msgid "Filter navigation items"
+msgstr "Filtrirajte stavke navigacije"
+
+#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Datum/vreme"
 
+#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Korisnik"
 
+#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Radnja"
 
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Ovaj objekat nema zabeležen istorijat izmena. Verovatno nije dodat kroz ovaj "
-"sajt za administraciju."
+#: contrib/admin/templates/admin/object_history.html:49
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "unos"
+msgstr[1] "unosa"
+msgstr[2] "unosa"
 
+#: contrib/admin/templates/admin/object_history.html:52
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this"
+" admin site."
+msgstr "Ovaj objekat nema zabeležen istorijat izmena. Verovatno nije dodat kroz ovaj sajt za administraciju."
+
+#: contrib/admin/templates/admin/pagination.html:10
+#: contrib/admin/templates/admin/search_form.html:9
 msgid "Show all"
 msgstr "Prikaži sve"
 
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save"
 msgstr "Sačuvaj"
 
+#: contrib/admin/templates/admin/popup_response.html:3
 msgid "Popup closing…"
-msgstr ""
+msgstr "Popup se zatvara..."
 
+#: contrib/admin/templates/admin/search_form.html:7
 msgid "Search"
 msgstr "Pretraga"
 
+#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
@@ -541,154 +802,202 @@ msgstr[0] "%(counter)s rezultat"
 msgstr[1] "%(counter)s rezultata"
 msgstr[2] "%(counter)s rezultata"
 
+#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "ukupno %(full_result_count)s"
 
+#: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
 msgstr "Sačuvaj kao novi"
 
+#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and add another"
 msgstr "Sačuvaj i dodaj sledeći"
 
+#: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save and continue editing"
 msgstr "Sačuvaj i nastavi sa izmenama"
 
+#: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save and view"
 msgstr "Snimi i pogledaj"
 
+#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Close"
-msgstr ""
+msgstr "Zatvori"
 
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:11
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Izmeni odabrani model %(model)s"
 
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:19
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Dodaj još jedan model %(model)s"
 
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:27
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Obriši odabrani model %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:34
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Izabran prikaz %(model)s"
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Hvala što ste danas proveli vreme na ovom sajtu."
 
+#: contrib/admin/templates/registration/logged_out.html:12
 msgid "Log in again"
 msgstr "Ponovna prijava"
 
+#: contrib/admin/templates/registration/password_change_done.html:14
+#: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Password change"
 msgstr "Izmena lozinke"
 
+#: contrib/admin/templates/registration/password_change_done.html:19
 msgid "Your password was changed."
 msgstr "Vaša lozinka je izmenjena."
 
+#: contrib/admin/templates/registration/password_change_form.html:32
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Iz bezbednosnih razloga prvo unesite svoju staru lozinku, a novu zatim "
-"unesite dva puta da bismo mogli da proverimo da li ste je pravilno uneli."
+"Please enter your old password, for security’s sake, and then enter your new"
+" password twice so we can verify you typed it in correctly."
+msgstr "Iz bezbednosnih razloga prvo unesite svoju staru lozinku, a novu zatim unesite dva puta da bismo mogli da proverimo da li ste je pravilno uneli."
 
+#: contrib/admin/templates/registration/password_change_form.html:60
+#: contrib/admin/templates/registration/password_reset_confirm.html:38
 msgid "Change my password"
 msgstr "Izmeni moju lozinku"
 
+#: contrib/admin/templates/registration/password_reset_complete.html:7
+#: contrib/admin/templates/registration/password_reset_done.html:7
+#: contrib/admin/templates/registration/password_reset_form.html:9
 msgid "Password reset"
 msgstr "Resetovanje lozinke"
 
+#: contrib/admin/templates/registration/password_reset_complete.html:13
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Vaša lozinka je postavljena.  Možete se prijaviti."
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:9
 msgid "Password reset confirmation"
 msgstr "Potvrda resetovanja lozinke"
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr ""
-"Unesite novu lozinku dva puta kako bismo mogli da proverimo da li ste je "
-"pravilno uneli."
+msgstr "Unesite novu lozinku dva puta kako bismo mogli da proverimo da li ste je pravilno uneli."
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:25
 msgid "New password:"
 msgstr "Nova lozinka:"
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:32
 msgid "Confirm password:"
 msgstr "Potvrda lozinke:"
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:44
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr ""
-"Link za resetovanje lozinke nije važeći, verovatno zato što je već "
-"iskorišćen.  Ponovo zatražite resetovanje lozinke."
+msgstr "Link za resetovanje lozinke nije važeći, verovatno zato što je već iskorišćen.  Ponovo zatražite resetovanje lozinke."
 
+#: contrib/admin/templates/registration/password_reset_done.html:13
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
-msgstr ""
+msgstr "Poslali smo Vam uputstva za postavljanje lozinke, ukoliko nalog sa ovom adresom postoji. Trebalo bi da ih dobijete uskoro."
 
+#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
-msgstr ""
+msgstr "Ako ne dobijete poruku, proverite da li ste uneli dobru adresu sa kojom ste se i registrovali i proverite fasciklu za neželjenu poštu."
 
+#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr ""
+msgstr "Primate ovu poruku zato što ste zatražili resetovanje lozinke za korisnički nalog na sajtu %(site_name)s."
 
+#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Idite na sledeću stranicu i postavite novu lozinku."
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Ukoliko ste zaboravili, vaše korisničko ime:"
+#: contrib/admin/templates/registration/password_reset_email.html:8
+msgid "In case you’ve forgotten, you are:"
+msgstr "U slučaju da ste zaboravili, vi ste:"
 
+#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Hvala što koristite naš sajt!"
 
+#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Ekipa sajta %(site_name)s"
 
+#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
-msgstr ""
+msgstr "Zaboravili ste lozinku? Unesite adresu e-pošte ispod i poslaćemo Vam na nju uputstva za postavljanje nove lozinke."
 
+#: contrib/admin/templates/registration/password_reset_form.html:22
 msgid "Email address:"
-msgstr ""
+msgstr "Adresa e-pošte:"
 
+#: contrib/admin/templates/registration/password_reset_form.html:28
 msgid "Reset my password"
 msgstr "Resetuj moju lozinku"
 
+#: contrib/admin/templatetags/admin_list.py:101
+msgid "Select all objects on this page for an action"
+msgstr "Izaberite sve objekte na ovoj stranici za radnju"
+
+#: contrib/admin/templatetags/admin_list.py:445
 msgid "All dates"
 msgstr "Svi datumi"
 
+#: contrib/admin/views/main.py:148
 #, python-format
 msgid "Select %s"
 msgstr "Odaberi objekat klase %s"
 
+#: contrib/admin/views/main.py:150
 #, python-format
 msgid "Select %s to change"
 msgstr "Odaberi objekat klase %s za izmenu"
 
+#: contrib/admin/views/main.py:152
 #, python-format
 msgid "Select %s to view"
-msgstr "Odaberi %sza pregled"
+msgstr "Odaberi %s za pregled"
 
+#: contrib/admin/widgets.py:99
 msgid "Date:"
 msgstr "Datum:"
 
+#: contrib/admin/widgets.py:100
 msgid "Time:"
 msgstr "Vreme:"
 
+#: contrib/admin/widgets.py:164
 msgid "Lookup"
 msgstr "Pretraži"
 
+#: contrib/admin/widgets.py:393
 msgid "Currently:"
-msgstr ""
+msgstr "Trenutno:"
 
+#: contrib/admin/widgets.py:394
 msgid "Change:"
-msgstr ""
+msgstr "Izmena:"
