@@ -1,7 +1,7 @@
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import gettext as _
 
@@ -18,11 +18,22 @@ def shortcut(request, content_type_id, object_id):
                 _("Content type %(ct_id)s object has no associated model")
                 % {"ct_id": content_type_id}
             )
-        obj = content_type.get_object_for_this_type(pk=object_id)
-    except (ObjectDoesNotExist, ValueError):
+
+        model_class = content_type.model_class()
+
+        # Remove the special UUID handling and use a consistent approach
+        try:
+            obj = model_class._default_manager.get(pk=object_id)
+        except (model_class.DoesNotExist, ValueError, ValidationError):
+            # Catch DoesNotExist, ValueError, and ValidationError
+            raise Http404(
+                _("Content type %(ct_id)s object %(obj_id)s doesn't exist")
+                % {"ct_id": content_type_id, "obj_id": object_id}
+            )
+
+    except ContentType.DoesNotExist:
         raise Http404(
-            _("Content type %(ct_id)s object %(obj_id)s doesn’t exist")
-            % {"ct_id": content_type_id, "obj_id": object_id}
+            _("Content type %(ct_id)s doesn’t exist") % {"ct_id": content_type_id}
         )
 
     try:

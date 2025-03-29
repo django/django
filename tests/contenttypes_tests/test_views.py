@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
@@ -19,6 +20,7 @@ from .models import (
     SchemeIncludedURL,
 )
 from .models import Site as MockSite
+from .models import YourUUIDModel
 
 
 @override_settings(ROOT_URLCONF="contenttypes_tests.urls")
@@ -263,3 +265,116 @@ class ShortcutViewTests(TestCase):
         obj = FooWithBrokenAbsoluteUrl.objects.create(name="john")
         with self.assertRaises(AttributeError):
             shortcut(self.request, user_ct.id, obj.id)
+
+
+class UUIDShortcutViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Set up test data for UUID shortcut view tests.
+        """
+        from django.contrib.auth.models import User
+
+        # Create test users
+        cls.staff_user = User.objects.create_user(
+            username="staff_user", password="staffpass", is_staff=True
+        )
+        cls.non_staff_user = User.objects.create_user(
+            username="non_staff", password="testpass", is_staff=False
+        )
+
+        # Create a test UUID
+        cls.test_uuid = uuid.uuid4()
+
+        # Get the content type for the test model
+        cls.content_type = ContentType.objects.get_for_model(YourUUIDModel)
+
+        # Create a test object
+        cls.test_obj = YourUUIDModel.objects.create(
+            id=cls.test_uuid, name="Test Object"
+        )
+
+    def test_invalid_uuid_shortcut(self):
+        """
+        Test that various invalid UUID formats raise a 404 error.
+        """
+        invalid_uuids = [
+            "not-a-valid-uuid",
+            "12345",
+            "z" * 36,
+            "123e4567-e89b-12d3-a456-426614174000-extra",
+            # Additional edge cases
+            "",  # Empty string
+            " ",  # Whitespace
+            "123e4567-e89b-12d3-a456-426614174000 ",  # Trailing whitespace
+            " 123e4567-e89b-12d3-a456-426614174000",  # Leading whitespace
+        ]
+
+        for invalid_uuid in invalid_uuids:
+            with self.subTest(invalid_uuid=invalid_uuid):
+                short_url = f"/shortcut/{self.content_type.id}/{invalid_uuid}/"
+                response = self.client.get(short_url)
+                self.assertEqual(response.status_code, 404)
+
+    def test_nonexistent_uuid_shortcut(self):
+        """
+        Test that a valid UUID format not in the database raises a 404 error.
+        """
+        non_existent_uuid = uuid.uuid4()
+
+        # Ensure the UUID is not in the database
+        self.assertFalse(YourUUIDModel.objects.filter(id=non_existent_uuid).exists())
+
+        short_url = f"/shortcut/{self.content_type.id}/{non_existent_uuid}/"
+        response = self.client.get(short_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_malformed_uuid_variations(self):
+        """
+        Test various malformed UUID strings that might pass initial validation.
+        """
+        malformed_uuids = [
+            # UUIDs with incorrect separators or formatting
+            "123e4567e89b12d3a456426614174000",  # No hyphens
+            "123e4567-e89b-12d3-a456-42661417400",  # Incorrect length
+            "g23e4567-e89b-12d3-a456-426614174000",  # Invalid hex character
+        ]
+
+        for malformed_uuid in malformed_uuids:
+            with self.subTest(malformed_uuid=malformed_uuid):
+                short_url = f"/shortcut/{self.content_type.id}/{malformed_uuid}/"
+                response = self.client.get(short_url)
+                self.assertEqual(response.status_code, 404)
+
+    def test_content_type_with_no_model(self):
+        """
+        Test behavior when content type has no associated model.
+        """
+        # Create a content type without an associated model
+        from django.contrib.contenttypes.models import ContentType
+
+        content_type = ContentType.objects.create(
+            app_label="test_app", model="non_existent_model"
+        )
+
+        short_url = f"/shortcut/{content_type.id}/{self.test_uuid}/"
+        response = self.client.get(short_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_unicode_uuid(self):
+        """
+        Test handling of Unicode-like UUID strings.
+        """
+        unicode_uuids = [
+            "ｂ6ａ283ｃｅ-0529-4ｃｅ6-8ａａ8-3ａａ5ｅｂａ4ｆ95ｂ",  # Full-width characters
+            (
+                "\u0431\u0436\u0430283\u0441\u0435-0529-4\u0441\u04356-8\u0430\u04308-"
+                "3\u0430\u04305\u0435\u0431\u0430\u0444\u0395\u0431"
+            ),  # Cyrillic-like
+        ]
+
+        for unicode_uuid in unicode_uuids:
+            with self.subTest(unicode_uuid=unicode_uuid):
+                short_url = f"/shortcut/{self.content_type.id}/{unicode_uuid}/"
+                response = self.client.get(short_url)
+                self.assertEqual(response.status_code, 404)
