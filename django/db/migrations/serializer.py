@@ -10,6 +10,7 @@ import pathlib
 import re
 import types
 import uuid
+import zoneinfo
 
 from django.conf import SettingsReference
 from django.db import models
@@ -334,6 +335,11 @@ class UUIDSerializer(BaseSerializer):
         return "uuid.%s" % repr(self.value), {"import uuid"}
 
 
+class ZoneInfoSerializer(BaseSerializer):
+    def serialize(self):
+        return repr(self.value), {"import zoneinfo"}
+
+
 class Serializer:
     _registry = {
         # Some of these are order-dependent.
@@ -357,6 +363,7 @@ class Serializer:
         uuid.UUID: UUIDSerializer,
         pathlib.PurePath: PathSerializer,
         os.PathLike: PathLikeSerializer,
+        zoneinfo.ZoneInfo: ZoneInfoSerializer,
     }
 
     @classmethod
