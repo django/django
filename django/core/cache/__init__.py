@@ -12,6 +12,7 @@ object.
 
 See docs/topics/cache.txt for information on the public API.
 """
+import threading
 
 from django.core import signals
 from django.core.cache.backends.base import (
@@ -40,7 +41,15 @@ class CacheHandler(BaseConnectionHandler):
     settings_name = "CACHES"
     exception_class = InvalidCacheBackendError
 
+    def __init__(self, settings=None):
+        super().__init__(settings)
+        # Store thread-safe connections here
+        self._global_connections = {}
+
     def create_connection(self, alias):
+        if alias in self._global_connections:
+            return self._global_connections[alias]
+
         params = self.settings[alias].copy()
         backend = params.pop("BACKEND")
         location = params.pop("LOCATION", "")
@@ -50,7 +59,13 @@ class CacheHandler(BaseConnectionHandler):
             raise InvalidCacheBackendError(
                 "Could not find backend '%s': %s" % (backend, e)
             ) from e
-        return backend_cls(location, params)
+
+        with threading.Lock():
+            connection = backend_cls(location, params)
+            if not connection.thread_sensitive:
+                self._global_connections[alias] = connection
+
+        return connection
 
 
 caches = CacheHandler()
@@ -64,4 +79,5 @@ def close_caches(**kwargs):
     caches.close_all()
 
 
+# TODO: doesnt close anything on ASGI because of asgiref.Local
 signals.request_finished.connect(close_caches)

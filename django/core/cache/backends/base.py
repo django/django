@@ -56,6 +56,9 @@ def get_key_func(key_func):
 
 
 class BaseCache:
+    # If False, all threads/tasks will use the same cache instance
+    # and allows concurrent usage of sync_to_async (using many threads)
+    thread_sensitive = True
     _missing_key = object()
 
     def __init__(self, params):
@@ -137,7 +140,7 @@ class BaseCache:
         )
 
     async def aadd(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        return await sync_to_async(self.add, thread_sensitive=True)(
+        return await sync_to_async(self.add, thread_sensitive=self.thread_sensitive)(
             key, value, timeout, version
         )
 
@@ -149,7 +152,7 @@ class BaseCache:
         raise NotImplementedError("subclasses of BaseCache must provide a get() method")
 
     async def aget(self, key, default=None, version=None):
-        return await sync_to_async(self.get, thread_sensitive=True)(
+        return await sync_to_async(self.get, thread_sensitive=self.thread_sensitive)(
             key, default, version
         )
 
@@ -161,7 +164,7 @@ class BaseCache:
         raise NotImplementedError("subclasses of BaseCache must provide a set() method")
 
     async def aset(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        return await sync_to_async(self.set, thread_sensitive=True)(
+        return await sync_to_async(self.set, thread_sensitive=self.thread_sensitive)(
             key, value, timeout, version
         )
 
@@ -175,7 +178,7 @@ class BaseCache:
         )
 
     async def atouch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        return await sync_to_async(self.touch, thread_sensitive=True)(
+        return await sync_to_async(self.touch, thread_sensitive=self.thread_sensitive)(
             key, timeout, version
         )
 
@@ -189,7 +192,7 @@ class BaseCache:
         )
 
     async def adelete(self, key, version=None):
-        return await sync_to_async(self.delete, thread_sensitive=True)(key, version)
+        return await sync_to_async(self.delete, thread_sensitive=self.thread_sensitive)(key, version)
 
     def get_many(self, keys, version=None):
         """
@@ -341,7 +344,7 @@ class BaseCache:
         )
 
     async def aclear(self):
-        return await sync_to_async(self.clear, thread_sensitive=True)()
+        return await sync_to_async(self.clear, thread_sensitive=self.thread_sensitive)()
 
     def incr_version(self, key, delta=1, version=None):
         """
