@@ -178,6 +178,8 @@ Migrations
 * Squashed migrations can now themselves be squashed before being transitioned
   to normal migrations.
 
+* Migrations now support serialization of :class:`zoneinfo.ZoneInfo` instances.
+
 Models
 ~~~~~~
 
