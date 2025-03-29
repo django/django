@@ -778,6 +778,7 @@ Django can serialize the following:
 - ``list``, ``set``, ``tuple``, ``dict``, ``range``.
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
+- :class:`zoneinfo.ZoneInfo` instances
 - ``decimal.Decimal`` instances
 - ``enum.Enum``  and ``enum.Flag`` instances
 - ``uuid.UUID`` instances
@@ -802,6 +803,10 @@ Django can serialize the following:
 - Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+.. versionchanged:: 6.0
+
+    Serialization support for :class:`zoneinfo.ZoneInfo` instances was added.
 
 Django cannot serialize:
 
