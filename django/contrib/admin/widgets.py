@@ -313,16 +313,24 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         )
 
     def get_context(self, name, value, attrs):
-        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
+        from django.contrib.admin.views.main import (
+            IS_POPUP_VAR,
+            SOURCE_MODEL_VAR,
+            TO_FIELD_VAR,
+        )
 
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         related_field_name = self.rel.get_related_field().name
+        app_label = self.rel.field.model._meta.app_label
+        model_name = self.rel.field.model._meta.model_name
+
         url_params = "&".join(
             "%s=%s" % param
             for param in [
                 (TO_FIELD_VAR, related_field_name),
                 (IS_POPUP_VAR, 1),
+                (SOURCE_MODEL_VAR, f"{app_label}.{model_name}"),
             ]
         )
         context = {
