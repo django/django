@@ -1713,6 +1713,7 @@ class PyMemcacheCacheTests(BaseMemcachedTests, TestCase):
         ):
             self.assertFalse(cache.thread_sensitive)
 
+
 @override_settings(
     CACHES=caches_setting_for_tests(
         BACKEND="django.core.cache.backends.filebased.FileBasedCache",
@@ -3004,6 +3005,7 @@ class CacheHandlerTest(SimpleTestCase):
         c = []
 
         caches._global_connections = {"default": caches["default"]}
+
         def runner():
             c.append(caches["default"])
 
