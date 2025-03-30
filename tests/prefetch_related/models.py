@@ -323,3 +323,23 @@ class Flea(models.Model):
     )
     pets_visited = models.ManyToManyField(Pet, related_name="fleas_hosted")
     people_visited = models.ManyToManyField(Person, related_name="fleas_hosted")
+
+
+class Related(models.Model):
+    pass
+
+
+class GrandParent(models.Model):
+    name = models.CharField(max_length=50)
+    gp_fk = models.ForeignKey(
+        Related, null=True, on_delete=models.CASCADE, related_name="gp_fk_rel"
+    )
+    gp_m2m = models.ManyToManyField(Related, related_name="gp_m2m_rel")
+
+
+class Parent(GrandParent):
+    pass
+
+
+class Child(Parent):
+    pass

@@ -26,16 +26,19 @@ from .models import (
     Bookmark,
     BookReview,
     BookWithYear,
+    Child,
     Comment,
     Department,
     Employee,
     FavoriteAuthors,
+    GrandParent,
     House,
     LessonEntry,
     ModelIterableSubclass,
     Person,
     Qualification,
     Reader,
+    Related,
     Room,
     TaggedItem,
     Teacher,
@@ -2073,3 +2076,172 @@ class PrefetchLimitTests(TestDataMixin, TestCase):
             with self.subTest(book=book):
                 self.assertEqual(len(book.authors_sliced), 1)
                 self.assertIn(book.authors_sliced[0], list(book.authors.all()))
+
+
+class PrefetchRelatedCacheWorksWithInheritance(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.related1 = Related.objects.create()
+        cls.related2 = Related.objects.create()
+        cls.related3 = Related.objects.create()
+        cls.related4 = Related.objects.create()
+
+        cls.child = Child.objects.create(
+            gp_fk=cls.related1,
+        )
+        cls.m2m_child = Child.objects.create()
+        cls.m2m_child.gp_m2m.set([cls.related1, cls.related2, cls.related3])
+
+    def test_parent_fk_available_in_child(self):
+        """
+        Make sure a prefetched FK relation is still cached in a direct child
+        """
+        qs = (
+            GrandParent.objects.select_related("parent")
+            .prefetch_related("gp_fk")
+            .filter(pk=self.child.pk)
+        )
+        with self.assertNumQueries(2):
+            results = list(qs)
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].parent.gp_fk, self.related1)
+
+    def test_grandparent_fk_available_in_child(self):
+        """
+        Make sure a prefetched FK relation is still cached in a grandchild
+        """
+        qs = (
+            GrandParent.objects.select_related("parent", "parent__child")
+            .prefetch_related("gp_fk")
+            .filter(pk=self.child.pk)
+        )
+        with self.assertNumQueries(2):
+            results = list(qs)
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].parent.child.gp_fk, self.related1)
+
+    def test_parent_m2m_available_in_child(self):
+        """
+        Make sure a prefetched M2M relation is still cached in a direct child
+        """
+        qs = (
+            GrandParent.objects.select_related("parent")
+            .prefetch_related("gp_m2m")
+            .filter(pk=self.m2m_child.pk)
+        )
+        with self.assertNumQueries(2):
+            results = list(qs)
+            self.assertEqual(len(results), 1)
+            # Causes extra query, M2M never looks in its parents
+            self.assertEqual(
+                set(results[0].parent.gp_m2m.all()),
+                {self.related1, self.related2, self.related3},
+            )
+
+    def test_grandparent_m2m_available_in_child(self):
+        """
+        Make sure a prefetched M2M relation is still cached in a grandchild
+        """
+        qs = (
+            GrandParent.objects.select_related("parent", "parent__child")
+            .prefetch_related("gp_m2m")
+            .filter(pk=self.m2m_child.pk)
+        )
+        with self.assertNumQueries(2):
+            results = list(qs)
+            self.assertEqual(len(results), 1)
+            # Causes extra query, M2M never looks in its parents
+            self.assertEqual(
+                set(results[0].parent.child.gp_m2m.all()),
+                {self.related1, self.related2, self.related3},
+            )
+
+    def test_add_clears_prefetched_objects_in_parent(self):
+        gp = (
+            GrandParent.objects.select_related("parent")
+            .prefetch_related("gp_m2m")
+            .get(pk=self.m2m_child.pk)
+        )
+        self.assertListEqual(
+            list(gp.gp_m2m.all()), [self.related1, self.related2, self.related3]
+        )
+        self.assertListEqual(
+            list(gp.parent.gp_m2m.all()), [self.related1, self.related2, self.related3]
+        )
+        gp.parent.gp_m2m.add(self.related4)
+        self.assertListEqual(
+            list(gp.gp_m2m.all()),
+            [self.related1, self.related2, self.related3, self.related4],
+        )
+        self.assertListEqual(
+            list(gp.parent.gp_m2m.all()),
+            [self.related1, self.related2, self.related3, self.related4],
+        )
+
+    def test_add_clears_prefetched_objects_in_grandparent(self):
+        gp = (
+            GrandParent.objects.select_related("parent", "parent__child")
+            .prefetch_related("gp_m2m")
+            .get(pk=self.m2m_child.pk)
+        )
+        self.assertListEqual(
+            list(gp.gp_m2m.all()), [self.related1, self.related2, self.related3]
+        )
+        self.assertListEqual(
+            list(gp.parent.gp_m2m.all()), [self.related1, self.related2, self.related3]
+        )
+        self.assertListEqual(
+            list(gp.parent.child.gp_m2m.all()),
+            [self.related1, self.related2, self.related3],
+        )
+        gp.parent.child.gp_m2m.add(self.related4)
+        self.assertListEqual(
+            list(gp.gp_m2m.all()),
+            [self.related1, self.related2, self.related3, self.related4],
+        )
+        self.assertListEqual(
+            list(gp.parent.gp_m2m.all()),
+            [self.related1, self.related2, self.related3, self.related4],
+        )
+        self.assertListEqual(
+            list(gp.parent.child.gp_m2m.all()),
+            [self.related1, self.related2, self.related3, self.related4],
+        )
+
+    def test_remove_clears_prefetched_objects_in_parent(self):
+        gp = (
+            GrandParent.objects.select_related("parent")
+            .prefetch_related("gp_m2m")
+            .get(pk=self.m2m_child.pk)
+        )
+        self.assertListEqual(
+            list(gp.gp_m2m.all()), [self.related1, self.related2, self.related3]
+        )
+        self.assertListEqual(
+            list(gp.parent.gp_m2m.all()), [self.related1, self.related2, self.related3]
+        )
+        gp.parent.gp_m2m.clear()
+        self.assertListEqual(list(gp.gp_m2m.all()), [])
+        self.assertListEqual(list(gp.parent.gp_m2m.all()), [])
+
+    def test_remove_clears_prefetched_objects_in_grandparent(self):
+        gp = (
+            GrandParent.objects.select_related("parent")
+            .prefetch_related("gp_m2m")
+            .get(pk=self.m2m_child.pk)
+        )
+        self.assertListEqual(
+            list(gp.gp_m2m.all()), [self.related1, self.related2, self.related3]
+        )
+        self.assertListEqual(
+            list(gp.parent.gp_m2m.all()), [self.related1, self.related2, self.related3]
+        )
+        self.assertListEqual(
+            list(gp.parent.child.gp_m2m.all()),
+            [self.related1, self.related2, self.related3],
+        )
+        gp.parent.gp_m2m.clear()
+        self.assertListEqual(list(gp.gp_m2m.all()), [])
+        self.assertListEqual(list(gp.parent.gp_m2m.all()), [])
+        self.assertListEqual(list(gp.parent.child.gp_m2m.all()), [])
