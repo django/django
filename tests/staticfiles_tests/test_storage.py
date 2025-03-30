@@ -7,6 +7,7 @@ import unittest
 from io import StringIO
 from pathlib import Path
 from unittest import mock
+import re
 
 from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles import finders, storage
@@ -19,6 +20,7 @@ from django.test import SimpleTestCase, override_settings
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
 
+from django.contrib.staticfiles.storage import HashedFilesMixin
 
 def hashed_file_path(test, path):
     fullpath = test.render_template(test.static_template_snippet(path))
@@ -929,3 +931,109 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
                 content = relfile.read()
                 self.assertIn(b"foo.57a5cb9ba68d.png", content)
                 self.assertIn(b"xyz.57a5cb9ba68d.png", content)
+
+class TestHashedFilesMixin(HashedFilesMixin):
+    """
+    Test fixture class for HashedFilesMixin.
+    
+    Provides a concrete implementation of the abstract HashedFilesMixin
+    for testing purposes without requiring a full storage backend.
+    """
+    pass
+
+
+class PreparePatternTests(SimpleTestCase):
+    """
+    Test case for the prepare_pattern() method of HashedFilesMixin.
+    
+    Verifies the conversion of patterns with spaces to regex patterns
+    with \s* sequences while handling special cases and edge conditions.
+    """
+    
+    def setUp(self):
+        """Initialize test fixture with a clean storage instance."""
+        self.storage = TestHashedFilesMixin()
+
+    def test_space_conversion(self):
+        """
+        Test basic space conversion functionality.
+        
+        Tests include:
+        - URL patterns with parentheses
+        - Simple space sequences
+        - Escaped spaces
+        - Quoted patterns
+        - Non-string inputs
+        
+        Each test case verifies:
+        1. The pattern conversion matches expected output
+        2. The converted pattern correctly matches test strings
+        """
+        test_cases = [
+            # Format: (input_pattern, expected_output, test_strings)
+            ('url(test)', r'url\s*\(\s*test\)', ['url(test)', 'url(\ntest)']),
+            ('a b c', r'a\s*b\s*c', ['a b c', 'a\nb\nc']),
+            (r'escaped\ space', r'escaped\ space', [r'escaped space']),
+            ('"space in"', r'"space\s*in"', ['"space in"', '"space\nin"']),
+            (123, 123, []),  # Non-string input should pass through unchanged
+        ]
+        
+        for pattern, expected, test_strings in test_cases:
+            with self.subTest(pattern=pattern):
+                processed = self.storage.prepare_pattern(pattern)
+                self.assertEqual(processed, expected)
+                for test_str in test_strings:
+                    print(f"Pattern: {pattern}, Processed: {processed}, Test String: {test_str}")
+                    self.assertIsNotNone(
+                        re.search(processed, test_str),
+                        msg=f"Failed to match {test_str} with pattern {processed}"
+                    )
+
+    def test_real_world_cases(self):
+        """
+        Test real-world pattern scenarios.
+        
+        Specifically tests:
+        - Complex JavaScript patterns from CKEditor
+        - Patterns with newlines and concatenation
+        - Verification that spaces are properly converted
+        """
+        # CKEditor pattern from actual ticket
+        ckeditor_pattern = r'appendStyleSheet\(this\.path\+"([^"]*)"\)'
+        processed = self.storage.prepare_pattern(ckeditor_pattern)
+        
+        # Verify space conversion occurred
+        self.assertIn(r'\s*', processed)
+        
+        # Test with actual content including newline
+        test_content = 'appendStyleSheet(this.path+\n"styles.css")'
+        self.assertIsNotNone(
+            re.search(processed, test_content),
+            msg="Failed to match CKEditor pattern with newline"
+        )
+
+    def test_pattern_edge_cases(self):
+        """
+        Test edge cases and special inputs.
+        
+        Includes:
+        - Empty string handling
+        - Pattern with no spaces
+        - Multiple consecutive spaces
+        - Already escaped patterns
+        """
+        edge_cases = [
+            ('', ''),  # Empty string should return empty string
+            ('no_spaces', 'no_spaces'),  # No conversion needed
+            ('  multi  spaces  ', r'\s*multi\s*spaces\s*'),  # Space compression
+            (r'complex\ pattern\ with\ spaces',  # Already escaped
+             r'complex\ pattern\ with\ spaces'),
+        ]
+        
+        for pattern, expected in edge_cases:
+            with self.subTest(pattern=pattern):
+                self.assertEqual(
+                    self.storage.prepare_pattern(pattern),
+                    expected,
+                    msg=f"Failed edge case for pattern: {pattern}"
+                )
