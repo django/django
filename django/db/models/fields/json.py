@@ -235,7 +235,7 @@ class HasKeyLookup(PostgresOperatorLookup):
             compiler, connection
         ):
             sql_parts.append(template % (lhs_sql, "%s"))
-            params.extend(lhs_params + [rhs_json_path])
+            params.extend(list(lhs_params) + [rhs_json_path])
         return self._combine_sql_parts(sql_parts), tuple(params)
 
     def as_mysql(self, compiler, connection):
