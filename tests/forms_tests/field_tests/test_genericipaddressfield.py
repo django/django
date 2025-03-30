@@ -20,21 +20,15 @@ class GenericIPAddressFieldTest(SimpleTestCase):
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
         self.assertEqual(f.clean(" 127.0.0.1 "), "127.0.0.1")
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid IPv4 or IPv6 address.'"
-        ):
+
+        msg = "'Enter a valid IPv4 or IPv6 address.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("foo")
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid IPv4 or IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("127.0.0.")
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid IPv4 or IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1.2.3.4.5")
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid IPv4 or IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("256.125.1.5")
         self.assertEqual(
             f.clean(" fe80::223:6cff:fe8a:2e8a "), "fe80::223:6cff:fe8a:2e8a"
@@ -42,25 +36,17 @@ class GenericIPAddressFieldTest(SimpleTestCase):
         self.assertEqual(
             f.clean(" 2a02::223:6cff:fe8a:2e8a "), "2a02::223:6cff:fe8a:2e8a"
         )
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+
+        msg = "'This is not a valid IPv6 address.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("12345:2:3:4")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1::2:3::4")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("foo::223:6cff:fe8a:2e8a")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1::2:3:4:5:6:7:8")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1:2")
 
     def test_generic_ipaddress_as_ipv4_only(self):
@@ -105,25 +91,17 @@ class GenericIPAddressFieldTest(SimpleTestCase):
         self.assertEqual(
             f.clean(" 2a02::223:6cff:fe8a:2e8a "), "2a02::223:6cff:fe8a:2e8a"
         )
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+
+        msg = "'This is not a valid IPv6 address.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("12345:2:3:4")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1::2:3::4")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("foo::223:6cff:fe8a:2e8a")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1::2:3:4:5:6:7:8")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1:2")
 
     def test_generic_ipaddress_max_length_custom(self):
@@ -140,6 +118,7 @@ class GenericIPAddressFieldTest(SimpleTestCase):
             ({}, MAX_IPV6_ADDRESS_LENGTH),  # Default value.
             ({"max_length": len(addr) - 1}, len(addr) - 1),
         ]
+        msg_invalid_ipv6 = "This is not a valid IPv6 address."
         for kwargs, max_length in cases:
             max_length_plus_one = max_length + 1
             msg = (
@@ -150,9 +129,7 @@ class GenericIPAddressFieldTest(SimpleTestCase):
                 f = GenericIPAddressField(**kwargs)
                 with self.assertRaisesMessage(ValidationError, msg):
                     f.clean("x" * max_length_plus_one)
-                with self.assertRaisesMessage(
-                    ValidationError, "This is not a valid IPv6 address."
-                ):
+                with self.assertRaisesMessage(ValidationError, msg_invalid_ipv6):
                     f.clean(addr)
 
     def test_generic_ipaddress_as_generic_not_required(self):
@@ -160,21 +137,15 @@ class GenericIPAddressFieldTest(SimpleTestCase):
         self.assertEqual(f.clean(""), "")
         self.assertEqual(f.clean(None), "")
         self.assertEqual(f.clean("127.0.0.1"), "127.0.0.1")
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid IPv4 or IPv6 address.'"
-        ):
+
+        msg = "'Enter a valid IPv4 or IPv6 address.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("foo")
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid IPv4 or IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("127.0.0.")
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid IPv4 or IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1.2.3.4.5")
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid IPv4 or IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("256.125.1.5")
         self.assertEqual(
             f.clean(" fe80::223:6cff:fe8a:2e8a "), "fe80::223:6cff:fe8a:2e8a"
@@ -183,25 +154,17 @@ class GenericIPAddressFieldTest(SimpleTestCase):
             f.clean(" " * MAX_IPV6_ADDRESS_LENGTH + " 2a02::223:6cff:fe8a:2e8a "),
             "2a02::223:6cff:fe8a:2e8a",
         )
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+
+        msg = "'This is not a valid IPv6 address.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("12345:2:3:4")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1::2:3::4")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("foo::223:6cff:fe8a:2e8a")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1::2:3:4:5:6:7:8")
-        with self.assertRaisesMessage(
-            ValidationError, "'This is not a valid IPv6 address.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1:2")
 
     def test_generic_ipaddress_normalization(self):

@@ -557,9 +557,8 @@ class BasicExtractorTests(ExtractorTests):
         # Bad version output
         mocked_popen_wrapper.return_value = ("any other return value\n", "", 0)
         cmd = MakeMessagesCommand()
-        with self.assertRaisesMessage(
-            CommandError, "Unable to get gettext version. Is it installed?"
-        ):
+        msg = "Unable to get gettext version. Is it installed?"
+        with self.assertRaisesMessage(CommandError, msg):
             cmd.gettext_version
 
     def test_po_file_encoding_when_updating(self):

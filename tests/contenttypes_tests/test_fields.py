@@ -18,9 +18,8 @@ class GenericForeignKeyTests(TestCase):
         self.assertEqual(str(Model.field), "contenttypes_tests.Model.field")
 
     def test_get_content_type_no_arguments(self):
-        with self.assertRaisesMessage(
-            Exception, "Impossible arguments to GFK.get_content_type!"
-        ):
+        msg = "Impossible arguments to GFK.get_content_type!"
+        with self.assertRaisesMessage(Exception, msg):
             Answer.question.get_content_type()
 
     def test_get_object_cache_respects_deleted_objects(self):

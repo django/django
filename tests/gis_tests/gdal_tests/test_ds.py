@@ -133,9 +133,8 @@ class DataSourceTest(SimpleTestCase):
             with self.assertRaisesMessage(IndexError, msg % len(ds)):
                 ds.__getitem__(len(ds))
 
-            with self.assertRaisesMessage(
-                IndexError, "Invalid OGR layer name given: invalid."
-            ):
+            msg = "Invalid OGR layer name given: invalid."
+            with self.assertRaisesMessage(IndexError, msg):
                 ds.__getitem__("invalid")
 
     def test_ds_input_pathlib(self):
@@ -178,9 +177,8 @@ class DataSourceTest(SimpleTestCase):
                     self.assertIn(f, source.fields)
 
                 # Negative FIDs are not allowed.
-                with self.assertRaisesMessage(
-                    IndexError, "Negative indices are not allowed on OGR Layers."
-                ):
+                msg = "Negative indices are not allowed on OGR Layers."
+                with self.assertRaisesMessage(IndexError, msg):
                     layer.__getitem__(-1)
                 with self.assertRaisesMessage(IndexError, "Invalid feature id: 50000."):
                     layer.__getitem__(50000)
@@ -206,9 +204,8 @@ class DataSourceTest(SimpleTestCase):
                         with self.assertRaisesMessage(IndexError, msg % len(feat)):
                             feat.__getitem__(len(feat))
 
-                        with self.assertRaisesMessage(
-                            IndexError, "Invalid OFT field name given: invalid."
-                        ):
+                        msg = "Invalid OFT field name given: invalid."
+                        with self.assertRaisesMessage(IndexError, msg):
                             feat.__getitem__("invalid")
 
     def test03b_layer_slice(self):

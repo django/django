@@ -278,9 +278,8 @@ class UtilsTests(SimpleTestCase):
 
         self.assertEqual(label_for_field("__str__", Article), "article")
 
-        with self.assertRaisesMessage(
-            AttributeError, "Unable to lookup 'unknown' on Article"
-        ):
+        msg = "Unable to lookup 'unknown' on Article"
+        with self.assertRaisesMessage(AttributeError, msg):
             label_for_field("unknown", Article)
 
         def test_callable(obj):

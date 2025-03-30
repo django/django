@@ -1182,9 +1182,8 @@ class AggregateTestCase(TestCase):
         self.assertEqual(b3.sums, Approximate(Decimal("383.69"), places=2))
 
     def test_complex_aggregations_require_kwarg(self):
-        with self.assertRaisesMessage(
-            TypeError, "Complex annotations require an alias"
-        ):
+        msg = "Complex annotations require an alias"
+        with self.assertRaisesMessage(TypeError, msg):
             Author.objects.annotate(Sum(F("age") + F("friends__age")))
         with self.assertRaisesMessage(TypeError, "Complex aggregates require an alias"):
             Author.objects.aggregate(Sum("age") / Count("age"))
@@ -1296,9 +1295,8 @@ class AggregateTestCase(TestCase):
             )
 
     def test_annotated_aggregate_over_annotated_aggregate(self):
-        with self.assertRaisesMessage(
-            FieldError, "Cannot compute Sum('id__max'): 'id__max' is an aggregate"
-        ):
+        msg = "Cannot compute Sum('id__max'): 'id__max' is an aggregate"
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.annotate(Max("id")).annotate(Sum("id__max"))
 
         class MyMax(Max):
@@ -1308,9 +1306,8 @@ class AggregateTestCase(TestCase):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
                 return super().as_sql(compiler, connection)
 
-        with self.assertRaisesMessage(
-            FieldError, "Cannot compute Max('id__max'): 'id__max' is an aggregate"
-        ):
+        msg = "Cannot compute Max('id__max'): 'id__max' is an aggregate"
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.annotate(Max("id")).annotate(my_max=MyMax("id__max", "price"))
 
     def test_multi_arg_aggregate(self):
@@ -1332,9 +1329,8 @@ class AggregateTestCase(TestCase):
         with self.assertRaisesMessage(TypeError, "Complex aggregates require an alias"):
             Book.objects.aggregate(MultiArgAgg("pages", "price"))
 
-        with self.assertRaisesMessage(
-            TypeError, "Complex annotations require an alias"
-        ):
+        msg = "Complex annotations require an alias"
+        with self.assertRaisesMessage(TypeError, msg):
             Book.objects.annotate(MultiArgAgg("pages", "price"))
 
         Book.objects.aggregate(max_field=MultiArgAgg("pages", "price"))
@@ -1448,9 +1444,9 @@ class AggregateTestCase(TestCase):
             Book.objects.aggregate(FloatField())
         with self.assertRaisesMessage(TypeError, msg % True):
             Book.objects.aggregate(is_book=True)
-        with self.assertRaisesMessage(
-            TypeError, msg % ", ".join([str(FloatField()), "True"])
-        ):
+
+        msg = msg % ", ".join([str(FloatField()), "True"])
+        with self.assertRaisesMessage(TypeError, msg):
             Book.objects.aggregate(FloatField(), Avg("price"), is_book=True)
 
     def test_aggregation_subquery_annotation(self):

@@ -903,9 +903,8 @@ class MultiParserTests(SimpleTestCase):
         )
 
     def test_invalid_content_type(self):
-        with self.assertRaisesMessage(
-            MultiPartParserError, "Invalid Content-Type: text/plain"
-        ):
+        msg = "Invalid Content-Type: text/plain"
+        with self.assertRaisesMessage(MultiPartParserError, msg):
             MultiPartParser(
                 {
                     "CONTENT_TYPE": "text/plain",
@@ -917,9 +916,8 @@ class MultiParserTests(SimpleTestCase):
             )
 
     def test_negative_content_length(self):
-        with self.assertRaisesMessage(
-            MultiPartParserError, "Invalid content length: -1"
-        ):
+        msg = "Invalid content length: -1"
+        with self.assertRaisesMessage(MultiPartParserError, msg):
             MultiPartParser(
                 {
                     "CONTENT_TYPE": "multipart/form-data; boundary=_foo",

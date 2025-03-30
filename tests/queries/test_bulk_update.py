@@ -129,9 +129,8 @@ class BulkUpdateTests(TestCase):
             Note.objects.bulk_update([], fields=["note"], batch_size=0)
 
     def test_nonexistent_field(self):
-        with self.assertRaisesMessage(
-            FieldDoesNotExist, "Note has no field named 'nonexistent'"
-        ):
+        msg = "Note has no field named 'nonexistent'"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
             Note.objects.bulk_update([], ["nonexistent"])
 
     pk_fields_error = "bulk_update() cannot be used with primary key fields."

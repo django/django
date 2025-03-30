@@ -714,7 +714,7 @@ class QuerySetSetOperationTests(TestCase):
 
     def test_unsupported_operations_on_combined_qs(self):
         qs = Number.objects.all()
-        msg = "Calling QuerySet.%s() after %s() is not supported."
+        msg_template = "Calling QuerySet.%s() after %s() is not supported."
         combinators = ["union"]
         if connection.features.supports_select_difference:
             combinators.append("difference")
@@ -735,16 +735,12 @@ class QuerySetSetOperationTests(TestCase):
                 "select_related",
                 "update",
             ):
+                msg = msg_template % (operation, combinator)
                 with self.subTest(combinator=combinator, operation=operation):
-                    with self.assertRaisesMessage(
-                        NotSupportedError,
-                        msg % (operation, combinator),
-                    ):
+                    with self.assertRaisesMessage(NotSupportedError, msg):
                         getattr(getattr(qs, combinator)(qs), operation)()
-            with self.assertRaisesMessage(
-                NotSupportedError,
-                msg % ("contains", combinator),
-            ):
+            msg = msg_template % ("contains", combinator)
+            with self.assertRaisesMessage(NotSupportedError, msg):
                 obj = Number.objects.first()
                 getattr(qs, combinator)(qs).contains(obj)
 

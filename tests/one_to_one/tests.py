@@ -38,9 +38,8 @@ class OneToOneTests(TestCase):
             repr(self.p1.restaurant), "<Restaurant: Demon Dogs the restaurant>"
         )
         # p2 doesn't have an associated restaurant.
-        with self.assertRaisesMessage(
-            Restaurant.DoesNotExist, "Place has no restaurant"
-        ):
+        msg = "Place has no restaurant"
+        with self.assertRaisesMessage(Restaurant.DoesNotExist, msg):
             self.p2.restaurant
         # The exception raised on attribute access when a related object
         # doesn't exist should be an instance of a subclass of `AttributeError`

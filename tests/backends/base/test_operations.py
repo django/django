@@ -30,21 +30,18 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         self.assertEqual(self.ops.end_transaction_sql(success=False), "ROLLBACK;")
 
     def test_no_limit_value(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "no_limit_value"
-        ):
+        msg = self.may_require_msg % "no_limit_value"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.no_limit_value()
 
     def test_quote_name(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "quote_name"
-        ):
+        msg = self.may_require_msg % "quote_name"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.quote_name("a")
 
     def test_regex_lookup(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "regex_lookup"
-        ):
+        msg = self.may_require_msg % "regex_lookup"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.regex_lookup(lookup_type="regex")
 
     def test_set_time_zone_sql(self):
@@ -105,51 +102,43 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
             self.ops.format_for_duration_arithmetic(None)
 
     def test_date_extract_sql(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "date_extract_sql"
-        ):
+        msg = self.may_require_msg % "date_extract_sql"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.date_extract_sql(None, None, None)
 
     def test_time_extract_sql(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "date_extract_sql"
-        ):
+        msg = self.may_require_msg % "date_extract_sql"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.time_extract_sql(None, None, None)
 
     def test_date_trunc_sql(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "date_trunc_sql"
-        ):
+        msg = self.may_require_msg % "date_trunc_sql"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.date_trunc_sql(None, None, None)
 
     def test_time_trunc_sql(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "time_trunc_sql"
-        ):
+        msg = self.may_require_msg % "time_trunc_sql"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.time_trunc_sql(None, None, None)
 
     def test_datetime_trunc_sql(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "datetime_trunc_sql"
-        ):
+        msg = self.may_require_msg % "datetime_trunc_sql"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.datetime_trunc_sql(None, None, None, None)
 
     def test_datetime_cast_date_sql(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "datetime_cast_date_sql"
-        ):
+        msg = self.may_require_msg % "datetime_cast_date_sql"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.datetime_cast_date_sql(None, None, None)
 
     def test_datetime_cast_time_sql(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "datetime_cast_time_sql"
-        ):
+        msg = self.may_require_msg % "datetime_cast_time_sql"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.datetime_cast_time_sql(None, None, None)
 
     def test_datetime_extract_sql(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, self.may_require_msg % "datetime_extract_sql"
-        ):
+        msg = self.may_require_msg % "datetime_extract_sql"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.datetime_extract_sql(None, None, None, None)
 
     def test_prepare_join_on_clause(self):

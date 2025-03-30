@@ -461,9 +461,8 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.sum_rating, book.rating)
 
     def test_filter_wrong_annotation(self):
-        with self.assertRaisesMessage(
-            FieldError, "Cannot resolve keyword 'nope' into field."
-        ):
+        msg = "Cannot resolve keyword 'nope' into field."
+        with self.assertRaisesMessage(FieldError, msg):
             list(
                 Book.objects.annotate(sum_rating=Sum("rating")).filter(
                     sum_rating=F("nope")
@@ -602,9 +601,8 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.rating, 5)
             self.assertEqual(book.other_rating, 4)
 
-        with self.assertRaisesMessage(
-            FieldDoesNotExist, "Book has no field named 'other_rating'"
-        ):
+        msg = "Book has no field named 'other_rating'"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
             book = qs.defer("other_rating").get(other_rating=4)
 
     def test_mti_annotations(self):
@@ -964,9 +962,9 @@ class NonAggregateAnnotationTestCase(TestCase):
             Book.objects.annotate(BooleanField())
         with self.assertRaisesMessage(TypeError, msg % True):
             Book.objects.annotate(is_book=True)
-        with self.assertRaisesMessage(
-            TypeError, msg % ", ".join([str(BooleanField()), "True"])
-        ):
+
+        msg = msg % ", ".join([str(BooleanField()), "True"])
+        with self.assertRaisesMessage(TypeError, msg):
             Book.objects.annotate(BooleanField(), Value(False), is_book=True)
 
     def test_complex_annotations_must_have_an_alias(self):

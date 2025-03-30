@@ -1729,9 +1729,8 @@ class SecondUrls:
 
 class SetupTestEnvironmentTests(SimpleTestCase):
     def test_setup_test_environment_calling_more_than_once(self):
-        with self.assertRaisesMessage(
-            RuntimeError, "setup_test_environment() was already called"
-        ):
+        msg = "setup_test_environment() was already called"
+        with self.assertRaisesMessage(RuntimeError, msg):
             setup_test_environment()
 
     def test_allowed_hosts(self):

@@ -12,23 +12,20 @@ class ResetCycleTagTests(SimpleTestCase):
 
     @setup({"resetcycle02": "{% resetcycle undefinedcycle %}"})
     def test_resetcycle02(self):
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "Named cycle 'undefinedcycle' does not exist."
-        ):
+        msg = "Named cycle 'undefinedcycle' does not exist."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("resetcycle02")
 
     @setup({"resetcycle03": "{% cycle 'a' 'b' %}{% resetcycle undefinedcycle %}"})
     def test_resetcycle03(self):
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "Named cycle 'undefinedcycle' does not exist."
-        ):
+        msg = "Named cycle 'undefinedcycle' does not exist."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("resetcycle03")
 
     @setup({"resetcycle04": "{% cycle 'a' 'b' as ab %}{% resetcycle undefinedcycle %}"})
     def test_resetcycle04(self):
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "Named cycle 'undefinedcycle' does not exist."
-        ):
+        msg = "Named cycle 'undefinedcycle' does not exist."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("resetcycle04")
 
     @setup(

@@ -108,9 +108,8 @@ class MockTTY:
 class MockInputTests(TestCase):
     @mock_inputs({"username": "alice"})
     def test_input_not_found(self):
-        with self.assertRaisesMessage(
-            ValueError, "Mock input for 'Email address: ' not found."
-        ):
+        msg = "Mock input for 'Email address: ' not found."
+        with self.assertRaisesMessage(ValueError, msg):
             call_command("createsuperuser", stdin=MockTTY())
 
 
@@ -291,9 +290,8 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
 class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_no_email_argument(self):
         new_io = StringIO()
-        with self.assertRaisesMessage(
-            CommandError, "You must use --email with --noinput."
-        ):
+        msg = "You must use --email with --noinput."
+        with self.assertRaisesMessage(CommandError, msg):
             call_command(
                 "createsuperuser", interactive=False, username="joe", stdout=new_io
             )
@@ -418,9 +416,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
         new_io = StringIO()
-        with self.assertRaisesMessage(
-            CommandError, "You must use --email with --noinput."
-        ):
+        msg = "You must use --email with --noinput."
+        with self.assertRaisesMessage(CommandError, msg):
             call_command(
                 "createsuperuser",
                 interactive=False,
@@ -1153,9 +1150,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         """Creation fails if the username already exists."""
         User.objects.create(username="janet")
         new_io = StringIO()
-        with self.assertRaisesMessage(
-            CommandError, "Error: That username is already taken."
-        ):
+        msg = "Error: That username is already taken."
+        with self.assertRaisesMessage(CommandError, msg):
             call_command(
                 "createsuperuser",
                 username="janet",

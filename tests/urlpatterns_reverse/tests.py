@@ -422,13 +422,13 @@ class NoURLPatternsTests(SimpleTestCase):
         """
         resolver = URLResolver(RegexPattern(r"^$"), settings.ROOT_URLCONF)
 
-        with self.assertRaisesMessage(
-            ImproperlyConfigured,
+        msg = (
             "The included URLconf 'urlpatterns_reverse.no_urls' does not "
             "appear to have any patterns in it. If you see the 'urlpatterns' "
             "variable with valid patterns in the file then the issue is "
-            "probably caused by a circular import.",
-        ):
+            "probably caused by a circular import."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             getattr(resolver, "url_patterns")
 
 
@@ -486,9 +486,8 @@ class URLPatternReverse(SimpleTestCase):
 
     def test_patterns_reported(self):
         # Regression for #17076
-        with self.assertRaisesMessage(
-            NoReverseMatch, r"1 pattern(s) tried: ['people/(?P<name>\\w+)/$']"
-        ):
+        msg = r"1 pattern(s) tried: ['people/(?P<name>\\w+)/$']"
+        with self.assertRaisesMessage(NoReverseMatch, msg):
             # this url exists, but requires an argument
             reverse("people", args=[])
 

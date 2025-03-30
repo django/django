@@ -33,9 +33,8 @@ class StorageValidateFileNameTests(SimpleTestCase):
                 mock.patch.object(s, "get_available_name") as mock_get_available_name,
                 mock.patch.object(s, "_save") as mock_internal_save,
             ):
-                with self.assertRaisesMessage(
-                    SuspiciousFileOperation, self.error_msg % name
-                ):
+                msg = self.error_msg % name
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                     s.save(name, content="irrelevant")
                 self.assertEqual(mock_get_available_name.mock_calls, [])
                 self.assertEqual(mock_internal_save.mock_calls, [])
@@ -50,9 +49,8 @@ class StorageValidateFileNameTests(SimpleTestCase):
                 mock.patch.object(s, "get_available_name", return_value=name),
                 mock.patch.object(s, "_save") as mock_internal_save,
             ):
-                with self.assertRaisesMessage(
-                    SuspiciousFileOperation, self.error_msg % name
-                ):
+                msg = self.error_msg % name
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                     s.save("valid-file-name.txt", content="irrelevant")
                 self.assertEqual(mock_internal_save.mock_calls, [])
 
@@ -65,8 +63,6 @@ class StorageValidateFileNameTests(SimpleTestCase):
                 self.subTest(name=name),
                 mock.patch.object(s, "_save", return_value=name),
             ):
-
-                with self.assertRaisesMessage(
-                    SuspiciousFileOperation, self.error_msg % name
-                ):
+                msg = self.error_msg % name
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                     s.save("valid-file-name.txt", content="irrelevant")

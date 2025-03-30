@@ -80,9 +80,8 @@ class CompositePKAggregateTests(TestCase):
         self.assertEqual(user_3.comments__count, 0)
 
     def test_count_distinct_not_supported(self):
-        with self.assertRaisesMessage(
-            ValueError, "COUNT(DISTINCT) doesn't support composite primary keys"
-        ):
+        msg = "COUNT(DISTINCT) doesn't support composite primary keys"
+        with self.assertRaisesMessage(ValueError, msg):
             self.assertIsNone(
                 User.objects.annotate(comments__count=Count("comments", distinct=True))
             )

@@ -458,26 +458,21 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                     ls, LineString(numpy.array(ls.tuple))
                 )  # as numpy array
 
-        with self.assertRaisesMessage(
-            TypeError, "Each coordinate should be a sequence (list or tuple)"
-        ):
+        msg = "Each coordinate should be a sequence (list or tuple)"
+        with self.assertRaisesMessage(TypeError, msg):
             LineString((0, 0))
 
-        with self.assertRaisesMessage(
-            ValueError, "LineString requires at least 2 points, got 1."
-        ):
+        msg = "LineString requires at least 2 points, got 1."
+        with self.assertRaisesMessage(ValueError, msg):
             LineString([(0, 0)])
 
         if numpy:
-            with self.assertRaisesMessage(
-                ValueError, "LineString requires at least 2 points, got 1."
-            ):
+            with self.assertRaisesMessage(ValueError, msg):
                 LineString(numpy.array([(0, 0)]))
 
         with mock.patch("django.contrib.gis.geos.linestring.numpy", False):
-            with self.assertRaisesMessage(
-                TypeError, "Invalid initialization input for LineStrings."
-            ):
+            msg = "Invalid initialization input for LineStrings."
+            with self.assertRaisesMessage(TypeError, msg):
                 LineString("wrong input")
 
         # Test __iter__().
@@ -556,20 +551,16 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             if numpy:
                 self.assertEqual(lr, LinearRing(numpy.array(lr.tuple)))
 
-        with self.assertRaisesMessage(
-            ValueError, "LinearRing requires at least 4 points, got 3."
-        ):
+        msg = "LinearRing requires at least 4 points, got 3."
+        with self.assertRaisesMessage(ValueError, msg):
             LinearRing((0, 0), (1, 1), (0, 0))
 
-        with self.assertRaisesMessage(
-            ValueError, "LinearRing requires at least 4 points, got 1."
-        ):
+        msg = "LinearRing requires at least 4 points, got 1."
+        with self.assertRaisesMessage(ValueError, msg):
             LinearRing([(0, 0)])
 
         if numpy:
-            with self.assertRaisesMessage(
-                ValueError, "LinearRing requires at least 4 points, got 1."
-            ):
+            with self.assertRaisesMessage(ValueError, msg):
                 LinearRing(numpy.array([(0, 0)]))
 
     def test_linearring_json(self):
@@ -959,13 +950,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # Input geometries that have an SRID.
         self.assertEqual(GEOSGeometry(pnt.ewkt, srid=pnt.srid).srid, pnt.srid)
         self.assertEqual(GEOSGeometry(pnt.ewkb, srid=pnt.srid).srid, pnt.srid)
-        with self.assertRaisesMessage(
-            ValueError, "Input geometry already has SRID: %d." % pnt.srid
-        ):
+        msg = "Input geometry already has SRID: %d." % pnt.srid
+        with self.assertRaisesMessage(ValueError, msg):
             GEOSGeometry(pnt.ewkt, srid=1)
-        with self.assertRaisesMessage(
-            ValueError, "Input geometry already has SRID: %d." % pnt.srid
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             GEOSGeometry(pnt.ewkb, srid=1)
 
     def test_custom_srid(self):

@@ -48,25 +48,19 @@ class TestSaveLoad(TestCase):
         self.assertIsNone(loaded.field)
 
     def test_pk_validated(self):
-        with self.assertRaisesMessage(
-            exceptions.ValidationError, "is not a valid UUID"
-        ):
+        msg = "is not a valid UUID"
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             PrimaryKeyUUIDModel.objects.get(pk={})
 
-        with self.assertRaisesMessage(
-            exceptions.ValidationError, "is not a valid UUID"
-        ):
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             PrimaryKeyUUIDModel.objects.get(pk=[])
 
     def test_wrong_value(self):
-        with self.assertRaisesMessage(
-            exceptions.ValidationError, "is not a valid UUID"
-        ):
+        msg = "is not a valid UUID"
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             UUIDModel.objects.get(field="not-a-uuid")
 
-        with self.assertRaisesMessage(
-            exceptions.ValidationError, "is not a valid UUID"
-        ):
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
             UUIDModel.objects.create(field="not-a-uuid")
 
 

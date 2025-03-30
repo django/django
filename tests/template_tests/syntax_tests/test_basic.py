@@ -64,9 +64,8 @@ class BasicSyntaxTests(SimpleTestCase):
         """
         Raise TemplateSyntaxError for empty variable tags.
         """
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "Empty variable tag on line 1"
-        ):
+        msg = "Empty variable tag on line 1"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("basic-syntax07")
 
     @setup({"basic-syntax08": "{{        }}"})
@@ -74,9 +73,8 @@ class BasicSyntaxTests(SimpleTestCase):
         """
         Raise TemplateSyntaxError for empty variable tags.
         """
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "Empty variable tag on line 1"
-        ):
+        msg = "Empty variable tag on line 1"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("basic-syntax08")
 
     @setup({"basic-syntax09": "{{ var.method }}"})

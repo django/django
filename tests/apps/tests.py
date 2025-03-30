@@ -220,16 +220,14 @@ class AppsTests(SimpleTestCase):
         self.assertEqual(apps.get_app_config("relabeled").name, "apps")
 
     def test_duplicate_labels(self):
-        with self.assertRaisesMessage(
-            ImproperlyConfigured, "Application labels aren't unique"
-        ):
+        msg = "Application labels aren't unique"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             with self.settings(INSTALLED_APPS=["apps.apps.PlainAppsConfig", "apps"]):
                 pass
 
     def test_duplicate_names(self):
-        with self.assertRaisesMessage(
-            ImproperlyConfigured, "Application names aren't unique"
-        ):
+        msg = "Application names aren't unique"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             with self.settings(
                 INSTALLED_APPS=["apps.apps.RelabeledAppsConfig", "apps"]
             ):
@@ -263,9 +261,8 @@ class AppsTests(SimpleTestCase):
         try:
             # The cache must be cleared to trigger the exception.
             apps.get_models.cache_clear()
-            with self.assertRaisesMessage(
-                AppRegistryNotReady, "Models aren't loaded yet."
-            ):
+            msg = "Models aren't loaded yet."
+            with self.assertRaisesMessage(AppRegistryNotReady, msg):
                 apps.get_models()
         finally:
             apps.models_ready = True
@@ -326,9 +323,9 @@ class AppsTests(SimpleTestCase):
         body = {}
         body["Meta"] = type("Meta", (), meta_contents)
         body["__module__"] = TotallyNormal.__module__ + ".whatever"
-        with self.assertRaisesMessage(
-            RuntimeError, "Conflicting 'southponies' models in application 'apps':"
-        ):
+
+        msg = "Conflicting 'southponies' models in application 'apps':"
+        with self.assertRaisesMessage(RuntimeError, msg):
             type("SouthPonies", (models.Model,), body)
 
     def test_get_containing_app_config_apps_not_ready(self):
@@ -338,9 +335,8 @@ class AppsTests(SimpleTestCase):
         """
         apps.apps_ready = False
         try:
-            with self.assertRaisesMessage(
-                AppRegistryNotReady, "Apps aren't loaded yet"
-            ):
+            msg = "Apps aren't loaded yet"
+            with self.assertRaisesMessage(AppRegistryNotReady, msg):
                 apps.get_containing_app_config("foo")
         finally:
             apps.apps_ready = True

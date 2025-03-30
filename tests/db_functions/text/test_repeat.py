@@ -29,7 +29,6 @@ class RepeatTests(TestCase):
                 )
 
     def test_negative_number(self):
-        with self.assertRaisesMessage(
-            ValueError, "'number' must be greater or equal to 0."
-        ):
+        msg = "'number' must be greater or equal to 0."
+        with self.assertRaisesMessage(ValueError, msg):
             Repeat("name", -1)

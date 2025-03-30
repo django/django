@@ -105,9 +105,8 @@ class ManyToOneTests(TestCase):
 
         # Adding an object of the wrong type raises TypeError.
         with transaction.atomic():
-            with self.assertRaisesMessage(
-                TypeError, "'Article' instance expected, got <Reporter:"
-            ):
+            msg = "'Article' instance expected, got <Reporter:"
+            with self.assertRaisesMessage(TypeError, msg):
                 self.r.article_set.add(self.r2)
         self.assertSequenceEqual(
             self.r.article_set.all(),

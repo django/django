@@ -31,9 +31,8 @@ class PoFileTests(MessageCompilationTests):
 
     def test_bom_rejection(self):
         stderr = StringIO()
-        with self.assertRaisesMessage(
-            CommandError, "compilemessages generated one or more errors."
-        ):
+        msg = "compilemessages generated one or more errors."
+        with self.assertRaisesMessage(CommandError, msg):
             call_command(
                 "compilemessages", locale=[self.LOCALE], verbosity=0, stderr=stderr
             )
@@ -49,9 +48,8 @@ class PoFileTests(MessageCompilationTests):
         # Ensure .po file is more recent than .mo file.
         mo_file_en.with_suffix(".po").touch()
         try:
-            with self.assertRaisesMessage(
-                CommandError, "compilemessages generated one or more errors."
-            ):
+            msg = "compilemessages generated one or more errors."
+            with self.assertRaisesMessage(CommandError, msg):
                 call_command(
                     "compilemessages", locale=["en"], stderr=err_buffer, verbosity=0
                 )
@@ -272,9 +270,8 @@ class CompilationErrorHandling(MessageCompilationTests):
             lambda *args, **kwargs: run(*args, env=env, **kwargs),
         ):
             stderr = StringIO()
-            with self.assertRaisesMessage(
-                CommandError, "compilemessages generated one or more errors"
-            ):
+            msg = "compilemessages generated one or more errors"
+            with self.assertRaisesMessage(CommandError, msg):
                 call_command(
                     "compilemessages", locale=["ko"], stdout=StringIO(), stderr=stderr
                 )

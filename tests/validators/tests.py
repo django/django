@@ -747,9 +747,8 @@ class TestValidators(SimpleTestCase):
         v = MaxLengthValidator(
             16, message='"%(value)s" has more than %(limit_value)d characters.'
         )
-        with self.assertRaisesMessage(
-            ValidationError, '"djangoproject.com" has more than 16 characters.'
-        ):
+        msg = '"djangoproject.com" has more than 16 characters.'
+        with self.assertRaisesMessage(ValidationError, msg):
             v("djangoproject.com")
 
 

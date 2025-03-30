@@ -941,9 +941,8 @@ class RequestsTests(SimpleTestCase):
                 "wsgi.input": FakePayload(),
             }
         )
-        with self.assertRaisesMessage(
-            MultiPartParserError, "Invalid boundary in multipart: None"
-        ):
+        msg = "Invalid boundary in multipart: None"
+        with self.assertRaisesMessage(MultiPartParserError, msg):
             request.POST
 
     def test_multipart_non_ascii_content_type(self):
@@ -1311,9 +1310,8 @@ class HostValidationTests(SimpleTestCase):
         ]:
             request = HttpRequest()
             request.META = {"HTTP_HOST": host}
-            with self.assertRaisesMessage(
-                DisallowedHost, msg_suggestion % (host, host)
-            ):
+            msg = msg_suggestion % (host, host)
+            with self.assertRaisesMessage(DisallowedHost, msg):
                 request.get_host()
 
         for domain, port in [  # Valid-looking hosts with a port number
@@ -1324,9 +1322,8 @@ class HostValidationTests(SimpleTestCase):
             host = "%s:%s" % (domain, port)
             request = HttpRequest()
             request.META = {"HTTP_HOST": host}
-            with self.assertRaisesMessage(
-                DisallowedHost, msg_suggestion % (host, domain)
-            ):
+            msg = msg_suggestion % (host, domain)
+            with self.assertRaisesMessage(DisallowedHost, msg):
                 request.get_host()
 
         for host in self.poisoned_hosts:
@@ -1337,9 +1334,8 @@ class HostValidationTests(SimpleTestCase):
 
         request = HttpRequest()
         request.META = {"HTTP_HOST": "invalid_hostname.com"}
-        with self.assertRaisesMessage(
-            DisallowedHost, msg_suggestion2 % "invalid_hostname.com"
-        ):
+        msg = msg_suggestion2 % "invalid_hostname.com"
+        with self.assertRaisesMessage(DisallowedHost, msg):
             request.get_host()
 
     def test_split_domain_port(self):

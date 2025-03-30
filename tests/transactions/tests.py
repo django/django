@@ -323,22 +323,18 @@ class AtomicErrorsTests(TransactionTestCase):
     def test_atomic_prevents_setting_autocommit(self):
         autocommit = transaction.get_autocommit()
         with transaction.atomic():
-            with self.assertRaisesMessage(
-                transaction.TransactionManagementError, self.forbidden_atomic_msg
-            ):
+            msg = self.forbidden_atomic_msg
+            with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
                 transaction.set_autocommit(not autocommit)
         # Make sure autocommit wasn't changed.
         self.assertEqual(connection.autocommit, autocommit)
 
     def test_atomic_prevents_calling_transaction_methods(self):
         with transaction.atomic():
-            with self.assertRaisesMessage(
-                transaction.TransactionManagementError, self.forbidden_atomic_msg
-            ):
+            msg = self.forbidden_atomic_msg
+            with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
                 transaction.commit()
-            with self.assertRaisesMessage(
-                transaction.TransactionManagementError, self.forbidden_atomic_msg
-            ):
+            with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
                 transaction.rollback()
 
     def test_atomic_prevents_queries_in_broken_transaction(self):

@@ -749,11 +749,11 @@ class LookupTests(TestCase):
         self.assertSequenceEqual(Article.objects.filter(id__in=[]), [])
 
     def test_in_different_database(self):
-        with self.assertRaisesMessage(
-            ValueError,
+        msg = (
             "Subqueries aren't allowed across different databases. Force the "
-            "inner query to be evaluated using `list(inner_query)`.",
-        ):
+            "inner query to be evaluated using `list(inner_query)`."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             list(Article.objects.filter(id__in=Article.objects.using("other").all()))
 
     def test_in_keeps_value_ordering(self):
@@ -799,61 +799,61 @@ class LookupTests(TestCase):
 
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Cannot resolve keyword 'pub_date_year' into field. Choices are: "
-            "author, author_id, headline, id, pub_date, slug, tag",
-        ):
+            "author, author_id, headline, id, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(pub_date_year="2005").count()
 
     def test_unsupported_lookups(self):
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Unsupported lookup 'starts' for CharField or join on the field "
-            "not permitted, perhaps you meant startswith or istartswith?",
-        ):
+            "not permitted, perhaps you meant startswith or istartswith?"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__starts="Article")
 
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Unsupported lookup 'is_null' for DateTimeField or join on the field "
-            "not permitted, perhaps you meant isnull?",
-        ):
+            "not permitted, perhaps you meant isnull?"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(pub_date__is_null=True)
 
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Unsupported lookup 'gobbledygook' for DateTimeField or join on the field "
-            "not permitted.",
-        ):
+            "not permitted."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(pub_date__gobbledygook="blahblah")
 
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Unsupported lookup 'gt__foo' for DateTimeField or join on the field "
-            "not permitted, perhaps you meant gt or gte?",
-        ):
+            "not permitted, perhaps you meant gt or gte?"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(pub_date__gt__foo="blahblah")
 
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Unsupported lookup 'gt__' for DateTimeField or join on the field "
-            "not permitted, perhaps you meant gt or gte?",
-        ):
+            "not permitted, perhaps you meant gt or gte?"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(pub_date__gt__="blahblah")
 
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Unsupported lookup 'gt__lt' for DateTimeField or join on the field "
-            "not permitted, perhaps you meant gt or gte?",
-        ):
+            "not permitted, perhaps you meant gt or gte?"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(pub_date__gt__lt="blahblah")
 
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Unsupported lookup 'gt__lt__foo' for DateTimeField or join"
-            " on the field not permitted, perhaps you meant gt or gte?",
-        ):
+            " on the field not permitted, perhaps you meant gt or gte?"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(pub_date__gt__lt__foo="blahblah")
 
     def test_unsupported_lookups_custom_lookups(self):

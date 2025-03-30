@@ -23,13 +23,10 @@ class TimezoneTests(SimpleTestCase):
 
     def test_localdate(self):
         naive = datetime.datetime(2015, 1, 1, 0, 0, 1)
-        with self.assertRaisesMessage(
-            ValueError, "localtime() cannot be applied to a naive datetime"
-        ):
+        msg = "localtime() cannot be applied to a naive datetime"
+        with self.assertRaisesMessage(ValueError, msg):
             timezone.localdate(naive)
-        with self.assertRaisesMessage(
-            ValueError, "localtime() cannot be applied to a naive datetime"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             timezone.localdate(naive, timezone=EAT)
 
         aware = datetime.datetime(2015, 1, 1, 0, 0, 1, tzinfo=ICT)
@@ -149,9 +146,8 @@ class TimezoneTests(SimpleTestCase):
             datetime.datetime(2011, 9, 1, 13, 20, 30),
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "make_naive() cannot be applied to a naive datetime"
-        ):
+        msg = "make_naive() cannot be applied to a naive datetime"
+        with self.assertRaisesMessage(ValueError, msg):
             timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT)
 
     def test_make_naive_no_tz(self):

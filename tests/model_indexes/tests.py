@@ -88,9 +88,8 @@ class SimpleIndexesTests(SimpleTestCase):
         self.assertNotEqual(index, another_index)
 
     def test_index_fields_type(self):
-        with self.assertRaisesMessage(
-            ValueError, "Index.fields must be a list or tuple."
-        ):
+        msg = "Index.fields must be a list or tuple."
+        with self.assertRaisesMessage(ValueError, msg):
             models.Index(fields="title")
 
     def test_index_fields_strings(self):
@@ -112,15 +111,13 @@ class SimpleIndexesTests(SimpleTestCase):
             models.Index(Upper("foo"), fields=["field"])
 
     def test_opclasses_requires_index_name(self):
-        with self.assertRaisesMessage(
-            ValueError, "An index must be named to use opclasses."
-        ):
+        msg = "An index must be named to use opclasses."
+        with self.assertRaisesMessage(ValueError, msg):
             models.Index(opclasses=["jsonb_path_ops"])
 
     def test_opclasses_requires_list_or_tuple(self):
-        with self.assertRaisesMessage(
-            ValueError, "Index.opclasses must be a list or tuple."
-        ):
+        msg = "Index.opclasses must be a list or tuple."
+        with self.assertRaisesMessage(ValueError, msg):
             models.Index(
                 name="test_opclass", fields=["field"], opclasses="jsonb_path_ops"
             )
@@ -135,9 +132,8 @@ class SimpleIndexesTests(SimpleTestCase):
             )
 
     def test_condition_requires_index_name(self):
-        with self.assertRaisesMessage(
-            ValueError, "An index must be named to use condition."
-        ):
+        msg = "An index must be named to use condition."
+        with self.assertRaisesMessage(ValueError, msg):
             models.Index(condition=models.Q(pages__gt=400))
 
     def test_expressions_requires_index_name(self):
@@ -158,9 +154,8 @@ class SimpleIndexesTests(SimpleTestCase):
             )
 
     def test_condition_must_be_q(self):
-        with self.assertRaisesMessage(
-            ValueError, "Index.condition must be a Q instance."
-        ):
+        msg = "Index.condition must be a Q instance."
+        with self.assertRaisesMessage(ValueError, msg):
             models.Index(condition="invalid", name="long_book_idx")
 
     def test_include_requires_list_or_tuple(self):

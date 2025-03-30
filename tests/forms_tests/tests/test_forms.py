@@ -4079,9 +4079,9 @@ aria-describedby="id_age_error"></td></tr>""",
         self.assertEqual(
             "+61.287654321 ext. 123 (label: )", f.clean(["+61", "287654321", "123"])
         )
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a complete value.', 'Enter an extension.'"
-        ):
+
+        msg = "'Enter a complete value.', 'Enter an extension.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(["", "", "", "Home"])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(["61", "287654321", "123", "Home"])
@@ -4097,9 +4097,9 @@ aria-describedby="id_age_error"></td></tr>""",
         self.assertEqual(
             "+61.287654321 ext. 123 (label: )", f.clean(["+61", "287654321", "123"])
         )
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a complete value.', 'Enter an extension.'"
-        ):
+
+        msg = "'Enter a complete value.', 'Enter an extension.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(["", "", "", "Home"])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(["61", "287654321", "123", "Home"])

@@ -33,9 +33,8 @@ class ConcatTests(TestCase):
         )
 
     def test_gt_two_expressions(self):
-        with self.assertRaisesMessage(
-            ValueError, "Concat must take at least two expressions"
-        ):
+        msg = "Concat must take at least two expressions"
+        with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(joined=Concat("alias"))
 
     def test_many(self):

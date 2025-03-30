@@ -490,9 +490,8 @@ class MultiColumnFKTests(TestCase):
 
     def test_foreign_key_raises_informative_does_not_exist(self):
         referrer = ArticleTranslation()
-        with self.assertRaisesMessage(
-            Article.DoesNotExist, "ArticleTranslation has no article"
-        ):
+        msg = "ArticleTranslation has no article"
+        with self.assertRaisesMessage(Article.DoesNotExist, msg):
             referrer.article
 
     def test_foreign_key_related_query_name(self):

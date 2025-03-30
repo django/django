@@ -557,15 +557,13 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         )
 
         # Excluding a bogus app should throw an error
-        with self.assertRaisesMessage(
-            management.CommandError, "No installed app with label 'foo_app'."
-        ):
+        msg = "No installed app with label 'foo_app'."
+        with self.assertRaisesMessage(management.CommandError, msg):
             self._dumpdata_assert(["fixtures", "sites"], "", exclude_list=["foo_app"])
 
         # Excluding a bogus model should throw an error
-        with self.assertRaisesMessage(
-            management.CommandError, "Unknown model: fixtures.FooModel"
-        ):
+        msg = "Unknown model: fixtures.FooModel"
+        with self.assertRaisesMessage(management.CommandError, msg):
             self._dumpdata_assert(
                 ["fixtures", "sites"], "", exclude_list=["fixtures.FooModel"]
             )
@@ -622,9 +620,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             primary_keys="2",
         )
 
-        with self.assertRaisesMessage(
-            management.CommandError, "You can only use --pks option with one model"
-        ):
+        msg = "You can only use --pks option with one model"
+        with self.assertRaisesMessage(management.CommandError, msg):
             self._dumpdata_assert(
                 ["fixtures"],
                 '[{"pk": 2, "model": "fixtures.article", "fields": '
@@ -636,9 +633,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 primary_keys="2,3",
             )
 
-        with self.assertRaisesMessage(
-            management.CommandError, "You can only use --pks option with one model"
-        ):
+        with self.assertRaisesMessage(management.CommandError, msg):
             self._dumpdata_assert(
                 "",
                 '[{"pk": 2, "model": "fixtures.article", "fields": '
@@ -650,9 +645,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 primary_keys="2,3",
             )
 
-        with self.assertRaisesMessage(
-            management.CommandError, "You can only use --pks option with one model"
-        ):
+        with self.assertRaisesMessage(management.CommandError, msg):
             self._dumpdata_assert(
                 ["fixtures.Article", "fixtures.category"],
                 '[{"pk": 2, "model": "fixtures.article", "fields": '
@@ -940,9 +933,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command("loaddata", "null_character_in_field_value.json")
 
     def test_loaddata_app_option(self):
-        with self.assertRaisesMessage(
-            CommandError, "No fixture named 'db_fixture_1' found."
-        ):
+        msg = "No fixture named 'db_fixture_1' found."
+        with self.assertRaisesMessage(CommandError, msg):
             management.call_command(
                 "loaddata", "db_fixture_1", verbosity=0, app_label="someotherapp"
             )
@@ -987,13 +979,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_unmatched_identifier_loading(self):
         # Db fixture 3 won't load because the database identifier doesn't
         # match.
-        with self.assertRaisesMessage(
-            CommandError, "No fixture named 'db_fixture_3' found."
-        ):
+        msg = "No fixture named 'db_fixture_3' found."
+        with self.assertRaisesMessage(CommandError, msg):
             management.call_command("loaddata", "db_fixture_3", verbosity=0)
-        with self.assertRaisesMessage(
-            CommandError, "No fixture named 'db_fixture_3' found."
-        ):
+        with self.assertRaisesMessage(CommandError, msg):
             management.call_command(
                 "loaddata", "db_fixture_3", verbosity=0, database="default"
             )
@@ -1156,9 +1145,8 @@ class NonexistentFixtureTests(TestCase):
 
     def test_loaddata_not_existent_fixture_file(self):
         stdout_output = StringIO()
-        with self.assertRaisesMessage(
-            CommandError, "No fixture named 'this_fixture_doesnt_exist' found."
-        ):
+        msg = "No fixture named 'this_fixture_doesnt_exist' found."
+        with self.assertRaisesMessage(CommandError, msg):
             management.call_command(
                 "loaddata", "this_fixture_doesnt_exist", stdout=stdout_output
             )
@@ -1172,9 +1160,8 @@ class NonexistentFixtureTests(TestCase):
         If no fixtures match the loaddata command, constraints checks on the
         database shouldn't be disabled. This is performance critical on MSSQL.
         """
-        with self.assertRaisesMessage(
-            CommandError, "No fixture named 'this_fixture_doesnt_exist' found."
-        ):
+        msg = "No fixture named 'this_fixture_doesnt_exist' found."
+        with self.assertRaisesMessage(CommandError, msg):
             management.call_command(
                 "loaddata", "this_fixture_doesnt_exist", verbosity=0
             )

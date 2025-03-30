@@ -1680,28 +1680,27 @@ class ModelStateTests(SimpleTestCase):
     def test_bound_field_sanity_check(self):
         field = models.CharField(max_length=1)
         field.model = models.Model
-        with self.assertRaisesMessage(
-            ValueError, 'ModelState.fields cannot be bound to a model - "field" is.'
-        ):
+        msg = 'ModelState.fields cannot be bound to a model - "field" is.'
+        with self.assertRaisesMessage(ValueError, msg):
             ModelState("app", "Model", [("field", field)])
 
     def test_sanity_check_to(self):
         field = models.ForeignKey(UnicodeModel, models.CASCADE)
-        with self.assertRaisesMessage(
-            ValueError,
+        msg = (
             'Model fields in "ModelState.fields" cannot refer to a model class - '
-            '"app.Model.field.to" does. Use a string reference instead.',
-        ):
+            '"app.Model.field.to" does. Use a string reference instead.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             ModelState("app", "Model", [("field", field)])
 
     def test_sanity_check_through(self):
         field = models.ManyToManyField("UnicodeModel")
         field.remote_field.through = UnicodeModel
-        with self.assertRaisesMessage(
-            ValueError,
+        msg = (
             'Model fields in "ModelState.fields" cannot refer to a model class - '
-            '"app.Model.field.through" does. Use a string reference instead.',
-        ):
+            '"app.Model.field.through" does. Use a string reference instead.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             ModelState("app", "Model", [("field", field)])
 
     def test_sanity_index_name(self):
@@ -1733,9 +1732,8 @@ class ModelStateTests(SimpleTestCase):
 
         project_state = ProjectState()
         project_state.add_model(state)
-        with self.assertRaisesMessage(
-            InvalidBasesError, "Cannot resolve bases for [<ModelState: 'app.Model'>]"
-        ):
+        msg = "Cannot resolve bases for [<ModelState: 'app.Model'>]"
+        with self.assertRaisesMessage(InvalidBasesError, msg):
             project_state.apps
 
     def test_fields_ordering_equality(self):

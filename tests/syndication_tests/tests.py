@@ -283,11 +283,11 @@ class SyndicationFeedTest(FeedTestCase):
             self.assertEqual(len(enclosures), 1)
 
     def test_rss2_multiple_enclosures(self):
-        with self.assertRaisesMessage(
-            ValueError,
+        msg = (
             "RSS feed items may only have one enclosure, see "
-            "http://www.rssboard.org/rss-profile#element-channel-item-enclosure",
-        ):
+            "http://www.rssboard.org/rss-profile#element-channel-item-enclosure"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             self.client.get("/syndication/rss2/multiple-enclosure/")
 
     def test_rss091_feed(self):

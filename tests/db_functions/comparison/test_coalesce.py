@@ -20,9 +20,8 @@ class CoalesceTests(TestCase):
         )
 
     def test_gt_two_expressions(self):
-        with self.assertRaisesMessage(
-            ValueError, "Coalesce must take at least two expressions"
-        ):
+        msg = "Coalesce must take at least two expressions"
+        with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(display_name=Coalesce("alias"))
 
     def test_mixed_values(self):

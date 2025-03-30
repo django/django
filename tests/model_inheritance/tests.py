@@ -62,9 +62,8 @@ class ModelInheritanceTests(TestCase):
 
         # However, the CommonInfo class cannot be used as a normal model (it
         # doesn't exist as a model).
-        with self.assertRaisesMessage(
-            AttributeError, "'CommonInfo' has no attribute 'objects'"
-        ):
+        msg = "'CommonInfo' has no attribute 'objects'"
+        with self.assertRaisesMessage(AttributeError, msg):
             CommonInfo.objects.all()
 
     def test_reverse_relation_for_different_hierarchy_tree(self):

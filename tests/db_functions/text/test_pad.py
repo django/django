@@ -40,11 +40,10 @@ class PadTests(TestCase):
                 )
 
     def test_pad_negative_length(self):
+        msg = "'length' must be greater or equal to 0."
         for function in (LPad, RPad):
             with self.subTest(function=function):
-                with self.assertRaisesMessage(
-                    ValueError, "'length' must be greater or equal to 0."
-                ):
+                with self.assertRaisesMessage(ValueError, msg):
                     function("name", -1)
 
     def test_combined_with_length(self):

@@ -503,10 +503,8 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertNotIn(missing_file_name, configured_storage.hashed_files)
 
         # File name not found in manifest
-        with self.assertRaisesMessage(
-            ValueError,
-            "Missing staticfiles manifest entry for '%s'" % missing_file_name,
-        ):
+        msg = "Missing staticfiles manifest entry for '%s'" % missing_file_name
+        with self.assertRaisesMessage(ValueError, msg):
             self.hashed_file_path(missing_file_name)
 
         configured_storage.manifest_strict = False

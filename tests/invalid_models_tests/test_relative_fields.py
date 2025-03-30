@@ -1971,9 +1971,8 @@ class M2mThroughFieldsTests(SimpleTestCase):
         class Fan(models.Model):
             pass
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot specify through_fields without a through model"
-        ):
+        msg = "Cannot specify through_fields without a through model"
+        with self.assertRaisesMessage(ValueError, msg):
             models.ManyToManyField(Fan, through_fields=("f1", "f2"))
 
     def test_invalid_order(self):

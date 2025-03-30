@@ -29,16 +29,16 @@ class ModelFormBaseTest(TestCase):
 
     def test_model_multiple_choice_field_uuid_pk(self):
         f = forms.ModelMultipleChoiceField(UUIDPK.objects.all())
-        with self.assertRaisesMessage(
-            ValidationError, "“invalid_uuid” is not a valid value."
-        ):
+
+        msg = "“invalid_uuid” is not a valid value."
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(["invalid_uuid"])
 
     def test_model_choice_invalid_pk_value_error_messages(self):
         f = forms.ModelChoiceField(UUIDPK.objects.all())
-        with self.assertRaisesMessage(
-            ValidationError,
+        msg = (
             "['Select a valid choice. "
-            "That choice is not one of the available choices.']",
-        ):
+            "That choice is not one of the available choices.']"
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("invalid")

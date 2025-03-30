@@ -25,9 +25,8 @@ class LowerTests(TestCase):
         )
 
     def test_num_args(self):
-        with self.assertRaisesMessage(
-            TypeError, "'Lower' takes exactly 1 argument (2 given)"
-        ):
+        msg = "'Lower' takes exactly 1 argument (2 given)"
+        with self.assertRaisesMessage(TypeError, msg):
             Author.objects.update(name=Lower("name", "name"))
 
     def test_transform(self):

@@ -68,9 +68,8 @@ class LeastTests(TestCase):
         self.assertIsNone(articles.first().first_updated)
 
     def test_one_expressions(self):
-        with self.assertRaisesMessage(
-            ValueError, "Least must take at least two expressions"
-        ):
+        msg = "Least must take at least two expressions"
+        with self.assertRaisesMessage(ValueError, msg):
             Least("written")
 
     def test_related_field(self):

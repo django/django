@@ -17,11 +17,10 @@ class QuerySetIteratorTests(TestCase):
         Article.objects.create(name="Article 2", created=datetime.datetime.now())
 
     def test_iterator_invalid_chunk_size(self):
+        msg = "Chunk size must be strictly positive."
         for size in (0, -1):
             with self.subTest(size=size):
-                with self.assertRaisesMessage(
-                    ValueError, "Chunk size must be strictly positive."
-                ):
+                with self.assertRaisesMessage(ValueError, msg):
                     Article.objects.iterator(chunk_size=size)
 
     def test_default_iterator_chunk_size(self):

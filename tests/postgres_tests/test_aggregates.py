@@ -159,10 +159,8 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     # RemovedInDjango61Warning: Remove this test
     def test_ordering_and_order_by_causes_error(self):
         with warnings.catch_warnings(record=True, action="always") as wm:
-            with self.assertRaisesMessage(
-                TypeError,
-                "Cannot specify both order_by and ordering.",
-            ):
+            msg = "Cannot specify both order_by and ordering."
+            with self.assertRaisesMessage(TypeError, msg):
                 AggregateTestModel.objects.aggregate(
                     stringagg=StringAgg(
                         "char_field",

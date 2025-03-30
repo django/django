@@ -364,9 +364,8 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         BaseDateListView.get().
         """
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
-        with self.assertRaisesMessage(
-            TypeError, "context must be a dict rather than MagicMock."
-        ):
+        msg = "context must be a dict rather than MagicMock."
+        with self.assertRaisesMessage(TypeError, msg):
             self.client.get("/dates/booksignings/2008/")
         args, kwargs = mock.call_args
         # These are context values from get_dated_items().
