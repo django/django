@@ -1134,6 +1134,19 @@ array:
     >>> Dog.objects.filter(data__owner__other_pets__0__name="Fishy")
     <QuerySet [<Dog: Rufus>]>
 
+If the key is a negative integer, it cannot be used in a filter keyword
+directly, but you can still use dictionary unpacking to use it in a query:
+
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(**{"data__owner__other_pets__-1__name": "Fishy"})
+    <QuerySet [<Dog: Rufus>]>
+
+.. admonition:: MySQL and MariaDB users
+
+    Negative indexing of JSON arrays is not currently supported by Django on
+    these databases.
+
 If the key you wish to query by clashes with the name of another lookup, use
 the :lookup:`contains <jsonfield.contains>` lookup instead.
 
