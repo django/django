@@ -3014,6 +3014,8 @@ class CacheHandlerTest(SimpleTestCase):
             t.start()
             t.join()
 
+        caches._global_connections = {}
+
         self.assertIs(c[0], c[1])
 
     def test_nonexistent_alias(self):
