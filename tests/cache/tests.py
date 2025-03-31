@@ -326,6 +326,9 @@ class BaseCacheTests:
     # with a non-integer value.
     incr_decr_type_error = TypeError
 
+    def setUp(self):
+        caches._global_connections = {}
+
     def tearDown(self):
         cache.clear()
         caches._global_connections = {}
@@ -1594,7 +1597,10 @@ class BaseMemcachedTests(BaseCacheTests):
                 cache._class, "disconnect_all", autospec=True
             ) as mock_disconnect:
                 signals.request_finished.send(self.__class__)
-                self.assertIs(mock_disconnect.called, cache.thread_sensitive)
+                self.assertIs(
+                    mock_disconnect.called,
+                    self.should_disconnect_on_close and cache.thread_sensitive,
+                )
         finally:
             signals.request_finished.connect(close_old_connections)
 
