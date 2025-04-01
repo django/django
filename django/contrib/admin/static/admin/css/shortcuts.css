@@ -9,10 +9,8 @@
 
     /* Dark Mode Colors */
     --django-dark-bg: #1E1E1E;
-    --django-dark-panel: #2A2A2A;
     --django-dark-text: #E6E6E6;
     --django-dark-border: #555;
-    --django-dark-muted: #85B79D;
 }
 
 #shortcuts-panel {
@@ -33,10 +31,6 @@
     display: none;
 }
 
-.shortcuts-container {
-    text-align: center;
-}
-
 kbd {
     background: #eee;
     padding: 4px 6px;
@@ -52,29 +46,3 @@ kbd {
     border: none;
     cursor: pointer;
 }
-
-#command-palette {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1000;
-}
-
-#command-box {
-    background: #fff;
-    width: 400px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 15px;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-}
-

@@ -10,7 +10,6 @@
 
     // Handle keypress events
     function handleKeyDown(event) {
-        if (isTyping()) {return;}
 
         const key = event.key.toLowerCase();
 
@@ -33,12 +32,6 @@
                 addLink && addLink.click();
             }
         }
-    }
-
-    // Check if user is typing (input or textarea)
-    function isTyping() {
-        const activeElement = document.activeElement;
-        return activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA";
     }
 
     // Handle Ctrl+K to focus the existing search bar
