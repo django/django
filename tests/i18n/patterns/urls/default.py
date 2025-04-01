@@ -35,4 +35,5 @@ urlpatterns += i18n_patterns(
     re_path(
         _(r"^account/"), include("i18n.patterns.urls.namespace", namespace="account")
     ),
+    path(_("register-as-path/"), view),
 )
