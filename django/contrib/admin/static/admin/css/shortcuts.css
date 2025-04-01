@@ -1,0 +1,80 @@
+:root {
+    /* Light Mode Colors */
+    --django-primary: #0C4B33;
+    --django-secondary: #417690;
+    --django-text: #333333;
+    --django-bg: #F8F8F8;
+    --django-border: #D3D3D3;
+    --django-muted: #6F9D83;
+
+    /* Dark Mode Colors */
+    --django-dark-bg: #1E1E1E;
+    --django-dark-panel: #2A2A2A;
+    --django-dark-text: #E6E6E6;
+    --django-dark-border: #555;
+    --django-dark-muted: #85B79D;
+}
+
+#shortcuts-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--django-dark-bg);
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none;
+    color: white;
+    border: white 1px solid;
+}
+
+#shortcuts-panel.hidden {
+    display: none;
+}
+
+.shortcuts-container {
+    text-align: center;
+}
+
+kbd {
+    background: #eee;
+    padding: 4px 6px;
+    font-weight: bold;
+}
+
+#close-shortcuts {
+    margin-top: 10px;
+    margin-left: 90%;
+    padding: 5px 10px;
+    background: var(--django-secondary);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#command-palette {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+}
+
+#command-box {
+    background: #fff;
+    width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
