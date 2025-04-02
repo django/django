@@ -61,6 +61,16 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
             "re-enable them, at least for this site, or for “same-origin” "
             "requests."
         ),
+        "bad_origin": reason.startswith("Origin checking failed"),
+        "forwarded_may_fix": (
+            request.headers.get("X-Forwarded-Proto", "") == "https"
+            and not request.is_secure()
+            or request.headers.get("Origin", "").endswith(
+                f'://{request.headers.get("X-Forwarded-Host", "")}'
+            )
+        ),
+        "x_forwarded_proto": request.headers.get("X-Forwarded-Proto"),
+        "x_forwarded_host": request.headers.get("X-Forwarded-Host"),
         "DEBUG": settings.DEBUG,
         "docs_version": get_docs_version(),
         "more": _("More information is available with DEBUG=True."),
