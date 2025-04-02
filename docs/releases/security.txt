@@ -36,6 +36,16 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+April 2, 2025 - :cve:`2025-27556`
+---------------------------------
+
+Potential denial-of-service vulnerability in ``LoginView``, ``LogoutView``, and
+``set_language()`` on Windows. `Full description
+<https://www.djangoproject.com/weblog/2025/apr/02/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <edc2716d01a6fdd84b173c02031695231bcee1f8>`
+* Django 5.0 :commit:`(patch) <8c6871b097b6c49d2a782c0d80d908bcbe2116f1>`
+
 March 6, 2025 - :cve:`2025-26699`
 ---------------------------------
 
