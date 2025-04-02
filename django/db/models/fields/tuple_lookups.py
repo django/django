@@ -318,6 +318,10 @@ class TupleIn(TupleLookupMixin, In):
         lhs = self.lhs
 
         for vals in rhs:
+            # Remove any tuple containing None from the list as NULL is never
+            # equal to anything.
+            if any(val is None for val in vals):
+                continue
             result.append(
                 Tuple(
                     *[
@@ -326,6 +330,9 @@ class TupleIn(TupleLookupMixin, In):
                     ]
                 )
             )
+
+        if not result:
+            raise EmptyResultSet
 
         return compiler.compile(Tuple(*result))
 
@@ -342,9 +349,15 @@ class TupleIn(TupleLookupMixin, In):
         lhs = self.lhs
 
         for vals in rhs:
+            # Remove any tuple containing None from the list as NULL is never
+            # equal to anything.
+            if any(val is None for val in vals):
+                continue
             lookups = [Exact(col, val) for col, val in zip(lhs, vals)]
             root.children.append(WhereNode(lookups, connector=AND))
 
+        if not root.children:
+            raise EmptyResultSet
         return root.as_sql(compiler, connection)
 
 

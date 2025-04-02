@@ -12,3 +12,6 @@ Bugfixes
 * Fixed a regression in Django 5.2 that caused a crash when annotating
   aggregate expressions over query that uses explicit grouping by transforms
   followed by field references (:ticket:`36292`).
+
+* Fixed a regression in Django 5.2 that caused unnecessary queries when
+  prefetching nullable foreign key relationships (:ticket:`36290`).
