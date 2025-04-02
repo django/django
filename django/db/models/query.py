@@ -1375,24 +1375,33 @@ class QuerySet(AltersData):
                 "field."
             )
 
-        field_names = {f for f in fields if not hasattr(f, "resolve_expression")}
+        field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []
         expressions = {}
         counter = 1
         for field in fields:
+            field_name = field
+            expression = None
             if hasattr(field, "resolve_expression"):
-                field_id_prefix = getattr(
+                field_name = getattr(
                     field, "default_alias", field.__class__.__name__.lower()
                 )
-                while True:
-                    field_id = field_id_prefix + str(counter)
+                expression = field
+                # For backward compatibility reasons expressions are always
+                # prefixed with the counter even if their default alias doesn't
+                # collide with field names. Changing this logic could break
+                # some usage of named=True.
+                seen = True
+            elif seen := field_names[field_name]:
+                expression = F(field_name)
+            if seen:
+                field_name_prefix = field_name
+                while (field_name := f"{field_name_prefix}{counter}") in field_names:
                     counter += 1
-                    if field_id not in field_names:
-                        break
-                expressions[field_id] = field
-                _fields.append(field_id)
-            else:
-                _fields.append(field)
+            if expression is not None:
+                expressions[field_name] = expression
+            field_names[field_name] = True
+            _fields.append(field_name)
 
         clone = self._values(*_fields, **expressions)
         clone._iterable_class = (
