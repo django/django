@@ -15,3 +15,7 @@ Bugfixes
 
 * Fixed a regression in Django 5.2 that caused unnecessary queries when
   prefetching nullable foreign key relationships (:ticket:`36290`).
+
+* Fixed a regression in Django 5.2 that caused improper values to be returned
+  from ``QuerySet.values_list`` when duplicate field names were specified
+  (:ticket:`36288`).
