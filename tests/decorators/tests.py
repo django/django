@@ -714,8 +714,7 @@ def simple_dec_factory(prefix_value="empty:"):
 simple_dec_w_args_m = method_decorator_with_args(simple_dec_factory)
 
 
-# For testing method_decorator_with_args, two decorators that add an attribute to
-# the function
+# For testing method_decorator_with_args, two decorators that add an attribute to the function
 def myattr_dec_factory(value="no value"):
     def decorator(func):
         @wraps(func)
