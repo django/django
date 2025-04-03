@@ -15,6 +15,36 @@ class GZipMiddleware(MiddlewareMixin):
 
     max_random_bytes = 100
 
+    @classmethod
+    def should_streaming_gzip(cls, response=None) -> bool:
+        """
+        Determine whether gzip compression should be applied to the response.
+        Can be disabled via response.no_gzip_streaming.
+
+        eg1: streaming response no gzip
+            response.no_gzip_streaming = True
+        """
+        no_gzip_streaming = getattr(response, "no_gzip_streaming", False)
+        return not no_gzip_streaming
+
+    @classmethod
+    def should_flush_each(cls, response=None) -> bool:
+        """
+        Determine whether to enable flush_each.
+        By default, enabled for text/event-stream unless explicitly disabled via
+        response.no_flush_each.
+
+        When gzip is enabled,
+            SSE responses should enable flush_each to avoid blocking.
+
+        eg1:
+            # sse response will blocking
+            response.no_flush_each = True
+        """
+        if getattr(response, "no_flush_each", False):
+            return False
+        return response.get("Content-Type", "").startswith("text/event-stream")
+
     def process_response(self, request, response):
         # It's not worth attempting to compress really short responses.
         if not response.streaming and len(response.content) < 200:
@@ -31,6 +61,8 @@ class GZipMiddleware(MiddlewareMixin):
             return response
 
         if response.streaming:
+            if not self.should_streaming_gzip(response=response):
+                return response
             if response.is_async:
                 # pull to lexical scope to capture fixed reference in case
                 # streaming_content is set again later.
@@ -48,9 +80,7 @@ class GZipMiddleware(MiddlewareMixin):
                 # Determine whether to flush after each write.
                 # This is important for SSE (Server-Sent Events) or similar streaming
                 # responses that benefit from reduced latency and timely delivery.
-                flush_each = response.get("Content-Type", "").startswith(
-                    "text/event-stream"
-                ) or getattr(response, "_flush_each", False)
+                flush_each = self.should_flush_each(response=response)
                 response.streaming_content = compress_sequence(
                     response.streaming_content,
                     max_random_bytes=self.max_random_bytes,
