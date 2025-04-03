@@ -21,6 +21,7 @@ from django.views.decorators.common import no_append_slash
 from .forms import MediaActionForm
 from .models import (
     Actor,
+    Address,
     AdminOrderedAdminMethod,
     AdminOrderedCallable,
     AdminOrderedField,
@@ -1113,6 +1114,18 @@ class CityAdmin(admin.ModelAdmin):
         }
 
 
+class AddressForm(forms.ModelForm):
+    city = forms.ModelMultipleChoiceField(
+        queryset=City.objects.all(),
+        widget=admin.widgets.FilteredSelectMultiple("City", is_stacked=False),
+    )
+
+
+class AddressAdmin(admin.ModelAdmin):
+    model = Address
+    form = AddressForm
+
+
 class WorkerAdmin(admin.ModelAdmin):
     def view_on_site(self, obj):
         return "/worker/%s/%s/" % (obj.surname, obj.name)
@@ -1250,6 +1263,7 @@ site.register(UndeletableObject, UndeletableObjectAdmin)
 site.register(UnchangeableObject, UnchangeableObjectAdmin)
 site.register(State, StateAdmin)
 site.register(City, CityAdmin)
+site.register(Address, AddressAdmin)
 site.register(Restaurant, RestaurantAdmin)
 site.register(Worker, WorkerAdmin)
 site.register(FunkyTag, FunkyTagAdmin)
