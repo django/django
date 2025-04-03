@@ -9,4 +9,6 @@ Django 5.2.1 fixes several bugs in 5.2.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.2 that caused a crash when annotating
+  aggregate expressions over query that uses explicit grouping by transforms
+  followed by field references (:ticket:`36292`).
