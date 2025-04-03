@@ -41,4 +41,3 @@ class GzipMiddlewareTest(SimpleTestCase):
         for i in range(1, len(durations)):
             self.assertGreaterEqual(durations[i], i * 0.5)
         return
-
