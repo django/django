@@ -15,3 +15,7 @@ Bugfixes
 
 * Fixed a regression in Django 5.2 that caused unnecessary queries when
   prefetching nullable foreign key relationships (:ticket:`36290`).
+
+* Fixed a regression in Django 5.2 that caused a crash of
+  ``QuerySet.bulk_create()`` with nullable geometry fields on PostGIS
+  (:ticket:`36289`).
