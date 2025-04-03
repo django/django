@@ -753,7 +753,7 @@ class Model(AltersData, metaclass=ModelBase):
 
         db_instance = db_instance_qs.get()
         non_loaded_fields = db_instance.get_deferred_fields()
-        for field in self._meta.concrete_fields:
+        for field in chain(self._meta.concrete_fields, self._meta.virtual_relations):
             if field.attname in non_loaded_fields:
                 # This field wasn't refreshed - skip ahead.
                 continue
