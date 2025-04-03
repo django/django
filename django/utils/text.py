@@ -368,7 +368,7 @@ class StreamingBuffer(BytesIO):
 
 
 # Like compress_string, but for iterators of strings.
-def compress_sequence(sequence, *, max_random_bytes=None):
+def compress_sequence(sequence, *, max_random_bytes=None, flush_each=False):
     buf = StreamingBuffer()
     filename = _get_random_filename(max_random_bytes) if max_random_bytes else None
     with GzipFile(
@@ -378,6 +378,8 @@ def compress_sequence(sequence, *, max_random_bytes=None):
         yield buf.read()
         for item in sequence:
             zfile.write(item)
+            if flush_each:
+                zfile.flush()
             data = buf.read()
             if data:
                 yield data
