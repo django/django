@@ -334,6 +334,7 @@ def compress_sequence(sequence):
         yield buf.read()
         for item in sequence:
             zfile.write(item)
+            zfile.flush()
             data = buf.read()
             if data:
                 yield data
