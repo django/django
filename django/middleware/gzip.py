@@ -29,9 +29,19 @@ class GZipMiddleware(MiddlewareMixin):
             return response
 
         if response.streaming:
+            # Determine whether to flush after each write.
+            # This is important for SSE (Server-Sent Events) or similar streaming
+            # responses that benefit from reduced latency and timely delivery.
+            flush_each = (
+                response.get("Content-Type", "").startswith("text/event-stream")
+                or getattr(response, "_flush_each", False)
+            )
             # Delete the `Content-Length` header for streaming content, because
             # we won't know the compressed size until we stream it.
-            response.streaming_content = compress_sequence(response.streaming_content)
+            response.streaming_content = compress_sequence(
+                response.streaming_content,
+                flush_each=flush_each,
+            )
             del response.headers["Content-Length"]
         else:
             # Return the compressed content only if it's actually shorter.
