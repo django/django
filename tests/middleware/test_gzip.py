@@ -6,7 +6,7 @@ from django.test import SimpleTestCase
 
 def new_sse_data(idx: int = 0):
     data = dict(create=idx)
-    return json.dumps(data).encode('utf-8')
+    return json.dumps(data).encode("utf-8")
 
 
 def data_generator():
