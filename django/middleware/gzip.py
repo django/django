@@ -16,7 +16,7 @@ class GZipMiddleware(MiddlewareMixin):
     max_random_bytes = 100
 
     @classmethod
-    def should_streaming_gzip(cls, response=None) -> bool:
+    def should_gzip_streaming(cls, response=None) -> bool:
         """
         Determine whether gzip compression should be applied to the response.
         Can be disabled via response.no_gzip_streaming.
@@ -61,7 +61,7 @@ class GZipMiddleware(MiddlewareMixin):
             return response
 
         if response.streaming:
-            if not self.should_streaming_gzip(response=response):
+            if not self.should_gzip_streaming(response=response):
                 return response
             if response.is_async:
                 # pull to lexical scope to capture fixed reference in case
