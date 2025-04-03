@@ -23,7 +23,7 @@ class GzipMiddlewareTest(SimpleTestCase):
         start = time.time()
         timestamps = []
 
-        for chunk in compress_sequence(data_generator()):
+        for chunk in compress_sequence(data_generator(), flush_each=True):
             if chunk:  # Ignore empty chunks
                 timestamps.append(time.time() - start)
         # Only consider timestamps for non-empty chunks
