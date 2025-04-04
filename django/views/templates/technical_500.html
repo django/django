@@ -217,6 +217,9 @@
   </h2>
   <div id="browserTraceback">
     <ul class="traceback">
+      {% for key,value in context.items%}
+      {{ key }}:{{ value }} <!-- using for loop for each entries in context-->
+      {%  endfor %}
       {% for frame in frames %}
         {% ifchanged frame.exc_cause %}{% if frame.exc_cause %}
           <li class="cause"><h3>
