@@ -530,12 +530,13 @@ There are a few restrictions on the intermediate model:
   to the foreign key to the target model (this would be ``Person`` in our
   example).
 
-* For a model which has a many-to-many relationship to itself through an
-  intermediary model, two foreign keys to the same model are permitted, but
-  they will be treated as the two (different) sides of the many-to-many
-  relationship. If there are *more* than two foreign keys though, you
-  must also specify ``through_fields`` as above, or a validation error
-  will be raised.
+* For a model that has a many-to-many relationship to itself through an
+  intermediary model, two foreign keys to the same model are allowed, but they
+  will be treated as the two different sides of the many-to-many relationship.
+  The first foreign key in the intermediary model will be taken to represent
+  the source side of the ``ManyToManyField``, while the second will be taken to
+  represent the target side. If more than two foreign keys are defined, you
+  must specify ``through_fields``, or a validation error will occur.
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
