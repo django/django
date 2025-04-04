@@ -58,6 +58,7 @@ from .models import (
     Book,
     Bookmark,
     Box,
+    CascadeRefCoverLetter,
     Category,
     Chapter,
     ChapterXtra1,
@@ -107,6 +108,7 @@ from .models import (
     Post,
     PrePopulatedPost,
     Promo,
+    ProtectRefCoverLetter,
     Question,
     ReadablePizza,
     ReadOnlyPizza,
@@ -3416,6 +3418,195 @@ class AdminViewPermissionsTest(TestCase):
             "</li>",
             html=True,
         )
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminBlankStringObjectDisplayTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="user",
+            password="secret",
+            is_staff=True,
+        )
+        cl_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(CoverLetter)
+        )
+        cls.user.user_permissions.add(*cl_permission)
+        cases = ["   ", "pizza ", "     pizza", "  pizza  "]
+        objs = [CoverLetter.objects.create(author=author) for author in cases]
+        cls.cases = list(zip(objs, ["   ", "pizza ", "     pizza", "  pizza  "]))
+        cls.change_link = "/test_admin/admin/admin_views/coverletter/%d/change/"
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_breadcrumbs_with_blank_string_object(self):
+        base_breadcrumbs = (
+            '<div class="breadcrumbs">'
+            '<a href="/test_admin/admin/">Home</a>'
+            '&rsaquo; <a href="/test_admin/admin/admin_views/">Admin_Views</a>'
+            '&rsaquo; <a href="/test_admin/admin/admin_views/coverletter/">'
+        )
+        for obj, expect_display_value in self.cases:
+            expect_display_value = f"“{expect_display_value}”"
+            with self.subTest(obj=obj):
+                url = reverse("admin:admin_views_coverletter_change", args=(obj.pk,))
+                response = self.client.get(url)
+                self.assertContains(
+                    response,
+                    base_breadcrumbs
+                    + "Cover letters</a>&rsaquo; %s</div>" % expect_display_value,
+                    html=True,
+                )
+                url = reverse("admin:admin_views_coverletter_delete", args=(obj.pk,))
+                response = self.client.get(url)
+                self.assertContains(
+                    response,
+                    base_breadcrumbs + 'Cover letters</a>&rsaquo; <a href="%s">%s</a>'
+                    "&rsaquo; Delete</div>"
+                    % (self.change_link % obj.pk, expect_display_value),
+                    html=True,
+                )
+                url = reverse("admin:admin_views_coverletter_history", args=(obj.pk,))
+                response = self.client.get(url)
+                self.assertContains(
+                    response,
+                    base_breadcrumbs + 'Cover letters</a>&rsaquo; <a href="%s">%s</a>'
+                    "&rsaquo; History</div>"
+                    % (self.change_link % obj.pk, expect_display_value),
+                    html=True,
+                )
+
+    def test_deleted_objects_with_blank_string_object(self):
+        for obj, expect_display_value in self.cases:
+            expect_display_value = f"“{expect_display_value}”"
+            with self.subTest(obj=obj):
+                url = reverse("admin:admin_views_coverletter_delete", args=(obj.pk,))
+                response = self.client.get(url)
+                self.assertContains(
+                    response,
+                    '<ul id="deleted-objects">'
+                    '<li>Cover letter: <a href="%s">%s</a></li></ul>'
+                    % (self.change_link % obj.pk, expect_display_value),
+                    html=True,
+                )
+
+    def test_delete_confirmation_message_with_blank_string_object(self):
+        for obj, expect_display_value in self.cases:
+            with self.subTest(obj=obj):
+                url = reverse("admin:admin_views_coverletter_delete", args=(obj.pk,))
+                response = self.client.get(url)
+                self.assertContains(
+                    response,
+                    "<p>Are you sure you want to delete the cover letter “%s”?"
+                    % expect_display_value,
+                )
+                forbidden_obj = CoverLetter.objects.create(author=obj.author)
+                CascadeRefCoverLetter.objects.create(coverletter=forbidden_obj)
+                url = reverse(
+                    "admin:admin_views_coverletter_delete", args=(forbidden_obj.pk,)
+                )
+                response = self.client.get(url)
+                self.assertContains(
+                    response,
+                    "<p>Deleting the cover letter “%s” would result in"
+                    % expect_display_value,
+                )
+                protected_obj = CoverLetter.objects.create(author=obj.author)
+                ProtectRefCoverLetter.objects.create(coverletter=protected_obj)
+                url = reverse(
+                    "admin:admin_views_coverletter_delete", args=(protected_obj.pk,)
+                )
+                response = self.client.get(url)
+                self.assertContains(
+                    response,
+                    "<p>Deleting the cover letter “%s” would require deleting"
+                    % expect_display_value,
+                )
+
+    def test_recentactions_with_blank_string_object(self):
+        for obj, expect_display_value in self.cases:
+            expect_display_value = f"“{expect_display_value}”"
+            with self.subTest(obj=obj):
+                LogEntry.objects.log_actions(
+                    user_id=self.user.pk,
+                    queryset=[obj],
+                    action_flag=ADDITION,
+                    change_message=[],
+                    single_object=True,
+                )
+                LogEntry.objects.log_actions(
+                    user_id=self.user.pk,
+                    queryset=[obj],
+                    action_flag=DELETION,
+                    change_message=[],
+                    single_object=True,
+                )
+                response = self.client.get(reverse("admin:index"))
+                self.assertContains(
+                    response,
+                    '<li class="addlink">'
+                    '<span class="visually-hidden">Added:</span><a href="%s">%s</a>'
+                    '<br><span class="mini quiet">Cover letter</span></li>'
+                    % (self.change_link % obj.pk, expect_display_value),
+                    html=True,
+                )
+                self.assertContains(
+                    response,
+                    '<li class="deletelink">'
+                    '<span class="visually-hidden">Deleted:</span>%s'
+                    '<br><span class="mini quiet">Cover letter</span></li>'
+                    % expect_display_value,
+                    html=True,
+                )
+
+    def test_messages_with_blank_string_object(self):
+        buttons = ["_save", "_continue", "_addanother"]
+        # Add and Change
+        for button in buttons:
+            for obj, expect_display_value in self.cases:
+                body = {"author": obj.author, button: "1"}
+                with self.subTest(obj=obj, button=button):
+                    response = self.client.post(
+                        reverse("admin:admin_views_coverletter_add"), body, follow=True
+                    )
+                    latest_cl = CoverLetter.objects.latest("id")
+                    self.assertContains(
+                        response,
+                        'The cover letter “<a href="%s">%s</a>” was added successfully.'
+                        % (self.change_link % latest_cl.pk, expect_display_value),
+                    )
+                    response = self.client.post(
+                        reverse(
+                            "admin:admin_views_coverletter_change", args=(latest_cl.pk,)
+                        ),
+                        {**body, "author": " " * 10},
+                        follow=True,
+                    )
+                    self.assertContains(
+                        response,
+                        'The cover letter “<a href="%s">%s</a>” was '
+                        "changed successfully."
+                        % (
+                            self.change_link % latest_cl.pk,
+                            (" " * 10),
+                        ),
+                    )
+        # Delete
+        for obj, expect_display_value in self.cases:
+            obj = CoverLetter.objects.create(author=obj.author)
+            with self.subTest(obj=obj):
+                response = self.client.post(
+                    reverse("admin:admin_views_coverletter_delete", args=(obj.pk,)),
+                    {"post": "yes"},
+                    follow=True,
+                )
+                self.assertContains(
+                    response,
+                    "The cover letter “%s” was deleted successfully."
+                    % expect_display_value,
+                )
 
 
 @override_settings(
