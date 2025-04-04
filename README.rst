@@ -11,6 +11,14 @@ here's how we recommend you read the docs:
 
 * First, read ``docs/intro/install.txt`` for instructions on installing Django.
 
+Development Setup
+================
+To set up Django for development:
+
+* Python 3.8 or newer is required
+* Create and activate a virtual environment
+* Install development dependencies: pip install -e ".[dev]"
+* Ensure all tests pass by following the testing instructions below
 * Next, work through the tutorials in order (``docs/intro/tutorial01.txt``,
   ``docs/intro/tutorial02.txt``, etc.).
 
@@ -29,7 +37,7 @@ ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
-* Join the `Django Discord community <https://chat.djangoproject.com>`_.
+* Join the `Django Discord community <https://chat.djangoproject.com>`_ for real-time discussions, support, and connecting with fellow Django developers.
 
 * Join the community on the `Django Forum <https://forum.djangoproject.com/>`_.
 
