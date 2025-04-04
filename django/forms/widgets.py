@@ -285,8 +285,9 @@ class Widget(metaclass=MediaDefiningClass):
     supports_microseconds = True
     use_fieldset = False
 
-    def __init__(self, attrs=None):
+    def __init__(self, attrs=None, renderer=None):
         self.attrs = {} if attrs is None else attrs.copy()
+        self.renderer = renderer
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -331,7 +332,7 @@ class Widget(metaclass=MediaDefiningClass):
 
     def _render(self, template_name, context, renderer=None):
         if renderer is None:
-            renderer = get_default_renderer()
+            renderer = getattr(self, "renderer", None) or get_default_renderer()
         return mark_safe(renderer.render(template_name, context))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
