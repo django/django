@@ -7,7 +7,7 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Col, ColPairs, F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
 from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
@@ -256,17 +256,8 @@ class SQLCompiler:
             # self.query.select is a special case. These columns never go to
             # any model.
             cols = self.query.select
-        if cols:
-            klass_info = {
-                "model": self.query.model,
-                "select_fields": list(
-                    range(
-                        len(self.query.extra_select),
-                        len(self.query.extra_select) + len(cols),
-                    )
-                ),
-            }
         selected = []
+        select_fields = None
         if self.query.selected is None:
             selected = [
                 *(
@@ -276,18 +267,28 @@ class SQLCompiler:
                 *((None, col) for col in cols),
                 *self.query.annotation_select.items(),
             ]
+            select_fields = list(
+                range(
+                    len(self.query.extra_select),
+                    len(self.query.extra_select) + len(cols),
+                )
+            )
         else:
-            for alias, expression in self.query.selected.items():
+            select_fields = []
+            for index, (alias, expression) in enumerate(self.query.selected.items()):
                 # Reference to an annotation.
                 if isinstance(expression, str):
                     expression = self.query.annotations[expression]
                 # Reference to a column.
                 elif isinstance(expression, int):
+                    select_fields.append(index)
                     expression = cols[expression]
                 # ColPairs cannot be aliased.
                 if isinstance(expression, ColPairs):
                     alias = None
                 selected.append((alias, expression))
+        if select_fields:
+            klass_info = {"model": self.query.model, "select_fields": select_fields}
 
         for select_idx, (alias, expression) in enumerate(selected):
             if alias:
@@ -1436,9 +1437,9 @@ class SQLCompiler:
             from the parent models.
             """
             concrete_model = klass_info["model"]._meta.concrete_model
-            for expr, *_ in self.select:
-                if isinstance(expr, Col) and expr.target.model == concrete_model:
-                    return expr
+            for select_index in klass_info["select_fields"]:
+                if self.select[select_index][0].target.model == concrete_model:
+                    return self.select[select_index][0]
 
         def _get_field_choices():
             """Yield all allowed field paths in breadth-first search order."""
