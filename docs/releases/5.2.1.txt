@@ -15,3 +15,7 @@ Bugfixes
 
 * Fixed a regression in Django 5.2 that caused unnecessary queries when
   prefetching nullable foreign key relationships (:ticket:`36290`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using
+  ``QuerySet.select_for_update(of)`` with ``values()`` and ``values_list()``
+  including annotations (:ticket:`36301`).
