@@ -67,6 +67,7 @@ def file_move_safe(
                 | os.O_CREAT
                 | getattr(os, "O_BINARY", 0)
                 | (os.O_EXCL if not allow_overwrite else 0)
+                | os.O_TRUNC
             ),
         )
         try:
