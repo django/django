@@ -369,19 +369,19 @@ To run coverage on the Django test suite using the standard test settings:
 
 .. console::
 
-   $ coverage run ./runtests.py --settings=test_sqlite
+   $ python -m coverage run ./runtests.py --settings=test_sqlite
 
 After running coverage, combine all coverage statistics by running:
 
 .. console::
 
-   $ coverage combine
+   $ python -m coverage combine
 
 After that generate the html report by running:
 
 .. console::
 
-   $ coverage html
+   $ python -m coverage html
 
 When running coverage for the Django tests, the included ``.coveragerc``
 settings file  defines ``coverage_html`` as the output directory for the report
