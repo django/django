@@ -256,17 +256,8 @@ class SQLCompiler:
             # self.query.select is a special case. These columns never go to
             # any model.
             cols = self.query.select
-        if cols:
-            klass_info = {
-                "model": self.query.model,
-                "select_fields": list(
-                    range(
-                        len(self.query.extra_select),
-                        len(self.query.extra_select) + len(cols),
-                    )
-                ),
-            }
         selected = []
+        select_fields = None
         if self.query.selected is None:
             selected = [
                 *(
@@ -276,18 +267,28 @@ class SQLCompiler:
                 *((None, col) for col in cols),
                 *self.query.annotation_select.items(),
             ]
+            select_fields = list(
+                range(
+                    len(self.query.extra_select),
+                    len(self.query.extra_select) + len(cols),
+                )
+            )
         else:
-            for alias, expression in self.query.selected.items():
+            select_fields = []
+            for index, (alias, expression) in enumerate(self.query.selected.items()):
                 # Reference to an annotation.
                 if isinstance(expression, str):
                     expression = self.query.annotations[expression]
                 # Reference to a column.
                 elif isinstance(expression, int):
+                    select_fields.append(index)
                     expression = cols[expression]
                 # ColPairs cannot be aliased.
                 if isinstance(expression, ColPairs):
                     alias = None
                 selected.append((alias, expression))
+        if select_fields:
+            klass_info = {"model": self.query.model, "select_fields": select_fields}
 
         for select_idx, (alias, expression) in enumerate(selected):
             if alias:
