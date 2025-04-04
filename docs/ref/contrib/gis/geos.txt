@@ -1191,13 +1191,13 @@ include the SRID value (in other words, EWKB).
         >>> print(wkt_w.precision)
         None
         >>> wkt_w.write(pnt)
-        'POINT (1.4399999999999999 1.6599999999999999)'
+        b'POINT (1.4399999999999999 1.6599999999999999)'
         >>> wkt_w.precision = 0
         >>> wkt_w.write(pnt)
-        'POINT (1 2)'
+        b'POINT (1 2)'
         >>> wkt_w.precision = 1
         >>> wkt_w.write(pnt)
-        'POINT (1.4 1.7)'
+        b'POINT (1.4 1.7)'
 
 .. rubric:: Footnotes
 .. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <https://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
