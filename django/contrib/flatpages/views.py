@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404
 from django.template import loader
+from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_protect
-from django.utils.module_loading import import_string
-from django.core.exceptions import ImproperlyConfigured
 
 DEFAULT_TEMPLATE = "flatpages/default.html"
 
@@ -107,7 +107,8 @@ def render_flatpage(request, f):
 
     # Template resolution follows a priority order:
     template_names: list[str | None] = [
-        # 1. FlatPage.template_name: Template specified in the FlatPage model database entry
+        # 1. FlatPage.template_name: Template specified in the FlatPage model database
+        # entry
         f.template_name,
         # 2. settings.FLATPAGE_DEFAULT_TEMPLATE: Site-wide default from settings
         getattr(settings, "FLATPAGE_DEFAULT_TEMPLATE", None),
