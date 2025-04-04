@@ -370,6 +370,11 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "POWER(%s)" % ",".join(sub_expressions)
         elif connector == "#":
             return "BITXOR(%s)" % ",".join(sub_expressions)
+        elif connector == "/":
+            return "CAST(%s AS REAL) / CAST(%s AS REAL)" % (
+                sub_expressions[0],
+                sub_expressions[1],
+            )
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
