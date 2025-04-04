@@ -19,3 +19,7 @@ Bugfixes
 * Fixed a regression in Django 5.2 that caused a crash of
   ``QuerySet.bulk_create()`` with nullable geometry fields on PostGIS
   (:ticket:`36289`).
+
+* Fixed a regression in Django 5.2 that caused fields to be incorrectly
+  selected when using ``QuerySet.alias()`` after ``values()``
+  (:ticket:`36299`).
