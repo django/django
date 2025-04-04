@@ -131,6 +131,8 @@ class MigrationWriter:
         items = {
             "replaces_str": "",
             "initial_str": "",
+            "run_before_str": "",
+            "atomic_str": "",
         }
 
         imports = set()
@@ -205,6 +207,15 @@ class MigrationWriter:
 
         if self.migration.initial:
             items["initial_str"] = "\n    initial = True\n"
+
+        if not self.migration.atomic:
+            items["atomic_str"] = "\n    atomic = False\n"
+
+        # If there's run_before, make a string for it
+        if self.migration.run_before:
+            items["run_before_str"] = (
+                "\n    run_before = %s\n" % self.serialize(self.migration.run_before)[0]
+            )
 
         return MIGRATION_TEMPLATE % items
 
@@ -305,7 +316,7 @@ MIGRATION_TEMPLATE = """\
 %(migration_header)s%(imports)s
 
 class Migration(migrations.Migration):
-%(replaces_str)s%(initial_str)s
+%(replaces_str)s%(initial_str)s%(atomic_str)s%(run_before_str)s
     dependencies = [
 %(dependencies)s\
     ]
