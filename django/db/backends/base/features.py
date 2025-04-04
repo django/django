@@ -266,6 +266,9 @@ class BaseDatabaseFeatures:
     # delimiter along with DISTINCT.
     supports_aggregate_distinct_multiple_argument = True
 
+    # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
+    supports_any_value = False
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
