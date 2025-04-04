@@ -206,10 +206,7 @@ class AsyncQuerySetTest(TestCase):
     async def test_acontains(self):
         check = await SimpleModel.objects.acontains(self.s1)
         self.assertIs(check, True)
-        # Unsaved instances are not allowed, so use an ID known not to exist.
-        check = await SimpleModel.objects.acontains(
-            SimpleModel(id=self.s3.id + 1, field=4)
-        )
+        check = await SimpleModel.objects.exclude(id=self.s3.id).acontains(self.s3)
         self.assertIs(check, False)
 
     async def test_aupdate(self):
