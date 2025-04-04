@@ -231,3 +231,29 @@ class MapWidget {
         document.getElementById(this.options.id).value = jsonFormat.writeGeometry(geometry);
     }
 }
+
+{
+    function initMapWidgetAfterInlineAdd(event) {
+        const formsetIndex = event.srcElement.id.split('-').pop();
+        event.target.querySelectorAll(".dj_map_wrapper").forEach((wrapper) => {
+            wrapper.querySelector(".dj_map").innerHTML = "";
+            const options = window[wrapper.dataset.widgetoptions];
+            const newOptions = {};
+            for (const key in options) {
+                if (options[key].includes && options[key].includes("__prefix__")) {
+                    newOptions[key] = options[key].replace( "__prefix__", formsetIndex);
+                } else {
+                    newOptions[key] = options[key];
+                }
+            }
+            new MapWidget(newOptions);
+        });
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".dj_map_wrapper").forEach((wrapper) => {
+            const options = window[wrapper.dataset.widgetoptions];
+            new MapWidget(options);
+        });
+        document.addEventListener('formset:added', initMapWidgetAfterInlineAdd);
+    });
+}
