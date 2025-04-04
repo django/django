@@ -1,0 +1,14 @@
+==========================
+Django 5.1.9 release notes
+==========================
+
+*Expected May 7, 2025*
+
+Django 5.1.9 fixes a data loss bug in 5.1.8.
+
+Bugfixes
+========
+
+* Fixed a data loss possibility where ``file_move_safe()``, with
+  ``allow_overwrite`` set to ``True``, did not truncate the overwritten file
+  content (:ticket:`36298`).

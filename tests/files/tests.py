@@ -496,6 +496,28 @@ class FileMoveSafeTests(unittest.TestCase):
             os.close(handle_b)
             os.close(handle_c)
 
+    def test_file_move_permission_error_truncate(self):
+        with tempfile.NamedTemporaryFile(delete=False) as src:
+            src.write(b"content")
+            src_name = src.name
+
+        with tempfile.NamedTemporaryFile(delete=False) as dest:
+            dest.write(b"This is a longer content.")
+            dest_name = dest.name
+
+        try:
+            with mock.patch("django.core.files.move.os.rename", side_effect=OSError()):
+                file_move_safe(src_name, dest_name, allow_overwrite=True)
+
+            with open(dest_name, "rb") as f:
+                content = f.read()
+
+            self.assertEqual(content, b"content")
+        finally:
+            os.remove(dest_name)
+            if os.path.exists(src_name):
+                os.remove(src_name)
+
 
 class SpooledTempTests(unittest.TestCase):
     def test_in_memory_spooled_temp(self):
