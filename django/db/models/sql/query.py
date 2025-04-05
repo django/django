@@ -1221,7 +1221,7 @@ class Query(BaseExpression):
         else:
             self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
-        if self.selected:
+        if select and self.selected:
             self.selected[alias] = alias
 
     @property
