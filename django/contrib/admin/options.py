@@ -1786,7 +1786,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         msg = _("%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?") % {
             "name": opts.verbose_name,
-            "key": unquote(object_id),
+            "key": self.unquote(object_id),
         }
         self.message_user(request, msg, messages.WARNING)
         url = reverse("admin:index", current_app=self.admin_site.name)
@@ -1818,7 +1818,7 @@ class ModelAdmin(BaseModelAdmin):
             obj = None
 
         else:
-            obj = self.get_object(request, unquote(object_id), to_field)
+            obj = self.get_object(request, self.unquote(object_id), to_field)
 
             if request.method == "POST":
                 if not self.has_change_permission(request, obj):
@@ -2174,7 +2174,7 @@ class ModelAdmin(BaseModelAdmin):
                 "The field %s cannot be referenced." % to_field
             )
 
-        obj = self.get_object(request, unquote(object_id), to_field)
+        obj = self.get_object(request, self.unquote(object_id), to_field)
 
         if not self.has_delete_permission(request, obj):
             raise PermissionDenied
@@ -2236,7 +2236,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # First check if the user can see this history.
         model = self.model
-        obj = self.get_object(request, unquote(object_id))
+        obj = self.get_object(request, self.unquote(object_id))
         if obj is None:
             return self._get_obj_does_not_exist_redirect(
                 request, model._meta, object_id
@@ -2249,7 +2249,7 @@ class ModelAdmin(BaseModelAdmin):
         app_label = self.opts.app_label
         action_list = (
             LogEntry.objects.filter(
-                object_id=unquote(object_id),
+                object_id=self.unquote(object_id),
                 content_type=get_content_type_for_model(model),
             )
             .select_related()
@@ -2339,6 +2339,9 @@ class ModelAdmin(BaseModelAdmin):
             formsets.append(formset)
             inline_instances.append(inline)
         return formsets, inline_instances
+
+    def unquote(self, pk):
+        return unquote(pk, is_composite=self.opts.is_composite_pk)
 
 
 class InlineModelAdmin(BaseModelAdmin):

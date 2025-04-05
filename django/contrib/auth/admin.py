@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.options import IS_POPUP_VAR
-from django.contrib.admin.utils import unquote
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm,
@@ -152,7 +151,7 @@ class UserAdmin(admin.ModelAdmin):
 
     @sensitive_post_parameters_m
     def user_change_password(self, request, id, form_url=""):
-        user = self.get_object(request, unquote(id))
+        user = self.get_object(request, self.unquote(id))
         if not self.has_change_permission(request, user):
             raise PermissionDenied
         if user is None:
