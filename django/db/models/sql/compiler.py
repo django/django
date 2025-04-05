@@ -1888,7 +1888,7 @@ class SQLInsertCompiler(SQLCompiler):
                 result.append(on_conflict_suffix_sql)
             # Skip empty r_sql to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
-            r_sql, self.returning_params = self.connection.ops.return_insert_columns(
+            r_sql, self.returning_params = self.connection.ops.returning_columns(
                 self.returning_fields
             )
             if r_sql:
@@ -1923,20 +1923,16 @@ class SQLInsertCompiler(SQLCompiler):
                 cursor.execute(sql, params)
             if not self.returning_fields:
                 return []
+            obj_len = len(self.query.objs)
             if (
                 self.connection.features.can_return_rows_from_bulk_insert
-                and len(self.query.objs) > 1
+                and obj_len > 1
+            ) or (
+                self.connection.features.can_return_columns_from_insert and obj_len == 1
             ):
-                rows = self.connection.ops.fetch_returned_insert_rows(cursor)
-                cols = [field.get_col(opts.db_table) for field in self.returning_fields]
-            elif self.connection.features.can_return_columns_from_insert:
-                assert len(self.query.objs) == 1
-                rows = [
-                    self.connection.ops.fetch_returned_insert_columns(
-                        cursor,
-                        self.returning_params,
-                    )
-                ]
+                rows = self.connection.ops.fetch_returned_rows(
+                    cursor, self.returning_params
+                )
                 cols = [field.get_col(opts.db_table) for field in self.returning_fields]
             elif returning_fields and isinstance(
                 returning_field := returning_fields[0], AutoField
@@ -2022,6 +2018,9 @@ class SQLDeleteCompiler(SQLCompiler):
 
 
 class SQLUpdateCompiler(SQLCompiler):
+    returning_fields = None
+    returning_params = ()
+
     def as_sql(self):
         """
         Create the SQL for this query. Return the SQL string and list of
@@ -2089,6 +2088,15 @@ class SQLUpdateCompiler(SQLCompiler):
             params = []
         else:
             result.append("WHERE %s" % where)
+        if self.returning_fields:
+            # Skip empty r_sql to allow subclasses to customize behavior for
+            # 3rd party backends. Refs #19096.
+            r_sql, self.returning_params = self.connection.ops.returning_columns(
+                self.returning_fields
+            )
+            if r_sql:
+                result.append(r_sql)
+                params.extend(self.returning_params)
         return " ".join(result), tuple(update_params + params)
 
     def execute_sql(self, result_type):
@@ -2111,6 +2119,38 @@ class SQLUpdateCompiler(SQLCompiler):
                 row_count = aux_row_count
                 is_empty = False
         return row_count
+
+    def execute_returning_sql(self, returning_fields):
+        """
+        Execute the specified update and return rows of the returned columns
+        associated with the specified returned_fields if the backends supports
+        it.
+        """
+        if self.query.get_related_updates():
+            raise NotImplementedError(
+                "Update returning is not implemented for queries with related updates."
+            )
+
+        if (
+            not returning_fields
+            or not self.connection.features.can_return_rows_from_update
+        ):
+            row_count = self.execute_sql(ROW_COUNT)
+            return [()] * row_count
+
+        self.returning_fields = returning_fields
+        with self.connection.cursor() as cursor:
+            sql, params = self.as_sql()
+            cursor.execute(sql, params)
+            rows = self.connection.ops.fetch_returned_rows(
+                cursor, self.returning_params
+            )
+        opts = self.query.get_meta()
+        cols = [field.get_col(opts.db_table) for field in self.returning_fields]
+        converters = self.get_converters(cols)
+        if converters:
+            rows = self.apply_converters(rows, converters)
+        return list(rows)
 
     def pre_sql_setup(self):
         """
