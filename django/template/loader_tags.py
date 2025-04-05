@@ -1,6 +1,8 @@
 import posixpath
+import warnings
 from collections import defaultdict
 
+from django.conf import settings
 from django.utils.safestring import mark_safe
 
 from .base import Node, Template, TemplateSyntaxError, TextNode, Variable, token_kwargs
@@ -304,6 +306,12 @@ def do_extends(parser, token):
     bits[1] = construct_relative_path(parser.origin.template_name, bits[1])
     parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
+    if settings.DEBUG:
+        if any(temp.s.strip() for temp in nodelist if isinstance(temp, TextNode)):
+            warnings.warn(
+                "Non-whitespace text used along with {% extends %} tag."
+                "The text will be ignored."
+            )
     if nodelist.get_nodes_by_type(ExtendsNode):
         raise TemplateSyntaxError(
             "'%s' cannot appear more than once in the same template" % bits[0]
