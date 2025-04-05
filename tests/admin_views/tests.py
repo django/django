@@ -7829,16 +7829,16 @@ class DateHierarchyTests(TestCase):
     def assert_contains_month_link(self, response, date):
         self.assertContains(
             response,
-            '?release_date__month=%d&amp;release_date__year=%d"'
-            % (date.month, date.year),
+            '?release_date__year=%d&amp;release_date__month=%d"'
+            % (date.year, date.month),
         )
 
     def assert_contains_day_link(self, response, date):
         self.assertContains(
             response,
-            "?release_date__day=%d&amp;"
-            'release_date__month=%d&amp;release_date__year=%d"'
-            % (date.day, date.month, date.year),
+            "?release_date__year=%d&amp;"
+            'release_date__month=%d&amp;release_date__day=%d"'
+            % (date.year, date.month, date.day),
         )
 
     def test_empty(self):
@@ -7957,6 +7957,19 @@ class DateHierarchyTests(TestCase):
                 self.assertContains(response, link)
             else:
                 self.assertNotContains(response, link)
+
+    def test_preserve_another_filters(self):
+        Podcast.objects.create(name="podcast1", release_date=datetime.date(2000, 9, 19))
+        url = "%s?q=podcast1&_facets=1&_popup=1" % reverse(
+            "admin:admin_views_podcast_changelist"
+        )
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            '<a href="?q=podcast1&amp;_facets=1&amp;_popup=1&amp;'
+            "release_date__year=2000&amp;release_date__month=9&amp;"
+            'release_date__day=19">September 19</a>',
+        )
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

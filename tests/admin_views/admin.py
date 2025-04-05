@@ -432,6 +432,7 @@ class PodcastAdmin(admin.ModelAdmin):
     list_editable = ("release_date",)
     date_hierarchy = "release_date"
     ordering = ("name",)
+    search_fields = ("name",)
 
 
 class VodcastAdmin(admin.ModelAdmin):
