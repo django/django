@@ -845,6 +845,7 @@ class BulkCreateTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_db_default_field_excluded(self):
         # created_at is excluded when no db_default override is provided.
         with self.assertNumQueries(1) as ctx:
@@ -869,7 +870,9 @@ class BulkCreateTests(TestCase):
             2 if connection.features.can_return_rows_from_bulk_insert else 1,
         )
 
-    @skipUnlessDBFeature("can_return_rows_from_bulk_insert")
+    @skipUnlessDBFeature(
+        "can_return_rows_from_bulk_insert", "supports_expression_defaults"
+    )
     def test_db_default_primary_key(self):
         (obj,) = DbDefaultPrimaryKey.objects.bulk_create([DbDefaultPrimaryKey()])
         self.assertIsInstance(obj.id, datetime)
