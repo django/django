@@ -165,6 +165,56 @@ The functions defined in this module share the following properties:
     See :ref:`decorating class based views <decorating-class-based-views>` for
     example usage.
 
+.. function:: method_decorator_with_args(decorator_factory, name='')
+
+.. versionadded:: 5.x
+
+    Converts a function decorator factory with arguments into a method
+    decorator with arguments. It can be used to decorate methods or classes;
+    in the latter case, ``name`` is the name of the method to be decorated and
+    is required.
+
+    ``method_decorator`` can be used to decorate methods with arguments::
+
+         from django.contrib.auth.decorators import permission_required
+         from django.utils.decorators import method_decorator
+         from django.views.generic import TemplateView
+
+
+         class SpamProtectedView(TemplateView):
+             template_name = "secret.html"
+
+             @method_decorator(permission_required("spam.more_spam"))
+             def dispatch(self, *args, **kwargs):
+                 return super().dispatch(*args, **kwargs)
+
+    ``method_decorator_with_args`` provides a way to re-use the decorator::
+
+         from django.contrib.auth.decorators import permission_required
+         from django.utils.decorators import method_decorator_with_args
+         from django.views.generic import TemplateView
+
+         cm_permission_required = method_decorator_with_args(
+             permission_required, name="dispatch"
+         )
+
+
+         class SpamProtectedView(TemplateView):
+             template_name = "secret.html"
+
+             @cm_permission_required("spam.more_spam")
+             def dispatch(self, *args, **kwargs):
+                 return super().dispatch(*args, **kwargs)
+
+
+         @cm_permission_required("egg.more_egg")
+         class EggProtectedView(TemplateView):
+             template_name = "other_secret.html"
+
+             def dispatch(self, *args, **kwargs):
+                 return super().dispatch(*args, **kwargs)
+
+
 .. function:: decorator_from_middleware(middleware_class)
 
     Given a middleware class, returns a view decorator. This lets you use
