@@ -224,7 +224,6 @@ class CycleTagTests(SimpleTestCase):
         }
     )
     def test_cycle_undefined(self):
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "Named cycle 'undefined' does not exist"
-        ):
+        msg = "Named cycle 'undefined' does not exist"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("undefined_cycle")

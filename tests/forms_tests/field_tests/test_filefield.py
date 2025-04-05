@@ -38,13 +38,11 @@ class FileFieldTest(SimpleTestCase):
         self.assertEqual("files/test3.pdf", f.clean(None, "files/test3.pdf"))
         with self.assertRaisesMessage(ValidationError, no_file_msg):
             f.clean("some content that is not a file")
-        with self.assertRaisesMessage(
-            ValidationError, "'The submitted file is empty.'"
-        ):
+
+        msg = "'The submitted file is empty.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(SimpleUploadedFile("name", None))
-        with self.assertRaisesMessage(
-            ValidationError, "'The submitted file is empty.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(SimpleUploadedFile("name", b""))
         self.assertEqual(
             SimpleUploadedFile,
@@ -68,10 +66,9 @@ class FileFieldTest(SimpleTestCase):
 
     def test_filefield_2(self):
         f = FileField(max_length=5)
-        with self.assertRaisesMessage(
-            ValidationError,
-            "'Ensure this filename has at most 5 characters (it has 18).'",
-        ):
+
+        msg = "'Ensure this filename has at most 5 characters (it has 18).'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(SimpleUploadedFile("test_maxlength.txt", b"hello world"))
         self.assertEqual("files/test1.pdf", f.clean("", "files/test1.pdf"))
         self.assertEqual("files/test2.pdf", f.clean(None, "files/test2.pdf"))

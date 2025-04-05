@@ -793,9 +793,8 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_update_with_join_in_condition_raise_field_error(self):
-        with self.assertRaisesMessage(
-            FieldError, "Joined field references are not permitted in this query"
-        ):
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
             CaseTestModel.objects.update(
                 integer=Case(
                     When(integer2=F("o2o_rel__integer") + 1, then=2),
@@ -804,9 +803,8 @@ class CaseExpressionTests(TestCase):
             )
 
     def test_update_with_join_in_predicate_raise_field_error(self):
-        with self.assertRaisesMessage(
-            FieldError, "Joined field references are not permitted in this query"
-        ):
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
             CaseTestModel.objects.update(
                 string=Case(
                     When(o2o_rel__integer=1, then=Value("one")),

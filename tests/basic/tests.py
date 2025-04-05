@@ -215,9 +215,8 @@ class ModelInstanceCreationTests(TestCase):
 
 class ModelTest(TestCase):
     def test_objects_attribute_is_only_available_on_the_class_itself(self):
-        with self.assertRaisesMessage(
-            AttributeError, "Manager isn't accessible via Article instances"
-        ):
+        msg = "Manager isn't accessible via Article instances"
+        with self.assertRaisesMessage(AttributeError, msg):
             getattr(
                 Article(),
                 "objects",
@@ -626,9 +625,8 @@ class ModelLookupTest(TestCase):
     def test_does_not_exist(self):
         # Django raises an Article.DoesNotExist exception for get() if the
         # parameters don't match any object.
-        with self.assertRaisesMessage(
-            ObjectDoesNotExist, "Article matching query does not exist."
-        ):
+        msg = "Article matching query does not exist."
+        with self.assertRaisesMessage(ObjectDoesNotExist, msg):
             Article.objects.get(
                 id__exact=2000,
             )
@@ -636,9 +634,7 @@ class ModelLookupTest(TestCase):
         # in single assert.
         with self.assertRaises(ObjectDoesNotExist):
             Article.objects.get(pub_date__year=2005, pub_date__month=8)
-        with self.assertRaisesMessage(
-            ObjectDoesNotExist, "Article matching query does not exist."
-        ):
+        with self.assertRaisesMessage(ObjectDoesNotExist, msg):
             Article.objects.get(
                 pub_date__week_day=6,
             )
@@ -815,9 +811,9 @@ class SelectOnSaveTests(TestCase):
         with self.assertNumQueries(1):
             asos.save(force_update=True)
         Article.objects.all().delete()
-        with self.assertRaisesMessage(
-            DatabaseError, "Forced update did not affect any rows."
-        ):
+
+        msg = "Forced update did not affect any rows."
+        with self.assertRaisesMessage(DatabaseError, msg):
             with self.assertNumQueries(1):
                 asos.save(force_update=True)
 
@@ -852,9 +848,8 @@ class SelectOnSaveTests(TestCase):
             # This is not wanted behavior, but this is how Django has always
             # behaved for databases that do not return correct information
             # about matched rows for UPDATE.
-            with self.assertRaisesMessage(
-                DatabaseError, "Forced update did not affect any rows."
-            ):
+            msg = "Forced update did not affect any rows."
+            with self.assertRaisesMessage(DatabaseError, msg):
                 asos.save(force_update=True)
             msg = (
                 "An error occurred in the current transaction. You can't "

@@ -67,11 +67,11 @@ class EarliestOrLatestTests(TestCase):
         # Error is raised if the user forgot to add a get_latest_by
         # in the Model.Meta
         Article.objects.model._meta.get_latest_by = None
-        with self.assertRaisesMessage(
-            ValueError,
+        msg = (
             "earliest() and latest() require either fields as positional "
-            "arguments or 'get_latest_by' in the model's Meta.",
-        ):
+            "arguments or 'get_latest_by' in the model's Meta."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             Article.objects.earliest()
 
         # Earliest publication date, earliest expire date.
@@ -148,11 +148,11 @@ class EarliestOrLatestTests(TestCase):
 
         # Error is raised if get_latest_by isn't in Model.Meta.
         Article.objects.model._meta.get_latest_by = None
-        with self.assertRaisesMessage(
-            ValueError,
+        msg = (
             "earliest() and latest() require either fields as positional "
-            "arguments or 'get_latest_by' in the model's Meta.",
-        ):
+            "arguments or 'get_latest_by' in the model's Meta."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             Article.objects.latest()
 
         # Latest publication date, latest expire date.

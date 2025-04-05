@@ -109,11 +109,11 @@ class DjangoTemplatesTests(TemplateStringsTests):
         """
         Import errors in tag modules should be reraised with a helpful message.
         """
-        with self.assertRaisesMessage(
-            InvalidTemplateLibrary,
+        msg = (
             "ImportError raised when trying to load "
-            "'template_backends.apps.importerror.templatetags.broken_tags'",
-        ) as cm:
+            "'template_backends.apps.importerror.templatetags.broken_tags'"
+        )
+        with self.assertRaisesMessage(InvalidTemplateLibrary, msg) as cm:
             DjangoTemplates(
                 {
                     "DIRS": [],

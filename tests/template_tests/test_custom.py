@@ -570,11 +570,11 @@ class SimpleBlockTagTests(TagTestCase):
         )
         self.assertEqual(t.render(c), "<div>Jack &amp; Jill</div>")
 
-        with self.assertRaisesMessage(
-            TemplateSyntaxError,
+        msg = (
             "'enddiv_custom_end', expected 'divend'. Did you forget to register or "
-            "load this tag?",
-        ):
+            "load this tag?"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.from_string(
                 "{% load custom %}{% div_custom_end %}{{ name }}{% enddiv_custom_end %}"
             )

@@ -148,9 +148,8 @@ class InlineFormsetFactoryTest(TestCase):
         If the field specified in fk_name is not a ForeignKey, we should get an
         exception.
         """
-        with self.assertRaisesMessage(
-            ValueError, "'inline_formsets.Child' has no field named 'test'."
-        ):
+        msg = "'inline_formsets.Child' has no field named 'test'."
+        with self.assertRaisesMessage(ValueError, msg):
             inlineformset_factory(Parent, Child, fk_name="test")
 
     def test_any_iterable_allowed_as_argument_to_exclude(self):

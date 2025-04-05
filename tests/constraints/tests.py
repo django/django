@@ -1135,9 +1135,8 @@ class UniqueConstraintTests(TestCase):
         constraint.validate(model, valid_product)
 
         invalid_product = model(price=20, discounted_price=4)
-        with self.assertRaisesMessage(
-            ValidationError, f"Constraint “{constraint.name}” is violated."
-        ):
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
             constraint.validate(model, invalid_product)
 
         # Excluding referenced or generated fields should skip validation.
@@ -1270,9 +1269,8 @@ class UniqueConstraintTests(TestCase):
         self.assertIn(expected_name, constraints)
 
     def test_condition_must_be_q(self):
-        with self.assertRaisesMessage(
-            ValueError, "UniqueConstraint.condition must be a Q instance."
-        ):
+        msg = "UniqueConstraint.condition must be a Q instance."
+        with self.assertRaisesMessage(ValueError, msg):
             models.UniqueConstraint(name="uniq", fields=["name"], condition="invalid")
 
     @skipUnlessDBFeature("supports_deferrable_unique_constraints")

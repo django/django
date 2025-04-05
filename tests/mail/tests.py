@@ -385,21 +385,17 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         )
 
     def test_recipients_as_string(self):
-        with self.assertRaisesMessage(
-            TypeError, '"to" argument must be a list or tuple'
-        ):
+        msg = '"to" argument must be a list or tuple'
+        with self.assertRaisesMessage(TypeError, msg):
             EmailMessage(to="foo@example.com")
-        with self.assertRaisesMessage(
-            TypeError, '"cc" argument must be a list or tuple'
-        ):
+        msg = '"cc" argument must be a list or tuple'
+        with self.assertRaisesMessage(TypeError, msg):
             EmailMessage(cc="foo@example.com")
-        with self.assertRaisesMessage(
-            TypeError, '"bcc" argument must be a list or tuple'
-        ):
+        msg = '"bcc" argument must be a list or tuple'
+        with self.assertRaisesMessage(TypeError, msg):
             EmailMessage(bcc="foo@example.com")
-        with self.assertRaisesMessage(
-            TypeError, '"reply_to" argument must be a list or tuple'
-        ):
+        msg = '"reply_to" argument must be a list or tuple'
+        with self.assertRaisesMessage(TypeError, msg):
             EmailMessage(reply_to="reply_to@example.com")
 
     def test_header_injection(self):
@@ -2303,9 +2299,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend(
             username="not empty username", password="not empty password"
         )
-        with self.assertRaisesMessage(
-            SMTPException, "SMTP AUTH extension not supported by server."
-        ):
+        msg = "SMTP AUTH extension not supported by server."
+        with self.assertRaisesMessage(SMTPException, msg):
             with backend:
                 pass
 
@@ -2393,9 +2388,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
-        with self.assertRaisesMessage(
-            SMTPException, "STARTTLS extension not supported by server."
-        ):
+        msg = "STARTTLS extension not supported by server."
+        with self.assertRaisesMessage(SMTPException, msg):
             with backend:
                 pass
 

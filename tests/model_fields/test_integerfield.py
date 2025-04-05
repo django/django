@@ -155,9 +155,8 @@ class IntegerFieldTests(TestCase):
                     field_range_message = validators.MinValueValidator.message % {
                         "limit_value": min_custom_value,
                     }
-                    with self.assertRaisesMessage(
-                        ValidationError, "[%r]" % field_range_message
-                    ):
+                    msg = "[%r]" % field_range_message
+                    with self.assertRaisesMessage(ValidationError, msg):
                         ranged_value_field.run_validators(min_backend_value - 1)
 
                 if max_backend_value is not None:
@@ -173,9 +172,8 @@ class IntegerFieldTests(TestCase):
                     field_range_message = validators.MaxValueValidator.message % {
                         "limit_value": max_custom_value,
                     }
-                    with self.assertRaisesMessage(
-                        ValidationError, "[%r]" % field_range_message
-                    ):
+                    msg = "[%r]" % field_range_message
+                    with self.assertRaisesMessage(ValidationError, msg):
                         ranged_value_field.run_validators(max_backend_value + 1)
 
     def test_types(self):

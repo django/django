@@ -27,32 +27,33 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean("1.0 "), decimal.Decimal("1.0"))
         self.assertEqual(f.clean(" 1.0"), decimal.Decimal("1.0"))
         self.assertEqual(f.clean(" 1.0 "), decimal.Decimal("1.0"))
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure that there are no more than 4 digits in total.'"
-        ):
+
+        msg = "'Ensure that there are no more than 4 digits in total.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("123.45")
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure that there are no more than 2 decimal places.'"
-        ):
+
+        msg = "'Ensure that there are no more than 2 decimal places.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1.234")
+
         msg = "'Ensure that there are no more than 2 digits before the decimal point.'"
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean("123.4")
         self.assertEqual(f.clean("-12.34"), decimal.Decimal("-12.34"))
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure that there are no more than 4 digits in total.'"
-        ):
+
+        msg = "'Ensure that there are no more than 4 digits in total.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("-123.45")
         self.assertEqual(f.clean("-.12"), decimal.Decimal("-0.12"))
         self.assertEqual(f.clean("-00.12"), decimal.Decimal("-0.12"))
         self.assertEqual(f.clean("-000.12"), decimal.Decimal("-0.12"))
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure that there are no more than 2 decimal places.'"
-        ):
+
+        msg = "'Ensure that there are no more than 2 decimal places.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("-000.123")
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure that there are no more than 4 digits in total.'"
-        ):
+
+        msg = "'Ensure that there are no more than 4 digits in total.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("-000.12345")
         self.assertEqual(f.max_digits, 4)
         self.assertEqual(f.decimal_places, 2)
@@ -108,13 +109,13 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" '
             "required>",
         )
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure this value is less than or equal to 1.5.'"
-        ):
+
+        msg = "'Ensure this value is less than or equal to 1.5.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1.6")
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure this value is greater than or equal to 0.5.'"
-        ):
+
+        msg = "'Ensure this value is greater than or equal to 0.5.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("0.4")
         self.assertEqual(f.clean("1.5"), decimal.Decimal("1.5"))
         self.assertEqual(f.clean("0.5"), decimal.Decimal("0.5"))
@@ -127,9 +128,8 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_decimalfield_4(self):
         f = DecimalField(decimal_places=2)
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure that there are no more than 2 decimal places.'"
-        ):
+        msg = "'Ensure that there are no more than 2 decimal places.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("0.00000001")
 
     def test_decimalfield_5(self):
@@ -140,9 +140,9 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean("0000000.100"), decimal.Decimal("0.100"))
         # Only leading whole zeros "collapse" to one digit.
         self.assertEqual(f.clean("000000.02"), decimal.Decimal("0.02"))
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure that there are no more than 3 digits in total.'"
-        ):
+
+        msg = "'Ensure that there are no more than 3 digits in total.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("000000.0002")
         self.assertEqual(f.clean(".002"), decimal.Decimal("0.002"))
 

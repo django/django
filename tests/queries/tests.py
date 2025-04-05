@@ -1485,14 +1485,12 @@ class Queries3Tests(TestCase):
             Item.objects.datetimes("name", "month")
 
     def test_ticket22023(self):
-        with self.assertRaisesMessage(
-            TypeError, "Cannot call only() after .values() or .values_list()"
-        ):
+        msg = "Cannot call only() after .values() or .values_list()"
+        with self.assertRaisesMessage(TypeError, msg):
             Valid.objects.values().only()
 
-        with self.assertRaisesMessage(
-            TypeError, "Cannot call defer() after .values() or .values_list()"
-        ):
+        msg = "Cannot call defer() after .values() or .values_list()"
+        with self.assertRaisesMessage(TypeError, msg):
             Valid.objects.values().defer()
 
 
@@ -4213,35 +4211,27 @@ class RelatedLookupTypeTests(TestCase):
         query lookup.
         """
         # Passing incorrect object type
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.wrong_type, ObjectA._meta.object_name)
-        ):
+        msg = self.error % (self.wrong_type, ObjectA._meta.object_name)
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectB.objects.get(objecta=self.wrong_type)
 
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.wrong_type, ObjectA._meta.object_name)
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectB.objects.filter(objecta__in=[self.wrong_type])
 
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.wrong_type, ObjectA._meta.object_name)
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectB.objects.filter(objecta=self.wrong_type)
 
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.wrong_type, ObjectB._meta.object_name)
-        ):
+        msg = self.error % (self.wrong_type, ObjectB._meta.object_name)
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectA.objects.filter(objectb__in=[self.wrong_type, self.ob])
 
+        msg = self.error % (self.ob, ObjectA._meta.object_name)
         # Passing an object of the class on which query is done.
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.ob, ObjectA._meta.object_name)
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectB.objects.filter(objecta__in=[self.poa, self.ob])
 
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.ob, ChildObjectA._meta.object_name)
-        ):
+        msg = self.error % (self.ob, ChildObjectA._meta.object_name)
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectC.objects.exclude(childobjecta__in=[self.coa, self.ob])
 
     def test_wrong_backward_lookup(self):
@@ -4249,19 +4239,15 @@ class RelatedLookupTypeTests(TestCase):
         A ValueError is raised when the incorrect object type is passed to a
         query lookup for backward relations.
         """
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.oa, ObjectB._meta.object_name)
-        ):
+        msg = self.error % (self.oa, ObjectB._meta.object_name)
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectA.objects.filter(objectb__in=[self.oa, self.ob])
 
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.oa, ObjectB._meta.object_name)
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectA.objects.exclude(objectb=self.oa)
 
-        with self.assertRaisesMessage(
-            ValueError, self.error % (self.wrong_type, ObjectB._meta.object_name)
-        ):
+        msg = self.error % (self.wrong_type, ObjectB._meta.object_name)
+        with self.assertRaisesMessage(ValueError, msg):
             ObjectA.objects.get(objectb=self.wrong_type)
 
     def test_correct_lookup(self):

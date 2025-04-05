@@ -373,9 +373,8 @@ class TestInteractiveMessages(CollectionTestCase):
     def test_cancelled(self):
         self.run_collectstatic()
         with mock.patch("builtins.input", side_effect=lambda _: "no"):
-            with self.assertRaisesMessage(
-                CommandError, "Collecting static files cancelled"
-            ):
+            msg = "Collecting static files cancelled"
+            with self.assertRaisesMessage(CommandError, msg):
                 call_command("collectstatic", interactive=True)
 
 
@@ -570,9 +569,8 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
             storage.get_modified_time("name"),
             datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC),
         )
-        with self.assertRaisesMessage(
-            NotImplementedError, "This backend doesn't support absolute paths."
-        ):
+        msg = "This backend doesn't support absolute paths."
+        with self.assertRaisesMessage(NotImplementedError, msg):
             storage.path("name")
 
 
@@ -658,7 +656,6 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
         }
     )
     def test_no_remote_link(self):
-        with self.assertRaisesMessage(
-            CommandError, "Can't symlink to a remote destination."
-        ):
+        msg = "Can't symlink to a remote destination."
+        with self.assertRaisesMessage(CommandError, msg):
             self.run_collectstatic()

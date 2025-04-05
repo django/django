@@ -17,9 +17,9 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
         self.assertEqual("person@example.com", f.clean("person@example.com"))
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid email address.'"
-        ):
+
+        msg = "'Enter a valid email address.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("foo")
         self.assertEqual(
             "local@domain.with.idn.xyz\xe4\xf6\xfc\xdfabc.part.com",
@@ -42,9 +42,9 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(
             "example@example.com", f.clean("      example@example.com  \t   \t ")
         )
-        with self.assertRaisesMessage(
-            ValidationError, "'Enter a valid email address.'"
-        ):
+
+        msg = "'Enter a valid email address.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("foo")
 
     def test_emailfield_min_max_length(self):
@@ -54,16 +54,14 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             '<input id="id_f" type="email" name="f" maxlength="15" minlength="10" '
             "required>",
         )
-        with self.assertRaisesMessage(
-            ValidationError,
-            "'Ensure this value has at least 10 characters (it has 9).'",
-        ):
+
+        msg = "'Ensure this value has at least 10 characters (it has 9).'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("a@foo.com")
         self.assertEqual("alf@foo.com", f.clean("alf@foo.com"))
-        with self.assertRaisesMessage(
-            ValidationError,
-            "'Ensure this value has at most 15 characters (it has 20).'",
-        ):
+
+        msg = "'Ensure this value has at most 15 characters (it has 20).'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("alf123456788@foo.com")
 
     def test_emailfield_strip_on_none_value(self):

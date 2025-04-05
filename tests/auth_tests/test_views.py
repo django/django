@@ -1183,9 +1183,8 @@ class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
         # Already logged in...
         with self.settings(LOGIN_URL=self.do_redirect_url):
             # redirect loop encountered.
-            with self.assertRaisesMessage(
-                RedirectCycleError, "Redirect loop detected."
-            ):
+            msg = "Redirect loop detected."
+            with self.assertRaisesMessage(RedirectCycleError, msg):
                 self.client.get("/permission_required_redirect/", follow=True)
             # exception raised.
             response = self.client.get("/permission_required_exception/", follow=True)

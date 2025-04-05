@@ -154,9 +154,8 @@ class UserManagerTestCase(TransactionTestCase):
         self.assertTrue(user.is_staff)
 
     def test_create_super_user_raises_error_on_false_is_superuser(self):
-        with self.assertRaisesMessage(
-            ValueError, "Superuser must have is_superuser=True."
-        ):
+        msg = "Superuser must have is_superuser=True."
+        with self.assertRaisesMessage(ValueError, msg):
             User.objects.create_superuser(
                 username="test",
                 email="test@test.com",
@@ -165,9 +164,8 @@ class UserManagerTestCase(TransactionTestCase):
             )
 
     async def test_acreate_super_user_raises_error_on_false_is_superuser(self):
-        with self.assertRaisesMessage(
-            ValueError, "Superuser must have is_superuser=True."
-        ):
+        msg = "Superuser must have is_superuser=True."
+        with self.assertRaisesMessage(ValueError, msg):
             await User.objects.acreate_superuser(
                 username="test",
                 email="test@test.com",

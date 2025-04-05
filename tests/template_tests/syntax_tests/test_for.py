@@ -276,9 +276,8 @@ class ForTagTests(SimpleTestCase):
 
     @setup({"for-tag-unpack10": "{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}"})
     def test_for_tag_unpack10(self):
-        with self.assertRaisesMessage(
-            ValueError, "Need 2 values to unpack in for loop; got 3."
-        ):
+        msg = "Need 2 values to unpack in for loop; got 3."
+        with self.assertRaisesMessage(ValueError, msg):
             self.engine.render_to_string(
                 "for-tag-unpack10",
                 {"items": (("one", 1, "carrot"), ("two", 2, "orange"))},
@@ -292,9 +291,8 @@ class ForTagTests(SimpleTestCase):
         }
     )
     def test_for_tag_unpack11(self):
-        with self.assertRaisesMessage(
-            ValueError, "Need 3 values to unpack in for loop; got 2."
-        ):
+        msg = "Need 3 values to unpack in for loop; got 2."
+        with self.assertRaisesMessage(ValueError, msg):
             self.engine.render_to_string(
                 "for-tag-unpack11",
                 {"items": (("one", 1), ("two", 2))},
@@ -308,18 +306,16 @@ class ForTagTests(SimpleTestCase):
         }
     )
     def test_for_tag_unpack12(self):
-        with self.assertRaisesMessage(
-            ValueError, "Need 3 values to unpack in for loop; got 2."
-        ):
+        msg = "Need 3 values to unpack in for loop; got 2."
+        with self.assertRaisesMessage(ValueError, msg):
             self.engine.render_to_string(
                 "for-tag-unpack12", {"items": (("one", 1, "carrot"), ("two", 2))}
             )
 
     @setup({"for-tag-unpack14": "{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}"})
     def test_for_tag_unpack14(self):
-        with self.assertRaisesMessage(
-            ValueError, "Need 2 values to unpack in for loop; got 1."
-        ):
+        msg = "Need 2 values to unpack in for loop; got 1."
+        with self.assertRaisesMessage(ValueError, msg):
             self.engine.render_to_string("for-tag-unpack14", {"items": (1, 2)})
 
     @setup(

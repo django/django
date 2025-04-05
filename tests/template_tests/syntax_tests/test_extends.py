@@ -436,9 +436,8 @@ class InheritanceTests(SimpleTestCase):
 
     @setup(inheritance_templates)
     def test_inheritance_empty(self):
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "'extends' takes one argument"
-        ):
+        msg = "'extends' takes one argument"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("inheritance_empty")
 
     @setup(inheritance_templates)

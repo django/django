@@ -132,11 +132,11 @@ class TupleLookupsTests(TestCase):
         lhs = (F("customer_code"), F("company_code"))
         # If rhs is any non-Query object with an as_sql() function.
         rhs = In(F("customer_code"), [1, 2, 3])
-        with self.assertRaisesMessage(
-            ValueError,
+        msg = (
             "'in' subquery lookup of ('customer_code', 'company_code') "
-            "must be a Query object (received 'In')",
-        ):
+            "must be a Query object (received 'In')"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             TupleIn(lhs, rhs)
 
     def test_tuple_in_subquery_must_have_2_fields(self):
@@ -174,13 +174,13 @@ class TupleLookupsTests(TestCase):
             ((1, 2), (3, 4), None),
         )
 
+        msg = (
+            "'in' lookup of ('customer_code', 'company_code') "
+            "must be a collection of tuples or lists"
+        )
         for rhs in test_cases:
             with self.subTest(rhs=rhs):
-                with self.assertRaisesMessage(
-                    ValueError,
-                    "'in' lookup of ('customer_code', 'company_code') "
-                    "must be a collection of tuples or lists",
-                ):
+                with self.assertRaisesMessage(ValueError, msg):
                     TupleIn((F("customer_code"), F("company_code")), rhs)
 
     def test_tuple_in_rhs_must_have_2_elements_each(self):
@@ -190,13 +190,13 @@ class TupleLookupsTests(TestCase):
             ((1, 2, 3),),
         )
 
+        msg = (
+            "'in' lookup of ('customer_code', 'company_code') "
+            "must have 2 elements each"
+        )
         for rhs in test_cases:
             with self.subTest(rhs=rhs):
-                with self.assertRaisesMessage(
-                    ValueError,
-                    "'in' lookup of ('customer_code', 'company_code') "
-                    "must have 2 elements each",
-                ):
+                with self.assertRaisesMessage(ValueError, msg):
                     TupleIn((F("customer_code"), F("company_code")), rhs)
 
     def test_lt(self):
@@ -239,9 +239,8 @@ class TupleLookupsTests(TestCase):
                 )
 
     def test_lt_subquery(self):
-        with self.assertRaisesMessage(
-            ValueError, "'lt' doesn't support multi-column subqueries."
-        ):
+        msg = "'lt' doesn't support multi-column subqueries."
+        with self.assertRaisesMessage(ValueError, msg):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
                 Contact.objects.filter(customer__lt=subquery).order_by("id"), ()
@@ -287,9 +286,8 @@ class TupleLookupsTests(TestCase):
                 )
 
     def test_lte_subquery(self):
-        with self.assertRaisesMessage(
-            ValueError, "'lte' doesn't support multi-column subqueries."
-        ):
+        msg = "'lte' doesn't support multi-column subqueries."
+        with self.assertRaisesMessage(ValueError, msg):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
                 Contact.objects.filter(customer__lte=subquery).order_by("id"), ()
@@ -327,9 +325,8 @@ class TupleLookupsTests(TestCase):
                 )
 
     def test_gt_subquery(self):
-        with self.assertRaisesMessage(
-            ValueError, "'gt' doesn't support multi-column subqueries."
-        ):
+        msg = "'gt' doesn't support multi-column subqueries."
+        with self.assertRaisesMessage(ValueError, msg):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
                 Contact.objects.filter(customer__gt=subquery).order_by("id"), ()
@@ -375,9 +372,8 @@ class TupleLookupsTests(TestCase):
                 )
 
     def test_gte_subquery(self):
-        with self.assertRaisesMessage(
-            ValueError, "'gte' doesn't support multi-column subqueries."
-        ):
+        msg = "'gte' doesn't support multi-column subqueries."
+        with self.assertRaisesMessage(ValueError, msg):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
                 Contact.objects.filter(customer__gte=subquery).order_by("id"), ()
@@ -419,9 +415,8 @@ class TupleLookupsTests(TestCase):
             )
 
     def test_isnull_subquery(self):
-        with self.assertRaisesMessage(
-            ValueError, "'isnull' doesn't support multi-column subqueries."
-        ):
+        msg = "'isnull' doesn't support multi-column subqueries."
+        with self.assertRaisesMessage(ValueError, msg):
             subquery = Customer.objects.filter(id=0)[:1]
             self.assertSequenceEqual(
                 Contact.objects.filter(customer__isnull=subquery).order_by("id"), ()
@@ -490,11 +485,11 @@ class TupleLookupsTests(TestCase):
         for lookup_cls, rhs in test_cases:
             lookup_name = lookup_cls.lookup_name
             with self.subTest(lookup_name=lookup_name, rhs=rhs):
-                with self.assertRaisesMessage(
-                    ValueError,
+                msg = (
                     f"'{lookup_name}' lookup of ('customer_code', 'company_code') "
-                    "must be a tuple or a list",
-                ):
+                    "must be a tuple or a list"
+                )
+                with self.assertRaisesMessage(ValueError, msg):
                     lookup_cls((F("customer_code"), F("company_code")), rhs)
 
     def test_tuple_lookup_rhs_must_have_2_elements(self):
@@ -519,9 +514,9 @@ class TupleLookupsTests(TestCase):
         for lookup_cls, rhs in test_cases:
             lookup_name = lookup_cls.lookup_name
             with self.subTest(lookup_name=lookup_name, rhs=rhs):
-                with self.assertRaisesMessage(
-                    ValueError,
+                msg = (
                     f"'{lookup_name}' lookup of ('customer_code', 'company_code') "
-                    "must have 2 elements",
-                ):
+                    "must have 2 elements"
+                )
+                with self.assertRaisesMessage(ValueError, msg):
                     lookup_cls((F("customer_code"), F("company_code")), rhs)

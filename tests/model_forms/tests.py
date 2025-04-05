@@ -229,9 +229,8 @@ class ModelFormBaseTest(TestCase):
         class NoModelModelForm(forms.ModelForm):
             pass
 
-        with self.assertRaisesMessage(
-            ValueError, "ModelForm has no model class specified."
-        ):
+        msg = "ModelForm has no model class specified."
+        with self.assertRaisesMessage(ValueError, msg):
             NoModelModelForm()
 
     def test_empty_fields_to_fields_for_model(self):
@@ -447,9 +446,8 @@ class ModelFormBaseTest(TestCase):
                 fields = ("name", "age")
 
     def test_extra_field_modelform_factory(self):
-        with self.assertRaisesMessage(
-            FieldError, "Unknown field(s) (no-field) specified for Person"
-        ):
+        msg = "Unknown field(s) (no-field) specified for Person"
+        with self.assertRaisesMessage(FieldError, msg):
             modelform_factory(Person, fields=["no-field", "name"])
 
     def test_replace_field(self):

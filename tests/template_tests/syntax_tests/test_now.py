@@ -92,7 +92,6 @@ class NowTagTests(SimpleTestCase):
 
     @setup({"no_args": "{% now %}"})
     def test_now_args(self):
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "'now' statement takes one argument"
-        ):
+        msg = "'now' statement takes one argument"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("no_args")

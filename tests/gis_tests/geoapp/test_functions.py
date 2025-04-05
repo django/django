@@ -296,9 +296,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         for state in qs:
             self.assertTrue(state.poly.centroid.equals_exact(state.centroid, tol))
 
-        with self.assertRaisesMessage(
-            TypeError, "'Centroid' takes exactly 1 argument (2 given)"
-        ):
+        msg = "'Centroid' takes exactly 1 argument (2 given)"
+        with self.assertRaisesMessage(TypeError, msg):
             State.objects.annotate(centroid=functions.Centroid("poly", "poly"))
 
     @skipUnlessDBFeature("has_Difference_function")
@@ -474,9 +473,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             CountryWebMercator.objects.get(name="New Zealand"),
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "AreaField only accepts Area measurement objects."
-        ):
+        msg = "AreaField only accepts Area measurement objects."
+        with self.assertRaisesMessage(ValueError, msg):
             qs.get(area__lt=500000)
 
     @skipUnlessDBFeature("has_ClosestPoint_function")
@@ -866,9 +864,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             self.assertEqual(city.union.srid, 3857)
 
     def test_argument_validation(self):
-        with self.assertRaisesMessage(
-            ValueError, "SRID is required for all geometries."
-        ):
+        msg = "SRID is required for all geometries."
+        with self.assertRaisesMessage(ValueError, msg):
             City.objects.annotate(geo=functions.GeoFunc(Point(1, 1)))
 
         msg = "GeoFunc function requires a GeometryField in position 1, got CharField."
