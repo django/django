@@ -5,7 +5,7 @@ Admin actions
 .. currentmodule:: django.contrib.admin
 
 The basic workflow of Django's admin is, in a nutshell, "select an object,
-then change it." This works well for a majority of use cases. However, if you
+then change it." This works well for the majority of use cases. However, if you
 need to make the same change to many objects at once, this workflow can be
 quite tedious.
 
