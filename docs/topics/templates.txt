@@ -279,6 +279,60 @@ backend with different options. In that case you should define a unique
 
 .. _template-loading:
 
+.. _template-variable-errors:
+
+Template Variable Error Handling
+--------------------------------
+
+By default, Django's template system handles missing variables by replacing them
+with an empty string (or a custom string specified in ``string_if_invalid``).
+However, during development and testing, you might want to catch these errors
+immediately.
+
+Raising Exceptions for Missing Variables
+----------------------------------------
+
+You can configure Django's template engine to raise exceptions when variables
+cannot be found in the template context. This is useful during development and
+testing to catch template variable errors early.
+
+To enable this behavior, set ``raise_on_missing_variable`` to ``True`` in your
+template configuration:
+
+.. code-block:: python
+
+    TEMPLATES = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "OPTIONS": {
+                "raise_on_missing_variable": True,
+            },
+        },
+    ]
+
+You can also enable this for specific template instances:
+
+.. code-block:: python
+
+    from django.template import Engine, Template, Context
+
+    # Create an engine that raises exceptions for missing variables
+    engine = Engine(raise_on_missing_variable=True)
+    template = Template("Hello {{ name }}!", engine=engine)
+
+    # This will raise VariableDoesNotExist
+    context = Context({})
+    template.render(context)
+
+When enabled, any attempt to access a missing variable will raise a
+``django.template.VariableDoesNotExist`` exception instead of using
+the ``string_if_invalid`` value.
+
+.. note::
+    This feature is designed for use during development and testing.
+    In production, you should keep the default behavior to avoid
+    exposing error details to users.
+
 Usage
 -----
 

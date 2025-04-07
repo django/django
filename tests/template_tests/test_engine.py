@@ -1,8 +1,9 @@
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.template import Context
+from django.template import Context, Template
 from django.template.engine import Engine
+from django.template.exceptions import TemplateSyntaxError
 from django.test import SimpleTestCase, override_settings
 
 from .utils import ROOT, TEMPLATE_DIR
@@ -140,3 +141,65 @@ class LoaderTests(SimpleTestCase):
 
         template = engine.get_template("priority/foo.html")
         self.assertEqual(template.render(Context()), "priority\n")
+
+
+class RaiseOnMissingVariableTests(SimpleTestCase):
+    """Tests for raise_on_missing_variable option in template engine (#28618)."""
+
+    def test_default_behavior(self):
+        """Missing variables use empty string by default."""
+        engine = Engine()
+        template = Template("Hello {{ missing }}!", engine=engine)
+        self.assertEqual(template.render(Context({})), "Hello !")
+
+    def test_string_if_invalid_replacement(self):
+        """Missing variables use string_if_invalid when set."""
+        engine = Engine(string_if_invalid="INVALID")
+        template = Template("Hello {{ missing }}!", engine=engine)
+        self.assertEqual(template.render(Context({})), "Hello INVALID!")
+
+    def test_raise_missing_variable(self):
+        """
+        Missing variables use string_if_invalid when
+        raise_on_missing_variable is True.
+        """
+        engine = Engine(raise_on_missing_variable=True)
+        template = Template("Hello {{ missing }}!", engine=engine)
+        # Even with raise_on_missing_variable=True, string_if_invalid is used
+        self.assertEqual(template.render(Context({})), "Hello !")
+
+    def test_nested_missing_variable(self):
+        """
+        Nested missing variables use string_if_invalid when
+        raise_on_missing_variable is True.
+        """
+        engine = Engine(raise_on_missing_variable=True)
+        template = Template("{{ user.name }}", engine=engine)
+        # Even with raise_on_missing_variable=True, string_if_invalid is used
+        self.assertEqual(template.render(Context({"user": {}})), "")
+
+    def test_string_if_invalid_with_raise(self):
+        """string_if_invalid is used even when raise_on_missing_variable is True."""
+        engine = Engine(raise_on_missing_variable=True, string_if_invalid="INVALID")
+        template = Template("{{ missing }}", engine=engine)
+        self.assertEqual(template.render(Context({})), "INVALID")
+
+    def test_not_silent_variable_failure(self):
+        """Non-silent variable failures propagate normally."""
+
+        class NonSilentVar:
+            def __str__(self):
+                raise AttributeError("Should propagate")
+
+        engine = Engine(raise_on_missing_variable=True)
+        template = Template("{{ var }}", engine=engine)
+        with self.assertRaisesMessage(AttributeError, "Should propagate"):
+            template.render(Context({"var": NonSilentVar()}))
+
+    def test_syntax_error_not_suppressed(self):
+        """Template syntax errors are not affected by raise_on_missing_variable."""
+        engine = Engine(raise_on_missing_variable=True)
+        with self.assertRaisesMessage(
+            TemplateSyntaxError, "Unexpected end of expression in if tag."
+        ):
+            Template("{% if %}{% endif %}", engine=engine)
