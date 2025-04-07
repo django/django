@@ -7,8 +7,7 @@ from ..utils import setup
 
 class UpperTests(SimpleTestCase):
     """
-    The "upper" filter messes up entities (which are case-sensitive),
-    so it's not safe for non-escaping purposes.
+    The "upper" filter should preserve HTML safety, just like the "lower" filter.
     """
 
     @setup(
@@ -29,7 +28,13 @@ class UpperTests(SimpleTestCase):
         output = self.engine.render_to_string(
             "upper02", {"a": "a & b", "b": mark_safe("a &amp; b")}
         )
-        self.assertEqual(output, "A &amp; B A &amp;AMP; B")
+        self.assertEqual(output, "A &amp; B A &AMP; B")
+
+    @setup({"upper03": "{{ html|upper }}"})
+    def test_upper03(self):
+        html = mark_safe("<p>Hello World!</p>")
+        output = self.engine.render_to_string("upper03", {"html": html})
+        self.assertEqual(output, "<P>HELLO WORLD!</P>")
 
 
 class FunctionTests(SimpleTestCase):
