@@ -71,6 +71,18 @@ overridden by what's passed by
 
           Only set it to ``False`` if you're rendering non-HTML templates!
 
+    * ``raise_on_missing_variable`` controls whether to raise an exception
+      when a variable lookup fails in template rendering.
+
+      It defaults to ``False``.
+
+      When set to ``True``, a ``django.template.VariableDoesNotExist``
+      exception will be raised if a variable cannot be resolved against the
+      context. When ``False``, invalid variables will be replaced with the
+      value of ``string_if_invalid``.
+
+      .. versionadded:: 6.0
+
     * ``context_processors`` is a list of dotted Python paths to callables
       that are used to populate the context when a template is rendered with a
       request. These callables take a request object as their argument and

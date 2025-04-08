@@ -242,6 +242,13 @@ Templates
   arguments, which must be mappings, such as :class:`~django.http.QueryDict`
   or :class:`dict`.
 
+* The template engine now supports raising exceptions for missing variables by
+  setting ``raise_on_missing_variable=True`` in the engine configuration. When
+  enabled, a ``django.template.VariableDoesNotExist`` exception is raised
+  if a variable cannot be resolved against the context, instead of silently
+  replacing it with ``string_if_invalid``. This is useful for catching template
+  variable errors during development and testing.
+
 Tests
 ~~~~~
 
