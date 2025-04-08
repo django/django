@@ -3,14 +3,17 @@ import sys
 import threading
 import time
 from pathlib import Path
+from tkinter import NO
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
+
 
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
 from django.core.exceptions import RequestDataTooBig
 from django.core.handlers.asgi import ASGIHandler, ASGIRequest
+from django.core.exceptions import RequestAborted
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections
 from django.http import HttpResponse, StreamingHttpResponse
@@ -25,6 +28,8 @@ from django.test.utils import captured_stderr
 from django.urls import path
 from django.utils.http import http_date
 from django.views.decorators.csrf import csrf_exempt
+
+from django.contrib.gis.db.backends.postgis.pgraster import chunk
 
 from .urls import sync_waiter, test_filename
 
@@ -659,3 +664,76 @@ class ASGITest(SimpleTestCase):
         # 'last\n' isn't sent.
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output(timeout=0.2)
+
+    # test read_body() for ticket #36281
+    async def test_read_body_comprehensive_cases(self):
+        handler = ASGIHandler()
+
+        # scenario
+        test_case = [
+            (
+                "multiple chunk",
+                [
+                    {"type": "http.request", "body": b"data ", "more_body": True},
+                    {"type": "http.request", "body": b"Async ", "more_body": True},
+                    {"type": "http.request", "body": b"test!", "more_body": False},
+                ],
+                b"data Async test!",
+                None,
+            ),
+            (
+                "single chunk",
+                [
+                    {"type": "http.request", "body": b"OneShot", "more_body": False},
+                ],
+                b"OneShot",
+                None,
+            ),
+            (
+                "empty middle chunk",
+                [
+                    {"type": "http.request", "body": b"Start", "more_body": True},
+                    {"type": "http.request", "body": b"", "more_body": True},
+                    {"type": "http.request", "body": b"End", "more_body": False},
+                ],
+                b"StartEnd",
+                None,
+            ),
+            (
+                "empty body test",
+                [
+                    {"type": "http.request", "body": b"", "more_body": False},
+                ],
+                b"",
+                None,
+            ),
+            (
+                "disconnect mid-body",
+                [
+                    {"type": "http.request", "body": b"partial...", "more_body": True},
+                    {"type": "http.disconnect"},
+                ],
+                None,
+                RequestAborted,
+            ),
+        ]
+
+        # Testing code
+        for name, chunk, expected, expected_exception in test_case:
+            async def fake_receive():
+                if chunk:
+                    return chunk.pop(0)
+                return {"type": "http.request", "body": b"", "more_body": False}
+
+            with self.subTest(name=name):
+                if expected_exception:
+                    with self.assertRaises(expected_exception):
+                        await handler.read_body(fake_receive)
+                else:
+                    body_file = await handler.read_body(fake_receive)
+                    try:
+                        body_file.seek(0)
+                        result = body_file.read()
+                        self.assertEqual(result, expected)
+                    finally:
+                        body_file.close()
