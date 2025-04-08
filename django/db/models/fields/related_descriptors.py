@@ -233,10 +233,17 @@ class ForwardManyToOneDescriptor:
                 ancestor_link = current_instance._meta.get_ancestor_link(
                     self.field.model
                 )
-                if ancestor_link and ancestor_link.is_cached(current_instance):
-                    # An ancestor link will exist if this field is defined on a
-                    # multi-table inheritance parent of the instance's class.
-                    ancestor = ancestor_link.get_cached_value(current_instance)
+                # An ancestor link will exist if this field is defined on a
+                # multi-table inheritance parent of the instance's class.
+                if (
+                    ancestor_link
+                    and (
+                        ancestor := ancestor_link.get_cached_value(
+                            current_instance, None
+                        )
+                    )
+                    is not None
+                ):
                     # The value might be cached on an ancestor if the instance
                     # originated from walking down the inheritance chain.
                     rel_obj = self.field.get_cached_value(ancestor, default=None)
@@ -1115,9 +1122,15 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 ancestor_link = current_instance._meta.get_ancestor_link(
                     rel.field.model
                 )
-                if ancestor_link and ancestor_link.is_cached(current_instance):
-                    current_instance = ancestor_link.get_cached_value(current_instance)
-                else:
+                if (
+                    not ancestor_link
+                    or (
+                        current_instance := ancestor_link.get_cached_value(
+                            current_instance, None
+                        )
+                    )
+                    is None
+                ):
                     return None
 
         def _remove_prefetched_objects(self):
@@ -1134,9 +1147,15 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 ancestor_link = current_instance._meta.get_ancestor_link(
                     rel.field.model
                 )
-                if ancestor_link and ancestor_link.is_cached(current_instance):
-                    current_instance = ancestor_link.get_cached_value(current_instance)
-                else:
+                if (
+                    not ancestor_link
+                    or (
+                        current_instance := ancestor_link.get_cached_value(
+                            current_instance, None
+                        )
+                    )
+                    is None
+                ):
                     break
 
         def get_queryset(self):
