@@ -921,9 +921,13 @@ class SerializationTests(SimpleTestCase):
                 self.assertEqual(obj.dt, dt)
 
 
-@translation.override(None)
 @override_settings(DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_TZ=True)
 class TemplateTests(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(translation.override(None))
+        super().setUpClass()
+
     @requires_tz_support
     def test_localtime_templatetag_and_filters(self):
         """
@@ -1324,7 +1328,6 @@ class NewFormsTests(TestCase):
             self.assertIn("2011-09-01 17:20:30", str(form))
 
 
-@translation.override(None)
 @override_settings(
     DATETIME_FORMAT="c",
     TIME_ZONE="Africa/Nairobi",
@@ -1334,6 +1337,7 @@ class NewFormsTests(TestCase):
 class AdminTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.enterClassContext(translation.override(None))
         cls.u1 = User.objects.create_user(
             password="secret",
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10, tzinfo=UTC),
