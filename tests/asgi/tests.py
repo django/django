@@ -3,12 +3,10 @@ import sys
 import threading
 import time
 from pathlib import Path
-from tkinter import NO
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
 
-from django.contrib.gis.db.backends.postgis.pgraster import chunk
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
 from django.core.exceptions import RequestAborted, RequestDataTooBig

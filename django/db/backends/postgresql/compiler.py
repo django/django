@@ -3,10 +3,8 @@ from django.db.models.sql.compiler import (
     SQLCompiler,
     SQLDeleteCompiler,
 )
-from django.db.models.sql.compiler import SQLInsertCompiler as BaseSQLInsertCompiler
-from django.db.models.sql.compiler import (
-    SQLUpdateCompiler,
-)
+from django.db.models.sql.compiler import SQLInsertCompiler as BaseSQLInsertCompiler, SQLUpdateCompiler
+from django.db.models.sql.compiler import SQLUpdateCompiler
 
 __all__ = [
     "SQLAggregateCompiler",

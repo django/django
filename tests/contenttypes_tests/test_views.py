@@ -18,10 +18,8 @@ from .models import (
     ModelWithNullFKToSite,
     SchemeIncludedURL,
 )
-from .models import Site as MockSite
-from .models import (
-    UUIDModel,
-)
+from .models import Site as MockSite, UUIDModel
+
 
 
 @override_settings(ROOT_URLCONF="contenttypes_tests.urls")
