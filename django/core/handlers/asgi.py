@@ -266,14 +266,14 @@ class ASGIHandler(base.BaseHandler):
             if "body" in message:
                 body = message["body"]
 
-                # check if the file has rolled over to disk
+                # Check if the file has rolled over to disk
                 if getattr(body_file, "_rolled", False):
-                    # if _rolled Use async-safe write
+                    # Use async-safe write
                     await sync_to_async(body_file.write, thread_sensitive=False)(body)
                 else:
-                    # still in memory : safe to write synchronously
+                    # Still in memory: safe to write synchronously.
                     body_file.write(body)
-                    
+
             # Quit out if that's the end.
             if not message.get("more_body", False):
                 break

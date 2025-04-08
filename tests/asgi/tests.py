@@ -3,7 +3,9 @@ import sys
 import threading
 import time
 from pathlib import Path
-from contextlib import nullcontext # Used in test_read_body_comprehensive_cases (ticket #36281)
+from contextlib import (
+    nullcontext,  # Used in test_read_body_comprehensive_cases (ticket #36281)
+)
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
