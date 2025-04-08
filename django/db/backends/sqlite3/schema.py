@@ -192,6 +192,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         ]
 
         indexes = model._meta.indexes
+        if create_field and hasattr(create_field, "opts"):
+            indexes.extend(create_field.opts.indexes)
         if delete_field:
             indexes = [
                 index for index in indexes if delete_field.name not in index.fields
