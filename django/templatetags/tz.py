@@ -1,5 +1,5 @@
 import zoneinfo
-from datetime import datetime, tzinfo
+from datetime import datetime, tzinfo, UTC
 
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils import timezone
@@ -31,7 +31,7 @@ def utc(value):
     """
     Convert a datetime to UTC.
     """
-    return do_timezone(value, datetime.UTC)
+    return do_timezone(value, UTC)
 
 
 @register.filter("timezone")
