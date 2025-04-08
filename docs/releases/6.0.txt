@@ -57,6 +57,9 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,000,000 to 1,200,000.
 
+* Fixed a bug with model's permissions that would'nt change when modifying the
+  verbose_name of some model.
+  
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

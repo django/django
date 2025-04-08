@@ -1521,6 +1521,25 @@ class CreatePermissionsTests(TestCase):
             ).exists()
         )
 
+    def test_permission_name_changes_with_verbose_name(self):
+        """
+        #26756 -Simulate a case where verbose name changes for some model
+        and check if the changes reflected in permissions table.
+        """
+
+        old_perm = Permission.objects.get(
+            codename="add_permission")
+
+        self.assertEqual(old_perm.name, "Can add permission")
+
+        Permission._meta.verbose_name_raw = "p"
+        create_permissions(self.app_config, verbosity=0)
+
+        new_perm = Permission.objects.get(
+            codename="add_permission")
+
+        self.assertEqual(new_perm.name, "Can add p")
+
 
 class DefaultDBRouter:
     """Route all writes to default."""
