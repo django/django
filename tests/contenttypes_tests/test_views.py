@@ -21,6 +21,7 @@ from .models import (
 from .models import Site as MockSite
 from .models import UUIDModel
 
+
 @override_settings(ROOT_URLCONF="contenttypes_tests.urls")
 class ContentTypesViewsTests(TestCase):
     @classmethod
