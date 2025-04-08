@@ -742,7 +742,7 @@ class ASGITest(SimpleTestCase):
             chunks,
             expected,
             expected_exception,
-            override_settings,
+            settings_override,
             check_rolled,
         ) in test_case:
 
@@ -753,8 +753,8 @@ class ASGITest(SimpleTestCase):
 
             with self.subTest(name=name):
                 context = (
-                    self.settings(**override_settings)
-                    if override_settings
+                    self.settings(**settings_override)
+                    if settings_override
                     else nullcontext()
                 )
 
