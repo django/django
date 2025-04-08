@@ -147,16 +147,29 @@ class TestUtilsHtml(SimpleTestCase):
             ("><!" + ("&" * 16000) + "D", "><!" + ("&" * 16000) + "D"),
             ("X<<<<br>br>br>br>X", "XX"),
             ("<" * 50 + "a>" * 50, ""),
+            (">" + "<a" * 500 + "a", ">" + "<a" * 500 + "a"),
+            ("<a" * 49 + "a" * 951, "<a" * 49 + "a" * 951),
+            ("<" + "a" * 1_002, "<" + "a" * 1_002),
         )
         for value, output in items:
             with self.subTest(value=value, output=output):
                 self.check_output(strip_tags, value, output)
                 self.check_output(strip_tags, lazystr(value), output)
 
-    def test_strip_tags_suspicious_operation(self):
+    def test_strip_tags_suspicious_operation_max_depth(self):
         value = "<" * 51 + "a>" * 51, "<a>"
         with self.assertRaises(SuspiciousOperation):
             strip_tags(value)
+
+    def test_strip_tags_suspicious_operation_large_open_tags(self):
+        items = [
+            ">" + "<a" * 501,
+            "<a" * 50 + "a" * 950,
+        ]
+        for value in items:
+            with self.subTest(value=value):
+                with self.assertRaises(SuspiciousOperation):
+                    strip_tags(value)
 
     def test_strip_tags_files(self):
         # Test with more lengthy content (also catching performance regressions)
