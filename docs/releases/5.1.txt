@@ -104,14 +104,6 @@ to your :setting:`MIDDLEWARE` setting.
 Minor features
 --------------
 
-Template System
----------------
-
-* Added ``raise_on_missing_variable`` option to the template engine that
-  raises ``django.template.VariableDoesNotExist`` exceptions when template
-  variables cannot be resolved. This helps catch template variable errors
-  during development and testing (:ticket:`28618`).
-
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
