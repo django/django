@@ -1002,21 +1002,43 @@ class Options:
             seen |= set(klass.__dict__)
         return frozenset(names)
 
-    @cached_property
-    def _non_pk_concrete_field_names(self):
+    def _get_field_names(self, fields, exclude_pk=False):
         """
-        Return a set of the non-pk concrete field names defined on the model.
+        Helper method to get field names and their attnames from a field list.
+        If exclude_pk is True, excludes fields that are primary keys.
         """
         names = []
-        all_pk_fields = set(self.pk_fields)
-        for parent in self.all_parents:
-            all_pk_fields.update(parent._meta.pk_fields)
-        for field in self.concrete_fields:
+        all_pk_fields = set(self.pk_fields) if exclude_pk else set()
+        if exclude_pk:
+            for parent in self.all_parents:
+                all_pk_fields.update(parent._meta.pk_fields)
+        for field in fields:
             if field not in all_pk_fields:
                 names.append(field.name)
                 if field.name != field.attname:
                     names.append(field.attname)
         return frozenset(names)
+
+    @cached_property
+    def _non_pk_concrete_field_names(self):
+        """
+        Return a set of the non-pk concrete field names defined on the model.
+        """
+        return self._get_field_names(self.concrete_fields, exclude_pk=True)
+
+    @cached_property
+    def _local_concrete_field_names(self):
+        """
+        Return a set of the local concrete field names defined on the model.
+        """
+        return self._get_field_names(self.local_concrete_fields)
+
+    @cached_property
+    def _field_names(self):
+        """
+        Return a set of all field names defined on the model.
+        """
+        return self._get_field_names(self.fields)
 
     @cached_property
     def _reverse_one_to_one_field_names(self):

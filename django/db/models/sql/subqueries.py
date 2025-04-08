@@ -99,6 +99,19 @@ class UpdateQuery(Query):
                     "Cannot update model field %r (only non-relations and "
                     "foreign keys permitted)." % field
                 )
+            for field_name, *lookups in model._get_expr_references(val):
+                if (
+                    field_name not in self.annotations
+                    and field_name not in model._meta._local_concrete_field_names
+                ):
+                    if (
+                        model is not self.get_meta().model
+                        and field_name in self.get_meta()._field_names
+                    ):
+                        raise FieldError(
+                            "Cannot reference child model field %r when updating "
+                            "parent field %r." % (field_name, field)
+                        )
             if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)
                 continue
