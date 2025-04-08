@@ -3,6 +3,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from contextlib import nullcontext # Used in test_read_body_comprehensive_cases (ticket #36281)
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
@@ -675,6 +676,8 @@ class ASGITest(SimpleTestCase):
                 ],
                 b"data Async test!",
                 None,
+                None,  # no settings override
+                False, # not testing rollover
             ),
             (
                 "single chunk",
@@ -683,6 +686,8 @@ class ASGITest(SimpleTestCase):
                 ],
                 b"OneShot",
                 None,
+                None,
+                False,
             ),
             (
                 "empty middle chunk",
@@ -693,6 +698,8 @@ class ASGITest(SimpleTestCase):
                 ],
                 b"StartEnd",
                 None,
+                None,
+                False,
             ),
             (
                 "empty body test",
@@ -701,6 +708,8 @@ class ASGITest(SimpleTestCase):
                 ],
                 b"",
                 None,
+                None,
+                False,
             ),
             (
                 "disconnect mid-body",
@@ -710,26 +719,47 @@ class ASGITest(SimpleTestCase):
                 ],
                 None,
                 RequestAborted,
+                None,
+                False,
+            ),
+            (
+                "rollover to disk",
+                [
+                    {"type": "http.request", "body": b"A" * 8, "more_body": True},
+                    {"type": "http.request", "body": b"B" * 8, "more_body": False},
+                ],
+                b"A" * 8 + b"B" * 8,
+                None,
+                {"FILE_UPLOAD_MAX_MEMORY_SIZE": 10},  # force rollover
+                True,  # assert _rolled
             ),
         ]
 
         # Testing code
-        for name, chunk, expected, expected_exception in test_case:
+        for name, chunks, expected, expected_exception, override_settings, check_rolled in test_case:
 
             async def fake_receive():
-                if chunk:
-                    return chunk.pop(0)
+                if chunks:
+                    return chunks.pop(0)
                 return {"type": "http.request", "body": b"", "more_body": False}
 
             with self.subTest(name=name):
-                if expected_exception:
-                    with self.assertRaises(expected_exception):
-                        await handler.read_body(fake_receive)
-                else:
-                    body_file = await handler.read_body(fake_receive)
-                    try:
-                        body_file.seek(0)
-                        result = body_file.read()
-                        self.assertEqual(result, expected)
-                    finally:
-                        body_file.close()
+                context = self.settings(**override_settings) if override_settings else nullcontext()
+
+                with context:
+                    if expected_exception:
+                        with self.assertRaises(expected_exception):
+                            await handler.read_body(fake_receive)
+                    else:
+                        body_file = await handler.read_body(fake_receive)
+                        try:
+                            if check_rolled:
+                                self.assertTrue(
+                                    getattr(body_file, "_rolled", False),
+                                    "Expected the file to roll over to disk."
+                                )
+                            body_file.seek(0)
+                            result = body_file.read()
+                            self.assertEqual(result, expected)
+                        finally:
+                            body_file.close()

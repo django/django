@@ -256,9 +256,6 @@ class ASGIHandler(base.BaseHandler):
             max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode="w+b"
         )
 
-        # async_safe version
-        async_write = sync_to_async(body_file.write, thread_sensitive=False)
-
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
@@ -267,7 +264,16 @@ class ASGIHandler(base.BaseHandler):
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
             if "body" in message:
-                await async_write(message["body"])
+                body = message["body"]
+
+                # check if the file has rolled over to disk
+                if getattr(body_file, "_rolled", False):
+                    # if _rolled Use async-safe write
+                    await sync_to_async(body_file.write, thread_sensitive=False)(body)
+                else:
+                    # still in memory : safe to write synchronously
+                    body_file.write(body)
+                    
             # Quit out if that's the end.
             if not message.get("more_body", False):
                 break
