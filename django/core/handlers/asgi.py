@@ -255,6 +255,10 @@ class ASGIHandler(base.BaseHandler):
         body_file = tempfile.SpooledTemporaryFile(
             max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode="w+b"
         )
+
+        # async_safe version
+        async_write = sync_to_async(body_file.write, thread_sensitive=False)
+
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
@@ -263,7 +267,7 @@ class ASGIHandler(base.BaseHandler):
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
             if "body" in message:
-                body_file.write(message["body"])
+                await async_write(message["body"])
             # Quit out if that's the end.
             if not message.get("more_body", False):
                 break
