@@ -19,7 +19,9 @@ from .models import (
     SchemeIncludedURL,
 )
 from .models import Site as MockSite
-from .models import UUIDModel
+from .models import (
+    UUIDModel,
+)
 
 
 @override_settings(ROOT_URLCONF="contenttypes_tests.urls")

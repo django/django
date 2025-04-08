@@ -8,12 +8,11 @@ from tkinter import NO
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
 
-
+from django.contrib.gis.db.backends.postgis.pgraster import chunk
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
-from django.core.exceptions import RequestDataTooBig
+from django.core.exceptions import RequestAborted, RequestDataTooBig
 from django.core.handlers.asgi import ASGIHandler, ASGIRequest
-from django.core.exceptions import RequestAborted
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections
 from django.http import HttpResponse, StreamingHttpResponse
@@ -28,8 +27,6 @@ from django.test.utils import captured_stderr
 from django.urls import path
 from django.utils.http import http_date
 from django.views.decorators.csrf import csrf_exempt
-
-from django.contrib.gis.db.backends.postgis.pgraster import chunk
 
 from .urls import sync_waiter, test_filename
 
@@ -720,6 +717,7 @@ class ASGITest(SimpleTestCase):
 
         # Testing code
         for name, chunk, expected, expected_exception in test_case:
+
             async def fake_receive():
                 if chunk:
                     return chunk.pop(0)
