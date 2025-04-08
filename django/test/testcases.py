@@ -353,8 +353,6 @@ class SimpleTestCase(unittest.TestCase):
             testMethod, "__unittest_skip__", False
         )
 
-        async_connections._from_testcase = True
-
         # Convert async test methods.
         if iscoroutinefunction(testMethod):
             setattr(self, self._testMethodName, async_to_sync(testMethod))
@@ -1423,6 +1421,7 @@ class TestCase(TransactionTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        async_connections._from_testcase = True
         if not (
             cls._databases_support_transactions()
             and cls._databases_support_savepoints()
