@@ -2,10 +2,10 @@ import asyncio
 import sys
 import threading
 import time
-from pathlib import Path
 from contextlib import (
     nullcontext,  # Used in test_read_body_comprehensive_cases (ticket #36281)
 )
+from pathlib import Path
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
@@ -679,7 +679,7 @@ class ASGITest(SimpleTestCase):
                 b"data Async test!",
                 None,
                 None,  # no settings override
-                False, # not testing rollover
+                False,  # not testing rollover
             ),
             (
                 "single chunk",
@@ -737,8 +737,14 @@ class ASGITest(SimpleTestCase):
             ),
         ]
 
-        # Testing code
-        for name, chunks, expected, expected_exception, override_settings, check_rolled in test_case:
+        for (
+            name,
+            chunks,
+            expected,
+            expected_exception,
+            override_settings,
+            check_rolled,
+        ) in test_case:
 
             async def fake_receive():
                 if chunks:
@@ -746,7 +752,11 @@ class ASGITest(SimpleTestCase):
                 return {"type": "http.request", "body": b"", "more_body": False}
 
             with self.subTest(name=name):
-                context = self.settings(**override_settings) if override_settings else nullcontext()
+                context = (
+                    self.settings(**override_settings)
+                    if override_settings
+                    else nullcontext()
+                )
 
                 with context:
                     if expected_exception:
@@ -758,7 +768,7 @@ class ASGITest(SimpleTestCase):
                             if check_rolled:
                                 self.assertTrue(
                                     getattr(body_file, "_rolled", False),
-                                    "Expected the file to roll over to disk."
+                                    "Expected the file to roll over to disk.",
                                 )
                             body_file.seek(0)
                             result = body_file.read()
