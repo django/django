@@ -87,7 +87,7 @@ def create_permissions(
         .filter(
             content_type__in=set(ctypes.values()),
         )
-        .values_list("content_type", "codename")
+        .values_list("content_type", "codename", "name")
     )
 
     perms = []
@@ -102,7 +102,13 @@ def create_permissions(
                 permission.content_type = ctype
                 perms.append(permission)
 
-    Permission.objects.using(using).bulk_create(perms)
+    Permission.objects.using(using).bulk_create(
+        perms,
+        update_conflicts=True,
+        update_fields=["name"],
+        unique_fields=["content_type", "codename"],
+    )
+
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
