@@ -87,24 +87,36 @@ def create_permissions(
         .filter(
             content_type__in=set(ctypes.values()),
         )
-        .values_list("content_type", "codename")
+        .values_list("content_type", "codename", "name")
     )
 
     perms = []
     for model in models:
         ctype = ctypes[model]
         for codename, name in _get_all_permissions(model._meta):
+            permission = Permission()
+            permission._state.db = using
+            permission.codename = codename
+            permission.name = name
+            permission.content_type = ctype
+
             if (ctype.pk, codename) not in all_perms:
-                permission = Permission()
-                permission._state.db = using
-                permission.codename = codename
-                permission.name = name
-                permission.content_type = ctype
                 perms.append(permission)
 
-    Permission.objects.using(using).bulk_create(perms)
+    # when mariadb and mysql will support update_conflicts can get rid of manual update
+    Permission.objects.using(using).bulk_create(
+        perms,
+        update_conflicts=True,
+        update_fields=("name",),
+        unique_fields=(
+            "content_type",
+            "codename",
+        ),
+    )
+
+    all_perms = perms
     if verbosity >= 2:
-        for perm in perms:
+        for perm in all_perms:
             print("Adding permission '%s'" % perm)
 
 
