@@ -1077,14 +1077,7 @@ class Model(AltersData, metaclass=ModelBase):
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
         if pk_set and not force_insert:
             base_qs = cls._base_manager.using(using)
-            values = [
-                (
-                    f,
-                    None,
-                    (getattr(self, f.attname) if raw else f.pre_save(self, False)),
-                )
-                for f in non_pks_non_generated
-            ]
+            values = self._get_update_values(meta, non_pks_non_generated, raw)
             forced_update = update_fields or force_update
             pk_val = self._get_pk_val(meta)
             updated = self._do_update(
@@ -1168,6 +1161,26 @@ class Model(AltersData, metaclass=ModelBase):
             using=using,
             raw=raw,
         )
+
+    def _get_update_values(self, meta, fields, raw=False):
+        """
+        Collect the update values of 'fields' and return list of triples of
+        (field, model, value).
+        """
+        values = []
+        for f in fields:
+            value = getattr(self, f.attname) if raw else f.pre_save(self, False)
+            for field_name, *lookups in self._get_expr_references(value):
+                if (
+                    field_name not in meta._local_concrete_field_names
+                    and field_name in self._meta._field_names
+                ):
+                    raise FieldError(
+                        "Cannot reference child model field %r when saving "
+                        "parent field %r." % (field_name, f)
+                    )
+            values.append((f, None, value))
+        return values
 
     def _prepare_related_fields_for_save(self, operation_name, fields=None):
         # Ensure that a model instance without a PK hasn't been assigned to

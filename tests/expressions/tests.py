@@ -467,6 +467,17 @@ class BasicExpressionsTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             RemoteEmployee.objects.update(salary=F("adjusted_salary") / 5)
 
+    def test_save_inherited_field_from_child_field_value(self):
+        update_field = RemoteEmployee._meta.get_field("salary")
+        msg = (
+            "Cannot reference child model field 'adjusted_salary' "
+            "when saving parent field %r."
+        ) % (update_field)
+        employee = RemoteEmployee.objects.create(salary=1000, adjusted_salary=0)
+        employee.salary = F("adjusted_salary") / 5
+        with self.assertRaisesMessage(FieldError, msg):
+            employee.save()
+
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
         # not yet exist in the database
