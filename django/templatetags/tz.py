@@ -1,5 +1,5 @@
 import zoneinfo
-from datetime import datetime, tzinfo, UTC
+from datetime import UTC, datetime, tzinfo
 
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils import timezone
