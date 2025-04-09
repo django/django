@@ -210,7 +210,7 @@ associated with proxy models.
 New ``view`` variable in class-based views context
 --------------------------------------------------
 
-In all :doc:`generic class-based views </topics/class-based-views/index>`
+In all generic :ref:`class-based-views-explanation`
 (or any class-based view inheriting from ``ContextMixin``), the context dictionary
 contains a ``view`` variable that points to the ``View`` instance.
 
