@@ -322,8 +322,25 @@ class ASGIHandler(base.BaseHandler):
                 "headers": response_headers,
             }
         )
+        # Streaming responses with TaskGroup/Timeout need to be pinned to their
+        # iterator.
+        if response.streaming_acmgr:
+            async with response.streaming_acmgr_content as content:
+                async for part in content:
+                    for chunk, _ in self.chunk_bytes(part):
+                        await send(
+                            {
+                                "type": "http.response.body",
+                                "body": chunk,
+                                # Ignore "more" as there may be more parts; instead,
+                                # use an empty final closing message with False.
+                                "more_body": True,
+                            }
+                        )
+            # Final closing message.
+            await send({"type": "http.response.body"})
         # Streaming responses need to be pinned to their iterator.
-        if response.streaming:
+        elif response.streaming:
             # - Consume via `__aiter__` and not `streaming_content` directly, to
             #   allow mapping of a sync iterator.
             # - Use aclosing() when consuming aiter. See
@@ -342,6 +359,7 @@ class ASGIHandler(base.BaseHandler):
                         )
             # Final closing message.
             await send({"type": "http.response.body"})
+
         # Other responses just need chunking.
         else:
             # Yield chunks of response.
