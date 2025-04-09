@@ -187,17 +187,12 @@ class ASGIHandler(base.BaseHandler):
                 pass
 
             response = None
-
-            async def process_request(request, send):
-                nonlocal response
-                response = await self.run_get_response(request)
-                await self.send_response(response, send)
-                raise _Done
-
             try:
                 async with asyncio.TaskGroup() as tg:
                     tg.create_task(self.listen_for_disconnect(receive))
-                    tg.create_task(process_request(request, send))
+                    response = await self.run_get_response(request)
+                    await self.send_response(response, send)
+                    raise RequestProcessed
             except* (RequestProcessed, RequestAborted):
                 pass
 
