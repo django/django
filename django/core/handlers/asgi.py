@@ -188,13 +188,18 @@ class ASGIHandler(base.BaseHandler):
 
             response = None
             try:
-                async with asyncio.TaskGroup() as tg:
-                    tg.create_task(self.listen_for_disconnect(receive))
-                    response = await self.run_get_response(request)
-                    await self.send_response(response, send)
-                    raise RequestProcessed
-            except* (RequestProcessed, RequestAborted):
-                pass
+                try:
+                    async with asyncio.TaskGroup() as tg:
+                        tg.create_task(self.listen_for_disconnect(receive))
+                        response = await self.run_get_response(request)
+                        await self.send_response(response, send)
+                        raise RequestProcessed
+                except* (RequestProcessed, RequestAborted):
+                    pass
+            except BaseExceptionGroup as exception_group:
+                if len(exception_group.exceptions) == 1:
+                    raise exception_group.exceptions[0]
+                raise
 
             if response is None:
                 await signals.request_finished.asend(sender=self.__class__)
