@@ -387,8 +387,8 @@ suitable for use in the :ttag:`{% for %}<for>` tag.
 
 See the :doc:`template guide </topics/templates>` for more about templates.
 
-Removing hardcoded URLs in templates
-====================================
+Removing hard-coded URLs in templates
+=====================================
 
 Remember, when we wrote the link to a question in the ``polls/index.html``
 template, the link was partially hard-coded like this:

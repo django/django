@@ -753,7 +753,7 @@ Useful attributes on ``{{ field }}`` include:
     The ID that will be used for this field (``id_email`` in the example
     above). If you are constructing the label manually, you may want to use
     this in lieu of ``label_tag``. It's also useful, for example, if you have
-    some inline JavaScript and want to avoid hardcoding the field's ID.
+    some inline JavaScript and want to avoid hard-coding the field's ID.
 
 ``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and

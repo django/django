@@ -56,7 +56,7 @@ Make sure that the key used in production isn't used anywhere else and avoid
 committing it to source control. This reduces the number of vectors from which
 an attacker may acquire the key.
 
-Instead of hardcoding the secret key in your settings module, consider loading
+Instead of hard-coding the secret key in your settings module, consider loading
 it from an environment variable::
 
     import os
