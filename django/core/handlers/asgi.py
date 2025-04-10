@@ -255,7 +255,6 @@ class ASGIHandler(base.BaseHandler):
         body_file = tempfile.SpooledTemporaryFile(
             max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode="w+b"
         )
-
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
@@ -266,13 +265,19 @@ class ASGIHandler(base.BaseHandler):
             if "body" in message:
                 body = message["body"]
 
-                # Check if the file has rolled over to disk
-                if getattr(body_file, "_rolled", False):
-                    # Use async-safe write
-                    await sync_to_async(body_file.write, thread_sensitive=False)(body)
+                # Perform IO in another thread if the temp file has rolled over
+                # to disk.
+                on_disk = getattr(body_file, "_rolled", False)
+                if on_disk:
+                    async_write = sync_to_async(
+                        body_file.write, 
+                        thread_sensitive=False,
+                    )
+                    # Use async_write
+                    await async_write(message["body"])
                 else:
                     # Still in memory: safe to write synchronously.
-                    body_file.write(body)
+                    body_file.write(message["body"])
 
             # Quit out if that's the end.
             if not message.get("more_body", False):
