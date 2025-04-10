@@ -86,7 +86,8 @@ UNKNOWN_SOURCE = "<unknown source>"
 # Match BLOCK_TAG_*, VARIABLE_TAG_*, and COMMENT_TAG_* tags and capture the
 # entire tag, including start/end delimiters. Using re.compile() is faster
 # than instantiating SimpleLazyObject with _lazy_re_compile().
-tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
+tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})", re.DOTALL)
+tag_re_legacy = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
 logger = logging.getLogger("django.template")
 
@@ -180,9 +181,9 @@ class Template:
         template source.
         """
         if self.engine.debug:
-            lexer = DebugLexer(self.source)
+            lexer = DebugLexer(self.source, multiline=self.engine.multiline)
         else:
-            lexer = Lexer(self.source)
+            lexer = Lexer(self.source, multiline=self.engine.multiline)
 
         tokens = lexer.tokenize()
         parser = Parser(
@@ -338,9 +339,11 @@ class Token:
 
 
 class Lexer:
-    def __init__(self, template_string):
+    def __init__(self, template_string, multiline=False):
         self.template_string = template_string
         self.verbatim = False
+        self.multiline = multiline
+        self.tag_re = tag_re if multiline else tag_re_legacy
 
     def __repr__(self):
         return '<%s template_string="%s...", verbatim=%s>' % (
@@ -356,7 +359,7 @@ class Lexer:
         in_tag = False
         lineno = 1
         result = []
-        for token_string in tag_re.split(self.template_string):
+        for token_string in self.tag_re.split(self.template_string):
             if token_string:
                 result.append(self.create_token(token_string, None, lineno, in_tag))
                 lineno += token_string.count("\n")
@@ -401,7 +404,7 @@ class Lexer:
 class DebugLexer(Lexer):
     def _tag_re_split_positions(self):
         last = 0
-        for match in tag_re.finditer(self.template_string):
+        for match in self.tag_re.finditer(self.template_string):
             start, end = match.span()
             yield last, start
             yield start, end
