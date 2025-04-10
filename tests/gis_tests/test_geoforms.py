@@ -154,7 +154,7 @@ class GeometryFieldTest(SimpleTestCase):
             }
         )
 
-        with self.assertLogs("django.contrib.gis", "ERROR") as logger_calls:
+        with self.assertLogs("django.contrib.gis", "WARNING") as logger_calls:
             output = str(form)
 
         # The first point can't use assertInHTML() due to non-deterministic

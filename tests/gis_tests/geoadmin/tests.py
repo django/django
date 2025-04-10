@@ -12,7 +12,7 @@ class GeoAdminTest(SimpleTestCase):
         geoadmin = self.admin_site.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)({"point": ""})
         with self.assertRaisesMessage(AssertionError, "no logs"):
-            with self.assertLogs("django.contrib.gis", "ERROR"):
+            with self.assertLogs("django.contrib.gis", "WARNING"):
                 output = str(form["point"])
         self.assertInHTML(
             '<textarea id="id_point" class="vSerializedField required" cols="150"'
@@ -23,7 +23,7 @@ class GeoAdminTest(SimpleTestCase):
     def test_widget_invalid_string(self):
         geoadmin = self.admin_site.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)({"point": "INVALID()"})
-        with self.assertLogs("django.contrib.gis", "ERROR") as cm:
+        with self.assertLogs("django.contrib.gis", "WARNING") as cm:
             output = str(form["point"])
         self.assertInHTML(
             '<textarea id="id_point" class="vSerializedField required" cols="150"'
