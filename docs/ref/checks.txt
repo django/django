@@ -56,15 +56,15 @@ API reference
         errors and so). The number can be allocated by the application, but should
         be unique within that application.
 
-    There are subclasses to make creating messages with common levels easier. When
-    using them you can omit the ``level`` argument because it is implied by the
-    class name.
+There are subclasses to make creating messages with common levels easier. When
+using them you can omit the ``level`` argument because it is implied by the
+class name.
 
-    .. class:: Debug(msg, hint=None, obj=None, id=None)
-    .. class:: Info(msg, hint=None, obj=None, id=None)
-    .. class:: Warning(msg, hint=None, obj=None, id=None)
-    .. class:: Error(msg, hint=None, obj=None, id=None)
-    .. class:: Critical(msg, hint=None, obj=None, id=None)
+.. class:: Debug(msg, hint=None, obj=None, id=None)
+.. class:: Info(msg, hint=None, obj=None, id=None)
+.. class:: Warning(msg, hint=None, obj=None, id=None)
+.. class:: Error(msg, hint=None, obj=None, id=None)
+.. class:: Critical(msg, hint=None, obj=None, id=None)
 
 .. _system-check-builtin-tags:
 
