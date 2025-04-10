@@ -668,7 +668,7 @@ processors::
 In addition to these, :class:`RequestContext` always enables
 ``'django.template.context_processors.csrf'``.  This is a security related
 context processor required by the admin and other contrib apps, and, in case
-of accidental misconfiguration, it is deliberately hardcoded in and cannot be
+of accidental misconfiguration, it is deliberately hard-coded in and cannot be
 turned off in the ``context_processors`` option.
 
 Each processor is applied in order. That means, if one processor adds a

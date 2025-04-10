@@ -154,7 +154,7 @@ You can use the :func:`redirect` function in a number of ways.
             ...
             return redirect("some-view-name", foo="bar")
 
-#. By passing a hardcoded URL to redirect to:
+#. By passing a hard-coded URL to redirect to:
    ::
 
         def my_view(request):

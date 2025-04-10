@@ -876,7 +876,7 @@ Versions affected
 November 1, 2016 - :cve:`2016-9013`
 -----------------------------------
 
-User with hardcoded password created when running tests on Oracle. `Full
+User with hard-coded password created when running tests on Oracle. `Full
 description <https://www.djangoproject.com/weblog/2016/nov/01/security-releases/>`__
 
 Versions affected
