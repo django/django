@@ -189,7 +189,6 @@ class GeographyFunctionTests(FuncTestMixin, TestCase):
     @skipUnlessDBFeature("has_Area_function")
     @skipIfDBFeature("supports_area_geodetic")
     def test_geodetic_area_raises_if_not_supported(self):
-        with self.assertRaisesMessage(
-            NotSupportedError, "Area on geodetic coordinate systems not supported."
-        ):
+        msg = "Area on geodetic coordinate systems not supported."
+        with self.assertRaisesMessage(NotSupportedError, msg):
             Zipcode.objects.annotate(area=Area("poly")).get(code="77002")

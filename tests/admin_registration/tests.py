@@ -154,9 +154,8 @@ class TestRegistrationDecorator(SimpleTestCase):
         self.default_site.unregister(Place)
 
     def test_wrapped_class_not_a_model_admin(self):
-        with self.assertRaisesMessage(
-            ValueError, "Wrapped class must subclass ModelAdmin."
-        ):
+        msg = "Wrapped class must subclass ModelAdmin."
+        with self.assertRaisesMessage(ValueError, msg):
             register(Person)(CustomSite)
 
     def test_custom_site_not_an_admin_site(self):
@@ -164,7 +163,6 @@ class TestRegistrationDecorator(SimpleTestCase):
             register(Person, site=Traveler)(NameAdmin)
 
     def test_empty_models_list_registration_fails(self):
-        with self.assertRaisesMessage(
-            ValueError, "At least one model must be passed to register."
-        ):
+        msg = "At least one model must be passed to register."
+        with self.assertRaisesMessage(ValueError, msg):
             register()(NameAdmin)

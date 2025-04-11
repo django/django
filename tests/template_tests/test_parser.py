@@ -80,18 +80,14 @@ class ParserTests(SimpleTestCase):
             ("test|<>|upper", "test||<>||upper"),
         ]:
             with self.subTest(filter_expression=filter_expression):
-                with self.assertRaisesMessage(
-                    TemplateSyntaxError,
-                    f"Could not parse some characters: {characters}",
-                ):
+                msg = f"Could not parse some characters: {characters}"
+                with self.assertRaisesMessage(TemplateSyntaxError, msg):
                     FilterExpression(filter_expression, p)
 
     def test_cannot_find_variable(self):
         p = Parser("", builtins=[filter_library])
-        with self.assertRaisesMessage(
-            TemplateSyntaxError,
-            'Could not find variable at start of |default:"Default"',
-        ):
+        msg = 'Could not find variable at start of |default:"Default"'
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             FilterExpression('|default:"Default"', p)
 
     def test_variable_parsing(self):
@@ -121,9 +117,8 @@ class ParserTests(SimpleTestCase):
                 Variable(name)
 
         # Variables should raise on non string type
-        with self.assertRaisesMessage(
-            TypeError, "Variable must be a string or number, got <class 'dict'>"
-        ):
+        msg = "Variable must be a string or number, got <class 'dict'>"
+        with self.assertRaisesMessage(TypeError, msg):
             Variable({})
 
     def test_filter_args_count(self):

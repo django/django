@@ -86,10 +86,9 @@ class CompositePKTests(TestCase):
             False,
         ]
 
+        msg = "'pk' must be a list or a tuple."
         for pk in test_cases:
-            with self.assertRaisesMessage(
-                ValueError, "'pk' must be a list or a tuple."
-            ):
+            with self.assertRaisesMessage(ValueError, msg):
                 user.pk = pk
 
     def test_pk_must_have_2_elements(self):
@@ -177,9 +176,8 @@ class CompositePKTests(TestCase):
         form = modelform_factory(Comment, fields="__all__")
         self.assertEqual(list(form().fields), fields)
 
-        with self.assertRaisesMessage(
-            FieldError, "Unknown field(s) (pk) specified for Comment"
-        ):
+        msg = "Unknown field(s) (pk) specified for Comment"
+        with self.assertRaisesMessage(FieldError, msg):
             self.assertIsNone(modelform_factory(Comment, fields=["pk"]))
 
 

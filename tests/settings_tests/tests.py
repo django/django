@@ -216,9 +216,8 @@ class SettingsTests(SimpleTestCase):
         self.assertIsInstance(decorated, type)
         self.assertTrue(issubclass(decorated, SimpleTestCase))
 
-        with self.assertRaisesMessage(
-            Exception, "Only subclasses of Django SimpleTestCase"
-        ):
+        msg = "Only subclasses of Django SimpleTestCase"
+        with self.assertRaisesMessage(Exception, msg):
             decorated = override_settings(TEST="override")(UnittestTestCaseSubclass)
 
     def test_signal_callback_context_manager(self):

@@ -155,10 +155,10 @@ class SpatialRefSysTest(TestCase):
                 self.wkt = wkt
                 self.proj4text = proj4text
 
-        with self.assertRaisesMessage(
-            Exception,
+        msg = (
             "Could not get OSR SpatialReference.\n"
             "Error for WKT 'INVALID_WKT': Corrupt data.\n"
-            "Error for PROJ.4 '+proj=invalid': Corrupt data.",
-        ):
+            "Error for PROJ.4 '+proj=invalid': Corrupt data."
+        )
+        with self.assertRaisesMessage(Exception, msg):
             MockSpatialRefSys(wkt="INVALID_WKT", proj4text="+proj=invalid").srs

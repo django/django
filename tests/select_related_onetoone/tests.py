@@ -279,21 +279,18 @@ class ReverseSelectRelatedValidationTests(SimpleTestCase):
     def test_reverse_related_validation(self):
         fields = "userprofile, userstat"
 
-        with self.assertRaisesMessage(
-            FieldError, self.invalid_error % ("foobar", fields)
-        ):
+        msg = self.invalid_error % ("foobar", fields)
+        with self.assertRaisesMessage(FieldError, msg):
             list(User.objects.select_related("foobar"))
 
-        with self.assertRaisesMessage(
-            FieldError, self.non_relational_error % ("username", fields)
-        ):
+        msg = self.non_relational_error % ("username", fields)
+        with self.assertRaisesMessage(FieldError, msg):
             list(User.objects.select_related("username"))
 
     def test_reverse_related_validation_with_filtered_relation(self):
         fields = "userprofile, userstat, relation"
-        with self.assertRaisesMessage(
-            FieldError, self.invalid_error % ("foobar", fields)
-        ):
+        msg = self.invalid_error % ("foobar", fields)
+        with self.assertRaisesMessage(FieldError, msg):
             list(
                 User.objects.annotate(
                     relation=FilteredRelation("userprofile")

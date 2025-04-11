@@ -270,9 +270,8 @@ class QueryDictTests(SimpleTestCase):
     def test_fromkeys_is_immutable_by_default(self):
         # Match behavior of __init__() which is also immutable by default.
         q = QueryDict.fromkeys(["key1", "key2", "key3"])
-        with self.assertRaisesMessage(
-            AttributeError, "This QueryDict instance is immutable"
-        ):
+        msg = "This QueryDict instance is immutable"
+        with self.assertRaisesMessage(AttributeError, msg):
             q["key4"] = "nope"
 
     def test_fromkeys_mutable_override(self):
@@ -601,9 +600,8 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         should work (in the debug view, for example).
         """
         response = HttpResponseRedirect.__new__(HttpResponseRedirect)
-        with self.assertRaisesMessage(
-            DisallowedRedirect, "Unsafe redirect to URL with protocol 'ssh'"
-        ):
+        msg = "Unsafe redirect to URL with protocol 'ssh'"
+        with self.assertRaisesMessage(DisallowedRedirect, msg):
             HttpResponseRedirect.__init__(response, "ssh://foo")
         expected = (
             '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", '
@@ -654,11 +652,11 @@ class JsonResponseTests(SimpleTestCase):
         self.assertEqual(json.loads(response.text), data)
 
     def test_json_response_raises_type_error_with_default_setting(self):
-        with self.assertRaisesMessage(
-            TypeError,
+        msg = (
             "In order to allow non-dict objects to be serialized set the "
-            "safe parameter to False",
-        ):
+            "safe parameter to False"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
             JsonResponse([1, 2, 3])
 
     def test_json_response_text(self):

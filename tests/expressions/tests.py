@@ -1010,15 +1010,13 @@ class BasicExpressionsTests(TestCase):
         self.assertEqual(pickle.loads(pickle.dumps(expr)), expr)
 
     def test_incorrect_field_in_F_expression(self):
-        with self.assertRaisesMessage(
-            FieldError, "Cannot resolve keyword 'nope' into field."
-        ):
+        msg = "Cannot resolve keyword 'nope' into field."
+        with self.assertRaisesMessage(FieldError, msg):
             list(Employee.objects.filter(firstname=F("nope")))
 
     def test_incorrect_joined_field_in_F_expression(self):
-        with self.assertRaisesMessage(
-            FieldError, "Cannot resolve keyword 'nope' into field."
-        ):
+        msg = "Cannot resolve keyword 'nope' into field."
+        with self.assertRaisesMessage(FieldError, msg):
             list(Company.objects.filter(ceo__pk=F("point_of_contact__nope")))
 
     def test_exists_in_filter(self):

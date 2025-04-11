@@ -78,9 +78,8 @@ class OperationTests(OperationTestBase):
         self.assertNotIn("managers", definition[2])
 
     def test_create_model_with_duplicate_field_name(self):
-        with self.assertRaisesMessage(
-            ValueError, "Found duplicate value pink in CreateModel fields argument."
-        ):
+        msg = "Found duplicate value pink in CreateModel fields argument."
+        with self.assertRaisesMessage(ValueError, msg):
             migrations.CreateModel(
                 "Pony",
                 [
@@ -169,10 +168,8 @@ class OperationTests(OperationTestBase):
             )
 
     def test_create_model_with_duplicate_manager_name(self):
-        with self.assertRaisesMessage(
-            ValueError,
-            "Found duplicate value objects in CreateModel managers argument.",
-        ):
+        msg = "Found duplicate value objects in CreateModel managers argument."
+        with self.assertRaisesMessage(ValueError, msg):
             migrations.CreateModel(
                 "Pony",
                 fields=[],
@@ -3510,9 +3507,8 @@ class OperationTests(OperationTestBase):
     def test_rename_missing_field(self):
         state = ProjectState()
         state.add_model(ModelState("app", "model", []))
-        with self.assertRaisesMessage(
-            FieldDoesNotExist, "app.model has no field named 'field'"
-        ):
+        msg = "app.model has no field named 'field'"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
             migrations.RenameField("model", "field", "new_field").state_forwards(
                 "app", state
             )
@@ -5682,9 +5678,8 @@ class OperationTests(OperationTestBase):
             project_state.apps.get_model("test_runpython", "Pony").objects.count(), 0
         )
         # Now test we can't use a string
-        with self.assertRaisesMessage(
-            ValueError, "RunPython must be supplied with a callable"
-        ):
+        msg = "RunPython must be supplied with a callable"
+        with self.assertRaisesMessage(ValueError, msg):
             migrations.RunPython("print 'ahahaha'")
         # And deconstruction
         definition = operation.deconstruct()
