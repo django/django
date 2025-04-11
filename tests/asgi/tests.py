@@ -659,3 +659,38 @@ class ASGITest(SimpleTestCase):
         # 'last\n' isn't sent.
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output(timeout=0.2)
+
+    async def test_streaming_acmgr(self):
+        scope = self.async_request_factory._base_scope(
+            path="/streaming_acmgr/", query_string=b"sleep=0.001"
+        )
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        # Fetch http.response.start.
+        await communicator.receive_output(timeout=1)
+        # Fetch the 'first' and 'last'.
+        first_response = await communicator.receive_output(timeout=1)
+        self.assertEqual(first_response["body"], b"first\n")
+        second_response = await communicator.receive_output(timeout=1)
+        self.assertEqual(second_response["body"], b"last\n")
+        # Fetch the rest of the response so that coroutines are cleaned up.
+        await communicator.receive_output(timeout=1)
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output(timeout=1)
+
+    async def test_streaming_acmgr_disconnect(self):
+        scope = self.async_request_factory._base_scope(
+            path="/streaming_acmgr/", query_string=b"sleep=0.1"
+        )
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        await communicator.receive_output(timeout=1)
+        first_response = await communicator.receive_output(timeout=1)
+        self.assertEqual(first_response["body"], b"first\n")
+        # Disconnect the client.
+        await communicator.send_input({"type": "http.disconnect"})
+        # 'last\n' isn't sent.
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output(timeout=0.2)
