@@ -669,7 +669,7 @@ class ASGITest(SimpleTestCase):
         loop_thread = threading.current_thread()
 
         called_threads = []
-        
+
         def write_wrapper(data):
             called_threads.append(threading.current_thread())
             return original_write(data)
@@ -680,15 +680,15 @@ class ASGITest(SimpleTestCase):
 
         async def receive():
             return in_memory_chunks.pop(0)
-        
+
         with tempfile.SpooledTemporaryFile(max_size=1024, mode="w+b") as f:
-                    original_write = f.write
-                    with patch(
-                            "django.core.handlers.asgi.tempfile.SpooledTemporaryFile", 
-                            return_value=f,
-                        ):
-                        with patch.object(f, "write", side_effect=write_wrapper):
-                            await handler.read_body(receive)
+                original_write = f.write
+                with patch(
+                        "django.core.handlers.asgi.tempfile.SpooledTemporaryFile", 
+                        return_value=f,
+                ):
+                    with patch.object(f, "write", side_effect=write_wrapper):
+                        await handler.read_body(receive)
         # Assert write was called in the event loop thread
         self.assertIn(loop_thread, called_threads)
 
@@ -706,9 +706,11 @@ class ASGITest(SimpleTestCase):
         with override_settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
             with tempfile.SpooledTemporaryFile(max_size=10, mode="w+b") as f:
                 original_write = f.write
-
                 # roll_over force in handlers
-                with patch("django.core.handlers.asgi.tempfile.SpooledTemporaryFile", return_value=f):
+                with patch(
+                        "django.core.handlers.asgi.tempfile.SpooledTemporaryFile", 
+                        return_value=f,
+                ):
                     with patch.object(f, "write", side_effect=write_wrapper):
                         await handler.read_body(receive_rolled)
 
