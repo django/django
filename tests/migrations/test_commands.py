@@ -1025,6 +1025,30 @@ class MigrateTests(MigrationTestBase):
             call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_backwards"}
+    )
+    def test_sqlmigrate_backwards_with_index_option(self):
+        call_command("migrate", "migrations", verbosity=0)
+        out = io.StringIO()
+        call_command(
+            "sqlmigrate", "migrations", "0002", stdout=out, backwards=True, verbosity=0
+        )
+        try:
+            lines = out.getvalue().splitlines()
+            if connection.features.can_rollback_ddl:
+                self.assertEqual(lines[0], connection.ops.start_transaction_sql())
+                self.assertEqual(lines[-1], connection.ops.end_transaction_sql())
+                lines = lines[1:-1]
+                create_index_sql = (
+                    'CREATE INDEX "animal_name_idx"'
+                    ' ON "migrations_dog" ("animal_id", "name");'
+                )
+                self.assertEqual(lines[-1], create_index_sql)
+        finally:
+            # Unmigrate everything.
+            call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_non_atomic"}
     )
     def test_sqlmigrate_for_non_atomic_migration(self):

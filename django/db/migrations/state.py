@@ -268,6 +268,11 @@ class ProjectState:
     def remove_field(self, app_label, model_name, name):
         model_key = app_label, model_name
         model_state = self.models[model_key]
+
+        for idx in model_state.options["indexes"]:
+            if name in idx.fields:
+                self.remove_index(app_label, model_name, idx.name)
+
         old_field = model_state.fields.pop(name)
         if self._relations is not None:
             self.resolve_model_field_relations(model_key, name, old_field)

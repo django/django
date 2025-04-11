@@ -801,6 +801,9 @@ class BaseDatabaseSchemaEditor:
             )
         # Add an index, if required
         self.deferred_sql.extend(self._field_indexes_sql(model, field))
+        if hasattr(field, "opts"):
+            for index in field.opts.indexes:
+                self.deferred_sql.append(index.create_sql(model, self))
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
