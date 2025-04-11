@@ -263,18 +263,14 @@ class ASGIHandler(base.BaseHandler):
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
             if "body" in message:
-                # Perform IO in another thread if the temp file has rolled over
-                # to disk.
                 on_disk = getattr(body_file, "_rolled", False)
                 if on_disk:
                     async_write = sync_to_async(
                         body_file.write,
                         thread_sensitive=False,
                     )
-                    # Use async_write
                     await async_write(message["body"])
                 else:
-                    # Still in memory: safe to write synchronously.
                     body_file.write(message["body"])
 
             # Quit out if that's the end.

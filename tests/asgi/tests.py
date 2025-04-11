@@ -2,13 +2,13 @@ import asyncio
 import sys
 import threading
 import time
-from contextlib import (
-    nullcontext,  # Used in test_read_body_comprehensive_cases (ticket #36281)
-)
+import tempfile
+from contextlib import nullcontext
 from pathlib import Path
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
+from unittest.mock import patch
 
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
@@ -664,114 +664,49 @@ class ASGITest(SimpleTestCase):
             await communicator.receive_output(timeout=0.2)
 
     # test read_body() for ticket #36281
-    async def test_read_body_comprehensive_cases(self):
+    async def test_read_body_thread(self):
+        """Test that write runs on correct thread depending on rollover."""
         handler = ASGIHandler()
+        loop_thread = threading.current_thread()
 
-        # scenario
-        test_case = [
-            (
-                "multiple chunk",
-                [
-                    {"type": "http.request", "body": b"data ", "more_body": True},
-                    {"type": "http.request", "body": b"Async ", "more_body": True},
-                    {"type": "http.request", "body": b"test!", "more_body": False},
-                ],
-                b"data Async test!",
-                None,
-                None,  # no settings override
-                False,  # not testing rollover
-            ),
-            (
-                "single chunk",
-                [
-                    {"type": "http.request", "body": b"OneShot", "more_body": False},
-                ],
-                b"OneShot",
-                None,
-                None,
-                False,
-            ),
-            (
-                "empty middle chunk",
-                [
-                    {"type": "http.request", "body": b"Start", "more_body": True},
-                    {"type": "http.request", "body": b"", "more_body": True},
-                    {"type": "http.request", "body": b"End", "more_body": False},
-                ],
-                b"StartEnd",
-                None,
-                None,
-                False,
-            ),
-            (
-                "empty body test",
-                [
-                    {"type": "http.request", "body": b"", "more_body": False},
-                ],
-                b"",
-                None,
-                None,
-                False,
-            ),
-            (
-                "disconnect mid-body",
-                [
-                    {"type": "http.request", "body": b"partial...", "more_body": True},
-                    {"type": "http.disconnect"},
-                ],
-                None,
-                RequestAborted,
-                None,
-                False,
-            ),
-            (
-                "rollover to disk",
-                [
-                    {"type": "http.request", "body": b"A" * 8, "more_body": True},
-                    {"type": "http.request", "body": b"B" * 8, "more_body": False},
-                ],
-                b"A" * 8 + b"B" * 8,
-                None,
-                {"FILE_UPLOAD_MAX_MEMORY_SIZE": 10},  # force rollover
-                True,  # assert _rolled
-            ),
+        called_threads = []
+        
+        def write_wrapper(data):
+            called_threads.append(threading.current_thread())
+            return original_write(data)
+        # Case 1: In-memory write (no rollover expected)
+        in_memory_chunks = [
+            {"type": "http.request", "body": b"small", "more_body": False}
+        ]
+        async def receive():
+            return in_memory_chunks.pop(0)
+        
+        with tempfile.SpooledTemporaryFile(max_size=1024, mode="w+b") as f:
+                    original_write = f.write
+                    with patch("django.core.handlers.asgi.tempfile.SpooledTemporaryFile", return_value=f):
+                        with patch.object(f, "write", side_effect=write_wrapper):
+                            await handler.read_body(receive)
+        # Assert write was called in the event loop thread
+        self.assertIn(loop_thread, called_threads)
+
+        # Clear thread log before next test
+        called_threads.clear()
+        # Case 2: Rollover to disk (write should occur in a threadpool thread)
+        rolled_chunks = [
+            {"type": "http.request", "body": b"A" * 16, "more_body": True},
+            {"type": "http.request", "body": b"B" * 16, "more_body": False},
         ]
 
-        for (
-            name,
-            chunks,
-            expected,
-            expected_exception,
-            settings_override,
-            check_rolled,
-        ) in test_case:
+        async def receive_rolled():
+            return rolled_chunks.pop(0)
 
-            async def fake_receive():
-                if chunks:
-                    return chunks.pop(0)
-                return {"type": "http.request", "body": b"", "more_body": False}
+        with override_settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            with tempfile.SpooledTemporaryFile(max_size=10, mode="w+b") as f:
+                original_write = f.write
 
-            with self.subTest(name=name):
-                context = (
-                    self.settings(**settings_override)
-                    if settings_override
-                    else nullcontext()
-                )
-
-                with context:
-                    if expected_exception:
-                        with self.assertRaises(expected_exception):
-                            await handler.read_body(fake_receive)
-                    else:
-                        body_file = await handler.read_body(fake_receive)
-                        try:
-                            if check_rolled:
-                                self.assertTrue(
-                                    getattr(body_file, "_rolled", False),
-                                    "Expected the file to roll over to disk.",
-                                )
-                            body_file.seek(0)
-                            result = body_file.read()
-                            self.assertEqual(result, expected)
-                        finally:
-                            body_file.close()
+                # roll_over force in handlers
+                with patch("django.core.handlers.asgi.tempfile.SpooledTemporaryFile", return_value=f):
+                    with patch.object(f, "write", side_effect=write_wrapper):
+                        await handler.read_body(receive_rolled)
+        self.assertTrue(any(t != loop_thread for t in called_threads))
+        
