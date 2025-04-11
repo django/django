@@ -16,6 +16,7 @@ from django.db.models.fields.related import (
     ReverseManyToOneDescriptor,
     lazy_related_operation,
 )
+from django.db.models.query import prefetch_related_objects
 from django.db.models.query_utils import PathInfo
 from django.db.models.sql import AND
 from django.db.models.sql.where import WhereNode
@@ -240,6 +241,14 @@ class GenericForeignKey(FieldCacheMixin, Field):
                 return rel_obj
             else:
                 rel_obj = None
+        instance._state.fetch_mode.fetch(self, instance)
+        return self.get_cached_value(instance)
+
+    def fetch_one(self, instance):
+        f = self.model._meta.get_field(self.ct_field)
+        ct_id = getattr(instance, f.attname, None)
+        pk_val = getattr(instance, self.fk_field)
+        rel_obj = None
         if ct_id is not None:
             ct = self.get_content_type(id=ct_id, using=instance._state.db)
             try:
@@ -249,7 +258,10 @@ class GenericForeignKey(FieldCacheMixin, Field):
             except ObjectDoesNotExist:
                 pass
         self.set_cached_value(instance, rel_obj)
-        return rel_obj
+
+    def fetch_many(self, instances):
+        missing_instances = [i for i in instances if not self.is_cached(i)]
+        return prefetch_related_objects(missing_instances, self.name)
 
     def __set__(self, instance, value):
         ct = None
