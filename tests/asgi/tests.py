@@ -1,18 +1,17 @@
 import asyncio
 import sys
+import tempfile
 import threading
 import time
-import tempfile
-from contextlib import nullcontext
 from pathlib import Path
+from unittest.mock import patch
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
-from unittest.mock import patch
 
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
-from django.core.exceptions import RequestAborted, RequestDataTooBig
+from django.core.exceptions import RequestDataTooBig
 from django.core.handlers.asgi import ASGIHandler, ASGIRequest
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections
@@ -678,12 +677,16 @@ class ASGITest(SimpleTestCase):
         in_memory_chunks = [
             {"type": "http.request", "body": b"small", "more_body": False}
         ]
+
         async def receive():
             return in_memory_chunks.pop(0)
         
         with tempfile.SpooledTemporaryFile(max_size=1024, mode="w+b") as f:
                     original_write = f.write
-                    with patch("django.core.handlers.asgi.tempfile.SpooledTemporaryFile", return_value=f):
+                    with patch(
+                            "django.core.handlers.asgi.tempfile.SpooledTemporaryFile", 
+                            return_value=f,
+                        ):
                         with patch.object(f, "write", side_effect=write_wrapper):
                             await handler.read_body(receive)
         # Assert write was called in the event loop thread
@@ -708,5 +711,5 @@ class ASGITest(SimpleTestCase):
                 with patch("django.core.handlers.asgi.tempfile.SpooledTemporaryFile", return_value=f):
                     with patch.object(f, "write", side_effect=write_wrapper):
                         await handler.read_body(receive_rolled)
+
         self.assertTrue(any(t != loop_thread for t in called_threads))
-        
