@@ -3,11 +3,12 @@ Testing some internals of the template processing.
 These are *not* examples to be copied in user code.
 """
 
-from django.template import Library, TemplateSyntaxError
+from django.template import Context, Library, Origin, TemplateSyntaxError
 from django.template.base import (
     FilterExpression,
     Lexer,
     Parser,
+    Template,
     Token,
     TokenType,
     Variable,
@@ -216,3 +217,12 @@ class ParserTests(SimpleTestCase):
                 )
                 with self.assertRaises(VariableDoesNotExist):
                     FilterExpression(f"0|default:{num}", p).resolve({})
+
+
+class TemplateNameInExceptionTest(SimpleTestCase):
+
+    def test_template_name_in_error_message(self):
+        with self.assertRaises(TemplateSyntaxError) as e:
+            template = Template("{% endfor %}", origin=Origin("test.html"))
+            template.render(Context())
+        self.assertIn("Template: test.html", str(e.exception))
