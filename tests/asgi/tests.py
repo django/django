@@ -673,6 +673,7 @@ class ASGITest(SimpleTestCase):
         def write_wrapper(data):
             called_threads.append(threading.current_thread())
             return original_write(data)
+
         # Case 1: In-memory write (no rollover expected)
         in_memory_chunks = [
             {"type": "http.request", "body": b"small", "more_body": False}
@@ -682,13 +683,13 @@ class ASGITest(SimpleTestCase):
             return in_memory_chunks.pop(0)
 
         with tempfile.SpooledTemporaryFile(max_size=1024, mode="w+b") as f:
-                original_write = f.write
-                with patch(
-                        "django.core.handlers.asgi.tempfile.SpooledTemporaryFile", 
-                        return_value=f,
-                ):
-                    with patch.object(f, "write", side_effect=write_wrapper):
-                        await handler.read_body(receive)
+            original_write = f.write
+            with patch(
+                "django.core.handlers.asgi.tempfile.SpooledTemporaryFile",
+                return_value=f,
+            ):
+                with patch.object(f, "write", side_effect=write_wrapper):
+                    await handler.read_body(receive)
         # Assert write was called in the event loop thread
         self.assertIn(loop_thread, called_threads)
 
@@ -708,8 +709,8 @@ class ASGITest(SimpleTestCase):
                 original_write = f.write
                 # roll_over force in handlers
                 with patch(
-                        "django.core.handlers.asgi.tempfile.SpooledTemporaryFile", 
-                        return_value=f,
+                    "django.core.handlers.asgi.tempfile.SpooledTemporaryFile",
+                    return_value=f,
                 ):
                     with patch.object(f, "write", side_effect=write_wrapper):
                         await handler.read_body(receive_rolled)
