@@ -387,17 +387,17 @@ suitable for use in the :ttag:`{% for %}<for>` tag.
 
 See the :doc:`template guide </topics/templates>` for more about templates.
 
-Removing hardcoded URLs in templates
-====================================
+Removing hard-coded URLs in templates
+=====================================
 
 Remember, when we wrote the link to a question in the ``polls/index.html``
-template, the link was partially hardcoded like this:
+template, the link was partially hard-coded like this:
 
 .. code-block:: html+django
 
     <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
 
-The problem with this hardcoded, tightly-coupled approach is that it becomes
+The problem with this hard-coded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
 you defined the ``name`` argument in the :func:`~django.urls.path` functions in
 the ``polls.urls`` module, you can remove a reliance on specific URL paths

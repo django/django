@@ -191,9 +191,9 @@ Greenhill
 gunicorn
 GZip
 gzipped
-hardcode
-hardcoded
-hardcoding
+hard-code
+hard-coded
+hard-coding
 hashable
 hasher
 hashers

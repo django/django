@@ -611,7 +611,7 @@ This example illustrates all possible attributes and methods for a
             instances).
             """
 
-        # Hardcoded stylesheets.
+        # Hard-coded stylesheets.
         stylesheets = ["/stylesheet1.xsl", "stylesheet2.xsl"]
 
         # ITEMS -- One of the following three is required. The framework looks
@@ -715,7 +715,7 @@ This example illustrates all possible attributes and methods for a
             Takes an item, as returned by items(), and returns a boolean.
             """
 
-        item_guid_is_permalink = False  # Hard coded value
+        item_guid_is_permalink = False  # Hard-coded value
 
         # ITEM AUTHOR NAME -- One of the following three is optional. The
         # framework looks for them in this order.
@@ -1138,7 +1138,7 @@ formats.
 You can add this to your RSS feed by setting the ``stylesheets`` attribute on
 the feed class.
 
-This can be a hardcoded URL::
+This can be a Hard-coded URL::
 
     from django.contrib.syndication.views import Feed
 

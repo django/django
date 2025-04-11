@@ -141,7 +141,7 @@ This code includes a few things we haven't covered yet in this tutorial:
 
 * We are using the :func:`~django.urls.reverse` function in the
   :class:`~django.http.HttpResponseRedirect` constructor in this example.
-  This function helps avoid having to hardcode a URL in the view function.
+  This function helps avoid having to hard-code a URL in the view function.
   It is given the name of the view that we want to pass control to and the
   variable portion of the URL pattern that points to that view. In this
   case, using the URLconf we set up in :doc:`Tutorial 3 </intro/tutorial03>`,
