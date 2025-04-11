@@ -272,3 +272,79 @@ use :data:`~django.core.files.storage.storages`::
 
     class MyModel(models.Model):
         upload = models.FileField(storage=select_storage)
+
+Testing with callable storage
+-----------------------------
+
+When testing models that use callable storage, special consideration needs to be
+taken because the callable is evaluated when model classes are loaded. This means
+that using ``override_settings`` directly with a callable storage may not work
+as expected.
+
+For example, this approach won't work correctly in tests::
+
+    from django.core.files.storage import storages
+
+
+    def select_other_storage():
+        return storages["other_storage"]
+
+
+    class TestModel(models.Model):
+        other_file = models.FileField(storage=select_other_storage)
+
+
+    @override_settings(
+        STORAGES={
+            "other_storage": {
+                "BACKEND": "django.core.files.storage.InMemoryStorage",
+                "OPTIONS": {"location": "other_location"},
+            }
+        }
+    )
+    def test_storage():
+        # This will fail because storage was evaluated before override_settings
+        model = TestModel()
+        assert model.other_file.storage._location == "other_location"  # Fails
+
+Instead, use a ``LazyObject`` subclass to ensure the storage is evaluated with
+the overridden settings::
+
+    from django.core.files.storage import storages
+    from django.utils.functional import LazyObject
+
+
+    class OtherStorage(LazyObject):
+        def _setup(self):
+            self._wrapped = storages["other_storage"]
+
+
+    other_storage = OtherStorage()
+
+
+    class TestModel(models.Model):
+        other_file = models.FileField(storage=other_storage)
+
+Now your tests will work as expected::
+
+    @override_settings(
+        STORAGES={
+            "other_storage": {
+                "BACKEND": "django.core.files.storage.InMemoryStorage",
+                "OPTIONS": {"location": "other_location"},
+            }
+        }
+    )
+    def test_storage():
+        model = TestModel()
+        assert isinstance(model.other_file.storage, InMemoryStorage)
+        assert model.other_file.storage._location == "other_location"
+
+This works because ``LazyObject`` delays the evaluation of the storage until
+it's actually needed, allowing :func:`~django.test.override_settings` to take
+effect.
+
+.. note::
+    This pattern is similar to how Django's ``default_storage`` works
+    internally, which is why overriding the default storage works without
+    additional configuration.
