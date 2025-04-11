@@ -92,6 +92,11 @@ W009 = Warning(
     id="security.W009",
 )
 
+W010 = Warning(
+    SECRET_KEY_WARNING_MSG % "PASSWORD_PEPPERS",
+    id="security.W010",
+)
+
 W018 = Warning(
     "You should not have DEBUG set to True in deployment.",
     id="security.W018",
@@ -221,6 +226,19 @@ def check_secret_key(app_configs, **kwargs):
     else:
         passed_check = _check_secret_key(secret_key)
     return [] if passed_check else [W009]
+
+
+@register(Tags.security, deploy=True)
+def check_password_pepper(app_configs, **kwargs):
+    try:
+        # This only checks the first pepper to allow upgrading from an insecure
+        # setting without a warning.
+        primary_pepper = settings.PASSWORD_PEPPERS[0]
+    except (ImproperlyConfigured, AttributeError, IndexError):
+        passed_check = False
+    else:
+        passed_check = _check_secret_key(primary_pepper)
+    return [] if passed_check else [W010]
 
 
 @register(Tags.security, deploy=True)
