@@ -11,7 +11,7 @@
 # Maciej Olko <maciej.olko@gmail.com>, 2016-2022
 # Maciej Olko <maciej.olko@gmail.com>, 2023
 # Maciej Olko <maciej.olko@gmail.com>, 2015
-# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020,2022-2024
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020,2022-2025
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Roman Barczyński, 2014
@@ -20,10 +20,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
 "Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, "
-"2020,2022-2024\n"
+"2020,2022-2025\n"
 "Language-Team: Polish (http://app.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -45,8 +45,8 @@ msgstr "Pomyślnie usunięto %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Nie można usunąć %(name)s"
 
-msgid "Are you sure?"
-msgstr "Jesteś pewien?"
+msgid "Delete multiple objects"
+msgstr "Usuwanie wielu obiektów"
 
 msgid "Administration"
 msgstr "Administracja"
@@ -283,6 +283,9 @@ msgstr[3] "Wybrano wszystkie %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "Wybrano 0 z %(cnt)s"
 
+msgid "Delete"
+msgstr "Usuń"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
@@ -366,6 +369,15 @@ msgstr "Breadcrumbs"
 msgid "Models in the %(name)s application"
 msgstr "Modele w aplikacji %(name)s"
 
+msgid "Model name"
+msgstr "Nazwa modelu"
+
+msgid "Add link"
+msgstr "Dodaj link"
+
+msgid "Change or view list link"
+msgstr "Link do zmiany lub podglądu"
+
 msgid "Add"
 msgstr "Dodaj"
 
@@ -375,15 +387,11 @@ msgstr "Zobacz"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Nie masz uprawnień do oglądania ani edycji niczego."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"Najpierw podaj nazwę użytkownika i hasło. Następnie będziesz mógł edytować "
-"więcej opcji użytkownika."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "Po tym jak utworzysz użytkownika, będzie mógł edytować więcej opcji."
 
-msgid "Enter a username and password."
-msgstr "Podaj nazwę użytkownika i hasło."
+msgid "Error:"
+msgstr "Błąd:"
 
 msgid "Change password"
 msgstr "Zmień hasło"
@@ -471,9 +479,6 @@ msgstr "Przełącz motyw (bieżący motyw: jasny)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Przełącz motyw (bieżący motyw: ciemny)"
 
-msgid "Delete"
-msgstr "Usuń"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -508,9 +513,6 @@ msgstr "Tak, na pewno"
 
 msgid "No, take me back"
 msgstr "Nie, zabierz mnie stąd"
-
-msgid "Delete multiple objects"
-msgstr "Usuwanie wielu obiektów"
 
 #, python-format
 msgid ""
@@ -586,8 +588,8 @@ msgstr ""
 "Jesteś uwierzytelniony jako %(username)s, ale nie jesteś upoważniony do "
 "dostępu do tej strony. Czy chciałbyś zalogować się na inne konto?"
 
-msgid "Forgotten your password or username?"
-msgstr "Nie pamiętasz swojego hasła lub nazwy użytkownika?"
+msgid "Forgotten your login credentials?"
+msgstr "Zapomniałeś swoich danych do logowania?"
 
 msgid "Toggle navigation"
 msgstr "Przełącz nawigację"
@@ -759,8 +761,8 @@ msgstr ""
 "Aby wprowadzić nowe hasło, proszę przejść na stronę, której adres widnieje "
 "poniżej:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Twoja nazwa użytkownika, na wypadek, gdybyś zapomniał(a):"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Na wypadek gdybyś zapomniał(a), jesteś:"
 
 msgid "Thanks for using our site!"
 msgstr "Dzięki za korzystanie z naszej strony!"

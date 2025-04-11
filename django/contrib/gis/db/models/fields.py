@@ -37,8 +37,6 @@ def get_srid_info(srid, connection):
     """
     from django.contrib.gis.gdal import SpatialReference
 
-    global _srid_cache
-
     try:
         # The SpatialRefSys model for the spatial backend.
         SpatialRefSys = connection.ops.spatial_ref_sys()

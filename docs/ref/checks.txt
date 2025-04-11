@@ -340,6 +340,8 @@ Related fields
 * **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
 * **fields.E347**: Field defines a relation to the ``CompositePrimaryKey`` of
   model ``<model>`` which is not supported.
+* **fields.E348**: Related name ``<related_name>`` for ``<model>.<field name>``
+  clashes with the name of a model manager.
 
 Models
 ------

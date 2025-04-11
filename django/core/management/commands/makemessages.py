@@ -498,7 +498,7 @@ class Command(BaseCommand):
             potfile = os.path.join(path, "%s.pot" % self.domain)
             if not os.path.exists(potfile):
                 continue
-            args = ["msguniq"] + self.msguniq_options + [potfile]
+            args = ["msguniq", *self.msguniq_options, potfile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
@@ -702,7 +702,7 @@ class Command(BaseCommand):
         pofile = os.path.join(basedir, "%s.po" % self.domain)
 
         if os.path.exists(pofile):
-            args = ["msgmerge"] + self.msgmerge_options + [pofile, potfile]
+            args = ["msgmerge", *self.msgmerge_options, pofile, potfile]
             _, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
@@ -725,7 +725,7 @@ class Command(BaseCommand):
             fp.write(msgs)
 
         if self.no_obsolete:
-            args = ["msgattrib"] + self.msgattrib_options + ["-o", pofile, pofile]
+            args = ["msgattrib", *self.msgattrib_options, "-o", pofile, pofile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:

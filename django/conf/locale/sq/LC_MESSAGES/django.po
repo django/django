@@ -2,16 +2,16 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011-2014
-# Besnik Bleta <besnik@programeshqip.org>, 2020-2024
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2025
 # Besnik Bleta <besnik@programeshqip.org>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2025\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgid "Afrikaans"
 msgstr "Afrikaans"
 
 msgid "Arabic"
-msgstr "Arabe"
+msgstr "Arabisht"
 
 msgid "Algerian Arabic"
 msgstr "Arabishte Algjeriane"
@@ -33,118 +33,118 @@ msgid "Asturian"
 msgstr "Asturiase"
 
 msgid "Azerbaijani"
-msgstr "Azerbaixhanase"
+msgstr "Azerbajxhanisht"
 
 msgid "Bulgarian"
-msgstr "Bulgare"
+msgstr "Bullgarisht"
 
 msgid "Belarusian"
-msgstr "Bjelloruse"
+msgstr "Bjellorusisht"
 
 msgid "Bengali"
-msgstr "Bengaleze"
+msgstr "Bengalisht"
 
 msgid "Breton"
-msgstr "Bretone"
+msgstr "Bretonisht"
 
 msgid "Bosnian"
 msgstr "Boshnjake"
 
 msgid "Catalan"
-msgstr "Katalane"
+msgstr "Katalanisht"
 
 msgid "Central Kurdish (Sorani)"
 msgstr "Kurdishte e Qendrës (Sorani)"
 
 msgid "Czech"
-msgstr "Çeke"
+msgstr "Çekisht"
 
 msgid "Welsh"
-msgstr "Uellsiane"
+msgstr "Uellsisht"
 
 msgid "Danish"
-msgstr "Daneze"
+msgstr "Danisht"
 
 msgid "German"
-msgstr "Gjermane"
+msgstr "Gjermanisht"
 
 msgid "Lower Sorbian"
-msgstr "Sorbiane e Poshtme"
+msgstr "Sorbishte e Poshtme"
 
 msgid "Greek"
-msgstr "Greke"
+msgstr "Greqisht"
 
 msgid "English"
-msgstr "Angleze"
+msgstr "Anglisht"
 
 msgid "Australian English"
-msgstr "Angleze Australiane"
+msgstr "Anglishte Australie"
 
 msgid "British English"
-msgstr "Angleze Britanike"
+msgstr "Anglishte Britanie"
 
 msgid "Esperanto"
 msgstr "Esperanto"
 
 msgid "Spanish"
-msgstr "Spanjolle"
+msgstr "Spanjisht"
 
 msgid "Argentinian Spanish"
-msgstr "Spanjolle Argjentinase"
+msgstr "Spanjishte Argjentine"
 
 msgid "Colombian Spanish"
-msgstr "Spanjolle Kolumbiane"
+msgstr "Spanjishte Kolumbie"
 
 msgid "Mexican Spanish"
-msgstr "Spanjolle Meksikane"
+msgstr "Spanjishte Meksike"
 
 msgid "Nicaraguan Spanish"
-msgstr "Spanjolle Nikaraguane"
+msgstr "Spanjishte Nikaraguaje"
 
 msgid "Venezuelan Spanish"
-msgstr "Spanjolle Venezuelane"
+msgstr "Spanjishte Venezuele"
 
 msgid "Estonian"
-msgstr "Estoneze"
+msgstr "Estonisht"
 
 msgid "Basque"
-msgstr "Baske"
+msgstr "Baskisht"
 
 msgid "Persian"
-msgstr "Persiane"
+msgstr "Persisht"
 
 msgid "Finnish"
-msgstr "Finlandeze"
+msgstr "Finlandisht"
 
 msgid "French"
 msgstr "Frënge"
 
 msgid "Frisian"
-msgstr "Frisiane"
+msgstr "Frisisht"
 
 msgid "Irish"
-msgstr "Irlandeze"
+msgstr "Irlandisht"
 
 msgid "Scottish Gaelic"
-msgstr "Skoceze Gaelike"
+msgstr "Skocisht Gaelike"
 
 msgid "Galician"
 msgstr "Galike"
 
 msgid "Hebrew"
-msgstr "Hebraishte"
+msgstr "Hebraisht"
 
 msgid "Hindi"
-msgstr "Indiane"
+msgstr "Indisht"
 
 msgid "Croatian"
-msgstr "Kroate"
+msgstr "Kroatisht"
 
 msgid "Upper Sorbian"
-msgstr "Sorbiane e Sipërme"
+msgstr "Sorbishte e Sipërme"
 
 msgid "Hungarian"
-msgstr "Hungareze"
+msgstr "Hungarisht"
 
 msgid "Armenian"
 msgstr "Armenisht"
@@ -153,7 +153,7 @@ msgid "Interlingua"
 msgstr "Interlingua"
 
 msgid "Indonesian"
-msgstr "Indoneziane"
+msgstr "Indonezisht"
 
 msgid "Igbo"
 msgstr "Igbo"
@@ -162,19 +162,19 @@ msgid "Ido"
 msgstr "Ido"
 
 msgid "Icelandic"
-msgstr "Islandeze"
+msgstr "Islandisht"
 
 msgid "Italian"
-msgstr "Italiane"
+msgstr "Italisht"
 
 msgid "Japanese"
-msgstr "Japoneze"
+msgstr "Japonisht"
 
 msgid "Georgian"
-msgstr "Gjeorgjiane"
+msgstr "Gjeorgjisht"
 
 msgid "Kabyle"
-msgstr "Kabilase"
+msgstr "Kabilisht"
 
 msgid "Kazakh"
 msgstr "Kazake"
@@ -186,7 +186,7 @@ msgid "Kannada"
 msgstr "Kannada"
 
 msgid "Korean"
-msgstr "Koreane"
+msgstr "Koreanisht"
 
 msgid "Kyrgyz"
 msgstr "Kirgize"
@@ -195,85 +195,85 @@ msgid "Luxembourgish"
 msgstr "Luksemburgase"
 
 msgid "Lithuanian"
-msgstr "Lituaneze"
+msgstr "Lituanisht"
 
 msgid "Latvian"
-msgstr "Letoneze"
+msgstr "Letonisht"
 
 msgid "Macedonian"
-msgstr "Maqedone"
+msgstr "Maqedonisht"
 
 msgid "Malayalam"
 msgstr "Malajalame"
 
 msgid "Mongolian"
-msgstr "Mongoliane"
+msgstr "Mongoliisht"
 
 msgid "Marathi"
 msgstr "Marati"
 
 msgid "Malay"
-msgstr ""
+msgstr "Malajase"
 
 msgid "Burmese"
 msgstr "Burmeze"
 
 msgid "Norwegian Bokmål"
-msgstr "Norvegjeze Bokmal"
+msgstr "Norvegjishte Bokmal"
 
 msgid "Nepali"
-msgstr "Nepaleze"
+msgstr "Nepalisht"
 
 msgid "Dutch"
-msgstr "Holandeze"
+msgstr "Holandisht"
 
 msgid "Norwegian Nynorsk"
-msgstr "Norvegjeze Nynorsk"
+msgstr "Norvegjishte Nynorsk"
 
 msgid "Ossetic"
-msgstr "Osetishte"
+msgstr "Osetisht"
 
 msgid "Punjabi"
-msgstr "Panxhabe"
+msgstr "Panxhabisht"
 
 msgid "Polish"
-msgstr "Polake"
+msgstr "Polonisht"
 
 msgid "Portuguese"
-msgstr "Portugeze"
+msgstr "Portugalisht"
 
 msgid "Brazilian Portuguese"
-msgstr "Portugeze Braziliane"
+msgstr "Portugalishte Brazili"
 
 msgid "Romanian"
-msgstr "Rumune"
+msgstr "Rumanisht"
 
 msgid "Russian"
-msgstr "Ruse"
+msgstr "Rusisht"
 
 msgid "Slovak"
-msgstr "Sllovake "
+msgstr "Sllovakisht "
 
 msgid "Slovenian"
-msgstr "Slovene"
+msgstr "Sllovenisht"
 
 msgid "Albanian"
-msgstr "Shqipe"
+msgstr "Shqip"
 
 msgid "Serbian"
-msgstr "Serbe"
+msgstr "Serbisht"
 
 msgid "Serbian Latin"
-msgstr "Serbe Latine"
+msgstr "Serbisht Latine"
 
 msgid "Swedish"
-msgstr "Suedeze"
+msgstr "Suedisht"
 
 msgid "Swahili"
-msgstr "Swahili"
+msgstr "Suahilisht"
 
 msgid "Tamil"
-msgstr "Tamileze"
+msgstr "Tamilisht"
 
 msgid "Telugu"
 msgstr "Telugu"
@@ -282,13 +282,13 @@ msgid "Tajik"
 msgstr "Taxhike"
 
 msgid "Thai"
-msgstr "Tajlandeze"
+msgstr "Tajlandisht"
 
 msgid "Turkmen"
 msgstr "Turkmene"
 
 msgid "Turkish"
-msgstr "Turke"
+msgstr "Turqisht"
 
 msgid "Tatar"
 msgstr "Tatare"
@@ -300,7 +300,7 @@ msgid "Uyghur"
 msgstr "Ujgure"
 
 msgid "Ukrainian"
-msgstr "Ukrainase"
+msgstr "Ukrainisht"
 
 msgid "Urdu"
 msgstr "Urdu"
@@ -309,7 +309,7 @@ msgid "Uzbek"
 msgstr "Uzbeke"
 
 msgid "Vietnamese"
-msgstr "Vietnameze"
+msgstr "Vietnamisht"
 
 msgid "Simplified Chinese"
 msgstr "Kineze e Thjeshtuar"
@@ -362,15 +362,15 @@ msgstr "Jepni një adresë email të vlefshme."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Jepni një “slug” të vlefshëm, të përbërë nga shkronja, numra, nëvija ose "
-"vija në mes."
+"Jepni një “identifikues” të vlefshëm, të përbërë nga shkronja, numra, "
+"nënvija, ose vija në mes."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Jepni një “slug” të vlefshëm, të përbërë nga shkronja, numra, nënvija ose "
-"vija ndarëse Unikod."
+"Jepni një “identifikues” të vlefshëm, të përbërë nga shkronja, numra, "
+"nënvija, ose vija ndarëse Unikod."
 
 #, python-format
 msgid "Enter a valid %(protocol)s address."
@@ -403,15 +403,14 @@ msgstr "Siguroni që kjo vlerë është më e madhe ose baras me %(limit_value)s
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
-"Garantoni që vlera të jetë një shumëfish i madhësisë së hapit "
-"%(limit_value)s."
+"Siguroni që vlera të jetë një shumëfish i madhësisë së hapit %(limit_value)s."
 
 #, python-format
 msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
-"Garantoni që kjo vlerë të jetë një shumëfish i madhësisë %(limit_value)s, "
+"Siguroni që kjo vlerë të jetë një shumëfish i madhësisë %(limit_value)s, "
 "duke filluar nga %(offset)s, p.sh., %(offset)s, %(valid_value1)s, "
 "%(valid_value2)s, e me radhë."
 
@@ -426,7 +425,7 @@ msgstr[0] ""
 "Sigurohuni që kjo vlerë ka të paktën %(limit_value)d shenjë (ka "
 "%(show_value)d)."
 msgstr[1] ""
-"Sigurohuni që kjo vlerë ka të paktën %(limit_value)d shenja (ka "
+"Siguroni që kjo vlerë ka të paktën %(limit_value)d shenja (ka "
 "%(show_value)d)."
 
 #, python-format
@@ -440,7 +439,7 @@ msgstr[0] ""
 "Sigurohuni që kjo vlerë ka të shumtën %(limit_value)d shenjë (ka "
 "%(show_value)d)."
 msgstr[1] ""
-"Sigurohuni që kjo vlerë ka të shumtën %(limit_value)d shenja (ka "
+"Siguroni që kjo vlerë ka të shumtën %(limit_value)d shenja (ka "
 "%(show_value)d)."
 
 msgid "Enter a number."
@@ -450,13 +449,13 @@ msgstr "Jepni një numër."
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Sigurohuni që s’ka më  tepër se %(max)s shifër gjithsej."
-msgstr[1] "Sigurohuni që s’ka më  tepër se %(max)s shifra gjithsej."
+msgstr[1] "Siguroni që s’ka më  tepër se %(max)s shifra gjithsej."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "Sigurohuni që s’ka më shumë se %(max)s vend dhjetor."
-msgstr[1] "Sigurohuni që s’ka më shumë se %(max)s vende dhjetore."
+msgstr[1] "Siguroni që s’ka më shumë se %(max)s vende dhjetore."
 
 #, python-format
 msgid ""
@@ -465,8 +464,7 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
 "Sigurohuni që s’ka më tepër se %(max)s shifër para presjes dhjetore."
-msgstr[1] ""
-"Sigurohuni që s’ka më tepër se %(max)s shifra para presjes dhjetore."
+msgstr[1] "Siguroni që s’ka më tepër se %(max)s shifra para presjes dhjetore."
 
 #, python-format
 msgid ""
@@ -518,14 +516,15 @@ msgstr "Fushë e llojit: %(field_type)s"
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr "Vlera “%(value)s” duhet të jetë ose True, ose False."
+msgstr "Vlera “%(value)s” duhet të jetë ose “True”, ose “False”."
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
-msgstr "Vlera për “%(value)s” duhet të jetë ose True, ose False, ose None."
+msgstr ""
+"Vlera për “%(value)s” duhet të jetë ose “True”, ose “False”, ose “None”."
 
 msgid "Boolean (Either True or False)"
-msgstr "Buleane (Ose True, ose False)"
+msgstr "Buleane (Ose “True”, ose “False”)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
@@ -627,10 +626,10 @@ msgstr "Adresë IP"
 
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
-msgstr "Vlera “%(value)s” duhet të jetë ose None, ose True, ose False."
+msgstr "Vlera “%(value)s” duhet të jetë ose “None”, ose “True”, ose “False”."
 
 msgid "Boolean (Either True, False or None)"
-msgstr "Buleane (Ose True, ose False, ose None)"
+msgstr "Buleane (Ose “True”, ose “False”, ose “None”)"
 
 msgid "Positive big integer"
 msgstr "Numër i plotë pozitiv i madh"
@@ -693,8 +692,8 @@ msgid "Value must be valid JSON."
 msgstr "Vlera duhet të jetë JSON i vlefshëm."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Instanca %(model)s me %(field)s %(value)r s’ekziston."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Kyç i Jashtëm (lloj i përcaktuar nga fusha përkatëse)"
@@ -759,8 +758,7 @@ msgstr[0] ""
 "Sigurohuni që ky emër kartele ka të shumtën %(max)d shenjë (it has "
 "%(length)d)."
 msgstr[1] ""
-"Sigurohuni që ky emër kartele ka të shumtën %(max)d shenja (it has "
-"%(length)d)."
+"Sigurohuni që ky emër kartele ka të shumtën %(max)d shenja (ka %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -849,12 +847,12 @@ msgid "Please correct the duplicate values below."
 msgstr "Ju lutemi, ndreqni më poshtë vlerat e përsëdytura."
 
 msgid "The inline value did not match the parent instance."
-msgstr "Vlera e brendshme s’u përputh me instancën prind."
+msgstr "Vlera e brendshme s’u përputh me instancën mëmë."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
-"Përzgjidhni një zgjedhje të vlefshme. Ajo zgjedhje nuk është një nga "
-"zgjedhjet e mundshme."
+"Përzgjidhni një zgjedhje të vlefshme. Ajo zgjedhje s’është një nga zgjedhjet "
+"e mundshme."
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
@@ -1228,7 +1226,7 @@ msgid ""
 "rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Nëse përdorni etiketën <meta name=\"referrer\" content=\"no-referrer\"> "
-"etiketën ose përfshini kryet “Referrer-Policy: no-referrer”, ju lutemi, "
+"etiketën, ose përfshini kryet “Referrer-Policy: no-referrer”, ju lutemi, "
 "hiqini. Mbrojtja CSRF lyp që kryet “Referer” të kryejnë kontroll strikt "
 "referuesi. Nëse shqetësoheni për privatësinë, për lidhje te sajte palësh të "
 "treta përdorni alternativa si <a rel=\"noreferrer\" …>."
@@ -1238,9 +1236,10 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
-"Këtë mesazh po e shihni ngaqë ky sajt lyp një cookie CSRF, kur parashtrohen "
-"formularë. Kjo cookie është e domosdoshme për arsye sigurie, për të bërë të "
-"mundur që shfletuesi juaj të mos komprometohet nga palë të treta."
+"Këtë mesazh po e shihni ngaqë ky sajt lyp një “cookie” CSRF, kur "
+"parashtrohen formularë. Kjo “cookie” është e domosdoshme për arsye sigurie, "
+"për të bërë të mundur që shfletuesi juaj të mos komprometohet nga palë të "
+"treta."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
@@ -1250,7 +1249,7 @@ msgstr ""
 "riaktivizojini, të paktën për këtë sajt, ose për kërkesa “same-origin”."
 
 msgid "More information is available with DEBUG=True."
-msgstr "Më tepër të dhëna mund të gjeni me DEBUG=True."
+msgstr "Më tepër hollësi mund të gjeni me DEBUG=True."
 
 msgid "No year specified"
 msgstr "Nuk është caktuar vit"
@@ -1289,7 +1288,7 @@ msgid "No %(verbose_name)s found matching the query"
 msgstr "S’u gjetën %(verbose_name)s me përputhje"
 
 msgid "Page is not “last”, nor can it be converted to an int."
-msgstr "Faqja nuk është “last”, as mund të shndërrohet në një int."
+msgstr "Faqja s’është “last”, as mund të shndërrohet në një int."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
@@ -1297,7 +1296,7 @@ msgstr "Faqe e pavlefshme (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
-msgstr "Listë e zbrazët dhe “%(class_name)s.allow_empty” është False."
+msgstr "Listë e zbrazët dhe “%(class_name)s.allow_empty” është “False”."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Këtu s’lejohen tregues drejtorish."
@@ -1338,7 +1337,7 @@ msgid "Django Documentation"
 msgstr "Dokumentim i Django-s"
 
 msgid "Topics, references, &amp; how-to’s"
-msgstr "Tema, referenca, &amp; how-to"
+msgstr "Tema, referenca, &amp; si-të"
 
 msgid "Tutorial: A Polling App"
 msgstr "Përkujdesore: Një Aplikacion Për Sondazhe"

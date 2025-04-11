@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2024
+# BouRock, 2015-2025
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: BouRock, 2015-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: BouRock, 2015-2025\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -38,8 +38,8 @@ msgstr "%(count)d adet %(items)s başarılı olarak silindi."
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s silinemiyor"
 
-msgid "Are you sure?"
-msgstr "Emin misiniz?"
+msgid "Delete multiple objects"
+msgstr "Birden fazla nesneyi sil"
 
 msgid "Administration"
 msgstr "Yönetim"
@@ -271,6 +271,9 @@ msgstr[1] "Tüm %(total_count)s nesne seçildi"
 msgid "0 of %(cnt)s selected"
 msgstr "0 / %(cnt)s nesne seçildi"
 
+msgid "Delete"
+msgstr "Sil"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Değişiklik geçmişi: %s"
@@ -354,6 +357,15 @@ msgstr "İçerik haritaları"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s uygulamasındaki modeller"
 
+msgid "Model name"
+msgstr "Model adı"
+
+msgid "Add link"
+msgstr "Bağlantı ekle"
+
+msgid "Change or view list link"
+msgstr "Liste bağlantısını değiştir veya görüntüle"
+
 msgid "Add"
 msgstr "Ekle"
 
@@ -363,15 +375,13 @@ msgstr "Göster"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Önce, bir kullanıcı adı ve parola girin. Ondan sonra, daha fazla kullanıcı "
-"seçeneğini düzenleyebileceksiniz."
+"Bir kullanıcı oluşturduktan sonra, daha fazla kullanıcı seçeneğini "
+"düzenleyebileceksiniz."
 
-msgid "Enter a username and password."
-msgstr "Kullanıcı adı ve parola girin."
+msgid "Error:"
+msgstr "Hata:"
 
 msgid "Change password"
 msgstr "Parolayı değiştir"
@@ -457,9 +467,6 @@ msgstr "Temayı değiştir (şu anki tema: açık)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Temayı değiştir (şu anki tema: koyu)"
 
-msgid "Delete"
-msgstr "Sil"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -494,9 +501,6 @@ msgstr "Evet, eminim"
 
 msgid "No, take me back"
 msgstr "Hayır, beni geri götür"
-
-msgid "Delete multiple objects"
-msgstr "Birden fazla nesneyi sil"
 
 #, python-format
 msgid ""
@@ -572,8 +576,8 @@ msgstr ""
 "%(username)s olarak kimlik doğrulamanız yapıldı, ancak bu sayfaya erişmek "
 "için yetkili değilsiniz. Farklı bir hesapla oturum açmak ister misiniz?"
 
-msgid "Forgotten your password or username?"
-msgstr "Kullanıcı adınızı veya parolanızı mı unuttunuz?"
+msgid "Forgotten your login credentials?"
+msgstr "Oturum açma kimlik bilgilerinizi mi unuttunuz?"
 
 msgid "Toggle navigation"
 msgstr "Gezinmeyi aç/kapat"
@@ -737,8 +741,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Lütfen şurada belirtilen sayfaya gidin ve yeni bir parola seçin:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Unutma ihtimalinize karşı, kullanıcı adınız:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Unutmuş olmanız durumunda, siz:"
 
 msgid "Thanks for using our site!"
 msgstr "Sitemizi kullandığınız için teşekkürler!"

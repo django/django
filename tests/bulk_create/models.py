@@ -147,3 +147,13 @@ class RelatedModel(models.Model):
 class DbDefaultModel(models.Model):
     name = models.CharField(max_length=10)
     created_at = models.DateTimeField(db_default=Now())
+
+    class Meta:
+        required_db_features = {"supports_expression_defaults"}
+
+
+class DbDefaultPrimaryKey(models.Model):
+    id = models.DateTimeField(primary_key=True, db_default=Now())
+
+    class Meta:
+        required_db_features = {"supports_expression_defaults"}

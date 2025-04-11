@@ -9,6 +9,7 @@
 # Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Harro van der Klauw <hvdklauw@gmail.com>, 2011-2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
+# jaap3 <jaap.roes@gmail.com>, 2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # 6a27f10aef159701c7a5ff07f0fb0a78_05545ed <bc5d401a7ecd9343dd5afac265ed8ab3_4845>, 2011-2012,2014
 # Michiel Overtoom <motoom@xs4all.nl>, 2014
@@ -20,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: jaap3 <jaap.roes@gmail.com>, 2024\n"
 "Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -648,7 +649,7 @@ msgid "Positive integer"
 msgstr "Positief geheel getal"
 
 msgid "Positive small integer"
-msgstr "Postitief klein geheel getal"
+msgstr "Positief klein geheel getal"
 
 #, python-format
 msgid "Slug (up to %(max_length)s)"
@@ -702,8 +703,8 @@ msgid "Value must be valid JSON."
 msgstr "Waarde moet geldige JSON zijn."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s-instantie met %(field)s %(value)r bestaat niet."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Refererende sleutel (type wordt bepaald door gerelateerde veld)"
@@ -1347,7 +1348,7 @@ msgid "Tutorial: A Polling App"
 msgstr "Handleiding: een app voor peilingen"
 
 msgid "Get started with Django"
-msgstr "Beginnen met Django"
+msgstr "Aan de slag met Django"
 
 msgid "Django Community"
 msgstr "Django-gemeenschap"

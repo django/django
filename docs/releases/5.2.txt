@@ -1,8 +1,8 @@
-============================================
-Django 5.2 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 5.2 release notes
+========================
 
-*Expected April 2025*
+*April 2, 2025*
 
 Welcome to Django 5.2!
 

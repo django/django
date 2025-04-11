@@ -13,6 +13,8 @@ from django.db import (
     router,
     transaction,
 )
+from django.db.models import F, Value
+from django.db.models.functions import Concat
 from django.test import (
     TransactionTestCase,
     override_settings,
@@ -148,6 +150,15 @@ class SelectForUpdateTests(TransactionTestCase):
             expected = ["select_for_update_person", "select_for_update_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature("has_select_for_update_of")
+    def test_for_update_of_values_list(self):
+        queries = Person.objects.select_for_update(
+            of=("self",),
+        ).values_list(Concat(Value("Dr. "), F("name")), "born")
+        with transaction.atomic():
+            values = queries.get(pk=self.person.pk)
+        self.assertSequenceEqual(values, ("Dr. Reinhardt", self.city1.pk))
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_model_inheritance_generated_of(self):

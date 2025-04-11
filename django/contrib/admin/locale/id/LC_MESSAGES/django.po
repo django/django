@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
@@ -38,8 +38,8 @@ msgstr "Sukses menghapus %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Tidak dapat menghapus %(name)s"
 
-msgid "Are you sure?"
-msgstr "Yakin?"
+msgid "Delete multiple objects"
+msgstr "Hapus beberapa objek sekaligus"
 
 msgid "Administration"
 msgstr "Administrasi"
@@ -266,6 +266,9 @@ msgstr[0] "%(total_count)s dipilih"
 msgid "0 of %(cnt)s selected"
 msgstr "0 dari %(cnt)s dipilih"
 
+msgid "Delete"
+msgstr "Hapus"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Ubah riwayat: %s"
@@ -349,6 +352,15 @@ msgstr "Breadcrumbs"
 msgid "Models in the %(name)s application"
 msgstr "Model pada aplikasi %(name)s"
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "Tambah"
 
@@ -358,15 +370,11 @@ msgstr "Lihat"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Anda tidak memiliki izin untuk melihat atau mengedit apa pun."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Pertama-tama, masukkan nama pengguna dan sandi. Anda akan dapat mengubah "
-"opsi pengguna lebih lengkap setelah itu."
 
-msgid "Enter a username and password."
-msgstr "Masukkan nama pengguna dan sandi."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Ganti sandi"
@@ -451,9 +459,6 @@ msgstr "Ganti tema (tema saat ini: terang)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Ganti tema (tema saat ini: gelap)"
 
-msgid "Delete"
-msgstr "Hapus"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -488,9 +493,6 @@ msgstr "Ya, saya yakin"
 
 msgid "No, take me back"
 msgstr "Tidak, bawa saya kembali"
-
-msgid "Delete multiple objects"
-msgstr "Hapus beberapa objek sekaligus"
 
 #, python-format
 msgid ""
@@ -565,8 +567,8 @@ msgstr ""
 "Anda diautentikasi sebagai %(username)s, tapi tidak diperbolehkan untuk "
 "mengakses halaman ini. Ingin mencoba mengakses menggunakan akun yang lain?"
 
-msgid "Forgotten your password or username?"
-msgstr "Lupa nama pengguna atau sandi?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Alihkan navigasi"
@@ -732,8 +734,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Kunjungi laman di bawah ini dan ketikkan sandi baru:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Nama pengguna Anda, jika lupa:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Terima kasih telah menggunakan situs kami!"

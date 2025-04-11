@@ -185,7 +185,7 @@ class UserAttributeSimilarityValidator:
             if not value or not isinstance(value, str):
                 continue
             value_lower = value.lower()
-            value_parts = re.split(r"\W+", value_lower) + [value_lower]
+            value_parts = [*re.split(r"\W+", value_lower), value_lower]
             for value_part in value_parts:
                 if exceeds_maximum_length_ratio(
                     password, self.max_similarity, value_part

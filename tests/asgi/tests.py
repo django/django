@@ -487,7 +487,7 @@ class ASGITest(SimpleTestCase):
 
         # A view that will listen for the cancelled error.
         async def view(request):
-            nonlocal view_started, view_did_cancel
+            nonlocal view_did_cancel
             view_started.set()
             try:
                 await asyncio.sleep(0.1)

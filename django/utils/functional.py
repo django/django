@@ -96,7 +96,7 @@ def lazy(func, *resultclasses):
         def __reduce__(self):
             return (
                 _lazy_proxy_unpickle,
-                (func, self._args, self._kw) + resultclasses,
+                (func, self._args, self._kw, *resultclasses),
             )
 
         def __deepcopy__(self, memo):

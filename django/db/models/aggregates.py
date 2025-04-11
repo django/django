@@ -108,7 +108,7 @@ class Aggregate(Func):
 
     def get_source_expressions(self):
         source_expressions = super().get_source_expressions()
-        return source_expressions + [self.filter, self.order_by]
+        return [*source_expressions, self.filter, self.order_by]
 
     def set_source_expressions(self, exprs):
         *exprs, self.filter, self.order_by = exprs

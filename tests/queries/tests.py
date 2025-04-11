@@ -2668,6 +2668,12 @@ class ValuesQuerysetTests(TestCase):
         qs = qs.values_list("num", flat=True)
         self.assertSequenceEqual(qs, [72])
 
+    def test_duplicate_values_list(self):
+        value = Number.objects.values_list("num", "num").get()
+        self.assertEqual(value, (72, 72))
+        value = Number.objects.values_list(F("num"), F("num")).get()
+        self.assertEqual(value, (72, 72))
+
     def test_extra_values(self):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(
