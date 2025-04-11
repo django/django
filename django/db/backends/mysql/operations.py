@@ -288,7 +288,17 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "NULL"
 
     def combine_expression(self, connector, sub_expressions):
-        if connector == "^":
+        if connector == "/":
+            return """
+                CAST(
+                    CAST(%s AS DECIMAL(20, 10)) /
+                    CAST(%s AS DECIMAL(20, 10))
+                AS DECIMAL(20, 10))
+            """ % (
+                sub_expressions[0],
+                sub_expressions[1],
+            )
+        elif connector == "^":
             return "POW(%s)" % ",".join(sub_expressions)
         # Convert the result to a signed integer since MySQL's binary operators
         # return an unsigned integer.
