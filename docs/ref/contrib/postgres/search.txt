@@ -96,7 +96,7 @@ Examples:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
     >>> SearchQuery("red tomato")  # two keywords
     >>> SearchQuery("tomato red")  # same results as above
     >>> SearchQuery("red tomato", search_type="phrase")  # a phrase
@@ -105,6 +105,7 @@ Examples:
     >>> SearchQuery(
     ...     "'tomato' ('red' OR 'green')", search_type="websearch"
     ... )  # websearch operators
+    >>> SearchQuery(Lexeme("tomato") & (Lexeme("red") | Lexeme("green")))  # Lexeme objects
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility:
 
@@ -117,6 +118,13 @@ Examples:
 
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
+
+    Support for ``'websearch'`` search type and query expressions in
+    ``SearchQuery.value`` were added.
+
+.. versionchanged:: 6.0
+
+    ``Lexeme`` objects were added.
 
 ``SearchRank``
 ==============
@@ -133,7 +141,11 @@ order by relevancy:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+    >>> from django.contrib.postgres.search import (
+    ...     SearchQuery,
+    ...     SearchRank,
+    ...     SearchVector,
+    ... )
     >>> vector = SearchVector("body_text")
     >>> query = SearchQuery("cheese")
     >>> Entry.objects.annotate(rank=SearchRank(vector, query)).order_by("-rank")
@@ -257,7 +269,11 @@ of various vectors before you combine them:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+    >>> from django.contrib.postgres.search import (
+    ...     SearchQuery,
+    ...     SearchRank,
+    ...     SearchVector,
+    ... )
     >>> vector = SearchVector("body_text", weight="A") + SearchVector(
     ...     "blog__tagline", weight="B"
     ... )
@@ -275,6 +291,39 @@ floats to :class:`SearchRank` as ``weights`` in the same order above:
 
     >>> rank = SearchRank(vector, query, weights=[0.2, 0.4, 0.6, 0.8])
     >>> Entry.objects.annotate(rank=rank).filter(rank__gte=0.3).order_by("-rank")
+
+Lexeme objects
+==============
+
+.. versionadded:: 6.0
+
+Lexeme objects allow search operators to be safely used with strings from an
+untrusted source. The content of each lexeme is escaped
+so that any operators that may exist in the string itself
+will not be interpreted.
+
+You can combine lexemes with other lexemes in Python using the ``&`` and ``|``
+operators and also negate them with the ``~`` operator. For example:
+
+.. code-block:: pycon
+
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
+    >>> SearchQuery(
+    ...     Lexeme("The user's search query")
+    ...     & Lexeme("Something else")
+    ...     & ~Lexeme("Exclude documents that match this")
+    ... )
+    >>> SearchQuery(Lexeme("The user's search query") | Lexeme("Something else"))
+
+Lexeme objects also support weighting and prefixes:
+
+.. code-block:: pycon
+
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
+    >>> SearchQuery(
+    ...     Lexeme("These terms have lower weight", weight="D") & Lexeme("than these terms")
+    ... )
+    >>> SearchQuery(Lexeme("Djan", prefix=True))
 
 Performance
 ===========
