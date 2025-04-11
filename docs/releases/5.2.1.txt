@@ -32,3 +32,7 @@ Bugfixes
 * Fixed a regression in Django 5.2 that caused a crash when using
   ``QuerySet.select_for_update(of=(…))`` with ``values()/values_list()``
   including expressions (:ticket:`36301`).
+
+* Fixed a regression in Django 5.2 that caused improper values to be returned
+  from ``QuerySet.values_list()`` when duplicate field names were specified
+  (:ticket:`36288`).

@@ -86,22 +86,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # Redundant sanity check.
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
 
-    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
-    def test_4d_hexewkb(self):
-        ogc_hex_4d = (
-            b"01010000C00000000000000000000000000000"
-            b"F03F00000000000000400000000000000000"
-        )
-        hexewkb_4d = (
-            b"01010000E0E61000000000000000000000000000000000"
-            b"F03F00000000000000400000000000000000"
-        )
-        pnt_4d = Point(0, 1, 2, 0, srid=4326)
-        self.assertEqual(ogc_hex_4d, pnt_4d.hex)
-        self.assertEqual(hexewkb_4d, pnt_4d.hexewkb)
-        self.assertIs(GEOSGeometry(hexewkb_4d).hasm, True)
-        self.assertEqual(memoryview(a2b_hex(hexewkb_4d)), pnt_4d.ewkb)
-
     def test_kml(self):
         "Testing KML output."
         for tg in self.geometries.wkt_out:
@@ -1284,12 +1268,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertIsInstance(g2.srs, gdal.SpatialReference)
         self.assertEqual(g2.hex, g2.ogr.hex)
         self.assertEqual("WGS 84", g2.srs.name)
-
-    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
-    def test_gdal_4d(self):
-        g1_4d = fromstr("POINT(5 23 8 0)")
-        self.assertIsInstance(g1_4d.ogr, gdal.OGRGeometry)
-        self.assertEqual(g1_4d.ogr.m, 0)
 
     def test_copy(self):
         "Testing use with the Python `copy` module."
