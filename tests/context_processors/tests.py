@@ -118,9 +118,7 @@ class DebugContextProcessorTests(TestCase):
         "django.middleware.csp.ContentSecurityPolicyMiddleware",
     ],
     SECURE_CSP={
-        "DIRECTIVES": {
-            "script-src": [CSP.SELF, CSP.NONCE],
-        }
+        "script-src": [CSP.SELF, CSP.NONCE],
     },
 )
 class CSPContextProcessorTests(TestCase):

@@ -65,12 +65,10 @@ Here's an an example of a basic CSP config::
   from django.middleware.constants import CSP
 
   SECURE_CSP = {
-      "DIRECTIVES": {
-          "default-src": [CSP.SELF],
-          "script-src": [CSP.SELF, CSP.NONCE],
-          "style-src": [CSP.SELF],
-          "img-src": [CSP.SELF, "https:"],
-      }
+      "default-src": [CSP.SELF],
+      "script-src": [CSP.SELF, CSP.NONCE],
+      "style-src": [CSP.SELF],
+      "img-src": [CSP.SELF, "https:"],
   }
 
 Per-view policy customization with can be achieved via the

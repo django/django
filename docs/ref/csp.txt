@@ -37,19 +37,15 @@ To enable CSP in your Django project:
       from django.middleware.constants import CSP
 
       SECURE_CSP = {
-          "DIRECTIVES": {
-              "default-src": [CSP.SELF],
-              # Add more directives as needed
-          }
+          "default-src": [CSP.SELF],
+          # Add more directives as needed
       }
 
       # Or for report-only mode:
       SECURE_CSP_REPORT_ONLY = {
-          "DIRECTIVES": {
-              "default-src": [CSP.SELF],
-              # Add more directives as needed
-              "report-uri": "/path/to/reports-endpoint/",
-          }
+          "default-src": [CSP.SELF],
+          # Add more directives as needed
+          "report-uri": "/path/to/reports-endpoint/",
       }
 
 .. _csp-settings:
@@ -127,12 +123,10 @@ Example usage::
     from django.middleware.constants import CSP
 
     SECURE_CSP = {
-        "DIRECTIVES": {
-            "default-src": [CSP.SELF],
-            "script-src": [CSP.SELF, CSP.NONCE],
-            "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
-            "object-src": [CSP.NONE],
-        }
+        "default-src": [CSP.SELF],
+        "script-src": [CSP.SELF, CSP.NONCE],
+        "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
+        "object-src": [CSP.NONE],
     }
 
 CSP Settings
@@ -170,9 +164,8 @@ Configuration Options
 
 Structure of the Settings
 -------------------------
-Both ``SECURE_CSP`` and ``SECURE_CSP_REPORT_ONLY`` are dictionaries that must
-include a ``"DIRECTIVES"`` key. The value of this key is another dictionary
-containing CSP directives and their corresponding policies.
+Both ``SECURE_CSP`` and ``SECURE_CSP_REPORT_ONLY`` are dictionaries containing
+CSP directives and their corresponding policies.
 
 Here's a comprehensive example that demonstrates a decent starting point for
 many applications::
@@ -180,21 +173,19 @@ many applications::
     from django.middleware.constants import CSP
 
     SECURE_CSP = {
-        "DIRECTIVES": {
-            "default-src": [CSP.SELF],
-            "base-uri": [CSP.SELF],
-            "connect-src": [CSP.SELF],
-            "font-src": [CSP.SELF],
-            "form-action": [CSP.SELF],
-            "frame-ancestors": [CSP.NONE],
-            "frame-src": [CSP.NONE],
-            "img-src": [CSP.SELF],
-            "media-src": [CSP.SELF],
-            "object-src": [CSP.NONE],
-            "script-src": [CSP.SELF],
-            "style-src": [CSP.SELF],
-            "upgrade-insecure-requests": True,
-        }
+        "default-src": [CSP.SELF],
+        "base-uri": [CSP.SELF],
+        "connect-src": [CSP.SELF],
+        "font-src": [CSP.SELF],
+        "form-action": [CSP.SELF],
+        "frame-ancestors": [CSP.NONE],
+        "frame-src": [CSP.NONE],
+        "img-src": [CSP.SELF],
+        "media-src": [CSP.SELF],
+        "object-src": [CSP.NONE],
+        "script-src": [CSP.SELF],
+        "style-src": [CSP.SELF],
+        "upgrade-insecure-requests": True,
     }
 
 Explanation of the CSP Directives
@@ -357,14 +348,12 @@ To use nonces in your CSP policy:
       from django.middleware.constants import CSP
 
       SECURE_CSP = {
-          "DIRECTIVES": {
-              "default-src": [CSP.SELF],
-              # Allows self-hosted scripts and script tags with the matching
-              # `nonce=` attribute
-              "script-src": [CSP.SELF, CSP.NONCE],
-              # Example of the less secure ``unsafe-inline`` option
-              "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
-          }
+          "default-src": [CSP.SELF],
+          # Allows self-hosted scripts and script tags with the matching
+          # `nonce=` attribute
+          "script-src": [CSP.SELF, CSP.NONCE],
+          # Example of the less secure ``unsafe-inline`` option
+          "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
       }
 
 2. Add the CSP context processor to your ``TEMPLATES`` setting, which makes the

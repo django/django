@@ -88,9 +88,8 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
     @staticmethod
     def build_policy(config, nonce=None):
         policy = []
-        directives = config.get("DIRECTIVES", {})
 
-        for directive, value in directives.items():
+        for directive, value in config.items():
             if value in (None, False):
                 continue
             elif value is True:

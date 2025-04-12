@@ -44,10 +44,8 @@ def csp_disabled_ro(request):
 
 
 csp_policy_override = {
-    "DIRECTIVES": {
-        "default-src": [CSP.SELF],
-        "img-src": [CSP.SELF, "data:"],
-    }
+    "default-src": [CSP.SELF],
+    "img-src": [CSP.SELF, "data:"],
 }
 
 

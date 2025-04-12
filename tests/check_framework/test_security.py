@@ -695,21 +695,13 @@ class CSPDirectivesCheckTests(SimpleTestCase):
         errors = csp.check_csp_directives(None)
         self.assertEqual(errors, [])
 
-    @override_settings(
-        SECURE_CSP={"DIRECTIVES": {}}, SECURE_CSP_REPORT_ONLY={"DIRECTIVES": {}}
-    )
-    def test_secure_csp_valid(self):
-        """Check should pass when both CSP settings have DIRECTIVES keys."""
-        errors = csp.check_csp_directives(None)
-        self.assertEqual(errors, [])
-
     def test_secure_csp_mixed_settings(self):
         """Check should pass when only one setting is used but it's valid."""
-        with self.settings(SECURE_CSP={"DIRECTIVES": {}}, SECURE_CSP_REPORT_ONLY=None):
+        with self.settings(SECURE_CSP={}, SECURE_CSP_REPORT_ONLY=None):
             errors = csp.check_csp_directives(None)
             self.assertEqual(errors, [])
 
-        with self.settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY={"DIRECTIVES": {}}):
+        with self.settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY={}):
             errors = csp.check_csp_directives(None)
             self.assertEqual(errors, [])
 
@@ -720,19 +712,5 @@ class CSPDirectivesCheckTests(SimpleTestCase):
             self.assertEqual(errors, [csp.W026])
 
         with self.settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY="not-a-dict"):
-            errors = csp.check_csp_directives(None)
-            self.assertEqual(errors, [csp.W026])
-
-    def test_secure_csp_missing_directives(self):
-        """Check should fail when either CSP setting lacks a DIRECTIVES key."""
-        with self.settings(
-            SECURE_CSP={"NOT_DIRECTIVES": {}}, SECURE_CSP_REPORT_ONLY=None
-        ):
-            errors = csp.check_csp_directives(None)
-            self.assertEqual(errors, [csp.W026])
-
-        with self.settings(
-            SECURE_CSP=None, SECURE_CSP_REPORT_ONLY={"NOT_DIRECTIVES": {}}
-        ):
             errors = csp.check_csp_directives(None)
             self.assertEqual(errors, [csp.W026])

@@ -19,10 +19,8 @@ class CSP(str, Enum):
     Example usage in Django settings:
 
         SECURE_CSP = {
-            "DIRECTIVES": {
-                "default-src": [CSP.NONE],
-                "script-src": [CSP.SELF, CSP.NONCE],
-            }
+            "default-src": [CSP.NONE],
+            "script-src": [CSP.SELF, CSP.NONCE],
         }
 
     """

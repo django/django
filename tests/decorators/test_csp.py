@@ -6,9 +6,7 @@ from django.test import SimpleTestCase
 from django.views.decorators.csp import csp_disabled, csp_override
 
 basic_config = {
-    "DIRECTIVES": {
-        "default-src": [CSP.SELF],
-    }
+    "default-src": [CSP.SELF],
 }
 
 
