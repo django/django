@@ -3,8 +3,9 @@ Tests for Django's bundled context processors.
 """
 
 from django.middleware.constants import CSP
-from django.middleware.csp import HEADER
 from django.test import SimpleTestCase, TestCase, override_settings
+
+HEADER = "Content-Security-Policy"
 
 
 @override_settings(
@@ -155,4 +156,4 @@ class CSPContextProcessorTests(TestCase):
     def test_csp_nonce_length(self):
         response = self.client.get("/csp_nonce/")
         nonce = response.context["CSP_NONCE"]
-        self.assertEqual(len(nonce), 24)  # Based on base64 encoding of 16 bytes
+        self.assertEqual(len(nonce), 22)  # Based on secrets.token_urlsafe of 16 bytes.

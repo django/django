@@ -1,14 +1,12 @@
 from django.http import HttpRequest, HttpResponse
 from django.middleware.constants import CSP
-from django.middleware.csp import (
-    HEADER,
-    HEADER_REPORT_ONLY,
-    ContentSecurityPolicyMiddleware,
-    LazyNonce,
-)
+from django.middleware.csp import ContentSecurityPolicyMiddleware, LazyNonce
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.functional import empty
+
+HEADER = "Content-Security-Policy"
+HEADER_REPORT_ONLY = "Content-Security-Policy-Report-Only"
 
 basic_config = {
     "DIRECTIVES": {
@@ -62,6 +60,18 @@ class CSPBuildPolicyTest(SimpleTestCase):
         """
         policy = {"DIRECTIVES": {"default-src": (CSP.SELF, "foo.com")}}
         self.assertPolicyEqual(self.build_policy(policy), "default-src 'self' foo.com")
+
+    def test_config_value_as_set(self):
+        """
+        Test that a set can be passed as a value.
+
+        Sets are often used in Django settings to ensure uniqueness, however, sets are
+        unordered. The middleware ensures consistency via sorting if a set is passed.
+        """
+        policy = {"DIRECTIVES": {"default-src": {CSP.SELF, "foo.com", "bar.com"}}}
+        self.assertPolicyEqual(
+            self.build_policy(policy), "default-src 'self' bar.com foo.com"
+        )
 
     def test_config_value_none(self):
         """
@@ -404,7 +414,7 @@ class LazyNonceTests(SimpleTestCase):
         self.assertTrue(nonce)
         self.assertEqual(nonce, val)
         self.assertIsInstance(nonce, str)
-        self.assertEqual(len(val), 24)  # Based on base64 encoding of 16 bytes.
+        self.assertEqual(len(val), 22)  # Based on secrets.token_urlsafe of 16 bytes.
 
         # Also test the wrapped value.
         self.assertEqual(nonce._wrapped, val)
