@@ -194,7 +194,7 @@ intersphinx_mapping = {
 intersphinx_cache_limit = 90  # days
 
 # The 'versionadded' and 'versionchanged' directives are overridden.
-suppress_warnings = ["app.add_directive"]
+suppress_warnings = ["app.add_directive", "epub.duplicated_toc_entry"]
 
 # -- Options for HTML output ---------------------------------------------------
 
