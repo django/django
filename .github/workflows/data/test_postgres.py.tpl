@@ -21,12 +21,4 @@ DATABASES = {
         "HOST": "localhost",
         "PORT": 5432,
     },
-    "other2": {
-        "ENGINE": "django.db.backends.postgresql",
-        "USER": "user",
-        "NAME": "django3",
-        "PASSWORD": "postgres",
-        "HOST": "localhost",
-        "PORT": 5432,
-    },
 }
