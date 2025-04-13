@@ -875,7 +875,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:admin_views_thing_changelist"))
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
             msg_prefix="Expected filter not found in changelist view",
         )
         self.assertNotContains(
@@ -930,7 +931,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(changelist_url)
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
         )
         filters = {
             "chap__id__exact": {
@@ -1070,7 +1072,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
         )
         self.assertContains(
             response,
