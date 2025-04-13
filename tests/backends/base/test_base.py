@@ -140,7 +140,7 @@ class DatabaseWrapperLoggingTests(TransactionTestCase):
                 raise Exception("Force rollback")
 
             conn = connections[DEFAULT_DB_ALIAS]
-            self.assertEqual(len(conn.queries_log), 0)
+            self.assertEqual(len(conn.queries_log), 0, conn.queries_log)
 
 
 class ExecuteWrapperTests(TestCase):
