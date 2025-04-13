@@ -1745,7 +1745,8 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         self.assertContains(
             response,
-            '<form id="changelist-search" method="get" role="search">',
+            '<form id="changelist-search" method="get" role="search" '
+            'aria-labelledby="changelist-search-form">',
         )
 
     def test_search_bar_total_link_preserves_options(self):
