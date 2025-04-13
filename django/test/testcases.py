@@ -152,7 +152,7 @@ class _AssertNumQueriesContext(_AssertNumQueriesMixin, CaptureQueriesContext):
         super().__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        CaptureQueriesContext.__exit__(exc_type, exc_value, traceback)
+        CaptureQueriesContext.__exit__(self, exc_type, exc_value, traceback)
         return super().__exit__(exc_type, exc_value, traceback)
 
 

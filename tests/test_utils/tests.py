@@ -50,7 +50,7 @@ from django.test.utils import (
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
 from django.utils.html import VOID_ELEMENTS
 
-from .models import Car, Department, Employee, Person, PossessedCar, Role
+from .models import Car, Person, PossessedCar
 from .views import empty_response
 
 
@@ -268,9 +268,9 @@ class MultiDBRouter:
         return True
 
     def db_for_read(self, model, **hints):
-        if model == Employee:
+        if model == Car:
             return "other"
-        if model == Role:
+        if model == Person:
             return "other2"
         return "default"
 
@@ -285,21 +285,21 @@ class AssertNumQueriesTestsMultiDB(TestCase):
 
     def test_assert_num_queries_all(self):
         with self.assertNumQueries(3, using="__all__"):
-            Department.objects.count()
-            Employee.objects.count()
-            Role.objects.count()
+            Car.objects.count()
+            Person.objects.count()
+            PossessedCar.objects.count()
 
     def test_assert_num_queries_all_specific(self):
         with self.assertNumQueries(3, using={"default", "other", "other2"}):
-            Department.objects.count()
-            Employee.objects.count()
-            Role.objects.count()
+            Car.objects.count()
+            Person.objects.count()
+            PossessedCar.objects.count()
 
     def test_assert_num_queries_specific(self):
         with self.assertNumQueries(2, using={"default", "other2"}):
-            Department.objects.count()
-            Employee.objects.count()
-            Role.objects.count()
+            Car.objects.count()
+            Person.objects.count()
+            PossessedCar.objects.count()
 
 
 class AssertQuerySetEqualTests(TestCase):
