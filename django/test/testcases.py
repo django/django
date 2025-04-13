@@ -125,12 +125,12 @@ class _AssertNumQueriesMixin:
 
 
 class _AssertCollectiveNumQueriesContext(_AssertNumQueriesMixin):
-    def __init__(self, test_case, num, connections):
+    def __init__(self, test_case, num, connections_):
         self.test_case = test_case
         self.num = num
         self.cm = LazyExitStack()
-        for connection in connections:
-            self.cm.enter_context(CaptureQueriesContext(connection))
+        for conn in connections_:
+            self.cm.enter_context(CaptureQueriesContext(conn))
 
     @property
     def captured_queries(self):

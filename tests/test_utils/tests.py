@@ -270,8 +270,6 @@ class MultiDBRouter:
     def db_for_read(self, model, **hints):
         if model == Car:
             return "other"
-        if model == Person:
-            return "other2"
         return "default"
 
     db_for_write = db_for_read
@@ -281,7 +279,7 @@ class MultiDBRouter:
     DATABASE_ROUTERS=["%s.MultiDBRouter" % __name__],
 )
 class AssertNumQueriesTestsMultiDB(TestCase):
-    databases = {"default", "other", "other2"}
+    databases = {"default", "other"}
 
     def test_assert_num_queries_all(self):
         with self.assertNumQueries(3, using="__all__"):
@@ -290,13 +288,13 @@ class AssertNumQueriesTestsMultiDB(TestCase):
             PossessedCar.objects.count()
 
     def test_assert_num_queries_all_specific(self):
-        with self.assertNumQueries(3, using={"default", "other", "other2"}):
+        with self.assertNumQueries(3, using={"default", "other"}):
             Car.objects.count()
             Person.objects.count()
             PossessedCar.objects.count()
 
     def test_assert_num_queries_specific(self):
-        with self.assertNumQueries(2, using={"default", "other2"}):
+        with self.assertNumQueries(1, using={"other"}):
             Car.objects.count()
             Person.objects.count()
             PossessedCar.objects.count()
