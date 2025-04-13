@@ -1,3 +1,4 @@
+import contextlib
 import copy
 import itertools
 import operator
@@ -449,3 +450,21 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
+
+
+class LazyExitStack:
+
+    def __init__(self):
+        self._context_managers = []
+
+    def enter_context(self, context_manager):
+        self._context_managers.append(context_manager)
+
+    def __enter__(self):
+        self._exit_stack = contextlib.ExitStack()
+        for cm in self._context_managers:
+            self._exit_stack.enter_context(cm)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return self._exit_stack.__exit__(exc_type, exc_value, traceback)

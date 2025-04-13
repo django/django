@@ -38,7 +38,13 @@ from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.core.signals import setting_changed
-from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from django.db import (
+    ALL_DATABASES,
+    DEFAULT_DB_ALIAS,
+    connection,
+    connections,
+    transaction,
+)
 from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -53,7 +59,7 @@ from django.test.utils import (
     modify_settings,
     override_settings,
 )
-from django.utils.functional import classproperty
+from django.utils.functional import LazyExitStack, classproperty
 from django.views.static import serve
 
 logger = logging.getLogger("django.test")
@@ -98,14 +104,8 @@ def assert_and_parse_html(self, html, user_msg, msg):
     return dom
 
 
-class _AssertNumQueriesContext(CaptureQueriesContext):
-    def __init__(self, test_case, num, connection):
-        self.test_case = test_case
-        self.num = num
-        super().__init__(connection)
-
+class _AssertNumQueriesMixin:
     def __exit__(self, exc_type, exc_value, traceback):
-        super().__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
         executed = len(self)
@@ -122,6 +122,38 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
                 ),
             ),
         )
+
+
+class _AssertCollectiveNumQueriesContext(_AssertNumQueriesMixin):
+    def __init__(self, test_case, num, connections):
+        self.test_case = test_case
+        self.num = num
+        self.cm = LazyExitStack()
+        for connection in connections:
+            self.cm.enter_context(CaptureQueriesContext(connection))
+
+    @property
+    def captured_queries(self):
+        return [
+            query for cm in self.cm._context_managers for query in cm.captured_queries
+        ]
+
+    def __len__(self):
+        return sum(len(cm) for cm in self.cm._context_managers)
+
+    def __enter__(self):
+        return self.cm.__enter__()
+
+
+class _AssertNumQueriesContext(_AssertNumQueriesMixin, CaptureQueriesContext):
+    def __init__(self, test_case, num, connection):
+        self.test_case = test_case
+        self.num = num
+        super().__init__(connection)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        CaptureQueriesContext.__exit__(exc_type, exc_value, traceback)
+        return super().__exit__(exc_type, exc_value, traceback)
 
 
 class _AssertTemplateUsedContext:
@@ -217,7 +249,7 @@ class SimpleTestCase(unittest.TestCase):
 
     @classmethod
     def _validate_databases(cls):
-        if cls.databases == "__all__":
+        if cls.databases == ALL_DATABASES:
             return frozenset(connections)
         for alias in cls.databases:
             if alias not in connections:
@@ -1261,9 +1293,16 @@ class TransactionTestCase(SimpleTestCase):
         return self.assertEqual(list(items), values, msg=msg)
 
     def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
-        conn = connections[using]
+        if using == ALL_DATABASES:
+            using = self.databases
 
-        context = _AssertNumQueriesContext(self, num, conn)
+        if isinstance(using, str):
+            conn = connections[using]
+            context = _AssertNumQueriesContext(self, num, conn)
+        else:
+            conns = [connections[db] for db in using]
+            context = _AssertCollectiveNumQueriesContext(self, num, conns)
+
         if func is None:
             return context
 

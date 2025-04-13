@@ -50,7 +50,7 @@ from django.test.utils import (
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
 from django.utils.html import VOID_ELEMENTS
 
-from .models import Car, Person, PossessedCar
+from .models import Car, Department, Employee, Person, PossessedCar, Role
 from .views import empty_response
 
 
@@ -261,6 +261,45 @@ class AssertNumQueriesUponConnectionTests(TransactionTestCase):
         with mock.patch(ensure_connection, side_effect=make_configuration_query):
             with self.assertNumQueries(1):
                 list(Car.objects.all())
+
+
+class MultiDBRouter:
+    def allow_relation(self, obj1, obj2, **hints):
+        return True
+
+    def db_for_read(self, model, **hints):
+        if model == Employee:
+            return "other"
+        if model == Role:
+            return "other2"
+        return "default"
+
+    db_for_write = db_for_read
+
+
+@override_settings(
+    DATABASE_ROUTERS=["%s.MultiDBRouter" % __name__],
+)
+class AssertNumQueriesTestsMultiDB(TestCase):
+    databases = {"default", "other", "other2"}
+
+    def test_assert_num_queries_all(self):
+        with self.assertNumQueries(3, using="__all__"):
+            Department.objects.count()
+            Employee.objects.count()
+            Role.objects.count()
+
+    def test_assert_num_queries_all_specific(self):
+        with self.assertNumQueries(3, using={"default", "other", "other2"}):
+            Department.objects.count()
+            Employee.objects.count()
+            Role.objects.count()
+
+    def test_assert_num_queries_specific(self):
+        with self.assertNumQueries(2, using={"default", "other2"}):
+            Department.objects.count()
+            Employee.objects.count()
+            Role.objects.count()
 
 
 class AssertQuerySetEqualTests(TestCase):

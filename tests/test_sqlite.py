@@ -19,6 +19,9 @@ DATABASES = {
     "other": {
         "ENGINE": "django.db.backends.sqlite3",
     },
+    "other2": {
+        "ENGINE": "django.db.backends.sqlite3",
+    },
 }
 
 SECRET_KEY = "django_tests_secret_key"
