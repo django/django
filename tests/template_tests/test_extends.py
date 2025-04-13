@@ -1,7 +1,9 @@
 import os
+import warnings
 
 from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .utils import ROOT, setup
 
@@ -195,3 +197,52 @@ class ExtendsBehaviorTests(SimpleTestCase):
         msg = "{% extends 'base.html' %} must be the first tag in the template."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Engine().from_string(template_string)
+
+    def test_comment_and_block_tag_used_after_extends_tag(self):
+        template_string = (
+            "{% extends 'index.html' %} {% comment %} comment {% endcomment %}"
+            "{% block main %} new text {% endblock %}"
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            Engine().from_string(template_string)
+            self.assertEqual(w, [])
+
+    def test_non_whitespace_text_used_after_extends_tag(self):
+        template_string = "{% extends 'index.html' %} some text"
+        msg = (
+            "Non-whitespace text after the {% extends %} tag and outside"
+            "of a tag gets ignored. It's usage is now deprecated"
+            "Use {% comment %} or {# ... #} tag instead."
+        )
+        with warnings.catch_warnings(
+            record=True, category=RemovedInDjango70Warning
+        ) as w:
+            warnings.simplefilter("always")
+            Engine().from_string(template_string)
+            self.assertTrue(any(msg == str(temp.message) for temp in w))
+
+    def test_whitespace_text_used_after_extends_tag(self):
+        template_string = "{% extends 'index.html' %}        "
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            Engine().from_string(template_string)
+            self.assertEqual(w, [])
+
+    def test_non_whitespace_text_used_before_extends_tag(self):
+        engine = Engine(
+            loaders=[
+                [
+                    "django.template.loaders.locmem.Loader",
+                    {
+                        "index.html": "{% block content %}index{% endblock %}",
+                    },
+                ],
+            ]
+        )
+        template_string = "some text {% extends 'index.html' %}"
+        with warnings.catch_warnings(record=True) as w:
+            template = engine.from_string(template_string)
+            temp = template.render(Context({}))
+        self.assertEqual(temp.strip(), "some text index")
+        self.assertEqual(w, [])

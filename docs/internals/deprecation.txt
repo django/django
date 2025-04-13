@@ -35,6 +35,9 @@ details on these changes.
   argument of ``django.core.paginator.Paginator`` and
   ``django.core.paginator.AsyncPaginator`` will no longer be allowed.
 
+* Support for adding non-whitespace text after ``{% extends %}`` tag outside a
+  tag will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

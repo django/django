@@ -1,6 +1,8 @@
 import posixpath
+import warnings
 from collections import defaultdict
 
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.safestring import mark_safe
 
 from .base import Node, Template, TemplateSyntaxError, TextNode, Variable, token_kwargs
@@ -304,6 +306,15 @@ def do_extends(parser, token):
     bits[1] = construct_relative_path(parser.origin.template_name, bits[1])
     parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
+    # Check for non-whitespace text used after {% extends %} tag
+    if any(temp.s.strip() for temp in nodelist if isinstance(temp, TextNode)):
+        warnings.warn(
+            "Non-whitespace text after the {% extends %} tag and outside"
+            "of a tag gets ignored. It's usage is now deprecated"
+            "Use {% comment %} or {# ... #} tag instead.",
+            category=RemovedInDjango70Warning,
+            stacklevel=2,
+        )
     if nodelist.get_nodes_by_type(ExtendsNode):
         raise TemplateSyntaxError(
             "'%s' cannot appear more than once in the same template" % bits[0]
