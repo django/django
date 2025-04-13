@@ -3,9 +3,10 @@ import pickle
 import sys
 import unittest
 import warnings
+from contextlib import contextmanager
 
 from django.test import TestCase
-from django.utils.functional import LazyObject, SimpleLazyObject, empty
+from django.utils.functional import LazyExitStack, LazyObject, SimpleLazyObject, empty
 
 from .models import Category, CategoryInfo
 
@@ -507,3 +508,80 @@ class SimpleLazyObjectPickleTestCase(TestCase):
                 )
                 # Assert that there were no warnings.
                 self.assertEqual(len(recorded), 0)
+
+
+class ContextManager:
+    """Helper method to create a class-based context manager."""
+
+    def __init__(self, name, entered, exited):
+        self.name = name
+        self.entered = entered
+        self.exited = exited
+
+    def __enter__(self):
+        self.entered.append(self.name)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.exited.append(self.name)
+
+
+@contextmanager
+def context_manager(name, entered, exited):
+    """Helper method to create a function-based context manager."""
+    entered.append(name)
+    yield
+    exited.append(name)
+
+
+class LazyExitStackTestCase(TestCase):
+    def setUp(self):
+        self.entered = []
+        self.exited = []
+
+    def test_lazy_behavior(self):
+        """Test that contexts are not entered until the with block is executed."""
+        stack = LazyExitStack()
+        stack.enter_context(ContextManager("a", self.entered, self.exited))
+
+        self.assertEqual(self.entered, [])
+
+        with stack:
+            self.assertEqual(self.entered, ["a"])
+
+        self.assertEqual(self.exited, ["a"])
+
+    def test_multiple_contexts(self):
+        """Test that multiple contexts are managed correctly."""
+        stack = LazyExitStack()
+        stack.enter_context(ContextManager("a", self.entered, self.exited))
+        stack.enter_context(ContextManager("b", self.entered, self.exited))
+
+        with stack:
+            self.assertEqual(self.entered, ["a", "b"])
+
+        self.assertEqual(self.exited, ["b", "a"])
+
+    def test_mixed_context_types(self):
+        """Test that both class-based and function-based contexts work."""
+        stack = LazyExitStack()
+        stack.enter_context(ContextManager("a", self.entered, self.exited))
+        stack.enter_context(context_manager("b", self.entered, self.exited))
+        stack.enter_context(ContextManager("c", self.entered, self.exited))
+        stack.enter_context(context_manager("d", self.entered, self.exited))
+
+        with stack:
+            self.assertEqual(self.entered, ["a", "b", "c", "d"])
+
+        self.assertEqual(self.entered, ["a", "b", "c", "d"])
+        self.assertEqual(self.exited, ["d", "c", "b", "a"])
+
+    def test_empty_stack(self):
+        """Test that an empty stack works correctly."""
+        stack = LazyExitStack()
+
+        with stack:
+            self.assertEqual(self.entered, [])
+
+        self.assertEqual(self.entered, [])
+        self.assertEqual(self.exited, [])
