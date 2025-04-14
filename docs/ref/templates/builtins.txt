@@ -777,7 +777,7 @@ will be displayed if the value has not changed:
 Loads a template and renders it with the current context. This is a way of
 "including" other templates within a template.
 
-The template name can either be a variable or a hard-coded (quoted) string,
+The template name can either be a variable or a hardcoded (quoted) string,
 in either single or double quotes.
 
 This example includes the contents of the template ``"foo/bar.html"``:
@@ -1386,7 +1386,7 @@ given view and optional parameters. Any special characters in the resulting
 path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
 
 This is a way to output links without violating the DRY principle by having to
-hard-code URLs in your templates:
+hardcode URLs in your templates:
 
 .. code-block:: html+django
 

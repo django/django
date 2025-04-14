@@ -89,7 +89,7 @@ to place the pattern at the end of the other urlpatterns::
     matched.
 
 Another common setup is to use flatpages for a limited set of known pages and
-to hard code their URLs in the :doc:`URLconf </topics/http/urls>`::
+to hardcode their URLs in the :doc:`URLconf </topics/http/urls>`::
 
     from django.contrib.flatpages import views
 
