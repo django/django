@@ -48,8 +48,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
 
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, private_only=True, **kwargs)
-        # GenericForeignKey is its own descriptor.
-        setattr(cls, self.attname, self)
+        setattr(cls, self.attname, GenericForeignKeyDescriptor(self))
 
     def get_attname_column(self):
         attname, column = super().get_attname_column()
@@ -161,11 +160,19 @@ class GenericForeignKey(FieldCacheMixin, Field):
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
 
+
+class GenericForeignKeyDescriptor:
+    def __init__(self, field):
+        self.field = field
+
+    def is_cached(self, instance):
+        return self.field.is_cached(instance)
+
     def get_prefetch_querysets(self, instances, querysets=None):
         custom_queryset_dict = {}
         if querysets is not None:
             for queryset in querysets:
-                ct_id = self.get_content_type(
+                ct_id = self.field.get_content_type(
                     model=queryset.query.model, using=queryset.db
                 ).pk
                 if ct_id in custom_queryset_dict:
@@ -179,12 +186,12 @@ class GenericForeignKey(FieldCacheMixin, Field):
         fk_dict = defaultdict(set)
         # We need one instance for each group in order to get the right db:
         instance_dict = {}
-        ct_attname = self.model._meta.get_field(self.ct_field).attname
+        ct_attname = self.field.model._meta.get_field(self.field.ct_field).attname
         for instance in instances:
             # We avoid looking for values if either ct_id or fkey value is None
             ct_id = getattr(instance, ct_attname)
             if ct_id is not None:
-                fk_val = getattr(instance, self.fk_field)
+                fk_val = getattr(instance, self.field.fk_field)
                 if fk_val is not None:
                     fk_dict[ct_id].add(fk_val)
                     instance_dict[ct_id] = instance
@@ -196,7 +203,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
                 ret_val.extend(custom_queryset_dict[ct_id].filter(pk__in=fkeys))
             else:
                 instance = instance_dict[ct_id]
-                ct = self.get_content_type(id=ct_id, using=instance._state.db)
+                ct = self.field.get_content_type(id=ct_id, using=instance._state.db)
                 ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
 
         # For doing the join in Python, we have to match both the FK val and
@@ -207,17 +214,17 @@ class GenericForeignKey(FieldCacheMixin, Field):
             if ct_id is None:
                 return None
             else:
-                model = self.get_content_type(
+                model = self.field.get_content_type(
                     id=ct_id, using=obj._state.db
                 ).model_class()
-                return str(getattr(obj, self.fk_field)), model
+                return str(getattr(obj, self.field.fk_field)), model
 
         return (
             ret_val,
             lambda obj: (obj._meta.pk.value_to_string(obj), obj.__class__),
             gfk_key,
             True,
-            self.name,
+            self.field.name,
             False,
         )
 
@@ -229,16 +236,17 @@ class GenericForeignKey(FieldCacheMixin, Field):
         # reload the same ContentType over and over (#5570). Instead, get the
         # content type ID here, and later when the actual instance is needed,
         # use ContentType.objects.get_for_id(), which has a global cache.
-        f = self.model._meta.get_field(self.ct_field)
+        f = self.field.model._meta.get_field(self.field.ct_field)
         ct_id = getattr(instance, f.attname, None)
-        pk_val = getattr(instance, self.fk_field)
+        pk_val = getattr(instance, self.field.fk_field)
 
-        rel_obj = self.get_cached_value(instance, default=None)
-        if rel_obj is None and self.is_cached(instance):
+        rel_obj = self.field.get_cached_value(instance, default=None)
+        if rel_obj is None and self.field.is_cached(instance):
             return rel_obj
         if rel_obj is not None:
             ct_match = (
-                ct_id == self.get_content_type(obj=rel_obj, using=instance._state.db).id
+                ct_id
+                == self.field.get_content_type(obj=rel_obj, using=instance._state.db).id
             )
             pk_match = ct_match and rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
             if pk_match:
@@ -246,26 +254,26 @@ class GenericForeignKey(FieldCacheMixin, Field):
             else:
                 rel_obj = None
         if ct_id is not None:
-            ct = self.get_content_type(id=ct_id, using=instance._state.db)
+            ct = self.field.get_content_type(id=ct_id, using=instance._state.db)
             try:
                 rel_obj = ct.get_object_for_this_type(
                     using=instance._state.db, pk=pk_val
                 )
             except ObjectDoesNotExist:
                 pass
-        self.set_cached_value(instance, rel_obj)
+        self.field.set_cached_value(instance, rel_obj)
         return rel_obj
 
     def __set__(self, instance, value):
         ct = None
         fk = None
         if value is not None:
-            ct = self.get_content_type(obj=value)
+            ct = self.field.get_content_type(obj=value)
             fk = value.pk
 
-        setattr(instance, self.ct_field, ct)
-        setattr(instance, self.fk_field, fk)
-        self.set_cached_value(instance, value)
+        setattr(instance, self.field.ct_field, ct)
+        setattr(instance, self.field.fk_field, fk)
+        self.field.set_cached_value(instance, value)
 
 
 class GenericRel(ForeignObjectRel):
