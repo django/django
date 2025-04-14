@@ -1892,10 +1892,20 @@ your test suite.
     Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
     ``num`` database queries are executed.
 
-    If a ``"using"`` key is present in ``kwargs`` it is used as the database
-    alias for which to check the number of queries::
+    The ``using`` parameter controls which database(s) to count queries for. You can
+    specify a single database::
 
         self.assertNumQueries(7, using="non_default_db")
+
+    Or count queries across multiple databases by passing an iterable of database
+    aliases::
+
+        self.assertNumQueries(7, using={"default", "other"})
+
+    Or use the special value ``"__all__"`` to count queries across all databases
+    defined in :attr:`TransactionTestCase.databases`::
+
+        self.assertNumQueries(7, using="__all__")
 
     If you wish to call a function with a ``using`` parameter you can do it by
     wrapping the call with a ``lambda`` to add an extra parameter::
