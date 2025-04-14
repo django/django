@@ -297,6 +297,17 @@ class AssertNumQueriesTestsMultiDB(TestCase):
             Person.objects.count()
             PossessedCar.objects.count()
 
+    def test_assert_num_queries_multiple_nesting(self):
+        with (
+            self.assertNumQueries(1, using="other"),
+            self.assertNumQueries(2, using={"default"}),
+            self.assertNumQueries(1, using={"other"}),
+            self.assertNumQueries(3, using={"default", "other"}),
+        ):
+            Car.objects.count()
+            Person.objects.count()
+            PossessedCar.objects.count()
+
 
 class AssertQuerySetEqualTests(TestCase):
     @classmethod
