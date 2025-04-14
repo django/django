@@ -1,4 +1,5 @@
 from django.core.exceptions import FieldError
+from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
@@ -209,6 +210,37 @@ class SelectRelatedTests(TestCase):
         message = "Cannot call select_related() after .values() or .values_list()"
         with self.assertRaisesMessage(TypeError, message):
             list(Species.objects.values_list("name").select_related("genus"))
+
+    def test_fetch_mode_copied_fetching_one(self):
+        fly = (
+            Species.objects.fetch_mode(FETCH_PEERS)
+            .select_related("genus__family")
+            .get(name="melanogaster")
+        )
+        self.assertEqual(fly._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            fly.genus._state.fetch_mode,
+            FETCH_PEERS,
+        )
+        self.assertEqual(
+            fly.genus.family._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_fetching_many(self):
+        specieses = list(
+            Species.objects.fetch_mode(FETCH_PEERS).select_related("genus__family")
+        )
+        species = specieses[0]
+        self.assertEqual(species._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            species.genus._state.fetch_mode,
+            FETCH_PEERS,
+        )
+        self.assertEqual(
+            species.genus.family._state.fetch_mode,
+            FETCH_PEERS,
+        )
 
 
 class SelectRelatedValidationTests(SimpleTestCase):
