@@ -154,8 +154,10 @@ class ForwardManyToOneDescriptor:
     def is_cached(self, instance):
         return self.field.is_cached(instance)
 
-    def get_queryset(self, **hints):
-        return self.field.remote_field.model._base_manager.db_manager(hints=hints).all()
+    def get_queryset(self, *, instance):
+        return self.field.remote_field.model._base_manager.db_manager(
+            hints={"instance": instance}
+        ).fetch_mode(instance._state.fetch_mode)
 
     def get_prefetch_querysets(self, instances, querysets=None):
         if querysets and len(querysets) != 1:
@@ -163,8 +165,11 @@ class ForwardManyToOneDescriptor:
                 "querysets argument of get_prefetch_querysets() should have a length "
                 "of 1."
             )
-        queryset = querysets[0] if querysets else self.get_queryset()
+        queryset = (
+            querysets[0] if querysets else self.get_queryset(instance=instances[0])
+        )
         queryset._add_hints(instance=instances[0])
+        queryset = queryset.fetch_mode(instances[0]._state.fetch_mode)
 
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
@@ -380,6 +385,7 @@ class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
                 obj = rel_model(**kwargs)
                 obj._state.adding = instance._state.adding
                 obj._state.db = instance._state.db
+                obj._state.fetch_mode = instance._state.fetch_mode
                 return obj
         return super().get_object(instance)
 
@@ -441,8 +447,10 @@ class ReverseOneToOneDescriptor:
     def is_cached(self, instance):
         return self.related.is_cached(instance)
 
-    def get_queryset(self, **hints):
-        return self.related.related_model._base_manager.db_manager(hints=hints).all()
+    def get_queryset(self, *, instance):
+        return self.related.related_model._base_manager.db_manager(
+            hints={"instance": instance}
+        ).fetch_mode(instance._state.fetch_mode)
 
     def get_prefetch_querysets(self, instances, querysets=None):
         if querysets and len(querysets) != 1:
@@ -450,7 +458,9 @@ class ReverseOneToOneDescriptor:
                 "querysets argument of get_prefetch_querysets() should have a length "
                 "of 1."
             )
-        queryset = querysets[0] if querysets else self.get_queryset()
+        queryset = (
+            querysets[0] if querysets else self.get_queryset(instance=instances[0])
+        )
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = self.related.field.get_local_related_value
@@ -716,6 +726,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
+            queryset._fetch_mode = self.instance._state.fetch_mode
             queryset._defer_next_filter = True
             queryset = queryset.filter(**self.core_filters)
             for field in self.field.foreign_related_fields:
@@ -1117,6 +1128,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
+            queryset._fetch_mode = self.instance._state.fetch_mode
             queryset._defer_next_filter = True
             return queryset._next_is_sticky().filter(**self.core_filters)
 

@@ -27,6 +27,10 @@ Fetch modes apply to:
 * Fields deferred with :meth:`.QuerySet.defer` or :meth:`.QuerySet.only`
 * :ref:`generic-relations`
 
+Fetch modes are copied to related objects when they are fetched, so they can
+apply to a whole tree of relationships, not just the top-level model in the
+initial ``QuerySet``.
+
 .. admonition:: Referencing fetch modes
 
     Fetch modes are defined in ``django.db.models.fetch_modes``, but for
