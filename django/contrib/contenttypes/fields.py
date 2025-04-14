@@ -201,11 +201,13 @@ class GenericForeignKeyDescriptor:
         for ct_id, fkeys in fk_dict.items():
             if ct_id in custom_queryset_dict:
                 # Return values from the custom queryset, if provided.
-                ret_val.extend(custom_queryset_dict[ct_id].filter(pk__in=fkeys))
+                queryset = custom_queryset_dict[ct_id].filter(pk__in=fkeys)
             else:
                 instance = instance_dict[ct_id]
                 ct = self.field.get_content_type(id=ct_id, using=instance._state.db)
-                ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
+                queryset = ct.get_all_objects_for_this_type(pk__in=fkeys)
+
+            ret_val.extend(queryset.fetch_mode(instances[0]._state.fetch_mode))
 
         # For doing the join in Python, we have to match both the FK val and
         # the content type, so we use a callable that returns a (fk, class)
@@ -271,6 +273,8 @@ class GenericForeignKeyDescriptor:
                 )
             except ObjectDoesNotExist:
                 pass
+            else:
+                rel_obj._state.fetch_mode = instance._state.fetch_mode
         self.field.set_cached_value(instance, rel_obj)
 
     def fetch_many(self, instances):
@@ -636,7 +640,11 @@ def create_generic_related_manager(superclass, rel):
             Filter the queryset for the instance this manager is bound to.
             """
             db = self._db or router.db_for_read(self.model, instance=self.instance)
-            return queryset.using(db).filter(**self.core_filters)
+            return (
+                queryset.using(db)
+                .fetch_mode(self.instance._state.fetch_mode)
+                .filter(**self.core_filters)
+            )
 
         def _remove_prefetched_objects(self):
             try:
