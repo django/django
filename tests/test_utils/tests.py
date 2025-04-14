@@ -483,6 +483,12 @@ class AssertNumQueriesContextManagerTests(TestCase):
             Person.objects.count()
             Person.objects.count()
 
+    def test_deferred(self):
+        context = self.assertNumQueries(0)
+        Person.objects.count()
+        with context:
+            pass
+
     def test_failure(self):
         msg = "1 != 2 : 1 queries executed, 2 expected\nCaptured queries were:\n1."
         with self.assertRaisesMessage(AssertionError, msg):
