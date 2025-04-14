@@ -132,6 +132,7 @@ class _AssertNumQueriesContext:
         return self.captured_queries[index]
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.cm.__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
         executed = len(self)
