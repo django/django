@@ -200,8 +200,18 @@ class ExtendsBehaviorTests(SimpleTestCase):
 
     def test_comment_and_block_tag_used_after_extends_tag(self):
         template_string = (
+            "{% extends 'index.html' %}"
+            "{# commenting #} {% block main %} new text {% endblock %}"
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            Engine().from_string(template_string)
+            self.assertEqual(w, [])
+
+    def test_non_block_tags_used_after_extends_tag(self):
+        template_string = (
             "{% extends 'index.html' %} {% comment %} comment {% endcomment %}"
-            "{% block main %} new text {% endblock %}"
+            "{% if True %} statement {% endif %} {% lorem 5 w %}"
         )
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
