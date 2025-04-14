@@ -38,13 +38,7 @@ from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.core.signals import setting_changed
-from django.db import (
-    ALL_DATABASES,
-    DEFAULT_DB_ALIAS,
-    connection,
-    connections,
-    transaction,
-)
+from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -244,7 +238,7 @@ class SimpleTestCase(unittest.TestCase):
 
     @classmethod
     def _validate_databases(cls):
-        if cls.databases == ALL_DATABASES:
+        if cls.databases == "__all__":
             return frozenset(connections)
         for alias in cls.databases:
             if alias not in connections:
@@ -1288,7 +1282,7 @@ class TransactionTestCase(SimpleTestCase):
         return self.assertEqual(list(items), values, msg=msg)
 
     def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
-        if using == ALL_DATABASES:
+        if using == "__all__":
             using = self.databases
 
         if isinstance(using, str):

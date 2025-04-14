@@ -35,8 +35,6 @@ __all__ = [
     "DJANGO_VERSION_PICKLE_KEY",
 ]
 
-ALL_DATABASES = "__all__"
-
 connections = ConnectionHandler()
 
 router = ConnectionRouter()

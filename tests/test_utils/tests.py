@@ -275,9 +275,7 @@ class MultiDBRouter:
     db_for_write = db_for_read
 
 
-@override_settings(
-    DATABASE_ROUTERS=["%s.MultiDBRouter" % __name__],
-)
+@override_settings(DATABASE_ROUTERS=[f"{__name__}.MultiDBRouter"])
 class AssertNumQueriesTestsMultiDB(TestCase):
     databases = {"default", "other"}
 
