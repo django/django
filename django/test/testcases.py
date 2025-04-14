@@ -115,7 +115,7 @@ class _AssertNumQueriesContext:
     @property
     def captured_queries(self):
         return [
-            query for cm in self.cm._context_managers for query in cm.captured_queries
+            query for cm in self.cm.context_managers for query in cm.captured_queries
         ]
 
     def __len__(self):

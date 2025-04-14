@@ -453,16 +453,30 @@ def partition(predicate, values):
 
 
 class LazyExitStack:
+    """
+    A context manager that defers entering nested context managers until
+    the main context is entered.
+
+    This class allows you to collect multiple context managers and only enter
+    them when the main context is entered. All nested context managers are
+    exited in reverse order when the main context is exited.
+
+    Unlike contextlib.ExitStack, which enters context managers immediately
+    when added, this class defers entering them until the main context is
+    entered. This is useful when building a context manager that needs to
+    delay processing until the main __enter__ method is called.
+
+    """
 
     def __init__(self):
-        self._context_managers = []
+        self.context_managers = []
 
     def enter_context(self, context_manager):
-        self._context_managers.append(context_manager)
+        self.context_managers.append(context_manager)
 
     def __enter__(self):
         self._exit_stack = contextlib.ExitStack()
-        for cm in self._context_managers:
+        for cm in self.context_managers:
             self._exit_stack.enter_context(cm)
         return self
 
