@@ -165,7 +165,9 @@ class RawModelIterable(BaseIterable):
                 annotation_fields,
             ) = self.queryset.resolve_model_init_order()
             model_cls = self.queryset.model
-            if model_cls._meta.pk.attname not in model_init_names:
+            if any(
+                f.attname not in model_init_names for f in model_cls._meta.pk_fields
+            ):
                 raise exceptions.FieldDoesNotExist(
                     "Raw query must include the primary key"
                 )
