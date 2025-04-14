@@ -246,7 +246,8 @@ backends.
 Miscellaneous
 -------------
 
-* ...
+* :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
+  separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
 .. _deprecated-features-6.1:
 
