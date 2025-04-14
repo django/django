@@ -65,8 +65,8 @@ associates a flatpage with a site.
 Using the URLconf
 -----------------
 
-There are several ways to include the flat pages in your URLconf. You can
-dedicate a particular path to flat pages::
+There are several ways to include the flatpages in your URLconf. You can
+dedicate a particular path to flatpages::
 
     urlpatterns = [
         path("pages/", include("django.contrib.flatpages.urls")),
@@ -88,7 +88,7 @@ to place the pattern at the end of the other urlpatterns::
     in the catchall pattern or flatpages without a trailing slash will not be
     matched.
 
-Another common setup is to use flat pages for a limited set of known pages and
+Another common setup is to use flatpages for a limited set of known pages and
 to hard code their URLs in the :doc:`URLconf </topics/http/urls>`::
 
     from django.contrib.flatpages import views
@@ -162,7 +162,7 @@ For more on middleware, read the :doc:`middleware docs
     raising an exception instead, the response will become an HTTP 500
     ("Internal Server Error") and the
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
-    will not attempt to serve a flat page.
+    will not attempt to serve a flatpage.
 
 .. currentmodule:: django.contrib.flatpages.models
 
@@ -242,12 +242,11 @@ Flatpage templates
 ==================
 
 By default, flatpages are rendered via the template
-:file:`flatpages/default.html`, but you can override that for a
-particular flatpage: in the admin, a collapsed fieldset titled
-"Advanced options" (clicking will expand it) contains a field for
-specifying a template name. If you're creating a flat page via the
-Python API you can set the template name as the field ``template_name`` on the
-``FlatPage`` object.
+:file:`flatpages/default.html`, but you can override that for a particular
+flatpage: in the admin, a collapsed fieldset titled "Advanced options"
+(clicking will expand it) contains a field for specifying a template name. If
+you're creating a flatpage via the Python API you can set the template name as
+the field ``template_name`` on the ``FlatPage`` object.
 
 Creating the :file:`flatpages/default.html` template is your responsibility;
 in your template directory, create a :file:`flatpages` directory containing a
