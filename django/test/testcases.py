@@ -103,6 +103,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
+
 class _AssertNumQueriesContext:
     def __init__(self, test_case, num, connections_):
         self.test_case = test_case
