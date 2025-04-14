@@ -103,28 +103,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
-
-class _AssertNumQueriesMixin:
-    def __exit__(self, exc_type, exc_value, traceback):
-        if exc_type is not None:
-            return
-        executed = len(self)
-        self.test_case.assertEqual(
-            executed,
-            self.num,
-            "%d queries executed, %d expected\nCaptured queries were:\n%s"
-            % (
-                executed,
-                self.num,
-                "\n".join(
-                    "%d. %s" % (i, query["sql"])
-                    for i, query in enumerate(self.captured_queries, start=1)
-                ),
-            ),
-        )
-
-
-class _AssertCollectiveNumQueriesContext(_AssertNumQueriesMixin):
+class _AssertCollectiveNumQueriesContext:
     def __init__(self, test_case, num, connections_):
         self.test_case = test_case
         self.num = num
@@ -142,18 +121,32 @@ class _AssertCollectiveNumQueriesContext(_AssertNumQueriesMixin):
         return sum(len(cm) for cm in self.cm._context_managers)
 
     def __enter__(self):
-        return self.cm.__enter__()
+        self.cm.__enter__()
+        return self
 
+    def __iter__(self):
+        return iter(self.captured_queries)
 
-class _AssertNumQueriesContext(_AssertNumQueriesMixin, CaptureQueriesContext):
-    def __init__(self, test_case, num, connection):
-        self.test_case = test_case
-        self.num = num
-        super().__init__(connection)
+    def __getitem__(self, index):
+        return self.captured_queries[index]
 
     def __exit__(self, exc_type, exc_value, traceback):
-        CaptureQueriesContext.__exit__(self, exc_type, exc_value, traceback)
-        return super().__exit__(exc_type, exc_value, traceback)
+        if exc_type is not None:
+            return
+        executed = len(self)
+        self.test_case.assertEqual(
+            executed,
+            self.num,
+            "%d queries executed, %d expected\nCaptured queries were:\n%s"
+            % (
+                executed,
+                self.num,
+                "\n".join(
+                    "%d. %s" % (i, query["sql"])
+                    for i, query in enumerate(self.captured_queries, start=1)
+                ),
+            ),
+        )
 
 
 class _AssertTemplateUsedContext:
@@ -1297,11 +1290,10 @@ class TransactionTestCase(SimpleTestCase):
             using = self.databases
 
         if isinstance(using, str):
-            conn = connections[using]
-            context = _AssertNumQueriesContext(self, num, conn)
+            conns = [connections[using]]
         else:
             conns = [connections[db] for db in using]
-            context = _AssertCollectiveNumQueriesContext(self, num, conns)
+        context = _AssertCollectiveNumQueriesContext(self, num, conns)
 
         if func is None:
             return context
