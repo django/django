@@ -715,7 +715,7 @@ This example illustrates all possible attributes and methods for a
             Takes an item, as returned by items(), and returns a boolean.
             """
 
-        item_guid_is_permalink = False  # Hard coded value
+        item_guid_is_permalink = False  # Hardcoded value
 
         # ITEM AUTHOR NAME -- One of the following three is optional. The
         # framework looks for them in this order.

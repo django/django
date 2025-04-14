@@ -2,7 +2,7 @@
 How to provide initial data for models
 ======================================
 
-It's sometimes useful to prepopulate your database with hard-coded data when
+It's sometimes useful to prepopulate your database with hardcoded data when
 you're first setting up an app. You can provide initial data with migrations or
 fixtures.
 

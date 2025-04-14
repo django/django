@@ -726,7 +726,7 @@ Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
 Specifying per-view cache in the URLconf
 ----------------------------------------
 
-The examples in the previous section have hard-coded the fact that the view is
+The examples in the previous section have hardcoded the fact that the view is
 cached, because ``cache_page`` alters the ``my_view`` function in place. This
 approach couples your view to the cache system, which is not ideal for several
 reasons. For instance, you might want to reuse the view functions on another,

@@ -904,7 +904,7 @@ Notes:
   any syntax error.
 
 * The ``TemplateSyntaxError`` exceptions use the ``tag_name`` variable.
-  Don't hard-code the tag's name in your error messages, because that
+  Don't hardcode the tag's name in your error messages, because that
   couples the tag's name to your function. ``token.contents.split()[0]``
   will ''always'' be the name of your tag -- even when the tag has no
   arguments.
@@ -1223,7 +1223,7 @@ Here's how you'd use this new version of the tag:
     with context in other blocks.
 
 But, there's a problem with ``CurrentTimeNode2``: The variable name
-``current_time`` is hard-coded. This means you'll need to make sure your
+``current_time`` is hardcoded. This means you'll need to make sure your
 template doesn't use ``{{ current_time }}`` anywhere else, because the
 ``{% current_time %}`` will blindly overwrite that variable's value. A cleaner
 solution is to make the template tag specify the name of the output variable,
