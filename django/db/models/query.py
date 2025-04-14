@@ -88,6 +88,7 @@ class ModelIterable(BaseIterable):
         queryset = self.queryset
         db = queryset.db
         compiler = queryset.query.get_compiler(using=db)
+        fetch_mode = queryset._fetch_mode
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
         results = compiler.execute_sql(
@@ -104,7 +105,7 @@ class ModelIterable(BaseIterable):
         init_list = [
             f[0].target.attname for f in select[model_fields_start:model_fields_end]
         ]
-        related_populators = get_related_populators(klass_info, select, db)
+        related_populators = get_related_populators(klass_info, select, db, fetch_mode)
         known_related_objects = [
             (
                 field,
@@ -122,7 +123,6 @@ class ModelIterable(BaseIterable):
             )
             for field, related_objs in queryset._known_related_objects.items()
         ]
-        fetch_mode = queryset._fetch_mode
         peers = []
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(
@@ -2702,8 +2702,9 @@ class RelatedPopulator:
     model instance.
     """
 
-    def __init__(self, klass_info, select, db):
+    def __init__(self, klass_info, select, db, fetch_mode):
         self.db = db
+        self.fetch_mode = fetch_mode
         # Pre-compute needed attributes. The attributes are:
         #  - model_cls: the possibly deferred model class to instantiate
         #  - either:
@@ -2756,7 +2757,9 @@ class RelatedPopulator:
         # relationship. Therefore checking for a single member of the primary
         # key is enough to determine if the referenced object exists or not.
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk_fields[0].attname)
-        self.related_populators = get_related_populators(klass_info, select, self.db)
+        self.related_populators = get_related_populators(
+            klass_info, select, db, fetch_mode
+        )
         self.local_setter = klass_info["local_setter"]
         self.remote_setter = klass_info["remote_setter"]
 
@@ -2768,7 +2771,12 @@ class RelatedPopulator:
         if obj_data[self.pk_idx] is None:
             obj = None
         else:
-            obj = self.model_cls.from_db(self.db, self.init_list, obj_data)
+            obj = self.model_cls.from_db(
+                self.db,
+                self.init_list,
+                obj_data,
+                fetch_mode=self.fetch_mode,
+            )
             for rel_iter in self.related_populators:
                 rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)
@@ -2776,10 +2784,10 @@ class RelatedPopulator:
             self.remote_setter(obj, from_obj)
 
 
-def get_related_populators(klass_info, select, db):
+def get_related_populators(klass_info, select, db, fetch_mode):
     iterators = []
     related_klass_infos = klass_info.get("related_klass_infos", [])
     for rel_klass_info in related_klass_infos:
-        rel_cls = RelatedPopulator(rel_klass_info, select, db)
+        rel_cls = RelatedPopulator(rel_klass_info, select, db, fetch_mode)
         iterators.append(rel_cls)
     return iterators

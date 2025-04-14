@@ -813,11 +813,41 @@ class GenericRelationsTests(TestCase):
             self.assertEqual(quartz_tag.content_object, self.quartz)
 
     def test_fetch_mode_raise(self):
-        TaggedItem.objects.create(tag="lion", content_object=self.lion)
         tag = TaggedItem.objects.fetch_mode(RAISE).get(tag="yellow")
         msg = "Fetching of TaggedItem.content_object blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg):
             tag.content_object
+
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        tag = TaggedItem.objects.fetch_mode(FETCH_PEERS).get(tag="yellow")
+        self.assertEqual(tag.content_object, self.lion)
+        self.assertEqual(
+            tag.content_object._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        tags = list(TaggedItem.objects.fetch_mode(FETCH_PEERS).order_by("tag"))
+        tag = [t for t in tags if t.tag == "yellow"][0]
+        self.assertEqual(tag.content_object, self.lion)
+        self.assertEqual(
+            tag.content_object._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        animal = Animal.objects.fetch_mode(FETCH_PEERS).get(pk=self.lion.pk)
+        self.assertEqual(animal._state.fetch_mode, FETCH_PEERS)
+        tag = animal.tags.get(tag="yellow")
+        self.assertEqual(tag._state.fetch_mode, FETCH_PEERS)
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        animals = list(Animal.objects.fetch_mode(FETCH_PEERS))
+        animal = animals[0]
+        self.assertEqual(animal._state.fetch_mode, FETCH_PEERS)
+        tags = list(animal.tags.all())
+        tag = tags[0]
+        self.assertEqual(tag._state.fetch_mode, FETCH_PEERS)
 
 
 class ProxyRelatedModelTest(TestCase):
