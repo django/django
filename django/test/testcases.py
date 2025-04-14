@@ -103,7 +103,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
-class _AssertCollectiveNumQueriesContext:
+class _AssertNumQueriesContext:
     def __init__(self, test_case, num, connections_):
         self.test_case = test_case
         self.num = num
@@ -118,7 +118,7 @@ class _AssertCollectiveNumQueriesContext:
         ]
 
     def __len__(self):
-        return sum(len(cm) for cm in self.cm._context_managers)
+        return len(self.captured_queries)
 
     def __enter__(self):
         self.cm.__enter__()
@@ -1293,7 +1293,7 @@ class TransactionTestCase(SimpleTestCase):
             conns = [connections[using]]
         else:
             conns = [connections[db] for db in using]
-        context = _AssertCollectiveNumQueriesContext(self, num, conns)
+        context = _AssertNumQueriesContext(self, num, conns)
 
         if func is None:
             return context
