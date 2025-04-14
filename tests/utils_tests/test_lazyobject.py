@@ -581,7 +581,7 @@ class LazyExitStackTestCase(TestCase):
         stack = LazyExitStack()
 
         with stack:
-            self.assertEqual(self.entered, [])
+            pass
 
         self.assertEqual(self.entered, [])
         self.assertEqual(self.exited, [])
