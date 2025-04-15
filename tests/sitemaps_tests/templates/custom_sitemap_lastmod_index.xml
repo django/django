@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This is a customised template -->
+<!-- This is a customized template -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 {% spaceless %}
 {% for site in sitemaps %}

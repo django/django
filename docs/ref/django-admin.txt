@@ -1071,7 +1071,7 @@ precedence. For a ``--verbosity`` of 2 or higher, the automatically imported
 objects will be listed. To disable automatic importing entirely, use the
 ``--no-imports`` flag.
 
-See the guide on :ref:`customizing this behaviour
+See the guide on :ref:`customizing this behavior
 <customizing-shell-auto-imports>` to add or remove automatic imports.
 
 .. versionchanged:: 5.2
