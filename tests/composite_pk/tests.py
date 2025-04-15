@@ -158,6 +158,10 @@ class CompositePKTests(TestCase):
         users = User.objects.values_list("pk").order_by("pk")
         self.assertNotIn('AS "pk"', str(users.query))
 
+    def test_raw_query(self):
+        users = User.objects.raw("SELECT * FROM composite_pk_user")
+        self.assertEqual(len(users), 1)
+
     def test_only(self):
         users = User.objects.only("pk")
         self.assertSequenceEqual(users, (self.user,))
