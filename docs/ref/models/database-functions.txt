@@ -608,9 +608,9 @@ The timezone offset for Melbourne in the example date above is +10:00. The
 values returned when this timezone is active will be:
 
 * "year": 2015-01-01 00:00:00+11:00
-* "quarter": 2015-04-01 00:00:00+10:00
+* "quarter": 2015-04-01 00:00:00+11:00
 * "month": 2015-06-01 00:00:00+10:00
-* "week": 2015-06-16 00:00:00+10:00
+* "week": 2015-06-15 00:00:00+10:00
 * "day": 2015-06-16 00:00:00+10:00
 * "hour": 2015-06-16 00:00:00+10:00
 * "minute": 2015-06-16 00:30:00+10:00

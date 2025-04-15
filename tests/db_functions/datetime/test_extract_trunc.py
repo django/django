@@ -1936,6 +1936,75 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 hour_melb=Trunc("start_time", "hour", tzinfo=melb),
             ).get()
 
+
+class Ticket34699Tests(TestCase):
+    def test_docs_example(self):
+        self.assertSequenceEqual(DTModel.objects.all(), [])
+
+        dt = datetime(2015, 6, 15, 14, 30, 50, 321, zoneinfo.ZoneInfo("UTC"))
+        # From the docs: Given the datetime 2015-06-15 14:30:50.000321+00:00...
+        docs_dt = "2015-06-15T14:30:50.000321+00:00"
+        self.assertEqual(dt.isoformat(), docs_dt)
+
+        utc = {
+            "year": "2015-01-01T00:00:00+00:00",
+            "quarter": "2015-04-01T00:00:00+00:00",
+            "month": "2015-06-01T00:00:00+00:00",
+            "week": "2015-06-15T00:00:00+00:00",
+            "day": "2015-06-15T00:00:00+00:00",
+            "hour": "2015-06-15T14:00:00+00:00",
+            "minute": "2015-06-15T14:30:00+00:00",
+            "second": "2015-06-15T14:30:50+00:00",
+        }
+        melbourne = {
+            "year": "2015-01-01T00:00:00+11:00",
+            "quarter": "2015-04-01T00:00:00+11:00",
+            "month": "2015-06-01T00:00:00+10:00",
+            "week": "2015-06-15T00:00:00+10:00",
+            "day": "2015-06-16T00:00:00+10:00",
+            "hour": "2015-06-16T00:00:00+10:00",
+            "minute": "2015-06-16T00:30:00+10:00",
+            "second": "2015-06-16T00:30:50+10:00",
+        }
+        for tz, cases in [("UTC", utc), ("Australia/Melbourne", melbourne)]:
+            for kind, expected in cases.items():
+                with (
+                    self.settings(USE_TZ=True, TIME_ZONE="UTC"),
+                    self.subTest(kind=kind, tz=tz, with_tzinfo=True)
+                ):
+                    test_zone = zoneinfo.ZoneInfo(tz)
+                    instance = DTModel.objects.create(start_datetime=dt)
+                    self.assertEqual(instance.start_datetime.isoformat(), docs_dt)
+
+                    result = DTModel.objects.annotate(
+                        truncated=Trunc(
+                            "start_datetime",
+                            kind,
+                            output_field=DateTimeField(),
+                            tzinfo=test_zone,
+                        )
+                    ).get()
+                    self.assertEqual(result.truncated.isoformat(), expected)
+
+                DTModel.objects.all().delete()
+        for tz, cases in [("UTC", utc), ("Australia/Melbourne", melbourne)]:
+            for kind, expected in cases.items():
+                with (self.settings(USE_TZ=True, TIME_ZONE=tz),
+                      self.subTest(kind=kind, tz=tz, with_tzinfo=False)):
+                    instance = DTModel.objects.create(start_datetime=dt)
+                    self.assertEqual(instance.start_datetime.isoformat(), docs_dt)
+
+                    result = DTModel.objects.annotate(
+                        truncated=Trunc(
+                            "start_datetime",
+                            kind,
+                            output_field=DateTimeField()
+                        )
+                    ).get()
+                    self.assertEqual(result.truncated.isoformat(), expected)
+
+                DTModel.objects.all().delete()
+
     def test_trunc_in_filter(self):
         """
         ticket #34699. When TruncSecond is used in a filter it can behave unexpectedly
