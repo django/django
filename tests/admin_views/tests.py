@@ -1940,9 +1940,9 @@ class AdminViewFormUrlTest(TestCase):
             reverse("admin:admin_views_restaurant_add", current_app=self.current_app),
             {"name": "test_value"},
         )
-        # this would be the usual behaviour
+        # this would be the usual behavior
         self.assertNotContains(response, 'value="test_value"')
-        # this is the overridden behaviour
+        # this is the overridden behavior
         self.assertContains(response, 'value="overridden_value"')
 
 
@@ -8806,7 +8806,7 @@ class GetFormsetsWithInlinesArgumentTest(TestCase):
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class AdminSiteFinalCatchAllPatternTests(TestCase):
     """
-    Verifies the behaviour of the admin catch-all view.
+    Verifies the behavior of the admin catch-all view.
 
     * Anonynous/non-staff users are redirected to login for all URLs, whether
       otherwise valid or not.
