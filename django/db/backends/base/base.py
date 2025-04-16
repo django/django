@@ -276,7 +276,9 @@ class BaseDatabaseWrapper:
 
     # ##### Backend-specific methods for creating connections #####
 
-    def _pre_connect(self):
+    @contextmanager
+    def connect_manager(self):
+        # Check for invalid configurations.
         self.check_settings()
         # In case the previous connection was closed while in an atomic block
         self.in_atomic_block = False
@@ -292,32 +294,29 @@ class BaseDatabaseWrapper:
         # New connections are healthy.
         self.health_check_done = True
 
+        try:
+            yield
+        finally:
+            connection_created.send(sender=self.__class__, connection=self)
+            self.run_on_commit = []
+
     @async_unsafe
     def connect(self):
         """Connect to the database. Assume that the connection is closed."""
-        # Check for invalid configurations.
-        self._pre_connect()
-        # Establish the connection
-        conn_params = self.get_connection_params()
-        self.connection = self.get_new_connection(conn_params)
-        self.set_autocommit(self.settings_dict["AUTOCOMMIT"])
-        self.init_connection_state()
-        connection_created.send(sender=self.__class__, connection=self)
-
-        self.run_on_commit = []
+        with self.connect_manager():
+            conn_params = self.get_connection_params()
+            self.connection = self.get_new_connection(conn_params)
+            self.set_autocommit(self.settings_dict["AUTOCOMMIT"])
+            self.init_connection_state()
 
     async def aconnect(self):
         """Connect to the database. Assume that the connection is closed."""
-        # Check for invalid configurations.
-        self._pre_connect()
-        # Establish the connection
-        conn_params = self.get_connection_params(for_async=True)
-        self.aconnection = await self.aget_new_connection(conn_params)
-        await self.aset_autocommit(self.settings_dict["AUTOCOMMIT"])
-        await self.ainit_connection_state()
-        connection_created.send(sender=self.__class__, connection=self)
-
-        self.run_on_commit = []
+        with self.connect_manager():
+            # Establish the connection
+            conn_params = self.get_connection_params(for_async=True)
+            self.aconnection = await self.aget_new_connection(conn_params)
+            await self.aset_autocommit(self.settings_dict["AUTOCOMMIT"])
+            await self.ainit_connection_state()
 
     def check_settings(self):
         if self.settings_dict["TIME_ZONE"] is not None and not settings.USE_TZ:
