@@ -837,12 +837,12 @@ The template system works in a two-step process: compiling and rendering. To
 define a custom template tag, you specify how the compilation works and how
 the rendering works.
 
-When Django compiles a template, it splits the raw template text into
-''nodes''. Each node is an instance of ``django.template.Node`` and has
-a ``render()`` method. A compiled template is a list of ``Node`` objects. When
-you call ``render()`` on a compiled template object, the template calls
-``render()`` on each ``Node`` in its node list, with the given context.  The
-results are all concatenated together to form the output of the template.
+When Django compiles a template, it splits the raw template text into *nodes*.
+Each node is an instance of ``django.template.Node`` and has a ``render()``
+method. A compiled template is a list of ``Node`` objects. When you call
+``render()`` on a compiled template object, the template calls ``render()`` on
+each ``Node`` in its node list, with the given context.  The results are all
+concatenated together to form the output of the template.
 
 Thus, to define a custom template tag, you specify how the raw template tag is
 converted into a ``Node`` (the compilation function), and what the node's
@@ -904,10 +904,9 @@ Notes:
   any syntax error.
 
 * The ``TemplateSyntaxError`` exceptions use the ``tag_name`` variable.
-  Don't hard-code the tag's name in your error messages, because that
+  Don't hardcode the tag's name in your error messages, because that
   couples the tag's name to your function. ``token.contents.split()[0]``
-  will ''always'' be the name of your tag -- even when the tag has no
-  arguments.
+  will *always* be the name of your tag -- even when the tag has no arguments.
 
 * The function returns a ``CurrentTimeNode`` with everything the node needs
   to know about this tag. In this case, it passes the argument --
@@ -1223,7 +1222,7 @@ Here's how you'd use this new version of the tag:
     with context in other blocks.
 
 But, there's a problem with ``CurrentTimeNode2``: The variable name
-``current_time`` is hard-coded. This means you'll need to make sure your
+``current_time`` is hardcoded. This means you'll need to make sure your
 template doesn't use ``{{ current_time }}`` anywhere else, because the
 ``{% current_time %}`` will blindly overwrite that variable's value. A cleaner
 solution is to make the template tag specify the name of the output variable,
@@ -1305,9 +1304,9 @@ Here's how a simplified ``{% comment %}`` tag might be implemented::
     followed by ``parser.delete_first_token()``, thus avoiding the generation of a
     node list.
 
-``parser.parse()`` takes a tuple of names of block tags ''to parse until''. It
+``parser.parse()`` takes a tuple of names of block tags *to parse until*. It
 returns an instance of ``django.template.NodeList``, which is a list of
-all ``Node`` objects that the parser encountered ''before'' it encountered
+all ``Node`` objects that the parser encountered *before* it encountered
 any of the tags named in the tuple.
 
 In ``"nodelist = parser.parse(('endcomment',))"`` in the above example,

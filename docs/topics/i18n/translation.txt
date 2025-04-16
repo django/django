@@ -129,8 +129,22 @@ have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
 
 Since string extraction is done by the ``xgettext`` command, only syntaxes
-supported by ``gettext`` are supported by Django. In particular, Python
-:py:ref:`f-strings <f-strings>` are not yet supported by ``xgettext``, and
+supported by ``gettext`` are supported by Django. Python :py:ref:`f-strings
+<f-strings>` cannot be used directly with ``gettext`` functions because
+f-string expressions are evaluated before they reach ``gettext``. This means
+``_(f"Welcome {name}")`` will not work as expected, as the variable is
+substituted before translation occurs. Instead, use named-string
+interpolation::
+
+    # Good
+    _("Welcome %(name)s") % {"name": name}
+
+    # Good
+    _("Welcome {name}").format(name=name)
+
+    # Bad
+    _(f"Welcome {name}")  # f-string evaluated before translation.
+
 JavaScript template strings need ``gettext`` 0.21+.
 
 .. _translator-comments:
