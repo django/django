@@ -306,12 +306,15 @@ def do_extends(parser, token):
     bits[1] = construct_relative_path(parser.origin.template_name, bits[1])
     parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
-    # Check for non-whitespace text used after {% extends %} tag
+    # Check for non-whitespace text used after {% extends %} tag.
     if any(temp.s.strip() for temp in nodelist if isinstance(temp, TextNode)):
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # raise TemplateSyntaxError(
+        #     "Non-whitespace text outside a tag cannot appear after an {% extends %} tag."
+        # )
         warnings.warn(
-            "Non-whitespace text after the {% extends %} tag and outside"
-            "of a tag gets ignored. It's usage is now deprecated"
-            "Use {% comment %} or {# ... #} tag instead.",
+            "Non-whitespace text outside a tag after the {% extends %} tag is "
+            "deprecated. Use a {% comment %} or {# ... #} tag instead.",
             category=RemovedInDjango70Warning,
             stacklevel=2,
         )
