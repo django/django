@@ -199,8 +199,7 @@ Building composite primary key ready applications
 
 Prior to the introduction of composite primary keys, the single field composing
 the primary key of a model could be retrieved by introspecting the
-:attr:`primary key <django.db.models.Field.primary_key>` attribute of its
-fields:
+:attr:`~django.db.models.Field.primary_key` attribute of its fields:
 
 .. code-block:: pycon
 
@@ -214,10 +213,10 @@ fields:
     <django.db.models.fields.AutoField: id>
 
 Now that a primary key can be composed of multiple fields the
-:attr:`primary key <django.db.models.Field.primary_key>` attribute can no
-longer be relied upon to identify members of the primary key as it will be set
-to ``False`` to maintain the invariant that at most one field per model will
-have this attribute set to ``True``:
+:attr:`~django.db.models.Field.primary_key` attribute can no longer be relied
+upon to identify members of the primary key as it will be set to ``False`` to
+maintain the invariant that at most one field per model will have this
+attribute set to ``True``:
 
 .. code-block:: pycon
 

@@ -1337,8 +1337,8 @@ Specifies which directories in the app template should be excluded, in addition
 to ``.git`` and ``__pycache__``. If this option is not provided, directories
 named ``__pycache__`` or starting with ``.`` will be excluded.
 
-The :class:`template context <django.template.Context>` used for all matching
-files is:
+The template context (see :class:`~django.template.Context`) used for all
+matching files is:
 
 - Any option passed to the ``startapp`` command (among the command's supported
   options)
@@ -1435,7 +1435,7 @@ Specifies which directories in the project template should be excluded, in
 addition to ``.git`` and ``__pycache__``. If this option is not provided,
 directories named ``__pycache__`` or starting with ``.`` will be excluded.
 
-The :class:`template context <django.template.Context>` used is:
+The template context (see :class:`~django.template.Context`) used is:
 
 - Any option passed to the ``startproject`` command (among the command's
   supported options)
