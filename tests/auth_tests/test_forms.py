@@ -1445,6 +1445,29 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
             "</div>",
         )
 
+    def test_render_no_password(self):
+        widget = ReadOnlyPasswordHashWidget()
+        self.assertHTMLEqual(
+            widget.render("name", None, {}),
+            "<div><p><strong>No password set.</p><p>"
+            '<a role="button" class="button" href="../password/">Set password</a>'
+            "</p></div>",
+        )
+
+    @override_settings(
+        PASSWORD_HASHERS=["django.contrib.auth.hashers.PBKDF2PasswordHasher"]
+    )
+    def test_render_invalid_password_format(self):
+        widget = ReadOnlyPasswordHashWidget()
+        value = "pbkdf2_sh"
+        self.assertHTMLEqual(
+            widget.render("name", value, {}),
+            "<div><p>"
+            "<strong>Invalid password format or unknown hashing algorithm.</strong>"
+            '</p><p><a role="button" class="button" href="../password/">Reset password'
+            "</a></p></div>",
+        )
+
     def test_readonly_field_has_changed(self):
         field = ReadOnlyPasswordHashField()
         self.assertIs(field.disabled, True)
