@@ -1,5 +1,4 @@
 import os
-import warnings
 
 from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
 from django.test import SimpleTestCase
@@ -198,61 +197,51 @@ class ExtendsBehaviorTests(SimpleTestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Engine().from_string(template_string)
 
-    def test_comment_and_block_tag_used_after_extends_tag(self):
-        template_string = (
-            "{% extends 'index.html' %}"
-            "{# commenting #} {% block main %} new text {% endblock %}"
-        )
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            Engine().from_string(template_string)
-            self.assertEqual(w, [])
-
-    def test_non_block_tags_used_after_extends_tag(self):
-        template_string = (
-            "{% extends 'index.html' %} {% comment %} comment {% endcomment %}"
-            "{% if True %} statement {% endif %} {% lorem 5 w %}"
-        )
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            Engine().from_string(template_string)
-            self.assertEqual(w, [])
-
-    def test_non_whitespace_text_used_after_extends_tag(self):
-        template_string = "{% extends 'index.html' %} some text"
-        msg = (
-            "Non-whitespace text after the {% extends %} tag and outside"
-            "of a tag gets ignored. It's usage is now deprecated"
-            "Use {% comment %} or {# ... #} tag instead."
-        )
-        with warnings.catch_warnings(
-            record=True, category=RemovedInDjango70Warning
-        ) as w:
-            warnings.simplefilter("always")
-            Engine().from_string(template_string)
-            self.assertTrue(any(msg == str(temp.message) for temp in w))
-
-    def test_whitespace_text_used_after_extends_tag(self):
-        template_string = "{% extends 'index.html' %}        "
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            Engine().from_string(template_string)
-            self.assertEqual(w, [])
-
-    def test_non_whitespace_text_used_before_extends_tag(self):
+    def test_content_outside_extends_tag(self):
         engine = Engine(
             loaders=[
                 [
                     "django.template.loaders.locmem.Loader",
                     {
-                        "index.html": "{% block content %}index{% endblock %}",
+                        "index.html": "Index start {% block content %}content{% endblock %}"
                     },
                 ],
             ]
         )
-        template_string = "some text {% extends 'index.html' %}"
-        with warnings.catch_warnings(record=True) as w:
-            template = engine.from_string(template_string)
-            temp = template.render(Context({}))
-        self.assertEqual(temp.strip(), "some text index")
-        self.assertEqual(w, [])
+        for template_string, output in [
+            (
+                "{% extends 'index.html' %}{# commenting #} "
+                "{% block content %}new text{% endblock %}",
+                "Index start new text",
+            ),
+            (
+                "{% extends 'index.html' %} {% comment %}comment{% endcomment %}"
+                "{% if True %} statement {% endif %} {% lorem 5 w %}",
+                "Index start content",
+            ),
+            (
+                "{% extends 'index.html' %}        ",
+                "Index start content",
+            ),
+            (
+                "some text {% extends 'index.html' %}",
+                "some text Index start content",
+            ),
+        ]:
+            with self.subTest(template_string=template_string):
+                template = engine.from_string(template_string)
+                self.assertEqual(template.render(Context({})), output)
+
+    def test_non_whitespace_text_used_after_extends_tag(self):
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # msg = (
+        #    "Non-whitespace text outside a tag cannot appear"
+        #    "after an {% extends %} tag."
+        # )
+        # with self.assertRaisesMessage(TemplateSyntaxError, msg):
+        msg = (
+            "Non-whitespace text outside a tag after the {% extends %} tag is "
+            "deprecated. Use a {% comment %} or {# ... #} tag instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            Engine().from_string("{% extends 'index.html' %} some text")

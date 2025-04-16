@@ -310,7 +310,8 @@ def do_extends(parser, token):
     if any(temp.s.strip() for temp in nodelist if isinstance(temp, TextNode)):
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # raise TemplateSyntaxError(
-        #     "Non-whitespace text outside a tag cannot appear after an {% extends %} tag."
+        #     "Non-whitespace text outside a tag cannot appear"
+        #     "after an {% extends %} tag."
         # )
         warnings.warn(
             "Non-whitespace text outside a tag after the {% extends %} tag is "
