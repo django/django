@@ -220,7 +220,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
                 "Index start content",
             ),
             (
-                "{% extends 'index.html' %}       ",
+                "{% extends 'index.html' %}        ",
                 "Index start content",
             ),
             (
