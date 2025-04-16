@@ -637,7 +637,7 @@ The process can be made robust, :ref:`avoiding a race condition
 the update relative to the original field value, rather than as an explicit
 assignment of a new value. Django provides :class:`F expressions
 <django.db.models.F>` for performing this kind of relative update. Using
-:class:`F expressions <django.db.models.F>`, the previous example is expressed
+:class:`~django.db.models.F` expressions, the previous example is expressed
 as:
 
 .. code-block:: pycon

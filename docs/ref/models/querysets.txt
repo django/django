@@ -1270,9 +1270,9 @@ database.
     :meth:`~django.db.models.fields.related.RelatedManager.create`,
     :meth:`~django.db.models.fields.related.RelatedManager.remove`,
     :meth:`~django.db.models.fields.related.RelatedManager.clear` or
-    :meth:`~django.db.models.fields.related.RelatedManager.set`, on
-    :class:`related managers<django.db.models.fields.related.RelatedManager>`,
-    any prefetched cache for the relation will be cleared.
+    :meth:`~django.db.models.fields.related.RelatedManager.set`, on a
+    :class:`~django.db.models.fields.related.RelatedManager`, any prefetched
+    cache for the relation will be cleared.
 
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
@@ -1426,8 +1426,8 @@ where prefetching with a custom ``QuerySet`` is useful:
 
 * You want to prefetch only a subset of the related objects.
 
-* You want to use performance optimization techniques like
-  :meth:`deferred fields <defer()>`:
+* You want to use performance optimization techniques like deferring fields,
+  for example, via :meth:`defer` or :meth:`only`:
 
   .. code-block:: pycon
 
@@ -1790,11 +1790,10 @@ will always be fetched into the resulting queryset.
     normalize your models and put the non-loaded data into a separate model
     (and database table). If the columns *must* stay in the one table for some
     reason, create a model with ``Meta.managed = False`` (see the
-    :attr:`managed attribute <django.db.models.Options.managed>` documentation)
-    containing just the fields you normally need to load and use that where you
-    might otherwise call ``defer()``. This makes your code more explicit to the
-    reader, is slightly faster and consumes a little less memory in the Python
-    process.
+    :attr:`~django.db.models.Options.managed` documentation) containing just
+    the fields you normally need to load and use that where you might otherwise
+    call ``defer()``. This makes your code more explicit to the reader, is
+    slightly faster and consumes a little less memory in the Python process.
 
     For example, both of these models use the same underlying database table::
 
@@ -3914,7 +3913,7 @@ of the return value
 ``filter``
 ~~~~~~~~~~
 
-An optional :class:`Q object <django.db.models.Q>` that's used to filter the
+An optional :class:`~django.db.models.Q` object that's used to filter the
 rows that are aggregated.
 
 See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
