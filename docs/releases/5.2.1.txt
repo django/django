@@ -36,3 +36,7 @@ Bugfixes
 * Fixed a regression in Django 5.2 that caused improper values to be returned
   from ``QuerySet.values_list()`` when duplicate field names were specified
   (:ticket:`36288`).
+
+* Fixed a regression in Django 5.2 where the password validation error message
+  from ``MinimumLengthValidator`` was not translated when using non-English
+  locales (:ticket:`36314`).
