@@ -106,15 +106,20 @@ class MinimumLengthValidator:
 
     def validate(self, password, user=None):
         if len(password) < self.min_length:
-            raise ValidationError(self.get_error_message(), code="password_too_short")
+            raise ValidationError(
+                self.get_error_message(),
+                code="password_too_short",
+                params={"min_length": self.min_length},
+            )
 
     def get_error_message(self):
-        return ngettext(
-            "This password is too short. It must contain at least %d character."
-            % self.min_length,
-            "This password is too short. It must contain at least %d characters."
-            % self.min_length,
-            self.min_length,
+        return (
+            ngettext(
+                "This password is too short. It must contain at least %d character.",
+                "This password is too short. It must contain at least %d characters.",
+                self.min_length,
+            )
+            % self.min_length
         )
 
     def get_help_text(self):
