@@ -133,8 +133,8 @@ For instance:
 * At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
   filtering in the database.
 
-* Use :class:`F expressions <django.db.models.F>` to filter
-  based on other fields within the same model.
+* Use :class:`~django.db.models.F` expressions to filter based on other fields
+  within the same model.
 
 * Use :doc:`annotate to do aggregation in the database
   </topics/db/aggregation>`.
@@ -377,9 +377,8 @@ number of SQL queries. For example::
     Entry.objects.create(headline="This is a test")
     Entry.objects.create(headline="This is only a test")
 
-Note that there are a number of :meth:`caveats to this method
-<django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
-for your use case.
+Note that :meth:`~django.db.models.query.QuerySet.bulk_create` has several
+caveats (see its documentation), so ensure it's appropriate for your use case.
 
 Update in bulk
 --------------
@@ -408,9 +407,8 @@ The following example::
     entries[1].headline = "This is no longer a test"
     entries[1].save()
 
-Note that there are a number of :meth:`caveats to this method
-<django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
-for your use case.
+Note that :meth:`~django.db.models.query.QuerySet.bulk_update` has several
+caveats (see its documentation), so ensure it's appropriate for your use case.
 
 Insert in bulk
 --------------

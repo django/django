@@ -1270,9 +1270,9 @@ database.
     :meth:`~django.db.models.fields.related.RelatedManager.create`,
     :meth:`~django.db.models.fields.related.RelatedManager.remove`,
     :meth:`~django.db.models.fields.related.RelatedManager.clear` or
-    :meth:`~django.db.models.fields.related.RelatedManager.set`, on
-    :class:`related managers<django.db.models.fields.related.RelatedManager>`,
-    any prefetched cache for the relation will be cleared.
+    :meth:`~django.db.models.fields.related.RelatedManager.set`, on a
+    :class:`~django.db.models.fields.related.RelatedManager`, any prefetched
+    cache for the relation will be cleared.
 
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
@@ -1426,8 +1426,8 @@ where prefetching with a custom ``QuerySet`` is useful:
 
 * You want to prefetch only a subset of the related objects.
 
-* You want to use performance optimization techniques like
-  :meth:`deferred fields <defer()>`:
+* You want to use performance optimization techniques like deferring fields,
+  for example, via :meth:`defer` or :meth:`only`:
 
   .. code-block:: pycon
 
@@ -3914,7 +3914,7 @@ of the return value
 ``filter``
 ~~~~~~~~~~
 
-An optional :class:`Q object <django.db.models.Q>` that's used to filter the
+An optional :class:`Q <django.db.models.Q>` object that's used to filter the
 rows that are aggregated.
 
 See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
