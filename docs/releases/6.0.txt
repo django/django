@@ -350,8 +350,8 @@ Miscellaneous
   ``per_page`` argument of :class:`django.core.paginator.Paginator` and
   :class:`django.core.paginator.AsyncPaginator` is deprecated.
 
-* Support for adding non-whitespace text after ``{% extends %}`` tag outside a
-  tag is deprecated.
+* Support for non-whitespace text outside a tag after an ``{% extends %}`` tag
+  is deprecated.
 
 Features removed in 6.0
 =======================
