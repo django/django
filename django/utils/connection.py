@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+from collections import defaultdict
+
 from asgiref.local import Local
 
 from django.conf import settings as django_settings
@@ -31,14 +34,56 @@ class ConnectionDoesNotExist(Exception):
     pass
 
 
-class BaseConnectionHandler:
+class StackLocal:
+    def __init__(self):
+        self._store = Local()
+
+    def _stack_for(self, key):
+        try:
+            return getattr(self._store, key)
+        except AttributeError:
+            stack = []
+            setattr(self._store, key, stack)
+            return stack
+
+    def __getattr__(self, key):
+        stack = self._stack_for(key)
+
+        if stack:
+            return stack[-1]
+
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{key}'"
+        )
+
+    def __setattr__(self, key, value):
+        if key == "_store":
+            return super().__setattr__(key, value)
+
+        setattr(self._store, key, self._stack_for(key) + [value])
+
+    def __delattr__(self, key):
+        stack = self._stack_for(key)
+
+        if not stack:
+            raise AttributeError(
+                f"'{self.__class__.__name__}' object has no attribute '{key}'"
+            )
+
+        setattr(self._store, key, stack[:-1])
+
+
+class AbstractConnectionHandler(ABC):
     settings_name = None
     exception_class = ConnectionDoesNotExist
-    thread_critical = False
 
     def __init__(self, settings=None):
         self._settings = settings
-        self._connections = Local(self.thread_critical)
+        self._connections = self.create_local_storage()
+
+    @abstractmethod
+    def create_local_storage(self):
+        pass
 
     @cached_property
     def settings(self):
@@ -50,6 +95,7 @@ class BaseConnectionHandler:
             settings = getattr(django_settings, self.settings_name)
         return settings
 
+    @abstractmethod
     def create_connection(self, alias):
         raise NotImplementedError("Subclasses must implement create_connection().")
 
@@ -80,6 +126,23 @@ class BaseConnectionHandler:
             if not initialized_only or hasattr(self._connections, alias)
         ]
 
+
+class BaseConnectionHandler(AbstractConnectionHandler):
+    thread_critical = False
+
+    def create_local_storage(self):
+        return Local(thread_critical=self.thread_critical)
+
     def close_all(self):
         for conn in self.all(initialized_only=True):
             conn.close()
+
+
+class BaseAsyncConnectionHandler(AbstractConnectionHandler):
+
+    def create_local_storage(self):
+        return StackLocal()
+
+    async def close_all(self):
+        for conn in self.all(initialized_only=True):
+            await conn.close()
