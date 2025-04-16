@@ -632,10 +632,9 @@ the value of 11 will be written back to the database.
 The process can be made robust, :ref:`avoiding a race condition
 <avoiding-race-conditions-using-f>`, as well as slightly faster by expressing
 the update relative to the original field value, rather than as an explicit
-assignment of a new value. Django provides :class:`F expressions
-<django.db.models.F>` for performing this kind of relative update. Using
-:class:`F expressions <django.db.models.F>`, the previous example is expressed
-as:
+assignment of a new value. Django provides :ref:`f-expressions` for performing
+this kind of relative update. Using :ref:`f-expressions`, the previous example
+is expressed as:
 
 .. code-block:: pycon
 
@@ -644,9 +643,8 @@ as:
     >>> product.number_sold = F("number_sold") + 1
     >>> product.save()
 
-For more details, see the documentation on :class:`F expressions
-<django.db.models.F>` and their :ref:`use in update queries
-<topics-db-queries-update>`.
+For more details, see the documentation on :ref:`f-expressions` and their
+:ref:`use in update queries <topics-db-queries-update>`.
 
 .. _ref-models-update-fields:
 
