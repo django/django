@@ -1,8 +1,10 @@
 import asyncio
 import sys
+import tempfile
 import threading
 import time
 from pathlib import Path
+from unittest.mock import patch
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
@@ -659,3 +661,58 @@ class ASGITest(SimpleTestCase):
         # 'last\n' isn't sent.
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output(timeout=0.2)
+
+    # test read_body() for ticket #36281
+    async def test_read_body_thread(self):
+        """Test that write runs on correct thread depending on rollover."""
+        handler = ASGIHandler()
+        loop_thread = threading.current_thread()
+
+        called_threads = []
+
+        def write_wrapper(data):
+            called_threads.append(threading.current_thread())
+            return original_write(data)
+
+        # Case 1: In-memory write (no rollover expected)
+        in_memory_chunks = [
+            {"type": "http.request", "body": b"small", "more_body": False}
+        ]
+
+        async def receive():
+            return in_memory_chunks.pop(0)
+
+        with tempfile.SpooledTemporaryFile(max_size=1024, mode="w+b") as f:
+            original_write = f.write
+            with patch(
+                "django.core.handlers.asgi.tempfile.SpooledTemporaryFile",
+                return_value=f,
+            ):
+                with patch.object(f, "write", side_effect=write_wrapper):
+                    await handler.read_body(receive)
+        # Assert write was called in the event loop thread
+        self.assertIn(loop_thread, called_threads)
+
+        # Clear thread log before next test
+        called_threads.clear()
+        # Case 2: Rollover to disk (write should occur in a threadpool thread)
+        rolled_chunks = [
+            {"type": "http.request", "body": b"A" * 16, "more_body": True},
+            {"type": "http.request", "body": b"B" * 16, "more_body": False},
+        ]
+
+        async def receive_rolled():
+            return rolled_chunks.pop(0)
+
+        with override_settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            with tempfile.SpooledTemporaryFile(max_size=10, mode="w+b") as f:
+                original_write = f.write
+                # roll_over force in handlers
+                with patch(
+                    "django.core.handlers.asgi.tempfile.SpooledTemporaryFile",
+                    return_value=f,
+                ):
+                    with patch.object(f, "write", side_effect=write_wrapper):
+                        await handler.read_body(receive_rolled)
+
+        self.assertTrue(any(t != loop_thread for t in called_threads))
