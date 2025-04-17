@@ -590,6 +590,9 @@ class Model(AltersData, metaclass=ModelBase):
         super().__init__()
         post_init.send(sender=cls, instance=self)
 
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
     @classmethod
     def from_db(cls, db, field_names, values):
         if len(values) != len(cls._meta.concrete_fields):

@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.core.exceptions import FieldDoesNotExist
+from django.db import models
 from django.db.models import CharField, Field, ForeignObjectRel, ManyToManyField
 from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
 from django.test import SimpleTestCase, override_settings
@@ -386,3 +387,8 @@ class AbstractModelTests(SimpleTestCase):
         msg = "Abstract models cannot be instantiated."
         with self.assertRaisesMessage(TypeError, msg):
             AbstractPerson()
+
+
+class ClassMethodsTests(SimpleTestCase):
+    def test_model_class_getitem(self):
+        self.assertIs(models.Model["Foo"], models.Model)
