@@ -203,8 +203,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
                 [
                     "django.template.loaders.locmem.Loader",
                     {
-                        "index.html":
-                        "Index start {% block content %}content{% endblock %}"
+                        "index.html":"Index {% block content %}content{% endblock %}"
                     },
                 ],
             ]
@@ -213,20 +212,20 @@ class ExtendsBehaviorTests(SimpleTestCase):
             (
                 "{% extends 'index.html' %}{# commenting #} "
                 "{% block content %}new text{% endblock %}",
-                "Index start new text",
+                "Index new text",
             ),
             (
                 "{% extends 'index.html' %} {% comment %}comment{% endcomment %}"
                 "{% if True %} statement {% endif %} {% lorem 5 w %}",
-                "Index start content",
+                "Index content",
             ),
             (
                 "{% extends 'index.html' %}          ",
-                "Index start content",
+                "Index content",
             ),
             (
                 "some text {% extends 'index.html' %}",
-                "some text Index start content",
+                "some text Index content",
             ),
         ]:
             with self.subTest(template_string=template_string):
