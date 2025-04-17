@@ -104,11 +104,10 @@ class UserAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.user_change_password),
                 name="auth_user_password_change",
             ),
-        ] + super().get_urls()
+            *super().get_urls(),
+        ]
 
-    # RemovedInDjango60Warning: when the deprecation ends, replace with:
-    # def lookup_allowed(self, lookup, value, request):
-    def lookup_allowed(self, lookup, value, request=None):
+    def lookup_allowed(self, lookup, value, request):
         # Don't allow lookups involving passwords.
         return not lookup.startswith("password") and super().lookup_allowed(
             lookup, value, request

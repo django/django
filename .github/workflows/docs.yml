@@ -21,8 +21,7 @@ permissions:
 
 jobs:
   docs:
-    # OS must be the same as on djangoproject.com.
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: docs
     steps:
       - name: Checkout
@@ -30,7 +29,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
           cache: 'pip'
           cache-dependency-path: 'docs/requirements.txt'
       - run: python -m pip install -r docs/requirements.txt
@@ -48,7 +47,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
       - run: python -m pip install blacken-docs
       - name: Build docs
         run: |

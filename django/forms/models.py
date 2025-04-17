@@ -370,10 +370,12 @@ class BaseModelForm(BaseForm, AltersData):
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
-        # self._validate_unique will be set to True by BaseModelForm.clean().
-        # It is False by default so overriding self.clean() and failing to call
-        # super will stop validate_unique from being called.
+        # self._validate_(unique|constraints) will be set to True by
+        # BaseModelForm.clean(). It is False by default so overriding
+        # self.clean() and failing to call super will stop
+        # validate_(unique|constraints) from being called.
         self._validate_unique = False
+        self._validate_constraints = False
         super().__init__(
             data,
             files,
@@ -436,6 +438,7 @@ class BaseModelForm(BaseForm, AltersData):
 
     def clean(self):
         self._validate_unique = True
+        self._validate_constraints = True
         return self.cleaned_data
 
     def _update_errors(self, errors):
@@ -495,13 +498,17 @@ class BaseModelForm(BaseForm, AltersData):
             self._update_errors(e)
 
         try:
-            self.instance.full_clean(exclude=exclude, validate_unique=False)
+            self.instance.full_clean(
+                exclude=exclude, validate_unique=False, validate_constraints=False
+            )
         except ValidationError as e:
             self._update_errors(e)
 
-        # Validate uniqueness if needed.
+        # Validate uniqueness and constraints if needed.
         if self._validate_unique:
             self.validate_unique()
+        if self._validate_constraints:
+            self.validate_constraints()
 
     def validate_unique(self):
         """
@@ -511,6 +518,17 @@ class BaseModelForm(BaseForm, AltersData):
         exclude = self._get_validation_exclusions()
         try:
             self.instance.validate_unique(exclude=exclude)
+        except ValidationError as e:
+            self._update_errors(e)
+
+    def validate_constraints(self):
+        """
+        Call the instance's validate_constraints() method and update the form's
+        validation errors if any were raised.
+        """
+        exclude = self._get_validation_exclusions()
+        try:
+            self.instance.validate_constraints(exclude=exclude)
         except ValidationError as e:
             self._update_errors(e)
 
@@ -877,7 +895,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                     # object
                     else:
                         date_data = (getattr(form.cleaned_data[unique_for], lookup),)
-                    data = (form.cleaned_data[field],) + date_data
+                    data = (form.cleaned_data[field], *date_data)
                     # if we've already seen it then we have a uniqueness failure
                     if data in seen_data:
                         # poke error messages into the right places and mark
@@ -1562,7 +1580,12 @@ class ModelChoiceField(ChoiceField):
             if isinstance(value, self.queryset.model):
                 value = getattr(value, key)
             value = self.queryset.get(**{key: value})
-        except (ValueError, TypeError, self.queryset.model.DoesNotExist):
+        except (
+            ValueError,
+            TypeError,
+            self.queryset.model.DoesNotExist,
+            ValidationError,
+        ):
             raise ValidationError(
                 self.error_messages["invalid_choice"],
                 code="invalid_choice",
@@ -1640,7 +1663,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
             self.validate_no_null_characters(pk)
             try:
                 self.queryset.filter(**{key: pk})
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, ValidationError):
                 raise ValidationError(
                     self.error_messages["invalid_pk_value"],
                     code="invalid_pk_value",

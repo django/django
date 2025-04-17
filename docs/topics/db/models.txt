@@ -224,6 +224,15 @@ ones:
     object. If callable it will be called every time a new object is
     created.
 
+:attr:`~Field.db_default`
+    The database-computed default value for the field. This can be a literal
+    value or a database function.
+
+    If both ``db_default`` and :attr:`Field.default` are set, ``default`` will
+    take precedence when creating instances in Python code. ``db_default`` will
+    still be set at the database level and will be used when inserting rows
+    outside of the ORM or when adding a new field in a migration.
+
 :attr:`~Field.help_text`
     Extra "help" text to be displayed with the form widget. It's useful for
     documentation even if your field isn't used on a form.
@@ -232,8 +241,8 @@ ones:
     If ``True``, this field is the primary key for the model.
 
     If you don't specify :attr:`primary_key=True <Field.primary_key>` for
-    any fields in your model, Django will automatically add an
-    :class:`IntegerField` to hold the primary key, so you don't need to set
+    any fields in your model, Django will automatically add a field to hold
+    the primary key, so you don't need to set
     :attr:`primary_key=True <Field.primary_key>` on any of your fields
     unless you want to override the default primary-key behavior. For more,
     see :ref:`automatic-primary-key-fields`.
@@ -494,9 +503,21 @@ something like this::
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
+        class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["person", "group"], name="unique_person_group"
+                )
+            ]
+
 When you set up the intermediary model, you explicitly specify foreign
 keys to the models that are involved in the many-to-many relationship. This
 explicit declaration defines how the two models are related.
+
+If you don't want multiple associations between the same instances, add a
+:class:`~django.db.models.UniqueConstraint` including the ``from`` and ``to``
+fields. Django's automatically generated many-to-many tables include such a
+constraint.
 
 There are a few restrictions on the intermediate model:
 
@@ -698,6 +719,24 @@ refer to the other model class wherever needed. For example::
             blank=True,
             null=True,
         )
+
+Alternatively, you can use a lazy reference to the related model, specified as
+a string in the format ``"app_label.ModelName"``. This does not require the
+related model to be imported. For example::
+
+    from django.db import models
+
+
+    class Restaurant(models.Model):
+        # ...
+        zip_code = models.ForeignKey(
+            "geography.ZipCode",
+            on_delete=models.SET_NULL,
+            blank=True,
+            null=True,
+        )
+
+See :ref:`lazy relationships <lazy-relationships>` for more details.
 
 Field name restrictions
 -----------------------

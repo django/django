@@ -1,0 +1,67 @@
+======================================
+How to customize the ``shell`` command
+======================================
+
+The Django :djadmin:`shell` is an interactive Python environment that provides
+access to models and settings, making it useful for testing code, experimenting
+with queries, and interacting with application data.
+
+Customizing the :djadmin:`shell` command allows adding extra functionality or
+pre-loading specific modules. To do this, create a new management command that
+subclasses ``django.core.management.commands.shell.Command`` and overrides the
+existing ``shell`` management command. For more details, refer to the guide on
+:ref:`overriding commands <overriding-commands>`.
+
+.. _customizing-shell-auto-imports:
+
+Customize automatic imports
+===========================
+
+.. versionadded:: 5.2
+
+To customize the automatic import behavior of the :djadmin:`shell` management
+command, override the ``get_auto_imports()`` method. This method should return
+a sequence of import paths for objects or modules available in the application.
+For example:
+
+.. code-block:: python
+    :caption: ``polls/management/commands/shell.py``
+
+    from django.core.management.commands import shell
+
+
+    class Command(shell.Command):
+        def get_auto_imports(self):
+            return super().get_auto_imports() + [
+                "django.urls.reverse",
+                "django.urls.resolve",
+            ]
+
+The customization above adds :func:`~django.urls.resolve` and
+:func:`~django.urls.reverse` to the default namespace, which already includes
+all models from the apps listed in :setting:`INSTALLED_APPS`. These objects
+will be available in the ``shell`` without requiring a manual import.
+
+Running this customized ``shell`` command with ``verbosity=2`` would show:
+
+.. console::
+
+    8 objects imported automatically:
+
+      from django.contrib.admin.models import LogEntry
+      from django.contrib.auth.models import Group, Permission, User
+      from django.contrib.contenttypes.models import ContentType
+      from django.contrib.sessions.models import Session
+      from django.urls import resolve, reverse
+
+If an overridden ``shell`` command includes paths that cannot be imported,
+these errors are shown when ``verbosity`` is set to ``1`` or higher. Duplicate
+imports are automatically handled.
+
+Note that automatic imports can be disabled for a specific ``shell`` session
+using the :option:`--no-imports <shell --no-imports>` flag. To permanently
+disable automatic imports, override ``get_auto_imports()`` to return ``None``::
+
+    class Command(shell.Command):
+        def get_auto_imports(self):
+            return None

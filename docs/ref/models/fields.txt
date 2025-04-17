@@ -22,9 +22,9 @@ This document contains all the API references of :class:`Field` including the
 
 .. note::
 
-    Technically, these models are defined in :mod:`django.db.models.fields`, but
-    for convenience they're imported into :mod:`django.db.models`; the standard
-    convention is to use ``from django.db import models`` and refer to fields as
+    Fields are defined in :mod:`django.db.models.fields`, but for convenience
+    they're imported into :mod:`django.db.models`. The standard convention is
+    to use ``from django.db import models`` and refer to fields as
     ``models.<Foo>Field``.
 
 .. _common-model-field-options:
@@ -426,6 +426,11 @@ precedence when creating instances in Python code. ``db_default`` will still be
 set at the database level and will be used when inserting rows outside of the
 ORM or when adding a new field in a migration.
 
+If a field has a ``db_default`` without a ``default`` set and no value is
+assigned to the field, a ``DatabaseDefault`` object is returned as the field
+value on unsaved model instances. The actual value for the field is determined
+by the database when the model instance is saved.
+
 ``db_index``
 ------------
 
@@ -492,7 +497,7 @@ The default value can also be set at the database level with
 .. attribute:: Field.editable
 
 If ``False``, the field will not be displayed in the admin or any other
-:class:`~django.forms.ModelForm`. They are also skipped during :ref:`model
+:class:`~django.forms.ModelForm`. It will also be skipped during :ref:`model
 validation <validating-objects>`. Default is ``True``.
 
 ``error_messages``
@@ -537,18 +542,20 @@ cross-site scripting attack.
 
 If ``True``, this field is the primary key for the model.
 
-If you don't specify ``primary_key=True`` for any field in your model, Django
-will automatically add a field to hold the primary key, so you don't need to
-set ``primary_key=True`` on any of your fields unless you want to override the
-default primary-key behavior. The type of auto-created primary key fields can
-be specified per app in :attr:`AppConfig.default_auto_field
-<django.apps.AppConfig.default_auto_field>` or globally in the
-:setting:`DEFAULT_AUTO_FIELD` setting. For more, see
+If you don't specify ``primary_key=True`` for any field in your model and have
+not defined a composite primary key, Django will automatically add a field to
+hold the primary key. So, you don't need to set ``primary_key=True`` on any of
+your fields unless you want to override the default primary-key behavior. The
+type of auto-created primary key fields can be specified per app in
+:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+or globally in the :setting:`DEFAULT_AUTO_FIELD` setting. For more, see
 :ref:`automatic-primary-key-fields`.
 
 ``primary_key=True`` implies :attr:`null=False <Field.null>` and
-:attr:`unique=True <Field.unique>`. Only one primary key is allowed on an
-object.
+:attr:`unique=True <Field.unique>`. Only one field per model can set
+``primary_key=True``. Composite primary keys must be defined using
+:class:`CompositePrimaryKey` instead of setting this flag to ``True`` for all
+fields to maintain this invariant.
 
 The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
@@ -556,6 +563,10 @@ alongside the old one.
 
 The primary key field is set to ``None`` when
 :meth:`deleting <django.db.models.Model.delete>` an object.
+
+.. versionchanged:: 5.2
+
+    The ``CompositePrimaryKey`` field was added.
 
 ``unique``
 ----------
@@ -701,6 +712,23 @@ or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
+
+``CompositePrimaryKey``
+-----------------------
+
+.. versionadded:: 5.2
+
+.. class:: CompositePrimaryKey(*field_names, **options)
+
+A virtual field used for defining a composite primary key.
+
+This field must be defined as the model's ``pk`` attribute. If present, Django
+will create the underlying model table with a composite primary key.
+
+The ``*field_names`` argument is a list of positional field names that compose
+the primary key.
+
+See :doc:`/topics/composite-primary-key` for more details.
 
 ``CharField``
 -------------
@@ -1250,7 +1278,7 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 ``GeneratedField``
 ------------------
 
-.. class:: GeneratedField(expression, output_field, db_persist=None, **kwargs)
+.. class:: GeneratedField(*, expression, output_field, db_persist, **kwargs)
 
 A field that is always computed based on other fields in the model. This field
 is managed and updated by the database itself. Uses the ``GENERATED ALWAYS``
@@ -1287,8 +1315,8 @@ materialized view.
 
 .. admonition:: Refresh the data
 
-    Since the database always computed the value, the object must be reloaded
-    to access the new value after :meth:`~Model.save()`, for example, by using
+    Since the database computes the value, the object must be reloaded to
+    access the new value after :meth:`~Model.save()`, for example, by using
     :meth:`~Model.refresh_from_db()`.
 
 .. admonition:: Database limitations
@@ -1610,6 +1638,8 @@ not an instance of ``UUID``.
     hyphens, because PostgreSQL and MariaDB 10.7+ store them in a hyphenated
     uuid datatype type.
 
+.. _relationship-fields:
+
 Relationship fields
 ===================
 
@@ -1628,80 +1658,25 @@ Django also defines a set of fields that represent relations.
 .. class:: ForeignKey(to, on_delete, **options)
 
 A many-to-one relationship. Requires two positional arguments: the class to
-which the model is related and the :attr:`~ForeignKey.on_delete` option.
-
-.. _recursive-relationships:
-
-To create a recursive relationship -- an object that has a many-to-one
-relationship with itself -- use ``models.ForeignKey('self',
-on_delete=models.CASCADE)``.
-
-.. _lazy-relationships:
-
-If you need to create a relationship on a model that has not yet been defined,
-you can use the name of the model, rather than the model object itself::
+which the model is related and the :attr:`~ForeignKey.on_delete` option::
 
     from django.db import models
-
-
-    class Car(models.Model):
-        manufacturer = models.ForeignKey(
-            "Manufacturer",
-            on_delete=models.CASCADE,
-        )
-        # ...
 
 
     class Manufacturer(models.Model):
-        # ...
-        pass
+        name = models.TextField()
 
-Relationships defined this way on :ref:`abstract models
-<abstract-base-classes>` are resolved when the model is subclassed as a
-concrete model and are not relative to the abstract model's ``app_label``:
-
-.. code-block:: python
-    :caption: ``products/models.py``
-
-    from django.db import models
-
-
-    class AbstractCar(models.Model):
-        manufacturer = models.ForeignKey("Manufacturer", on_delete=models.CASCADE)
-
-        class Meta:
-            abstract = True
-
-.. code-block:: python
-    :caption: ``production/models.py``
-
-    from django.db import models
-    from products.models import AbstractCar
-
-
-    class Manufacturer(models.Model):
-        pass
-
-
-    class Car(AbstractCar):
-        pass
-
-
-    # Car.manufacturer will point to `production.Manufacturer` here.
-
-To refer to models defined in another application, you can explicitly specify
-a model with the full application label. For example, if the ``Manufacturer``
-model above is defined in another application called ``production``, you'd
-need to use::
 
     class Car(models.Model):
-        manufacturer = models.ForeignKey(
-            "production.Manufacturer",
-            on_delete=models.CASCADE,
-        )
+        manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
 
-This sort of reference, called a lazy relationship, can be useful when
-resolving circular import dependencies between two applications.
+The first positional argument can be either a concrete model class or a
+:ref:`lazy reference <lazy-relationships>` to a model class.
+:ref:`Recursive relationships <recursive-relationships>`, where a model has a
+relationship with itself, are also supported.
+
+See :attr:`ForeignKey.on_delete` for details on the second positional
+argument.
 
 A database index is automatically created on the ``ForeignKey``. You can
 disable this by setting :attr:`~Field.db_index` to ``False``.  You may want to
@@ -1714,9 +1689,9 @@ Database Representation
 
 Behind the scenes, Django appends ``"_id"`` to the field name to create its
 database column name. In the above example, the database table for the ``Car``
-model will have a ``manufacturer_id`` column. (You can change this explicitly by
-specifying :attr:`~Field.db_column`) However, your code should never have to
-deal with the database column name, unless you write custom SQL. You'll always
+model will have a ``manufacturer_id`` column. You can change this explicitly by
+specifying :attr:`~Field.db_column`, however, your code should never have to
+deal with the database column name (unless you write custom SQL). You'll always
 deal with the field names of your model object.
 
 .. _foreign-key-arguments:
@@ -1861,8 +1836,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
             limit_choices_to={"is_staff": True},
         )
 
-    causes the corresponding field on the ``ModelForm`` to list only ``Users``
-    that have ``is_staff=True``. This may be helpful in the Django admin.
+    causes the corresponding field on the ``ModelForm`` to list only ``User``
+    instances that have ``is_staff=True``. This may be helpful in the Django
+    admin.
 
     The callable form can be helpful, for instance, when used in conjunction
     with the Python ``datetime`` module to limit selections by date range. For
@@ -2049,16 +2025,13 @@ that control how the relationship functions.
     the Django model that represents the intermediate table that you want to
     use.
 
+    The ``through`` model can be specified using either the model class
+    directly or a :ref:`lazy reference <lazy-relationships>` to the model
+    class.
+
     The most common use for this option is when you want to associate
     :ref:`extra data with a many-to-many relationship
     <intermediary-manytomany>`.
-
-    .. note::
-
-        If you don't want multiple associations between the same instances, add
-        a :class:`~django.db.models.UniqueConstraint` including the from and to
-        fields. Django's automatically generated many-to-many tables include
-        such a constraint.
 
     .. note::
 
@@ -2070,7 +2043,9 @@ that control how the relationship functions.
 
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
-    created to hold the association. It has three fields to link the models.
+    created to hold the association. It has three fields to link the models, a
+    primary key and two foreign keys. There is a unique constraint on the two
+    foreign keys.
 
     If the source and target models differ, the following fields are
     generated:
@@ -2265,6 +2240,120 @@ accepted by :class:`ForeignKey`, plus one extra argument:
 
 See :doc:`One-to-one relationships </topics/db/examples/one_to_one>` for usage
 examples of ``OneToOneField``.
+
+.. _lazy-relationships:
+
+Lazy relationships
+------------------
+
+Lazy relationships allow referencing models by their names (as strings) or
+creating recursive relationships. Strings can be used as the first argument in
+any relationship field to reference models lazily. A lazy reference can be
+either :ref:`recursive <recursive-relationships>`,
+:ref:`relative <relative-relationships>` or
+:ref:`absolute <absolute-relationships>`.
+
+.. _recursive-relationships:
+
+Recursive
+~~~~~~~~~
+
+To define a relationship where a model references itself, use ``"self"`` as the
+first argument of the relationship field::
+
+    from django.db import models
+
+
+    class Manufacturer(models.Model):
+        name = models.TextField()
+        suppliers = models.ManyToManyField("self", symmetrical=False)
+
+
+When used in an :ref:`abstract model <abstract-base-classes>`, the recursive
+relationship resolves such that each concrete subclass references itself.
+
+.. _relative-relationships:
+
+Relative
+~~~~~~~~
+
+When a relationship needs to be created with a model that has not been defined
+yet, it can be referenced by its name rather than the model object itself::
+
+    from django.db import models
+
+
+    class Car(models.Model):
+        manufacturer = models.ForeignKey(
+            "Manufacturer",
+            on_delete=models.CASCADE,
+        )
+
+
+    class Manufacturer(models.Model):
+        name = models.TextField()
+        suppliers = models.ManyToManyField("self", symmetrical=False)
+
+Relationships defined this way on :ref:`abstract models
+<abstract-base-classes>` are resolved when the model is subclassed as a
+concrete model and are not relative to the abstract model's ``app_label``:
+
+.. code-block:: python
+    :caption: ``products/models.py``
+
+    from django.db import models
+
+
+    class AbstractCar(models.Model):
+        manufacturer = models.ForeignKey("Manufacturer", on_delete=models.CASCADE)
+
+        class Meta:
+            abstract = True
+
+.. code-block:: python
+    :caption: ``production/models.py``
+
+    from django.db import models
+    from products.models import AbstractCar
+
+
+    class Manufacturer(models.Model):
+        name = models.TextField()
+
+
+    class Car(AbstractCar):
+        pass
+
+In this example, the ``Car.manufacturer`` relationship will resolve to
+``production.Manufacturer``, as it points to the concrete model defined
+within the ``production/models.py`` file.
+
+.. admonition:: Reusable models with relative references
+
+    Relative references allow the creation of reusable abstract models with
+    relationships that can resolve to different implementations of the
+    referenced models in various subclasses across different applications.
+
+.. _absolute-relationships:
+
+Absolute
+~~~~~~~~
+
+Absolute references specify a model using its ``app_label`` and class name,
+allowing for model references across different applications. This type of lazy
+relationship can also help resolve circular imports.
+
+For example, if the ``Manufacturer`` model is defined in another application
+called ``thirdpartyapp``, it can be referenced as::
+
+    class Car(models.Model):
+        manufacturer = models.ForeignKey(
+            "thirdpartyapp.Manufacturer",
+            on_delete=models.CASCADE,
+        )
+
+Absolute references always point to the same model, even when used in an
+:ref:`abstract model <abstract-base-classes>`.
 
 Field API reference
 ===================

@@ -1,6 +1,6 @@
 """
- This module houses the Geometry Collection objects:
- GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
+This module houses the Geometry Collection objects:
+GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
 
 from django.contrib.gis.geos import prototypes as capi

@@ -242,9 +242,13 @@ when calling :meth:`~django.forms.Form.is_valid()` or accessing the
 ``full_clean()``, although you will typically not use the latter method in
 practice.
 
-``Model`` validation (:meth:`Model.full_clean()
-<django.db.models.Model.full_clean()>`) is triggered from within the form
-validation step, right after the form's ``clean()`` method is called.
+``Model`` validation is triggered from within the form validation step right
+after the form's ``clean()`` method is called. First, the model's
+:meth:`~django.db.models.Model.full_clean()` is called with
+``validate_unique=False`` and ``validate_constraints=False``, then the model's
+:meth:`~django.db.models.Model.validate_unique()` and
+:meth:`~django.db.models.Model.validate_constraints()` methods are called in
+order.
 
 .. warning::
 
@@ -267,10 +271,10 @@ attribute that gives its methods access to that specific model instance.
 
 .. warning::
 
-    The ``ModelForm.clean()`` method sets a flag that makes the :ref:`model
+    The ``ModelForm.clean()`` method sets flags that make the :ref:`model
     validation <validating-objects>` step validate the uniqueness of model
     fields that are marked as ``unique``, ``unique_together`` or
-    ``unique_for_date|month|year``.
+    ``unique_for_date|month|year``, as well as constraints.
 
     If you would like to override the ``clean()`` method and maintain this
     validation, you must call the parent class's ``clean()`` method.
@@ -284,9 +288,9 @@ If you have excluded any model fields, validation will not be run on those
 fields. See the :doc:`form validation </ref/forms/validation>` documentation
 for more on how field cleaning and validation work.
 
-The model's ``clean()`` method will be called before any uniqueness checks are
-made. See :ref:`Validating objects <validating-objects>` for more information
-on the model's ``clean()`` hook.
+The model's ``clean()`` method will be called before any uniqueness or
+constraint checks are made. See :ref:`Validating objects <validating-objects>`
+for more information on the model's ``clean()`` hook.
 
 .. _considerations-regarding-model-errormessages:
 
@@ -696,10 +700,10 @@ will be localized.
 Form inheritance
 ----------------
 
-As with basic forms, you can extend and reuse ``ModelForms`` by inheriting
-them. This is useful if you need to declare extra fields or extra methods on a
-parent class for use in a number of forms derived from models. For example,
-using the previous ``ArticleForm`` class:
+As with basic forms, you can extend and reuse ``ModelForm`` classes by
+inheriting them. This is useful if you need to declare extra fields or extra
+methods on a parent class for use in a number of forms derived from models.
+For example, using the previous ``ArticleForm`` class:
 
 .. code-block:: pycon
 
@@ -979,7 +983,7 @@ value (``instances``, in the above example).
 When fields are missing from the form (for example because they have been
 excluded), these fields will not be set by the ``save()`` method. You can find
 more information about this restriction, which also holds for regular
-``ModelForms``, in `Selecting the fields to use`_.
+model forms, in `Selecting the fields to use`_.
 
 Pass ``commit=False`` to return the unsaved model instances:
 
@@ -1100,7 +1104,7 @@ above, in :ref:`saving-objects-in-the-formset`.)
 Overriding ``clean()`` on a ``ModelFormSet``
 --------------------------------------------
 
-Just like with ``ModelForms``, by default the ``clean()`` method of a
+Just like with a ``ModelForm``, by default the ``clean()`` method of a
 ``ModelFormSet`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
 ``unique_for_date|month|year``).  If you want to override the ``clean()`` method

@@ -76,7 +76,7 @@ class ExclusionConstraint(BaseConstraint):
             expressions.append(expression)
         return ExpressionList(*expressions).resolve_expression(query)
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
         references = set()
         for expr, _ in self.expressions:
             if isinstance(expr, str):
@@ -206,6 +206,11 @@ class ExclusionConstraint(BaseConstraint):
                     self.get_violation_error_message(), code=self.violation_error_code
                 )
         else:
+            # Ignore constraints with excluded fields in condition.
+            if exclude and self._expression_refs_exclude(
+                model, self.condition, exclude
+            ):
+                return
             if (self.condition & Exists(queryset.filter(self.condition))).check(
                 replacement_map, using=using
             ):

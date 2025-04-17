@@ -6,7 +6,7 @@ This advanced tutorial begins where :doc:`Tutorial 8 </intro/tutorial08>`
 left off. We'll be turning our web-poll into a standalone Python package
 you can reuse in new projects and share with other people.
 
-If you haven't recently completed Tutorials 1–7, we encourage you to review
+If you haven't recently completed Tutorials 1–8, we encourage you to review
 these so that your example project matches the one described below.
 
 Reusability matters
@@ -57,7 +57,7 @@ After the previous tutorials, our project should look like this:
 
 .. code-block:: text
 
-    mysite/
+    djangotutorial/
         manage.py
         mysite/
             __init__.py
@@ -90,12 +90,12 @@ After the previous tutorials, our project should look like this:
             admin/
                 base_site.html
 
-You created ``mysite/templates`` in :doc:`Tutorial 7 </intro/tutorial07>`,
-and ``polls/templates`` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
-it is clearer why we chose to have separate template directories for the
-project and application: everything that is part of the polls application is in
-``polls``. It makes the application self-contained and easier to drop into a
-new project.
+You created ``djangotutorial/templates`` in :doc:`Tutorial 7
+</intro/tutorial07>`, and ``polls/templates`` in
+:doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps it is clearer why we chose
+to have separate template directories for the project and application:
+everything that is part of the polls application is in ``polls``. It makes the
+application self-contained and easier to drop into a new project.
 
 The ``polls`` directory could now be copied into a new Django project and
 immediately reused. It's not quite ready to be published though. For that, we
@@ -220,7 +220,7 @@ this. For a small app like polls, this process isn't too difficult.
        ]
        description = "A Django app to conduct web-based polls."
        readme = "README.rst"
-       requires-python = ">= 3.10"
+       requires-python = ">= 3.12"
        authors = [
            {name = "Your Name", email = "yourname@example.com"},
        ]
@@ -234,9 +234,8 @@ this. For a small app like polls, this process isn't too difficult.
            "Programming Language :: Python",
            "Programming Language :: Python :: 3",
            "Programming Language :: Python :: 3 :: Only",
-           "Programming Language :: Python :: 3.10",
-           "Programming Language :: Python :: 3.11",
            "Programming Language :: Python :: 3.12",
+           "Programming Language :: Python :: 3.13",
            "Topic :: Internet :: WWW/HTTP",
            "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
        ]
@@ -262,6 +261,26 @@ this. For a small app like polls, this process isn't too difficult.
    Note that the ``docs`` directory won't be included in your package unless
    you add some files to it. Many Django apps also provide their documentation
    online through sites like `readthedocs.org <https://readthedocs.org>`_.
+
+   Many Python projects, including Django and Python itself, use `Sphinx
+   <https://www.sphinx-doc.org/en/master/usage/quickstart.html>`_ to build
+   their documentation. If you choose to use Sphinx you can link back to the
+   Django documentation by configuring `Intersphinx
+   <https://www.sphinx-doc.org/en/master/usage/quickstart.html#intersphinx>`_
+   and including a value for Django in your project's ``intersphinx_mapping``
+   value::
+
+        intersphinx_mapping = {
+            # ...
+            "django": (
+                "https://docs.djangoproject.com/en/stable/",
+                None,
+            ),
+        }
+
+   With that in place, you can then cross-link to specific entries, in the
+   same way as in the Django docs, such as
+   "``:attr:`django.test.TransactionTestCase.databases```".
 
 #. Check that the :pypi:`build` package is installed (``python -m pip install
    build``) and try building your package by running ``python -m build`` inside

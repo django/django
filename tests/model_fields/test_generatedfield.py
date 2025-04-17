@@ -22,6 +22,7 @@ from .models import (
     GeneratedModelCheckConstraint,
     GeneratedModelCheckConstraintVirtual,
     GeneratedModelFieldWithConverters,
+    GeneratedModelNonAutoPk,
     GeneratedModelNull,
     GeneratedModelNullVirtual,
     GeneratedModelOutputFieldDbCollation,
@@ -93,11 +94,11 @@ class BaseGeneratedFieldTests(SimpleTestCase):
             )
 
     def test_db_persist_required(self):
-        msg = "GeneratedField.db_persist must be True or False."
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaises(TypeError):
             GeneratedField(
                 expression=Lower("name"), output_field=CharField(max_length=255)
             )
+        msg = "GeneratedField.db_persist must be True or False."
         with self.assertRaisesMessage(ValueError, msg):
             GeneratedField(
                 expression=Lower("name"),
@@ -355,6 +356,12 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         obj = GeneratedModelFieldWithConverters.objects.create(field=uuid.uuid4())
         obj = self._refresh_if_needed(obj)
         self.assertEqual(obj.field, obj.field_copy)
+
+    def test_create_with_non_auto_pk(self):
+        obj = GeneratedModelNonAutoPk.objects.create(id=1, a=2)
+        self.assertEqual(obj.id, 1)
+        self.assertEqual(obj.a, 2)
+        self.assertEqual(obj.b, 2)
 
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")

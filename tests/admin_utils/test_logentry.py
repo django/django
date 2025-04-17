@@ -5,13 +5,13 @@ from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.utils import quote
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import post_save, pre_save
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.html import escape
 
-from .models import Article, ArticleProxy, Car, InheritedLogEntryManager, Site
+from .models import Article, ArticleProxy, Car, Site
 
 
 @override_settings(ROOT_URLCONF="admin_utils.urls")
@@ -42,11 +42,23 @@ class LogEntryTests(TestCase):
             [cls.a1],
             CHANGE,
             change_message="Changed something",
-            single_object=True,
         )
 
     def setUp(self):
         self.client.force_login(self.user)
+        self.signals = []
+
+        pre_save.connect(self.pre_save_listener, sender=LogEntry)
+        self.addCleanup(pre_save.disconnect, self.pre_save_listener, sender=LogEntry)
+
+        post_save.connect(self.post_save_listener, sender=LogEntry)
+        self.addCleanup(post_save.disconnect, self.post_save_listener, sender=LogEntry)
+
+    def pre_save_listener(self, instance, **kwargs):
+        self.signals.append(("pre_save", instance))
+
+    def post_save_listener(self, instance, created, **kwargs):
+        self.signals.append(("post_save", instance, created))
 
     def test_logentry_save(self):
         """
@@ -236,34 +248,19 @@ class LogEntryTests(TestCase):
         logentry = LogEntry.objects.first()
         self.assertEqual(repr(logentry), str(logentry.action_time))
 
-    # RemovedInDjango60Warning.
-    def test_log_action(self):
-        msg = "LogEntryManager.log_action() is deprecated. Use log_actions() instead."
-        content_type_val = ContentType.objects.get_for_model(Article).pk
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            log_entry = LogEntry.objects.log_action(
-                self.user.pk,
-                content_type_val,
-                self.a1.pk,
-                repr(self.a1),
-                CHANGE,
-                change_message="Changed something else",
-            )
-        self.assertEqual(log_entry, LogEntry.objects.latest("id"))
-        self.assertEqual(ctx.filename, __file__)
-
     def test_log_actions(self):
         queryset = Article.objects.all().order_by("-id")
         msg = "Deleted Something"
         content_type = ContentType.objects.get_for_model(self.a1)
         self.assertEqual(len(queryset), 3)
         with self.assertNumQueries(1):
-            LogEntry.objects.log_actions(
+            result = LogEntry.objects.log_actions(
                 self.user.pk,
                 queryset,
                 DELETION,
                 change_message=msg,
             )
+        self.assertEqual(len(result), len(queryset))
         logs = (
             LogEntry.objects.filter(action_flag=DELETION)
             .order_by("id")
@@ -287,47 +284,54 @@ class LogEntryTests(TestCase):
             )
             for obj in queryset
         ]
-        self.assertSequenceEqual(logs, expected_log_values)
-
-    # RemovedInDjango60Warning.
-    def test_log_action_fallback(self):
-        LogEntry.objects2 = InheritedLogEntryManager()
-        queryset = Article.objects.all().order_by("-id")
-        content_type = ContentType.objects.get_for_model(self.a1)
-        self.assertEqual(len(queryset), 3)
-        msg = (
-            "The usage of log_action() is deprecated. Implement log_actions() instead."
-        )
-        with (
-            self.assertNumQueries(3),
-            self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx,
-        ):
-            LogEntry.objects2.log_actions(self.user.pk, queryset, DELETION)
-        self.assertEqual(ctx.filename, __file__)
-        log_values = (
-            LogEntry.objects.filter(action_flag=DELETION)
-            .order_by("id")
-            .values_list(
-                "user",
-                "content_type",
-                "object_id",
-                "object_repr",
-                "action_flag",
-                "change_message",
-            )
-        )
-        expected_log_values = [
+        result_logs = [
             (
-                self.user.pk,
-                content_type.id,
-                str(obj.pk),
-                "Test Repr",
-                DELETION,
-                "",
+                entry.user_id,
+                entry.content_type_id,
+                str(entry.object_id),
+                entry.object_repr,
+                entry.action_flag,
+                entry.change_message,
             )
-            for obj in queryset
+            for entry in result
         ]
-        self.assertSequenceEqual(log_values, expected_log_values)
+        self.assertSequenceEqual(logs, result_logs)
+        self.assertSequenceEqual(logs, expected_log_values)
+        self.assertEqual(self.signals, [])
+
+    def test_log_actions_single_object_param(self):
+        queryset = Article.objects.filter(pk=self.a1.pk)
+        msg = "Deleted Something"
+        content_type = ContentType.objects.get_for_model(self.a1)
+        self.assertEqual(len(queryset), 1)
+        for single_object in (True, False):
+            self.signals = []
+            with self.subTest(single_object=single_object), self.assertNumQueries(1):
+                result = LogEntry.objects.log_actions(
+                    self.user.pk,
+                    queryset,
+                    DELETION,
+                    change_message=msg,
+                    single_object=single_object,
+                )
+                if single_object:
+                    self.assertIsInstance(result, LogEntry)
+                    entry = result
+                else:
+                    self.assertIsInstance(result, list)
+                    self.assertEqual(len(result), 1)
+                    entry = result[0]
+                self.assertEqual(entry.user_id, self.user.pk)
+                self.assertEqual(entry.content_type_id, content_type.id)
+                self.assertEqual(str(entry.object_id), str(self.a1.pk))
+                self.assertEqual(entry.object_repr, str(self.a1))
+                self.assertEqual(entry.action_flag, DELETION)
+                self.assertEqual(entry.change_message, msg)
+                expected_signals = [
+                    ("pre_save", entry),
+                    ("post_save", entry, True),
+                ]
+                self.assertEqual(self.signals, expected_signals)
 
     def test_recentactions_without_content_type(self):
         """
@@ -371,6 +375,8 @@ class LogEntryTests(TestCase):
             "created_1": "00:00",
         }
         changelist_url = reverse("admin:admin_utils_articleproxy_changelist")
+        expected_signals = []
+        self.assertEqual(self.signals, expected_signals)
 
         # add
         proxy_add_url = reverse("admin:admin_utils_articleproxy_add")
@@ -379,6 +385,10 @@ class LogEntryTests(TestCase):
         proxy_addition_log = LogEntry.objects.latest("id")
         self.assertEqual(proxy_addition_log.action_flag, ADDITION)
         self.assertEqual(proxy_addition_log.content_type, proxy_content_type)
+        expected_signals.extend(
+            [("pre_save", proxy_addition_log), ("post_save", proxy_addition_log, True)]
+        )
+        self.assertEqual(self.signals, expected_signals)
 
         # change
         article_id = proxy_addition_log.object_id
@@ -391,6 +401,10 @@ class LogEntryTests(TestCase):
         proxy_change_log = LogEntry.objects.latest("id")
         self.assertEqual(proxy_change_log.action_flag, CHANGE)
         self.assertEqual(proxy_change_log.content_type, proxy_content_type)
+        expected_signals.extend(
+            [("pre_save", proxy_change_log), ("post_save", proxy_change_log, True)]
+        )
+        self.assertEqual(self.signals, expected_signals)
 
         # delete
         proxy_delete_url = reverse(
@@ -401,6 +415,10 @@ class LogEntryTests(TestCase):
         proxy_delete_log = LogEntry.objects.latest("id")
         self.assertEqual(proxy_delete_log.action_flag, DELETION)
         self.assertEqual(proxy_delete_log.content_type, proxy_content_type)
+        expected_signals.extend(
+            [("pre_save", proxy_delete_log), ("post_save", proxy_delete_log, True)]
+        )
+        self.assertEqual(self.signals, expected_signals)
 
     def test_action_flag_choices(self):
         tests = ((1, "Addition"), (2, "Change"), (3, "Deletion"))
@@ -415,7 +433,6 @@ class LogEntryTests(TestCase):
             [self.a1],
             CHANGE,
             change_message="Article changed message",
-            single_object=True,
         )
         c1 = Car.objects.create()
         LogEntry.objects.log_actions(
@@ -423,7 +440,6 @@ class LogEntryTests(TestCase):
             [c1],
             ADDITION,
             change_message="Car created message",
-            single_object=True,
         )
         exp_str_article = escape(str(self.a1))
         exp_str_car = escape(str(c1))

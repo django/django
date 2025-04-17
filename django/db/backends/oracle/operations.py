@@ -1,12 +1,19 @@
 import datetime
 import uuid
 from functools import lru_cache
+from itertools import chain
 
 from django.conf import settings
-from django.db import DatabaseError, NotSupportedError
+from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
-from django.db.models import AutoField, Exists, ExpressionWrapper, Lookup
+from django.db.models import (
+    AutoField,
+    CompositePrimaryKey,
+    Exists,
+    ExpressionWrapper,
+    Lookup,
+)
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.where import WhereNode
 from django.utils import timezone
@@ -295,15 +302,6 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
-            # Can be removed when cx_Oracle is no longer supported and
-            # python-oracle 2.1.2 becomes the minimum supported version.
-            if value == []:
-                raise DatabaseError(
-                    "The database did not return a new row id. Probably "
-                    '"ORA-1403: no data found" was raised internally but was '
-                    "hidden by the Oracle OCI library (see "
-                    "https://code.djangoproject.com/ticket/28859)."
-                )
             columns.append(value[0])
         return tuple(columns)
 
@@ -328,7 +326,7 @@ END;
         # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, oracledb's
         # `statement` doesn't contain the query parameters. Substitute
         # parameters manually.
-        if params:
+        if statement and params:
             if isinstance(params, (tuple, list)):
                 params = {
                     f":arg{i}": param for i, param in enumerate(dict.fromkeys(params))
@@ -629,9 +627,6 @@ END;
             1900, 1, 1, value.hour, value.minute, value.second, value.microsecond
         )
 
-    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
-        return value
-
     def combine_expression(self, connector, sub_expressions):
         lhs, rhs = sub_expressions
         if connector == "%%":
@@ -711,6 +706,12 @@ END;
 
     def bulk_batch_size(self, fields, objs):
         """Oracle restricts the number of parameters in a query."""
+        fields = list(
+            chain.from_iterable(
+                field.fields if isinstance(field, CompositePrimaryKey) else [field]
+                for field in fields
+            )
+        )
         if fields:
             return self.connection.features.max_query_params // len(fields)
         return len(objs)

@@ -1,15 +1,8 @@
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 from .models import Foo
-
-
-# RemovedInDjango60Warning.
-class ExampleOld(FieldCacheMixin):
-    def get_cache_name(self):
-        return "example"
 
 
 class Example(FieldCacheMixin):
@@ -23,21 +16,9 @@ class FieldCacheMixinTests(SimpleTestCase):
         self.instance = Foo()
         self.field = Example()
 
-    # RemovedInDjango60Warning: when the deprecation ends, replace with:
-    # def test_cache_name_not_implemented(self):
-    #   with self.assertRaises(NotImplementedError):
-    #       FieldCacheMixin().cache_name
-    def test_get_cache_name_not_implemented(self):
+    def test_cache_name_not_implemented(self):
         with self.assertRaises(NotImplementedError):
-            FieldCacheMixin().get_cache_name()
-
-    # RemovedInDjango60Warning.
-    def test_get_cache_name_deprecated(self):
-        msg = "Override ExampleOld.cache_name instead of get_cache_name()."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            result = ExampleOld().cache_name
-        self.assertEqual(result, "example")
-        self.assertEqual(ctx.filename, __file__)
+            FieldCacheMixin().cache_name
 
     def test_cache_name(self):
         result = Example().cache_name

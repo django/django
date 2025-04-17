@@ -1,0 +1,18 @@
+==========================
+Django 5.1.6 release notes
+==========================
+
+*February 5, 2025*
+
+Django 5.1.6 fixes several bugs in 5.1.5.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.1.5 that caused ``validate_ipv6_address()``
+  and ``validate_ipv46_address()`` to crash when handling non-string values
+  (:ticket:`36098`).
+
+* Fixed a regression in Django 5.1 where password fields, despite being set to
+  ``required=False``, were still treated as required in forms derived from
+  :class:`~django.contrib.auth.forms.BaseUserCreationForm` (:ticket:`36140`).

@@ -14,13 +14,11 @@ directory corresponding to settings.GEOIP_PATH.
 
 import ipaddress
 import socket
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 __all__ = ["HAS_GEOIP2"]
@@ -32,6 +30,18 @@ except ImportError:  # pragma: no cover
 else:
     HAS_GEOIP2 = True
     __all__ += ["GeoIP2", "GeoIP2Exception"]
+
+
+# These are the values stored in the `database_type` field of the metadata.
+# See https://maxmind.github.io/MaxMind-DB/#database_type for details.
+SUPPORTED_DATABASE_TYPES = {
+    "DBIP-City-Lite",
+    "DBIP-Country-Lite",
+    "GeoIP2-City",
+    "GeoIP2-Country",
+    "GeoLite2-City",
+    "GeoLite2-Country",
+}
 
 
 class GeoIP2Exception(Exception):
@@ -106,7 +116,7 @@ class GeoIP2:
             )
 
         database_type = self._metadata.database_type
-        if not database_type.endswith(("City", "Country")):
+        if database_type not in SUPPORTED_DATABASE_TYPES:
             raise GeoIP2Exception(f"Unable to handle database edition: {database_type}")
 
     def __del__(self):
@@ -123,6 +133,14 @@ class GeoIP2:
     def _metadata(self):
         return self._reader.metadata()
 
+    @cached_property
+    def is_city(self):
+        return "City" in self._metadata.database_type
+
+    @cached_property
+    def is_country(self):
+        return "Country" in self._metadata.database_type
+
     def _query(self, query, *, require_city=False):
         if not isinstance(query, (str, ipaddress.IPv4Address, ipaddress.IPv6Address)):
             raise TypeError(
@@ -130,18 +148,17 @@ class GeoIP2:
                 "IPv6Address, not type %s" % type(query).__name__,
             )
 
-        is_city = self._metadata.database_type.endswith("City")
-
-        if require_city and not is_city:
+        if require_city and not self.is_city:
             raise GeoIP2Exception(f"Invalid GeoIP city data file: {self._path}")
 
-        try:
-            validate_ipv46_address(query)
-        except ValidationError:
-            # GeoIP2 only takes IP addresses, so try to resolve a hostname.
-            query = socket.gethostbyname(query)
+        if isinstance(query, str):
+            try:
+                validate_ipv46_address(query)
+            except ValidationError:
+                # GeoIP2 only takes IP addresses, so try to resolve a hostname.
+                query = socket.gethostbyname(query)
 
-        function = self._reader.city if is_city else self._reader.country
+        function = self._reader.city if self.is_city else self._reader.country
         return function(query)
 
     def city(self, query):
@@ -195,15 +212,6 @@ class GeoIP2:
             "is_in_european_union": response.country.is_in_european_union,
         }
 
-    def coords(self, query, ordering=("longitude", "latitude")):
-        warnings.warn(
-            "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        data = self.city(query)
-        return tuple(data[o] for o in ordering)
-
     def lon_lat(self, query):
         "Return a tuple of the (longitude, latitude) for the given query."
         data = self.city(query)
@@ -220,12 +228,3 @@ class GeoIP2:
         from django.contrib.gis.geos import Point
 
         return Point(self.lon_lat(query), srid=4326)
-
-    @classmethod
-    def open(cls, full_path, cache):
-        warnings.warn(
-            "GeoIP2.open() is deprecated. Use GeoIP2() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return GeoIP2(full_path, cache)

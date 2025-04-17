@@ -23,15 +23,12 @@ in a shell prompt (indicated by the $ prefix):
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version|, which supports Python 3.10 and
+This tutorial is written for Django |version|, which supports Python 3.12 and
 later. If the Django version doesn't match, you can refer to the tutorial for
 your version of Django by using the version switcher at the bottom right corner
 of this page, or update Django to the newest version. If you're using an older
 version of Python, check :ref:`faq-python-version-support` to find a compatible
 version of Django.
-
-See :doc:`How to install Django </topics/install>` for advice on how to remove
-older versions of Django and install a newer one.
 
 .. admonition:: Where to get help:
 
@@ -48,14 +45,21 @@ including database configuration, Django-specific options and
 application-specific settings.
 
 From the command line, ``cd`` into a directory where you'd like to store your
-code, then run the following command:
+code and create a new directory named ``djangotutorial``. (This directory name
+doesn't matter to Django; you can rename it to anything you like.)
 
 .. console::
 
-   $ django-admin startproject mysite
+   $ mkdir djangotutorial
 
-This will create a ``mysite`` directory in your current directory. If it didn't
-work, see :ref:`troubleshooting-django-admin`.
+Then, run the following command to bootstrap a new Django project:
+
+.. console::
+
+   $ django-admin startproject mysite djangotutorial
+
+This will create a project called ``mysite`` inside the ``djangotutorial``
+directory. If it didn't work, see :ref:`troubleshooting-django-admin`.
 
 .. note::
 
@@ -68,7 +72,7 @@ Let's look at what :djadmin:`startproject` created:
 
 .. code-block:: text
 
-    mysite/
+    djangotutorial/
         manage.py
         mysite/
             __init__.py
@@ -79,14 +83,11 @@ Let's look at what :djadmin:`startproject` created:
 
 These files are:
 
-* The outer :file:`mysite/` root directory is a container for your project. Its
-  name doesn't matter to Django; you can rename it to anything you like.
-
 * :file:`manage.py`: A command-line utility that lets you interact with this
   Django project in various ways. You can read all the details about
   :file:`manage.py` in :doc:`/ref/django-admin`.
 
-* The inner :file:`mysite/` directory is the actual Python package for your
+* :file:`mysite/`: A directory that is the actual Python package for your
   project. Its name is the Python package name you'll need to use to import
   anything inside it (e.g. ``mysite.urls``).
 
@@ -111,8 +112,8 @@ These files are:
 The development server
 ======================
 
-Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
-you haven't already, and run the following commands:
+Let's verify your Django project works. Change into the :file:`djangotutorial`
+directory, if you haven't already, and run the following commands:
 
 .. console::
 
@@ -182,10 +183,8 @@ rather than creating directories.
     configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
 
-Your apps can live anywhere on your :ref:`Python path <tut-searchpath>`. In
-this tutorial, we'll create our poll app in the same directory as your
-:file:`manage.py` file so that it can be imported as its own top-level module,
-rather than a submodule of ``mysite``.
+Your apps can live anywhere in your :ref:`Python path <tut-searchpath>`. In
+this tutorial, we'll create our poll app inside the ``djangotutorial`` folder.
 
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:
@@ -291,7 +290,8 @@ app will still work.
 .. admonition:: When to use :func:`~django.urls.include()`
 
     You should always use ``include()`` when you include other URL patterns.
-    ``admin.site.urls`` is the only exception to this.
+    The only exception is ``admin.site.urls``, which is a pre-built URLconf
+    provided by Django for the default admin site.
 
 You have now wired an ``index`` view into the URLconf. Verify it's working with
 the following command:

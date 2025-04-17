@@ -254,10 +254,6 @@ input[type="submit"], button {
         align-items: center;
     }
 
-    .selector .selector-filter label {
-        margin: 0 8px 0 0;
-    }
-
     .selector .selector-filter input {
         width: 100%;
         min-height: 0;
@@ -277,29 +273,7 @@ input[type="submit"], button {
         margin-bottom: 5px;
     }
 
-    .selector ul.selector-chooser {
-        width: 26px;
-        height: 52px;
-        padding: 2px 0;
-        border-radius: 20px;
-        transform: translateY(-10px);
-    }
-
-    .selector-add, .selector-remove {
-        width: 20px;
-        height: 20px;
-        background-size: 20px auto;
-    }
-
-    .selector-add {
-        background-position: 0 -120px;
-    }
-
-    .selector-remove {
-        background-position: 0 -80px;
-    }
-
-    a.selector-chooseall, a.selector-clearall {
+    .selector-chooseall, .selector-clearall {
         align-self: center;
     }
 
@@ -321,50 +295,12 @@ input[type="submit"], button {
     }
 
     .stacked ul.selector-chooser {
-        width: 52px;
-        height: 26px;
         padding: 0 2px;
         transform: none;
     }
 
     .stacked .selector-chooser li {
         padding: 3px;
-    }
-
-    .stacked .selector-add, .stacked .selector-remove {
-        background-size: 20px auto;
-    }
-
-    .stacked .selector-add {
-        background-position: 0 -40px;
-    }
-
-    .stacked .active.selector-add {
-        background-position: 0 -40px;
-    }
-
-    .active.selector-add:focus, .active.selector-add:hover {
-        background-position: 0 -140px;
-    }
-
-    .stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
-        background-position: 0 -60px;
-    }
-
-    .stacked .selector-remove {
-        background-position: 0 0;
-    }
-
-    .stacked .active.selector-remove {
-        background-position: 0 0;
-    }
-
-    .active.selector-remove:focus, .active.selector-remove:hover {
-        background-position: 0 -100px;
-    }
-
-    .stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
-        background-position: 0 -20px;
     }
 
     .help-tooltip, .selector .help-icon {
@@ -529,6 +465,10 @@ input[type="submit"], button {
         margin-left: 15px;
     }
 
+    .object-tools:has(a.addlink) {
+        margin-top: 0px;
+    }
+
     /* Forms */
 
     .form-row {
@@ -649,6 +589,7 @@ input[type="submit"], button {
 
     .related-widget-wrapper .selector {
         order: 1;
+        flex: 1 0 auto;
     }
 
     .related-widget-wrapper > a {
@@ -679,9 +620,9 @@ input[type="submit"], button {
     }
 
     .selector ul.selector-chooser {
-        display: block;
-        width: 52px;
-        height: 26px;
+        display: flex;
+        width: 60px;
+        height: 30px;
         padding: 0 2px;
         transform: none;
     }
@@ -694,16 +635,16 @@ input[type="submit"], button {
         background-position: 0 0;
     }
 
-    .active.selector-remove:focus, .active.selector-remove:hover {
-        background-position: 0 -20px;
+    :enabled.selector-remove:focus, :enabled.selector-remove:hover {
+        background-position: 0 -24px;
     }
 
     .selector-add  {
-        background-position: 0 -40px;
+        background-position: 0 -48px;
     }
 
-    .active.selector-add:focus, .active.selector-add:hover {
-        background-position: 0 -60px;
+    :enabled.selector-add:focus, :enabled.selector-add:hover {
+        background-position: 0 -72px;
     }
 
     /* Inlines */

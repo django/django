@@ -164,8 +164,8 @@ To access the new value saved this way, the object must be reloaded::
    reporter.refresh_from_db()
 
 As well as being used in operations on single instances as above, ``F()`` can
-be used on ``QuerySets`` of object instances, with ``update()``. This reduces
-the two queries we were using above - the ``get()`` and the
+be used with ``update()`` to perform bulk updates on a ``QuerySet``. This
+reduces the two queries we were using above - the ``get()`` and the
 :meth:`~Model.save()` - to just one::
 
     reporter = Reporters.objects.filter(name="Tintin")
@@ -187,8 +187,6 @@ the field value of each one, and saving each one back to the database::
 
 Slicing ``F()`` expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 5.1
 
 For string-based fields, text-based fields, and
 :class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
@@ -450,7 +448,7 @@ some complex computations::
 
 The ``Aggregate`` API is as follows:
 
-.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, default=None, **extra)
+.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, default=None, order_by=None, **extra)
 
     .. attribute:: template
 
@@ -475,6 +473,15 @@ The ``Aggregate`` API is as follows:
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
 
+    .. attribute:: allow_order_by
+
+        .. versionadded:: 6.0
+
+        A class attribute determining whether or not this aggregate function
+        allows passing a ``order_by`` keyword argument. If set to ``False``
+        (default), ``TypeError`` is raised if ``order_by`` is passed as a value
+        other than ``None``.
+
     .. attribute:: empty_result_set_value
 
         Defaults to ``None`` since most aggregate functions result in ``NULL``
@@ -493,6 +500,12 @@ The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
+The ``order_by`` argument behaves similarly to the ``field_names`` input of the
+:meth:`~.QuerySet.order_by` function, accepting a field name (with an optional
+``"-"`` prefix which indicates descending order) or an expression (or a tuple
+or list of strings and/or expressions) that specifies the ordering of the
+elements in the result.
+
 The ``default`` argument takes a value that will be passed along with the
 aggregate to :class:`~django.db.models.functions.Coalesce`. This is useful for
 specifying a value to be returned other than ``None`` when the queryset (or
@@ -500,6 +513,10 @@ grouping) contains no entries.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
+
+.. versionchanged:: 6.0
+
+    The ``order_by`` argument was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -516,6 +533,7 @@ generated. Here's a brief example::
         function = "SUM"
         template = "%(function)s(%(all_values)s%(expressions)s)"
         allow_distinct = False
+        arity = 1
 
         def __init__(self, expression, all_values=False, **extra):
             super().__init__(expression, all_values="ALL " if all_values else "", **extra)
@@ -919,19 +937,11 @@ ordinary sequence of rows.
     the standard start and end points, such as ``CURRENT ROW`` and ``UNBOUNDED
     FOLLOWING``.
 
-    .. versionchanged:: 5.1
-
-        The ``exclusion`` argument was added.
-
 .. class:: RowRange(start=None, end=None, exclusion=None)
 
     .. attribute:: frame_type
 
         This attribute is set to ``'ROWS'``.
-
-    .. versionchanged:: 5.1
-
-        The ``exclusion`` argument was added.
 
 Both classes return SQL with the template:
 
@@ -940,8 +950,6 @@ Both classes return SQL with the template:
     %(frame_type)s BETWEEN %(start)s AND %(end)s
 
 .. class:: WindowFrameExclusion
-
-    .. versionadded:: 5.1
 
     .. attribute:: CURRENT_ROW
 
@@ -1023,11 +1031,6 @@ released between twelve months before and twelve months after each movie:
     ...     ),
     ... )
 
-.. versionchanged:: 5.1
-
-    Support for positive integer ``start`` and negative integer ``end`` was
-    added for ``RowRange``.
-
 .. currentmodule:: django.db.models
 
 Technical Information
@@ -1057,8 +1060,6 @@ calling the appropriate methods on the wrapped expression.
         :attr:`Field.db_default`. Defaults to ``False``.
 
     .. attribute:: constraint_validation_compatible
-
-        .. versionadded:: 5.1
 
         Tells Django that this expression can be used during a constraint
         validation. Expressions with ``constraint_validation_compatible`` set
@@ -1104,6 +1105,14 @@ calling the appropriate methods on the wrapped expression.
         Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
         ``UNNEST``, etc.) to skip optimization and be properly evaluated when
         annotations spawn rows themselves. Defaults to ``False``.
+
+    .. attribute:: allows_composite_expressions
+
+        .. versionadded:: 5.2
+
+        Tells Django that this expression allows composite expressions, for
+        example, to support :ref:`composite primary keys
+        <cpk-and-database-functions>`. Defaults to ``False``.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 

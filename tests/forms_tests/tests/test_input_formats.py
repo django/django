@@ -118,9 +118,13 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(text, "13:30:00")
 
 
-@translation.override(None)
 @override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"])
 class CustomTimeInputFormatsTests(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(translation.override(None))
+        super().setUpClass()
+
     def test_timeField(self):
         "TimeFields can parse dates in the default format"
         f = forms.TimeField()
@@ -431,9 +435,13 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(text, "21.12.2010")
 
 
-@translation.override(None)
 @override_settings(DATE_INPUT_FORMATS=["%d.%m.%Y", "%d-%m-%Y"])
 class CustomDateInputFormatsTests(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(translation.override(None))
+        super().setUpClass()
+
     def test_dateField(self):
         "DateFields can parse dates in the default format"
         f = forms.DateField()
@@ -752,9 +760,13 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(text, "21.12.2010 13:30:00")
 
 
-@translation.override(None)
 @override_settings(DATETIME_INPUT_FORMATS=["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"])
 class CustomDateTimeInputFormatsTests(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(translation.override(None))
+        super().setUpClass()
+
     def test_dateTimeField(self):
         "DateTimeFields can parse dates in the default format"
         f = forms.DateTimeField()

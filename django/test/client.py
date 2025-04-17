@@ -752,6 +752,8 @@ class AsyncRequestFactory(RequestFactory):
             "scheme": "https" if secure else "http",
             "headers": [(b"host", b"testserver")],
         }
+        if self.defaults:
+            extra = {**self.defaults, **extra}
         if data:
             s["headers"].extend(
                 [
@@ -947,9 +949,7 @@ class ClientMixin:
                     'Content-Type header is "%s", not "application/json"'
                     % response.get("Content-Type")
                 )
-            response._json = json.loads(
-                response.content.decode(response.charset), **extra
-            )
+            response._json = json.loads(response.text, **extra)
         return response._json
 
     def _follow_redirect(

@@ -57,6 +57,9 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         }
         if self.connection.mysql_is_mariadb:
             operators["relate"] = SpatialOperator(func="ST_Relate")
+        else:
+            operators["covers"] = SpatialOperator(func="MBRCovers")
+            operators["coveredby"] = SpatialOperator(func="MBRCoveredBy")
         return operators
 
     @cached_property
@@ -95,6 +98,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "Perimeter",
             "PointOnSurface",
             "Reverse",
+            "Rotate",
             "Scale",
             "SnapToGrid",
             "Transform",

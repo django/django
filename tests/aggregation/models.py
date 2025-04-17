@@ -43,3 +43,7 @@ class Store(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Employee(models.Model):
+    work_day_preferences = models.JSONField()

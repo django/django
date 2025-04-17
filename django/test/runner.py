@@ -12,12 +12,11 @@ import random
 import sys
 import textwrap
 import unittest
+import unittest.suite
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
-
-import sqlparse
 
 import django
 from django.core.management import call_command
@@ -29,7 +28,7 @@ from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.version import PY312
+from django.utils.version import PY313
 
 try:
     import ipdb as pdb
@@ -96,9 +95,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln(
-                sqlparse.format(sql_debug, reindent=True, keyword_case="upper")
-            )
+            self.stream.writeln(sql_debug)
 
 
 class PDBDebugResult(unittest.TextTestResult):
@@ -125,7 +122,10 @@ class PDBDebugResult(unittest.TextTestResult):
         self.buffer = False
         exc_type, exc_value, traceback = error
         print("\nOpening PDB: %r" % exc_value)
-        pdb.post_mortem(traceback)
+        if PY313:
+            pdb.post_mortem(exc_value)
+        else:
+            pdb.post_mortem(traceback)
 
 
 class DummyList:
@@ -292,7 +292,15 @@ failure and get a correct traceback.
 
     def addError(self, test, err):
         self.check_picklable(test, err)
-        self.events.append(("addError", self.test_index, err))
+
+        event_occurred_before_first_test = self.test_index == -1
+        if event_occurred_before_first_test and isinstance(
+            test, unittest.suite._ErrorHolder
+        ):
+            self.events.append(("addError", self.test_index, test.id(), err))
+        else:
+            self.events.append(("addError", self.test_index, err))
+
         super().addError(test, err)
 
     def addFailure(self, test, err):
@@ -547,17 +555,31 @@ class ParallelTestSuite(unittest.TestSuite):
 
             tests = list(self.subsuites[subsuite_index])
             for event in events:
-                event_name = event[0]
-                handler = getattr(result, event_name, None)
-                if handler is None:
-                    continue
-                test = tests[event[1]]
-                args = event[2:]
-                handler(test, *args)
+                self.handle_event(result, tests, event)
 
         pool.join()
 
         return result
+
+    def handle_event(self, result, tests, event):
+        event_name = event[0]
+        handler = getattr(result, event_name, None)
+        if handler is None:
+            return
+        test_index = event[1]
+        event_occurred_before_first_test = test_index == -1
+        if (
+            event_name == "addError"
+            and event_occurred_before_first_test
+            and len(event) >= 4
+        ):
+            test_id = event[2]
+            test = unittest.suite._ErrorHolder(test_id)
+            args = event[3:]
+        else:
+            test = tests[test_index]
+            args = event[2:]
+        handler(test, *args)
 
     def __iter__(self):
         return iter(self.subsuites)
@@ -807,15 +829,14 @@ class DiscoverRunner:
                 "unittest -k option."
             ),
         )
-        if PY312:
-            parser.add_argument(
-                "--durations",
-                dest="durations",
-                type=int,
-                default=None,
-                metavar="N",
-                help="Show the N slowest test cases (N=0 for all).",
-            )
+        parser.add_argument(
+            "--durations",
+            dest="durations",
+            type=int,
+            default=None,
+            metavar="N",
+            help="Show the N slowest test cases (N=0 for all).",
+        )
 
     @property
     def shuffle_seed(self):
@@ -983,9 +1004,8 @@ class DiscoverRunner:
             "resultclass": self.get_resultclass(),
             "verbosity": self.verbosity,
             "buffer": self.buffer,
+            "durations": self.durations,
         }
-        if PY312:
-            kwargs["durations"] = self.durations
         return kwargs
 
     def run_checks(self, databases):

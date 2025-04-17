@@ -65,8 +65,6 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     Traceback (most recent call last):
     ...
     ValidationError: ['This field is required.']
-    >>> f.clean(" ")
-    ' '
     >>> f.clean(0)
     '0'
     >>> f.clean(True)
@@ -112,7 +110,7 @@ validation may not be correct when adding and deleting formsets.
 The ``label`` argument lets you specify the "human-friendly" label for this
 field. This is used when the ``Field`` is displayed in a ``Form``.
 
-As explained in "Outputting forms as HTML" above, the default label for a
+As explained in :ref:`ref-forms-api-outputting-html`, the default label for a
 ``Field`` is generated from the field name by converting all underscores to
 spaces and upper-casing the first letter. Specify ``label`` if that default
 behavior doesn't result in an adequate label.
@@ -226,7 +224,7 @@ validation if a particular field's value is not given. ``initial`` values are
     >>> f = CommentForm(data)
     >>> f.is_valid()
     False
-    # The form does *not* fall back to using the initial values.
+    # The form does *not* fallback to using the initial values.
     >>> f.errors
     {'url': ['This field is required.'], 'name': ['This field is required.']}
 
@@ -322,10 +320,6 @@ inside ``aria-describedby``:
     >>> print(f["username"])
     <input type="text" name="username" aria-describedby="custom-description id_username_helptext" maxlength="255" id="id_username" required>
 
-.. versionchanged:: 5.1
-
-    ``aria-describedby`` support was added for ``<fieldset>``.
-
 ``error_messages``
 ------------------
 
@@ -375,7 +369,7 @@ See the :doc:`validators documentation </ref/validators>` for more information.
 The ``localize`` argument enables the localization of form data input, as well
 as the rendered output.
 
-See the :doc:`format localization </topics/i18n/formatting>` documentation for
+See the :doc:`format localization documentation </topics/i18n/formatting>` for
 more information.
 
 ``disabled``
@@ -394,10 +388,20 @@ be ignored in favor of the value from the form's initial data.
 .. attribute:: Field.template_name
 
 The ``template_name`` argument allows a custom template to be used when the
-field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By 
+field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By
 default this value is set to ``"django/forms/field.html"``. Can be changed per
 field by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-field-templates`.
+
+``bound_field_class``
+---------------------
+
+.. attribute:: Field.bound_field_class
+
+.. versionadded:: 5.2
+
+The ``bound_field_class`` attribute allows a per-field override of
+:attr:`.Form.bound_field_class`.
 
 Checking if the field data has changed
 ======================================
@@ -763,7 +767,7 @@ For each field, we describe the default widget used if you don't specify
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A string. IPv6 addresses are normalized as described below.
     * Validates that the given value is a valid IP address.
-    * Error message keys: ``required``, ``invalid``
+    * Error message keys: ``required``, ``invalid``, ``max_length``
 
     The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
     including using the IPv4 format suggested in paragraph 3 of that section, like
@@ -771,7 +775,7 @@ For each field, we describe the default widget used if you don't specify
     ``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All characters
     are converted to lowercase.
 
-    Takes two optional arguments:
+    Takes three optional arguments:
 
     .. attribute:: protocol
 
@@ -785,6 +789,11 @@ For each field, we describe the default widget used if you don't specify
         If this option is enabled that address would be unpacked to
         ``192.0.2.1``. Default is disabled. Can only be used
         when ``protocol`` is set to ``'both'``.
+
+    .. attribute:: max_length
+
+        Defaults to 39, and behaves the same way as it does for
+        :class:`CharField`.
 
 ``ImageField``
 --------------
@@ -1133,16 +1142,9 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: assume_scheme
 
         The scheme assumed for URLs provided without one. Defaults to
-        ``"http"``. For example, if ``assume_scheme`` is ``"https"`` and the
+        ``"https"``. For example, if ``assume_scheme`` is ``"https"`` and the
         provided value is ``"example.com"``, the normalized value will be
         ``"https://example.com"``.
-
-    .. deprecated:: 5.0
-
-        The default value for ``assume_scheme`` will change from ``"http"`` to
-        ``"https"`` in Django 6.0. Set :setting:`FORMS_URLFIELD_ASSUME_HTTPS`
-        transitional setting to ``True`` to opt into using ``"https"`` during
-        the Django 5.x release cycle.
 
 ``UUIDField``
 -------------
@@ -1628,4 +1630,14 @@ only requirements are that it implement a ``clean()`` method and that its
 ``label``, ``initial``, ``widget``, ``help_text``).
 
 You can also customize how a field will be accessed by overriding
-:meth:`~django.forms.Field.get_bound_field()`.
+:attr:`~django.forms.Field.bound_field_class` or override
+:meth:`.Field.get_bound_field()` if you need more flexibility when creating
+the ``BoundField``:
+
+.. method:: Field.get_bound_field(form, field_name)
+
+    Takes an instance of :class:`~django.forms.Form` and the name of the field.
+    The returned :class:`.BoundField` instance will be used when accessing the
+    field in a template.
+
+See :ref:`custom-boundfield` for examples of overriding a ``BoundField``.

@@ -52,9 +52,13 @@ A list of all the people who get code error notifications. When
 is configured in :setting:`LOGGING` (done by default), Django emails these
 people the details of exceptions raised in the request/response cycle.
 
-Each item in the list should be a tuple of (Full name, email address). Example::
+Each item in the list should be an email address string. Example::
 
-    [("John", "john@example.com"), ("Mary", "mary@example.com")]
+    ADMINS = ["john@example.com", '"Ng, Mary" <mary@example.com>']
+
+.. versionchanged:: 6.0
+
+    In older versions, required a list of (name, address) tuples.
 
 .. setting:: ALLOWED_HOSTS
 
@@ -1502,9 +1506,24 @@ exclusive, so only set one of those settings to ``True``.
 
 Default: ``None``
 
-If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
-optionally specify the path to a PEM-formatted certificate chain file to use
-for the SSL connection.
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True`` and the
+secure connection to the SMTP server requires client authentication, use this
+setting to specify the path to a PEM-formatted certificate chain file, which
+must be used in conjunction with :setting:`EMAIL_SSL_KEYFILE`.
+
+``EMAIL_SSL_CERTFILE`` should not be used with a self-signed server certificate
+or a certificate from a private certificate authority (CA). In such cases, the
+server's certificate (or the root certificate of the private CA) should be
+installed into the system's CA bundle. This can be done by following
+platform-specific instructions for installing a root CA certificate,
+or by using OpenSSL's ``SSL_CERT_FILE`` or ``SSL_CERT_DIR`` environment
+variables to specify a custom certificate bundle (if modifying the system
+bundle is not possible or desired).
+
+For more complex scenarios, the SMTP
+:class:`~django.core.mail.backends.smtp.EmailBackend` can be subclassed to add
+root certificates to its ``ssl_context`` using
+:meth:`python:ssl.SSLContext.load_verify_locations`.
 
 .. setting:: EMAIL_SSL_KEYFILE
 
@@ -1514,8 +1533,8 @@ for the SSL connection.
 Default: ``None``
 
 If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
-optionally specify the path to a PEM-formatted private key file to use for the
-SSL connection.
+optionally specify the path to a PEM-formatted private key file for client
+authentication of the SSL connection along with :setting:`EMAIL_SSL_CERTFILE`.
 
 Note that setting :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE`
 doesn't result in any certificate checking. They're passed to the underlying SSL
@@ -1683,19 +1702,6 @@ renderers are:
 * ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 * ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 * ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
-
-.. setting:: FORMS_URLFIELD_ASSUME_HTTPS
-
-``FORMS_URLFIELD_ASSUME_HTTPS``
--------------------------------
-
-.. deprecated:: 5.0
-
-Default: ``False``
-
-Set this transitional setting to ``True`` to opt into using ``"https"`` as the
-new default value of :attr:`URLField.assume_scheme
-<django.forms.URLField.assume_scheme>` during the Django 5.x release cycle.
 
 .. setting:: FORMAT_MODULE_PATH
 
@@ -2071,6 +2077,10 @@ Default: ``[]`` (Empty list)
 A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
+
+.. versionchanged:: 6.0
+
+    In older versions, required a list of (name, address) tuples.
 
 .. setting:: MEDIA_ROOT
 
@@ -2953,6 +2963,21 @@ enabled if a proxy which sets this header is in use.
 
 :setting:`USE_X_FORWARDED_HOST` takes priority over this setting.
 
+.. setting:: URLIZE_ASSUME_HTTPS
+
+``URLIZE_ASSUME_HTTPS``
+-----------------------
+
+.. versionadded:: 6.0
+.. deprecated:: 6.0
+
+Default: ``False``
+
+Set this transitional setting to ``True`` to opt into using HTTPS as the
+default protocol when none is provided in URLs processed by the
+:tfilter:`urlize` and :tfilter:`urlizetrunc` template filters during the Django
+6.x release cycle.
+
 .. setting:: WSGI_APPLICATION
 
 ``WSGI_APPLICATION``
@@ -3664,7 +3689,6 @@ File uploads
 Forms
 -----
 * :setting:`FORM_RENDERER`
-* :setting:`FORMS_URLFIELD_ASSUME_HTTPS`
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------
@@ -3765,6 +3789,7 @@ Security
 
 * :setting:`SECRET_KEY`
 * :setting:`SECRET_KEY_FALLBACKS`
+* :setting:`URLIZE_ASSUME_HTTPS`
 * :setting:`X_FRAME_OPTIONS`
 
 Serialization

@@ -32,10 +32,6 @@ restricted subset of the test client API:
   attributes must be supplied by the test itself if required
   for the view to function properly.
 
-.. versionchanged:: 5.1
-
-    The ``query_params`` parameter was added.
-
 Example
 -------
 
@@ -88,10 +84,6 @@ difference being that it returns ``ASGIRequest`` instances rather than
 
 Arbitrary keyword arguments in ``defaults`` are added directly into the ASGI
 scope.
-
-.. versionchanged:: 5.1
-
-    The ``query_params`` parameter was added.
 
 Testing class-based views
 =========================
@@ -365,7 +357,7 @@ Advanced features of ``TransactionTestCase``
                 self.assertEqual(lion.pk, 1)
 
     Unless you are explicitly testing primary keys sequence numbers, it is
-    recommended that you do not hard code primary key values in tests.
+    recommended that you do not hardcode primary key values in tests.
 
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is a relatively expensive database operation.
@@ -616,7 +608,6 @@ and tear down the test suite.
 
     ``durations`` will show a list of the N slowest test cases. Setting this
     option to ``0`` will result in the duration for all tests being shown.
-    Requires Python 3.12+.
 
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
@@ -805,7 +796,7 @@ utility methods in the ``django.test.utils`` module.
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
 
-.. function:: create_test_db(verbosity=1, autoclobber=False, serialize=True, keepdb=False)
+.. function:: create_test_db(verbosity=1, autoclobber=False, keepdb=False)
 
     Creates a new test database and runs ``migrate`` against it.
 
@@ -821,12 +812,6 @@ can be useful during testing.
     * If ``autoclobber`` is ``True``, the database will be destroyed
       without consulting the user.
 
-    ``serialize`` determines if Django serializes the database into an
-    in-memory JSON string before running tests (used to restore the database
-    state between tests if you don't have transactions). You can set this to
-    ``False`` to speed up creation time if you don't have any test classes
-    with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
-
     ``keepdb`` determines if the test run should use an existing
     database, or create a new one. If ``True``, the existing
     database will be used, or created if not present. If ``False``,
@@ -839,6 +824,13 @@ can be useful during testing.
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
 
+    .. deprecated:: 6.0
+
+        The ``serialize`` keyword argument is deprecated. Passing
+        ``serialize=True`` would automatically call
+        :func:`serialize_db_to_string` but it was deprecated as it could result
+        in queries against non-test databases during serialization.
+
 .. function:: destroy_test_db(old_database_name, verbosity=1, keepdb=False)
 
     Destroys the database whose name is the value of :setting:`NAME` in
@@ -850,6 +842,18 @@ can be useful during testing.
 
     If the ``keepdb`` argument is ``True``, then the connection to the
     database will be closed, but the database will not be destroyed.
+
+.. function:: serialize_db_to_string()
+
+    Serializes the database into an in-memory JSON string that can be used to
+    restore the database state between tests if the backend doesn't support
+    transactions or if your suite contains test classes with
+    :ref:`serialized_rollback=True <test-case-serialized-rollback>` enabled.
+
+    This function should only be called once all test databases have been
+    created as the serialization process could result in queries against
+    non-test databases depending on your
+    :ref:`routing configuration <topics-db-multi-db-routing>`.
 
 .. _topics-testing-code-coverage:
 

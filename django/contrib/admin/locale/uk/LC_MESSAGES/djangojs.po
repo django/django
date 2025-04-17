@@ -3,8 +3,8 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
-# Denis Podlesniy <haos616@gmail.com>, 2016
-# Illia Volochii <illia.volochii@gmail.com>, 2021
+# Denys Pidlisnyi <haos616@gmail.com>, 2016
+# Illia Volochii <illia.volochii@gmail.com>, 2021,2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Panasoft, 2016
 # Sergey Lysach <sergikoff88@gmail.com>, 2011-2012
@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-10-21 18:50+0000\n"
-"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
-"Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021,2025\n"
+"Language-Team: Ukrainian (http://app.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,11 +32,8 @@ msgstr "В наявності %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Це список всіх доступних %s. Ви можете обрати деякі з них, виділивши їх у "
-"полі нижче і натиснувшт кнопку \"Обрати\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -46,18 +43,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Фільтр"
 
-msgid "Choose all"
-msgstr "Обрати всі"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Натисніть щоб обрати всі %s відразу."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Обрати"
-
-msgid "Remove"
-msgstr "Видалити"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -65,18 +61,27 @@ msgstr "Обрано %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Це список обраних %s. Ви можете видалити деякі з них, виділивши їх у полі "
-"нижче і натиснувши кнопку \"Видалити\"."
-
-msgid "Remove all"
-msgstr "Видалити все"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Натисніть щоб видалити всі обрані %s відразу."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+msgid "(click to clear)"
+msgstr ""
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr ""
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -240,6 +245,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Груд."
 
+msgid "Sunday"
+msgstr "Неділя"
+
+msgid "Monday"
+msgstr "Понеділок"
+
+msgid "Tuesday"
+msgstr "Вівторок"
+
+msgid "Wednesday"
+msgstr "Середа"
+
+msgid "Thursday"
+msgstr "Четвер"
+
+msgid "Friday"
+msgstr "П'ятниця"
+
+msgid "Saturday"
+msgstr "Субота"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Нд"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Пн"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Вт"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Ср"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Чт"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Пт"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Сб"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Н"
@@ -267,9 +321,3 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
-
-msgid "Show"
-msgstr "Показати"
-
-msgid "Hide"
-msgstr "Сховати"

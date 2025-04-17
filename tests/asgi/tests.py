@@ -21,6 +21,7 @@ from django.test import (
     modify_settings,
     override_settings,
 )
+from django.test.utils import captured_stderr
 from django.urls import path
 from django.utils.http import http_date
 from django.views.decorators.csrf import csrf_exempt
@@ -95,7 +96,8 @@ class ASGITest(SimpleTestCase):
         with open(test_filename, "rb") as test_file:
             test_file_contents = test_file.read()
         # Read the response.
-        response_start = await communicator.receive_output()
+        with captured_stderr():
+            response_start = await communicator.receive_output()
         self.assertEqual(response_start["type"], "http.response.start")
         self.assertEqual(response_start["status"], 200)
         headers = response_start["headers"]
@@ -485,7 +487,7 @@ class ASGITest(SimpleTestCase):
 
         # A view that will listen for the cancelled error.
         async def view(request):
-            nonlocal view_started, view_did_cancel
+            nonlocal view_did_cancel
             view_started.set()
             try:
                 await asyncio.sleep(0.1)

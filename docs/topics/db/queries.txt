@@ -62,7 +62,8 @@ class represents a particular record in the database table.
 To create an object, instantiate it using keyword arguments to the model class,
 then call :meth:`~django.db.models.Model.save` to save it to the database.
 
-Assuming models live in a file ``mysite/blog/models.py``, here's an example:
+Assuming models live in a ``models.py`` file inside a ``blog`` Django app, here
+is an example:
 
 .. code-block:: pycon
 
@@ -177,11 +178,11 @@ model class, like so:
 
 .. note::
 
-    ``Managers`` are accessible only via model classes, rather than from model
+    A ``Manager`` is accessible only via model classes, rather than from model
     instances, to enforce a separation between "table-level" operations and
     "record-level" operations.
 
-The :class:`~django.db.models.Manager` is the main source of ``QuerySets`` for
+The :class:`~django.db.models.Manager` is the main source of querysets for
 a model. For example, ``Blog.objects.all()`` returns a
 :class:`~django.db.models.query.QuerySet` that contains all ``Blog`` objects in
 the database.
@@ -273,7 +274,7 @@ Example:
     >>> q2 = q1.exclude(pub_date__gte=datetime.date.today())
     >>> q3 = q1.filter(pub_date__gte=datetime.date.today())
 
-These three ``QuerySets`` are separate. The first is a base
+These three querysets are separate. The first is a base
 :class:`~django.db.models.query.QuerySet` containing all entries that contain a
 headline starting with "What". The second is a subset of the first, with an
 additional criteria that excludes records whose ``pub_date`` is today or in the
@@ -287,7 +288,7 @@ refinement process.
 ``QuerySet``\s are lazy
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-``QuerySets`` are lazy -- the act of creating a
+``QuerySet`` objects are lazy -- the act of creating a
 :class:`~django.db.models.query.QuerySet` doesn't involve any database
 activity. You can stack filters together all day long, and Django won't
 actually run the query until the :class:`~django.db.models.query.QuerySet` is
@@ -1178,7 +1179,7 @@ To query for missing keys, use the ``isnull`` lookup:
         ...     },
         ... )
         <Dog: Shep>
-        >>> Dogs.objects.annotate(
+        >>> Dog.objects.annotate(
         ...     first_breed=KT("data__breed__1"), owner_name=KT("data__owner__name")
         ... ).filter(first_breed__startswith="lhasa", owner_name="Bob")
         <QuerySet [<Dog: Shep>]>
@@ -1246,10 +1247,15 @@ contained in the top-level of the field. For example:
     <Dog: Meg>
     >>> Dog.objects.create(name="Fred", data={})
     <Dog: Fred>
+    >>> Dog.objects.create(
+    ...     name="Merry", data={"breed": "pekingese", "tricks": ["fetch", "dance"]}
+    ... )
     >>> Dog.objects.filter(data__contains={"owner": "Bob"})
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
     >>> Dog.objects.filter(data__contains={"breed": "collie"})
     <QuerySet [<Dog: Meg>]>
+    >>> Dog.objects.filter(data__contains={"tricks": ["dance"]})
+    <QuerySet [<Dog: Merry>]>
 
 .. admonition:: Oracle and SQLite
 
@@ -1272,10 +1278,17 @@ subset of those in the value passed. For example:
     <Dog: Meg>
     >>> Dog.objects.create(name="Fred", data={})
     <Dog: Fred>
+    >>> Dog.objects.create(
+    ...     name="Merry", data={"breed": "pekingese", "tricks": ["fetch", "dance"]}
+    ... )
     >>> Dog.objects.filter(data__contained_by={"breed": "collie", "owner": "Bob"})
     <QuerySet [<Dog: Meg>, <Dog: Fred>]>
     >>> Dog.objects.filter(data__contained_by={"breed": "collie"})
     <QuerySet [<Dog: Fred>]>
+    >>> Dog.objects.filter(
+    ...     data__contained_by={"breed": "pekingese", "tricks": ["dance", "fetch", "hug"]}
+    ... )
+    <QuerySet [<Dog: Merry>, <Dog: Fred>]>
 
 .. admonition:: Oracle and SQLite
 
@@ -1724,8 +1737,8 @@ foreign-key model will have access to a :class:`~django.db.models.Manager` that
 returns all instances of the first model. By default, this
 :class:`~django.db.models.Manager` is named ``FOO_set``, where ``FOO`` is the
 source model name, lowercased. This :class:`~django.db.models.Manager` returns
-``QuerySets``, which can be filtered and manipulated as described in the
-"Retrieving objects" section above.
+``QuerySet`` instances, which can be filtered and manipulated as described in
+the "Retrieving objects" section above.
 
 Example:
 
@@ -1749,7 +1762,7 @@ related_name='entries')``, the above example code would look like this:
     >>> b = Blog.objects.get(id=1)
     >>> b.entries.all()  # Returns all Entry objects related to Blog.
 
-    # b.entries is a Manager that returns QuerySets.
+    # b.entries is a Manager that returns ``QuerySet`` instances.
     >>> b.entries.filter(headline__contains="Lennon")
     >>> b.entries.count()
 

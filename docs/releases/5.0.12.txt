@@ -1,0 +1,14 @@
+===========================
+Django 5.0.12 release notes
+===========================
+
+*February 5, 2025*
+
+Django 5.0.12 fixes a regression in 5.0.11.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.0.11 that caused ``validate_ipv6_address()``
+  and ``validate_ipv46_address()`` to crash when handling non-string values
+  (:ticket:`36098`).

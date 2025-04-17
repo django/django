@@ -21,7 +21,7 @@ from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 try:
-    from django.db.backends.oracle.oracledb_any import oracledb as Database
+    import oracledb as Database
 except ImportError as e:
     raise ImproperlyConfigured(f"Error loading oracledb module: {e}")
 
@@ -235,6 +235,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
     validation_class = DatabaseValidation
+    _connection_pools = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -242,6 +243,43 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             "use_returning_into", True
         )
         self.features.can_return_columns_from_insert = use_returning_into
+
+    @property
+    def is_pool(self):
+        return self.settings_dict["OPTIONS"].get("pool", False)
+
+    @property
+    def pool(self):
+        if not self.is_pool:
+            return None
+
+        if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
+            raise ImproperlyConfigured(
+                "Pooling doesn't support persistent connections."
+            )
+
+        pool_key = (self.alias, self.settings_dict["USER"])
+        if pool_key not in self._connection_pools:
+            connect_kwargs = self.get_connection_params()
+            pool_options = connect_kwargs.pop("pool")
+            if pool_options is not True:
+                connect_kwargs.update(pool_options)
+
+            pool = Database.create_pool(
+                user=self.settings_dict["USER"],
+                password=self.settings_dict["PASSWORD"],
+                dsn=dsn(self.settings_dict),
+                **connect_kwargs,
+            )
+            self._connection_pools.setdefault(pool_key, pool)
+
+        return self._connection_pools[pool_key]
+
+    def close_pool(self):
+        if self.pool:
+            self.pool.close(force=True)
+            pool_key = (self.alias, self.settings_dict["USER"])
+            del self._connection_pools[pool_key]
 
     def get_database_version(self):
         return self.oracle_version
@@ -254,6 +292,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def get_new_connection(self, conn_params):
+        if self.pool:
+            return self.pool.acquire()
         return Database.connect(
             user=self.settings_dict["USER"],
             password=self.settings_dict["PASSWORD"],
@@ -344,6 +384,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
+
+    def close_if_health_check_failed(self):
+        if self.pool:
+            # The pool only returns healthy connections.
+            return
+        return super().close_if_health_check_failed()
 
     @cached_property
     def oracle_version(self):

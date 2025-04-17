@@ -1,37 +1,37 @@
 """
- DataSource is a wrapper for the OGR Data Source object, which provides
- an interface for reading vector geometry data from many different file
- formats (including ESRI shapefiles).
+DataSource is a wrapper for the OGR Data Source object, which provides
+an interface for reading vector geometry data from many different file
+formats (including ESRI shapefiles).
 
- When instantiating a DataSource object, use the filename of a
- GDAL-supported data source.  For example, a SHP file or a
- TIGER/Line file from the government.
+When instantiating a DataSource object, use the filename of a
+GDAL-supported data source.  For example, a SHP file or a
+TIGER/Line file from the government.
 
- The ds_driver keyword is used internally when a ctypes pointer
- is passed in directly.
+The ds_driver keyword is used internally when a ctypes pointer
+is passed in directly.
 
- Example:
-  ds = DataSource('/home/foo/bar.shp')
-  for layer in ds:
-      for feature in layer:
-          # Getting the geometry for the feature.
-          g = feature.geom
+Example:
+ ds = DataSource('/home/foo/bar.shp')
+ for layer in ds:
+     for feature in layer:
+         # Getting the geometry for the feature.
+         g = feature.geom
 
-          # Getting the 'description' field for the feature.
-          desc = feature['description']
+         # Getting the 'description' field for the feature.
+         desc = feature['description']
 
-          # We can also increment through all of the fields
-          #  attached to this feature.
-          for field in feature:
-              # Get the name of the field (e.g. 'description')
-              nm = field.name
+         # We can also increment through all of the fields
+         #  attached to this feature.
+         for field in feature:
+             # Get the name of the field (e.g. 'description')
+             nm = field.name
 
-              # Get the type (integer) of the field, e.g. 0 => OFTInteger
-              t = field.type
+             # Get the type (integer) of the field, e.g. 0 => OFTInteger
+             t = field.type
 
-              # Returns the value the field; OFTIntegers return ints,
-              #  OFTReal returns floats, all else returns string.
-              val = field.value
+             # Returns the value the field; OFTIntegers return ints,
+             #  OFTReal returns floats, all else returns string.
+             val = field.value
 """
 
 from pathlib import Path
@@ -50,6 +50,7 @@ from django.utils.encoding import force_bytes, force_str
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
+
     destructor = capi.destroy_ds
 
     def __init__(self, ds_input, ds_driver=False, write=False, encoding="utf-8"):

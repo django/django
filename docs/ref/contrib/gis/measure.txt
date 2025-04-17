@@ -125,10 +125,6 @@ Unit Attribute                     Full name or alias(es)
 ``ha``                             Hectare
 =================================  ========================================
 
-.. versionchanged:: 5.1
-
-    Support for the ``ha`` unit was added.
-
 Measurement API
 ===============
 

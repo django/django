@@ -54,7 +54,6 @@ from django.test.utils import (
     override_settings,
 )
 from django.utils.functional import classproperty
-from django.utils.version import PY311
 from django.views.static import serve
 
 logger = logging.getLogger("django.test")
@@ -69,24 +68,6 @@ __all__ = (
 
 # Make unittest ignore frames in this module when reporting failures.
 __unittest = True
-
-
-if not PY311:
-    # Backport of unittest.case._enter_context() from Python 3.11.
-    def _enter_context(cm, addcleanup):
-        # Look up the special methods on the type to match the with statement.
-        cls = type(cm)
-        try:
-            enter = cls.__enter__
-            exit = cls.__exit__
-        except AttributeError:
-            raise TypeError(
-                f"'{cls.__module__}.{cls.__qualname__}' object does not support the "
-                f"context manager protocol"
-            ) from None
-        result = enter(cm)
-        addcleanup(exit, cm, None, None, None)
-        return result
 
 
 def to_list(value):
@@ -397,12 +378,6 @@ class SimpleTestCase(unittest.TestCase):
     def _post_teardown(self):
         """Perform post-test things."""
         pass
-
-    if not PY311:
-        # Backport of unittest.TestCase.enterClassContext() from Python 3.11.
-        @classmethod
-        def enterClassContext(cls, cm):
-            return _enter_context(cm, cls.addClassCleanup)
 
     def settings(self, **kwargs):
         """

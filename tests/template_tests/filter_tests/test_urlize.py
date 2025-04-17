@@ -1,6 +1,10 @@
+from unittest import mock
+
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
 from django.utils.functional import lazy
+from django.utils.html import Urlizer
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -106,6 +110,7 @@ class UrlizeTests(SimpleTestCase):
         )
 
 
+@override_settings(URLIZE_ASSUME_HTTPS=True)
 class FunctionTests(SimpleTestCase):
     def test_urls(self):
         self.assertEqual(
@@ -118,15 +123,16 @@ class FunctionTests(SimpleTestCase):
         )
         self.assertEqual(
             urlize("www.google.com"),
-            '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',
+            '<a href="https://www.google.com" rel="nofollow">www.google.com</a>',
         )
         self.assertEqual(
             urlize("djangoproject.org"),
-            '<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>',
+            '<a href="https://djangoproject.org" rel="nofollow">djangoproject.org</a>',
         )
         self.assertEqual(
             urlize("djangoproject.org/"),
-            '<a href="http://djangoproject.org/" rel="nofollow">djangoproject.org/</a>',
+            '<a href="https://djangoproject.org/" rel="nofollow">'
+            "djangoproject.org/</a>",
         )
 
     def test_url_split_chars(self):
@@ -134,21 +140,21 @@ class FunctionTests(SimpleTestCase):
         # part of URLs.
         self.assertEqual(
             urlize('www.server.com"abc'),
-            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&quot;'
+            '<a href="https://www.server.com" rel="nofollow">www.server.com</a>&quot;'
             "abc",
         )
         self.assertEqual(
             urlize("www.server.com'abc"),
-            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&#x27;'
+            '<a href="https://www.server.com" rel="nofollow">www.server.com</a>&#x27;'
             "abc",
         )
         self.assertEqual(
             urlize("www.server.com<abc"),
-            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&lt;abc',
+            '<a href="https://www.server.com" rel="nofollow">www.server.com</a>&lt;abc',
         )
         self.assertEqual(
             urlize("www.server.com>abc"),
-            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&gt;abc',
+            '<a href="https://www.server.com" rel="nofollow">www.server.com</a>&gt;abc',
         )
 
     def test_email(self):
@@ -181,7 +187,7 @@ class FunctionTests(SimpleTestCase):
     def test_urlencoded(self):
         self.assertEqual(
             urlize("www.mystore.com/30%OffCoupons!"),
-            '<a href="http://www.mystore.com/30%25OffCoupons" rel="nofollow">'
+            '<a href="https://www.mystore.com/30%25OffCoupons" rel="nofollow">'
             "www.mystore.com/30%OffCoupons</a>!",
         )
         self.assertEqual(
@@ -219,26 +225,41 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(
             urlize("foo@bar.com or www.bar.com"),
             '<a href="mailto:foo@bar.com">foo@bar.com</a> or '
-            '<a href="http://www.bar.com" rel="nofollow">www.bar.com</a>',
+            '<a href="https://www.bar.com" rel="nofollow">www.bar.com</a>',
         )
 
     def test_idn(self):
         """
         #13704 - Check urlize handles IDN correctly
         """
+        # The "✶" below is \N{SIX POINTED BLACK STAR}, not "*" \N{ASTERISK}.
         self.assertEqual(
             urlize("http://c✶.ws"),
-            '<a href="http://xn--c-lgq.ws" rel="nofollow">http://c✶.ws</a>',
+            '<a href="http://c%E2%9C%B6.ws" rel="nofollow">http://c✶.ws</a>',
         )
         self.assertEqual(
             urlize("www.c✶.ws"),
-            '<a href="http://www.xn--c-lgq.ws" rel="nofollow">www.c✶.ws</a>',
+            '<a href="https://www.c%E2%9C%B6.ws" rel="nofollow">www.c✶.ws</a>',
         )
         self.assertEqual(
-            urlize("c✶.org"), '<a href="http://xn--c-lgq.org" rel="nofollow">c✶.org</a>'
+            urlize("c✶.org"),
+            '<a href="https://c%E2%9C%B6.org" rel="nofollow">c✶.org</a>',
         )
         self.assertEqual(
-            urlize("info@c✶.org"), '<a href="mailto:info@xn--c-lgq.org">info@c✶.org</a>'
+            urlize("info@c✶.org"),
+            '<a href="mailto:info@c%E2%9C%B6.org">info@c✶.org</a>',
+        )
+
+        # Pre-encoded IDNA is urlized but not re-encoded.
+        self.assertEqual(
+            urlize("www.xn--iny-zx5a.com/idna2003"),
+            '<a href="https://www.xn--iny-zx5a.com/idna2003"'
+            ' rel="nofollow">www.xn--iny-zx5a.com/idna2003</a>',
+        )
+        self.assertEqual(
+            urlize("www.xn--fa-hia.com/idna2008"),
+            '<a href="https://www.xn--fa-hia.com/idna2008"'
+            ' rel="nofollow">www.xn--fa-hia.com/idna2008</a>',
         )
 
     def test_malformed(self):
@@ -254,7 +275,7 @@ class FunctionTests(SimpleTestCase):
         #16656 - Check urlize accepts more TLDs
         """
         self.assertEqual(
-            urlize("usa.gov"), '<a href="http://usa.gov" rel="nofollow">usa.gov</a>'
+            urlize("usa.gov"), '<a href="https://usa.gov" rel="nofollow">usa.gov</a>'
         )
 
     def test_invalid_email(self):
@@ -333,11 +354,12 @@ class FunctionTests(SimpleTestCase):
         """
         self.assertEqual(
             urlize("[see www.example.com]"),
-            '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]',
+            '[see <a href="https://www.example.com" rel="nofollow">'
+            "www.example.com</a>]",
         )
         self.assertEqual(
             urlize("see test[at[example.com"),
-            'see <a href="http://test[at[example.com" rel="nofollow">'
+            'see <a href="https://test[at[example.com" rel="nofollow">'
             "test[at[example.com</a>",
         )
         self.assertEqual(
@@ -425,22 +447,22 @@ class FunctionTests(SimpleTestCase):
         """
         self.assertEqual(
             urlize("Go to djangoproject.com! and enjoy."),
-            'Go to <a href="http://djangoproject.com" rel="nofollow">djangoproject.com'
+            'Go to <a href="https://djangoproject.com" rel="nofollow">djangoproject.com'
             "</a>! and enjoy.",
         )
         self.assertEqual(
             urlize("Search for google.com/?q=! and see."),
-            'Search for <a href="http://google.com/?q=" rel="nofollow">google.com/?q='
+            'Search for <a href="https://google.com/?q=" rel="nofollow">google.com/?q='
             "</a>! and see.",
         )
         self.assertEqual(
             urlize("Search for google.com/?q=dj!`? and see."),
-            'Search for <a href="http://google.com/?q=dj%21%60%3F" rel="nofollow">'
+            'Search for <a href="https://google.com/?q=dj%21%60%3F" rel="nofollow">'
             "google.com/?q=dj!`?</a> and see.",
         )
         self.assertEqual(
             urlize("Search for google.com/?q=dj!`?! and see."),
-            'Search for <a href="http://google.com/?q=dj%21%60%3F" rel="nofollow">'
+            'Search for <a href="https://google.com/?q=dj%21%60%3F" rel="nofollow">'
             "google.com/?q=dj!`?</a>! and see.",
         )
 
@@ -450,14 +472,14 @@ class FunctionTests(SimpleTestCase):
     def test_autoescape(self):
         self.assertEqual(
             urlize('foo<a href=" google.com ">bar</a>buz'),
-            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com'
-            "</a> &quot;&gt;bar&lt;/a&gt;buz",
+            'foo&lt;a href=&quot; <a href="https://google.com" rel="nofollow">'
+            "google.com</a> &quot;&gt;bar&lt;/a&gt;buz",
         )
 
     def test_autoescape_off(self):
         self.assertEqual(
             urlize('foo<a href=" google.com ">bar</a>buz', autoescape=False),
-            'foo<a href=" <a href="http://google.com" rel="nofollow">google.com</a> ">'
+            'foo<a href=" <a href="https://google.com" rel="nofollow">google.com</a> ">'
             "bar</a>buz",
         )
 
@@ -465,5 +487,39 @@ class FunctionTests(SimpleTestCase):
         prepend_www = lazy(lambda url: "www." + url, str)
         self.assertEqual(
             urlize(prepend_www("google.com")),
-            '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',
+            '<a href="https://www.google.com" rel="nofollow">www.google.com</a>',
+        )
+
+    @mock.patch.object(Urlizer, "handle_word", return_value="test")
+    def test_caching_repeated_words(self, mock_handle_word):
+        urlize("test test test test")
+        common_handle_word_args = {
+            "safe_input": False,
+            "trim_url_limit": None,
+            "nofollow": True,
+            "autoescape": True,
+        }
+        self.assertEqual(
+            mock_handle_word.mock_calls,
+            [
+                mock.call("test", **common_handle_word_args),
+                mock.call(" ", **common_handle_word_args),
+            ],
+        )
+
+    @mock.patch.object(Urlizer, "handle_word", return_value="test")
+    def test_caching_repeated_calls(self, mock_handle_word):
+        urlize("test")
+        handle_word_test = mock.call(
+            "test",
+            safe_input=False,
+            trim_url_limit=None,
+            nofollow=True,
+            autoescape=True,
+        )
+        self.assertEqual(mock_handle_word.mock_calls, [handle_word_test])
+
+        urlize("test")
+        self.assertEqual(
+            mock_handle_word.mock_calls, [handle_word_test, handle_word_test]
         )

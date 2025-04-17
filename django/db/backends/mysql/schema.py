@@ -11,9 +11,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_type = "MODIFY %(column)s %(type)s%(collation)s%(comment)s"
     sql_alter_column_no_default_null = "ALTER COLUMN %(column)s SET DEFAULT NULL"
 
-    # No 'CASCADE' which works as a no-op in MySQL but is undocumented
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
-
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
     sql_create_column_inline_fk = (
         ", ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
@@ -42,15 +39,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # crash. Constraint is removed during a "MODIFY" column statement.
             return "ALTER TABLE %(table)s DROP CONSTRAINT IF EXISTS %(name)s"
         return "ALTER TABLE %(table)s DROP CHECK %(name)s"
-
-    @property
-    def sql_rename_column(self):
-        is_mariadb = self.connection.mysql_is_mariadb
-        if is_mariadb and self.connection.mysql_version < (10, 5, 2):
-            # MariaDB < 10.5.2 doesn't support an
-            # "ALTER TABLE ... RENAME COLUMN" statement.
-            return "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
-        return super().sql_rename_column
 
     def quote_value(self, value):
         self.connection.ensure_connection()
@@ -222,7 +210,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         Keep the NULL and DEFAULT properties of the old field. If it has
         changed, it will be handled separately.
         """
-        if field.db_default is not NOT_PROVIDED:
+        if field.has_db_default():
             default_sql, params = self.db_default_sql(field)
             default_sql %= tuple(self.quote_value(p) for p in params)
             new_type += f" DEFAULT {default_sql}"
@@ -241,16 +229,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
 
     def _field_db_check(self, field, field_db_params):
-        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            5,
-            2,
-        ):
+        if self.connection.mysql_is_mariadb:
             return super()._field_db_check(field, field_db_params)
-        # On MySQL and MariaDB < 10.5.2 (no support for
-        # "ALTER TABLE ... RENAME COLUMN" statements), check constraints with
-        # the column name as it requires explicit recreation when the column is
-        # renamed.
+        # On MySQL, check constraints with the column name as it requires
+        # explicit recreation when the column is renamed.
         return field_db_params["check"]
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
@@ -266,7 +248,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return f" COMMENT {comment_sql}"
 
     def _alter_column_null_sql(self, model, old_field, new_field):
-        if new_field.db_default is NOT_PROVIDED:
+        if not new_field.has_db_default():
             return super()._alter_column_null_sql(model, old_field, new_field)
 
         new_db_params = new_field.db_parameters(connection=self.connection)

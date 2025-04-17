@@ -7,6 +7,7 @@ _builtin_context_processors = ("django.template.context_processors.csrf",)
 
 class ContextPopException(Exception):
     "pop() has been called more times than push()"
+
     pass
 
 
@@ -37,7 +38,9 @@ class BaseContext:
             self.dicts.append(value)
 
     def __copy__(self):
-        duplicate = copy(super())
+        duplicate = BaseContext()
+        duplicate.__class__ = self.__class__
+        duplicate.__dict__ = copy(self.__dict__)
         duplicate.dicts = self.dicts[:]
         return duplicate
 

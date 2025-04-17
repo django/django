@@ -2,7 +2,7 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -38,8 +38,8 @@ msgstr "Veiksmīgi izdzēsti %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Nevar izdzēst %(name)s"
 
-msgid "Are you sure?"
-msgstr "Vai esat pārliecināts?"
+msgid "Delete multiple objects"
+msgstr "Dzēst vairākus objektus"
 
 msgid "Administration"
 msgstr "Administrācija"
@@ -269,6 +269,9 @@ msgstr[2] "%(total_count)s izvēlēti"
 msgid "0 of %(cnt)s selected"
 msgstr "0 no %(cnt)s izvēlēti"
 
+msgid "Delete"
+msgstr "Dzēst"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Izmaiņu vēsture: %s"
@@ -352,6 +355,15 @@ msgstr "Atpakaļceļi"
 msgid "Models in the %(name)s application"
 msgstr "Modeļi %(name)s lietotnē"
 
+msgid "Model name"
+msgstr "Modeļa nosaukums"
+
+msgid "Add link"
+msgstr "Pievienot saiti"
+
+msgid "Change or view list link"
+msgstr "Mainīt vai skatīt saraksta saiti"
+
 msgid "Add"
 msgstr "Pievienot"
 
@@ -361,15 +373,13 @@ msgstr "Apskatīt"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Jums nav tiesību neko skatīt vai labot."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Vispirms ievadiet lietotāja vārdu un paroli. Tad varēsiet labot pārējos "
-"lietotāja uzstādījumus."
+"Kad būsiet izveidojis lietotāju, varēsiet rediģēt vairāk lietotāja "
+"uzstādījumus."
 
-msgid "Enter a username and password."
-msgstr "Ievadi lietotājvārdu un paroli."
+msgid "Error:"
+msgstr "Kļūda:"
 
 msgid "Change password"
 msgstr "Paroles maiņa"
@@ -456,9 +466,6 @@ msgstr "Pārslēgt motīvu (pašreizējais motīvs: gaišs)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Pārslēgt motīvu (pašreizējais motīvs: tumšs)"
 
-msgid "Delete"
-msgstr "Dzēst"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -492,9 +499,6 @@ msgstr "Jā, esmu pārliecināts"
 
 msgid "No, take me back"
 msgstr "Nē, ved mani atpakaļ"
-
-msgid "Delete multiple objects"
-msgstr "Dzēst vairākus objektus"
 
 #, python-format
 msgid ""
@@ -568,8 +572,8 @@ msgstr ""
 "Jūs esat autentificējies kā %(username)s, bet jums nav tiesību piekļūt šai "
 "lapai. Vai vēlaties pieteikties citā kontā?"
 
-msgid "Forgotten your password or username?"
-msgstr "Aizmirsi paroli vai lietotājvārdu?"
+msgid "Forgotten your login credentials?"
+msgstr "Aizmirsāt savus pieteikšanās datus?"
 
 msgid "Toggle navigation"
 msgstr "Pārslēgt navigāciju"
@@ -736,8 +740,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Lūdzu apmeklējiet sekojošo lapu un ievadiet jaunu paroli:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Jūsu lietotājvārds, gadījumā ja tas ir aizmirsts:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Ja aizmirsāt, jūs esat:"
 
 msgid "Thanks for using our site!"
 msgstr "Paldies par mūsu lapas lietošanu!"

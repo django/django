@@ -64,6 +64,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_frame_exclusion = True
     only_supports_unbounded_with_preceding_and_following = True
     supports_aggregate_filter_clause = True
+    supports_aggregate_order_by_clause = True
     supported_explain_formats = {"JSON", "TEXT", "XML", "YAML"}
     supports_deferrable_unique_constraints = True
     has_json_operators = True
@@ -159,6 +160,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def is_postgresql_16(self):
         return self.connection.pg_version >= 160000
+
+    @cached_property
+    def is_postgresql_17(self):
+        return self.connection.pg_version >= 170000
 
     supports_unlimited_charfield = True
     supports_nulls_distinct_unique_constraints = property(

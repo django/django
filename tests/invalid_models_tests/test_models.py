@@ -145,6 +145,27 @@ class UniqueTogetherTests(SimpleTestCase):
 
         self.assertEqual(Bar.check(), [])
 
+    def test_pointing_to_composite_primary_key(self):
+        class Model(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                unique_together = [["pk"]]
+
+        self.assertEqual(
+            Model.check(),
+            [
+                Error(
+                    "'unique_together' refers to a CompositePrimaryKey 'pk', but "
+                    "CompositePrimaryKeys are not permitted in 'unique_together'.",
+                    obj=Model,
+                    id="models.E048",
+                ),
+            ],
+        )
+
 
 @isolate_apps("invalid_models_tests")
 class IndexesTests(TestCase):
@@ -224,6 +245,27 @@ class IndexesTests(TestCase):
                 ]
 
         self.assertEqual(Bar.check(), [])
+
+    def test_pointing_to_composite_primary_key(self):
+        class Model(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                indexes = [models.Index(fields=["pk", "name"], name="name")]
+
+        self.assertEqual(
+            Model.check(),
+            [
+                Error(
+                    "'indexes' refers to a CompositePrimaryKey 'pk', but "
+                    "CompositePrimaryKeys are not permitted in 'indexes'.",
+                    obj=Model,
+                    id="models.E048",
+                ),
+            ],
+        )
 
     def test_name_constraints(self):
         class Model(models.Model):
@@ -446,6 +488,28 @@ class IndexesTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [])
 
+    @skipUnlessDBFeature("supports_covering_indexes")
+    def test_index_include_pointing_to_composite_primary_key(self):
+        class Model(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                indexes = [models.Index(fields=["name"], include=["pk"], name="name")]
+
+        self.assertEqual(
+            Model.check(),
+            [
+                Error(
+                    "'indexes' refers to a CompositePrimaryKey 'pk', but "
+                    "CompositePrimaryKeys are not permitted in 'indexes'.",
+                    obj=Model,
+                    id="models.E048",
+                ),
+            ],
+        )
+
     def test_func_index(self):
         class Model(models.Model):
             name = models.CharField(max_length=10)
@@ -580,6 +644,27 @@ class IndexesTests(TestCase):
                 ]
 
         self.assertEqual(Bar.check(), [])
+
+    def test_func_index_pointing_to_composite_primary_key(self):
+        class Model(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                indexes = [models.Index(Abs("pk"), name="name")]
+
+        self.assertEqual(
+            Model.check(),
+            [
+                Error(
+                    "'indexes' refers to a CompositePrimaryKey 'pk', but "
+                    "CompositePrimaryKeys are not permitted in 'indexes'.",
+                    obj=Model,
+                    id="models.E048",
+                ),
+            ],
+        )
 
 
 @isolate_apps("invalid_models_tests")
@@ -2209,6 +2294,33 @@ class ConstraintsTests(TestCase):
         )
         self.assertEqual(Model.check(databases=self.databases), expected_warnings)
 
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_check_constraint_pointing_to_composite_primary_key(self):
+        class Model(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(
+                        name="name",
+                        condition=models.Q(pk__gt=(7, "focal")),
+                    ),
+                ]
+
+        self.assertEqual(
+            Model.check(databases=self.databases),
+            [
+                Error(
+                    "'constraints' refers to a CompositePrimaryKey 'pk', but "
+                    "CompositePrimaryKeys are not permitted in 'constraints'.",
+                    obj=Model,
+                    id="models.E048",
+                ),
+            ],
+        )
+
     def test_unique_constraint_with_condition(self):
         class Model(models.Model):
             age = models.IntegerField()
@@ -2471,6 +2583,27 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [])
 
+    def test_unique_constraint_pointing_to_composite_primary_key(self):
+        class Model(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                constraints = [models.UniqueConstraint(fields=["pk"], name="name")]
+
+        self.assertEqual(
+            Model.check(databases=self.databases),
+            [
+                Error(
+                    "'constraints' refers to a CompositePrimaryKey 'pk', but "
+                    "CompositePrimaryKeys are not permitted in 'constraints'.",
+                    obj=Model,
+                    id="models.E048",
+                ),
+            ],
+        )
+
     def test_unique_constraint_with_include(self):
         class Model(models.Model):
             age = models.IntegerField()
@@ -2617,6 +2750,34 @@ class ConstraintsTests(TestCase):
                 ]
 
         self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature("supports_covering_indexes")
+    def test_unique_constraint_include_pointing_to_composite_primary_key(self):
+        class Model(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=["version"],
+                        include=["pk"],
+                        name="name",
+                    ),
+                ]
+
+        self.assertEqual(
+            Model.check(databases=self.databases),
+            [
+                Error(
+                    "'constraints' refers to a CompositePrimaryKey 'pk', but "
+                    "CompositePrimaryKeys are not permitted in 'constraints'.",
+                    obj=Model,
+                    id="models.E048",
+                ),
+            ],
+        )
 
     def test_func_unique_constraint(self):
         class Model(models.Model):
@@ -2815,3 +2976,25 @@ class ConstraintsTests(TestCase):
                 ]
 
         self.assertEqual(Bar.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    def test_func_unique_constraint_pointing_composite_primary_key(self):
+        class Model(models.Model):
+            pk = models.CompositePrimaryKey("version", "name")
+            version = models.IntegerField()
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                constraints = [models.UniqueConstraint(Abs("pk"), name="name")]
+
+        self.assertEqual(
+            Model.check(databases=self.databases),
+            [
+                Error(
+                    "'constraints' refers to a CompositePrimaryKey 'pk', but "
+                    "CompositePrimaryKeys are not permitted in 'constraints'.",
+                    obj=Model,
+                    id="models.E048",
+                ),
+            ],
+        )

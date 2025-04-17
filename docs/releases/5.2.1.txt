@@ -1,0 +1,42 @@
+==========================
+Django 5.2.1 release notes
+==========================
+
+*Expected May 7, 2025*
+
+Django 5.2.1 fixes several bugs in 5.2.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.2 that caused a crash when annotating
+  aggregate expressions over query that uses explicit grouping by transforms
+  followed by field references (:ticket:`36292`).
+
+* Fixed a regression in Django 5.2 that caused unnecessary queries when
+  prefetching nullable foreign key relationships (:ticket:`36290`).
+
+* Fixed a regression in Django 5.2 that caused a crash of
+  ``QuerySet.bulk_create()`` with nullable geometry fields on PostGIS
+  (:ticket:`36289`).
+
+* Fixed a regression in Django 5.2 that caused fields to be incorrectly
+  selected when using ``QuerySet.alias()`` after ``values()``
+  (:ticket:`36299`).
+
+* Fixed a data corruption possibility in ``file_move_safe()`` when
+  ``allow_overwrite=True``, where leftover content from a previously larger
+  file could remain after overwriting with a smaller one due to lack of
+  truncation (:ticket:`36298`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using
+  ``QuerySet.select_for_update(of=(…))`` with ``values()/values_list()``
+  including expressions (:ticket:`36301`).
+
+* Fixed a regression in Django 5.2 that caused improper values to be returned
+  from ``QuerySet.values_list()`` when duplicate field names were specified
+  (:ticket:`36288`).
+
+* Fixed a regression in Django 5.2 where the password validation error message
+  from ``MinimumLengthValidator`` was not translated when using non-English
+  locales (:ticket:`36314`).

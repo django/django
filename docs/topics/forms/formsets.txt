@@ -48,13 +48,10 @@ following example will create a formset class to display two blank forms:
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
-Iterating over a formset will render the forms in the order they were
-created. You can change this order by providing an alternate implementation for
-the ``__iter__()`` method.
-
-Formsets can also be indexed into, which returns the corresponding form. If you
-override ``__iter__``, you will need to also override ``__getitem__`` to have
-matching behavior.
+Formsets can be iterated and indexed, accessing forms in the order they were
+created. You can reorder the forms by overriding the default
+:py:meth:`iteration <object.__iter__>` and
+:py:meth:`indexing <object.__getitem__>` behavior if needed.
 
 .. _formsets-initial-data:
 
@@ -574,14 +571,12 @@ happen when the user changes these values:
     ...         {"title": "Article #2", "pub_date": datetime.date(2008, 5, 11)},
     ...     ],
     ... )
-    >>> formset.is_valid()
-    True
     >>> for form in formset.ordered_forms:
     ...     print(form.cleaned_data)
     ...
-    {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': 'Article #3'}
-    {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': 'Article #2'}
-    {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': 'Article #1'}
+    {'title': 'Article #3', 'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0}
+    {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1}
+    {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2}
 
 :class:`~django.forms.formsets.BaseFormSet` also provides an
 :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute and
@@ -693,7 +688,7 @@ delete fields you can access them with ``deleted_forms``:
     ...     ],
     ... )
     >>> [form.cleaned_data for form in formset.deleted_forms]
-    [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': 'Article #1'}]
+    [{'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10), 'DELETE': True}]
 
 If you are using a :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`,
 model instances for deleted forms will be deleted when you call
@@ -1008,10 +1003,11 @@ deal with the management form:
 The above ends up calling the :meth:`BaseFormSet.render` method on the formset
 class. This renders the formset using the template specified by the
 :attr:`~BaseFormSet.template_name` attribute. Similar to forms, by default the
-formset will be rendered ``as_table``, with other helper methods of ``as_p``
-and ``as_ul`` being available. The rendering of the formset can be customized
-by specifying the ``template_name`` attribute, or more generally by
-:ref:`overriding the default template <overriding-built-in-formset-templates>`.
+formset will be rendered ``as_div``, with other helper methods of ``as_p``,
+``as_ul``, and ``as_table`` being available. The rendering of the formset can
+be customized by specifying the ``template_name`` attribute, or more generally
+by :ref:`overriding the default template
+<overriding-built-in-formset-templates>`.
 
 .. _manually-rendered-can-delete-and-can-order:
 

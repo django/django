@@ -214,10 +214,6 @@ values::
 
     obj.refresh_from_db(from_queryset=MyModel.objects.select_for_update())
 
-.. versionchanged:: 5.1
-
-    The ``from_queryset`` argument was added.
-
 .. method:: Model.get_deferred_fields()
 
 A helper method that returns a set containing the attribute names of all those
@@ -434,10 +430,6 @@ method. See :ref:`overriding-model-methods` for more details.
 
 The model save process also has some subtleties; see the sections below.
 
-.. deprecated:: 5.1
-
-    Support for positional arguments is deprecated.
-
 Auto-incrementing primary keys
 ------------------------------
 
@@ -468,9 +460,14 @@ The ``pk`` property
 Regardless of whether you define a primary key field yourself, or let Django
 supply one for you, each model will have a property called ``pk``. It behaves
 like a normal attribute on the model, but is actually an alias for whichever
-attribute is the primary key field for the model. You can read and set this
-value, just as you would for any other attribute, and it will update the
-correct field in the model.
+field or fields compose the primary key for the model. You can read and set
+this value, just as you would for any other attribute, and it will update the
+correct fields in the model.
+
+.. versionchanged:: 5.2
+
+    Support for the primary key to be composed of multiple fields was added via
+    ``CompositePrimaryKey``.
 
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -552,9 +549,8 @@ object's primary key attribute does **not** define a
 :attr:`~django.db.models.Field.default` or
 :attr:`~django.db.models.Field.db_default`, Django follows this algorithm:
 
-* If the object's primary key attribute is set to a value that evaluates to
-  ``True`` (i.e., a value other than ``None`` or the empty string), Django
-  executes an ``UPDATE``.
+* If the object's primary key attribute is set to anything except ``None``,
+  Django executes an ``UPDATE``.
 * If the object's primary key attribute is *not* set or if the ``UPDATE``
   didn't update anything (e.g. if primary key is set to a value that doesn't
   exist in the database), Django executes an ``INSERT``.
@@ -604,6 +600,12 @@ force ``INSERT`` statements for each base. For example::
 You can pass ``force_insert=(models.Model,)`` to force an ``INSERT`` statement
 for all parents. By default, ``force_insert=True`` only forces the insertion of
 a new row for the current model.
+
+.. versionchanged:: 6.0
+
+    When a forced update does not affect any rows a
+    :exc:`~django.db.models.Model.NotUpdated` exception is raised. On previous
+    versions a generic :exc:`django.db.DatabaseError` was raised.
 
 It should be very rare that you'll need to use these parameters. Django will
 almost always do the right thing and trying to override that will lead to
@@ -861,7 +863,7 @@ URL, you should define ``get_absolute_url()``.
 
 
 It's good practice to use ``get_absolute_url()`` in templates, instead of
-hard-coding your objects' URLs. For example, this template code is bad:
+hardcoding your objects' URLs. For example, this template code is bad:
 
 .. code-block:: html+django
 

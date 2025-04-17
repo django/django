@@ -198,7 +198,7 @@ class AssertContainsTests(SimpleTestCase):
 
         long_content = (
             b"This is a very very very very very very very very long message which "
-            b"exceedes the max limit of truncation."
+            b"exceeds the max limit of truncation."
         )
         response = HttpResponse(long_content)
         msg = f"Couldn't find 'thrice' in the following response\n{long_content}"

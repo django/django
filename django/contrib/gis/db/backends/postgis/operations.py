@@ -360,7 +360,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         minor, subminor).
         """
         version = self.postgis_lib_version()
-        return (version,) + get_version_tuple(version)
+        return (version, *get_version_tuple(version))
 
     def proj_version_tuple(self):
         """

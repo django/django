@@ -214,8 +214,6 @@ messages during filesystem inspection and event subscription processes.
 ``django.contrib.auth``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 4.2.16
-
 Log messages related to :doc:`contrib/auth`, particularly ``ERROR`` messages
 are generated when a :class:`~django.contrib.auth.forms.PasswordResetForm` is
 successfully submitted but the password reset email cannot be delivered due to

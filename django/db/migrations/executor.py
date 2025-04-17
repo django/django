@@ -37,18 +37,18 @@ class MigrationExecutor:
                             if migration in applied:
                                 plan.append((self.loader.graph.nodes[migration], True))
                                 applied.pop(migration)
+            # If the target is missing, it's likely a replaced migration.
+            # Reload the graph without replacements.
+            elif (
+                self.loader.replace_migrations
+                and target not in self.loader.graph.node_map
+            ):
+                self.loader.replace_migrations = False
+                self.loader.build_graph()
+                return self.migration_plan(targets, clean_start=clean_start)
             # If the migration is already applied, do backwards mode,
             # otherwise do forwards mode.
             elif target in applied:
-                # If the target is missing, it's likely a replaced migration.
-                # Reload the graph without replacements.
-                if (
-                    self.loader.replace_migrations
-                    and target not in self.loader.graph.node_map
-                ):
-                    self.loader.replace_migrations = False
-                    self.loader.build_graph()
-                    return self.migration_plan(targets, clean_start=clean_start)
                 # Don't migrate backwards all the way to the target node (that
                 # may roll back dependencies in other apps that don't need to
                 # be rolled back); instead roll back through target's immediate
@@ -254,22 +254,25 @@ class MigrationExecutor:
                 ) as schema_editor:
                     state = migration.apply(state, schema_editor)
                     if not schema_editor.deferred_sql:
-                        self.record_migration(migration)
+                        self.record_migration(migration.app_label, migration.name)
                         migration_recorded = True
         if not migration_recorded:
-            self.record_migration(migration)
+            self.record_migration(migration.app_label, migration.name)
         # Report progress
         if self.progress_callback:
             self.progress_callback("apply_success", migration, fake)
         return state
 
-    def record_migration(self, migration):
+    def record_migration(self, app_label, name, forward=True):
+        migration = self.loader.disk_migrations.get((app_label, name))
         # For replacement migrations, record individual statuses
-        if migration.replaces:
-            for app_label, name in migration.replaces:
-                self.recorder.record_applied(app_label, name)
+        if migration and migration.replaces:
+            for replaced_app_label, replaced_name in migration.replaces:
+                self.record_migration(replaced_app_label, replaced_name, forward)
+        if forward:
+            self.recorder.record_applied(app_label, name)
         else:
-            self.recorder.record_applied(migration.app_label, migration.name)
+            self.recorder.record_unapplied(app_label, name)
 
     def unapply_migration(self, state, migration, fake=False):
         """Run a migration backwards."""
@@ -280,11 +283,7 @@ class MigrationExecutor:
                 atomic=migration.atomic
             ) as schema_editor:
                 state = migration.unapply(state, schema_editor)
-        # For replacement migrations, also record individual statuses.
-        if migration.replaces:
-            for app_label, name in migration.replaces:
-                self.recorder.record_unapplied(app_label, name)
-        self.recorder.record_unapplied(migration.app_label, migration.name)
+        self.record_migration(migration.app_label, migration.name, forward=False)
         # Report progress
         if self.progress_callback:
             self.progress_callback("unapply_success", migration, fake)

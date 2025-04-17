@@ -51,16 +51,19 @@ from django.db.models.expressions import (
     Combinable,
     CombinedExpression,
     NegatedExpression,
+    OutputFieldIsNoneError,
     RawSQL,
     Ref,
 )
 from django.db.models.functions import (
     Coalesce,
     Concat,
+    ExtractDay,
     Left,
     Length,
     Lower,
     Substr,
+    TruncDate,
     Upper,
 )
 from django.db.models.sql import constants
@@ -1275,6 +1278,23 @@ class IterableLookupInnerExpressionsTests(TestCase):
                 queryset = Result.objects.filter(**{lookup: within_experiment_time})
                 self.assertSequenceEqual(queryset, [r1])
 
+    def test_relabeled_clone_rhs(self):
+        Number.objects.bulk_create([Number(integer=1), Number(integer=2)])
+        self.assertIs(
+            Number.objects.filter(
+                # Ensure iterable of expressions are properly re-labelled on
+                # subquery pushdown. If the inner query __range right-hand-side
+                # members are not relabelled they will point at the outer query
+                # alias and this test will fail.
+                Exists(
+                    Number.objects.exclude(pk=OuterRef("pk")).filter(
+                        integer__range=(F("integer"), F("integer"))
+                    )
+                )
+            ).exists(),
+            True,
+        )
+
 
 class FTests(SimpleTestCase):
     def test_deepcopy(self):
@@ -1311,6 +1331,38 @@ class FTests(SimpleTestCase):
         msg = "argument of type 'F' is not iterable"
         with self.assertRaisesMessage(TypeError, msg):
             "" in F("name")
+
+    def test_replace_expressions_transform(self):
+        replacements = {F("timestamp"): Value(None)}
+        transform_ref = F("timestamp__date")
+        self.assertIs(transform_ref.replace_expressions(replacements), transform_ref)
+        invalid_transform_ref = F("timestamp__invalid")
+        self.assertIs(
+            invalid_transform_ref.replace_expressions(replacements),
+            invalid_transform_ref,
+        )
+        replacements = {F("timestamp"): Value(datetime.datetime(2025, 3, 1, 14, 10))}
+        self.assertEqual(
+            F("timestamp__date").replace_expressions(replacements),
+            TruncDate(Value(datetime.datetime(2025, 3, 1, 14, 10))),
+        )
+        self.assertEqual(
+            F("timestamp__date__day").replace_expressions(replacements),
+            ExtractDay(TruncDate(Value(datetime.datetime(2025, 3, 1, 14, 10)))),
+        )
+        invalid_nested_transform_ref = F("timestamp__date__invalid")
+        self.assertIs(
+            invalid_nested_transform_ref.replace_expressions(replacements),
+            invalid_nested_transform_ref,
+        )
+        # `replacements` is not unnecessarily looked up a second time for
+        # transform-less field references as it's the case the vast majority of
+        # the time.
+        mock_replacements = mock.Mock()
+        mock_replacements.get.return_value = None
+        field_ref = F("name")
+        self.assertIs(field_ref.replace_expressions(mock_replacements), field_ref)
+        mock_replacements.get.assert_called_once_with(field_ref)
 
 
 class ExpressionsTests(TestCase):
@@ -1413,6 +1465,29 @@ class SimpleExpressionTests(SimpleTestCase):
         self.assertNotEqual(
             Expression(TestModel._meta.get_field("field")),
             Expression(TestModel._meta.get_field("other_field")),
+        )
+
+        class InitCaptureExpression(Expression):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+        # The identity of expressions that obscure their __init__() signature
+        # with *args and **kwargs cannot be determined when bound with
+        # different combinations or *args and **kwargs.
+        self.assertNotEqual(
+            InitCaptureExpression(IntegerField()),
+            InitCaptureExpression(output_field=IntegerField()),
+        )
+
+        # However, they should be considered equal when their bindings are
+        # equal.
+        self.assertEqual(
+            InitCaptureExpression(IntegerField()),
+            InitCaptureExpression(IntegerField()),
+        )
+        self.assertEqual(
+            InitCaptureExpression(output_field=IntegerField()),
+            InitCaptureExpression(output_field=IntegerField()),
         )
 
     def test_hash(self):
@@ -2328,6 +2403,16 @@ class ValueTests(TestCase):
         Time.objects.create()
         time = Time.objects.annotate(one=Value(1, output_field=DecimalField())).first()
         self.assertEqual(time.one, 1)
+
+    def test_output_field_is_none_error(self):
+        with self.assertRaises(OutputFieldIsNoneError):
+            Employee.objects.annotate(custom_expression=Value(None)).first()
+
+    def test_output_field_or_none_property_not_cached(self):
+        expression = Value(None, output_field=None)
+        self.assertIsNone(expression._output_field_or_none)
+        expression.output_field = BooleanField()
+        self.assertIsInstance(expression._output_field_or_none, BooleanField)
 
     def test_resolve_output_field(self):
         value_types = [

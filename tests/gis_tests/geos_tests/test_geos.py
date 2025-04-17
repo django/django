@@ -311,6 +311,20 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         with self.assertRaisesMessage(GEOSException, msg):
             g1.equals_identical(g2)
 
+    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
+    def test_hasm(self):
+        pnt_xym = fromstr("POINT M (5 23 8)")
+        self.assertTrue(pnt_xym.hasm)
+        pnt_xyzm = fromstr("POINT (5 23 8 0)")
+        self.assertTrue(pnt_xyzm.hasm)
+
+    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
+    def test_hasm_geos_version(self):
+        p = fromstr("POINT (1 2 3)")
+        msg = "GEOSGeometry.hasm requires GEOS >= 3.12.0."
+        with self.assertRaisesMessage(GEOSException, msg):
+            p.hasm
+
     def test_points(self):
         "Testing Point objects."
         prev = fromstr("POINT(0 0)")

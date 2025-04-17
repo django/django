@@ -860,6 +860,47 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
+    def test_search_with_exact_lookup_for_non_string_field(self):
+        child = Child.objects.create(name="Asher", age=11)
+        model_admin = ChildAdmin(Child, custom_site)
+
+        for search_term, expected_result in [
+            ("11", [child]),
+            ("Asher", [child]),
+            ("1", []),
+            ("A", []),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                # 1 query for filtered result, 1 for filtered count, 1 for total count.
+                with self.assertNumQueries(3):
+                    cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
+    def test_search_with_exact_lookup_relationship_field(self):
+        child = Child.objects.create(name="I am a child", age=11)
+        grandchild = GrandChild.objects.create(name="I am a grandchild", parent=child)
+        model_admin = GrandChildAdmin(GrandChild, custom_site)
+
+        request = self.factory.get("/", data={SEARCH_VAR: "'I am a child'"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [grandchild])
+        for search_term, expected_result in [
+            ("11", [grandchild]),
+            ("'I am a child'", [grandchild]),
+            ("1", []),
+            ("A", []),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
     def test_no_distinct_for_m2m_in_list_filter_without_params(self):
         """
         If a ManyToManyField is in list_filter but isn't in any lookup params,
@@ -1015,6 +1056,36 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         link = reverse("admin:admin_changelist_parent_change", args=(p.pk,))
         self.assertNotContains(response, '<a href="%s">' % link)
+
+    def test_link_field_display_links(self):
+        self.client.force_login(self.superuser)
+        g = Genre.objects.create(
+            name="Blues",
+            file="documents/blues_history.txt",
+            url="http://blues_history.com",
+        )
+        response = self.client.get(reverse("admin:admin_changelist_genre_changelist"))
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_changelist/genre/%s/change/">'
+            "documents/blues_history.txt</a>" % g.pk,
+        )
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_changelist/genre/%s/change/">'
+            "http://blues_history.com</a>" % g.pk,
+        )
+
+    def test_blank_str_display_links(self):
+        self.client.force_login(self.superuser)
+        gc = GrandChild.objects.create(name="          ")
+        response = self.client.get(
+            reverse("admin:admin_changelist_grandchild_changelist")
+        )
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_changelist/grandchild/%s/change/">-</a>' % gc.pk,
+        )
 
     def test_clear_all_filters_link(self):
         self.client.force_login(self.superuser)
@@ -1774,7 +1845,7 @@ class GetAdminLogTests(TestCase):
         """{% get_admin_log %} works without specifying a user."""
         user = User(username="jondoe", password="secret", email="super@example.com")
         user.save()
-        LogEntry.objects.log_actions(user.pk, [user], 1, single_object=True)
+        LogEntry.objects.log_actions(user.pk, [user], 1)
         context = Context({"log_entries": LogEntry.objects.all()})
         t = Template(
             "{% load log %}"

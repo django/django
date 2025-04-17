@@ -1,3 +1,4 @@
+from datetime import datetime
 from math import ceil
 from operator import attrgetter
 
@@ -17,10 +18,13 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
+from django.utils import timezone
 
 from .models import (
     BigAutoFieldModel,
     Country,
+    DbDefaultModel,
+    DbDefaultPrimaryKey,
     FieldsWithDbColumns,
     NoFields,
     NullableFields,
@@ -840,3 +844,35 @@ class BulkCreateTests(TestCase):
                 {"rank": 2, "name": "d"},
             ],
         )
+
+    @skipUnlessDBFeature("supports_expression_defaults")
+    def test_db_default_field_excluded(self):
+        # created_at is excluded when no db_default override is provided.
+        with self.assertNumQueries(1) as ctx:
+            DbDefaultModel.objects.bulk_create(
+                [DbDefaultModel(name="foo"), DbDefaultModel(name="bar")]
+            )
+        created_at_quoted_name = connection.ops.quote_name("created_at")
+        self.assertEqual(
+            ctx[0]["sql"].count(created_at_quoted_name),
+            1 if connection.features.can_return_rows_from_bulk_insert else 0,
+        )
+        # created_at is included when a db_default override is provided.
+        with self.assertNumQueries(1) as ctx:
+            DbDefaultModel.objects.bulk_create(
+                [
+                    DbDefaultModel(name="foo", created_at=timezone.now()),
+                    DbDefaultModel(name="bar"),
+                ]
+            )
+        self.assertEqual(
+            ctx[0]["sql"].count(created_at_quoted_name),
+            2 if connection.features.can_return_rows_from_bulk_insert else 1,
+        )
+
+    @skipUnlessDBFeature(
+        "can_return_rows_from_bulk_insert", "supports_expression_defaults"
+    )
+    def test_db_default_primary_key(self):
+        (obj,) = DbDefaultPrimaryKey.objects.bulk_create([DbDefaultPrimaryKey()])
+        self.assertIsInstance(obj.id, datetime)

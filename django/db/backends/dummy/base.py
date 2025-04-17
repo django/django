@@ -39,6 +39,7 @@ class DatabaseClient(BaseDatabaseClient):
 class DatabaseCreation(BaseDatabaseCreation):
     create_test_db = ignore
     destroy_test_db = ignore
+    serialize_db_to_string = ignore
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):

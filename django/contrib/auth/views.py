@@ -301,7 +301,8 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         try:
             # urlsafe_base64_decode() decodes to bytestring
             uid = urlsafe_base64_decode(uidb64).decode()
-            user = UserModel._default_manager.get(pk=uid)
+            pk = UserModel._meta.pk.to_python(uid)
+            user = UserModel._default_manager.get(pk=pk)
         except (
             TypeError,
             ValueError,

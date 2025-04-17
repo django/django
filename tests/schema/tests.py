@@ -2422,13 +2422,14 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor, self.assertNumQueries(0):
             editor.alter_field(Author, Author._meta.get_field("name"), new_field)
 
+    @skipUnlessDBFeature("supports_json_field")
     @isolate_apps("schema")
     def test_db_default_output_field_resolving(self):
         class Author(Model):
             data = JSONField(
                 encoder=DjangoJSONEncoder,
                 db_default={
-                    "epoch": datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+                    "epoch": datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC)
                 },
             )
 
@@ -4861,6 +4862,24 @@ class SchemaTests(TransactionTestCase):
             comment,
         )
 
+    @skipUnlessDBFeature("supports_comments", "supports_stored_generated_columns")
+    def test_add_db_comment_generated_field(self):
+        comment = "Custom comment"
+        field = GeneratedField(
+            expression=Value(1),
+            db_persist=True,
+            output_field=IntegerField(),
+            db_comment=comment,
+        )
+        field.set_attributes_from_name("volume")
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.add_field(Author, field)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "volume"),
+            comment,
+        )
+
     @skipUnlessDBFeature("supports_comments")
     def test_add_db_comment_and_default_charfield(self):
         comment = "Custom comment with default"
@@ -5223,6 +5242,51 @@ class SchemaTests(TransactionTestCase):
             ["schema_tag_slug_2c418ba3_like", "schema_tag_slug_key"],
         )
 
+    @isolate_apps("schema")
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_indexed_charfield_to_textfield(self):
+        class SimpleModel(Model):
+            field1 = CharField(max_length=10, db_index=True)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(SimpleModel)
+        self.assertEqual(
+            self.get_constraints_for_column(SimpleModel, "field1"),
+            [
+                "schema_simplemodel_field1_f07a3d6a",
+                "schema_simplemodel_field1_f07a3d6a_like",
+            ],
+        )
+        # Change to TextField.
+        old_field1 = SimpleModel._meta.get_field("field1")
+        new_field1 = TextField(db_index=True)
+        new_field1.set_attributes_from_name("field1")
+        with connection.schema_editor() as editor:
+            editor.alter_field(SimpleModel, old_field1, new_field1, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(SimpleModel, "field1"),
+            [
+                "schema_simplemodel_field1_f07a3d6a",
+                "schema_simplemodel_field1_f07a3d6a_like",
+            ],
+        )
+        # Change back to CharField.
+        old_field1 = SimpleModel._meta.get_field("field1")
+        new_field1 = CharField(max_length=10, db_index=True)
+        new_field1.set_attributes_from_name("field1")
+        with connection.schema_editor() as editor:
+            editor.alter_field(SimpleModel, old_field1, new_field1, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(SimpleModel, "field1"),
+            [
+                "schema_simplemodel_field1_f07a3d6a",
+                "schema_simplemodel_field1_f07a3d6a_like",
+            ],
+        )
+
     def test_alter_field_add_index_to_integerfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
@@ -5270,7 +5334,7 @@ class SchemaTests(TransactionTestCase):
         """
         now = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1)
         now_tz = datetime.datetime(
-            month=1, day=1, year=2000, hour=1, minute=1, tzinfo=datetime.timezone.utc
+            month=1, day=1, year=2000, hour=1, minute=1, tzinfo=datetime.UTC
         )
         mocked_datetime.now = mock.MagicMock(return_value=now)
         mocked_tz.now = mock.MagicMock(return_value=now_tz)

@@ -42,7 +42,7 @@
           {% elif i == action_list.number %}
             <span class="this-page">{{ i }}</span>
           {% else %}
-            <a href="?{{ page_var }}={{ i }}" {% if i == action_list.paginator.num_pages %} class="end" {% endif %}>{{ i }}</a>
+            <a role="button" href="?{{ page_var }}={{ i }}" {% if i == action_list.paginator.num_pages %} class="end" {% endif %}>{{ i }}</a>
           {% endif %}
         {% endfor %}
       {% endif %}

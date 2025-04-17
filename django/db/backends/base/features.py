@@ -257,6 +257,15 @@ class BaseDatabaseFeatures:
     # expressions?
     supports_aggregate_filter_clause = False
 
+    # Does the database support ORDER BY in aggregate expressions?
+    supports_aggregate_order_by_clause = False
+
+    # Does the database backend support DISTINCT when using multiple arguments in an
+    # aggregate expression? For example, Sqlite treats the "delimiter" argument of
+    # STRING_AGG/GROUP_CONCAT as an extra argument and does not allow using a custom
+    # delimiter along with DISTINCT.
+    supports_aggregate_distinct_multiple_argument = True
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
@@ -368,6 +377,9 @@ class BaseDatabaseFeatures:
     # Does the backend support unlimited character columns?
     supports_unlimited_charfield = False
 
+    # Does the backend support native tuple lookups (=, >, <, IN)?
+    supports_tuple_lookups = True
+
     # Collation names for use by the Django test suite.
     test_collations = {
         "ci": None,  # Case-insensitive.
@@ -382,6 +394,9 @@ class BaseDatabaseFeatures:
     # SQL to create a model instance using the database defaults.
     insert_test_table_with_defaults = None
 
+    # Does the Round() database function round to even?
+    rounds_to_even = False
+
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
     django_test_expected_failures = set()
@@ -391,6 +406,9 @@ class BaseDatabaseFeatures:
 
     def __init__(self, connection):
         self.connection = connection
+
+    def __del__(self):
+        del self.connection
 
     @cached_property
     def supports_explaining_query_execution(self):

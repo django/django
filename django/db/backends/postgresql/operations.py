@@ -3,6 +3,7 @@ from functools import lru_cache, partial
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.postgresql.compiler import InsertUnnest
 from django.db.backends.postgresql.psycopg_any import (
     Inet,
     Jsonb,
@@ -24,6 +25,7 @@ def get_json_dumps(encoder):
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.postgresql.compiler"
     cast_char_field_without_max_length = "varchar"
     explain_prefix = "EXPLAIN"
     explain_options = frozenset(
@@ -32,7 +34,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             "BUFFERS",
             "COSTS",
             "GENERIC_PLAN",
+            "MEMORY",
             "SETTINGS",
+            "SERIALIZE",
             "SUMMARY",
             "TIMING",
             "VERBOSE",
@@ -145,6 +149,11 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
+
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        if isinstance(placeholder_rows, InsertUnnest):
+            return f"SELECT * FROM {placeholder_rows}"
+        return super().bulk_insert_sql(fields, placeholder_rows)
 
     def fetch_returned_insert_rows(self, cursor):
         """
@@ -344,9 +353,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     def adapt_timefield_value(self, value):
         return value
 
-    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
-        return value
-
     def adapt_ipaddressfield_value(self, value):
         if value:
             return Inet(value)
@@ -365,6 +371,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def explain_query_prefix(self, format=None, **options):
         extra = {}
+        if serialize := options.pop("serialize", None):
+            if serialize.upper() in {"TEXT", "BINARY"}:
+                extra["SERIALIZE"] = serialize.upper()
         # Normalize options.
         if options:
             options = {

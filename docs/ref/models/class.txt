@@ -39,6 +39,23 @@ Attributes
     The exception is a subclass of
     :exc:`django.core.exceptions.MultipleObjectsReturned`.
 
+``NotUpdated``
+--------------
+
+.. versionadded:: 6.0
+
+.. exception:: Model.NotUpdated
+
+    This exception is raised when :ref:`a forced update
+    <ref-models-force-insert>` of a :class:`~django.db.models.Model` instance
+    does not affect any rows.
+
+    Django provides a ``NotUpdated`` exception as an attribute of each model
+    class to identify the class of object that could not be updated, allowing
+    you to catch exceptions for a particular model class. The exception is a
+    subclass of :exc:`django.core.exceptions.ObjectNotUpdated` and inherits
+    from :exc:`django.db.DatabaseError` for backward compatibility reasons.
+
 ``objects``
 -----------
 

@@ -922,20 +922,6 @@ class Queries1Tests(TestCase):
             [self.t2, self.t3],
         )
 
-        # Multi-valued values() and values_list() querysets should raise errors.
-        with self.assertRaisesMessage(
-            TypeError, "Cannot use multi-field values as a filter value."
-        ):
-            Tag.objects.filter(
-                name__in=Tag.objects.filter(parent=self.t1).values("name", "id")
-            )
-        with self.assertRaisesMessage(
-            TypeError, "Cannot use multi-field values as a filter value."
-        ):
-            Tag.objects.filter(
-                name__in=Tag.objects.filter(parent=self.t1).values_list("name", "id")
-            )
-
     def test_ticket9985(self):
         # qs.values_list(...).values(...) combinations should work.
         self.assertSequenceEqual(
@@ -2681,6 +2667,12 @@ class ValuesQuerysetTests(TestCase):
         qs = Number.objects.values_list("num")
         qs = qs.values_list("num", flat=True)
         self.assertSequenceEqual(qs, [72])
+
+    def test_duplicate_values_list(self):
+        value = Number.objects.values_list("num", "num").get()
+        self.assertEqual(value, (72, 72))
+        value = Number.objects.values_list(F("num"), F("num")).get()
+        self.assertEqual(value, (72, 72))
 
     def test_extra_values(self):
         # testing for ticket 14930 issues

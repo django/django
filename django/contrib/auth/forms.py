@@ -3,7 +3,7 @@ import unicodedata
 
 from django import forms
 from django.contrib.auth import authenticate, get_user_model, password_validation
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, identify_hasher
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -13,8 +13,8 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
-from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.debug import sensitive_variables
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
@@ -34,29 +34,10 @@ def _unicode_ci_compare(s1, s2):
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name = "auth/widgets/read_only_password_hash.html"
-    read_only = True
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         usable_password = value and not value.startswith(UNUSABLE_PASSWORD_PREFIX)
-        summary = []
-        if usable_password:
-            try:
-                hasher = identify_hasher(value)
-            except ValueError:
-                summary.append(
-                    {
-                        "label": gettext(
-                            "Invalid password format or unknown hashing algorithm."
-                        )
-                    }
-                )
-            else:
-                for key, value_ in hasher.safe_summary(value).items():
-                    summary.append({"label": gettext(key), "value": value_})
-        else:
-            summary.append({"label": gettext("No password set.")})
-        context["summary"] = summary
         context["button_label"] = (
             _("Reset password") if usable_password else _("Set password")
         )
@@ -108,20 +89,21 @@ class SetPasswordMixin:
     def create_password_fields(label1=_("Password"), label2=_("Password confirmation")):
         password1 = forms.CharField(
             label=label1,
-            required=False,
+            required=True,
             strip=False,
             widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
             help_text=password_validation.password_validators_help_text_html(),
         )
         password2 = forms.CharField(
             label=label2,
-            required=False,
+            required=True,
             widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
             strip=False,
             help_text=_("Enter the same password as before, for verification."),
         )
         return password1, password2
 
+    @sensitive_variables("password1", "password2")
     def validate_passwords(
         self,
         password1_field_name="password1",
@@ -130,20 +112,6 @@ class SetPasswordMixin:
         password1 = self.cleaned_data.get(password1_field_name)
         password2 = self.cleaned_data.get(password2_field_name)
 
-        if not password1 and password1_field_name not in self.errors:
-            error = ValidationError(
-                self.fields[password1_field_name].error_messages["required"],
-                code="required",
-            )
-            self.add_error(password1_field_name, error)
-
-        if not password2 and password2_field_name not in self.errors:
-            error = ValidationError(
-                self.fields[password2_field_name].error_messages["required"],
-                code="required",
-            )
-            self.add_error(password2_field_name, error)
-
         if password1 and password2 and password1 != password2:
             error = ValidationError(
                 self.error_messages["password_mismatch"],
@@ -151,6 +119,7 @@ class SetPasswordMixin:
             )
             self.add_error(password2_field_name, error)
 
+    @sensitive_variables("password")
     def validate_password_for_user(self, user, password_field_name="password2"):
         password = self.cleaned_data.get(password_field_name)
         if password:
@@ -190,19 +159,39 @@ class SetUnusablePasswordMixin:
             help_text=help_text,
         )
 
+    @sensitive_variables("password1", "password2")
     def validate_passwords(
         self,
-        *args,
+        password1_field_name="password1",
+        password2_field_name="password2",
         usable_password_field_name="usable_password",
-        **kwargs,
     ):
         usable_password = (
             self.cleaned_data.pop(usable_password_field_name, None) != "false"
         )
         self.cleaned_data["set_usable_password"] = usable_password
 
-        if usable_password:
-            super().validate_passwords(*args, **kwargs)
+        if not usable_password:
+            return
+
+        password1 = self.cleaned_data.get(password1_field_name)
+        password2 = self.cleaned_data.get(password2_field_name)
+
+        if not password1 and password1_field_name not in self.errors:
+            error = ValidationError(
+                self.fields[password1_field_name].error_messages["required"],
+                code="required",
+            )
+            self.add_error(password1_field_name, error)
+
+        if not password2 and password2_field_name not in self.errors:
+            error = ValidationError(
+                self.fields[password2_field_name].error_messages["required"],
+                code="required",
+            )
+            self.add_error(password2_field_name, error)
+
+        super().validate_passwords(password1_field_name, password2_field_name)
 
     def validate_password_for_user(self, user, **kwargs):
         if self.cleaned_data["set_usable_password"]:
@@ -348,6 +337,7 @@ class AuthenticationForm(forms.Form):
         if self.fields["username"].label is None:
             self.fields["username"].label = capfirst(self.username_field.verbose_name)
 
+    @sensitive_variables()
     def clean(self):
         username = self.cleaned_data.get("username")
         password = self.cleaned_data.get("password")
@@ -474,11 +464,12 @@ class PasswordResetForm(forms.Form):
         email_field_name = UserModel.get_email_field_name()
         for user in self.get_users(email):
             user_email = getattr(user, email_field_name)
+            user_pk_bytes = force_bytes(UserModel._meta.pk.value_to_string(user))
             context = {
                 "email": user_email,
                 "domain": domain,
                 "site_name": site_name,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                "uid": urlsafe_base64_encode(user_pk_bytes),
                 "user": user,
                 "token": token_generator.make_token(user),
                 "protocol": "https" if use_https else "http",
@@ -539,6 +530,7 @@ class PasswordChangeForm(SetPasswordForm):
 
     field_order = ["old_password", "new_password1", "new_password2"]
 
+    @sensitive_variables("old_password")
     def clean_old_password(self):
         """
         Validate that the old_password field is correct.
@@ -569,6 +561,8 @@ class AdminPasswordChangeForm(SetUnusablePasswordMixin, SetPasswordMixin, forms.
         super().__init__(*args, **kwargs)
         self.fields["password1"].widget.attrs["autofocus"] = True
         if self.user.has_usable_password():
+            self.fields["password1"].required = False
+            self.fields["password2"].required = False
             self.fields["usable_password"] = (
                 SetUnusablePasswordMixin.create_usable_password_field(
                     self.usable_password_help_text
@@ -595,3 +589,8 @@ class AdminPasswordChangeForm(SetUnusablePasswordMixin, SetPasswordMixin, forms.
 class AdminUserCreationForm(SetUnusablePasswordMixin, UserCreationForm):
 
     usable_password = SetUnusablePasswordMixin.create_usable_password_field()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["password1"].required = False
+        self.fields["password2"].required = False

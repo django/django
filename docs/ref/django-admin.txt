@@ -947,7 +947,7 @@ multithreaded by default.
 Uses IPv6 for the development server. This changes the default IP address from
 ``127.0.0.1`` to ``::1``.
 
-.. envvar:: HIDE_PRODUCTION_WARNING
+.. envvar:: DJANGO_RUNSERVER_HIDE_WARNING
 
 .. versionadded:: 5.2
 
@@ -1065,6 +1065,19 @@ Mails the email addresses specified in :setting:`ADMINS` using
 
 Starts the Python interactive interpreter.
 
+All models from installed apps are automatically imported into the shell
+environment. Models from apps listed earlier in :setting:`INSTALLED_APPS` take
+precedence. For a ``--verbosity`` of 2 or higher, the automatically imported
+objects will be listed. To disable automatic importing entirely, use the
+``--no-imports`` flag.
+
+See the guide on :ref:`customizing this behavior
+<customizing-shell-auto-imports>` to add or remove automatic imports.
+
+.. versionchanged:: 5.2
+
+    Automatic models import was added.
+
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
 Specifies the shell to use. By default, Django will use IPython_ or bpython_ if
@@ -1097,6 +1110,12 @@ Python interpreter, use ``python`` as the interface name, like so:
 Disables reading the startup script for the "plain" Python interpreter. By
 default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment
 variable or the ``~/.pythonrc.py`` script is read.
+
+.. django-admin-option:: --no-imports
+
+.. versionadded:: 5.2
+
+Disables the automatic import of models from :setting:`INSTALLED_APPS`.
 
 .. django-admin-option:: --command COMMAND, -c COMMAND
 
@@ -1569,10 +1588,6 @@ Outputs timings, including database setup and total run time.
 .. django-admin-option:: --durations N
 
 Shows the N slowest test cases (N=0 for all).
-
-.. admonition:: Python 3.12 and later
-
-    This feature is only available for Python 3.12 and later.
 
 ``testserver``
 --------------

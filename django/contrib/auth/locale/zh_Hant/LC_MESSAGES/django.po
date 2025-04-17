@@ -3,22 +3,22 @@
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Claude Paroz <claude@2xlibre.net>, 2016
-# yubike, 2024
+# coby2023t, 2024-2025
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # tcc <tcchou@tcchou.org>, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017,2019
 # YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2013
-# yubike, 2024
+# coby2023t, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: YAO WEN LIANG, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: coby2023t, 2024-2025\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -66,11 +66,11 @@ msgstr "密碼"
 msgid "last login"
 msgstr "上次登入"
 
-msgid "No password set."
-msgstr "無設定密碼。"
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "無效的密碼格式或未知的雜湊演算法。"
+
+msgid "No password set."
+msgstr "無設定密碼。"
 
 msgid "Reset password"
 msgstr "重設密碼"
@@ -81,14 +81,6 @@ msgstr "設定密碼"
 msgid "The two password fields didn’t match."
 msgstr "輸入的兩個密碼不一致。"
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"用戶是否能夠使用密碼進行認證。如果禁用，他們仍可能能夠使用其他後端進行認證，"
-"例如單一登入或LDAP。"
-
 msgid "Password"
 msgstr "密碼"
 
@@ -97,6 +89,14 @@ msgstr "密碼確認"
 
 msgid "Enter the same password as before, for verification."
 msgstr "輸入與之前相同的密碼以進行驗證。"
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"用戶是否能夠使用密碼進行認證。如果禁用，他們仍可能能夠使用其他後端進行認證，"
+"例如單一登入或LDAP。"
 
 msgid "Password-based authentication"
 msgstr "基於密碼的驗證"
@@ -257,13 +257,10 @@ msgid "users"
 msgstr "使用者"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] "此密碼過短。請至少使用 %(min_length)d 個字元。"
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "密碼太短，必須至少 %d 個字元。"
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

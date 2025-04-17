@@ -36,6 +36,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         If there's only a single field to insert, the limit is 500
         (SQLITE_MAX_COMPOUND_SELECT).
         """
+        fields = list(
+            chain.from_iterable(
+                (
+                    field.fields
+                    if isinstance(field, models.CompositePrimaryKey)
+                    else [field]
+                )
+                for field in fields
+            )
+        )
         if len(fields) == 1:
             return 500
         elif len(fields) > 1:
@@ -365,7 +375,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ["+", "-", "*", "/"]:
             raise DatabaseError("Invalid connector for timedelta: %s." % connector)
-        fn_params = ["'%s'" % connector] + sub_expressions
+        fn_params = ["'%s'" % connector, *sub_expressions]
         if len(fn_params) > 3:
             raise ValueError("Too many params for timedelta operations.")
         return "django_format_dtdelta(%s)" % ", ".join(fn_params)

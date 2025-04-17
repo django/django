@@ -1,11 +1,13 @@
 import platform
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest import mock
 
 from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
 from django.utils.http import (
+    MAX_HEADER_LENGTH,
+    MAX_URL_LENGTH,
     base36_to_int,
     content_disposition_header,
     escape_leading_slashes,
@@ -273,6 +275,21 @@ class URLHasAllowedHostAndSchemeTests(unittest.TestCase):
                     False,
                 )
 
+    def test_max_url_length(self):
+        allowed_host = "example.com"
+        max_extra_characters = "é" * (MAX_URL_LENGTH - len(allowed_host) - 1)
+        max_length_boundary_url = f"{allowed_host}/{max_extra_characters}"
+        cases = [
+            (max_length_boundary_url, True),
+            (max_length_boundary_url + "ú", False),
+        ]
+        for url, expected in cases:
+            with self.subTest(url=url):
+                self.assertIs(
+                    url_has_allowed_host_and_scheme(url, allowed_hosts={allowed_host}),
+                    expected,
+                )
+
 
 class URLSafeBase64Tests(unittest.TestCase):
     def test_roundtrip(self):
@@ -329,61 +346,61 @@ class HttpDateProcessingTests(unittest.TestCase):
     def test_parsing_rfc1123(self):
         parsed = parse_http_date("Sun, 06 Nov 1994 08:49:37 GMT")
         self.assertEqual(
-            datetime.fromtimestamp(parsed, timezone.utc),
-            datetime(1994, 11, 6, 8, 49, 37, tzinfo=timezone.utc),
+            datetime.fromtimestamp(parsed, UTC),
+            datetime(1994, 11, 6, 8, 49, 37, tzinfo=UTC),
         )
 
     @unittest.skipIf(platform.architecture()[0] == "32bit", "The Year 2038 problem.")
     @mock.patch("django.utils.http.datetime")
     def test_parsing_rfc850(self, mocked_datetime):
         mocked_datetime.side_effect = datetime
-        now_1 = datetime(2019, 11, 6, 8, 49, 37, tzinfo=timezone.utc)
-        now_2 = datetime(2020, 11, 6, 8, 49, 37, tzinfo=timezone.utc)
-        now_3 = datetime(2048, 11, 6, 8, 49, 37, tzinfo=timezone.utc)
+        now_1 = datetime(2019, 11, 6, 8, 49, 37, tzinfo=UTC)
+        now_2 = datetime(2020, 11, 6, 8, 49, 37, tzinfo=UTC)
+        now_3 = datetime(2048, 11, 6, 8, 49, 37, tzinfo=UTC)
         tests = (
             (
                 now_1,
                 "Tuesday, 31-Dec-69 08:49:37 GMT",
-                datetime(2069, 12, 31, 8, 49, 37, tzinfo=timezone.utc),
+                datetime(2069, 12, 31, 8, 49, 37, tzinfo=UTC),
             ),
             (
                 now_1,
                 "Tuesday, 10-Nov-70 08:49:37 GMT",
-                datetime(1970, 11, 10, 8, 49, 37, tzinfo=timezone.utc),
+                datetime(1970, 11, 10, 8, 49, 37, tzinfo=UTC),
             ),
             (
                 now_1,
                 "Sunday, 06-Nov-94 08:49:37 GMT",
-                datetime(1994, 11, 6, 8, 49, 37, tzinfo=timezone.utc),
+                datetime(1994, 11, 6, 8, 49, 37, tzinfo=UTC),
             ),
             (
                 now_2,
                 "Wednesday, 31-Dec-70 08:49:37 GMT",
-                datetime(2070, 12, 31, 8, 49, 37, tzinfo=timezone.utc),
+                datetime(2070, 12, 31, 8, 49, 37, tzinfo=UTC),
             ),
             (
                 now_2,
                 "Friday, 31-Dec-71 08:49:37 GMT",
-                datetime(1971, 12, 31, 8, 49, 37, tzinfo=timezone.utc),
+                datetime(1971, 12, 31, 8, 49, 37, tzinfo=UTC),
             ),
             (
                 now_3,
                 "Sunday, 31-Dec-00 08:49:37 GMT",
-                datetime(2000, 12, 31, 8, 49, 37, tzinfo=timezone.utc),
+                datetime(2000, 12, 31, 8, 49, 37, tzinfo=UTC),
             ),
             (
                 now_3,
                 "Friday, 31-Dec-99 08:49:37 GMT",
-                datetime(1999, 12, 31, 8, 49, 37, tzinfo=timezone.utc),
+                datetime(1999, 12, 31, 8, 49, 37, tzinfo=UTC),
             ),
         )
         for now, rfc850str, expected_date in tests:
             with self.subTest(rfc850str=rfc850str):
                 mocked_datetime.now.return_value = now
                 parsed = parse_http_date(rfc850str)
-                mocked_datetime.now.assert_called_once_with(tz=timezone.utc)
+                mocked_datetime.now.assert_called_once_with(tz=UTC)
                 self.assertEqual(
-                    datetime.fromtimestamp(parsed, timezone.utc),
+                    datetime.fromtimestamp(parsed, UTC),
                     expected_date,
                 )
             mocked_datetime.reset_mock()
@@ -391,8 +408,8 @@ class HttpDateProcessingTests(unittest.TestCase):
     def test_parsing_asctime(self):
         parsed = parse_http_date("Sun Nov  6 08:49:37 1994")
         self.assertEqual(
-            datetime.fromtimestamp(parsed, timezone.utc),
-            datetime(1994, 11, 6, 8, 49, 37, tzinfo=timezone.utc),
+            datetime.fromtimestamp(parsed, UTC),
+            datetime(1994, 11, 6, 8, 49, 37, tzinfo=UTC),
         )
 
     def test_parsing_asctime_nonascii_digits(self):
@@ -405,8 +422,8 @@ class HttpDateProcessingTests(unittest.TestCase):
     def test_parsing_year_less_than_70(self):
         parsed = parse_http_date("Sun Nov  6 08:49:37 0037")
         self.assertEqual(
-            datetime.fromtimestamp(parsed, timezone.utc),
-            datetime(2037, 11, 6, 8, 49, 37, tzinfo=timezone.utc),
+            datetime.fromtimestamp(parsed, UTC),
+            datetime(2037, 11, 6, 8, 49, 37, tzinfo=UTC),
         )
 
 
@@ -424,6 +441,8 @@ class EscapeLeadingSlashesTests(unittest.TestCase):
 class ParseHeaderParameterTests(unittest.TestCase):
     def test_basic(self):
         tests = [
+            ("", ("", {})),
+            (None, ("none", {})),
             ("text/plain", ("text/plain", {})),
             ("text/vnd.just.made.this.up ; ", ("text/vnd.just.made.this.up", {})),
             ("text/plain;charset=us-ascii", ("text/plain", {"charset": "us-ascii"})),
@@ -448,8 +467,16 @@ class ParseHeaderParameterTests(unittest.TestCase):
                 ("attachment", {"filename": "strange;name", "size": "123"}),
             ),
             (
+                'attachment; filename="strange;name";;;;size=123;;;',
+                ("attachment", {"filename": "strange;name", "size": "123"}),
+            ),
+            (
                 'form-data; name="files"; filename="fo\\"o;bar"',
                 ("form-data", {"name": "files", "filename": 'fo"o;bar'}),
+            ),
+            (
+                'form-data; name="files"; filename="\\"fo\\"o;b\\\\ar\\""',
+                ("form-data", {"name": "files", "filename": '"fo"o;b\\ar"'}),
             ),
         ]
         for header, expected in tests:
@@ -480,12 +507,13 @@ class ParseHeaderParameterTests(unittest.TestCase):
         """
         Test wrongly formatted RFC 2231 headers (missing double single quotes).
         Parsing should not crash (#24209).
+        But stdlib email still decodes (#35440).
         """
         test_data = (
             (
                 "Content-Type: application/x-stuff; "
                 "title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
-                "'This%20is%20%2A%2A%2Afun%2A%2A%2A",
+                "'This is ***fun***",
             ),
             ("Content-Type: application/x-stuff; title*='foo.html", "'foo.html"),
             ("Content-Type: application/x-stuff; title*=bar.html", "bar.html"),
@@ -493,6 +521,37 @@ class ParseHeaderParameterTests(unittest.TestCase):
         for raw_line, expected_title in test_data:
             parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
+
+    def test_header_max_length(self):
+        base_header = "Content-Type: application/x-stuff; title*="
+        base_header_len = len(base_header)
+
+        test_data = [
+            (MAX_HEADER_LENGTH, {}),
+            (MAX_HEADER_LENGTH, {"max_length": None}),
+            (MAX_HEADER_LENGTH + 1, {"max_length": None}),
+            (100, {"max_length": 100}),
+        ]
+        for line_length, kwargs in test_data:
+            with self.subTest(line_length=line_length, kwargs=kwargs):
+                title = "x" * (line_length - base_header_len)
+                line = base_header + title
+                assert len(line) == line_length
+
+                parsed = parse_header_parameters(line, **kwargs)
+
+                expected = ("content-type: application/x-stuff", {"title": title})
+                self.assertEqual(parsed, expected)
+
+    def test_header_too_long(self):
+        test_data = [
+            ("x" * (MAX_HEADER_LENGTH + 1), {}),
+            ("x" * 101, {"max_length": 100}),
+        ]
+        for line, kwargs in test_data:
+            with self.subTest(line_length=len(line), kwargs=kwargs):
+                with self.assertRaises(ValueError):
+                    parse_header_parameters(line, **kwargs)
 
 
 class ContentDispositionHeaderTests(unittest.TestCase):
@@ -511,6 +570,7 @@ class ContentDispositionHeaderTests(unittest.TestCase):
                 (True, '"espécimen" filename'),
                 "attachment; filename*=utf-8''%22esp%C3%A9cimen%22%20filename",
             ),
+            ((True, "some\nfile"), "attachment; filename*=utf-8''some%0Afile"),
         )
 
         for (is_attachment, filename), expected in tests:

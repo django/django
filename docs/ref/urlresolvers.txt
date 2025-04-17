@@ -7,13 +7,14 @@
 ``reverse()``
 =============
 
-If you need to use something similar to the :ttag:`url` template tag in
-your code, Django provides the following function:
+The ``reverse()`` function can be used to return an absolute path reference
+for a given view and optional parameters, similar to the :ttag:`url` tag:
 
-.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, *, query=None, fragment=None)
 
 ``viewname`` can be a :ref:`URL pattern name <naming-url-patterns>` or the
-callable view object. For example, given the following ``url``::
+callable view object used in the URLconf. For example, given the following
+``url``::
 
     from news import views
 
@@ -66,6 +67,33 @@ namespaces into URLs on specific application instances, according to the
 The ``urlconf`` argument is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
 
+The ``query`` keyword argument specifies parameters to be added to the returned
+URL. It can accept an instance of :class:`~django.http.QueryDict` (such as
+``request.GET``) or any value compatible with :func:`urllib.parse.urlencode`.
+The encoded query string is appended to the resolved URL, prefixed by a ``?``.
+
+The ``fragment`` keyword argument specifies a fragment identifier to be
+appended to the returned URL (that is, after the path and query string,
+preceded by a ``#``).
+
+For example:
+
+.. code-block:: pycon
+
+   >>> from django.urls import reverse
+   >>> reverse("admin:index", query={"q": "biscuits", "page": 2}, fragment="results")
+   '/admin/?q=biscuits&page=2#results'
+   >>> reverse("admin:index", query=[("color", "blue"), ("color", 1), ("none", None)])
+   '/admin/?color=blue&color=1&none=None'
+   >>> reverse("admin:index", query={"has empty spaces": "also has empty spaces!"})
+   '/admin/?has+empty+spaces=also+has+empty+spaces%21'
+   >>> reverse("admin:index", fragment="no encoding is done")
+   '/admin/#no encoding is done'
+
+.. versionchanged:: 5.2
+
+    The ``query`` and ``fragment`` arguments were added.
+
 .. note::
 
     The string returned by ``reverse()`` is already
@@ -79,12 +107,32 @@ use for reversing. By default, the root URLconf for the current thread is used.
     Applying further encoding (such as :func:`urllib.parse.quote`) to the output
     of ``reverse()`` may produce undesirable results.
 
+.. admonition:: Reversing class-based views by view object
+
+    The view object can also be the result of calling
+    :meth:`~django.views.generic.base.View.as_view` if the same view object is
+    used in the URLConf. Following the original example, the view object could
+    be defined as:
+
+    .. code-block:: python
+       :caption: ``news/views.py``
+
+        from django.views import View
+
+
+        class ArchiveView(View): ...
+
+
+        archive = ArchiveView.as_view()
+
+    However, remember that namespaced views cannot be reversed by view object.
+
 ``reverse_lazy()``
 ==================
 
 A lazily evaluated version of `reverse()`_.
 
-.. function:: reverse_lazy(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+.. function:: reverse_lazy(viewname, urlconf=None, args=None, kwargs=None, current_app=None, *, query=None, fragment=None)
 
 It is useful for when you need to use a URL reversal before your project's
 URLConf is loaded. Some common cases where this function is necessary are:
@@ -98,6 +146,10 @@ URLConf is loaded. Some common cases where this function is necessary are:
 
 * providing a reversed URL as a default value for a parameter in a function's
   signature.
+
+.. versionchanged:: 5.2
+
+    The ``query`` and ``fragment`` arguments were added.
 
 ``resolve()``
 =============

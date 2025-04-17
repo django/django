@@ -4,11 +4,10 @@ import pickle
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
-from django.db import models
+from django.db import connection, models
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -120,7 +119,7 @@ class MultiColumnFKTests(TestCase):
         )
 
     def test_reverse_query_filters_correctly(self):
-        timemark = datetime.datetime.now(tz=datetime.timezone.utc).replace(tzinfo=None)
+        timemark = datetime.datetime.now(tz=datetime.UTC).replace(tzinfo=None)
         timedelta = datetime.timedelta(days=1)
 
         # Creating a to valid memberships
@@ -247,7 +246,7 @@ class MultiColumnFKTests(TestCase):
         normal_people = [m.person for m in Membership.objects.order_by("pk")]
         self.assertEqual(people, normal_people)
 
-    def test_prefetch_foreignkey_forward_works(self):
+    def test_prefetch_foreignobject_forward(self):
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
         )
@@ -264,7 +263,53 @@ class MultiColumnFKTests(TestCase):
         normal_people = [m.person for m in Membership.objects.order_by("pk")]
         self.assertEqual(people, normal_people)
 
-    def test_prefetch_foreignkey_reverse_works(self):
+    def test_prefetch_foreignobject_hidden_forward(self):
+        Friendship.objects.create(
+            from_friend_country=self.usa,
+            from_friend_id=self.bob.id,
+            to_friend_country_id=self.usa.id,
+            to_friend_id=self.george.id,
+        )
+        Friendship.objects.create(
+            from_friend_country=self.usa,
+            from_friend_id=self.bob.id,
+            to_friend_country_id=self.soviet_union.id,
+            to_friend_id=self.sam.id,
+        )
+        with self.assertNumQueries(2) as ctx:
+            friendships = list(
+                Friendship.objects.prefetch_related("to_friend").order_by("pk")
+            )
+        prefetch_sql = ctx[-1]["sql"]
+        # Prefetch queryset should be filtered by all foreign related fields
+        # to prevent extra rows from being eagerly fetched.
+        prefetch_where_sql = prefetch_sql.split("WHERE")[-1]
+        for to_field_name in Friendship.to_friend.field.to_fields:
+            to_field = Person._meta.get_field(to_field_name)
+            with self.subTest(to_field=to_field):
+                self.assertIn(
+                    connection.ops.quote_name(to_field.column),
+                    prefetch_where_sql,
+                )
+        self.assertNotIn(" JOIN ", prefetch_sql)
+        with self.assertNumQueries(0):
+            self.assertEqual(friendships[0].to_friend, self.george)
+            self.assertEqual(friendships[1].to_friend, self.sam)
+
+    def test_prefetch_foreignobject_null_hidden_forward_skipped(self):
+        fiendship = Friendship.objects.create(
+            from_friend_country=self.usa,
+            from_friend_id=self.bob.id,
+            to_friend_country_id=self.usa.id,
+            to_friend_id=None,
+        )
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                Friendship.objects.prefetch_related("to_friend").get(),
+                fiendship,
+            )
+
+    def test_prefetch_foreignobject_reverse(self):
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
         )
@@ -686,7 +731,7 @@ class TestCachedPathInfo(TestCase):
 
         ForeignObjectRel implements __getstate__(), so copy and pickle modules
         both use that, but ForeignObject implements __reduce__() and __copy__()
-        separately, so doesn't share the same behaviour.
+        separately, so doesn't share the same behavior.
         """
         foreign_object_rel = Membership._meta.get_field("person").remote_field
         # Trigger storage of cached_property into ForeignObjectRel's __dict__.
@@ -712,52 +757,3 @@ class TestCachedPathInfo(TestCase):
         foreign_object_restored = pickle.loads(pickle.dumps(foreign_object))
         self.assertIn("path_infos", foreign_object_restored.__dict__)
         self.assertIn("reverse_path_infos", foreign_object_restored.__dict__)
-
-
-class GetJoiningDeprecationTests(TestCase):
-    def test_foreign_object_get_joining_columns_warning(self):
-        msg = (
-            "ForeignObject.get_joining_columns() is deprecated. Use "
-            "get_joining_fields() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Membership.person.field.get_joining_columns()
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_foreign_object_get_reverse_joining_columns_warning(self):
-        msg = (
-            "ForeignObject.get_reverse_joining_columns() is deprecated. Use "
-            "get_reverse_joining_fields() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Membership.person.field.get_reverse_joining_columns()
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_foreign_object_rel_get_joining_columns_warning(self):
-        msg = (
-            "ForeignObjectRel.get_joining_columns() is deprecated. Use "
-            "get_joining_fields() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Membership.person.field.remote_field.get_joining_columns()
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_join_get_joining_columns_warning(self):
-        class CustomForeignKey(models.ForeignKey):
-            def __getattribute__(self, attr):
-                if attr == "get_joining_fields":
-                    raise AttributeError
-                return super().__getattribute__(attr)
-
-        class CustomParent(models.Model):
-            value = models.CharField(max_length=255)
-
-        class CustomChild(models.Model):
-            links = CustomForeignKey(CustomParent, models.CASCADE)
-
-        msg = (
-            "The usage of get_joining_columns() in Join is deprecated. Implement "
-            "get_joining_fields() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            CustomChild.objects.filter(links__value="value")

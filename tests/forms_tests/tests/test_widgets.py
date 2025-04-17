@@ -19,6 +19,7 @@ class LiveWidgetTests(AdminSeleniumTestCase):
         self.selenium.get(
             self.live_server_url + reverse("article_form", args=[article.pk])
         )
-        self.selenium.find_element(By.ID, "submit").click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.ID, "submit").click()
         article = Article.objects.get(pk=article.pk)
         self.assertEqual(article.content, "\r\nTst\r\n")

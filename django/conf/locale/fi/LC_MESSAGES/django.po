@@ -1,20 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017-2018,2020-2022
+# Aarni Koskela, 2015,2017-2018,2020-2022,2025
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023
-# Lasse Liehu <larso@gmx.com>, 2015
+# Lasse Liehu-Inui <larso@gmx.com>, 2015
 # Mika Mäkelä <mika.m.makela@gmail.com>, 2018
 # Klaus Dahlén, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Aarni Koskela, 2015,2017-2018,2020-2022,2025\n"
 "Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,7 @@ msgid "Catalan"
 msgstr "katalaani"
 
 msgid "Central Kurdish (Sorani)"
-msgstr ""
+msgstr "Keskikurdi (sorani)"
 
 msgid "Czech"
 msgstr "tšekki"
@@ -349,6 +349,9 @@ msgstr "Annetulla sivulla ei ole tuloksia"
 msgid "Enter a valid value."
 msgstr "Syötä oikea arvo."
 
+msgid "Enter a valid domain name."
+msgstr "Syötä kelvollinen domainnimi."
+
 msgid "Enter a valid URL."
 msgstr "Syötä oikea URL-osoite."
 
@@ -372,14 +375,18 @@ msgstr ""
 "Anna lyhytnimi joka koostuu vain Unicode-kirjaimista, numeroista sekä ala- "
 "ja tavuviivoista."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Syötä kelvollinen IPv4-osoite."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Syötä kelvollinen %(protocol)s-osoite."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Syötä kelvollinen IPv6-osoite."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Syötä kelvollinen IPv4- tai IPv6-osoite."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4- tai IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Vain pilkulla erotetut numeromerkit kelpaavat tässä."
@@ -398,13 +405,15 @@ msgstr "Tämän luvun on oltava vähintään %(limit_value)s."
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
-msgstr "Varmista, että arvo on askelkoon %(limit_value)smonikerta. "
+msgstr "Tämän arvon tulee olla askelkoon %(limit_value)smonikerta. "
 
 #, python-format
 msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
+"Tämän arvon tulee olla arvon %(limit_value)smonikerta, alkaen luvusta "
+"%(offset)s, eli esim. %(offset)s, %(valid_value1)s, %(valid_value2)s, jne."
 
 #, python-format
 msgid ""
@@ -417,7 +426,7 @@ msgstr[0] ""
 "Varmista, että tämä arvo on vähintään %(limit_value)d merkin pituinen (tällä "
 "hetkellä %(show_value)d)."
 msgstr[1] ""
-"Varmista, että tämä arvo on vähintään %(limit_value)d merkkiä pitkä (tällä "
+"Tämän arvon tulee olla vähintään %(limit_value)d merkkiä pitkä (tällä "
 "hetkellä %(show_value)d)."
 
 #, python-format
@@ -431,7 +440,7 @@ msgstr[0] ""
 "Varmista, että tämä arvo on enintään %(limit_value)d merkin pituinen (tällä "
 "hetkellä %(show_value)d)."
 msgstr[1] ""
-"Varmista, että tämä arvo on enintään %(limit_value)d merkkiä pitkä (tällä "
+"Tämän arvon tulee olla enintään %(limit_value)d merkkiä pitkä (tällä "
 "hetkellä %(show_value)d)."
 
 msgid "Enter a number."
@@ -681,8 +690,8 @@ msgid "Value must be valid JSON."
 msgstr "Arvon pitää olla kelvollista JSONia."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s-tietuetta %(field)s-kentällä %(value)r ei ole olemassa."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Vierasavain (tyyppi määräytyy liittyvän kentän mukaan)"
@@ -746,7 +755,7 @@ msgstr[0] ""
 "Varmista, että tämä tiedostonimi on enintään %(max)d merkin pituinen (tällä "
 "hetkellä %(length)d)."
 msgstr[1] ""
-"Varmista, että tämä tiedostonimi on enintään %(max)d merkkiä pitkä (tällä "
+"Tämän tiedostonimen pituus tulee olla enintään %(max)d merkkiä pitkä (tällä "
 "hetkellä %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."

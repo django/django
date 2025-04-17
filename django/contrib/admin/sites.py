@@ -57,6 +57,7 @@ class AdminSite:
     app_index_template = None
     login_template = None
     logout_template = None
+    password_change_form = None
     password_change_template = None
     password_change_done_template = None
 
@@ -112,6 +113,11 @@ class AdminSite:
                 raise ImproperlyConfigured(
                     "The model %s is abstract, so it cannot be registered with admin."
                     % model.__name__
+                )
+            if model._meta.is_composite_pk:
+                raise ImproperlyConfigured(
+                    "The model %s has a composite primary key, so it cannot be "
+                    "registered with admin." % model.__name__
                 )
 
             if self.is_registered(model):
@@ -282,7 +288,7 @@ class AdminSite:
             path("autocomplete/", wrap(self.autocomplete_view), name="autocomplete"),
             path("jsi18n/", wrap(self.i18n_javascript, cacheable=True), name="jsi18n"),
             path(
-                "r/<int:content_type_id>/<path:object_id>/",
+                "r/<path:content_type_id>/<path:object_id>/",
                 wrap(contenttype_views.shortcut),
                 name="view_on_site",
             ),
@@ -350,7 +356,7 @@ class AdminSite:
 
         url = reverse("admin:password_change_done", current_app=self.name)
         defaults = {
-            "form_class": AdminPasswordChangeForm,
+            "form_class": self.password_change_form or AdminPasswordChangeForm,
             "success_url": url,
             "extra_context": {**self.each_context(request), **(extra_context or {})},
         }

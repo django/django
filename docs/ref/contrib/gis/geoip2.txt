@@ -99,18 +99,6 @@ Keyword Arguments    Description
 Methods
 =======
 
-Instantiating
--------------
-
-.. classmethod:: GeoIP2.open(path, cache)
-
-This classmethod instantiates the GeoIP object from the given database path
-and given cache setting.
-
-.. deprecated:: 5.1
-
-   Use the :class:`GeoIP2()` constructor instead.
-
 Querying
 --------
 
@@ -140,14 +128,6 @@ Returns the country name corresponding to the query.
 
 Coordinate Retrieval
 --------------------
-
-.. method:: GeoIP2.coords(query)
-
-Returns a coordinate tuple of (longitude, latitude).
-
-.. deprecated:: 5.1
-
-    Use :meth:`.GeoIP2.lon_lat` instead.
 
 .. method:: GeoIP2.lon_lat(query)
 

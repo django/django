@@ -582,6 +582,28 @@ class FilteredRelationTests(TestCase):
             lambda x: (x.author, x.book_title, x.preferred_by_author_pk),
         )
 
+    def test_three_level_nested_chained_relations(self):
+        borrower = Borrower.objects.create(name="Jenny")
+        Reservation.objects.create(
+            borrower=borrower,
+            book=self.book1,
+            state=Reservation.STOPPED,
+        )
+        qs = Author.objects.annotate(
+            my_books=FilteredRelation("book"),
+            my_reserved_books=FilteredRelation(
+                "my_books__reservation",
+                condition=Q(my_books__reservation__state=Reservation.STOPPED),
+            ),
+            my_readers=FilteredRelation(
+                "my_reserved_books__borrower",
+                condition=Q(my_reserved_books__borrower=borrower),
+            ),
+        )
+        self.assertSequenceEqual(
+            qs.filter(my_readers=borrower).values_list("name", flat=True), ["Alice"]
+        )
+
     def test_deep_nested_foreign_key(self):
         qs = (
             Book.objects.annotate(
@@ -665,6 +687,19 @@ class FilteredRelationTests(TestCase):
                 book_editor=FilteredRelation(
                     "book",
                     condition=Q(book__editor__name__icontains="b"),
+                ),
+            )
+
+    def test_condition_deeper_relation_name_implicit_exact(self):
+        msg = (
+            "FilteredRelation's condition doesn't support nested relations "
+            "deeper than the relation_name (got 'book__editor__name' for 'book')."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                book_editor=FilteredRelation(
+                    "book",
+                    condition=Q(book__editor__name="b"),
                 ),
             )
 

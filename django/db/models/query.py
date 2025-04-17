@@ -23,18 +23,17 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, F, Value, When
+from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
-from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
+from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
 from django.db.models.utils import (
     AltersData,
     create_namedtuple_class,
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
-from django.utils.functional import cached_property, partition
+from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
 MAX_GET_RESULTS = 21
@@ -166,16 +165,21 @@ class RawModelIterable(BaseIterable):
                 annotation_fields,
             ) = self.queryset.resolve_model_init_order()
             model_cls = self.queryset.model
-            if model_cls._meta.pk.attname not in model_init_names:
+            if any(
+                f.attname not in model_init_names for f in model_cls._meta.pk_fields
+            ):
                 raise exceptions.FieldDoesNotExist(
                     "Raw query must include the primary key"
                 )
             fields = [self.queryset.model_fields.get(c) for c in self.queryset.columns]
-            converters = compiler.get_converters(
-                [f.get_col(f.model._meta.db_table) if f else None for f in fields]
-            )
+            cols = [f.get_col(f.model._meta.db_table) if f else None for f in fields]
+            converters = compiler.get_converters(cols)
             if converters:
                 query_iterator = compiler.apply_converters(query_iterator, converters)
+            if compiler.has_composite_fields(cols):
+                query_iterator = compiler.composite_fields_to_tuples(
+                    query_iterator, cols
+                )
             for values in query_iterator:
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
@@ -660,26 +664,28 @@ class QuerySet(AltersData):
         obj.save(force_insert=True, using=self.db)
         return obj
 
+    create.alters_data = True
+
     async def acreate(self, **kwargs):
         return await sync_to_async(self.create)(**kwargs)
 
+    acreate.alters_data = True
+
     def _prepare_for_bulk_create(self, objs):
-        from django.db.models.expressions import DatabaseDefault
-
-        connection = connections[self.db]
+        objs_with_pk, objs_without_pk = [], []
         for obj in objs:
-            if not obj._is_pk_set():
-                # Populate new PK values.
+            if isinstance(obj.pk, DatabaseDefault):
+                objs_without_pk.append(obj)
+            elif obj._is_pk_set():
+                objs_with_pk.append(obj)
+            else:
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
-            if not connection.features.supports_default_keyword_in_bulk_insert:
-                for field in obj._meta.fields:
-                    if field.generated:
-                        continue
-                    value = getattr(obj, field.attname)
-                    if isinstance(value, DatabaseDefault):
-                        setattr(obj, field.attname, field.db_default)
-
+                if obj._is_pk_set():
+                    objs_with_pk.append(obj)
+                else:
+                    objs_without_pk.append(obj)
             obj._prepare_related_fields_for_save(operation_name="bulk_create")
+        return objs_with_pk, objs_without_pk
 
     def _check_bulk_create_options(
         self, ignore_conflicts, update_conflicts, update_fields, unique_fields
@@ -721,7 +727,7 @@ class QuerySet(AltersData):
                     "bulk_create() can only be used with concrete fields in "
                     "update_fields."
                 )
-            if any(f.primary_key for f in update_fields):
+            if any(f in self.model._meta.pk_fields for f in update_fields):
                 raise ValueError(
                     "bulk_create() cannot be used with primary keys in "
                     "update_fields."
@@ -792,9 +798,8 @@ class QuerySet(AltersData):
         self._for_write = True
         fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
-        self._prepare_for_bulk_create(objs)
+        objs_with_pk, objs_without_pk = self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_without_pk, objs_with_pk = partition(lambda o: o._is_pk_set(), objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
@@ -835,6 +840,8 @@ class QuerySet(AltersData):
 
         return objs
 
+    bulk_create.alters_data = True
+
     async def abulk_create(
         self,
         objs,
@@ -853,6 +860,8 @@ class QuerySet(AltersData):
             unique_fields=unique_fields,
         )
 
+    abulk_create.alters_data = True
+
     def bulk_update(self, objs, fields, batch_size=None):
         """
         Update the given fields in each of the given objects in the database.
@@ -864,10 +873,14 @@ class QuerySet(AltersData):
         objs = tuple(objs)
         if not all(obj._is_pk_set() for obj in objs):
             raise ValueError("All bulk_update() objects must have a primary key set.")
-        fields = [self.model._meta.get_field(name) for name in fields]
+        opts = self.model._meta
+        fields = [opts.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
-        if any(f.primary_key for f in fields):
+        all_pk_fields = set(opts.pk_fields)
+        for parent in opts.all_parents:
+            all_pk_fields.update(parent._meta.pk_fields)
+        if any(f in all_pk_fields for f in fields):
             raise ValueError("bulk_update() cannot be used with primary key fields.")
         if not objs:
             return 0
@@ -879,7 +892,9 @@ class QuerySet(AltersData):
         # and once in the WHEN. Each field will also have one CAST.
         self._for_write = True
         connection = connections[self.db]
-        max_batch_size = connection.ops.bulk_batch_size(["pk", "pk"] + fields, objs)
+        max_batch_size = connection.ops.bulk_batch_size(
+            [opts.pk, opts.pk, *fields], objs
+        )
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         requires_casting = connection.features.requires_casted_case_in_updates
         batches = (objs[i : i + batch_size] for i in range(0, len(objs), batch_size))
@@ -941,11 +956,15 @@ class QuerySet(AltersData):
                     pass
                 raise
 
+    get_or_create.alters_data = True
+
     async def aget_or_create(self, defaults=None, **kwargs):
         return await sync_to_async(self.get_or_create)(
             defaults=defaults,
             **kwargs,
         )
+
+    aget_or_create.alters_data = True
 
     def update_or_create(self, defaults=None, create_defaults=None, **kwargs):
         """
@@ -980,9 +999,10 @@ class QuerySet(AltersData):
                 # This is to maintain backward compatibility as these fields
                 # are not updated unless explicitly specified in the
                 # update_fields list.
+                pk_fields = self.model._meta.pk_fields
                 for field in self.model._meta.local_concrete_fields:
                     if not (
-                        field.primary_key or field.__class__.pre_save is Field.pre_save
+                        field in pk_fields or field.__class__.pre_save is Field.pre_save
                     ):
                         update_fields.add(field.name)
                         if field.name != field.attname:
@@ -992,12 +1012,16 @@ class QuerySet(AltersData):
                 obj.save(using=self.db)
         return obj, False
 
+    update_or_create.alters_data = True
+
     async def aupdate_or_create(self, defaults=None, create_defaults=None, **kwargs):
         return await sync_to_async(self.update_or_create)(
             defaults=defaults,
             create_defaults=create_defaults,
             **kwargs,
         )
+
+    aupdate_or_create.alters_data = True
 
     def _extract_model_params(self, defaults, **kwargs):
         """
@@ -1190,11 +1214,7 @@ class QuerySet(AltersData):
         """
         query = self.query.clone()
         query.__class__ = sql.DeleteQuery
-        cursor = query.get_compiler(using).execute_sql(CURSOR)
-        if cursor:
-            with cursor:
-                return cursor.rowcount
-        return 0
+        return query.get_compiler(using).execute_sql(ROW_COUNT)
 
     _raw_delete.alters_data = True
 
@@ -1233,7 +1253,7 @@ class QuerySet(AltersData):
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
         with transaction.mark_for_rollback_on_error(using=self.db):
-            rows = query.get_compiler(self.db).execute_sql(CURSOR)
+            rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
         self._result_cache = None
         return rows
 
@@ -1258,7 +1278,7 @@ class QuerySet(AltersData):
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
         self._result_cache = None
-        return query.get_compiler(self.db).execute_sql(CURSOR)
+        return query.get_compiler(self.db).execute_sql(ROW_COUNT)
 
     _update.alters_data = True
     _update.queryset_only = False
@@ -1353,24 +1373,33 @@ class QuerySet(AltersData):
                 "field."
             )
 
-        field_names = {f for f in fields if not hasattr(f, "resolve_expression")}
+        field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []
         expressions = {}
         counter = 1
         for field in fields:
+            field_name = field
+            expression = None
             if hasattr(field, "resolve_expression"):
-                field_id_prefix = getattr(
+                field_name = getattr(
                     field, "default_alias", field.__class__.__name__.lower()
                 )
-                while True:
-                    field_id = field_id_prefix + str(counter)
+                expression = field
+                # For backward compatibility reasons expressions are always
+                # prefixed with the counter even if their default alias doesn't
+                # collide with field names. Changing this logic could break
+                # some usage of named=True.
+                seen = True
+            elif seen := field_names[field_name]:
+                expression = F(field_name)
+            if seen:
+                field_name_prefix = field_name
+                while (field_name := f"{field_name_prefix}{counter}") in field_names:
                     counter += 1
-                    if field_id not in field_names:
-                        break
-                expressions[field_id] = field
-                _fields.append(field_id)
-            else:
-                _fields.append(field)
+            if expression is not None:
+                expressions[field_name] = expression
+            field_names[field_name] = True
+            _fields.append(field_name)
 
         clone = self._values(*_fields, **expressions)
         clone._iterable_class = (
@@ -1506,9 +1535,7 @@ class QuerySet(AltersData):
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
-        clone.query.combined_queries = (self.query,) + tuple(
-            qs.query for qs in other_qs
-        )
+        clone.query.combined_queries = (self.query, *(qs.query for qs in other_qs))
         clone.query.combinator = combinator
         clone.query.combinator_all = all
         return clone
@@ -1625,14 +1652,16 @@ class QuerySet(AltersData):
         )
         annotations = {}
         for arg in args:
-            # The default_alias property may raise a TypeError.
+            # The default_alias property raises TypeError if default_alias
+            # can't be set automatically or AttributeError if it isn't an
+            # attribute.
             try:
                 if arg.default_alias in kwargs:
                     raise ValueError(
                         "The named annotation '%s' conflicts with the "
                         "default name for another annotation." % arg.default_alias
                     )
-            except TypeError:
+            except (TypeError, AttributeError):
                 raise TypeError("Complex annotations require an alias")
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
@@ -1727,7 +1756,7 @@ class QuerySet(AltersData):
         Defer the loading of data for certain fields until they are accessed.
         Add the set of deferred fields to any existing set of deferred fields.
         The only exception to this is if None is passed in as the only
-        parameter, in which case removal all deferrals.
+        parameter, in which case remove all deferrals.
         """
         self._not_support_combined_queries("defer")
         if self._fields is not None:
@@ -1946,10 +1975,6 @@ class QuerySet(AltersData):
             self._known_related_objects.setdefault(field, {}).update(objects)
 
     def resolve_expression(self, *args, **kwargs):
-        if self._fields and len(self._fields) > 1:
-            # values() queryset can only be used as nested queries
-            # if they are set up to select only a single field.
-            raise TypeError("Cannot use multi-field values as a filter value.")
         query = self.query.resolve_expression(*args, **kwargs)
         query._db = self._db
         return query
@@ -2220,16 +2245,6 @@ class Prefetch:
         as_attr = self.to_attr and level == len(parts) - 1
         return to_attr, as_attr
 
-    def get_current_queryset(self, level):
-        warnings.warn(
-            "Prefetch.get_current_queryset() is deprecated. Use "
-            "get_current_querysets() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        querysets = self.get_current_querysets(level)
-        return querysets[0] if querysets is not None else None
-
     def get_current_querysets(self, level):
         if (
             self.get_current_prefetch_to(level) == self.prefetch_to
@@ -2461,11 +2476,7 @@ def get_prefetcher(instance, through_attr, to_attr):
         if rel_obj_descriptor:
             # singly related object, descriptor object has the
             # get_prefetch_querysets() method.
-            if (
-                hasattr(rel_obj_descriptor, "get_prefetch_querysets")
-                # RemovedInDjango60Warning.
-                or hasattr(rel_obj_descriptor, "get_prefetch_queryset")
-            ):
+            if hasattr(rel_obj_descriptor, "get_prefetch_querysets"):
                 prefetcher = rel_obj_descriptor
                 # If to_attr is set, check if the value has already been set,
                 # which is done with has_to_attr_attribute(). Do not use the
@@ -2478,11 +2489,7 @@ def get_prefetcher(instance, through_attr, to_attr):
                 # the attribute on the instance rather than the class to
                 # support many related managers
                 rel_obj = getattr(instance, through_attr)
-                if (
-                    hasattr(rel_obj, "get_prefetch_querysets")
-                    # RemovedInDjango60Warning.
-                    or hasattr(rel_obj, "get_prefetch_queryset")
-                ):
+                if hasattr(rel_obj, "get_prefetch_querysets"):
                     prefetcher = rel_obj
                 if through_attr == to_attr:
 
@@ -2515,36 +2522,16 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
 
     # The 'values to be matched' must be hashable as they will be used
     # in a dictionary.
-
-    if hasattr(prefetcher, "get_prefetch_querysets"):
-        (
-            rel_qs,
-            rel_obj_attr,
-            instance_attr,
-            single,
-            cache_name,
-            is_descriptor,
-        ) = prefetcher.get_prefetch_querysets(
-            instances, lookup.get_current_querysets(level)
-        )
-    else:
-        warnings.warn(
-            "The usage of get_prefetch_queryset() in prefetch_related_objects() is "
-            "deprecated. Implement get_prefetch_querysets() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        queryset = None
-        if querysets := lookup.get_current_querysets(level):
-            queryset = querysets[0]
-        (
-            rel_qs,
-            rel_obj_attr,
-            instance_attr,
-            single,
-            cache_name,
-            is_descriptor,
-        ) = prefetcher.get_prefetch_queryset(instances, queryset)
+    (
+        rel_qs,
+        rel_obj_attr,
+        instance_attr,
+        single,
+        cache_name,
+        is_descriptor,
+    ) = prefetcher.get_prefetch_querysets(
+        instances, lookup.get_current_querysets(level)
+    )
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need

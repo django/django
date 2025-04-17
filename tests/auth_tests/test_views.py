@@ -38,7 +38,7 @@ from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
-from .models import CustomUser, UUIDUser
+from .models import CustomUser, CustomUserCompositePrimaryKey, UUIDUser
 from .settings import AUTH_TEMPLATES
 
 
@@ -538,6 +538,18 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
             },
         )
         self.assertRedirects(response, "/reset/done/")
+
+
+@override_settings(AUTH_USER_MODEL="auth_tests.CustomUserCompositePrimaryKey")
+class CustomUserCompositePrimaryKeyPasswordResetTest(CustomUserPasswordResetTest):
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = CustomUserCompositePrimaryKey.custom_objects.create(
+            email="staffmember@example.com",
+            date_of_birth=datetime.date(1976, 11, 8),
+        )
+        cls.u1.set_password("password")
+        cls.u1.save()
 
 
 @override_settings(AUTH_USER_MODEL="auth_tests.UUIDUser")
@@ -1520,8 +1532,8 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'<a class="button" href="([^"]*)">Reset password</a>',
-            response.content.decode(),
+            r'<a role="button" class="button" href="([^"]*)">Reset password</a>',
+            response.text,
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
 
@@ -1616,8 +1628,8 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'<a class="button" href="([^"]*)">Set password</a>',
-            response.content.decode(),
+            r'<a role="button" class="button" href="([^"]*)">Set password</a>',
+            response.text,
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
 
@@ -1691,7 +1703,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         )
         algo, salt, hash_string = u.password.split("$")
         self.assertContains(response, '<div class="readonly">testclient</div>')
-        # ReadOnlyPasswordHashWidget is used to render the field.
+        # The password value is hashed.
         self.assertContains(
             response,
             "<strong>algorithm</strong>: <bdi>%s</bdi>\n\n"
@@ -1703,6 +1715,10 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
                 hash_string[:6],
             ),
             html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<a role="button" class="button" href="../password/">Reset password</a>',
         )
         # Value in POST data is ignored.
         data = self.get_user_data(u)

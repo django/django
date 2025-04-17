@@ -1,8 +1,7 @@
-{% with name=fieldset.name|default:""|slugify %}
-<fieldset class="module aligned {{ fieldset.classes }}"{% if name %} aria-labelledby="{{ prefix }}-{{ id_prefix}}-{{ name }}-{{ id_suffix }}-heading"{% endif %}>
-    {% if name %}
+<fieldset class="module aligned {{ fieldset.classes }}"{% if fieldset.name %} aria-labelledby="{{ prefix }}-{{ id_prefix}}-{{ id_suffix }}-heading"{% endif %}>
+    {% if fieldset.name %}
         {% if fieldset.is_collapsible %}<details><summary>{% endif %}
-        <h{{ heading_level|default:2 }} id="{{ prefix }}-{{ id_prefix}}-{{ name }}-{{ id_suffix }}-heading" class="fieldset-heading">{{ fieldset.name }}</h{{ heading_level|default:2 }}>
+        <h{{ heading_level|default:2 }} id="{{ prefix }}-{{ id_prefix}}-{{ id_suffix }}-heading" class="fieldset-heading">{{ fieldset.name }}</h{{ heading_level|default:2 }}>
         {% if fieldset.is_collapsible %}</summary>{% endif %}
     {% endif %}
     {% if fieldset.description %}
@@ -36,6 +35,5 @@
             {% if not line.fields|length == 1 %}</div>{% endif %}
         </div>
     {% endfor %}
-    {% if name and fieldset.is_collapsible %}</details>{% endif %}
+    {% if fieldset.name and fieldset.is_collapsible %}</details>{% endif %}
 </fieldset>
-{% endwith %}

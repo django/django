@@ -19,6 +19,7 @@ from .models import (
     Child,
     ChildModel1,
     ChildModel2,
+    ExtraTerrestrial,
     Fashionista,
     FootNote,
     Holder,
@@ -1453,12 +1454,13 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
         response = self.client.get(self.change_url)
         self.assertContains(
             response,
-            '<a href="/admin/admin_inlines/poll/" class="closelink">Close</a>',
+            '<a role="button" href="/admin/admin_inlines/poll/" class="closelink">'
+            "Close</a>",
             html=True,
         )
         delete_link = (
-            '<a href="/admin/admin_inlines/poll/%s/delete/" class="deletelink">Delete'
-            "</a>"
+            '<a role="button" href="/admin/admin_inlines/poll/%s/delete/" '
+            'class="deletelink">Delete</a>'
         )
         self.assertNotContains(response, delete_link % self.poll.id, html=True)
         self.assertNotContains(
@@ -1801,7 +1803,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
         # The second and third have the same "Advanced options" name, but the
         # second one has the "collapse" class.
         for x, classes in ((1, ""), (2, "collapse")):
-            heading_id = f"fieldset-0-advanced-options-{x}-heading"
+            heading_id = f"fieldset-0-{x}-heading"
             with self.subTest(heading_id=heading_id):
                 self.assertContains(
                     response,
@@ -1846,7 +1848,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
                 # Every fieldset defined for an inline's form.
                 for z, fieldset in enumerate(inline_admin_form):
                     if fieldset.name:
-                        heading_id = f"{prefix}-{y}-details-{z}-heading"
+                        heading_id = f"{prefix}-{y}-{z}-heading"
                         self.assertContains(
                             response,
                             f'<fieldset class="module aligned {fieldset.classes}" '
@@ -2420,31 +2422,43 @@ class SeleniumTests(AdminSeleniumTestCase):
             "admin:admin_inlines_courseproxy1_add",
             "admin:admin_inlines_courseproxy2_add",
         ]
-        css_selector = ".dynamic-class_set#class_set-%s h2"
+        css_available_selector = (
+            ".dynamic-class_set#class_set-%s .selector-available-title"
+        )
+        css_chosen_selector = ".dynamic-class_set#class_set-%s .selector-chosen-title"
 
         for url_name in tests:
             with self.subTest(url=url_name):
                 self.selenium.get(self.live_server_url + reverse(url_name))
                 # First inline shows the verbose_name.
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 0
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 0
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 0
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Added inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 1
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 1
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 1
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Third inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 2
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 2
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 2
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
 
     def test_tabular_inline_layout(self):
         from selenium.webdriver.common.by import By
@@ -2481,3 +2495,34 @@ class SeleniumTests(AdminSeleniumTestCase):
             tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
             [],
         )
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_delete_layout(self):
+        from selenium.webdriver.common.by import By
+
+        user = User.objects.create_user("testing", password="password", is_staff=True)
+        et_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ExtraTerrestrial),
+        )
+        s_permission = Permission.objects.filter(
+            codename__in=["view_sighting", "add_sighting"],
+            content_type=ContentType.objects.get_for_model(Sighting),
+        )
+        user.user_permissions.add(*et_permission, *s_permission)
+        self.admin_login(username="testing", password="password")
+        cf = ExtraTerrestrial.objects.create(name="test")
+        url = reverse("admin:admin_inlines_extraterrestrial_change", args=(cf.pk,))
+        self.selenium.get(self.live_server_url + url)
+        headers = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module thead tr th"
+        )
+        self.assertHTMLEqual(headers[-1].get_attribute("outerHTML"), "<th></th>")
+        delete = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            "fieldset.module tbody tr.dynamic-sighting_set:not(.original) td.delete",
+        )
+        self.assertIn(
+            '<a role="button" class="inline-deletelink" href="#">',
+            delete.get_attribute("innerHTML"),
+        )
+        self.take_screenshot("loaded")

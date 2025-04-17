@@ -48,7 +48,13 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
     themselves. For example, with 23 items, ``per_page=10``, and ``orphans=3``,
     there will be two pages; the first page with 10 items and the second
     (and last) page with 13 items. ``orphans`` defaults to zero, which means
-    pages are never combined and the last page may have one item.
+    pages are never combined and the last page may have one item. ``orphans``
+    should be less than the :attr:`~Paginator.per_page` value.
+
+    .. deprecated:: 6.0
+
+        Support for the ``orphans`` argument being larger than or equal to the
+        ``per_page`` argument is deprecated.
 
 .. attribute:: Paginator.allow_empty_first_page
 
@@ -161,6 +167,30 @@ Attributes
 
     A 1-based range iterator of page numbers, e.g. yielding ``[1, 2, 3, 4]``.
 
+``AsyncPaginator`` class
+========================
+
+.. versionadded:: 6.0
+
+.. class:: AsyncPaginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None)
+
+    Asynchronous version of :class:`Paginator`.
+
+    ``AsyncPaginator`` has the same attributes and signatures as
+    :class:`Paginator`, with the following exceptions:
+
+    * The attribute :attr:`.Paginator.count` is supported as an asynchronous
+      method ``AsyncPaginator.acount()``.
+    * The attribute :attr:`.Paginator.num_pages` is supported as an
+      asynchronous method ``AsyncPaginator.anum_pages()``.
+    * The attribute :attr:`.Paginator.page_range` is supported as an
+      asynchronous method ``AsyncPaginator.apage_range()``.
+
+    ``AsyncPaginator`` has asynchronous versions of the same methods as
+    :class:`Paginator`, using an ``a`` prefix - for example, use
+    ``await async_paginator.aget_page(number)`` rather than
+    ``paginator.get_page(number)``.
+
 ``Page`` class
 ==============
 
@@ -225,6 +255,28 @@ Attributes
 .. attribute:: Page.paginator
 
     The associated :class:`Paginator` object.
+
+``AsyncPage`` class
+===================
+
+.. versionadded:: 6.0
+
+.. class:: AsyncPage(object_list, number, paginator)
+
+    Asynchronous version of :class:`Page`.
+
+    ``AsyncPage`` has the same attributes and signatures as :class:`Page`, as
+    well as asynchronous versions of all the same methods, using an ``a``
+    prefix - for example, use ``await async_page.ahas_next()`` rather than
+    ``page.has_next()``.
+
+    ``AsyncPage`` has the following additional method:
+
+    .. method:: AsyncPage.aget_object_list()
+
+        Returns ``AsyncPage.object_list`` as a list. This method must be
+        awaited before ``AsyncPage`` can be treated as a sequence of
+        ``AsyncPage.object_list``.
 
 Exceptions
 ==========

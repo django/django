@@ -17,7 +17,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.version import PY311, get_docs_version
+from django.utils.version import get_docs_version
 from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
 
 # Minimal Django templates engine to render the error templates
@@ -414,7 +414,9 @@ class ExceptionReporter:
         if self.exc_type:
             c["exception_type"] = self.exc_type.__name__
         if self.exc_value:
-            c["exception_value"] = str(self.exc_value)
+            c["exception_value"] = getattr(
+                self.exc_value, "raw_error_message", self.exc_value
+            )
             if exc_notes := getattr(self.exc_value, "__notes__", None):
                 c["exception_notes"] = "\n" + "\n".join(exc_notes)
         if frames:
@@ -567,22 +569,19 @@ class ExceptionReporter:
                 post_context = []
 
             colno = tb_area_colno = ""
-            if PY311:
-                _, _, start_column, end_column = next(
-                    itertools.islice(
-                        tb.tb_frame.f_code.co_positions(), tb.tb_lasti // 2, None
-                    )
+            _, _, start_column, end_column = next(
+                itertools.islice(
+                    tb.tb_frame.f_code.co_positions(), tb.tb_lasti // 2, None
                 )
-                if start_column and end_column:
-                    underline = "^" * (end_column - start_column)
-                    spaces = " " * (start_column + len(str(lineno + 1)) + 2)
-                    colno = f"\n{spaces}{underline}"
-                    tb_area_spaces = " " * (
-                        4
-                        + start_column
-                        - (len(context_line) - len(context_line.lstrip()))
-                    )
-                    tb_area_colno = f"\n{tb_area_spaces}{underline}"
+            )
+            if start_column and end_column:
+                underline = "^" * (end_column - start_column)
+                spaces = " " * (start_column + len(str(lineno + 1)) + 2)
+                colno = f"\n{spaces}{underline}"
+                tb_area_spaces = " " * (
+                    4 + start_column - (len(context_line) - len(context_line.lstrip()))
+                )
+                tb_area_colno = f"\n{tb_area_spaces}{underline}"
             yield {
                 "exc_cause": exc_cause,
                 "exc_cause_explicit": exc_cause_explicit,

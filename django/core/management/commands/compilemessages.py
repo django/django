@@ -2,6 +2,7 @@ import codecs
 import concurrent.futures
 import glob
 import os
+import tempfile
 from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
@@ -16,12 +17,10 @@ def has_bom(fn):
     )
 
 
-def is_writable(path):
-    # Known side effect: updating file access/modified time to current time if
-    # it is writable.
+def is_dir_writable(path):
     try:
-        with open(path, "a"):
-            os.utime(path, None)
+        with tempfile.NamedTemporaryFile(dir=path):
+            pass
     except OSError:
         return False
     return True
@@ -75,7 +74,7 @@ class Command(BaseCommand):
         ignore_patterns = set(options["ignore_patterns"])
         self.verbosity = options["verbosity"]
         if options["fuzzy"]:
-            self.program_options = self.program_options + ["-f"]
+            self.program_options = [*self.program_options, "-f"]
 
         if find_command(self.program) is None:
             raise CommandError(
@@ -172,7 +171,7 @@ class Command(BaseCommand):
                     continue
 
                 # Check writability on first location
-                if i == 0 and not is_writable(mo_path):
+                if i == 0 and not is_dir_writable(mo_path.parent):
                     self.stderr.write(
                         "The po files under %s are in a seemingly not writable "
                         "location. mo files will not be updated/created." % dirpath

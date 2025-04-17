@@ -162,8 +162,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``DomainNameValidator``
 -----------------------
 
-.. versionadded:: 5.1
-
 .. class:: DomainNameValidator(accept_idna=True, message=None, code=None)
 
     A :class:`RegexValidator` subclass that ensures a value looks like a domain
@@ -222,8 +220,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_domain_name``
 ------------------------
-
-.. versionadded:: 5.1
 
 .. data:: validate_domain_name
 

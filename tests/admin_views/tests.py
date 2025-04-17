@@ -24,13 +24,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
-from django.db import connection
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
     RequestFactory,
     TestCase,
-    ignore_warnings,
     modify_settings,
     override_settings,
     skipUnlessDBFeature,
@@ -40,7 +38,6 @@ from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -128,6 +125,7 @@ from .models import (
     Song,
     State,
     Story,
+    Subscriber,
     SuperSecretHideout,
     SuperVillain,
     Telegram,
@@ -296,9 +294,7 @@ class AdminViewBasicTestCase(TestCase):
         self.assertLess(
             response.content.index(text1.encode()),
             response.content.index(text2.encode()),
-            (failing_msg or "")
-            + "\nResponse:\n"
-            + response.content.decode(response.charset),
+            (failing_msg or "") + "\nResponse:\n" + response.text,
         )
 
 
@@ -1825,6 +1821,11 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         response = user_admin.user_change_password(request, str(user.pk))
         self.assertContains(response, '<div class="help">')
 
+    def test_custom_password_change_form(self):
+        self.client.force_login(self.superuser)
+        response = self.client.get(reverse("admin4:password_change"))
+        self.assertContains(response, "Custom old password label")
+
     def test_extended_bodyclass_template_index(self):
         """
         The admin/index.html template uses block.super in the bodyclass block.
@@ -1939,9 +1940,9 @@ class AdminViewFormUrlTest(TestCase):
             reverse("admin:admin_views_restaurant_add", current_app=self.current_app),
             {"name": "test_value"},
         )
-        # this would be the usual behaviour
+        # this would be the usual behavior
         self.assertNotContains(response, 'value="test_value"')
-        # this is the overridden behaviour
+        # this is the overridden behavior
         self.assertContains(response, 'value="overridden_value"')
 
 
@@ -2535,6 +2536,19 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(
             response, '<input type="submit" value="Save and view" name="_continue">'
         )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-0-heading" class="fieldset-heading">Some fields</h2>',
+        )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-1-heading" class="fieldset-heading">'
+            "Some other fields</h2>",
+        )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-2-heading" class="fieldset-heading">이름</h2>',
+        )
         post = self.client.post(
             reverse("admin:admin_views_article_add"), add_dict, follow=False
         )
@@ -2669,8 +2683,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<label>Extra form field:</label>")
         self.assertContains(
             response,
-            '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close'
-            "</a>",
+            '<a role="button" href="/test_admin/admin/admin_views/article/" '
+            'class="closelink">Close</a>',
         )
         self.assertEqual(response.context["title"], "View article")
         post = self.client.post(article_change_url, change_dict)
@@ -2821,8 +2835,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(
             response,
-            '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close'
-            "</a>",
+            '<a role="button" href="/test_admin/admin9/admin_views/article/" '
+            'class="closelink">Close</a>',
         )
 
     def test_change_view_save_as_new(self):
@@ -3603,7 +3617,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         response = self.client.get(
             reverse("admin:admin_views_villain_delete", args=(self.v1.pk,))
         )
-        self.assertRegex(response.content.decode(), pattern)
+        self.assertRegex(response.text, pattern)
 
     def test_cyclic(self):
         """
@@ -3870,21 +3884,18 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             [cls.m1],
             2,
             change_message="Changed something",
-            single_object=True,
         )
         LogEntry.objects.log_actions(
             user_pk,
             [cls.m1],
             1,
             change_message="Added something",
-            single_object=True,
         )
         LogEntry.objects.log_actions(
             user_pk,
             [cls.m1],
             3,
             change_message="Deleted something",
-            single_object=True,
         )
 
     def setUp(self):
@@ -4045,7 +4056,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             args=(quote(self.pk),),
         )
         self.assertContains(
-            response, '<a href="%s" class="historylink"' % escape(expected_link)
+            response,
+            '<a role="button" href="%s" class="historylink"' % escape(expected_link),
         )
 
     def test_redirect_on_add_view_continue_button(self):
@@ -6214,9 +6226,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.take_screenshot("selectbox-available-perms-some-selected")
 
         # Move permissions to the "Chosen" list, but none is selected yet.
-        self.selenium.find_element(
-            By.CSS_SELECTOR, "#id_user_permissions_add_link"
-        ).click()
+        self.selenium.find_element(By.CSS_SELECTOR, "#id_user_permissions_add").click()
         self.take_screenshot("selectbox-chosen-perms-none-selected")
 
         # Select some permissions from the "Chosen" list.
@@ -6439,6 +6449,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         ActionChains(self.selenium).move_to_element(delete_parent).click().perform()
         self.wait_for_and_switch_to_popup()
         self.selenium.find_element(By.XPATH, '//input[@value="Yes, I’m sure"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_parent"))
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
@@ -6573,6 +6584,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         self.selenium.find_element(By.ID, "id_title").send_keys("test3")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 3, 1)
         self.selenium.switch_to.window(popup_window_test2)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test3").id)
@@ -6581,6 +6593,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 2, 1)
         self.selenium.switch_to.window(popup_window_test)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test2").id)
@@ -6589,6 +6602,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(base_window)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test").id)
@@ -6824,15 +6838,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + add_url)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 1")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and add another"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and add another"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 1)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 2")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and add another"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and add another"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 2)
 
     def test_redirect_on_add_view_continue_button(self):
@@ -6845,13 +6861,32 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + add_url)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 1")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and continue editing"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and continue editing"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 1)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_long_object_str_on_change_view(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        s = Subscriber.objects.create(name="a " * 40, email="b " * 80)
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:admin_views_subscriber_change", args=(s.pk,))
+        )
+        object_tools = self.selenium.find_elements(
+            By.CSS_SELECTOR, "div#content ul.object-tools li"
+        )
+        self.assertGreater(len(object_tools), 0)
+        self.take_screenshot("not-overwrap")
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -6865,7 +6900,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_get(self):
         response = self.client.get(reverse("admin:admin_views_post_add"))
         self.assertNotContains(response, 'name="posted"')
@@ -6926,7 +6960,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         self.assertContains(response, "%d amount of cool" % p.pk)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_text_field(self):
         p = Post.objects.create(
             title="Readonly test",
@@ -6946,7 +6979,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         # Checking readonly field in inline.
         self.assertContains(response, "test<br>link")
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_post(self):
         data = {
             "title": "Django Got Readonly Fields",
@@ -7092,7 +7124,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse("admin:admin_views_square_add"))
         self.assertContains(response, '<div class="readonly">-</div>')
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_field_overrides(self):
         """
         Regression test for #22087 - ModelForm Meta overrides are ignored by
@@ -7132,7 +7163,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         url = reverse("admin:admin_views_pizza_change", args=(pizza.pk,))
         with self.settings(LANGUAGE_CODE="fr"):
             response = self.client.get(url)
-        self.assertContains(response, "<label>Toppings\u00A0:</label>", html=True)
+        self.assertContains(response, "<label>Toppings\u00a0:</label>", html=True)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -7468,8 +7499,7 @@ class UserAdminTest(TestCase):
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
 
-        expected_num_queries = 8 if connection.features.uses_savepoints else 6
-        with self.assertNumQueries(expected_num_queries):
+        with self.assertNumQueries(8):
             response = self.client.get(reverse("admin:auth_user_change", args=(u.pk,)))
             self.assertEqual(response.status_code, 200)
 
@@ -7516,8 +7546,7 @@ class GroupAdminTest(TestCase):
         # Ensure no queries are skipped due to cached content type for Group.
         ContentType.objects.clear_cache()
 
-        expected_num_queries = 6 if connection.features.uses_savepoints else 4
-        with self.assertNumQueries(expected_num_queries):
+        with self.assertNumQueries(6):
             response = self.client.get(reverse("admin:auth_group_change", args=(g.pk,)))
             self.assertEqual(response.status_code, 200)
 
@@ -7552,7 +7581,6 @@ class CSSTest(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_field_prefix_css_classes(self):
         """
         Fields have a CSS class name with a 'field-' prefix.
@@ -8266,7 +8294,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the `change_view` link has the correct querystring.
         detail_link = re.search(
             '<a href="(.*?)">{}</a>'.format(self.joepublicuser.username),
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(detail_link[1], self.get_change_url())
 
@@ -8278,7 +8306,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the form action.
         form_action = re.search(
             '<form action="(.*?)" method="post" id="user_form" novalidate>',
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(
             form_action[1], "?%s" % self.get_preserved_filters_querystring()
@@ -8286,13 +8314,14 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the history link.
         history_link = re.search(
-            '<a href="(.*?)" class="historylink">History</a>', response.content.decode()
+            '<a role="button" href="(.*?)" class="historylink">History</a>',
+            response.text,
         )
         self.assertURLEqual(history_link[1], self.get_history_url())
 
         # Check the delete link.
         delete_link = re.search(
-            '<a href="(.*?)" class="deletelink">Delete</a>', response.content.decode()
+            '<a role="button" href="(.*?)" class="deletelink">Delete</a>', response.text
         )
         self.assertURLEqual(delete_link[1], self.get_delete_url())
 
@@ -8332,7 +8361,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.client.force_login(viewuser)
         response = self.client.get(self.get_change_url())
         close_link = re.search(
-            '<a href="(.*?)" class="closelink">Close</a>', response.content.decode()
+            '<a role="button" href="(.*?)" class="closelink">Close</a>', response.text
         )
         close_link = close_link[1].replace("&amp;", "&")
         self.assertURLEqual(close_link, self.get_changelist_url())
@@ -8350,7 +8379,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the form action.
         form_action = re.search(
             '<form action="(.*?)" method="post" id="user_form" novalidate>',
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(
             form_action[1], "?%s" % self.get_preserved_filters_querystring()
@@ -8653,6 +8682,19 @@ class AdminViewOnSiteTests(TestCase):
             ),
         )
 
+    def test_view_on_site_url_non_integer_ids(self):
+        """The view_on_site URL accepts non-integer ids."""
+        self.assertEqual(
+            reverse(
+                "admin:view_on_site",
+                kwargs={
+                    "content_type_id": "37156b6a-8a82",
+                    "object_id": "37156b6a-8a83",
+                },
+            ),
+            "/test_admin/admin/r/37156b6a-8a82/37156b6a-8a83/",
+        )
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class InlineAdminViewOnSiteTest(TestCase):
@@ -8764,7 +8806,7 @@ class GetFormsetsWithInlinesArgumentTest(TestCase):
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class AdminSiteFinalCatchAllPatternTests(TestCase):
     """
-    Verifies the behaviour of the admin catch-all view.
+    Verifies the behavior of the admin catch-all view.
 
     * Anonynous/non-staff users are redirected to login for all URLs, whether
       otherwise valid or not.

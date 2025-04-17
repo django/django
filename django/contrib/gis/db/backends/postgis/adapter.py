@@ -1,5 +1,5 @@
 """
- This object provides quoting for GEOS geometries into PostgreSQL/PostGIS.
+This object provides quoting for GEOS geometries into PostgreSQL/PostGIS.
 """
 
 from django.contrib.gis.db.backends.postgis.pgraster import to_pgraster

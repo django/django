@@ -22,12 +22,11 @@ from django.db.models import (
     ManyToManyField,
     UUIDField,
 )
-from django.test import SimpleTestCase, TestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.selenium import screenshot_cases
 from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Advisor,
@@ -109,7 +108,6 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
     def test_TextField(self):
         self.assertFormfield(Event, "description", widgets.AdminTextareaWidget)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_URLField(self):
         self.assertFormfield(Event, "link", widgets.AdminURLFieldWidget)
 
@@ -324,7 +322,6 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_nonexistent_target_id(self):
         band = Band.objects.create(name="Bogey Blues")
         pk = band.pk
@@ -340,7 +337,6 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
             "Select a valid choice. That choice is not one of the available choices.",
         )
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_invalid_target_id(self):
         for test_str in ("Iñtërnâtiônàlizætiøn", "1234'", -1234):
             # This should result in an error message, not a server exception.
@@ -490,11 +486,13 @@ class AdminURLWidgetTest(SimpleTestCase):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             w.render("test", "http://example-äüö.com"),
-            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com">'
+            '<p class="url">Currently: <a href="http://example-%C3%A4%C3%BC%C3%B6.com">'
             "http://example-äüö.com</a><br>"
             'Change:<input class="vURLField" name="test" type="url" '
             'value="http://example-äüö.com"></p>',
         )
+        # Does not use obsolete IDNA-2003 encoding (#36013).
+        self.assertNotIn("fass.example.com", w.render("test", "http://faß.example.com"))
 
     def test_render_quoting(self):
         """
@@ -521,7 +519,8 @@ class AdminURLWidgetTest(SimpleTestCase):
         output = w.render("test", "http://example-äüö.com/<sometag>some-text</sometag>")
         self.assertEqual(
             HREF_RE.search(output)[1],
-            "http://xn--example--7za4pnc.com/%3Csometag%3Esome-text%3C/sometag%3E",
+            "http://example-%C3%A4%C3%BC%C3%B6.com/"
+            "%3Csometag%3Esome-text%3C/sometag%3E",
         )
         self.assertEqual(
             TEXT_RE.search(output)[1],
@@ -959,7 +958,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
           <a class="related-widget-wrapper-link add-related" id="add_id_stream"
              data-popup="yes" title="Add another release event"
              href="/admin_widgets/releaseevent/add/?_to_field=album&amp;_popup=1">
-            <img src="/static/admin/img/icon-addlink.svg" alt="" width="20" height="20">
+            <img src="/static/admin/img/icon-addlink.svg" alt="" width="24" height="24">
           </a>
         </div>
         """
@@ -1254,18 +1253,28 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.arthur = Student.objects.create(name="Arthur")
         self.school = School.objects.create(name="School of Awesome")
 
-    def assertActiveButtons(
-        self, mode, field_name, choose, remove, choose_all=None, remove_all=None
+    def assertButtonsDisabled(
+        self,
+        mode,
+        field_name,
+        choose_btn_disabled=False,
+        remove_btn_disabled=False,
+        choose_all_btn_disabled=False,
+        remove_all_btn_disabled=False,
     ):
-        choose_link = "#id_%s_add_link" % field_name
-        choose_all_link = "#id_%s_add_all_link" % field_name
-        remove_link = "#id_%s_remove_link" % field_name
-        remove_all_link = "#id_%s_remove_all_link" % field_name
-        self.assertEqual(self.has_css_class(choose_link, "active"), choose)
-        self.assertEqual(self.has_css_class(remove_link, "active"), remove)
+        choose_button = "#id_%s_add" % field_name
+        choose_all_button = "#id_%s_add_all" % field_name
+        remove_button = "#id_%s_remove" % field_name
+        remove_all_button = "#id_%s_remove_all" % field_name
+        self.assertEqual(self.is_disabled(choose_button), choose_btn_disabled)
+        self.assertEqual(self.is_disabled(remove_button), remove_btn_disabled)
         if mode == "horizontal":
-            self.assertEqual(self.has_css_class(choose_all_link, "active"), choose_all)
-            self.assertEqual(self.has_css_class(remove_all_link, "active"), remove_all)
+            self.assertEqual(
+                self.is_disabled(choose_all_button), choose_all_btn_disabled
+            )
+            self.assertEqual(
+                self.is_disabled(remove_all_button), remove_all_btn_disabled
+            )
 
     def execute_basic_operations(self, mode, field_name):
         from selenium.webdriver.common.by import By
@@ -1274,10 +1283,10 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         from_box = "#id_%s_from" % field_name
         to_box = "#id_%s_to" % field_name
-        choose_link = "id_%s_add_link" % field_name
-        choose_all_link = "id_%s_add_all_link" % field_name
-        remove_link = "id_%s_remove_link" % field_name
-        remove_all_link = "id_%s_remove_all_link" % field_name
+        choose_button = "id_%s_add" % field_name
+        choose_all_button = "id_%s_add_all" % field_name
+        remove_button = "id_%s_remove" % field_name
+        remove_all_button = "id_%s_remove_all" % field_name
 
         # Initial positions ---------------------------------------------------
         self.assertSelectOptions(
@@ -1292,11 +1301,18 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             ],
         )
         self.assertSelectOptions(to_box, [str(self.lisa.id), str(self.peter.id)])
-        self.assertActiveButtons(mode, field_name, False, False, True, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=False,
+        )
 
         # Click 'Choose all' --------------------------------------------------
         if mode == "horizontal":
-            self.selenium.find_element(By.ID, choose_all_link).click()
+            self.selenium.find_element(By.ID, choose_all_button).click()
         elif mode == "vertical":
             # There 's no 'Choose all' button in vertical mode, so individually
             # select all options and click 'Choose'.
@@ -1304,7 +1320,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
                 By.CSS_SELECTOR, from_box + " > option"
             ):
                 option.click()
-            self.selenium.find_element(By.ID, choose_link).click()
+            self.selenium.find_element(By.ID, choose_button).click()
         self.assertSelectOptions(from_box, [])
         self.assertSelectOptions(
             to_box,
@@ -1319,11 +1335,18 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
                 str(self.john.id),
             ],
         )
-        self.assertActiveButtons(mode, field_name, False, False, False, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=True,
+            remove_all_btn_disabled=False,
+        )
 
         # Click 'Remove all' --------------------------------------------------
         if mode == "horizontal":
-            self.selenium.find_element(By.ID, remove_all_link).click()
+            self.selenium.find_element(By.ID, remove_all_button).click()
         elif mode == "vertical":
             # There 's no 'Remove all' button in vertical mode, so individually
             # select all options and click 'Remove'.
@@ -1331,7 +1354,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
                 By.CSS_SELECTOR, to_box + " > option"
             ):
                 option.click()
-            self.selenium.find_element(By.ID, remove_link).click()
+            self.selenium.find_element(By.ID, remove_button).click()
         self.assertSelectOptions(
             from_box,
             [
@@ -1346,7 +1369,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             ],
         )
         self.assertSelectOptions(to_box, [])
-        self.assertActiveButtons(mode, field_name, False, False, True, False)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=True,
+        )
 
         # Choose some options ------------------------------------------------
         from_lisa_select_option = self.selenium.find_element(
@@ -1363,9 +1393,23 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(from_box, str(self.jason.id))
         self.select_option(from_box, str(self.bob.id))
         self.select_option(from_box, str(self.john.id))
-        self.assertActiveButtons(mode, field_name, True, False, True, False)
-        self.selenium.find_element(By.ID, choose_link).click()
-        self.assertActiveButtons(mode, field_name, False, False, True, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=False,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=True,
+        )
+        self.selenium.find_element(By.ID, choose_button).click()
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=False,
+        )
 
         self.assertSelectOptions(
             from_box,
@@ -1398,9 +1442,23 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         # Remove some options -------------------------------------------------
         self.select_option(to_box, str(self.lisa.id))
         self.select_option(to_box, str(self.bob.id))
-        self.assertActiveButtons(mode, field_name, False, True, True, True)
-        self.selenium.find_element(By.ID, remove_link).click()
-        self.assertActiveButtons(mode, field_name, False, False, True, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=False,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=False,
+        )
+        self.selenium.find_element(By.ID, remove_button).click()
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=False,
+        )
 
         self.assertSelectOptions(
             from_box,
@@ -1418,7 +1476,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         # Choose some more options --------------------------------------------
         self.select_option(from_box, str(self.arthur.id))
         self.select_option(from_box, str(self.cliff.id))
-        self.selenium.find_element(By.ID, choose_link).click()
+        self.selenium.find_element(By.ID, choose_button).click()
 
         self.assertSelectOptions(
             from_box,
@@ -1445,7 +1503,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Confirm they're selected after clicking inactive buttons: ticket #26575
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
-        self.selenium.find_element(By.ID, remove_link).click()
+        self.selenium.find_element(By.ID, remove_button).click()
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
 
         # Unselect the options ------------------------------------------------
@@ -1458,7 +1516,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Confirm they're selected after clicking inactive buttons: ticket #26575
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
-        self.selenium.find_element(By.ID, choose_link).click()
+        self.selenium.find_element(By.ID, choose_button).click()
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
 
         # Unselect the options ------------------------------------------------
@@ -1520,8 +1578,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             for field_name in ["students", "alumni"]:
                 from_box = "#id_%s_from" % field_name
                 to_box = "#id_%s_to" % field_name
-                choose_link = "id_%s_add_link" % field_name
-                remove_link = "id_%s_remove_link" % field_name
+                choose_link = "id_%s_add" % field_name
+                remove_link = "id_%s_remove" % field_name
                 input = self.selenium.find_element(By.ID, "id_%s_input" % field_name)
                 # Initial values.
                 self.assertSelectOptions(
@@ -1679,7 +1737,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertCountSeleniumElements("#id_students_to > option", 2)
 
 
-@ignore_warnings(category=RemovedInDjango60Warning)
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def setUp(self):
         super().setUp()

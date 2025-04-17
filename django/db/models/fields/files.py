@@ -14,7 +14,6 @@ from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData
 from django.utils.translation import gettext_lazy as _
-from django.utils.version import PY311
 
 
 class FieldFile(File, AltersData):
@@ -329,7 +328,7 @@ class FileField(Field):
                 f"File for {self.name} must have "
                 "the name attribute specified to be saved."
             )
-            if PY311 and isinstance(file._file, ContentFile):
+            if isinstance(file._file, ContentFile):
                 exc.add_note("Pass a 'name' argument to ContentFile.")
             raise exc
 
