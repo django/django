@@ -202,9 +202,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
             loaders=[
                 [
                     "django.template.loaders.locmem.Loader",
-                    {
-                        "index.html":"Index {% block content %}content{% endblock %}"
-                    },
+                    {"index.html": "Index {% block content %}content{% endblock %}"},
                 ],
             ]
         )
