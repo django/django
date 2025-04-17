@@ -492,9 +492,8 @@ class I18nBlockTransTagTests(SimpleTestCase):
         }
     )
     def test_variable_twice(self):
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "The 'with' option was specified more than once"
-        ):
+        msg = "The 'with' option was specified more than once"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("template", {"foo": "bar"})
 
     @setup(

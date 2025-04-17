@@ -74,9 +74,8 @@ class GreatestTests(TestCase):
         self.assertIsNone(articles.first().last_updated)
 
     def test_one_expressions(self):
-        with self.assertRaisesMessage(
-            ValueError, "Greatest must take at least two expressions"
-        ):
+        msg = "Greatest must take at least two expressions"
+        with self.assertRaisesMessage(ValueError, msg):
             Greatest("written")
 
     def test_related_field(self):

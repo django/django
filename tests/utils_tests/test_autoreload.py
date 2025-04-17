@@ -799,25 +799,22 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
     @mock.patch("pywatchman.client")
     def test_check_availability(self, mocked_client):
         mocked_client().capabilityCheck.side_effect = Exception()
-        with self.assertRaisesMessage(
-            WatchmanUnavailable, "Cannot connect to the watchman service"
-        ):
+        msg = "Cannot connect to the watchman service"
+        with self.assertRaisesMessage(WatchmanUnavailable, msg):
             self.RELOADER_CLS.check_availability()
 
     @mock.patch("pywatchman.client")
     def test_check_availability_lower_version(self, mocked_client):
         mocked_client().capabilityCheck.return_value = {"version": "4.8.10"}
-        with self.assertRaisesMessage(
-            WatchmanUnavailable, "Watchman 4.9 or later is required."
-        ):
+        msg = "Watchman 4.9 or later is required."
+        with self.assertRaisesMessage(WatchmanUnavailable, msg):
             self.RELOADER_CLS.check_availability()
 
     def test_pywatchman_not_available(self):
         with mock.patch.object(autoreload, "pywatchman") as mocked:
             mocked.__bool__.return_value = False
-            with self.assertRaisesMessage(
-                WatchmanUnavailable, "pywatchman not installed."
-            ):
+            msg = "pywatchman not installed."
+            with self.assertRaisesMessage(WatchmanUnavailable, msg):
                 self.RELOADER_CLS.check_availability()
 
     def test_update_watches_raises_exceptions(self):

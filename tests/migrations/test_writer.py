@@ -783,10 +783,8 @@ class WriterTests(SimpleTestCase):
         validator = deconstructible(path="django.core.validators.EmailValidator2")(
             EmailValidator
         )(message="hello")
-        with self.assertRaisesMessage(
-            ValueError,
-            "Could not find object EmailValidator2 in django.core.validators.",
-        ):
+        msg = "Could not find object EmailValidator2 in django.core.validators."
+        with self.assertRaisesMessage(ValueError, msg):
             MigrationWriter.serialize(validator)
 
     def test_serialize_complex_func_index(self):
@@ -851,9 +849,8 @@ class WriterTests(SimpleTestCase):
 
             thing = models.FileField(upload_to=upload_to)
 
-        with self.assertRaisesMessage(
-            ValueError, "Could not find function upload_to in migrations.test_writer"
-        ):
+        msg = "Could not find function upload_to in migrations.test_writer"
+        with self.assertRaisesMessage(ValueError, msg):
             self.serialize_round_trip(TestModel2.thing)
 
     def test_serialize_managers(self):
@@ -1155,9 +1152,8 @@ class WriterTests(SimpleTestCase):
             self.assertSerializedEqual(complex(1, 2))
 
     def test_register_non_serializer(self):
-        with self.assertRaisesMessage(
-            ValueError, "'TestModel1' must inherit from 'BaseSerializer'."
-        ):
+        msg = "'TestModel1' must inherit from 'BaseSerializer'."
+        with self.assertRaisesMessage(ValueError, msg):
             MigrationWriter.register_serializer(complex, TestModel1)
 
     def test_composite_pk_import(self):

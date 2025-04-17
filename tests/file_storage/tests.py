@@ -692,9 +692,9 @@ class OverwritingStorageTests(FileStorageTests):
     def test_file_name_truncation_extension_too_long(self):
         name = "file_name.longext"
         file = ContentFile(b"content")
-        with self.assertRaisesMessage(
-            SuspiciousFileOperation, "Storage can not find an available filename"
-        ):
+
+        msg = "Storage can not find an available filename"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
             self.storage.save(name, file, max_length=5)
 
 
@@ -858,9 +858,9 @@ class FileFieldStorageTests(TestCase):
             # Testing exception is raised when filename is too short to truncate.
             filename = "short.longext"
             objs[0].limited_length.save(filename, ContentFile("Same Content"))
-            with self.assertRaisesMessage(
-                SuspiciousFileOperation, "Storage can not find an available filename"
-            ):
+
+            msg = "Storage can not find an available filename"
+            with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                 objs[1].limited_length.save(*(filename, ContentFile("Same Content")))
         finally:
             for o in objs:

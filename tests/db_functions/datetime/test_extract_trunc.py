@@ -247,10 +247,8 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(extracted=Extract("name", "hour")))
 
-        with self.assertRaisesMessage(
-            ValueError,
-            "Cannot extract time component 'second' from DateField 'start_date'.",
-        ):
+        msg = "Cannot extract time component 'second' from DateField 'start_date'."
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(extracted=Extract("start_date", "second")))
 
         self.assertQuerySetEqual(
@@ -1141,14 +1139,10 @@ class DateFunctionTests(TestCase):
             1,
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        msg = "Cannot truncate TimeField 'start_time' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncYear("start_time")))
-
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncYear("start_time", output_field=TimeField())
@@ -1200,14 +1194,11 @@ class DateFunctionTests(TestCase):
             lambda m: (m.start_datetime, m.extracted),
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        msg = "Cannot truncate TimeField 'start_time' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncQuarter("start_time")))
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncQuarter("start_time", output_field=TimeField())
@@ -1249,14 +1240,11 @@ class DateFunctionTests(TestCase):
             1,
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        msg = "Cannot truncate TimeField 'start_time' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncMonth("start_time")))
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncMonth("start_time", output_field=TimeField())
@@ -1288,14 +1276,11 @@ class DateFunctionTests(TestCase):
             1,
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        msg = "Cannot truncate TimeField 'start_time' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncWeek("start_time")))
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncWeek("start_time", output_field=TimeField())
@@ -1327,14 +1312,11 @@ class DateFunctionTests(TestCase):
             2,
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateField"
-        ):
+        msg = "Cannot truncate TimeField 'start_time' to DateField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncDate("start_time")))
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncDate("start_time", output_field=TimeField())
@@ -1374,14 +1356,10 @@ class DateFunctionTests(TestCase):
             2,
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'start_date' to TimeField"
-        ):
+        msg = "Cannot truncate DateField 'start_date' to TimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncTime("start_date")))
-
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'start_date' to TimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncTime("start_date", output_field=DateField())
@@ -1447,14 +1425,10 @@ class DateFunctionTests(TestCase):
             DTModel.objects.filter(start_datetime=TruncDay("start_datetime")).count(), 1
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        msg = "Cannot truncate TimeField 'start_time' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncDay("start_time")))
-
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncDay("start_time", output_field=TimeField())
@@ -1496,14 +1470,10 @@ class DateFunctionTests(TestCase):
             1,
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"
-        ):
+        msg = "Cannot truncate DateField 'start_date' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncHour("start_date")))
-
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncHour("start_date", output_field=DateField())
@@ -1547,14 +1517,10 @@ class DateFunctionTests(TestCase):
             1,
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"
-        ):
+        msg = "Cannot truncate DateField 'start_date' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncMinute("start_date")))
-
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncMinute("start_date", output_field=DateField())
@@ -1598,14 +1564,10 @@ class DateFunctionTests(TestCase):
             1,
         )
 
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"
-        ):
+        msg = "Cannot truncate DateField 'start_date' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(truncated=TruncSecond("start_date")))
-
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             list(
                 DTModel.objects.annotate(
                     truncated=TruncSecond("start_date", output_field=DateField())

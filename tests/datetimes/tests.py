@@ -182,9 +182,8 @@ class DateTimesTests(TestCase):
             published_on=dt.date(),
             title="Don't put dates into datetime functions!",
         )
-        with self.assertRaisesMessage(
-            ValueError, "Cannot truncate DateField 'published_on' to DateTimeField"
-        ):
+        msg = "Cannot truncate DateField 'published_on' to DateTimeField"
+        with self.assertRaisesMessage(ValueError, msg):
             list(Article.objects.datetimes("published_on", "second"))
 
     def test_datetimes_fails_when_given_invalid_kind_argument(self):

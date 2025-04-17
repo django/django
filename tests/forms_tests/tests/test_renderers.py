@@ -35,9 +35,8 @@ class SharedTests:
 
 class BaseTemplateRendererTests(SimpleTestCase):
     def test_get_renderer(self):
-        with self.assertRaisesMessage(
-            NotImplementedError, "subclasses must implement get_template()"
-        ):
+        msg = "subclasses must implement get_template()"
+        with self.assertRaisesMessage(NotImplementedError, msg):
             BaseRenderer().get_template("")
 
 

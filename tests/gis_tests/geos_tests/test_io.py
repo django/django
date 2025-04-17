@@ -114,10 +114,9 @@ class GEOSIOTest(SimpleTestCase):
         wkb3d_srid = memoryview(binascii.a2b_hex(hex3d_srid))
 
         # Ensuring bad output dimensions are not accepted
+        msg = "WKB output dimension must be 2 or 3"
         for bad_outdim in (-1, 0, 1, 4, 423, "foo", None):
-            with self.assertRaisesMessage(
-                ValueError, "WKB output dimension must be 2 or 3"
-            ):
+            with self.assertRaisesMessage(ValueError, msg):
                 wkb_w.outdim = bad_outdim
 
         # Now setting the output dimensions to be 3
@@ -175,9 +174,8 @@ class GEOSIOTest(SimpleTestCase):
             b"POINT (0.3333333333333333 0.6666666666666666)",
         )
 
-        with self.assertRaisesMessage(
-            AttributeError, "WKT output rounding precision must be "
-        ):
+        msg = "WKT output rounding precision must be "
+        with self.assertRaisesMessage(AttributeError, msg):
             wkt_w.precision = "potato"
 
     def test_empty_point_wkb(self):
@@ -185,13 +183,10 @@ class GEOSIOTest(SimpleTestCase):
         wkb_w = WKBWriter()
 
         wkb_w.srid = False
-        with self.assertRaisesMessage(
-            ValueError, "Empty point is not representable in WKB."
-        ):
+        msg = "Empty point is not representable in WKB."
+        with self.assertRaisesMessage(ValueError, msg):
             wkb_w.write(p)
-        with self.assertRaisesMessage(
-            ValueError, "Empty point is not representable in WKB."
-        ):
+        with self.assertRaisesMessage(ValueError, msg):
             wkb_w.write_hex(p)
 
         wkb_w.srid = True

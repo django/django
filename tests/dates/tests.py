@@ -95,11 +95,11 @@ class DatesTests(TestCase):
             Article.objects.dates()
 
     def test_dates_fails_when_given_invalid_field_argument(self):
-        with self.assertRaisesMessage(
-            FieldError,
+        msg = (
             "Cannot resolve keyword 'invalid_field' into field. Choices are: "
-            "categories, comments, id, pub_date, pub_datetime, title",
-        ):
+            "categories, comments, id, pub_date, pub_datetime, title"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.dates("invalid_field", "year")
 
     def test_dates_fails_when_given_invalid_kind_argument(self):

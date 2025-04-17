@@ -156,9 +156,8 @@ class ShellCommandTestCase(SimpleTestCase):
     @mock.patch.dict("sys.modules", {"IPython": None})
     def test_shell_with_ipython_not_installed(self, select):
         select.return_value = ([], [], [])
-        with self.assertRaisesMessage(
-            CommandError, "Couldn't import ipython interface."
-        ):
+        msg = "Couldn't import ipython interface."
+        with self.assertRaisesMessage(CommandError, msg):
             call_command("shell", interface="ipython")
 
     def test_bpython(self):
@@ -177,9 +176,8 @@ class ShellCommandTestCase(SimpleTestCase):
     @mock.patch.dict("sys.modules", {"bpython": None})
     def test_shell_with_bpython_not_installed(self, select):
         select.return_value = ([], [], [])
-        with self.assertRaisesMessage(
-            CommandError, "Couldn't import bpython interface."
-        ):
+        msg = "Couldn't import bpython interface."
+        with self.assertRaisesMessage(CommandError, msg):
             call_command("shell", interface="bpython")
 
     def test_python(self):

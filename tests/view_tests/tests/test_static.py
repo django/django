@@ -190,9 +190,8 @@ class StaticHelperTest(StaticTests):
         self.assertEqual(static("test"), [])
 
     def test_empty_prefix(self):
-        with self.assertRaisesMessage(
-            ImproperlyConfigured, "Empty static prefix not permitted"
-        ):
+        msg = "Empty static prefix not permitted"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             static("")
 
     def test_special_prefix(self):

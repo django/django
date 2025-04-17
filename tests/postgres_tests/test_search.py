@@ -310,9 +310,8 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         self.assertSequenceEqual(searched, [self.french])
 
     def test_bad_search_type(self):
-        with self.assertRaisesMessage(
-            ValueError, "Unknown search_type argument 'foo'."
-        ):
+        msg = "Unknown search_type argument 'foo'."
+        with self.assertRaisesMessage(ValueError, msg):
             SearchQuery("kneecaps", search_type="foo")
 
     def test_config_query_explicit(self):

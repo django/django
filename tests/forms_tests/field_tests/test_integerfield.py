@@ -59,14 +59,12 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f.clean(None)
         self.assertEqual(1, f.clean(1))
         self.assertEqual(10, f.clean(10))
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure this value is less than or equal to 10.'"
-        ):
+
+        msg = "'Ensure this value is less than or equal to 10.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(11)
         self.assertEqual(10, f.clean("10"))
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure this value is less than or equal to 10.'"
-        ):
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("11")
         self.assertEqual(f.max_value, 10)
         self.assertIsNone(f.min_value)
@@ -78,9 +76,9 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         )
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure this value is greater than or equal to 10.'"
-        ):
+
+        msg = "'Ensure this value is greater than or equal to 10.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(1)
         self.assertEqual(10, f.clean(10))
         self.assertEqual(11, f.clean(11))
@@ -96,18 +94,18 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         )
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure this value is greater than or equal to 10.'"
-        ):
+
+        msg = "'Ensure this value is greater than or equal to 10.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(1)
         self.assertEqual(10, f.clean(10))
         self.assertEqual(11, f.clean(11))
         self.assertEqual(10, f.clean("10"))
         self.assertEqual(11, f.clean("11"))
         self.assertEqual(20, f.clean(20))
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure this value is less than or equal to 20.'"
-        ):
+
+        msg = "'Ensure this value is less than or equal to 20.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(21)
         self.assertEqual(f.max_value, 20)
         self.assertEqual(f.min_value, 10)
@@ -118,9 +116,9 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f,
             '<input name="f" step="3" type="number" id="id_f" required>',
         )
-        with self.assertRaisesMessage(
-            ValidationError, "'Ensure this value is a multiple of step size 3.'"
-        ):
+
+        msg = "'Ensure this value is a multiple of step size 3.'"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean("10")
         self.assertEqual(12, f.clean(12))
         self.assertEqual(12, f.clean("12"))

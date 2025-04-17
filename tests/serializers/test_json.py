@@ -111,9 +111,8 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
                 "team": "Team"
             }
         }]"""
-        with self.assertRaisesMessage(
-            DeserializationError, "(serializers.player:pk=badpk)"
-        ):
+        msg = "(serializers.player:pk=badpk)"
+        with self.assertRaisesMessage(DeserializationError, msg):
             list(serializers.deserialize("json", test_string))
 
     def test_helpful_error_message_invalid_field(self):

@@ -94,9 +94,8 @@ class JsonlSerializerTestCase(SerializersTestBase, TestCase):
             '{"pk": "badpk","model": "serializers.player",'
             '"fields": {"name": "Bob","rank": 1,"team": "Team"}}'
         )
-        with self.assertRaisesMessage(
-            DeserializationError, "(serializers.player:pk=badpk)"
-        ):
+        msg = "(serializers.player:pk=badpk)"
+        with self.assertRaisesMessage(DeserializationError, msg):
             list(serializers.deserialize("jsonl", test_string))
 
     def test_helpful_error_message_invalid_field(self):
