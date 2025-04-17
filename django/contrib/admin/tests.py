@@ -26,6 +26,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         "django.contrib.contenttypes",
         "django.contrib.sessions",
         "django.contrib.sites",
+        "django.contrib.redirects",
     ]
 
     def wait_until(self, callback, timeout=10):
