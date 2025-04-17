@@ -1995,7 +1995,7 @@ class Ticket34699Tests(TestCase):
     def test_docs_example(self):
         self.assertSequenceEqual(DTModel.objects.all(), [])
 
-        dt = datetime(2015, 6, 15, 14, 30, 50, 321, zoneinfo.ZoneInfo("UTC"))
+        dt = datetime.datetime(2015, 6, 15, 14, 30, 50, 321, zoneinfo.ZoneInfo("UTC"))
         # From the docs: Given the datetime 2015-06-15 14:30:50.000321+00:00...
         docs_dt = "2015-06-15T14:30:50.000321+00:00"
         self.assertEqual(dt.isoformat(), docs_dt)
