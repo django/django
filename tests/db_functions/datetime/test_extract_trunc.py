@@ -1962,7 +1962,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         """
         # UTC: No adjustment required to filtering for TruncSecond
         now = timezone.now()
-        two_hours = timedelta(hours=2)
+        two_hours = datetime.timedelta(hours=2)
         later = now + two_hours
         non_utc_model = self.create_model(now, later)
         models_qs = DTModel.objects.annotate(
