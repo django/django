@@ -11,7 +11,7 @@ except ImportError:
 
 from django import forms
 from django.core import serializers
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import IntegrityError, connection
 from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
@@ -157,6 +157,20 @@ class CompositePKTests(TestCase):
     def test_query(self):
         users = User.objects.values_list("pk").order_by("pk")
         self.assertNotIn('AS "pk"', str(users.query))
+
+    def test_raw(self):
+        users = User.objects.raw("SELECT * FROM composite_pk_user")
+        self.assertEqual(len(users), 1)
+        user = users[0]
+        self.assertEqual(user.tenant_id, self.user.tenant_id)
+        self.assertEqual(user.id, self.user.id)
+        self.assertEqual(user.email, self.user.email)
+
+    def test_raw_missing_PK_fields(self):
+        query = "SELECT tenant_id, email FROM composite_pk_user"
+        msg = "Raw query must include the primary key"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
+            list(User.objects.raw(query))
 
     def test_only(self):
         users = User.objects.only("pk")

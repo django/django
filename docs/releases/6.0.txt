@@ -201,6 +201,9 @@ Models
   :ref:`a forced update <ref-models-force-insert>` results in no affected rows,
   instead of a generic :exc:`django.db.DatabaseError`.
 
+* :meth:`.QuerySet.raw` now supports models with a
+  :class:`~django.db.models.CompositePrimaryKey`.
+
 Pagination
 ~~~~~~~~~~
 

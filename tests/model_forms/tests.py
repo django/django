@@ -38,8 +38,8 @@ from .models import (
     Book,
     Category,
     Character,
-    Colour,
-    ColourfulItem,
+    Color,
+    ColorfulItem,
     ConstraintsModel,
     CustomErrorMessage,
     CustomFF,
@@ -2998,18 +2998,18 @@ class OtherModelFormTests(TestCase):
         """
         ModelChoiceField should respect a prefetch_related() on its queryset.
         """
-        blue = Colour.objects.create(name="blue")
-        red = Colour.objects.create(name="red")
-        multicolor_item = ColourfulItem.objects.create()
-        multicolor_item.colours.add(blue, red)
-        red_item = ColourfulItem.objects.create()
-        red_item.colours.add(red)
+        blue = Color.objects.create(name="blue")
+        red = Color.objects.create(name="red")
+        multicolor_item = ColorfulItem.objects.create()
+        multicolor_item.colors.add(blue, red)
+        red_item = ColorfulItem.objects.create()
+        red_item.colors.add(red)
 
         class ColorModelChoiceField(forms.ModelChoiceField):
             def label_from_instance(self, obj):
-                return ", ".join(c.name for c in obj.colours.all())
+                return ", ".join(c.name for c in obj.colors.all())
 
-        field = ColorModelChoiceField(ColourfulItem.objects.prefetch_related("colours"))
+        field = ColorModelChoiceField(ColorfulItem.objects.prefetch_related("colors"))
         # CPython < 3.14 calls ModelChoiceField.__len__() when coercing to
         # tuple. PyPy and Python 3.14+ don't call __len__() and so .count()
         # isn't called on the QuerySet. The following would trigger an extra
@@ -3091,13 +3091,13 @@ class OtherModelFormTests(TestCase):
         )
 
     def test_iterable_model_m2m(self):
-        class ColourfulItemForm(forms.ModelForm):
+        class ColorfulItemForm(forms.ModelForm):
             class Meta:
-                model = ColourfulItem
+                model = ColorfulItem
                 fields = "__all__"
 
-        colour = Colour.objects.create(name="Blue")
-        form = ColourfulItemForm()
+        color = Color.objects.create(name="Blue")
+        form = ColorfulItemForm()
         self.maxDiff = 1024
         self.assertHTMLEqual(
             form.as_p(),
@@ -3105,12 +3105,12 @@ class OtherModelFormTests(TestCase):
             <p>
             <label for="id_name">Name:</label>
             <input id="id_name" type="text" name="name" maxlength="50" required></p>
-            <p><label for="id_colours">Colours:</label>
-            <select multiple name="colours" id="id_colours" required>
+            <p><label for="id_colors">Colors:</label>
+            <select multiple name="colors" id="id_colors" required>
             <option value="%(blue_pk)s">Blue</option>
             </select></p>
             """
-            % {"blue_pk": colour.pk},
+            % {"blue_pk": color.pk},
         )
 
     def test_callable_field_default(self):
@@ -3709,13 +3709,13 @@ class StrictAssignmentTests(SimpleTestCase):
 class ModelToDictTests(TestCase):
     def test_many_to_many(self):
         """Data for a ManyToManyField is a list rather than a lazy QuerySet."""
-        blue = Colour.objects.create(name="blue")
-        red = Colour.objects.create(name="red")
-        item = ColourfulItem.objects.create()
-        item.colours.set([blue])
-        data = model_to_dict(item)["colours"]
+        blue = Color.objects.create(name="blue")
+        red = Color.objects.create(name="red")
+        item = ColorfulItem.objects.create()
+        item.colors.set([blue])
+        data = model_to_dict(item)["colors"]
         self.assertEqual(data, [blue])
-        item.colours.set([red])
+        item.colors.set([red])
         # If data were a QuerySet, it would be reevaluated here and give "red"
         # instead of the original value.
         self.assertEqual(data, [blue])
