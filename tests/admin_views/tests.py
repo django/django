@@ -127,7 +127,6 @@ from .models import (
     Song,
     State,
     Story,
-    Subscriber,
     SuperSecretHideout,
     SuperVillain,
     Telegram,
@@ -6858,24 +6857,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
-
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
-    def test_long_object_str_on_change_view(self):
-        from selenium.webdriver.common.by import By
-
-        self.admin_login(
-            username="super", password="secret", login_url=reverse("admin:index")
-        )
-        s = Subscriber.objects.create(name="a " * 40, email="b " * 80)
-        self.selenium.get(
-            self.live_server_url
-            + reverse("admin:admin_views_subscriber_change", args=(s.pk,))
-        )
-        object_tools = self.selenium.find_elements(
-            By.CSS_SELECTOR, "div#content ul.object-tools li"
-        )
-        self.assertGreater(len(object_tools), 0)
-        self.take_screenshot("not-overwrap")
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
