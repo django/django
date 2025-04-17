@@ -5880,9 +5880,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(num_initial_select2_inputs, 4)
 
         # Add an inline
-        self.selenium.find_elements(By.LINK_TEXT, "Add another Related prepopulated")[
-            0
-        ].click()
+        self.selenium.find_elements(
+            By.XPATH, "//button[contains(text(), 'Add another Related prepopulated')]"
+        )[0].click()
         self.assertEqual(
             len(self.selenium.find_elements(By.CLASS_NAME, "select2-selection")),
             num_initial_select2_inputs + 2,
@@ -5940,7 +5940,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Add an inline
         # Button may be outside the browser frame.
         element = self.selenium.find_elements(
-            By.LINK_TEXT, "Add another Related prepopulated"
+            By.XPATH, "//button[contains(text(), 'Add another Related prepopulated')]"
         )[1]
         self.selenium.execute_script("window.scrollTo(0, %s);" % element.location["y"])
         element.click()
@@ -5970,9 +5970,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Add an inline without an initial inline.
         # The button is outside of the browser frame.
         self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        self.selenium.find_elements(By.LINK_TEXT, "Add another Related prepopulated")[
-            2
-        ].click()
+        self.selenium.find_elements(
+            By.XPATH, "//button[contains(text(), 'Add another Related prepopulated')]"
+        )[2].click()
         self.assertEqual(
             len(self.selenium.find_elements(By.CLASS_NAME, "select2-selection")),
             num_initial_select2_inputs + 6,
@@ -5997,8 +5997,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug2, "option-one")
         # Add inline.
         self.selenium.find_elements(
-            By.LINK_TEXT,
-            "Add another Related prepopulated",
+            By.XPATH, "//button[contains(text(), 'Add another Related prepopulated')]"
         )[3].click()
         row_id = "id_relatedprepopulated_set-4-1-"
         self.selenium.find_element(By.ID, f"{row_id}pubdate").send_keys("1999-01-20")
