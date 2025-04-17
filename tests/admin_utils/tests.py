@@ -16,6 +16,7 @@ from django.contrib.admin.utils import (
     label_for_field,
     lookup_field,
     quote,
+    unquote,
 )
 from django.contrib.auth.models import User
 from django.contrib.auth.templatetags.auth import render_password_as_hash
@@ -470,7 +471,38 @@ class UtilsTests(SimpleTestCase):
         )
 
     def test_quote(self):
-        self.assertEqual(quote("something\nor\nother"), "something_0Aor_0Aother")
+        test_cases = (
+            ("something\nor\nother", "something_0Aor_0Aother"),
+            ("f,o,o", "f_2Co_2Co"),
+            ("b-a-r", "b-a-r"),
+            ((), ""),
+            ((1, 2), "1,2"),
+            ((3, "f,o,o"), "3,f_2Co_2Co"),
+            ((4, "b-a-r"), "4,b-a-r"),
+        )
+
+        for s, expected in test_cases:
+            with self.subTest(s=s, expected=expected):
+                self.assertEqual(quote(s), expected)
+
+    def test_unquote(self):
+        test_cases = (
+            ("something_0Aor_0Aother", False, "something\nor\nother"),
+            ("f_2Co_2Co", False, "f,o,o"),
+            ("b-a-r", False, "b-a-r"),
+            ("", False, ""),
+            ("", True, ("",)),
+            ("1,2,3", False, "1,2,3"),
+            ("1,2,3", True, ("1", "2", "3")),
+            ("3,f_2Co_2Co", False, "3,f,o,o"),
+            ("3,f_2Co_2Co", True, ("3", "f,o,o")),
+            ("4,b-a-r", False, "4,b-a-r"),
+            ("4,b-a-r", True, ("4", "b-a-r")),
+        )
+
+        for s, is_composite, expected in test_cases:
+            with self.subTest(s=s, is_composite=is_composite, expected=expected):
+                self.assertEqual(unquote(s, is_composite=is_composite), expected)
 
     def test_build_q_object_from_lookup_parameters(self):
         parameters = {
