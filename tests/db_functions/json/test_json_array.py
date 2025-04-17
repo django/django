@@ -12,6 +12,7 @@ from ..models import Article, Author
 
 @skipUnlessDBFeature("supports_json_field")
 class JSONArrayTests(TestCase):
+
     @classmethod
     def setUpTestData(cls):
         Author.objects.create(name="Ivan Ivanov", alias="iivanov")
@@ -106,6 +107,45 @@ class JSONArrayTests(TestCase):
             "-arr__0__0"
         )
         self.assertQuerySetEqual(qs, Author.objects.order_by("-alias"))
+
+    def test_null_on_null(self):
+        obj = Author.objects.annotate(
+            arr=JSONArray(F("goes_by"), absent_on_null=False)
+        ).first()
+
+        self.assertEqual(obj.arr, [None])
+
+    @skipIfDBFeature("supports_json_absent_on_null")
+    def test_absent_on_null_not_supported(self):
+        msg = "ABSENT ON NULL is not supported by this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.annotate(
+                arr=JSONArray(F("goes_by"), absent_on_null=True)
+            ).first()
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_absent_on_null(self):
+        obj = Author.objects.annotate(
+            arr=JSONArray(F("name"), F("goes_by"), absent_on_null=True)
+        ).first()
+        self.assertEqual(obj.arr, ["Ivan Ivanov"])
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_empty_absent_on_null(self):
+        obj = Author.objects.annotate(json_array=JSONArray(absent_on_null=True)).first()
+        self.assertEqual(obj.json_array, [])
+
+    @skipUnlessDBFeature("supports_json_absent_on_null")
+    def test_single_absent_on_null(self):
+        obj_null = Author.objects.annotate(
+            json_array=JSONArray(F("goes_by"), absent_on_null=True)
+        ).first()
+        self.assertEqual(obj_null.json_array, [])
+
+        obj_non_null = Author.objects.annotate(
+            json_array=JSONArray(F("name"), absent_on_null=True)
+        ).first()
+        self.assertEqual(obj_non_null.json_array, ["Ivan Ivanov"])
 
 
 @skipIfDBFeature("supports_json_field")
