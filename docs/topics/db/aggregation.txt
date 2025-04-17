@@ -643,6 +643,52 @@ aggregate that author count, referencing the annotation field:
     >>> Book.objects.annotate(num_authors=Count("authors")).aggregate(Avg("num_authors"))
     {'num_authors__avg': 1.66}
 
+When you are generating an aggregate by using ``.values()`` clause to create the
+grouping for the annotation on MySQL, and the ``ONLY_FULL_GROUP_BY`` SQL mode
+is enabled, it may be necessary to apply :class:`~django.db.models.AnyValue` if
+the annotation includes a mix of aggregate and non-aggregate expressions.
+
+Take the following example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F, Count, Greatest
+    >>> Book.objects.values(greatest_pages=Greatest("pages", 600)).annotate(
+    ...     num_authors=Count("authors"),
+    ...     pages_per_author=F("greatest_pages") / F("num_authors"),
+    ... ).aggregate(Avg("pages_per_author"))
+
+This creates groups of books based on the SQL column ``GREATEST(pages, 600)``.
+One unique group consists of books with 600 pages or less, and other unique
+groups will consist of books with the same pages. The ``pages_per_author``
+annotation is composed of aggregate and non-aggregate expressions,
+``num_authors`` is an aggregate expression while ``greatest_page`` isn't.
+
+The column in the group by clause is the expression for ``greatest_pages``.
+MySQL is not able to determine that the ``greatest_pages`` referenced in
+``pages_per_author`` is functionally dependent on the column in the group by
+clause, and it might raise a
+``OperationalError: incompatible with sql_mode=only_full_group_by`` error.
+To avoid the ``OperationalError``, you can wrap the non-aggregate expression
+with :class:`~django.db.models.AnyValue`.
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F, Count, Greatest
+    >>> Book.objects.values(
+    ...     greatest_pages=Greatest("pages", 600),
+    ... ).annotate(
+    ...     num_authors=Count("authors"),
+    ...     pages_per_author=AnyValue(F("greatest_pages")) / F("num_authors"),
+    ... ).aggregate(Avg("pages_per_author"))
+    {'pages_per_author__avg': 532.57143333}
+
+The other supported databases will not encounter the ``OperationalError`` in the
+example above, because they will detect the functional dependency. In general,
+``AnyValue`` is useful for working around columns in the select list that
+involve non-aggregate functions or complex expressions that are not determined
+by the database to be functionally dependent on the columns in the grouping clause.
+
 Aggregating on empty querysets or groups
 ----------------------------------------
 
