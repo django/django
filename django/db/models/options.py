@@ -15,6 +15,7 @@ from django.db.models import (
     UniqueConstraint,
 )
 from django.db.models.fields import composite
+from django.db.models.fields.reverse_related import ManyToOneRel
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
@@ -626,6 +627,28 @@ class Options:
                 obj
                 for obj in all_related_fields
                 if not obj.hidden or obj.field.many_to_many
+            ),
+        )
+
+    @cached_property
+    def virtual_relations(self):
+        """
+        Return many-to-one related objects that may be virtual, i.e. using
+        ForeignObjectRel without ManyToOneRel (ForeignKey).
+
+        Private API intended only to be used by Django itself.
+        """
+        all_related_fields = self._get_fields(
+            forward=True, reverse=False, include_hidden=True
+        )
+        return make_immutable_fields_list(
+            "virtual_relations",
+            (
+                obj
+                for obj in all_related_fields
+                if obj.many_to_one
+                and hasattr(obj, "rel_class")
+                and not issubclass(obj.rel_class, ManyToOneRel)
             ),
         )
 
