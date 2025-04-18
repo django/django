@@ -129,9 +129,9 @@ Retrieving fields composing the primary key of a model
 
     Returns a list of the fields composing the primary key of a model.
 
-    When a :class:`composite primary key <django.db.models.CompositePrimaryKey>`
-    is defined on a model it will contain all the
-    :class:`fields <django.db.models.Field>` referenced by it.
+    When a :class:`~django.db.models.CompositePrimaryKey` is defined on a
+    model it will contain all the :doc:`fields </ref/models/fields>`
+    referenced by it.
 
     .. code-block:: python
 

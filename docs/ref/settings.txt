@@ -463,8 +463,8 @@ A list of trusted origins for unsafe requests (e.g. ``POST``).
 For requests that include the ``Origin`` header, Django's CSRF protection
 requires that header match the origin present in the ``Host`` header.
 
-For a :meth:`secure <django.http.HttpRequest.is_secure>` unsafe
-request that doesn't include the ``Origin`` header, the request must have a
+For an unsafe request (checked via :meth:`~django.http.HttpRequest.is_secure`)
+that doesn't include the ``Origin`` header, the request must have a
 ``Referer`` header that matches the origin present in the ``Host`` header.
 
 These checks prevent, for example, a ``POST`` request from
@@ -1771,9 +1771,10 @@ Default: ``[]`` (Empty list)
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
 :doc:`/howto/error-reporting`). Regular expressions are matched against
-:meth:`request's full paths <django.http.HttpRequest.get_full_path>` (including
-query string, if any). Use this if your site does not provide a commonly
-requested file such as ``favicon.ico`` or ``robots.txt``.
+request's full paths, as returned by
+:meth:`django.http.HttpRequest.get_full_path` (including query string, if any).
+Use this if your site does not provide a commonly requested file such as
+``favicon.ico`` or ``robots.txt``.
 
 This is only used if
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled (see
