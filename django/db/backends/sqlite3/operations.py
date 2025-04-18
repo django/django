@@ -441,3 +441,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def force_group_by(self):
         return ["GROUP BY TRUE"] if Database.sqlite_version_info < (3, 39) else []
+
+    def format_json_path_numeric_index(self, num):
+        """
+        SQLite backend has special syntax for negative indices in JSON paths.
+        """
+        return "[#%s]" % num if num < 0 else super().format_json_path_numeric_index(num)
