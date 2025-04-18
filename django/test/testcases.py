@@ -536,6 +536,11 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Expected '%s' to equal '%s'." % (url1, url2),
         )
 
+    def _text_repr(self, content, force_string):
+        if isinstance(content, bytes) and not force_string:
+            return safe_repr(content)
+        return "'%s'" % str(content)
+
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
@@ -560,13 +565,10 @@ class SimpleTestCase(unittest.TestCase):
             content = b"".join(response.streaming_content)
         else:
             content = response.content
-        content_repr = safe_repr(content)
+        response_content = content
         if not isinstance(text, bytes) or html:
             text = str(text)
             content = content.decode(response.charset)
-            text_repr = "'%s'" % text
-        else:
-            text_repr = repr(text)
         if html:
             content = assert_and_parse_html(
                 self, content, None, "Response's content is not valid HTML:"
@@ -575,7 +577,7 @@ class SimpleTestCase(unittest.TestCase):
                 self, text, None, "Second argument is not valid HTML:"
             )
         real_count = content.count(text)
-        return text_repr, real_count, msg_prefix, content_repr
+        return real_count, msg_prefix, response_content
 
     def assertContains(
         self, response, text, count=None, status_code=200, msg_prefix="", html=False
@@ -587,27 +589,29 @@ class SimpleTestCase(unittest.TestCase):
         If ``count`` is None, the count doesn't matter - the assertion is true
         if the text occurs at least once in the response.
         """
-        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
+        real_count, msg_prefix, response_content = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
+        if (count is None and real_count > 0) or (
+            (count is not None and real_count == count)
+        ):
+            return
+
+        text_repr = self._text_repr(text, force_string=html)
+
         if count is not None:
-            self.assertEqual(
-                real_count,
-                count,
-                (
-                    f"{msg_prefix}Found {real_count} instances of {text_repr} "
-                    f"(expected {count}) in the following response\n{content_repr}"
-                ),
+            msg = (
+                f"{real_count} != {count} : {msg_prefix}Found {real_count} instances "
+                f"of {text_repr} (expected {count}) in the following response\n"
+                f"{response_content!r}"
             )
         else:
-            self.assertTrue(
-                real_count != 0,
-                (
-                    f"{msg_prefix}Couldn't find {text_repr} in the following response\n"
-                    f"{content_repr}"
-                ),
+            msg = (
+                f"False is not true : {msg_prefix}Couldn't find {text_repr} in the "
+                f"following response\n{response_content!r}"
             )
+        self.fail(msg)
 
     def assertNotContains(
         self, response, text, status_code=200, msg_prefix="", html=False
@@ -617,18 +621,16 @@ class SimpleTestCase(unittest.TestCase):
         successfully, (i.e., the HTTP status code was as expected) and that
         ``text`` doesn't occur in the content of the response.
         """
-        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
+        real_count, msg_prefix, response_content = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
-        self.assertEqual(
-            real_count,
-            0,
-            (
-                f"{msg_prefix}{text_repr} unexpectedly found in the following response"
-                f"\n{content_repr}"
-            ),
-        )
+        if real_count != 0:
+            text_repr = self._text_repr(text, force_string=html)
+            self.fail(
+                f"{real_count} != 0 :{msg_prefix}{text_repr} unexpectedly found in the "
+                f"following response\n{response_content!r}"
+            )
 
     def _check_test_client_response(self, response, attribute, method_name):
         """
@@ -641,26 +643,42 @@ class SimpleTestCase(unittest.TestCase):
                 "the Django test Client."
             )
 
-    def _assert_form_error(self, form, field, errors, msg_prefix, form_repr):
+    def _form_repr(self, form, formset, form_index):
+        if formset is None:
+            return f"form {form!r}"
+        return f"form {form_index} of formset {formset!r}"
+
+    def _assert_form_error(
+        self, form, field, errors, msg_prefix, formset=None, form_index=None
+    ):
         if not form.is_bound:
             self.fail(
-                f"{msg_prefix}The {form_repr} is not bound, it will never have any "
-                f"errors."
+                "%sThe %s is not bound, it will never have any errors."
+                % (msg_prefix, self._form_repr(form, formset, form_index))
             )
 
         if field is not None and field not in form.fields:
             self.fail(
-                f"{msg_prefix}The {form_repr} does not contain the field {field!r}."
+                "%sThe %s does not contain the field %r."
+                % (msg_prefix, self._form_repr(form, formset, form_index), field)
             )
-        if field is None:
-            field_errors = form.non_field_errors()
-            failure_message = f"The non-field errors of {form_repr} don't match."
-        else:
-            field_errors = form.errors.get(field, [])
-            failure_message = (
-                f"The errors of field {field!r} on {form_repr} don't match."
-            )
+        field_errors = (
+            form.non_field_errors() if field is None else form.errors.get(field, [])
+        )
 
+        if field_errors == errors:
+            return
+
+        # Use assertEqual to show detailed diff if errors don't match.
+        if field is None:
+            failure_message = "The non-field errors of %s don't match." % (
+                self._form_repr(form, formset, form_index),
+            )
+        else:
+            failure_message = "The errors of field %r on %s don't match." % (
+                field,
+                self._form_repr(form, formset, form_index),
+            )
         self.assertEqual(field_errors, errors, msg_prefix + failure_message)
 
     def assertFormError(self, form, field, errors, msg_prefix=""):
@@ -676,7 +694,7 @@ class SimpleTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
         errors = to_list(errors)
-        self._assert_form_error(form, field, errors, msg_prefix, f"form {form!r}")
+        self._assert_form_error(form, field, errors, msg_prefix)
 
     def assertFormSetError(self, formset, form_index, field, errors, msg_prefix=""):
         """
@@ -708,15 +726,22 @@ class SimpleTestCase(unittest.TestCase):
                 f"{form_or_forms}."
             )
         if form_index is not None:
-            form_repr = f"form {form_index} of formset {formset!r}"
             self._assert_form_error(
-                formset.forms[form_index], field, errors, msg_prefix, form_repr
+                formset.forms[form_index],
+                field,
+                errors,
+                msg_prefix,
+                formset=formset,
+                form_index=form_index,
             )
         else:
+            formset_errors = formset.non_form_errors()
+            if formset_errors == errors:
+                # Skip assertion if errors already match.
+                return
+
             failure_message = f"The non-form errors of formset {formset!r} don't match."
-            self.assertEqual(
-                formset.non_form_errors(), errors, msg_prefix + failure_message
-            )
+            self.assertEqual(formset_errors, errors, msg_prefix + failure_message)
 
     def _get_template_used(self, response, template_name, msg_prefix, method_name):
         if response is None and template_name is None:
@@ -958,6 +983,10 @@ class SimpleTestCase(unittest.TestCase):
             self, haystack, None, "Second argument is not valid HTML:"
         )
         real_count = parsed_haystack.count(parsed_needle)
+
+        if (count is None and real_count > 0) or count == real_count:
+            return
+
         if msg_prefix:
             msg_prefix += ": "
         haystack_repr = safe_repr(haystack)
@@ -972,15 +1001,13 @@ class SimpleTestCase(unittest.TestCase):
                     f"Found {real_count} instances of {needle!r} (expected {count}) in "
                     f"the following response\n{haystack_repr}"
                 )
-            self.assertEqual(real_count, count, f"{msg_prefix}{msg}")
+            msg = f"{real_count} != {count} : {msg_prefix}{msg}"
         else:
-            self.assertTrue(
-                real_count != 0,
-                (
-                    f"{msg_prefix}Couldn't find {needle!r} in the following response\n"
-                    f"{haystack_repr}"
-                ),
+            msg = (
+                f"False is not true : {msg_prefix}Couldn't find {needle!r} in the "
+                f"following response\n{haystack_repr}"
             )
+        self.fail(msg)
 
     def assertNotInHTML(self, needle, haystack, msg_prefix=""):
         self.assertInHTML(needle, haystack, count=0, msg_prefix=msg_prefix)
