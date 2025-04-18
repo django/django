@@ -1156,6 +1156,17 @@ This has a similar purpose to ``select_related``, in that both are designed to
 stop the deluge of database queries that is caused by accessing related objects,
 but the strategy is quite different.
 
+
+To filter prefetched relation,use :class:`~django.db.models.Prefetch`::
+
+   from django.db.models import Prefetch
+
+   # Example: Only prefetch active comments for each article
+   Article.objects.prefetch_related(
+    Prefetch('comments', queryset=Comment.objects.filter(is_active=True))
+   )
+
+
 ``select_related`` works by creating an SQL join and including the fields of the
 related object in the ``SELECT`` statement. For this reason, ``select_related``
 gets the related objects in the same database query. However, to avoid the much
