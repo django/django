@@ -170,7 +170,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :djadmin:`startproject` and :djadmin:`startapp` commands now create the
+  custom target directory if it doesn't exist.
 
 Migrations
 ~~~~~~~~~~
