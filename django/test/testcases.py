@@ -536,6 +536,15 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Expected '%s' to equal '%s'." % (url1, url2),
         )
 
+    def _text_repr(self, content, force_string):
+        """
+        Helper method for converting content or text to a helpful representation.
+        Used by _assert_contains().
+        """
+        if isinstance(content, bytes) and not force_string:
+            return safe_repr(content)
+        return "'%s'" % str(content)
+
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
@@ -560,13 +569,11 @@ class SimpleTestCase(unittest.TestCase):
             content = b"".join(response.streaming_content)
         else:
             content = response.content
-        content_repr = safe_repr(content)
+        response_content = content
         if not isinstance(text, bytes) or html:
             text = str(text)
             content = content.decode(response.charset)
-            text_repr = "'%s'" % text
-        else:
-            text_repr = repr(text)
+
         if html:
             content = assert_and_parse_html(
                 self, content, None, "Response's content is not valid HTML:"
@@ -575,7 +582,7 @@ class SimpleTestCase(unittest.TestCase):
                 self, text, None, "Second argument is not valid HTML:"
             )
         real_count = content.count(text)
-        return text_repr, real_count, msg_prefix, content_repr
+        return real_count, msg_prefix, response_content
 
     def assertContains(
         self, response, text, count=None, status_code=200, msg_prefix="", html=False
@@ -587,27 +594,29 @@ class SimpleTestCase(unittest.TestCase):
         If ``count`` is None, the count doesn't matter - the assertion is true
         if the text occurs at least once in the response.
         """
-        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
+        real_count, msg_prefix, response_content = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
+        if (count is None and real_count > 0) or (
+            (count is not None and real_count == count)
+        ):
+            return
+
+        text_repr = self._text_repr(text, force_string=html)
+
         if count is not None:
-            self.assertEqual(
-                real_count,
-                count,
-                (
-                    f"{msg_prefix}Found {real_count} instances of {text_repr} "
-                    f"(expected {count}) in the following response\n{content_repr}"
-                ),
+            msg = (
+                f"{real_count} != {count} : {msg_prefix}Found {real_count} instances "
+                f"of {text_repr} (expected {count}) in the following response\n"
+                f"{response_content!r}"
             )
         else:
-            self.assertTrue(
-                real_count != 0,
-                (
-                    f"{msg_prefix}Couldn't find {text_repr} in the following response\n"
-                    f"{content_repr}"
-                ),
+            msg = (
+                f"{msg_prefix}Couldn't find {text_repr} in the following response\n"
+                f"{response_content!r}"
             )
+        self.fail(msg)
 
     def assertNotContains(
         self, response, text, status_code=200, msg_prefix="", html=False
@@ -617,18 +626,16 @@ class SimpleTestCase(unittest.TestCase):
         successfully, (i.e., the HTTP status code was as expected) and that
         ``text`` doesn't occur in the content of the response.
         """
-        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
+        real_count, msg_prefix, response_content = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
-        self.assertEqual(
-            real_count,
-            0,
-            (
+        if real_count != 0:
+            text_repr = self._text_repr(text, force_string=html)
+            self.fail(
                 f"{msg_prefix}{text_repr} unexpectedly found in the following response"
-                f"\n{content_repr}"
+                f"\n{response_content!r}"
             ),
-        )
 
     def _check_test_client_response(self, response, attribute, method_name):
         """
