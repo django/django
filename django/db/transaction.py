@@ -195,6 +195,7 @@ class Atomic(ContextDecorator):
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
             connection.needs_rollback = False
+            connection.rollback_exc = None
             if not connection.get_autocommit():
                 # Pretend we're already in an atomic block to bypass the code
                 # that disables autocommit to enter a transaction, and make a
@@ -278,6 +279,9 @@ class Atomic(ContextDecorator):
                     # otherwise.
                     if sid is None:
                         connection.needs_rollback = True
+                        # Avoid shadowing an already assigned rollback exc.
+                        if connection.rollback_exc is None:
+                            connection.rollback_exc = exc_value
                     else:
                         try:
                             connection.savepoint_rollback(sid)
