@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   no_ticket:
+    if: github.event.pull_request.base.repo.full_name == 'django/django'
     name: "Flag if no Trac ticket is found in the title"
     runs-on: ubuntu-latest
     steps:
