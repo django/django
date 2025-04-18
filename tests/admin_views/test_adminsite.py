@@ -68,8 +68,8 @@ class SiteEachContextTest(TestCase):
         request.user = self.u1
         self.assertEqual(site.each_context(request)["site_url"], "/my-script-name/")
 
-    def test_available_apps(self):
-        ctx = self.ctx
+    def test_available_apps(self, ctx=None):
+        ctx = ctx if ctx else self.ctx
         apps = ctx["available_apps"]
         # we have registered two models from two different apps
         self.assertEqual(len(apps), 2)
@@ -100,6 +100,15 @@ class SiteEachContextTest(TestCase):
         self.assertEqual(user["admin_url"], "/test_admin/admin/auth/user/")
         self.assertEqual(user["add_url"], "/test_admin/admin/auth/user/add/")
         self.assertEqual(user["name"], "Users")
+
+    def test_available_apps_in_app_index(self):
+        """available_apps in some app_index view are the same as in site index view"""
+        request = self.request_factory.get(
+            reverse("test_adminsite:app_list", args=["auth"])
+        )
+        request.user = self.u1
+        ctx = site.each_context(request)
+        self.test_available_apps(ctx)
 
 
 class SiteActionsTests(SimpleTestCase):
