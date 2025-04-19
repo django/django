@@ -654,26 +654,41 @@ class SimpleTestCase(unittest.TestCase):
                 "the Django test Client."
             )
 
-    def _assert_form_error(self, form, field, errors, msg_prefix, form_repr):
+    def _assert_form_error(
+        self, form, field, errors, msg_prefix, formset=None, form_index=None
+    ):
+
+        def form_repr():
+            if formset is None:
+                return f"form {form!r}"
+            return f"form {form_index} of formset {formset!r}"
+
         if not form.is_bound:
             self.fail(
-                f"{msg_prefix}The {form_repr} is not bound, it will never have any "
-                f"errors."
+                "%sThe %s is not bound, it will never have any errors."
+                % (msg_prefix, form_repr())
             )
 
         if field is not None and field not in form.fields:
             self.fail(
-                f"{msg_prefix}The {form_repr} does not contain the field {field!r}."
+                "%sThe %s does not contain the field %r."
+                % (msg_prefix, form_repr(), field)
             )
-        if field is None:
-            field_errors = form.non_field_errors()
-            failure_message = f"The non-field errors of {form_repr} don't match."
-        else:
-            field_errors = form.errors.get(field, [])
-            failure_message = (
-                f"The errors of field {field!r} on {form_repr} don't match."
-            )
+        field_errors = (
+            form.non_field_errors() if field is None else form.errors.get(field, [])
+        )
 
+        if field_errors == errors:
+            return
+
+        # Use assertEqual to show detailed diff if errors don't match.
+        if field is None:
+            failure_message = "The non-field errors of %s don't match." % (form_repr(),)
+        else:
+            failure_message = "The errors of field %r on %s don't match." % (
+                field,
+                form_repr(),
+            )
         self.assertEqual(field_errors, errors, msg_prefix + failure_message)
 
     def assertFormError(self, form, field, errors, msg_prefix=""):
@@ -689,7 +704,7 @@ class SimpleTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
         errors = to_list(errors)
-        self._assert_form_error(form, field, errors, msg_prefix, f"form {form!r}")
+        self._assert_form_error(form, field, errors, msg_prefix)
 
     def assertFormSetError(self, formset, form_index, field, errors, msg_prefix=""):
         """
@@ -721,15 +736,22 @@ class SimpleTestCase(unittest.TestCase):
                 f"{form_or_forms}."
             )
         if form_index is not None:
-            form_repr = f"form {form_index} of formset {formset!r}"
             self._assert_form_error(
-                formset.forms[form_index], field, errors, msg_prefix, form_repr
+                formset.forms[form_index],
+                field,
+                errors,
+                msg_prefix,
+                formset=formset,
+                form_index=form_index,
             )
         else:
+            formset_errors = formset.non_form_errors()
+            if formset_errors == errors:
+                # Skip assertion if errors already match.
+                return
+
             failure_message = f"The non-form errors of formset {formset!r} don't match."
-            self.assertEqual(
-                formset.non_form_errors(), errors, msg_prefix + failure_message
-            )
+            self.assertEqual(formset_errors, errors, msg_prefix + failure_message)
 
     def _get_template_used(self, response, template_name, msg_prefix, method_name):
         if response is None and template_name is None:
