@@ -33,7 +33,12 @@ Requires core.js and SelectBox.js.
             const selector_div = quickElement('div', from_box.parentNode);
             // Make sure the selector div is at the beginning so that the
             // add link would be displayed to the right of the widget.
-            from_box.parentNode.prepend(selector_div);
+            const label = from_box.parentNode.querySelector('label');
+            if (label) {
+                label.after(selector_div);
+            } else {
+                from_box.parentNode.insertBefore(selector_div, from_box);
+            }
             selector_div.className = is_stacked ? 'selector stacked' : 'selector';
 
             // <div class="selector-available">
@@ -106,7 +111,7 @@ Requires core.js and SelectBox.js.
                 interpolate(gettext('Remove %s by selecting them and then select the "Remove" arrow button.'), [field_name]),
                 'class', 'helptext'
             );
-            
+
             const filter_selected_p = quickElement('p', selector_chosen, '', 'id', field_id + '_filter_selected');
             filter_selected_p.className = 'selector-filter';
 
