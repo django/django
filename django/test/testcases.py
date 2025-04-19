@@ -989,6 +989,11 @@ class SimpleTestCase(unittest.TestCase):
             self, haystack, None, "Second argument is not valid HTML:"
         )
         real_count = parsed_haystack.count(parsed_needle)
+
+        if (count is None and real_count > 0) or count == real_count:
+            # Shortcut.
+            return
+
         if msg_prefix:
             msg_prefix += ": "
         haystack_repr = safe_repr(haystack)
