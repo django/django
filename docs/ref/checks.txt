@@ -19,42 +19,42 @@ API reference
 
 .. class:: CheckMessage(level, msg, hint=None, obj=None, id=None)
 
-    The warnings and errors raised by system checks must be instances of
-    ``CheckMessage``. An instance encapsulates a single reportable error or
-    warning. It also provides context and hints applicable to the message, and a
-    unique identifier that is used for filtering purposes.
+The warnings and errors raised by system checks must be instances of
+``CheckMessage``. An instance encapsulates a single reportable error or
+warning. It also provides context and hints applicable to the message, and a
+unique identifier that is used for filtering purposes.
 
-    Constructor arguments are:
+Constructor arguments are:
 
-    ``level``
-        The severity of the message. Use one of the predefined values: ``DEBUG``,
-        ``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. If the level is greater or
-        equal to ``ERROR``, then Django will prevent management commands from
-        executing. Messages with level lower than ``ERROR`` (i.e. warnings) are
-        reported to the console, but can be silenced.
+``level``
+    The severity of the message. Use one of the predefined values: ``DEBUG``,
+    ``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. If the level is greater or
+    equal to ``ERROR``, then Django will prevent management commands from
+    executing. Messages with level lower than ``ERROR`` (i.e. warnings) are
+    reported to the console, but can be silenced.
 
-    ``msg``
-        A short (less than 80 characters) string describing the problem. The string
-        should *not* contain newlines.
+``msg``
+    A short (less than 80 characters) string describing the problem. The string
+    should *not* contain newlines.
 
-    ``hint``
-        A single-line string providing a hint for fixing the problem. If no hint
-        can be provided, or the hint is self-evident from the error message, the
-        hint can be omitted, or a value of ``None`` can be used.
+``hint``
+    A single-line string providing a hint for fixing the problem. If no hint
+    can be provided, or the hint is self-evident from the error message, the
+    hint can be omitted, or a value of ``None`` can be used.
 
-    ``obj``
-        Optional. An object providing context for the message (for example, the
-        model where the problem was discovered). The object should be a model,
-        field, or manager or any other object that defines a ``__str__()`` method.
-        The method is used while reporting all messages and its result precedes the
-        message.
+``obj``
+    Optional. An object providing context for the message (for example, the
+    model where the problem was discovered). The object should be a model,
+    field, or manager or any other object that defines a ``__str__()`` method.
+    The method is used while reporting all messages and its result precedes the
+    message.
 
-    ``id``
-        Optional string. A unique identifier for the issue. Identifiers should
-        follow the pattern ``applabel.X001``, where ``X`` is one of the letters
-        ``CEWID``, indicating the message severity (``C`` for criticals, ``E`` for
-        errors and so). The number can be allocated by the application, but should
-        be unique within that application.
+``id``
+    Optional string. A unique identifier for the issue. Identifiers should
+    follow the pattern ``applabel.X001``, where ``X`` is one of the letters
+    ``CEWID``, indicating the message severity (``C`` for criticals, ``E`` for
+    errors and so). The number can be allocated by the application, but should
+    be unique within that application.
 
 There are subclasses to make creating messages with common levels easier. When
 using them you can omit the ``level`` argument because it is implied by the

@@ -90,7 +90,7 @@ GZip middleware
 ---------------
 
 .. module:: django.middleware.gzip
-    :synopsis: Middleware to serve GZipped content for performance.
+   :synopsis: Middleware to serve GZipped content for performance.
 
 .. class:: GZipMiddleware
 
@@ -100,44 +100,44 @@ GZip middleware
         to change the maximum number of random bytes that is included with
         compressed responses.
 
-    .. note::
+.. note::
 
-        Security researchers revealed that when compression techniques (including
-        ``GZipMiddleware``) are used on a website, the site may become exposed to a
-        number of possible attacks.
+    Security researchers revealed that when compression techniques (including
+    ``GZipMiddleware``) are used on a website, the site may become exposed to a
+    number of possible attacks.
 
-        To mitigate attacks, Django implements a technique called *Heal The Breach
-        (HTB)*. It adds up to 100 bytes (see
-        :attr:`.max_random_bytes`) of random bytes to each response
-        to make the attacks less effective.
+    To mitigate attacks, Django implements a technique called *Heal The Breach
+    (HTB)*. It adds up to 100 bytes (see
+    :attr:`.max_random_bytes`) of random bytes to each response
+    to make the attacks less effective.
 
-        For more details, see the `BREACH paper (PDF)`_, `breachattack.com`_, and
-        the `Heal The Breach (HTB) paper`_.
+    For more details, see the `BREACH paper (PDF)`_, `breachattack.com`_, and
+    the `Heal The Breach (HTB) paper`_.
 
-        .. _BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
-        .. _breachattack.com: https://www.breachattack.com/
-        .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
+    .. _BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+    .. _breachattack.com: https://www.breachattack.com/
+    .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
 
-    The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
-    that understand GZip compression (all modern browsers).
+The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
+that understand GZip compression (all modern browsers).
 
-    This middleware should be placed before any other middleware that need to
-    read or write the response body so that compression happens afterward.
+This middleware should be placed before any other middleware that need to
+read or write the response body so that compression happens afterward.
 
-    It will NOT compress content if any of the following are true:
+It will NOT compress content if any of the following are true:
 
-    * The content body is less than 200 bytes long.
+* The content body is less than 200 bytes long.
 
-    * The response has already set the ``Content-Encoding`` header.
-    
-    * The request (the browser) hasn't sent an ``Accept-Encoding`` header
-      containing ``gzip``.
+* The response has already set the ``Content-Encoding`` header.
 
-    If the response has an ``ETag`` header, the ETag is made weak to comply with
-    :rfc:`9110#section-8.8.1`.
+* The request (the browser) hasn't sent an ``Accept-Encoding`` header
+  containing ``gzip``.
 
-    You can apply GZip compression to individual views using the
-    :func:`~django.views.decorators.gzip.gzip_page()` decorator.
+If the response has an ``ETag`` header, the ETag is made weak to comply with
+:rfc:`9110#section-8.8.1`.
+
+You can apply GZip compression to individual views using the
+:func:`~django.views.decorators.gzip.gzip_page()` decorator.
 
 Conditional GET middleware
 --------------------------
@@ -147,14 +147,14 @@ Conditional GET middleware
 
 .. class:: ConditionalGetMiddleware
 
-    Handles conditional GET operations. If the response doesn't have an ``ETag``
-    header, the middleware adds one if needed. If the response has an ``ETag`` or
-    ``Last-Modified`` header, and the request has ``If-None-Match`` or
-    ``If-Modified-Since``, the response is replaced by an
-    :class:`~django.http.HttpResponseNotModified`.
+Handles conditional GET operations. If the response doesn't have an ``ETag``
+header, the middleware adds one if needed. If the response has an ``ETag`` or
+``Last-Modified`` header, and the request has ``If-None-Match`` or
+``If-Modified-Since``, the response is replaced by an
+:class:`~django.http.HttpResponseNotModified`.
 
-    You can handle conditional GET operations with individual views using the
-    :func:`~django.views.decorators.http.conditional_page()` decorator.
+You can handle conditional GET operations with individual views using the
+:func:`~django.views.decorators.http.conditional_page()` decorator.
 
 Locale middleware
 -----------------
@@ -170,9 +170,9 @@ Locale middleware
         ``LocaleMiddleware`` and override the attribute to customize the
         redirects issued by the middleware.
 
-    Enables language selection based on data from the request. It customizes
-    content for each user. See the :doc:`internationalization documentation
-    </topics/i18n/translation>`.
+Enables language selection based on data from the request. It customizes
+content for each user. See the :doc:`internationalization documentation
+</topics/i18n/translation>`.
 
 Message middleware
 ------------------
@@ -182,8 +182,8 @@ Message middleware
 
 .. class:: MessageMiddleware
 
-    Enables cookie- and session-based message support. See the
-    :doc:`messages documentation </ref/contrib/messages>`.
+Enables cookie- and session-based message support. See the
+:doc:`messages documentation </ref/contrib/messages>`.
 
 .. _security-middleware:
 
@@ -202,9 +202,9 @@ Security middleware
 
 .. class:: SecurityMiddleware
 
-    The ``django.middleware.security.SecurityMiddleware`` provides several security
-    enhancements to the request/response cycle. Each one can be independently
-    enabled or disabled with a setting.
+The ``django.middleware.security.SecurityMiddleware`` provides several security
+enhancements to the request/response cycle. Each one can be independently
+enabled or disabled with a setting.
 
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
 * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
@@ -273,51 +273,50 @@ __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Se
 Referrer Policy
 ~~~~~~~~~~~~~~~
 
-    Browsers use `the Referer header`__ as a way to send information to a site
-    about how users got there. When a user clicks a link, the browser will send the
-    full URL of the linking page as the referrer. While this can be useful for some
-    purposes -- like figuring out who's linking to your site -- it also can cause
-    privacy concerns by informing one site that a user was visiting another site.
+Browsers use `the Referer header`__ as a way to send information to a site
+about how users got there. When a user clicks a link, the browser will send the
+full URL of the linking page as the referrer. While this can be useful for some
+purposes -- like figuring out who's linking to your site -- it also can cause
+privacy concerns by informing one site that a user was visiting another site.
 
-    __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer
 
-    Some browsers have the ability to accept hints about whether they should send
-    the HTTP ``Referer`` header when a user clicks a link; this hint is provided
-    via `the Referrer-Policy header`__. This header can suggest any of three
-    behaviors to browsers:
+Some browsers have the ability to accept hints about whether they should send
+the HTTP ``Referer`` header when a user clicks a link; this hint is provided
+via `the Referrer-Policy header`__. This header can suggest any of three
+behaviors to browsers:
 
-    __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
 
-    * Full URL: send the entire URL in the ``Referer`` header. For example, if the
-      user is visiting ``https://example.com/page.html``, the ``Referer`` header
-      would contain ``"https://example.com/page.html"``.
+* Full URL: send the entire URL in the ``Referer`` header. For example, if the
+  user is visiting ``https://example.com/page.html``, the ``Referer`` header
+  would contain ``"https://example.com/page.html"``.
 
-    * Origin only: send only the "origin" in the referrer. The origin consists of
-      the scheme, host and (optionally) port number. For example, if the user is
-      visiting ``https://example.com/page.html``, the origin would be
-      ``https://example.com/``.
+* Origin only: send only the "origin" in the referrer. The origin consists of
+  the scheme, host and (optionally) port number. For example, if the user is
+  visiting ``https://example.com/page.html``, the origin would be
+  ``https://example.com/``.
 
-    * No referrer: do not send a ``Referer`` header at all.
+* No referrer: do not send a ``Referer`` header at all.
 
-    There are two types of conditions this header can tell a browser to watch out
-    for:
+There are two types of conditions this header can tell a browser to watch out
+for:
 
-    * Same-origin versus cross-origin: a link from ``https://example.com/1.html``
-      to ``https://example.com/2.html`` is same-origin. A link from
-      ``https://example.com/page.html`` to ``https://not.example.com/page.html`` is
-      cross-origin.
+* Same-origin versus cross-origin: a link from ``https://example.com/1.html``
+  to ``https://example.com/2.html`` is same-origin. A link from
+  ``https://example.com/page.html`` to ``https://not.example.com/page.html`` is
+  cross-origin.
 
-    * Protocol downgrade: a downgrade occurs if the page containing the link is
-      served via HTTPS, but the page being linked to is not served via HTTPS.
+* Protocol downgrade: a downgrade occurs if the page containing the link is
+  served via HTTPS, but the page being linked to is not served via HTTPS.
 
-    .. warning::
-
-        When your site is served via HTTPS, :ref:`Django's CSRF protection system
-        <how-csrf-works>` requires the ``Referer`` header to be present, so
-        completely disabling the ``Referer`` header will interfere with CSRF
-        protection. To gain most of the benefits of disabling ``Referer`` headers
-        while also keeping CSRF protection, consider enabling only same-origin
-        referrers.
+.. warning::
+    When your site is served via HTTPS, :ref:`Django's CSRF protection system
+    <how-csrf-works>` requires the ``Referer`` header to be present, so
+    completely disabling the ``Referer`` header will interfere with CSRF
+    protection. To gain most of the benefits of disabling ``Referer`` headers
+    while also keeping CSRF protection, consider enabling only same-origin
+    referrers.
 
 ``SecurityMiddleware`` can set the ``Referrer-Policy`` header for you, based on
 the :setting:`SECURE_REFERRER_POLICY` setting (note spelling: browsers send a
@@ -473,8 +472,8 @@ Session middleware
 
 .. class:: SessionMiddleware
 
-    Enables session support. See the :doc:`session documentation
-    </topics/http/sessions>`.
+Enables session support. See the :doc:`session documentation
+</topics/http/sessions>`.
 
 Site middleware
 ---------------
@@ -484,8 +483,8 @@ Site middleware
 
 .. class:: CurrentSiteMiddleware
 
-    Adds the ``site`` attribute representing the current site to every incoming
-    ``HttpRequest`` object. See the :ref:`sites documentation <site-middleware>`.
+Adds the ``site`` attribute representing the current site to every incoming
+``HttpRequest`` object. See the :ref:`sites documentation <site-middleware>`.
 
 Authentication middleware
 -------------------------
@@ -581,9 +580,9 @@ Middleware for utilizing web server provided authentication. See
 
 .. class:: PersistentRemoteUserMiddleware
 
-    Middleware for utilizing web server provided authentication when enabled only
-    on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
-    details.
+Middleware for utilizing web server provided authentication when enabled only
+on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
+details.
 
 CSRF protection middleware
 --------------------------
@@ -592,12 +591,12 @@ CSRF protection middleware
 
 .. class:: CsrfViewMiddleware
 
-    Adds protection against Cross Site Request Forgeries by adding hidden form
-    fields to POST forms and checking requests for the correct value. See the
-    :doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
+Adds protection against Cross Site Request Forgeries by adding hidden form
+fields to POST forms and checking requests for the correct value. See the
+:doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
 
-    You can add Cross Site Request Forgery protection to individual views using the
-    :func:`~django.views.decorators.csrf.csrf_protect()` decorator.
+You can add Cross Site Request Forgery protection to individual views using the
+:func:`~django.views.decorators.csrf.csrf_protect()` decorator.
 
 ``X-Frame-Options`` middleware
 ------------------------------
@@ -606,7 +605,7 @@ CSRF protection middleware
 
 .. class:: XFrameOptionsMiddleware
 
-    Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.
+Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.
 
 .. _middleware-ordering:
 

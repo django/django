@@ -321,44 +321,6 @@ documentation:
 * To improve readability, use ``.. admonition:: Descriptive title`` rather than
   ``.. note::``. Use these boxes sparingly.
 
-Directive Content Indentation
------------------------------
-
-When documenting Python objects (classes, methods, attributes, etc.), all content
-must be properly indented to ensure correct rendering and readability. Follow these
-rules:
-
-* All directive content must be indented relative to its directive
-* Use 4 spaces for indentation (one level)
-* Options must be indented to the same level as the directive content
-* Maintain consistent indentation throughout the documentation
-
-Example of correct indentation:
-
-.. code-block:: rst
-
-    .. class:: MyClass
-
-        Class description goes here.
-
-        .. method:: my_method()
-
-            Method description goes here.
-
-            :param arg1: First parameter description
-            :type arg1: str
-
-        .. attribute:: my_attribute
-
-            Attribute description goes here.
-
-Key points to remember:
-
-* All content under a directive must be indented 4 spaces
-* Nested directives (like methods within a class) maintain the hierarchy with additional indentation
-* Parameter descriptions and options align with their parent content
-* Multi-line descriptions maintain the same indentation level
-
 * Use these heading styles:
 
   .. code-block:: rst
@@ -677,3 +639,41 @@ To generate an updated version of the man page, in the ``docs`` directory, run:
      $ make man
 
 The new man page will be written in ``docs/_build/man/django-admin.1``.
+
+Directive Content Indentation
+=============================
+
+When documenting Python objects (classes, methods, attributes, etc.), all content
+must be properly indented to ensure correct rendering and readability. Follow these
+rules:
+
+* All directive content must be indented relative to its directive
+* Use 4 spaces for indentation (one level)
+* Options must be indented to the same level as the directive content
+* Maintain consistent indentation throughout the documentation
+
+Example of correct indentation:
+
+.. code-block:: rst
+
+    .. class:: MyClass
+
+        Class description goes here.
+
+        .. method:: my_method()
+
+            Method description goes here.
+
+            :param arg1: First parameter description
+            :type arg1: str
+
+        .. attribute:: my_attribute
+
+            Attribute description goes here.
+
+Key points to remember:
+
+* All content under a directive must be indented 4 spaces
+* Nested directives (like methods within a class) maintain the hierarchy with additional indentation
+* Parameter descriptions and options align with their parent content
+* Multi-line descriptions maintain the same indentation level
