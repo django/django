@@ -989,16 +989,13 @@ class HTMLEqualTests(SimpleTestCase):
 
 class InHTMLTests(SimpleTestCase):
     def test_needle_msg(self):
-        msg = (
-            "False is not true : Couldn't find '<b>Hello</b>' in the following "
-            "response\n'<p>Test</p>'"
-        )
+        msg = "Couldn't find '<b>Hello</b>' in the following response\n'<p>Test</p>'"
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertInHTML("<b>Hello</b>", "<p>Test</p>")
 
     def test_msg_prefix(self):
         msg = (
-            "False is not true : Prefix: Couldn't find '<b>Hello</b>' in the following "
+            "Prefix: Couldn't find '<b>Hello</b>' in the following "
             'response\n\'<input type="text" name="Hello" />\''
         )
         with self.assertRaisesMessage(AssertionError, msg):
@@ -1063,6 +1060,15 @@ class InHTMLTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertNotInHTML("<b>Hello</b>", haystack=haystack)
+
+    def test_assert_not_in_html_msg_prefix(self):
+        haystack = "<p>Hello</p>"
+        msg = (
+            "1 != 0 : Prefix: '<p>Hello</p>' unexpectedly found in the following "
+            f"response\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertNotInHTML("<p>Hello</p>", haystack=haystack, msg_prefix="Prefix")
 
 
 class JSONEqualTests(SimpleTestCase):
