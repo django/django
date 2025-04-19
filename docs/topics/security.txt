@@ -286,6 +286,68 @@ User-uploaded content
 
 .. _same-origin policy: https://en.wikipedia.org/wiki/Same-origin_policy
 
+.. _security-csp:
+
+Content Security Policy (CSP)
+=============================
+
+.. versionadded:: 6.0
+
+Content Security Policy (CSP) is a powerful security feature that helps protect
+web applications against various types of attacks, particularly Cross-Site
+Scripting (XSS) and other code injection attacks.
+
+CSP works by allowing you to specify which sources of content are considered
+trusted, and instructing the browser to only execute or render resources from
+those trusted sources. This effectively creates an allowlist of content sources,
+significantly reducing the risk of malicious code execution.
+
+Key benefits of implementing CSP include:
+
+1. Mitigating XSS attacks by preventing the execution of inline scripts and
+   restricting which external scripts can be loaded.
+2. Controlling which external resources (like images, fonts, or stylesheets) can
+   be loaded by your site.
+3. Preventing unwanted framing of your site, protecting against clickjacking
+   attacks.
+4. Reporting policy violations to a specified URL, allowing you to monitor
+   potential attacks or misconfigured directives.
+
+For detailed information on how to enable and configure CSP in your Django
+project, refer to the :ref:`Using CSP <using-csp>` documentation.
+
+Limitations and considerations
+------------------------------
+
+While Content Security Policy (CSP) is a powerful security feature, it's
+important to be aware of its limitations and considerations, especially in the
+context of Django's implementation:
+
+* Policy Exclusion Risks: Be cautious about excluding specific paths or
+  responses from your CSP policy. Due to the browser's same-origin policy, a
+  vulnerability on an unprotected page (e.g., allowing arbitrary script
+  injection) can potentially be leveraged to attack other parts of your site
+  that *are* protected by CSP. Excluding *any* path can therefore
+  *significantly compromise the overall security benefits* CSP aims to provide
+  for your entire origin.
+
+* Potential Performance Overhead: While generally negligible for most
+  applications, processing CSP settings and headers adds some overhead. Nonce
+  generation, in particular, requires cryptographic randomness for each relevant
+  request. Monitor performance impact if deploying on very high-traffic sites or
+  in resource-constrained environments.
+
+* Browser Support Variations: While core CSP features (Level 1 & 2) are widely
+  and consistently supported across modern browsers, it's worth noting that
+  newer directives (CSP Level 3+) or complex policy interactions may still have
+  implementation variations. It is advised to test your specific policy across
+  target browsers, especially when using advanced CSP features.
+
+Remember, while these limitations exist, CSP is still a valuable tool in your
+security arsenal and remains a highly recommended security layer for web
+applications. It's important to understand these constraints and plan your
+implementation accordingly.
+
 .. _additional-security-topics:
 
 Additional security topics
