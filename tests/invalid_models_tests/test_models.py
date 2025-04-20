@@ -539,6 +539,7 @@ class IndexesTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [])
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_complex_expression_custom_lookup(self):
         class Model(models.Model):
             height = models.IntegerField()
@@ -556,6 +557,7 @@ class IndexesTests(TestCase):
         with register_lookup(models.IntegerField, Abs):
             self.assertEqual(Model.check(databases=self.databases), [])
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
@@ -572,6 +574,7 @@ class IndexesTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_missing_field_nested(self):
         class Model(models.Model):
             class Meta:
@@ -590,6 +593,7 @@ class IndexesTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_m2m_field(self):
         class Model(models.Model):
             m2m = models.ManyToManyField("self")
@@ -609,6 +613,7 @@ class IndexesTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_non_local_field(self):
         class Foo(models.Model):
             field1 = models.CharField(max_length=15)
@@ -630,6 +635,7 @@ class IndexesTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_fk(self):
         class Foo(models.Model):
             pass
@@ -645,6 +651,7 @@ class IndexesTests(TestCase):
 
         self.assertEqual(Bar.check(databases=self.databases), [])
 
+    @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_index_pointing_to_composite_primary_key(self):
         class Model(models.Model):
             pk = models.CompositePrimaryKey("version", "name")
