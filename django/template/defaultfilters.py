@@ -776,12 +776,12 @@ def get_digit(value, arg):
 
 
 @register.filter(expects_localtime=True, is_safe=False)
-def date(value, arg=None):
+def date(value, arg=None, use_l10n=None):
     """Format a date according to the given format."""
     if value in (None, ""):
         return ""
     try:
-        return formats.date_format(value, arg)
+        return formats.date_format(value, arg, use_l10n=use_l10n)
     except AttributeError:
         try:
             return format(value, arg)
@@ -790,12 +790,12 @@ def date(value, arg=None):
 
 
 @register.filter(expects_localtime=True, is_safe=False)
-def time(value, arg=None):
+def time(value, arg=None, use_l10n=None):
     """Format a time according to the given format."""
     if value in (None, ""):
         return ""
     try:
-        return formats.time_format(value, arg)
+        return formats.time_format(value, arg, use_l10n=use_l10n)
     except (AttributeError, TypeError):
         try:
             return time_format(value, arg)
