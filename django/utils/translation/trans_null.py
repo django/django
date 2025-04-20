@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 def gettext(message):
-    return message
+    return str(message)
 
 
 gettext_noop = gettext_lazy = _ = gettext
