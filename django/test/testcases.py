@@ -545,7 +545,9 @@ class SimpleTestCase(unittest.TestCase):
             return safe_repr(content)
         return "'%s'" % str(content)
 
-    def _assert_contains(self, response, text, status_code, msg_prefix, html):
+    def _assert_contains(
+        self, response, text, status_code, msg_prefix, html, count=None
+    ):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
         if (
@@ -581,8 +583,12 @@ class SimpleTestCase(unittest.TestCase):
             text = assert_and_parse_html(
                 self, text, None, "Second argument is not valid HTML:"
             )
-        real_count = content.count(text)
-        return real_count, msg_prefix, response_content
+        if (count is None or count == 0) and html:
+            # Does text exist in content, regardless of count?
+            real_count = int(text in content)
+            return real_count, msg_prefix, response_content
+
+        return content.count(text), msg_prefix, response_content
 
     def assertContains(
         self, response, text, count=None, status_code=200, msg_prefix="", html=False
@@ -595,7 +601,7 @@ class SimpleTestCase(unittest.TestCase):
         if the text occurs at least once in the response.
         """
         real_count, msg_prefix, response_content = self._assert_contains(
-            response, text, status_code, msg_prefix, html
+            response, text, status_code, msg_prefix, html, count=count
         )
 
         if count is not None:
@@ -624,7 +630,7 @@ class SimpleTestCase(unittest.TestCase):
         ``text`` doesn't occur in the content of the response.
         """
         real_count, msg_prefix, response_content = self._assert_contains(
-            response, text, status_code, msg_prefix, html
+            response, text, status_code, msg_prefix, html, count=0
         )
 
         if real_count != 0:
@@ -988,8 +994,12 @@ class SimpleTestCase(unittest.TestCase):
         parsed_haystack = assert_and_parse_html(
             self, haystack, None, "Second argument is not valid HTML:"
         )
-        real_count = parsed_haystack.count(parsed_needle)
 
+        if count is None or count == 0:
+            # Does needle exist regardless of count?
+            real_count = int(parsed_needle in parsed_haystack)
+        else:
+            real_count = parsed_haystack.count(parsed_needle)
         if (count is None and real_count > 0) or count == real_count:
             # Shortcut.
             return
