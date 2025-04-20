@@ -20,6 +20,7 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper, ProgrammingError
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
+from django.views.decorators.debug import sensitive_variables
 
 NO_DB_ALIAS = "__no_db__"
 RAN_DB_VERSION_CHECK = set()
@@ -205,6 +206,7 @@ class BaseDatabaseWrapper:
 
     # ##### Backend-specific methods for creating connections and cursors #####
 
+    @sensitive_variables()
     def get_connection_params(self):
         """Return a dict of parameters suitable for get_new_connection."""
         raise NotImplementedError(
@@ -212,6 +214,7 @@ class BaseDatabaseWrapper:
             "method"
         )
 
+    @sensitive_variables("conn_params")
     def get_new_connection(self, conn_params):
         """Open a connection to the database."""
         raise NotImplementedError(
@@ -234,6 +237,7 @@ class BaseDatabaseWrapper:
     # ##### Backend-specific methods for creating connections #####
 
     @async_unsafe
+    @sensitive_variables("conn_params")
     def connect(self):
         """Connect to the database. Assume that the connection is closed."""
         # Check for invalid configurations.
