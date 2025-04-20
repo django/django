@@ -191,9 +191,16 @@ localization system cannot handle automatically.
 Switzerland (German)
 --------------------
 
-The Swiss number formatting depends on the type of number that is being
-formatted. For monetary values, a comma is used as the thousand separator and
-a decimal point for the decimal separator. For all other numbers, a comma is
-used as decimal separator and a space as thousand separator. The locale format
-provided by Django uses the generic separators, a comma for decimal and a space
-for thousand separators.
+The Swiss number formatting traditionally varies depending on context. For example,
+monetary values might use a dot as decimal separator (Fr. 23.50), while
+measurements might use a comma (22,5 m). Django's localization system cannot
+handle such context-specific formats automatically.
+
+The locale format provided by Django follows common IT practices in Switzerland,
+using a dot as the decimal separator and a single quote as the thousand
+separator, matching the behavior of major operating systems and applications
+in the region.
+
+For Swiss government publication guidelines and additional context, see:
+- https://www.bk.admin.ch/bk/de/home/dokumentation/sprachen/hilfsmittel-textredaktion/schreibweisungen.html
+- https://de.wikipedia.org/wiki/Dezimaltrennzeichen#Schweiz
