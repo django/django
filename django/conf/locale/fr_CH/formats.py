@@ -27,6 +27,10 @@ DATETIME_INPUT_FORMATS = [
     "%d/%m/%Y %H:%M:%S.%f",  # '25/10/2006 14:30:59.000200'
     "%d/%m/%Y %H:%M",  # '25/10/2006 14:30'
 ]
-DECIMAL_SEPARATOR = ","
+
+# Swiss number formatting can vary based on context (e.g. Fr. 23.50 vs 22,5 m).
+# As Django does not support context-specific formatting, these settings follow
+# common IT practices used in Swiss operating systems and applications.
+DECIMAL_SEPARATOR = "."
 THOUSAND_SEPARATOR = "\xa0"  # non-breaking space
 NUMBER_GROUPING = 3
