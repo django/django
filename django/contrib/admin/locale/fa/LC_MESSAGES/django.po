@@ -391,8 +391,8 @@ msgstr "تغییر گذرواژه"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "لطفا خطای زیر را برطرف کنید."
+msgstr[1] "لطفا خطاهای ریز را برطرف کنید."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -427,7 +427,7 @@ msgid "Filter"
 msgstr "فیلتر"
 
 msgid "Hide counts"
-msgstr ""
+msgstr "مخفی کردن تعداد"
 
 msgid "Show counts"
 msgstr "نمایش تعداد"
@@ -593,8 +593,8 @@ msgstr "عمل"
 
 msgid "entry"
 msgid_plural "entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ورودی"
+msgstr[1] "ورودی ها"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -658,7 +658,7 @@ msgstr "نمایش %(model)sهای انتخاب شده"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
-"از شما ممنون هستیم که زمان با ارزش خود را برای این تارنما امروز صرف کرده اید"
+"از شما ممنون هستیم که امروز زمان با ارزش خود را برای این تارنما صرف کرده اید"
 
 msgid "Log in again"
 msgstr "ورود دوباره"
