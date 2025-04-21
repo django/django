@@ -6,7 +6,11 @@ from django.conf import settings
 
 
 def gettext(message):
-    return str(message)
+    from django.utils.functional import Promise
+
+    if isinstance(message, Promise):
+        return str(message)
+    return message
 
 
 gettext_noop = gettext_lazy = _ = gettext
