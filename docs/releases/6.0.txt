@@ -290,6 +290,10 @@ Models
   values concatenated into a string, separated by the ``delimiter`` string.
   This aggregate was previously supported only for PostgreSQL.
 
+* The new :class:`~django.db.models.JSONArrayAgg` aggregate function accepts
+  a list of field names or expressions, converts each expression to a JSON
+  value, and returns a single JSON array containing those JSON values.
+
 * The :meth:`~django.db.models.Model.save` method now raises a specialized
   :exc:`Model.NotUpdated <django.db.models.Model.NotUpdated>` exception, when
   :ref:`a forced update <ref-models-force-insert>` results in no affected rows,
