@@ -1,6 +1,7 @@
 import pkgutil
 from importlib import import_module
 
+from asgiref.sync import iscoroutinefunction
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
@@ -96,9 +97,14 @@ class DatabaseErrorWrapper:
     def __call__(self, func):
         # Note that we are intentionally not using @wraps here for performance
         # reasons. Refs #21109.
-        def inner(*args, **kwargs):
-            with self:
-                return func(*args, **kwargs)
+        if iscoroutinefunction(func):
+            async def inner(*args, **kwargs):
+                with self:
+                    return await func(*args, **kwargs)
+        else:
+            def inner(*args, **kwargs):
+                with self:
+                    return func(*args, **kwargs)
 
         return inner
 

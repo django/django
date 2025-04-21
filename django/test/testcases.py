@@ -25,7 +25,7 @@ from urllib.parse import (
 )
 from urllib.request import url2pathname
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync, iscoroutinefunction, AsyncSingleThreadContext
 
 from django.apps import apps
 from django.conf import settings
@@ -38,7 +38,7 @@ from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.core.signals import setting_changed
-from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction, async_connections
 from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -1407,6 +1407,13 @@ class TestCase(TransactionTestCase):
                 setattr(cls, name, TestData(name, value))
 
     @classmethod
+    async def asyncTearDownClass(cls):
+        # todo: add _databases_support_transactions + _databases_support_savepoints
+        # checks
+        for conn in async_connections.all(initialized_only=True):
+            await conn.close()
+
+    @classmethod
     def tearDownClass(cls):
         if (
             cls._databases_support_transactions()
@@ -1415,7 +1422,14 @@ class TestCase(TransactionTestCase):
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all(initialized_only=True):
                 conn.close()
+
         super().tearDownClass()
+
+        async_to_sync(cls.asyncTearDownClass)()
+
+    def __call__(self, result=None):
+        with AsyncSingleThreadContext():
+            return super().__call__(result)
 
     @classmethod
     def setUpTestData(cls):

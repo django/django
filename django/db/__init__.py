@@ -3,6 +3,7 @@ from django.db.utils import (
     DEFAULT_DB_ALIAS,
     DJANGO_VERSION_PICKLE_KEY,
     ConnectionHandler,
+    AsyncConnectionHandler,
     ConnectionRouter,
     DatabaseError,
     DataError,
@@ -36,6 +37,7 @@ __all__ = [
 ]
 
 connections = ConnectionHandler()
+async_connections = AsyncConnectionHandler()
 
 router = ConnectionRouter()
 
