@@ -710,6 +710,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             return True
 
+    async def ais_usable(self):
+        if self.aconnection is None:
+            return False
+        try:
+            # Use a psycopg cursor directly, bypassing Django's utilities.
+            async with self.aconnection.cursor() as cursor:
+                await cursor.execute("SELECT 1")
+        except Database.Error:
+            return False
+        else:
+            return True
+
     def close_if_health_check_failed(self):
         if self.pool:
             # The pool only returns healthy connections.
