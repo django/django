@@ -93,6 +93,7 @@ def _get_varchar_column(data):
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "postgresql"
     display_name = "PostgreSQL"
+    _pg_version = None
     supports_async = is_psycopg3
 
     # This dictionary maps Field objects to their associated PostgreSQL column
@@ -774,13 +775,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def pg_version(self):
-        with self.temporary_connection():
-            return self.connection.info.server_version
+        if self._pg_version is None:
+            with self.temporary_connection():
+                self._pg_version = self.connection.info.server_version
+        return self._pg_version
 
     @cached_property
     async def apg_version(self):
-        async with self.atemporary_connection():
-            return self.aconnection.info.server_version
+        if self._pg_version is None:
+            async with self.atemporary_connection():
+                self._pg_version = self.aconnection.info.server_version
+        return self._pg_version
 
     def make_debug_cursor(self, cursor):
         return CursorDebugWrapper(cursor, self)
