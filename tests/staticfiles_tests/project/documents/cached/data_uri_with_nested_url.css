@@ -1,0 +1,4 @@
+#example {
+    /* Not a valid SVG, but just to illustrate the issue */
+    background-image: url("data:image/svg+xml,url(%23b) url(%23c)");
+}

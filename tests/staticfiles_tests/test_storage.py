@@ -360,6 +360,26 @@ class TestHashedFiles:
         self.assertEqual("Post-processing 'nonutf8.css' failed!\n\n", err.getvalue())
         self.assertPostCondition()
 
+    def test_css_data_uri_with_nested_url(self):
+        """
+        Test that data URIs containing nested url() calls are properly handled.
+        The nested url() fragments should be left unchanged.
+        """
+        relpath = self.hashed_file_path("cached/data_uri_with_nested_url.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            # The data URI should be preserved as-is
+            self.assertIn(
+                b'url("data:image/svg+xml,url(%23b) url(%23c)")',
+                content,
+            )
+            # Make sure we don't see a broken pattern like this
+            self.assertNotIn(
+                b'url("data:image/svg+xml,url(%23b) url("%23c")")',
+                content,
+            )
+        self.assertPostCondition()
+
 
 @override_settings(
     STORAGES={
