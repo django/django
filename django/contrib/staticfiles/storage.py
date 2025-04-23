@@ -80,7 +80,8 @@ class HashedFilesMixin:
         (
             "*.css",
             (
-                r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+                r"""(?P<matched>url\((?P<quote>['"]{0,1})"""
+                r"""\s*(?P<url>.*?)(?P=quote)\))""",
                 (
                     r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
                     """@import url("%(url)s")""",
