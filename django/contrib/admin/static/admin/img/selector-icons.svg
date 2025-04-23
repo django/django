@@ -1,28 +1,52 @@
 <svg width="16" height="192" viewBox="0 0 512 6144" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <!-- 
-  All icons are provided by Font Awesome Free, version 6.7.1 
-  Website: https://fontawesome.com 
-  License: Creative Commons Attribution 4.0 International (CC BY 4.0)
-  For more details, visit: https://fontawesome.com/license/free 
-  Copyright 2024 Fonticons, Inc.
-  -->
+  <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
   <defs>
     <g id="up">
+      <!-- 
+        Icon Name: circle-arrow-up
+        Icon Family: classic
+        Icon Style: solid
+      -->
       <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM385 215c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-71-71L280 392c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-214.1-71 71c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L239 103c9.4-9.4 24.6-9.4 33.9 0L385 215z"/>
     </g>
     <g id="down">
+      <!-- 
+        Icon Name: circle-arrow-down
+        Icon Family: classic
+        Icon Style: solid
+      -->
       <path d="M256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM127 297c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l71 71L232 120c0-13.3 10.7-24 24-24s24 10.7 24 24l0 214.1 71-71c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L273 409c-9.4 9.4-24.6 9.4-33.9 0L127 297z"/>
     </g>
     <g id="right">
+      <!-- 
+        Icon Name: circle-arrow-right
+        Icon Family: classic
+        Icon Style: solid
+      -->
       <path d="M0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM297 385c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l71-71L120 280c-13.3 0-24-10.7-24-24s10.7-24 24-24l214.1 0-71-71c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0L409 239c9.4 9.4 9.4 24.6 0 33.9L297 385z"/>
     </g>
     <g id="left">
+      <!-- 
+        Icon Name: circle-arrow-left
+        Icon Family: classic
+        Icon Style: solid
+      -->
       <path d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM215 127c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-71 71L392 232c13.3 0 24 10.7 24 24s-10.7 24-24 24l-214.1 0 71 71c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L103 273c-9.4-9.4-9.4-24.6 0-33.9L215 127z"/>
     </g>
     <g id="clearall">
+      <!-- 
+        Icon Name: circle-chevron-left
+        Icon Family: classic
+        Icon Style: solid
+      -->
       <path d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM271 135c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-87 87 87 87c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L167 273c-9.4-9.4-9.4-24.6 0-33.9L271 135z"/>
     </g>
     <g id="chooseall">
+      <!-- 
+        Icon Name: circle-chevron-right
+        Icon Family: classic
+        Icon Style: solid
+      -->
       <path d="M0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM241 377c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l87-87-87-87c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0L345 239c9.4 9.4 9.4 24.6 0 33.9L241 377z"/>
     </g>
   </defs>
