@@ -89,20 +89,6 @@ def inject_rename_contenttypes_operations(
             migration.operations.insert(inserted + index, operation)
 
 
-def get_contenttypes_and_models(app_config, using, ContentType):
-    if not router.allow_migrate_model(using, ContentType):
-        return None, None
-
-    ContentType.objects.clear_cache()
-
-    content_types = {
-        ct.model: ct
-        for ct in ContentType.objects.using(using).filter(app_label=app_config.label)
-    }
-    app_models = {model._meta.model_name: model for model in app_config.get_models()}
-    return content_types, app_models
-
-
 def create_contenttypes(
     app_config,
     verbosity=2,
@@ -117,29 +103,33 @@ def create_contenttypes(
     if not app_config.models_module:
         return
 
-    app_label = app_config.label
     try:
-        app_config = apps.get_app_config(app_label)
+        app_config = apps.get_app_config(app_config.label)
         ContentType = apps.get_model("contenttypes", "ContentType")
     except LookupError:
         return
 
-    content_types, app_models = get_contenttypes_and_models(
-        app_config, using, ContentType
-    )
-
-    if not app_models:
+    if not router.allow_migrate_model(using, ContentType):
         return
 
+    all_model_names = {model._meta.model_name for model in app_config.get_models()}
+
+    if not all_model_names:
+        return
+
+    ContentType.objects.clear_cache()
+
+    existing_model_names = set(
+        ContentType.objects.using(using)
+        .filter(app_label=app_config.label)
+        .values_list("model", flat=True)
+    )
+
     cts = [
-        ContentType(
-            app_label=app_label,
-            model=model_name,
-        )
-        for (model_name, model) in app_models.items()
-        if model_name not in content_types
+        ContentType(app_label=app_config.label, model=model_name)
+        for model_name in sorted(all_model_names - existing_model_names)
     ]
     ContentType.objects.using(using).bulk_create(cts)
     if verbosity >= 2:
         for ct in cts:
-            print("Adding content type '%s | %s'" % (ct.app_label, ct.model))
+            print(f"Adding content type '{ct.app_label} | {ct.model}'")
