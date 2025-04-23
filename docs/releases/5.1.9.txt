@@ -4,7 +4,7 @@ Django 5.1.9 release notes
 
 *Expected May 7, 2025*
 
-Django 5.1.9 fixes a data loss bug in 5.1.8.
+Django 5.1.9 fixes a data loss bug and a regression in 5.1.8.
 
 Bugfixes
 ========
@@ -13,3 +13,7 @@ Bugfixes
   ``allow_overwrite=True``, where leftover content from a previously larger
   file could remain after overwriting with a smaller one due to lack of
   truncation (:ticket:`36298`).
+
+* Fixed a regression in Django 5.1.8, introduced when fixing :cve:`2025-26699`,
+  where the :tfilter:`wordwrap` template filter did not preserve empty lines
+  between paragraphs after wrapping text (:ticket:`36341`).
