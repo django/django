@@ -1,0 +1,3 @@
+#example {
+    background-image: url("data:image/svg+xml,url(%23b) url(%23c)");
+}
