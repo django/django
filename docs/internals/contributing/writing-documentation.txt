@@ -344,7 +344,7 @@ documentation:
 * Add headers for functions, classes, and methods in reference documentation:
 
   - Each function, class, method, or attribute in reference documentation should
-    have a header using the appropriate heading level (typically "~~~~" style).
+    have a header using the appropriate heading level based on document hierarchy.
   - Use the exact name of the item as the header text.
   - Place the header directly above the directive documentation.
   - For better accessibility and navigation, ensure these headers are
@@ -355,18 +355,18 @@ documentation:
   .. code-block:: rst
 
     patch_cache_control()
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~
 
     .. function:: patch_cache_control(response, **kwargs)
 
-        This function patches the Cache-Control header.
+        This function patches the ``Cache-Control`` header.
 
     get_max_age()
-    ~~~~~~~~~~~~
+    ~~~~~~~~~~~~~
 
     .. function:: get_max_age(response)
 
-        Returns the max-age from the response Cache-Control header.
+        Returns the max-age from the response ``Cache-Control`` header.
 
   This approach ensures:
 
