@@ -2476,6 +2476,61 @@ class SchemaTests(TransactionTestCase):
         ]
         self.assertEqual(len(check_constraints), 1)
 
+    @skipUnlessDBFeature(
+        "supports_column_check_constraints", "can_introspect_check_constraints"
+    )
+    @isolate_apps("schema")
+    def test_field_custom_constraint_detected_in_alter_field(self):
+        class CharChoiceField(CharField):
+            """
+            A custom CharField that automatically creates a db constraint to guarante
+            that the stored value respects the field's `choices`.
+            """
+            @property
+            def non_db_attrs(self):
+                # Remove `choices` from non_db_attrs so that migrations that only change
+                # choices still trigger a db operation and drop/create the constraint.
+                attrs = super().non_db_attrs
+                return tuple({*attrs} - {"choices"})
+
+            def db_check(self, connection):
+                if not self.choices:
+                    return None
+                constraint = CheckConstraint(
+                    condition=Q(**{f"{self.name}__in": dict(self.choices)}),
+                    name="",  # doesn't matter, Django will reassign one anyway
+                )
+                with connection.schema_editor() as schema_editor:
+                    return constraint._get_check_sql(self.model, schema_editor)
+
+        class ModelWithCustomField(Model):
+            f = CharChoiceField(choices=[])
+
+            class Meta:
+                app_label = "schema"
+
+        self.isolated_local_models = [ModelWithCustomField]
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithCustomField)
+
+        constraints = self.get_constraints(ModelWithCustomField._meta.db_table)
+        self.assertEqual(
+            len(constraints),
+            1,  # just the pk constraint
+        )
+
+        old_field = ModelWithCustomField._meta.get_field("f")
+        new_field = CharChoiceField(choices=[("a", "a")])
+        new_field.contribute_to_class(ModelWithCustomField, "f")
+        with connection.schema_editor() as editor:
+            editor.alter_field(ModelWithCustomField, old_field, new_field, strict=True)
+
+        constraints = self.get_constraints(ModelWithCustomField._meta.db_table)
+        self.assertEqual(
+            len(constraints),
+            2,  # pk + custom constraint
+        )
+
     def _test_m2m_create(self, M2MFieldClass):
         """
         Tests M2M fields on models during creation
