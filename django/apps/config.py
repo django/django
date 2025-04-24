@@ -9,6 +9,8 @@ from django.utils.module_loading import import_string, module_has_submodule
 APPS_MODULE_NAME = "apps"
 MODELS_MODULE_NAME = "models"
 
+# 测试读写
+
 
 class AppConfig:
     """Class representing a Django application and its configuration."""
