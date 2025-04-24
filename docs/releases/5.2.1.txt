@@ -48,3 +48,6 @@ Bugfixes
 * Fixed a regression in Django 5.2, introduced when fixing :cve:`2025-26699`,
   where the :tfilter:`wordwrap` template filter did not preserve empty lines
   between paragraphs after wrapping text (:ticket:`36341`).
+
+* Fixed a regression in Django 5.2 that caused a crash when serializing email
+  alternatives or attachments due to named tuple mismatches (:ticket:`36309`).
