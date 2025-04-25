@@ -1215,7 +1215,7 @@ class ForeignKey(ForeignObject):
             }
         )
 
-    def db_check(self, connection):
+    def db_check(self, connection, **overrides):
         return None
 
     def db_type(self, connection):
@@ -2052,7 +2052,7 @@ class ManyToManyField(RelatedField):
             defaults["initial"] = [i.pk for i in initial]
         return super().formfield(**defaults)
 
-    def db_check(self, connection):
+    def db_check(self, connection, **overrides):
         return None
 
     def db_type(self, connection):

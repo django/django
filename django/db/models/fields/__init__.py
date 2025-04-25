@@ -840,13 +840,15 @@ class Field(RegisterLookupMixin):
     def db_type_parameters(self, connection):
         return DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
 
-    def db_check(self, connection):
+    def db_check(self, connection, **overrides):
         """
         Return the database column check constraint for this field, for the
         provided connection. Works the same way as db_type() for the case that
         get_internal_type() does not map to a preexisting model field.
+        Any keyword arguments provided will override the ones received from
+        db_type_parameters() and used for formatting the constraint's SQL string.
         """
-        data = self.db_type_parameters(connection)
+        data = self.db_type_parameters(connection) | overrides
         try:
             return (
                 connection.data_type_check_constraints[self.get_internal_type()] % data

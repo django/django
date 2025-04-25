@@ -923,11 +923,8 @@ class BaseDatabaseSchemaEditor:
     def _field_db_check(self, field, field_db_params):
         # Always check constraints with the same mocked column name to avoid
         # recreating constrains when the column is renamed.
-        if (constraint := field.db_check(self.connection)) is None:
-            return None
-        data = field.db_type_parameters(self.connection)
-        data["column"] = "__column_name__"
-        return constraint % data
+        overrides = {"column": "__column_name__"}
+        return field.db_check(self.connection, **overrides)
 
     def _alter_field(
         self,
