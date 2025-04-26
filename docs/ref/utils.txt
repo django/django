@@ -31,8 +31,8 @@ cache keys to prevent delivery of wrong content.
 For example, :doc:`internationalization </topics/i18n/index>` middleware would
 need to distinguish caches by the ``Accept-language`` header.
 
-patch_cache_control()
----------------------
+``patch_cache_control()``
+-------------------------
 
 .. function:: patch_cache_control(response, **kwargs)
 
@@ -46,16 +46,16 @@ patch_cache_control()
     * All other parameters are added with their value, after applying
       ``str()`` to it.
 
-get_max_age()
--------------
+``get_max_age()``
+-----------------
 
 .. function:: get_max_age(response)
 
     Returns the max-age from the response Cache-Control header as an integer
     (or ``None`` if it wasn't found or wasn't an integer).
 
-patch_response_headers()
-------------------------
+``patch_response_headers()``
+----------------------------
 
 .. function:: patch_response_headers(response, cache_timeout=None)
 
@@ -69,8 +69,8 @@ patch_response_headers()
     ``cache_timeout`` is in seconds. The :setting:`CACHE_MIDDLEWARE_SECONDS`
     setting is used by default.
 
-add_never_cache_headers()
--------------------------
+``add_never_cache_headers()``
+-----------------------------
 
 .. function:: add_never_cache_headers(response)
 
@@ -82,8 +82,8 @@ add_never_cache_headers()
 
     Each header is only added if it isn't already set.
 
-patch_vary_headers()
---------------------
+``patch_vary_headers()``
+------------------------
 
 .. function:: patch_vary_headers(response, newheaders)
 
@@ -93,8 +93,8 @@ patch_vary_headers()
     asterisk ``'*'``, according to :rfc:`9110#section-12.5.5`. Otherwise,
     existing headers in ``Vary`` aren't removed.
 
-get_cache_key()
----------------
+``get_cache_key()``
+-------------------
 
 .. function:: get_cache_key(request, key_prefix=None, method='GET', cache=None)
 
@@ -106,8 +106,8 @@ get_cache_key()
     If there is no headerlist stored, the page needs to be rebuilt, so this
     function returns ``None``.
 
-learn_cache_key()
------------------
+``learn_cache_key()``
+---------------------
 
 .. function:: learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None)
 
@@ -140,15 +140,15 @@ The functions defined in this module share the following properties:
 - They accept up to picosecond resolution in input, but they truncate it to
   microseconds, since that's what Python supports.
 
-parse_date()
-------------
+``parse_date()``
+----------------
 
 .. function:: parse_date(value)
 
     Parses a string and returns a :class:`datetime.date`.
 
-parse_time()
-------------
+``parse_time()``
+----------------
 
 .. function:: parse_time(value)
 
@@ -157,8 +157,8 @@ parse_time()
     UTC offsets aren't supported; if ``value`` describes one, the result is
     ``None``.
 
-parse_datetime()
-----------------
+``parse_datetime()``
+--------------------
 
 .. function:: parse_datetime(value)
 
@@ -167,8 +167,8 @@ parse_datetime()
     UTC offsets are supported; if ``value`` describes one, the result's
     ``tzinfo`` attribute is a :class:`datetime.timezone` instance.
 
-parse_duration()
-----------------
+``parse_duration()``
+--------------------
 
 .. function:: parse_duration(value)
 
@@ -185,8 +185,8 @@ parse_duration()
 .. module:: django.utils.decorators
     :synopsis: Functions that help with creating decorators for views.
 
-method_decorator()
-------------------
+``method_decorator()``
+----------------------
 
 .. function:: method_decorator(decorator, name='')
 
@@ -201,8 +201,8 @@ method_decorator()
     See :ref:`decorating class based views <decorating-class-based-views>` for
     example usage.
 
-decorator_from_middleware()
----------------------------
+``decorator_from_middleware()``
+-------------------------------
 
 .. function:: decorator_from_middleware(middleware_class)
 
@@ -214,8 +214,8 @@ decorator_from_middleware()
     and earlier (having methods like ``process_request()``,
     ``process_exception()``, and ``process_response()``).
 
-decorator_from_middleware_with_args()
--------------------------------------
+``decorator_from_middleware_with_args()``
+-----------------------------------------
 
 .. function:: decorator_from_middleware_with_args(middleware_class)
 
@@ -231,8 +231,8 @@ decorator_from_middleware_with_args()
          def my_view(request):
              pass
 
-sync_only_middleware()
-----------------------
+``sync_only_middleware()``
+--------------------------
 
 .. function:: sync_only_middleware(middleware)
 
@@ -240,8 +240,8 @@ sync_only_middleware()
     default in Django, but this allows you to future-proof if the default ever
     changes in a future release.)
 
-async_only_middleware()
------------------------
+``async_only_middleware()``
+---------------------------
 
 .. function:: async_only_middleware(middleware)
 
@@ -249,8 +249,8 @@ async_only_middleware()
     will wrap it in an asynchronous event loop when it is called from the WSGI
     request path.
 
-sync_and_async_middleware()
----------------------------
+``sync_and_async_middleware()``
+-------------------------------
 
 .. function:: sync_and_async_middleware(middleware)
 
@@ -265,8 +265,8 @@ sync_and_async_middleware()
 .. module:: django.utils.encoding
    :synopsis: A series of helper functions to manage character encoding.
 
-smart_str()
------------
+``smart_str()``
+---------------
 
 .. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
@@ -276,8 +276,8 @@ smart_str()
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
 
-is_protected_type()
--------------------
+``is_protected_type()``
+-----------------------
 
 .. function:: is_protected_type(obj)
 
@@ -286,8 +286,8 @@ is_protected_type()
     Objects of protected types are preserved as-is when passed to
     ``force_str(strings_only=True)``.
 
-force_str()
------------
+``force_str()``
+---------------
 
 .. function:: force_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
@@ -297,8 +297,8 @@ force_str()
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
 
-smart_bytes()
--------------
+``smart_bytes()``
+-----------------
 
 .. function:: smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
 
@@ -308,8 +308,8 @@ smart_bytes()
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
 
-force_bytes()
--------------
+``force_bytes()``
+-----------------
 
 .. function:: force_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
 
@@ -320,8 +320,8 @@ force_bytes()
     objects.
 
 
-iri_to_uri()
-------------
+``iri_to_uri()``
+----------------
 
 .. function:: iri_to_uri(iri)
 
@@ -335,8 +335,8 @@ iri_to_uri()
     Takes an IRI (string or UTF-8 bytes) and returns a string containing the
     encoded result.
 
-uri_to_iri()
-------------
+``uri_to_iri()``
+----------------
 
 .. function:: uri_to_iri(uri)
 
@@ -348,8 +348,8 @@ uri_to_iri()
     Takes a URI in ASCII bytes and returns a string containing the encoded
     result.
 
-filepath_to_uri()
------------------
+``filepath_to_uri()``
+---------------------
 
 .. function:: filepath_to_uri(path)
 
@@ -364,8 +364,8 @@ filepath_to_uri()
 
     Returns an ASCII string containing the encoded result.
 
-escape_uri_path()
------------------
+``escape_uri_path()``
+---------------------
 
 .. function:: escape_uri_path(path)
 
@@ -404,8 +404,8 @@ which is currently ``Rss201rev2Feed``
 For definitions of the different versions of RSS, see:
 https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 
-get_tag_uri()
--------------
+``get_tag_uri()``
+-----------------
 
 .. function:: get_tag_uri(url, date)
 
@@ -465,8 +465,8 @@ get_tag_uri()
 
             The ``stylesheets`` argument was added.
 
-    add_item()
-    ----------
+    ``add_item()``
+    --------------
 
     .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
 
@@ -474,29 +474,29 @@ get_tag_uri()
         ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
         objects, and ``enclosures``, which is a list of ``Enclosure`` instances.
 
-    num_items()
-    -----------
+    ``num_items()``
+    ---------------
 
     .. method:: num_items()
 
-    root_attributes()
-    -----------------
+    ``root_attributes()``
+    ---------------------
 
     .. method:: root_attributes()
 
         Return extra attributes to place on the root (i.e. feed/channel)
         element. Called from ``write()``.
 
-    add_root_elements()
-    -------------------
+    ``add_root_elements()``
+    -----------------------
 
     .. method:: add_root_elements(handler)
 
         Add elements in the root (i.e. feed/channel) element.
         Called from ``write()``.
 
-    add_stylesheets()
-    -----------------
+    ``add_stylesheets()``
+    ---------------------
 
     .. method:: add_stylesheets(self, handler)
 
@@ -505,38 +505,38 @@ get_tag_uri()
         Add stylesheet information to the document.
         Called from ``write()``.
 
-    item_attributes()
-    -----------------
+    ``item_attributes()``
+    ---------------------
 
     .. method:: item_attributes(item)
 
         Return extra attributes to place on each item (i.e. item/entry)
         element.
 
-    add_item_elements()
-    -------------------
+    ``add_item_elements()``
+    -----------------------
 
     .. method:: add_item_elements(handler, item)
 
         Add elements on each item (i.e. item/entry) element.
 
-    write()
-    -------
+    ``write()``
+    -----------
 
     .. method:: write(outfile, encoding)
 
         Outputs the feed in the given encoding to ``outfile``, which is a
         file-like object. Subclasses should override this.
 
-    writeString()
-    -------------
+    ``writeString()``
+    -----------------
 
     .. method:: writeString(encoding)
 
         Returns the feed in the given encoding as a string.
 
-    latest_post_date()
-    ---------------
+    ``latest_post_date()``
+    ----------------------
 
     .. method:: latest_post_date()
 
@@ -670,8 +670,8 @@ get_tag_uri()
     decorator converts the result of a method with a single ``cls`` argument
     into a property that can be accessed directly from the class.
 
-keep_lazy()
------------
+``keep_lazy()``
+---------------
 
 .. function:: keep_lazy(func, *resultclasses)
 
@@ -718,8 +718,8 @@ keep_lazy()
     input is a proper string, then add support for lazy translation objects at
     the end.
 
-keep_lazy_text()
-----------------
+``keep_lazy_text()``
+--------------------
 
 .. function:: keep_lazy_text(func)
 
@@ -752,8 +752,8 @@ autoescape mechanism, using the utilities in :mod:`django.utils.safestring`
 where appropriate. This module provides some additional low level utilities for
 escaping HTML.
 
-escape()
---------
+``escape()``
+------------
 
 .. function:: escape(text)
 
@@ -761,16 +761,16 @@ escape()
     for use in HTML. The input is first coerced to a string and the output has
     :func:`~django.utils.safestring.mark_safe` applied.
 
-conditional_escape()
---------------------
+``conditional_escape()``
+------------------------
 
 .. function:: conditional_escape(text)
 
     Similar to ``escape()``, except that it doesn't operate on preescaped
     strings, so it will not double escape.
 
-format_html()
--------------
+``format_html()``
+-----------------
 
 .. function:: format_html(format_string, *args, **kwargs)
 
@@ -814,8 +814,8 @@ format_html()
     through :func:`conditional_escape` which (ultimately) calls
     :func:`~django.utils.encoding.force_str` on the values.
 
-format_html_join()
-------------------
+``format_html_join()``
+----------------------
 
 .. function:: format_html_join(sep, format_string, args_generator)
 
@@ -848,8 +848,8 @@ format_html_join()
 
         Support for mappings in ``args_generator`` was added.
 
-json_script()
--------------
+``json_script()``
+-----------------
 
 .. function:: json_script(value, element_id=None, encoder=None)
 
@@ -869,8 +869,8 @@ json_script()
     <serialization-formats-json>` for more details about this serializer.
 
 
-strip_tags()
-------------
+``strip_tags()``
+----------------
 
 .. function:: strip_tags(value)
 
@@ -891,8 +891,8 @@ strip_tags()
     If you are looking for a more robust solution, consider using a third-party
     HTML sanitizing tool.
 
-html_safe()
------------
+``html_safe()``
+---------------
 
 .. function:: html_safe()
 
@@ -910,16 +910,16 @@ html_safe()
 .. module:: django.utils.http
    :synopsis: HTTP helper functions. (URL encoding, cookie handling, ...)
 
-urlencode()
------------
+``urlencode()``
+---------------
 
 .. function:: urlencode(query, doseq=False)
 
     A version of Python's :func:`urllib.parse.urlencode` function that can
     operate on ``MultiValueDict`` and non-string values.
 
-http_date()
------------
+``http_date()``
+---------------
 
 .. function:: http_date(epoch_seconds=None)
 
@@ -933,8 +933,8 @@ http_date()
     Outputs a string in the format ``Wdy, DD Mon YYYY HH:MM:SS GMT``.
 
 
-content_disposition_header()
-----------------------------
+``content_disposition_header()``
+--------------------------------
 
 .. function:: content_disposition_header(as_attachment, filename)
 
@@ -943,30 +943,30 @@ content_disposition_header()
     ``as_attachment`` is ``False`` and ``filename`` is ``None``, otherwise
     returns a string suitable for the ``Content-Disposition`` HTTP header.
 
-base36_to_int()
----------------
+``base36_to_int()``
+-------------------
 
 .. function:: base36_to_int(s)
 
     Converts a base 36 string to an integer.
 
-int_to_base36()
----------------
+``int_to_base36()``
+-------------------
 
 .. function:: int_to_base36(i)
 
     Converts a positive integer to a base 36 string.
 
-urlsafe_base64_encode()
------------------------
+``urlsafe_base64_encode()``
+---------------------------
 
 .. function:: urlsafe_base64_encode(s)
 
     Encodes a bytestring to a base64 string for use in URLs, stripping any
     trailing equal signs.
 
-urlsafe_base64_decode()
------------------------
+``urlsafe_base64_decode()``
+---------------------------
 
 .. function::  urlsafe_base64_decode(s)
 
@@ -981,8 +981,8 @@ urlsafe_base64_decode()
 
 Functions for working with Python modules.
 
-import_string()
----------------
+``import_string()``
+-------------------
 
 .. function:: import_string(dotted_path)
 
@@ -1018,8 +1018,8 @@ appropriate entities.
     A ``str`` subclass that has been specifically marked as "safe" (requires no
     further escaping) for HTML output purposes.
 
-mark_safe()
------------
+``mark_safe()``
+---------------
 
 .. function:: mark_safe(s)
 
@@ -1052,8 +1052,8 @@ mark_safe()
 .. module:: django.utils.text
     :synopsis: Text manipulation.
 
-format_lazy()
--------------
+``format_lazy()``
+-----------------
 
 .. function:: format_lazy(format_string, *args, **kwargs)
 
@@ -1075,8 +1075,8 @@ format_lazy()
     is translated to "persona", the regular expression will match
     ``persona/(?P<pk>\d+)/$``, e.g. ``persona/5/``.
 
-slugify()
----------
+``slugify()``
+-------------
 
 .. function:: slugify(value, allow_unicode=False)
 
@@ -1112,8 +1112,8 @@ slugify()
 .. module:: django.utils.timezone
     :synopsis: Timezone support.
 
-get_fixed_timezone()
---------------------
+``get_fixed_timezone()``
+------------------------
 
 .. function:: get_fixed_timezone(offset)
 
@@ -1124,40 +1124,40 @@ get_fixed_timezone()
     minutes. Use positive values for time zones east of UTC and negative
     values for west of UTC.
 
-get_default_timezone()
-----------------------
+``get_default_timezone()``
+--------------------------
 
 .. function:: get_default_timezone()
 
     Returns a :class:`~datetime.tzinfo` instance that represents the
     :ref:`default time zone <default-current-time-zone>`.
 
-get_default_timezone_name()
----------------------------
+``get_default_timezone_name()``
+-------------------------------
 
 .. function:: get_default_timezone_name()
 
     Returns the name of the :ref:`default time zone
     <default-current-time-zone>`.
 
-get_current_timezone()
-----------------------
+``get_current_timezone()``
+--------------------------
 
 .. function:: get_current_timezone()
 
     Returns a :class:`~datetime.tzinfo` instance that represents the
     :ref:`current time zone <default-current-time-zone>`.
 
-get_current_timezone_name()
----------------------------
+``get_current_timezone_name()``
+-------------------------------
 
 .. function:: get_current_timezone_name()
 
     Returns the name of the :ref:`current time zone
     <default-current-time-zone>`.
 
-activate()
-----------
+``activate()``
+--------------
 
 .. function:: activate(timezone)
 
@@ -1165,15 +1165,15 @@ activate()
     ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
     subclass or a time zone name.
 
-deactivate()
-------------
+``deactivate()``
+----------------
 
 .. function:: deactivate()
 
     Unsets the :ref:`current time zone <default-current-time-zone>`.
 
-override()
-----------
+``override()``
+--------------
 
 .. function:: override(timezone)
 
@@ -1185,8 +1185,8 @@ override()
 
     ``override`` is also usable as a function decorator.
 
-localtime()
------------
+``localtime()``
+---------------
 
 .. function:: localtime(value=None, timezone=None)
 
@@ -1198,8 +1198,8 @@ localtime()
     This function doesn't work on naive datetimes; use :func:`make_aware`
     instead.
 
-localtime()
------------
+``localtime()``
+---------------
 
 .. function:: localdate(value=None, timezone=None)
 
@@ -1211,8 +1211,8 @@ localtime()
 
     This function doesn't work on naive datetimes.
 
-now()
------
+``now()``
+---------
 
 .. function:: now()
 
@@ -1231,24 +1231,24 @@ now()
       times in UTC regardless of the value of :setting:`TIME_ZONE`;
       you can use :func:`localtime` to get the time in the current time zone.
 
-is_aware()
-----------
+``is_aware()``
+--------------
 
 .. function:: is_aware(value)
 
     Returns ``True`` if ``value`` is aware, ``False`` if it is naive. This
     function assumes that ``value`` is a :class:`~datetime.datetime`.
 
-is_naive()
-----------
+``is_naive()``
+--------------
 
 .. function:: is_naive(value)
 
     Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
     function assumes that ``value`` is a :class:`~datetime.datetime`.
 
-make_aware()
-------------
+``make_aware()``
+----------------
 
 .. function:: make_aware(value, timezone=None)
 
@@ -1257,8 +1257,8 @@ make_aware()
     :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
 
-make_naive()
-------------
+``make_naive()``
+----------------
 
 .. function:: make_naive(value, timezone=None)
 
@@ -1276,15 +1276,15 @@ make_naive()
 For a complete discussion on the usage of the following see the
 :doc:`translation documentation </topics/i18n/translation>`.
 
-gettext()
----------
+``gettext()``
+-------------
 
 .. function:: gettext(message)
 
     Translates ``message`` and returns it as a string.
 
-pgettext()
-----------
+``pgettext()``
+--------------
 
 .. function:: pgettext(context, message)
 
@@ -1292,8 +1292,8 @@ pgettext()
 
     For more information, see :ref:`contextual-markers`.
 
-gettext_lazy()
---------------
+``gettext_lazy()``
+------------------
 
 .. function:: gettext_lazy(message)
 
@@ -1301,8 +1301,8 @@ gettext_lazy()
 
     See :ref:`lazy translations documentation <lazy-translations>`.
 
-pgettext_lazy()
----------------
+``pgettext_lazy()``
+-------------------
 
 .. function:: pgettext_lazy(context, message)
 
@@ -1310,8 +1310,8 @@ pgettext_lazy()
 
     See :ref:`lazy translations documentation <lazy-translations>`.
 
-gettext_noop()
---------------
+``gettext_noop()``
+------------------
 
 .. function:: gettext_noop(message)
 
@@ -1320,24 +1320,24 @@ gettext_noop()
     language (because they might be used externally) and will be translated
     later.
 
-ngettext()
-----------
+``ngettext()``
+--------------
 
 .. function:: ngettext(singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
     based on ``number``.
 
-npgettext()
------------
+``npgettext()``
+---------------
 
 .. function:: npgettext(context, singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
     based on ``number`` and the ``context``.
 
-ngettext_lazy()
----------------
+``ngettext_lazy()``
+-------------------
 
 .. function:: ngettext_lazy(singular, plural, number)
 
@@ -1345,8 +1345,8 @@ ngettext_lazy()
 
     See :ref:`lazy translations documentation <lazy-translations>`.
 
-npgettext_lazy()
-----------------
+``npgettext_lazy()``
+--------------------
 
 .. function:: npgettext_lazy(context, singular, plural, number)
 
@@ -1354,24 +1354,24 @@ npgettext_lazy()
 
     See :ref:`lazy translations documentation <lazy-translations>`.
 
-activate()
-----------
+``activate()``
+--------------
 
 .. function:: activate(language)
 
     Fetches the translation object for a given language and activates it as
     the current translation object for the current thread.
 
-deactivate()
-------------
+``deactivate()``
+----------------
 
 .. function:: deactivate()
 
     Deactivates the currently active translation object so that further _ calls
     will resolve against the default translation object, again.
 
-deactivate_all()
-----------------
+``deactivate_all()``
+--------------------
 
 .. function:: deactivate_all()
 
@@ -1380,8 +1380,8 @@ deactivate_all()
     string for some reason.
 
 
-override()
-----------
+``override()``
+--------------
 
 .. function:: override(language, deactivate=False)
 
@@ -1396,8 +1396,8 @@ override()
 
     ``override`` is also usable as a function decorator.
 
-check_for_language()
---------------------
+``check_for_language()``
+------------------------
 
 .. function:: check_for_language(lang_code)
 
@@ -1405,8 +1405,8 @@ check_for_language()
     code (e.g. 'fr', 'pt_BR'). This is used to decide whether a user-provided
     language is available.
 
-get_language()
---------------
+``get_language()``
+------------------
 
 .. function:: get_language()
 
@@ -1414,8 +1414,8 @@ get_language()
     translations are temporarily deactivated (by :func:`deactivate_all()` or
     when ``None`` is passed to :func:`override()`).
 
-get_language_bidi()
--------------------
+``get_language_bidi()``
+-----------------------
 
 .. function:: get_language_bidi()
 
@@ -1424,8 +1424,8 @@ get_language_bidi()
     * ``False`` = left-to-right layout
     * ``True`` = right-to-left layout
 
-get_language_from_request()
----------------------------
+``get_language_from_request()``
+-------------------------------
 
 .. function:: get_language_from_request(request, check_path=False)
 
@@ -1438,8 +1438,8 @@ get_language_from_request()
     for whether its path begins with a language code listed in the
     :setting:`LANGUAGES` setting.
 
-get_supported_language_variant()
---------------------------------
+``get_supported_language_variant()``
+------------------------------------
 
 .. function:: get_supported_language_variant(lang_code, strict=False)
 
@@ -1462,15 +1462,15 @@ get_supported_language_variant()
     Raises :exc:`LookupError` if nothing is found.
 
 
-to_locale()
------------
+``to_locale()``
+---------------
 
 .. function:: to_locale(language)
 
     Turns a language name (en-us) into a locale name (en_US).
 
-templatize()
-------------
+``templatize()``
+----------------
 
 .. function:: templatize(src)
 
