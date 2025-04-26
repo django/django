@@ -238,6 +238,13 @@ class ArticleAdmin(ArticleAdminWithExtraUrl):
             {"classes": ("wide",), "fields": ("date", "section", "sub_section")},
         ),
         ("이름", {"fields": ("another_section",)}),
+        (
+            "Collapsible open fields",
+            {
+                "classes": ("collapse", "collapse-open"),
+                "fields": ("collapsible_open_field",),
+            },
+        ),
     )
 
     # These orderings aren't particularly useful but show that expressions can
