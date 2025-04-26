@@ -125,6 +125,12 @@ class Fieldset:
             return False
         return "collapse" in self.classes
 
+    @cached_property
+    def is_collapsible_open(self):
+        if any(field in self.fields for field in self.form.errors):
+            return False
+        return "collapse-open" in self.classes
+
     def __iter__(self):
         for field in self.fields:
             yield Fieldline(
@@ -442,6 +448,12 @@ class InlineAdminFormSet:
         if any(self.formset.errors):
             return False
         return "collapse" in self.classes
+
+    @cached_property
+    def is_collapsible_open(self):
+        if any(self.formset.errors):
+            return False
+        return "collapse-open" in self.classes
 
     def non_form_errors(self):
         return self.formset.non_form_errors()
