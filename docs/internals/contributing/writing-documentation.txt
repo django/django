@@ -355,14 +355,14 @@ documentation:
   .. code-block:: rst
 
     patch_cache_control()
-    ~~~~~~~~~~~~~~~~~~~~~
+    ---------------------
 
     .. function:: patch_cache_control(response, **kwargs)
 
         This function patches the ``Cache-Control`` header.
 
     get_max_age()
-    ~~~~~~~~~~~~~
+    -------------
 
     .. function:: get_max_age(response)
 
