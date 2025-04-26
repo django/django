@@ -1551,6 +1551,14 @@ class MigrateTests(MigrationTestBase):
             recorder.record_unapplied("migrations2", "0002_second")
             recorder.record_unapplied("migrations2", "0001_squashed_0002")
 
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.with_generic_model",
+        ]
+    )
+    def test_migrate_model_inherit_generic(self):
+        call_command("migrate", verbosity=0)
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """
