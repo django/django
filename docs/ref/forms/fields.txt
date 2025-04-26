@@ -677,9 +677,32 @@ For each field, we describe the default widget used if you don't specify
     When you use a ``FileField`` in a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
-    The ``max_length`` error refers to the length of the filename. In the error
-    message for that key, ``%(max)d`` will be replaced with the maximum filename
-    length and ``%(length)d`` will be replaced with the current filename length.
+    The ``max_length`` error message includes the length of the filename. In
+    the error message for that key, ``%(max)d`` will be replaced with the
+    maximum filename length and ``%(length)d`` will be replaced with the
+    current filename length.
+
+    .. admonition:: Usage with :class:`~django.forms.ModelForm`
+
+        A ``FileField`` in a :class:`~django.forms.ModelForm` will
+        **not** automatically validate the length of uploaded filenames against
+        the ``max_length`` of the :class:`~django.db.models.FileField`
+        on the model it is bound to. If an uploaded object has a filename
+        longer than allowed by the
+        :attr:`~django.db.models.CharField.max_length` argument of the model
+        field, then a :exc:`~django.db.IntegrityError` will be raised when the
+        form is saved.
+
+        You should ensure that the ``max_length`` argument of the form field
+        is set to a value low enough to prevent this from happening. If an
+        :attr:`~django.db.models.FileField.upload_to` location is specified on
+        the model field, then this will also become part of the filename and
+        you must account for this.
+
+        If the filename is dynamically generated after upload (such as by a
+        callable :attr:`~django.db.models.FileField.upload_to` on the model
+        field), then you must ensure that you handle the possibility of a
+        filename longer than the database field.
 
 ``FilePathField``
 -----------------
