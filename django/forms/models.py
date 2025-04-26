@@ -1054,6 +1054,7 @@ def modelformset_factory(
     can_delete_extra=True,
     renderer=None,
     edit_only=False,
+    auto_id="id_%s",
 ):
     """Return a FormSet class for the given Django model class."""
     meta = getattr(form, "Meta", None)
@@ -1092,6 +1093,7 @@ def modelformset_factory(
         absolute_max=absolute_max,
         can_delete_extra=can_delete_extra,
         renderer=renderer,
+        auto_id=auto_id,
     )
     FormSet.model = model
     FormSet.edit_only = edit_only
@@ -1112,6 +1114,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         save_as_new=False,
         prefix=None,
         queryset=None,
+        auto_id="id_%s",
         **kwargs,
     ):
         if instance is None:
@@ -1126,7 +1129,9 @@ class BaseInlineFormSet(BaseModelFormSet):
         else:
             qs = queryset.none()
         self.unique_fields = {self.fk.name}
-        super().__init__(data, files, prefix=prefix, queryset=qs, **kwargs)
+        super().__init__(
+            data, files, prefix=prefix, queryset=qs, auto_id=auto_id, **kwargs
+        )
 
         # Add the generated field to form._meta.fields if it's defined to make
         # sure validation isn't skipped on that field.
@@ -1323,6 +1328,7 @@ def inlineformset_factory(
     can_delete_extra=True,
     renderer=None,
     edit_only=False,
+    auto_id="id_%s",
 ):
     """
     Return an ``InlineFormSet`` for the given kwargs.
@@ -1357,6 +1363,7 @@ def inlineformset_factory(
         "can_delete_extra": can_delete_extra,
         "renderer": renderer,
         "edit_only": edit_only,
+        "auto_id": auto_id,
     }
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk
