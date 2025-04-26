@@ -80,7 +80,19 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added :class:`~django.contrib.postgres.fields.UUID4Field`, a new field that
+  automatically generates a UUID4 value in the database without requiring
+  explicit value assignment in Python code.
+
+* Added :class:`~django.contrib.postgres.fields.UUID4AutoField`, a new field
+  that can be used as a primary key field that automatically generates
+  UUID4 values in the database for new model instances.
+  When set as the default primary key field using
+  :setting:`DEFAULT_AUTO_FIELD` or
+  :attr:`AppConfig.default_auto_field
+  <django.apps.AppConfig.default_auto_field>`,
+  this field eliminates the need to specify a primary key column
+  in your model definitions.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,6 +194,11 @@ Migrations
 
 Models
 ~~~~~~
+
+* Introduced ``AutoFieldMixin` to decouple the automatic primary key generation
+  behavior from the underlying data type. This allows creating
+  auto-incrementing primary keys of any data type, such as UUID fields,
+  without being limited to integer-based primary keys with ``AutoField``.
 
 * :doc:`Constraints </ref/models/constraints>` now implement a ``check()``
   method that is already registered with the check framework.

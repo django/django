@@ -38,7 +38,7 @@ class TestDefaultPK(SimpleTestCase):
     def test_default_auto_field_setting_non_auto(self):
         msg = (
             "Primary key 'django.db.models.TextField' referred by "
-            "DEFAULT_AUTO_FIELD must subclass AutoField."
+            "DEFAULT_AUTO_FIELD must subclass AutoFieldMixin."
         )
         with self.assertRaisesMessage(ValueError, msg):
 
@@ -50,7 +50,7 @@ class TestDefaultPK(SimpleTestCase):
         msg = (
             "Primary key 'django.db.models.TextField' referred by "
             "model_options.apps.ModelPKNonAutoConfig.default_auto_field must "
-            "subclass AutoField."
+            "subclass AutoFieldMixin."
         )
         with self.assertRaisesMessage(ValueError, msg):
 

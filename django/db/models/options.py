@@ -8,7 +8,7 @@ from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.db import connections
 from django.db.models import (
-    AutoField,
+    AutoFieldMixin,
     CompositePrimaryKey,
     Manager,
     OrderWrt,
@@ -275,10 +275,10 @@ class Options:
                 f"not be imported."
             )
             raise ImproperlyConfigured(msg) from e
-        if not issubclass(pk_class, AutoField):
+        if not issubclass(pk_class, AutoFieldMixin):
             raise ValueError(
                 f"Primary key '{pk_class_path}' referred by {source} must "
-                f"subclass AutoField."
+                f"subclass AutoFieldMixin."
             )
         return pk_class
 
