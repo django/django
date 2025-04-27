@@ -36,8 +36,6 @@ Requires core.js and SelectBox.js.
             const label = from_box.parentNode.querySelector('label');
             if (label) {
                 label.after(selector_div);
-            } else {
-                from_box.parentNode.insertBefore(selector_div, from_box);
             }
             selector_div.className = is_stacked ? 'selector stacked' : 'selector';
 
