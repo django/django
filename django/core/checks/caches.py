@@ -74,3 +74,12 @@ def check_file_based_cache_is_absolute(app_configs, **kwargs):
                 )
             )
     return errors
+
+
+@register(Tags.caches)
+def check_all_caches(app_configs, **kwargs):
+    errors = []
+    for alias, config in settings.CACHES.items():
+        cache = caches[alias]
+        errors.extend(cache.check(alias=alias, config=config))
+    return errors
