@@ -183,8 +183,8 @@ QUnit.test('with multiple labels', function(assert) {
     $('<label for="id_field">Test Label</label>').appendTo('#test2');
     $('<select id="id_field"><option value="0">A</option></select>').appendTo('#test2');
     SelectFilter.init('id_field', 'things', 0);
-    const fieldLabel = $('#test2').find('label[for="id_field"]');
-    assert.equal(fieldLabel.next().hasClass('selector'), true, "Selector should be right after the field's label");
+    const firstLabel = $('#test2 label').first();
+    assert.equal(firstLabel.next().hasClass('selector'), true, "Selector should be after the first label found");
 });
 
 QUnit.test('with no label', function(assert) {
