@@ -164,3 +164,33 @@ QUnit.test('deselecting option', function(assert) {
         done_left();
     });
 });
+
+QUnit.test('label positioning detail', function(assert) {
+    const $ = django.jQuery;
+    $('<form id="test"></form>').appendTo('#qunit-fixture');
+    $('<label for="id_field">Test Label</label>').appendTo('#test');
+    $('<select id="id_field"><option value="0">A</option></select>').appendTo('#test');
+    SelectFilter.init('id_field', 'things', 0);
+    assert.equal($('#test').children().first().prop("tagName"), "LABEL", "Label should remain first child");
+    assert.equal($('#test').children().eq(1).attr("class"), "selector", "Selector should be second child after label");
+    assert.equal($('.selector').find('label[for="id_field"]').length, 0, "Original label should not be inside selector div");
+});
+
+QUnit.test('with multiple labels', function(assert) {
+    const $ = django.jQuery;
+    $('<form id="test2"></form>').appendTo('#qunit-fixture');
+    $('<label for="something_else">Unrelated Label</label>').appendTo('#test2');
+    $('<label for="id_field">Test Label</label>').appendTo('#test2');
+    $('<select id="id_field"><option value="0">A</option></select>').appendTo('#test2');
+    SelectFilter.init('id_field', 'things', 0);
+    const fieldLabel = $('#test2').find('label[for="id_field"]');
+    assert.equal(fieldLabel.next().hasClass('selector'), true, "Selector should be right after the field's label");
+});
+
+QUnit.test('with no label', function(assert) {
+    const $ = django.jQuery;
+    $('<form id="test3"></form>').appendTo('#qunit-fixture');
+    $('<select id="id_field"><option value="0">A</option></select>').appendTo('#test3');
+    SelectFilter.init('id_field', 'things', 0);
+    assert.equal($('#test3').children().first().hasClass('selector'), true, "Selector should be first child when no label exists");
+});
