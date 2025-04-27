@@ -153,6 +153,9 @@ class BuildFile:
             if os.path.exists(self.work_path):
                 os.unlink(self.work_path)
 
+    def __repr_(self):
+        return "<%s: %s>" % (self.__class__.__name__, self.translatable.path)
+
 
 def normalize_eols(raw_contents):
     """
