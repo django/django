@@ -343,15 +343,18 @@ class AuthenticationForm(forms.Form):
         password = self.cleaned_data.get("password")
 
         if username is not None and password:
-            self.user_cache = authenticate(
-                self.request, username=username, password=password
-            )
-            if self.user_cache is None:
-                raise self.get_invalid_login_error()
-            else:
-                self.confirm_login_allowed(self.user_cache)
+            user = UserModel.objects.filter(**{UserModel.USERNAME_FIELD: username}).first()
+            if user:
+                password_check = user.check_password(password)
+                if password_check:
+                    self.user_cache = authenticate(
+                    self.request, username=username, password=password
+                    )
+                    if self.user_cache is None:
+                        self.confirm_login_allowed(user)
 
-        return self.cleaned_data
+                    return self.cleaned_data
+        raise self.get_invalid_login_error()
 
     def confirm_login_allowed(self, user):
         """
