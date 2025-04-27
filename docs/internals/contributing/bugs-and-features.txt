@@ -10,8 +10,10 @@ Reporting bugs and requesting features
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
 
-Otherwise, before reporting a bug or requesting a new feature on the
-`ticket tracker <https://code.djangoproject.com/>`_, consider these points:
+Otherwise, before reporting a bug on the
+`ticket tracker <https://code.djangoproject.com/>`_, or a new feature on the
+`new feature ideas tracker <https://github.com/orgs/django/projects/24/>`_
+consider these points:
 
 * Check that someone hasn't already filed the bug or feature request by
   `searching`_ or running `custom queries`_ in the ticket tracker.
@@ -88,16 +90,18 @@ Requesting features
 We're always trying to make Django better, and your feature requests are a key
 part of that. Here are some tips on how to make a request most effectively:
 
-* Make sure the feature actually requires changes in Django's core. If your
+* Be aware that your feature may not require changes in Django's core. If your
   idea can be developed as an independent application or module — for
   instance, you want to support another database engine — we'll probably
   suggest that you develop it independently. Then, if your project gathers
   sufficient community support, we may consider it for inclusion in Django.
 
-* First request the feature on the `Django Forum`_, not in the ticket tracker.
-  It'll get read more closely and reach a larger audience. This is even more
-  important for large-scale feature requests. We like to discuss any big
-  changes to Django's core before actually working on them.
+* First request the feature on the `new feature ideas tracker`_, not in the
+  ticket tracker. This is where the community and Steering Council evaluate
+  whether we want to include features in core or encourage the creation of a
+  third party package. This is even more important for large-scale feature
+  requests. We like to discuss any big changes to Django's core before actually
+  working on them.
 
 * Describe clearly and concisely what the missing feature is and how you'd
   like to see it implemented. Include example code (non-functional is OK)
@@ -106,9 +110,6 @@ part of that. Here are some tips on how to make a request most effectively:
 * Explain *why* you'd like the feature. Explaining a minimal use case will help
   others understand where it fits in, and if there are already other ways of
   achieving the same thing.
-
-If there's a consensus agreement on the feature, then it's appropriate to
-create a ticket. Include a link to the discussion in the ticket description.
 
 See also: :ref:`documenting-new-features`.
 
@@ -126,45 +127,27 @@ benchmarks.
 How we make decisions
 =====================
 
-Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on the Django Forum about a feature. In these votes we
-follow the voting style invented by Apache and used on Python itself, where
-votes are given as +1, +0, -0, or -1.
-Roughly translated, these votes mean:
+Whenever possible, we strive for a rough consensus. To that end, we use emoji
+reactions to track the community response to a new feature idea.
+We give these meanings to these reactions:
 
-* +1: "I love the idea and I'm strongly committed to it."
+* 👍: This is something I would use
+* 👎: This is something that would cause problems for me or Django
+* 😕: I’m indifferent to this
+* 🎉: This is an easy win
 
-* +0: "Sounds OK to me."
+The Steering Council will regularly review the idea tracker and move ideas with
+community approval through the different stages of implementation:
 
-* -0: "I'm not thrilled, but I won't stand in the way."
-
-* -1: "I strongly disagree and would be very unhappy to see the idea turn
-  into reality."
-
-Although these votes are informal, they'll be taken very seriously. After a
-suitable voting period, if an obvious consensus arises we'll follow the votes.
-
-However, consensus is not always possible. If consensus cannot be reached, or
-if the discussion toward a consensus fizzles out without a concrete decision,
-the decision may be deferred to the :ref:`steering council <steering-council>`.
-
-Internally, the steering council will use the same voting mechanism. A
-proposition will be considered carried if:
-
-* There are at least three "+1" votes from members of the steering council.
-
-* There is no "-1" vote from any member of the steering council.
-
-Votes should be submitted within a week.
-
-Since this process allows any steering council member to veto a proposal, a
-"-1" vote should be accompanied by an explanation of what it would take to
-convert that "-1" into at least a "+0".
-
-Votes on technical matters should be announced and held in public on the
-`Django Forum`_.
+* Idea
+* Approved - Idea refinement - Team creation
+* In progress
+* Working solution - Review - Feedback
+* Needs maintainer (Django only)
+* Done
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
 .. _Django Forum: https://forum.djangoproject.com/
 .. _Django Discord server: https://chat.djangoproject.com
+.. _new feature ideas tracker: https://github.com/orgs/django/projects/24/
