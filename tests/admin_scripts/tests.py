@@ -2843,8 +2843,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_custom_project_destination_missing(self):
         """
-        Make sure an exception is raised when the provided
-        destination directory doesn't exist
+        Create the directory when the provided destination directory doesn't exist.
         """
         template_path = os.path.join(custom_templates_dir, "project_template")
         args = [
@@ -2857,12 +2856,8 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "project_dir2")
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(
-            err,
-            "Destination directory '%s' does not exist, please create it first."
-            % testproject_dir,
-        )
-        self.assertFalse(os.path.exists(testproject_dir))
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(testproject_dir))
 
     def test_custom_project_template_with_non_ascii_templates(self):
         """
@@ -3098,6 +3093,66 @@ class StartApp(AdminScriptTestCase):
                 'name = "new_app"' if HAS_BLACK else "name = 'new_app'",
                 content,
             )
+
+    def test_creates_directory_when_custom_app_destination_missing(self):
+        args = [
+            "startapp",
+            "my_app",
+            "my_app",
+        ]
+        testapp_dir = os.path.join(self.test_dir, "my_app")
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(testapp_dir))
+
+    def test_custom_app_destination_missing_with_nested_subdirectory(self):
+        args = [
+            "startapp",
+            "my_app",
+            "apps/my_app",
+        ]
+        testapp_dir = os.path.join(self.test_dir, "apps", "my_app")
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(testapp_dir))
+
+    def test_custom_name_with_app_within_other_app(self):
+        parent_app_dir = os.path.join(self.test_dir, "parent")
+        self.run_django_admin(["startapp", "parent"])
+        self.assertTrue(os.path.exists(parent_app_dir))
+
+        nested_args = ["startapp", "child", "parent/child"]
+        child_app_dir = os.path.join(self.test_dir, "parent", "child")
+        out, err = self.run_django_admin(nested_args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(child_app_dir))
+
+    @unittest.skipIf(
+        sys.platform == "win32",
+        "Windows only partially supports umasks and chmod.",
+    )
+    def test_custom_app_directory_creation_error_handling(self):
+        """The error is displayed to the user in case of OSError."""
+        args = [
+            "startapp",
+            "my_app",
+            "project_dir/my_app",
+        ]
+        # Create a read-only parent directory.
+        os.makedirs(
+            os.path.join(self.test_dir, "project_dir"), exist_ok=True, mode=0o200
+        )
+        testapp_dir = os.path.join(self.test_dir, "project_dir", "my_app")
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertOutput(
+            err,
+            "Permission denied",
+        )
+        self.assertFalse(os.path.exists(testapp_dir))
 
 
 class DiffSettings(AdminScriptTestCase):
