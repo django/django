@@ -97,7 +97,7 @@ part of that. Here are some tips on how to make a request most effectively:
   sufficient community support, we may consider it for inclusion in Django.
 
 * First request the feature on the `new feature ideas tracker`_, not in the
-  ticket tracker. This is where the community and Steering Council evaluate
+  ticket tracker. This is where the community and `Steering Council`_ evaluate
   features for the Django eco-system. This is especially important for large-scale feature
   requests. We like to discuss any big changes to Django's core before actually
   working on them. We may also decide that a feature is best as a third-party
@@ -136,7 +136,7 @@ We give these meanings to these reactions:
 * 😕: I’m indifferent to this
 * 🎉: This is an easy win
 
-The Steering Council will regularly review the idea tracker and move ideas with
+The `Steering Council`_ will regularly review the idea tracker and move ideas with
 community approval through the different stages of implementation:
 
 * Idea
@@ -151,3 +151,5 @@ community approval through the different stages of implementation:
 .. _Django Forum: https://forum.djangoproject.com/
 .. _Django Discord server: https://chat.djangoproject.com
 .. _new feature ideas tracker: https://github.com/orgs/django/projects/24/
+.. _Steering Council:
+   https://docs.djangoproject.com/en/dev/internals/organization/#steering-council
