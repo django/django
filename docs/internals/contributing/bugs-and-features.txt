@@ -98,10 +98,11 @@ part of that. Here are some tips on how to make a request most effectively:
 
 * First request the feature on the `new feature ideas tracker`_, not in the
   ticket tracker. This is where the community and `Steering Council`_ evaluate
-  features for the Django eco-system. This is especially important for large-scale feature
-  requests. We like to discuss any big changes to Django's core before actually
-  working on them. We may also decide that a feature is best as a third-party
-  package where it can be implemented outside of Django core's release cycle.
+  features for the Django ecosystem. This is especially important for
+  large-scale feature requests. We like to discuss any big changes to Django's
+  core before actually working on them. We may also decide that a feature is
+  best as a third-party package where it can be implemented outside of Django
+  core's release cycle.
 
 * Describe clearly and concisely what the missing feature is and how you'd
   like to see it implemented. Include example code (non-functional is OK)
@@ -136,8 +137,8 @@ We give these meanings to these reactions:
 * 😕: I’m indifferent to this
 * 🎉: This is an easy win
 
-The `Steering Council`_ will regularly review the idea tracker and move ideas with
-community approval through the different stages of implementation:
+The `Steering Council`_ will regularly review the idea tracker and move ideas
+with community approval through the different stages of implementation:
 
 * Idea
 * Approved - Idea refinement - Team creation
