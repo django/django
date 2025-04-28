@@ -59,3 +59,7 @@ Bugfixes
 * Fixed a bug in composite primary key introspection that caused
   ``IntegerField`` to be wrongly identified as ``AutoField`` on SQLite
   (:ticket:`36358`).
+
+* Fixed a bug in Django 5.2 that caused a redundant ``unique_together``
+  constraint to be generated for composite primary keys when using
+  :djadmin:`inspectdb` (:ticket:`36357`).
