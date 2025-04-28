@@ -361,16 +361,12 @@ class TestHashedFiles:
         self.assertPostCondition()
 
     def test_css_data_uri_with_nested_url(self):
-        """
-        Test that data URIs containing nested url() calls are properly handled.
-        The nested url() fragments should be left unchanged.
-        """
         relpath = self.hashed_file_path("cached/data_uri_with_nested_url.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             # The data URI should be preserved as-is
             self.assertIn(
-                b'url("data:image/svg+xml,url(%23b) url(%23c)")',
+                b'url("data:image/svg+xml,%3Csvg%20test-1%3D%22url(%23id-1)%22%20test-2%3D%22url(%23id-2)%22%20%2F%3E")',  # noqa: E501
                 content,
             )
             # Make sure we don't see a broken pattern like this
