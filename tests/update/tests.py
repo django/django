@@ -25,8 +25,8 @@ class SimpleTest(TestCase):
     def setUpTestData(cls):
         cls.a1 = A.objects.create()
         cls.a2 = A.objects.create()
+        B.objects.bulk_create(B(a=cls.a1) for _ in range(20))
         for x in range(20):
-            B.objects.create(a=cls.a1)
             D.objects.create(a=cls.a1)
 
     def test_nonempty_update(self):
@@ -292,8 +292,9 @@ class MySQLUpdateOrderByTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        UniqueNumber.objects.create(number=1)
-        UniqueNumber.objects.create(number=2)
+        UniqueNumber.objects.bulk_create(
+            [UniqueNumber(number=1), UniqueNumber(number=2)]
+        )
 
     def test_order_by_update_on_unique_constraint(self):
         tests = [
