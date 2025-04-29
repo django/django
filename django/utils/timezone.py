@@ -178,9 +178,6 @@ def localtime(value=None, timezone=None):
         value = now()
     if timezone is None:
         timezone = get_current_timezone()
-    # Emulate the behavior of astimezone() on Python < 3.6.
-    if is_naive(value):
-        raise ValueError("localtime() cannot be applied to a naive datetime")
     return value.astimezone(timezone)
 
 
@@ -249,9 +246,6 @@ def make_naive(value, timezone=None):
     """Make an aware datetime.datetime naive in a given time zone."""
     if timezone is None:
         timezone = get_current_timezone()
-    # Emulate the behavior of astimezone() on Python < 3.6.
-    if is_naive(value):
-        raise ValueError("make_naive() cannot be applied to a naive datetime")
     return value.astimezone(timezone).replace(tzinfo=None)
 
 
