@@ -18,3 +18,7 @@ Bugfixes
   :cve:`2025-26699`, where the :tfilter:`wordwrap` template filter did not
   preserve empty lines between paragraphs after wrapping text
   (:ticket:`36341`).
+
+* Fixed a bug which caused inconsistent internationalization with ``intcomma``
+  when the string representation of a number contains a decimal
+  (:ticket:`35852`).
