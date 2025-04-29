@@ -278,10 +278,6 @@ class BaseDatabaseFeatures:
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
 
-    # SQL to create a table with a composite primary key for use by the Django
-    # test suite.
-    create_test_table_with_composite_primary_key = None
-
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
 

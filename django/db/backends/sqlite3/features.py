@@ -51,13 +51,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         # Date/DateTime fields and timedeltas.
         "expressions.tests.FTimeDeltaTests.test_mixed_comparisons1",
     }
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 INTEGER NOT NULL,
-            column_2 INTEGER NOT NULL,
-            PRIMARY KEY(column_1, column_2)
-        )
-    """
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
     supports_unlimited_charfield = True
