@@ -55,3 +55,7 @@ Bugfixes
 * Fixed a regression in Django 5.2 that caused a crash when using ``update()``
   on a ``QuerySet`` filtered against a related model and including references
   to annotations through ``values()`` (:ticket:`36360`).
+
+* Fixed a bug in composite primary key introspection that caused
+  ``IntegerField`` to be wrongly identified as ``AutoField`` on SQLite
+  (:ticket:`36358`).
