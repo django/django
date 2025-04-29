@@ -628,10 +628,7 @@ class InspectDBTransactionalTests(TransactionTestCase):
 
     def test_composite_primary_key(self):
         out = StringIO()
-        if connection.vendor == "sqlite":
-            field_type = connection.features.introspected_field_types["AutoField"]
-        else:
-            field_type = connection.features.introspected_field_types["IntegerField"]
+        field_type = connection.features.introspected_field_types["IntegerField"]
         call_command("inspectdb", "inspectdb_compositeprimarykeymodel", stdout=out)
         output = out.getvalue()
         self.assertIn(
@@ -639,8 +636,4 @@ class InspectDBTransactionalTests(TransactionTestCase):
             output,
         )
         self.assertIn(f"column_1 = models.{field_type}()", output)
-        self.assertIn(
-            "column_2 = models.%s()"
-            % connection.features.introspected_field_types["IntegerField"],
-            output,
-        )
+        self.assertIn(f"column_2 = models.{field_type}()", output)
