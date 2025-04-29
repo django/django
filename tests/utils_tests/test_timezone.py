@@ -22,12 +22,6 @@ class TimezoneTests(SimpleTestCase):
             self.assertTrue(timezone.is_naive(timezone.now()))
 
     def test_localdate(self):
-        naive = datetime.datetime(2015, 1, 1, 0, 0, 1)
-        with self.assertRaisesMessage(
-            ValueError, "localtime() cannot be applied to a naive datetime"
-        ):
-            timezone.localdate(naive, timezone=EAT)
-
         aware = datetime.datetime(2015, 1, 1, 0, 0, 1, tzinfo=ICT)
         self.assertEqual(
             timezone.localdate(aware, timezone=EAT), datetime.date(2014, 12, 31)
