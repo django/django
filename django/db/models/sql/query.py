@@ -412,7 +412,11 @@ class Query(BaseExpression):
             obj.select_related = copy.deepcopy(obj.select_related)
         if "subq_aliases" in self.__dict__:
             obj.subq_aliases = self.subq_aliases.copy()
-        obj.used_aliases = self.used_aliases.copy()
+        if obj.filter_is_sticky:
+            obj.filter_is_sticky = False
+            obj.used_aliases = self.used_aliases.copy()
+        else:
+            obj.used_aliases = set()
         obj._filtered_relations = self._filtered_relations.copy()
         # Clear the cached_property, if it exists.
         obj.__dict__.pop("base_table", None)
@@ -426,9 +430,6 @@ class Query(BaseExpression):
         obj = self.clone()
         if klass and obj.__class__ != klass:
             obj.__class__ = klass
-        if not obj.filter_is_sticky:
-            obj.used_aliases = set()
-        obj.filter_is_sticky = False
         if hasattr(obj, "_setup_query"):
             obj._setup_query()
         return obj
