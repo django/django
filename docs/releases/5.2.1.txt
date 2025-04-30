@@ -4,7 +4,8 @@ Django 5.2.1 release notes
 
 *Expected May 7, 2025*
 
-Django 5.2.1 fixes several bugs in 5.2.
+Django 5.2.1 fixes a security issue with severity "moderate" and several bugs
+in 5.2.
 
 Bugfixes
 ========
@@ -56,8 +57,8 @@ Bugfixes
   on a ``QuerySet`` filtered against a related model and including references
   to annotations through ``values()`` (:ticket:`36360`).
 
-* Fixed a bug in composite primary key introspection that caused
-  ``IntegerField`` to be wrongly identified as ``AutoField`` on SQLite
+* Fixed a bug in Django 5.2 that caused composite primary key introspection to
+  wrongly identify ``IntegerField`` as ``AutoField`` on SQLite
   (:ticket:`36358`).
 
 * Fixed a bug in Django 5.2 that caused a redundant ``unique_together``
