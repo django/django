@@ -284,7 +284,6 @@ class QuerySet(AltersData):
         self._hints = hints or {}
         self._query = query or sql.Query(self.model)
         self._result_cache = None
-        self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = ()
         self._prefetch_done = False
@@ -1493,10 +1492,12 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("exclude")
         return self._filter_q(~Q(*args, **kwargs))
 
-    def _filter_q(self, q, defer=False):
+    def _filter_q(self, q, defer=False, sticky=False):
         if q and self.query.is_sliced:
             raise TypeError("Cannot filter a query once a slice has been taken.")
         clone = self._clone()
+        if sticky:
+            clone.query.filter_is_sticky = True
         if defer:
             clone._deferred_filter = q
         else:
@@ -1912,8 +1913,6 @@ class QuerySet(AltersData):
         c._known_related_objects = self._known_related_objects
         c._iterable_class = self._iterable_class
         c._fields = self._fields
-        if self._sticky_filter:
-            c.query.filter_is_sticky = True
         return c
 
     def _fetch_all(self):
