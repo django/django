@@ -284,7 +284,6 @@ class QuerySet(AltersData):
         self._hints = hints or {}
         self._query = query or sql.Query(self.model)
         self._result_cache = None
-        self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = ()
         self._prefetch_done = False
@@ -1494,10 +1493,12 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("exclude")
         return self._filter_q(~Q(*args, **kwargs))
 
-    def _filter_q(self, q, *, defer=False):
+    def _filter_q(self, q, *, defer=False, sticky=False):
         if q and self.query.is_sliced:
             raise TypeError("Cannot filter a query once a slice has been taken.")
         clone = self._chain()
+        if sticky:
+            clone.query.filter_is_sticky = True
         if defer:
             clone._deferred_filter = q
         else:
@@ -1885,11 +1886,7 @@ class QuerySet(AltersData):
         Return a copy of the current QuerySet that's ready for another
         operation.
         """
-        obj = self._clone()
-        if obj._sticky_filter:
-            obj.query.filter_is_sticky = True
-            obj._sticky_filter = False
-        return obj
+        return self._clone()
 
     def _clone(self):
         """
@@ -1902,7 +1899,6 @@ class QuerySet(AltersData):
             using=self._db,
             hints=self._hints,
         )
-        c._sticky_filter = self._sticky_filter
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
         c._known_related_objects = self._known_related_objects
@@ -1915,20 +1911,6 @@ class QuerySet(AltersData):
             self._result_cache = list(self._iterable_class(self))
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
-
-    def _next_is_sticky(self):
-        """
-        Indicate that the next filter call and the one following that should
-        be treated as a single filter. This is only important when it comes to
-        determining when to reuse tables for many-to-many filters. Required so
-        that we can filter naturally on the results of related managers.
-
-        This doesn't return a clone of the current QuerySet (it returns
-        "self"). The method is only used internally and should be immediately
-        followed by a filter() that does create a clone.
-        """
-        self._sticky_filter = True
-        return self
 
     def _merge_sanity_check(self, other):
         """Check that two QuerySet classes may be merged."""

@@ -1087,9 +1087,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
-            return queryset._next_is_sticky()._filter_q(
-                Q(**self.core_filters), defer=True
-            )
+            return queryset._filter_q(Q(**self.core_filters), defer=True, sticky=True)
 
         def get_prefetch_cache(self):
             try:
