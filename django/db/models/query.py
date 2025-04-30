@@ -297,8 +297,7 @@ class QuerySet(AltersData):
     @property
     def query(self):
         if self._deferred_filter:
-            negate, args, kwargs = self._deferred_filter
-            self._filter_or_exclude_inplace(negate, args, kwargs)
+            self._filter_or_exclude_inplace(self._deferred_filter)
             self._deferred_filter = None
         return self._query
 
@@ -1485,7 +1484,7 @@ class QuerySet(AltersData):
         set.
         """
         self._not_support_combined_queries("filter")
-        return self._filter_or_exclude(False, args, kwargs)
+        return self._filter_or_exclude(Q(*args, **kwargs))
 
     def exclude(self, *args, **kwargs):
         """
@@ -1493,24 +1492,21 @@ class QuerySet(AltersData):
         set.
         """
         self._not_support_combined_queries("exclude")
-        return self._filter_or_exclude(True, args, kwargs)
+        return self._filter_or_exclude(~Q(*args, **kwargs))
 
-    def _filter_or_exclude(self, negate, args, kwargs):
-        if (args or kwargs) and self.query.is_sliced:
+    def _filter_or_exclude(self, q):
+        if q and self.query.is_sliced:
             raise TypeError("Cannot filter a query once a slice has been taken.")
         clone = self._chain()
         if self._defer_next_filter:
             self._defer_next_filter = False
-            clone._deferred_filter = negate, args, kwargs
+            clone._deferred_filter = q
         else:
-            clone._filter_or_exclude_inplace(negate, args, kwargs)
+            clone._filter_or_exclude_inplace(q)
         return clone
 
-    def _filter_or_exclude_inplace(self, negate, args, kwargs):
-        if negate:
-            self._query.add_q(~Q(*args, **kwargs))
-        else:
-            self._query.add_q(Q(*args, **kwargs))
+    def _filter_or_exclude_inplace(self, q):
+        self._query.add_q(q)
 
     def complex_filter(self, filter_obj):
         """
@@ -1527,7 +1523,7 @@ class QuerySet(AltersData):
             clone.query.add_q(filter_obj)
             return clone
         else:
-            return self._filter_or_exclude(False, args=(), kwargs=filter_obj)
+            return self._filter_or_exclude(Q(**filter_obj))
 
     def _combinator_query(self, combinator, *other_qs, all=False):
         # Clone the query to inherit the select list and everything
