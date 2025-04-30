@@ -291,7 +291,6 @@ class QuerySet(AltersData):
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
         self._fields = None
-        self._defer_next_filter = False
         self._deferred_filter = None
 
     @property
@@ -1495,12 +1494,11 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("exclude")
         return self._filter_q(~Q(*args, **kwargs))
 
-    def _filter_q(self, q):
+    def _filter_q(self, q, *, defer=False):
         if q and self.query.is_sliced:
             raise TypeError("Cannot filter a query once a slice has been taken.")
         clone = self._chain()
-        if self._defer_next_filter:
-            self._defer_next_filter = False
+        if defer:
             clone._deferred_filter = q
         else:
             clone.query.add_q(q)
