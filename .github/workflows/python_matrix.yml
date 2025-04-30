@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
       - id: set-matrix
         run: |
-          python_versions=$(sed -n "s/^.*Programming Language :: Python :: \([[:digit:]]\+\.[[:digit:]]\+\).*$/'\1', /p" setup.cfg | tr -d '\n' | sed 's/, $//g')
+          python_versions=$(sed -n "s/^.*Programming Language :: Python :: \([[:digit:]]\+\.[[:digit:]]\+\).*$/'\1', /p" pyproject.toml | tr -d '\n' | sed 's/, $//g')
           echo "Supported Python versions: $python_versions"
           echo "python_versions=[$python_versions]" >> "$GITHUB_OUTPUT"
   python:
