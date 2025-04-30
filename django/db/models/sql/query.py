@@ -1501,7 +1501,7 @@ class Query(BaseExpression):
                 filter_expr,
                 branch_negated=branch_negated,
                 current_negated=current_negated,
-                used_aliases=can_reuse,
+                can_reuse=can_reuse,
                 allow_joins=allow_joins,
                 split_subq=split_subq,
                 check_filterable=check_filterable,
@@ -1654,7 +1654,7 @@ class Query(BaseExpression):
     def _add_q(
         self,
         q_object,
-        used_aliases,
+        can_reuse,
         branch_negated=False,
         current_negated=False,
         allow_joins=True,
@@ -1674,7 +1674,7 @@ class Query(BaseExpression):
         for child in q_object.children:
             child_clause, needed_inner = self.build_filter(
                 child,
-                can_reuse=used_aliases,
+                can_reuse=can_reuse,
                 branch_negated=branch_negated,
                 current_negated=current_negated,
                 allow_joins=allow_joins,
