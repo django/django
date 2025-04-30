@@ -1484,7 +1484,7 @@ class QuerySet(AltersData):
         set.
         """
         self._not_support_combined_queries("filter")
-        return self._filter_or_exclude(Q(*args, **kwargs))
+        return self._filter_q(Q(*args, **kwargs))
 
     def exclude(self, *args, **kwargs):
         """
@@ -1492,9 +1492,9 @@ class QuerySet(AltersData):
         set.
         """
         self._not_support_combined_queries("exclude")
-        return self._filter_or_exclude(~Q(*args, **kwargs))
+        return self._filter_q(~Q(*args, **kwargs))
 
-    def _filter_or_exclude(self, q):
+    def _filter_q(self, q):
         if q and self.query.is_sliced:
             raise TypeError("Cannot filter a query once a slice has been taken.")
         clone = self._clone()
@@ -1520,7 +1520,7 @@ class QuerySet(AltersData):
             clone.query.add_q(filter_obj)
             return clone
         else:
-            return self._filter_or_exclude(Q(**filter_obj))
+            return self._filter_q(Q(**filter_obj))
 
     def _combinator_query(self, combinator, *other_qs, all=False):
         # Clone the query to inherit the select list and everything
