@@ -297,7 +297,7 @@ class QuerySet(AltersData):
     @property
     def query(self):
         if self._deferred_filter:
-            self._filter_or_exclude_inplace(self._deferred_filter)
+            self._query.add_q(self._deferred_filter)
             self._deferred_filter = None
         return self._query
 
@@ -1502,11 +1502,8 @@ class QuerySet(AltersData):
             self._defer_next_filter = False
             clone._deferred_filter = q
         else:
-            clone._filter_or_exclude_inplace(q)
+            clone._query.add_q(q)
         return clone
-
-    def _filter_or_exclude_inplace(self, q):
-        self._query.add_q(q)
 
     def complex_filter(self, filter_obj):
         """
