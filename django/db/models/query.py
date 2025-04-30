@@ -296,6 +296,7 @@ class QuerySet(AltersData):
     def query(self):
         if self._deferred_filter:
             self._query.add_q(self._deferred_filter)
+            self._query.filter_is_sticky = True
             self._deferred_filter = None
         return self._query
 
@@ -1492,12 +1493,10 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("exclude")
         return self._filter_q(~Q(*args, **kwargs))
 
-    def _filter_q(self, q, *, defer=False, sticky=False):
+    def _filter_q(self, q, *, defer=False):
         if q and self.query.is_sliced:
             raise TypeError("Cannot filter a query once a slice has been taken.")
         clone = self._clone()
-        if sticky:
-            clone.query.filter_is_sticky = True
         if defer:
             clone._deferred_filter = q
         else:
