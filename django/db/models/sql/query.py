@@ -156,9 +156,6 @@ class RawQuery:
         self.extra_select = {}
         self.annotation_select = {}
 
-    def chain(self, using):
-        return self.clone(using)
-
     def clone(self, using):
         return RawQuery(self.sql, using, params=self.params)
 
@@ -373,10 +370,12 @@ class Query(BaseExpression):
         if self.model:
             return self.model._meta
 
-    def clone(self):
+    def clone(self, *, klass=None):
         """
         Return a copy of the current Query. A lightweight alternative to
         deepcopy().
+
+        The klass argument changes the type of the Query, e.g. UpdateQuery.
         """
         obj = Empty()
         obj.__class__ = self.__class__
@@ -420,18 +419,12 @@ class Query(BaseExpression):
         obj._filtered_relations = self._filtered_relations.copy()
         # Clear the cached_property, if it exists.
         obj.__dict__.pop("base_table", None)
-        return obj
 
-    def chain(self, klass=None):
-        """
-        Return a copy of the current Query that's ready for another operation.
-        The klass argument changes the type of the Query, e.g. UpdateQuery.
-        """
-        obj = self.clone()
         if klass and obj.__class__ != klass:
             obj.__class__ = klass
         if hasattr(obj, "_setup_query"):
             obj._setup_query()
+
         return obj
 
     def relabeled_clone(self, change_map):
