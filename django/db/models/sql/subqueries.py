@@ -63,8 +63,8 @@ class UpdateQuery(Query):
         self.related_ids = None
         self.related_updates = {}
 
-    def clone(self):
-        obj = super().clone()
+    def clone(self, *, klass=None):
+        obj = super().clone(klass=klass)
         obj.related_updates = self.related_updates.copy()
         return obj
 

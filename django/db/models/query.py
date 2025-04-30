@@ -583,7 +583,7 @@ class QuerySet(AltersData):
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
-        return self.query.chain().get_aggregation(self.db, kwargs)
+        return self.query.clone().get_aggregation(self.db, kwargs)
 
     async def aaggregate(self, *args, **kwargs):
         return await sync_to_async(self.aggregate)(*args, **kwargs)
@@ -1209,8 +1209,7 @@ class QuerySet(AltersData):
         Delete objects found from the given queryset in single direct SQL
         query. No signals are sent and there is no protection for cascades.
         """
-        query = self.query.clone()
-        query.__class__ = sql.DeleteQuery
+        query = self.query.clone(klass=sql.DeleteQuery)
         return query.get_compiler(using).execute_sql(ROW_COUNT)
 
     _raw_delete.alters_data = True
@@ -1224,7 +1223,7 @@ class QuerySet(AltersData):
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
         self._for_write = True
-        query = self.query.chain(sql.UpdateQuery)
+        query = self.query.clone(klass=sql.UpdateQuery)
         query.add_update_values(kwargs)
 
         # Inline annotations in order_by(), if possible.
@@ -1271,7 +1270,7 @@ class QuerySet(AltersData):
         """
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
-        query = self.query.chain(sql.UpdateQuery)
+        query = self.query.clone(klass=sql.UpdateQuery)
         query.add_update_fields(values)
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
@@ -1888,7 +1887,7 @@ class QuerySet(AltersData):
         """
         c = self.__class__(
             model=self.model,
-            query=self.query.chain(),
+            query=self.query.clone(),
             using=self._db,
             hints=self._hints,
         )
@@ -2116,7 +2115,7 @@ class RawQuerySet:
         return RawQuerySet(
             self.raw_query,
             model=self.model,
-            query=self.query.chain(using=alias),
+            query=self.query.clone(using=alias),
             params=self.params,
             translations=self.translations,
             using=alias,
