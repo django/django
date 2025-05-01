@@ -21,26 +21,32 @@ tutorial, so that the template contains an HTML ``<form>`` element:
     :caption: ``polls/templates/polls/detail.html``
 
     <form action="{% url 'polls:vote' question.id %}" method="post">
-    {% csrf_token %}
-    <fieldset>
-        <legend><h1>{{ question.question_text }}</h1></legend>
-        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-        {% for choice in question.choice_set.all %}
-            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-        {% endfor %}
-    </fieldset>
-    <input type="submit" value="Vote">
+        {% csrf_token %}
+        <fieldset>
+            <legend><h1>{{ question.question_text }}</h1></legend>
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            {% if question.choice_set.all %}
+                {% for choice in question.choice_set.all %}
+                    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+                {% endfor %}
+            {% else %}
+                <p>No choices available for this question.</p>
+            {% endif %}
+        </fieldset>
+        <input type="submit" value="Vote">
     </form>
 
 A quick rundown:
 
 * The above template displays a radio button for each question choice. The
-  ``value`` of each radio button is the associated question choice's ID. The
-  ``name`` of each radio button is ``"choice"``. That means, when somebody
-  selects one of the radio buttons and submits the form, it'll send the
-  POST data ``choice=#`` where # is the ID of the selected choice. This is the
-  basic concept of HTML forms.
+    ``value`` of each radio button is the associated question choice's ID. The
+    ``name`` of each radio button is ``"choice"``. That means, when somebody
+    selects one of the radio buttons and submits the form, it'll send the
+    POST data ``choice=#`` where # is the ID of the selected choice. This is the
+    basic concept of HTML forms.
+
+* If there are no choices available for the question, the template displays a message: "No choices available for this question."
 
 * We set the form's ``action`` to ``{% url 'polls:vote' question.id %}``, and we
   set ``method="post"``. Using ``method="post"`` (as opposed to
@@ -58,6 +64,25 @@ A quick rundown:
   helpful system for protecting against it. In short, all POST forms that are
   targeted at internal URLs should use the :ttag:`{% csrf_token %}<csrf_token>`
   template tag.
+
+If you want to add choices to a question using the Python interactive shell,
+ you can do so as follows:
+
+.. code-block:: pycon
+
+    # No choice are in the system yet.
+    >>> from polls.models import Question, Choice
+    >>> q = Question.objects.get(pk=1)
+    >>> q.choice_set.all()
+    <QuerySet []>
+    >>> q.choice_set.create(choice_text="Not much", votes=0)
+    <Choice: Not much>
+    >>> q.choice_set.create(choice_text="The sky", votes=0)
+    <Choice: The sky>
+    >>> q.choice_set.create(choice_text="Just hacking again", votes=0)
+    <Choice: Just hacking again>
+    >>> q.choice_set.all()
+    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
 Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
