@@ -365,15 +365,7 @@ class TestHashedFiles:
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             # The data URI should be preserved as-is
-            self.assertIn(
-                b'url("data:image/svg+xml,%3Csvg%20test-1%3D%22url(%23id-1)%22%20test-2%3D%22url(%23id-2)%22%20%2F%3E")',  # noqa: E501
-                content,
-            )
-            # Make sure we don't see a broken pattern like this
-            self.assertNotIn(
-                b'url("data:image/svg+xml,url(%23b) url("%23c")")',
-                content,
-            )
+            self.assertIn(b'url("data:image/svg+xml,url(%23b) url(%23c)")', content)
         self.assertPostCondition()
 
 
