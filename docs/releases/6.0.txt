@@ -37,6 +37,43 @@ compatible with Django 6.0.
 What's new in Django 6.0
 ========================
 
+Content Security Policy support
+-------------------------------
+
+Built-in support for the :ref:`Content Security Policy (CSP) <security-csp>`
+standard is now available, making it easier to protect web applications against
+content injection attacks such as cross-site scripting (XSS). CSP allows
+declaring trusted sources of content by giving browsers strict rules about
+which scripts, styles, images, or other resources can be loaded.
+
+CSP policies can now be enforced or monitored directly using built-in tools:
+headers are added via the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`, nonces are
+supported through the :func:`~django.template.context_processors.csp` context
+processor, and policies are configured using the :setting:`SECURE_CSP` and
+:setting:`SECURE_CSP_REPORT_ONLY` settings.
+
+These settings accept Python dictionaries and support Django-provided constants
+for clarity and safety. For example::
+
+    from django.utils.csp import CSP
+
+    SECURE_CSP = {
+        "default-src": [CSP.SELF],
+        "script-src": [CSP.SELF, CSP.NONCE],
+        "img-src": [CSP.SELF, "https:"],
+    }
+
+The resulting ``Content-Security-Policy`` header would be set to:
+
+.. code-block:: text
+
+    default-src 'self'; script-src 'self' 'nonce-SECRET'; img-src 'self' https:
+
+To get started, follow the :doc:`CSP how-to guide </howto/csp>`. For in-depth
+guidance, see the :ref:`CSP security overview <security-csp>` and the
+:doc:`reference docs </ref/csp>`.
+
 Minor features
 --------------
 
