@@ -205,6 +205,8 @@ Django's Git repository:
 
   (use the commit hash where the regression was introduced).
 
+  Tip: After installing the requirements from ``requirements/py3.txt``, you can run the full test suite using ``python tests/runtests.py``.
+
 Reverting commits
 =================
 
