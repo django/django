@@ -568,6 +568,8 @@ The following checks are run if you use the :option:`check --deploy` option:
   ``'django-insecure-'`` indicating that it was generated automatically by
   Django. Please generate a long and random value, otherwise many of Django's
   security-critical features will be vulnerable to attack.
+* **security.E026**: The CSP setting ``<SETTING_NAME>`` must be a dictionary
+  (got ``<value>`` instead).
 
 The following checks verify that your security-related settings are correctly
 configured:
