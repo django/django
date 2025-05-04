@@ -995,10 +995,7 @@ class ModelAdmin(BaseModelAdmin):
     @staticmethod
     def _get_action_description(func, name, change=False):
         try:
-            if change:
-                return func.short_description
-            else:
-                return func.plural_description
+            return func.short_description if change else func.plural_description
         except AttributeError:
             return capfirst(name.replace("_", " "))
 
@@ -1595,7 +1592,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self._response_post_save(request, obj)
 
-    def response_action(self, request, queryset, change):
+    def response_action(self, request, queryset, change=False):
         """
         Handle an admin action. This is called if a request is POSTed to the
         changelist or changeform; it returns an HttpResponse if the action was
@@ -1632,26 +1629,25 @@ class ModelAdmin(BaseModelAdmin):
         # If the form's valid we can handle the action.
         if action_form.is_valid():
             action = action_form.cleaned_data["action"]
+            select_across = action_form.cleaned_data["select_across"]
             func = self.get_actions(request)[action][0]
-            if not change:
-                select_across = action_form.cleaned_data["select_across"]
-                # Get the list of selected PKs. If nothing's selected, we can't
-                # perform an action on it, so bail. Except we want to perform
-                # the action explicitly on all objects.
-                selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
-                if not selected and not select_across:
-                    # Reminder that something needs to be selected or nothing will
-                    # happen
-                    msg = _(
-                        "Items must be selected in order to perform "
-                        "actions on them. No items have been changed."
-                    )
-                    self.message_user(request, msg, messages.WARNING)
-                    return None
 
-                if not select_across:
-                    # Perform the action only on the selected objects
-                    queryset = queryset.filter(pk__in=selected)
+            # Get the list of selected PKs. If nothing's selected, we can't
+            # perform an action on it, so bail. Except we want to perform
+            # the action explicitly on all objects.
+            selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+            if not selected and not select_across:
+                # Reminder that something needs to be selected or nothing will happen
+                msg = _(
+                    "Items must be selected in order to perform "
+                    "actions on them. No items have been changed."
+                )
+                self.message_user(request, msg, messages.WARNING)
+                return None
+
+            if not select_across:
+                # Perform the action only on the selected objects
+                queryset = queryset.filter(pk__in=selected)
 
             response = func(self, request, queryset)
 
@@ -1861,17 +1857,14 @@ class ModelAdmin(BaseModelAdmin):
         actions = self.get_actions(request)
         if request.method == "POST":
             if actions and request.POST.get("action", ""):
-                action_failed = False
                 response = self.response_action(
                     request,
-                    self.get_queryset(request).filter(id=object_id),
-                    change=not add,
+                    self.get_queryset(request),
+                    change=True,
                 )
                 if response:
                     return response
                 else:
-                    action_failed = True
-                if action_failed:
                     # Redirect back to the changelist page to avoid resubmitting the
                     # form if the user refreshes the browser or uses the "No, take
                     # me back" button on the action confirmation page.
@@ -1948,7 +1941,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Build the action form and populate it with available actions.
         if actions and not add:
-            action_form = self.action_form(auto_id=None)
+            action_form = self.action_form(initial={"change": True}, auto_id=None)
             action_form.fields["action"].choices = self.get_action_choices(
                 request, change=True
             )
@@ -1967,6 +1960,7 @@ class ModelAdmin(BaseModelAdmin):
             "to_field": to_field,
             "media": media,
             "action_form": action_form,
+            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
             "inline_admin_formsets": inline_formsets,
             "errors": helpers.AdminErrorList(form, formsets),
             "preserved_filters": self.get_preserved_filters(request),
@@ -2065,7 +2059,7 @@ class ModelAdmin(BaseModelAdmin):
         ):
             if selected:
                 response = self.response_action(
-                    request, queryset=cl.get_queryset(request), change=False
+                    request, queryset=cl.get_queryset(request)
                 )
                 if response:
                     return response
@@ -2089,7 +2083,7 @@ class ModelAdmin(BaseModelAdmin):
         ):
             if selected:
                 response = self.response_action(
-                    request, queryset=cl.get_queryset(request), change=False
+                    request, queryset=cl.get_queryset(request)
                 )
                 if response:
                     return response

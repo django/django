@@ -7,7 +7,6 @@ from django.contrib.admin import helpers
 from django.contrib.admin.decorators import action
 from django.contrib.admin.utils import model_ngettext
 from django.core.exceptions import PermissionDenied
-from django.db.models.query import QuerySet
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
@@ -15,7 +14,7 @@ from django.utils.translation import gettext_lazy
 
 @action(
     permissions=["delete"],
-    description="Delete",
+    description=gettext_lazy("Delete"),
     description_plural=gettext_lazy("Delete selected %(verbose_name_plural)s"),
 )
 def delete_selected(modeladmin, request, queryset):
@@ -30,11 +29,6 @@ def delete_selected(modeladmin, request, queryset):
     """
     opts = modeladmin.model._meta
     app_label = opts.app_label
-
-    # Handle the case when delete action is called from change view and
-    # it is a single object
-    if not isinstance(queryset, QuerySet):
-        queryset = modeladmin.model.objects.filter(id=queryset.id)
 
     # Populate deletable_objects, a data structure of all related objects that
     # will also be deleted.

@@ -646,6 +646,7 @@ class AdminDetailActionsTest(TestCase):
                 "email": "foo@bar.com",
                 "_save": "Save",
                 "action": "",
+                ACTION_CHECKBOX_NAME: [self.s1.pk],
             },
         )
         external_subscriber = ExternalSubscriber.objects.get()
@@ -664,6 +665,7 @@ class AdminDetailActionsTest(TestCase):
                 "email": "foo@bar.com",
                 "_save": "Save",
                 "action": "external_mail",
+                ACTION_CHECKBOX_NAME: [self.s1.pk],
             },
         )
         self.assertEqual(len(mail.outbox), 1)
@@ -680,7 +682,7 @@ class AdminDetailActionsTest(TestCase):
 
         response = self.client.post(
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
-            {"action": "download"},
+            {"action": "download", ACTION_CHECKBOX_NAME: [self.s1.pk]},
         )
         content = b"".join(list(response))
         self.assertEqual(
@@ -697,7 +699,7 @@ class AdminDetailActionsTest(TestCase):
         self.user.user_permissions.add(permission)
         response = self.client.post(
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
-            {"action": "delete_selected"},
+            {"action": "delete_selected", ACTION_CHECKBOX_NAME: [self.s1.pk]},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(
@@ -709,6 +711,7 @@ class AdminDetailActionsTest(TestCase):
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
             {
                 "action": "delete_selected",
+                ACTION_CHECKBOX_NAME: [self.s1.pk],
                 "post": "yes",
             },
         )
@@ -719,7 +722,7 @@ class AdminDetailActionsTest(TestCase):
         # User doesn't have the permission to run the custom action.
         response = self.client.post(
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
-            {"action": "custom_action"},
+            {"action": "custom_action", ACTION_CHECKBOX_NAME: [self.s1.pk]},
         )
         self.assertEqual(response.status_code, 302)
 
@@ -733,7 +736,7 @@ class AdminDetailActionsTest(TestCase):
         self.user.user_permissions.add(permission)
         response = self.client.post(
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
-            {"action": "custom_action"},
+            {"action": "custom_action", ACTION_CHECKBOX_NAME: [self.s1.pk]},
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"OK")
