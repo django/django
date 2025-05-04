@@ -993,17 +993,17 @@ class ModelAdmin(BaseModelAdmin):
         return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
 
     @staticmethod
-    def _get_action_description(func, name, change=False):
+    def _get_action_description(func, name, is_change_view):
         try:
-            return func.short_description if change else func.plural_description
+            return func.short_description if is_change_view else func.plural_description
         except AttributeError:
             return capfirst(name.replace("_", " "))
 
-    def _get_base_actions(self, change=False):
+    def _get_base_actions(self, is_change_view=False):
         """Return the list of actions, prior to any request-based filtering."""
         actions = []
         base_actions = (
-            self.get_action(action, change) for action in self.actions or []
+            self.get_action(action, is_change_view) for action in self.actions or []
         )
         # get_action might have returned None, so filter any of those out.
         base_actions = [action for action in base_actions if action]
@@ -1013,7 +1013,7 @@ class ModelAdmin(BaseModelAdmin):
         for name, func in self.admin_site.actions:
             if name in base_action_names:
                 continue
-            description = self._get_action_description(func, name, change)
+            description = self._get_action_description(func, name, is_change_view)
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
         actions.extend(base_actions)
@@ -1035,7 +1035,7 @@ class ModelAdmin(BaseModelAdmin):
                 filtered_actions.append(action)
         return filtered_actions
 
-    def get_actions(self, request, change=False):
+    def get_actions(self, request):
         """
         Return a dictionary mapping the names of all actions for this
         ModelAdmin to a tuple of (callable, name, description) for each action.
@@ -1044,25 +1044,24 @@ class ModelAdmin(BaseModelAdmin):
         # this page.
         if self.actions is None or IS_POPUP_VAR in request.GET:
             return {}
+        is_change_view = request.resolver_match.url_name.endswith("change")
         actions = self._filter_actions_by_permissions(
-            request, self._get_base_actions(change)
+            request, self._get_base_actions(is_change_view)
         )
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(
-        self, request, change=False, default_choices=models.BLANK_CHOICE_DASH
-    ):
+    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
         """
         Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
         """
         choices = [*default_choices]
-        for func, name, description in self.get_actions(request, change).values():
+        for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
 
-    def get_action(self, action, change):
+    def get_action(self, action, is_change_view):
         """
         Return a given action from a parameter, which can either be a callable,
         or the name of a method on the ModelAdmin. Return is a tuple of
@@ -1086,7 +1085,7 @@ class ModelAdmin(BaseModelAdmin):
             except KeyError:
                 return None
 
-        description = self._get_action_description(func, action, change)
+        description = self._get_action_description(func, action, is_change_view)
         return func, action, description
 
     def get_list_display(self, request):
@@ -1592,13 +1591,11 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self._response_post_save(request, obj)
 
-    def response_action(self, request, queryset, change=False):
+    def response_action(self, request, queryset):
         """
         Handle an admin action. This is called if a request is POSTed to the
         changelist or changeform; it returns an HttpResponse if the action was
         handled, and None otherwise.
-        `change` is True if it's called from change_view; False if comes from
-        changelist_view or add_view.
         """
 
         # There can be multiple action forms on the page (at the top
@@ -1659,13 +1656,14 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 # If action was executed from change view, redirect to
                 # list view once finished.
+                is_change_view = request.resolver_match.url_name.endswith("change")
                 return HttpResponseRedirect(
-                    request.get_full_path()
-                    if not change
-                    else reverse(
+                    reverse(
                         "admin:%s_%s_changelist"
                         % (self.opts.app_label, self.opts.model_name)
                     )
+                    if is_change_view
+                    else request.get_full_path()
                 )
         else:
             msg = _("No action selected.")
@@ -1860,7 +1858,6 @@ class ModelAdmin(BaseModelAdmin):
                 response = self.response_action(
                     request,
                     self.get_queryset(request),
-                    change=True,
                 )
                 if response:
                     return response
@@ -1941,10 +1938,8 @@ class ModelAdmin(BaseModelAdmin):
 
         # Build the action form and populate it with available actions.
         if actions and not add:
-            action_form = self.action_form(initial={"change": True}, auto_id=None)
-            action_form.fields["action"].choices = self.get_action_choices(
-                request, change=True
-            )
+            action_form = self.action_form(auto_id=None)
+            action_form.fields["action"].choices = self.get_action_choices(request)
             media += action_form.media
         else:
             action_form = None
