@@ -228,7 +228,7 @@ class BaseDatabaseWrapper:
 
     # ##### Backend-specific methods for creating connections and cursors #####
 
-    def get_connection_params(self):
+    def get_connection_params(self, for_async=False):
         """Return a dict of parameters suitable for get_new_connection."""
         raise NotImplementedError(
             "subclasses of BaseDatabaseWrapper may require a get_connection_params() "
