@@ -99,6 +99,10 @@ class BaseDatabaseFeatures:
     # Does the database have a copy of the zoneinfo database?
     has_zoneinfo_database = True
 
+    # Does the backend require the foreign key constraints to be recreated
+    # when dropping an index?
+    requires_fk_constraints_to_be_recreated = False
+
     # When performing a GROUP BY, is an ORDER BY NULL required
     # to remove any ordering?
     requires_explicit_null_ordering_when_grouping = False
