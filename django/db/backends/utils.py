@@ -200,8 +200,10 @@ class AsyncCursorWrapper(CursorWrapper):
         except self.db.Database.Error:
             pass
 
-    def __aiter__(self):
-        return self.cursor.__aiter__()
+    async def __aiter__(self):
+        with self.db.wrap_database_errors:
+            async for item in self.cursor:
+                yield item
 
 
 class CursorDebugWrapper(CursorWrapper):
