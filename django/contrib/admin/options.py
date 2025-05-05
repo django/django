@@ -1854,18 +1854,17 @@ class ModelAdmin(BaseModelAdmin):
 
         actions = self.get_actions(request)
         if request.method == "POST":
-            if actions and request.POST.get("action", ""):
+            selected_action = request.POST.get("action", "")
+            if actions and selected_action:
                 response = self.response_action(
                     request,
                     self.get_queryset(request),
                 )
-                if response:
-                    return response
-                else:
-                    # Redirect back to the changelist page to avoid resubmitting the
-                    # form if the user refreshes the browser or uses the "No, take
-                    # me back" button on the action confirmation page.
-                    return HttpResponseRedirect(request.get_full_path())
+                return (
+                    response
+                    if response
+                    else HttpResponseRedirect(request.get_full_path())
+                )
 
             form = ModelForm(request.POST, request.FILES, instance=obj)
             formsets, inline_instances = self._create_formsets(
