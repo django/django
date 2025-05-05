@@ -1,11 +1,11 @@
-import unittest
-
-from django.db import connection, new_connection
-from django.test import SimpleTestCase
+from django.db import new_connection
+from django.test import SimpleTestCase, skipUnlessDBFeature
 
 
-@unittest.skipUnless(connection.supports_async is True, "Async DB test")
+@skipUnlessDBFeature("supports_async")
 class AsyncCursorTests(SimpleTestCase):
+    databases = {"default", "other"}
+
     async def test_aexecute(self):
         async with new_connection() as conn:
             async with conn.acursor() as cursor:
