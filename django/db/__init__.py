@@ -21,6 +21,7 @@ __all__ = [
     "close_old_connections",
     "connection",
     "connections",
+    "async_connections",
     "reset_queries",
     "router",
     "DatabaseError",
