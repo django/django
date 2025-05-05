@@ -149,23 +149,25 @@ That code will give us an admin change list that looks something like this:
 
 .. image:: _images/adding-actions-to-the-modeladmin.png
 
-The actions will be available also in the detail view but the description should be
-adjusted to make sense we are talking about only one object::
+.. versionchanged:: 6.0
 
-    @admin.action(
-        description="Mark selected story as published",
-        description_plural="Mark selected stories as published",
-    )
-    def make_published(modeladmin, request, queryset):
-        pass
+    The actions will be available also in the detail view but the description should be
+    adjusted to make sense we are talking about only one object::
 
-It will looks like this:
+        @admin.action(
+            description="Mark selected story as published",
+            description_plural="Mark selected stories as published",
+        )
+        def make_published(modeladmin, request, queryset):
+            pass
 
-.. image:: _images/adding-actions-to-the-modeladmin-detail-view.png
+    It will looks like this:
 
-.. note::
+    .. image:: _images/adding-actions-to-the-modeladmin-detail-view.png
 
-    In this case ``queryset`` will be a :class:`~django.db.models.query.QuerySet` of one object.
+    .. note::
+
+        In this case ``queryset`` will be a :class:`~django.db.models.query.QuerySet` of one object.
 
 That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document covers more
