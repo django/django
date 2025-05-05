@@ -589,8 +589,7 @@ class DurableTests(DurableTestsBase, TestCase):
     pass
 
 
-@skipUnlessDBFeature("uses_savepoints")
-@skipUnless(connection.supports_async is True, "Async DB test")
+@skipUnlessDBFeature("uses_savepoints", "supports_async")
 class AsyncTransactionTestCase(TransactionTestCase):
     available_apps = ["transactions"]
 

@@ -1,14 +1,12 @@
-import unittest
-
 from asgiref.sync import sync_to_async
 
-from django.db import connection, new_connection
-from django.test import TransactionTestCase
+from django.db import new_connection
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import SimpleModel
 
 
-@unittest.skipUnless(connection.supports_async is True, "Async DB test")
+@skipUnlessDBFeature("supports_async")
 class AsyncSyncCominglingTest(TransactionTestCase):
 
     available_apps = ["async"]

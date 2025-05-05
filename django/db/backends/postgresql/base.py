@@ -94,7 +94,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "postgresql"
     display_name = "PostgreSQL"
     _pg_version = None
-    supports_async = is_psycopg3
 
     # This dictionary maps Field objects to their associated PostgreSQL column
     # types, as strings. Column-type strings can contain format strings;

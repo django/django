@@ -358,6 +358,9 @@ class BaseDatabaseFeatures:
     # Does the backend support negative JSON array indexing?
     supports_json_negative_indexing = True
 
+    # Asynchronous database operations
+    supports_async = False
+
     # Does the backend support column collations?
     supports_collation_on_charfield = True
     supports_collation_on_textfield = True

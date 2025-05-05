@@ -39,7 +39,6 @@ class BaseDatabaseWrapper:
     ops = None
     vendor = "unknown"
     display_name = "unknown"
-    supports_async = False
 
     SchemaEditorClass = None
     # Classes instantiated in __init__().
