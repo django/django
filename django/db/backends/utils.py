@@ -319,7 +319,7 @@ def debug_transaction(connection, sql):
                 {
                     "sql": "%s" % sql,
                     "time": "%.3f" % duration,
-                    "async": connection.supports_async,
+                    "async": connection.features.supports_async,
                 }
             )
             logger.debug(
@@ -328,12 +328,12 @@ def debug_transaction(connection, sql):
                 sql,
                 None,
                 connection.alias,
-                connection.supports_async,
+                connection.features.supports_async,
                 extra={
                     "duration": duration,
                     "sql": sql,
                     "alias": connection.alias,
-                    "async": connection.supports_async,
+                    "async": connection.features.supports_async,
                 },
             )
 

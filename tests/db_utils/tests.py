@@ -20,7 +20,7 @@ from django.db.utils import (
     ConnectionHandler,
     load_backend,
 )
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils.connection import ConnectionDoesNotExist
 
 
@@ -108,6 +108,8 @@ class LoadBackendTests(SimpleTestCase):
 
 
 class AsyncConnectionTests(SimpleTestCase):
+    databases = {"default", "other"}
+
     def run_pool(self, coro, count=2):
         def fn():
             asyncio.run(coro())
@@ -146,7 +148,7 @@ class AsyncConnectionTests(SimpleTestCase):
 
         self.run_pool(coro)
 
-    @unittest.skipUnless(connection.supports_async is True, "Async DB test")
+    @skipUnlessDBFeature("supports_async")
     def test_new_connection_threading(self):
         async def coro():
             assert async_connections.empty is True
@@ -156,7 +158,7 @@ class AsyncConnectionTests(SimpleTestCase):
 
         self.run_pool(coro)
 
-    @unittest.skipUnless(connection.supports_async is True, "Async DB test")
+    @skipUnlessDBFeature("supports_async")
     async def test_new_connection(self):
         with self.assertRaises(ConnectionDoesNotExist):
             async_connections.get_connection(DEFAULT_DB_ALIAS)
@@ -177,7 +179,7 @@ class AsyncConnectionTests(SimpleTestCase):
         with self.assertRaises(ConnectionDoesNotExist):
             async_connections.get_connection(DEFAULT_DB_ALIAS)
 
-    @unittest.skipUnless(connection.supports_async is False, "Sync DB test")
+    @skipUnlessDBFeature("supports_async")
     async def test_new_connection_on_sync(self):
         with self.assertRaises(NotSupportedError):
             async with new_connection():

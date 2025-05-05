@@ -51,7 +51,7 @@ class new_connection:
 
     async def __aenter__(self):
         conn = connections.create_connection(self.using)
-        if conn.supports_async is False:
+        if conn.features.supports_async is False:
             raise NotSupportedError(
                 "The database backend does not support asynchronous execution."
             )
