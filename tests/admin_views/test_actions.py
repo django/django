@@ -575,8 +575,9 @@ class AdminDetailActionsTest(TestCase):
 
     def test_available_detail_actions(self):
         """
-        'Download' action with singular description and
         'Delete' action present in dropdown.
+        'Download' action with SINGULAR description.
+        'Custom action' is not present because user doesn't have permission.
         """
 
         response = self.client.get(
@@ -599,7 +600,7 @@ class AdminDetailActionsTest(TestCase):
 
     def test_available_list_actions(self):
         """
-        'Download' action with plural description.
+        'Download' action with PLURAL description.
         """
 
         response = self.client.get(
@@ -721,7 +722,7 @@ class AdminDetailActionsTest(TestCase):
         )
         self.assertEqual(ExternalSubscriber.objects.count(), 0)
 
-    def test_permissions(self):
+    def test_action_with_permissions(self):
         # User doesn't have the permission to run the custom action.
         response = self.client.post(
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
