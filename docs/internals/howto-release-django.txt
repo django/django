@@ -83,7 +83,7 @@ permissions.
     ``you@example.com`` is the email address associated with the key you want
     to use.
 
-* A clean Python virtual environment per Django version being released, with
+* A clean Python virtual environment (Python 3.9+) to build artifacts, with
   these required Python packages installed:
 
   .. code-block:: shell
@@ -466,10 +466,8 @@ Building the artifacts
 
     You can streamline some of the steps below using helper scripts from the Wiki:
 
-    * `Release script for versions 5.1 and newer
+    * `Release script
       <https://code.djangoproject.com/wiki/ReleaseScript>`_
-    * `Release script for versions 5.0 and older
-      <https://code.djangoproject.com/wiki/ReleaseScript5.0AndOlder>`_
     * `Test new version script
       <https://code.djangoproject.com/wiki/ReleaseTestNewVersion>`_
 
