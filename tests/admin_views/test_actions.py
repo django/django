@@ -715,7 +715,10 @@ class AdminDetailActionsTest(TestCase):
                 "post": "yes",
             },
         )
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url, reverse("admin:admin_views_externalsubscriber_changelist")
+        )
         self.assertEqual(ExternalSubscriber.objects.count(), 0)
 
     def test_permissions(self):
@@ -740,3 +743,19 @@ class AdminDetailActionsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"OK")
+
+    def test_redirect_after_an_action(self):
+        response = self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {
+                "name": "Foo Bar",
+                "email": "foo@bar.com",
+                "_save": "Save",
+                "action": "external_mail",
+                ACTION_CHECKBOX_NAME: [self.s1.pk],
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url, reverse("admin:admin_views_externalsubscriber_changelist")
+        )
