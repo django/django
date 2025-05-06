@@ -859,6 +859,7 @@ class Model(AltersData, metaclass=ModelBase):
             not force_insert
             and deferred_non_generated_fields
             and using == self._state.db
+            and self._is_pk_set()
         ):
             field_names = set()
             pk_fields = self._meta.pk_fields
