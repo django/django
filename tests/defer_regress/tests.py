@@ -366,3 +366,25 @@ class DeferDeletionSignalsTests(TestCase):
         Proxy.objects.only("value").get(pk=self.item_pk).delete()
         self.assertEqual(self.pre_delete_senders, [Proxy])
         self.assertEqual(self.post_delete_senders, [Proxy])
+
+
+class DeferCopyInstanceTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        SimpleItem.objects.create(name="test", value=42)
+        cls.deferred_item = SimpleItem.objects.defer("value").first()
+        cls.deferred_item.pk = None
+        cls.deferred_item._state.adding = True
+        cls.expected_msg = (
+            "Cannot retrieve deferred field 'value' from an unsaved model."
+        )
+
+    def test_save(self):
+        with self.assertRaisesMessage(AttributeError, self.expected_msg):
+            self.deferred_item.save(force_insert=True)
+        with self.assertRaisesMessage(AttributeError, self.expected_msg):
+            self.deferred_item.save()
+
+    def test_bulk_create(self):
+        with self.assertRaisesMessage(AttributeError, self.expected_msg):
+            SimpleItem.objects.bulk_create([self.deferred_item])
