@@ -629,7 +629,7 @@ class InspectDBTransactionalTests(TransactionTestCase):
     def test_composite_primary_key(self):
         out = StringIO()
         field_type = connection.features.introspected_field_types["IntegerField"]
-        call_command("inspectdb", "inspectdb_compositeprimarykeymodel", stdout=out)
+        call_command("inspectdb", "inspectdb_compositepkmodel", stdout=out)
         output = out.getvalue()
         self.assertIn(
             "pk = models.CompositePrimaryKey('column_1', 'column_2')",
@@ -640,5 +640,5 @@ class InspectDBTransactionalTests(TransactionTestCase):
 
     def test_composite_primary_key_not_unique_together(self):
         out = StringIO()
-        call_command("inspectdb", "inspectdb_compositeprimarykeymodel", stdout=out)
+        call_command("inspectdb", "inspectdb_compositepkmodel", stdout=out)
         self.assertNotIn("unique_together", out.getvalue())
