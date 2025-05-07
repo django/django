@@ -1250,8 +1250,9 @@ class QuerySet(AltersData):
                 new_order_by.append(col)
         query.order_by = tuple(new_order_by)
 
-        # Clear any annotations so that they won't be present in subqueries.
-        query.annotations = {}
+        # Clear SELECT clause as all annotation references were inlined by
+        # add_update_values() already.
+        query.clear_select_clause()
         with transaction.mark_for_rollback_on_error(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
         self._result_cache = None
@@ -2077,7 +2078,9 @@ class RawQuerySet:
         """Resolve the init field names and value positions."""
         converter = connections[self.db].introspection.identifier_converter
         model_init_fields = [
-            f for f in self.model._meta.fields if converter(f.column) in self.columns
+            field
+            for column_name, field in self.model_fields.items()
+            if column_name in self.columns
         ]
         annotation_fields = [
             (column, pos)
@@ -2192,10 +2195,13 @@ class RawQuerySet:
     def model_fields(self):
         """A dict mapping column names to model field names."""
         converter = connections[self.db].introspection.identifier_converter
-        model_fields = {}
-        for field in self.model._meta.fields:
-            model_fields[converter(field.column)] = field
-        return model_fields
+        return {
+            converter(field.column): field
+            for field in self.model._meta.fields
+            # Fields with None "column" should be ignored
+            # (e.g. CompositePrimaryKey).
+            if field.column
+        }
 
 
 class Prefetch:

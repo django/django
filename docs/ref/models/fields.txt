@@ -2041,6 +2041,42 @@ that control how the relationship functions.
         prefer Django not to create a backwards relation, set ``related_name``
         to ``'+'``.
 
+    .. admonition:: Foreign key order in intermediary models
+
+        When defining an asymmetric many-to-many relationship from a model to
+        itself using an intermediary model without defining
+        :attr:`through_fields`, the first foreign key in the intermediary model
+        will be treated as representing the source side of the
+        ``ManyToManyField``, and the second as the target side. For example::
+
+            from django.db import models
+
+
+            class Manufacturer(models.Model):
+                name = models.CharField(max_length=255)
+                clients = models.ManyToManyField(
+                    "self", symmetrical=False, related_name="suppliers", through="Supply"
+                )
+
+
+            class Supply(models.Model):
+                supplier = models.ForeignKey(
+                    Manufacturer, models.CASCADE, related_name="supplies_given"
+                )
+                client = models.ForeignKey(
+                    Manufacturer, models.CASCADE, related_name="supplies_received"
+                )
+                product = models.CharField(max_length=255)
+
+        Here, the ``Manufacturer`` model defines the many-to-many relationship
+        with ``clients`` in its role as a supplier. Therefore, the ``supplier``
+        foreign key (the source) must come before the ``client`` foreign key
+        (the target) in the intermediary ``Supply`` model.
+
+        Specifying :attr:`through_fields=("supplier", "client")
+        <.ManyToManyField.through_fields>` on the ``ManyToManyField`` makes the
+        order of foreign keys on the ``through`` model irrelevant.
+
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
     created to hold the association. It has three fields to link the models, a

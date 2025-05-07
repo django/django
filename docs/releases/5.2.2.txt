@@ -1,0 +1,12 @@
+==========================
+Django 5.2.2 release notes
+==========================
+
+*Expected June 4, 2025*
+
+Django 5.2.2 fixes several bugs in 5.2.1.
+
+Bugfixes
+========
+
+* ...
