@@ -115,6 +115,17 @@ def get_cookie_signer(salt="django.core.signing.get_cookie_signer"):
     )
 
 
+def check_signature_expiry(timestamp, max_age=None):
+    if max_age is None:
+        return
+    if isinstance(max_age, datetime.timedelta):
+        max_age = max_age.total_seconds()
+    # Check timestamp is not older than max_age.
+    age = time.time() - timestamp
+    if age > max_age:
+        raise SignatureExpired("Signature age %s > %s seconds" % (age, max_age))
+
+
 class JSONSerializer:
     """
     Simple wrapper around json to be used in signing.dumps and
@@ -159,6 +170,7 @@ def loads(
     serializer=JSONSerializer,
     max_age=None,
     fallback_keys=None,
+    return_timestamp=False,
 ):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
@@ -171,6 +183,7 @@ def loads(
         s,
         serializer=serializer,
         max_age=max_age,
+        return_timestamp=return_timestamp,
     )
 
 
@@ -259,19 +272,22 @@ class TimestampSigner(Signer):
         value = "%s%s%s" % (value, self.sep, self.timestamp())
         return super().sign(value)
 
-    def unsign(self, value, max_age=None):
+    def unsign(self, value, max_age=None, return_timestamp=False):
         """
         Retrieve original value and check it wasn't signed more
         than max_age seconds ago.
         """
         result = super().unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
-        timestamp = b62_decode(timestamp)
-        if max_age is not None:
-            if isinstance(max_age, datetime.timedelta):
-                max_age = max_age.total_seconds()
-            # Check timestamp is not older than max_age
-            age = time.time() - timestamp
-            if age > max_age:
-                raise SignatureExpired("Signature age %s > %s seconds" % (age, max_age))
+        self.payload_timestamp = b62_decode(timestamp)
+        check_signature_expiry(self.payload_timestamp, max_age=max_age)
+        if return_timestamp:
+            return value, self.payload_timestamp
+        return value
+
+    def unsign_object(self, signed_obj, max_age=None, return_timestamp=False, **kwargs):
+        # First verify the outer max_age boundary
+        value = super().unsign_object(signed_obj, max_age=max_age, **kwargs)
+        if return_timestamp:
+            return value, self.payload_timestamp
         return value
