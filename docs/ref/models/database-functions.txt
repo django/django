@@ -641,7 +641,8 @@ Usage example:
     timezone naive value. This can lead to unexpected results if you are using
     timezones other than UTC. Django will store date/time values in the
     database in the UTC timezone. The following example demonstrates what
-    happens when using the timezone "Europe/Berlin" and how to adjust for this:
+    happens when "Europe/Berlin" is active in Django (in settings
+    :setting:`TIME_ZONE`) and how to adjust for this:
 
     .. code-block:: pycon
 
@@ -663,6 +664,22 @@ Usage example:
         ... ).filter(trunc_start__lte=start_adjusted)
         >>> find_this_exp.count()
         1
+
+    .. admonition:: The value of ``trunc_start``
+
+        A timezone aware value for ``start`` is stored as
+        ``2015-06-15T12:30:50.321Z`` (the UTC timezone) in the database. When
+        Django runs the annotate ``TruncSecond`` the result is a timezone naive
+        value converted to the local timezone which becomes
+        ``2015-06-15T14:30:50`` with no timezone. When we filter using
+        ``.filter(trunc_start__lte=start)`` we are expecting
+        ``2015-06-15T14:30:50+2 <= 2015-06-15T14:30:50.321+2`` which would
+        return the row, but instead the comparison is
+        ``2015-06-15T14:30:50 <= 2015-06-15T12:30:50.321`` which doesn't find
+        the row. Converting ``start`` to ``start_adjusted`` creates a UTC
+        value for the start time so that we are comparing
+        ``2015-06-15T14:30:50 <= 2015-06-15T14:30:50.321`` which returns the
+        expected value.
 
 ``DateField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
