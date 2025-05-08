@@ -1,6 +1,8 @@
 import datetime
+from math import ceil
 
 from django.core.exceptions import FieldDoesNotExist
+from django.db import connection
 from django.db.models import F
 from django.db.models.functions import Lower
 from django.db.utils import IntegrityError
@@ -68,6 +70,15 @@ class BulkUpdateNoteTests(TestCase):
     def test_batch_size(self):
         with self.assertNumQueries(len(self.notes)):
             Note.objects.bulk_update(self.notes, fields=["note"], batch_size=1)
+
+    def test_max_batch_size(self):
+        max_batch_size = connection.ops.bulk_batch_size(
+            # PK is used twice, see comment in bulk_update().
+            [Note._meta.pk, Note._meta.pk, Note._meta.get_field("note")],
+            self.notes,
+        )
+        with self.assertNumQueries(ceil(len(self.notes) / max_batch_size)):
+            Note.objects.bulk_update(self.notes, fields=["note"])
 
     def test_unsaved_models(self):
         objs = self.notes + [Note(note="test", misc="test")]
