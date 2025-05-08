@@ -4,6 +4,7 @@ import re
 import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
+from pathlib import Path
 from unittest import skipUnless
 
 from django import forms
@@ -1906,7 +1907,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
     name_input_id = "id_name"
     photo_input_id = "id_photo"
-    tests_files_folder = "%s/files" % os.getcwd()
+    tests_files_folder = "%s/files" % Path(__file__).parent.parent
     clear_checkbox_id = "photo-clear_id"
 
     def _submit_and_wait(self):
