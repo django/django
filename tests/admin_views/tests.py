@@ -69,6 +69,7 @@ from .models import (
     Collector,
     Color,
     ComplexSortedPerson,
+    CompositePKModel,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -4076,6 +4077,67 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
         self.assertEqual(response.status_code, 302)  # temporary redirect
         self.assertIn("/123_2Fhistory/", response.headers["location"])  # PK is quoted
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminViewCompositePKTests(TestCase):
+    MODEL = "compositepkmodel"
+    CHANGE_VIEW = "admin:admin_views_%s_change"
+    HISTORY_VIEW = "admin:admin_views_%s_history"
+    DELETE_VIEW = "admin:admin_views_%s_delete"
+    CHANGELIST_VIEW = "admin:admin_views_%s_changelist"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.obj = CompositePKModel.objects.create(foo="f,o,o", bar="b-a-r")
+        cls.ct = ContentType.objects.get_for_model(CompositePKModel)
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_history_view(self):
+        viewname = self.HISTORY_VIEW % (self.MODEL,)
+        url = reverse(viewname, args=(quote(self.obj.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.obj.pk))
+
+    def test_history_view_redirects_if_does_not_exist(self):
+        viewname = self.HISTORY_VIEW % (self.MODEL,)
+        url = reverse(viewname, args=("1,2,3",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_change_view(self):
+        viewname = self.CHANGE_VIEW % (self.MODEL,)
+        url = reverse(viewname, args=(quote(self.obj.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.obj.pk))
+
+        response = self.client.post(url, {"foo": self.obj.foo, "bar": self.obj.bar})
+        self.assertRedirects(response, reverse(self.CHANGELIST_VIEW % (self.MODEL,)))
+        log_entry = LogEntry.objects.get(content_type=self.ct)
+        self.assertEqual(log_entry.object_id, '["f,o,o", "b,a,r"]')
+
+    def test_change_view_redirects_if_does_not_exist(self):
+        viewname = self.CHANGE_VIEW % (self.MODEL,)
+        url = reverse(viewname, args=("f,o,o",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_delete_view(self):
+        viewname = self.DELETE_VIEW % (self.MODEL,)
+        url = reverse(viewname, args=(quote(self.obj.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.obj.pk))
+
+    def test_delete_view_redirects_if_does_not_exist(self):
+        viewname = self.DELETE_VIEW % (self.MODEL,)
+        url = reverse(viewname, args=("1,2",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
