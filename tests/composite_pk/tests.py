@@ -170,6 +170,14 @@ class CompositePKTests(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(user.email, self.user.email)
 
+    def test_select_related(self):
+        Comment.objects.create(tenant=self.tenant, id=2)
+        with self.assertNumQueries(1):
+            comments = list(Comment.objects.select_related("user").order_by("pk"))
+            self.assertEqual(len(comments), 2)
+            self.assertEqual(comments[0].user, self.user)
+            self.assertIsNone(comments[1].user)
+
     def test_model_forms(self):
         fields = ["tenant", "id", "user_id", "text", "integer"]
         self.assertEqual(list(CommentForm.base_fields), fields)
