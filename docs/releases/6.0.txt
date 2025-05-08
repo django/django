@@ -135,6 +135,14 @@ Minor features
   now include system checks to verify that ``django.contrib.postgres`` is an
   installed app.
 
+* The :class:`.CreateExtension`, :class:`.BloomExtension`,
+  :class:`.BtreeGinExtension`, :class:`.BtreeGistExtension`,
+  :class:`.CITextExtension`, :class:`.CryptoExtension`,
+  :class:`.HStoreExtension`, :class:`.TrigramExtension`, and
+  :class:`.UnaccentExtension` operations now support the optional ``hints``
+  parameter. This allows providing database hints to database routers to assist
+  them in :ref:`making routing decisions <topics-db-multi-db-hints>`.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
