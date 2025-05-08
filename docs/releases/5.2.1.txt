@@ -7,6 +7,11 @@ Django 5.2.1 release notes
 Django 5.2.1 fixes a security issue with severity "moderate" and several bugs
 in 5.2.
 
+This release was built using an upgraded :pypi:`setuptools`, producing
+filenames compliant with :pep:`491` and :pep:`625` and thus addressing a PyPI
+warning about non-compliant distribution filenames. This change only affects
+the Django packaging process and does not impact Django's behavior.
+
 CVE-2025-32873: Denial-of-service possibility in ``strip_tags()``
 =================================================================
 
