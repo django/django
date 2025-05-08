@@ -34,20 +34,21 @@
         {% endfor %}
         </tbody>
     </table>
-    <p class="paginator">
+    <nav class="paginator" aria-labelledby="pagination">
+      <h2 id="pagination" class="visually-hidden">Pagination</h2>
       {% if pagination_required %}
         {% for i in page_range %}
           {% if i == action_list.paginator.ELLIPSIS %}
             {{ action_list.paginator.ELLIPSIS }}
           {% elif i == action_list.number %}
-            <span class="this-page">{{ i }}</span>
+            <span class="this-page" aria-current="page">{{ i }}</span>
           {% else %}
-            <a role="button" href="?{{ page_var }}={{ i }}" {% if i == action_list.paginator.num_pages %} class="end" {% endif %}>{{ i }}</a>
+            <a role="button" href="?{{ page_var }}={{ i }}" aria-label="page {{ i }}" {% if i == action_list.paginator.num_pages %} class="end" {% endif %}>{{ i }}</a>
           {% endif %}
         {% endfor %}
       {% endif %}
       {{ action_list.paginator.count }} {% blocktranslate count counter=action_list.paginator.count %}entry{% plural %}entries{% endblocktranslate %}
-    </p>
+    </nav>
 {% else %}
     <p>{% translate 'This object doesn’t have a change history. It probably wasn’t added via this admin site.' %}</p>
 {% endif %}
