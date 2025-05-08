@@ -107,7 +107,7 @@ thead th.sorted .text {
     border-left: none;
 }
 
-.paginator .end {
+.paginator ul {
     margin-left: 6px;
     margin-right: 0;
 }

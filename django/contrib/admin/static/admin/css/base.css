@@ -1164,7 +1164,19 @@ a.deletelink:focus, a.deletelink:hover {
     box-sizing: border-box;
 }
 
+.paginator ul {
+    margin: 0;
+    margin-right: 6px;
+}
+
+.paginator ul li {
+    display: inline-block;
+    line-height: 22px;
+    padding: 0;
+}
+
 .paginator a:link, .paginator a:visited {
+    display: inline-block;
     padding: 2px 6px;
     background: var(--button-bg);
     text-decoration: none;
@@ -1182,18 +1194,15 @@ a.deletelink:focus, a.deletelink:hover {
     color: var(--link-hover-color);
 }
 
-.paginator .end {
-    margin-right: 6px;
-}
-
-.paginator .this-page {
-    padding: 2px 6px;
+.paginator a[aria-current="page"] {
+    color: var(--body-quiet-color);
+    background: transparent;
     font-weight: bold;
-    font-size: 0.8125rem;
-    vertical-align: top;
+    cursor: default;
 }
 
-.paginator a:focus, .paginator a:hover {
+.paginator a:not([aria-current="page"]):focus,
+.paginator a:not([aria-current="page"]):hover {
     color: white;
     background: var(--link-hover-color);
 }
