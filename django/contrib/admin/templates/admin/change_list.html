@@ -69,7 +69,12 @@
           {% result_list cl %}
           {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
         {% endblock %}
-        {% block pagination %}{% pagination cl %}{% endblock %}
+        {% block pagination %}
+        <div class="changelist-footer">
+        {% pagination cl %}
+        {% if cl.formset and cl.result_count %}<input type="submit" name="_save" class="default" value="{% translate 'Save' %}">{% endif %}
+        {% endblock %}
+        </div>
         </form>
       </div>
       {% block filters %}
