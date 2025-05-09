@@ -1572,6 +1572,20 @@ For example, assuming ``entry`` is already duplicated as above::
     detail.entry = entry
     detail.save()
 
+Note that it is not possible to copy instances of models with deferred fields
+
+.. code-block:: pycon
+
+    >>> detail = Blog.objects.defer("name")[0]
+    >>> detail.pk = None
+    >>> detail._state.adding = True
+    >>> detail.save()
+    Traceback (most recent call last):
+        ...
+    AttributeError: Cannot retrieve deferred field 'name' from an unsaved model.
+    >>> details.name = "Another Blog"
+    >>> details.save()
+
 .. _topics-db-queries-update:
 
 Updating multiple objects at once
