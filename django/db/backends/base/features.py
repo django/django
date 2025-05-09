@@ -348,6 +348,9 @@ class BaseDatabaseFeatures:
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
 
+    # Asynchronous database operations
+    supports_async = False
+
     # Does the backend support column collations?
     supports_collation_on_charfield = True
     supports_collation_on_textfield = True
