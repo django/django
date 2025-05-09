@@ -9,4 +9,5 @@ Django 5.2.2 fixes several bugs in 5.2.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a crash when using ``select_related`` against a ``ForeignObject``
+  originating from a model with a ``CompositePrimaryKey`` (:ticket:`36373`).
