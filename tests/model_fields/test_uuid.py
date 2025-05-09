@@ -2,15 +2,10 @@ import json
 import uuid
 
 from django.core import exceptions, serializers
-from django.db import IntegrityError, connection, models
+from django.db import connection, models
 from django.db.models import CharField, F, Value
 from django.db.models.functions import Concat, Repeat
-from django.test import (
-    SimpleTestCase,
-    TestCase,
-    TransactionTestCase,
-    skipUnlessDBFeature,
-)
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     NullableUUIDModel,
@@ -331,13 +326,16 @@ class TestAsPrimaryKey(TestCase):
         gc.refresh_from_db()
         self.assertIsInstance(gc.uuidchild_ptr_id, uuid.UUID)
 
-
-class TestAsPrimaryKeyTransactionTests(TransactionTestCase):
-    # Need a TransactionTestCase to avoid deferring FK constraint checking.
-    available_apps = ["model_fields"]
-
     @skipUnlessDBFeature("supports_foreign_keys")
     def test_unsaved_fk(self):
         u1 = PrimaryKeyUUIDModel()
-        with self.assertRaises(IntegrityError):
+        clone = PrimaryKeyUUIDModel.objects.create()
+        clone.pk = None
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related "
+            "object 'uuid_fk'"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             RelatedToUUIDModel.objects.create(uuid_fk=u1)
+        with self.assertRaisesMessage(ValueError, msg):
+            RelatedToUUIDModel.objects.create(uuid_fk=clone)

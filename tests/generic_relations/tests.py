@@ -618,13 +618,20 @@ class GenericRelationsTests(TestCase):
 
     def test_unsaved_generic_foreign_key_parent_save(self):
         quartz = Mineral(name="Quartz", hardness=7)
+        obj_supplied_pk = ManualPK(id=6808)
         tagged_item = TaggedItem(tag="shiny", content_object=quartz)
+        clone = Mineral.objects.create(name="Tin", hardness=2)
+        clone.pk = None
         msg = (
             "save() prohibited to prevent data loss due to unsaved related object "
             "'content_object'."
         )
         with self.assertRaisesMessage(ValueError, msg):
             tagged_item.save()
+        with self.assertRaisesMessage(ValueError, msg):
+            TaggedItem.objects.create(tag="pikapika", content_object=obj_supplied_pk)
+        with self.assertRaisesMessage(ValueError, msg):
+            TaggedItem.objects.create(tag="pikapika", content_object=clone)
 
     @skipUnlessDBFeature("has_bulk_insert")
     def test_unsaved_generic_foreign_key_parent_bulk_create(self):
