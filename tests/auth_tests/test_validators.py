@@ -155,16 +155,18 @@ class MinimumLengthValidatorTest(SimpleTestCase):
         with self.subTest("get_error_message"):
             MinimumLengthValidator().get_error_message()
             mock_ngettext.assert_called_with(
-                "This password is too short. It must contain at least %(min_length)d character.",
-                "This password is too short. It must contain at least %(min_length)d characters.",
+                "This password is too short. "
+                "It must contain at least %(min_length)d character.",
+                "This password is too short. "
+                "It must contain at least %(min_length)d characters.",
                 8,
             )
         mock_ngettext.reset()
         with self.subTest("get_help_text"):
             MinimumLengthValidator().get_help_text()
             mock_ngettext.assert_called_with(
-                "Your password must contain at least %(min_length)d " "character.",
-                "Your password must contain at least %(min_length)d " "characters.",
+                "Your password must contain at least %(min_length)d character.",
+                "Your password must contain at least %(min_length)d characters.",
                 8,
             )
 
