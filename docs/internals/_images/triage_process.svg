@@ -264,7 +264,7 @@
         <rect x="72" y="522" width="342" height="36" fill="white"/>
         <path d="M 414 558 L 72 558 L 72 522 L 414 522 Z" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
         <text transform="translate(76 526)" fill="#595959">
-          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="7.241211" y="11">The ticket has a patch which applies cleanly and includes all </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="7.241211" y="11">The ticket has a pull request which includes all </tspan>
           <tspan font-family="Helvetica" font-size="12" fill="#595959" x="26.591797" y="25">needed tests and docs. A merger can commit it as is.</tspan>
         </text>
       </g>

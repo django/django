@@ -30,10 +30,8 @@ Code style
   ``$(selector).click(func)``. This makes it easier for projects to extend
   Django's default behavior with JavaScript.
 
-.. _javascript-patches:
-
-JavaScript patches
-==================
+JavaScript in the Django admin
+==============================
 
 Django's admin system leverages the jQuery framework to increase the
 capabilities of the admin interface. In conjunction, there is an emphasis on

@@ -70,17 +70,17 @@ By way of example, here we see the lifecycle of an average ticket:
   incorrect implementation).
 
 * Bob reviews the pull request, marks the ticket as "Accepted", "needs tests",
-  and "patch needs improvement", and leaves a comment telling Alice how the
-  patch could be improved.
+  and "pull request needs improvement", and leaves a comment telling Alice how
+  the pull request could be improved.
 
 * Alice updates the pull request, adding tests (but not changing the
   implementation). She removes the two flags.
 
-* Charlie reviews the pull request and resets the "patch needs improvement"
-  flag with another comment about improving the implementation.
+* Charlie reviews the pull request and resets the "pull request needs
+  improvement" flag with another comment about improving the implementation.
 
 * Alice updates the pull request, fixing the implementation. She removes the
-  "patch needs improvement" flag.
+  "pull request needs improvement" flag.
 
 * Daisy reviews the pull request and marks the ticket as "Ready for checkin".
 
@@ -114,39 +114,40 @@ Beyond that there are several considerations:
 
 * **Accepted + No Flags**
 
-  The ticket is valid, but no one has submitted a patch for it yet. Often this
-  means you could safely start writing a fix for it. This is generally more
-  true for the case of accepted bugs than accepted features. A ticket for a bug
-  that has been accepted means that the issue has been verified by at least one
-  triager as a legitimate bug - and should probably be fixed if possible. An
-  accepted new feature may only mean that one triager thought the feature would
-  be good to have, but this alone does not represent a consensus view or imply
-  with any certainty that a patch will be accepted for that feature. Seek more
-  feedback before writing an extensive contribution if you are in doubt.
+  The ticket is valid, but no one has submitted a pull request for it yet.
+  Often this means you could safely start writing a fix for it. This is
+  generally more true for the case of accepted bugs than accepted features. A
+  ticket for a bug that has been accepted means that the issue has been
+  verified by at least one triager as a legitimate bug - and should probably be
+  fixed if possible. An accepted new feature may only mean that one triager
+  thought the feature would be good to have, but this alone does not represent
+  a consensus view or imply with any certainty that a pull request will be
+  accepted for that feature. Seek more feedback before writing an extensive
+  contribution if you are in doubt.
 
-* **Accepted + Has Patch**
+* **Accepted + Has Pull Request**
 
   The ticket is waiting for people to review the supplied solution. This means
-  downloading the patch and trying it out, verifying that it contains tests
-  and docs, running the test suite with the included patch, and leaving
-  feedback on the ticket.
+  checking out the pull request and trying it out, verifying that it contains
+  tests and docs, checking that all the automated tests on the pull request are
+  passing, and leaving feedback.
 
-* **Accepted + Has Patch + Needs ...**
+* **Accepted + Has Pull Request + Needs ...**
 
   This means the ticket has been reviewed, and has been found to need further
-  work. "Needs tests" and "Needs documentation" are self-explanatory. "Patch
-  needs improvement" will generally be accompanied by a comment on the ticket
-  explaining what is needed to improve the code.
+  work. "Needs tests" and "Needs documentation" are self-explanatory. "Pull
+  request needs improvement" will generally be accompanied by a comment on the
+  ticket explaining what is needed to improve the code.
 
 Ready For Checkin
 -----------------
 
 The ticket was reviewed by any member of the community other than the person
-who supplied the patch and found to meet all the requirements for a
+who submitted the pull request and found to meet all the requirements for a
 commit-ready contribution. A :ref:`merger <mergers-team>` now needs to give
 a final review prior to being committed.
 
-There are a lot of pull requests. It can take a while for your patch to get
+There are a lot of pull requests. It can take a while for yours to get
 reviewed. See the :ref:`contributing code FAQ<new-contributors-faq>` for some
 ideas here.
 
@@ -158,44 +159,43 @@ high-level ideas or long-term feature requests.
 
 These tickets are uncommon and overall less useful since they don't describe
 concrete actionable issues. They are enhancement requests that we might
-consider adding someday to the framework if an excellent patch is submitted.
-They are not a high priority.
+consider adding someday to the framework if an excellent contribution is
+submitted. They are not a high priority.
 
 Other triage attributes
 =======================
 
 A number of flags, appearing as checkboxes in Trac, can be set on a ticket:
 
-Has patch
----------
+Has pull request
+----------------
 
 This means the ticket has an associated solution. These will be reviewed to
 ensure they adhere to the :doc:`documented guidelines
 <writing-code/submitting-patches>`.
 
 The following three fields (Needs documentation, Needs tests,
-Patch needs improvement) apply only if a patch has been supplied.
+Pull request needs improvement) apply only if a pull request has been supplied.
 
 Needs documentation
 -------------------
 
-This flag is used for tickets with patches that need associated
-documentation. Complete documentation of features is a prerequisite
-before we can check them into the codebase.
+This flag is used for tickets with pull requests that need associated
+documentation. Complete documentation of features is a prerequisite before we
+can check them into the codebase.
 
 Needs tests
 -----------
 
-This flags the patch as needing associated unit tests. Again, this
-is a required part of a valid contribution.
+This flags the pull request as needing associated unit tests. Again, this is a
+required part of a valid contribution.
 
-Patch needs improvement
------------------------
+Pull request needs improvement
+------------------------------
 
 This flag means that although the ticket *has* a solution, it's not quite
-ready for checkin. This could mean the patch no longer applies
-cleanly, there is a flaw in the implementation, or that the code
-doesn't meet our standards.
+ready for checkin. This could mean the pull request has merge conflicts, there
+is a flaw in the implementation, or that the code doesn't meet our standards.
 
 Easy pickings
 -------------
@@ -296,7 +296,7 @@ If you do close a ticket, you should always make sure of the following:
 A ticket can be resolved in a number of ways:
 
 * fixed
-      Used once a patch has been rolled into Django and the issue is fixed.
+      Used once a commit has been merged and the issue is fixed.
 
 * invalid
       Used if the ticket is found to be incorrect. This means that the
@@ -355,7 +355,7 @@ Then, you can help out by:
   sparse to be actionable, or when they're feature requests requiring a
   discussion on the `Django Forum`_.
 
-* Correcting the "Needs tests", "Needs documentation", or "Has patch"
+* Correcting the "Needs tests", "Needs documentation", or "Has pull request"
   flags for tickets where they are incorrectly set.
 
 * Setting the "`Easy pickings`_" flag for tickets that are small and
@@ -376,7 +376,7 @@ Then, you can help out by:
 * Verify if solutions submitted by others are correct. If they are correct
   and also contain appropriate documentation and tests then move them to the
   "Ready for Checkin" stage. If they are not correct then leave a comment to
-  explain why and set the corresponding flags ("Patch needs improvement",
+  explain why and set the corresponding flags ("Pull request needs improvement",
   "Needs tests" etc.).
 
 .. note::
@@ -395,7 +395,7 @@ the ticket database:
 * Please **don't** promote your own tickets to "Ready for checkin". You
   may mark other people's tickets that you've reviewed as "Ready for
   checkin", but you should get at minimum one other community member to
-  review a patch that you submit.
+  review a pull request that you submit.
 
 * Please **don't** reverse a decision without posting a message to the
   `Django Forum`_ to find consensus.
