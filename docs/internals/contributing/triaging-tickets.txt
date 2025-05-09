@@ -3,11 +3,10 @@ Triaging tickets
 ================
 
 Django uses Trac_ for managing the work on the code base. Trac is a
-community-tended garden of the bugs people have found and the features people
-would like to see added. As in any garden, sometimes there are weeds to be
-pulled and sometimes there are flowers and vegetables that need picking. We need
-your help to sort out one from the other, and in the end, we all benefit
-together.
+community-tended garden of the bugs people have found and the features Django
+has decided to add. As in any garden, sometimes there are weeds to be pulled
+and sometimes there are flowers and vegetables that need picking. We need your
+help to sort out one from the other, and in the end, we all benefit together.
 
 Like all gardens, we can aspire to perfection, but in reality there's no such
 thing. Even in the most pristine garden there are still snails and insects.
@@ -33,7 +32,7 @@ without **you**!
 Triage workflow
 ===============
 
-Unfortunately, not all bug reports and feature requests in the ticket tracker
+Unfortunately, not all bug reports and new features in the ticket tracker
 provide all the :doc:`required details<bugs-and-features>`. A number of
 tickets have proposed solutions, but those don't necessarily meet all the
 requirements :ref:`adhering to the guidelines for contributing <patch-style>`.
@@ -102,8 +101,8 @@ Unreviewed
 ----------
 
 The ticket has not been reviewed by anyone who felt qualified to make a
-judgment about whether the ticket contained a valid issue, a viable feature,
-or ought to be closed for any of the various reasons.
+judgment about whether the ticket contained a valid issue or ought to be closed
+for any of the various reasons.
 
 Accepted
 --------
@@ -118,11 +117,9 @@ Beyond that there are several considerations:
   means you could safely start writing a fix for it. This is generally more
   true for the case of accepted bugs than accepted features. A ticket for a bug
   that has been accepted means that the issue has been verified by at least one
-  triager as a legitimate bug - and should probably be fixed if possible. An
-  accepted new feature may only mean that one triager thought the feature would
-  be good to have, but this alone does not represent a consensus view or imply
-  with any certainty that a patch will be accepted for that feature. Seek more
-  feedback before writing an extensive contribution if you are in doubt.
+  triager as a legitimate bug - and should probably be fixed if possible. A new
+  feature ticket should only be created once the idea has been approved via the
+  `new feature idea tracker`_ or a DEP.
 
 * **Accepted + Has Patch**
 
@@ -154,7 +151,10 @@ Someday/Maybe
 -------------
 
 This stage isn't shown on the diagram. It's used sparingly to keep track of
-high-level ideas or long-term feature requests.
+long-term changes.
+
+These tickets are uncommon and overall less useful since they don't describe
+currently actionable issues.
 
 These tickets are uncommon and overall less useful since they don't describe
 concrete actionable issues. They are enhancement requests that we might
@@ -410,6 +410,7 @@ the ticket database:
 .. _`creating an account on Trac`: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
 .. _Django Forum: https://forum.djangoproject.com/
+.. _new feature idea tracker: https://github.com/orgs/django/projects/24/
 
 Bisecting a regression
 ======================
