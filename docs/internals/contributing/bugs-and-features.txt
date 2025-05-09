@@ -145,6 +145,24 @@ with community approval through the different stages of implementation:
 * Needs maintainer (Django only)
 * Done
 
+Occasionally, some discussions around feature ideas or the direction of Django
+will occur on the Django Forum. These discussions may have informal votes. In these votes we
+follow the voting style invented by Apache and used on Python itself, where
+votes are given as +1, +0, -0, or -1.
+Roughly translated, these votes mean:
+
+* +1: "I love the idea and I'm strongly committed to it."
+
+* +0: "Sounds OK to me."
+
+* -0: "I'm not thrilled, but I won't stand in the way."
+
+* -1: "I strongly disagree and would be very unhappy to see the idea turn
+  into reality."
+  
+Although these votes are informal, they'll be taken very seriously. After a
+suitable voting period, if an obvious consensus arises we'll follow the votes.
+
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
 .. _Django Forum: https://forum.djangoproject.com/
