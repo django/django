@@ -103,7 +103,8 @@ class AppsTests(SimpleTestCase):
         msg = (
             "Module 'apps.apps' does not contain a 'NoSuchConfig' class. "
             "Choices are: 'BadConfig', 'ModelPKAppsConfig', 'MyAdmin', "
-            "'MyAuth', 'NoSuchApp', 'PlainAppsConfig', 'RelabeledAppsConfig'."
+            "'MyAuth', 'NoSuchApp', 'PlainAppsConfig', 'RelabeledAppsConfig', "
+            "'UUIDv4AutoAppConfig'."
         )
         with self.assertRaisesMessage(ImportError, msg):
             with self.settings(INSTALLED_APPS=["apps.apps.NoSuchConfig"]):
@@ -488,6 +489,18 @@ class AppConfigTests(SimpleTestCase):
         self.assertEqual(
             apps_config.default_auto_field,
             "django.db.models.BigAutoField",
+        )
+        self.assertIs(apps_config._is_default_auto_field_overridden, True)
+
+    @override_settings(
+        INSTALLED_APPS=["apps.apps.UUIDv4AutoAppConfig"],
+        DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField",
+    )
+    def test_app_default_auto_field_uuid_v4(self):
+        apps_config = apps.get_app_config("apps")
+        self.assertEqual(
+            apps_config.default_auto_field,
+            "django.contrib.postgres.fields.UUID4AutoField",
         )
         self.assertIs(apps_config._is_default_auto_field_overridden, True)
 

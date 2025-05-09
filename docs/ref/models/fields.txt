@@ -649,6 +649,14 @@ Field types
 
 .. currentmodule:: django.db.models
 
+``AutoFieldMixin``
+------------------
+
+.. class:: AutoFieldMixin(**options)
+
+An interface for implementing database-generated primary keys.
+
+
 ``AutoField``
 -------------
 
@@ -1629,6 +1637,9 @@ it is recommended to use :attr:`~Field.default`::
 
 Note that a callable (with the parentheses omitted) is passed to ``default``,
 not an instance of ``UUID``.
+
+If you're looking for a UUID field that will generate the values in the database,
+see custom implementations for each database backends. For example, PostgreSQL has :class:`~django.contrib.postgres.fields.UUID4Field` and :class:`~django.contrib.postgres.fields.UUID4AutoField`.
 
 .. admonition:: Lookups on PostgreSQL and MariaDB 10.7+
 
