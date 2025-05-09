@@ -150,9 +150,11 @@ ideas here.
 Someday/Maybe
 -------------
 
-This stage isn't shown on the diagram. It's an old way to keep track of
-high-level ideas or long-term feature requests, which are now handled by the
-`new feature idea tracker`_.
+This stage isn't shown on the diagram. It's used sparingly to keep track of
+long-term changes.
+
+These tickets are uncommon and overall less useful since they don't describe
+currently actionable issues.
 
 These tickets are uncommon and overall less useful since they don't describe
 concrete actionable issues. They are enhancement requests that we might
