@@ -2463,6 +2463,9 @@ On databases that support it (all except Oracle), setting the
 SQLite, in addition to ``update_fields``, a list of ``unique_fields`` that may
 be in conflict must be provided.
 
+If the model has ``order_with_respect_to`` set, the ``_order`` field will be automatically
+populated based on the provided object order and existing database entries.
+
 Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
 each model instance (if the database normally supports it).
 
