@@ -382,10 +382,15 @@ class Command(BaseCommand):
             self.invoked_for_django = True
         else:
             if self.settings_available:
-                self.locale_paths.extend(settings.LOCALE_PATHS)
+                for path in settings.LOCALE_PATHS:
+                    locale_path = os.path.abspath(path)
+                    if locale_path not in self.locale_paths:
+                        self.locale_paths.append(locale_path)
             # Allow to run makemessages inside an app dir
             if os.path.isdir("locale"):
-                self.locale_paths.append(os.path.abspath("locale"))
+                locale_path = os.path.abspath("locale")
+                if locale_path not in self.locale_paths:
+                    self.locale_paths.append(locale_path)
             if self.locale_paths:
                 self.default_locale_path = self.locale_paths[0]
                 os.makedirs(self.default_locale_path, exist_ok=True)
@@ -548,9 +553,10 @@ class Command(BaseCommand):
                         self.stdout.write("ignoring directory %s" % dirname)
                 elif dirname == "locale":
                     dirnames.remove(dirname)
-                    self.locale_paths.insert(
-                        0, os.path.join(os.path.abspath(dirpath), dirname)
-                    )
+                    locale_dir = os.path.join(os.path.abspath(dirpath), dirname)
+                    if locale_dir in self.locale_paths:
+                        self.locale_paths.remove(locale_dir)
+                    self.locale_paths.insert(0, locale_dir)
             for filename in filenames:
                 file_path = os.path.normpath(os.path.join(dirpath, filename))
                 file_ext = os.path.splitext(filename)[1]
