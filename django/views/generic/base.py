@@ -231,6 +231,7 @@ class RedirectView(View):
     """Provide a redirect on any GET request."""
 
     permanent = False
+    preserve_request = False
     url = None
     pattern_name = None
     query_string = False
@@ -257,9 +258,9 @@ class RedirectView(View):
         url = self.get_redirect_url(*args, **kwargs)
         if url:
             if self.permanent:
-                return HttpResponsePermanentRedirect(url)
+                return HttpResponsePermanentRedirect(url, preserve_request=self.preserve_request)
             else:
-                return HttpResponseRedirect(url)
+                return HttpResponseRedirect(url, preserve_request=self.preserve_request)
         else:
             logger.warning(
                 "Gone: %s", request.path, extra={"status_code": 410, "request": request}
