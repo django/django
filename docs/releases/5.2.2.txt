@@ -9,4 +9,6 @@ Django 5.2.2 fixes several bugs in 5.2.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug where the model migration process
+  was not tracking changes to unmanaged models in
+  the same way as managed models (:ticket:`35813`).
