@@ -41,7 +41,7 @@ them. In that case, connect to your Django database and run the query
 ``CreateExtension``
 ===================
 
-.. class:: CreateExtension(name)
+.. class:: CreateExtension(name, hints=None)
 
     An ``Operation`` subclass which installs a PostgreSQL extension. For common
     extensions, use one of the more specific subclasses below.
@@ -50,45 +50,54 @@ them. In that case, connect to your Django database and run the query
 
         This is a required argument. The name of the extension to be installed.
 
+    .. attribute:: hints
+
+        .. versionadded:: 5.3
+
+        The optional ``hints`` argument will be passed as ``**hints`` to the
+        :meth:`allow_migrate` method of database routers to assist them in
+        making routing decisions. See :ref:`topics-db-multi-db-hints` for more
+        details on database hints.
+
 ``BloomExtension``
 ==================
 
-.. class:: BloomExtension()
+.. class:: BloomExtension(**options)
 
     Installs the ``bloom`` extension.
 
 ``BtreeGinExtension``
 =====================
 
-.. class:: BtreeGinExtension()
+.. class:: BtreeGinExtension(**options)
 
     Installs the ``btree_gin`` extension.
 
 ``BtreeGistExtension``
 ======================
 
-.. class:: BtreeGistExtension()
+.. class:: BtreeGistExtension(**options)
 
     Installs the ``btree_gist`` extension.
 
 ``CITextExtension``
 ===================
 
-.. class:: CITextExtension()
+.. class:: CITextExtension(**options)
 
     Installs the ``citext`` extension.
 
 ``CryptoExtension``
 ===================
 
-.. class:: CryptoExtension()
+.. class:: CryptoExtension(**options)
 
     Installs the ``pgcrypto`` extension.
 
 ``HStoreExtension``
 ===================
 
-.. class:: HStoreExtension()
+.. class:: HStoreExtension(**options)
 
     Installs the ``hstore`` extension and also sets up the connection to
     interpret hstore data for possible use in subsequent migrations.
@@ -96,14 +105,14 @@ them. In that case, connect to your Django database and run the query
 ``TrigramExtension``
 ====================
 
-.. class:: TrigramExtension()
+.. class:: TrigramExtension(**options)
 
     Installs the ``pg_trgm`` extension.
 
 ``UnaccentExtension``
 =====================
 
-.. class:: UnaccentExtension()
+.. class:: UnaccentExtension(**options)
 
     Installs the ``unaccent`` extension.
 
