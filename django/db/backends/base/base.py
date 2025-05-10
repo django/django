@@ -20,7 +20,8 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper, ProgrammingError
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
-from django.utils.sync_async import run_async_generator, run_sync_generator
+from django.utils.sync_async import run_async_generator, run_sync_generator, sync_async_method_adapter
+from django.utils.decorators import apply_method_decorator
 
 NO_DB_ALIAS = "__no_db__"
 RAN_DB_VERSION_CHECK = set()
@@ -133,15 +134,13 @@ class AbstractBaseDatabaseWrapper:
             f"vendor={self.vendor!r} alias={self.alias!r}>"
         )
 
-    def ensure_timezone_gen(self):
-        yield False
-
+    @sync_async_method_adapter
     def ensure_timezone(self):
         """
         Ensure the connection's timezone is set to `self.timezone_name` and
         return whether it changed or not.
         """
-        raise NotImplementedError
+        yield False
 
     @cached_property
     def timezone(self):
@@ -199,7 +198,12 @@ class AbstractBaseDatabaseWrapper:
             "method."
         )
 
-    def check_database_version_supported_gen(self):
+    @sync_async_method_adapter
+    def check_database_version_supported(self):
+        """
+        Raise an error if the database version isn't supported by this
+        version of Django.
+        """
         if self.features.minimum_database_version is None:
             yield
             return
@@ -214,13 +218,6 @@ class AbstractBaseDatabaseWrapper:
                 f"{self.display_name} {min_db_version} or later is required "
                 f"(found {db_version})."
             )
-
-    def check_database_version_supported(self):
-        """
-        Raise an error if the database version isn't supported by this
-        version of Django.
-        """
-        raise NotImplementedError
 
     # ##### Backend-specific methods for creating connections and cursors #####
 
@@ -238,14 +235,12 @@ class AbstractBaseDatabaseWrapper:
             "method"
         )
 
-    def init_connection_state_gen(self):
+    @sync_async_method_adapter
+    def init_connection_state(self):
+        """Initialize the database connection settings."""
         if self.alias not in RAN_DB_VERSION_CHECK:
             yield self.check_database_version_supported()
             RAN_DB_VERSION_CHECK.add(self.alias)
-
-    def init_connection_state(self):
-        """Initialize the database connection settings."""
-        raise NotImplementedError
 
     def create_cursor(self, name=None):
         """Create a cursor. Assume that a connection is established."""
@@ -255,7 +250,9 @@ class AbstractBaseDatabaseWrapper:
 
     # ##### Backend-specific methods for creating connections #####
 
-    def connect_gen(self):
+    @sync_async_method_adapter
+    def connect(self):
+        """Connect to the database. Assume that the connection is closed."""
         # Check for invalid configurations.
         self.check_settings()
         # In case the previous connection was closed while in an atomic block
@@ -280,10 +277,6 @@ class AbstractBaseDatabaseWrapper:
 
         self.run_on_commit = []
 
-    def connect(self):
-        """Connect to the database. Assume that the connection is closed."""
-        raise NotImplementedError
-
     def check_settings(self):
         if self.settings_dict["TIME_ZONE"] is not None and not settings.USE_TZ:
             raise ImproperlyConfigured(
@@ -291,7 +284,9 @@ class AbstractBaseDatabaseWrapper:
                 % self.alias
             )
 
-    def ensure_connection_gen(self):
+    @sync_async_method_adapter
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
         if self.connection is None:
             if self.in_atomic_block and self.closed_in_transaction:
                 raise ProgrammingError(
@@ -299,10 +294,6 @@ class AbstractBaseDatabaseWrapper:
                 )
             with self.wrap_database_errors:
                 yield self.connect()
-
-    def ensure_connection(self):
-        """Guarantee that a connection to the database is established."""
-        raise NotImplementedError
 
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
 
@@ -317,39 +308,31 @@ class AbstractBaseDatabaseWrapper:
             wrapped_cursor = self.make_cursor(cursor)
         return wrapped_cursor
 
-    def _cursor_gen(self, name=None):
+    @sync_async_method_adapter
+    def _cursor(self, name=None):
         yield self.close_if_health_check_failed()
         yield self.ensure_connection()
         with self.wrap_database_errors:
             raw_cursor = yield self.create_cursor(name)
             yield self._prepare_cursor(raw_cursor)
 
-    def _cursor(self, name=None):
-        raise NotImplementedError
-
-    def _commit_gen(self):
+    @sync_async_method_adapter
+    def _commit(self):
         if self.connection is not None:
             with debug_transaction(self, "COMMIT"), self.wrap_database_errors:
                 yield self.connection.commit()
 
-    def _commit(self):
-        raise NotImplementedError
-
-    def _rollback_gen(self):
+    @sync_async_method_adapter
+    def _rollback(self):
         if self.connection is not None:
             with debug_transaction(self, "ROLLBACK"), self.wrap_database_errors:
                 yield self.connection.rollback()
 
-    def _rollback(self):
-        raise NotImplementedError
-
-    def _close_gen(self):
+    @sync_async_method_adapter
+    def _close(self):
         if self.connection is not None:
             with self.wrap_database_errors:
                 yield self.connection.close()
-
-    def _close(self):
-        raise NotImplementedError
 
     # ##### Generic wrappers for PEP-249 connection methods #####
 
@@ -357,7 +340,9 @@ class AbstractBaseDatabaseWrapper:
         """Create a cursor, opening a connection if necessary."""
         raise NotImplementedError
 
-    def commit_gen(self):
+    @sync_async_method_adapter
+    def commit(self):
+        """Commit a transaction and reset the dirty flag."""
         self.validate_thread_sharing()
         self.validate_no_atomic_block()
         yield self._commit()
@@ -365,11 +350,9 @@ class AbstractBaseDatabaseWrapper:
         self.errors_occurred = False
         self.run_commit_hooks_on_set_autocommit_on = True
 
-    def commit(self):
-        """Commit a transaction and reset the dirty flag."""
-        raise NotImplementedError
-
-    def rollback_gen(self):
+    @sync_async_method_adapter
+    def rollback(self):
+        """Roll back a transaction and reset the dirty flag."""
         self.validate_thread_sharing()
         self.validate_no_atomic_block()
         yield self._rollback()
@@ -378,11 +361,9 @@ class AbstractBaseDatabaseWrapper:
         self.needs_rollback = False
         self.run_on_commit = []
 
-    def rollback(self):
-        """Roll back a transaction and reset the dirty flag."""
-        raise NotImplementedError
-
-    def close_gen(self):
+    @sync_async_method_adapter
+    def close(self):
+        """Close the connection to the database."""
         self.validate_thread_sharing()
         self.run_on_commit = []
 
@@ -401,10 +382,6 @@ class AbstractBaseDatabaseWrapper:
             else:
                 self.connection = None
 
-    def close(self):
-        """Close the connection to the database."""
-        raise NotImplementedError
-
     # ##### Backend-specific savepoint management methods #####
 
     def _savepoint(self, sid):
@@ -416,7 +393,8 @@ class AbstractBaseDatabaseWrapper:
     def _savepoint_commit(self, sid):
         raise NotImplementedError
 
-    def _savepoint_allowed_gen(self):
+    @sync_async_method_adapter
+    def _savepoint_allowed(self):
         # Savepoints cannot be created outside a transaction
         if not self.features.uses_savepoints:
             yield
@@ -426,12 +404,15 @@ class AbstractBaseDatabaseWrapper:
 
         yield not autocommit_state
 
-    def _savepoint_allowed(self):
-        raise NotImplementedError
-
     # ##### Generic savepoint management methods #####
 
-    def savepoint_gen(self):
+    @sync_async_method_adapter
+    def savepoint(self):
+        """
+        Create a savepoint inside the current transaction. Return an
+        identifier for the savepoint that will be used for the subsequent
+        rollback or commit. Do nothing if savepoints are not supported.
+        """
         is_savepoint_allowed = yield self._savepoint_allowed()
         if not is_savepoint_allowed:
             yield
@@ -448,15 +429,11 @@ class AbstractBaseDatabaseWrapper:
 
         yield sid
 
-    def savepoint(self):
+    @sync_async_method_adapter
+    def savepoint_rollback(self, sid):
         """
-        Create a savepoint inside the current transaction. Return an
-        identifier for the savepoint that will be used for the subsequent
-        rollback or commit. Do nothing if savepoints are not supported.
+        Roll back to a savepoint. Do nothing if savepoints are not supported.
         """
-        raise NotImplementedError
-
-    def savepoint_rollback_gen(self, sid):
         is_savepoint_allowed = yield self._savepoint_allowed()
         if not is_savepoint_allowed:
             yield
@@ -472,13 +449,11 @@ class AbstractBaseDatabaseWrapper:
             if sid not in sids
         ]
 
-    def savepoint_rollback(self, sid):
+    @sync_async_method_adapter
+    def savepoint_commit(self, sid):
         """
-        Roll back to a savepoint. Do nothing if savepoints are not supported.
+        Release a savepoint. Do nothing if savepoints are not supported.
         """
-        raise NotImplementedError
-
-    def savepoint_commit_gen(self, sid):
         is_savepoint_allowed = yield self._savepoint_allowed()
         if not is_savepoint_allowed:
             yield
@@ -487,21 +462,13 @@ class AbstractBaseDatabaseWrapper:
         self.validate_thread_sharing()
         yield self._savepoint_commit(sid)
 
-    def savepoint_commit(self, sid):
-        """
-        Release a savepoint. Do nothing if savepoints are not supported.
-        """
-        raise NotImplementedError
-
-    def clean_savepoints_gen(self):
-        self.savepoint_state = 0
-        yield
-
-    def clean_savepoints(self):
+    @sync_async_method_adapter
+    def clean_savepoints(self, sid):
         """
         Reset the counter used to generate unique savepoint ids in this thread.
         """
-        raise NotImplementedError
+        self.savepoint_state = 0
+        yield
 
     # ##### Backend-specific transaction management methods #####
 
@@ -515,18 +482,27 @@ class AbstractBaseDatabaseWrapper:
 
     # ##### Generic transaction management methods #####
 
-    def get_autocommit_gen(self):
+    @sync_async_method_adapter
+    def get_autocommit(self):
         """Get the autocommit state."""
         yield self.ensure_connection()
         yield self.autocommit
 
-    def get_autocommit(self):
-        """Get the autocommit state."""
-        raise NotImplementedError
-
-    def set_autocommit_gen(
+    @sync_async_method_adapter
+    def set_autocommit(
         self, autocommit, force_begin_transaction_with_broken_autocommit=False
     ):
+        """
+        Enable or disable autocommit.
+
+        The usual way to start a transaction is to turn autocommit off.
+        SQLite does not properly start a transaction when disabling
+        autocommit. To avoid this buggy behavior and to actually enter a new
+        transaction, an explicit BEGIN is required. Using
+        force_begin_transaction_with_broken_autocommit=True will issue an
+        explicit BEGIN with SQLite. This option will be ignored for other
+        backends.
+        """
         self.validate_no_atomic_block()
         yield self.close_if_health_check_failed()
         yield self.ensure_connection()
@@ -549,22 +525,6 @@ class AbstractBaseDatabaseWrapper:
         if autocommit and self.run_commit_hooks_on_set_autocommit_on:
             yield self.run_and_clear_commit_hooks()
             self.run_commit_hooks_on_set_autocommit_on = False
-
-    def set_autocommit(
-        self, autocommit, force_begin_transaction_with_broken_autocommit=False
-    ):
-        """
-        Enable or disable autocommit.
-
-        The usual way to start a transaction is to turn autocommit off.
-        SQLite does not properly start a transaction when disabling
-        autocommit. To avoid this buggy behavior and to actually enter a new
-        transaction, an explicit BEGIN is required. Using
-        force_begin_transaction_with_broken_autocommit=True will issue an
-        explicit BEGIN with SQLite. This option will be ignored for other
-        backends.
-        """
-        raise NotImplementedError
 
     def get_rollback(self):
         """Get the "needs rollback" flag -- for *advanced use* only."""
@@ -613,7 +573,9 @@ class AbstractBaseDatabaseWrapper:
             "subclasses of BaseDatabaseWrapper may require an is_usable() method"
         )
 
-    def close_if_health_check_failed_gen(self):
+    @sync_async_method_adapter
+    def close_if_health_check_failed(self):
+        """Close existing connection if it fails a health check."""
         if (
             self.connection is None
             or not self.health_check_enabled
@@ -627,11 +589,12 @@ class AbstractBaseDatabaseWrapper:
             yield self.close()
         self.health_check_done = True
 
-    def close_if_health_check_failed(self):
-        """Close existing connection if it fails a health check."""
-        raise NotImplementedError
-
-    def close_if_unusable_or_obsolete_gen(self):
+    @sync_async_method_adapter
+    def close_if_unusable_or_obsolete(self):
+        """
+        Close the current connection if unrecoverable errors have occurred
+        or if it outlived its maximum age.
+        """
         if self.connection is not None:
             self.health_check_done = False
             # If the application didn't restore the original autocommit setting,
@@ -655,13 +618,6 @@ class AbstractBaseDatabaseWrapper:
             if self.close_at is not None and time.monotonic() >= self.close_at:
                 yield self.close()
                 return
-
-    def close_if_unusable_or_obsolete(self):
-        """
-        Close the current connection if unrecoverable errors have occurred
-        or if it outlived its maximum age.
-        """
-        raise NotImplementedError
 
     # ##### Thread safety handling #####
 
@@ -755,7 +711,8 @@ class AbstractBaseDatabaseWrapper:
         """
         raise NotImplementedError
 
-    def on_commit_gen(self, func, robust=False):
+    @sync_async_method_adapter
+    def on_commit(self, func, robust=False):
         autocommit_state = yield self.get_autocommit()
 
         if not callable(func):
@@ -782,10 +739,8 @@ class AbstractBaseDatabaseWrapper:
             else:
                 yield func()
 
-    def on_commit(self, func, robust=False):
-        raise NotImplementedError
-
-    def run_and_clear_commit_hooks_gen(self):
+    @sync_async_method_adapter
+    def run_and_clear_commit_hooks(self):
         self.validate_no_atomic_block()
         current_run_on_commit = self.run_on_commit
         self.run_on_commit = []
@@ -803,9 +758,6 @@ class AbstractBaseDatabaseWrapper:
                     )
             else:
                 yield func()
-
-    def run_and_clear_commit_hooks(self):
-        raise NotImplementedError
 
     @contextmanager
     def execute_wrapper(self, wrapper):
@@ -831,53 +783,25 @@ class AbstractBaseDatabaseWrapper:
         return type(self)(settings_dict, alias)
 
 
+@apply_method_decorator(async_unsafe, [
+    'connect',
+    'ensure_connection',
+    'commit',
+    'rollback',
+    'close',
+    'savepoint',
+    'savepoint_rollback',
+    'savepoint_commit',
+    'clean_savepoints',
+    'set_autocommit',
+])
 class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
     is_async = False
-
-    def ensure_timezone(self):
-        return run_sync_generator(self.ensure_timezone_gen())
-
-    def check_database_version_supported(self):
-        return run_sync_generator(self.check_database_version_supported_gen())
-
-    def init_connection_state(self):
-        return run_sync_generator(self.init_connection_state_gen())
-
-    @async_unsafe
-    def connect(self):
-        return run_sync_generator(self.connect_gen())
-
-    @async_unsafe
-    def ensure_connection(self):
-        return run_sync_generator(self.ensure_connection_gen())
-
-    def _cursor(self, name=None):
-        return run_sync_generator(self._cursor_gen())
-
-    def _commit(self):
-        return run_sync_generator(self._commit_gen())
-
-    def _rollback(self):
-        return run_sync_generator(self._rollback_gen())
-
-    def _close(self):
-        return run_sync_generator(self._close_gen())
+    sync_async_adapter = run_sync_generator
 
     @async_unsafe
     def cursor(self):
         return self._cursor()
-
-    @async_unsafe
-    def commit(self):
-        return run_sync_generator(self.commit_gen())
-
-    @async_unsafe
-    def rollback(self):
-        return run_sync_generator(self.rollback_gen())
-
-    @async_unsafe
-    def close(self):
-        return run_sync_generator(self.close_gen())
 
     def _savepoint(self, sid):
         with self.cursor() as cursor:
@@ -890,34 +814,6 @@ class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
     def _savepoint_commit(self, sid):
         with self.cursor() as cursor:
             cursor.execute(self.ops.savepoint_commit_sql(sid))
-
-    def _savepoint_allowed(self):
-        return run_sync_generator(self._savepoint_allowed_gen())
-
-    @async_unsafe
-    def savepoint(self):
-        return run_sync_generator(self.savepoint_gen())
-
-    @async_unsafe
-    def savepoint_rollback(self, sid):
-        return run_sync_generator(self.savepoint_rollback_gen(sid))
-
-    @async_unsafe
-    def savepoint_commit(self, sid):
-        return run_sync_generator(self.savepoint_commit_gen(sid))
-
-    @async_unsafe
-    def clean_savepoints(self, sid):
-        return run_sync_generator(self.clean_savepoints_gen(sid))
-
-    def get_autocommit(self):
-        return run_sync_generator(self.get_autocommit_gen())
-
-    @async_unsafe
-    def set_autocommit(
-        self, autocommit, force_begin_transaction_with_broken_autocommit=False
-    ):
-        return run_sync_generator(self.set_autocommit_gen(autocommit, force_begin_transaction_with_broken_autocommit))
 
     # ##### Foreign key constraints checks handling #####
 
@@ -955,12 +851,6 @@ class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
         IntegrityError if any invalid foreign key references are encountered.
         """
         pass
-
-    def close_if_health_check_failed(self):
-        return run_sync_generator(self.close_if_health_check_failed_gen())
-
-    def close_if_unusable_or_obsolete(self):
-        return run_sync_generator(self.close_if_unusable_or_obsolete_gen())
 
     def prepare_database(self):
         pass
@@ -1007,61 +897,20 @@ class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
             )
         return self.SchemaEditorClass(self, *args, **kwargs)
 
-    def on_commit(self, func, robust=False):
-        return run_sync_generator(self.on_commit_gen(func, robust))
-
-    def run_and_clear_commit_hooks(self):
-        return run_sync_generator(self.run_and_clear_commit_hooks_gen())
-
 
 class AsyncBaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
     is_async = True
 
+    sync_async_adapter = run_async_generator
     client_class = NotImplementedInterface
     creation_class = NotImplementedInterface
     introspection_class = NotImplementedInterface
     validation_class = NotImplementedInterface
 
-    async def ensure_timezone(self):
-        return await run_async_generator(self.ensure_timezone_gen())
-
-    async def check_database_version_supported(self):
-        return await run_async_generator(self.check_database_version_supported_gen())
-
-    async def init_connection_state(self):
-        return await run_async_generator(self.init_connection_state_gen())
-
-    async def connect(self):
-        return await run_async_generator(self.connect_gen())
-
-    async def ensure_connection(self):
-        return await run_async_generator(self.ensure_connection_gen())
-
-    async def _cursor(self, name=None):
-        return await run_async_generator(self._cursor_gen())
-
-    async def _commit(self):
-        return await run_async_generator(self._commit_gen())
-
-    async def _rollback(self):
-        return await run_async_generator(self._rollback_gen())
-
-    async def _close(self):
-        return await run_async_generator(self._close_gen())
-
     @asynccontextmanager
     async def cursor(self):
         async with await self._cursor() as cursor:
             yield cursor
-
-    async def commit(self):
-        return await run_async_generator(self.commit_gen())
-
-    async def rollback(self):
-        return await run_async_generator(self.rollback_gen())
-
-    async def close(self):
-        return await run_async_generator(self.close_gen())
 
     async def _savepoint(self, sid):
         async with self.cursor() as cursor:
@@ -1074,35 +923,6 @@ class AsyncBaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
     async def _savepoint_commit(self, sid):
         async with self.cursor() as cursor:
             await cursor.execute(self.ops.savepoint_commit_sql(sid))
-
-    async def _savepoint_allowed(self):
-        return await run_async_generator(self._savepoint_allowed_gen())
-
-    async def savepoint(self):
-        return await run_async_generator(self.savepoint_gen())
-
-    async def savepoint_rollback(self, sid):
-        return await run_async_generator(self.savepoint_rollback_gen(sid))
-
-    async def savepoint_commit(self, sid):
-        return await run_async_generator(self.savepoint_commit_gen(sid))
-
-    async def clean_savepoints(self, sid):
-        return await run_async_generator(self.clean_savepoints_gen(sid))
-
-    async def get_autocommit(self):
-        return await run_async_generator(self.get_autocommit_gen())
-
-    async def set_autocommit(
-        self, autocommit, force_begin_transaction_with_broken_autocommit=False
-    ):
-        return await run_async_generator(self.set_autocommit_gen(autocommit, force_begin_transaction_with_broken_autocommit))
-
-    async def close_if_health_check_failed(self):
-        return await run_async_generator(self.close_if_health_check_failed_gen())
-
-    async def close_if_unusable_or_obsolete(self):
-        return await run_async_generator(self.close_if_unusable_or_obsolete_gen())
 
     async def chunked_cursor(self):
         return await self.cursor()
@@ -1122,9 +942,3 @@ class AsyncBaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
         finally:
             if must_close:
                 await self.close()
-
-    async def on_commit(self, func, robust=False):
-        return await run_async_generator(self.on_commit_gen(func, robust))
-
-    async def run_and_clear_commit_hooks(self):
-        return await run_async_generator(self.run_and_clear_commit_hooks_gen())

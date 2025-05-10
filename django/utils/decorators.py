@@ -96,6 +96,18 @@ def method_decorator(decorator, name=""):
     return _dec
 
 
+def apply_method_decorator(decorator, method_names):
+    """
+    Reuses Django's `method_decorator` to apply a function-based decorator
+    to multiple methods in a class-based view.
+    """
+    def decorator_applier(cls):
+        for method_name in method_names:
+            cls = method_decorator(decorator, name=method_name)(cls)
+        return cls
+    return decorator_applier
+
+
 def decorator_from_middleware_with_args(middleware_class):
     """
     Like decorator_from_middleware, but return a function

@@ -27,10 +27,10 @@ def get_connection(using=None):
     return connections[using]
 
 
-def aget_connection(using=None):
+async def aget_connection(using=None):
     """
-    Get a async database connection by name, or the default database connection
-    if no name is provided. This is a private API.
+    Get an async database connection by name, or the default database
+    connection if no name is provided. This is a private API.
     """
     if using is None:
         using = DEFAULT_DB_ALIAS
@@ -110,7 +110,14 @@ def set_rollback(rollback, using=None):
 
 
 async def aset_rollback(rollback, using=None):
-    return aget_connection(using).set_rollback(rollback)
+    """
+    Async version of `set_rollback`.
+
+    Same behavior as `set_rollback`, but for asynchronous database
+    connections.
+    """
+    connection = await aget_connection(using)
+    return connection.set_rollback(rollback)
 
 
 @contextmanager
@@ -154,7 +161,7 @@ def on_commit(func, using=None, robust=False):
 # Decorators / context managers #
 #################################
 
-class BaseAtomic:
+class _BaseAtomic:
     """
     Guarantee the atomic execution of a given block.
 
@@ -163,10 +170,11 @@ class BaseAtomic:
     When it's used as a decorator, __call__ wraps the execution of the
     decorated function in the instance itself, used as a context manager.
 
-    When it's used as a context manager, __enter__ creates a transaction or a
-    savepoint, depending on whether a transaction is already in progress, and
-    __exit__ commits the transaction or releases the savepoint on normal exit,
-    and rolls back the transaction or to the savepoint on exceptions.
+    When it's used as a context manager, entering the block creates a
+    transaction or a savepoint, depending on whether a transaction is already
+    in progress, and exiting the block commits the transaction or releases the
+    savepoint on normal exit, and rolls back the transaction or to the
+    savepoint on exceptions.
 
     It's possible to disable the creation of savepoints if the goal is to
     ensure that some code runs within a transaction without creating overhead.
@@ -197,7 +205,7 @@ class BaseAtomic:
     def get_connection(self, using):
         raise NotImplementedError
 
-    def enter_gen(self):
+    def _enter_gen(self):
         connection = yield self.get_connection(self.using)
 
         if (
@@ -243,7 +251,7 @@ class BaseAtomic:
         if connection.in_atomic_block:
             connection.atomic_blocks.append(self)
 
-    def exit_gen(self, exc_type, exc_value, traceback):
+    def _exit_gen(self, exc_type, exc_value, traceback):
         connection = yield self.get_connection(self.using)
 
         if connection.in_atomic_block:
@@ -335,45 +343,81 @@ class BaseAtomic:
                     connection.in_atomic_block = False
 
 
-class Atomic(ContextDecorator, BaseAtomic):
+class Atomic(ContextDecorator, _BaseAtomic):
+    __doc__ = _BaseAtomic.__doc__
+
     def get_connection(self, using):
         return get_connection(using)
 
     def __enter__(self):
-        run_sync_generator(self.enter_gen())
+        run_sync_generator(self._enter_gen())
 
     def __exit__(self, exc_type, exc_value, traceback):
-        run_sync_generator(self.exit_gen(exc_type, exc_value, traceback))
+        run_sync_generator(self._exit_gen(exc_type, exc_value, traceback))
 
 
-class AsyncAtomic(AsyncContextDecorator, BaseAtomic):
-    def get_connection(self, using):
-        connection = aget_connection(using)
-        return connection
+class AsyncAtomic(AsyncContextDecorator, _BaseAtomic):
+    __doc__ = _BaseAtomic.__doc__
+
+    async def get_connection(self, using):
+        return await aget_connection(using)
 
     async def __aenter__(self):
-        await run_async_generator(self.enter_gen())
+        await run_async_generator(self._enter_gen())
 
     async def __aexit__(self, exc_type, exc_value, traceback):
-        await run_async_generator(self.exit_gen(exc_type, exc_value, traceback))
+        await run_async_generator(self._exit_gen(exc_type, exc_value, traceback))
 
 
 def atomic(using=None, savepoint=True, durable=False):
-    # Bare decorator: @atomic -- although the first argument is called
-    # `using`, it's actually the function being decorated.
+    """
+    Create a transactional scope for database operations.
+
+    This helper function returns an `Atomic` object that can be used
+    either as a decorator or a context manager. It starts a new database
+    transaction or, if a transaction is already in progress, creates
+    a savepoint.
+
+    Usage as a decorator:
+
+        @transaction.atomic(using=using)
+        def my_function():
+            ...
+
+    Equivalent usage as a context manager:
+
+        with transaction.atomic(using=using):
+            ...
+    """
+
     if callable(using):
         return Atomic(DEFAULT_DB_ALIAS, savepoint, durable)(using)
-    # Decorator: @atomic(...) or context manager: with atomic(...): ...
     else:
         return Atomic(using, savepoint, durable)
 
 
 def async_atomic(using=None, savepoint=True, durable=False):
-    # Bare decorator: @async_atomic -- although the first argument is called
-    # `using`, it's actually the function being decorated.
+    """
+    Create a transactional scope for database operations.
+
+    This helper function returns an `AsyncAtomic` object that can be used
+    either as a decorator or a context manager. It starts a new database
+    transaction or, if a transaction is already in progress, creates
+    a savepoint.
+
+    Usage as a decorator:
+
+        @transaction.async_atomic(using=using)
+        async def my_function():
+            ...
+
+    Equivalent usage as a context manager:
+
+        async with transaction.async_atomic(using=using):
+            ...
+    """
     if callable(using):
         return AsyncAtomic(DEFAULT_DB_ALIAS, savepoint, durable)(using)
-    # Decorator: @async_atomic(...) or context manager: with async_atomic(...): ...
     else:
         return AsyncAtomic(using, savepoint, durable)
 

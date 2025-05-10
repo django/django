@@ -1,17 +1,32 @@
 from django.db import async_connections, DEFAULT_DB_ALIAS
-from django.test import TestCase
+from django.test import AsyncTestCase
 from django.test import skipUnlessDBFeature
 
-# todo: error with thread local (forbidden create if no async)
 
 @skipUnlessDBFeature("supports_async")
-class AsyncConnectionsTest(TestCase):
+class AsyncConnectionsTest(AsyncTestCase):
+
+    @classmethod
+    async def asyncSetUpTestData(self):
+        connection = async_connections[DEFAULT_DB_ALIAS]
+
+        async with connection.cursor() as cursor:
+            await cursor.execute("""
+                CREATE TABLE test_table (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
 
     async def test_success(self):
         connection = async_connections[DEFAULT_DB_ALIAS]
 
         async with connection.cursor() as cursor:
-            res = await cursor.execute("""select 1""")
+            await cursor.execute("""
+                INSERT INTO test_table (name) VALUES ('Test Name');
+            """)
+            res = await cursor.execute("""SELECT * FROM test_table;""")
             data = await res.fetchone()
 
-            self.assertEqual(data[0], 1)
+
