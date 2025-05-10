@@ -379,13 +379,7 @@ class FilterVerticalCheckTests(CheckTestCase):
         class TestModelAdmin(ModelAdmin):
             filter_vertical = ["bands"]
 
-        self.assertIsInvalid(
-            TestModelAdmin,
-            Artist,
-            "The value of 'filter_vertical[0]' cannot include the ManyToManyField "
-            "'bands', because that field manually specifies a relationship model.",
-            "admin.E013",
-        )
+        self.assertIsValid(TestModelAdmin, Artist)
 
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
@@ -448,7 +442,7 @@ class FilterHorizontalCheckTests(CheckTestCase):
         )
 
     @isolate_apps("modeladmin")
-    def test_invalid_m2m_field_with_through(self):
+    def test_valid_m2m_field_with_through(self):
         class Artist(Model):
             bands = ManyToManyField("Band", through="BandArtist")
 
@@ -459,13 +453,7 @@ class FilterHorizontalCheckTests(CheckTestCase):
         class TestModelAdmin(ModelAdmin):
             filter_horizontal = ["bands"]
 
-        self.assertIsInvalid(
-            TestModelAdmin,
-            Artist,
-            "The value of 'filter_horizontal[0]' cannot include the ManyToManyField "
-            "'bands', because that field manually specifies a relationship model.",
-            "admin.E013",
-        )
+        self.assertIsValid(TestModelAdmin, Artist)
 
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
