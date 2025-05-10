@@ -74,7 +74,7 @@
       </div>
       {% block filters %}
         {% if cl.has_filters %}
-          <nav id="changelist-filter" aria-labelledby="changelist-filter-header">
+          <search id="changelist-filter" aria-labelledby="changelist-filter-header">
             <h2 id="changelist-filter-header">{% translate 'Filter' %}</h2>
             {% if cl.is_facets_optional or cl.has_active_filters %}<div id="changelist-filter-extra-actions">
               {% if cl.is_facets_optional %}<h3>
@@ -86,7 +86,7 @@
               </h3>{% endif %}
             </div>{% endif %}
             {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
-          </nav>
+          </search>
         {% endif %}
       {% endblock %}
     </div>
