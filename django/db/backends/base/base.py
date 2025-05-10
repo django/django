@@ -397,8 +397,8 @@ class AbstractBaseDatabaseWrapper:
     def _savepoint_allowed(self):
         # Savepoints cannot be created outside a transaction
         if not self.features.uses_savepoints:
-            yield
-            return False
+            yield False
+            return
 
         autocommit_state = yield self.get_autocommit()
 
@@ -557,6 +557,34 @@ class AbstractBaseDatabaseWrapper:
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block."
             ) from self.rollback_exc
+
+    # ##### Foreign key constraints checks handling #####
+
+    @sync_async_method_adapter
+    def disable_constraint_checking(self):
+        """
+        Backends can implement as needed to temporarily disable foreign key
+        constraint checking. Should return True if the constraints were
+        disabled and will need to be reenabled.
+        """
+        yield False
+
+    @sync_async_method_adapter
+    def enable_constraint_checking(self):
+        """
+        Backends can implement as needed to re-enable foreign key constraint
+        checking.
+        """
+        yield
+
+    @sync_async_method_adapter
+    def check_constraints(self, table_names=None):
+        """
+        Backends can override this method if they can apply constraint
+        checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE"). Should raise an
+        IntegrityError if any invalid foreign key references are encountered.
+        """
+        yield
 
     # ##### Connection termination handling #####
 
@@ -786,6 +814,7 @@ class AbstractBaseDatabaseWrapper:
 @apply_method_decorator(async_unsafe, [
     'connect',
     'ensure_connection',
+    'cursor',
     'commit',
     'rollback',
     'close',
@@ -799,7 +828,6 @@ class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
     is_async = False
     sync_async_adapter = run_sync_generator
 
-    @async_unsafe
     def cursor(self):
         return self._cursor()
 
@@ -815,8 +843,6 @@ class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
         with self.cursor() as cursor:
             cursor.execute(self.ops.savepoint_commit_sql(sid))
 
-    # ##### Foreign key constraints checks handling #####
-
     @contextmanager
     def constraint_checks_disabled(self):
         """
@@ -828,29 +854,6 @@ class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
         finally:
             if disabled:
                 self.enable_constraint_checking()
-
-    def disable_constraint_checking(self):
-        """
-        Backends can implement as needed to temporarily disable foreign key
-        constraint checking. Should return True if the constraints were
-        disabled and will need to be reenabled.
-        """
-        return False
-
-    def enable_constraint_checking(self):
-        """
-        Backends can implement as needed to re-enable foreign key constraint
-        checking.
-        """
-        pass
-
-    def check_constraints(self, table_names=None):
-        """
-        Backends can override this method if they can apply constraint
-        checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE"). Should raise an
-        IntegrityError if any invalid foreign key references are encountered.
-        """
-        pass
 
     def prepare_database(self):
         pass
