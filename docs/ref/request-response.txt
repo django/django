@@ -351,14 +351,14 @@ Methods
 
     Returns the ``path``, plus an appended query string, if applicable.
 
-    Example: ``"/music/bands/the_beatles/?print=true"``
+    Example: ``"/minfo/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.get_full_path_info()
 
     Like :meth:`get_full_path`, but uses :attr:`path_info` instead of
     :attr:`path`.
 
-    Example: ``"/minfo/music/bands/the_beatles/?print=true"``
+    Example: ``"/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.build_absolute_uri(location=None)
 
