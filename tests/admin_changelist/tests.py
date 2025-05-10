@@ -27,6 +27,7 @@ from django.test.client import RequestFactory
 from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
 from django.urls import reverse
 from django.utils import formats
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .admin import (
     BandAdmin,
@@ -1821,6 +1822,19 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request("/", self.superuser)
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.get_ordering_field_columns(), {2: "asc"})
+
+    # RemovedInDjango70Warning.
+    def test_get_query_string_warning(self):
+        msg = (
+            "ChangeList.get_query_string() is deprecated. "
+            "use django.template.defaulttags.querystring instead."
+        )
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get("/child?age=1")
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            cl.get_query_string(new_params={"name": "antoliny"}, remove=["age"])
 
 
 class GetAdminLogTests(TestCase):
