@@ -8,6 +8,9 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
     geom_index_ops_nd = "GIST_GEOMETRY_OPS_ND"
     rast_index_template = "ST_ConvexHull(%(expressions)s)"
 
+    sql_alter_column_to_4d = (
+        "ALTER COLUMN %(column)s TYPE %(type)s USING ST_Force4D(%(column)s)::%(type)s"
+    )
     sql_alter_column_to_3d = (
         "ALTER COLUMN %(column)s TYPE %(type)s USING ST_Force3D(%(column)s)::%(type)s"
     )
@@ -40,9 +43,11 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
                 table, old_field, new_field, new_type, old_collation, new_collation
             )
 
-        if old_field.dim == 2 and new_field.dim == 3:
+        if old_field.dim in (2, 3) and new_field.dim == 4:
+            sql_alter = self.sql_alter_column_to_4d
+        elif old_field.dim in (2, 4) and new_field.dim == 3:
             sql_alter = self.sql_alter_column_to_3d
-        elif old_field.dim == 3 and new_field.dim == 2:
+        elif old_field.dim in (3, 4) and new_field.dim == 2:
             sql_alter = self.sql_alter_column_to_2d
         else:
             sql_alter = self.sql_alter_column_type
