@@ -181,6 +181,9 @@ Migrations
 
 * Migrations now support serialization of :class:`zoneinfo.ZoneInfo` instances.
 
+* Serialization of deconstructible objects now supports keyword arguments with
+  names that are not valid Python identifiers.
+
 Models
 ~~~~~~
 
