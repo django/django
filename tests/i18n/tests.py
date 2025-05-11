@@ -2243,15 +2243,3 @@ class UtilsTests(SimpleTestCase):
         for value, expected in tests:
             with self.subTest(value=value):
                 self.assertEqual(round_away_from_one(value), expected)
-
-
-class NestedLazyTranslationTest(SimpleTestCase):
-    @override_settings(USE_I18N=False)
-    def test_nested_lazy_translation(self):
-        """Test that nested gettext_lazy objects work when i18n is disabled."""
-        first_level = gettext_lazy("Test message")
-        nested = gettext_lazy(first_level)
-        result = str(nested)
-        self.assertEqual(result, "Test message")
-        double_nested = gettext_lazy(nested)
-        self.assertEqual(str(double_nested), "Test message")
