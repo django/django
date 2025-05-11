@@ -93,10 +93,10 @@ class DecimalSerializer(BaseSerializer):
         return repr(self.value), {"from decimal import Decimal"}
 
 
-class DeconstructableSerializer(BaseSerializer):
+class DeconstructibleSerializer(BaseSerializer):
     @staticmethod
     def serialize_deconstructed(path, args, kwargs):
-        name, imports = DeconstructableSerializer._serialize_path(path)
+        name, imports = DeconstructibleSerializer._serialize_path(path)
         strings = []
         for arg in args:
             arg_string, arg_imports = serializer_factory(arg).serialize()
@@ -231,13 +231,13 @@ class IterableSerializer(BaseSerializer):
         return value % (", ".join(strings)), imports
 
 
-class ModelFieldSerializer(DeconstructableSerializer):
+class ModelFieldSerializer(DeconstructibleSerializer):
     def serialize(self):
         attr_name, path, args, kwargs = self.value.deconstruct()
         return self.serialize_deconstructed(path, args, kwargs)
 
 
-class ModelManagerSerializer(DeconstructableSerializer):
+class ModelManagerSerializer(DeconstructibleSerializer):
     def serialize(self):
         as_manager, manager_path, qs_path, args, kwargs = self.value.deconstruct()
         if as_manager:
@@ -397,7 +397,7 @@ def serializer_factory(value):
         return TypeSerializer(value)
     # Anything that knows how to deconstruct itself.
     if hasattr(value, "deconstruct"):
-        return DeconstructableSerializer(value)
+        return DeconstructibleSerializer(value)
     for type_, serializer_cls in Serializer._registry.items():
         if isinstance(value, type_):
             return serializer_cls(value)
