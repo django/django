@@ -703,7 +703,7 @@ class AbstractBaseDatabaseWrapper:
         Return a cursor that tries to avoid caching in the database (if
         supported by the database), otherwise return a regular cursor.
         """
-        raise NotImplementedError
+        return self.cursor()
 
     def make_debug_cursor(self, cursor):
         """Create a cursor that logs all queries in self.queries_log."""
@@ -858,9 +858,6 @@ class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
     def prepare_database(self):
         pass
 
-    def chunked_cursor(self):
-        return self.cursor()
-
     def make_debug_cursor(self, cursor):
         return utils.CursorDebugWrapper(cursor, self)
 
@@ -926,9 +923,6 @@ class AsyncBaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
     async def _savepoint_commit(self, sid):
         async with self.cursor() as cursor:
             await cursor.execute(self.ops.savepoint_commit_sql(sid))
-
-    async def chunked_cursor(self):
-        return await self.cursor()
 
     def make_debug_cursor(self, cursor):
         return utils.AsyncCursorDebugWrapper(cursor, self)
