@@ -207,23 +207,11 @@ class FunctionTypeSerializer(BaseSerializer):
 
 class FunctoolsPartialSerializer(BaseSerializer):
     def serialize(self):
-        # Serialize functools.partial() arguments
-        func_string, func_imports = serializer_factory(self.value.func).serialize()
-        args_string, args_imports = serializer_factory(self.value.args).serialize()
-        keywords_string, keywords_imports = serializer_factory(
-            self.value.keywords
-        ).serialize()
-        # Add any imports needed by arguments
-        imports = {"import functools", *func_imports, *args_imports, *keywords_imports}
-        return (
-            "functools.%s(%s, *%s, **%s)"
-            % (
-                self.value.__class__.__name__,
-                func_string,
-                args_string,
-                keywords_string,
-            ),
-            imports,
+        partial_name = self.value.__class__.__name__
+        return DeconstructibleSerializer.serialize_deconstructed(
+            f"functools.{partial_name}",
+            (self.value.func, *self.value.args),
+            self.value.keywords,
         )
 
 

@@ -911,7 +911,7 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(value)
         self.assertSerializedFunctoolsPartialEqual(
             value,
-            "functools.partial(datetime.timedelta, *(), **{})",
+            "functools.partial(datetime.timedelta)",
             {"import datetime", "import functools"},
         )
 
@@ -920,7 +920,7 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(value)
         self.assertSerializedFunctoolsPartialEqual(
             value,
-            "functools.partial(datetime.timedelta, *(1,), **{})",
+            "functools.partial(datetime.timedelta, 1)",
             {"import datetime", "import functools"},
         )
 
@@ -929,7 +929,7 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(value)
         self.assertSerializedFunctoolsPartialEqual(
             value,
-            "functools.partial(datetime.timedelta, *(), **{'seconds': 2})",
+            "functools.partial(datetime.timedelta, seconds=2)",
             {"import datetime", "import functools"},
         )
 
@@ -938,7 +938,7 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(value)
         self.assertSerializedFunctoolsPartialEqual(
             value,
-            "functools.partial(datetime.timedelta, *(1,), **{'seconds': 2})",
+            "functools.partial(datetime.timedelta, 1, seconds=2)",
             {"import datetime", "import functools"},
         )
 
@@ -947,7 +947,7 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(value)
         self.assertSerializedFunctoolsPartialEqual(
             value,
-            "functools.partial(datetime.timedelta, *(), **{'kebab-case': 1})",
+            "functools.partial(datetime.timedelta, **{'kebab-case': 1})",
             {"import datetime", "import functools"},
         )
 
@@ -956,7 +956,7 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(value)
         result = self.assertSerializedFunctoolsPartialEqual(
             value,
-            "functools.partialmethod(datetime.timedelta, *(1,), **{'seconds': 2})",
+            "functools.partialmethod(datetime.timedelta, 1, seconds=2)",
             {"import datetime", "import functools"},
         )
         self.assertIsInstance(result, functools.partialmethod)
