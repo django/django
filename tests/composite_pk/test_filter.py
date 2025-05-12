@@ -478,7 +478,7 @@ class CompositePKFilterTests(TestCase):
             Comment.objects.filter(text=Case(When(text="", then="text"), default="pk"))
 
     def test_outer_ref_pk(self):
-        subquery = Subquery(Comment.objects.filter(pk=OuterRef("pk")).values("id"))
+        subquery = Subquery(Comment.objects.filter(pk=OuterRef("pk")).values("id")[:1])
         tests = [
             ("", 5),
             ("__gt", 0),
@@ -526,7 +526,7 @@ class CompositePKFilterTests(TestCase):
         )
 
     def test_outer_ref_not_composite_pk(self):
-        subquery = Comment.objects.filter(pk=OuterRef("id")).values("id")
+        subquery = Comment.objects.filter(pk=OuterRef("id")).values("id")[:1]
         queryset = Comment.objects.filter(id=Subquery(subquery))
 
         msg = "Composite field lookups only work with composite expressions."
