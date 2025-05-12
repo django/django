@@ -242,6 +242,7 @@ class Query(BaseExpression):
 
     filter_is_sticky = False
     subquery = False
+    contains_subquery = False
 
     # SQL-related attributes.
     # Select and related select clauses are expressions to use in the SELECT

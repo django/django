@@ -988,10 +988,23 @@ class BasicExpressionsTests(TestCase):
                 )
                 .order_by("-salary_raise")
                 .values("salary_raise")[:1],
-                output_field=IntegerField(),
             ),
         ).get(pk=self.gmbh.pk)
         self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332)
+
+    def test_annotation_with_outerref_and_output_field(self):
+        gmbh_salary = Company.objects.annotate(
+            max_ceo_salary_raise=Subquery(
+                Company.objects.annotate(
+                    salary_raise=OuterRef("num_employees") + F("num_employees"),
+                )
+                .order_by("-salary_raise")
+                .values("salary_raise")[:1],
+                output_field=DecimalField(),
+            ),
+        ).get(pk=self.gmbh.pk)
+        self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332.0)
+        self.assertIsInstance(gmbh_salary.max_ceo_salary_raise, Decimal)
 
     def test_annotation_with_nested_outerref(self):
         self.gmbh.point_of_contact = Employee.objects.get(lastname="Meyer")
@@ -2539,6 +2552,15 @@ class ExistsTests(TestCase):
         qs = Manager.objects.annotate(exists=Exists(Manager.objects.none())).filter(
             pk=manager.pk, exists=False
         )
+        self.assertSequenceEqual(qs, [manager])
+        self.assertIs(qs.get().exists, False)
+
+    def test_annotate_by_empty_custom_exists(self):
+        class CustomExists(Exists):
+            template = Subquery.template
+
+        manager = Manager.objects.create()
+        qs = Manager.objects.annotate(exists=CustomExists(Manager.objects.none()))
         self.assertSequenceEqual(qs, [manager])
         self.assertIs(qs.get().exists, False)
 
