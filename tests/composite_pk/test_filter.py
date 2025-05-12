@@ -1,3 +1,4 @@
+from django.db import NotSupportedError
 from django.db.models import (
     Case,
     F,
@@ -10,7 +11,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast
 from django.db.models.lookups import Exact
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Comment, Tenant, User
 
@@ -483,6 +484,39 @@ class CompositePKFilterTests(TestCase):
             with self.subTest(f"id{lookup}"):
                 queryset = Comment.objects.filter(**{f"id{lookup}": subquery})
                 self.assertEqual(queryset.count(), expected_count)
+
+    def test_outer_ref_pk_filter_on_pk_exact(self):
+        subquery = Subquery(User.objects.filter(pk=OuterRef("pk")).values("pk")[:1])
+        qs = Comment.objects.filter(pk=subquery)
+        self.assertEqual(qs.count(), 2)
+
+    @skipUnlessDBFeature("supports_tuple_comparison_against_subquery")
+    def test_outer_ref_pk_filter_on_pk_comparison(self):
+        subquery = Subquery(User.objects.filter(pk=OuterRef("pk")).values("pk")[:1])
+        tests = [
+            ("gt", 0),
+            ("gte", 2),
+            ("lt", 0),
+            ("lte", 2),
+        ]
+        for lookup, expected_count in tests:
+            with self.subTest(f"pk__{lookup}"):
+                qs = Comment.objects.filter(**{f"pk__{lookup}": subquery})
+                self.assertEqual(qs.count(), expected_count)
+
+    @skipIfDBFeature("supports_tuple_comparison_against_subquery")
+    def test_outer_ref_pk_filter_on_pk_comparison_unsupported(self):
+        subquery = Subquery(User.objects.filter(pk=OuterRef("pk")).values("pk")[:1])
+        tests = ["gt", "gte", "lt", "lte"]
+        for lookup in tests:
+            with self.subTest(f"pk__{lookup}"):
+                qs = Comment.objects.filter(**{f"pk__{lookup}": subquery})
+                with self.assertRaisesMessage(
+                    NotSupportedError,
+                    f'"{lookup}" cannot be used to target composite fields '
+                    "through subqueries on this backend",
+                ):
+                    qs.count()
 
     def test_unsupported_rhs(self):
         pk = Exact(F("tenant_id"), 1)
