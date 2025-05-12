@@ -1594,6 +1594,7 @@ class ManageRunserver(SimpleTestCase):
         call_command(self.cmd, addrport="7000")
         self.assertServerSettings("127.0.0.1", "7000")
 
+    @mock.patch.dict(os.environ, {"DJANGO_RUNSERVER_HIDE_WARNING": "anything-but-true"})
     def test_zero_ip_addr(self):
         self.cmd.addr = "0"
         self.cmd._raw_ipv6 = False
@@ -1612,6 +1613,7 @@ class ManageRunserver(SimpleTestCase):
             self.output.getvalue(),
         )
 
+    @mock.patch.dict(os.environ, {"DJANGO_RUNSERVER_HIDE_WARNING": "anything-but-true"})
     def test_on_bind(self):
         self.cmd.addr = "127.0.0.1"
         self.cmd._raw_ipv6 = False
