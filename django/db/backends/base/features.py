@@ -385,6 +385,10 @@ class BaseDatabaseFeatures:
     # Does the backend support native tuple lookups (=, >, <, IN)?
     supports_tuple_lookups = True
 
+    # Does the backend support native tuple gt(e), lt(e) comparisons against
+    # subqueries?
+    supports_tuple_comparison_against_subquery = True
+
     # Collation names for use by the Django test suite.
     test_collations = {
         "ci": None,  # Case-insensitive.
