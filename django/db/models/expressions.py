@@ -1756,6 +1756,7 @@ class Subquery(BaseExpression, Combinable):
         # Allow the usage of both QuerySet and sql.Query objects.
         self.query = getattr(queryset, "query", queryset).clone()
         self.query.subquery = True
+        self.template = extra.pop("template", self.template)
         self.extra = extra
         super().__init__(output_field)
 
@@ -1767,6 +1768,14 @@ class Subquery(BaseExpression, Combinable):
 
     def _resolve_output_field(self):
         return self.query.output_field
+
+    def resolve_expression(self, *args, **kwargs):
+        resolved = super().resolve_expression(*args, **kwargs)
+        if type(self) is Subquery and self.template == Subquery.template:
+            # Subquery is an unnecessary shim for a resolved query as it
+            # complexifies the lookup's right-hand-side introspection.
+            return resolved.query
+        return resolved
 
     def copy(self):
         clone = super().copy()
