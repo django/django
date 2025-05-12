@@ -10,7 +10,7 @@ from hashlib import md5
 from django.apps import apps
 from django.db import NotSupportedError
 from django.utils.dateparse import parse_time
-from django.utils.sync_async import run_async_generator, run_sync_generator, sync_async_method_adapter
+from django.utils.sync_async import sync_async_method_adapter, SyncMixin, AsyncMixin
 
 logger = logging.getLogger("django.db.backends")
 
@@ -85,8 +85,7 @@ class _AbstractCursorWrapper:
             yield self.cursor.executemany(sql, param_list)
 
 
-class CursorWrapper(_AbstractCursorWrapper):
-    sync_async_adapter = run_sync_generator
+class CursorWrapper(SyncMixin, _AbstractCursorWrapper):
 
     def __iter__(self):
         with self.db.wrap_database_errors:
@@ -182,9 +181,7 @@ class CursorDebugWrapper(CursorDebugWrapperMixin, CursorWrapper):
     pass
 
 
-class AsyncCursorWrapper(_AbstractCursorWrapper):
-
-    sync_async_adapter = run_async_generator
+class AsyncCursorWrapper(AsyncMixin, _AbstractCursorWrapper):
 
     async def __aiter__(self):
         with self.db.wrap_database_errors:

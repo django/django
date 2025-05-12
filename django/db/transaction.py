@@ -251,6 +251,8 @@ class _BaseAtomic:
         if connection.in_atomic_block:
             connection.atomic_blocks.append(self)
 
+        yield
+
     def _exit_gen(self, exc_type, exc_value, traceback):
         connection = yield self.get_connection(self.using)
 
@@ -341,6 +343,8 @@ class _BaseAtomic:
                     connection.connection = None
                 else:
                     connection.in_atomic_block = False
+
+        yield
 
 
 class Atomic(ContextDecorator, _BaseAtomic):

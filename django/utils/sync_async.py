@@ -74,3 +74,59 @@ def sync_async_method_adapter(fn):
         return adapter(fn(self, *args, **kwargs))
 
     return inner
+
+
+class AsyncContextWrapper:
+    """
+    Wraps an async context manager with explicit open/close control.
+
+    Usage:
+        wrapper = AsyncContextWrapper(cm)
+        value = await wrapper.enter()
+        ...
+        await wrapper.close()
+    """
+
+    def __init__(self, cm):
+        self._cm = cm
+        self._value = None
+
+    async def enter(self):
+        self._value = await self._cm.__aenter__()
+        return self._value
+
+    async def close(self, exc_type=None, exc_val=None, exc_tb=None):
+        await self._cm.__aexit__(exc_type, exc_val, exc_tb)
+
+
+class SyncContextWrapper:
+    """
+    Wraps a sync context manager with explicit open/close control.
+
+    Usage:
+        wrapper = SyncContextWrapper(cm)
+        value = wrapper.enter()
+        ...
+        wrapper.close()
+    """
+
+    def __init__(self, cm):
+        self._cm = cm
+        self._value = None
+
+    def enter(self):
+        self._value = self._cm.__enter__()
+        return self._value
+
+    def close(self, exc_type=None, exc_val=None, exc_tb=None):
+        self._cm.__exit__(exc_type, exc_val, exc_tb)
+
+
+class SyncMixin:
+    sync_async_adapter = run_sync_generator
+    manual_context = SyncContextWrapper
+
+
+class AsyncMixin:
+    sync_async_adapter = run_async_generator
+    manual_context = AsyncContextWrapper

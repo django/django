@@ -172,6 +172,14 @@ class BaseDatabaseWrapperMixin:
         "iendswith": "LIKE '%%' || UPPER({})",
     }
 
+    Database = Database
+    # Classes instantiated in __init__().
+    features_class = DatabaseFeatures
+    ops_class = DatabaseOperations
+    # PostgreSQL backend-specific attributes.
+    _named_cursor_idx = 0
+    _connection_pools = {}
+
     @property
     def _connection_pool_cls(self):
         raise NotImplementedError
@@ -348,6 +356,38 @@ class BaseDatabaseWrapperMixin:
         yield self._configure_timezone(self.connection)
 
     @sync_async_method_adapter
+    def _configure_timezone(self, connection):
+        conn_timezone_name = connection.info.parameter_status("TimeZone")
+        timezone_name = self.timezone_name
+
+        if timezone_name and conn_timezone_name != timezone_name:
+            cursor_ctx = self.manual_context(connection.cursor())
+            cursor = yield cursor_ctx.enter()
+            try:
+                yield cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
+            finally:
+                yield cursor_ctx.close()
+
+            yield True
+            return
+
+        yield False
+
+    @sync_async_method_adapter
+    def _configure_role(self, connection):
+        if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
+            cursor_ctx = self.manual_context(connection.cursor())
+            cursor = yield cursor_ctx.enter()
+            try:
+                yield cursor.execute(self.ops.compose_sql("SET ROLE %s", [new_role]))
+            finally:
+                yield cursor_ctx.close()
+
+            yield True
+            return
+        yield False
+
+    @sync_async_method_adapter
     def _configure_connection(self, connection):
         # This function is called from init_connection_state and from the
         # psycopg pool itself after a connection is opened.
@@ -489,17 +529,10 @@ class BaseDatabaseWrapperMixin:
     'chunked_cursor',
 ])
 class DatabaseWrapper(BaseDatabaseWrapperMixin, BaseDatabaseWrapper):
-    Database = Database
     SchemaEditorClass = DatabaseSchemaEditor
-    # Classes instantiated in __init__().
     client_class = DatabaseClient
     creation_class = DatabaseCreation
-    features_class = DatabaseFeatures
     introspection_class = DatabaseIntrospection
-    ops_class = DatabaseOperations
-    # PostgreSQL backend-specific attributes.
-    _named_cursor_idx = 0
-    _connection_pools = {}
 
     @property
     def server_cursor_cls(self):
@@ -522,23 +555,6 @@ class DatabaseWrapper(BaseDatabaseWrapperMixin, BaseDatabaseWrapper):
     @property
     def _connect(self):
         return self.Database.connect
-
-    def _configure_timezone(self, connection):
-        conn_timezone_name = connection.info.parameter_status("TimeZone")
-        timezone_name = self.timezone_name
-        if timezone_name and conn_timezone_name != timezone_name:
-            with connection.cursor() as cursor:
-                cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
-            return True
-        return False
-
-    def _configure_role(self, connection):
-        if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
-            with connection.cursor() as cursor:
-                sql = self.ops.compose_sql("SET ROLE %s", [new_role])
-                cursor.execute(sql)
-            return True
-        return False
 
     @property
     def _server_side_cursor_cls(self):
@@ -616,13 +632,6 @@ if is_psycopg3:
 
     class AsyncDatabaseWrapper(BaseDatabaseWrapperMixin, AsyncBaseDatabaseWrapper):
 
-        Database = Database
-        # Classes instantiated in __init__().
-        features_class = DatabaseFeatures
-        ops_class = DatabaseOperations
-        # PostgreSQL backend-specific attributes.
-        _named_cursor_idx = 0
-        _connection_pools = {}
         _pg_version = None
 
         @property
@@ -646,23 +655,6 @@ if is_psycopg3:
         @property
         def _connect(self):
             return self.Database.AsyncConnection.connect
-
-        async def _configure_timezone(self, connection):
-            conn_timezone_name = connection.info.parameter_status("TimeZone")
-            timezone_name = self.timezone_name
-            if timezone_name and conn_timezone_name != timezone_name:
-                async with connection.cursor() as cursor:
-                    await cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
-                return True
-            return False
-
-        async def _configure_role(self, connection):
-            if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
-                async with connection.cursor() as cursor:
-                    sql = self.ops.compose_sql("SET ROLE %s", [new_role])
-                    await cursor.execute(sql)
-                return True
-            return False
 
         @property
         def _server_side_cursor_cls(self):

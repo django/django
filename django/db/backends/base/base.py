@@ -20,7 +20,7 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper, ProgrammingError
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
-from django.utils.sync_async import run_async_generator, run_sync_generator, sync_async_method_adapter
+from django.utils.sync_async import sync_async_method_adapter, SyncMixin, AsyncMixin
 from django.utils.decorators import apply_method_decorator
 
 NO_DB_ALIAS = "__no_db__"
@@ -241,6 +241,7 @@ class AbstractBaseDatabaseWrapper:
         if self.alias not in RAN_DB_VERSION_CHECK:
             yield self.check_database_version_supported()
             RAN_DB_VERSION_CHECK.add(self.alias)
+            yield
 
     def create_cursor(self, name=None):
         """Create a cursor. Assume that a connection is established."""
@@ -274,6 +275,7 @@ class AbstractBaseDatabaseWrapper:
         yield self.set_autocommit(self.settings_dict["AUTOCOMMIT"])
         yield self.init_connection_state()
         connection_created.send(sender=self.__class__, connection=self)
+        yield
 
         self.run_on_commit = []
 
@@ -294,6 +296,8 @@ class AbstractBaseDatabaseWrapper:
                 )
             with self.wrap_database_errors:
                 yield self.connect()
+
+        yield
 
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
 
@@ -349,6 +353,7 @@ class AbstractBaseDatabaseWrapper:
         # A successful commit means that the database connection works.
         self.errors_occurred = False
         self.run_commit_hooks_on_set_autocommit_on = True
+        yield
 
     @sync_async_method_adapter
     def rollback(self):
@@ -360,6 +365,7 @@ class AbstractBaseDatabaseWrapper:
         self.errors_occurred = False
         self.needs_rollback = False
         self.run_on_commit = []
+        yield
 
     @sync_async_method_adapter
     def close(self):
@@ -382,16 +388,42 @@ class AbstractBaseDatabaseWrapper:
             else:
                 self.connection = None
 
+        yield
+
     # ##### Backend-specific savepoint management methods #####
 
+    @sync_async_method_adapter
     def _savepoint(self, sid):
-        raise NotImplementedError
+        cursor_ctx = self.manual_context(self.cursor())
+        cursor = yield cursor_ctx.enter()
+        try:
+            yield cursor.execute(self.ops.savepoint_create_sql(sid))
+        finally:
+            yield cursor_ctx.close()
 
+        yield
+
+    @sync_async_method_adapter
     def _savepoint_rollback(self, sid):
-        raise NotImplementedError
+        cursor_ctx = self.manual_context(self.cursor())
+        cursor = yield cursor_ctx.enter()
+        try:
+            yield cursor.execute(self.ops.savepoint_rollback_sql(sid))
+        finally:
+            yield cursor_ctx.close()
 
+        yield
+
+    @sync_async_method_adapter
     def _savepoint_commit(self, sid):
-        raise NotImplementedError
+        cursor_ctx = self.manual_context(self.cursor())
+        cursor = yield cursor_ctx.enter()
+        try:
+            yield cursor.execute(self.ops.savepoint_commit_sql(sid))
+        finally:
+            yield cursor_ctx.close()
+
+        yield
 
     @sync_async_method_adapter
     def _savepoint_allowed(self):
@@ -448,6 +480,8 @@ class AbstractBaseDatabaseWrapper:
             for (sids, func, robust) in self.run_on_commit
             if sid not in sids
         ]
+
+        yield
 
     @sync_async_method_adapter
     def savepoint_commit(self, sid):
@@ -525,6 +559,8 @@ class AbstractBaseDatabaseWrapper:
         if autocommit and self.run_commit_hooks_on_set_autocommit_on:
             yield self.run_and_clear_commit_hooks()
             self.run_commit_hooks_on_set_autocommit_on = False
+
+        yield
 
     def get_rollback(self):
         """Get the "needs rollback" flag -- for *advanced use* only."""
@@ -617,6 +653,8 @@ class AbstractBaseDatabaseWrapper:
             yield self.close()
         self.health_check_done = True
 
+        yield
+
     @sync_async_method_adapter
     def close_if_unusable_or_obsolete(self):
         """
@@ -630,6 +668,7 @@ class AbstractBaseDatabaseWrapper:
             autocommit_state = yield self.get_autocommit()
             if autocommit_state != self.settings_dict["AUTOCOMMIT"]:
                 yield self.close()
+                yield
                 return
 
             # If an exception other than DataError or IntegrityError occurred
@@ -641,10 +680,12 @@ class AbstractBaseDatabaseWrapper:
                     self.health_check_done = True
                 else:
                     yield self.close()
+                    yield
                     return
 
             if self.close_at is not None and time.monotonic() >= self.close_at:
                 yield self.close()
+                yield
                 return
 
     # ##### Thread safety handling #####
@@ -767,6 +808,8 @@ class AbstractBaseDatabaseWrapper:
             else:
                 yield func()
 
+        yield
+
     @sync_async_method_adapter
     def run_and_clear_commit_hooks(self):
         self.validate_no_atomic_block()
@@ -786,6 +829,8 @@ class AbstractBaseDatabaseWrapper:
                     )
             else:
                 yield func()
+
+        yield
 
     @contextmanager
     def execute_wrapper(self, wrapper):
@@ -824,24 +869,11 @@ class AbstractBaseDatabaseWrapper:
     'clean_savepoints',
     'set_autocommit',
 ])
-class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
+class BaseDatabaseWrapper(SyncMixin, AbstractBaseDatabaseWrapper):
     is_async = False
-    sync_async_adapter = run_sync_generator
 
     def cursor(self):
         return self._cursor()
-
-    def _savepoint(self, sid):
-        with self.cursor() as cursor:
-            cursor.execute(self.ops.savepoint_create_sql(sid))
-
-    def _savepoint_rollback(self, sid):
-        with self.cursor() as cursor:
-            cursor.execute(self.ops.savepoint_rollback_sql(sid))
-
-    def _savepoint_commit(self, sid):
-        with self.cursor() as cursor:
-            cursor.execute(self.ops.savepoint_commit_sql(sid))
 
     @contextmanager
     def constraint_checks_disabled(self):
@@ -898,10 +930,9 @@ class BaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
         return self.SchemaEditorClass(self, *args, **kwargs)
 
 
-class AsyncBaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
+class AsyncBaseDatabaseWrapper(AsyncMixin, AbstractBaseDatabaseWrapper):
     is_async = True
 
-    sync_async_adapter = run_async_generator
     client_class = NotImplementedInterface
     creation_class = NotImplementedInterface
     introspection_class = NotImplementedInterface
@@ -911,18 +942,6 @@ class AsyncBaseDatabaseWrapper(AbstractBaseDatabaseWrapper):
     async def cursor(self):
         async with await self._cursor() as cursor:
             yield cursor
-
-    async def _savepoint(self, sid):
-        async with self.cursor() as cursor:
-            await cursor.execute(self.ops.savepoint_create_sql(sid))
-
-    async def _savepoint_rollback(self, sid):
-        async with self.cursor() as cursor:
-            await cursor.execute(self.ops.savepoint_rollback_sql(sid))
-
-    async def _savepoint_commit(self, sid):
-        async with self.cursor() as cursor:
-            await cursor.execute(self.ops.savepoint_commit_sql(sid))
 
     def make_debug_cursor(self, cursor):
         return utils.AsyncCursorDebugWrapper(cursor, self)
