@@ -43,6 +43,34 @@
     </pre>
     {% endif %}
 
+  {% if bad_origin %}
+  {% if forwarded_may_fix %}
+  <p>The <code>Origin</code> header does not match
+  the expected server origin,
+  but common proxy headers are present in the request
+  and may include parts of the <code>Origin</code> header.</p>
+  <ul>
+    <li><strong><code>X-Forwarded-Proto</code></strong>:
+      <code>{{ x_forwarded_proto }}</code></li>
+    <li><strong><code>X-Forwarded-Host</code></strong>:
+      <code>{{ x_forwarded_host }}</code></li>
+  </ul>
+  <p>If you’re sure that you are only running behind a secure proxy
+     that always set these headers to avoid spoofing as described in
+     <a href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#secure-proxy-ssl-header">this warning in the docs</a>,
+     you may wish to add one or more of the following
+     settings to permit Django to trust these headers.</p>
+  <p><pre>
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
+  </pre></p>
+  {% else %}
+  If the expected server origin looks correct,
+  you may wish to add the origin to the <code>CSRF_TRUSTED_ORIGINS</code>
+  setting.
+  {% endif %}
+  {% else %}
+
   <p>In general, this can occur when there is a genuine Cross Site Request Forgery, or when
   <a
   href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/csrf/">Django’s
@@ -68,6 +96,7 @@
     tab or hitting the back button after a login, you may need to reload the
     page with the form, because the token is rotated after a login.</li>
   </ul>
+  {% endif %}
 
   <p>You’re seeing the help section of this page because you have <code>DEBUG =
   True</code> in your Django settings file. Change that to <code>False</code>,
