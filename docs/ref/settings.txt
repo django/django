@@ -473,7 +473,7 @@ need cross-origin unsafe requests, continuing the example, add
 ``'https://subdomain.example.com'`` to this list (and/or ``http://...`` if
 requests originate from an insecure page).
 
-The setting also supports subdomains, so you could add
+The setting also supports wildcard subdomains, so you could add
 ``'https://*.example.com'``, for example, to allow access from all subdomains
 of ``example.com``.
 
