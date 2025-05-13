@@ -1,5 +1,7 @@
 import io
+import sys
 import textwrap
+import unittest
 from pathlib import Path
 
 from migrations.test_base import MigrationTestBase
@@ -10,6 +12,10 @@ from django.test import TransactionTestCase
 from django.test.utils import override_settings
 
 
+@unittest.skipIf(
+    sys.platform.startswith("win"),
+    "Fails on Windows due to SQLite bad state (already existing table a01).",
+)
 class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
     """Regression test for bug in autodetector with FK to managed=False model."""
 
