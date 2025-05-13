@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from collections import defaultdict
+import asyncio
 
 from asgiref.local import Local
 
@@ -130,6 +130,13 @@ class AbstractConnectionHandler(ABC):
 class BaseConnectionHandler(AbstractConnectionHandler):
     thread_critical = False
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        for conn in self.all(initialized_only=True):
+            conn.close_if_unusable_or_obsolete()
+
     def create_local_storage(self):
         return Local(thread_critical=self.thread_critical)
 
@@ -140,9 +147,20 @@ class BaseConnectionHandler(AbstractConnectionHandler):
 
 class BaseAsyncConnectionHandler(AbstractConnectionHandler):
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        await asyncio.gather(*[
+            conn.close_if_unusable_or_obsolete()
+            for conn in self.all(initialized_only=True)
+        ])
+
     def create_local_storage(self):
         return StackLocal()
 
     async def close_all(self):
-        for conn in self.all(initialized_only=True):
-            await conn.close()
+        await asyncio.gather(*[
+            conn.close()
+            for conn in self.all(initialized_only=True)
+        ])
