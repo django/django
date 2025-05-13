@@ -208,6 +208,9 @@ Models
 * :meth:`.QuerySet.raw` now supports models with a
   :class:`~django.db.models.CompositePrimaryKey`.
 
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
+
 Pagination
 ~~~~~~~~~~
 

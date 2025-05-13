@@ -1092,6 +1092,8 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 
 .. fieldlookup:: jsonfield.key
 
+.. _key-index-and-path-transforms:
+
 Key, index, and path transforms
 -------------------------------
 
@@ -1133,6 +1135,22 @@ array:
 
     >>> Dog.objects.filter(data__owner__other_pets__0__name="Fishy")
     <QuerySet [<Dog: Rufus>]>
+
+If the key is a negative integer, it cannot be used in a filter keyword
+directly, but you can still use dictionary unpacking to use it in a query:
+
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(**{"data__owner__other_pets__-1__name": "Fishy"})
+    <QuerySet [<Dog: Rufus>]>
+
+.. admonition:: MySQL, MariaDB, and Oracle
+
+    Negative JSON array indices are not supported.
+
+.. versionchanged:: 6.0
+
+    SQLite support for negative JSON array indices was added.
 
 If the key you wish to query by clashes with the name of another lookup, use
 the :lookup:`contains <jsonfield.contains>` lookup instead.
