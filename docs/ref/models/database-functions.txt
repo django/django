@@ -671,7 +671,7 @@ Usage example:
         ``2015-06-15T12:30:50.321Z`` (the UTC timezone) in the database. When
         Django runs the annotate ``TruncSecond`` the result is a timezone naive
         value converted to the local timezone which becomes
-        ``2015-06-15T14:30:50`` with no timezone. When we filter using
+        ``2015-06-15T14:30:50``. When we filter using
         ``.filter(trunc_start__lte=start)`` we are expecting
         ``2015-06-15T14:30:50+2 <= 2015-06-15T14:30:50.321+2`` which would
         return the row, but instead the comparison is
