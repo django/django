@@ -2673,6 +2673,7 @@ It is possible to use an inline with generically related objects. Let's say
 you have the following models::
 
     from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.contrib.contenttypes.models import ContentType
     from django.db import models
 
 
