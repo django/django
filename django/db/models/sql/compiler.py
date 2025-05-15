@@ -613,6 +613,7 @@ class SQLCompiler:
             # SQL due to the usage of multiple LIMIT clauses. Prevent that from
             # happening by always including an empty resultset query to force
             # the creation of an union.
+            empty_compiler = compiler
             empty_compiler.elide_empty = False
             parts.append(self._get_combinator_part_sql(empty_compiler))
         combinator_sql = self.connection.ops.set_operators[combinator]
