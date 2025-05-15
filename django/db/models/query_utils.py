@@ -220,7 +220,7 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
-                if not instance._is_pk_set() and self.field.generated:
+                if instance._state.adding and self.field.generated:
                     raise AttributeError(
                         "Cannot read a generated field from an unsaved model."
                     )

@@ -1121,7 +1121,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         self.save_as_new = save_as_new
         if queryset is None:
             queryset = self.model._default_manager
-        if self.instance._is_pk_set():
+        if not self.instance._state.adding:
             qs = queryset.filter(**{self.fk.name: self.instance})
         else:
             qs = queryset.none()

@@ -1310,7 +1310,7 @@ class QuerySet(AltersData):
                 return False
         except AttributeError:
             raise TypeError("'obj' must be a model instance.")
-        if not obj._is_pk_set():
+        if obj._state.adding or not obj._is_pk_set():
             raise ValueError("QuerySet.contains() cannot be used on unsaved objects.")
         if self._result_cache is not None:
             return obj in self._result_cache

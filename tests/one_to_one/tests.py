@@ -170,6 +170,27 @@ class OneToOneTests(TestCase):
         with self.assertRaises(Restaurant.DoesNotExist):
             place.restaurant
 
+    def test_unsaved_object_with_supplied_primary_key(self):
+        link1 = Place.objects.create(name="Ushaka", address="Ethekwini")
+        link2 = ManualPrimaryKey(primary_key="ytrewq", name="moonwalk")
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related object "
+            "'link2'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            MultiModel.objects.create(link1=link1, link2=link2, name="unsavable")
+
+    def test_unsaved_clone_of_an_existing_object(self):
+        link1 = Place.objects.create(name="Outeniqua", address="Joburg")
+        link2 = ManualPrimaryKey.objects.create(primary_key="abc123", name="name")
+        link2.pk = None
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related object "
+            "'link2'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            MultiModel.objects.create(link1=link1, link2=link2, name="unsavable")
+
     def test_reverse_relationship_cache_cascade(self):
         """
         Regression test for #9023: accessing the reverse relationship shouldn't
