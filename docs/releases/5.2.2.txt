@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a crash when using ``select_related`` against a ``ForeignObject``
   originating from a model with a ``CompositePrimaryKey`` (:ticket:`36373`).
+
+* Fixed a bug in Django 5.2 where subqueries using ``"pk"`` to reference models
+  with a ``CompositePrimaryKey`` failed to raise ``ValueError`` when too many
+  or too few columns were selected (:ticket:`36392`).

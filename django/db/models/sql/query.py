@@ -1227,7 +1227,10 @@ class Query(BaseExpression):
     @property
     def _subquery_fields_len(self):
         if self.has_select_fields:
-            return len(self.selected)
+            return sum(
+                len(self.model._meta.pk_fields) if field == "pk" else 1
+                for field in self.selected
+            )
         return len(self.model._meta.pk_fields)
 
     def resolve_expression(self, query, *args, **kwargs):
