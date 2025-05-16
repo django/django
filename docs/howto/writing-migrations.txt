@@ -120,7 +120,7 @@ the respective field according to your needs.
         ]
 
 * Edit the first migration file. The generated migration class should look
-  similar to this:
+  similar to this afterwards:
 
   .. code-block:: python
     :caption: ``0004_add_uuid_field.py``
@@ -134,7 +134,7 @@ the respective field according to your needs.
             migrations.AddField(
                 model_name="mymodel",
                 name="uuid",
-                field=models.UUIDField(default=uuid.uuid4, unique=True),
+                field=models.UUIDField(default=uuid.uuid4, null=True),
             ),
         ]
 
