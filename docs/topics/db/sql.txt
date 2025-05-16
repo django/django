@@ -226,7 +226,7 @@ fragments in annotations or filters.
 
 .. warning::
 
-    Use :class:`RawSQL` with caution. It bypasses Django's SQL compiler and query safety
+    Use :class:`~django.db.models.expressions.RawSQL` with caution. It bypasses Django's SQL compiler and query safety
     mechanisms. Parameters must always be passed separately to avoid SQL injection vulnerabilities.
 
 For example:
@@ -241,7 +241,7 @@ For example:
         )
     )
 
-The second argument to :class:`RawSQL` is a list of parameters. These are safely bound to the query
+The second argument to :class:`~django.db.models.expressions.RawSQL` is a list of parameters. These are safely bound to the query
 to prevent SQL injection. This works similarly to the ``params`` argument in :meth:`Manager.raw`.
 
 Use ``%s`` as a placeholder when passing a list of parameters, or ``%(key)s`` for a dictionary.
