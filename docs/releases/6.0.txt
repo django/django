@@ -37,6 +37,42 @@ compatible with Django 6.0.
 What's new in Django 6.0
 ========================
 
+Content Security Policy (CSP) support
+-------------------------------------
+
+The new built-in :ref:`Content Security Policy (CSP) <security-csp>` support
+makes it easier to protect your application against content injection attacks.
+CSP is a security standard that allows you to specify which resources browsers
+are allowed to load.
+
+To enable CSP, add the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` to your
+settings::
+
+  MIDDLEWARE = [
+      # ...
+      "django.middleware.csp.ContentSecurityPolicyMiddleware",
+      # ...
+  ]
+
+You can customize your CSP policy through Django settings:
+
+* :setting:`SECURE_CSP` for the enforced policy
+* :setting:`SECURE_CSP_REPORT_ONLY` for the report-only policy
+
+Here's an an example of a basic CSP configuration::
+
+  from django.middleware.constants import CSP
+
+  SECURE_CSP = {
+      "default-src": [CSP.SELF],
+      "script-src": [CSP.SELF, CSP.NONCE],
+      "style-src": [CSP.SELF],
+      "img-src": [CSP.SELF, "https:"],
+  }
+
+See :ref:`Using CSP <using-csp>` for more usage details.
+
 Minor features
 --------------
 

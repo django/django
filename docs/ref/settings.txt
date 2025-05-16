@@ -2363,6 +2363,71 @@ Unless set to ``None``, the
 :ref:`cross-origin-opener-policy` header on all responses that do not already
 have it to the value provided.
 
+.. setting:: SECURE_CSP
+
+``SECURE_CSP``
+--------------
+
+.. versionadded:: 6.0
+
+Default: ``{}``
+
+If configured, this setting provides the directives for the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` to build the
+:ref:`Content-Security-Policy <content-security-policy>` header. The middleware
+then sets this header on all responses that do not already have it.
+
+The dictionary for this setting must be a mapping of Content Security Policy
+directive names to their corresponding values, typically a list or tuple of
+strings defining the sources. See the `MDN documentation on
+Content-Security-Policy Directives
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>`_
+for details on available directives and their possible values.
+
+A minimal example allowing resources only from the same origin, using constants
+defined in :ref:`csp-constants`:
+
+.. code-block:: python
+
+    from django.middleware.constants import CSP
+
+    SECURE_CSP = {
+        "default-src": [CSP.SELF],
+    }
+
+.. setting:: SECURE_CSP_REPORT_ONLY
+
+``SECURE_CSP_REPORT_ONLY``
+--------------------------
+
+.. versionadded:: 6.0
+
+Default: ``{}``
+
+If configured, this setting provides the directives for the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` to build the
+:ref:`Content-Security-Policy-Report-Only <content-security-policy-report-only>`
+header. The middleware then sets this header on all responses that do not
+already have it.
+
+The dictionary for this setting must be a mapping of Content Security Policy
+directive names to their corresponding values, typically a list or tuple of
+strings defining the sources. See the `MDN documentation on
+Content-Security-Policy Directives
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>`_
+for details on available directives and their possible values.
+
+A minimal example allowing resources only from the same origin, using constants
+defined in :ref:`csp-constants`:
+
+.. code-block:: python
+
+    from django.middleware.constants import CSP
+
+    SECURE_CSP_REPORT_ONLY = {
+        "default-src": [CSP.SELF],
+    }
+
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
 ``SECURE_HSTS_INCLUDE_SUBDOMAINS``
@@ -3749,6 +3814,8 @@ HTTP
 
   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
   * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+  * :setting:`SECURE_CSP`
+  * :setting:`SECURE_CSP_REPORT_ONLY`
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
   * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`
