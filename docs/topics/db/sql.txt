@@ -217,6 +217,37 @@ You can often avoid using raw SQL to compute annotations by instead using a
 
 __ https://www.postgresql.org/docs/current/functions-datetime.html
 
+Using RawSQL in ORM expressions
+-------------------------------
+
+In cases where the ORM's built-in expressions and functions do not meet your needs,
+you can use :class:`~django.db.models.expressions.RawSQL` to include custom SQL
+fragments in annotations or filters.
+
+.. warning::
+
+    Use RawSQL with caution. It bypasses Django's SQL compiler and query sanitization
+    mechanisms. Parameters must always be passed separately to avoid SQL injection
+
+For example:
+
+.. code-block:: python
+
+    from django.db.models.expression import RawSQL
+
+    Entry.objects.annotate(
+        avg_score=RawSQL(
+            "SELECT AVG(score) FROM scoring WHERE scoring.entry_id = entry.id", []
+        )
+    )
+
+The second argument to `RawSQL` is a list of parameters. These are safely bound to the query to prevent SQL injection.
+This works similarly to the ``params`` can be a list or a dictionary of parameters.
+Use ``%s`` as a placeholder when using a list, or ``%(key)s`` for a dictionary.
+
+Before reaching for `RawSQL`, consider whether a :ref:`Func() expression <func-expressions>`
+or other built-in ORM functionality can achieve the same result.
+
 Passing parameters into ``raw()``
 ---------------------------------
 
