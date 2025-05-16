@@ -126,3 +126,146 @@ class BaseOrderWithRespectToTests:
                 ),
             ):
                 self.q1.set_answer_order([3, 1, 2, 4])
+
+    def test_bulk_create_with_empty_parent(self):
+        """
+        bulk_create() should properly set _order when parent has no existing children.
+        """
+        question = self.Question.objects.create(text="Test Question")
+        answers = [self.Answer(question=question, text=f"Answer {i}") for i in range(3)]
+        answer0, answer1, answer2 = self.Answer.objects.bulk_create(answers)
+
+        self.assertEqual(answer0._order, 0)
+        self.assertEqual(answer1._order, 1)
+        self.assertEqual(answer2._order, 2)
+
+    def test_bulk_create_with_existing_children(self):
+        """
+        bulk_create() should continue _order sequence from existing children.
+        """
+        question = self.Question.objects.create(text="Test Question")
+        self.Answer.objects.create(question=question, text="Existing 0")
+        self.Answer.objects.create(question=question, text="Existing 1")
+
+        new_answers = [
+            self.Answer(question=question, text=f"New Answer {i}") for i in range(2)
+        ]
+        answer2, answer3 = self.Answer.objects.bulk_create(new_answers)
+
+        self.assertEqual(answer2._order, 2)
+        self.assertEqual(answer3._order, 3)
+
+    def test_bulk_create_multiple_parents(self):
+        """
+        bulk_create() should maintain separate _order sequences for different parents.
+        """
+        question0 = self.Question.objects.create(text="Question 0")
+        question1 = self.Question.objects.create(text="Question 1")
+
+        answers = [
+            self.Answer(question=question0, text="Q0 Answer 0"),
+            self.Answer(question=question1, text="Q1 Answer 0"),
+            self.Answer(question=question0, text="Q0 Answer 1"),
+            self.Answer(question=question1, text="Q1 Answer 1"),
+        ]
+        created_answers = self.Answer.objects.bulk_create(answers)
+        answer_q0_0, answer_q1_0, answer_q0_1, answer_q1_1 = created_answers
+
+        self.assertEqual(answer_q0_0._order, 0)
+        self.assertEqual(answer_q0_1._order, 1)
+        self.assertEqual(answer_q1_0._order, 0)
+        self.assertEqual(answer_q1_1._order, 1)
+
+    def test_bulk_create_mixed_scenario(self):
+        """
+        The _order field should be correctly set for new Answer objects based
+        on the count of existing Answers for each related Question.
+        """
+        question0 = self.Question.objects.create(text="Question 0")
+        question1 = self.Question.objects.create(text="Question 1")
+
+        self.Answer.objects.create(question=question1, text="Q1 Existing 0")
+        self.Answer.objects.create(question=question1, text="Q1 Existing 1")
+
+        new_answers = [
+            self.Answer(question=question0, text="Q0 New 0"),
+            self.Answer(question=question1, text="Q1 New 0"),
+            self.Answer(question=question0, text="Q0 New 1"),
+        ]
+        created_answers = self.Answer.objects.bulk_create(new_answers)
+        answer_q0_0, answer_q1_2, answer_q0_1 = created_answers
+
+        self.assertEqual(answer_q0_0._order, 0)
+        self.assertEqual(answer_q0_1._order, 1)
+        self.assertEqual(answer_q1_2._order, 2)
+
+    def test_bulk_create_respects_mixed_manual_order(self):
+        """
+        bulk_create() should assign _order automatically only for instances
+        where it is not manually set. Mixed objects with and without _order
+        should result in expected final order values.
+        """
+        question_a = self.Question.objects.create(text="Question A")
+        question_b = self.Question.objects.create(text="Question B")
+
+        # Existing answers to push initial _order forward.
+        self.Answer.objects.create(question=question_a, text="Q-A Existing 0")
+        self.Answer.objects.create(question=question_b, text="Q-B Existing 0")
+        self.Answer.objects.create(question=question_b, text="Q-B Existing 1")
+
+        answers = [
+            self.Answer(question=question_a, text="Q-A Manual 4", _order=4),
+            self.Answer(question=question_b, text="Q-B Auto 2"),
+            self.Answer(question=question_a, text="Q-A Auto"),
+            self.Answer(question=question_b, text="Q-B Manual 10", _order=10),
+            self.Answer(question=question_a, text="Q-A Manual 7", _order=7),
+            self.Answer(question=question_b, text="Q-B Auto 3"),
+        ]
+
+        created_answers = self.Answer.objects.bulk_create(answers)
+        (
+            qa_manual_4,
+            qb_auto_2,
+            qa_auto,
+            qb_manual_10,
+            qa_manual_7,
+            qb_auto_3,
+        ) = created_answers
+
+        # Manual values should stay untouched.
+        self.assertEqual(qa_manual_4._order, 4)
+        self.assertEqual(qb_manual_10._order, 10)
+        self.assertEqual(qa_manual_7._order, 7)
+        # Existing max was 0 → auto should get _order=1.
+        self.assertEqual(qa_auto._order, 1)
+        # Existing max was 1 → next auto gets 2, then 3 (manual 10 is skipped).
+        self.assertEqual(qb_auto_2._order, 2)
+        self.assertEqual(qb_auto_3._order, 3)
+
+    def test_bulk_create_allows_duplicate_order_values(self):
+        """
+        bulk_create() should allow duplicate _order values if the model
+        does not enforce uniqueness on the _order field.
+        """
+        question = self.Question.objects.create(text="Duplicated Test")
+
+        # Existing answer to set initial _order=0.
+        self.Answer.objects.create(question=question, text="Existing Answer")
+        # Two manually set _order=1 and one auto (which may also be assigned 1).
+        answers = [
+            self.Answer(question=question, text="Manual Order 1", _order=1),
+            self.Answer(question=question, text="Auto Order 1"),
+            self.Answer(question=question, text="Auto Order 2"),
+            self.Answer(question=question, text="Manual Order 1 Duplicate", _order=1),
+        ]
+
+        created_answers = self.Answer.objects.bulk_create(answers)
+        manual_1, auto_1, auto_2, manual_2 = created_answers
+
+        # Manual values are as assigned, even if duplicated.
+        self.assertEqual(manual_1._order, 1)
+        self.assertEqual(manual_2._order, 1)
+        # Auto-assigned orders may also use 1 or any value, depending on implementation.
+        # If no collision logic, they may overlap with manual values.
+        self.assertEqual(auto_1._order, 1)
+        self.assertEqual(auto_2._order, 2)
