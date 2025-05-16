@@ -276,6 +276,12 @@ not be looking at your Django code. For example::
     make and apply the appropriate migrations if you add or change
     ``order_with_respect_to`` after your initial :djadmin:`migrate`.
 
+.. note::
+
+    When using :meth:`~django.db.models.query.QuerySet.bulk_create`,
+    the ``_order`` field is automatically populated for each created object
+    based on their insertion order relative to existing instances.
+
 ``ordering``
 ------------
 
