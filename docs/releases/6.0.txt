@@ -84,7 +84,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Model fields, indexes, and constraints from :mod:`django.contrib.postgres`
+  now include system checks to verify that ``django.contrib.postgres`` is an
+  installed app.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
