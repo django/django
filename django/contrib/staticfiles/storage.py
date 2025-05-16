@@ -136,8 +136,10 @@ class HashedFilesMixin:
         # `filename` is the name of file to hash if `content` isn't given.
         # `name` is the base name to construct the new hashed filename from.
         parsed_name = urlsplit(unquote(name))
-        clean_name = parsed_name.path.strip()
-        filename = (filename and urlsplit(unquote(filename)).path.strip()) or clean_name
+        clean_name = self.clean_name(parsed_name.path)
+        filename = (
+            filename and self.clean_name(urlsplit(unquote(filename)).path)
+        ) or clean_name
         opened = content is None
         if opened:
             if not self.exists(filename):
@@ -173,11 +175,11 @@ class HashedFilesMixin:
         if settings.DEBUG and not force:
             hashed_name, fragment = name, ""
         else:
-            clean_name, fragment = urldefrag(name)
-            if urlsplit(clean_name).path.endswith("/"):  # don't hash paths
+            cleaned_name, fragment = urldefrag(self.clean_name(name))
+            if urlsplit(cleaned_name).path.endswith("/"):  # don't hash paths
                 hashed_name = name
             else:
-                args = (clean_name,)
+                args = (cleaned_name,)
                 if hashed_files is not None:
                     args += (hashed_files,)
                 hashed_name = hashed_name_func(*args)
@@ -410,7 +412,7 @@ class HashedFilesMixin:
                 yield name, hashed_name, processed, substitutions
 
     def clean_name(self, name):
-        return name.replace("\\", "/")
+        return name.strip().replace("\\", "/").removeprefix("/")
 
     def hash_key(self, name):
         return name
@@ -510,13 +512,13 @@ class ManifestFilesMixin(HashedFilesMixin):
 
     def stored_name(self, name):
         parsed_name = urlsplit(unquote(name))
-        clean_name = parsed_name.path.strip()
-        hash_key = self.hash_key(clean_name)
+        cleaned_name = self.clean_name(parsed_name.path)
+        hash_key = self.hash_key(cleaned_name)
         cache_name = self.hashed_files.get(hash_key)
         if cache_name is None:
             if self.manifest_strict:
                 raise ValueError(
-                    "Missing staticfiles manifest entry for '%s'" % clean_name
+                    "Missing staticfiles manifest entry for '%s'" % cleaned_name
                 )
             cache_name = self.clean_name(self.hashed_name(name))
         unparsed_name = list(parsed_name)
