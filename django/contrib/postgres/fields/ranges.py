@@ -12,6 +12,7 @@ from django.db.backends.postgresql.psycopg_any import (
 from django.db.models.functions import Cast
 from django.db.models.lookups import PostgresOperatorLookup
 
+from ..utils import CheckPostgresInstalledMixin
 from .utils import AttributeSetter
 
 __all__ = [
@@ -51,7 +52,7 @@ class RangeOperators:
     ADJACENT_TO = "-|-"
 
 
-class RangeField(models.Field):
+class RangeField(CheckPostgresInstalledMixin, models.Field):
     empty_strings_allowed = False
 
     def __init__(self, *args, **kwargs):
