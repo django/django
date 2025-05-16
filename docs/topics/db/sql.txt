@@ -226,14 +226,14 @@ fragments in annotations or filters.
 
 .. warning::
 
-    Use RawSQL with caution. It bypasses Django's SQL compiler and query sanitization
-    mechanisms. Parameters must always be passed separately to avoid SQL injection
+    Use :class:`RawSQL` with caution. It bypasses Django's SQL compiler and query safety
+    mechanisms. Parameters must always be passed separately to avoid SQL injection vulnerabilities.
 
 For example:
 
 .. code-block:: python
 
-    from django.db.models.expression import RawSQL
+    from django.db.models.expressions import RawSQL
 
     Entry.objects.annotate(
         avg_score=RawSQL(
@@ -241,12 +241,10 @@ For example:
         )
     )
 
-The second argument to `RawSQL` is a list of parameters. These are safely bound to the query to prevent SQL injection.
-This works similarly to the ``params`` can be a list or a dictionary of parameters.
-Use ``%s`` as a placeholder when using a list, or ``%(key)s`` for a dictionary.
+The second argument to :class:`RawSQL` is a list of parameters. These are safely bound to the query
+to prevent SQL injection. This works similarly to the ``params`` argument in :meth:`Manager.raw`.
 
-Before reaching for `RawSQL`, consider whether a :ref:`Func() expression <func-expressions>`
-or other built-in ORM functionality can achieve the same result.
+Use ``%s`` as a placeholder when passing a list of parameters, or ``%(key)s`` for a dictionary.
 
 Passing parameters into ``raw()``
 ---------------------------------
