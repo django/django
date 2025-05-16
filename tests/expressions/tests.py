@@ -728,7 +728,7 @@ class BasicExpressionsTests(TestCase):
         subquery_test = Company.objects.filter(pk__in=Subquery(small_companies))
         self.assertCountEqual(subquery_test, [self.foobar_ltd, self.gmbh])
         subquery_test2 = Company.objects.filter(
-            pk=Subquery(small_companies.filter(num_employees=3))
+            pk=Subquery(small_companies.filter(num_employees=3)[:1])
         )
         self.assertCountEqual(subquery_test2, [self.foobar_ltd])
 
@@ -2504,6 +2504,15 @@ class ExistsTests(TestCase):
         qs = Manager.objects.annotate(exists=Exists(Manager.objects.none())).filter(
             pk=manager.pk, exists=False
         )
+        self.assertSequenceEqual(qs, [manager])
+        self.assertIs(qs.get().exists, False)
+
+    def test_annotate_by_empty_custom_exists(self):
+        class CustomExists(Exists):
+            template = Subquery.template
+
+        manager = Manager.objects.create()
+        qs = Manager.objects.annotate(exists=CustomExists(Manager.objects.none()))
         self.assertSequenceEqual(qs, [manager])
         self.assertIs(qs.get().exists, False)
 

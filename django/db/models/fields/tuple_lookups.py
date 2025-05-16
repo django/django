@@ -1,6 +1,7 @@
 import itertools
 
 from django.core.exceptions import EmptyResultSet
+from django.db import NotSupportedError
 from django.db.models import Field
 from django.db.models.expressions import (
     ColPairs,
@@ -129,6 +130,22 @@ class TupleLookupMixin:
         return super().as_sql(compiler, connection)
 
 
+class TupleComparisonMixin:
+    def as_sql(self, compiler, connection):
+        if (
+            not connection.features.supports_tuple_comparison_against_subquery
+            and isinstance(self.rhs, Query)
+            and self.rhs.subquery
+        ):
+            lookup = self.lookup_name
+            msg = (
+                f'"{lookup}" cannot be used to target composite fields '
+                "through subqueries on this backend"
+            )
+            raise NotSupportedError(msg)
+        return super().as_sql(compiler, connection)
+
+
 class TupleExact(TupleLookupMixin, Exact):
     def get_fallback_sql(self, compiler, connection):
         if isinstance(self.rhs, Query):
@@ -165,7 +182,7 @@ class TupleIsNull(TupleLookupMixin, IsNull):
         return root.as_sql(compiler, connection)
 
 
-class TupleGreaterThan(TupleLookupMixin, GreaterThan):
+class TupleGreaterThan(TupleLookupMixin, TupleComparisonMixin, GreaterThan):
     def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
@@ -193,7 +210,9 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
         return root.as_sql(compiler, connection)
 
 
-class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
+class TupleGreaterThanOrEqual(
+    TupleLookupMixin, TupleComparisonMixin, GreaterThanOrEqual
+):
     def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
@@ -221,7 +240,7 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
         return root.as_sql(compiler, connection)
 
 
-class TupleLessThan(TupleLookupMixin, LessThan):
+class TupleLessThan(TupleLookupMixin, TupleComparisonMixin, LessThan):
     def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
@@ -249,7 +268,7 @@ class TupleLessThan(TupleLookupMixin, LessThan):
         return root.as_sql(compiler, connection)
 
 
-class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
+class TupleLessThanOrEqual(TupleLookupMixin, TupleComparisonMixin, LessThanOrEqual):
     def get_fallback_sql(self, compiler, connection):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
