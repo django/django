@@ -37,6 +37,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_aggregate_order_by_clause = Database.sqlite_version_info >= (3, 44, 0)
     supports_aggregate_distinct_multiple_argument = False
     order_by_nulls_first = True
+    supports_json_absent_on_null = False
+    supports_json_array_concat = False
     supports_json_field_contains = False
     supports_update_conflicts = True
     supports_update_conflicts_with_target = True
