@@ -7,10 +7,12 @@ from django.db.models import Field, TextField, Transform
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.utils.translation import gettext_lazy as _
 
+from ..utils import CheckPostgresInstalledMixin
+
 __all__ = ["HStoreField"]
 
 
-class HStoreField(CheckFieldDefaultMixin, Field):
+class HStoreField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     description = _("Map of strings to strings/nulls")
     default_error_messages = {
