@@ -1071,7 +1071,7 @@ precedence. For a ``--verbosity`` of 2 or higher, the automatically imported
 objects will be listed. To disable automatic importing entirely, use the
 ``--no-imports`` flag.
 
-See the guide on :ref:`customizing this behaviour
+See the guide on :ref:`customizing this behavior
 <customizing-shell-auto-imports>` to add or remove automatic imports.
 
 .. versionchanged:: 5.2
@@ -1266,9 +1266,13 @@ By default, :source:`the new directory <django/conf/app_template>` contains a
 ``models.py`` file and other app template files. If only the app name is given,
 the app directory will be created in the current working directory.
 
-If the optional destination is provided, Django will use that existing
-directory rather than creating a new one. You can use '.' to denote the current
-working directory.
+If the optional destination is provided, Django will use that name instead. If
+the directory with the given name doesn't exist, it will be created. You can
+use '.' to denote the current working directory.
+
+.. versionchanged:: 6.0
+
+    Automatic creation of the destination directory was added.
 
 For example:
 
@@ -1378,9 +1382,14 @@ If only the project name is given, both the project directory and project
 package will be named ``<projectname>`` and the project directory
 will be created in the current working directory.
 
-If the optional destination is provided, Django will use that existing
-directory as the project directory, and create ``manage.py`` and the project
-package within it. Use '.' to denote the current working directory.
+If the optional destination is provided, Django will use that name as the
+project directory, and create ``manage.py`` and the project package within it.
+If the directory with the given name doesn't exist, it will be created. Use '.'
+to denote the current working directory.
+
+.. versionchanged:: 6.0
+
+    Automatic creation of the destination directory was added.
 
 For example:
 

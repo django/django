@@ -287,10 +287,6 @@ class BaseDatabaseFeatures:
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
 
-    # SQL to create a table with a composite primary key for use by the Django
-    # test suite.
-    create_test_table_with_composite_primary_key = None
-
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
 
@@ -351,6 +347,8 @@ class BaseDatabaseFeatures:
     json_key_contains_list_matching_requires_list = False
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
+    # Does the backend support negative JSON array indexing?
+    supports_json_negative_indexing = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True

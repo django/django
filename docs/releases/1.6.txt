@@ -648,7 +648,7 @@ Help text of model form fields for ManyToManyField fields
 
 HTML rendering of model form fields corresponding to
 :class:`~django.db.models.ManyToManyField` model fields used to get the
-hard-coded sentence:
+hardcoded sentence:
 
   *Hold down "Control", or "Command" on a Mac, to select more than one.*
 
@@ -668,7 +668,7 @@ widget is :class:`~django.forms.SelectMultiple` or selected subclasses.
 
 The change can affect you in a backward incompatible way if you employ custom
 model form fields and/or widgets for ``ManyToManyField`` model fields whose UIs
-do rely on the automatic provision of the mentioned hard-coded sentence. These
+do rely on the automatic provision of the mentioned hardcoded sentence. These
 form field implementations need to adapt to the new scenario by providing their
 own handling of the ``help_text`` attribute.
 

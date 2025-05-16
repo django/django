@@ -53,20 +53,20 @@ class RequestsTests(SimpleTestCase):
 
     def test_httprequest_full_path(self):
         request = HttpRequest()
-        request.path = "/;some/?awful/=path/foo:bar/"
-        request.path_info = "/prefix" + request.path
+        request.path_info = "/;some/?awful/=path/foo:bar/"
+        request.path = "/prefix" + request.path_info
         request.META["QUERY_STRING"] = ";some=query&+query=string"
         expected = "/%3Bsome/%3Fawful/%3Dpath/foo:bar/?;some=query&+query=string"
-        self.assertEqual(request.get_full_path(), expected)
-        self.assertEqual(request.get_full_path_info(), "/prefix" + expected)
+        self.assertEqual(request.get_full_path_info(), expected)
+        self.assertEqual(request.get_full_path(), "/prefix" + expected)
 
     def test_httprequest_full_path_with_query_string_and_fragment(self):
         request = HttpRequest()
-        request.path = "/foo#bar"
-        request.path_info = "/prefix" + request.path
+        request.path_info = "/foo#bar"
+        request.path = "/prefix" + request.path_info
         request.META["QUERY_STRING"] = "baz#quux"
-        self.assertEqual(request.get_full_path(), "/foo%23bar?baz#quux")
-        self.assertEqual(request.get_full_path_info(), "/prefix/foo%23bar?baz#quux")
+        self.assertEqual(request.get_full_path_info(), "/foo%23bar?baz#quux")
+        self.assertEqual(request.get_full_path(), "/prefix/foo%23bar?baz#quux")
 
     def test_httprequest_repr(self):
         request = HttpRequest()

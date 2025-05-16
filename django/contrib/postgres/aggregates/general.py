@@ -73,7 +73,7 @@ class StringAgg(_DeprecatedOrdering, _StringAgg):
             warnings.warn(
                 "delimiter: str will be resolved as a field reference instead "
                 "of a string literal on Django 7.0. Pass "
-                f"`delimiter=Value({delimiter!r})` to preserve the previous behaviour.",
+                f"`delimiter=Value({delimiter!r})` to preserve the previous behavior.",
                 category=RemovedInDjango70Warning,
                 stacklevel=2,
             )

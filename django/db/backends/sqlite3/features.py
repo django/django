@@ -1,4 +1,5 @@
 import operator
+import sqlite3
 
 from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
@@ -13,7 +14,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
-    max_query_params = 999
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
@@ -53,13 +53,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         # Date/DateTime fields and timedeltas.
         "expressions.tests.FTimeDeltaTests.test_mixed_comparisons1",
     }
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 INTEGER NOT NULL,
-            column_2 INTEGER NOT NULL,
-            PRIMARY KEY(column_1, column_2)
-        )
-    """
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
     supports_unlimited_charfield = True
@@ -146,6 +139,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "GenericIPAddressField": "CharField",
             "SmallAutoField": "AutoField",
         }
+
+    @property
+    def max_query_params(self):
+        """
+        SQLite has a variable limit per query. The limit can be changed using
+        the SQLITE_MAX_VARIABLE_NUMBER compile-time option (which defaults to
+        999 in versions < 3.32.0 or 32766 in newer versions) or lowered per
+        connection at run-time with setlimit(SQLITE_LIMIT_VARIABLE_NUMBER, N).
+        """
+        return self.connection.connection.getlimit(sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER)
 
     @cached_property
     def supports_json_field(self):

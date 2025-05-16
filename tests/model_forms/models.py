@@ -374,7 +374,7 @@ class FlexibleDatePost(models.Model):
     posted = models.DateField(blank=True, null=True)
 
 
-class Colour(models.Model):
+class Color(models.Model):
     name = models.CharField(max_length=50)
 
     def __iter__(self):
@@ -384,9 +384,9 @@ class Colour(models.Model):
         return self.name
 
 
-class ColourfulItem(models.Model):
+class ColorfulItem(models.Model):
     name = models.CharField(max_length=50)
-    colours = models.ManyToManyField(Colour)
+    colors = models.ManyToManyField(Color)
 
 
 class CustomErrorMessage(models.Model):

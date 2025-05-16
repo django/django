@@ -165,7 +165,9 @@ class RawModelIterable(BaseIterable):
                 annotation_fields,
             ) = self.queryset.resolve_model_init_order()
             model_cls = self.queryset.model
-            if model_cls._meta.pk.attname not in model_init_names:
+            if any(
+                f.attname not in model_init_names for f in model_cls._meta.pk_fields
+            ):
                 raise exceptions.FieldDoesNotExist(
                     "Raw query must include the primary key"
                 )
@@ -1248,8 +1250,9 @@ class QuerySet(AltersData):
                 new_order_by.append(col)
         query.order_by = tuple(new_order_by)
 
-        # Clear any annotations so that they won't be present in subqueries.
-        query.annotations = {}
+        # Clear SELECT clause as all annotation references were inlined by
+        # add_update_values() already.
+        query.clear_select_clause()
         with transaction.mark_for_rollback_on_error(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
         self._result_cache = None
@@ -1371,24 +1374,33 @@ class QuerySet(AltersData):
                 "field."
             )
 
-        field_names = {f for f in fields if not hasattr(f, "resolve_expression")}
+        field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []
         expressions = {}
         counter = 1
         for field in fields:
+            field_name = field
+            expression = None
             if hasattr(field, "resolve_expression"):
-                field_id_prefix = getattr(
+                field_name = getattr(
                     field, "default_alias", field.__class__.__name__.lower()
                 )
-                while True:
-                    field_id = field_id_prefix + str(counter)
+                expression = field
+                # For backward compatibility reasons expressions are always
+                # prefixed with the counter even if their default alias doesn't
+                # collide with field names. Changing this logic could break
+                # some usage of named=True.
+                seen = True
+            elif seen := field_names[field_name]:
+                expression = F(field_name)
+            if seen:
+                field_name_prefix = field_name
+                while (field_name := f"{field_name_prefix}{counter}") in field_names:
                     counter += 1
-                    if field_id not in field_names:
-                        break
-                expressions[field_id] = field
-                _fields.append(field_id)
-            else:
-                _fields.append(field)
+            if expression is not None:
+                expressions[field_name] = expression
+            field_names[field_name] = True
+            _fields.append(field_name)
 
         clone = self._values(*_fields, **expressions)
         clone._iterable_class = (
@@ -2066,7 +2078,9 @@ class RawQuerySet:
         """Resolve the init field names and value positions."""
         converter = connections[self.db].introspection.identifier_converter
         model_init_fields = [
-            f for f in self.model._meta.fields if converter(f.column) in self.columns
+            field
+            for column_name, field in self.model_fields.items()
+            if column_name in self.columns
         ]
         annotation_fields = [
             (column, pos)
@@ -2181,10 +2195,13 @@ class RawQuerySet:
     def model_fields(self):
         """A dict mapping column names to model field names."""
         converter = connections[self.db].introspection.identifier_converter
-        model_fields = {}
-        for field in self.model._meta.fields:
-            model_fields[converter(field.column)] = field
-        return model_fields
+        return {
+            converter(field.column): field
+            for field in self.model._meta.fields
+            # Fields with None "column" should be ignored
+            # (e.g. CompositePrimaryKey).
+            if field.column
+        }
 
 
 class Prefetch:
@@ -2661,7 +2678,11 @@ class RelatedPopulator:
             )
 
         self.model_cls = klass_info["model"]
-        self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
+        # A primary key must have all of its constituents not-NULL as
+        # NULL != NULL and thus NULL cannot be referenced through a foreign
+        # relationship. Therefore checking for a single member of the primary
+        # key is enough to determine if the referenced object exists or not.
+        self.pk_idx = self.init_list.index(self.model_cls._meta.pk_fields[0].attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
         self.local_setter = klass_info["local_setter"]
         self.remote_setter = klass_info["remote_setter"]

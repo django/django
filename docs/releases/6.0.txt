@@ -43,7 +43,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The Font Awesome Free icon set (version 6.7.2) is now used for the admin
+  interface icons.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,7 +171,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :djadmin:`startproject` and :djadmin:`startapp` commands now create the
+  custom target directory if it doesn't exist.
 
 Migrations
 ~~~~~~~~~~
@@ -179,6 +181,9 @@ Migrations
   to normal migrations.
 
 * Migrations now support serialization of :class:`zoneinfo.ZoneInfo` instances.
+
+* Serialization of deconstructible objects now supports keyword arguments with
+  names that are not valid Python identifiers.
 
 Models
 ~~~~~~
@@ -200,6 +205,12 @@ Models
   :exc:`Model.NotUpdated <django.db.models.Model.NotUpdated>` exception, when
   :ref:`a forced update <ref-models-force-insert>` results in no affected rows,
   instead of a generic :exc:`django.db.DatabaseError`.
+
+* :meth:`.QuerySet.raw` now supports models with a
+  :class:`~django.db.models.CompositePrimaryKey`.
+
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
 
 Pagination
 ~~~~~~~~~~

@@ -391,7 +391,7 @@ class Command(BaseCommand):
                 columns = [
                     x for x in columns if x is not None and x in column_to_field_name
                 ]
-                if len(columns) > 1:
+                if len(columns) > 1 and not params["primary_key"]:
                     unique_together.append(
                         str(tuple(column_to_field_name[c] for c in columns))
                     )
