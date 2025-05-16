@@ -1550,6 +1550,8 @@ class QuerySet(AltersData):
             if len(qs) == 1:
                 return qs[0]
             return qs[0]._combinator_query("union", *qs[1:], all=all)
+        elif not other_qs:
+            return self
         return self._combinator_query("union", *other_qs, all=all)
 
     def intersection(self, *other_qs):
