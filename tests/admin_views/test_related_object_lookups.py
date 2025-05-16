@@ -179,3 +179,41 @@ class SeleniumTests(AdminSeleniumTestCase):
             m2m_to.get_attribute("innerHTML"),
             f"""<option title="{name}" value="{id_value}">{name}</option>""",
         )
+
+    def test_radio_select_widget_no_edit_view_icons(self):
+        from selenium.webdriver.common.by import By
+
+        # Navigate to the Redirect add page in the admin
+        redirect_add_url = reverse("admin:redirects_redirect_add")
+        self.selenium.get(self.live_server_url + redirect_add_url)
+
+        # Wait until the 'site' field is present
+        self.wait_until(
+            lambda driver: driver.find_element(By.CSS_SELECTOR, ".form-row.field-site")
+        )
+
+        # Find the 'site' field container
+        field_container = self.selenium.find_element(
+            By.CSS_SELECTOR, ".form-row.field-site"
+        )
+
+        # Find the widget wrapper
+        widget_wrapper = field_container.find_element(
+            By.CSS_SELECTOR, ".related-widget-wrapper"
+        )
+
+        # Check for edit and view icons
+        edit_icons = widget_wrapper.find_elements(By.CSS_SELECTOR, ".change-related")
+        view_icons = widget_wrapper.find_elements(By.CSS_SELECTOR, ".view-related")
+
+        # Assert that no edit or view icons are present
+        self.assertEqual(
+            len(edit_icons),
+            0,
+            "Edit icon should not be present for RadioSelect fields.",
+        )
+        self.assertEqual(
+            len(view_icons),
+            0,
+            "View icon should not be present for RadioSelect fields.",
+        )
