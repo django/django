@@ -608,8 +608,11 @@ def create_generic_related_manager(superclass, rel):
             """
             Filter the queryset for the instance this manager is bound to.
             """
-            db = self._db or router.db_for_read(self.model, instance=self.instance)
-            return queryset.using(db).filter(**self.core_filters)
+            queryset._add_hints(instance=self.instance)
+            if self._db:
+                queryset = queryset.using(self._db)
+            queryset._defer_next_filter = True
+            return queryset.filter(**self.core_filters)
 
         def _remove_prefetched_objects(self):
             try:
