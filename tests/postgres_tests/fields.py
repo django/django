@@ -16,6 +16,8 @@ try:
         DecimalRangeField,
         HStoreField,
         IntegerRangeField,
+        UUID4AutoField,
+        UUID4Field,
     )
     from django.contrib.postgres.search import SearchVector, SearchVectorField
 except ImportError:
@@ -52,6 +54,8 @@ except ImportError:
     IntegerRangeField = models.Field
     SearchVector = models.Expression
     SearchVectorField = models.Field
+    UUID4Field = models.Field
+    UUID4AutoField = models.Field
 
 
 class EnumField(models.CharField):
