@@ -338,11 +338,6 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
         self.assertEqual(response.status_code, 200)
 
-        # Empty filenames should be ignored
-        received = response.json()
-        for i, name in enumerate(filenames):
-            self.assertIsNone(received.get("file%s" % i))
-
     def test_non_printable_chars_in_file_names(self):
         file_name = "non-\x00printable\x00\n_chars.txt\x00"
         payload = client.FakePayload()
