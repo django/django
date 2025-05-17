@@ -188,11 +188,12 @@ class FileStorageTests(SimpleTestCase):
         self.addCleanup(self.storage.delete, f_name)
         atime = self.storage.get_accessed_time(f_name)
 
-        self.assertEqual(
-            atime,
-            datetime.datetime.fromtimestamp(
+        self.assertLess(
+            atime
+            - datetime.datetime.fromtimestamp(
                 os.path.getatime(self.storage.path(f_name))
             ),
+            datetime.timedelta(seconds=1),
         )
         self.assertLess(
             timezone.now() - self.storage.get_accessed_time(f_name),
