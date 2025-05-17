@@ -595,6 +595,37 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn("Content-Type: text/plain; charset=UTF-8", pot_contents)
             self.assertIn("mañana; charset=CHARSET", pot_contents)
 
+    def test_no_duplicate_locale_paths(self):
+        """
+        Check for duplicate locale paths in the command
+        (#36368)
+        """
+        for LOCALE_PATHS in [
+            [],
+            [os.path.join(self.test_dir, "locale")],
+            [Path(self.test_dir, "locale")],
+        ]:
+            with override_settings(LOCALE_PATHS=LOCALE_PATHS):
+                cmd = MakeMessagesCommand()
+                management.call_command(cmd, locale=["en", "ru"], verbosity=0)
+                locale_paths = list(map(str, cmd.locale_paths))
+                self.assertEqual(len(locale_paths), len(set(locale_paths)))
+
+    def test_no_duplicate_write_po_file_calls(self):
+        """
+        Check if write_po_file is called only once for each potfile and locale
+        (#36368)
+        """
+        with mock.patch.object(
+            MakeMessagesCommand, "write_po_file"
+        ) as mock_write_po_file:
+            cmd = MakeMessagesCommand()
+            management.call_command(cmd, locale=["en", "ru"], verbosity=0)
+            self.assertEqual(
+                len(mock_write_po_file.call_args_list),
+                len({call.args for call in mock_write_po_file.call_args_list}),
+            )
+
 
 class JavaScriptExtractorTests(ExtractorTests):
     PO_FILE = "locale/%s/LC_MESSAGES/djangojs.po" % LOCALE
