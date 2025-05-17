@@ -186,3 +186,12 @@ class PyMemcacheCache(BaseMemcachedCache):
             "serde": pymemcache.serde.pickle_serde,
             **self._options,
         }
+
+        # If we use pooling, we can share the connection handler between tasks/threads.
+        # use_pooling True by default
+        self.thread_sensitive = not self._options.setdefault("use_pooling", True)
+
+    def close(self, **kwargs):
+        # If we do not use pooling, we need to close sessions
+        if self.thread_sensitive:
+            self._cache.disconnect_all()
