@@ -496,7 +496,7 @@ should be invoked for each distinct value of ``expressions`` (or set of
 values, for multiple ``expressions``). The argument is only supported on
 aggregates that have :attr:`~Aggregate.allow_distinct` set to ``True``.
 
-The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
+The ``filter`` argument takes a :class:`~django.db.models.Q` object that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 

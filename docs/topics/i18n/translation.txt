@@ -1041,13 +1041,13 @@ The ``JavaScriptCatalog`` view
 
     .. attribute:: packages
 
-        A list of :attr:`application names <django.apps.AppConfig.name>` among
-        installed applications. Those apps should contain a ``locale``
-        directory. All those catalogs plus all catalogs found in
-        :setting:`LOCALE_PATHS` (which are always included) are merged into one
-        catalog. Defaults to ``None``, which means that all available
-        translations from all :setting:`INSTALLED_APPS` are provided in the
-        JavaScript output.
+        A list of application names (:attr:`AppConfig.name
+        <django.apps.AppConfig.name>`) among the installed applications. Those
+        apps should contain a ``locale`` directory. All those catalogs plus all
+        catalogs found in :setting:`LOCALE_PATHS` (which are always included)
+        are merged into one catalog. Defaults to ``None``, which means that all
+        available translations from all :setting:`INSTALLED_APPS` are provided
+        in the JavaScript output.
 
     **Example with default values**::
 
