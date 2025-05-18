@@ -716,7 +716,10 @@ class AutodetectorTests(BaseAutodetectorTests):
         "testapp", "AuthorUnmanaged", [], {}, ("testapp.author",)
     )
     author_unmanaged_default_pk = ModelState(
-        "testapp", "Author", [("id", models.AutoField(primary_key=True))]
+        "testapp",
+        "Author",
+        [("id", models.AutoField(primary_key=True))],
+        {"managed": False},
     )
     author_unmanaged_custom_pk = ModelState(
         "testapp",
@@ -724,6 +727,7 @@ class AutodetectorTests(BaseAutodetectorTests):
         [
             ("pk_field", models.IntegerField(primary_key=True)),
         ],
+        {"managed": False},
     )
     author_with_m2m = ModelState(
         "testapp",
