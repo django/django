@@ -10,6 +10,7 @@ from hashlib import md5
 from django.apps import apps
 from django.db import NotSupportedError
 from django.utils.dateparse import parse_time
+from django.utils.functional import lazy
 
 logger = logging.getLogger("django.db.backends")
 
@@ -151,7 +152,7 @@ class CursorDebugWrapper(CursorWrapper):
             logger.debug(
                 "(%.3f) %s; args=%s; alias=%s",
                 duration,
-                self.db.ops.format_debug_sql(sql),
+                lazy(self.db.ops.format_debug_sql)(sql),
                 params,
                 self.db.alias,
                 extra={

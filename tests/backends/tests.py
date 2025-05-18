@@ -85,13 +85,23 @@ class LastExecutedQueryTest(TestCase):
     def test_debug_sql(self):
         qs = Reporter.objects.filter(first_name="test")
         ops = connections[qs.db].ops
-        with mock.patch.object(ops, "format_debug_sql") as format_debug_sql:
+        with (
+            self.assertLogs("django.db.backends", "DEBUG"),
+            mock.patch.object(ops, "format_debug_sql") as format_debug_sql,
+        ):
             list(qs)
         # Queries are formatted with DatabaseOperations.format_debug_sql().
         format_debug_sql.assert_called()
         sql = connection.queries[-1]["sql"].lower()
         self.assertIn("select", sql)
         self.assertIn(Reporter._meta.db_table, sql)
+
+    def test_debug_sql_logging_disabled(self):
+        qs = Reporter.objects.filter(first_name="test")
+        ops = connections[qs.db].ops
+        with mock.patch.object(ops, "format_debug_sql") as format_debug_sql:
+            list(qs)
+        format_debug_sql.assert_not_called()
 
     def test_query_encoding(self):
         """last_executed_query() returns a string."""
