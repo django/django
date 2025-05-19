@@ -18,13 +18,13 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
 
     @override_settings(
         DEFAULT_AUTO_FIELD="django.db.models.AutoField",
-        INSTALLED_APPS=["migrations.migrations_test_apps.unmanaged_models"],
+        INSTALLED_APPS=["migrations.migrations_test_apps.unmanaged_model_with_fk"],
     )
     def test_create_model_migrate_crashes_on_missing_fk(self):
         out = io.StringIO()
-        with self.temporary_migration_module("unmanaged_models") as tmp_dir:
-            call_command("makemigrations", "unmanaged_models", verbosity=0)
-            call_command("migrate", "unmanaged_models", verbosity=0)
+        with self.temporary_migration_module("unmanaged_model_with_fk") as tmp_dir:
+            call_command("makemigrations", "unmanaged_model_with_fk", verbosity=0)
+            call_command("migrate", "unmanaged_model_with_fk", verbosity=0)
             with open(Path(tmp_dir) / "0002_custom.py", "w") as custom_migration_file:
                 custom_migration_content = textwrap.dedent(
                     """
@@ -32,14 +32,14 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
 
 
                 def forwards_func(apps, schema_editor):
-                    klass_Boo = apps.get_model("unmanaged_models", "Boo")
+                    klass_Boo = apps.get_model("unmanaged_model_with_fk", "Boo")
                     klass_Boo.objects.filter(foo=1)
 
 
                 class Migration(migrations.Migration):
 
                     dependencies = [
-                        ('unmanaged_models', '0001_initial'),
+                        ('unmanaged_model_with_fk', '0001_initial'),
                     ]
 
                     operations = [
@@ -52,7 +52,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
                 )
                 custom_migration_file.write(custom_migration_content)
             try:
-                call_command("migrate", "unmanaged_models", stdout=out)
+                call_command("migrate", "unmanaged_model_with_fk", stdout=out)
             except FieldError:
                 # this is the bug from #29177, it can not find FK in managed=False model
                 pass
@@ -60,7 +60,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
 
     @override_settings(
         DEFAULT_AUTO_FIELD="django.db.models.AutoField",
-        INSTALLED_APPS=["migrations.migrations_test_apps.unmanaged_models"],
+        INSTALLED_APPS=["migrations.migrations_test_apps.unmanaged_model_with_fk"],
     )
     def test_add_field_operation_is_detected(self):
         out = io.StringIO()
@@ -114,12 +114,12 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
                 ]
             """
         )
-        with self.temporary_migration_module("unmanaged_models") as tmp_dir:
+        with self.temporary_migration_module("unmanaged_model_with_fk") as tmp_dir:
             with open(Path(tmp_dir) / "0001_initial.py", "w") as initial_migration_file:
                 initial_migration_file.write(initial_migration_content)
             call_command(
                 "makemigrations",
-                "unmanaged_models",
+                "unmanaged_model_with_fk",
                 dry_run=True,
                 verbosity=3,
                 stdout=out,
@@ -135,7 +135,7 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
 
     @override_settings(
         DEFAULT_AUTO_FIELD="django.db.models.AutoField",
-        INSTALLED_APPS=["migrations.migrations_test_apps.unmanaged_models"],
+        INSTALLED_APPS=["migrations.migrations_test_apps.unmanaged_model_with_fk"],
     )
     def test_remove_field_operation_is_detected(self):
         out = io.StringIO()
@@ -185,14 +185,14 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
                                 'foo',
                                 models.ForeignKey(
                                     on_delete=models.deletion.CASCADE,
-                                    to='unmanaged_models.foo',
+                                    to='unmanaged_model_with_fk.foo',
                                 )
                             ),
                             (
                                 'fk_foo',
                                 models.ForeignKey(
                                     on_delete=models.deletion.CASCADE,
-                                    to='unmanaged_models.foo',
+                                    to='unmanaged_model_with_fk.foo',
                                 )
                             ),
                         ],
@@ -203,12 +203,12 @@ class AutodetectorUnmanagedModelTest(MigrationTestBase, TransactionTestCase):
                 ]
             """
         )
-        with self.temporary_migration_module("unmanaged_models") as tmp_dir:
+        with self.temporary_migration_module("unmanaged_model_with_fk") as tmp_dir:
             with open(Path(tmp_dir) / "0001_initial.py", "w") as initial_migration_file:
                 initial_migration_file.write(initial_migration_content)
             call_command(
                 "makemigrations",
-                "unmanaged_models",
+                "unmanaged_model_with_fk",
                 dry_run=True,
                 verbosity=3,
                 stdout=out,
