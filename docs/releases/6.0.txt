@@ -394,7 +394,7 @@ to remove usage of these features.
 * The ``get_joining_columns()`` method of ``ForeignObject`` and
   ``ForeignObjectRel`` is removed.
 
-* The ``ForeignObject.get_reverse_joining_columns()`` method is be removed.
+* The ``ForeignObject.get_reverse_joining_columns()`` method is removed.
 
 * Support for ``cx_Oracle`` is removed.
 
