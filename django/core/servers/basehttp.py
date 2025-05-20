@@ -154,7 +154,19 @@ class ServerHandler(simple_server.ServerHandler):
             self.request_handler.close_connection = True
 
     def close(self):
-        self.get_stdin().read()
+        def _read_with_chunks(io_stream, chunk_size=1024):
+            """
+            Block-based read prevents memory usage caused by large packets
+            """
+            lefe_size = io_stream.limit
+            while True:
+                if left_size <= chunk_size:
+                    io_stream.read(left_size)
+                    break
+                io_stream.read(chunk_size)
+                left_size = left_size - chunk_size
+                continue
+        _read_with_chunks(self.get_stdin())
         super().close()
 
     def finish_response(self):
