@@ -1,4 +1,4 @@
-# Information about icons in this directoy
+# Information about icons in this directory
 
 ## License
 
@@ -29,7 +29,7 @@ All icons in this directory are provided by
 ## Contributing SVG Icons
 
 To ensure visual consistency, traceability, and proper license attribution,
-follow these guidelines when adding or modifying icons.
+follow these guidelines. This applies when adding or modifying icons.
 
 ## ⚠️ Important: Changing Font Awesome Version
 
@@ -49,12 +49,14 @@ licensing URL accordingly. For example:
 ## Adding a new icon
 
 1. Use only [Font Awesome Free Icons](https://fontawesome.com/icons).
-2. Save the icon as a .svg file in this directory.
-3. Include the following attribution comment at the top of the file (do not change it):
+2. Save the icon as an .svg file in this directory.
+3. Include the following attribution comment at the top of the file (do not
+   change it):
 ```xml
 <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
 ```
-4. Right before the `<path>` element, add the following metadata comment, using the correct values:
+4. Right before the `<path>` element, add the following metadata comment with
+   the appropriate values:
 ```xml
 <!--
   Icon Name: [icon-name]
