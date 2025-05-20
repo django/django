@@ -94,7 +94,6 @@ class DefaultLoggingTests(
 
 
 class LoggingAssertionMixin:
-
     def assertLogRecord(
         self,
         logger_cm,
@@ -147,6 +146,14 @@ class HandlerLoggingTests(
             msg="Not Found: /does_not_exist/",
         )
 
+    def test_control_chars_escaped(self):
+        self.assertLogsRequest(
+            url="/%1B[1;31mNOW IN RED!!!1B[0m/",
+            level="WARNING",
+            status_code=404,
+            msg=r"Not Found: /\x1b[1;31mNOW IN RED!!!1B[0m/",
+        )
+
     async def test_async_page_not_found_warning(self):
         logger = "django.request"
         level = "WARNING"
@@ -154,6 +161,16 @@ class HandlerLoggingTests(
             await self.async_client.get("/does_not_exist/")
 
         self.assertLogRecord(cm, level, "Not Found: /does_not_exist/", 404)
+
+    async def test_async_control_chars_escaped(self):
+        logger = "django.request"
+        level = "WARNING"
+        with self.assertLogs(logger, level) as cm:
+            await self.async_client.get(r"/%1B[1;31mNOW IN RED!!!1B[0m/")
+
+        self.assertLogRecord(
+            cm, level, r"Not Found: /\x1b[1;31mNOW IN RED!!!1B[0m/", 404
+        )
 
     def test_page_not_found_raised(self):
         self.assertLogsRequest(
@@ -686,6 +703,7 @@ class LogResponseRealLoggerTests(TestCase):
         self.assertEqual(record.levelno, levelno)
         self.assertEqual(record.status_code, status_code)
         self.assertEqual(record.request, request)
+        return record
 
     def test_missing_response_raises_attribute_error(self):
         with self.assertRaises(AttributeError):
@@ -787,3 +805,62 @@ class LogResponseRealLoggerTests(TestCase):
         self.assertEqual(
             f"WARNING:my.custom.logger:{msg}", log_stream.getvalue().strip()
         )
+
+    def test_unicode_escape_escaping(self):
+        test_cases = [
+            # Control characters.
+            ("line\nbreak", "line\\nbreak"),
+            ("carriage\rreturn", "carriage\\rreturn"),
+            ("tab\tseparated", "tab\\tseparated"),
+            ("formfeed\f", "formfeed\\x0c"),
+            ("bell\a", "bell\\x07"),
+            ("multi\nline\ntext", "multi\\nline\\ntext"),
+            # Slashes.
+            ("slash\\test", "slash\\\\test"),
+            ("back\\slash", "back\\\\slash"),
+            # Quotes.
+            ('quote"test"', 'quote"test"'),
+            ("quote'test'", "quote'test'"),
+            # Accented, composed characters, emojis and symbols.
+            ("café", "caf\\xe9"),
+            ("e\u0301", "e\\u0301"),  # e + combining acute
+            ("smile🙂", "smile\\U0001f642"),
+            ("weird ☃️", "weird \\u2603\\ufe0f"),
+            # Non-Latin alphabets.
+            ("Привет", "\\u041f\\u0440\\u0438\\u0432\\u0435\\u0442"),
+            ("你好", "\\u4f60\\u597d"),
+            # ANSI escape sequences.
+            ("escape\x1b[31mred\x1b[0m", "escape\\x1b[31mred\\x1b[0m"),
+            (
+                "/\x1b[1;31mCAUTION!!YOU ARE PWNED\x1b[0m/",
+                "/\\x1b[1;31mCAUTION!!YOU ARE PWNED\\x1b[0m/",
+            ),
+            (
+                "/\r\n\r\n1984-04-22 INFO    Listening on 0.0.0.0:8080\r\n\r\n",
+                "/\\r\\n\\r\\n1984-04-22 INFO    Listening on 0.0.0.0:8080\\r\\n\\r\\n",
+            ),
+            # Plain safe input.
+            ("normal-path", "normal-path"),
+            ("slash/colon:", "slash/colon:"),
+            # Non strings.
+            (0, "0"),
+            ([1, 2, 3], "[1, 2, 3]"),
+            ({"test": "🙂"}, "{'test': '🙂'}"),
+        ]
+
+        msg = "Test message: %s"
+        for case, expected in test_cases:
+            with self.assertLogs("django.request", level="ERROR") as cm:
+                with self.subTest(case=case):
+                    response = HttpResponse(status=318)
+                    log_response(msg, case, response=response, level="error")
+
+                    record = self.assertResponseLogged(
+                        cm,
+                        msg % expected,
+                        levelno=logging.ERROR,
+                        status_code=318,
+                        request=None,
+                    )
+                    # Log record is always a single line.
+                    self.assertEqual(len(record.getMessage().splitlines()), 1)
