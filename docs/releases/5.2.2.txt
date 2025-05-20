@@ -7,6 +7,20 @@ Django 5.2.2 release notes
 Django 5.2.2 fixes a security issue with severity "low" and several bugs in
 5.2.1.
 
+CVE-2025-48432: Potential log injection via unescaped request path
+==================================================================
+
+Internal HTTP response logging used ``request.path`` directly, allowing control
+characters (e.g. newlines or ANSI escape sequences) to be written unescaped
+into logs. This could enable log injection or forgery, letting attackers
+manipulate log appearance or structure, especially in logs processed by
+external systems or viewed in terminals.
+
+Although this does not directly impact Django's security model, it poses risks
+when logs are consumed or interpreted by other tools. To fix this, the internal
+``django.utils.log.log_response()`` function now escapes all positional
+formatting arguments using a safe encoding.
+
 Bugfixes
 ========
 
