@@ -94,6 +94,28 @@ class DefaultLoggingTests(
 
 
 class LoggingAssertionMixin:
+
+    def assertLogRecord(
+        self,
+        logger_cm,
+        level,
+        msg,
+        status_code,
+        exc_class=None,
+    ):
+        self.assertEqual(
+            records_len := len(logger_cm.records),
+            1,
+            f"Wrong number of calls for {logger_cm=} in {level=} (expected 1, got "
+            f"{records_len}).",
+        )
+        record = logger_cm.records[0]
+        self.assertEqual(record.getMessage(), msg)
+        self.assertEqual(record.status_code, status_code)
+        if exc_class:
+            self.assertIsNotNone(record.exc_info)
+            self.assertEqual(record.exc_info[0], exc_class)
+
     def assertLogsRequest(
         self, url, level, msg, status_code, logger="django.request", exc_class=None
     ):
@@ -102,17 +124,7 @@ class LoggingAssertionMixin:
                 self.client.get(url)
             except views.UncaughtException:
                 pass
-            self.assertEqual(
-                len(cm.records),
-                1,
-                "Wrong number of calls for logger %r in %r level." % (logger, level),
-            )
-            record = cm.records[0]
-            self.assertEqual(record.getMessage(), msg)
-            self.assertEqual(record.status_code, status_code)
-            if exc_class:
-                self.assertIsNotNone(record.exc_info)
-                self.assertEqual(record.exc_info[0], exc_class)
+            self.assertLogRecord(cm, level, msg, status_code, exc_class)
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF="logging_tests.urls")
@@ -134,6 +146,14 @@ class HandlerLoggingTests(
             status_code=404,
             msg="Not Found: /does_not_exist/",
         )
+
+    async def test_async_page_not_found_warning(self):
+        logger = "django.request"
+        level = "WARNING"
+        with self.assertLogs(logger, level) as cm:
+            await self.async_client.get("/does_not_exist/")
+
+        self.assertLogRecord(cm, level, "Not Found: /does_not_exist/", 404)
 
     def test_page_not_found_raised(self):
         self.assertLogsRequest(
