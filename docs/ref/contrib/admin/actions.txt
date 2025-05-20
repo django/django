@@ -151,8 +151,8 @@ That code will give us an admin change list that looks something like this:
 
 .. versionchanged:: 6.0
 
-    The actions will be available also in the detail view but the description should be
-    adjusted to make sense we are talking about only one object::
+    The actions will also be available in the detail view but the description should be
+    adjusted to show we are only talking about a single object.::
 
         @admin.action(
             description="Mark selected story as published",
@@ -161,7 +161,7 @@ That code will give us an admin change list that looks something like this:
         def make_published(modeladmin, request, queryset):
             pass
 
-    It will looks like this:
+    It will look like this:
 
     .. image:: _images/adding-actions-to-the-modeladmin-detail-view.png
 

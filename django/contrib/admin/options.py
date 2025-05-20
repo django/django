@@ -1854,8 +1854,7 @@ class ModelAdmin(BaseModelAdmin):
 
         actions = self.get_actions(request)
         if request.method == "POST":
-            selected_action = request.POST.get("action", "")
-            if actions and selected_action:
+            if actions and request.POST.get("action", ""):
                 response = self.response_action(
                     request,
                     self.get_queryset(request),
