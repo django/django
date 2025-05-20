@@ -1,7 +1,8 @@
+import warnings
 from functools import partial
 from urllib.parse import urlsplit
 
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
 
 from django.conf import settings
 from django.contrib import auth
@@ -10,7 +11,7 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import resolve_url
-from django.utils.deprecation import MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin, RemovedInDjango61Warning
 from django.utils.functional import SimpleLazyObject
 
 
@@ -128,6 +129,10 @@ class RemoteUserMiddleware:
     def __call__(self, request):
         if self.is_async:
             return self.__acall__(request)
+        self.process_request(request)
+        return self.get_response(request)
+
+    def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, "user"):
             raise ImproperlyConfigured(
@@ -145,13 +150,13 @@ class RemoteUserMiddleware:
             # AnonymousUser by the AuthenticationMiddleware).
             if self.force_logout_if_no_header and request.user.is_authenticated:
                 self._remove_invalid_user(request)
-            return self.get_response(request)
+            return
         # If the user is already authenticated and that user is the user we are
         # getting passed in the headers, then the correct user is already
         # persisted in the session and we don't need to continue.
         if request.user.is_authenticated:
             if request.user.get_username() == self.clean_username(username, request):
-                return self.get_response(request)
+                return
             else:
                 # An authenticated user is associated with the request, but
                 # it does not match the authorized user in the header.
@@ -165,9 +170,26 @@ class RemoteUserMiddleware:
             # by logging the user in.
             request.user = user
             auth.login(request, user)
-        return self.get_response(request)
 
     async def __acall__(self, request):
+        # RemovedInDjango61Warning.
+        if (
+            self.__class__.process_request is not RemoteUserMiddleware.process_request
+            and self.__class__.aprocess_request is RemoteUserMiddleware.aprocess_request
+        ):
+            warnings.warn(
+                "Support for subclasses of RemoteUserMiddleware that override "
+                "process_request() without overriding aprocess_request() is "
+                "deprecated.",
+                category=RemovedInDjango61Warning,
+                stacklevel=2,
+            )
+            await sync_to_async(self.process_request, thread_sensitive=True)(request)
+            return await self.get_response(request)
+        await self.aprocess_request(request)
+        return await self.get_response(request)
+
+    async def aprocess_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, "user"):
             raise ImproperlyConfigured(
@@ -187,14 +209,14 @@ class RemoteUserMiddleware:
                 user = await request.auser()
                 if user.is_authenticated:
                     await self._aremove_invalid_user(request)
-            return await self.get_response(request)
+            return
         user = await request.auser()
         # If the user is already authenticated and that user is the user we are
         # getting passed in the headers, then the correct user is already
         # persisted in the session and we don't need to continue.
         if user.is_authenticated:
             if user.get_username() == self.clean_username(username, request):
-                return await self.get_response(request)
+                return
             else:
                 # An authenticated user is associated with the request, but
                 # it does not match the authorized user in the header.
@@ -208,8 +230,6 @@ class RemoteUserMiddleware:
             # by logging the user in.
             request.user = user
             await auth.alogin(request, user)
-
-        return await self.get_response(request)
 
     def clean_username(self, username, request):
         """
