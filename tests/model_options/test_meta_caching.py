@@ -151,3 +151,66 @@ class ForwardPropertiesCachingTests(SimpleTestCase):
         # Verify the new field is included
         field_names = [f.name for f in updated_fields]
         self.assertIn("dynamic_field", field_names)
+
+
+@isolate_apps("model_options")
+class ReversePropertiesCachingTests(SimpleTestCase):
+    """Tests REVERSE_PROPERTIES for Django's model metadata caching system."""
+
+    def test_reverse_properties_initialization(self):
+        """Test that REVERSE_PROPERTIES are properly initialized."""
+
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+            parent = models.ForeignKey(
+                "self", on_delete=models.CASCADE, null=True, related_name="children"
+            )
+
+        # Verify that none of the REVERSE_PROPERTIES are in the __dict__ initially
+        for prop in TestModel._meta.REVERSE_PROPERTIES:
+            with self.subTest(property=prop):
+                self.assertNotIn(prop, TestModel._meta.__dict__)
+
+    def test_reverse_properties_access(self):
+        """Test that accessing a REVERSE_PROPERTY caches it in the __dict__."""
+
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+            parent = models.ForeignKey(
+                "self", on_delete=models.CASCADE, null=True, related_name="children"
+            )
+
+        # Access each reverse property and verify it's cached
+        for prop in TestModel._meta.REVERSE_PROPERTIES:
+            if hasattr(TestModel._meta, prop):
+                with self.subTest(property=prop):
+                    # Access the property to trigger caching
+                    getattr(TestModel._meta, prop)
+                    # Verify it's now in the __dict__
+                    self.assertIn(prop, TestModel._meta.__dict__)
+
+    def test_expire_cache_reverse_properties(self):
+        """Test that _expire_cache properly clears REVERSE_PROPERTIES."""
+
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+            parent = models.ForeignKey(
+                "self", on_delete=models.CASCADE, null=True, related_name="children"
+            )
+
+        meta = TestModel._meta
+
+        # First, access some reverse properties to cache them
+        _ = meta.related_objects
+        _ = meta.fields_map
+
+        # Verify they're cached
+        self.assertIn("related_objects", meta.__dict__)
+        self.assertIn("fields_map", meta.__dict__)
+
+        # Now expire the cache
+        meta._expire_cache(forward=False, reverse=True)
+
+        # Verify the properties are no longer cached
+        self.assertNotIn("related_objects", meta.__dict__)
+        self.assertNotIn("fields_map", meta.__dict__)
