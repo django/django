@@ -158,7 +158,7 @@ class ServerHandler(simple_server.ServerHandler):
             """
             Block-based read prevents memory usage caused by large packets
             """
-            lefe_size = io_stream.limit
+            left_size = io_stream.limit
             while True:
                 if left_size <= chunk_size:
                     io_stream.read(left_size)
