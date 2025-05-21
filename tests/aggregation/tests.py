@@ -2413,6 +2413,35 @@ class AggregateTestCase(TestCase):
         }
         self.assertEqual(values, expected_values)
 
+    @skipUnlessDBFeature("supports_aggregate_order_by_clause")
+    def test_string_agg_filter_outerref(self):
+        values = (
+            Publisher.objects.annotate(
+                stringagg=Subquery(
+                    Book.objects.annotate(
+                        stringagg=StringAgg(
+                            "name",
+                            delimiter=Value(";"),
+                            order_by=OuterRef("num_awards"),
+                        )
+                    ).values("stringagg")[:1]
+                )
+            )
+            .values("stringagg")
+            .order_by("id")
+        )
+
+        self.assertQuerySetEqual(
+            values,
+            [
+                {
+                    "stringagg": "The Definitive Guide to Django: "
+                    "Web Development Done Right"
+                }
+            ]
+            * 5,
+        )
+
     @skipUnlessDBFeature("supports_json_field", "supports_aggregate_order_by_clause")
     def test_string_agg_jsonfield_order_by(self):
         Employee.objects.bulk_create(
