@@ -120,11 +120,6 @@ class Aggregate(Func):
     ):
         # Aggregates are not allowed in UPDATE queries, so ignore for_save
         c = super().resolve_expression(query, allow_joins, reuse, summarize)
-        c.order_by = (
-            c.order_by.resolve_expression(query, allow_joins, reuse, summarize)
-            if c.order_by
-            else None
-        )
         if summarize:
             # Summarized aggregates cannot refer to summarized aggregates.
             for ref in c.get_refs():
