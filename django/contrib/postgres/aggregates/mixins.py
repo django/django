@@ -27,11 +27,6 @@ class OrderableAggMixin:
             self.order_by = OrderByList(order_by)
         super().__init__(*expressions, **extra)
 
-    def resolve_expression(self, *args, **kwargs):
-        if self.order_by is not None:
-            self.order_by = self.order_by.resolve_expression(*args, **kwargs)
-        return super().resolve_expression(*args, **kwargs)
-
     def get_source_expressions(self):
         return super().get_source_expressions() + [self.order_by]
 

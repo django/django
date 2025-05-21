@@ -350,6 +350,18 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                         [[], [], [], []],
                     )
 
+    def test_array_agg_with_order_by_outer_ref(self):
+        StatTestModel.objects.annotate(
+            atm_ids=Subquery(
+                AggregateTestModel.objects.annotate(
+                    ids=ArrayAgg(
+                        "id",
+                        order_by=[OuterRef("int1")],
+                    )
+                ).values("ids")[:1]
+            )
+        )
+
     def test_bit_and_general(self):
         values = AggregateTestModel.objects.filter(integer_field__in=[0, 1]).aggregate(
             bitand=BitAnd("integer_field")
