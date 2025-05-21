@@ -25,3 +25,7 @@ Bugfixes
 
 * Fixed a regression in Django 5.2 that caused a crash when using ``OuterRef``
   in the ``filter`` argument of an ``Aggregate`` expression (:ticket:`36404`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using ``OuterRef``
+  in PostgreSQL aggregate functions ``ArrayAgg``, ``StringAgg``, and
+  ``JSONBAgg`` (:ticket:`36405`).
