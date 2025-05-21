@@ -95,7 +95,7 @@ class Aggregate(Func):
             raise TypeError(f"{self.__class__.__name__} does not allow default.")
 
         self.distinct = distinct
-        self.filter = filter and AggregateFilter(filter)
+        self.filter = None if filter is None else AggregateFilter(filter)
         self.default = default
         self.order_by = AggregateOrderBy.from_param(
             f"{self.__class__.__name__}.order_by", order_by
@@ -120,11 +120,6 @@ class Aggregate(Func):
     ):
         # Aggregates are not allowed in UPDATE queries, so ignore for_save
         c = super().resolve_expression(query, allow_joins, reuse, summarize)
-        c.filter = (
-            c.filter.resolve_expression(query, allow_joins, reuse, summarize)
-            if c.filter
-            else None
-        )
         c.order_by = (
             c.order_by.resolve_expression(query, allow_joins, reuse, summarize)
             if c.order_by
