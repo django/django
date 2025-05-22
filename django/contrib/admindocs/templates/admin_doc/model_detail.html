@@ -10,12 +10,12 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-models-index' %}">{% translate 'Models' %}</a>
-&rsaquo; {{ name }}
-</div>
+<ol class="breadcrumbs">
+<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+<li><a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a></li>
+<li><a href="{% url 'django-admindocs-models-index' %}">{% translate 'Models' %}</a></li>
+<li aria-current="page">{{ name }}</li>
+</ol>
 {% endblock %}
 
 {% block title %}{% blocktranslate %}Model: {{ name }}{% endblocktranslate %}{% endblock %}
