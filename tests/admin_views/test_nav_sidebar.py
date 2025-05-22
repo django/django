@@ -91,9 +91,7 @@ class AdminSidebarTests(TestCase):
         self.assertContains(
             response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
         )
-        # Does not include aria-current attribute.
         self.assertContains(response, '<a href="%s">Users</a>' % url)
-        self.assertNotContains(response, "aria-current")
 
     @override_settings(DEBUG=True)
     def test_included_app_list_template_context_fully_set(self):

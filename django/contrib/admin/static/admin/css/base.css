@@ -722,19 +722,32 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 
 /* BREADCRUMBS */
 
-div.breadcrumbs {
+ul.breadcrumbs {
     background: var(--breadcrumbs-bg);
     padding: 10px 40px;
     border: none;
     color: var(--breadcrumbs-fg);
     text-align: left;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
-div.breadcrumbs a {
+ul.breadcrumbs li {
+    display: inline-block;
+    font-size: 0.875rem;
+    padding: 0;
+    line-height: 0;
+}
+
+ul.breadcrumbs li:last-child a {
+    color: var(--breadcrumbs-fg);
+}
+
+ul.breadcrumbs a {
     color: var(--breadcrumbs-link-fg);
 }
 
-div.breadcrumbs a:focus, div.breadcrumbs a:hover {
+ul.breadcrumbs a:focus, ul.breadcrumbs a:hover {
     color: var(--breadcrumbs-fg);
 }
 
