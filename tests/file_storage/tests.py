@@ -186,17 +186,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         atime = self.storage.get_accessed_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             atime,
-            datetime.datetime.fromtimestamp(
-                os.path.getatime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getatime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_accessed_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            atime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -212,17 +214,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         ctime = self.storage.get_created_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             ctime,
-            datetime.datetime.fromtimestamp(
-                os.path.getctime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getctime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_created_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            ctime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
@@ -238,17 +242,19 @@ class FileStorageTests(SimpleTestCase):
         f = ContentFile("custom contents")
         f_name = self.storage.save("test.file", f)
         self.addCleanup(self.storage.delete, f_name)
+
+        path = self.storage.path(f_name)
         mtime = self.storage.get_modified_time(f_name)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             mtime,
-            datetime.datetime.fromtimestamp(
-                os.path.getmtime(self.storage.path(f_name))
-            ),
+            datetime.datetime.fromtimestamp(os.path.getmtime(path)),
+            delta=datetime.timedelta(seconds=1),
         )
-        self.assertLess(
-            timezone.now() - self.storage.get_modified_time(f_name),
-            datetime.timedelta(seconds=2),
+        self.assertAlmostEqual(
+            mtime,
+            timezone.now(),
+            delta=datetime.timedelta(seconds=1),
         )
 
     @requires_tz_support
