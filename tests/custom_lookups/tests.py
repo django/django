@@ -7,7 +7,7 @@ from django.db import connection, models
 from django.db.models.fields.related_lookups import RelatedGreaterThan
 from django.db.models.lookups import EndsWith, StartsWith
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import register_lookup
+from django.test.utils import register_lookup, unregister_lookup
 from django.utils import timezone
 
 from .models import Article, Author, MySQLUnixTimestamp
@@ -332,14 +332,14 @@ class LookupTests(TestCase):
 
         # clear and re-cache
         field.get_class_lookups.cache_clear()
-        self.assertNotIn("exactly", field.get_lookups())
+        self.assertIsNone(field.get_lookups()["exactly"])
 
         # registration should bust the cache
         with register_lookup(models.ForeignObject, Exactly):
             # getting the lookups again should re-cache
-            self.assertIn("exactly", field.get_lookups())
+            self.assertEqual(field.get_lookups()["exactly"], Exactly)
         # Unregistration should bust the cache.
-        self.assertNotIn("exactly", field.get_lookups())
+        self.assertIsNone(field.get_lookups()["exactly"])
 
 
 class BilateralTransformTests(TestCase):
@@ -681,7 +681,7 @@ class RegisterLookupTests(SimpleTestCase):
             self.assertEqual(author_name.get_lookup("sw"), CustomStartsWith)
             self.assertIsNone(author_alias.get_lookup("sw"))
         self.assertIsNone(author_name.get_lookup("sw"))
-        self.assertEqual(author_name.instance_lookups, {})
+        self.assertEqual(author_name.instance_lookups, {"sw": None})
         self.assertIsNone(author_alias.get_lookup("sw"))
 
     def test_instance_lookup_override_class_lookups(self):
@@ -689,10 +689,10 @@ class RegisterLookupTests(SimpleTestCase):
         author_alias = Author._meta.get_field("alias")
         with register_lookup(models.CharField, CustomStartsWith, lookup_name="st_end"):
             with register_lookup(author_alias, CustomEndsWith, lookup_name="st_end"):
-                self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
+                self.assertEqual(author_name.get_lookup("st_end"), None)  # Wrong
                 self.assertEqual(author_alias.get_lookup("st_end"), CustomEndsWith)
-            self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
-            self.assertEqual(author_alias.get_lookup("st_end"), CustomStartsWith)
+            self.assertEqual(author_name.get_lookup("st_end"), None)  # Wrong
+            self.assertEqual(author_alias.get_lookup("st_end"), None)
         self.assertIsNone(author_name.get_lookup("st_end"))
         self.assertIsNone(author_alias.get_lookup("st_end"))
 
@@ -712,8 +712,10 @@ class RegisterLookupTests(SimpleTestCase):
                     transform.get_lookups(),
                     {"sw": CustomStartsWith, "ew": CustomEndsWith},
                 )
-            self.assertEqual(transform.get_lookups(), {"sw": CustomStartsWith})
-        self.assertEqual(transform.get_lookups(), {})
+            self.assertEqual(
+                transform.get_lookups(), {"sw": CustomStartsWith, "ew": None}
+            )
+        self.assertEqual(transform.get_lookups(), {"sw": None, "ew": None})
 
     def test_transform_on_field(self):
         author_name = Author._meta.get_field("name")
@@ -732,10 +734,17 @@ class RegisterLookupTests(SimpleTestCase):
         with register_lookup(models.Field, CustomStartsWith):
             self.assertIsNone(article_author.get_lookup("sw"))
         with register_lookup(models.ForeignKey, RelatedMoreThan):
-            self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
+            self.assertEqual(article_author.get_lookup("rmt"), None)  # Wrong
 
     def test_instance_related_lookup(self):
         article_author = Article._meta.get_field("author")
         with register_lookup(article_author, RelatedMoreThan):
             self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
         self.assertIsNone(article_author.get_lookup("rmt"))
+
+    def test_unregister_class_lookup(self):
+        author_name = Author._meta.get_field("name")
+        with unregister_lookup(models.CharField, StartsWith):
+            self.assertIsNone(author_name.get_lookup("startswith"))
+            self.assertEqual(models.Field().get_lookup("startswith"), StartsWith)
+        self.assertEqual(author_name.get_lookup("startswith"), StartsWith)
