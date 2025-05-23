@@ -2,7 +2,9 @@ from django.http.response import HttpResponseRedirectBase
 from django.shortcuts import redirect
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
-
+from django.test import TestCase, RequestFactory, override_settings
+from django.shortcuts import delayed_redirect
+from django.template import engines
 
 @override_settings(ROOT_URLCONF="shortcuts.urls")
 class RenderTests(SimpleTestCase):
@@ -56,3 +58,37 @@ class RedirectTests(SimpleTestCase):
                 )
                 self.assertIsInstance(response, HttpResponseRedirectBase)
                 self.assertEqual(response.status_code, expected_status_code)
+
+
+TEMPLATE_STRING = """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="refresh" content="{{ delay }};url={{ url }}">
+</head>
+<body>
+    <p>Redirecting to {{ url }} in {{ delay }} seconds.</p>
+</body>
+</html>
+"""
+
+@override_settings(
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': False,
+        'OPTIONS': {
+            'loaders': [('django.template.loaders.locmem.Loader', {
+                'delayed_redirect.html': TEMPLATE_STRING,
+            })],
+        },
+    }]
+)
+class DelayedRedirectTests(TestCase):
+    def test_delayed_redirect_renders_correct_html(self):
+        factory = RequestFactory()
+        request = factory.get('/')
+        response = delayed_redirect(request, '/next/', delay=7)
+
+        self.assertContains(response, 'meta http-equiv="refresh" content="7;url=/next/"')
+        self.assertContains(response, 'Redirecting to /next/ in 7 seconds.')

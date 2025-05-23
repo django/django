@@ -13,7 +13,8 @@ from django.http import (
 from django.template import loader
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import Promise
-
+from django.http import HttpRequest, HttpResponse
+from django.template.loader import render_to_string
 
 def render(
     request, template_name, context=None, content_type=None, status=None, using=None
@@ -192,3 +193,23 @@ def resolve_url(to, *args, **kwargs):
 
     # Finally, fall back and assume it's a URL
     return to
+
+
+def delayed_redirect(request: HttpRequest, url: str, delay: int = 5) -> HttpResponse:
+    """
+    Returns an HttpResponse that displays an intermediate HTML page,
+    which redirects to the given URL after a specified delay (in seconds).
+
+    This is useful when you want to show a message or confirmation to the user
+    before automatically redirecting them to another page.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+        url (str): The URL to redirect to.
+        delay (int, optional): Delay in seconds before redirection. Defaults to 5.
+
+    Returns:
+        HttpResponse: A rendered HTML page that triggers a client-side redirect.
+    """
+    html = render_to_string('delayed_redirect.html', {'url': url, 'delay': delay})
+    return HttpResponse(html)
