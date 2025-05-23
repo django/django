@@ -73,6 +73,10 @@ Minor features
   function rotates a geometry by a specified angle around the origin or a
   specified point.
 
+* Geometry widgets now render without inline JavaScript in templates. If you
+  customize any of the widgets in :mod:`django.contrib.gis.forms.widgets` or
+  their templates, you may need to update them to reflect the new layout.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
