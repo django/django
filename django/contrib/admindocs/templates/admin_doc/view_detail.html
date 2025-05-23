@@ -2,12 +2,12 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-views-index' %}">{% translate 'Views' %}</a>
-&rsaquo; {{ name }}
-</div>
+<ul class="breadcrumbs">
+<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+<li>&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a></li>
+<li>&rsaquo; <a href="{% url 'django-admindocs-views-index' %}">{% translate 'Views' %}</a></li>
+<li>&rsaquo; <a href="" aria-current="page">{{ name }}</a></li>
+</ul>
 {% endblock %}
 {% block title %}{% blocktranslate %}View: {{ name }}{% endblocktranslate %}{% endblock %}
 
