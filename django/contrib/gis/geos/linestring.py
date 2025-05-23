@@ -80,9 +80,18 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using its methods.
-        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim == 3))
-        point_setter = cs._set_point_3d if ndim == 3 else cs._set_point_2d
-
+        if ndim == 4:
+            z = True
+            m = True
+        elif ndim == 3:
+            # Default to the third dimension as Z unless explicitly passed to be M.
+            is_measured = kwargs.get("is_measured", False)
+            z = not is_measured
+            m = is_measured
+        else:
+            z = False
+            m = False
+        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=z, m=m)
         for i in range(ncoords):
             if numpy_coords:
                 point_coords = coords[i, :]
@@ -90,7 +99,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                 point_coords = coords[i].tuple
             else:
                 point_coords = coords[i]
-            point_setter(i, point_coords)
+            cs[i] = point_coords
 
         # Calling the base geometry initialization with the returned pointer
         #  from the function.
@@ -113,10 +122,11 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     def _set_list(self, length, items):
         ndim = self._cs.dims
         hasz = self._cs.hasz  # I don't understand why these are different
+        hasm = self._cs.hasm
         srid = self.srid
 
         # create a new coordinate sequence and populate accordingly
-        cs = GEOSCoordSeq(capi.create_cs(length, ndim), z=hasz)
+        cs = GEOSCoordSeq(capi.create_cs(length, ndim), z=hasz, m=hasm)
         for i, c in enumerate(items):
             cs[i] = c
 
@@ -135,7 +145,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         self._cs[index] = value
 
     def _checkdim(self, dim):
-        if dim not in (2, 3):
+        if dim not in (2, 3, 4):
             raise TypeError("Dimension mismatch.")
 
     # #### Sequence Properties ####
@@ -179,6 +189,14 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
             return None
         else:
             return self._listarr(self._cs.getZ)
+
+    @property
+    def m(self):
+        "Return a list or numpy array of the M variable."
+        if not self.hasm:
+            return None
+        else:
+            return self._listarr(self._cs.getM)
 
 
 # LinearRings are LineStrings used within Polygons.
