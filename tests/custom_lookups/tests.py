@@ -689,10 +689,10 @@ class RegisterLookupTests(SimpleTestCase):
         author_alias = Author._meta.get_field("alias")
         with register_lookup(models.CharField, CustomStartsWith, lookup_name="st_end"):
             with register_lookup(author_alias, CustomEndsWith, lookup_name="st_end"):
-                self.assertEqual(author_name.get_lookup("st_end"), None)  # Wrong
+                self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
                 self.assertEqual(author_alias.get_lookup("st_end"), CustomEndsWith)
-            self.assertEqual(author_name.get_lookup("st_end"), None)  # Wrong
-            self.assertEqual(author_alias.get_lookup("st_end"), None)
+            self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
+            self.assertEqual(author_alias.get_lookup("st_end"), CustomStartsWith)
         self.assertIsNone(author_name.get_lookup("st_end"))
         self.assertIsNone(author_alias.get_lookup("st_end"))
 
@@ -732,7 +732,7 @@ class RegisterLookupTests(SimpleTestCase):
         with register_lookup(models.Field, CustomStartsWith):
             self.assertIsNone(article_author.get_lookup("sw"))
         with register_lookup(models.ForeignKey, RelatedMoreThan):
-            self.assertEqual(article_author.get_lookup("rmt"), None)  # Wrong
+            self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
 
     def test_instance_related_lookup(self):
         article_author = Article._meta.get_field("author")
