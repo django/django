@@ -131,8 +131,7 @@ E023 = Error(
 )
 
 E024 = Error(
-    "You have set the SECURE_CROSS_ORIGIN_OPENER_POLICY setting to an invalid "
-    "value.",
+    "You have set the SECURE_CROSS_ORIGIN_OPENER_POLICY setting to an invalid value.",
     hint="Valid values are: {}.".format(
         ", ".join(sorted(CROSS_ORIGIN_OPENER_POLICY_VALUES)),
     ),
@@ -140,6 +139,11 @@ E024 = Error(
 )
 
 W025 = Warning(SECRET_KEY_WARNING_MSG, id="security.W025")
+
+E026 = Error(
+    "The Content Security Policy setting '%s' must be a dictionary.",
+    id="security.E026",
+)
 
 
 def _security_middleware():
@@ -281,3 +285,22 @@ def check_cross_origin_opener_policy(app_configs, **kwargs):
     ):
         return [E024]
     return []
+
+
+@register(Tags.security)
+def check_csp_settings(app_configs, **kwargs):
+    """
+    Validate that CSP settings are properly configured when enabled.
+
+    Ensures both SECURE_CSP and SECURE_CSP_REPORT_ONLY are dictionaries.
+    """
+    errors = []
+
+    for setting_name in ("SECURE_CSP", "SECURE_CSP_REPORT_ONLY"):
+        setting_value = getattr(settings, setting_name, None)
+
+        # CSP Setting must be a dictionary or None.
+        if setting_value is not None and not isinstance(setting_value, dict):
+            errors.append(Error(E026.msg % setting_name, id=E026.id))
+
+    return errors

@@ -678,3 +678,58 @@ class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
     )
     def test_with_invalid_coop(self):
         self.assertEqual(base.check_cross_origin_opener_policy(None), [base.E024])
+
+
+class CSPCheckTests(SimpleTestCase):
+    """Tests for the CSP settings check function."""
+
+    @override_settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY=None)
+    def test_secure_csp_none(self):
+        """Check should pass when both CSP settings are None."""
+        errors = base.check_csp_settings(None)
+        self.assertEqual(errors, [])
+
+    @override_settings(SECURE_CSP={}, SECURE_CSP_REPORT_ONLY={})
+    def test_secure_csp_empty_dict(self):
+        """Check should pass when both CSP settings are an empty dict."""
+        errors = base.check_csp_settings(None)
+        self.assertEqual(errors, [])
+
+    def test_secure_csp_mixed_settings(self):
+        """Check should pass when only one setting is used but it's valid."""
+        with self.settings(SECURE_CSP={"key": "value"}, SECURE_CSP_REPORT_ONLY=None):
+            errors = base.check_csp_settings(None)
+            self.assertEqual(errors, [])
+
+        with self.settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY={"key": "value"}):
+            errors = base.check_csp_settings(None)
+            self.assertEqual(errors, [])
+
+    def test_secure_csp_not_dict(self):
+        """Check should fail when either CSP setting is not a dict."""
+        with self.settings(SECURE_CSP="not-a-dict", SECURE_CSP_REPORT_ONLY=None):
+            errors = base.check_csp_settings(None)
+            self.assertEqual(
+                errors, [Error(base.E026.msg % "SECURE_CSP", id=base.E026.id)]
+            )
+
+        with self.settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY="not-a-dict"):
+            errors = base.check_csp_settings(None)
+            self.assertEqual(
+                errors,
+                [Error(base.E026.msg % "SECURE_CSP_REPORT_ONLY", id=base.E026.id)],
+            )
+
+    def test_secure_csp_both_not_dict(self):
+        """Check should fail when both CSP settings are not dicts."""
+        with self.settings(
+            SECURE_CSP="not-a-dict", SECURE_CSP_REPORT_ONLY="not-a-dict"
+        ):
+            errors = base.check_csp_settings(None)
+            self.assertEqual(
+                errors,
+                [
+                    Error(base.E026.msg % "SECURE_CSP", id=base.E026.id),
+                    Error(base.E026.msg % "SECURE_CSP_REPORT_ONLY", id=base.E026.id),
+                ],
+            )
