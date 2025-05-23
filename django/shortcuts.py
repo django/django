@@ -16,6 +16,11 @@ from django.utils.functional import Promise
 from django.http import HttpRequest, HttpResponse
 from django.template.loader import render_to_string
 
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.urls import reverse
+
+
 def render(
     request, template_name, context=None, content_type=None, status=None, using=None
 ):
@@ -213,3 +218,30 @@ def delayed_redirect(request: HttpRequest, url: str, delay: int = 5) -> HttpResp
     """
     html = render_to_string('delayed_redirect.html', {'url': url, 'delay': delay})
     return HttpResponse(html)
+
+
+def redirect_with_message(request, to, message, msg_type="info"):
+    """
+    Redirect to a given URL and attach a Django message.
+
+    Parameters:
+        request (HttpRequest): The current request object.
+        to (str): The URL or view name to redirect to.
+        message (str): The message text to display.
+        msg_type (str): The message level, one of: 'debug', 'info',
+                        'success', 'warning', or 'error'.
+
+    Returns:
+        HttpResponseRedirect: Redirect response with attached message.
+    """
+    level_map = {
+        "debug": messages.DEBUG,
+        "info": messages.INFO,
+        "success": messages.SUCCESS,
+        "warning": messages.WARNING,
+        "error": messages.ERROR,
+    }
+
+    level = level_map.get(msg_type.lower(), messages.INFO)
+    messages.add_message(request, level, message)
+    return HttpResponseRedirect(to)

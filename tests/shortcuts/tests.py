@@ -1,10 +1,10 @@
+from django.contrib import messages
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.http.response import HttpResponseRedirectBase
-from django.shortcuts import redirect
-from django.test import SimpleTestCase, override_settings
+from django.shortcuts import delayed_redirect, redirect, redirect_with_message
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.test.utils import require_jinja2
-from django.test import TestCase, RequestFactory, override_settings
-from django.shortcuts import delayed_redirect
-from django.template import engines
+
 
 @override_settings(ROOT_URLCONF="shortcuts.urls")
 class RenderTests(SimpleTestCase):
@@ -72,23 +72,55 @@ TEMPLATE_STRING = """
 </html>
 """
 
+
 @override_settings(
-    TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': False,
-        'OPTIONS': {
-            'loaders': [('django.template.loaders.locmem.Loader', {
-                'delayed_redirect.html': TEMPLATE_STRING,
-            })],
-        },
-    }]
+    TEMPLATES=[
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [],
+            "APP_DIRS": False,
+            "OPTIONS": {
+                "loaders": [
+                    (
+                        "django.template.loaders.locmem.Loader",
+                        {
+                            "delayed_redirect.html": TEMPLATE_STRING,
+                        },
+                    )
+                ],
+            },
+        }
+    ]
 )
 class DelayedRedirectTests(TestCase):
     def test_delayed_redirect_renders_correct_html(self):
         factory = RequestFactory()
-        request = factory.get('/')
-        response = delayed_redirect(request, '/next/', delay=7)
+        request = factory.get("/")
+        response = delayed_redirect(request, "/next/", delay=7)
 
-        self.assertContains(response, 'meta http-equiv="refresh" content="7;url=/next/"')
-        self.assertContains(response, 'Redirecting to /next/ in 7 seconds.')
+        self.assertContains(
+            response, 'meta http-equiv="refresh" content="7;url=/next/"'
+        )
+        self.assertContains(response, "Redirecting to /next/ in 7 seconds.")
+
+
+class RedirectWithMessageTests(TestCase):
+    def test_redirect_with_message_sets_message(self):
+        factory = RequestFactory()
+        request = factory.get("/")
+
+        setattr(request, "session", {})
+        messages_storage = FallbackStorage(request)
+        setattr(request, "_messages", messages_storage)
+
+        response = redirect_with_message(
+            request, "/success/", "Done!", msg_type="success"
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/success/")
+
+        stored_messages = list(request._messages)
+        self.assertEqual(len(stored_messages), 1)
+        self.assertEqual(stored_messages[0].message, "Done!")
+        self.assertEqual(stored_messages[0].level, messages.SUCCESS)
