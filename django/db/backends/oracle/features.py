@@ -21,6 +21,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_columns_from_insert = True
     supports_subqueries_in_group_by = False
     ignores_unnecessary_order_by_in_subqueries = False
+    supports_tuple_comparison_against_subquery = False
     supports_transactions = True
     supports_timezones = False
     has_native_duration_field = True
