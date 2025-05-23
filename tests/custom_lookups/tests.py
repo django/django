@@ -752,3 +752,18 @@ class RegisterLookupTests(SimpleTestCase):
             with self.assertRaisesMessage(FieldError, msg):
                 Author.objects.filter(name__startswith="John")
         self.assertEqual(author_name.get_lookup("startswith"), StartsWith)
+
+    @unittest.expectedFailure
+    def test_unregister_instance_lookup(self):
+        author_name = Author._meta.get_field("name")
+        author_alias = Author._meta.get_field("alias")
+        with unregister_lookup(author_name, StartsWith):
+            self.assertEqual(
+                author_name.instance_lookups,
+                {"st_end": None, "startswith": None, "sw": None},
+            )
+            self.assertEqual(author_alias.get_lookup("startswith"), StartsWith)
+            # Unregistering built-in lookups on an instance doesn't work.
+            # Not sure it's needed or should be in scope for this ticket.
+            # I just included this test for demonstration purposes.
+            self.assertIsNone(author_name.get_lookup("startswith"), None)
