@@ -273,7 +273,7 @@ class RegisterLookupMixin:
     def get_instance_lookups(self):
         class_lookups = self.get_class_lookups()
         if instance_lookups := getattr(self, "instance_lookups", None):
-            instance_lookups = self.remove_none_from_dict(instance_lookups)
+            # TODO: confirm whether not not None filtering is needed.
             return self.remove_none_from_dict({**class_lookups, **instance_lookups})
         return self.remove_none_from_dict(class_lookups)
 
@@ -355,7 +355,10 @@ class RegisterLookupMixin:
             lookup_name = lookup.lookup_name
         if "instance_lookups" not in self.__dict__:
             self.instance_lookups = {}
-        self.instance_lookups[lookup_name] = None
+        if lookup_name in self.instance_lookups:
+            del self.instance_lookups[lookup_name]
+        else:
+            self.instance_lookups[lookup_name] = None
 
     _unregister_lookup = class_or_instance_method(
         _unregister_class_lookup, _unregister_instance_lookup

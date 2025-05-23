@@ -681,7 +681,7 @@ class RegisterLookupTests(SimpleTestCase):
             self.assertEqual(author_name.get_lookup("sw"), CustomStartsWith)
             self.assertIsNone(author_alias.get_lookup("sw"))
         self.assertIsNone(author_name.get_lookup("sw"))
-        self.assertEqual(author_name.instance_lookups, {"sw": None})
+        self.assertEqual(author_name.instance_lookups, {})
         self.assertIsNone(author_alias.get_lookup("sw"))
 
     def test_instance_lookup_override_class_lookups(self):
@@ -753,17 +753,10 @@ class RegisterLookupTests(SimpleTestCase):
                 Author.objects.filter(name__startswith="John")
         self.assertEqual(author_name.get_lookup("startswith"), StartsWith)
 
-    @unittest.expectedFailure
     def test_unregister_instance_lookup(self):
         author_name = Author._meta.get_field("name")
         author_alias = Author._meta.get_field("alias")
         with unregister_lookup(author_name, StartsWith):
-            self.assertEqual(
-                author_name.instance_lookups,
-                {"st_end": None, "startswith": None, "sw": None},
-            )
+            self.assertEqual(author_name.instance_lookups, {"startswith": None})
             self.assertEqual(author_alias.get_lookup("startswith"), StartsWith)
-            # Unregistering built-in lookups on an instance doesn't work.
-            # Not sure it's needed or should be in scope for this ticket.
-            # I just included this test for demonstration purposes.
-            self.assertIsNone(author_name.get_lookup("startswith"), None)
+            self.assertIsNone(author_name.get_lookup("startswith"))
