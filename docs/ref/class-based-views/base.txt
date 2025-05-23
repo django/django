@@ -221,6 +221,7 @@ MRO is an acronym for Method Resolution Order.
 
         class ArticleCounterRedirectView(RedirectView):
             permanent = False
+            preserve_request = False
             query_string = True
             pattern_name = "article-detail"
 
@@ -268,6 +269,28 @@ MRO is an acronym for Method Resolution Order.
         the HTTP status code returned. If ``True``, then the redirect will use
         status code 301. If ``False``, then the redirect will use status code
         302. By default, ``permanent`` is ``False``.
+
+    .. attribute:: preserve_request
+
+       By default, a temporary redirect is issued with a 302 status code. If
+       ``permanent=True``, a permanent redirect is issued with a 301 status code.
+
+       If ``preserve_request=True``, the response instructs the user agent to
+       preserve the method and body of the original request when issuing the
+       redirect. In this case, temporary redirects use a 307 status code, and
+       permanent redirects use a 308 status code. This is better illustrated in the
+       following table:
+    
+       =========  ================ ================
+       permanent  preserve_request HTTP status code
+       =========  ================ ================
+       ``True``   ``False``        301
+       ``False``  ``False``        302
+       ``False``  ``True``         307
+       ``True``   ``True``         308
+       =========  ================ ================
+
+       By default, ``preserve_request`` is ``False``.
 
     .. attribute:: query_string
 
