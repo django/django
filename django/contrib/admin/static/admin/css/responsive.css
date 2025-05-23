@@ -341,7 +341,7 @@ input[type="submit"], button {
         background-position: 30px 12px;
     }
 
-    ul.messagelist li.error {
+    ul.messagelist li.debug, ul.messagelist li.info, ul.messagelist li.error {
         background-position: 30px 12px;
     }
 
@@ -743,7 +743,7 @@ input[type="submit"], button {
         background-position: 15px 12px;
     }
 
-    ul.messagelist li.error {
+    ul.messagelist li.debug, ul.messagelist li.info, ul.messagelist li.error {
         background-position: 15px 12px;
     }
 
