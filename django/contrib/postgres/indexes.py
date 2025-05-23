@@ -1,6 +1,8 @@
 from django.db.models import Func, Index
 from django.utils.functional import cached_property
 
+from .utils import CheckPostgresInstalledMixin
+
 __all__ = [
     "BloomIndex",
     "BrinIndex",
@@ -12,7 +14,7 @@ __all__ = [
 ]
 
 
-class PostgresIndex(Index):
+class PostgresIndex(CheckPostgresInstalledMixin, Index):
     @cached_property
     def max_name_length(self):
         # Allow an index name longer than 30 characters when the suffix is
