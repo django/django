@@ -10,8 +10,8 @@ QUnit.test('init', function(assert) {
     $('<div class="helptext">This is helpful.</div>').appendTo('#test');
     $('<select id="id"><option value="0">A</option></select>').appendTo('#test');
     SelectFilter.init('id', 'things', 0);
-    assert.equal($('#test').children().first().prop("tagName"), "DIV");
-    assert.equal($('#test').children().first().attr("class"), "selector");
+    assert.equal($('#test').children().eq(0).prop("tagName"), "LABEL", "Label should be first child");
+    assert.equal($('#test').children().eq(1).attr("class"), "selector", "Selector div should be second child");
     assert.equal($('.selector-available label').text().trim(), "Available things");
     assert.equal($('.selector-chosen label').text().trim(), "Chosen things");
     assert.equal($('.selector-chosen select')[0].getAttribute('multiple'), '');
@@ -163,4 +163,34 @@ QUnit.test('deselecting option', function(assert) {
         assert.equal($('#select_to option').length, 0);
         done_left();
     });
+});
+
+QUnit.test('label positioning detail', function(assert) {
+    const $ = django.jQuery;
+    $('<form id="test"></form>').appendTo('#qunit-fixture');
+    $('<label for="id_field">Test Label</label>').appendTo('#test');
+    $('<select id="id_field"><option value="0">A</option></select>').appendTo('#test');
+    SelectFilter.init('id_field', 'things', 0);
+    assert.equal($('#test').children().first().prop("tagName"), "LABEL", "Label should remain first child");
+    assert.equal($('#test').children().eq(1).attr("class"), "selector", "Selector should be second child after label");
+    assert.equal($('.selector').find('label[for="id_field"]').length, 0, "Original label should not be inside selector div");
+});
+
+QUnit.test('with multiple labels', function(assert) {
+    const $ = django.jQuery;
+    $('<form id="test2"></form>').appendTo('#qunit-fixture');
+    $('<label for="something_else">Unrelated Label</label>').appendTo('#test2');
+    $('<label for="id_field">Test Label</label>').appendTo('#test2');
+    $('<select id="id_field"><option value="0">A</option></select>').appendTo('#test2');
+    SelectFilter.init('id_field', 'things', 0);
+    const firstLabel = $('#test2 label').first();
+    assert.equal(firstLabel.next().hasClass('selector'), true, "Selector should be after the first label found");
+});
+
+QUnit.test('with no label', function(assert) {
+    const $ = django.jQuery;
+    $('<form id="test3"></form>').appendTo('#qunit-fixture');
+    $('<select id="id_field"><option value="0">A</option></select>').appendTo('#test3');
+    SelectFilter.init('id_field', 'things', 0);
+    assert.equal($('#test3').children().first().hasClass('selector'), true, "Selector should be first child when no label exists");
 });
