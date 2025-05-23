@@ -268,13 +268,13 @@ class RegisterLookupMixin:
         class_lookups = [
             parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
         ]
-        return cls.merge_dicts(class_lookups)
+        return cls.remove_none_from_dict(cls.merge_dicts(class_lookups))
 
     def get_instance_lookups(self):
         class_lookups = self.get_class_lookups()
         if instance_lookups := getattr(self, "instance_lookups", None):
-            return {**class_lookups, **instance_lookups}
-        return class_lookups
+            return self.remove_none_from_dict({**class_lookups, **instance_lookups})
+        return self.remove_none_from_dict(class_lookups)
 
     get_lookups = class_or_instance_method(get_class_lookups, get_instance_lookups)
     get_class_lookups = classmethod(get_class_lookups)
@@ -309,6 +309,10 @@ class RegisterLookupMixin:
         for d in reversed(dicts):
             merged.update(d)
         return merged
+
+    @staticmethod
+    def remove_none_from_dict(dict_):
+        return {k: v for k, v in dict_.items() if v is not None}
 
     @classmethod
     def _clear_cached_class_lookups(cls):

@@ -332,14 +332,14 @@ class LookupTests(TestCase):
 
         # clear and re-cache
         field.get_class_lookups.cache_clear()
-        self.assertIsNone(field.get_lookups()["exactly"])
+        self.assertNotIn("exactly", field.get_lookups())
 
         # registration should bust the cache
         with register_lookup(models.ForeignObject, Exactly):
             # getting the lookups again should re-cache
-            self.assertEqual(field.get_lookups()["exactly"], Exactly)
+            self.assertIn("exactly", field.get_lookups())
         # Unregistration should bust the cache.
-        self.assertIsNone(field.get_lookups()["exactly"])
+        self.assertNotIn("exactly", field.get_lookups())
 
 
 class BilateralTransformTests(TestCase):
@@ -712,10 +712,8 @@ class RegisterLookupTests(SimpleTestCase):
                     transform.get_lookups(),
                     {"sw": CustomStartsWith, "ew": CustomEndsWith},
                 )
-            self.assertEqual(
-                transform.get_lookups(), {"sw": CustomStartsWith, "ew": None}
-            )
-        self.assertEqual(transform.get_lookups(), {"sw": None, "ew": None})
+            self.assertEqual(transform.get_lookups(), {"sw": CustomStartsWith})
+        self.assertEqual(transform.get_lookups(), {})
 
     def test_transform_on_field(self):
         author_name = Author._meta.get_field("name")
@@ -743,8 +741,14 @@ class RegisterLookupTests(SimpleTestCase):
         self.assertIsNone(article_author.get_lookup("rmt"))
 
     def test_unregister_class_lookup(self):
+        msg = (
+            "Unsupported lookup 'startswith' for CharField or join on the "
+            "field not permitted, perhaps you meant istartswith?"
+        )
         author_name = Author._meta.get_field("name")
         with unregister_lookup(models.CharField, StartsWith):
             self.assertIsNone(author_name.get_lookup("startswith"))
             self.assertEqual(models.Field().get_lookup("startswith"), StartsWith)
+            with self.assertRaisesMessage(FieldError, msg):
+                Author.objects.filter(name__startswith="John")
         self.assertEqual(author_name.get_lookup("startswith"), StartsWith)
