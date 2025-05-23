@@ -355,9 +355,7 @@ class TruncBase(TimezoneMixin, Transform):
                     "zone definitions for your database installed?"
                 )
         elif isinstance(value, datetime):
-            if value is None:
-                pass
-            elif isinstance(self.output_field, DateField):
+            if isinstance(self.output_field, DateField):
                 value = value.date()
             elif isinstance(self.output_field, TimeField):
                 value = value.time()
