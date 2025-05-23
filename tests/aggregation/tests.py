@@ -576,7 +576,7 @@ class AggregateTestCase(TestCase):
         books = Book.objects.aggregate(
             ratings=StringAgg(Cast(F("rating"), CharField()), Value(","), distinct=True)
         )
-        self.assertEqual(books["ratings"], "3,4,4.5,5")
+        self.assertCountEqual(books["ratings"].split(","), ["3", "4", "4.5", "5"])
 
     @skipIfDBFeature("supports_aggregate_distinct_multiple_argument")
     def test_raises_error_on_multiple_argument_distinct(self):
