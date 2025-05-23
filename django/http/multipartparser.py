@@ -9,6 +9,7 @@ import base64
 import binascii
 import collections
 import html
+from uuid import uuid4
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -269,7 +270,7 @@ class MultiPartParser:
                         file_name = force_str(file_name, encoding, errors="replace")
                         file_name = self.sanitize_file_name(file_name)
                     if not file_name:
-                        continue
+                        file_name = f"unnamed_file_{uuid4()}"
 
                     content_type, content_type_extra = meta_data.get(
                         "content-type", ("", {})
@@ -731,7 +732,7 @@ def parse_boundary_stream(stream, max_header_size):
 
         if name == "content-disposition":
             TYPE = FIELD
-            if params.get("filename"):
+            if "filename" in params:
                 TYPE = FILE
 
         outdict[name] = value, params
