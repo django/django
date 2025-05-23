@@ -16,6 +16,7 @@ from django.utils.crypto import (
     get_random_string,
     pbkdf2,
 )
+from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -361,6 +362,80 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
         decoded = self.decode(encoded)
         extra_iterations = self.iterations - decoded["iterations"]
         if extra_iterations > 0:
+            self.encode(password, decoded["salt"], extra_iterations)
+
+
+class PepperedPBKDF2PasswordHasher(BasePasswordHasher):
+    """
+    Secure password hashing using the PBKDF2 algorithm (recommended)
+
+    Configured to use PBKDF2 + HMAC + SHA256 + pepper.
+    The result is a 64 byte binary string.  Iterations may be changed
+    safely but you must rename the algorithm if you change SHA256.
+    """
+
+    algorithm = "peppered_pbkdf2_sha256"
+    iterations = 1_200_000
+    digest = hashlib.sha256
+
+    def encode(self, password, salt, iterations=None, pepper=None):
+        self._check_encode_args(password, salt)
+        iterations = iterations or self.iterations
+        pepper = pepper or settings.PASSWORD_PEPPERS[0]
+        hash = pbkdf2(password, salt + "$" + pepper, iterations, digest=self.digest)
+        hash = base64.b64encode(hash).decode("ascii").strip()
+        pepper_hash = self._hash_pepper(pepper)
+        return "%s$%d$%s$%s$%s" % (self.algorithm, iterations, salt, hash, pepper_hash)
+
+    def _hash_pepper(self, pepper):
+        pepper_hash = self.digest(force_bytes(pepper)).digest()
+        return base64.b64encode(pepper_hash).decode("ascii").strip()
+
+    def decode(self, encoded):
+        algorithm, iterations, salt, hash, pepper_hash = encoded.split("$", 4)
+        assert algorithm == self.algorithm
+        pepper = None
+        for pepper_candidate in settings.PASSWORD_PEPPERS:
+            if self._hash_pepper(pepper_candidate) == pepper_hash:
+                pepper = pepper_candidate
+                break
+
+        return {
+            "algorithm": algorithm,
+            "hash": hash,
+            "iterations": int(iterations),
+            "salt": salt,
+            "pepper": pepper,
+        }
+
+    def verify(self, password, encoded):
+        decoded = self.decode(encoded)
+        encoded_2 = self.encode(
+            password, decoded["salt"], decoded["iterations"], decoded["pepper"]
+        )
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        decoded = self.decode(encoded)
+        return {
+            _("algorithm"): decoded["algorithm"],
+            _("iterations"): decoded["iterations"],
+            _("salt"): mask_hash(decoded["salt"]),
+            _("hash"): mask_hash(decoded["hash"]),
+        }
+
+    def must_update(self, encoded):
+        decoded = self.decode(encoded)
+        update_salt = must_update_salt(decoded["salt"], self.salt_entropy)
+        update_pepper = decoded["pepper"] == settings.PASSWORD_PEPPERS[0]
+        return (
+            (decoded["iterations"] != self.iterations) or update_salt or update_pepper
+        )
+
+    def harden_runtime(self, password, encoded):
+        decoded = self.decode(encoded)
+        extra_iterations = self.iterations - decoded["iterations"]
+        if extra_iterations > 0 or decoded["pepper"] != settings.PASSWORD_PEPPERS[0]:
             self.encode(password, decoded["salt"], extra_iterations)
 
 
