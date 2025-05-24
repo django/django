@@ -34,3 +34,7 @@ Bugfixes
 * Fixed a regression in Django 5.2 where admin's ``filter_horizontal`` buttons
   lacked ``type="button"``, causing them to intercept form submission when
   pressing the Enter key (:ticket:`36423`).
+
+* Fixed a bug in Django 5.2 where calling ``QuerySet.in_bulk()`` with an
+  ``id_list`` argument on models with a ``CompositePrimaryKey`` failed to
+  observe database parameter limits (:ticket:`36416`).
