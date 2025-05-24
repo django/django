@@ -62,6 +62,11 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
+            "--disable-atomic",
+            action="store_true",
+            help="do not use transaction.atomic duration save data",
+        )
+        parser.add_argument(
             "--app",
             dest="app_label",
             help="Only look for fixtures in the specified app.",
@@ -99,8 +104,11 @@ class Command(BaseCommand):
         )
         self.format = options["format"]
 
-        with transaction.atomic(using=self.using):
+        if options["disable_atomic"]:
             self.loaddata(fixture_labels)
+        else:
+            with transaction.atomic(using=self.using):
+                self.loaddata(fixture_labels)
 
         # Close the DB connection -- unless we're still in a transaction. This
         # is required as a workaround for an edge case in MySQL: if the same
