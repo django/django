@@ -16,6 +16,10 @@ Bugfixes
   with a ``CompositePrimaryKey`` failed to raise ``ValueError`` when too many
   or too few columns were selected (:ticket:`36392`).
 
+* Fixed a bug in Django 5.2 where calling ``QuerySet.in_bulk()`` with an
+  ``id_list`` argument on models with a ``CompositePrimaryKey`` failed to
+  observe database parameter limits.
+
 * Fixed a regression in Django 5.2 that caused a crash when no arguments were
   passed into ``QuerySet.union()`` (:ticket:`36388`).
 
