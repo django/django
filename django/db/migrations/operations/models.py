@@ -150,34 +150,26 @@ class CreateModel(ModelOperation):
 
     def reduce_related(self, operation, app_label):
         if isinstance(operation, RenameModel):
-            impacted_fields = [
-                (_, field)
-                for _, field in self.fields
-                if field.remote_field
-                and field.remote_field.model
-                == f"{app_label}.{operation.old_name_lower}"
-            ]
-            if len(impacted_fields) == 0:
-                return [self]
-
-            not_impacted_fields = [
-                (_, field)
-                for (_, field) in self.fields
-                if (_, field) not in impacted_fields
-            ]
-
-            fixed_fields = []
-
-            for _, impacted_field in impacted_fields:
-                name, path, args, kwargs = impacted_field.deconstruct()
-                kwargs["to"] = f"{app_label}.{operation.new_name_lower}"
-                impacted_field = impacted_field.__class__(*args, **kwargs)
-                fixed_fields.append((_, impacted_field))
+            impacted_fields = []
+            not_impacted_fields = []
+            remote_field_old_model = f"{app_label}.{operation.old_name_lower}"
+            remote_field_new_model = f"{app_label}.{operation.new_name_lower}"
+            for _, field in self.fields:
+                if (
+                    field.remote_field
+                    and field.remote_field.model == remote_field_old_model
+                ):
+                    name, path, args, kwargs = field.deconstruct()
+                    kwargs["to"] = remote_field_new_model
+                    impacted_field = field.__class__(*args, **kwargs)
+                    impacted_fields.append((_, impacted_field))
+                else:
+                    not_impacted_fields.append((_, field))
 
             return [
                 CreateModel(
                     name=self.name,
-                    fields=not_impacted_fields + fixed_fields,
+                    fields=not_impacted_fields + impacted_fields,
                     options=self.options,
                     bases=self.bases,
                     managers=self.managers,

@@ -158,7 +158,7 @@ class Operation:
         return router.allow_migrate_model(connection_alias, model)
 
     def reduce_related(self, operation, app_label):
-        return None
+        return [self]
 
     def reduce(self, operation, app_label):
         """
