@@ -22,6 +22,7 @@ from django.db.models.functions.mixins import (
 
 __all__ = [
     "Aggregate",
+    "AnyValue",
     "Avg",
     "Count",
     "Max",
@@ -108,7 +109,7 @@ class Aggregate(Func):
 
     def get_source_expressions(self):
         source_expressions = super().get_source_expressions()
-        return source_expressions + [self.filter, self.order_by]
+        return [*source_expressions, self.filter, self.order_by]
 
     def set_source_expressions(self, exprs):
         *exprs, self.filter, self.order_by = exprs
@@ -227,6 +228,20 @@ class Aggregate(Func):
         if self.order_by:
             options["order_by"] = self.order_by
         return options
+
+
+class AnyValue(Aggregate):
+    function = "ANY_VALUE"
+    name = "AnyValue"
+    arity = 1
+    window_compatible = False
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_any_value:
+            raise NotSupportedError(
+                "ANY_VALUE is not supported on this database backend."
+            )
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):

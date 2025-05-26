@@ -94,11 +94,11 @@ class BaseGeneratedFieldTests(SimpleTestCase):
             )
 
     def test_db_persist_required(self):
-        msg = "GeneratedField.db_persist must be True or False."
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaises(TypeError):
             GeneratedField(
                 expression=Lower("name"), output_field=CharField(max_length=255)
             )
+        msg = "GeneratedField.db_persist must be True or False."
         with self.assertRaisesMessage(ValueError, msg):
             GeneratedField(
                 expression=Lower("name"),
@@ -180,7 +180,7 @@ class GeneratedFieldTestMixin:
 
     def test_unsaved_error(self):
         m = self.base_model(a=1, b=2)
-        msg = "Cannot read a generated field from an unsaved model."
+        msg = "Cannot retrieve deferred field 'field' from an unsaved model."
         with self.assertRaisesMessage(AttributeError, msg):
             m.field
 

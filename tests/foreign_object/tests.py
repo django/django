@@ -296,6 +296,19 @@ class MultiColumnFKTests(TestCase):
             self.assertEqual(friendships[0].to_friend, self.george)
             self.assertEqual(friendships[1].to_friend, self.sam)
 
+    def test_prefetch_foreignobject_null_hidden_forward_skipped(self):
+        fiendship = Friendship.objects.create(
+            from_friend_country=self.usa,
+            from_friend_id=self.bob.id,
+            to_friend_country_id=self.usa.id,
+            to_friend_id=None,
+        )
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                Friendship.objects.prefetch_related("to_friend").get(),
+                fiendship,
+            )
+
     def test_prefetch_foreignobject_reverse(self):
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
@@ -436,6 +449,15 @@ class MultiColumnFKTests(TestCase):
 
         normal_groups_lists = [list(p.groups.all()) for p in Person.objects.all()]
         self.assertEqual(groups_lists, normal_groups_lists)
+
+    def test_refresh_foreign_object(self):
+        member = Membership.objects.create(
+            membership_country=self.usa, person=self.bob, group=self.cia
+        )
+        member.person = self.jim
+        with self.assertNumQueries(1):
+            member.refresh_from_db()
+        self.assertEqual(member.person, self.bob)
 
     @translation.override("fi")
     def test_translations(self):
@@ -718,7 +740,7 @@ class TestCachedPathInfo(TestCase):
 
         ForeignObjectRel implements __getstate__(), so copy and pickle modules
         both use that, but ForeignObject implements __reduce__() and __copy__()
-        separately, so doesn't share the same behaviour.
+        separately, so doesn't share the same behavior.
         """
         foreign_object_rel = Membership._meta.get_field("person").remote_field
         # Trigger storage of cached_property into ForeignObjectRel's __dict__.

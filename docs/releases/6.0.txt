@@ -43,7 +43,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The Font Awesome Free icon set (version 6.7.2) is now used for the admin
+  interface icons.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,13 +171,19 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :djadmin:`startproject` and :djadmin:`startapp` commands now create the
+  custom target directory if it doesn't exist.
 
 Migrations
 ~~~~~~~~~~
 
 * Squashed migrations can now themselves be squashed before being transitioned
   to normal migrations.
+
+* Migrations now support serialization of :class:`zoneinfo.ZoneInfo` instances.
+
+* Serialization of deconstructible objects now supports keyword arguments with
+  names that are not valid Python identifiers.
 
 Models
 ~~~~~~
@@ -198,6 +205,16 @@ Models
   :exc:`Model.NotUpdated <django.db.models.Model.NotUpdated>` exception, when
   :ref:`a forced update <ref-models-force-insert>` results in no affected rows,
   instead of a generic :exc:`django.db.DatabaseError`.
+
+* :meth:`.QuerySet.raw` now supports models with a
+  :class:`~django.db.models.CompositePrimaryKey`.
+
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
+
+* The new :class:`~django.db.models.AnyValue` aggregate returns an arbitrary
+  value from the non-null input values. This is supported on SQLite, MySQL,
+  Oracle, and PostgreSQL 16+.
 
 Pagination
 ~~~~~~~~~~
@@ -232,6 +249,13 @@ Templates
 
 * The new variable ``forloop.length`` is now available within a :ttag:`for`
   loop.
+
+* The :ttag:`querystring` template tag now consistently prefixes the returned
+  query string with a ``?``, ensuring reliable link generation behavior.
+
+* The :ttag:`querystring` template tag now accepts multiple positional
+  arguments, which must be mappings, such as :class:`~django.http.QueryDict`
+  or :class:`dict`.
 
 Tests
 ~~~~~
@@ -304,6 +328,10 @@ Miscellaneous
 * The :ref:`JSON <serialization-formats-json>` serializer now writes a newline
   at the end of the output, even without the ``indent`` option set.
 
+* The undocumented ``django.utils.http.parse_header_parameters()`` function is
+  refactored to use Python's :py:class:`email.message.Message` for parsing.
+  Input headers exceeding 10000 characters will now raise :exc:`ValueError`.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
@@ -332,6 +360,10 @@ Miscellaneous
   tuples is deprecated. Set to a list of email address strings instead. Django
   never used the name portion. To include a name, format the address string as
   ``'"Name" <address>'`` or use Python's :func:`email.utils.formataddr`.
+
+* Support for the ``orphans`` argument being larger than or equal to the
+  ``per_page`` argument of :class:`django.core.paginator.Paginator` and
+  :class:`django.core.paginator.AsyncPaginator` is deprecated.
 
 Features removed in 6.0
 =======================
@@ -366,7 +398,7 @@ to remove usage of these features.
 * The ``get_joining_columns()`` method of ``ForeignObject`` and
   ``ForeignObjectRel`` is removed.
 
-* The ``ForeignObject.get_reverse_joining_columns()`` method is be removed.
+* The ``ForeignObject.get_reverse_joining_columns()`` method is removed.
 
 * Support for ``cx_Oracle`` is removed.
 

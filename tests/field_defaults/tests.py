@@ -179,6 +179,7 @@ class DefaultTests(TestCase):
         years = DBDefaultsFunction.objects.values_list("year", flat=True)
         self.assertCountEqual(years, [2000, timezone.now().year])
 
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_full_clean(self):
         obj = DBArticle()
         obj.full_clean()

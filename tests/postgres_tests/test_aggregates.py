@@ -658,7 +658,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         msg = (
             "delimiter: str will be resolved as a field reference instead "
             'of a string literal on Django 7.0. Pass `delimiter=Value("\'")` to '
-            "preserve the previous behaviour."
+            "preserve the previous behavior."
         )
 
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:

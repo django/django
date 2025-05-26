@@ -107,8 +107,13 @@ Explore additional avenues of contributing to Django beyond coding. Django's
 `ticket tracker`_ is the central hub for managing issues, improvements, and
 contributions to Django. It's a valuable resource where you can report bugs you
 encounter or assist in triaging existing tickets to ensure a smooth development
-workflow. Explore the ways you can make a difference below, and join us in
-making Django better for everyone.
+workflow.
+
+Django also has a :ref:`process for suggesting ideas <requesting-features>`
+where you can join the community in discussing ideas for new features.
+
+Explore the ways you can make a difference below, and join us in making Django
+better for everyone.
 
 .. toctree::
    :maxdepth: 2

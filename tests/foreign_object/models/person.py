@@ -84,7 +84,7 @@ class Friendship(models.Model):
     )
     from_friend_id = models.IntegerField()
     to_friend_country_id = models.IntegerField()
-    to_friend_id = models.IntegerField()
+    to_friend_id = models.IntegerField(null=True)
 
     # Relation Fields
     from_friend = models.ForeignObject(

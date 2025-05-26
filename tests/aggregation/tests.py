@@ -6,6 +6,7 @@ from decimal import Decimal
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
 from django.db.models import (
+    AnyValue,
     Avg,
     Case,
     CharField,
@@ -1662,6 +1663,10 @@ class AggregateTestCase(TestCase):
         self.assertEqual(dict(has_long_books_breakdown), {True: 2, False: 3})
 
     def test_group_by_nested_expression_with_params(self):
+        greatest_pages_param = "greatest_pages"
+        if connection.vendor == "mysql" and connection.features.supports_any_value:
+            greatest_pages_param = AnyValue("greatest_pages")
+
         books_qs = (
             Book.objects.annotate(greatest_pages=Greatest("pages", Value(600)))
             .values(
@@ -1669,11 +1674,65 @@ class AggregateTestCase(TestCase):
             )
             .annotate(
                 min_pages=Min("pages"),
-                least=Least("min_pages", "greatest_pages"),
+                least=Least("min_pages", greatest_pages_param),
             )
             .values_list("least", flat=True)
         )
         self.assertCountEqual(books_qs, [300, 946, 1132])
+
+    @skipUnlessDBFeature("supports_any_value")
+    def test_any_value(self):
+        books_qs = (
+            Book.objects.values(greatest_pages=Greatest("pages", 600))
+            .annotate(
+                pubdate_year=AnyValue("pubdate__year"),
+            )
+            .values_list("pubdate_year", flat=True)
+            .order_by("pubdate_year")
+        )
+        self.assertCountEqual(books_qs[0:2], [1991, 1995])
+        self.assertIn(books_qs[2], [2007, 2008])
+
+    @skipUnlessDBFeature("supports_any_value")
+    def test_any_value_filter(self):
+        books_qs = (
+            Book.objects.values(greatest_pages=Greatest("pages", 600))
+            .annotate(
+                pubdate_year=AnyValue("pubdate__year", filter=Q(rating__lte=4.5)),
+            )
+            .values_list("pubdate_year", flat=True)
+        )
+        self.assertCountEqual(books_qs, [2007, 1995, None])
+
+    @skipUnlessDBFeature("supports_any_value")
+    def test_any_value_aggregate_clause(self):
+        books_qs = (
+            Book.objects.values(greatest_pages=Greatest("pages", 600))
+            .annotate(
+                num_authors=Count("authors"),
+                pages_per_author=(
+                    AnyValue("greatest_pages") / (Cast("num_authors", FloatField()))
+                ),
+            )
+            .values_list("pages_per_author", flat=True)
+            .order_by("pages_per_author")
+        )
+        self.assertAlmostEqual(books_qs[0], 600 / 7, places=4)
+        self.assertAlmostEqual(books_qs[1], 1132 / 2, places=4)
+        self.assertAlmostEqual(books_qs[2], 946 / 1, places=4)
+
+        aggregate_qs = books_qs.aggregate(Avg("pages_per_author"))
+        self.assertAlmostEqual(
+            aggregate_qs["pages_per_author__avg"],
+            ((600 / 7) + (1132 / 2) + (946 / 1)) / 3,
+            places=4,
+        )
+
+    @skipIfDBFeature("supports_any_value")
+    def test_any_value_not_supported(self):
+        message = "ANY_VALUE is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, message):
+            Book.objects.aggregate(AnyValue("rating"))
 
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_aggregation_subquery_annotation_related_field(self):
@@ -2208,6 +2267,33 @@ class AggregateTestCase(TestCase):
                 "total_books": 10,
                 "coalesced_total_books": 10,
             },
+        )
+
+    def test_group_by_transform_column(self):
+        self.assertSequenceEqual(
+            Store.objects.values(
+                "original_opening__date",
+                "name",
+            )
+            .annotate(Count("books"))
+            .order_by("name"),
+            [
+                {
+                    "original_opening__date": datetime.date(1994, 4, 23),
+                    "name": "Amazon.com",
+                    "books__count": 6,
+                },
+                {
+                    "original_opening__date": datetime.date(2001, 3, 15),
+                    "name": "Books.com",
+                    "books__count": 4,
+                },
+                {
+                    "original_opening__date": datetime.date(1945, 4, 25),
+                    "name": "Mamma and Pappa's Books",
+                    "books__count": 3,
+                },
+            ],
         )
 
     def test_group_by_reference_subquery(self):

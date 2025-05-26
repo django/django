@@ -16,6 +16,7 @@ from django.test.utils import CaptureQueriesContext
 
 from .models import (
     Article,
+    ArticleCustomUUID,
     Author,
     Author2,
     AuthorAddress,
@@ -1178,6 +1179,14 @@ class GenericRelationTests(TestCase):
         Comment.objects.create(comment="awesome", content_object_uuid=article)
         qs = Comment.objects.prefetch_related("content_object_uuid")
         self.assertEqual([c.content_object_uuid for c in qs], [article])
+
+    def test_prefetch_GFK_uses_prepped_primary_key(self):
+        article = ArticleCustomUUID.objects.create(name="Blanche")
+        Comment.objects.create(comment="Enchantment", content_object_uuid=article)
+        obj = Comment.objects.prefetch_related("content_object_uuid").get(
+            comment="Enchantment"
+        )
+        self.assertEqual(obj.content_object_uuid, article)
 
     def test_prefetch_GFK_fk_pk(self):
         book = Book.objects.create(title="Poems")

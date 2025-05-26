@@ -191,8 +191,8 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         MIMEMultipart.__setitem__(self, name, val)
 
 
-EmailAlternative = namedtuple("Alternative", ["content", "mimetype"])
-EmailAttachment = namedtuple("Attachment", ["filename", "content", "mimetype"])
+EmailAlternative = namedtuple("EmailAlternative", ["content", "mimetype"])
+EmailAttachment = namedtuple("EmailAttachment", ["filename", "content", "mimetype"])
 
 
 class EmailMessage:

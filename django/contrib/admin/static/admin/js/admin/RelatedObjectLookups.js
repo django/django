@@ -58,9 +58,9 @@
             elem.value = chosenId;
         }
         $(elem).trigger('change');
-        const index = window.relatedWindows.indexOf(win);
+        const index = relatedWindows.indexOf(win);
         if (index > -1) {
-            window.relatedWindows.splice(index, 1);
+            relatedWindows.splice(index, 1);
         }
         win.close();
     }
@@ -206,6 +206,7 @@
     window.dismissChangeRelatedObjectPopup = dismissChangeRelatedObjectPopup;
     window.dismissDeleteRelatedObjectPopup = dismissDeleteRelatedObjectPopup;
     window.dismissChildPopups = dismissChildPopups;
+    window.relatedWindows = relatedWindows;
 
     // Kept for backward compatibility
     window.showAddAnotherPopup = showRelatedObjectPopup;

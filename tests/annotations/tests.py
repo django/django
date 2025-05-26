@@ -1470,6 +1470,10 @@ class AliasTests(TestCase):
                 with self.assertRaisesMessage(FieldError, msg):
                     getattr(qs, operation)("rating_alias")
 
+    def test_alias_after_values(self):
+        qs = Book.objects.values_list("pk").alias(other_pk=F("pk"))
+        self.assertEqual(qs.get(pk=self.b1.pk), (self.b1.pk,))
+
     def test_alias_sql_injection(self):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         msg = (

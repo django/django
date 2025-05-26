@@ -83,7 +83,7 @@ permissions.
     ``you@example.com`` is the email address associated with the key you want
     to use.
 
-* A clean Python virtual environment per Django version being released, with
+* A clean Python virtual environment (Python 3.9+) to build artifacts, with
   these required Python packages installed:
 
   .. code-block:: shell
@@ -215,13 +215,17 @@ A few days before any release
    bit lengthy so be sure to set aside 4-10 hours to do this, and ideally plan
    for this task one or two days ahead of the release day.
 
-   In addition to having a configured Transifex account, the
-   `tx CLI <https://developers.transifex.com/docs/cli>`_ should be available in
-   your ``PATH``. Then, you can fetch all the translations by running:
+   In addition to having a configured Transifex account, ensure that the `tx
+   CLI <https://developers.transifex.com/docs/cli>`_ is available in your
+   ``PATH``. You can then fetch all translations since a given date by running:
 
    .. code-block:: shell
 
-        $ python scripts/manage_translations.py fetch
+        $ python scripts/manage_translations.py fetch -v 1 --since=<some date>
+
+   To determine a good value for ``--since``, check the date of the most recent
+   commit with wording similar to ``Updated translations from Transifex`` and
+   use a date a few days prior.
 
    This command takes some time to run. When done, carefully inspect the output
    for potential errors and/or warnings. If there are some, you will need to
@@ -246,6 +250,9 @@ A few days before any release
    a new PR targeting the stable branch of the corresponding release (example
    `PR updating translations for 4.2
    <https://github.com/django/django/pull/16715>`_).
+
+    Once merged, forward port the changes into ``main`` (:commit:`example
+    commit <cb27e5b9c0703fb0edd70b2138e3e53a78c9551d>`).
 
 #. :ref:`Update the django-admin manual page <django-admin-manpage>`:
 
@@ -466,10 +473,8 @@ Building the artifacts
 
     You can streamline some of the steps below using helper scripts from the Wiki:
 
-    * `Release script for versions 5.1 and newer
+    * `Release script
       <https://code.djangoproject.com/wiki/ReleaseScript>`_
-    * `Release script for versions 5.0 and older
-      <https://code.djangoproject.com/wiki/ReleaseScript5.0AndOlder>`_
     * `Test new version script
       <https://code.djangoproject.com/wiki/ReleaseTestNewVersion>`_
 

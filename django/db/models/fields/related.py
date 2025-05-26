@@ -580,6 +580,7 @@ class ForeignObject(RelatedField):
             *self._check_to_fields_exist(),
             *self._check_to_fields_composite_pk(),
             *self._check_unique_target(),
+            *self._check_conflict_with_managers(),
         ]
 
     def _check_to_fields_exist(self):
@@ -707,6 +708,27 @@ class ForeignObject(RelatedField):
                     )
                 ]
         return []
+
+    def _check_conflict_with_managers(self):
+        errors = []
+        manager_names = {manager.name for manager in self.opts.managers}
+        for rel_objs in self.model._meta.related_objects:
+            related_object_name = rel_objs.name
+            if related_object_name in manager_names:
+                field_name = f"{self.model._meta.object_name}.{self.name}"
+                errors.append(
+                    checks.Error(
+                        f"Related name '{related_object_name}' for '{field_name}' "
+                        "clashes with the name of a model manager.",
+                        hint=(
+                            "Rename the model manager or change the related_name "
+                            f"argument in the definition for field '{field_name}'."
+                        ),
+                        obj=self,
+                        id="fields.E348",
+                    )
+                )
+        return errors
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -1707,13 +1729,18 @@ class ManyToManyField(RelatedField):
                             and getattr(field.remote_field, "model", None)
                             == related_model
                         ):
+                            related_object_name = (
+                                related_model
+                                if isinstance(related_model, str)
+                                else related_model._meta.object_name
+                            )
                             errors.append(
                                 checks.Error(
                                     "'%s.%s' is not a foreign key to '%s'."
                                     % (
                                         through._meta.object_name,
                                         field_name,
-                                        related_model._meta.object_name,
+                                        related_object_name,
                                     ),
                                     hint=hint,
                                     obj=self,

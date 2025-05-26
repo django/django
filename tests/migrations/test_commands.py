@@ -1331,6 +1331,16 @@ class MigrateTests(MigrationTestBase):
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"}
     )
+    def test_migrate_forward_to_squashed_migration(self):
+        try:
+            call_command("migrate", "migrations", "0001_initial", verbosity=0)
+        finally:
+            # Unmigrate everything.
+            call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"}
+    )
     def test_migrate_backward_to_squashed_migration(self):
         try:
             call_command("migrate", "migrations", "0001_squashed_0002", verbosity=0)
@@ -1540,6 +1550,14 @@ class MigrateTests(MigrationTestBase):
             recorder.record_unapplied("migrations2", "0001_initial")
             recorder.record_unapplied("migrations2", "0002_second")
             recorder.record_unapplied("migrations2", "0001_squashed_0002")
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.with_generic_model",
+        ]
+    )
+    def test_migrate_model_inherit_generic(self):
+        call_command("migrate", verbosity=0)
 
 
 class MakeMigrationsTests(MigrationTestBase):

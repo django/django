@@ -8,7 +8,6 @@ QUnit.module('admin.RelatedObjectLookups', {
             <input type="text" id="test_id" name="test" />
             <input type="text" id="many_test_id" name="many_test" class="vManyToManyRawIdAdminField" />
         `);
-        window.relatedWindows = window.relatedWindows || [];
     }
 });
 
