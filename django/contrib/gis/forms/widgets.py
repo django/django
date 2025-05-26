@@ -1,11 +1,9 @@
 import logging
 
-from django.conf import settings
 from django.contrib.gis import gdal
 from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
-from django.utils import translation
 
 logger = logging.getLogger("django.contrib.gis")
 
@@ -16,6 +14,7 @@ class BaseGeometryWidget(Widget):
     Render a map using the WKT of the geometry.
     """
 
+    base_layer_name = None
     geom_type = "GEOMETRY"
     map_srid = 4326
     display_raw = False
@@ -40,6 +39,27 @@ class BaseGeometryWidget(Widget):
             logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
 
+    def widget_options(self):
+        """Return options that are passed to the JS MapWidget constructor.
+
+        These options control how the geometry widget behaves in the browser.
+        Result is a dictionary with relevant options. Typical entries include:
+
+        * `base_layer`: the name of the base map layer to use (e.g., "osm").
+        * `geom_name`: the name/type of geometry (like "Point" or "Polygon").
+        * `map_srid`: the spatial reference ID the map should use.
+
+        Subclasses may override or extend it to include additional options
+        like default zoom or center.
+
+        """
+        geom_type = gdal.OGRGeomType(self.attrs["geom_type"]).name
+        return {
+            "base_layer": self.base_layer_name,
+            "geom_name": "Geometry" if geom_type == "Unknown" else geom_type,
+            "map_srid": self.attrs["map_srid"],
+        }
+
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         # If a string reaches here (via a validation error on another
@@ -61,26 +81,17 @@ class BaseGeometryWidget(Widget):
                         self.map_srid,
                         err,
                     )
-
-        geom_type = gdal.OGRGeomType(self.attrs["geom_type"]).name
         context.update(
-            self.build_attrs(
-                self.attrs,
-                {
-                    "name": name,
-                    "module": "geodjango_%s" % name.replace("-", "_"),  # JS-safe
-                    "serialized": self.serialize(value),
-                    "geom_type": "Geometry" if geom_type == "Unknown" else geom_type,
-                    "STATIC_URL": settings.STATIC_URL,
-                    "LANGUAGE_BIDI": translation.get_language_bidi(),
-                    **(attrs or {}),
-                },
-            )
+            {
+                "serialized": self.serialize(value),
+                "widget_options": self.widget_options(),
+            }
         )
         return context
 
 
 class OpenLayersWidget(BaseGeometryWidget):
+    base_layer_name = "nasaWorldview"
     template_name = "gis/openlayers.html"
     map_srid = 3857
 
@@ -112,7 +123,7 @@ class OSMWidget(OpenLayersWidget):
     An OpenLayers/OpenStreetMap-based widget.
     """
 
-    template_name = "gis/openlayers-osm.html"
+    base_layer_name = "osm"
     default_lon = 5
     default_lat = 47
     default_zoom = 12
@@ -123,3 +134,11 @@ class OSMWidget(OpenLayersWidget):
             self.attrs[key] = getattr(self, key)
         if attrs:
             self.attrs.update(attrs)
+
+    def widget_options(self):
+        return {
+            **super().widget_options(),
+            "default_lon": self.attrs.get("default_lon", self.default_lon),
+            "default_lat": self.attrs.get("default_lat", self.default_lat),
+            "default_zoom": self.attrs.get("default_zoom", self.default_zoom),
+        }
