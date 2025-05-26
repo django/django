@@ -28,7 +28,7 @@
          */
         setupButtonHints() {
             const modifierKey = this.isMac ? 'Command' : 'Ctrl';
-            
+
             const shortcuts = [
                 { selector: this.SELECTORS.CONTINUE, hint: `${modifierKey} + S` },
                 { selector: this.SELECTORS.SAVE, hint: `${modifierKey} + Shift + S` },
@@ -108,12 +108,14 @@
          * @returns {boolean} True if the element is editable
          */
         isEditableElement(element) {
-            if (!element) return false;
-            
+            if (!element) {
+                return false;
+            }
+
             const tagName = element.tagName.toLowerCase();
             const editableTags = ['input', 'textarea', 'select'];
-            
-            return editableTags.includes(tagName) || 
+
+            return editableTags.includes(tagName) ||
                    element.contentEditable === 'true' ||
                    element.isContentEditable;
         },
@@ -138,7 +140,7 @@
          * @returns {boolean} True if the element is visible
          */
         isElementVisible(element) {
-            return element.offsetParent !== null && 
+            return element.offsetParent !== null &&
                    getComputedStyle(element).display !== 'none' &&
                    getComputedStyle(element).visibility !== 'hidden';
         }
