@@ -13,3 +13,7 @@ Bugfixes
 * Fixed a log injection possibility by migrating remaining response logging
   to ``django.utils.log.log_response()``, which safely escapes arguments such
   as the request path to prevent unsafe log output (:cve:`2025-48432`).
+
+* Fixed a regression in Django 5.2 that caused :meth:`.QuerySet.bulk_update` to
+  incorrectly convert ``None`` to JSON ``null`` instead of SQL ``NULL`` for
+  ``JSONField`` (:ticket:`36419`).

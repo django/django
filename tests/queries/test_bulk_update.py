@@ -2,7 +2,7 @@ import datetime
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import F
-from django.db.models.functions import Lower
+from django.db.models.functions import Coalesce, Lower
 from django.db.utils import IntegrityError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 
@@ -288,6 +288,21 @@ class BulkUpdateTests(TestCase):
         self.assertCountEqual(
             JSONFieldNullable.objects.filter(json_field__has_key="c"), objs
         )
+
+    @skipUnlessDBFeature("supports_json_field")
+    def test_json_field_sql_null(self):
+        obj = JSONFieldNullable.objects.create(json_field={})
+        test_cases = [
+            ("direct_none_assignment", None),
+            ("expression_none_assignment", Coalesce(None, None)),
+        ]
+        for label, value in test_cases:
+            with self.subTest(case=label):
+                obj.json_field = value
+                JSONFieldNullable.objects.bulk_update([obj], fields=["json_field"])
+                obj.refresh_from_db()
+                sql_null_qs = JSONFieldNullable.objects.filter(json_field__isnull=True)
+                self.assertSequenceEqual(sql_null_qs, [obj])
 
     def test_nullable_fk_after_related_save(self):
         parent = RelatedObject.objects.create()
