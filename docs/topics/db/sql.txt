@@ -212,22 +212,23 @@ of people with their ages calculated by the database:
     Jane is 42.
     ...
 
-You can often avoid using raw SQL to compute annotations by instead using a
-:ref:`Func() expression <func-expressions>`.
+You can often avoid using raw SQL to compute annotations by using a
+:ref:`Func() expression <func-expressions>`, or use :class:`~django.db.models.expressions.RawSQL`
+for more control when needed.
 
 __ https://www.postgresql.org/docs/current/functions-datetime.html
 
 Using RawSQL in ORM expressions
--------------------------------
+================================
 
-In cases where the ORM's built-in expressions and functions do not meet your needs,
-you can use :class:`~django.db.models.expressions.RawSQL` to include custom SQL
-fragments in annotations or filters.
+Django provides a number of built-in expressions and functions for use in queries.
+However, when these are not sufficient, you can use :class:`~django.db.models.expressions.RawSQL`
+to include custom SQL fragments inside annotations or filters.
 
 .. warning::
 
-    Use :class:`~django.db.models.expressions.RawSQL` with caution. It bypasses Django's SQL compiler and query safety
-    mechanisms. Parameters must always be passed separately to avoid SQL injection vulnerabilities.
+    Use :class:`~django.db.models.expressions.RawSQL` with caution. It bypasses Django's SQL compiler and query safety mechanisms.
+    Always pass parameters separately using the second argument to avoid SQL injection vulnerabilities.
 
 For example:
 
@@ -241,10 +242,12 @@ For example:
         )
     )
 
-The second argument to :class:`~django.db.models.expressions.RawSQL` is a list of parameters. These are safely bound to the query
-to prevent SQL injection. This works similarly to the ``params`` argument in :meth:`Manager.raw`.
+The second argument is a list of parameters that will be safely bound to the query.
+This is similar to the ``params`` argument in :meth:`Manager.raw`.
 
-Use ``%s`` as a placeholder when passing a list of parameters, or ``%(key)s`` for a dictionary.
+Use ``%s`` for positional placeholders or ``%(key)s`` for named placeholders in the SQL string.
+
+For full documentation, see the `RawSQL reference <https://docs.djangoproject.com/en/stable/ref/models/expressions/#rawsql>`_.
 
 Passing parameters into ``raw()``
 ---------------------------------
