@@ -517,7 +517,7 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
         with self.assertTemplateNotUsed("template_used/alternative.html"):
             pass
 
-    def test_error_message(self):
+    def test_error_message_no_template_used(self):
         msg = "No templates used to render the response"
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed("template_used/base.html"):
@@ -527,15 +527,6 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed(template_name="template_used/base.html"):
                 pass
 
-        msg2 = (
-            "Template 'template_used/base.html' was not a template used to render "
-            "the response. Actual template(s) used: template_used/alternative.html"
-        )
-        with self.assertRaisesMessage(AssertionError, msg2):
-            with self.assertTemplateUsed("template_used/base.html"):
-                render_to_string("template_used/alternative.html")
-
-        msg = "No templates used to render the response"
         with self.assertRaisesMessage(AssertionError, msg):
             response = self.client.get("/test_utils/no_template_used/")
             self.assertTemplateUsed(response, "template_used/base.html")
@@ -548,6 +539,15 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed("template_used/base.html"):
                 template = Template("template_used/alternative.html", name=None)
                 template.render(Context())
+
+    def test_error_message_unexpected_template_used(self):
+        msg = (
+            "Template 'template_used/base.html' was not a template used to render "
+            "the response. Actual template(s) used: template_used/alternative.html"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed("template_used/base.html"):
+                render_to_string("template_used/alternative.html")
 
     def test_msg_prefix(self):
         msg_prefix = "Prefix"
