@@ -28,6 +28,7 @@ from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
 from django.utils.datastructures import OrderedSet
+from django.utils.log import QueryFormatter
 from django.utils.version import PY313
 
 try:
@@ -41,16 +42,24 @@ except ImportError:
     tblib = None
 
 
+def _get_handler(logger):
+    handlers = [h for h in logger.handlers if isinstance(h.formatter, QueryFormatter)]
+    handler = logging.StreamHandler(stream=StringIO())
+    if handlers:
+        formatter = handlers[0].formatter
+        handler.setFormatter(formatter)
+    return handler
+
+
 class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger("django.db.backends")
         self.logger.setLevel(logging.DEBUG)
-        self.debug_sql_stream = None
+        self.handler = None
         super().__init__(stream, descriptions, verbosity)
 
     def startTest(self, test):
-        self.debug_sql_stream = StringIO()
-        self.handler = logging.StreamHandler(self.debug_sql_stream)
+        self.handler = _get_handler(self.logger)
         self.logger.addHandler(self.handler)
         super().startTest(test)
 
@@ -58,35 +67,35 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
         super().stopTest(test)
         self.logger.removeHandler(self.handler)
         if self.showAll:
-            self.debug_sql_stream.seek(0)
-            self.stream.write(self.debug_sql_stream.read())
+            self.handler.stream.seek(0)
+            self.stream.write(self.handler.stream.read())
             self.stream.writeln(self.separator2)
 
     def addError(self, test, err):
         super().addError(test, err)
-        if self.debug_sql_stream is None:
+        if self.handler is None:
             # Error before tests e.g. in setUpTestData().
             sql = ""
         else:
-            self.debug_sql_stream.seek(0)
-            sql = self.debug_sql_stream.read()
+            self.handler.stream.seek(0)
+            sql = self.handler.stream.read()
         self.errors[-1] = self.errors[-1] + (sql,)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
-        self.debug_sql_stream.seek(0)
-        self.failures[-1] = self.failures[-1] + (self.debug_sql_stream.read(),)
+        self.handler.stream.seek(0)
+        self.failures[-1] = self.failures[-1] + (self.handler.stream.read(),)
 
     def addSubTest(self, test, subtest, err):
         super().addSubTest(test, subtest, err)
         if err is not None:
-            self.debug_sql_stream.seek(0)
+            self.handler.stream.seek(0)
             errors = (
                 self.failures
                 if issubclass(err[0], test.failureException)
                 else self.errors
             )
-            errors[-1] = errors[-1] + (self.debug_sql_stream.read(),)
+            errors[-1] = errors[-1] + (self.handler.stream.read(),)
 
     def printErrorList(self, flavour, errors):
         for test, err, sql_debug in errors:

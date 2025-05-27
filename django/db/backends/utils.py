@@ -114,6 +114,27 @@ class CursorWrapper:
             return self.cursor.executemany(sql, param_list)
 
 
+def _log_query(connection, start, stop, sql, params=None):
+    duration = stop - start
+    connection.queries_log.append(
+        {
+            "sql": "%s" % sql,
+            "time": "%.3f" % duration,
+        }
+    )
+    extra = {
+        "duration": duration,
+        "sql": sql,
+        "params": params,
+        "alias": connection.alias,
+    }
+    logger.debug(
+        "(%(duration).3f) %(sql)s; args=%(params)s; alias=%(alias)s",
+        extra,
+        extra=extra,
+    )
+
+
 class CursorDebugWrapper(CursorWrapper):
     # XXX callproc isn't instrumented at this time.
 
@@ -134,7 +155,6 @@ class CursorDebugWrapper(CursorWrapper):
             yield
         finally:
             stop = time.monotonic()
-            duration = stop - start
             if use_last_executed_query:
                 sql = self.db.ops.last_executed_query(self.cursor, sql, params)
             try:
@@ -142,25 +162,8 @@ class CursorDebugWrapper(CursorWrapper):
             except TypeError:
                 # params could be an iterator.
                 times = "?"
-            self.db.queries_log.append(
-                {
-                    "sql": "%s times: %s" % (times, sql) if many else sql,
-                    "time": "%.3f" % duration,
-                }
-            )
-            logger.debug(
-                "(%.3f) %s; args=%s; alias=%s",
-                duration,
-                sql,
-                params,
-                self.db.alias,
-                extra={
-                    "duration": duration,
-                    "sql": sql,
-                    "params": params,
-                    "alias": self.db.alias,
-                },
-            )
+            sql = "%s times: %s" % (times, sql) if many else sql
+            _log_query(self.db, start, stop, sql, params)
 
 
 @contextmanager
@@ -171,25 +174,7 @@ def debug_transaction(connection, sql):
     finally:
         if connection.queries_logged:
             stop = time.monotonic()
-            duration = stop - start
-            connection.queries_log.append(
-                {
-                    "sql": "%s" % sql,
-                    "time": "%.3f" % duration,
-                }
-            )
-            logger.debug(
-                "(%.3f) %s; args=%s; alias=%s",
-                duration,
-                sql,
-                None,
-                connection.alias,
-                extra={
-                    "duration": duration,
-                    "sql": sql,
-                    "alias": connection.alias,
-                },
-            )
+            _log_query(connection, start, stop, sql)
 
 
 def split_tzname_delta(tzname):

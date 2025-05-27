@@ -88,24 +88,24 @@ class TestDebugSQL(unittest.TestCase):
 
     expected_outputs = [
         (
-            """SELECT COUNT(*) AS "__count" """
-            """FROM "test_runner_person" WHERE """
-            """"test_runner_person"."first_name" = 'error';"""
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'error';"""
         ),
         (
-            """SELECT COUNT(*) AS "__count" """
-            """FROM "test_runner_person" WHERE """
-            """"test_runner_person"."first_name" = 'fail';"""
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'fail';"""
         ),
         (
-            """SELECT COUNT(*) AS "__count" """
-            """FROM "test_runner_person" WHERE """
-            """"test_runner_person"."first_name" = 'subtest-error';"""
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'subtest-error';"""
         ),
         (
-            """SELECT COUNT(*) AS "__count" """
-            """FROM "test_runner_person" WHERE """
-            """"test_runner_person"."first_name" = 'subtest-fail';"""
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'subtest-fail';"""
         ),
     ]
 
@@ -119,14 +119,14 @@ class TestDebugSQL(unittest.TestCase):
         f"runTest ({test_class_path}.FailingSubTest.runTest) ...",
         f"runTest ({test_class_path}.ErrorSubTest.runTest) ...",
         (
-            """SELECT COUNT(*) AS "__count" """
-            """FROM "test_runner_person" WHERE """
-            """"test_runner_person"."first_name" = 'pass';"""
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'pass';"""
         ),
         (
-            """SELECT COUNT(*) AS "__count" """
-            """FROM "test_runner_person" WHERE """
-            """"test_runner_person"."first_name" = 'subtest-pass';"""
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'subtest-pass';"""
         ),
     ]
 

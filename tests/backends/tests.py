@@ -1,10 +1,10 @@
 """Tests related to django.db.backends that haven't been organized."""
 
 import datetime
+import logging
 import threading
 import unittest
 import warnings
-from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
@@ -572,22 +572,27 @@ class BackendTestCase(TransactionTestCase):
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
 
-    @mock.patch("django.db.backends.utils.logger")
     @override_settings(DEBUG=True)
-    def test_queries_logger(self, mocked_logger):
+    def test_queries_logger(self):
         sql = "SELECT 1" + connection.features.bare_select_suffix
-        with connection.cursor() as cursor:
-            cursor.execute(sql)
-        params, kwargs = mocked_logger.debug.call_args
-        self.assertIn("; alias=%s", params[0])
-        self.assertEqual(params[2], sql)
-        self.assertIsNone(params[3])
-        self.assertEqual(params[4], connection.alias)
-        self.assertEqual(
-            list(kwargs["extra"]),
-            ["duration", "sql", "params", "alias"],
+        with self.assertLogs("django.db.backends", "DEBUG") as cm:
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+
+        self.assertGreaterEqual(
+            records_len := len(cm.records),
+            1,
+            f"Wrong number of calls for {cm=} in (expected at least 1, got "
+            f"{records_len}).",
         )
-        self.assertEqual(tuple(kwargs["extra"].values()), params[1:])
+        record = cm.records[-1]
+        self.assertEqual(
+            record.getMessage(), "(0.000) SELECT 1; args=None; alias=default"
+        )
+        self.assertEqual(record.levelno, logging.DEBUG)
+        self.assertEqual(record.sql, sql)
+        self.assertEqual(record.params, None)
+        self.assertEqual(record.alias, connection.alias)
 
     def test_queries_bare_where(self):
         sql = f"SELECT 1{connection.features.bare_select_suffix} WHERE 1=1"
