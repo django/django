@@ -38,3 +38,8 @@ Bugfixes
 * Fixed a bug in Django 5.2 where calling ``QuerySet.in_bulk()`` with an
   ``id_list`` argument on models with a ``CompositePrimaryKey`` failed to
   observe database parameter limits (:ticket:`36416`).
+
+* Fixed a bug in Django 5.2 where :meth:`HttpRequest.get_preferred_type()
+  <django.http.HttpRequest.get_preferred_type>` did not account for media type
+  parameters in ``Accept`` headers, reducing specificity in content negotiation
+  (:ticket:`36411`).
