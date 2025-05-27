@@ -40,8 +40,8 @@ In some cases, you may need to embed raw SQL fragments directly in ORM queries.
 
 Django provides two tools for this: :ref:`Func() expressions <func-expressions>` and
 :class:`~django.db.models.expressions.RawSQL`. Both allow you to insert custom SQL snippets in places like
-``annotate()`` or ``filter()``. While `Func` is useful for calling standard SQL functions across backends,
-`RawSQL` provides more flexibility for database-specific or complex expressions.
+``annotate()`` or ``filter()``. While :ref:`Func() expressions <func-expressions>` are useful for calling standard SQL functions across backends,
+:class:`~django.db.models.expressions.RawSQL` provides more flexibility for database-specific or complex expressions.
 
 .. warning::
 
