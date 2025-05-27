@@ -4,12 +4,9 @@ Performing raw SQL queries
 
 .. currentmodule:: django.db.models
 
-Django gives you two ways of performing raw SQL queries: you can use
-:meth:`Manager.raw()` to `perform raw queries and return model instances`__, or
-you can avoid the model layer entirely and `execute custom SQL directly`__.
-
-__ `performing raw queries`_
-__ `executing custom SQL directly`_
+Django gives you three ways of performing raw SQL queries: you can embed raw SQL fragments into ORM expressions using
+:class:`~django.db.models.expressions.RawSQL`, use :meth:`~django.db.models.query.QuerySet.raw` to return model instances,
+or avoid the model layer entirely and use ``cursor.execute()`` (see :ref:`executing-custom-sql`).
 
 .. admonition:: Explore the ORM before using raw SQL!
 
@@ -35,6 +32,40 @@ __ `executing custom SQL directly`_
     <sql-injection-protection>`.
 
 .. _executing-raw-queries:
+
+Raw SQL fragments
+=================
+
+In some cases, you may need to embed raw SQL fragments directly in ORM queries.
+
+Django provides two tools for this: :ref:`Func() expressions <func-expressions>` and
+:class:`~django.db.models.expressions.RawSQL`. Both allow you to insert custom SQL snippets in places like
+``annotate()`` or ``filter()``. While `Func` is useful for calling standard SQL functions across backends,
+`RawSQL` provides more flexibility for database-specific or complex expressions.
+
+.. warning::
+
+    Use :class:`~django.db.models.expressions.RawSQL` with caution. It bypasses Django's SQL compiler and query safety mechanisms.
+    Always pass parameters separately using the second argument to avoid SQL injection vulnerabilities.
+
+For example:
+
+.. code-block:: python
+
+    from django.db.models.expressions import RawSQL
+
+    Entry.objects.annotate(
+        avg_score=RawSQL(
+            "SELECT AVG(score) FROM scoring WHERE scoring.entry_id = entry.id", []
+        )
+    )
+
+The second argument is a list of parameters that will be safely bound to the query.
+This is similar to the ``params`` argument in :meth:`Manager.raw`.
+
+Use ``%s`` for positional placeholders or ``%(key)s`` for named placeholders in the SQL string.
+
+For full documentation, see the `RawSQL reference <https://docs.djangoproject.com/en/stable/ref/models/expressions/#rawsql>`_.
 
 Performing raw queries
 ======================
@@ -212,42 +243,12 @@ of people with their ages calculated by the database:
     Jane is 42.
     ...
 
-You can often avoid using raw SQL to compute annotations by using a
-:ref:`Func() expression <func-expressions>`, or use :class:`~django.db.models.expressions.RawSQL`
-for more control when needed.
+You can often avoid using raw SQL to compute annotations by using either
+:ref:`Func() expressions <func-expressions>` or :class:`~django.db.models.expressions.RawSQL`,
+both of which allow embedding SQL fragments directly in ORM queries.
+See the next section for more details on using :class:`~django.db.models.expressions.RawSQL`.
 
 __ https://www.postgresql.org/docs/current/functions-datetime.html
-
-Using RawSQL in ORM expressions
-================================
-
-Django provides a number of built-in expressions and functions for use in queries.
-However, when these are not sufficient, you can use :class:`~django.db.models.expressions.RawSQL`
-to include custom SQL fragments inside annotations or filters.
-
-.. warning::
-
-    Use :class:`~django.db.models.expressions.RawSQL` with caution. It bypasses Django's SQL compiler and query safety mechanisms.
-    Always pass parameters separately using the second argument to avoid SQL injection vulnerabilities.
-
-For example:
-
-.. code-block:: python
-
-    from django.db.models.expressions import RawSQL
-
-    Entry.objects.annotate(
-        avg_score=RawSQL(
-            "SELECT AVG(score) FROM scoring WHERE scoring.entry_id = entry.id", []
-        )
-    )
-
-The second argument is a list of parameters that will be safely bound to the query.
-This is similar to the ``params`` argument in :meth:`Manager.raw`.
-
-Use ``%s`` for positional placeholders or ``%(key)s`` for named placeholders in the SQL string.
-
-For full documentation, see the `RawSQL reference <https://docs.djangoproject.com/en/stable/ref/models/expressions/#rawsql>`_.
 
 Passing parameters into ``raw()``
 ---------------------------------
