@@ -789,10 +789,6 @@ class BaseDatabaseOperations:
 
         return lhs_expr, rhs_expr
 
-    def format_debug_sql(self, sql):
-        # Hook for backends (e.g. NoSQL) to customize formatting.
-        return sqlparse.format(sql, reindent=True, keyword_case="upper")
-
     def format_json_path_numeric_index(self, num):
         """
         Hook for backends to customize array indexing in JSON paths.

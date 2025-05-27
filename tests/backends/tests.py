@@ -83,12 +83,7 @@ class LastExecutedQueryTest(TestCase):
             connection.ops.last_executed_query(cursor, "SELECT %s" + suffix, (1,))
 
     def test_debug_sql(self):
-        qs = Reporter.objects.filter(first_name="test")
-        ops = connections[qs.db].ops
-        with mock.patch.object(ops, "format_debug_sql") as format_debug_sql:
-            list(qs)
-        # Queries are formatted with DatabaseOperations.format_debug_sql().
-        format_debug_sql.assert_called()
+        list(Reporter.objects.filter(first_name="test"))
         sql = connection.queries[-1]["sql"].lower()
         self.assertIn("select", sql)
         self.assertIn(Reporter._meta.db_table, sql)
