@@ -29,3 +29,8 @@ Bugfixes
 * Fixed a regression in Django 5.2 that caused a crash when using ``OuterRef``
   in PostgreSQL aggregate functions ``ArrayAgg``, ``StringAgg``, and
   ``JSONBAgg`` (:ticket:`36405`).
+
+* Fixed a bug in Django 5.2 where :meth:`HttpRequest.get_preferred_type()
+  <django.http.HttpRequest.get_preferred_type>` did not account for media type
+  parameters in ``Accept`` headers, reducing specificity in content negotiation
+  (:ticket:`36411`).
