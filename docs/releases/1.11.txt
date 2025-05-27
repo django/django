@@ -249,14 +249,14 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* Added the ``skip_locked`` argument to :meth:`.QuerySet.select_for_update()`
+* Added the ``skip_locked`` argument to :meth:`.QuerySet.select_for_update`
   on PostgreSQL 9.5+ and Oracle to execute queries with
   ``FOR UPDATE SKIP LOCKED``.
 
 * Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
   PostgreSQL users specify a template for creating the test database.
 
-* :meth:`.QuerySet.iterator()` now uses `server-side cursors`_ on PostgreSQL.
+* :meth:`.QuerySet.iterator` now uses `server-side cursors`_ on PostgreSQL.
   This feature transfers some of the worker memory load (used to hold query
   results) to the database and might increase database memory usage.
 
@@ -646,7 +646,7 @@ described in :ref:`writing your own migration operation
 Server-side cursors on PostgreSQL
 ---------------------------------
 
-The change to make :meth:`.QuerySet.iterator()` use server-side cursors on
+The change to make :meth:`.QuerySet.iterator` use server-side cursors on
 PostgreSQL prevents running Django with PgBouncer in transaction pooling mode.
 To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
 <DATABASE-DISABLE_SERVER_SIDE_CURSORS>` setting (added in Django 1.11.1) in

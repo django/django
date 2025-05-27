@@ -414,7 +414,7 @@ Checking if the field data has changed
 The ``has_changed()`` method is used to determine if the field value has changed
 from the initial value. Returns ``True`` or ``False``.
 
-See the :class:`Form.has_changed()` documentation for more information.
+See the :class:`Form.has_changed` documentation for more information.
 
 .. _built-in-fields:
 
@@ -1631,7 +1631,7 @@ only requirements are that it implement a ``clean()`` method and that its
 
 You can also customize how a field will be accessed by overriding
 :attr:`~django.forms.Field.bound_field_class` or override
-:meth:`.Field.get_bound_field()` if you need more flexibility when creating
+:meth:`.Field.get_bound_field` if you need more flexibility when creating
 the ``BoundField``:
 
 .. method:: Field.get_bound_field(form, field_name)

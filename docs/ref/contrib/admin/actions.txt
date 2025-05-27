@@ -288,7 +288,7 @@ Making actions available site-wide
 
     Some actions are best if they're made available to *any* object in the admin
     site -- the export action defined above would be a good candidate. You can
-    make an action globally available using :meth:`AdminSite.add_action()`. For
+    make an action globally available using :meth:`AdminSite.add_action`. For
     example::
 
         from django.contrib import admin
@@ -299,7 +299,7 @@ Making actions available site-wide
     action named "export_selected_objects". You can explicitly give the action
     a name -- good if you later want to programmatically :ref:`remove the action
     <disabling-admin-actions>` -- by passing a second argument to
-    :meth:`AdminSite.add_action()`::
+    :meth:`AdminSite.add_action`::
 
         admin.site.add_action(export_selected_objects, "export_selected")
 
@@ -318,7 +318,7 @@ Disabling a site-wide action
 .. method:: AdminSite.disable_action(name)
 
     If you need to disable a :ref:`site-wide action <adminsite-actions>` you can
-    call :meth:`AdminSite.disable_action()`.
+    call :meth:`AdminSite.disable_action`.
 
     For example, you can use this method to remove the built-in "delete selected
     objects" action::

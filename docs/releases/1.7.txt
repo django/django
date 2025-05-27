@@ -109,7 +109,7 @@ Improvements thus far include:
 * The name of applications can be customized in the admin with the
   :attr:`~django.apps.AppConfig.verbose_name` of application configurations.
 
-* The admin automatically calls :func:`~django.contrib.admin.autodiscover()`
+* The admin automatically calls :func:`~django.contrib.admin.autodiscover`
   when Django starts. You can consequently remove this line from your
   URLconf.
 
@@ -233,9 +233,9 @@ You can specify the ``QuerySet`` used to traverse a given relation
 or customize the storage location of prefetch results.
 
 This enables things like filtering prefetched relations, calling
-:meth:`~django.db.models.query.QuerySet.select_related()` from a prefetched
+:meth:`~django.db.models.query.QuerySet.select_related` from a prefetched
 relation, or prefetching the same relation multiple times with different
-querysets. See :meth:`~django.db.models.query.QuerySet.prefetch_related()`
+querysets. See :meth:`~django.db.models.query.QuerySet.prefetch_related`
 for more details.
 
 Admin shortcuts support time zones
@@ -316,7 +316,7 @@ automatically process them. This remains the canonical way of adding errors
 when possible. However the latter was fiddly and error-prone, since the burden
 of handling edge cases fell on the user.
 
-The new :meth:`~django.forms.Form.add_error()` method allows adding errors
+The new :meth:`~django.forms.Form.add_error` method allows adding errors
 to specific form fields from anywhere without having to worry about the details
 such as creating instances of ``django.forms.utils.ErrorList`` or dealing with
 ``Form.cleaned_data``. This new API replaces manipulating ``Form._errors``
@@ -416,8 +416,8 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Any ``**kwargs`` passed to
-  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
-  underlying :meth:`~django.core.mail.send_mail()` call.
+  :meth:`~django.contrib.auth.models.User.email_user` are passed to the
+  underlying :meth:`~django.core.mail.send_mail` call.
 
 * The :func:`~django.contrib.auth.decorators.permission_required` decorator can
   take a list of permissions as well as a single permission.
@@ -847,9 +847,9 @@ Templates
 * The following functions now accept a ``dirs`` parameter which is a list or
   tuple to override ``TEMPLATE_DIRS``:
 
-  * :func:`django.template.loader.get_template()`
-  * :func:`django.template.loader.select_template()`
-  * :func:`django.shortcuts.render()`
+  * :func:`django.template.loader.get_template`
+  * :func:`django.template.loader.select_template`
+  * :func:`django.shortcuts.render`
   * ``django.shortcuts.render_to_response()``
 
 * The :tfilter:`time` filter now accepts timezone-related :ref:`format
@@ -1252,7 +1252,7 @@ has been set to the more regular ``invalid_login`` key.
 ----------------------------------------------
 
 Historically, queries that use
-:meth:`~django.db.models.query.QuerySet.select_for_update()` could be
+:meth:`~django.db.models.query.QuerySet.select_for_update` could be
 executed in autocommit mode, outside of a transaction. Before Django
 1.6, Django's automatic transactions mode allowed this to be used to
 lock records until the next write operation. Django 1.6 introduced
@@ -1296,7 +1296,7 @@ project's needs. You should also check for any code that accesses
 Miscellaneous
 -------------
 
-* The :meth:`django.core.files.uploadhandler.FileUploadHandler.new_file()`
+* The :meth:`django.core.files.uploadhandler.FileUploadHandler.new_file`
   method is now passed an additional ``content_type_extra`` parameter. If you
   have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
   that implements ``new_file()``, be sure it accepts this new parameter.
@@ -1344,7 +1344,7 @@ Miscellaneous
   #) Use :djadmin:`loaddata` to import the fixtures you exported in (1).
 
 * ``django.contrib.auth.models.AbstractUser`` no longer defines a
-  :meth:`~django.db.models.Model.get_absolute_url()` method. The old definition
+  :meth:`~django.db.models.Model.get_absolute_url` method. The old definition
   returned  ``"/users/%s/" % urlquote(self.username)`` which was arbitrary
   since applications may or may not define such a url in ``urlpatterns``.
   Define a ``get_absolute_url()`` method on your own custom user object or use

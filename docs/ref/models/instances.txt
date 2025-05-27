@@ -23,7 +23,7 @@ class:
 
 The keyword arguments are the names of the fields you've defined on your model.
 Note that instantiating a model in no way touches your database; for that, you
-need to :meth:`~Model.save()`.
+need to :meth:`~Model.save`.
 
 .. note::
 
@@ -226,27 +226,27 @@ Validating objects
 
 There are four steps involved in validating a model:
 
-1. Validate the model fields - :meth:`Model.clean_fields()`
-2. Validate the model as a whole - :meth:`Model.clean()`
-3. Validate the field uniqueness - :meth:`Model.validate_unique()`
+1. Validate the model fields - :meth:`Model.clean_fields`
+2. Validate the model as a whole - :meth:`Model.clean`
+3. Validate the field uniqueness - :meth:`Model.validate_unique`
 4. Validate the constraints - :meth:`Model.validate_constraints`
 
 All four steps are performed when you call a model's :meth:`~Model.full_clean`
 method.
 
 When you use a :class:`~django.forms.ModelForm`, the call to
-:meth:`~django.forms.Form.is_valid()` will perform these validation steps for
+:meth:`~django.forms.Form.is_valid` will perform these validation steps for
 all the fields that are included on the form. See the :doc:`ModelForm
 documentation </topics/forms/modelforms>` for more information. You should only
-need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
+need to call a model's :meth:`~Model.full_clean` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
 :class:`~django.forms.ModelForm` that require validation.
 
 .. method:: Model.full_clean(exclude=None, validate_unique=True, validate_constraints=True)
 
-This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`,
-:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``),  and
-:meth:`Model.validate_constraints()` (if ``validate_constraints`` is ``True``)
+This method calls :meth:`Model.clean_fields`, :meth:`Model.clean`,
+:meth:`Model.validate_unique` (if ``validate_unique`` is ``True``),  and
+:meth:`Model.validate_constraints` (if ``validate_constraints`` is ``True``)
 in that order and raises a :exc:`~django.core.exceptions.ValidationError` that
 has a ``message_dict`` attribute containing errors from all four stages.
 
@@ -257,7 +257,7 @@ aren't present on your form from being validated since any errors raised could
 not be corrected by the user.
 
 Note that ``full_clean()`` will *not* be called automatically when you call
-your model's :meth:`~Model.save()` method. You'll need to call it manually
+your model's :meth:`~Model.save` method. You'll need to call it manually
 when you want to run one-step model validation for your own manually created
 models. For example::
 
@@ -279,7 +279,7 @@ argument lets you provide a ``set`` of field names to exclude from validation.
 It will raise a :exc:`~django.core.exceptions.ValidationError` if any fields
 fail validation.
 
-The second step ``full_clean()`` performs is to call :meth:`Model.clean()`.
+The second step ``full_clean()`` performs is to call :meth:`Model.clean`.
 This method should be overridden to perform custom validation on your model.
 
 .. method:: Model.clean()
@@ -306,8 +306,8 @@ access to more than a single field::
             if self.status == "published" and self.pub_date is None:
                 self.pub_date = datetime.date.today()
 
-Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
-method is not invoked when you call your model's :meth:`~Model.save()` method.
+Note, however, that like :meth:`Model.full_clean`, a model's ``clean()``
+method is not invoked when you call your model's :meth:`~Model.save` method.
 
 In the above example, the :exc:`~django.core.exceptions.ValidationError`
 exception raised by ``Model.clean()`` was instantiated with a string, so it
@@ -582,10 +582,10 @@ Forcing an INSERT or UPDATE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In some rare circumstances, it's necessary to be able to force the
-:meth:`~Model.save()` method to perform an SQL ``INSERT`` and not fall back to
+:meth:`~Model.save` method to perform an SQL ``INSERT`` and not fall back to
 doing an ``UPDATE``. Or vice-versa: update, if possible, but not insert a new
 row. In these cases you can pass the ``force_insert=True`` or
-``force_update=True`` parameters to the :meth:`~Model.save()` method.
+``force_update=True`` parameters to the :meth:`~Model.save` method.
 Passing both parameters is an error: you cannot both insert *and* update at the
 same time!
 
@@ -672,8 +672,8 @@ perform an update on all fields.
 Specifying ``update_fields`` will force an update.
 
 When saving a model fetched through deferred model loading
-(:meth:`~django.db.models.query.QuerySet.only()` or
-:meth:`~django.db.models.query.QuerySet.defer()`) only the fields loaded
+(:meth:`~django.db.models.query.QuerySet.only` or
+:meth:`~django.db.models.query.QuerySet.defer`) only the fields loaded
 from the DB will get updated. In effect there is an automatic
 ``update_fields`` in this case. If you assign or change any deferred field
 value, the field will be added to the updated fields.
@@ -894,7 +894,7 @@ track down every place that the URL might be created. Specify it once, in
 Extra instance methods
 ======================
 
-In addition to :meth:`~Model.save()`, :meth:`~Model.delete()`, a model object
+In addition to :meth:`~Model.save`, :meth:`~Model.delete`, a model object
 might have some of the following methods:
 
 .. method:: Model.get_FOO_display()

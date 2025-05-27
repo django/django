@@ -157,7 +157,7 @@ instances.
 Use this method anytime you need to identify an error by its ``code``. This
 enables things like rewriting the error's message or writing custom logic in a
 view when a given error is present. It can also be used to serialize the errors
-in a custom format (e.g. XML); for instance, :meth:`~Form.errors.as_json()`
+in a custom format (e.g. XML); for instance, :meth:`~Form.errors.as_json`
 relies on ``as_data()``.
 
 The need for the ``as_data()`` method is due to backwards compatibility.
@@ -193,11 +193,11 @@ directly in HTML.
 .. method:: Form.errors.get_json_data(escape_html=False)
 
 Returns the errors as a dictionary suitable for serializing to JSON.
-:meth:`Form.errors.as_json()` returns serialized JSON, while this returns the
+:meth:`Form.errors.as_json` returns serialized JSON, while this returns the
 error data before it's serialized.
 
 The ``escape_html`` parameter behaves as described in
-:meth:`Form.errors.as_json()`.
+:meth:`Form.errors.as_json`.
 
 .. method:: Form.add_error(field, error)
 
@@ -298,8 +298,8 @@ Returns the initial data for a form field. It retrieves the data from
 Callable values are evaluated.
 
 It is recommended to use :attr:`BoundField.initial` over
-:meth:`~Form.get_initial_for_field()` because ``BoundField.initial`` has a
-simpler interface. Also, unlike :meth:`~Form.get_initial_for_field()`,
+:meth:`~Form.get_initial_for_field` because ``BoundField.initial`` has a
+simpler interface. Also, unlike :meth:`~Form.get_initial_for_field`,
 :attr:`BoundField.initial` caches its values. This is useful especially when
 dealing with callables whose return values can change (e.g. ``datetime.now`` or
 ``uuid.uuid4``):
@@ -1315,7 +1315,7 @@ Attributes of ``BoundField``
         datetime.datetime(2021, 7, 27, 9, 5, 54)
 
     Using :attr:`BoundField.initial` is recommended over
-    :meth:`~Form.get_initial_for_field()`.
+    :meth:`~Form.get_initial_for_field`.
 
 .. attribute:: BoundField.is_hidden
 
@@ -1517,7 +1517,7 @@ If not defined as a class variable, ``bound_field_class`` can be set via the
 constructor.
 
 For compatibility reasons, a custom form field can still override
-:meth:`.Field.get_bound_field()` to use a custom class, though any of the
+:meth:`.Field.get_bound_field` to use a custom class, though any of the
 previous options are preferred.
 
 You may want to use a custom :class:`.BoundField` if you need to access some

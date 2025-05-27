@@ -166,12 +166,12 @@ To access the new value saved this way, the object must be reloaded::
 As well as being used in operations on single instances as above, ``F()`` can
 be used with ``update()`` to perform bulk updates on a ``QuerySet``. This
 reduces the two queries we were using above - the ``get()`` and the
-:meth:`~Model.save()` - to just one::
+:meth:`~Model.save` - to just one::
 
     reporter = Reporters.objects.filter(name="Tintin")
     reporter.update(stories_filed=F("stories_filed") + 1)
 
-We can also use :meth:`~django.db.models.query.QuerySet.update()` to increment
+We can also use :meth:`~django.db.models.query.QuerySet.update` to increment
 the field value on multiple objects - which could be very much faster than
 pulling them all into Python from the database, looping over them, incrementing
 the field value of each one, and saving each one back to the database::
@@ -218,14 +218,14 @@ based on the original value; the work of the first thread will be lost.
 
 If the database is responsible for updating the field, the process is more
 robust: it will only ever update the field based on the value of the field in
-the database when the :meth:`~Model.save()` or ``update()`` is executed, rather
+the database when the :meth:`~Model.save` or ``update()`` is executed, rather
 than based on its value when the instance was retrieved.
 
 ``F()`` assignments persist after ``Model.save()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``F()`` objects assigned to model fields persist after saving the model
-instance and will be applied on each :meth:`~Model.save()`. For example::
+instance and will be applied on each :meth:`~Model.save`. For example::
 
     reporter = Reporters.objects.get(name="Tintin")
     reporter.stories_filed = F("stories_filed") + 1
@@ -237,7 +237,7 @@ instance and will be applied on each :meth:`~Model.save()`. For example::
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
 the final value will be ``3``. This persistence can be avoided by reloading the
 model object after saving it, for example, by using
-:meth:`~Model.refresh_from_db()`.
+:meth:`~Model.refresh_from_db`.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1199,7 +1199,7 @@ calling the appropriate methods on the wrapped expression.
         implementing ``NULLS LAST`` would change its value to be
         ``NULLS FIRST``. Modifications are only required for expressions that
         implement sort order like ``OrderBy``. This method is called when
-        :meth:`~django.db.models.query.QuerySet.reverse()` is called on a
+        :meth:`~django.db.models.query.QuerySet.reverse` is called on a
         queryset.
 
 .. _writing-your-own-query-expressions:

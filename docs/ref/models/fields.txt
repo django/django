@@ -292,7 +292,7 @@ modifications:
 
     These property names cannot be used as member names as they would conflict.
 
-* The use of :func:`enum.unique()` is enforced to ensure that values cannot be
+* The use of :func:`enum.unique` is enforced to ensure that values cannot be
   defined multiple times. This is unlikely to be expected in choices for a
   field.
 
@@ -603,11 +603,11 @@ portion of the field will be considered. Besides, when :setting:`USE_TZ` is
 ``True``, the check will be performed in the :ref:`current time zone
 <default-current-time-zone>` at the time the object gets saved.
 
-This is enforced by :meth:`Model.validate_unique()` during model validation
+This is enforced by :meth:`Model.validate_unique` during model validation
 but not at the database level. If any :attr:`~Field.unique_for_date` constraint
 involves fields that are not part of a :class:`~django.forms.ModelForm` (for
 example, if one of the fields is listed in ``exclude`` or has
-:attr:`editable=False<Field.editable>`), :meth:`Model.validate_unique()` will
+:attr:`editable=False<Field.editable>`), :meth:`Model.validate_unique` will
 skip validation for that particular constraint.
 
 ``unique_for_month``
@@ -1316,8 +1316,8 @@ materialized view.
 .. admonition:: Refresh the data
 
     Since the database computes the value, the object must be reloaded to
-    access the new value after :meth:`~Model.save()`, for example, by using
-    :meth:`~Model.refresh_from_db()`.
+    access the new value after :meth:`~Model.save`, for example, by using
+    :meth:`~Model.refresh_from_db`.
 
 .. admonition:: Database limitations
 
@@ -1796,7 +1796,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 * .. function:: SET()
 
     Set the :class:`ForeignKey` to the value passed to
-    :func:`~django.db.models.SET()`, or if a callable is passed in,
+    :func:`~django.db.models.SET`, or if a callable is passed in,
     the result of calling it. In most cases, passing a callable will be
     necessary to avoid executing queries at the time your ``models.py`` is
     imported::

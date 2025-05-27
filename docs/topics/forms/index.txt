@@ -248,7 +248,7 @@ user from entering more than that number of characters in the first place). It
 also means that when Django receives the form back from the browser, it will
 validate the length of the data.
 
-A :class:`Form` instance has an :meth:`~Form.is_valid()` method, which runs
+A :class:`Form` instance has an :meth:`~Form.is_valid` method, which runs
 validation routines for all its fields. When this method is called, if all
 fields contain valid data, it will:
 

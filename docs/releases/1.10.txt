@@ -445,8 +445,8 @@ Requests and Responses
 * Added ``request.user`` to the debug view.
 
 * Added :class:`~django.http.HttpResponse` methods
-  :meth:`~django.http.HttpResponse.readable()` and
-  :meth:`~django.http.HttpResponse.seekable()` to make an instance a
+  :meth:`~django.http.HttpResponse.readable` and
+  :meth:`~django.http.HttpResponse.seekable` to make an instance a
   stream-like object and allow wrapping it with :py:class:`io.TextIOWrapper`.
 
 * Added the :attr:`HttpRequest.content_type
@@ -498,7 +498,7 @@ Tests
 URLs
 ~~~~
 
-* An addition in :func:`django.setup()` allows URL resolving that happens
+* An addition in :func:`django.setup` allows URL resolving that happens
   outside of the request/response cycle (e.g. in management commands and
   standalone scripts) to take :setting:`FORCE_SCRIPT_NAME` into account when it
   is set.
@@ -839,9 +839,9 @@ Miscellaneous
   in :setting:`AUTHENTICATION_BACKENDS` instead.
 
 * In light of the previous change, the test client's
-  :meth:`~django.test.Client.login()` method no longer always rejects inactive
+  :meth:`~django.test.Client.login` method no longer always rejects inactive
   users but instead delegates this decision to the authentication backend.
-  :meth:`~django.test.Client.force_login()` also delegates the decision to the
+  :meth:`~django.test.Client.force_login` also delegates the decision to the
   authentication backend, so if you're using the default backends, you need to
   use an active user.
 
@@ -1317,7 +1317,7 @@ to remove usage of these features.
   :func:`~django.template.loader.get_template` and
   :func:`~django.template.loader.select_template` no longer accept a
   :class:`~django.template.Context` in their
-  :meth:`~django.template.backends.base.Template.render()` method.
+  :meth:`~django.template.backends.base.Template.render` method.
 
 * :doc:`Template response APIs </ref/template-response>` enforce the use of
   :class:`dict` and backend-dependent template objects instead of
