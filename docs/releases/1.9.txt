@@ -207,7 +207,7 @@ Minor features
   Django 1.9).
 
 * The permission argument of
-  :func:`~django.contrib.auth.decorators.permission_required()` accepts all
+  :func:`~django.contrib.auth.decorators.permission_required` accepts all
   kinds of iterables, not only list and tuples.
 
 * The new :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
@@ -364,7 +364,7 @@ Forms
   allowing the field widget to be displayed disabled by browsers.
 
 * It's now possible to customize bound fields by overriding a field's
-  :meth:`~django.forms.Field.get_bound_field()` method.
+  :meth:`~django.forms.Field.get_bound_field` method.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -642,10 +642,10 @@ Tests
 * Added the :meth:`json() <django.test.Response.json>` method to test client
   responses to give access to the response body as JSON.
 
-* Added the :meth:`~django.test.Client.force_login()` method to the test
+* Added the :meth:`~django.test.Client.force_login` method to the test
   client. Use this method to simulate the effect of a user logging into the
   site while skipping the authentication and verification steps of
-  :meth:`~django.test.Client.login()`.
+  :meth:`~django.test.Client.login`.
 
 URLs
 ~~~~

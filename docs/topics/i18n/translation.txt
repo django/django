@@ -180,7 +180,7 @@ more details.
 Marking strings as no-op
 ------------------------
 
-Use the function :func:`django.utils.translation.gettext_noop()` to mark a
+Use the function :func:`django.utils.translation.gettext_noop` to mark a
 string as a translation string without translating it. The string is later
 translated from a variable.
 
@@ -192,7 +192,7 @@ such as when the string is presented to the user.
 Pluralization
 -------------
 
-Use the function :func:`django.utils.translation.ngettext()` to specify
+Use the function :func:`django.utils.translation.ngettext` to specify
 pluralized messages.
 
 ``ngettext()`` takes three arguments: the singular translation string, the
@@ -290,8 +290,8 @@ Contextual markers
 Sometimes words have several meanings, such as ``"May"`` in English, which
 refers to a month name and to a verb. To enable translators to translate
 these words correctly in different contexts, you can use the
-:func:`django.utils.translation.pgettext()` function, or the
-:func:`django.utils.translation.npgettext()` function if the string needs
+:func:`django.utils.translation.pgettext` function, or the
+:func:`django.utils.translation.npgettext` function if the string needs
 pluralization. Both take a context string as the first variable.
 
 In the resulting ``.po`` file, the string will then appear as often as there are
@@ -502,10 +502,10 @@ directly with the ``number`` argument::
 Formatting strings: ``format_lazy()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Python's :meth:`str.format()` method will not work when either the
-``format_string`` or any of the arguments to :meth:`str.format()`
+Python's :meth:`str.format` method will not work when either the
+``format_string`` or any of the arguments to :meth:`str.format`
 contains lazy translation objects. Instead, you can use
-:func:`django.utils.text.format_lazy()`, which creates a lazy object
+:func:`django.utils.text.format_lazy`, which creates a lazy object
 that runs the ``str.format()`` method only when the result is included
 in a string. For example::
 
@@ -1224,7 +1224,7 @@ in the future.
 ~~~~~~~~~~~~
 
 The ``pgettext`` function behaves like the Python variant
-(:func:`~django.utils.translation.pgettext()`), providing a contextually
+(:func:`~django.utils.translation.pgettext`), providing a contextually
 translated word::
 
     document.write(pgettext("month name", "May"))
@@ -1233,7 +1233,7 @@ translated word::
 ~~~~~~~~~~~~~
 
 The ``npgettext`` function also behaves like the Python variant
-(:func:`~django.utils.translation.npgettext()`), providing a **pluralized**
+(:func:`~django.utils.translation.npgettext`), providing a **pluralized**
 contextually translated word:
 
 .. code-block:: javascript
@@ -1365,7 +1365,7 @@ Django provides two mechanisms to internationalize URL patterns:
   the language to activate from the requested URL.
 
 * Making URL patterns themselves translatable via the
-  :func:`django.utils.translation.gettext_lazy()` function.
+  :func:`django.utils.translation.gettext_lazy` function.
 
 .. warning::
 
@@ -1931,7 +1931,7 @@ Explicitly setting the active language
 
 You may want to set the active language for the current session explicitly. Perhaps
 a user's language preference is retrieved from another system, for example.
-You've already been introduced to :func:`django.utils.translation.activate()`. That
+You've already been introduced to :func:`django.utils.translation.activate`. That
 applies to the current thread only. To persist the language for the entire
 session in a cookie, set the :setting:`LANGUAGE_COOKIE_NAME` cookie on the
 response::
@@ -1945,7 +1945,7 @@ response::
     response = HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
 
-You would typically want to use both: :func:`django.utils.translation.activate()`
+You would typically want to use both: :func:`django.utils.translation.activate`
 changes the language for this thread, and setting the cookie makes this
 preference persist in future requests.
 
@@ -1979,14 +1979,14 @@ Calling this function with the value ``'de'`` will give you ``"Willkommen"``,
 regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
 
 Functions of particular interest are
-:func:`django.utils.translation.get_language()` which returns the language used
-in the current thread, :func:`django.utils.translation.activate()` which
+:func:`django.utils.translation.get_language` which returns the language used
+in the current thread, :func:`django.utils.translation.activate` which
 activates a translation catalog for the current thread, and
-:func:`django.utils.translation.check_for_language()`
+:func:`django.utils.translation.check_for_language`
 which checks if the given language is supported by Django.
 
 To help write more concise code, there is also a context manager
-:func:`django.utils.translation.override()` that stores the current language on
+:func:`django.utils.translation.override` that stores the current language on
 enter and restores it on exit. With it, the above example becomes::
 
     from django.utils import translation

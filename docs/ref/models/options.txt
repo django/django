@@ -382,7 +382,7 @@ not be looking at your Django code. For example::
 .. attribute:: Options.select_on_save
 
     Determines if Django will use the pre-1.6
-    :meth:`django.db.models.Model.save()` algorithm. The old algorithm
+    :meth:`django.db.models.Model.save` algorithm. The old algorithm
     uses ``SELECT`` to determine if there is an existing row to be updated.
     The new algorithm tries an ``UPDATE`` directly. In some rare cases the
     ``UPDATE`` of an existing row isn't visible to Django. An example is the
@@ -393,7 +393,7 @@ not be looking at your Django code. For example::
     Usually there is no need to set this attribute. The default is
     ``False``.
 
-    See :meth:`django.db.models.Model.save()` for more about the old and
+    See :meth:`django.db.models.Model.save` for more about the old and
     new saving algorithm.
 
 ``indexes``

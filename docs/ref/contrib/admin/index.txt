@@ -154,12 +154,12 @@ application and imports it.
 .. class:: apps.AdminConfig
 
     This is the default :class:`~django.apps.AppConfig` class for the admin.
-    It calls :func:`~django.contrib.admin.autodiscover()` when Django starts.
+    It calls :func:`~django.contrib.admin.autodiscover` when Django starts.
 
 .. class:: apps.SimpleAdminConfig
 
     This class works like :class:`~django.contrib.admin.apps.AdminConfig`,
-    except it doesn't call :func:`~django.contrib.admin.autodiscover()`.
+    except it doesn't call :func:`~django.contrib.admin.autodiscover`.
 
     .. attribute:: default_site
 
@@ -3119,7 +3119,7 @@ Hooking ``AdminSite`` instances into your URLconf
 The last step in setting up the Django admin is to hook your ``AdminSite``
 instance into your URLconf. Do this by pointing a given URL at the
 ``AdminSite.urls`` method. It is not necessary to use
-:func:`~django.urls.include()`.
+:func:`~django.urls.include`.
 
 In this example, we register the default ``AdminSite`` instance
 ``django.contrib.admin.site`` at the URL ``/admin/`` ::
@@ -3245,10 +3245,10 @@ Adding views to admin sites
 ---------------------------
 
 Just like :class:`ModelAdmin`, :class:`AdminSite` provides a
-:meth:`~django.contrib.admin.ModelAdmin.get_urls()` method
+:meth:`~django.contrib.admin.ModelAdmin.get_urls` method
 that can be overridden to define additional views for the site. To add
 a new view to your admin site, extend the base
-:meth:`~django.contrib.admin.ModelAdmin.get_urls()` method to include
+:meth:`~django.contrib.admin.ModelAdmin.get_urls` method to include
 a pattern for your new view.
 
 .. note::

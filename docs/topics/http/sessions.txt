@@ -253,7 +253,7 @@ You can edit it multiple times.
       Deletes the current session data from the session and deletes the session
       cookie. This is used if you want to ensure that the previous session data
       can't be accessed again from the user's browser (for example, the
-      :func:`django.contrib.auth.logout()` function calls it).
+      :func:`django.contrib.auth.logout` function calls it).
 
     .. method:: set_test_cookie()
     .. method:: aset_test_cookie()
@@ -380,7 +380,7 @@ You can edit it multiple times.
       *Asynchronous version*: ``acycle_key()``
 
       Creates a new session key while retaining the current session data.
-      :func:`django.contrib.auth.login()` calls this method to mitigate against
+      :func:`django.contrib.auth.login` calls this method to mitigate against
       session fixation.
 
 .. _session_serialization:
@@ -519,7 +519,7 @@ is necessary due to the way cookies work. When you set a cookie, you can't
 actually tell whether a browser accepted it until the browser's next request.
 
 It's good practice to use
-:meth:`~backends.base.SessionBase.delete_test_cookie()` to clean up after
+:meth:`~backends.base.SessionBase.delete_test_cookie` to clean up after
 yourself. Do this after you've verified that the test cookie worked.
 
 Here's a typical usage example::
@@ -589,7 +589,7 @@ access sessions using the normal Django database API:
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
 Note that you'll need to call
-:meth:`~base_session.AbstractBaseSession.get_decoded()` to get the session
+:meth:`~base_session.AbstractBaseSession.get_decoded` to get the session
 dictionary. This is necessary because the dictionary is stored in an encoded
 format:
 

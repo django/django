@@ -280,7 +280,7 @@ ORM to fetch some data -- there's one more step you'll need in addition to
 configuring settings.
 
 After you've either set :envvar:`DJANGO_SETTINGS_MODULE` or called
-``configure()``, you'll need to call :func:`django.setup()` to load your
+``configure()``, you'll need to call :func:`django.setup` to load your
 settings and populate Django's application registry. For example::
 
     import django

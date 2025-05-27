@@ -237,17 +237,17 @@ There are two main steps involved in validating a ``ModelForm``:
 2. :ref:`Validating the model instance <validating-objects>`
 
 Just like normal form validation, model form validation is triggered implicitly
-when calling :meth:`~django.forms.Form.is_valid()` or accessing the
+when calling :meth:`~django.forms.Form.is_valid` or accessing the
 :attr:`~django.forms.Form.errors` attribute and explicitly when calling
 ``full_clean()``, although you will typically not use the latter method in
 practice.
 
 ``Model`` validation is triggered from within the form validation step right
 after the form's ``clean()`` method is called. First, the model's
-:meth:`~django.db.models.Model.full_clean()` is called with
+:meth:`~django.db.models.Model.full_clean` is called with
 ``validate_unique=False`` and ``validate_constraints=False``, then the model's
-:meth:`~django.db.models.Model.validate_unique()` and
-:meth:`~django.db.models.Model.validate_constraints()` methods are called in
+:meth:`~django.db.models.Model.validate_unique` and
+:meth:`~django.db.models.Model.validate_constraints` methods are called in
 order.
 
 .. warning::

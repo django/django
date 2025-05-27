@@ -150,7 +150,7 @@ URL from an :rfc:`IRI <3987>` -- very loosely speaking, a :rfc:`URI <3986>`
 that can contain Unicode characters. Use these functions for quoting and
 converting an IRI to a URI:
 
-* The :func:`django.utils.encoding.iri_to_uri()` function, which implements the
+* The :func:`django.utils.encoding.iri_to_uri` function, which implements the
   conversion from IRI to URI as required by :rfc:`3987#section-3.1`.
 
 * The :func:`urllib.parse.quote` and :func:`urllib.parse.quote_plus`
@@ -192,7 +192,7 @@ you can construct your IRI without worrying about whether it contains
 non-ASCII characters and then, right at the end, call ``iri_to_uri()`` on the
 result.
 
-Similarly, Django provides :func:`django.utils.encoding.uri_to_iri()` which
+Similarly, Django provides :func:`django.utils.encoding.uri_to_iri` which
 implements the conversion from URI to IRI as per :rfc:`3987#section-3.2`.
 
 An example to demonstrate:

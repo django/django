@@ -189,7 +189,7 @@ You can prevent a migration from running in a transaction by setting the
         atomic = False
 
 It's also possible to execute parts of the migration inside a transaction using
-:func:`~django.db.transaction.atomic()` or by passing ``atomic=True`` to
+:func:`~django.db.transaction.atomic` or by passing ``atomic=True`` to
 :class:`~django.db.migrations.operations.RunPython`. See
 :ref:`non-atomic-migrations` for more details.
 

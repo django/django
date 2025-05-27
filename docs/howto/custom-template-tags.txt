@@ -509,7 +509,7 @@ Simple block tags
 
 When a section of rendered template needs to be passed into a custom tag,
 Django provides the ``simple_block_tag`` helper function to accomplish this.
-Similar to :meth:`~django.template.Library.simple_tag()`, this function accepts
+Similar to :meth:`~django.template.Library.simple_tag`, this function accepts
 a custom tag function, but with the additional ``content`` argument, which
 contains the rendered content as defined inside the tag. This allows dynamic
 template sections to be easily incorporated into custom tags.

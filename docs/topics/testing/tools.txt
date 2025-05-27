@@ -144,8 +144,8 @@ Use the ``django.test.Client`` class to make requests.
         but the ``headers`` parameter should be preferred for readability.
 
     The values from the ``headers``, ``query_params``, and ``extra`` keyword
-    arguments passed to :meth:`~django.test.Client.get()`,
-    :meth:`~django.test.Client.post()`, etc. have precedence over
+    arguments passed to :meth:`~django.test.Client.get`,
+    :meth:`~django.test.Client.post`, etc. have precedence over
     the defaults passed to the class constructor.
 
     The ``enforce_csrf_checks`` argument can be used to test CSRF
@@ -198,7 +198,7 @@ Use the ``django.test.Client`` class to make requests.
 
         ...will send the HTTP header ``HTTP_ACCEPT`` to the details view, which
         is a good way to test code paths that use the
-        :meth:`django.http.HttpRequest.accepts()` method.
+        :meth:`django.http.HttpRequest.accepts` method.
 
         Arbitrary keyword arguments set WSGI
         :pep:`environ variables <3333#environ-variables>`. For example, headers
@@ -456,7 +456,7 @@ Use the ``django.test.Client`` class to make requests.
         fixture. Remember that if you want your test user to have a password,
         you can't set the user's password by setting the password attribute
         directly -- you must use the
-        :meth:`~django.contrib.auth.models.User.set_password()` function to
+        :meth:`~django.contrib.auth.models.User.set_password` function to
         store a correctly hashed password. Alternatively, you can use the
         :meth:`~django.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
@@ -882,7 +882,7 @@ end of each test. A consequence of this, however, is that some database
 behaviors cannot be tested within a Django ``TestCase`` class. For instance,
 you cannot test that a block of code is executing within a transaction, as is
 required when using
-:meth:`~django.db.models.query.QuerySet.select_for_update()`. In those cases,
+:meth:`~django.db.models.query.QuerySet.select_for_update`. In those cases,
 you should use ``TransactionTestCase``.
 
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner

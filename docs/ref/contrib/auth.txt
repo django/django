@@ -159,7 +159,7 @@ Methods
 
         When the ``raw_password`` is ``None``, the password will be set to an
         unusable password, as if
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+        :meth:`~django.contrib.auth.models.User.set_unusable_password`
         were used.
 
     .. method:: check_password(raw_password)
@@ -176,7 +176,7 @@ Methods
         Marks the user as having no password set by updating the metadata in
         the :attr:`~django.contrib.auth.models.User.password` field. This isn't
         the same as having a blank string for a password.
-        :meth:`~django.contrib.auth.models.User.check_password()` for this user
+        :meth:`~django.contrib.auth.models.User.check_password` for this user
         will never return ``True``. Doesn't save the
         :class:`~django.contrib.auth.models.User` object.
 
@@ -192,7 +192,7 @@ Methods
     .. method:: has_usable_password()
 
         Returns ``False`` if
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
+        :meth:`~django.contrib.auth.models.User.set_unusable_password` has
         been called for this user.
 
     .. method:: get_user_permissions(obj=None)
@@ -293,7 +293,7 @@ Methods
 
         Sends an email to the user. If ``from_email`` is ``None``, Django uses
         the :setting:`DEFAULT_FROM_EMAIL`. Any ``**kwargs`` are passed to the
-        underlying :meth:`~django.core.mail.send_mail()` call.
+        underlying :meth:`~django.core.mail.send_mail` call.
 
 Manager methods
 ---------------
@@ -319,7 +319,7 @@ Manager methods
         :attr:`~django.contrib.auth.models.User.is_active` set to ``True``.
 
         If no password is provided,
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
+        :meth:`~django.contrib.auth.models.User.set_unusable_password` will
         be called.
 
         If no email is provided, :attr:`~django.contrib.auth.models.User.email`
@@ -380,7 +380,7 @@ Manager methods
     * :ref:`id <automatic-primary-key-fields>` is always ``None``.
     * :attr:`~django.contrib.auth.models.User.username` is always the empty
       string.
-    * :meth:`~django.contrib.auth.models.User.get_username()` always returns
+    * :meth:`~django.contrib.auth.models.User.get_username` always returns
       the empty string.
     * :attr:`~django.contrib.auth.models.User.is_anonymous` is ``True``
       instead of ``False``.
@@ -393,10 +393,10 @@ Manager methods
     * :attr:`~django.contrib.auth.models.User.groups` and
       :attr:`~django.contrib.auth.models.User.user_permissions` are always
       empty.
-    * :meth:`~django.contrib.auth.models.User.set_password()`,
-      :meth:`~django.contrib.auth.models.User.check_password()`,
+    * :meth:`~django.contrib.auth.models.User.set_password`,
+      :meth:`~django.contrib.auth.models.User.check_password`,
       :meth:`~django.db.models.Model.save` and
-      :meth:`~django.db.models.Model.delete()` raise :exc:`NotImplementedError`.
+      :meth:`~django.db.models.Model.delete` raise :exc:`NotImplementedError`.
 
 In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
@@ -524,7 +524,7 @@ can be used for notification when a user logs in or out.
 
     ``credentials``
         A dictionary of keyword arguments containing the user credentials that were
-        passed to :func:`~django.contrib.auth.authenticate()` or your own custom
+        passed to :func:`~django.contrib.auth.authenticate` or your own custom
         authentication backend. Credentials matching a set of 'sensitive' patterns,
         (including password) will not be sent in the clear as part of the signal.
 

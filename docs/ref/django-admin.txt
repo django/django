@@ -1051,12 +1051,12 @@ together:
 .. django-admin-option:: --managers
 
 Mails the email addresses specified in :setting:`MANAGERS` using
-:meth:`~django.core.mail.mail_managers()`.
+:meth:`~django.core.mail.mail_managers`.
 
 .. django-admin-option:: --admins
 
 Mails the email addresses specified in :setting:`ADMINS` using
-:meth:`~django.core.mail.mail_admins()`.
+:meth:`~django.core.mail.mail_admins`.
 
 ``shell``
 ---------
@@ -1524,7 +1524,7 @@ Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
 
 Using ``--parallel`` without a value, or with the value ``auto``, runs one test
-process per core according to :func:`multiprocessing.cpu_count()`. You can
+process per core according to :func:`multiprocessing.cpu_count`. You can
 override this by passing the desired number of processes, e.g.
 ``--parallel 4``, or by setting the :envvar:`DJANGO_TEST_PROCESSES` environment
 variable.
@@ -1597,7 +1597,7 @@ as :option:`unittest's --buffer option<unittest.-b>`.
 
 .. django-admin-option:: --no-faulthandler
 
-Django automatically calls :func:`faulthandler.enable()` when starting the
+Django automatically calls :func:`faulthandler.enable` when starting the
 tests, which allows it to print a traceback if the interpreter crashes. Pass
 ``--no-faulthandler`` to disable this behavior.
 

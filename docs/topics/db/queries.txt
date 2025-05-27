@@ -83,7 +83,7 @@ The :meth:`~django.db.models.Model.save` method has no return value.
     :meth:`~django.db.models.Model.save` for complete details.
 
     To create and save an object in a single step, use the
-    :meth:`~django.db.models.query.QuerySet.create()` method.
+    :meth:`~django.db.models.query.QuerySet.create` method.
 
 Saving changes to objects
 =========================

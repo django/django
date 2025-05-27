@@ -225,7 +225,7 @@ application.
 .. attribute:: HttpRequest.current_app
 
     The :ttag:`url` template tag will use its value as the ``current_app``
-    argument to :func:`~django.urls.reverse()`.
+    argument to :func:`~django.urls.reverse`.
 
 .. attribute:: HttpRequest.urlconf
 
@@ -264,7 +264,7 @@ middleware class is listed in :setting:`MIDDLEWARE`.
     From the :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`:
     An instance of :class:`~django.contrib.sites.models.Site` or
     :class:`~django.contrib.sites.requests.RequestSite` as returned by
-    :func:`~django.contrib.sites.shortcuts.get_current_site()`
+    :func:`~django.contrib.sites.shortcuts.get_current_site`
     representing the current site.
 
 .. attribute:: HttpRequest.user
@@ -310,7 +310,7 @@ Methods
     :setting:`ALLOWED_HOSTS` or the domain name is invalid according to
     :rfc:`1034`/:rfc:`1035 <1035>`.
 
-    .. note:: The :meth:`~HttpRequest.get_host()` method fails when the host is
+    .. note:: The :meth:`~HttpRequest.get_host` method fails when the host is
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
@@ -337,7 +337,7 @@ Methods
                     return self.get_response(request)
 
         This middleware should be positioned before any other middleware that
-        relies on the value of :meth:`~HttpRequest.get_host()` -- for instance,
+        relies on the value of :meth:`~HttpRequest.get_host` -- for instance,
         :class:`~django.middleware.common.CommonMiddleware` or
         :class:`~django.middleware.csrf.CsrfViewMiddleware`.
 
@@ -381,7 +381,7 @@ Methods
     .. note::
 
         Mixing HTTP and HTTPS on the same site is discouraged, therefore
-        :meth:`~HttpRequest.build_absolute_uri()` will always generate an
+        :meth:`~HttpRequest.build_absolute_uri` will always generate an
         absolute URI with the same scheme the current request has. If you need
         to redirect users to HTTPS, it's best to let your web server redirect
         all HTTP traffic to HTTPS.
@@ -692,7 +692,7 @@ In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.lists()
 
-    Like :meth:`items()`, except it includes all values, as a list, for each
+    Like :meth:`items`, except it includes all values, as a list, for each
     member of the dictionary. For example:
 
     .. code-block:: pycon
@@ -1040,7 +1040,7 @@ Methods
 
 .. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
 
-    Like :meth:`~HttpResponse.set_cookie()`, but
+    Like :meth:`~HttpResponse.set_cookie`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
     it. Use in conjunction with :meth:`HttpRequest.get_signed_cookie`.
     You can use the optional ``salt`` argument for added key strength, but

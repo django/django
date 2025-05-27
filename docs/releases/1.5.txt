@@ -219,8 +219,8 @@ GeoDjango
 
 * :class:`~django.contrib.gis.geos.LineString` and
   :class:`~django.contrib.gis.geos.MultiLineString` GEOS objects now support the
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.interpolate()` and
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
+  :meth:`~django.contrib.gis.geos.GEOSGeometry.interpolate` and
+  :meth:`~django.contrib.gis.geos.GEOSGeometry.project` methods
   (so-called linear referencing).
 
 * The ``wkb`` and ``hex`` properties of
@@ -365,7 +365,7 @@ Backwards incompatible changes in 1.5
 The new :setting:`ALLOWED_HOSTS` setting validates the request's ``Host``
 header and protects against host-poisoning attacks. This setting is now
 required whenever :setting:`DEBUG` is ``False``, or else
-:meth:`django.http.HttpRequest.get_host()` will raise
+:meth:`django.http.HttpRequest.get_host` will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`. For more details see the
 :setting:`full documentation<ALLOWED_HOSTS>` for the new setting.
 
@@ -624,7 +624,7 @@ fragile, and must now be changed to be able to run independently.
 The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
 after form validation. When the form doesn't validate, it contains only the
 fields that passed validation. You should test the success of the validation
-with the :meth:`~django.forms.Form.is_valid()` method and not with the
+with the :meth:`~django.forms.Form.is_valid` method and not with the
 presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
 on the form.
 

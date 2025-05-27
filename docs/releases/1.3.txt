@@ -292,8 +292,8 @@ requests. These include:
 
 * Support for HttpOnly_ cookies.
 
-* :meth:`~django.core.mail.mail_admins()` and
-  :meth:`~django.core.mail.mail_managers()` now support easily attaching
+* :meth:`~django.core.mail.mail_admins` and
+  :meth:`~django.core.mail.mail_managers` now support easily attaching
   HTML content to messages.
 
 * :class:`~django.core.mail.EmailMessage` now supports CC's.
@@ -305,7 +305,7 @@ requests. These include:
   ``takes_context`` argument, making it easier to write simple
   template tags that require access to template context.
 
-* A new :meth:`~django.shortcuts.render()` shortcut -- an alternative
+* A new :meth:`~django.shortcuts.render` shortcut -- an alternative
   to ``django.shortcuts.render_to_response()`` providing a
   :class:`~django.template.RequestContext` by default.
 

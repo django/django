@@ -46,7 +46,7 @@ Specifying authentication backends
 
 Behind the scenes, Django maintains a list of "authentication backends" that it
 checks for authentication. When somebody calls
-:func:`django.contrib.auth.authenticate()` -- as described in :ref:`How to log
+:func:`django.contrib.auth.authenticate` -- as described in :ref:`How to log
 a user in <how-to-log-a-user-in>` -- Django tries authenticating across
 all of its authentication backends. If the first authentication method fails,
 Django tries the second one, and so on, until all backends have been attempted.
@@ -187,12 +187,12 @@ Handling authorization in custom backends
 Custom auth backends can provide their own permissions.
 
 The user model and its manager will delegate permission lookup functions
-(:meth:`~django.contrib.auth.models.User.get_user_permissions()`,
-:meth:`~django.contrib.auth.models.User.get_group_permissions()`,
-:meth:`~django.contrib.auth.models.User.get_all_permissions()`,
-:meth:`~django.contrib.auth.models.User.has_perm()`,
-:meth:`~django.contrib.auth.models.User.has_module_perms()`, and
-:meth:`~django.contrib.auth.models.UserManager.with_perm()`) to any
+(:meth:`~django.contrib.auth.models.User.get_user_permissions`,
+:meth:`~django.contrib.auth.models.User.get_group_permissions`,
+:meth:`~django.contrib.auth.models.User.get_all_permissions`,
+:meth:`~django.contrib.auth.models.User.has_perm`,
+:meth:`~django.contrib.auth.models.User.has_module_perms`, and
+:meth:`~django.contrib.auth.models.UserManager.with_perm`) to any
 authentication backend that implements these functions.
 
 The permissions given to the user will be the superset of all permissions
@@ -200,8 +200,8 @@ returned by all backends. That is, Django grants a permission to a user that
 any one backend grants.
 
 If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
-exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
-:meth:`~django.contrib.auth.models.User.has_module_perms()`, the authorization
+exception in :meth:`~django.contrib.auth.models.User.has_perm` or
+:meth:`~django.contrib.auth.models.User.has_module_perms`, the authorization
 will immediately fail and Django won't check the backends that follow.
 
 A backend could implement permissions for the magic admin like this::
@@ -694,7 +694,7 @@ The following attributes and methods are available on any subclass of
 
         When the raw_password is ``None``, the password will be set to an
         unusable password, as if
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()`
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password`
         were used.
 
     .. method:: models.AbstractBaseUser.check_password(raw_password)
@@ -710,7 +710,7 @@ The following attributes and methods are available on any subclass of
 
         Marks the user as having no password set.  This isn't the same as
         having a blank string for a password.
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.check_password()` for this user
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.check_password` for this user
         will never return ``True``. Doesn't save the
         :class:`~django.contrib.auth.models.AbstractBaseUser` object.
 
@@ -720,7 +720,7 @@ The following attributes and methods are available on any subclass of
     .. method:: models.AbstractBaseUser.has_usable_password()
 
         Returns ``False`` if
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()` has
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password` has
         been called for this user.
 
     .. method:: models.AbstractBaseUser.get_session_auth_hash()

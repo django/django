@@ -557,8 +557,8 @@ repetition out of the process of creating questions.
 "No polls are available." and verifies the ``latest_question_list`` is empty.
 Note that the :class:`django.test.TestCase` class provides some additional
 assertion methods. In these examples, we use
-:meth:`~django.test.SimpleTestCase.assertContains()` and
-:meth:`~django.test.TransactionTestCase.assertQuerySetEqual()`.
+:meth:`~django.test.SimpleTestCase.assertContains` and
+:meth:`~django.test.TransactionTestCase.assertQuerySetEqual`.
 
 In ``test_past_question``, we create a question and verify that it appears in
 the list.
