@@ -29,7 +29,7 @@ Returns an element for inclusion in ``urlpatterns``. For example::
 ---------
 
 The ``route`` argument should be a string or
-:func:`~django.utils.translation.gettext_lazy()` (see
+:func:`~django.utils.translation.gettext_lazy` (see
 :ref:`translating-urlpatterns`) that contains a URL pattern. The string
 may contain angle brackets (like ``<username>`` above) to capture part of the
 URL and send it as a keyword argument to the view. The angle brackets may
@@ -93,7 +93,7 @@ Returns an element for inclusion in ``urlpatterns``. For example::
     ]
 
 The ``route`` argument should be a string or
-:func:`~django.utils.translation.gettext_lazy()` (see
+:func:`~django.utils.translation.gettext_lazy` (see
 :ref:`translating-urlpatterns`) that contains a regular expression compatible
 with Python's :py:mod:`re` module. Strings typically use raw string syntax
 (``r''``) so that they can contain sequences like ``\d`` without the need to
@@ -107,7 +107,7 @@ When a ``route`` ends with ``$`` the whole requested URL, matching against
 pattern (:py:func:`re.fullmatch` is used).
 
 The ``view``, ``kwargs`` and ``name`` arguments are the same as for
-:func:`~django.urls.path()`.
+:func:`~django.urls.path`.
 
 ``include()``
 =============
@@ -143,7 +143,7 @@ See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 
 .. function:: register_converter(converter, type_name)
 
-The function for registering a converter for use in :func:`~django.urls.path()`
+The function for registering a converter for use in :func:`~django.urls.path`
 ``route``\s.
 
 The ``converter`` argument is a converter class, and ``type_name`` is the

@@ -966,7 +966,7 @@ See :ref:`ref-models-update-fields` for more details.
 
 .. admonition:: Overridden model methods are not called on bulk operations
 
-    Note that the :meth:`~Model.delete()` method for an object is not
+    Note that the :meth:`~Model.delete` method for an object is not
     necessarily called when :ref:`deleting objects in bulk using a
     QuerySet <topics-db-queries-delete>` or as a result of a :attr:`cascading
     delete <django.db.models.ForeignKey.on_delete>`. To ensure customized
@@ -977,7 +977,7 @@ See :ref:`ref-models-update-fields` for more details.
     Unfortunately, there isn't a workaround when
     :meth:`creating<django.db.models.query.QuerySet.bulk_create>` or
     :meth:`updating<django.db.models.query.QuerySet.update>` objects in bulk,
-    since none of :meth:`~Model.save()`,
+    since none of :meth:`~Model.save`,
     :data:`~django.db.models.signals.pre_save`, and
     :data:`~django.db.models.signals.post_save` are called.
 

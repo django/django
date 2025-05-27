@@ -90,7 +90,7 @@ strips when performing host validation.
 
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
-list, the :meth:`django.http.HttpRequest.get_host()` method will raise
+list, the :meth:`django.http.HttpRequest.get_host` method will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`.
 
 When :setting:`DEBUG` is ``True`` and ``ALLOWED_HOSTS`` is empty, the host
@@ -99,7 +99,7 @@ is validated against ``['.localhost', '127.0.0.1', '[::1]']``.
 ``ALLOWED_HOSTS`` is also :ref:`checked when running tests
 <topics-testing-advanced-multiple-hosts>`.
 
-This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+This validation only applies via :meth:`~django.http.HttpRequest.get_host`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
@@ -1684,7 +1684,7 @@ If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
 environment variable in any HTTP request. This setting can be used to override
 the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
 of the preferred value or not supplied at all. It is also used by
-:func:`django.setup()` to set the URL resolver script prefix outside of the
+:func:`django.setup` to set the URL resolver script prefix outside of the
 request/response cycle (e.g. in management commands and standalone scripts) to
 generate correct URLs when ``FORCE_SCRIPT_NAME`` is provided.
 
@@ -2292,7 +2292,7 @@ The secret key is used for:
 * All :doc:`sessions </topics/http/sessions>` if you are using
   any other session backend than ``django.contrib.sessions.backends.cache``,
   or are using the default
-  :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
+  :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`.
 * All :doc:`messages </ref/contrib/messages>` if you are using
   :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
   :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
@@ -2648,7 +2648,7 @@ protocol.
 .. admonition:: Why are my emails sent from a different address?
 
     This address is used only for error messages. It is *not* the address that
-    regular email messages sent with :meth:`~django.core.mail.send_mail()`
+    regular email messages sent with :meth:`~django.core.mail.send_mail`
     come from; for that, see :setting:`DEFAULT_FROM_EMAIL`.
 
 .. setting:: SHORT_DATE_FORMAT

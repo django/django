@@ -1348,7 +1348,7 @@ actually provided the body of the HTTP request. It's been renamed to
 In previous versions, ``Paginator`` objects used in sitemap classes were
 cached, which could result in stale site maps. We've removed the caching, so
 each request to a site map now creates a new Paginator object and calls the
-:attr:`~django.contrib.sitemaps.Sitemap.items()` method of the
+:attr:`~django.contrib.sitemaps.Sitemap.items` method of the
 :class:`~django.contrib.sitemaps.Sitemap` subclass. Depending on what your
 ``items()`` method is doing, this may have a negative performance impact.
 To mitigate the performance impact, consider using the :doc:`caching

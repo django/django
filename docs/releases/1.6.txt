@@ -693,7 +693,7 @@ Notably most database backends did fetch all the rows in one go already in
 1.5.
 
 It is still possible to convert the fetched rows to ``Model`` objects
-lazily by using the :meth:`~django.db.models.query.QuerySet.iterator()`
+lazily by using the :meth:`~django.db.models.query.QuerySet.iterator`
 method.
 
 :meth:`BoundField.label_tag<django.forms.BoundField.label_tag>` now includes the form's :attr:`~django.forms.Form.label_suffix`
@@ -941,10 +941,10 @@ Miscellaneous
 
 * In Django 1.4 and 1.5, a blank string was unintentionally not considered to
   be a valid password. This meant
-  :meth:`~django.contrib.auth.models.User.set_password()` would save a blank
+  :meth:`~django.contrib.auth.models.User.set_password` would save a blank
   password as an unusable password like
-  :meth:`~django.contrib.auth.models.User.set_unusable_password()` does, and
-  thus :meth:`~django.contrib.auth.models.User.check_password()` always
+  :meth:`~django.contrib.auth.models.User.set_unusable_password` does, and
+  thus :meth:`~django.contrib.auth.models.User.check_password` always
   returned ``False`` for blank passwords. This has been corrected in this
   release: blank passwords are now valid.
 

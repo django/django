@@ -282,7 +282,7 @@ plug-and-play URLs. Since polls are in their own URLconf
 "/fun_polls/", or under "/content/polls/", or any other path root, and the
 app will still work.
 
-.. admonition:: When to use :func:`~django.urls.include()`
+.. admonition:: When to use :func:`~django.urls.include`
 
     You should always use ``include()`` when you include other URL patterns.
     The only exception is ``admin.site.urls``, which is a pre-built URLconf

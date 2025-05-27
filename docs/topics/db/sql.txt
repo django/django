@@ -5,7 +5,7 @@ Performing raw SQL queries
 .. currentmodule:: django.db.models
 
 Django gives you two ways of performing raw SQL queries: you can use
-:meth:`Manager.raw()` to `perform raw queries and return model instances`__, or
+:meth:`Manager.raw` to `perform raw queries and return model instances`__, or
 you can avoid the model layer entirely and `execute custom SQL directly`__.
 
 __ `performing raw queries`_
@@ -170,7 +170,7 @@ Fields may also be left out:
     >>> people = Person.objects.raw("SELECT id, first_name FROM myapp_person")
 
 The ``Person`` objects returned by this query will be deferred model instances
-(see :meth:`~django.db.models.query.QuerySet.defer()`). This means that the
+(see :meth:`~django.db.models.query.QuerySet.defer`). This means that the
 fields that are omitted from the query will be loaded on demand. For example:
 
 .. code-block:: pycon

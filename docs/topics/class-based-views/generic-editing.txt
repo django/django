@@ -71,20 +71,20 @@ they can work out which model class to use:
 
 * If the :attr:`~django.views.generic.edit.ModelFormMixin.model` attribute is
   given, that model class will be used.
-* If :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+* If :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
   returns an object, the class of that object will be used.
 * If a :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` is
   given, the model for that queryset will be used.
 
 Model form views provide a
-:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` implementation
+:meth:`~django.views.generic.edit.ModelFormMixin.form_valid` implementation
 that saves the model automatically.  You can override this if you have any
 special requirements; see below for examples.
 
 You don't even need to provide a ``success_url`` for
 :class:`~django.views.generic.edit.CreateView` or
 :class:`~django.views.generic.edit.UpdateView` - they will use
-:meth:`~django.db.models.Model.get_absolute_url()` on the model object if available.
+:meth:`~django.db.models.Model.get_absolute_url` on the model object if available.
 
 If you want to use a custom :class:`~django.forms.ModelForm` (for instance to
 add extra validation), set
@@ -95,7 +95,7 @@ add extra validation), set
     even though the :attr:`~django.views.generic.edit.FormMixin.form_class` may
     be a :class:`~django.forms.ModelForm`.
 
-First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
+First we need to add :meth:`~django.db.models.Model.get_absolute_url` to our
 ``Author`` class:
 
 .. code-block:: python
@@ -208,7 +208,7 @@ the foreign key relation to the model:
 
 In the view, ensure that you don't include ``created_by`` in the list of fields
 to edit, and override
-:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user:
+:meth:`~django.views.generic.edit.ModelFormMixin.form_valid` to add the user:
 
 .. code-block:: python
     :caption: ``views.py``
@@ -228,7 +228,7 @@ to edit, and override
 
 :class:`~django.contrib.auth.mixins.LoginRequiredMixin` prevents users who
 aren't logged in from accessing the form. If you omit that, you'll need to
-handle unauthorized users in :meth:`~.ModelFormMixin.form_valid()`.
+handle unauthorized users in :meth:`~.ModelFormMixin.form_valid`.
 
 .. _content-negotiation-example:
 

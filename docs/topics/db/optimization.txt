@@ -40,9 +40,9 @@ Use standard DB optimization techniques
   :attr:`Meta.indexes <django.db.models.Options.indexes>` or
   :attr:`Field.db_index <django.db.models.Field.db_index>` to add these from
   Django. Consider adding indexes to fields that you frequently query using
-  :meth:`~django.db.models.query.QuerySet.filter()`,
-  :meth:`~django.db.models.query.QuerySet.exclude()`,
-  :meth:`~django.db.models.query.QuerySet.order_by()`, etc. as indexes may help
+  :meth:`~django.db.models.query.QuerySet.filter`,
+  :meth:`~django.db.models.query.QuerySet.exclude`,
+  :meth:`~django.db.models.query.QuerySet.order_by`, etc. as indexes may help
   to speed up lookups. Note that determining the best indexes is a complex
   database-dependent topic that will depend on your particular application.
   The overhead of maintaining an index may outweigh any gains in query speed.
@@ -115,7 +115,7 @@ Use ``iterator()``
 
 When you have a lot of objects, the caching behavior of the ``QuerySet`` can
 cause a large amount of memory to be used. In this case,
-:meth:`~django.db.models.query.QuerySet.iterator()` may help.
+:meth:`~django.db.models.query.QuerySet.iterator` may help.
 
 Use ``explain()``
 -----------------
@@ -227,7 +227,7 @@ Use ``QuerySet.values()`` and ``values_list()``
 
 When you only want a ``dict`` or ``list`` of values, and don't need ORM model
 objects, make appropriate usage of
-:meth:`~django.db.models.query.QuerySet.values()`.
+:meth:`~django.db.models.query.QuerySet.values`.
 These can be useful for replacing model objects in template code - as long as
 the dicts you supply have the same attributes as those used in the template,
 you are fine.
@@ -235,8 +235,8 @@ you are fine.
 Use ``QuerySet.defer()`` and ``only()``
 ---------------------------------------
 
-Use :meth:`~django.db.models.query.QuerySet.defer()` and
-:meth:`~django.db.models.query.QuerySet.only()` if there are database columns
+Use :meth:`~django.db.models.query.QuerySet.defer` and
+:meth:`~django.db.models.query.QuerySet.only` if there are database columns
 you know that you won't need (or won't need in most cases) to avoid loading
 them. Note that if you *do* use them, the ORM will have to go and get them in
 a separate query, making this a pessimization if you use it inappropriately.
@@ -349,7 +349,7 @@ Ordering is not free; each field to order by is an operation the database must
 perform. If a model has a default ordering (:attr:`Meta.ordering
 <django.db.models.Options.ordering>`) and you don't need it, remove
 it on a ``QuerySet`` by calling
-:meth:`~django.db.models.query.QuerySet.order_by()` with no parameters.
+:meth:`~django.db.models.query.QuerySet.order_by` with no parameters.
 
 Adding an index to your database may help to improve ordering performance.
 
@@ -362,7 +362,7 @@ Create in bulk
 --------------
 
 When creating objects, where possible, use the
-:meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
+:meth:`~django.db.models.query.QuerySet.bulk_create` method to reduce the
 number of SQL queries. For example::
 
     Entry.objects.bulk_create(
@@ -385,7 +385,7 @@ Update in bulk
 --------------
 
 When updating objects, where possible, use the
-:meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
+:meth:`~django.db.models.query.QuerySet.bulk_update` method to reduce the
 number of SQL queries. Given a list or queryset of objects::
 
     entries = Entry.objects.bulk_create(
@@ -432,7 +432,7 @@ objects to reduce the number of SQL queries. For example::
 When inserting different pairs of objects into
 :class:`~django.db.models.ManyToManyField` or when the custom
 :attr:`~django.db.models.ManyToManyField.through` table is defined, use
-:meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
+:meth:`~django.db.models.query.QuerySet.bulk_create` method to reduce the
 number of SQL queries. For example::
 
     PizzaToppingRelationship = Pizza.toppings.through

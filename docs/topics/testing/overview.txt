@@ -208,7 +208,7 @@ with ability to share the database between threads.
     your code* anyway - rewrite your code so that it doesn't do this.
 
     This also applies to customized implementations of
-    :meth:`~django.apps.AppConfig.ready()`.
+    :meth:`~django.apps.AppConfig.ready`.
 
 .. seealso::
 

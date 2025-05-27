@@ -220,7 +220,7 @@ The ``ContentTypeManager``
         referenced via a :ref:`natural key<topics-serialization-natural-keys>`
         during deserialization.
 
-The :meth:`~ContentTypeManager.get_for_model()` method is especially
+The :meth:`~ContentTypeManager.get_for_model` method is especially
 useful when you know you need to work with a
 :class:`ContentType <django.contrib.contenttypes.models.ContentType>` but don't
 want to go to the trouble of obtaining the model's metadata to perform a manual

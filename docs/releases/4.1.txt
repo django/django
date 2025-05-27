@@ -145,7 +145,7 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new :meth:`.GEOSGeometry.make_valid()` method allows converting invalid
+* The new :meth:`.GEOSGeometry.make_valid` method allows converting invalid
   geometries to valid ones.
 
 * The new ``clone`` argument for :meth:`.GEOSGeometry.normalize` allows

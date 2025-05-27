@@ -32,7 +32,7 @@ the current statement. This is a complement to
 :class:`django.db.models.functions.Now`, which returns the date and time of the
 current statement.
 
-Note that only the outermost call to :func:`~django.db.transaction.atomic()`
+Note that only the outermost call to :func:`~django.db.transaction.atomic`
 sets up a transaction and thus sets the time that ``TransactionNow()`` will
 return; nested calls create savepoints which do not affect the transaction
 time.

@@ -348,7 +348,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         An optional string containing the MIME type of the stylesheet. If not
         specified, Django will attempt to guess it by using Python's
-        :py:func:`mimetypes.guess_type()`. Use ``mimetype=None`` if you don't
+        :py:func:`mimetypes.guess_type`. Use ``mimetype=None`` if you don't
         want your stylesheet to have a MIME type specified.
 
     .. attribute:: media
@@ -977,10 +977,10 @@ appropriate entities.
 .. function:: override(timezone)
 
     This is a Python context manager that sets the :ref:`current time zone
-    <default-current-time-zone>` on entry with :func:`activate()`, and restores
+    <default-current-time-zone>` on entry with :func:`activate`, and restores
     the previously active time zone on exit. If the ``timezone`` argument is
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
-    on entry with :func:`deactivate()` instead.
+    on entry with :func:`deactivate` instead.
 
     ``override`` is also usable as a function decorator.
 
@@ -1133,8 +1133,8 @@ For a complete discussion on the usage of the following see the
 .. function:: get_language()
 
     Returns the currently selected language code. Returns ``None`` if
-    translations are temporarily deactivated (by :func:`deactivate_all()` or
-    when ``None`` is passed to :func:`override()`).
+    translations are temporarily deactivated (by :func:`deactivate_all` or
+    when ``None`` is passed to :func:`override`).
 
 .. function:: get_language_bidi()
 

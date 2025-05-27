@@ -188,9 +188,9 @@ cache poisoning attacks, and poisoning links in emails.
 Because even seemingly-secure web server configurations are susceptible to fake
 ``Host`` headers, Django validates ``Host`` headers against the
 :setting:`ALLOWED_HOSTS` setting in the
-:meth:`django.http.HttpRequest.get_host()` method.
+:meth:`django.http.HttpRequest.get_host` method.
 
-This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+This validation only applies via :meth:`~django.http.HttpRequest.get_host`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 

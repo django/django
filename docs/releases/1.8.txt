@@ -123,7 +123,7 @@ initialization at the class level using transactions and savepoints. Database
 backends which do not support transactions, like MySQL with the MyISAM storage
 engine, will still be able to run these tests but won't benefit from the
 improvements. Tests are now run within two nested
-:func:`~django.db.transaction.atomic()` blocks: one for the whole class and one
+:func:`~django.db.transaction.atomic` blocks: one for the whole class and one
 for each test.
 
 * The class method
@@ -242,7 +242,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Session cookie is now deleted after
-  :meth:`~django.contrib.sessions.backends.base.SessionBase.flush()` is called.
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.flush` is called.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -327,7 +327,7 @@ Forms
 * Form widgets now render attributes with a value of ``True`` or ``False``
   as HTML5 boolean attributes.
 
-* The new :meth:`~django.forms.Form.has_error()` method allows checking
+* The new :meth:`~django.forms.Form.has_error` method allows checking
   if a specific error has happened.
 
 * If :attr:`~django.forms.Form.required_css_class` is defined on a form, then
@@ -366,21 +366,21 @@ Generic Views
   may now specify the ordering applied to the
   :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` by setting
   :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` or overriding
-  :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering()`.
+  :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering`.
 
 * The new :attr:`SingleObjectMixin.query_pk_and_slug
   <django.views.generic.detail.SingleObjectMixin.query_pk_and_slug>`
   attribute allows changing the behavior of
-  :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+  :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
   so that it'll perform its lookup using both the primary key and the slug.
 
-* The :meth:`~django.views.generic.edit.FormMixin.get_form()` method doesn't
+* The :meth:`~django.views.generic.edit.FormMixin.get_form` method doesn't
   require a ``form_class`` to be provided anymore. If not provided ``form_class``
-  defaults to :meth:`~django.views.generic.edit.FormMixin.get_form_class()`.
+  defaults to :meth:`~django.views.generic.edit.FormMixin.get_form_class`.
 
 * Placeholders in :attr:`ModelFormMixin.success_url
   <django.views.generic.edit.ModelFormMixin.success_url>` now support the Python
-  :py:meth:`str.format()` syntax. The legacy ``%(<foo>)s`` syntax is still
+  :py:meth:`str.format` syntax. The legacy ``%(<foo>)s`` syntax is still
   supported but will be removed in Django 1.10.
 
 Internationalization
@@ -675,7 +675,7 @@ Related object operations are run in a transaction
 --------------------------------------------------
 
 Some operations on related objects such as
-:meth:`~django.db.models.fields.related.RelatedManager.add()` or direct
+:meth:`~django.db.models.fields.related.RelatedManager.add` or direct
 assignment ran multiple data modifying queries without wrapping them in
 transactions. To reduce the risk of data corruption, all data modifying methods
 that affect multiple related objects (i.e. ``add()``, ``remove()``,
@@ -1182,7 +1182,7 @@ Miscellaneous
   this will not happen any longer. It might be that new database migrations are
   generated (once) after migrating to 1.8.
 
-* :func:`django.utils.translation.get_language()` now returns ``None`` instead
+* :func:`django.utils.translation.get_language` now returns ``None`` instead
   of :setting:`LANGUAGE_CODE` when translations are temporarily deactivated.
 
 * When a translation doesn't exist for a specific literal, the fallback is now
@@ -1521,10 +1521,10 @@ to construct the "view on site" URL. This URL is now accessible using the
 sure to provide a default value for the ``form_class`` argument since it's
 now optional.
 
-Rendering templates loaded by :func:`~django.template.loader.get_template()` with a :class:`~django.template.Context`
+Rendering templates loaded by :func:`~django.template.loader.get_template` with a :class:`~django.template.Context`
 ---------------------------------------------------------------------------------------------------------------------
 
-The return type of :func:`~django.template.loader.get_template()` has changed
+The return type of :func:`~django.template.loader.get_template` has changed
 in Django 1.8: instead of a :class:`django.template.Template`, it returns a
 ``Template`` instance whose exact type depends on which backend loaded it.
 
@@ -1533,7 +1533,7 @@ Both classes provide a ``render()`` method, however, the former takes a
 :class:`dict`. This change is enforced through a deprecation path for Django
 templates.
 
-All this also applies to :func:`~django.template.loader.select_template()`.
+All this also applies to :func:`~django.template.loader.select_template`.
 
 :class:`~django.template.Template` and :class:`~django.template.Context` classes in template responses
 ------------------------------------------------------------------------------------------------------
@@ -1589,9 +1589,9 @@ pass a :class:`dict` in the ``context`` parameter instead. If you're passing a
 The following functions will no longer accept a ``dirs`` parameter to override
 ``TEMPLATE_DIRS`` in Django 1.10:
 
-* :func:`django.template.loader.get_template()`
-* :func:`django.template.loader.select_template()`
-* :func:`django.shortcuts.render()`
+* :func:`django.template.loader.get_template`
+* :func:`django.template.loader.select_template`
+* :func:`django.shortcuts.render`
 * ``django.shortcuts.render_to_response()``
 
 The parameter didn't work consistently across different template loaders and
