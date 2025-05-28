@@ -1,6 +1,7 @@
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
 from copy import copy
+from io import StringIO
 
 from django.conf import settings
 from django.core import mail
@@ -31,7 +32,10 @@ DEFAULT_LOGGING = {
             "()": "django.utils.log.ServerFormatter",
             "format": "[{server_time}] {message}",
             "style": "{",
-        }
+        },
+        "query_formatter": {
+            "()": "django.utils.log.QueryFormatter",
+        },
     },
     "handlers": {
         "console": {
@@ -43,6 +47,12 @@ DEFAULT_LOGGING = {
             "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "django.server",
+        },
+        "debug_queries": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "query_formatter",
+            "stream": StringIO(),
         },
         "mail_admins": {
             "level": "ERROR",
@@ -58,6 +68,11 @@ DEFAULT_LOGGING = {
         "django.server": {
             "handlers": ["django.server"],
             "level": "INFO",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["debug_queries"],
+            "level": "CRITICAL",
             "propagate": False,
         },
     },
@@ -212,6 +227,18 @@ class ServerFormatter(logging.Formatter):
 
     def uses_server_time(self):
         return self._fmt.find("{server_time}") >= 0
+
+
+class QueryFormatter(logging.Formatter):
+
+    def format(self, record):
+        try:
+            sql = record.args.get("sql")
+        except AttributeError:
+            sql = None
+        if sql and (format_sql := getattr(record, "format_sql", None)):
+            record.args["sql"] = format_sql(sql)
+        return super().format(record)
 
 
 def log_response(

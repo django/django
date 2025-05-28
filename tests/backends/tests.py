@@ -1,10 +1,10 @@
 """Tests related to django.db.backends that haven't been organized."""
 
 import datetime
+import logging
 import threading
 import unittest
 import warnings
-from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
@@ -44,6 +44,54 @@ from .models import (
 )
 
 
+class MementoHandler(logging.Handler):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.records = []
+
+    def emit(self, record):
+        self.records.append(record)
+
+
+class MementoHandlerTestCaseMixin:
+
+    def add_memento_handler(self, logger_name):
+        # Python's `assertLogs` can't be used because it bypasses the
+        # configured formatters from the logging config. Instead, a custom
+        # handler (MementoHandler) is attached to capture log records with the
+        # actual formatter used in production.
+        logger = logging.getLogger(logger_name)
+        original_level = logger.level
+        self.addCleanup(logger.setLevel, original_level)
+        logger.setLevel(logging.DEBUG)
+
+        handler = MementoHandler()
+        for h in logger.handlers:
+            handler.setFormatter(h.formatter)
+        handler.setLevel(logging.DEBUG)
+        logger.addHandler(handler)
+        self.addCleanup(logger.removeHandler, handler)
+
+        return handler
+
+    def assertLogRecord(self, handler, ops, sql, params=None, alias=None):
+        self.assertGreaterEqual(
+            records_len := len(handler.records),
+            1,
+            f"Wrong number of calls for {handler=} in (expected at least 1, got "
+            f"{records_len}).",
+        )
+        record = handler.records[-1]
+        # Queries are formatted with DatabaseOperations.format_debug_sql().
+        self.assertIn(ops.format_debug_sql(sql), record.getMessage())
+        self.assertEqual(record.levelno, logging.DEBUG)
+        self.assertEqual(record.sql.lower(), sql.lower())
+        self.assertEqual(record.params, params)
+        self.assertEqual(record.alias, alias)
+        self.assertEqual(record.format_sql, ops.format_debug_sql)
+
+
 class DateQuotingTest(TestCase):
     def test_django_date_trunc(self):
         """
@@ -67,7 +115,7 @@ class DateQuotingTest(TestCase):
 
 
 @override_settings(DEBUG=True)
-class LastExecutedQueryTest(TestCase):
+class LastExecutedQueryTest(MementoHandlerTestCaseMixin, TestCase):
     def test_last_executed_query_without_previous_query(self):
         """
         last_executed_query should not raise an exception even if no previous
@@ -83,15 +131,19 @@ class LastExecutedQueryTest(TestCase):
             connection.ops.last_executed_query(cursor, "SELECT %s" + suffix, (1,))
 
     def test_debug_sql(self):
+        # Configure a MementoHandler that remembers formatted logs.
+        handler = self.add_memento_handler("django.db.backends")
+
         qs = Reporter.objects.filter(first_name="test")
-        ops = connections[qs.db].ops
-        with mock.patch.object(ops, "format_debug_sql") as format_debug_sql:
-            list(qs)
-        # Queries are formatted with DatabaseOperations.format_debug_sql().
-        format_debug_sql.assert_called()
+        self.assertSequenceEqual(qs, [])
+
         sql = connection.queries[-1]["sql"].lower()
         self.assertIn("select", sql)
         self.assertIn(Reporter._meta.db_table, sql)
+
+        self.assertLogRecord(
+            handler, connections[qs.db].ops, sql, params=("test",), alias=qs.db
+        )
 
     def test_query_encoding(self):
         """last_executed_query() returns a string."""
@@ -308,7 +360,7 @@ class EscapingChecksDebug(EscapingChecks):
     pass
 
 
-class BackendTestCase(TransactionTestCase):
+class BackendTestCase(MementoHandlerTestCaseMixin, TransactionTestCase):
     available_apps = ["backends"]
 
     def create_squares_with_executemany(self, args):
@@ -577,23 +629,18 @@ class BackendTestCase(TransactionTestCase):
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
 
-    @mock.patch("django.db.backends.utils.logger")
     @override_settings(DEBUG=True)
-    def test_queries_logger(self, mocked_logger):
-        sql = "SELECT 1" + connection.features.bare_select_suffix
-        sql = connection.ops.format_debug_sql(sql)
+    def test_queries_logger(self):
+        # Configure a MementoHandler that remembers formatted logs.
+        handler = self.add_memento_handler("django.db.backends")
+
+        sql = "select 1" + connection.features.bare_select_suffix
         with connection.cursor() as cursor:
             cursor.execute(sql)
-        params, kwargs = mocked_logger.debug.call_args
-        self.assertIn("; alias=%s", params[0])
-        self.assertEqual(params[2], sql)
-        self.assertIsNone(params[3])
-        self.assertEqual(params[4], connection.alias)
-        self.assertEqual(
-            list(kwargs["extra"]),
-            ["duration", "sql", "params", "alias"],
+
+        self.assertLogRecord(
+            handler, connection.ops, sql, params=None, alias=connection.alias
         )
-        self.assertEqual(tuple(kwargs["extra"].values()), params[1:])
 
     def test_queries_bare_where(self):
         sql = f"SELECT 1{connection.features.bare_select_suffix} WHERE 1=1"
