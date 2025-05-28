@@ -1,10 +1,10 @@
 """Tests related to django.db.backends that haven't been organized."""
 
 import datetime
+import logging
 import threading
 import unittest
 import warnings
-from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
@@ -572,23 +572,39 @@ class BackendTestCase(TransactionTestCase):
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
 
-    @mock.patch("django.db.backends.utils.logger")
     @override_settings(DEBUG=True)
-    def test_queries_logger(self, mocked_logger):
+    def test_queries_logger(self):
         sql = "select 1" + connection.features.bare_select_suffix
-        with connection.cursor() as cursor:
+        with (
+            connection.cursor() as cursor,
+            self.assertLogs("django.db.backends", "DEBUG") as handler,
+        ):
             cursor.execute(sql)
-        params, kwargs = mocked_logger.debug.call_args
-        self.assertIn("; alias=%s", params[0])
-        self.assertEqual(params[2], sql)
-        self.assertNotEqual(params[2], connection.ops.format_debug_sql(sql))
-        self.assertIsNone(params[3])
-        self.assertEqual(params[4], connection.alias)
-        self.assertEqual(
-            list(kwargs["extra"]),
-            ["duration", "sql", "params", "alias"],
+        self.assertGreaterEqual(
+            records_len := len(handler.records),
+            1,
+            f"Wrong number of calls for {handler=} in (expected at least 1, got "
+            f"{records_len}).",
         )
-        self.assertEqual(tuple(kwargs["extra"].values()), params[1:])
+        record = handler.records[-1]
+        # Log raw message, effective level and args are correct.
+        self.assertEqual(record.msg, "(%.3f) %s; args=%s; alias=%s")
+        self.assertEqual(record.levelno, logging.DEBUG)
+        self.assertEqual(len(record.args), 4)
+        duration, logged_sql, params, alias = record.args
+        # Duration is hard to test without mocking time, expect under 1 second.
+        self.assertIsInstance(duration, float)
+        self.assertLess(duration, 1)
+        self.assertEqual(duration, record.duration)
+        # SQL is correct and not formatted.
+        self.assertEqual(logged_sql, sql)
+        self.assertNotEqual(logged_sql, connection.ops.format_debug_sql(sql))
+        self.assertEqual(logged_sql, record.sql)
+        # Params is None and alias is connection.alias.
+        self.assertIsNone(params)
+        self.assertIsNone(record.params)
+        self.assertEqual(alias, connection.alias)
+        self.assertEqual(alias, record.alias)
 
     def test_queries_bare_where(self):
         sql = f"SELECT 1{connection.features.bare_select_suffix} WHERE 1=1"
