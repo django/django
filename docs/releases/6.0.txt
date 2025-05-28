@@ -43,7 +43,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The Font Awesome Free icon set (version 6.7.2) is now used for the admin
+  interface icons.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -181,6 +182,9 @@ Migrations
 
 * Migrations now support serialization of :class:`zoneinfo.ZoneInfo` instances.
 
+* Serialization of deconstructible objects now supports keyword arguments with
+  names that are not valid Python identifiers.
+
 Models
 ~~~~~~
 
@@ -204,6 +208,13 @@ Models
 
 * :meth:`.QuerySet.raw` now supports models with a
   :class:`~django.db.models.CompositePrimaryKey`.
+
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
+
+* The new :class:`~django.db.models.AnyValue` aggregate returns an arbitrary
+  value from the non-null input values. This is supported on SQLite, MySQL,
+  Oracle, and PostgreSQL 16+.
 
 Pagination
 ~~~~~~~~~~
@@ -387,7 +398,7 @@ to remove usage of these features.
 * The ``get_joining_columns()`` method of ``ForeignObject`` and
   ``ForeignObjectRel`` is removed.
 
-* The ``ForeignObject.get_reverse_joining_columns()`` method is be removed.
+* The ``ForeignObject.get_reverse_joining_columns()`` method is removed.
 
 * Support for ``cx_Oracle`` is removed.
 

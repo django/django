@@ -61,6 +61,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         END;
     """
     supports_callproc_kwargs = True
+    supports_any_value = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_ignore_conflicts = False
@@ -73,6 +74,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
     supports_json_field_contains = False
+    supports_json_negative_indexing = False
     supports_collation_on_textfield = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {

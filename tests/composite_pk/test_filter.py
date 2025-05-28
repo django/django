@@ -206,6 +206,14 @@ class CompositePKFilterTests(TestCase):
             [self.comment_1],
         )
 
+    def test_filter_by_pk_in_subquery_invalid_selected_columns(self):
+        msg = (
+            "The QuerySet value for the 'in' lookup must have 2 selected "
+            "fields (received 3)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.filter(pk__in=Comment.objects.values("pk", "text"))
+
     def test_filter_by_pk_in_none(self):
         with self.assertNumQueries(0):
             self.assertSequenceEqual(

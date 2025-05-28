@@ -4,6 +4,7 @@ import re
 import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
+from pathlib import Path
 from unittest import skipUnless
 
 from django import forms
@@ -1740,8 +1741,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def setUp(self):
         super().setUp()
-        Band.objects.create(id=42, name="Bogey Blues")
-        Band.objects.create(id=98, name="Green Potatoes")
+        self.blues = Band.objects.create(name="Bogey Blues")
+        self.potatoes = Band.objects.create(name="Green Potatoes")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_ForeignKey(self):
@@ -1763,23 +1764,23 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "lookup_id_main_band").click()
         self.wait_for_and_switch_to_popup()
         link = self.selenium.find_element(By.LINK_TEXT, "Bogey Blues")
-        self.assertIn("/band/42/", link.get_attribute("href"))
+        self.assertIn(f"/band/{self.blues.pk}/", link.get_attribute("href"))
         link.click()
 
         # The field now contains the selected band's id
         self.selenium.switch_to.window(main_window)
-        self.wait_for_value("#id_main_band", "42")
+        self.wait_for_value("#id_main_band", str(self.blues.pk))
 
         # Reopen the popup window and click on another band
         self.selenium.find_element(By.ID, "lookup_id_main_band").click()
         self.wait_for_and_switch_to_popup()
         link = self.selenium.find_element(By.LINK_TEXT, "Green Potatoes")
-        self.assertIn("/band/98/", link.get_attribute("href"))
+        self.assertIn(f"/band/{self.potatoes.pk}/", link.get_attribute("href"))
         link.click()
 
         # The field now contains the other selected band's id
         self.selenium.switch_to.window(main_window)
-        self.wait_for_value("#id_main_band", "98")
+        self.wait_for_value("#id_main_band", str(self.potatoes.pk))
 
     def test_many_to_many(self):
         from selenium.webdriver.common.by import By
@@ -1810,23 +1811,25 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "lookup_id_supporting_bands").click()
         self.wait_for_and_switch_to_popup()
         link = self.selenium.find_element(By.LINK_TEXT, "Bogey Blues")
-        self.assertIn("/band/42/", link.get_attribute("href"))
+        self.assertIn(f"/band/{self.blues.pk}/", link.get_attribute("href"))
         link.click()
 
         # The field now contains the selected band's id
         self.selenium.switch_to.window(main_window)
-        self.wait_for_value("#id_supporting_bands", "42")
+        self.wait_for_value("#id_supporting_bands", str(self.blues.pk))
 
         # Reopen the popup window and click on another band
         self.selenium.find_element(By.ID, "lookup_id_supporting_bands").click()
         self.wait_for_and_switch_to_popup()
         link = self.selenium.find_element(By.LINK_TEXT, "Green Potatoes")
-        self.assertIn("/band/98/", link.get_attribute("href"))
+        self.assertIn(f"/band/{self.potatoes.pk}/", link.get_attribute("href"))
         link.click()
 
         # The field now contains the two selected bands' ids
         self.selenium.switch_to.window(main_window)
-        self.wait_for_value("#id_supporting_bands", "42,98")
+        self.wait_for_value(
+            "#id_supporting_bands", f"{self.blues.pk},{self.potatoes.pk}"
+        )
 
 
 class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
@@ -1906,7 +1909,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
     name_input_id = "id_name"
     photo_input_id = "id_photo"
-    tests_files_folder = "%s/files" % os.getcwd()
+    tests_files_folder = "%s/files" % Path(__file__).parent.parent
     clear_checkbox_id = "photo-clear_id"
 
     def _submit_and_wait(self):

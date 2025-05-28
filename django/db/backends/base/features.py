@@ -266,6 +266,9 @@ class BaseDatabaseFeatures:
     # delimiter along with DISTINCT.
     supports_aggregate_distinct_multiple_argument = True
 
+    # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
+    supports_any_value = False
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
@@ -347,6 +350,8 @@ class BaseDatabaseFeatures:
     json_key_contains_list_matching_requires_list = False
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
+    # Does the backend support negative JSON array indexing?
+    supports_json_negative_indexing = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True

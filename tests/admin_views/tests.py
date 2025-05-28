@@ -69,6 +69,7 @@ from .models import (
     Collector,
     Color,
     ComplexSortedPerson,
+    Country,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -874,7 +875,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:admin_views_thing_changelist"))
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
             msg_prefix="Expected filter not found in changelist view",
         )
         self.assertNotContains(
@@ -929,7 +931,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(changelist_url)
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
         )
         filters = {
             "chap__id__exact": {
@@ -1069,7 +1072,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
         )
         self.assertContains(
             response,
@@ -6698,11 +6702,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
+        argentina = Country.objects.get(name="Argentina")
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
-            """
+            f"""
             <option value="" selected="">---------</option>
-            <option value="1" selected="">Argentina</option>
+            <option value="{argentina.pk}" selected="">Argentina</option>
             """,
         )
         # Argentina isn't added to the living_country select nor selected by
@@ -6736,12 +6741,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
+        spain = Country.objects.get(name="Spain")
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
-            """
+            f"""
             <option value="" selected="">---------</option>
-            <option value="1" selected="">Argentina</option>
-            <option value="2">Spain</option>
+            <option value="{argentina.pk}" selected="">Argentina</option>
+            <option value="{spain.pk}">Spain</option>
             """,
         )
 
@@ -6778,12 +6784,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
+        italy = spain
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
-            """
+            f"""
             <option value="" selected="">---------</option>
-            <option value="1" selected="">Argentina</option>
-            <option value="2">Italy</option>
+            <option value="{argentina.pk}" selected="">Argentina</option>
+            <option value="{italy.pk}">Italy</option>
             """,
         )
         # Italy is added to the living_country select and it's also selected by
