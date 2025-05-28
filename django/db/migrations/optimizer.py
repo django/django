@@ -59,8 +59,13 @@ class MigrationOptimizer:
                         # Otherwise keep trying.
                         new_operations.append(operation)
                         break
-                    new_operations.extend(operations[i + j + 2 :])
-                    return new_operations
+                    new_reduced_operations = []
+                    for op in new_operations:
+                        new_reduced_operations.extend(
+                            op.reduce_related(other, app_label) or [op]
+                        )
+                    new_reduced_operations.extend(operations[i + j + 2 :])
+                    return new_reduced_operations
                 elif not result:
                     # Can't perform a right reduction.
                     right = False
