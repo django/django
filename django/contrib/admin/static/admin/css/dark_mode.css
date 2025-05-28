@@ -25,8 +25,9 @@
       --message-error-bg: #570808;
   
       --darkened-bg: #212121;
-      --selected-bg: #1b1b1b;
+      --selected-bg: #3A6982;
       --selected-row: #00363a;
+      --col-sort-button-color: #d0d0d0;
   
       --close-button-bg: #333333;
       --close-button-hover-bg: #666666;
@@ -62,8 +63,9 @@ html[data-theme="dark"] {
     --message-error-bg: #570808;
 
     --darkened-bg: #212121;
-    --selected-bg: #1b1b1b;
+    --selected-bg: #3A6982;
     --selected-row: #00363a;
+    --col-sort-button-color: #d0d0d0;
 
     --close-button-bg: #333333;
     --close-button-hover-bg: #666666;
