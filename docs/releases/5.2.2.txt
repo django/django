@@ -30,3 +30,7 @@ Bugfixes
 * Fixed a regression in Django 5.2 that caused a crash when using ``OuterRef``
   in PostgreSQL aggregate functions ``ArrayAgg``, ``StringAgg``, and
   ``JSONBAgg`` (:ticket:`36405`).
+
+* Fixed a regression in Django 5.2 where admin's ``filter_horizontal`` buttons
+  lacked ``type="button"``, causing them to intercept form submission when
+  pressing the Enter key (:ticket:`36423`).
