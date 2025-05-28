@@ -55,7 +55,8 @@ class ChildAdmin(admin.ModelAdmin):
 
 
 class GrandChildAdmin(admin.ModelAdmin):
-    list_display = ["name", "parent__name", "parent__parent__name"]
+    list_display = ["name", "parent__name", "parent__parent__name", "age"]
+    sortable_by = ["name", "parent__name", "parent__parent__name"]
     search_fields = ["parent__name__exact", "parent__age__exact"]
 
 
