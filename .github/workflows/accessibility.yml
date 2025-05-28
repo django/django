@@ -1,0 +1,48 @@
+name: Accessibility
+
+on:
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  accessibility:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Django core
+        uses: actions/checkout@v4
+      - name: Checkout Django admin demo
+        uses: actions/checkout@v4
+        with:
+          repository: knyghty/django-admin-demo
+          ref: a58fa374767a1904dbf0e45e9cc0df1cd2692838
+          path: demo
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: 'demo/requirements.txt'
+      - name: Set up Node
+        uses: actions/setup-node@v4
+      - name: Install Requirements
+        run: pip install -r demo/requirements.txt
+      - name: Launch migrations
+        run: python demo/manage.py migrate
+      - name: Install pa11y
+        run: npm install -g pa11y
+      - name: Run the project and pa11y
+        run: >-
+          python demo/manage.py runserver
+          & (sleep 10 && pa11y http://127.0.0.1:8000/
+          --config ./pa11y.json
+          --runner axe
+          --include-warnings)
+          && pa11y http://127.0.0.1:8000/en/admin/demo/artist/
+          --config ./pa11y.json
+          --runner axe
+          --include-warnings
+        # TODO: remove this when the errors are fixed.
+        continue-on-error: true
