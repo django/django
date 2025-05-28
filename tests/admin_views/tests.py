@@ -1431,9 +1431,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 self.assertContains(response, "question__expires__year=2016")
 
     def test_sortable_by_columns_subset(self):
-        expected_sortable_fields = ("date", "callable_year")
+        expected_sortable_fields = ("content", "date", "callable_year")
         expected_not_sortable_fields = (
-            "content",
             "model_year",
             "modeladmin_year",
             "model_year_reversed",
@@ -1442,7 +1441,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin6:admin_views_article_changelist"))
         for field_name in expected_sortable_fields:
             self.assertContains(
-                response, '<th scope="col" class="sortable column-%s">' % field_name
+                response,
+                f'<th scope="col" class="sortable column-{field_name}" '
+                f'id="col-{field_name}" aria-labelledby="col-label-{field_name}">',
             )
         for field_name in expected_not_sortable_fields:
             self.assertContains(
@@ -1451,7 +1452,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_get_sortable_by_columns_subset(self):
         response = self.client.get(reverse("admin6:admin_views_actor_changelist"))
-        self.assertContains(response, '<th scope="col" class="sortable column-age">')
+        self.assertContains(
+            response,
+            '<th scope="col" class="sortable column-age" id="col-age" '
+            'aria-labelledby="col-label-age">',
+        )
         self.assertContains(response, '<th scope="col" class="column-name">')
 
     def test_sortable_by_no_column(self):
@@ -1467,6 +1472,61 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin6:admin_views_color_changelist"))
         self.assertContains(response, '<th scope="col" class="column-value">')
         self.assertNotContains(response, '<th scope="col" class="sortable column')
+
+    def test_sorted_column_have_aria_sort(self):
+        aria_sort_fields = [("date", "ascending"), ("callable_year", "descending")]
+        response = self.client.get(
+            reverse("admin6:admin_views_article_changelist") + "?o=2.-3"
+        )
+        for field_name, direction in aria_sort_fields:
+            # Sorted columns are provided aria-sort attribute.
+            self.assertContains(
+                response,
+                f'<th scope="col" class="sortable column-{field_name} sorted" '
+                f'id="col-{field_name}" aria-labelledby="col-label-{field_name}" '
+                f'aria-sort="{direction}">',
+            )
+
+    def test_sortable_column_description(self):
+        response = self.client.get(reverse("admin6:admin_views_article_changelist"))
+        toggle_descriptions = ["content", "date", "callable_year"]
+        for field_name in toggle_descriptions:
+            self.assertContains(
+                response,
+                f'<span class="visually-hidden" aria-describedby="col-{field_name}">'
+                "toggle sorting ascending, </span>",
+            )
+        response = self.client.get(
+            reverse("admin6:admin_views_article_changelist") + "?o=1.-2"
+        )
+        priority_description = "content priority 1, date priority 2, "
+        toggle_descriptions = [
+            ("content", "descending, "),
+            ("date", "remove, "),
+            ("callable_year", "ascending, "),
+        ]
+        for field_name, toggle_description in toggle_descriptions:
+            description = "toggle sorting " + toggle_description + priority_description
+            # Sortable columns are provided description for screen reader.
+            self.assertContains(
+                response,
+                f'<span class="visually-hidden" aria-describedby="col-{field_name}">'
+                f"{description}</span>",
+            )
+
+        not_sortable_fields = [
+            ("model_year", ""),
+            ("modeladmin_year", "Modeladmin year"),
+            ("model_year_reversed", ""),
+            ("section", "Section"),
+        ]
+        for field_name, label in not_sortable_fields:
+            self.assertContains(
+                response,
+                f'<th scope="col" class="column-{field_name}">'
+                f"<span>{label}</span></th>",
+                html=True,
+            )
 
     def test_app_index_context(self):
         response = self.client.get(reverse("admin:app_list", args=("admin_views",)))

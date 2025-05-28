@@ -48,6 +48,7 @@ html[data-theme="light"],
     --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
     --selected-bg: #e4e4e4; /* E.g. selected table cells */
     --selected-row: #ffc;
+    --selected-col-bg: #e6e6e6;
 
     --button-fg: #fff;
     --button-bg: var(--secondary);
@@ -388,42 +389,42 @@ thead th a:link, thead th a:visited {
     color: var(--body-quiet-color);
 }
 
-thead th.sorted {
-    background: var(--selected-bg);
+thead th.sorted,
+table thead th.sortable:hover {
+    background: var(--selected-col-bg);
+    cursor: pointer;
 }
 
-thead th.sorted .text {
-    padding-right: 42px;
-}
-
-table thead th .text span {
-    padding: 8px 10px;
-    display: block;
-}
-
-table thead th .text a {
-    display: block;
+table thead th a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
     cursor: pointer;
     padding: 8px 10px;
+    text-decoration: none !important;
 }
 
-table thead th .text a:focus, table thead th .text a:hover {
-    background: var(--selected-bg);
-}
-
-thead th.sorted a.sortremove {
-    visibility: hidden;
-}
-
-table thead th.sorted:hover a.sortremove {
-    visibility: visible;
-}
-
-table thead th.sorted .sortoptions {
+table thead th > span {
     display: block;
-    padding: 9px 5px 0 5px;
-    float: right;
-    text-align: right;
+    padding: 8px 10px;
+}
+
+table thead th.sortable div {
+    display: flex;
+    align-items: center;
+}
+
+table thead th.sortable[aria-sort="ascending"] div span:nth-last-child(2):after {
+    content: "▲";
+}
+
+table thead th.sortable[aria-sort="descending"] div span:nth-last-child(2):after {
+    content: "▼";
+}
+
+table thead th.sortable:not([aria-sort]) div span:nth-last-child(2):after {
+    content: "⇅";
 }
 
 table thead th.sorted .sortpriority {
@@ -433,58 +434,6 @@ table thead th.sorted .sortpriority {
     vertical-align: 3px;
     margin-left: 2px;
     margin-right: 2px;
-}
-
-table thead th.sorted .sortoptions a {
-    position: relative;
-    width: 14px;
-    height: 14px;
-    display: inline-block;
-    background: url(../img/sorting-icons.svg) 0 0 no-repeat;
-    background-size: 14px auto;
-}
-
-table thead th.sorted .sortoptions a.sortremove {
-    background-position: 0 0;
-}
-
-table thead th.sorted .sortoptions a.sortremove:after {
-    content: '\\';
-    position: absolute;
-    top: -6px;
-    left: 3px;
-    font-weight: 200;
-    font-size: 1.125rem;
-    color: var(--body-quiet-color);
-}
-
-table thead th.sorted .sortoptions a.sortremove:focus:after,
-table thead th.sorted .sortoptions a.sortremove:hover:after {
-    color: var(--link-fg);
-}
-
-table thead th.sorted .sortoptions a.sortremove:focus,
-table thead th.sorted .sortoptions a.sortremove:hover {
-    background-position: 0 -14px;
-}
-
-table thead th.sorted .sortoptions a.ascending {
-    background-position: 0 -28px;
-}
-
-table thead th.sorted .sortoptions a.ascending:focus,
-table thead th.sorted .sortoptions a.ascending:hover {
-    background-position: 0 -42px;
-}
-
-table thead th.sorted .sortoptions a.descending {
-    top: 1px;
-    background-position: 0 -56px;
-}
-
-table thead th.sorted .sortoptions a.descending:focus,
-table thead th.sorted .sortoptions a.descending:hover {
-    background-position: 0 -70px;
 }
 
 /* FORM DEFAULTS */

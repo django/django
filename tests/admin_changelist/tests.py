@@ -24,6 +24,7 @@ from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.client import RequestFactory
+from django.test.selenium import screenshot_cases
 from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
 from django.urls import reverse
 from django.utils import formats
@@ -384,7 +385,7 @@ class ChangeListTests(TestCase):
             link,
             "name",
             '<td class="field-parent__name">-</td>'
-            '<td class="field-parent__parent__name">-</td>',
+            '<td class="field-parent__parent__name">-</td><td class="field-age">-</td>',
         )
         self.assertNotEqual(
             table_output.find(row_html),
@@ -2274,27 +2275,33 @@ class SeleniumTests(AdminSeleniumTestCase):
             return [
                 " ".join("-" if i is None else i for i in item)
                 for item in qs.values_list(
-                    "name", "parent__name", "parent__parent__name"
+                    "name", "parent__name", "parent__parent__name", "age"
                 )
             ]
 
         cases = [
             # Order ascending by `name`.
-            ("th.sortable.column-name", ("name",)),
+            ("th.sortable.column-name a", ("name",)),
             # Order descending by `name`.
-            ("th.sortable.column-name", ("-name",)),
+            ("th.sortable.column-name a", ("-name",)),
             # Order ascending by `parent__name`.
-            ("th.sortable.column-parent__name", ("parent__name", "-name")),
+            (
+                "th.sortable.column-parent__name a",
+                ("parent__name", "-name"),
+            ),
             # Order descending by `parent__name`.
-            ("th.sortable.column-parent__name", ("-parent__name", "-name")),
+            (
+                "th.sortable.column-parent__name a",
+                ("-parent__name", "-name"),
+            ),
             # Order ascending by `parent__parent__name`.
             (
-                "th.sortable.column-parent__parent__name",
+                "th.sortable.column-parent__parent__name a",
                 ("parent__parent__name", "-parent__name", "-name"),
             ),
             # Order descending by `parent__parent__name`.
             (
-                "th.sortable.column-parent__parent__name",
+                "th.sortable.column-parent__parent__name a",
                 ("-parent__parent__name", "-parent__name", "-name"),
             ),
         ]
@@ -2305,3 +2312,39 @@ class SeleniumTests(AdminSeleniumTestCase):
                     GrandChild.objects.all().order_by(*ordering)
                 )
                 self.assertEqual(find_result_row_texts(), expected)
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_table_columns_sorting_display(self):
+        from selenium.webdriver.common.by import By
+
+        child = Child.objects.create(name="David", parent=None)
+        GrandChild.objects.create(name="James", parent=child)
+
+        self.admin_login(username="super", password="secret")
+        changelist_url = reverse("admin:admin_changelist_grandchild_changelist")
+        self.selenium.get(self.live_server_url + changelist_url)
+
+        self.selenium.find_element(
+            By.CSS_SELECTOR,
+            "th.sortable.column-name a",
+        ).click()
+        for _ in range(2):
+            # descending parent__name column
+            self.selenium.find_element(
+                By.CSS_SELECTOR,
+                "th.sortable.column-parent__name a",
+            ).click()
+
+        name_column = self.selenium.find_element(
+            By.CSS_SELECTOR, "th.sortable.column-name"
+        )
+        parent_name_column = self.selenium.find_element(
+            By.CSS_SELECTOR, "th.sortable.column-parent__name"
+        )
+        grand_parent_name_column = self.selenium.find_element(
+            By.CSS_SELECTOR, "th.sortable.column-parent__parent__name"
+        )
+        self.assertIn("sorted", name_column.get_attribute("class"))
+        self.assertIn("sorted", parent_name_column.get_attribute("class"))
+        self.assertNotIn("sorted", grand_parent_name_column.get_attribute("class"))
+        self.take_screenshot("table_column_sorted")
