@@ -1376,7 +1376,7 @@ class ArticleAdmin6(admin.ModelAdmin):
         "model_year_reversed",
         "section",
     )
-    sortable_by = ("date", callable_year)
+    sortable_by = ("content", "date", callable_year)
 
     @admin.display(ordering="date")
     def modeladmin_year(self, obj):
