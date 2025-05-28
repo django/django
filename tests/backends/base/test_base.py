@@ -116,6 +116,8 @@ class DatabaseWrapperLoggingTests(TransactionTestCase):
                     r"DEBUG:django.db.backends:\(\d+.\d{3}\) "
                     rf"COMMIT; args=None; alias={DEFAULT_DB_ALIAS}",
                 )
+                for record in cm.records:
+                    self.assertEqual(record.format_sql, conn.ops.format_debug_sql)
 
     @override_settings(DEBUG=True)
     def test_rollback_debug_log(self):
@@ -132,6 +134,8 @@ class DatabaseWrapperLoggingTests(TransactionTestCase):
                     r"DEBUG:django.db.backends:\(\d+.\d{3}\) "
                     rf"ROLLBACK; args=None; alias={DEFAULT_DB_ALIAS}",
                 )
+                for record in cm.records:
+                    self.assertEqual(record.format_sql, conn.ops.format_debug_sql)
 
     def test_no_logs_without_debug(self):
         with self.assertNoLogs("django.db.backends", "DEBUG"):

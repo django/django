@@ -1,10 +1,10 @@
 """Tests related to django.db.backends that haven't been organized."""
 
 import datetime
+import logging
 import threading
 import unittest
 import warnings
-from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
@@ -44,6 +44,23 @@ from .models import (
 )
 
 
+class LogRecordMixin:
+
+    def assertLogRecord(self, handler, ops, sql, params=None, alias=None):
+        self.assertGreaterEqual(
+            records_len := len(handler.records),
+            1,
+            f"Wrong number of calls for {handler=} in (expected at least 1, got "
+            f"{records_len}).",
+        )
+        record = handler.records[-1]
+        self.assertEqual(record.levelno, logging.DEBUG)
+        self.assertEqual(record.sql, sql)
+        self.assertEqual(record.params, params)
+        self.assertEqual(record.alias, alias)
+        self.assertEqual(record.format_sql, ops.format_debug_sql)
+
+
 class DateQuotingTest(TestCase):
     def test_django_date_trunc(self):
         """
@@ -67,7 +84,7 @@ class DateQuotingTest(TestCase):
 
 
 @override_settings(DEBUG=True)
-class LastExecutedQueryTest(TestCase):
+class LastExecutedQueryTest(LogRecordMixin, TestCase):
     def test_last_executed_query_without_previous_query(self):
         """
         last_executed_query should not raise an exception even if no previous
@@ -84,14 +101,19 @@ class LastExecutedQueryTest(TestCase):
 
     def test_debug_sql(self):
         qs = Reporter.objects.filter(first_name="test")
-        ops = connections[qs.db].ops
-        with mock.patch.object(ops, "format_debug_sql") as format_debug_sql:
-            list(qs)
-        # Queries are formatted with DatabaseOperations.format_debug_sql().
-        format_debug_sql.assert_called()
-        sql = connection.queries[-1]["sql"].lower()
-        self.assertIn("select", sql)
+        with (
+            self.assertNumQueries(1) as ctx,
+            self.assertLogs("django.db.backends", "DEBUG") as cm,
+        ):
+            self.assertSequenceEqual(qs, [])
+
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertIn("SELECT", sql)
         self.assertIn(Reporter._meta.db_table, sql)
+
+        self.assertLogRecord(
+            cm, connections[qs.db].ops, sql, params=("test",), alias=qs.db
+        )
 
     def test_query_encoding(self):
         """last_executed_query() returns a string."""
@@ -308,7 +330,7 @@ class EscapingChecksDebug(EscapingChecks):
     pass
 
 
-class BackendTestCase(TransactionTestCase):
+class BackendTestCase(LogRecordMixin, TransactionTestCase):
     available_apps = ["backends"]
 
     def create_squares_with_executemany(self, args):
@@ -577,23 +599,16 @@ class BackendTestCase(TransactionTestCase):
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
 
-    @mock.patch("django.db.backends.utils.logger")
     @override_settings(DEBUG=True)
-    def test_queries_logger(self, mocked_logger):
-        sql = "SELECT 1" + connection.features.bare_select_suffix
-        sql = connection.ops.format_debug_sql(sql)
-        with connection.cursor() as cursor:
-            cursor.execute(sql)
-        params, kwargs = mocked_logger.debug.call_args
-        self.assertIn("; alias=%s", params[0])
-        self.assertEqual(params[2], sql)
-        self.assertIsNone(params[3])
-        self.assertEqual(params[4], connection.alias)
-        self.assertEqual(
-            list(kwargs["extra"]),
-            ["duration", "sql", "params", "alias"],
+    def test_queries_logger(self):
+        sql = "select 1" + connection.features.bare_select_suffix
+        with self.assertLogs("django.db.backends", "DEBUG") as cm:
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+
+        self.assertLogRecord(
+            cm, connection.ops, sql, params=None, alias=connection.alias
         )
-        self.assertEqual(tuple(kwargs["extra"].values()), params[1:])
 
     def test_queries_bare_where(self):
         sql = f"SELECT 1{connection.features.bare_select_suffix} WHERE 1=1"
