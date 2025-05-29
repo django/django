@@ -188,22 +188,36 @@ created within a specified period of time:
 
         Sign ``value`` and append current timestamp to it.
 
-    .. method:: unsign(value, max_age=None)
+    .. method:: unsign(value, max_age=None, return_timestamp=False)
 
         Checks if ``value`` was signed less than ``max_age`` seconds ago,
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
+
+        If ``return_timestamp`` is ``True``, returns a tuple of the unsigned
+        value and the timestamp, otherwise the unsigned value is returned.
+
+        .. versionchanged:: 6.0
+
+            The ``return_timestamp`` parameter was added.
 
     .. method:: sign_object(obj, serializer=JSONSerializer, compress=False)
 
         Encode, optionally compress, append current timestamp, and sign complex
         data structure (e.g. list, tuple, or dictionary).
 
-    .. method:: unsign_object(signed_obj, serializer=JSONSerializer, max_age=None)
+    .. method:: unsign_object(signed_obj, serializer=JSONSerializer, max_age=None, return_timestamp=False)
 
         Checks if ``signed_obj`` was signed less than ``max_age`` seconds ago,
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
+
+        If ``return_timestamp`` is ``True``, returns a tuple of the unsigned
+        object and the timestamp, otherwise the unsigned object is returned.
+
+        .. versionchanged:: 6.0
+
+            The ``return_timestamp`` parameter was added.
 
 .. _signing-complex-data:
 
@@ -249,7 +263,14 @@ and tuples) if you pass in a tuple, you will get a list from
     Returns URL-safe, signed base64 compressed JSON string. Serialized object
     is signed using :class:`~TimestampSigner`.
 
-.. function:: loads(string, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None, fallback_keys=None)
+.. function:: loads(string, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None, fallback_keys=None, return_timestamp=False)
 
     Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
     Checks ``max_age`` (in seconds) if given.
+
+    If ``return_timestamp`` is ``True``, returns a tuple of the unsigned object
+    and the timestamp, otherwise the unsigned value is returned.
+
+    .. versionchanged:: 6.0
+
+        The ``return_timestamp`` parameter was added.
