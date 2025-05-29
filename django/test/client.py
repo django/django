@@ -433,7 +433,13 @@ class RequestFactory:
 
     def request(self, **request):
         "Construct a generic request object."
-        return WSGIRequest(self._base_environ(**request))
+        response = WSGIRequest(self._base_environ(**request))
+        response.resolver_match = type(
+            "RersolverMatch",
+            (object,),
+            {"app_name": "name", "url_name": "", "_func_path": "", "tried": []},
+        )()
+        return response
 
     def _encode_data(self, data, content_type):
         if content_type is MULTIPART_CONTENT:
