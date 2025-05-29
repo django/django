@@ -11,4 +11,8 @@ urlpatterns = [
     # Should not append slash.
     path("sensitive_fbv/", views.sensitive_fbv),
     path("sensitive_cbv/", views.SensitiveCBV.as_view()),
+    # Used in CSP tests.
+    path("csp-base/", views.empty_view),
+    path("csp-nonce/", views.csp_nonce),
+    path("csp-500/", views.csp_500),
 ]

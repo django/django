@@ -1,0 +1,124 @@
+.. _using-csp:
+
+===========================================
+How to use Django's Content Security Policy
+===========================================
+
+To enable CSP in your Django project:
+
+1. Add the CSP middleware to your ``MIDDLEWARE`` setting::
+
+      MIDDLEWARE = [
+          # ...
+          "django.middleware.csp.ContentSecurityPolicyMiddleware",
+          # ...
+      ]
+
+2. Configure your CSP policies in your ``settings.py`` using either
+   ``SECURE_CSP`` or ``SECURE_CSP_REPORT_ONLY``, or both. The :ref:`CSP Settings
+   <csp-settings>` provides more detailed explanation on the differences between
+   these two settings::
+
+      from django.middleware.constants import CSP
+
+      SECURE_CSP = {
+          "default-src": [CSP.SELF],
+          # Add more directives as needed
+      }
+
+      # Or for report-only mode:
+      SECURE_CSP_REPORT_ONLY = {
+          "default-src": [CSP.SELF],
+          # Add more directives as needed
+          "report-uri": "/path/to/reports-endpoint/",
+      }
+
+To use nonces in your CSP policy:
+
+1. Include the ``CSP.NONCE`` placeholder value in your CSP settings. This only
+   applies to ``script-src`` or ``style-src``::
+
+      from django.middleware.constants import CSP
+
+      SECURE_CSP = {
+          "default-src": [CSP.SELF],
+          # Allows self-hosted scripts and script tags with the matching
+          # `nonce=` attribute
+          "script-src": [CSP.SELF, CSP.NONCE],
+          # Example of the less secure ``unsafe-inline`` option
+          "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
+      }
+
+2. Add the CSP context processor to your ``TEMPLATES`` setting. This makes
+   the generated nonce value available as the ``CSP_NONCE`` variable
+   in your Django templates::
+
+      TEMPLATES = [
+          {
+              "BACKEND": "django.template.backends.django.DjangoTemplates",
+              "OPTIONS": {
+                  "context_processors": [
+                      # ...
+                      "django.template.context_processors.csp_nonce",
+                  ],
+              },
+          },
+      ]
+
+3. In your templates, add the ``nonce`` attribute to the desired inline
+   ``<style>`` or ``<script>`` tags, using the context variable ``CSP_NONCE``:
+
+   .. code-block:: html+django
+
+      <style nonce="{{ CSP_NONCE }}">
+        /* These inline styles will be allowed. */
+      </style>
+
+      <script nonce="{{ CSP_NONCE }}">
+        // This inline JavaScript will be allowed.
+      </script>
+
+The :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` automatically
+handles generating the unique nonce and adding the appropriate ``nonce-...``
+source to the ``Content-Security-Policy`` header *if* the nonce is used in the
+template.
+
+.. warning:: Caching and Nonce Reuse
+
+    Nonces are designed to be unique for each HTTP response ("number used once")
+    to provide maximum security effectiveness. If you employ full response
+    caching (e.g., Django's cache middleware, CDN caching), a cached response
+    will typically serve the *exact same* ``nonce`` value in both the CSP header
+    and the HTML content repeatedly across multiple requests and users.
+
+    While the browser might execute the script or apply the style in such a
+    cached response (because the header and attribute nonce values match *within
+    that specific response*), *this reuse of nonces across different requests
+    undermines their intended security purpose and is strongly discouraged*.
+    The nonce is no longer unique per request-response cycle.
+
+    It is recommended to avoid full-page caching for responses that utilize CSP
+    nonces. If caching is essential for performance, ensure your caching
+    strategy can accommodate the need for unique nonces per request, or consider
+    alternative approaches to managing inline scripts/styles.
+
+.. note:: Lazy Nonce Generation and Header Inclusion
+
+    The middleware generates the actual nonce value lazily for performance. The
+    corresponding ``nonce-...`` source expression is added to the
+    ``Content-Security-Policy`` header *only if* the ``CSP_NONCE``
+    template variable is accessed during the rendering process for that specific
+    request. This avoids unnecessary nonce generation and header modification if
+    a page doesn't actually contain any nonced elements.
+
+    However, consistency is crucial:
+
+    * If you use ``{{ CSP_NONCE }}`` in a template, you *must* also
+      include the ``CSP.NONCE`` placeholder in the corresponding directive(s)
+      (``script-src`` or ``style-src``) within your :setting:`SECURE_CSP`
+      settings.
+    * Failing to include ``CSP.NONCE`` in the settings while accessing
+      ``{{ CSP_NONCE }}`` in the template means the nonce attribute will
+      appear in the HTML, but the required authorizing ``nonce-...`` source will
+      be *missing* from the CSP header. This mismatch *will cause the browser
+      to block* the execution or application of that nonced script or style.
