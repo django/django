@@ -95,6 +95,17 @@ class QuerySetSetOperationTests(TestCase):
         self.assertNumbersEqual(qs[:1], [0])
         self.assertNumbersEqual(qs.order_by("num")[0:], list(range(0, 10)))
 
+    @skipUnlessDBFeature("supports_select_intersection")
+    def test_intersection_empty_slice(self):
+        qs = Number.objects.intersection()
+        self.assertNumbersEqual(qs[:1], [0])
+
+    @skipUnlessDBFeature("supports_select_difference")
+    def test_difference_empty_slice(self):
+        qs = Number.objects.difference()
+        self.assertNumbersEqual(qs[:1], [0])
+        self.assertNumbersEqual(qs.order_by("num")[0:], list(range(0, 10)))
+
     def test_union_all_none_slice(self):
         qs = Number.objects.filter(id__in=[])
         with self.assertNumQueries(0):

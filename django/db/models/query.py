@@ -1558,6 +1558,8 @@ class QuerySet(AltersData):
         # If any query is an EmptyQuerySet, return it.
         if isinstance(self, EmptyQuerySet):
             return self
+        if not other_qs:
+            return self
         for other in other_qs:
             if isinstance(other, EmptyQuerySet):
                 return other
@@ -1566,6 +1568,8 @@ class QuerySet(AltersData):
     def difference(self, *other_qs):
         # If the query is an EmptyQuerySet, return it.
         if isinstance(self, EmptyQuerySet):
+            return self
+        if not other_qs:
             return self
         return self._combinator_query("difference", *other_qs)
 
