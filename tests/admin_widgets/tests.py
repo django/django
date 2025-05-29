@@ -1737,6 +1737,48 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         self.assertCountSeleniumElements("#id_students_to > option", 2)
 
+    def test_submission_via_enter_key(self):
+        """
+        Make sure the form can be submitted correctly by pressing the enter key
+        (#36423).
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.school.students.set([self.peter])
+        self.school.alumni.set([self.lisa])
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+        )
+
+        self.wait_page_ready()
+        self.select_option("#id_students_from", str(self.lisa.id))
+        self.selenium.find_element(By.ID, "id_students_add").click()
+        self.select_option("#id_alumni_from", str(self.peter.id))
+        self.selenium.find_element(By.ID, "id_alumni_add").click()
+
+        # Save, everything should be stored properly stored in the
+        # database.
+        name_element = self.selenium.find_element(
+            By.XPATH, "//input[contains(@id, 'id_name')]"
+        )
+        name_element.click()
+        name_element.send_keys(Keys.ENTER)
+        self.wait_page_ready()
+
+        self.school = School.objects.get(id=self.school.id)  # Reload from database
+        self.assertEqual(
+            list(self.school.students.all()),
+            [self.lisa, self.peter],
+        )
+        self.assertEqual(
+            list(self.school.alumni.all()),
+            [self.lisa, self.peter],
+        )
+
 
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def setUp(self):
