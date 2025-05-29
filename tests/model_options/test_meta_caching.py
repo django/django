@@ -7,210 +7,374 @@ from django.test.utils import isolate_apps
 class ForwardPropertiesCachingTests(SimpleTestCase):
     """Tests FORWARD_PROPERTIES for Django's model metadata caching system."""
 
-    def test_forward_properties_initialization(self):
-        """Test that FORWARD_PROPERTIES are properly initialized."""
-
+    def test_fields_caching(self):
         class TestModel(models.Model):
             name = models.CharField(max_length=100)
-
-        # Verify that none of the FORWARD_PROPERTIES are in the __dict__ initially
-        for prop in TestModel._meta.FORWARD_PROPERTIES:
-            with self.subTest(property=prop):
-                self.assertNotIn(prop, TestModel._meta.__dict__)
-
-    def test_forward_properties_access(self):
-        """Test that accessing a FORWARD_PROPERTY caches it in the __dict__."""
-
-        class TestModel(models.Model):
-            name = models.CharField(max_length=100)
-
-        # Access each property and verify it's cached
-        for prop in TestModel._meta.FORWARD_PROPERTIES:
-            if hasattr(TestModel._meta, prop):
-                with self.subTest(property=prop):
-                    # Access the property to trigger caching
-                    getattr(TestModel._meta, prop)
-                    # Verify it's now in the __dict__
-                    self.assertIn(prop, TestModel._meta.__dict__)
-
-    def test_expire_cache_forward_properties(self):
-        """Test that _expire_cache properly clears FORWARD_PROPERTIES."""
-
-        class TestModel(models.Model):
-            name = models.CharField(max_length=100)
+            number = models.IntegerField()
 
         meta = TestModel._meta
 
-        # First, access some properties to cache them
+        # Access fields to cache them
         _ = meta.fields
-        _ = meta.managers
-
-        # Verify they're cached
         self.assertIn("fields", meta.__dict__)
-        self.assertIn("managers", meta.__dict__)
 
-        # Now expire the cache
-        meta._expire_cache(forward=True, reverse=False)
+        field_names = [field.name for field in meta.__dict__["fields"]]
+        self.assertIn("name", field_names)
+        self.assertIn("number", field_names)
 
-        # Verify the properties are no longer cached
+        TestModel.add_to_class("new_field", models.CharField(max_length=100))
+
+        # Verify the cache was expired
         self.assertNotIn("fields", meta.__dict__)
-        self.assertNotIn("managers", meta.__dict__)
 
-    def test_expire_cache_selective(self):
-        """Test that _expire_cache can selectively clear caches."""
+        meta = TestModel._meta
 
+        self.assertIn("new_field", [field.name for field in meta.fields])
+        self.assertIn("fields", meta.__dict__)
+
+    def test_many_to_many_forward_properties(self):
         class TestModel(models.Model):
             name = models.CharField(max_length=100)
             parent = models.ForeignKey(
                 "self", on_delete=models.CASCADE, null=True, related_name="children"
             )
+            tags = models.ManyToManyField("self", related_name="tagged_items")
 
         meta = TestModel._meta
 
-        # Access properties from both FORWARD_PROPERTIES and REVERSE_PROPERTIES
-        _ = meta.fields  # forward
+        # Access many_to_many to cache it
+        _ = meta.many_to_many
+        self.assertIn("many_to_many", meta.__dict__)
 
-        # Check if related_objects exists before accessing
-        has_related_objects = hasattr(meta, "related_objects")
-        if has_related_objects:
-            _ = meta.related_objects
+        self.assertIn("tags", [field.name for field in meta.__dict__["many_to_many"]])
 
-        # Verify they're cached
-        self.assertIn("fields", meta.__dict__)
-        if has_related_objects:
-            self.assertIn("related_objects", meta.__dict__)
+        tags_field = TestModel._meta.get_field("tags")
+        new_tags_field = models.ManyToManyField(
+            "self",
+            related_name="new_tagged_items",
+            through=tags_field.remote_field.through,
+        )
 
-        # Selectively expire forward cache
-        meta._expire_cache(forward=True, reverse=False)
+        TestModel.add_to_class("tags", new_tags_field)
 
-        # Verify forward properties are cleared but reverse properties remain
-        self.assertNotIn("fields", meta.__dict__)
-        if has_related_objects:
-            self.assertIn("related_objects", meta.__dict__)
+        # Verify the cache was expired
+        self.assertNotIn("many_to_many", meta.__dict__)
 
-        # Reaccess forward properties
-        _ = meta.fields
-        self.assertIn("fields", meta.__dict__)
+        meta = TestModel._meta
+        self.assertIn("tags", [field.name for field in meta.many_to_many])
+        self.assertIn("many_to_many", meta.__dict__)
 
-        # Selectively expire reverse cache
-        meta._expire_cache(forward=False, reverse=True)
-
-        # Verify forward properties remain but reverse properties are cleared
-        self.assertIn("fields", meta.__dict__)
-        if has_related_objects:
-            self.assertNotIn("related_objects", meta.__dict__)
-
-    def test_model_inheritance_caching(self):
-        """Test that model inheritance properly handles property caching."""
-
+    def test_concrete_fields_caching(self):
         class ParentModel(models.Model):
             parent_field = models.CharField(max_length=100)
 
-        class ChildModel(ParentModel):
-            child_field = models.CharField(max_length=100)
+        class TestModel(ParentModel):
+            name = models.CharField(max_length=100)
 
-        # Access parent properties
-        parent_fields = ParentModel._meta.fields
+        meta = TestModel._meta
 
-        # Verify parent properties are cached
-        self.assertIn("fields", ParentModel._meta.__dict__)
+        # Access concrete_fields to cache it
+        _ = meta.concrete_fields
+        self.assertIn("concrete_fields", meta.__dict__)
 
-        # Access child properties
-        child_fields = ChildModel._meta.fields
+        concrete_field_names = [
+            field.name for field in meta.__dict__["concrete_fields"]
+        ]
+        self.assertIn("parent_field", concrete_field_names)
+        self.assertIn("name", concrete_field_names)
 
-        # Verify child properties are cached
-        self.assertIn("fields", ChildModel._meta.__dict__)
+        # Create a related model for the ForeignKey
+        class RelatedModel(models.Model):
+            pass
 
-        # Verify child fields include parent fields
-        parent_field_names = [f.name for f in parent_fields]
-        child_field_names = [f.name for f in child_fields]
-
-        for name in parent_field_names:
-            self.assertIn(name, child_field_names)
-
-    def test_add_field_expires_cache(self):
-        """Test that adding a field properly expires the cache."""
-
-        class DynamicModel(models.Model):
-            initial_field = models.CharField(max_length=100)
-
-        # Access fields to cache them
-        _ = DynamicModel._meta.fields
-        self.assertIn("fields", DynamicModel._meta.__dict__)
-
-        # Add a new field
-        new_field = models.IntegerField(name="dynamic_field")
-        DynamicModel._meta.add_field(new_field)
+        TestModel.add_to_class(
+            "related", models.ForeignKey(RelatedModel, on_delete=models.CASCADE)
+        )
 
         # Verify the cache was expired
-        self.assertNotIn("fields", DynamicModel._meta.__dict__)
+        self.assertNotIn("concrete_fields", meta.__dict__)
 
-        # Access fields again
-        updated_fields = DynamicModel._meta.fields
+        meta = TestModel._meta
+        self.assertIn("related", [field.name for field in meta.concrete_fields])
+        self.assertIn("concrete_fields", meta.__dict__)
 
-        # Verify the new field is included
-        field_names = [f.name for f in updated_fields]
-        self.assertIn("dynamic_field", field_names)
+    def test_local_concrete_fields_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+            number = models.IntegerField()
+
+        meta = TestModel._meta
+
+        # Access local_concrete_fields to cache it
+        _ = meta.local_concrete_fields
+        self.assertIn("local_concrete_fields", meta.__dict__)
+        self.assertIn(
+            "name", [field.name for field in meta.__dict__["local_concrete_fields"]]
+        )
+        self.assertIn(
+            "number", [field.name for field in meta.__dict__["local_concrete_fields"]]
+        )
+
+        TestModel.add_to_class("new_field", models.CharField(max_length=100))
+
+        # Verify the cache was expired
+        self.assertNotIn("local_concrete_fields", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIn("new_field", [field.name for field in meta.local_concrete_fields])
+        self.assertIn("local_concrete_fields", meta.__dict__)
+
+    def test_non_pk_concrete_field_names_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        meta = TestModel._meta
+
+        # Access _non_pk_concrete_field_names to cache it
+        _ = meta._non_pk_concrete_field_names
+        self.assertIn("_non_pk_concrete_field_names", meta.__dict__)
+
+        TestModel.add_to_class("new_field", models.CharField(max_length=100))
+
+        # Verify the cache was expired
+        self.assertNotIn("_non_pk_concrete_field_names", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIn("new_field", meta._non_pk_concrete_field_names)
+        self.assertIn("_non_pk_concrete_field_names", meta.__dict__)
+
+    def test_reverse_one_to_one_field_names_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        class RelatedModel(models.Model):
+            test = models.OneToOneField(TestModel, on_delete=models.CASCADE)
+
+        meta = TestModel._meta
+
+        # Access _reverse_one_to_one_field_names to cache it
+        _ = meta._reverse_one_to_one_field_names
+        self.assertIn("_reverse_one_to_one_field_names", meta.__dict__)
+
+        class NewRelatedModel(models.Model):
+            new_test = models.OneToOneField(TestModel, on_delete=models.CASCADE)
+
+        # Verify the cache was expired
+        self.assertNotIn("_reverse_one_to_one_field_names", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIn("newrelatedmodel", meta._reverse_one_to_one_field_names)
+        self.assertIn("_reverse_one_to_one_field_names", meta.__dict__)
+
+    def test_forward_fields_map_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        meta = TestModel._meta
+
+        # Access _forward_fields_map to cache it
+        _ = meta._forward_fields_map
+        self.assertIn("_forward_fields_map", meta.__dict__)
+
+        TestModel.add_to_class("new_field", models.CharField(max_length=100))
+
+        # Verify the cache was expired
+        self.assertNotIn("_forward_fields_map", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIn("new_field", meta._forward_fields_map)
+
+    def test_managers_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        meta = TestModel._meta
+
+        # Access managers to cache it
+        _ = meta.managers
+        self.assertIn("managers", meta.__dict__)
+
+        TestModel.add_to_class("custom_manager", models.Manager())
+
+        # Verify the cache was expired
+        self.assertNotIn("managers", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIn("custom_manager", [m.name for m in meta.managers])
+
+    def test_managers_map_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        meta = TestModel._meta
+
+        # Access managers_map to cache it
+        _ = meta.managers_map
+        self.assertIn("managers_map", meta.__dict__)
+
+        TestModel.add_to_class("custom_manager", models.Manager())
+        self.assertNotIn("managers_map", meta.__dict__)
+
+        # Verify the cache was expired
+        meta = TestModel._meta
+        self.assertIn("custom_manager", meta.managers_map)
+
+    def test_base_manager_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        meta = TestModel._meta
+
+        # Access base_manager to cache it
+        _ = meta.base_manager
+        self.assertIn("base_manager", meta.__dict__)
+
+        TestModel.add_to_class("custom_manager", models.Manager())
+
+        # Verify the cache was expired
+        self.assertNotIn("base_manager", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIsNotNone(meta.base_manager)
+
+    def test_default_manager_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        meta = TestModel._meta
+
+        # Access default_manager to cache it
+        _ = meta.default_manager
+        self.assertIn("default_manager", meta.__dict__)
+
+        TestModel.add_to_class("custom_manager", models.Manager())
+
+        # Verify the cache was expired
+        self.assertNotIn("default_manager", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIsNotNone(meta.default_manager)
+
+    def test_db_returning_fields_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+            number = models.IntegerField()
+
+        meta = TestModel._meta
+
+        # Access db_returning_fields to cache it
+        _ = meta.db_returning_fields
+        self.assertIn("db_returning_fields", meta.__dict__)
+
+        new_field = models.GeneratedField(
+            expression=models.functions.Ord(models.F("initial_field")),
+            output_field=models.IntegerField(),
+            db_persist=False,
+        )
+        new_field.name = "new_field"
+
+        # Add a new field
+        TestModel._meta.add_field(new_field)
+
+        # Verify the cache was expired
+        self.assertNotIn("db_returning_fields", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIn("new_field", [field.name for field in meta.db_returning_fields])
+        self.assertIn("db_returning_fields", meta.__dict__)
 
 
 @isolate_apps("model_options")
 class ReversePropertiesCachingTests(SimpleTestCase):
     """Tests REVERSE_PROPERTIES for Django's model metadata caching system."""
 
-    def test_reverse_properties_initialization(self):
-        """Test that REVERSE_PROPERTIES are properly initialized."""
-
+    def test_related_objects_caching(self):
         class TestModel(models.Model):
             name = models.CharField(max_length=100)
-            parent = models.ForeignKey(
-                "self", on_delete=models.CASCADE, null=True, related_name="children"
-            )
 
-        # Verify that none of the REVERSE_PROPERTIES are in the __dict__ initially
-        for prop in TestModel._meta.REVERSE_PROPERTIES:
-            with self.subTest(property=prop):
-                self.assertNotIn(prop, TestModel._meta.__dict__)
-
-    def test_reverse_properties_access(self):
-        """Test that accessing a REVERSE_PROPERTY caches it in the __dict__."""
-
-        class TestModel(models.Model):
-            name = models.CharField(max_length=100)
-            parent = models.ForeignKey(
-                "self", on_delete=models.CASCADE, null=True, related_name="children"
-            )
-
-        # Access each reverse property and verify it's cached
-        for prop in TestModel._meta.REVERSE_PROPERTIES:
-            if hasattr(TestModel._meta, prop):
-                with self.subTest(property=prop):
-                    # Access the property to trigger caching
-                    getattr(TestModel._meta, prop)
-                    # Verify it's now in the __dict__
-                    self.assertIn(prop, TestModel._meta.__dict__)
-
-    def test_expire_cache_reverse_properties(self):
-        """Test that _expire_cache properly clears REVERSE_PROPERTIES."""
-
-        class TestModel(models.Model):
-            name = models.CharField(max_length=100)
-            parent = models.ForeignKey(
-                "self", on_delete=models.CASCADE, null=True, related_name="children"
-            )
+        class RelatedModel(models.Model):
+            test = models.ForeignKey(TestModel, on_delete=models.CASCADE)
 
         meta = TestModel._meta
 
-        # First, access some reverse properties to cache them
+        # Access related_objects to cache it
         _ = meta.related_objects
-        _ = meta.fields_map
-
-        # Verify they're cached
         self.assertIn("related_objects", meta.__dict__)
-        self.assertIn("fields_map", meta.__dict__)
 
-        # Now expire the cache
-        meta._expire_cache(forward=False, reverse=True)
+        class NewRelatedModel(models.Model):
+            test = models.ForeignKey(TestModel, on_delete=models.CASCADE)
 
-        # Verify the properties are no longer cached
+        # Verify the cache was expired
         self.assertNotIn("related_objects", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIn("relatedmodel", [obj.name for obj in meta.related_objects])
+        self.assertIn("newrelatedmodel", [obj.name for obj in meta.related_objects])
+
+    def test_fields_map_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        class RelatedModel(models.Model):
+            test = models.ForeignKey(TestModel, on_delete=models.CASCADE)
+
+        meta = TestModel._meta
+
+        # Access fields_map to cache it
+        _ = meta.fields_map
+        self.assertIn("fields_map", meta.__dict__)
+        self.assertIn("relatedmodel", meta.fields_map)
+        self.assertIsInstance(meta.fields_map["relatedmodel"], models.ManyToOneRel)
+
+        class NewRelatedModel(models.Model):
+            test = models.ForeignKey(TestModel, on_delete=models.CASCADE)
+
+        # Verify the cache was expired
         self.assertNotIn("fields_map", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertIn("relatedmodel", meta.fields_map)
+        self.assertIn("newrelatedmodel", meta.fields_map)
+        self.assertIsInstance(meta.fields_map["relatedmodel"], models.ManyToOneRel)
+        self.assertIsInstance(meta.fields_map["newrelatedmodel"], models.ManyToOneRel)
+
+    def test_relation_tree_caching(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=100)
+
+        class RelatedModel(models.Model):
+            test = models.ForeignKey(TestModel, on_delete=models.CASCADE)
+
+        meta = TestModel._meta
+
+        # Access _relation_tree to cache it
+        _ = meta._relation_tree
+        self.assertIn("_relation_tree", meta.__dict__)
+
+        # Verify the relation field is in the tree
+        self.assertTrue(
+            any(
+                field.name == "test" and field.model == RelatedModel
+                for field in meta._relation_tree
+            )
+        )
+
+        class NewRelatedModel(models.Model):
+            test = models.ForeignKey(TestModel, on_delete=models.CASCADE)
+
+        # Verify the cache was expired
+        self.assertNotIn("_relation_tree", meta.__dict__)
+
+        meta = TestModel._meta
+        self.assertTrue(
+            any(
+                field.name == "test" and field.model == RelatedModel
+                for field in meta._relation_tree
+            )
+        )
+        self.assertTrue(
+            any(
+                field.name == "test" and field.model == NewRelatedModel
+                for field in meta._relation_tree
+            )
+        )
