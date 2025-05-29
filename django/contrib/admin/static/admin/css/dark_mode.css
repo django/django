@@ -20,6 +20,9 @@
       --border-color: #353535;
   
       --error-fg: #e35f5f;
+
+      --message-debug-bg: #4e4e4e;
+      --message-info-bg: #265895;
       --message-success-bg: #006b1b;
       --message-warning-bg: #583305;
       --message-error-bg: #570808;
@@ -57,6 +60,9 @@ html[data-theme="dark"] {
     --border-color: #353535;
 
     --error-fg: #e35f5f;
+
+    --message-debug-bg: #4e4e4e;
+    --message-info-bg: #265895;
     --message-success-bg: #006b1b;
     --message-warning-bg: #583305;
     --message-error-bg: #570808;
