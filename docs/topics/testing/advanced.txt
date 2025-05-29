@@ -871,14 +871,14 @@ following from your project folder containing ``manage.py``:
 
 .. code-block:: shell
 
-   coverage run --source='.' manage.py test myapp
+   python -m coverage run --source='.' -m manage test myapp
 
 This runs your tests and collects coverage data of the executed files in your
 project. You can see a report of this data by typing following command:
 
 .. code-block:: shell
 
-   coverage report
+   python -m coverage report
 
 Note that some Django code was executed while running tests, but it is not
 listed here because of the ``source`` flag passed to the previous command.
