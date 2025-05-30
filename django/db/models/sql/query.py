@@ -534,7 +534,14 @@ class Query(BaseExpression):
             # Queries with distinct_fields need ordering and when a limit is
             # applied we must take the slice from the ordered query. Otherwise
             # no need for ordering.
-            inner_query.clear_ordering(force=False)
+            if (
+                not inner_query.is_sliced
+                and not inner_query.distinct_fields
+                and inner_query.orderby_issubset_groupby
+            ):
+                inner_query.order_by = ()
+                inner_query.extra_order_by = ()
+                inner_query.default_ordering = False
             if not inner_query.distinct:
                 # If the inner query uses default select and it has some
                 # aggregate annotations, then we must make sure the inner
@@ -2337,6 +2344,34 @@ class Query(BaseExpression):
             self.order_by += ordering
         else:
             self.default_ordering = False
+
+    @property
+    def orderby_issubset_groupby(self):
+        """
+        Return true if order_by of query is subset of group_by.
+        """
+        # we don't want to harm original query, so we need to clone it
+        q = self.clone()
+        if q.group_by is False:
+            # there is no use case for that, but we need to be sure
+            return False
+        if q.group_by in (None, True):
+            # it seems like there is no aggregation at all (None)
+            # or there are all required groupbies(True) generated automatically
+            # from models fields - so, it is safe to clear ordering
+            return True
+        order_by_set = set(
+            [
+                (
+                    order_by.resolve_expression(q)
+                    if hasattr(order_by, "resolve_expression")
+                    else F(order_by).resolve_expression(q)
+                )
+                for order_by in q.order_by
+            ]
+        ).union(q.extra_order_by)
+        group_by_set = set([group_by.resolve_expression(q) for group_by in q.group_by])
+        return order_by_set.issubset(group_by_set)
 
     def clear_ordering(self, force=False, clear_default=True):
         """
