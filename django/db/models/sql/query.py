@@ -528,7 +528,8 @@ class Query(BaseExpression):
             # Queries with distinct_fields need ordering and when a limit is
             # applied we must take the slice from the ordered query. Otherwise
             # no need for ordering.
-            inner_query.clear_ordering(force=False)
+            if orderby_issubset_groupby(self):
+                inner_query.clear_ordering(force=False)
             if not inner_query.distinct:
                 # If the inner query uses default select and it has some
                 # aggregate annotations, then we must make sure the inner
@@ -2303,12 +2304,43 @@ class Query(BaseExpression):
         else:
             self.default_ordering = False
 
+    @property
+    def order_by_issubset_group_by(self):
+        """
+        It just compares order_by part to group_by part of Query instance
+        to say it is subset or not.
+        """
+        if self.group_by is None:
+            # if there is some order_by, it cannot be subset
+            return not len(self.order_by) > 0
+        if self.group_by is True:
+            # group_by will contain all selected values later?
+            return True
+        order_by_set = set(
+            [
+                (
+                    order_by.resolve_expression(self)
+                    if hasattr(order_by, "resolve_expression")
+                    else F(order_by).resolve_expression(self)
+                )
+                for order_by in self.order_by
+            ]
+        )
+        group_by_set = set(
+            [group_by.resolve_expression(self) for group_by in self.group_by]
+        )
+        return order_by_set.issubset(group_by_set)
+
     def clear_ordering(self, force=False, clear_default=True):
         """
         Remove any ordering settings if the current query allows it without
         side effects, set 'force' to True to clear the ordering regardless.
         If 'clear_default' is True, there will be no ordering in the resulting
         query (not even the model's default).
+
+        The `aggregate` kwarg is here because of its use
+        in the Query.get_aggregate(...) method call,
+        where the ordering was being cleared too aggressively...(ticket_26434)
         """
         if not force and (
             self.is_sliced or self.distinct_fields or self.select_for_update
@@ -2691,6 +2723,31 @@ class Query(BaseExpression):
             field.empty_strings_allowed
             and connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
         )
+
+
+def orderby_issubset_groupby(query):
+    """
+    Return true if order_by of passed query is subset of group_by.
+    """
+    # we don't want to harm original query, so we need to clone it
+    q = query.clone()
+    if q.group_by is None:
+        # if there is some order_by, it cannot be subset
+        return not len(q.order_by) > 0 and not len(q.extra_order_by) > 0
+    if isinstance(q.group_by, bool):
+        return True
+    order_by_set = set(
+        [
+            (
+                order_by.resolve_expression(q)
+                if hasattr(order_by, "resolve_expression")
+                else F(order_by).resolve_expression(q)
+            )
+            for order_by in q.order_by
+        ]
+    ).union(q.extra_order_by)
+    group_by_set = set([group_by.resolve_expression(q) for group_by in q.group_by])
+    return order_by_set.issubset(group_by_set)
 
 
 def get_order_dir(field, default="ASC"):
