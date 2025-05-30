@@ -297,7 +297,7 @@ class BaseExpression:
         c.is_summary = summarize
         source_expressions = [
             (
-                expr.resolve_expression(query, allow_joins, reuse, summarize)
+                expr.resolve_expression(query, allow_joins, reuse, summarize, for_save)
                 if expr is not None
                 else None
             )
