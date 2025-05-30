@@ -413,6 +413,19 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
     a development machine where you can easily restore the entire contents of
     all databases in the cluster.
 
+Notes on specific fields
+------------------------
+
+Positive integer fields
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+PostgreSQL does not have unsigned integer types. Django's positive integer
+fields (:class:`~django.db.models.PositiveIntegerField`,
+:class:`~django.db.models.PositiveBigIntegerField`, and
+:class:`~django.db.models.PositiveSmallIntegerField`) are implemented using
+regular signed integer columns with ``CHECK`` constraints to enforce
+non-negative values. These constraints are properly enforced by the database.
+
 .. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg2: https://www.psycopg.org/
 
@@ -559,8 +572,6 @@ than comparisons for ``utf8mb4_unicode_ci``. If this is acceptable for your
 application, you should use ``utf8mb4_general_ci`` because it is faster. If
 this is not acceptable (for example, if you require German dictionary order),
 use ``utf8mb4_unicode_ci`` because it is more accurate.
-
-.. _MySQL Unicode Character Sets: https://dev.mysql.com/doc/refman/en/charset-unicode-sets.html
 
 .. warning::
 
@@ -768,6 +779,17 @@ set :setting:`USE_TZ = False <USE_TZ>` to avoid data corruption.
 :class:`~django.db.models.DateTimeField` and if you enable timezone support,
 both MySQL and Django will attempt to convert the values from UTC to local time.
 
+Positive integer fields
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL uses ``UNSIGNED`` integer types for Django's positive integer fields
+(:class:`~django.db.models.PositiveIntegerField`,
+:class:`~django.db.models.PositiveBigIntegerField`, and
+:class:`~django.db.models.PositiveSmallIntegerField`). While the ``UNSIGNED``
+attribute itself allows for the value ``0`` and shifts the value range,
+Django also includes a ``CHECK`` constraint (e.g., ``column >= 0``) to
+ensure non-negative values are enforced at the database level.
+
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
 
@@ -943,6 +965,18 @@ not appear, or may appear twice, in subsequent results fetched from the
 iterator. Your code must handle this.
 
 .. _`Isolation in SQLite`: https://www.sqlite.org/isolation.html
+
+Positive integer fields
+-----------------------
+
+SQLite does not have unsigned integer types, but Django's positive integer 
+fields (:class:`~django.db.models.PositiveIntegerField`,
+:class:`~django.db.models.PositiveBigIntegerField`, and
+:class:`~django.db.models.PositiveSmallIntegerField`) are implemented using
+``CHECK`` constraints to enforce non-negative values. Note that SQLite stores
+all integers as signed 64-bit values internally, regardless of the declared
+column type, but the ``CHECK`` constraints ensure data integrity by preventing
+negative values from being inserted.
 
 .. _sqlite-json1:
 
@@ -1201,6 +1235,17 @@ have the empty string as a possible value and generates DDL as if
 a ``NULL`` value in one of these fields really means the empty
 string, and the data is silently converted to reflect this assumption.
 
+Positive integer fields
+------------------------
+
+Oracle does not have unsigned integer types. Django's positive integer fields
+(:class:`~django.db.models.PositiveIntegerField`,
+:class:`~django.db.models.PositiveBigIntegerField`, and
+:class:`~django.db.models.PositiveSmallIntegerField`) are stored as regular
+``NUMBER`` columns. Unlike some other backends, Oracle does not automatically
+add ``CHECK`` constraints to enforce non-negative values, so application-level
+validation is essential when using positive integer fields with Oracle.
+
 ``TextField`` limitations
 -------------------------
 
@@ -1290,3 +1335,4 @@ The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
+

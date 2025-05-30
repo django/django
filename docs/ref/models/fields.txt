@@ -1491,6 +1491,14 @@ Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
 safe in all databases supported by Django.
 
+.. note::
+
+   The range above represents the largest interval that is guaranteed to
+   work across all database backends supported by Django. **Actual storage
+   types and limits may differ depending on the database.** Some database
+   backends may support larger values. For backend-specific details, please
+   refer to the :doc:`notes on specific database backends </ref/databases>`.
+
 ``PositiveIntegerField``
 ------------------------
 
@@ -1500,6 +1508,11 @@ Like an :class:`IntegerField`, but must be either positive or zero (``0``).
 Values from ``0`` to ``2147483647`` are safe in all databases supported by
 Django. The value ``0`` is accepted for backward compatibility reasons.
 
+.. note::
+
+   See the note for :class:`PositiveBigIntegerField` regarding database
+   backend compatibility.
+
 ``PositiveSmallIntegerField``
 -----------------------------
 
@@ -1508,6 +1521,11 @@ Django. The value ``0`` is accepted for backward compatibility reasons.
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``32767`` are safe in all
 databases supported by Django.
+
+.. note::
+
+   See the note for :class:`PositiveBigIntegerField` regarding database
+   backend compatibility.
 
 ``SlugField``
 -------------
