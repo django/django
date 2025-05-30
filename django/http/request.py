@@ -689,13 +689,13 @@ class QueryDict(MultiValueDict):
 
 class MediaType:
     def __init__(self, media_type_raw_line):
-        full_type, self.params = parse_header_parameters(
+        full_type, self._params = parse_header_parameters(
             media_type_raw_line if media_type_raw_line else ""
         )
         self.main_type, _, self.sub_type = full_type.partition("/")
 
     def __str__(self):
-        params_str = "".join("; %s=%s" % (k, v) for k, v in self.params.items())
+        params_str = "".join("; %s=%s" % (k, v) for k, v in self._params.items())
         return "%s%s%s" % (
             self.main_type,
             ("/%s" % self.sub_type) if self.sub_type else "",
@@ -707,21 +707,37 @@ class MediaType:
 
     @property
     def is_all_types(self):
-        return self.main_type == "*" and self.sub_type == "*"
+        return self.main_type == "*" and self.sub_type == "*" and not self.params
+
+    @cached_property
+    def params(self):
+        params = self._params.copy()
+        params.pop("q", None)
+        return params
 
     def match(self, other):
-        if self.is_all_types:
-            return True
         other = MediaType(other)
-        return self.main_type == other.main_type and self.sub_type in {
-            "*",
-            other.sub_type,
-        }
+
+        if not (
+            self.main_type in [other.main_type, "*"]
+            and self.sub_type in [other.sub_type, "*"]
+        ):
+            return False
+
+        if self.params and other.params:
+            # If both have params, they must be identical
+            return self.params == other.params
+        elif self.params:
+            # If we have params and they don't, don't match
+            return False
+        else:
+            # If they have params and we don't, match
+            return True
 
     @cached_property
     def quality(self):
         try:
-            quality = float(self.params.get("q", 1))
+            quality = float(self._params.get("q", 1))
         except ValueError:
             # Discard invalid values.
             return 1
@@ -735,15 +751,17 @@ class MediaType:
     @property
     def specificity(self):
         """
-        Return a value from 0-3 for how specific the media type is.
+        Return a value from 0-4 for how specific the media type is.
         """
         if self.main_type == "*":
             return 0
         elif self.sub_type == "*":
             return 1
-        elif self.quality == 1:
+        elif not self._params:
             return 2
-        return 3
+        elif self.quality == 1:
+            return 3
+        return 4
 
 
 # It's neither necessary nor appropriate to use

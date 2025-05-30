@@ -27,6 +27,7 @@ class MediaTypeTests(TestCase):
     def test_is_all_types(self):
         self.assertIs(MediaType("*/*").is_all_types, True)
         self.assertIs(MediaType("*/*; q=0.8").is_all_types, True)
+        self.assertIs(MediaType("*/*; version=3.0").is_all_types, False)
         self.assertIs(MediaType("text/*").is_all_types, False)
         self.assertIs(MediaType("application/xml").is_all_types, False)
 
@@ -39,6 +40,8 @@ class MediaTypeTests(TestCase):
             ("application/xml", "application/xml"),
             (" application/xml ", "application/xml"),
             ("application/xml", " application/xml "),
+            ("text/vcard; version=4.0", "text/vcard; version=4.0"),
+            ("text/vcard; version=4.0", "text/vcard"),
         ]
         for accepted_type, mime_type in tests:
             with self.subTest(accepted_type, mime_type=mime_type):
@@ -51,6 +54,8 @@ class MediaTypeTests(TestCase):
             ("; q=0.8", "*/*"),
             ("application/xml", "application/html"),
             ("application/xml", "*/*"),
+            ("text/vcard; version=4.0", "text/vcard; version=3.0"),
+            ("text/vcard", "text/vcard; version=3.0"),
         ]
         for accepted_type, mime_type in tests:
             with self.subTest(accepted_type, mime_type=mime_type):
@@ -65,6 +70,7 @@ class MediaTypeTests(TestCase):
             ("*/*; q=-1", 1),
             ("*/*; q=2", 1),
             ("*/*; q=h", 1),
+            ("*/*; q=inf", 1),
             ("*/*", 1),
         ]
         for accepted_type, quality in tests:
@@ -78,8 +84,9 @@ class MediaTypeTests(TestCase):
             ("text/*", 1),
             ("text/*;q=0.5", 1),
             ("text/html", 2),
-            ("text/html;q=1", 2),
-            ("text/html;q=0.5", 3),
+            ("text/html;q=1", 3),
+            ("text/html;version=5", 3),
+            ("text/html;q=0.5", 4),
         ]
         for accepted_type, specificity in tests:
             with self.subTest(accepted_type, specificity=specificity):
@@ -108,6 +115,24 @@ class AcceptHeaderTests(TestCase):
                 "text/*",
                 "application/xml; q=0.9",
                 "*/*; q=0.8",
+            ],
+        )
+
+    def test_precedence(self):
+        """
+        Example as per https://datatracker.ietf.org/doc/html/rfc7231#section-5.3.2.
+        """
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = (
+            "text/*, text/plain, text/plain;format=flowed, */*"
+        )
+        self.assertEqual(
+            [str(accepted_type) for accepted_type in request.accepted_types],
+            [
+                "text/plain; format=flowed",
+                "text/plain",
+                "text/*",
+                "*/*",
             ],
         )
 
@@ -175,3 +200,52 @@ class AcceptHeaderTests(TestCase):
         self.assertIsNone(
             request.get_preferred_type(["application/json", "text/plain"])
         )
+
+    def test_accept_with_param(self):
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = "text/vcard; version=3.0"
+
+        self.assertEqual(
+            request.get_preferred_type(
+                [
+                    "text/vcard; version=4.0",
+                    "text/vcard; version=3.0",
+                    "text/vcard",
+                    "text/directory",
+                ]
+            ),
+            "text/vcard; version=3.0",
+        )
+
+        self.assertEqual(
+            request.get_preferred_type(
+                [
+                    "text/vcard",
+                    "text/directory",
+                ]
+            ),
+            "text/vcard",
+        )
+
+    def test_quality(self):
+        """
+        Example as per https://datatracker.ietf.org/doc/html/rfc7231#section-5.3.2
+        """
+
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = (
+            "text/*;q=0.3, text/html;q=0.7, text/html;level=1, text/html;level=2;q=0.4, */*;q=0.5"
+        )
+
+        for media_type, quality in [
+            ("text/html;level=1", 1),
+            ("text/html", 0.7),
+            ("text/plain", 0.3),
+            ("image/jpeg", 0.5),
+            ("text/html;level=2", 0.4),
+            ("text/html;level=3", 0.7),
+        ]:
+            with self.subTest(media_type):
+                accepted_media_type = request.accepted_type(media_type)
+                self.assertIsNotNone(accepted_media_type)
+                self.assertEqual(accepted_media_type.quality, quality)
