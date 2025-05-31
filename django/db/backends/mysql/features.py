@@ -58,6 +58,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = True
 
+    supports_json_absent_on_null = False
     supports_json_negative_indexing = False
 
     @cached_property
