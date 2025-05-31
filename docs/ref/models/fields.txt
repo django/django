@@ -1405,7 +1405,8 @@ The default form widget for this field is a
 
 .. class:: IntegerField(**options)
 
-An integer. Values from ``-2147483648`` to ``2147483647`` are safe in all
+An integer. Values are only allowed between certain (database-dependent)
+points. Values from ``-2147483648`` to ``2147483647`` are compatible in all
 databases supported by Django.
 
 It uses :class:`~django.core.validators.MinValueValidator` and
@@ -1489,7 +1490,7 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
-safe in all databases supported by Django.
+compatible in all databases supported by Django.
 
 ``PositiveIntegerField``
 ------------------------
@@ -1497,8 +1498,9 @@ safe in all databases supported by Django.
 .. class:: PositiveIntegerField(**options)
 
 Like an :class:`IntegerField`, but must be either positive or zero (``0``).
-Values from ``0`` to ``2147483647`` are safe in all databases supported by
-Django. The value ``0`` is accepted for backward compatibility reasons.
+Values are only allowed under a certain (database-dependent) point. Values from
+``0`` to ``2147483647`` are compatible in all databases supported by Django.
+The value ``0`` is accepted for backward compatibility reasons.
 
 ``PositiveSmallIntegerField``
 -----------------------------
@@ -1506,8 +1508,8 @@ Django. The value ``0`` is accepted for backward compatibility reasons.
 .. class:: PositiveSmallIntegerField(**options)
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
-(database-dependent) point. Values from ``0`` to ``32767`` are safe in all
-databases supported by Django.
+(database-dependent) point. Values from ``0`` to ``32767`` are compatible in
+all databases supported by Django.
 
 ``SlugField``
 -------------
@@ -1543,8 +1545,8 @@ It uses :class:`~django.core.validators.validate_slug` or
 .. class:: SmallAutoField(**options)
 
 Like an :class:`AutoField`, but only allows values under a certain
-(database-dependent) limit. Values from ``1`` to ``32767`` are safe in all
-databases supported by Django.
+(database-dependent) limit. Values from ``1`` to ``32767`` are compatible in
+all databases supported by Django.
 
 ``SmallIntegerField``
 ---------------------
@@ -1552,8 +1554,8 @@ databases supported by Django.
 .. class:: SmallIntegerField(**options)
 
 Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point. Values from ``-32768`` to ``32767`` are safe in all
-databases supported by Django.
+(database-dependent) point. Values from ``-32768`` to ``32767`` are compatible
+in all databases supported by Django.
 
 ``TextField``
 -------------
