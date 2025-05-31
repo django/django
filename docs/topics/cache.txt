@@ -10,8 +10,8 @@ processing-overhead perspective, than your standard
 read-a-file-off-the-filesystem server arrangement.
 
 For most web applications, this overhead isn't a big deal. Most web
-applications aren't ``washingtonpost.com`` or ``slashdot.org``; they're small-
-to medium-sized sites with so-so traffic. But for medium- to high-traffic
+applications aren't ``washingtonpost.com`` or ``slashdot.org``; they're
+small-to medium-sized sites with so-so traffic. But for medium- to high-traffic
 sites, it's essential to cut as much overhead as possible.
 
 That's where caching comes in.
