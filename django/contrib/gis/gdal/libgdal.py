@@ -6,7 +6,7 @@ from ctypes.util import find_library
 
 from django.contrib.gis.gdal.error import GDALException
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import SimpleLazyObject, lazy
+from django.utils.functional import SimpleLazyObject, cached_property, lazy
 
 logger = logging.getLogger("django.contrib.gis")
 
@@ -99,7 +99,7 @@ lgdal = SimpleLazyObject(load_gdal)
 
 
 def load_wingdal():
-    from ctypes import WinDLL  # type: ignore[attr-defined]
+    from ctypes import WinDLL
 
     lib_path = getattr(lgdal, "_name", None)
     return WinDLL(lib_path)
@@ -111,17 +111,6 @@ def load_wingdal():
 # different calling convention.
 if os.name == "nt":
     lwingdal = SimpleLazyObject(load_wingdal)
-
-
-def std_call(func):
-    """
-    Return the correct STDCALL function for certain OSR routines on Win32
-    platforms.
-    """
-    if os.name == "nt":
-        return lwingdal[func]
-    else:
-        return lgdal[func]
 
 
 class GDALFuncFactory:
@@ -145,9 +134,12 @@ class GDALFuncFactory:
     def __call__(self, *args):
         return self.func(*args)
 
-    @property
+    @cached_property
     def func(self):
-        func = std_call(self.func_name)
+        if os.name == "nt":
+            func = lwingdal[self.func_name]
+        else:
+            func = lgdal[self.func_name]
 
         # Setting the argument and return types.
         if self.argtypes is not None:
