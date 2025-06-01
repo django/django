@@ -298,7 +298,8 @@ be notified of a signal in the face of an error.
 
 ``send_robust()`` catches all errors derived from Python's ``Exception`` class,
 and ensures all receivers are notified of the signal. If an error occurs, the
-error instance is returned in the tuple pair for the receiver that raised the error.
+error instance is returned in the tuple pair for the receiver that raised the
+error.
 
 The tracebacks are present on the ``__traceback__`` attribute of the errors
 returned when calling ``send_robust()``.

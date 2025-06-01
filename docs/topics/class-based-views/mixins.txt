@@ -635,8 +635,9 @@ For example, a JSON mixin might look something like this::
     information on how to correctly transform Django models and querysets into
     JSON.
 
-This mixin provides a ``render_to_json_response()`` method with the same signature
-as :func:`~django.views.generic.base.TemplateResponseMixin.render_to_response`.
+This mixin provides a ``render_to_json_response()`` method with the same
+signature as
+:func:`~django.views.generic.base.TemplateResponseMixin.render_to_response`.
 To use it, we need to mix it into a ``TemplateView`` for example, and override
 ``render_to_response()`` to call ``render_to_json_response()`` instead::
 

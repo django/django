@@ -815,8 +815,8 @@ The default form widget for this field is a
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
-The options ``auto_now_add``, ``auto_now``, and ``default`` are mutually exclusive.
-Any combination of these options will result in an error.
+The options ``auto_now_add``, ``auto_now``, and ``default`` are mutually
+exclusive. Any combination of these options will result in an error.
 
 .. note::
     As currently implemented, setting ``auto_now`` or ``auto_now_add`` to
@@ -2476,7 +2476,8 @@ Field API reference
       value)
     * when it saves to the database (Python value -> database backend value)
 
-    When querying, :meth:`get_db_prep_value` and :meth:`get_prep_value` are used:
+    When querying, :meth:`get_db_prep_value` and :meth:`get_prep_value` are
+    used:
 
     .. method:: get_prep_value(value)
 
@@ -2587,8 +2588,9 @@ Field API reference
         Returns a 4-tuple with enough information to recreate the field:
 
         1. The name of the field on the model.
-        2. The import path of the field (e.g. ``"django.db.models.IntegerField"``).
-           This should be the most portable version, so less specific may be better.
+        2. The import path of the field (e.g.
+           ``"django.db.models.IntegerField"``). This should be the most
+           portable version, so less specific may be better.
         3. A list of positional arguments.
         4. A dict of keyword arguments.
 

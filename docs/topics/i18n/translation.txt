@@ -571,12 +571,12 @@ Similar access to this information is available for template code. See below.
 Internationalization: in template code
 ======================================
 
-Translations in :doc:`Django templates </ref/templates/language>` uses two template
-tags and a slightly different syntax than in Python code. To give your template
-access to these tags, put ``{% load i18n %}`` toward the top of your template.
-As with all template tags, this tag needs to be loaded in all templates which
-use translations, even those templates that extend from other templates which
-have already loaded the ``i18n`` tag.
+Translations in :doc:`Django templates </ref/templates/language>` uses two
+template tags and a slightly different syntax than in Python code. To give your
+template access to these tags, put ``{% load i18n %}`` toward the top of your
+template. As with all template tags, this tag needs to be loaded in all
+templates which use translations, even those templates that extend from other
+templates which have already loaded the ``i18n`` tag.
 
 .. warning::
 
@@ -693,8 +693,8 @@ You can use multiple expressions inside a single ``blocktranslate`` tag:
 .. note:: The previous more verbose format is still supported:
    ``{% blocktranslate with book|title as book_t and author|title as author_t %}``
 
-Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`) are
-not allowed inside a ``blocktranslate`` tag.
+Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`)
+are not allowed inside a ``blocktranslate`` tag.
 
 If resolving one of the block arguments fails, ``blocktranslate`` will fall
 back to the default language by deactivating the currently active language
@@ -827,7 +827,8 @@ tag:
     <p>{% blocktranslate %}A multiline translatable
     literal.{% endblocktranslate %}</p>
 
-or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-comments>`:
+or with the ``{#`` ... ``#}``
+:ref:`one-line comment constructs <template-comments>`:
 
 .. code-block:: html+django
 
@@ -999,7 +1000,8 @@ There are also some filters available for convenience:
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
 * ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
-* ``{{ LANGUAGE_CODE|language_name_translated }}`` ("německy", when active language is Czech)
+* ``{{ LANGUAGE_CODE|language_name_translated }}`` ("německy", when active
+  language is Czech)
 
 Internationalization: in JavaScript code
 ========================================
@@ -1864,9 +1866,9 @@ The ``set_language`` redirect view
 
 .. function:: set_language(request)
 
-As a convenience, Django comes with a view, :func:`django.views.i18n.set_language`,
-that sets a user's language preference and redirects to a given URL or, by default,
-back to the previous page.
+As a convenience, Django comes with a view,
+:func:`django.views.i18n.set_language`, that sets a user's language preference
+and redirects to a given URL or, by default, back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
 
@@ -1929,12 +1931,12 @@ redirected in the ``redirect_to`` context variable.
 Explicitly setting the active language
 --------------------------------------
 
-You may want to set the active language for the current session explicitly. Perhaps
-a user's language preference is retrieved from another system, for example.
-You've already been introduced to :func:`django.utils.translation.activate`. That
-applies to the current thread only. To persist the language for the entire
-session in a cookie, set the :setting:`LANGUAGE_COOKIE_NAME` cookie on the
-response::
+You may want to set the active language for the current session explicitly.
+Perhaps a user's language preference is retrieved from another system, for
+example. You've already been introduced to
+:func:`django.utils.translation.activate`. That applies to the current thread
+only. To persist the language for the entire session in a cookie, set the
+:setting:`LANGUAGE_COOKIE_NAME` cookie on the response::
 
     from django.conf import settings
     from django.http import HttpResponse
@@ -2211,9 +2213,10 @@ All message file repositories are structured the same way. They are:
 * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
 * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
-To create message files, you use the :djadmin:`django-admin makemessages <makemessages>`
-tool. And you use :djadmin:`django-admin compilemessages <compilemessages>`
-to produce the binary ``.mo`` files that are used by ``gettext``.
+To create message files, you use the
+:djadmin:`django-admin makemessages <makemessages>` tool. And you use
+:djadmin:`django-admin compilemessages <compilemessages>` to produce the binary
+``.mo`` files that are used by ``gettext``.
 
 You can also run :djadmin:`django-admin compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all

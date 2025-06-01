@@ -8,7 +8,8 @@ Django Utils
 This document covers all stable modules in ``django.utils``. Most of the
 modules in ``django.utils`` are designed for internal use and only the
 following parts can be considered stable and thus backwards compatible as per
-the :ref:`internal release deprecation policy <internal-release-deprecation-policy>`.
+the :ref:`internal release deprecation policy
+<internal-release-deprecation-policy>`.
 
 ``django.utils.cache``
 ======================
@@ -297,7 +298,8 @@ The functions defined in this module share the following properties:
 ==============================
 
 .. module:: django.utils.feedgenerator
-   :synopsis: Syndication feed generation library -- used for generating RSS, etc.
+   :synopsis: Syndication feed generation library -- used for generating RSS,
+       etc.
 
 Sample usage:
 
@@ -322,14 +324,14 @@ Sample usage:
 For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
 
-For definitions of the different versions of RSS, see:
-https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
+For definitions of the different versions of RSS, see
+`The myth of RSS compatibility <https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss>`__.
 
 .. function:: get_tag_uri(url, date)
 
     Creates a TagURI.
 
-    See https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See `How to make a good ID in Atom <https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id>`__.
 
 ``Stylesheet``
 --------------
@@ -837,7 +839,8 @@ Functions for working with Python modules.
 ===========================
 
 .. module:: django.utils.safestring
-   :synopsis: Functions and classes for working with strings that can be displayed safely without further escaping in HTML.
+   :synopsis: Functions and classes for working with strings that can be
+       displayed safely without further escaping in HTML.
 
 Functions and classes for working with "safe strings": strings that can be
 displayed safely without further escaping in HTML. Marking something as a "safe

@@ -117,8 +117,8 @@ determine a few things:
 * The column type, which tells the database what kind of data to store (e.g.
   ``INTEGER``, ``VARCHAR``, ``TEXT``).
 
-* The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a form
-  field (e.g. ``<input type="text">``, ``<select>``).
+* The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a
+  form field (e.g. ``<input type="text">``, ``<select>``).
 
 * The minimal validation requirements, used in Django's admin and in
   automatically-generated forms.
@@ -1059,11 +1059,12 @@ still only creating one database table per child model at the database level.
 ``Meta`` inheritance
 ~~~~~~~~~~~~~~~~~~~~
 
-When an abstract base class is created, Django makes any :ref:`Meta <meta-options>`
-inner class you declared in the base class available as an
-attribute. If a child class does not declare its own :ref:`Meta <meta-options>`
-class, it will inherit the parent's :ref:`Meta <meta-options>`. If the child wants to
-extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example::
+When an abstract base class is created, Django makes any
+:ref:`Meta <meta-options>` inner class you declared in the base class available
+as an attribute. If a child class does not declare its own
+:ref:`Meta <meta-options>` class, it will inherit the parent's
+:ref:`Meta <meta-options>`. If the child wants to extend the parent's
+:ref:`Meta <meta-options>` class, it can subclass it. For example::
 
     from django.db import models
 
@@ -1087,10 +1088,11 @@ base classes don't automatically become abstract classes themselves. To make
 an abstract base class that inherits from another abstract base class, you need
 to explicitly set ``abstract=True`` on the child.
 
-Some attributes won't make sense to include in the :ref:`Meta <meta-options>` class of an
-abstract base class. For example, including ``db_table`` would mean that all
-the child classes (the ones that don't specify their own :ref:`Meta <meta-options>`) would use
-the same database table, which is almost certainly not what you want.
+Some attributes won't make sense to include in the :ref:`Meta <meta-options>`
+class of an abstract base class. For example, including ``db_table`` would mean
+that all the child classes (the ones that don't specify their own
+:ref:`Meta <meta-options>`) would use the same database table, which is almost
+certainly not what you want.
 
 Due to the way Python inheritance works, if a child class inherits from
 multiple abstract base classes, only the :ref:`Meta <meta-options>` options
@@ -1269,11 +1271,11 @@ You can override that field by declaring your own
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the multi-table inheritance situation, it doesn't make sense for a child
-class to inherit from its parent's :ref:`Meta <meta-options>` class. All the :ref:`Meta <meta-options>` options
-have already been applied to the parent class and applying them again would
-normally only lead to contradictory behavior (this is in contrast with the
-abstract base class case, where the base class doesn't exist in its own
-right).
+class to inherit from its parent's :ref:`Meta <meta-options>` class. All the
+:ref:`Meta <meta-options>` options have already been applied to the parent class
+and applying them again would normally only lead to contradictory behavior (this
+is in contrast with the abstract base class case, where the base class doesn't
+exist in its own right).
 
 So a child model does not have access to its parent's :ref:`Meta
 <meta-options>` class. However, there are a few limited cases where the child
@@ -1359,7 +1361,8 @@ Proxy models are declared like normal models. You tell Django that it's a
 proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
 the ``Meta`` class to ``True``.
 
-For example, suppose you want to add a method to the ``Person`` model. You can do it like this::
+For example, suppose you want to add a method to the ``Person`` model. You can
+do it like this::
 
     from django.db import models
 

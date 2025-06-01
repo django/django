@@ -168,8 +168,8 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 ``KEY_FUNCTION``
 ~~~~~~~~~~~~~~~~
 
-A string containing a dotted path to a function (or any callable) that defines how to
-compose a prefix, version and key into a final cache key. The default
+A string containing a dotted path to a function (or any callable) that defines
+how to compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
     def make_key(key, key_prefix, version):
@@ -1116,7 +1116,8 @@ The default formatting to use for displaying date fields in any part of the
 system. Note that the locale-dictated format has higher precedence and will be
 applied instead. See :tfilter:`allowed date format strings <date>`.
 
-See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
+See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and
+:setting:`SHORT_DATE_FORMAT`.
 
 .. setting:: DATE_INPUT_FORMATS
 
@@ -1160,7 +1161,8 @@ The default formatting to use for displaying datetime fields in any part of the
 system. Note that the locale-dictated format has higher precedence and will be
 applied instead. See :tfilter:`allowed date format strings <date>`.
 
-See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
+See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and
+:setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: DATETIME_INPUT_FORMATS
 
@@ -1458,9 +1460,9 @@ Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 
 Default: ``'[Django] '``
 
-Subject-line prefix for email messages sent with ``django.core.mail.mail_admins``
-or ``django.core.mail.mail_managers``. You'll probably want to include the
-trailing space.
+Subject-line prefix for email messages sent with
+``django.core.mail.mail_admins`` or ``django.core.mail.mail_managers``. You'll
+probably want to include the trailing space.
 
 .. setting:: EMAIL_USE_LOCALTIME
 
@@ -1852,8 +1854,8 @@ It serves three purposes:
 
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
-* If the locale middleware is active, it provides a fallback language in case the
-  user's preferred language can't be determined or is not supported by the
+* If the locale middleware is active, it provides a fallback language in case
+  the user's preferred language can't be determined or is not supported by the
   website. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
 * If localization is explicitly disabled via the :tfilter:`unlocalize` filter
@@ -1927,8 +1929,8 @@ application). See :doc:`/topics/i18n/index`.
 
 Default: ``'/'``
 
-The path set on the language cookie. This should either match the URL path of your
-Django installation or be a parent of that path.
+The path set on the language cookie. This should either match the URL path of
+your Django installation or be a parent of that path.
 
 This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths and each instance will only see
@@ -2032,8 +2034,9 @@ Example::
         "/var/local/translations/locale",
     ]
 
-Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
-directories containing the actual translation files.
+Django will look within each of these paths for the
+``<locale_code>/LC_MESSAGES`` directories containing the actual translation
+files.
 
 .. setting:: LOGGING
 
@@ -2409,9 +2412,8 @@ This example illustrates the expected structure, using the constants defined in
    that the configuration is syntactically and semantically correct. Use
    browser developer tools or external CSP validators during development.
 
-   For a list of available directives and their values, refer to the `MDN
-   documentation on CSP directives
-   <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>`_.
+   For a list of available directives and their values, refer to the
+   `MDN documentation on CSP directives <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>`_.
 
 
 .. setting:: SECURE_CSP_REPORT_ONLY
@@ -2434,8 +2436,8 @@ Most browsers log CSP violations to the developer console and can optionally
 send them to a reporting endpoint. To collect these reports, the ``report-uri``
 directive must be defined (see :ref:`csp-reports` for more details).
 
-As noted in the `MDN documentation on Content-Security-Policy-Report-Only
-<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only>`_,
+As noted in the
+`MDN documentation on Content-Security-Policy-Report-Only <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only>`_,
 the ``report-uri`` directive must be specified for reports to be sent;
 otherwise, the header has no reporting effect (other than logging to the
 browser's developer tools console).
@@ -3287,8 +3289,9 @@ See :ref:`message storage backends <message-storage-backends>` for more details.
 The backends that use cookies --
 :class:`~django.contrib.messages.storage.cookie.CookieStorage` and
 :class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
-use the value of :setting:`SESSION_COOKIE_DOMAIN`, :setting:`SESSION_COOKIE_SECURE`
-and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
+use the value of :setting:`SESSION_COOKIE_DOMAIN`,
+:setting:`SESSION_COOKIE_SECURE` and :setting:`SESSION_COOKIE_HTTPONLY` when
+setting their cookies.
 
 .. setting:: MESSAGE_TAGS
 
@@ -3412,8 +3415,8 @@ The name of the cookie to use for sessions. This can be whatever you want
 
 Default: ``'/'``
 
-The path set on the session cookie. This should either match the URL path of your
-Django installation or be parent of that path.
+The path set on the session cookie. This should either match the URL path of
+your Django installation or be parent of that path.
 
 This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see

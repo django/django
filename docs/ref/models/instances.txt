@@ -87,7 +87,8 @@ fields are present, then ``values`` are guaranteed to be in the order
 to each of the missing fields.
 
 In addition to creating the new model, the ``from_db()`` method must set the
-``adding`` and ``db`` flags in the new instance's :attr:`~Model._state` attribute.
+``adding`` and ``db`` flags in the new instance's :attr:`~Model._state`
+attribute.
 
 Below is an example showing how to record the initial values of fields that
 are loaded from the database::

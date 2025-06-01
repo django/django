@@ -1370,7 +1370,8 @@ Complex lookups with ``Q`` objects
 
 Keyword argument queries -- in :meth:`~django.db.models.query.QuerySet.filter`,
 etc. -- are "AND"ed together. If you need to execute more complex queries (for
-example, queries with ``OR`` statements), you can use :class:`Q objects <django.db.models.Q>`.
+example, queries with ``OR`` statements), you can use
+:class:`Q objects <django.db.models.Q>`.
 
 A :class:`Q object <django.db.models.Q>` (``django.db.models.Q``) is an object
 used to encapsulate a collection of keyword arguments. These keyword arguments
@@ -1805,9 +1806,9 @@ Using a custom reverse manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default the :class:`~django.db.models.fields.related.RelatedManager` used
-for reverse relations is a subclass of the :ref:`default manager <manager-names>`
-for that model. If you would like to specify a different manager for a given
-query you can use the following syntax::
+for reverse relations is a subclass of the :ref:`default manager
+<manager-names>` for that model. If you would like to specify a different
+manager for a given query you can use the following syntax::
 
     from django.db import models
 

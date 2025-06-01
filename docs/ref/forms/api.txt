@@ -1255,8 +1255,8 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.form
 
-    The :class:`~django.forms.Form` instance this :class:`~django.forms.BoundField`
-    is bound to.
+    The :class:`~django.forms.Form` instance this
+    :class:`~django.forms.BoundField` is bound to.
 
 .. attribute:: BoundField.help_text
 
@@ -1380,7 +1380,8 @@ Methods of ``BoundField``
 
 .. method:: BoundField.as_hidden(attrs=None, **kwargs)
 
-    Returns a string of HTML for representing this as an ``<input type="hidden">``.
+    Returns a string of HTML for representing this as an
+    ``<input type="hidden">``.
 
     ``**kwargs`` are passed to :meth:`~django.forms.BoundField.as_widget`.
 
@@ -1484,8 +1485,8 @@ Methods of ``BoundField``
 
 .. method:: BoundField.value()
 
-    Use this method to render the raw value of this field as it would be rendered
-    by a ``Widget``:
+    Use this method to render the raw value of this field as it would be
+    rendered by a ``Widget``:
 
     .. code-block:: pycon
 

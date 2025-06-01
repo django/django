@@ -187,8 +187,7 @@ To use Redis as your cache backend with Django:
 
 * Set :setting:`LOCATION <CACHES-LOCATION>` to the URL pointing to your Redis
   instance, using the appropriate scheme. See the ``redis-py`` docs for
-  `details on the available schemes
-  <https://redis-py.readthedocs.io/en/stable/connections.html#redis.connection.ConnectionPool.from_url>`_.
+  `details on the available schemes <https://redis-py.readthedocs.io/en/stable/connections.html#redis.connection.ConnectionPool.from_url>`__.
 
 For example, if Redis is running on localhost (127.0.0.1) port 6379::
 
@@ -470,10 +469,10 @@ behavior. These arguments are provided as additional keys in the
 :setting:`CACHES` setting. Valid arguments are as follows:
 
 * :setting:`TIMEOUT <CACHES-TIMEOUT>`: The default timeout, in
-  seconds, to use for the cache. This argument defaults to ``300`` seconds (5 minutes).
-  You can set ``TIMEOUT`` to ``None`` so that, by default, cache keys never
-  expire. A value of ``0`` causes keys to immediately expire (effectively
-  "don't cache").
+  seconds, to use for the cache. This argument defaults to ``300`` seconds
+  (5 minutes). You can set ``TIMEOUT`` to ``None`` so that, by default, cache
+  keys never expire. A value of ``0`` causes keys to immediately expire
+  (effectively "don't cache").
 
 * :setting:`OPTIONS <CACHES-OPTIONS>`: Any options that should be
   passed to the cache backend. The list of valid options will vary
@@ -773,10 +772,10 @@ example:
     {% endcache %}
 
 Sometimes you might want to cache multiple copies of a fragment depending on
-some dynamic data that appears inside the fragment. For example, you might want a
-separate cached copy of the sidebar used in the previous example for every user
-of your site. Do this by passing one or more additional arguments, which may be
-variables with or without filters, to the ``{% cache %}`` template tag to
+some dynamic data that appears inside the fragment. For example, you might want
+a separate cached copy of the sidebar used in the previous example for every
+user of your site. Do this by passing one or more additional arguments, which
+may be variables with or without filters, to the ``{% cache %}`` template tag to
 uniquely identify the cache fragment:
 
 .. code-block:: html+django
@@ -1382,8 +1381,9 @@ are equivalent::
 The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
 
-You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
-directly. This function sets, or adds to, the ``Vary header``. For example::
+You can also use a helper function,
+:func:`django.utils.cache.patch_vary_headers`, directly. This function sets, or
+adds to, the ``Vary header``. For example::
 
     from django.shortcuts import render
     from django.utils.cache import patch_vary_headers

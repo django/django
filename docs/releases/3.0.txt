@@ -358,9 +358,9 @@ Tests
   new :option:`test -k` option.
 
 * HTML comparison, as used by
-  :meth:`~django.test.SimpleTestCase.assertHTMLEqual`, now treats text, character
-  references, and entity references that refer to the same character as
-  equivalent.
+  :meth:`~django.test.SimpleTestCase.assertHTMLEqual`, now treats text,
+  character references, and entity references that refer to the same character
+  as equivalent.
 
 * :class:`~django.test.runner.DiscoverRunner` can now spawn a debugger at each
   error or failure using the :option:`test --pdb` option.

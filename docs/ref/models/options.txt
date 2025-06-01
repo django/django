@@ -229,12 +229,12 @@ not be looking at your Django code. For example::
             class Meta:
                 order_with_respect_to = "question"
 
-    When ``order_with_respect_to`` is set, two additional methods are provided to
-    retrieve and to set the order of the related objects: ``get_RELATED_order()``
-    and ``set_RELATED_order()``, where ``RELATED`` is the lowercased model name. For
-    example, assuming that a ``Question`` object has multiple related ``Answer``
-    objects, the list returned contains the primary keys of the related ``Answer``
-    objects:
+    When ``order_with_respect_to`` is set, two additional methods are provided
+    to retrieve and to set the order of the related objects:
+    ``get_RELATED_order()`` and ``set_RELATED_order()``, where ``RELATED`` is
+    the lowercased model name. For example, assuming that a ``Question`` object
+    has multiple related ``Answer`` objects, the list returned contains the
+    primary keys of the related ``Answer`` objects:
 
     .. code-block:: pycon
 
@@ -242,16 +242,16 @@ not be looking at your Django code. For example::
         >>> question.get_answer_order()
         [1, 2, 3]
 
-    The order of a ``Question`` object's related ``Answer`` objects can be set by
-    passing in a list of ``Answer`` primary keys:
+    The order of a ``Question`` object's related ``Answer`` objects can be set
+    by passing in a list of ``Answer`` primary keys:
 
     .. code-block:: pycon
 
         >>> question.set_answer_order([3, 1, 2])
 
     The related objects also get two methods, ``get_next_in_order()`` and
-    ``get_previous_in_order()``, which can be used to access those objects in their
-    proper order. Assuming the ``Answer`` objects are ordered by ``id``:
+    ``get_previous_in_order()``, which can be used to access those objects in
+    their proper order. Assuming the ``Answer`` objects are ordered by ``id``:
 
     .. code-block:: pycon
 
@@ -281,7 +281,8 @@ not be looking at your Django code. For example::
 
 .. attribute:: Options.ordering
 
-    The default ordering for the object, for use when obtaining lists of objects::
+    The default ordering for the object, for use when obtaining lists of
+    objects::
 
         ordering = ["-order_date"]
 
@@ -298,7 +299,8 @@ not be looking at your Django code. For example::
 
         ordering = ["-pub_date"]
 
-    To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+    To order by ``pub_date`` descending, then by ``author`` ascending, use
+    this::
 
         ordering = ["-pub_date", "author"]
 
@@ -326,9 +328,10 @@ not be looking at your Django code. For example::
 
 .. attribute:: Options.permissions
 
-    Extra permissions to enter into the permissions table when creating this object.
-    Add, change, delete, and view permissions are automatically created for each
-    model. This example specifies an extra permission, ``can_deliver_pizzas``::
+    Extra permissions to enter into the permissions table when creating this
+    object. Add, change, delete, and view permissions are automatically created
+    for each model. This example specifies an extra permission,
+    ``can_deliver_pizzas``::
 
         permissions = [("can_deliver_pizzas", "Can deliver pizzas")]
 
@@ -351,8 +354,8 @@ not be looking at your Django code. For example::
 
 .. attribute:: Options.proxy
 
-    If ``proxy = True``, a model which subclasses another model will be treated as
-    a :ref:`proxy model <proxy-models>`.
+    If ``proxy = True``, a model which subclasses another model will be treated
+    as a :ref:`proxy model <proxy-models>`.
 
 ``required_db_features``
 ------------------------
@@ -433,8 +436,8 @@ not be looking at your Django code. For example::
         unique_together = [["driver", "restaurant"]]
 
     This is a list of lists that must be unique when considered together.
-    It's used in the Django admin and is enforced at the database level (i.e., the
-    appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
+    It's used in the Django admin and is enforced at the database level (i.e.,
+    the appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
     statement).
 
     For convenience, ``unique_together`` can be a single list when dealing with
@@ -491,7 +494,8 @@ not be looking at your Django code. For example::
 
         verbose_name_plural = "stories"
 
-    If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+    If this isn't given, Django will use :attr:`~Options.verbose_name` +
+    ``"s"``.
 
 Read-only ``Meta`` attributes
 =============================

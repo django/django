@@ -227,9 +227,9 @@ Notice also that  as both sides are used multiple times in the query the params
 need to contain ``lhs_params`` and ``rhs_params`` multiple times.
 
 The final query does the inversion (``27`` to ``-27``) directly in the
-database. The reason for doing this is that if the ``self.rhs`` is something else
-than a plain integer value (for example an ``F()`` reference) we can't do the
-transformations in Python.
+database. The reason for doing this is that if the ``self.rhs`` is something
+else than a plain integer value (for example an ``F()`` reference) we can't do
+the transformations in Python.
 
 .. note::
     In fact, most lookups with ``__abs`` could be implemented as range queries
@@ -252,8 +252,8 @@ very useful in practice as Django already comes with a bunch of built-in
 case-insensitive lookups, but it will be a nice demonstration of bilateral
 transformations in a database-agnostic way.
 
-We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()`` to
-transform the values before comparison. We define
+We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()``
+to transform the values before comparison. We define
 :attr:`bilateral = True <django.db.models.Transform.bilateral>` to indicate that
 this transformation should apply to both ``lhs`` and ``rhs``::
 
@@ -272,8 +272,8 @@ Next, let's register it::
   CharField.register_lookup(UpperCase)
   TextField.register_lookup(UpperCase)
 
-Now, the queryset ``Author.objects.filter(name__upper="doe")`` will generate a case
-insensitive query like this:
+Now, the queryset ``Author.objects.filter(name__upper="doe")`` will generate a
+case insensitive query like this:
 
 .. code-block:: sql
 

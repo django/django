@@ -127,8 +127,8 @@ The ``register`` decorator
             pass
 
     It's given one or more model classes to register with the ``ModelAdmin``.
-    If you're using a custom :class:`AdminSite`, pass it using the ``site`` keyword
-    argument::
+    If you're using a custom :class:`AdminSite`, pass it using the ``site``
+    keyword argument::
 
         from django.contrib import admin
         from .models import Author, Editor, Reader
@@ -209,8 +209,8 @@ subclass::
 
 .. attribute:: ModelAdmin.actions_selection_counter
 
-    Controls whether a selection counter is displayed next to the action dropdown.
-    By default, the admin changelist will display it
+    Controls whether a selection counter is displayed next to the action
+    dropdown. By default, the admin changelist will display it
     (``actions_selection_counter = True``).
 
 .. attribute:: ModelAdmin.date_hierarchy
@@ -1080,8 +1080,8 @@ subclass::
     You have the choice of using ``HORIZONTAL`` or ``VERTICAL`` from the
     ``django.contrib.admin`` module.
 
-    Don't include a field in ``radio_fields`` unless it's a ``ForeignKey`` or has
-    ``choices`` set.
+    Don't include a field in ``radio_fields`` unless it's a ``ForeignKey`` or
+    has ``choices`` set.
 
 .. attribute:: ModelAdmin.autocomplete_fields
 
@@ -1298,9 +1298,9 @@ subclass::
 .. attribute:: ModelAdmin.show_full_result_count
 
     Set ``show_full_result_count`` to control whether the full count of objects
-    should be displayed on a filtered admin page (e.g. ``99 results (103 total)``).
-    If this option is set to ``False``, a text like ``99 results (Show all)``
-    is displayed instead.
+    should be displayed on a filtered admin page (e.g.
+    ``99 results (103 total)``). If this option is set to ``False``, a text like
+    ``99 results (Show all)`` is displayed instead.
 
     The default of ``show_full_result_count=True`` generates a query to perform
     a full count on the table which can be expensive if the table contains a
@@ -1323,8 +1323,9 @@ subclass::
 
 .. attribute:: ModelAdmin.view_on_site
 
-    Set ``view_on_site`` to control whether or not to display the "View on site" link.
-    This link should bring you to a URL where you can display the saved object.
+    Set ``view_on_site`` to control whether or not to display the "View on site"
+    link. This link should bring you to a URL where you can display the saved
+    object.
 
     This value can be either a boolean flag or a callable. If ``True`` (the
     default), the object's :meth:`~django.db.models.Model.get_absolute_url`
@@ -1355,9 +1356,9 @@ subclass::
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The :ref:`admin-overriding-templates` section describes how to override or extend
-the default admin templates.  Use the following options to override the default
-templates used by the :class:`ModelAdmin` views:
+The :ref:`admin-overriding-templates` section describes how to override or
+extend the default admin templates.  Use the following options to override the
+default templates used by the :class:`ModelAdmin` views:
 
 .. attribute:: ModelAdmin.add_form_template
 
@@ -1494,11 +1495,12 @@ templates used by the :class:`ModelAdmin` views:
 
     The ``get_search_results`` method modifies the list of objects displayed
     into those that match the provided search term. It accepts the request, a
-    queryset that applies the current filters, and the user-provided search term.
-    It returns a tuple containing a queryset modified to implement the search, and
-    a boolean indicating if the results may contain duplicates.
+    queryset that applies the current filters, and the user-provided search
+    term. It returns a tuple containing a queryset modified to implement the
+    search, and a boolean indicating if the results may contain duplicates.
 
-    The default implementation searches the fields named in :attr:`ModelAdmin.search_fields`.
+    The default implementation searches the fields named in
+    :attr:`ModelAdmin.search_fields`.
 
     This method may be overridden with your own custom search method. For
     example, you might wish to search by an integer field, or use an external
@@ -1528,8 +1530,8 @@ templates used by the :class:`ModelAdmin` views:
 
     This implementation is more efficient than ``search_fields =
     ('name', '=age')`` which results in a string comparison for the numeric
-    field, for example ``... OR UPPER("polls_choice"."votes"::text) = UPPER('4')``
-    on PostgreSQL.
+    field, for example
+    ``... OR UPPER("polls_choice"."votes"::text) = UPPER('4')`` on PostgreSQL.
 
 .. _Solr: https://solr.apache.org
 .. _Haystack: https://haystacksearch.org
@@ -1560,8 +1562,8 @@ templates used by the :class:`ModelAdmin` views:
 
     The ``get_prepopulated_fields`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
-    a ``dictionary``, as described above in the :attr:`ModelAdmin.prepopulated_fields`
-    section.
+    a ``dictionary``, as described above in the
+    :attr:`ModelAdmin.prepopulated_fields` section.
 
 .. method:: ModelAdmin.get_list_display(request)
 
@@ -1595,7 +1597,8 @@ templates used by the :class:`ModelAdmin` views:
     The ``get_fieldsets`` method is given the ``HttpRequest`` and the ``obj``
     being edited (or ``None`` on an add form) and is expected to return a list
     of 2-tuples, in which each 2-tuple represents a ``<fieldset>`` on the
-    admin form page, as described above in the :attr:`ModelAdmin.fieldsets` section.
+    admin form page, as described above in the :attr:`ModelAdmin.fieldsets`
+    section.
 
 .. method:: ModelAdmin.get_list_filter(request)
 
@@ -1611,8 +1614,8 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_search_fields(request)
 
-    The ``get_search_fields`` method is given the ``HttpRequest`` and is expected
-    to return the same kind of sequence type as for the
+    The ``get_search_fields`` method is given the ``HttpRequest`` and is
+    expected to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.search_fields` attribute.
 
 .. method:: ModelAdmin.get_sortable_by(request)
@@ -1635,9 +1638,10 @@ templates used by the :class:`ModelAdmin` views:
     The ``get_inline_instances`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
     a ``list`` or ``tuple`` of :class:`~django.contrib.admin.InlineModelAdmin`
-    objects, as described below in the :class:`~django.contrib.admin.InlineModelAdmin`
-    section. For example, the following would return inlines without the default
-    filtering based on add, change, delete, and view permissions::
+    objects, as described below in the
+    :class:`~django.contrib.admin.InlineModelAdmin` section. For example, the
+    following would return inlines without the default filtering based on add,
+    change, delete, and view permissions::
 
         class MyModelAdmin(admin.ModelAdmin):
             inlines = [MyInline]
@@ -2067,8 +2071,9 @@ templates used by the :class:`ModelAdmin` views:
     :attr:`~django.db.models.Options.verbose_name_plural` to the number of
     objects that will be deleted.
 
-    ``perms_needed`` is a set of :attr:`~django.db.models.Options.verbose_name`\s
-    of the models that the user doesn't have permission to delete.
+    ``perms_needed`` is a set of
+    :attr:`~django.db.models.Options.verbose_name`\s of the models that the user
+    doesn't have permission to delete.
 
     ``protected`` is a list of strings representing of all the protected
     related objects that can't be deleted. The list is displayed in the
@@ -2676,7 +2681,8 @@ If you want to allow editing and creating an ``Image`` instance on the
 ``Product``, add/change views you can use
 :class:`~django.contrib.contenttypes.admin.GenericTabularInline`
 or :class:`~django.contrib.contenttypes.admin.GenericStackedInline` (both
-subclasses of :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`)
+subclasses of
+:class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`)
 provided by :mod:`~django.contrib.contenttypes.admin`. They implement tabular
 and stacked visual layouts for the forms representing the inline objects,
 respectively, just like their non-generic counterparts. They behave just like
@@ -2735,8 +2741,8 @@ directory, so make sure you name the directory in all lowercase if you are
 going to run your app on a case-sensitive filesystem.
 
 To override an admin template for a specific app, copy and edit the template
-from the :source:`django/contrib/admin/templates/admin` directory, and save it to one
-of the directories you just created.
+from the :source:`django/contrib/admin/templates/admin` directory, and save it
+to one of the directories you just created.
 
 For example, if we wanted to add a tool to the change list view for all the
 models in an app named ``my_app``, we would copy
@@ -2856,8 +2862,8 @@ The list of CSS variables are defined at
 :source:`django/contrib/admin/static/admin/css/base.css`.
 
 Dark mode variables, respecting the `prefers-color-scheme`_ media query, are
-defined at :source:`django/contrib/admin/static/admin/css/dark_mode.css`. This is
-linked to the document in ``{% block dark-mode-vars %}``.
+defined at :source:`django/contrib/admin/static/admin/css/dark_mode.css`. This
+is linked to the document in ``{% block dark-mode-vars %}``.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
@@ -2949,7 +2955,8 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.app_index_template
 
-    Path to a custom template that will be used by the admin site app index view.
+    Path to a custom template that will be used by the admin site app index
+    view.
 
 .. attribute:: AdminSite.empty_value_display
 
@@ -3019,14 +3026,14 @@ Templates can override or extend base admin templates as described in
     * ``site_title``: :attr:`AdminSite.site_title`
     * ``site_url``: :attr:`AdminSite.site_url`
     * ``has_permission``: :meth:`AdminSite.has_permission`
-    * ``available_apps``: a list of applications from the :doc:`application registry
-      </ref/applications/>` available for the current user. Each entry in the
-      list is a dict representing an application with the following keys:
+    * ``available_apps``: a list of applications from the :doc:`application
+      registry </ref/applications/>` available for the current user. Each entry
+      in the list is a dict representing an application with the following keys:
 
       * ``app_label``: the application label
       * ``app_url``: the URL of the application index in the admin
-      * ``has_module_perms``: a boolean indicating if displaying and accessing of
-        the module's index page is permitted for the current user
+      * ``has_module_perms``: a boolean indicating if displaying and accessing
+        of the module's index page is permitted for the current user
       * ``models``: a list of the models available in the application
 
       Each model is a dict with the following keys:
@@ -3102,7 +3109,8 @@ Templates can override or extend base admin templates as described in
 .. method:: AdminSite.get_model_admin(model)
 
     Returns an admin class for the given model class. Raises
-    ``django.contrib.admin.exceptions.NotRegistered`` if a model isn't registered.
+    ``django.contrib.admin.exceptions.NotRegistered`` if a model isn't
+    registered.
 
 .. method:: AdminSite.get_log_entries(request)
 

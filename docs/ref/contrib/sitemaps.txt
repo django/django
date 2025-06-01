@@ -61,7 +61,8 @@ To activate sitemap generation on your Django site, add this line to your
         name="django.contrib.sitemaps.views.sitemap",
     )
 
-This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
+This tells Django to build a sitemap when a client accesses
+:file:`/sitemap.xml`.
 
 The name of the sitemap file is not important, but the location is. Search
 engines will only index links in your sitemap for the current URL level and

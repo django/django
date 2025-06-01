@@ -122,8 +122,8 @@ You'll see the following output on the command line:
 
     System check identified no issues (0 silenced).
 
-    You have unapplied migrations; your app may not work properly until they are applied.
-    Run 'python manage.py migrate' to apply them.
+    You have unapplied migrations; your app may not work properly until they are
+    applied. Run 'python manage.py migrate' to apply them.
 
     |today| - 15:50:53
     Django version |version|, using settings 'mysite.settings'

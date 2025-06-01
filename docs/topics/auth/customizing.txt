@@ -710,8 +710,8 @@ The following attributes and methods are available on any subclass of
 
         Marks the user as having no password set.  This isn't the same as
         having a blank string for a password.
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.check_password` for this user
-        will never return ``True``. Doesn't save the
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.check_password` for
+        this user will never return ``True``. Doesn't save the
         :class:`~django.contrib.auth.models.AbstractBaseUser` object.
 
         You may need this if authentication for your application takes place
@@ -720,8 +720,8 @@ The following attributes and methods are available on any subclass of
     .. method:: models.AbstractBaseUser.has_usable_password()
 
         Returns ``False`` if
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password` has
-        been called for this user.
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password`
+        has been called for this user.
 
     .. method:: models.AbstractBaseUser.get_session_auth_hash()
 

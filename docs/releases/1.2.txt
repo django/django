@@ -49,8 +49,8 @@ These are just the highlights; full details and a complete list of features
 Wherever possible these features have been introduced in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
 
-However, a handful of features *have* changed in ways that, for some users, will be
-backwards-incompatible. The big changes are:
+However, a handful of features *have* changed in ways that, for some users, will
+be backwards-incompatible. The big changes are:
 
 * Support for Python 2.3 has been dropped. See the full notes
   below.
@@ -308,11 +308,11 @@ Models can now use a 64-bit :class:`~django.db.models.BigIntegerField` type.
 Improved localization
 ---------------------
 
-Django's :doc:`internationalization framework </topics/i18n/index>` has been expanded
-with locale-aware formatting and form processing. That means, if enabled, dates
-and numbers on templates will be displayed using the format specified for the
-current locale. Django will also use localized formats when parsing data in
-forms. See :doc:`/topics/i18n/formatting` for more details.
+Django's :doc:`internationalization framework </topics/i18n/index>` has been
+expanded with locale-aware formatting and form processing. That means, if
+enabled, dates and numbers on templates will be displayed using the format
+specified for the current locale. Django will also use localized formats when
+parsing data in forms. See :doc:`/topics/i18n/formatting` for more details.
 
 ``readonly_fields`` in ``ModelAdmin``
 -------------------------------------
@@ -636,8 +636,8 @@ changed to use the standard Python introspection method, involving
 ``__members__`` and ``__dir__()``.
 
 If you used ``LazyObject`` in your own code
-and implemented the ``get_all_members()`` method for wrapped objects, you'll need
-to make a couple of changes:
+and implemented the ``get_all_members()`` method for wrapped objects, you'll
+need to make a couple of changes:
 
 First, if your class does not have special requirements for introspection (i.e.,
 you have not implemented ``__getattr__()`` or other methods that allow for
@@ -911,7 +911,8 @@ User Messages API
 
 The API for storing messages in the user ``Message`` model (via
 ``user.message_set.create``) is now deprecated and will be removed in Django
-1.4 according to the standard :doc:`release process </internals/release-process>`.
+1.4 according to the standard
+:doc:`release process </internals/release-process>`.
 
 To upgrade your code, you need to replace any instances of this::
 

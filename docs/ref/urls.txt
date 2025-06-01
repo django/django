@@ -132,7 +132,8 @@ The ``view``, ``kwargs`` and ``name`` arguments are the same as for
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: str
-    :arg pattern_list: Iterable of :func:`~django.urls.path` and/or :func:`~django.urls.re_path` instances.
+    :arg pattern_list: Iterable of :func:`~django.urls.path`
+        and/or :func:`~django.urls.re_path` instances.
     :arg app_namespace: Application namespace for the URL entries being included
     :type app_namespace: str
 

@@ -403,8 +403,8 @@ The ``Func`` API is as follows:
                         **extra_context
                     )
 
-        To avoid an SQL injection vulnerability, ``extra_context`` :ref:`must
-        not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
+        To avoid an SQL injection vulnerability, ``extra_context``
+        :ref:`must not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
         as these values are interpolated into the SQL string rather than passed
         as query parameters, where the database driver would escape them.
 

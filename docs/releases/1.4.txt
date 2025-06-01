@@ -431,8 +431,8 @@ number of positional or keyword arguments. For example::
         ...
         return ...
 
-Then, in the template, any number of arguments may be passed to the template tag.
-For example:
+Then, in the template, any number of arguments may be passed to the template
+tag. For example:
 
 .. code-block:: html+django
 
@@ -495,8 +495,8 @@ CSRF improvements
 We've made various improvements to our CSRF features, including the
 :func:`~django.views.decorators.csrf.ensure_csrf_cookie` decorator, which can
 help with AJAX-heavy sites; protection for PUT and DELETE requests; and the
-:setting:`CSRF_COOKIE_SECURE` and :setting:`CSRF_COOKIE_PATH` settings, which can
-improve the security and usefulness of CSRF protection. See the :doc:`CSRF
+:setting:`CSRF_COOKIE_SECURE` and :setting:`CSRF_COOKIE_PATH` settings, which
+can improve the security and usefulness of CSRF protection. See the :doc:`CSRF
 docs </ref/csrf>` for more information.
 
 Error report filtering
@@ -609,9 +609,9 @@ Django 1.4 also includes several smaller improvements worth noting:
 * The :ttag:`if` template tag now supports ``{% elif %}`` clauses.
 
 * If your Django app is behind a proxy, you might find the new
-  :setting:`SECURE_PROXY_SSL_HEADER` setting useful. It solves the problem of your
-  proxy "eating" the fact that a request came in via HTTPS. But only use this
-  setting if you know what you're doing.
+  :setting:`SECURE_PROXY_SSL_HEADER` setting useful. It solves the problem of
+  your proxy "eating" the fact that a request came in via HTTPS. But only use
+  this setting if you know what you're doing.
 
 * A new, plain-text, version of the HTTP 500 status code internal error page
   served when :setting:`DEBUG` is ``True`` is now sent to the client when
@@ -1254,8 +1254,9 @@ disable this backward-compatibility shim and deprecation warning.
 -----------------------------
 
 Until Django 1.3, the ``include()``, ``patterns()``, and ``url()`` functions,
-plus :data:`~django.conf.urls.handler404` and :data:`~django.conf.urls.handler500`
-were located in a ``django.conf.urls.defaults`` module.
+plus :data:`~django.conf.urls.handler404` and
+:data:`~django.conf.urls.handler500` were located in a
+``django.conf.urls.defaults`` module.
 
 In Django 1.4, they live in :mod:`django.conf.urls`.
 
@@ -1321,7 +1322,8 @@ Now, the flags are keyword arguments of :meth:`@register.filter
     def noop(value):
         return value
 
-See :ref:`filters and auto-escaping <filters-auto-escaping>` for more information.
+See :ref:`filters and auto-escaping <filters-auto-escaping>` for more
+information.
 
 Wildcard expansion of application names in ``INSTALLED_APPS``
 -------------------------------------------------------------

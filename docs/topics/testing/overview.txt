@@ -212,7 +212,8 @@ with ability to share the database between threads.
 
 .. seealso::
 
-    The :ref:`advanced multi-db testing topics <topics-testing-advanced-multidb>`.
+    The :ref:`advanced multi-db testing topics
+    <topics-testing-advanced-multidb>`.
 
 .. _order-of-tests:
 

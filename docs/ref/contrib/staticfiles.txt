@@ -280,10 +280,11 @@ counterparts and update the cache appropriately.
 
 .. class:: storage.ManifestStaticFilesStorage
 
-A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
-storage backend which stores the file names it handles by appending the MD5
-hash of the file's content to the filename. For example, the file
-``css/styles.css`` would also be saved as ``css/styles.55e7cbb9ba48.css``.
+A subclass of the
+:class:`~django.contrib.staticfiles.storage.StaticFilesStorage` storage backend
+which stores the file names it handles by appending the MD5 hash of the file's
+content to the filename. For example, the file ``css/styles.css`` would also be
+saved as ``css/styles.55e7cbb9ba48.css``.
 
 The purpose of this storage is to keep serving the old files in case some
 pages still refer to those files, e.g. because they are cached by you or

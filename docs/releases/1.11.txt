@@ -231,10 +231,10 @@ Minor features
 Cache
 ~~~~~
 
-* Memcached backends now pass the contents of :setting:`OPTIONS <CACHES-OPTIONS>`
-  as keyword arguments to the client constructors, allowing for more advanced
-  control of client behavior. See the :ref:`cache arguments <cache_arguments>`
-  documentation for examples.
+* Memcached backends now pass the contents of
+  :setting:`OPTIONS <CACHES-OPTIONS>` as keyword arguments to the client
+  constructors, allowing for more advanced control of client behavior. See the
+  :ref:`cache arguments <cache_arguments>` documentation for examples.
 
 * Memcached backends now allow defining multiple servers as a comma-delimited
   string in :setting:`LOCATION <CACHES-LOCATION>`, for convenience with
@@ -506,7 +506,8 @@ backends.
 
 * The ``DatabaseOperations.datetime_cast_time_sql()`` method is added to
   support the :lookup:`time` lookup. It accepts a ``field_name`` and ``tzname``
-  arguments and returns the SQL necessary to cast a datetime value to time value.
+  arguments and returns the SQL necessary to cast a datetime value to time
+  value.
 
 * To enable ``FOR UPDATE SKIP LOCKED`` support, set
   ``DatabaseFeatures.has_select_for_update_skip_locked = True``.

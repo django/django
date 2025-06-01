@@ -926,8 +926,9 @@ In order to obtain a prepared geometry, access the
 ``PreparedGeometry`` instance its spatial predicate methods, listed below,
 may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
 geometry can be orders of magnitude faster -- the more complex the geometry
-that is prepared, the larger the speedup in the operation.  For more information,
-please consult the `GEOS wiki page on prepared geometries <https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
+that is prepared, the larger the speedup in the operation.  For more
+information, please consult the
+`GEOS wiki page on prepared geometries <https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
 
 For example:
 
@@ -972,7 +973,8 @@ Geometry Factories
 
     :param file_h: input file that contains spatial data
     :type file_h: a Python ``file`` object or a string path to the file
-    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the file
+    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the
+        file
 
     Example:
 
@@ -987,7 +989,8 @@ Geometry Factories
     :type string: str
     :param srid: spatial reference identifier
     :type srid: int
-    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
+    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the
+            string
 
     ``fromstr(string, srid)`` is equivalent to
     :class:`GEOSGeometry(string, srid) <GEOSGeometry>`.

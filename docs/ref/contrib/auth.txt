@@ -61,7 +61,8 @@ Fields
 
     .. attribute:: user_permissions
 
-        Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+        Many-to-many relationship to
+        :class:`~django.contrib.auth.models.Permission`
 
     .. attribute:: is_staff
 
@@ -246,8 +247,8 @@ Methods
 
         Returns ``True`` if the user has the specified permission, where perm
         is in the format ``"<app label>.<permission codename>"``. (see
-        documentation on :ref:`permissions <topic-authorization>`). If the user is
-        inactive, this method will always return ``False``. For an active
+        documentation on :ref:`permissions <topic-authorization>`). If the user
+        is inactive, this method will always return ``False``. For an active
         superuser, this method will always return ``True``.
 
         If ``obj`` is passed in, this method won't check for a permission for
@@ -330,7 +331,8 @@ Manager methods
         allow setting arbitrary fields on a :ref:`custom user model
         <auth-custom-user>`.
 
-        See :ref:`Creating users <topics-auth-creating-users>` for example usage.
+        See :ref:`Creating users <topics-auth-creating-users>` for example
+        usage.
 
         .. versionchanged:: 5.2
 
@@ -523,10 +525,11 @@ can be used for notification when a user logs in or out.
         The name of the module used for authentication.
 
     ``credentials``
-        A dictionary of keyword arguments containing the user credentials that were
-        passed to :func:`~django.contrib.auth.authenticate` or your own custom
-        authentication backend. Credentials matching a set of 'sensitive' patterns,
-        (including password) will not be sent in the clear as part of the signal.
+        A dictionary of keyword arguments containing the user credentials that
+        were passed to :func:`~django.contrib.auth.authenticate` or your own
+        custom authentication backend. Credentials matching a set of 'sensitive'
+        patterns, (including password) will not be sent in the clear as part of
+        the signal.
 
     ``request``
         The :class:`~django.http.HttpRequest` object, if one was provided to
@@ -678,8 +681,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         *Asynchronous version*: ``aget_all_permissions()``
 
-        Returns the set of permission strings the ``user_obj`` has, including both
-        user permissions and group permissions. Returns an empty set if
+        Returns the set of permission strings the ``user_obj`` has, including
+        both user permissions and group permissions. Returns an empty set if
         :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
 

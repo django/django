@@ -301,8 +301,8 @@ Use the ``django.test.Client`` class to make requests.
             ...     c.post("/customers/wishes/", {"name": "fred", "attachment": fp})
             ...
 
-        You may also provide any file-like object (e.g., :class:`~io.StringIO` or
-        :class:`~io.BytesIO`) as a file handle. If you're uploading to an
+        You may also provide any file-like object (e.g., :class:`~io.StringIO`
+        or :class:`~io.BytesIO`) as a file handle. If you're uploading to an
         :class:`~django.db.models.ImageField`, the object needs a ``name``
         attribute that passes the
         :data:`~django.core.validators.validate_image_file_extension` validator.
@@ -417,10 +417,10 @@ Use the ``django.test.Client`` class to make requests.
 
         *Asynchronous version*: ``alogin()``
 
-        If your site uses Django's :doc:`authentication system</topics/auth/index>`
-        and you deal with logging in users, you can use the test client's
-        ``login()`` method to simulate the effect of a user logging into the
-        site.
+        If your site uses Django's
+        :doc:`authentication system</topics/auth/index>` and you deal with
+        logging in users, you can use the test client's ``login()`` method to
+        simulate the effect of a user logging into the site.
 
         After you call this method, the test client will have all the cookies
         and session data required to pass any login-based tests that may form
@@ -493,9 +493,10 @@ Use the ``django.test.Client`` class to make requests.
 
         *Asynchronous version*: ``alogout()``
 
-        If your site uses Django's :doc:`authentication system</topics/auth/index>`,
-        the ``logout()`` method can be used to simulate the effect of a user
-        logging out of your site.
+        If your site uses Django's
+        :doc:`authentication system</topics/auth/index>`, the ``logout()``
+        method can be used to simulate the effect of a user logging out of your
+        site.
 
         After you call this method, the test client will have all the cookies
         and session data cleared to defaults. Subsequent requests will appear
@@ -525,8 +526,8 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: context
 
-        The template ``Context`` instance that was used to render the template that
-        produced the response content.
+        The template ``Context`` instance that was used to render the template
+        that produced the response content.
 
         If the rendered page used multiple templates, then ``context`` will be a
         list of ``Context`` objects, in the order in which they were rendered.
@@ -646,8 +647,8 @@ The only exceptions that are not visible to the test client are
 exceptions internally and converts them into the appropriate HTTP response
 codes. In these cases, you can check ``response.status_code`` in your test.
 
-If ``Client.raise_request_exception`` is ``False``, the test client will return a
-500 response as would be returned to a browser. The response has the attribute
+If ``Client.raise_request_exception`` is ``False``, the test client will return
+a 500 response as would be returned to a browser. The response has the attribute
 :attr:`~Response.exc_info` to provide information about the unhandled
 exception.
 
@@ -812,7 +813,8 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
   * Verifying an HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
     performed by the app.
   * Robustly testing two :meth:`HTML fragments <SimpleTestCase.assertHTMLEqual>`
-    for equality/inequality or :meth:`containment <SimpleTestCase.assertInHTML>`.
+    for equality/inequality or
+    :meth:`containment <SimpleTestCase.assertInHTML>`.
   * Robustly testing two :meth:`XML fragments <SimpleTestCase.assertXMLEqual>`
     for equality/inequality.
   * Robustly testing two :meth:`JSON fragments <SimpleTestCase.assertJSONEqual>`
@@ -1641,7 +1643,8 @@ your test suite.
         error messages.
     :param field_args: the args passed to instantiate the field.
     :param field_kwargs: the kwargs passed to instantiate the field.
-    :param empty_value: the expected clean output for inputs in ``empty_values``.
+    :param empty_value: the expected clean output for inputs in
+        ``empty_values``.
 
     For example, the following code tests that an ``EmailField`` accepts
     ``a@a.com`` as a valid email address, but rejects ``aaa`` with a reasonable
@@ -1865,8 +1868,8 @@ your test suite.
 
 .. method:: SimpleTestCase.assertJSONNotEqual(raw, expected_data, msg=None)
 
-    Asserts that the JSON fragments ``raw`` and ``expected_data`` are *not* equal.
-    See :meth:`~SimpleTestCase.assertJSONEqual` for further details.
+    Asserts that the JSON fragments ``raw`` and ``expected_data`` are *not*
+    equal. See :meth:`~SimpleTestCase.assertJSONEqual` for further details.
 
     Output in case of error can be customized with the ``msg`` argument.
 
@@ -1880,9 +1883,9 @@ your test suite.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
-    ``False``, which turns the comparison into a ``collections.Counter`` comparison.
-    If the order is undefined (if the given ``qs`` isn't ordered and the
-    comparison is against more than one ordered value), a ``ValueError`` is
+    ``False``, which turns the comparison into a ``collections.Counter``
+    comparison. If the order is undefined (if the given ``qs`` isn't ordered and
+    the comparison is against more than one ordered value), a ``ValueError`` is
     raised.
 
     Output in case of error can be customized with the ``msg`` argument.

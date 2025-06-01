@@ -103,16 +103,18 @@ implementation, though:
   method does not take a ``request`` argument. The current request is available
   in ``self.request``.
 
-* The custom ``test_func()`` of :class:`~django.contrib.auth.mixins.UserPassesTestMixin`
-  does not take a ``user`` argument. The current user is available in
-  ``self.request.user``.
+* The custom ``test_func()`` of
+  :class:`~django.contrib.auth.mixins.UserPassesTestMixin` does not take a
+  ``user`` argument. The current user is available in ``self.request.user``.
 
-* The :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
+* The
+  :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
   attribute supports a string (defining one permission) or a list/tuple of
   strings (defining multiple permissions) that need to be fulfilled to grant
   access.
 
-* The new :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
+* The new
+  :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
   attribute allows passing a message to the ``PermissionDenied`` exception.
 
 .. _django-braces: https://django-braces.readthedocs.io/en/latest/index.html
@@ -210,7 +212,8 @@ Minor features
   :func:`~django.contrib.auth.decorators.permission_required` accepts all
   kinds of iterables, not only list and tuples.
 
-* The new :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+* The new
+  :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
   makes it possible to use ``REMOTE_USER`` for setups where the header is only
   populated on login pages instead of every request in the session.
 
@@ -767,8 +770,9 @@ behavior.
 Filesystem-based template loaders catch more specific exceptions
 ----------------------------------------------------------------
 
-When using the :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`
-or :class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
+When using the
+:class:`filesystem.Loader <django.template.loaders.filesystem.Loader>` or
+:class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
 template loaders, earlier versions of Django raised a
 :exc:`~django.template.TemplateDoesNotExist` error if a template source existed
 but was unreadable. This could happen under many circumstances, such as if

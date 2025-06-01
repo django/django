@@ -55,8 +55,9 @@ App names
 ---------
 
 Many commands take a list of "app names." An "app name" is the basename of
-the package containing your models. For example, if your :setting:`INSTALLED_APPS`
-contains the string ``'mysite.blog'``, the app name is ``blog``.
+the package containing your models. For example, if your
+:setting:`INSTALLED_APPS` contains the string ``'mysite.blog'``, the app name is
+``blog``.
 
 Determining the version
 -----------------------
@@ -1633,9 +1634,9 @@ For example, this command:
 
 This is useful in a number of ways:
 
-* When you're writing :doc:`unit tests </topics/testing/overview>` of how your views
-  act with certain fixture data, you can use ``testserver`` to interact with
-  the views in a web browser, manually.
+* When you're writing :doc:`unit tests </topics/testing/overview>` of how your
+  views act with certain fixture data, you can use ``testserver`` to interact
+  with the views in a web browser, manually.
 
 * Let's say you're developing your Django application and have a "pristine"
   copy of a database that you'd like to interact with. You can dump your
@@ -2085,8 +2086,8 @@ Bash completion
 ---------------
 
 If you use the Bash shell, consider installing the Django bash completion
-script, which lives in :source:`extras/django_bash_completion` in the Django source
-distribution. It enables tab-completion of ``django-admin`` and
+script, which lives in :source:`extras/django_bash_completion` in the Django
+source distribution. It enables tab-completion of ``django-admin`` and
 ``manage.py`` commands, so you can, for instance...
 
 * Type ``django-admin``.
@@ -2150,7 +2151,8 @@ Examples::
       management.call_command(loaddata.Command(), "test_data", verbosity=0)
 
 Note that command options that take no arguments are passed as keywords
-with ``True`` or ``False``, as you can see with the ``interactive`` option above.
+with ``True`` or ``False``, as you can see with the ``interactive`` option
+above.
 
 Named arguments can be passed by using either one of the following syntaxes::
 

@@ -36,9 +36,9 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 
     .. attribute:: response_redirect_class
 
-        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
-        ``CommonMiddleware`` and override the attribute to customize the redirects
-        issued by the middleware.
+        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`.
+        Subclass ``CommonMiddleware`` and override the attribute to customize
+        the redirects issued by the middleware.
 
 Adds a few conveniences for perfectionists:
 
@@ -509,8 +509,8 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 
     .. method:: get_login_url()
 
-        Returns the URL that unauthenticated requests will be redirected to. This
-        result is either the ``login_url`` set on the
+        Returns the URL that unauthenticated requests will be redirected to.
+        This result is either the ``login_url`` set on the
         :func:`~django.contrib.auth.decorators.login_required` decorator (if not
         ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
@@ -519,9 +519,9 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
         Returns the name of the query parameter that contains the URL the user
         should be redirected to after a successful login. This result is either
         the ``redirect_field_name`` set on the
-        :func:`~.django.contrib.auth.decorators.login_required` decorator (if not
-        ``None``), or :attr:`redirect_field_name`. If ``None`` is returned, a query
-        parameter won't be added.
+        :func:`~.django.contrib.auth.decorators.login_required` decorator (if
+        not ``None``), or :attr:`redirect_field_name`. If ``None`` is returned,
+        a query parameter won't be added.
 
 Redirects all unauthenticated requests to a login page, except for views
 excluded with :func:`~.django.contrib.auth.decorators.login_not_required`. The
@@ -605,7 +605,8 @@ You can add Cross Site Request Forgery protection to individual views using the
 
 .. class:: XFrameOptionsMiddleware
 
-Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.
+Simple
+:doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.
 
 Content Security Policy middleware
 ----------------------------------

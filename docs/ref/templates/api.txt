@@ -115,9 +115,10 @@ overridden by what's passed by
 
       It defaults to ``'utf-8'``.
 
-    * ``'libraries'``: A dictionary of labels and dotted Python paths of template
-      tag modules to register with the template engine. This is used to add new
-      libraries or provide alternate labels for existing ones. For example::
+    * ``'libraries'``: A dictionary of labels and dotted Python paths of
+      template tag modules to register with the template engine. This is used to
+      add new libraries or provide alternate labels for existing ones. For
+      example::
 
           Engine(
               libraries={
@@ -600,7 +601,8 @@ including builtin variables.
     >>> c.flatten()
     {'True': True, 'None': None, 'foo': 'first level', 'False': False, 'bar': 'second level'}
 
-A ``flatten()`` method is also internally used to make ``Context`` objects comparable.
+A ``flatten()`` method is also internally used to make ``Context`` objects
+comparable.
 
 .. code-block:: pycon
 

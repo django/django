@@ -245,8 +245,8 @@ Entries that have a status of "broken" need to be fixed. Those that have a
 status of "redirected" may need to be updated to point to the canonical
 location, e.g. the scheme has changed ``http://`` → ``https://``. In certain
 cases, we do not want to update a "redirected" link, e.g. a rewrite to always
-point to the latest or stable version of the documentation, e.g. ``/en/stable/`` →
-``/en/3.2/``.
+point to the latest or stable version of the documentation, e.g. ``/en/stable/``
+→ ``/en/3.2/``.
 
 Writing style
 =============

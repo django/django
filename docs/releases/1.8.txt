@@ -219,7 +219,8 @@ Minor features
   available.
 
 * It is now allowed to include a subquery as a geographic lookup argument, for
-  example ``City.objects.filter(point__within=Country.objects.filter(continent='Africa').values('mpoly'))``.
+  example
+  ``City.objects.filter(point__within=Country.objects.filter(continent='Africa').values('mpoly'))``.
 
 * The SpatiaLite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
@@ -375,8 +376,9 @@ Generic Views
   so that it'll perform its lookup using both the primary key and the slug.
 
 * The :meth:`~django.views.generic.edit.FormMixin.get_form` method doesn't
-  require a ``form_class`` to be provided anymore. If not provided ``form_class``
-  defaults to :meth:`~django.views.generic.edit.FormMixin.get_form_class`.
+  require a ``form_class`` to be provided anymore. If not provided
+  ``form_class`` defaults to
+  :meth:`~django.views.generic.edit.FormMixin.get_form_class`.
 
 * Placeholders in :attr:`ModelFormMixin.success_url
   <django.views.generic.edit.ModelFormMixin.success_url>` now support the Python
@@ -917,12 +919,12 @@ for users who haven't logged in, you can run this query::
 Priority of context processors for ``TemplateResponse`` brought in line with ``render``
 ---------------------------------------------------------------------------------------
 
-The :class:`~django.template.response.TemplateResponse` constructor is designed to be a
-drop-in replacement for the :func:`~django.shortcuts.render` function. However,
-it had a slight incompatibility, in that for ``TemplateResponse``, context data
-from the passed in context dictionary could be shadowed by context data returned
-from context processors, whereas for ``render`` it was the other way
-around. This was a bug, and the behavior of ``render`` is more appropriate,
+The :class:`~django.template.response.TemplateResponse` constructor is designed
+to be a drop-in replacement for the :func:`~django.shortcuts.render` function.
+However, it had a slight incompatibility, in that for ``TemplateResponse``,
+context data from the passed in context dictionary could be shadowed by context
+data returned from context processors, whereas for ``render`` it was the other
+way around. This was a bug, and the behavior of ``render`` is more appropriate,
 since it allows the globally defined context processors to be overridden locally
 in the view. If you were relying on the fact context data in a
 ``TemplateResponse`` could be overridden using a context processor, you will
@@ -1281,9 +1283,9 @@ written (and is better written) as::
         url("^other/$", views.otherview),
     )
 
-Thus ``patterns()`` serves little purpose and is a burden when teaching new users
-(answering the newbie's question "why do I need this empty string as the first
-argument to ``patterns()``?"). For these reasons, we are deprecating it.
+Thus ``patterns()`` serves little purpose and is a burden when teaching new
+users (answering the newbie's question "why do I need this empty string as the
+first argument to ``patterns()``?"). For these reasons, we are deprecating it.
 Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
 ``django.conf.urls.url()`` instances. For example::
 
@@ -1494,8 +1496,8 @@ in ``.values()`` calls or in aggregates. It has been replaced with
 
 The new approach doesn't call the :meth:`~django.db.models.Field.to_python`
 method on assignment as was the case with ``SubfieldBase``. If you need that
-behavior, reimplement the ``Creator`` class `from Django's source code
-<https://github.com/django/django/blob/stable/1.8.x/django/db/models/fields/subclassing.py#L31-L44>`_
+behavior, reimplement the ``Creator`` class
+`from Django's source code <https://github.com/django/django/blob/stable/1.8.x/django/db/models/fields/subclassing.py#L31-L44>`_
 in your project.
 
 ``django.utils.checksums``
@@ -1522,7 +1524,7 @@ sure to provide a default value for the ``form_class`` argument since it's
 now optional.
 
 Rendering templates loaded by :func:`~django.template.loader.get_template` with a :class:`~django.template.Context`
----------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
 
 The return type of :func:`~django.template.loader.get_template` has changed
 in Django 1.8: instead of a :class:`django.template.Template`, it returns a
@@ -1651,8 +1653,8 @@ added in Django 1.7. In Django 1.7.2, its functionality was moved to
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
 ``MIDDLEWARE_CLASSES``.
 
-In Django 1.10, session verification will be enabled regardless of whether or not
-``SessionAuthenticationMiddleware`` is enabled (at which point
+In Django 1.10, session verification will be enabled regardless of whether or
+not ``SessionAuthenticationMiddleware`` is enabled (at which point
 ``SessionAuthenticationMiddleware`` will have no significance). You can add it
 to your ``MIDDLEWARE_CLASSES`` sometime before then to opt-in. Please read the
 :ref:`upgrade considerations <session-invalidation-on-password-change>` first.
