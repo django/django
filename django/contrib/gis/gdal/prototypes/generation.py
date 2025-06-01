@@ -6,6 +6,7 @@ GDAL routines.
 from ctypes import POINTER, c_bool, c_char_p, c_double, c_int, c_int64, c_void_p
 from functools import partial
 
+from django.contrib.gis.gdal.libgdal import GDALFuncFactory
 from django.contrib.gis.gdal.prototypes.errcheck import (
     check_arg_errcode,
     check_const_string,
@@ -23,97 +24,88 @@ class gdal_char_p(c_char_p):
     pass
 
 
-def bool_output(func, argtypes, errcheck=None):
+class BoolOutput(GDALFuncFactory):
     """Generate a ctypes function that returns a boolean value."""
-    func.argtypes = argtypes
-    func.restype = c_bool
-    if errcheck:
-        func.errcheck = errcheck
-    return func
+
+    restype = c_bool
 
 
-def double_output(func, argtypes, errcheck=False, strarg=False, cpl=False):
-    "Generate a ctypes function that returns a double value."
-    func.argtypes = argtypes
-    func.restype = c_double
-    if errcheck:
-        func.errcheck = partial(check_arg_errcode, cpl=cpl)
-    if strarg:
-        func.errcheck = check_str_arg
-    return func
+class DoubleOutput(GDALFuncFactory):
+    """Generate a ctypes function that returns a double value."""
+
+    restype = c_double
+
+    def __init__(self, func_name, *, errcheck=False, strarg=False, cpl=False, **kwargs):
+        super().__init__(func_name, **kwargs)
+        if strarg:
+            self.errcheck = staticmethod(check_str_arg)
+        elif errcheck:
+            self.errcheck = staticmethod(partial(check_arg_errcode, cpl=cpl))
 
 
-def geom_output(func, argtypes, offset=None):
+class GeomOutput(GDALFuncFactory):
     """
     Generate a function that returns a Geometry either by reference
     or directly (if the return_geom keyword is set to True).
     """
-    # Setting the argument types
-    func.argtypes = argtypes
 
-    if not offset:
-        # When a geometry pointer is directly returned.
-        func.restype = c_void_p
-        func.errcheck = check_geom
-    else:
-        # Error code returned, geometry is returned by-reference.
-        func.restype = c_int
+    def __init__(self, func_name, *, offset=None, **kwargs):
+        super().__init__(func_name, **kwargs)
+        if not offset:
+            # When a geometry pointer is directly returned.
+            self.restype = c_void_p
+            self.errcheck = staticmethod(check_geom)
+        else:
+            # Error code returned, geometry is returned by-reference.
+            self.restype = c_int
 
-        def geomerrcheck(result, func, cargs):
-            return check_geom_offset(result, func, cargs, offset)
+            def geomerrcheck(result, func, cargs):
+                return check_geom_offset(result, func, cargs, offset)
 
-        func.errcheck = geomerrcheck
-
-    return func
+            self.errcheck = staticmethod(geomerrcheck)
 
 
-def int_output(func, argtypes, errcheck=None):
-    "Generate a ctypes function that returns an integer value."
-    func.argtypes = argtypes
-    func.restype = c_int
-    if errcheck:
-        func.errcheck = errcheck
-    return func
+class IntOutput(GDALFuncFactory):
+    """Generate a ctypes function that returns an integer value."""
+
+    restype = c_int
 
 
-def int64_output(func, argtypes):
-    "Generate a ctypes function that returns a 64-bit integer value."
-    func.argtypes = argtypes
-    func.restype = c_int64
-    return func
+class Int64Output(GDALFuncFactory):
+    """Generate a ctypes function that returns a 64-bit integer value."""
+
+    restype = c_int64
 
 
-def srs_output(func, argtypes):
+class SRSOutput(GDALFuncFactory):
     """
     Generate a ctypes prototype for the given function with
     the given C arguments that returns a pointer to an OGR
     Spatial Reference System.
     """
-    func.argtypes = argtypes
-    func.restype = c_void_p
-    func.errcheck = check_srs
-    return func
+
+    restype = c_void_p
+    errcheck = staticmethod(check_srs)
 
 
-def const_string_output(func, argtypes, offset=None, decoding=None, cpl=False):
-    func.argtypes = argtypes
-    if offset:
-        func.restype = c_int
-    else:
-        func.restype = c_char_p
+class ConstStringOutput(GDALFuncFactory):
+    def __init__(self, func_name, *, offset=None, decoding=None, cpl=False, **kwargs):
+        super().__init__(func_name, **kwargs)
+        if offset:
+            self.restype = c_int
+        else:
+            self.restype = c_char_p
 
-    def _check_const(result, func, cargs):
-        res = check_const_string(result, func, cargs, offset=offset, cpl=cpl)
-        if res and decoding:
-            res = res.decode(decoding)
-        return res
+        def _check_const(result, func, cargs):
+            res = check_const_string(result, func, cargs, offset=offset, cpl=cpl)
+            if res and decoding:
+                res = res.decode(decoding)
+            return res
 
-    func.errcheck = _check_const
-
-    return func
+        self.errcheck = staticmethod(_check_const)
 
 
-def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
+class StringOutput(GDALFuncFactory):
     """
     Generate a ctypes prototype for the given function with the
     given argument types that returns a string from a GDAL pointer.
@@ -121,58 +113,71 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     be freed via the GDAL library routine VSIFree -- but only applies
     only when `str_result` is True.
     """
-    func.argtypes = argtypes
-    if str_result:
-        # Use subclass of c_char_p so the error checking routine
-        # can free the memory at the pointer's address.
-        func.restype = gdal_char_p
-    else:
-        # Error code is returned
-        func.restype = c_int
 
-    # Dynamically defining our error-checking function with the
-    # given offset.
-    def _check_str(result, func, cargs):
-        res = check_string(result, func, cargs, offset=offset, str_result=str_result)
-        if res and decoding:
-            res = res.decode(decoding)
-        return res
+    def __init__(
+        self, func_name, *, offset=-1, str_result=False, decoding=None, **kwargs
+    ):
+        super().__init__(func_name, **kwargs)
+        if str_result:
+            # Use subclass of c_char_p so the error checking routine
+            # can free the memory at the pointer's address.
+            self.restype = gdal_char_p
+        else:
+            # Error code is returned
+            self.restype = c_int
 
-    func.errcheck = _check_str
-    return func
+        # Dynamically defining our error-checking function with the
+        # given offset.
+        def _check_str(result, func, cargs):
+            res = check_string(
+                result, func, cargs, offset=offset, str_result=str_result
+            )
+            if res and decoding:
+                res = res.decode(decoding)
+            return res
+
+        self.errcheck = staticmethod(_check_str)
 
 
-def void_output(func, argtypes, errcheck=True, cpl=False):
+class VoidOutput(GDALFuncFactory):
     """
     For functions that don't only return an error code that needs to
     be examined.
     """
-    if argtypes:
-        func.argtypes = argtypes
-    if errcheck:
-        # `errcheck` keyword may be set to False for routines that
-        # return void, rather than a status code.
-        func.restype = c_int
-        func.errcheck = partial(check_errcode, cpl=cpl)
-    else:
-        func.restype = None
 
-    return func
-
-
-def voidptr_output(func, argtypes, errcheck=True):
-    "For functions that return c_void_p."
-    func.argtypes = argtypes
-    func.restype = c_void_p
-    if errcheck:
-        func.errcheck = check_pointer
-    return func
+    def __init__(self, func_name, *, errcheck=True, cpl=False, **kwargs):
+        super().__init__(func_name, **kwargs)
+        if errcheck:
+            # `errcheck` keyword may be set to False for routines that
+            # return void, rather than a status code.
+            self.restype = c_int
+            self.errcheck = staticmethod(partial(check_errcode, cpl=cpl))
+        else:
+            self.restype = None
+            self.errcheck = None
 
 
-def chararray_output(func, argtypes, errcheck=True):
+class VoidPtrOutput(GDALFuncFactory):
+    """For functions that return c_void_p."""
+
+    restype = c_void_p
+
+    def __init__(self, func_name, *, errcheck=True, **kwargs):
+        super().__init__(func_name, **kwargs)
+        if errcheck:
+            self.errcheck = staticmethod(check_pointer)
+        else:
+            self.errcheck = None
+
+
+class CharArrayOutput(GDALFuncFactory):
     """For functions that return a c_char_p array."""
-    func.argtypes = argtypes
-    func.restype = POINTER(c_char_p)
-    if errcheck:
-        func.errcheck = check_pointer
-    return func
+
+    restype = POINTER(c_char_p)
+
+    def __init__(self, func_name, *, errcheck=True, **kwargs):
+        super().__init__(func_name, **kwargs)
+        if errcheck:
+            self.errcheck = staticmethod(check_pointer)
+        else:
+            self.errcheck = None
