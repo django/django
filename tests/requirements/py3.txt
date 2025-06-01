@@ -8,8 +8,8 @@ geoip2 >= 4.8.0; sys.platform != 'win32' or python_version < '3.14'
 jinja2 >= 2.11.0
 numpy >= 1.26.0; python_version < '3.14'
 Pillow >= 10.1.0; sys.platform != 'win32' or python_version < '3.14'
-# pylibmc/libmemcached can't be built on Windows.
-pylibmc; sys_platform != 'win32'
+# pylibmc/libmemcached isn't available on Windows or Python 3.12+, use pymemcache instead
+pylibmc; sys_platform != 'win32' and python_version < '3.12'
 pymemcache >= 3.4.0
 pywatchman; sys_platform != 'win32'
 PyYAML >= 6.0.2
