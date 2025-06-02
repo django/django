@@ -205,6 +205,7 @@ if "%1" == "lint" (
 )
 
 if "%1" == "check" (
+	call :run_lint
 	call :run_black
 	call :run_spelling
 	echo.
