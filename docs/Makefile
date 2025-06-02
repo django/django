@@ -181,6 +181,6 @@ lint:
 	@echo
 	@echo "Documentation lint complete."
 
-check: spelling black
+check: spelling black lint
 	@echo
 	@echo "Style and spelling checks completed."

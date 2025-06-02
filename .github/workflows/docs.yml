@@ -58,3 +58,19 @@ jobs:
               echo "💥 📢 Code blocks in documentation must be reformatted with blacken-docs 📢 💥"
           fi;
           exit $RESULT
+
+  lint-docs:
+    runs-on: ubuntu-latest
+    name: lint-docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install sphinx-lint
+      - name: Build docs
+        run: |
+          cd docs
+          make lint
