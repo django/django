@@ -1487,66 +1487,44 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 
 .. class:: PositiveBigIntegerField(**options)
 
-Like a :class:`PositiveIntegerField`, but allows larger values depending
-on the database backend.
+Like a :class:`PositiveIntegerField`, but only allows values under a certain
+(database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
+safe in all databases supported by Django.
 
-**Portable safe range**:
-Values from ``0`` to ``9223372036854775807`` can be safely used across all
-database backends supported by Django.
+.. note::
 
-**Backend-specific notes**:
-
-- In MySQL, this field maps to ``UNSIGNED BIGINT``, allowing values from
-  ``0`` to ``18446744073709551615``.
-- Other databases, such as PostgreSQL and SQLite, do not natively support
-  unsigned integers. Django uses signed integer types internally, hence the
-  conservative safe range listed above.
+    See :class:`PositiveIntegerField` for information about portable value ranges
+    across database backends.
 
 ``PositiveIntegerField``
 ------------------------
 
 .. class:: PositiveIntegerField(**options)
 
-Like an :class:`IntegerField`, but must be positive or zero (``0``).
+Like an :class:`IntegerField`, but must be either positive or zero (``0``).
+Values from ``0`` to ``2147483647`` are safe in all databases supported by
+Django. The value ``0`` is accepted for backward compatibility reasons.
 
-**Portable safe range**:
-Values from ``0`` to ``2147483647`` are consistently safe across all supported
-databases.
+.. note::
 
-**Backend-specific notes**:
-
-- In MySQL, this field maps to ``UNSIGNED INT``, supporting values from
-  ``0`` to ``4294967295``.
-- Databases like PostgreSQL and SQLite implement this using signed integers,
-  which limits the portable safe range to the value above.
+    The documented "safe range" represents the cross-database-compatible range.
+    Individual database backends may internally support larger ranges, but values
+    outside the documented range may not be portable across different databases.
 
 ``PositiveSmallIntegerField``
 -----------------------------
 
 .. class:: PositiveSmallIntegerField(**options)
 
-Like a :class:`PositiveIntegerField`, but intended for smaller integers.
+Like a :class:`PositiveIntegerField`, but only allows values under a certain
+(database-dependent) point. Values from ``0`` to ``32767`` are safe in all
+databases supported by Django.
 
-**Portable safe range**:
-Values from ``0`` to ``32767`` are safe and consistently supported across all
-databases.
+.. note::
 
-**Backend-specific notes**:
+    See :class:`PositiveIntegerField` for information about portable value ranges
+    across database backends.
 
-- In MySQL, this field maps to ``UNSIGNED SMALLINT``, supporting values from
-  ``0`` to ``65535``.
-- Other database backends typically use signed small integers, restricting
-  the portable safe range accordingly.
-
-.. admonition:: About portable safe ranges
-
-    The "portable safe ranges" listed above represent values guaranteed to
-    behave consistently across all Django-supported databases.
-
-    Some backends, such as MySQL, internally use unsigned integer columns,
-    enabling larger maximum values. However, other backends like PostgreSQL
-    or SQLite use signed integer columns, restricting the universally safe
-    range.
 
 ``SlugField``
 -------------
