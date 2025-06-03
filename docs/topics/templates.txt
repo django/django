@@ -306,6 +306,33 @@ The ``django.template.loader`` module defines two functions to load templates.
     If you want to restrict the search to a particular template engine, pass
     the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
 
+    **Partial loading:**
+
+    When using the :class:`~django.template.backends.django.DjangoTemplates`
+    backend, a specific fragment from a template can be loaded by name. This
+    fragment should have been previously defined using the :ttag:`partialdef`
+    template tag::
+
+        from django.template.loader import get_template
+
+        # Load an entire template.
+        template = get_template("template.html")
+
+        # Load a specific fragment from a template.
+        partial = get_template("template.html#partial_name")
+
+    When loading a partial, the returned object behaves like a regular
+    ``Template`` but contains only the partial's content.
+
+    See :ref:`template-partials` for more information about defining and using
+    template fragments.
+
+    .. versionchanged:: 6.0
+
+        Support for loading template partials when using the
+        :class:`~django.template.backends.django.DjangoTemplates` backend was
+        added.
+
 .. function:: select_template(template_name_list, using=None)
 
     ``select_template()`` is just like ``get_template()``, except it takes a
