@@ -536,8 +536,8 @@ changes when the time comes.
 Minimizing images
 =================
 
-Optimize image compression where possible. For PNG files, use OptiPNG and
-AdvanceCOMP's ``advpng``:
+If your contribution adds images, optimize image compression where possible.
+For PNG files, use OptiPNG and AdvanceCOMP's ``advpng``:
 
 .. console::
 
