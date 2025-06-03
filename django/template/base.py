@@ -88,6 +88,11 @@ UNKNOWN_SOURCE = "<unknown source>"
 # than instantiating SimpleLazyObject with _lazy_re_compile().
 tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
+combined_partial_re = re.compile(
+    r"{%\s*partialdef\s+(?P<name>[\w-]+)(?:\s+inline)?\s*%}"
+    r"|{%\s*endpartialdef(?:\s+[\w-]+)?\s*%}"
+)
+
 logger = logging.getLogger("django.template")
 
 
@@ -286,6 +291,57 @@ class Template:
             "start": start,
             "end": end,
         }
+
+
+class PartialTemplate:
+    """
+    A lightweight Template lookalike used for template partials.
+
+    Wraps nodelist as a partial, in order to be able to bind context.
+    """
+
+    def __init__(self, nodelist, origin, name):
+        self.nodelist = nodelist
+        self.origin = origin
+        self.name = name
+
+    def get_exception_info(self, exception, token):
+        template = self.origin.loader.get_template(self.origin.template_name)
+        return template.get_exception_info(exception, token)
+
+    def find_partial_source(self, full_source, partial_name):
+        start_match = None
+        nesting = 0
+
+        for match in combined_partial_re.finditer(full_source):
+            if name := match["name"]:  # Opening tag.
+                if start_match is None and name == partial_name:
+                    start_match = match
+                if start_match is not None:
+                    nesting += 1
+            elif start_match is not None:
+                nesting -= 1
+                if nesting == 0:
+                    return full_source[start_match.start() : match.end()]
+
+        return ""
+
+    @property
+    def source(self):
+        template = self.origin.loader.get_template(self.origin.template_name)
+        return self.find_partial_source(template.source, self.name)
+
+    def _render(self, context):
+        return self.nodelist.render(context)
+
+    def render(self, context):
+        with context.render_context.push_state(self):
+            if context.template is None:
+                with context.bind_template(self):
+                    context.template_name = self.name
+                    return self._render(context)
+            else:
+                return self._render(context)
 
 
 def linebreak_iter(template_source):
