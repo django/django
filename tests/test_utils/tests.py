@@ -386,6 +386,7 @@ class CaptureQueriesContextManagerTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person_pk = str(Person.objects.create(name="test").pk)
+        cls.url = f"/test_utils/get_person/{cls.person_pk}/"
 
     def test_simple(self):
         with CaptureQueriesContext(connection) as captured_queries:
@@ -418,18 +419,18 @@ class CaptureQueriesContextManagerTests(TestCase):
 
     def test_with_client(self):
         with CaptureQueriesContext(connection) as captured_queries:
-            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+            self.client.get(self.url)
         self.assertEqual(len(captured_queries), 1)
         self.assertIn(self.person_pk, captured_queries[0]["sql"])
 
         with CaptureQueriesContext(connection) as captured_queries:
-            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+            self.client.get(self.url)
         self.assertEqual(len(captured_queries), 1)
         self.assertIn(self.person_pk, captured_queries[0]["sql"])
 
         with CaptureQueriesContext(connection) as captured_queries:
-            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
-            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+            self.client.get(self.url)
+            self.client.get(self.url)
         self.assertEqual(len(captured_queries), 2)
         self.assertIn(self.person_pk, captured_queries[0]["sql"])
         self.assertIn(self.person_pk, captured_queries[1]["sql"])
@@ -437,6 +438,11 @@ class CaptureQueriesContextManagerTests(TestCase):
 
 @override_settings(ROOT_URLCONF="test_utils.urls")
 class AssertNumQueriesContextManagerTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person_pk = str(Person.objects.create(name="test").pk)
+        cls.url = f"/test_utils/get_person/{cls.person_pk}/"
+
     def test_simple(self):
         with self.assertNumQueries(0):
             pass
@@ -459,17 +465,15 @@ class AssertNumQueriesContextManagerTests(TestCase):
                 raise TypeError
 
     def test_with_client(self):
-        person = Person.objects.create(name="test")
+        with self.assertNumQueries(1):
+            self.client.get(self.url)
 
         with self.assertNumQueries(1):
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
-
-        with self.assertNumQueries(1):
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
+            self.client.get(self.url)
 
         with self.assertNumQueries(2):
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
-            self.client.get("/test_utils/get_person/%s/" % person.pk)
+            self.client.get(self.url)
+            self.client.get(self.url)
 
 
 @override_settings(ROOT_URLCONF="test_utils.urls")
