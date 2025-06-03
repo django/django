@@ -435,6 +435,14 @@ class CaptureQueriesContextManagerTests(TestCase):
         self.assertIn(self.person_pk, captured_queries[0]["sql"])
         self.assertIn(self.person_pk, captured_queries[1]["sql"])
 
+    def test_with_client_nested(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            Person.objects.count()
+            with CaptureQueriesContext(connection):
+                pass
+            self.client.get(self.url)
+        self.assertEqual(2, len(captured_queries))
+
 
 @override_settings(ROOT_URLCONF="test_utils.urls")
 class AssertNumQueriesContextManagerTests(TestCase):
@@ -473,6 +481,13 @@ class AssertNumQueriesContextManagerTests(TestCase):
 
         with self.assertNumQueries(2):
             self.client.get(self.url)
+            self.client.get(self.url)
+
+    def test_with_client_nested(self):
+        with self.assertNumQueries(2):
+            Person.objects.count()
+            with self.assertNumQueries(0):
+                pass
             self.client.get(self.url)
 
 
