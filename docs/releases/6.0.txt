@@ -297,6 +297,13 @@ Signals
 Templates
 ~~~~~~~~~
 
+* **Template partials** are now supported, allowing you to define reusable
+  template fragments within a template file. The new :ttag:`partialdef` tag
+  defines a partial, and the :ttag:`partial` tag renders it. Partials can be
+  accessed directly using the ``template_name#partial_name`` syntax with
+  :func:`~django.template.Engine.get_template`, :func:`~django.shortcuts.render`,
+  :ttag:`include`, and other template loading functions.
+
 * The new variable ``forloop.length`` is now available within a :ttag:`for`
   loop.
 

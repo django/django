@@ -75,10 +75,26 @@ class DjangoTemplates(BaseEngine):
         return Template(self.engine.from_string(template_code), self)
 
     def get_template(self, template_name):
+        template_name, _, partial_name = template_name.partition("#")
+
         try:
-            return Template(self.engine.get_template(template_name), self)
+            template = self.engine.get_template(template_name)
         except TemplateDoesNotExist as exc:
             reraise(exc, self)
+        if not partial_name:
+            return Template(template, self)
+
+        extra_data = getattr(template, "extra_data")
+        partial_contents = extra_data.get("template-partials", {})
+
+        try:
+            partial = partial_contents[partial_name]
+        except KeyError:
+            # Partial not found on this template.
+            raise TemplateDoesNotExist(partial_name, tried=[template_name])
+        partial.engine = self.engine
+
+        return Template(partial, self)
 
     def get_templatetag_libraries(self, custom_libraries):
         """

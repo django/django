@@ -957,6 +957,83 @@ output (as a string) inside a variable. This is useful if you want to use
     {% now "Y" as current_year %}
     {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
+.. templatetag:: partial
+
+``partial``
+-----------
+
+.. versionadded:: 6.0
+
+Renders a partial that was defined with :ttag:`partialdef`.
+
+Usage:
+
+.. code-block:: html+django
+
+    {% partial partial_name %}
+
+The ``partial_name`` argument is the string identifier of the partial to render.
+
+Example:
+
+.. code-block:: html+django
+
+    {% partialdef button %}
+        <button class="btn">{{ button_text }}</button>
+    {% endpartialdef %}
+
+    {% partial button %}
+    {% partial button %}
+
+
+.. templatetag:: partialdef
+
+``partialdef``
+--------------
+
+.. versionadded:: 6.0
+
+Defines a reusable template partial that can be rendered multiple times within
+the same template or accessed directly via template loading.
+
+Usage:
+
+.. code-block:: html+django
+
+    {% partialdef partial_name %}
+        <!-- partial content -->
+    {% endpartialdef %}
+
+The ``{% partialdef %}`` tag can be used with one or two arguments.
+The arguments are:
+
+================  =============================================================
+Argument          Description
+================  =============================================================
+``partial_name``  String identifier for the partial (required).
+``inline``        The word ``inline``, which if given, renders the partial
+                  content immediately in addition to defining it.
+================  =============================================================
+
+Examples:
+
+* ``{% partialdef card %}...{% endpartialdef %}`` defines a partial named "card".
+* ``{% partialdef header inline %}...{% endpartialdef %}`` defines and immediately
+  renders a partial named "header".
+
+.. code-block:: html+django
+
+    {% partialdef card %}
+        <div class="card">
+            <h3>{{ title }}</h3>
+            <p>{{ content }}</p>
+        </div>
+    {% endpartialdef %}
+
+    {% partialdef header inline %}
+        <header>Site Header</header>
+    {% endpartialdef %}
+
 .. templatetag:: querystring
 
 ``querystring``
