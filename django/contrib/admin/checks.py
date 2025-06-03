@@ -451,27 +451,13 @@ class BaseModelAdminChecks:
             return []
         else:
             try:
-                field = obj.model._meta.get_field(field_name)
+                obj.model._meta.get_field(field_name)
             except FieldDoesNotExist:
                 # If we can't find a field on the model that matches, it could
                 # be an extra field on the form.
                 return []
             else:
-                if (
-                    isinstance(field, models.ManyToManyField)
-                    and not field.remote_field.through._meta.auto_created
-                ):
-                    return [
-                        checks.Error(
-                            "The value of '%s' cannot include the ManyToManyField "
-                            "'%s', because that field manually specifies a "
-                            "relationship model." % (label, field_name),
-                            obj=obj.__class__,
-                            id="admin.E013",
-                        )
-                    ]
-                else:
-                    return []
+                return []
 
     def _check_exclude(self, obj):
         """Check that exclude is a sequence without duplicates."""
@@ -554,16 +540,6 @@ class BaseModelAdminChecks:
                 return must_be(
                     "a many-to-many field", option=label, obj=obj, id="admin.E020"
                 )
-            elif not field.remote_field.through._meta.auto_created:
-                return [
-                    checks.Error(
-                        f"The value of '{label}' cannot include the ManyToManyField "
-                        f"'{field_name}', because that field manually specifies a "
-                        f"relationship model.",
-                        obj=obj.__class__,
-                        id="admin.E013",
-                    )
-                ]
             else:
                 return []
 
