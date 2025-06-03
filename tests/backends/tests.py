@@ -83,12 +83,7 @@ class LastExecutedQueryTest(TestCase):
             connection.ops.last_executed_query(cursor, "SELECT %s" + suffix, (1,))
 
     def test_debug_sql(self):
-        qs = Reporter.objects.filter(first_name="test")
-        ops = connections[qs.db].ops
-        with mock.patch.object(ops, "format_debug_sql") as format_debug_sql:
-            list(qs)
-        # Queries are formatted with DatabaseOperations.format_debug_sql().
-        format_debug_sql.assert_called()
+        list(Reporter.objects.filter(first_name="test"))
         sql = connection.queries[-1]["sql"].lower()
         self.assertIn("select", sql)
         self.assertIn(Reporter._meta.db_table, sql)
@@ -580,13 +575,13 @@ class BackendTestCase(TransactionTestCase):
     @mock.patch("django.db.backends.utils.logger")
     @override_settings(DEBUG=True)
     def test_queries_logger(self, mocked_logger):
-        sql = "SELECT 1" + connection.features.bare_select_suffix
-        sql = connection.ops.format_debug_sql(sql)
+        sql = "select 1" + connection.features.bare_select_suffix
         with connection.cursor() as cursor:
             cursor.execute(sql)
         params, kwargs = mocked_logger.debug.call_args
         self.assertIn("; alias=%s", params[0])
         self.assertEqual(params[2], sql)
+        self.assertNotEqual(params[2], connection.ops.format_debug_sql(sql))
         self.assertIsNone(params[3])
         self.assertEqual(params[4], connection.alias)
         self.assertEqual(
