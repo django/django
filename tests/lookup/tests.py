@@ -248,28 +248,21 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Article.objects.in_bulk([self.au1], field_name="author")
 
-    @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering(self):
-        articles = (
-            Article.objects.order_by("author_id", "-pub_date")
-            .distinct("author_id")
-            .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
-        )
         self.assertEqual(
-            articles,
-            {self.au1.id: self.a4, self.au2.id: self.a5},
+            list(Article.objects.in_bulk([self.au2.id, self.au1.id])),
+            [self.au2.id, self.au1.id],
         )
 
-    @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering_with_batch_size(self):
-        qs = Article.objects.order_by("author_id", "-pub_date").distinct("author_id")
+        qs = Article.objects.all()
         with (
-            mock.patch.object(connection.features.__class__, "max_query_params", 1),
+            mock.patch.object(connection.ops, "bulk_batch_size", return_value=2),
             self.assertNumQueries(2),
         ):
             self.assertEqual(
-                qs.in_bulk([self.au1.id, self.au2.id], field_name="author_id"),
-                {self.au1.id: self.a4, self.au2.id: self.a5},
+                list(qs.in_bulk([self.a4.id, self.a3.id, self.a2.id, self.a1.id])),
+                [self.a4.id, self.a3.id, self.a2.id, self.a1.id],
             )
 
     @skipUnlessDBFeature("can_distinct_on_fields")

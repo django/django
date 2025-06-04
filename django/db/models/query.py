@@ -1182,10 +1182,8 @@ class QuerySet(AltersData):
             if not id_list:
                 return {}
             filter_key = "{}__in".format(field_name)
-            max_params = connections[self.db].features.max_query_params or 0
-            num_fields = len(opts.pk_fields) if field_name == "pk" else 1
-            batch_size = max_params // num_fields
             id_list = tuple(id_list)
+            batch_size = connections[self.db].ops.bulk_batch_size([opts.pk], id_list)
             # If the database has a limit on the number of query parameters
             # (e.g. SQLite), retrieve objects in batches if necessary.
             if batch_size and batch_size < len(id_list):
