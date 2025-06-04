@@ -32,9 +32,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         SQLite has a variable limit defined by SQLITE_LIMIT_VARIABLE_NUMBER
         (reflected in max_query_params).
-
-        If there's only a single field to insert, the limit is 500
-        (SQLITE_MAX_COMPOUND_SELECT).
         """
         fields = list(
             chain.from_iterable(
@@ -46,9 +43,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 for field in fields
             )
         )
-        if len(fields) == 1:
-            return 500
-        elif len(fields) > 1:
+        if fields:
             return self.connection.features.max_query_params // len(fields)
         else:
             return len(objs)
