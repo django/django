@@ -280,6 +280,10 @@ class Employee(models.Model):
         ordering = ["id"]
 
 
+class SelfDirectedEmployee(Employee):
+    pass
+
+
 # Ticket #19607
 
 
