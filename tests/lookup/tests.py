@@ -264,7 +264,7 @@ class LookupTests(TestCase):
     def test_in_bulk_preserve_ordering_with_batch_size(self):
         qs = Article.objects.order_by("author_id", "-pub_date").distinct("author_id")
         with (
-            mock.patch.object(connection.features.__class__, "max_query_params", 1),
+            mock.patch.object(connection.ops, "bulk_batch_size", return_value=1),
             self.assertNumQueries(2),
         ):
             self.assertEqual(
