@@ -1,10 +1,10 @@
-==========================
-Django 5.2.3 release notes
-==========================
+===========================
+Django 5.1.11 release notes
+===========================
 
 *June 10, 2025*
 
-Django 5.2.3 fixes several bugs in 5.2.2.
+Django 5.1.11 fixes a potential log injection issue in 5.1.10.
 
 Bugfixes
 ========
