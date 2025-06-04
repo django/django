@@ -1,4 +1,7 @@
+import logging
 import time
+
+from logging_tests.tests import LoggingAssertionMixin
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
@@ -63,7 +66,7 @@ class InstanceView(View):
         return self
 
 
-class ViewTest(SimpleTestCase):
+class ViewTest(LoggingAssertionMixin, SimpleTestCase):
     rf = RequestFactory()
 
     def _assert_simple(self, response):
@@ -297,6 +300,25 @@ class ViewTest(SimpleTestCase):
         response = view.dispatch(self.rf.head("/"))
         self.assertEqual(response.status_code, 405)
 
+    def test_method_not_allowed_response_logged(self):
+        for path, escaped in [
+            ("/foo/", "/foo/"),
+            (r"/%1B[1;31mNOW IN RED!!!1B[0m/", r"/\x1b[1;31mNOW IN RED!!!1B[0m/"),
+        ]:
+            with self.subTest(path=path):
+                request = self.rf.get(path, REQUEST_METHOD="BOGUS")
+                with self.assertLogs("django.request", "WARNING") as handler:
+                    response = SimpleView.as_view()(request)
+
+                self.assertLogRecord(
+                    handler,
+                    f"Method Not Allowed (BOGUS): {escaped}",
+                    logging.WARNING,
+                    405,
+                    request,
+                )
+                self.assertEqual(response.status_code, 405)
+
 
 @override_settings(ROOT_URLCONF="generic_views.urls")
 class TemplateViewTest(SimpleTestCase):
@@ -425,7 +447,7 @@ class TemplateViewTest(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF="generic_views.urls")
-class RedirectViewTest(SimpleTestCase):
+class RedirectViewTest(LoggingAssertionMixin, SimpleTestCase):
     rf = RequestFactory()
 
     def test_no_url(self):
@@ -548,6 +570,20 @@ class RedirectViewTest(SimpleTestCase):
         view = RedirectView()
         response = view.dispatch(self.rf.head("/foo/"))
         self.assertEqual(response.status_code, 410)
+
+    def test_gone_response_logged(self):
+        for path, escaped in [
+            ("/foo/", "/foo/"),
+            (r"/%1B[1;31mNOW IN RED!!!1B[0m/", r"/\x1b[1;31mNOW IN RED!!!1B[0m/"),
+        ]:
+            with self.subTest(path=path):
+                request = self.rf.get(path)
+                with self.assertLogs("django.request", "WARNING") as handler:
+                    RedirectView().dispatch(request)
+
+                self.assertLogRecord(
+                    handler, f"Gone: {escaped}", logging.WARNING, 410, request
+                )
 
 
 class GetContextDataTest(SimpleTestCase):
