@@ -36,6 +36,17 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+June 4, 2025 - :cve:`2025-48432`
+--------------------------------
+
+Potential log injection via unescaped request path.
+`Full description
+<https://www.djangoproject.com/weblog/2025/jun/04/security-releases/>`__
+
+* Django 5.2 :commit:`(patch) <7456aa23dafa149e65e62f95a6550cdb241d55ad>`
+* Django 5.1 :commit:`(patch) <596542ddb46cdabe011322917e1655f0d24eece2>`
+* Django 4.2 :commit:`(patch) <ac03c5e7df8680c61cdb0d3bdb8be9095dba841e>`
+
 May 7, 2025 - :cve:`2025-32873`
 -------------------------------
 
