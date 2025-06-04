@@ -43,3 +43,7 @@ Bugfixes
   <django.http.HttpRequest.get_preferred_type>` did not account for media type
   parameters in ``Accept`` headers, reducing specificity in content negotiation
   (:ticket:`36411`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using
+  ``QuerySet.prefetch_related()`` to prefetch a foreign key with a ``Prefetch``
+  queryset for a subclass of the foreign target (:ticket:`36432`).

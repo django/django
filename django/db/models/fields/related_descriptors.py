@@ -183,8 +183,11 @@ class ForwardManyToOneDescriptor:
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = {instance_attr(inst): inst for inst in instances}
-        related_fields = self.field.foreign_related_fields
         remote_field = self.field.remote_field
+        related_fields = [
+            queryset.query.resolve_ref(field.name).target
+            for field in self.field.foreign_related_fields
+        ]
         queryset = queryset.filter(
             TupleIn(
                 ColPairs(
