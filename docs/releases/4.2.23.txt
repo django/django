@@ -1,0 +1,14 @@
+===========================
+Django 4.2.23 release notes
+===========================
+
+*June 10, 2025*
+
+Django 4.2.23 fixes a potential log injection issue in 4.2.22.
+
+Bugfixes
+========
+
+* Fixed a log injection possibility by migrating remaining response logging
+  to ``django.utils.log.log_response()``, which safely escapes arguments such
+  as the request path to prevent unsafe log output (:cve:`2025-48432`).
