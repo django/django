@@ -38,11 +38,10 @@ class EnvFunc(GDALFuncFactory):
     errcheck = staticmethod(check_envelope)
 
 
-class PntFunc(GDALFuncFactory):
+class PntFunc(DoubleOutput):
     """For accessing point information."""
 
     argtypes = [c_void_p, c_int]
-    restype = c_double
 
 
 class TopologyFunc(GDALFuncFactory):
