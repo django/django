@@ -107,11 +107,8 @@ class GDALFuncFactory:
         else:
             func = lgdal[self.func_name]
 
-        # Setting the argument and return types.
-        if self.argtypes is not None:
-            func.argtypes = self.argtypes
-        if self.restype is not None:
-            func.restype = self.restype
+        func.argtypes = self.argtypes or []
+        func.restype = self.restype
         if self.errcheck:
             func.errcheck = self.errcheck
         return func
