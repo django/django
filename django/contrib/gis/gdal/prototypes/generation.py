@@ -44,10 +44,10 @@ class DoubleOutput(GDALFuncFactory):
 
     def __init__(self, func_name, *, errcheck=False, strarg=False, cpl=False, **kwargs):
         super().__init__(func_name, **kwargs)
+        if errcheck:
+            self.errcheck = staticmethod(partial(check_arg_errcode, cpl=cpl))
         if strarg:
             self.errcheck = staticmethod(check_str_arg)
-        elif errcheck:
-            self.errcheck = staticmethod(partial(check_arg_errcode, cpl=cpl))
 
 
 class GeomOutput(GDALFuncFactory):
