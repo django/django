@@ -18,7 +18,9 @@ class SRSDouble(DoubleOutput):
     """
 
     argtypes = [c_void_p, POINTER(c_int)]
-    errcheck = True
+
+    def __init__(self, func_name, **kwargs):
+        super().__init__(func_name, errcheck=True, **kwargs)
 
 
 class UnitsFunc(DoubleOutput):
