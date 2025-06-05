@@ -31,7 +31,7 @@ msgstr "Успешно обрисано: %(count)d %(items)s."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "Несуспело брисање %(name)s"
+msgstr "Неуспело брисање %(name)s"
 
 msgid "Delete multiple objects"
 msgstr "Брисање више објеката"
