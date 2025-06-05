@@ -1049,6 +1049,34 @@ class RequestsTests(SimpleTestCase):
         request.encoding = "iso-8859-16"
         self.assertEqual(request.GET, {"name": ["Hello G\u0102\u0152nter"]})
 
+    def test_FILES_immutable(self):
+        """
+        MultiPartParser.parse() leaves request.FILES immutable.
+        """
+        content_disposition = 'form-data; name="upload_file"; filename="asd.txt"'
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    f"Content-Disposition: {content_disposition}",
+                    "Content-Type: text/plain",
+                    "",
+                    "asd",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertTrue("upload_file" in request.FILES)
+        self.assertFalse(request.FILES._mutable)
+
     def test_FILES_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
