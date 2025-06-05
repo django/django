@@ -33,8 +33,6 @@ class BoolOutput(GDALFuncFactory):
         super().__init__(func_name, **kwargs)
         if errcheck:
             self.errcheck = staticmethod(errcheck)
-        else:
-            self.errcheck = None
 
 
 class DoubleOutput(GDALFuncFactory):
@@ -81,8 +79,6 @@ class IntOutput(GDALFuncFactory):
         super().__init__(func_name, **kwargs)
         if errcheck:
             self.errcheck = staticmethod(errcheck)
-        else:
-            self.errcheck = None
 
 
 class Int64Output(GDALFuncFactory):
@@ -168,7 +164,6 @@ class VoidOutput(GDALFuncFactory):
             self.errcheck = staticmethod(partial(check_errcode, cpl=cpl))
         else:
             self.restype = None
-            self.errcheck = None
 
 
 class VoidPtrOutput(GDALFuncFactory):
@@ -180,8 +175,6 @@ class VoidPtrOutput(GDALFuncFactory):
         super().__init__(func_name, **kwargs)
         if errcheck:
             self.errcheck = staticmethod(check_pointer)
-        else:
-            self.errcheck = None
 
 
 class CharArrayOutput(GDALFuncFactory):
@@ -193,5 +186,3 @@ class CharArrayOutput(GDALFuncFactory):
         super().__init__(func_name, **kwargs)
         if errcheck:
             self.errcheck = staticmethod(check_pointer)
-        else:
-            self.errcheck = None
