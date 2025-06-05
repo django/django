@@ -444,6 +444,19 @@ class CustomSerializationJSONModel(models.Model):
         }
 
 
+class JSONConstrainedModel(models.Model):
+    value = models.JSONField(null=True)
+
+    class Meta:
+        required_db_features = {"supports_json_field"}
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_value_always_null",
+                condition=models.Q(value__isnull=True),
+            ),
+        ]
+
+
 class AllFieldsModel(models.Model):
     big_integer = models.BigIntegerField()
     binary = models.BinaryField()

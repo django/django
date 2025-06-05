@@ -43,6 +43,7 @@ from django.test.utils import CaptureQueriesContext
 from .models import (
     CustomJSONDecoder,
     CustomSerializationJSONModel,
+    JSONConstrainedModel,
     JSONModel,
     NullableJSONModel,
     RelatedJSONModel,
@@ -1235,3 +1236,8 @@ class TestQuerying(TestCase):
             data__foo="bar"
         )
         self.assertQuerySetEqual(qs, all_objects)
+
+    def test_bulk_update_saves_null_not_json_null(self):
+        JSONConstrainedModel.objects.create()
+        objs = list(JSONConstrainedModel.objects.all())
+        JSONConstrainedModel.objects.bulk_update(objs, ["value"])

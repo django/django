@@ -9,4 +9,6 @@ Django 5.2.3 fixes several bugs in 5.2.2.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.2 that caused ``bulk_update()`` on a model
+  with a ``JSONField`` to save ``None`` as a JSON ``null`` instead of SQL
+  ``NULL`` (:ticket:`36440`).
