@@ -24,26 +24,15 @@ class GDALLazyLoadingTest(SimpleTestCase):
         if libgdal_mod in sys.modules:
             del sys.modules[libgdal_mod]
 
-    def test_lgdal_not_loaded_on_import(self):
+    def test_lgdal_lazy_loading(self):
         from django.contrib.gis.gdal import libgdal
 
+        # check that lgdal wasn't loaded on import
         self.assertIsInstance(libgdal.lgdal, SimpleLazyObject)
         self.assertTrue(hasattr(libgdal.lgdal, "_wrapped"))
         self.assertIs(libgdal.lgdal._wrapped, empty)
 
-    @skipIf(os.name != "nt", "lwingdal is Windows-specific")
-    def test_lwingdal_not_loaded_on_import(self):
-        from django.contrib.gis.gdal import libgdal
-
-        self.assertIsInstance(libgdal.lwingdal, SimpleLazyObject)
-        self.assertTrue(hasattr(libgdal.lwingdal, "_wrapped"))
-        self.assertIs(libgdal.lwingdal._wrapped, empty)
-
-    def test_lgdal_loaded_on_first_access(self):
-        from django.contrib.gis.gdal import libgdal
-
-        self.assertIs(libgdal.lgdal._wrapped, empty)
-
+        # now check that lgdal gets loaded at first access
         load_called = False
         lgdal_setupfunc = libgdal.lgdal.__dict__["_setupfunc"]
 
@@ -66,11 +55,15 @@ class GDALLazyLoadingTest(SimpleTestCase):
         self.assertTrue(load_called)
 
     @skipIf(os.name != "nt", "lwingdal is Windows-specific")
-    def test_lwingdal_loaded_on_first_access(self):
+    def test_lwingdal_lazy_loading(self):
         from django.contrib.gis.gdal import libgdal
 
+        # check that lwingdal wasn't loaded on import
+        self.assertIsInstance(libgdal.lwingdal, SimpleLazyObject)
+        self.assertTrue(hasattr(libgdal.lwingdal, "_wrapped"))
         self.assertIs(libgdal.lwingdal._wrapped, empty)
 
+        # now check that lwingdal gets loaded at first access
         load_called = False
         lwingdal_setupfunc = libgdal.lwingdal.__dict__["_setupfunc"]
 
@@ -83,7 +76,6 @@ class GDALLazyLoadingTest(SimpleTestCase):
         libgdal.lwingdal.__dict__["_setupfunc"] = track_load
 
         try:
-            # Access lwingdal to trigger loading
             libgdal.lwingdal["OSRNewSpatialReference"]
         except Exception:
             # Don't care if it fails, just that it tried
