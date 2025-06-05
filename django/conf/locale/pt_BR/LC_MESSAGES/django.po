@@ -33,7 +33,7 @@
 # Marssal Jr. <marssaljr@gmail.com>, 2022
 # Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
-# Rafael Fontenelle <rffontenelle@gmail.com>, 2021-2022
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2021-2022,2025
 # Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>, 2020
 # Sandro <sandrossv@hotmail.com>, 2011
 # Sergio Garcia <sergio@ginx.com.br>, 2015
@@ -45,8 +45,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>, 2021-2022,2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -738,8 +738,9 @@ msgid "Value must be valid JSON."
 msgstr "O valor deve ser um JSON válido."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "A instância de %(model)s com %(field)s %(value)r não existe."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
+"A instância de %(model)s com %(field)s %(value)r não é uma escolha válida."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Chave Estrangeira (tipo determinado pelo campo relacionado)"

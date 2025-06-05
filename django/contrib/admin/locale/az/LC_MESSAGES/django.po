@@ -356,13 +356,13 @@ msgid "Models in the %(name)s application"
 msgstr "%(name)s tətbiqetməsindəki modellər"
 
 msgid "Model name"
-msgstr ""
+msgstr "Model adı"
 
 msgid "Add link"
-msgstr ""
+msgstr "Keçid əlavə et"
 
 msgid "Change or view list link"
-msgstr ""
+msgstr "Siyahı keçidini dəyişdir və ya bax"
 
 msgid "Add"
 msgstr "Əlavə et"
@@ -375,9 +375,11 @@ msgstr "Heç nəyə baxmağa və ya dəyişməyə icazəniz yoxdur."
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
+"Hesab yaratdıqdan sonra daha çox istifadəçi seçimlərini redaktə edə "
+"biləcəksiniz."
 
 msgid "Error:"
-msgstr ""
+msgstr "Xəta:"
 
 msgid "Change password"
 msgstr "Şifrəni dəyiş"
@@ -573,7 +575,7 @@ msgstr ""
 "bir hesaba daxil olmaq istərdiniz?"
 
 msgid "Forgotten your login credentials?"
-msgstr ""
+msgstr "Giriş məlumatlarınızı unutmusunuz?"
 
 msgid "Toggle navigation"
 msgstr "Naviqasiyanı dəyiş"
@@ -737,7 +739,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Növbəti səhifəyə keçid alın və yeni şifrəni seçin:"
 
 msgid "In case you’ve forgotten, you are:"
-msgstr ""
+msgstr "Əgər unutmusunuzsa, siz:"
 
 msgid "Thanks for using our site!"
 msgstr "Bizim saytdan istifadə etdiyiniz üçün təşəkkür edirik!"
