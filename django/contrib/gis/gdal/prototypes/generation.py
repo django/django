@@ -29,6 +29,13 @@ class BoolOutput(GDALFuncFactory):
 
     restype = c_bool
 
+    def __init__(self, func_name, *, errcheck=None, **kwargs):
+        super().__init__(func_name, **kwargs)
+        if errcheck:
+            self.errcheck = staticmethod(errcheck)
+        else:
+            self.errcheck = None
+
 
 class DoubleOutput(GDALFuncFactory):
     """Generate a ctypes function that returns a double value."""
@@ -69,6 +76,13 @@ class IntOutput(GDALFuncFactory):
     """Generate a ctypes function that returns an integer value."""
 
     restype = c_int
+
+    def __init__(self, func_name, *, errcheck=None, **kwargs):
+        super().__init__(func_name, **kwargs)
+        if errcheck:
+            self.errcheck = staticmethod(errcheck)
+        else:
+            self.errcheck = None
 
 
 class Int64Output(GDALFuncFactory):
