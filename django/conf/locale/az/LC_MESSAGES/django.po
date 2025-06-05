@@ -5,15 +5,15 @@
 # Emin Mastizada <emin@linux.com>, 2015-2016
 # Metin Amiroff <amiroff@gmail.com>, 2011
 # Nicat Məmmədov <n1c4t97@gmail.com>, 2022
-# Nijat Mammadov, 2024
+# Nijat Mammadov, 2024-2025
 # Sevdimali <sevdimaliisayev@mail.ru>, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: Sevdimali <sevdimaliisayev@mail.ru>, 2024\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Nijat Mammadov, 2024-2025\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -695,8 +695,8 @@ msgid "Value must be valid JSON."
 msgstr "Dəyər düzgün JSON olmalıdır."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(field)s dəyəri %(value)r olan %(model)s mövcud deyil."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(field)s %(value)r ilə %(model)s dəyəri düzgün seçim deyil."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Xarici açar (bağlı olduğu sahəyə uyğun tipi alır)"
