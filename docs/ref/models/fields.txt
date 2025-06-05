@@ -1489,12 +1489,7 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
-safe in all databases supported by Django.
-
-.. note::
-
-    See :class:`PositiveIntegerField` for information about portable value ranges
-    across database backends.
+compatible in all databases supported by Django.
 
 ``PositiveIntegerField``
 ------------------------
@@ -1502,14 +1497,9 @@ safe in all databases supported by Django.
 .. class:: PositiveIntegerField(**options)
 
 Like an :class:`IntegerField`, but must be either positive or zero (``0``).
-Values from ``0`` to ``2147483647`` are safe in all databases supported by
-Django. The value ``0`` is accepted for backward compatibility reasons.
-
-.. note::
-
-    The documented "safe range" represents the cross-database-compatible range.
-    Individual database backends may internally support larger ranges, but values
-    outside the documented range may not be portable across different databases.
+Values are only allowed under a certain (database-dependent) point. Values from
+``0`` to ``2147483647`` are compatible in all databases supported by Django.
+The value ``0`` is accepted for backward compatibility reasons.
 
 ``PositiveSmallIntegerField``
 -----------------------------
@@ -1517,13 +1507,8 @@ Django. The value ``0`` is accepted for backward compatibility reasons.
 .. class:: PositiveSmallIntegerField(**options)
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
-(database-dependent) point. Values from ``0`` to ``32767`` are safe in all
-databases supported by Django.
-
-.. note::
-
-    See :class:`PositiveIntegerField` for information about portable value ranges
-    across database backends.
+(database-dependent) point. Values from ``0`` to ``32767`` are compatible in
+all databases supported by Django.
 
 
 ``SlugField``
