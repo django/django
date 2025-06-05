@@ -53,9 +53,11 @@ times with multiple contexts)
 import inspect
 import logging
 import re
+import warnings
 from enum import Enum
 
 from django.template.context import BaseContext
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.regex_helper import _lazy_re_compile
@@ -198,6 +200,12 @@ class Template:
             return nodelist
         except Exception as e:
             if self.engine.debug:
+                # RemovedInDjango70Warning
+                # Not sure how to test this change.
+                # Without this change, crashes when warnings are
+                # elevated to errors.
+                if isinstance(e, RemovedInDjango70Warning):
+                    raise
                 e.template_debug = self.get_exception_info(e, e.token)
             if (
                 isinstance(e, TemplateSyntaxError)
@@ -497,6 +505,23 @@ class Parser:
                 except TemplateSyntaxError as e:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
+                if ".." in str(filter_expression.var):
+                    warnings.warn(
+                        "Support double-dot lookups '..' which maps to a lookup"
+                        " of the empty string is deprecated.\n"
+                        f"  Template: {self.origin.name}\n"
+                        f"  Line: {token.lineno}",
+                        RemovedInDjango70Warning,
+                        stacklevel=2,
+                    )
+
+                    # RemovedInDjango70Warning
+                    # When deprecation ends elevate the warning to an error.
+                    # raise self.error(
+                    #     token,
+                    #     ("Variable contains '..' on line %d" % token.lineno),
+                    # )
+
                 self.extend_nodelist(nodelist, var_node, token)
             elif token_type == 2:  # TokenType.BLOCK
                 try:
