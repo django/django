@@ -291,3 +291,8 @@ form .form-row p.datetime {
 .selector .selector-chooser {
     margin: 0;
 }
+
+ul.messagelist li {
+    padding: 10px 65px 10px 10px;
+    background-position-x: calc(100% - 40px);
+}
