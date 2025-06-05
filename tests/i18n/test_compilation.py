@@ -1,5 +1,6 @@
 import gettext as gettext_module
 import os
+import re
 import stat
 import unittest
 from io import StringIO
@@ -8,10 +9,12 @@ from subprocess import run
 from unittest import mock
 
 from django.core.management import CommandError, call_command, execute_from_command_line
-from django.core.management.utils import find_command
+from django.core.management.utils import find_command, popen_wrapper
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING
+from django.utils.functional import cached_property
 from django.utils.translation import gettext
 
 from .utils import RunInTmpDirMixin, copytree
@@ -254,6 +257,17 @@ class IgnoreDirectoryCompilationTests(MessageCompilationTests):
 
 
 class CompilationErrorHandling(MessageCompilationTests):
+    @cached_property
+    def msgfmt_version(self):
+        # Note that msgfmt is installed via GNU gettext tools, hence the msgfmt
+        # version should align to gettext.
+        out, err, status = popen_wrapper(
+            ["msgfmt", "--version"],
+            stdout_encoding=DEFAULT_LOCALE_ENCODING,
+        )
+        m = re.search(r"(\d+)\.(\d+)\.?(\d+)?", out)
+        return tuple(int(d) for d in m.groups() if d is not None)
+
     def test_error_reported_by_msgfmt(self):
         # po file contains wrong po formatting.
         with self.assertRaises(CommandError):
@@ -278,7 +292,14 @@ class CompilationErrorHandling(MessageCompilationTests):
                 call_command(
                     "compilemessages", locale=["ko"], stdout=StringIO(), stderr=stderr
                 )
-            self.assertIn("' cannot start a field name", stderr.getvalue())
+            if self.msgfmt_version < (0, 25):
+                error_msg = "' cannot start a field name"
+            else:
+                error_msg = (
+                    "a field name starts with a character that is not alphanumerical "
+                    "or underscore"
+                )
+            self.assertIn(error_msg, stderr.getvalue())
 
 
 class ProjectAndAppTests(MessageCompilationTests):
