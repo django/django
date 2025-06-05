@@ -47,6 +47,11 @@
         padding-left: 0;
         padding-right: 16px;
     }
+
+    [dir="rtl"] ul.messagelist li {
+        padding: 10px 55px 10px 10px;
+        background-position-x: calc(100% - 30px);
+    }
 }
 
 /* MOBILE */
@@ -85,5 +90,10 @@
 
     [dir="rtl"] :enabled.selector-add:focus, :enabled.selector-add:hover {
         background-position: 0 -72px;
+    }
+
+    [dir="rtl"] ul.messagelist li {
+        padding: 10px 40px 10px 10px;
+        background-position-x: calc(100% - 15px);
     }
 }
