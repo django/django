@@ -278,7 +278,18 @@ class CompilationErrorHandling(MessageCompilationTests):
                 call_command(
                     "compilemessages", locale=["ko"], stdout=StringIO(), stderr=stderr
                 )
-            self.assertIn("' cannot start a field name", stderr.getvalue())
+            stderr_output = stderr.getvalue()
+
+            # Check for msgfmt error messages. The format changed in msgfmt 0.25+
+            # Old format: "' cannot start a field name"
+            # New format: "a field name starts with a character that is not "
+            # "alphanumerical or underscore"
+            self.assertTrue(
+                "' cannot start a field name" in stderr_output
+                or "a field name starts with a character that is not "
+                "alphanumerical or underscore" in stderr_output,
+                f"Expected msgfmt error message not found in: {stderr_output}",
+            )
 
 
 class ProjectAndAppTests(MessageCompilationTests):
