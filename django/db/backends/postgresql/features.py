@@ -164,3 +164,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     )
 
     supports_any_value = property(operator.attrgetter("is_postgresql_16"))
+    supports_json_absent_on_null = property(operator.attrgetter("is_postgresql_16"))

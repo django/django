@@ -3,6 +3,7 @@ Implementations of SQL functions for SQLite.
 """
 
 import functools
+import json
 import random
 import statistics
 import zoneinfo
@@ -59,6 +60,9 @@ def register(connection):
     create_deterministic_function("django_time_diff", 2, _sqlite_time_diff)
     create_deterministic_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
     create_deterministic_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
+    create_deterministic_function(
+        "django_json_strip_nulls", 1, _sqlite_json_strip_nulls
+    )
     create_deterministic_function("regexp", 2, _sqlite_regexp)
     create_deterministic_function("BITXOR", 2, _sqlite_bitxor)
     create_deterministic_function("COT", 1, _sqlite_cot)
@@ -298,6 +302,20 @@ def _sqlite_timestamp_diff(lhs, rhs):
     left = typecast_timestamp(lhs)
     right = typecast_timestamp(rhs)
     return duration_microseconds(left - right)
+
+
+def _sqlite_json_strip_nulls(json_array):
+    if json_array is None:
+        return None
+    deserialized = json.loads(json_array)
+    if isinstance(deserialized, list):
+        out = [v for v in deserialized if v is not None]
+    else:
+        raise TypeError(
+            "Input must be a JSON object or a JSON array, "
+            f"got {type(deserialized).__name__} instead."
+        )
+    return json.dumps(out)
 
 
 def _sqlite_regexp(pattern, string):
