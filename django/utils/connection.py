@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import asyncio
+from contextlib import asynccontextmanager
 
 from asgiref.local import Local
 
@@ -34,56 +35,14 @@ class ConnectionDoesNotExist(Exception):
     pass
 
 
-class StackLocal:
-    def __init__(self):
-        self._store = Local()
-
-    def _stack_for(self, key):
-        try:
-            return getattr(self._store, key)
-        except AttributeError:
-            stack = []
-            setattr(self._store, key, stack)
-            return stack
-
-    def __getattr__(self, key):
-        stack = self._stack_for(key)
-
-        if stack:
-            return stack[-1]
-
-        raise AttributeError(
-            f"'{self.__class__.__name__}' object has no attribute '{key}'"
-        )
-
-    def __setattr__(self, key, value):
-        if key == "_store":
-            return super().__setattr__(key, value)
-
-        setattr(self._store, key, self._stack_for(key) + [value])
-
-    def __delattr__(self, key):
-        stack = self._stack_for(key)
-
-        if not stack:
-            raise AttributeError(
-                f"'{self.__class__.__name__}' object has no attribute '{key}'"
-            )
-
-        setattr(self._store, key, stack[:-1])
-
-
 class AbstractConnectionHandler(ABC):
+    thread_critical = False
     settings_name = None
     exception_class = ConnectionDoesNotExist
 
     def __init__(self, settings=None):
         self._settings = settings
-        self._connections = self.create_local_storage()
-
-    @abstractmethod
-    def create_local_storage(self):
-        pass
+        self._connections = Local(thread_critical=self.thread_critical)
 
     @cached_property
     def settings(self):
@@ -128,17 +87,6 @@ class AbstractConnectionHandler(ABC):
 
 
 class BaseConnectionHandler(AbstractConnectionHandler):
-    thread_critical = False
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        for conn in self.all(initialized_only=True):
-            conn.close_if_unusable_or_obsolete()
-
-    def create_local_storage(self):
-        return Local(thread_critical=self.thread_critical)
 
     def close_all(self):
         for conn in self.all(initialized_only=True):
@@ -147,20 +95,24 @@ class BaseConnectionHandler(AbstractConnectionHandler):
 
 class BaseAsyncConnectionHandler(AbstractConnectionHandler):
 
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, exc_type, exc_value, traceback):
-        await asyncio.gather(*[
-            conn.close_if_unusable_or_obsolete()
-            for conn in self.all(initialized_only=True)
-        ])
-
-    def create_local_storage(self):
-        return StackLocal()
-
     async def close_all(self):
         await asyncio.gather(*[
             conn.close()
             for conn in self.all(initialized_only=True)
         ])
+
+    @asynccontextmanager
+    async def independent_connection(self):
+        active_connection = self.all(initialized_only=True)
+
+        try:
+            for conn in active_connection:
+                del self[conn.alias]
+            yield
+        finally:
+            close_task = asyncio.create_task(self.close_all())
+
+            for conn in active_connection:
+                self[conn.alias] = conn
+
+            await close_task
