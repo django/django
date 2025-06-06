@@ -1045,11 +1045,13 @@ class ModelAdmin(BaseModelAdmin):
         actions = self._filter_actions_by_permissions(request, self._get_base_actions())
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
+    def get_action_choices(self, request, default_choices=None):
         """
         Return a list of choices for use in a form object.  Each choice is a
         tuple (name, description).
         """
+        if default_choices is None:
+            default_choices = [("", settings.BLANK_CHOICE_LABEL)]
         choices = [*default_choices]
         for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))

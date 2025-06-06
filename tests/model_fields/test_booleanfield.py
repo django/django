@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models, transaction
 from django.test import SimpleTestCase, TestCase
@@ -48,7 +49,10 @@ class BooleanFieldTests(TestCase):
         """
         choices = [(1, "Si"), (2, "No")]
         f = models.BooleanField(choices=choices)
-        self.assertEqual(f.formfield().choices, [("", "---------")] + choices)
+        self.assertEqual(
+            f.formfield().choices,
+            [("", settings.BLANK_CHOICE_LABEL)] + choices,
+        )
 
     def test_nullbooleanfield_formfield(self):
         f = models.BooleanField(null=True)
