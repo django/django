@@ -8,6 +8,24 @@ from django.test.runner import DiscoverRunner
 from .models import Person
 
 
+class QueryFormatterTests(unittest.TestCase):
+
+    def test_log_record_no_args(self):
+        pass
+
+    def test_log_record_not_enough_args(self):
+        pass
+
+    def test_log_record_not_key_in_args(self):
+        pass
+
+    def test_log_record_no_alias(self):
+        pass
+
+    def test_formats_sql(self):
+        pass
+
+
 @unittest.skipUnless(
     connection.vendor == "sqlite", "Only run on sqlite so we can check output SQL."
 )
