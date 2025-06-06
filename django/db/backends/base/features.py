@@ -266,6 +266,9 @@ class BaseDatabaseFeatures:
     # delimiter along with DISTINCT.
     supports_aggregate_distinct_multiple_argument = True
 
+    # Does the database support SQL 2023 ORDER BY in grouped table?
+    supports_order_by_grouped_table = False
+
     # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
     supports_any_value = False
 

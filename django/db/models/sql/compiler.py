@@ -1,6 +1,7 @@
 import collections
 import json
 import re
+import warnings
 from functools import partial
 from itertools import chain
 
@@ -23,6 +24,7 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
@@ -161,12 +163,43 @@ class SQLCompiler:
             if alias in group_by_refs:
                 continue
             expressions.extend(expr.get_group_by_cols())
+
+        expressions_order_by = []
         if not self._meta_ordering:
             for expr, (sql, params, is_ref) in order_by:
                 # Skip references to the SELECT clause, as all expressions in
                 # the SELECT clause are already part of the GROUP BY.
                 if not is_ref:
-                    expressions.extend(expr.get_group_by_cols())
+                    expressions_order_by.extend(expr.get_group_by_cols())
+
+            if (
+                len(expressions_order_by) > 0
+                and not self.connection.features.supports_order_by_grouped_table
+                and self.query.group_by is not True
+            ):
+                # Compare results of collapsed_group_by() with and without the
+                # expressions from order_by.
+                collapsed_no_order_by = self.collapse_group_by(expressions, [])
+                collapsed_order_by = self.collapse_group_by(expressions_order_by, [])
+                collapsed_diff = set(collapsed_order_by).difference(
+                    set(collapsed_no_order_by)
+                )
+                if collapsed_diff:
+                    # RemovedInDjango70Warning: When the deprecation ends, replace
+                    # with raise NotSupportedError(
+                    #     "Having columns in the ORDER BY clause that are not in "
+                    #     "the GROUP BY clause is not supported on this database "
+                    #     "backend."
+                    # )
+                    warnings.warn(
+                        "Having columns in the ORDER BY clause that are not in "
+                        "the GROUP BY clause is not supported on this database "
+                        "backend and will be deprecated on Django 7.0.",
+                        category=RemovedInDjango70Warning,
+                        stacklevel=2,
+                    )
+        expressions.extend(expressions_order_by)
+
         having_group_by = self.having.get_group_by_cols() if self.having else ()
         for expr in having_group_by:
             expressions.append(expr)
