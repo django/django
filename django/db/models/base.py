@@ -1322,6 +1322,7 @@ class Model(AltersData, metaclass=ModelBase):
             if not value or not hasattr(value, "resolve_expression"):
                 value = Value(value, field)
             field_map[field.name] = value
+            field_map[field.attname] = value
         if "pk" not in exclude:
             field_map["pk"] = Value(self.pk, meta.pk)
         if generated_fields:
