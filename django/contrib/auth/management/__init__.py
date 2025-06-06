@@ -9,7 +9,8 @@ from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
+from django.db.utils import IntegrityError
 
 
 def _get_all_permissions(opts):
@@ -106,6 +107,102 @@ def create_permissions(
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
+
+
+class RenamePermission(migrations.RunPython):
+    def __init__(self, app_label, old_model, new_model):
+        self.app_label = app_label
+        self.old_model = old_model
+        self.new_model = new_model
+        super(RenamePermission, self).__init__(
+            self.rename_forward, self.rename_backward
+        )
+
+    def _rename(self, apps, schema_editor, old_model, new_model):
+        Permission = apps.get_model("auth", "Permission")
+        ContentType = apps.get_model("contenttypes", "ContentType")
+
+        db = schema_editor.connection.alias
+
+        if not router.allow_migrate_model(db, Permission):
+            return
+
+        ctypes = ContentType.objects.filter(
+            app_label=self.app_label, model__icontains=old_model
+        )
+
+        permissions = Permission.objects.filter(content_type__in=ctypes)
+
+        for permission in permissions:
+            # Calculate new names
+            prefix = permission.codename.split("_")[0]
+            new_codename = f"{prefix}_{new_model}"
+            new_name = f"Can {prefix} {new_model}"
+
+            # Only update if changes are needed
+            if permission.codename != new_codename or permission.name != new_name:
+                # Save original values in case of error
+                original_codename = permission.codename
+                original_name = permission.name
+
+                permission.codename = new_codename
+                permission.name = new_name
+
+                try:
+                    with transaction.atomic(using=db):
+                        permission.save(update_fields={"name", "codename"})
+                except IntegrityError:
+                    # Skip conflicting permissions - leave them unchanged
+                    permission.codename = original_codename
+                    permission.name = original_name
+
+    def rename_forward(self, apps, schema_editor):
+        self._rename(apps, schema_editor, self.old_model, self.new_model)
+
+    def rename_backward(self, apps, schema_editor):
+        self._rename(apps, schema_editor, self.new_model, self.old_model)
+
+
+def update_permissions(
+    plan,
+    verbosity=2,
+    interactive=True,
+    using=DEFAULT_DB_ALIAS,
+    apps=global_apps,
+    **kwargs,
+):
+    """
+    Insert a `RenameContentType` operation after every planned `RenameModel`
+    operation.
+    """
+    # Determine whether or not the ContentType model is available.
+    try:
+        ContentType = apps.get_model("contenttypes", "ContentType")
+        apps.get_model("auth", "Permission")
+    except LookupError:
+        available = False
+    else:
+        if not router.allow_migrate_model(using, ContentType):
+            return
+        available = True
+
+    if not available:
+        return
+
+    for migration, backward in plan:
+
+        inserts = []
+        for index, operation in enumerate(migration.operations):
+            if isinstance(operation, migrations.RenameModel):
+                operation = RenamePermission(
+                    migration.app_label,
+                    operation.old_name_lower,
+                    operation.new_name_lower,
+                )
+
+                inserts.append((index + 1, operation))
+        for inserted, (index, operation) in enumerate(inserts):
+            migration.operations.insert(inserted + index, operation)
 
 
 def get_system_username():
