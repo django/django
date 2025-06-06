@@ -1206,6 +1206,42 @@ class NonAggregateAnnotationTestCase(TestCase):
 
         self.assertEqual(qs.count(), len(qs))
 
+    def test_chained_values_annotation_fielderror(self):
+        qs1 = Book.objects.values("id").annotate(
+            author_name=F("authors__name"),
+            author_id=F("authors__id"),
+        )
+        qs2 = Book.objects.values("id").annotate(
+            author_name=F("authors__name"),
+            author_id=F("authors__id"),
+        )
+        combined = (qs1 | qs2).distinct()
+        sub = combined.filter(id=OuterRef("id")).values("author_name")
+
+        result = (
+            Book.objects.values("id")
+            .annotate(
+                author_id=Subquery(
+                    sub.values("author_id").order_by("author_id")[:1],
+                    output_field=IntegerField(),
+                )
+            )
+            .first()
+        )
+        self.assertIsNotNone(result)
+        self.assertIn("author_id", result)
+
+        qs = (
+            Book.objects.values("id")
+            .annotate(
+                author_name=F("authors__name"),
+                author_id=F("authors__id"),
+            )
+            .values("author_name")
+            .values("author_id")
+        )
+        self.assertGreaterEqual(len(list(qs)), 0)
+
 
 class AliasTests(TestCase):
     @classmethod
