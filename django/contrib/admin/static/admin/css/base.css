@@ -34,6 +34,8 @@ html[data-theme="light"],
 
     --error-fg: #ba2121;
 
+    --message-debug-bg: #efefef;
+    --message-info-bg: #ccefff;
     --message-success-bg: #dfd;
     --message-warning-bg: #ffc;
     --message-error-bg: #ffefef;
@@ -641,6 +643,16 @@ ul.messagelist li {
     background-size: 16px auto;
     color: var(--body-fg);
     word-break: break-word;
+}
+
+ul.messagelist li.debug {
+    background: var(--message-debug-bg) url(../img/icon-debug.svg) 40px 12px no-repeat;
+    background-size: 16px auto;
+}
+
+ul.messagelist li.info {
+    background: var(--message-info-bg) url(../img/icon-info.svg) 40px 12px no-repeat;
+    background-size: 16px auto;
 }
 
 ul.messagelist li.warning {
