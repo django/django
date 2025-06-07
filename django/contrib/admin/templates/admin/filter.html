@@ -6,7 +6,8 @@
   <ul>
   {% for choice in choices %}
     <li{% if choice.selected %} class="selected"{% endif %}>
-    <a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
+    {% querystring cl.filter_params choice.query_string as querystring %}
+    <a href="{{ querystring|iriencode }}">{{ choice.display }}</a></li>
   {% endfor %}
   </ul>
 </details>
