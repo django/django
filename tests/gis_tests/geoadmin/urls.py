@@ -1,6 +1,7 @@
-from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
+
+from .models import site_gis
 
 urlpatterns = [
-    path("admin/", include(admin.site.urls)),
+    path("admin/", site_gis.urls),
 ]
