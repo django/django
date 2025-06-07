@@ -226,7 +226,7 @@ a mail sending exception.
 
 Log messages related to :doc:`contrib/gis/index` at various points: during the
 loading of external GeoSpatial libraries (GEOS, GDAL, etc.) and when reporting
-errors. Each ``ERROR`` log record includes the caught exception and relevant
+errors. Each ``WARNING`` log record includes the caught exception and relevant
 contextual data.
 
 .. _django-dispatch-logger:
