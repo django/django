@@ -86,10 +86,12 @@ To handle model name collisions, you can:
                # Get all default imports
                imports = super().get_auto_imports()
                # Add aliases for colliding models
-               imports.extend([
-                   "apps.cart.models.Line as CartLine",
-                   "apps.order.models.Line as OrderLine",
-               ])
+               imports.extend(
+                   [
+                       "apps.cart.models.Line as CartLine",
+                       "apps.order.models.Line as OrderLine",
+                   ]
+               )
                return imports
 
 If an overridden ``shell`` command includes paths that cannot be imported,
