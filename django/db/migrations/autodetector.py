@@ -1460,6 +1460,29 @@ class MigrationAutodetector:
         for attr in new_constraint.non_db_attrs:
             new_kwargs.pop(attr, None)
 
+        # Replace renamed fields if the db_column is preserved.
+        for (
+            _,
+            _,
+            rem_db_column,
+            rem_field_name,
+            _,
+            _,
+            field,
+            field_name,
+        ) in self.renamed_operations:
+            if field.db_column and rem_db_column == field.db_column:
+                new_fields = new_kwargs["fields"]
+                try:
+                    new_field_idx = new_fields.index(field_name)
+                except ValueError:
+                    continue
+                new_kwargs["fields"] = tuple(
+                    new_fields[:new_field_idx]
+                    + (rem_field_name,)
+                    + new_fields[new_field_idx + 1 :]
+                )
+
         return (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
 
     def create_altered_constraints(self):
