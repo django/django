@@ -113,8 +113,8 @@ To work around this limitation, ``ForeignObject`` can be used as an
 alternative::
 
     class Foo(models.Model):
-        item_order_id = models.IntegerField()
-        item_product_id = models.CharField(max_length=20)
+        item_order_id = models.CharField(max_length=20)
+        item_product_id = models.IntegerField()
         item = models.ForeignObject(
             OrderLineItem,
             on_delete=models.CASCADE,
