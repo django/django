@@ -124,7 +124,7 @@ alternative::
 
 ``ForeignObject`` is much like ``ForeignKey``, except that it doesn't create
 any columns (e.g. ``item_id``), foreign key constraints or indexes in the
-database.
+database, and the ``on_delete`` argument is ignored.
 
 .. warning::
 
