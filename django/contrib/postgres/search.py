@@ -19,14 +19,14 @@ _spec_chars_re = re.compile(_SEARCH_SPEC_CHARS)
 multiple_spaces_re = re.compile(r"\s{2,}")
 
 
-def normalize_spaces(val: str):
+def normalize_spaces(val):
     """Converts multiple spaces to single and strips from both sides"""
     if not val:
         return None
     return multiple_spaces_re.sub(" ", val.strip())
 
 
-def psql_escape(query: str):
+def psql_escape(query):
     # replace unsafe chars with space
     query = _spec_chars_re.sub(" ", query)
     query = normalize_spaces(query)  # convert multiple spaces to single
