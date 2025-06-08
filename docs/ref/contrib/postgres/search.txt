@@ -295,9 +295,8 @@ Lexeme objects
 .. versionadded:: 6.0
 
 Lexeme objects allow search operators to be safely used with strings from an
-untrusted source. The content of each lexeme is escaped
-so that any operators that may exist in the string itself
-will not be interpreted.
+untrusted source. The content of each lexeme is escaped so that any operators
+that may exist in the string itself will not be interpreted.
 
 You can combine lexemes with other lexemes in Python using the ``&`` and ``|``
 operators and also negate them with the ``~`` operator. For example:
