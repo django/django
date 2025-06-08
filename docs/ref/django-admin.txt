@@ -1072,7 +1072,9 @@ objects will be listed. To disable automatic importing entirely, use the
 ``--no-imports`` flag.
 
 See the guide on :ref:`customizing this behavior
-<customizing-shell-auto-imports>` to add or remove automatic imports.
+<customizing-shell-auto-imports>` to add or remove automatic imports, and
+:ref:`handling model name collisions <handling-model-name-collisions>` for
+dealing with identically named models from different apps.
 
 .. versionchanged:: 5.2
 
