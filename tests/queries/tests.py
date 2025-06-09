@@ -4609,8 +4609,12 @@ class Ticket23622Tests(TestCase):
 
 class QuerySetFilterIfTests(TestCase):
     def setUp(self):
-        self.article1 = Article.objects.create(title="Test Article 1", author="Author 1")
-        self.article2 = Article.objects.create(title="Test Article 2", author="Author 2")
+        self.article1 = Article.objects.create(
+            title="Test Article 1", author="Author 1"
+        )
+        self.article2 = Article.objects.create(
+            title="Test Article 2", author="Author 2"
+        )
 
     def test_filter_if_true_condition(self):
         qs = Article.objects.filter_if(True, author="Author 1")
@@ -4635,6 +4639,7 @@ class QuerySetFilterIfTests(TestCase):
         self.assertEqual(qs.count(), 2)
 
     def test_filter_if_chaining(self):
-        qs = Article.objects.filter_if(True, author="Author 1").filter(title__contains="Test")
+        qs = (Article.objects.filter_if(True, author="Author 1")
+              .filter(title__contains="Test"))
         self.assertEqual(qs.count(), 1)
         self.assertEqual(qs.first().title, "Test Article 1")
