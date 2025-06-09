@@ -210,6 +210,16 @@ underlying SQL statement.
 If you need to execute more complex queries (for example, queries with ``OR`` statements),
 you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
+``filter_id()``
+.. method:: filter_if(condition, **kwargs)
+Apply a filter to the queryset only if the provided condition evaluates to
+True. This is useful for dynamically applying filters based on a condition.
+
+:param condition: A boolean value or a callable that returns a boolean.
+:param kwargs: The filter arguments to apply if the condition is True.
+:returns: A new queryset with the filter applied if condition is True, otherwise
+the original queryset.
+
 ``exclude()``
 ~~~~~~~~~~~~~
 
