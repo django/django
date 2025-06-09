@@ -303,13 +303,25 @@ operators and also negate them with the ``~`` operator. For example:
 
 .. code-block:: pycon
 
-    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
-    >>> SearchQuery(
-    ...     Lexeme("The user's search query")
-    ...     & Lexeme("Something else")
-    ...     & ~Lexeme("Exclude documents that match this")
-    ... )
-    >>> SearchQuery(Lexeme("The user's search query") | Lexeme("Something else"))
+    >>> from django.contrib.postgres.search import SearchQuery, SearchVector,
+    ... Lexeme
+    >>> Entry.objects.annotate(
+    ...     search=SearchVector("body_text", "blog__tagline")   
+    ... ).filter(search=SearchQuery(Lexeme("fruit") & Lexeme("dessert")))
+    [<Entry: Apple Crumble Recipes>, <Entry: Banana Split Recipes>]
+
+.. code-block:: pycon
+
+    >>> from django.contrib.postgres.search import SearchQuery, SearchVector,
+    ... Lexeme
+    >>> Entry.objects.annotate(
+    ...     search=SearchVector("body_text", "blog__tagline")   
+    ... ).filter(search=SearchQuery(
+    ...     Lexeme("fruit") &
+    ...     Lexeme("dessert") &
+    ...     ~Lexeme("banana")
+    ... ))
+    [<Entry: Apple Crumble Recipes>]
 
 Lexeme objects also support weighting and prefixes:
 
