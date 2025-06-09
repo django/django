@@ -64,18 +64,18 @@ if lib_names:
 lgdal = SimpleLazyObject(load_gdal)
 
 
-def load_wingdal():
-    from ctypes import WinDLL
-
-    lib_path = getattr(lgdal, "_name", None)
-    return WinDLL(lib_path)
-
-
 # On Windows, the GDAL binaries have some OSR routines exported with
 # STDCALL, while others are not. Thus, the library will also need to
 # be loaded up as WinDLL for said OSR functions that require the
 # different calling convention.
 if os.name == "nt":
+
+    def load_wingdal():
+        from ctypes import WinDLL
+
+        lib_path = getattr(lgdal, "_name", None)
+        return WinDLL(lib_path)
+
     lwingdal = SimpleLazyObject(load_wingdal)
 
 
