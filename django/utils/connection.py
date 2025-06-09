@@ -103,16 +103,33 @@ class BaseAsyncConnectionHandler(AbstractConnectionHandler):
 
     @asynccontextmanager
     async def independent_connection(self):
-        active_connection = self.all(initialized_only=True)
+        """
+        Creates an isolated connection to enable parallel queries.
+
+        Django reuses connections per-thread, which can block concurrent async
+        queries. This context temporarily removes existing connections, allowing new,
+        independent ones to be used inside the block.
+
+        Example:
+
+            async def load():
+                async with connections.independent_connection():
+                    await fetch_data(connections['default'])
+
+            await asyncio.gather(load(), load(), load())
+        """
+        connections = self.all()
 
         try:
-            for conn in active_connection:
-                del self[conn.alias]
+            for conn in connections:
+                self[conn.alias] = self.create_connection(conn.alias)
             yield
         finally:
-            close_task = asyncio.create_task(self.close_all())
+            close_task = asyncio.gather(*[
+                conn.close() for conn in self.all()
+            ])
 
-            for conn in active_connection:
+            for conn in connections:
                 self[conn.alias] = conn
 
             await close_task
