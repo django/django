@@ -89,7 +89,7 @@ class CookieStorage(BaseStorage):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.signer = signing.get_cookie_signer(salt=self.key_salt)
+        self._signer = signing.get_cookie_signer(salt=self.key_salt)
 
     def _get(self, *args, **kwargs):
         """
@@ -181,7 +181,7 @@ class CookieStorage(BaseStorage):
         also contains a hash to ensure that the data was not tampered with.
         """
         if messages or encode_empty:
-            return self.signer.sign_object(
+            return self._signer.sign_object(
                 messages, serializer=MessagePartGatherSerializer, compress=True
             )
 
@@ -205,7 +205,7 @@ class CookieStorage(BaseStorage):
         if not data:
             return None
         try:
-            return self.signer.unsign_object(data, serializer=MessageSerializer)
+            return self._signer.unsign_object(data, serializer=MessageSerializer)
         except (signing.BadSignature, binascii.Error, json.JSONDecodeError):
             pass
         # Mark the data as used (so it gets removed) since something was wrong
