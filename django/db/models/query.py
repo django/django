@@ -939,7 +939,10 @@ class QuerySet(AltersData):
                 for obj in batch_objs:
                     attr = getattr(obj, field.attname)
                     if not hasattr(attr, "resolve_expression"):
-                        attr = Value(attr, output_field=field)
+                        if attr is None:
+                            attr = Value(None)
+                        else:
+                            attr = Value(attr, output_field=field)
                     when_statements.append(When(pk=obj.pk, then=attr))
                 case_statement = Case(*when_statements, output_field=field)
                 if requires_casting:
