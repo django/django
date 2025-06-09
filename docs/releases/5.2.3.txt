@@ -17,3 +17,6 @@ Bugfixes
 * Fixed a regression in Django 5.2 that caused :meth:`.QuerySet.bulk_update` to
   incorrectly convert ``None`` to JSON ``null`` instead of SQL ``NULL`` for
   ``JSONField`` (:ticket:`36419`).
+
+* Fixed a regression in Django 5.2.2 where the ``q`` parameter was removed from
+  the internal ``django.http.MediaType.params`` property (:ticket:`36446`).
