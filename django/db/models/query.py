@@ -1833,6 +1833,25 @@ class QuerySet(AltersData):
         clone._db = alias
         return clone
 
+    def filter_if(self, condition, **kwargs):
+        """
+        Apply a filter to the queryset only if the condition is True.
+
+        Args:
+            condition: A boolean value or callable that returns a boolean.
+            **kwargs: Filter parameters to apply if the condition is True.
+
+        Returns:
+            QuerySet: A new queryset with the filter applied if condition is True,
+                     otherwise the original queryset.
+
+        Example:
+            qs = Model.objects.filter_if(user is not None, user=user)
+        """
+        if callable(condition):
+            condition = condition()
+        return self.filter(**kwargs) if condition else self
+
     ###################################
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################
