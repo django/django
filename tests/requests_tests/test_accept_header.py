@@ -173,6 +173,19 @@ class AcceptHeaderTests(TestCase):
             [
                 "text/html",
                 "application/xhtml+xml",
+                "text/*",
+                "application/xml; q=0.9",
+                "*/*; q=0.8",
+            ],
+        )
+        self.assertEqual(
+            [
+                str(accepted_type)
+                for accepted_type in request.accepted_types_by_precedence
+            ],
+            [
+                "text/html",
+                "application/xhtml+xml",
                 "application/xml; q=0.9",
                 "text/*",
                 "*/*; q=0.8",
@@ -196,7 +209,10 @@ class AcceptHeaderTests(TestCase):
             "text/*, text/plain, text/plain;format=flowed, */*"
         )
         self.assertEqual(
-            [str(accepted_type) for accepted_type in request.accepted_types],
+            [
+                str(accepted_type)
+                for accepted_type in request.accepted_types_by_precedence
+            ],
             [
                 "text/plain; format=flowed",
                 "text/plain",
@@ -261,6 +277,16 @@ class AcceptHeaderTests(TestCase):
                 "text/*; q=0.8",
             ],
         )
+        self.assertEqual(
+            [
+                str(accepted_type)
+                for accepted_type in request.accepted_types_by_precedence
+            ],
+            [
+                "text/html; q=0.8",
+                "text/*; q=0.8",
+            ],
+        )
 
     def test_no_matching_accepted_type(self):
         request = HttpRequest()
@@ -289,7 +315,7 @@ class AcceptHeaderTests(TestCase):
         ]:
             self.assertEqual(request.get_preferred_type(media_types), expected)
 
-    def test_quality(self):
+    def test_quality_for_media_type_rfc7231(self):
         """
         Taken from https://datatracker.ietf.org/doc/html/rfc7231#section-5.3.2.
         """
@@ -314,7 +340,36 @@ class AcceptHeaderTests(TestCase):
 
         for media_types, expected in [
             (["text/html", "text/html; level=1"], "text/html; level=1"),
-            (["text/html; level=2", "text/html; level=3"], "text/html; level=2"),
+            (["text/html; level=2", "text/html; level=3"], "text/html; level=3"),
+        ]:
+            self.assertEqual(request.get_preferred_type(media_types), expected)
+
+    def test_quality_for_media_type_rfc9110(self):
+        """
+        Taken from https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1-18.
+        """
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = (
+            "text/*;q=0.3, text/plain;q=0.7, text/plain;format=flowed, "
+            "text/plain;format=fixed;q=0.4, */*;q=0.5"
+        )
+
+        for media_type, quality in [
+            ("text/plain;format=flowed", 1),
+            ("text/plain", 0.7),
+            ("text/html", 0.3),
+            ("image/jpeg", 0.5),
+            ("text/plain;format=fixed", 0.4),
+            ("text/html;level=3", 0.3),  # https://www.rfc-editor.org/errata/eid7138
+        ]:
+            with self.subTest(media_type):
+                accepted_media_type = request.accepted_type(media_type)
+                self.assertIsNotNone(accepted_media_type)
+                self.assertEqual(accepted_media_type.quality, quality)
+
+        for media_types, expected in [
+            (["text/plain", "text/plain; format=flowed"], "text/plain; format=flowed"),
+            (["text/html", "image/jpeg"], "image/jpeg"),
         ]:
             self.assertEqual(request.get_preferred_type(media_types), expected)
 
@@ -333,4 +388,21 @@ class AcceptHeaderTests(TestCase):
 
         self.assertEqual(
             request.get_preferred_type(["text/html", "text/plain"]), "text/html"
+        )
+
+    def test_quality_over_specificity(self):
+        """
+        For media types with the same quality, prefer the more specific type.
+        """
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = "text/*,image/jpeg"
+
+        self.assertEqual(request.accepted_type("text/plain").quality, 1)
+        self.assertEqual(request.accepted_type("text/plain").specificity, 1)
+
+        self.assertEqual(request.accepted_type("image/jpeg").quality, 1)
+        self.assertEqual(request.accepted_type("image/jpeg").specificity, 2)
+
+        self.assertEqual(
+            request.get_preferred_type(["text/plain", "image/jpeg"]), "image/jpeg"
         )
