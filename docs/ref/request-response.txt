@@ -478,7 +478,7 @@ Methods
         None
 
     (For further details on how content negotiation is performed, see
-    :rfc:`7231#section-5.3.2`.)
+    :rfc:`9110#section-12.5.1`.)
 
     Most browsers send ``Accept: */*`` by default, meaning they don't have a
     preference, in which case the first item in ``media_types`` would be
