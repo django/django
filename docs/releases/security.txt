@@ -47,6 +47,14 @@ Potential log injection via unescaped request path.
 * Django 5.1 :commit:`(patch) <596542ddb46cdabe011322917e1655f0d24eece2>`
 * Django 4.2 :commit:`(patch) <ac03c5e7df8680c61cdb0d3bdb8be9095dba841e>`
 
+There was an additional hardening with new patch releases published on June 10,
+2025. `Full description
+<https://www.djangoproject.com/weblog/2025/jun/10/bugfix-releases/>`__
+
+* Django 5.2.3 :commit:`(patch) <8fcc83953c350e158a484bf1da0aa1b79b69bb07>`
+* Django 5.1.11 :commit:`(patch) <31f4bd31fa16f7f5302f65b9b8b7a49b69a7c4a6>`
+* Django 4.2.23 :commit:`(patch) <b597d46bb19c8567615e62029210dab16c70db7d>`
+
 May 7, 2025 - :cve:`2025-32873`
 -------------------------------
 
