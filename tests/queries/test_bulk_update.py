@@ -1,7 +1,7 @@
 import datetime
 
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models import F
+from django.db.models import F, IntegerField, Value
 from django.db.models.functions import Coalesce, Lower
 from django.db.utils import IntegrityError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
@@ -294,7 +294,11 @@ class BulkUpdateTests(TestCase):
         obj = JSONFieldNullable.objects.create(json_field={})
         test_cases = [
             ("direct_none_assignment", None),
-            ("expression_none_assignment", Coalesce(None, None)),
+            ("value_none_assignment", Value(None)),
+            (
+                "expression_none_assignment",
+                Coalesce(None, None, output_field=IntegerField()),
+            ),
         ]
         for label, value in test_cases:
             with self.subTest(case=label):
