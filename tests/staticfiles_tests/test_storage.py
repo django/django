@@ -235,6 +235,13 @@ class TestHashedFiles:
             self.assertIn(b"other.d41d8cd98f00.css", content)
         self.assertPostCondition()
 
+    def test_css_data_uri_with_nested_url(self):
+        relpath = self.hashed_file_path("cached/data_uri_with_nested_url.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b'url("data:image/svg+xml,url(%23b) url(%23c)")', content)
+        self.assertPostCondition()
+
     def test_css_source_map(self):
         relpath = self.hashed_file_path("cached/source_map.css")
         self.assertEqual(relpath, "cached/source_map.b2fceaf426aa.css")

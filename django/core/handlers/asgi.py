@@ -263,7 +263,16 @@ class ASGIHandler(base.BaseHandler):
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
             if "body" in message:
-                body_file.write(message["body"])
+                on_disk = getattr(body_file, "_rolled", False)
+                if on_disk:
+                    async_write = sync_to_async(
+                        body_file.write,
+                        thread_sensitive=False,
+                    )
+                    await async_write(message["body"])
+                else:
+                    body_file.write(message["body"])
+
             # Quit out if that's the end.
             if not message.get("more_body", False):
                 break

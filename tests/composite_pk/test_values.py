@@ -128,18 +128,18 @@ class CompositePKValuesTests(TestCase):
             self.assertSequenceEqual(
                 User.objects.values_list("pk", "pk").order_by("pk"),
                 (
-                    (self.user_1.pk,),
-                    (self.user_2.pk,),
-                    (self.user_3.pk,),
+                    (self.user_1.pk, self.user_1.pk),
+                    (self.user_2.pk, self.user_2.pk),
+                    (self.user_3.pk, self.user_3.pk),
                 ),
             )
         with self.subTest('User.objects.values_list("pk", "id", "pk", "id")'):
             self.assertSequenceEqual(
                 User.objects.values_list("pk", "id", "pk", "id").order_by("pk"),
                 (
-                    (self.user_1.pk, self.user_1.id),
-                    (self.user_2.pk, self.user_2.id),
-                    (self.user_3.pk, self.user_3.id),
+                    (self.user_1.pk, self.user_1.id, self.user_1.pk, self.user_1.id),
+                    (self.user_2.pk, self.user_2.id, self.user_2.pk, self.user_2.id),
+                    (self.user_3.pk, self.user_3.id, self.user_3.pk, self.user_3.id),
                 ),
             )
 

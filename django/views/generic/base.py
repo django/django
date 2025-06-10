@@ -14,6 +14,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import classonlymethod
 from django.utils.functional import classproperty
+from django.utils.log import log_response
 
 logger = logging.getLogger("django.request")
 
@@ -143,13 +144,14 @@ class View:
         return handler(request, *args, **kwargs)
 
     def http_method_not_allowed(self, request, *args, **kwargs):
-        logger.warning(
+        response = HttpResponseNotAllowed(self._allowed_methods())
+        log_response(
             "Method Not Allowed (%s): %s",
             request.method,
             request.path,
-            extra={"status_code": 405, "request": request},
+            response=response,
+            request=request,
         )
-        response = HttpResponseNotAllowed(self._allowed_methods())
 
         if self.view_is_async:
 
@@ -261,10 +263,9 @@ class RedirectView(View):
             else:
                 return HttpResponseRedirect(url)
         else:
-            logger.warning(
-                "Gone: %s", request.path, extra={"status_code": 410, "request": request}
-            )
-            return HttpResponseGone()
+            response = HttpResponseGone()
+            log_response("Gone: %s", request.path, response=response, request=request)
+            return response
 
     def head(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)

@@ -1537,6 +1537,32 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
 
 
 @isolate_apps("invalid_models_tests")
+class RelatedQueryNameClashWithManagerTests(SimpleTestCase):
+    def test_clash_between_related_query_name_and_manager(self):
+        class Author(models.Model):
+            authors = models.Manager()
+            mentor = models.ForeignKey(
+                "self", related_name="authors", on_delete=models.CASCADE
+            )
+
+        self.assertEqual(
+            Author.check(),
+            [
+                Error(
+                    "Related name 'authors' for 'Author.mentor' clashes with the name "
+                    "of a model manager.",
+                    hint=(
+                        "Rename the model manager or change the related_name argument "
+                        "in the definition for field 'Author.mentor'."
+                    ),
+                    obj=Author._meta.get_field("mentor"),
+                    id="fields.E348",
+                )
+            ],
+        )
+
+
+@isolate_apps("invalid_models_tests")
 class SelfReferentialM2MClashTests(SimpleTestCase):
     def test_clash_between_accessors(self):
         class Model(models.Model):
@@ -2182,6 +2208,48 @@ class M2mThroughFieldsTests(SimpleTestCase):
                     ),
                     obj=field,
                     id="fields.E310",
+                ),
+            ],
+        )
+
+    def test_invalid_to_argument_with_through(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foos = models.ManyToManyField(
+                to="Fo",
+                through="FooBar",
+                through_fields=("bar", "foo"),
+            )
+
+        class FooBar(models.Model):
+            foo = models.ForeignKey("Foo", on_delete=models.CASCADE)
+            bar = models.ForeignKey("Bar", on_delete=models.CASCADE)
+
+        field = Bar._meta.get_field("foos")
+
+        self.assertEqual(
+            field.check(from_model=Bar),
+            [
+                Error(
+                    "Field defines a relation with model 'Fo', "
+                    "which is either not installed, or is abstract.",
+                    obj=field,
+                    id="fields.E300",
+                ),
+                Error(
+                    "The model is used as an intermediate model by "
+                    "'invalid_models_tests.Bar.foos', "
+                    "but it does not have a foreign key to 'Bar' "
+                    "or 'invalid_models_tests.Fo'.",
+                    obj=FooBar,
+                    id="fields.E336",
+                ),
+                Error(
+                    "'FooBar.foo' is not a foreign key to 'Fo'.",
+                    obj=field,
+                    id="fields.E339",
                 ),
             ],
         )

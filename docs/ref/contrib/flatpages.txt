@@ -31,7 +31,7 @@ To install the flatpages app, follow these steps:
 
    Also make sure you've correctly set :setting:`SITE_ID` to the ID of the
    site the settings file represents. This will usually be ``1`` (i.e.
-   ``SITE_ID = 1``, but if you're using the sites framework to manage
+   ``SITE_ID = 1``), but if you're using the sites framework to manage
    multiple sites, it could be the ID of a different site.
 
 2. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
@@ -65,8 +65,8 @@ associates a flatpage with a site.
 Using the URLconf
 -----------------
 
-There are several ways to include the flat pages in your URLconf. You can
-dedicate a particular path to flat pages::
+There are several ways to include the flatpages in your URLconf. You can
+dedicate a particular path to flatpages::
 
     urlpatterns = [
         path("pages/", include("django.contrib.flatpages.urls")),
@@ -88,16 +88,21 @@ to place the pattern at the end of the other urlpatterns::
     in the catchall pattern or flatpages without a trailing slash will not be
     matched.
 
-Another common setup is to use flat pages for a limited set of known pages and
-to hard code the urls, so you can reference them with the :ttag:`url` template
-tag::
+Another common setup is to use flatpages for a limited set of known pages and
+to hardcode their URLs in the :doc:`URLconf </topics/http/urls>`::
 
     from django.contrib.flatpages import views
 
     urlpatterns += [
-        path("about-us/", views.flatpage, {"url": "/about-us/"}, name="about"),
-        path("license/", views.flatpage, {"url": "/license/"}, name="license"),
+        path("about-us/", views.flatpage, kwargs={"url": "/about-us/"}, name="about"),
+        path("license/", views.flatpage, kwargs={"url": "/license/"}, name="license"),
     ]
+
+The ``kwargs`` argument sets the ``url`` value used for the ``FlatPage`` model
+lookup in the flatpage view.
+
+The ``name`` argument allows the URL to be reversed in templates, for example
+using the :ttag:`url` template tag.
 
 Using the middleware
 --------------------
@@ -157,7 +162,7 @@ For more on middleware, read the :doc:`middleware docs
     raising an exception instead, the response will become an HTTP 500
     ("Internal Server Error") and the
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
-    will not attempt to serve a flat page.
+    will not attempt to serve a flatpage.
 
 .. currentmodule:: django.contrib.flatpages.models
 
@@ -216,14 +221,9 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
 Via the Python API
 ------------------
 
-.. class:: FlatPage
-
-    Flatpages are represented by a standard
-    :doc:`Django model </topics/db/models>`,
-    which lives in :source:`django/contrib/flatpages/models.py`. You can access
-    flatpage objects via the :doc:`Django database API </topics/db/queries>`.
-
-.. currentmodule:: django.contrib.flatpages
+Flatpages are represented by a standard
+:doc:`Django model </topics/db/models>`, :class:`.FlatPage`. You can access
+flatpage objects via the :doc:`Django database API </topics/db/queries>`.
 
 .. admonition:: Check for duplicate flatpage URLs.
 
@@ -233,16 +233,80 @@ Via the Python API
     ``django.contrib.flatpages.forms.FlatpageForm`` and used in your own
     views.
 
+.. currentmodule:: django.contrib.flatpages
+
+``FlatPage`` model
+==================
+
+.. class:: models.FlatPage
+
+Fields
+------
+
+:class:`~django.contrib.flatpages.models.FlatPage` objects have the following
+fields:
+
+.. class:: models.FlatPage
+    :noindex:
+
+    .. attribute:: url
+
+        Required. 100 characters or fewer. Indexed for faster lookups.
+
+    .. attribute:: title
+
+        Required. 200 characters or fewer.
+
+    .. attribute:: content
+
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`).
+        :class:`~django.db.models.TextField` that typically, contains the HTML
+        content of the page.
+
+    .. attribute:: enable_comments
+
+        Boolean. This field is not used by :mod:`~django.contrib.flatpages` by
+        default and does not appear in the admin interface. Please see
+        :ref:`flatpages admin interface section <flatpages-admin>` for a
+        detailed explanation.
+
+    .. attribute:: template_name
+
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 70
+        characters or fewer. Specifies the template used to render the page.
+        Defaults to :file:`flatpages/default.html` if not provided.
+
+    .. attribute: registration_required
+
+        Boolean. When ``True``, restricts the page access to logged-in users
+        only.
+
+    .. attribute:: sites
+
+        Many-to-many relationship to
+        :class:`~django.contrib.sites.models.Site`, which determines the
+        :doc:`sites </ref/contrib/sites>` the flatpage is available on.
+
+Methods
+-------
+
+.. class:: models.FlatPage
+    :noindex:
+
+    .. method:: get_absolute_url()
+
+        Returns the relative URL path of the page based on the
+        :attr:`~django.contrib.flatpages.models.FlatPage.url` attribute.
+
 Flatpage templates
 ==================
 
 By default, flatpages are rendered via the template
-:file:`flatpages/default.html`, but you can override that for a
-particular flatpage: in the admin, a collapsed fieldset titled
-"Advanced options" (clicking will expand it) contains a field for
-specifying a template name. If you're creating a flat page via the
-Python API you can set the template name as the field ``template_name`` on the
-``FlatPage`` object.
+:file:`flatpages/default.html`, but you can override that for a particular
+flatpage: in the admin, a collapsed fieldset titled "Advanced options"
+(clicking will expand it) contains a field for specifying a template name. If
+you're creating a flatpage via the Python API you can set the template name as
+the field ``template_name`` on the ``FlatPage`` object.
 
 Creating the :file:`flatpages/default.html` template is your responsibility;
 in your template directory, create a :file:`flatpages` directory containing a

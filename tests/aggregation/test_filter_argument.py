@@ -84,6 +84,10 @@ class FilteredAggregateTests(TestCase):
                     Author.objects.aggregate(age=agg)["age"], expected_result
                 )
 
+    def test_empty_filtered_aggregates(self):
+        agg = Count("pk", filter=Q())
+        self.assertEqual(Author.objects.aggregate(count=agg)["count"], 3)
+
     def test_double_filtered_aggregates(self):
         agg = Sum("age", filter=Q(Q(name="test2") & ~Q(name="test")))
         self.assertEqual(Author.objects.aggregate(age=agg)["age"], 60)
@@ -181,6 +185,23 @@ class FilteredAggregateTests(TestCase):
             )
         )
         self.assertEqual(aggregate, {"max_rating": 4.5})
+
+    def test_filtered_aggregrate_ref_in_subquery_annotation(self):
+        aggs = (
+            Author.objects.annotate(
+                count=Subquery(
+                    Book.objects.annotate(
+                        weird_count=Count(
+                            "pk",
+                            filter=Q(pages=OuterRef("age")),
+                        )
+                    ).values("weird_count")[:1]
+                ),
+            )
+            .order_by("pk")
+            .aggregate(sum=Sum("count"))
+        )
+        self.assertEqual(aggs["sum"], 0)
 
     def test_filtered_aggregate_on_exists(self):
         aggregate = Book.objects.values("publisher").aggregate(

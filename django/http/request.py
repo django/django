@@ -93,8 +93,12 @@ class HttpRequest:
         """Return a list of MediaType instances, in order of preference."""
         header_value = self.headers.get("Accept", "*/*")
         return sorted(
-            (MediaType(token) for token in header_value.split(",") if token.strip()),
-            key=operator.attrgetter("quality", "specificity"),
+            (
+                media_type
+                for token in header_value.split(",")
+                if token.strip() and (media_type := MediaType(token)).quality != 0
+            ),
+            key=operator.attrgetter("specificity", "quality"),
             reverse=True,
         )
 
@@ -102,11 +106,12 @@ class HttpRequest:
         """
         Return the preferred MediaType instance which matches the given media type.
         """
+        media_type = MediaType(media_type)
         return next(
             (
                 accepted_type
                 for accepted_type in self.accepted_types
-                if accepted_type.match(media_type)
+                if media_type.match(accepted_type)
             ),
             None,
         )
@@ -705,18 +710,39 @@ class MediaType:
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__qualname__, self)
 
-    @property
-    def is_all_types(self):
-        return self.main_type == "*" and self.sub_type == "*"
+    @cached_property
+    def range_params(self):
+        params = self.params.copy()
+        params.pop("q", None)
+        return params
 
     def match(self, other):
-        if self.is_all_types:
-            return True
-        other = MediaType(other)
-        return self.main_type == other.main_type and self.sub_type in {
-            "*",
-            other.sub_type,
-        }
+        if not other:
+            return False
+
+        if not isinstance(other, MediaType):
+            other = MediaType(other)
+
+        main_types = [self.main_type, other.main_type]
+        sub_types = [self.sub_type, other.sub_type]
+
+        # Main types and sub types must be defined.
+        if not all((*main_types, *sub_types)):
+            return False
+
+        # Main types must match or one be "*", same for sub types.
+        for this_type, other_type in (main_types, sub_types):
+            if this_type != other_type and this_type != "*" and other_type != "*":
+                return False
+
+        if bool(self.range_params) == bool(other.range_params):
+            # If both have params or neither have params, they must be identical.
+            result = self.range_params == other.range_params
+        else:
+            # If self has params and other does not, it's a match.
+            # If other has params and self does not, don't match.
+            result = bool(self.range_params or not other.range_params)
+        return result
 
     @cached_property
     def quality(self):
@@ -741,7 +767,7 @@ class MediaType:
             return 0
         elif self.sub_type == "*":
             return 1
-        elif self.quality == 1:
+        elif not self.range_params:
             return 2
         return 3
 

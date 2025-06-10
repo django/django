@@ -1092,6 +1092,8 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 
 .. fieldlookup:: jsonfield.key
 
+.. _key-index-and-path-transforms:
+
 Key, index, and path transforms
 -------------------------------
 
@@ -1133,6 +1135,22 @@ array:
 
     >>> Dog.objects.filter(data__owner__other_pets__0__name="Fishy")
     <QuerySet [<Dog: Rufus>]>
+
+If the key is a negative integer, it cannot be used in a filter keyword
+directly, but you can still use dictionary unpacking to use it in a query:
+
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(**{"data__owner__other_pets__-1__name": "Fishy"})
+    <QuerySet [<Dog: Rufus>]>
+
+.. admonition:: MySQL, MariaDB, and Oracle
+
+    Negative JSON array indices are not supported.
+
+.. versionchanged:: 6.0
+
+    SQLite support for negative JSON array indices was added.
 
 If the key you wish to query by clashes with the name of another lookup, use
 the :lookup:`contains <jsonfield.contains>` lookup instead.
@@ -1571,6 +1589,21 @@ For example, assuming ``entry`` is already duplicated as above::
     detail._state.adding = True
     detail.entry = entry
     detail.save()
+
+Note that it is not possible to copy instances of models with deferred fields
+using this pattern unless values are assigned to them:
+
+.. code-block:: pycon
+
+    >>> blog = Blog.objects.defer("name")[0]
+    >>> blog.pk = None
+    >>> blog._state.adding = True
+    >>> blog.save()
+    Traceback (most recent call last):
+        ...
+    AttributeError: Cannot retrieve deferred field 'name' from an unsaved model.
+    >>> blog.name = "Another Blog"
+    >>> blog.save()
 
 .. _topics-db-queries-update:
 

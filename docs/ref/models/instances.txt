@@ -863,7 +863,7 @@ URL, you should define ``get_absolute_url()``.
 
 
 It's good practice to use ``get_absolute_url()`` in templates, instead of
-hard-coding your objects' URLs. For example, this template code is bad:
+hardcoding your objects' URLs. For example, this template code is bad:
 
 .. code-block:: html+django
 

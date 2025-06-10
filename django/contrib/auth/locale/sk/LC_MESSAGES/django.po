@@ -4,7 +4,7 @@
 # Adam Zahradník, 2023-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # 18f25ad6fa9930fc67cb11aca9d16a27, 2012-2014
-# Marian Andre <marian@andre.sk>, 2015,2017
+# Marian Andre <marian@andre.sk>, 2015,2017,2025
 # Martin Tóth <ezimir@gmail.com>, 2017-2018,2023
 # Peter Kuma, 2021
 # Richard von Kellner, 2021
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 08:09+0000\n"
-"Last-Translator: Adam Zahradník, 2023-2024\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Marian Andre <marian@andre.sk>, 2015,2017,2025\n"
 "Language-Team: Slovak (http://app.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,11 +62,11 @@ msgstr "heslo"
 msgid "last login"
 msgstr "naposledy prihlásený"
 
-msgid "No password set."
-msgstr "Žiadne heslo."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Neplatný formát hesla alebo neznámy hašovací algoritmus."
+
+msgid "No password set."
+msgstr "Žiadne heslo."
 
 msgid "Reset password"
 msgstr "Obnoviť heslo"
@@ -77,15 +77,6 @@ msgstr "Nastaviť heslo"
 msgid "The two password fields didn’t match."
 msgstr "Heslo a jeho potvrdenie sa nezhodujú."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Určuje, či sa bude používateľ môcť prihlásiť pomocou hesla. Ak je "
-"prihlasovanie pomocou hesla vypnuté, stále sa bude môcť vedieť prihlásiť "
-"pomocou iných metód, ako napríklad Single Sign-On alebo LDAP."
-
 msgid "Password"
 msgstr "Heslo"
 
@@ -94,6 +85,15 @@ msgstr "Potvrdenie hesla"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Kvôli overeniu, znovu zadajte rovnaké heslo."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Určuje, či sa bude používateľ môcť prihlásiť pomocou hesla. Ak je "
+"prihlasovanie pomocou hesla vypnuté, stále sa bude môcť vedieť prihlásiť "
+"pomocou iných metód, ako napríklad Single Sign-On alebo LDAP."
 
 msgid "Password-based authentication"
 msgstr "Prihlasovanie pomocou hesla"
@@ -264,20 +264,13 @@ msgid "users"
 msgstr "používatelia"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znak."
-msgstr[1] ""
-"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znaky."
-msgstr[2] ""
-"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znakov."
-msgstr[3] ""
-"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znakov."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Toto heslo je príliš krátke. Musí obsahovať aspoň %d znak."
+msgstr[1] "Toto heslo je príliš krátke. Musí obsahovať aspoň %d znaky."
+msgstr[2] "Toto heslo je príliš krátke. Musí obsahovať aspoň %d znakov."
+msgstr[3] "Toto heslo je príliš krátke. Musí obsahovať aspoň %d znakov."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

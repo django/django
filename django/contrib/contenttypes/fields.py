@@ -55,11 +55,15 @@ class GenericForeignKey(FieldCacheMixin, Field):
         attname, column = super().get_attname_column()
         return attname, None
 
+    @cached_property
+    def ct_field_attname(self):
+        return self.model._meta.get_field(self.ct_field).attname
+
     def get_filter_kwargs_for_object(self, obj):
         """See corresponding method on Field"""
         return {
             self.fk_field: getattr(obj, self.fk_field),
-            self.ct_field: getattr(obj, self.ct_field),
+            self.ct_field_attname: getattr(obj, self.ct_field_attname),
         }
 
     def get_forward_related_filter(self, obj):
@@ -205,14 +209,11 @@ class GenericForeignKey(FieldCacheMixin, Field):
                 model = self.get_content_type(
                     id=ct_id, using=obj._state.db
                 ).model_class()
-                return (
-                    model._meta.pk.get_prep_value(getattr(obj, self.fk_field)),
-                    model,
-                )
+                return str(getattr(obj, self.fk_field)), model
 
         return (
             ret_val,
-            lambda obj: (obj.pk, obj.__class__),
+            lambda obj: (obj._meta.pk.value_to_string(obj), obj.__class__),
             gfk_key,
             True,
             self.name,

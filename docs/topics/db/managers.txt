@@ -197,7 +197,7 @@ Using managers for related object access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, Django uses an instance of the ``Model._base_manager`` manager
-class when accessing related objects (i.e. ``choice.question``), not the
+class when accessing related objects (e.g. ``choice.question``), not the
 ``_default_manager`` on the related object. This is because Django needs to be
 able to retrieve the related object, even if it would otherwise be filtered out
 (and hence be inaccessible) by the default manager.

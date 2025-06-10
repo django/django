@@ -2,15 +2,15 @@
 #
 # Translators:
 # Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024
-# Azat, 2023
+# Azat, 2023,2025
 # Murat Orhun <oku.orhun@gmail.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 08:09+0000\n"
-"Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Azat, 2023,2025\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -57,12 +57,12 @@ msgstr "پارول"
 msgid "last login"
 msgstr "ئاخىرقى كىرگەن ۋاقتى"
 
-msgid "No password set."
-msgstr "پارول تەڭشەلمىگەن."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 "ئىناۋەتسىز پارول پىچىمى ياكى يوچۇن مۇكەممەللىكىنى تەكشۈرۈش ھېسابلاش ئۇسۇلى."
+
+msgid "No password set."
+msgstr "پارول تەڭشەلمىگەن."
 
 msgid "Reset password"
 msgstr "ئىم ئەسلىگە قايتۇر"
@@ -73,15 +73,6 @@ msgstr "ئىم تەڭشەك"
 msgid "The two password fields didn’t match."
 msgstr "ئىككى پارول بۆلىكى ماس كەلمىدى."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"ئىشلەتكۈچى ئىم ئارقىلىق دەلىللەشنى ئىشلىتەلەمدۇ يوق. ئەگەر چەكلەنسە، ئۇلار "
-"يەنىلا باشقا ئارقا ئۇچ پىروگراممىسى يەنى يەككە تىزىمغا كىرىش ياكى LDAP "
-"ئارقىلىق دەلىللىيەلەيدۇ."
-
 msgid "Password"
 msgstr "پارول"
 
@@ -90,6 +81,15 @@ msgstr "پارول جەزملەش"
 
 msgid "Enter the same password as before, for verification."
 msgstr "دەلىللەش ئۈچۈن، ئىلگىرىكى ئوخشاش ئىمنى قايتا كىرگۈزۈڭ."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"ئىشلەتكۈچى ئىم ئارقىلىق دەلىللەشنى ئىشلىتەلەمدۇ يوق. ئەگەر چەكلەنسە، ئۇلار "
+"يەنىلا باشقا ئارقا ئۇچ پىروگراممىسى يەنى يەككە تىزىمغا كىرىش ياكى LDAP "
+"ئارقىلىق دەلىللىيەلەيدۇ."
 
 msgid "Password-based authentication"
 msgstr "ئىم ئاساسىدىكى دەلىللەش"
@@ -260,16 +260,13 @@ msgid "users"
 msgstr "ئىشلەتكۈچىلەر"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"پارول بەك قىسقا. ئۇ ئاز دېگەندە %(min_length)d ھەرپنى ئۆز ئىچىگە ئالىدۇ."
+"بۇ پارول بەك قىسقا بولۇپ قالغان، ئەڭ ئاز بولغاندا %d ھەرىپ بولىشى كېرەك. "
 msgstr[1] ""
-"پارول بەك قىسقا. ئۇ ئاز دېگەندە %(min_length)d ھەرپنى ئۆز ئىچىگە ئالىدۇ."
+"بۇ پارول بەك قىسقا بولۇپ قالغان، ئەڭ ئاز بولغاندا %d ھەرىپ بولىشى كېرەك. "
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

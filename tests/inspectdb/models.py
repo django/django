@@ -155,3 +155,9 @@ class DbComment(models.Model):
     class Meta:
         db_table_comment = "Custom table comment"
         required_db_features = {"supports_comments"}
+
+
+class CompositePKModel(models.Model):
+    pk = models.CompositePrimaryKey("column_1", "column_2")
+    column_1 = models.IntegerField()
+    column_2 = models.IntegerField()

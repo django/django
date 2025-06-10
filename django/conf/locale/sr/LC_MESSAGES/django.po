@@ -2,7 +2,7 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018-2019
-# Igor Jerosimić, 2019-2021,2023-2024
+# Igor Jerosimić, 2019-2021,2023-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
-"Last-Translator: Igor Jerosimić, 2019-2021,2023-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2019-2021,2023-2025\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -701,8 +701,8 @@ msgid "Value must be valid JSON."
 msgstr "Вредност мора бити исправан JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s инстанца са вредношћу %(value)r у пољу %(field)s не постоји."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s инстанца са %(field)s %(value)r није исправан избор."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Спољни кључ (тип је одређен асоцираном колоном)"

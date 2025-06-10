@@ -54,10 +54,19 @@ def wrap(text, width):
         width=width,
         break_long_words=False,
         break_on_hyphens=False,
+        replace_whitespace=False,
     )
     result = []
-    for line in text.splitlines(True):
-        result.extend(wrapper.wrap(line))
+    for line in text.splitlines():
+        wrapped = wrapper.wrap(line)
+        if not wrapped:
+            # If `line` contains only whitespaces that are dropped, restore it.
+            result.append(line)
+        else:
+            result.extend(wrapped)
+    if text.endswith("\n"):
+        # If `text` ends with a newline, preserve it.
+        result.append("")
     return "\n".join(result)
 
 

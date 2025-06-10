@@ -422,7 +422,7 @@ The template to customize is ``admin/index.html``. (Do the same as with
 ``admin/base_site.html`` in the previous section -- copy it from the default
 directory to your custom template directory). Edit the file, and you'll see it
 uses a template variable called ``app_list``. That variable contains every
-installed Django app. Instead of using that, you can hard-code links to
+installed Django app. Instead of using that, you can hardcode links to
 object-specific admin pages in whatever way you think is best.
 
 When you're comfortable with the admin, read :doc:`part 8 of this

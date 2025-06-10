@@ -272,3 +272,36 @@ use :data:`~django.core.files.storage.storages`::
 
     class MyModel(models.Model):
         upload = models.FileField(storage=select_storage)
+
+Because the callable is evaluated when your models classes are loaded, if you
+need to override the :setting:`STORAGES` setting in tests, you should use a
+``LazyObject`` subclass instead::
+
+    from django.core.files.storage import storages
+    from django.utils.functional import LazyObject
+
+
+    class OtherStorage(LazyObject):
+        def _setup(self):
+            self._wrapped = storages["mystorage"]
+
+
+    my_storage = OtherStorage()
+
+
+    class MyModel(models.Model):
+        upload = models.FileField(storage=my_storage)
+
+The ``LazyObject`` delays the evaluation of the storage until it's actually
+needed, allowing :func:`~django.test.override_settings` to take effect::
+
+    @override_settings(
+        STORAGES={
+            "mystorage": {
+                "BACKEND": "django.core.files.storage.InMemoryStorage",
+            }
+        }
+    )
+    def test_storage():
+        model = MyModel()
+        assert isinstance(model.upload.storage, InMemoryStorage)

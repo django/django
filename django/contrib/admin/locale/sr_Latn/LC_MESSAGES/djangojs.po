@@ -1,89 +1,76 @@
 # This file is distributed under the same license as the Django package.
-# 
+#
 # Translators:
-# Igor Jerosimić, 2019,2021,2023-2024
+# Igor Jerosimić, 2019,2021,2023-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:59+0000\n"
-"Last-Translator: Igor Jerosimić, 2019,2021,2023-2024\n"
-"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/language/sr@latin/)\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Igor Jerosimić, 2019,2021,2023-2025\n"
+"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/"
+"language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sr@latin\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:38
 #, javascript-format
 msgid "Available %s"
 msgstr "Dostupni %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:44
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr "Ovo je lista dostupnih „%s“. Možete izabrati elemente tako što ćete ih izabrati u listi i kliknuti na „Izaberi“."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr ""
+"Izaberite %s tako što ćete ih označiti, a zatim kliknite dugme sa strelicom "
+"\"Izaberi\"."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:60
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "Filtrirajte listu dostupnih elemenata „%s“."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:65
-#: contrib/admin/static/admin/js/SelectFilter2.js:110
 msgid "Filter"
 msgstr "Filter"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
-msgid "Choose all"
-msgstr "Izaberi sve"
-
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Izaberite sve „%s“ odjednom."
+msgid "Choose all %s"
+msgstr "Izaberi sve %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-msgid "Choose"
-msgstr "Izaberi"
+#, javascript-format
+msgid "Choose selected %s"
+msgstr "Izaberi označene %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:77
-msgid "Remove"
-msgstr "Ukloni"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Ukloni izabrane %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:83
 #, javascript-format
 msgid "Chosen %s"
 msgstr "Izabrano „%s“"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:89
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr "Ovo je lista izabranih „%s“. Možete ukloniti elemente tako što ćete ih izabrati u listi i kliknuti na „Ukloni“."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr ""
+"Uklonite %s tako što ćete ih označiti, a zatim kliknite dugme sa strelicom "
+"\"Ukloni\"."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:105
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Unesite u ovo polje da biste filtrirali listu izabranih %s."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:120
-msgid "Remove all"
-msgstr "Ukloni sve"
+msgid "(click to clear)"
+msgstr "(klikni da obrišeš)"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:120
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Uklonite sve izabrane „%s“ odjednom."
+msgid "Remove all %s"
+msgstr "Ukloni sve %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:211
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
@@ -91,55 +78,50 @@ msgstr[0] "%s izabrana opcija nije vidljiva"
 msgstr[1] "%s izabrane opcije nisu vidljive"
 msgstr[2] "%s izabranih opcija nije vidljivo"
 
-#: contrib/admin/static/admin/js/actions.js:67
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s od %(cnt)s izabran"
 msgstr[1] "%(sel)s od %(cnt)s izabrana"
 msgstr[2] "%(sel)s od %(cnt)s izabranih"
 
-#: contrib/admin/static/admin/js/actions.js:161
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
-msgstr "Imate nesačivane izmene. Ako pokrenete akciju, izmene će biti izgubljene."
+msgstr ""
+"Imate nesačivane izmene. Ako pokrenete akciju, izmene će biti izgubljene."
 
-#: contrib/admin/static/admin/js/actions.js:174
 msgid ""
 "You have selected an action, but you haven’t saved your changes to "
 "individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
-msgstr "Izabrali ste akciju, ali niste sačuvali vaše promene u pojedinačna polja. Kliknite na OK da sačuvate promene. Biće neophodno da ponovo pokrenete akciju."
+msgstr ""
+"Izabrali ste akciju, ali niste sačuvali vaše promene u pojedinačna polja. "
+"Kliknite na OK da sačuvate promene. Biće neophodno da ponovo pokrenete "
+"akciju."
 
-#: contrib/admin/static/admin/js/actions.js:175
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
 "fields. You’re probably looking for the Go button rather than the Save "
 "button."
-msgstr "Izabrali ste akciju i niste napravili nijednu promenu na pojedinačnim poljima. Verovatno tražite Kreni dugme umesto Sačuvaj."
+msgstr ""
+"Izabrali ste akciju i niste napravili nijednu promenu na pojedinačnim "
+"poljima. Verovatno tražite Kreni dugme umesto Sačuvaj."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:13
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:110
 msgid "Now"
 msgstr "Trenutno vreme"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:14
 msgid "Midnight"
 msgstr "Ponoć"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:15
 msgid "6 a.m."
 msgstr "18č"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:16
 msgid "Noon"
 msgstr "Podne"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:17
 msgid "6 p.m."
 msgstr "18č"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:78
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -147,7 +129,6 @@ msgstr[0] "Obaveštenje: Vi ste %s sat ispred serverskog vremena."
 msgstr[1] "Obaveštenje: Vi ste %s sata ispred serverskog vremena."
 msgstr[2] "Obaveštenje: Vi ste %s sati ispred serverskog vremena."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:86
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
@@ -155,238 +136,184 @@ msgstr[0] "Obaveštenje: Vi ste %s sat iza serverskog vremena."
 msgstr[1] "Obaveštenje: Vi ste %s sata iza serverskog vremena."
 msgstr[2] "Obaveštenje: Vi ste %s sati iza serverskog vremena."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:128
 msgid "Choose a Time"
 msgstr "Odaberite vreme"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:158
 msgid "Choose a time"
 msgstr "Odabir vremena"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:175
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:333
 msgid "Cancel"
 msgstr "Poništi"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:238
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:318
 msgid "Today"
 msgstr "Danas"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:255
 msgid "Choose a Date"
 msgstr "Odaberite datum"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:312
 msgid "Yesterday"
 msgstr "Juče"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:324
 msgid "Tomorrow"
 msgstr "Sutra"
 
-#: contrib/admin/static/admin/js/calendar.js:11
 msgid "January"
 msgstr "Januar"
 
-#: contrib/admin/static/admin/js/calendar.js:12
 msgid "February"
 msgstr "Februar"
 
-#: contrib/admin/static/admin/js/calendar.js:13
 msgid "March"
 msgstr "Mart"
 
-#: contrib/admin/static/admin/js/calendar.js:14
 msgid "April"
 msgstr "April"
 
-#: contrib/admin/static/admin/js/calendar.js:15
 msgid "May"
 msgstr "Maj"
 
-#: contrib/admin/static/admin/js/calendar.js:16
 msgid "June"
 msgstr "Jun"
 
-#: contrib/admin/static/admin/js/calendar.js:17
 msgid "July"
 msgstr "Jul"
 
-#: contrib/admin/static/admin/js/calendar.js:18
 msgid "August"
 msgstr "Avgust"
 
-#: contrib/admin/static/admin/js/calendar.js:19
 msgid "September"
 msgstr "Septembar"
 
-#: contrib/admin/static/admin/js/calendar.js:20
 msgid "October"
 msgstr "Oktobar"
 
-#: contrib/admin/static/admin/js/calendar.js:21
 msgid "November"
 msgstr "Novembar"
 
-#: contrib/admin/static/admin/js/calendar.js:22
 msgid "December"
 msgstr "Decembar"
 
-#: contrib/admin/static/admin/js/calendar.js:25
 msgctxt "abbrev. month January"
 msgid "Jan"
 msgstr "jan"
 
-#: contrib/admin/static/admin/js/calendar.js:26
 msgctxt "abbrev. month February"
 msgid "Feb"
 msgstr "feb"
 
-#: contrib/admin/static/admin/js/calendar.js:27
 msgctxt "abbrev. month March"
 msgid "Mar"
 msgstr "mart"
 
-#: contrib/admin/static/admin/js/calendar.js:28
 msgctxt "abbrev. month April"
 msgid "Apr"
 msgstr "apr"
 
-#: contrib/admin/static/admin/js/calendar.js:29
 msgctxt "abbrev. month May"
 msgid "May"
 msgstr "maj"
 
-#: contrib/admin/static/admin/js/calendar.js:30
 msgctxt "abbrev. month June"
 msgid "Jun"
 msgstr "jun"
 
-#: contrib/admin/static/admin/js/calendar.js:31
 msgctxt "abbrev. month July"
 msgid "Jul"
 msgstr "jul"
 
-#: contrib/admin/static/admin/js/calendar.js:32
 msgctxt "abbrev. month August"
 msgid "Aug"
 msgstr "avg"
 
-#: contrib/admin/static/admin/js/calendar.js:33
 msgctxt "abbrev. month September"
 msgid "Sep"
 msgstr "sep"
 
-#: contrib/admin/static/admin/js/calendar.js:34
 msgctxt "abbrev. month October"
 msgid "Oct"
 msgstr "okt"
 
-#: contrib/admin/static/admin/js/calendar.js:35
 msgctxt "abbrev. month November"
 msgid "Nov"
 msgstr "nov"
 
-#: contrib/admin/static/admin/js/calendar.js:36
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "dec"
 
-#: contrib/admin/static/admin/js/calendar.js:39
 msgid "Sunday"
 msgstr "nedelja"
 
-#: contrib/admin/static/admin/js/calendar.js:40
 msgid "Monday"
 msgstr "ponedeljak"
 
-#: contrib/admin/static/admin/js/calendar.js:41
 msgid "Tuesday"
 msgstr "utorak"
 
-#: contrib/admin/static/admin/js/calendar.js:42
 msgid "Wednesday"
 msgstr "sreda"
 
-#: contrib/admin/static/admin/js/calendar.js:43
 msgid "Thursday"
 msgstr "četvrtak"
 
-#: contrib/admin/static/admin/js/calendar.js:44
 msgid "Friday"
 msgstr "petak"
 
-#: contrib/admin/static/admin/js/calendar.js:45
 msgid "Saturday"
 msgstr "subota"
 
-#: contrib/admin/static/admin/js/calendar.js:48
 msgctxt "abbrev. day Sunday"
 msgid "Sun"
 msgstr "ned"
 
-#: contrib/admin/static/admin/js/calendar.js:49
 msgctxt "abbrev. day Monday"
 msgid "Mon"
 msgstr "pon"
 
-#: contrib/admin/static/admin/js/calendar.js:50
 msgctxt "abbrev. day Tuesday"
 msgid "Tue"
 msgstr "uto"
 
-#: contrib/admin/static/admin/js/calendar.js:51
 msgctxt "abbrev. day Wednesday"
 msgid "Wed"
 msgstr "sre"
 
-#: contrib/admin/static/admin/js/calendar.js:52
 msgctxt "abbrev. day Thursday"
 msgid "Thur"
 msgstr "čet"
 
-#: contrib/admin/static/admin/js/calendar.js:53
 msgctxt "abbrev. day Friday"
 msgid "Fri"
 msgstr "pet"
 
-#: contrib/admin/static/admin/js/calendar.js:54
 msgctxt "abbrev. day Saturday"
 msgid "Sat"
 msgstr "sub"
 
-#: contrib/admin/static/admin/js/calendar.js:57
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "N"
 
-#: contrib/admin/static/admin/js/calendar.js:58
 msgctxt "one letter Monday"
 msgid "M"
 msgstr "P"
 
-#: contrib/admin/static/admin/js/calendar.js:59
 msgctxt "one letter Tuesday"
 msgid "T"
 msgstr "U"
 
-#: contrib/admin/static/admin/js/calendar.js:60
 msgctxt "one letter Wednesday"
 msgid "W"
 msgstr "S"
 
-#: contrib/admin/static/admin/js/calendar.js:61
 msgctxt "one letter Thursday"
 msgid "T"
 msgstr "Č"
 
-#: contrib/admin/static/admin/js/calendar.js:62
 msgctxt "one letter Friday"
 msgid "F"
 msgstr "P"
 
-#: contrib/admin/static/admin/js/calendar.js:63
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"

@@ -148,19 +148,6 @@ class JSONField(CheckFieldDefaultMixin, Field):
         )
 
 
-def compile_json_path(key_transforms, include_root=True):
-    path = ["$"] if include_root else []
-    for key_transform in key_transforms:
-        try:
-            num = int(key_transform)
-        except ValueError:  # non-integer
-            path.append(".")
-            path.append(json.dumps(key_transform))
-        else:
-            path.append("[%s]" % num)
-    return "".join(path)
-
-
 class DataContains(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
     lookup_name = "contains"
     postgres_operator = "@>"
@@ -194,7 +181,7 @@ class ContainedBy(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
 class HasKeyLookup(PostgresOperatorLookup):
     logical_operator = None
 
-    def compile_json_path_final_key(self, key_transform):
+    def compile_json_path_final_key(self, connection, key_transform):
         # Compile the final key without interpreting ints as array elements.
         return ".%s" % json.dumps(key_transform)
 
@@ -204,7 +191,7 @@ class HasKeyLookup(PostgresOperatorLookup):
             lhs_sql, lhs_params, lhs_key_transforms = self.lhs.preprocess_lhs(
                 compiler, connection
             )
-            lhs_json_path = compile_json_path(lhs_key_transforms)
+            lhs_json_path = connection.ops.compile_json_path(lhs_key_transforms)
         else:
             lhs_sql, lhs_params = self.process_lhs(compiler, connection)
             lhs_json_path = "$"
@@ -218,8 +205,10 @@ class HasKeyLookup(PostgresOperatorLookup):
             else:
                 rhs_key_transforms = [key]
             *rhs_key_transforms, final_key = rhs_key_transforms
-            rhs_json_path = compile_json_path(rhs_key_transforms, include_root=False)
-            rhs_json_path += self.compile_json_path_final_key(final_key)
+            rhs_json_path = connection.ops.compile_json_path(
+                rhs_key_transforms, include_root=False
+            )
+            rhs_json_path += self.compile_json_path_final_key(connection, final_key)
             yield lhs_sql, lhs_params, lhs_json_path + rhs_json_path
 
     def _combine_sql_parts(self, parts):
@@ -235,7 +224,7 @@ class HasKeyLookup(PostgresOperatorLookup):
             compiler, connection
         ):
             sql_parts.append(template % (lhs_sql, "%s"))
-            params.extend(lhs_params + [rhs_json_path])
+            params.extend([*lhs_params, rhs_json_path])
         return self._combine_sql_parts(sql_parts), tuple(params)
 
     def as_mysql(self, compiler, connection):
@@ -296,8 +285,8 @@ class HasAnyKeys(HasKeys):
 
 
 class HasKeyOrArrayIndex(HasKey):
-    def compile_json_path_final_key(self, key_transform):
-        return compile_json_path([key_transform], include_root=False)
+    def compile_json_path_final_key(self, connection, key_transform):
+        return connection.ops.compile_json_path([key_transform], include_root=False)
 
 
 class CaseInsensitiveMixin:
@@ -378,12 +367,12 @@ class KeyTransform(Transform):
 
     def as_mysql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = compile_json_path(key_transforms)
-        return "JSON_EXTRACT(%s, %%s)" % lhs, tuple(params) + (json_path,)
+        json_path = connection.ops.compile_json_path(key_transforms)
+        return "JSON_EXTRACT(%s, %%s)" % lhs, (*params, json_path)
 
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = compile_json_path(key_transforms)
+        json_path = connection.ops.compile_json_path(key_transforms)
         if connection.features.supports_primitives_in_json_field:
             sql = (
                 "COALESCE("
@@ -410,23 +399,23 @@ class KeyTransform(Transform):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         if len(key_transforms) > 1:
             sql = "(%s %s %%s)" % (lhs, self.postgres_nested_operator)
-            return sql, tuple(params) + (key_transforms,)
+            return sql, (*params, key_transforms)
         try:
             lookup = int(self.key_name)
         except ValueError:
             lookup = self.key_name
-        return "(%s %s %%s)" % (lhs, self.postgres_operator), tuple(params) + (lookup,)
+        return "(%s %s %%s)" % (lhs, self.postgres_operator), (*params, lookup)
 
     def as_sqlite(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        json_path = compile_json_path(key_transforms)
+        json_path = connection.ops.compile_json_path(key_transforms)
         datatype_values = ",".join(
             [repr(datatype) for datatype in connection.ops.jsonfield_datatype_values]
         )
         return (
             "(CASE WHEN JSON_TYPE(%s, %%s) IN (%s) "
             "THEN JSON_TYPE(%s, %%s) ELSE JSON_EXTRACT(%s, %%s) END)"
-        ) % (lhs, datatype_values, lhs, lhs), (tuple(params) + (json_path,)) * 3
+        ) % (lhs, datatype_values, lhs, lhs), (*params, json_path) * 3
 
 
 class KeyTextTransform(KeyTransform):
@@ -441,8 +430,8 @@ class KeyTextTransform(KeyTransform):
             return "JSON_UNQUOTE(%s)" % sql, params
         else:
             lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-            json_path = compile_json_path(key_transforms)
-            return "(%s ->> %%s)" % lhs, tuple(params) + (json_path,)
+            json_path = connection.ops.compile_json_path(key_transforms)
+            return "(%s ->> %%s)" % lhs, (*params, json_path)
 
     @classmethod
     def from_lookup(cls, lookup):

@@ -297,7 +297,7 @@ class BaseExpression:
         c.is_summary = summarize
         source_expressions = [
             (
-                expr.resolve_expression(query, allow_joins, reuse, summarize)
+                expr.resolve_expression(query, allow_joins, reuse, summarize, for_save)
                 if expr is not None
                 else None
             )
@@ -1686,7 +1686,7 @@ class Case(SQLiteNumericMixin, Expression):
         return "<%s: %s>" % (self.__class__.__name__, self)
 
     def get_source_expressions(self):
-        return self.cases + [self.default]
+        return [*self.cases, self.default]
 
     def set_source_expressions(self, exprs):
         *self.cases, self.default = exprs
@@ -1711,14 +1711,24 @@ class Case(SQLiteNumericMixin, Expression):
             except EmptyResultSet:
                 continue
             except FullResultSet:
-                default_sql, default_params = compiler.compile(case.result)
+                default = case.result
                 break
             case_parts.append(case_sql)
             sql_params.extend(case_params)
         else:
-            default_sql, default_params = compiler.compile(self.default)
-        if not case_parts:
-            return default_sql, default_params
+            default = self.default
+        if case_parts:
+            default_sql, default_params = compiler.compile(default)
+        else:
+            if (
+                isinstance(default, Value)
+                and (output_field := default._output_field_or_none) is not None
+            ):
+                from django.db.models.functions import Cast
+
+                default = Cast(default, output_field)
+            return compiler.compile(default)
+
         case_joiner = case_joiner or self.case_joiner
         template_params["cases"] = case_joiner.join(case_parts)
         template_params["default"] = default_sql

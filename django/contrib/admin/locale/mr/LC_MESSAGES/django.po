@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Natalia, 2024
 # Omkar Parab, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2024-01-25 07:05+0000\n"
-"Last-Translator: Omkar Parab, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Natalia, 2024\n"
 "Language-Team: Marathi (http://app.transifex.com/django/django/language/"
 "mr/)\n"
 "MIME-Version: 1.0\n"
@@ -29,8 +30,8 @@ msgstr "यशस्वीरीत्या %(count)d %(items)s घालवल
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s घालवू शकत नाही"
 
-msgid "Are you sure?"
-msgstr "तुम्हाला खात्री आहे का?"
+msgid "Delete multiple objects"
+msgstr "एकाधिक वस्तू घालवा"
 
 msgid "Administration"
 msgstr "प्रशासन"
@@ -155,17 +156,17 @@ msgstr "जोडले."
 msgid "and"
 msgstr "आणि"
 
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} “{object}” साठी {fields} बदलले. "
 
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} बदलले. "
 
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}” घालवला"
 
 msgid "No fields changed."
 msgstr "कोणतेही रखाणे बदलले नाहीत."
@@ -179,34 +180,32 @@ msgstr "एकापेक्षा जास्त निवडण्यास�
 msgid "Select this object for an action - {}"
 msgstr ""
 
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” यशस्वीरीत्या जोडले गेले आहे."
+
 msgid "You may edit it again below."
 msgstr "तुम्ही ते खाली पुन्हा संपादित करू शकता."
 
 #, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
-"below."
-msgstr ""
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "{name} “{obj}” यशस्वीरीत्या जोडले गेले आहे. तुम्ही खाली दुसरे {name} जोडू शकता."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" यशस्वीरीत्या जोडले गेले आहे. तुम्ही त्याचे पुन्हा संपादन करू शकता."
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} “{obj}” यशस्वीरीत्या बदलले गेले. तुम्ही त्याचे पुन्हा संपादन करू शकता."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "{name} \"{obj}\" यशस्वीरीत्या जोडले गेले आहे. तुम्ही त्याचे पुन्हा संपादन करू शकता."
+msgstr "{name} “{obj}” यशस्वीरीत्या जोडले गेले आहे. तुम्ही खाली दुसरे {name} जोडू शकता."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
-msgstr "{name} \"{obj}\" यशस्वीरीत्या बदलले गेले आहे."
+msgstr "{name} “{obj}” यशस्वीरीत्या बदलले गेले आहे."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -256,6 +255,9 @@ msgstr[1] ""
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
+
+msgid "Delete"
+msgstr "घालवा"
 
 #, python-format
 msgid "Change history: %s"
@@ -338,6 +340,15 @@ msgstr "ब्रेडक्रम्ब्स"
 msgid "Models in the %(name)s application"
 msgstr ""
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "जोडा"
 
@@ -347,18 +358,17 @@ msgstr "पहा"
 msgid "You don’t have permission to view or edit anything."
 msgstr "तुम्हाला काहीही पाहण्याची किंवा संपादित करण्याची परवानगी नाही."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"पहिलं, वापरकर्तानाव आणि गुप्तशब्द नमूद करा. मग, आपण अधिक वापरकर्ता पर्यायांचे संपादन करू "
-"शकता."
 
-msgid "Enter a username and password."
-msgstr "वापरकर्तानाव आणि गुप्तशब्द नमूद करा."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "गुप्तशब्द बदला"
+
+msgid "Set password"
+msgstr ""
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -368,6 +378,17 @@ msgstr[1] ""
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> वापरकर्त्यासाठी नवीन गुप्तशब्द नमूद करा "
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "मुख्य सामुग्रीवर जा"
@@ -425,9 +446,6 @@ msgstr "थीम खुंटी बदला (सध्याची थीम:
 msgid "Toggle theme (current theme: dark)"
 msgstr "थीम खुंटी बदला (सध्याची थीम: काळोख)"
 
-msgid "Delete"
-msgstr "घालवा"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -457,9 +475,6 @@ msgstr "होय, मला खात्री आहे"
 
 msgid "No, take me back"
 msgstr "नको, मला मागे न्या"
-
-msgid "Delete multiple objects"
-msgstr "एकाधिक वस्तू घालवा"
 
 #, python-format
 msgid ""
@@ -531,8 +546,8 @@ msgstr ""
 "तुम्ही %(username)s म्हणून प्रमाणित केले आहे, परंतु हे पानात शिरकाव करण्यास अधिकृत नाही. "
 "तुम्हाला वेगळ्या खात्यात प्रवेश करायला आवडेल का?"
 
-msgid "Forgotten your password or username?"
-msgstr "तुमचा गुप्तशब्द किंवा वापरकर्तानाव विसरलात का?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "टॉगल नेविगेशन"
@@ -696,8 +711,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "कृपया खालील पानावर जा आणि नवीन गुप्तशब्द निवडा."
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "तुमचे वापरकर्तानाव, जर तुम्ही विसरला असाल तर:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "आमच्या संकेतस्थळाचा वापर केल्याबद्दल आभार!"

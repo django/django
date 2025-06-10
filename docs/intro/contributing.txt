@@ -7,7 +7,8 @@ Introduction
 
 Interested in giving back to the community a little? Maybe you've found a bug
 in Django that you'd like to see fixed, or maybe there's a small feature you
-want added.
+want added (but remember that proposals for new features should follow the
+:ref:`process for suggesting new features <requesting-features>`).
 
 Contributing back to Django itself is the best way to see your own concerns
 addressed. This may seem daunting at first, but it's a well-traveled path with
@@ -264,11 +265,11 @@ __ https://djangoci.com
     <running-unit-tests-settings>`. When making UI changes, you will need to
     :ref:`run the Selenium tests <running-selenium-tests>`.
 
-Working on a feature
-====================
+Working on an approved new feature
+==================================
 
-For this tutorial, we'll work on a "fake ticket" as a case study. Here are the
-imaginary details:
+For this tutorial, we'll work on a "fake accepted ticket" as a case study. Here
+are the imaginary details:
 
 .. admonition:: Ticket #99999 -- Allow making toast
 

@@ -2422,6 +2422,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor, self.assertNumQueries(0):
             editor.alter_field(Author, Author._meta.get_field("name"), new_field)
 
+    @skipUnlessDBFeature("supports_json_field")
     @isolate_apps("schema")
     def test_db_default_output_field_resolving(self):
         class Author(Model):

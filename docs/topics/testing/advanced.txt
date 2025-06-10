@@ -357,7 +357,7 @@ Advanced features of ``TransactionTestCase``
                 self.assertEqual(lion.pk, 1)
 
     Unless you are explicitly testing primary keys sequence numbers, it is
-    recommended that you do not hard code primary key values in tests.
+    recommended that you do not hardcode primary key values in tests.
 
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is a relatively expensive database operation.

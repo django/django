@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2023
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2023,2025\n"
 "Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
@@ -24,11 +24,9 @@ msgstr "%s k dispoziciji"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"To je lisćina k dispoziciji stejacych %s. Móžeće někotre z nich w slědowacym "
-"kašćiku wubrać a potom na šipk „Wubrać“ mjez kašćikomaj kliknyć."
+"Wubjerće je, zo byšće %swubrał a wubjerće potom šipowe tłóčatko „Wubrać“."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,18 +37,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Filtrować"
 
-msgid "Choose all"
-msgstr "Wšě wubrać"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Wšě %s wubrać"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Klikńće, zo byšće wšě %s naraz wubrał."
+msgid "Choose selected %s"
+msgstr "Wubrane %swubrać"
 
-msgid "Choose"
-msgstr "Wubrać"
-
-msgid "Remove"
-msgstr "Wotstronić"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Wubrane %s wotstronić"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -58,12 +55,10 @@ msgstr "Wubrane %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"To je lisćina wubranych %s. Móžeće někotre z nich wotstronić, hdyž je w "
-"slědowacym kašćiku wuběraće a potom na šipk „Wotstronić“ mjez kašćikomaj "
-"kliknjeće."
+"Wubjerće je, zo byšće %swotstronił a wubjerće potom šipowe tłóčatko "
+"„Wotstronić“."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
@@ -71,12 +66,12 @@ msgstr ""
 "Zapisajće do tutoho kašćika, zo byšće někotre z lisćiny wubranych %s "
 "wufiltrował."
 
-msgid "Remove all"
-msgstr "Wšě wotstronić"
+msgid "(click to clear)"
+msgstr "(klikńće, zo byšće zhašał)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Klikńće, zo byšće wšě wubrane %s naraz wotstronił."
+msgid "Remove all %s"
+msgstr "Wšě %s wotstronić"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -329,9 +324,3 @@ msgstr "Pj"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "So"
-
-msgid "Show"
-msgstr "Pokazać"
-
-msgid "Hide"
-msgstr "Schować"

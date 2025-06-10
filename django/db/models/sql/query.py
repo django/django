@@ -1221,13 +1221,16 @@ class Query(BaseExpression):
         else:
             self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
-        if self.selected:
+        if select and self.selected:
             self.selected[alias] = alias
 
     @property
     def _subquery_fields_len(self):
         if self.has_select_fields:
-            return len(self.selected)
+            return sum(
+                len(self.model._meta.pk_fields) if field == "pk" else 1
+                for field in self.selected
+            )
         return len(self.model._meta.pk_fields)
 
     def resolve_expression(self, query, *args, **kwargs):
@@ -2339,6 +2342,9 @@ class Query(BaseExpression):
             self.append_annotation_mask(group_by_annotations)
             self.select = tuple(values_select.values())
             self.values_select = tuple(values_select)
+            if self.selected is not None:
+                for index, value_select in enumerate(values_select):
+                    self.selected[value_select] = index
         group_by = list(self.select)
         for alias, annotation in self.annotation_select.items():
             if not (group_by_cols := annotation.get_group_by_cols()):

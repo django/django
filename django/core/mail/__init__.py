@@ -2,7 +2,10 @@
 Tools for sending email.
 """
 
+import warnings
+
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 # Imported for backwards compatibility and for the sake
 # of a cleaner namespace. These symbols used to be in
@@ -21,6 +24,8 @@ from django.core.mail.message import (
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
+from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.functional import Promise
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -132,14 +137,28 @@ def _send_server_message(
     if not recipients:
         return
 
-    if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in recipients):
-        raise ValueError(f"The {setting_name} setting must be a list of 2-tuples.")
+    # RemovedInDjango70Warning.
+    if all(isinstance(a, (list, tuple)) and len(a) == 2 for a in recipients):
+        warnings.warn(
+            f"Using (name, address) pairs in the {setting_name} setting is deprecated."
+            " Replace with a list of email address strings.",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        recipients = [a[1] for a in recipients]
+
+    if not isinstance(recipients, (list, tuple)) or not all(
+        isinstance(address, (str, Promise)) for address in recipients
+    ):
+        raise ImproperlyConfigured(
+            f"The {setting_name} setting must be a list of email address strings."
+        )
 
     mail = EmailMultiAlternatives(
         subject="%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
         body=message,
         from_email=settings.SERVER_EMAIL,
-        to=[a[1] for a in recipients],
+        to=recipients,
         connection=connection,
     )
     if html_message:

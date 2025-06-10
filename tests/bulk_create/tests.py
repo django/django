@@ -1,3 +1,4 @@
+from datetime import datetime
 from math import ceil
 from operator import attrgetter
 
@@ -23,6 +24,7 @@ from .models import (
     BigAutoFieldModel,
     Country,
     DbDefaultModel,
+    DbDefaultPrimaryKey,
     FieldsWithDbColumns,
     NoFields,
     NullableFields,
@@ -290,6 +292,14 @@ class BulkCreateTests(TestCase):
         max_batch_size = max(connection.ops.bulk_batch_size(fields, objs), 1)
         with self.assertNumQueries(ceil(len(objs) / max_batch_size)):
             Country.objects.bulk_create(objs, batch_size=max_batch_size + 1)
+
+    @skipUnlessDBFeature("has_bulk_insert")
+    def test_max_batch_size(self):
+        objs = [Country(name=f"Country {i}") for i in range(1000)]
+        fields = ["name", "iso_two_letter", "description"]
+        max_batch_size = connection.ops.bulk_batch_size(fields, objs)
+        with self.assertNumQueries(ceil(len(objs) / max_batch_size)):
+            Country.objects.bulk_create(objs)
 
     @skipUnlessDBFeature("has_bulk_insert")
     def test_bulk_insert_expressions(self):
@@ -843,6 +853,7 @@ class BulkCreateTests(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_db_default_field_excluded(self):
         # created_at is excluded when no db_default override is provided.
         with self.assertNumQueries(1) as ctx:
@@ -866,3 +877,10 @@ class BulkCreateTests(TestCase):
             ctx[0]["sql"].count(created_at_quoted_name),
             2 if connection.features.can_return_rows_from_bulk_insert else 1,
         )
+
+    @skipUnlessDBFeature(
+        "can_return_rows_from_bulk_insert", "supports_expression_defaults"
+    )
+    def test_db_default_primary_key(self):
+        (obj,) = DbDefaultPrimaryKey.objects.bulk_create([DbDefaultPrimaryKey()])
+        self.assertIsInstance(obj.id, datetime)

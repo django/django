@@ -316,7 +316,7 @@ Dynamic filtering
 -----------------
 
 Another common need is to filter down the objects given in a list page by some
-key in the URL. Earlier we hard-coded the publisher's name in the URLconf, but
+key in the URL. Earlier we hardcoded the publisher's name in the URLconf, but
 what if we wanted to write a view that displayed all the books by some arbitrary
 publisher?
 

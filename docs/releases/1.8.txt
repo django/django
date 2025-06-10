@@ -1783,7 +1783,7 @@ remove usage of these features.
   ``django.middleware.cache.UpdateCacheMiddleware`` despite the lack of a
   deprecation warning in the latter class.
 
-* Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
+* Usage of the hardcoded *Hold down "Control", or "Command" on a Mac, to select
   more than one.* string to override or append to user-provided ``help_text`` in
   forms for ``ManyToMany`` model fields is not performed by Django anymore
   either at the model or forms layer.

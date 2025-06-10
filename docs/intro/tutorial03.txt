@@ -166,7 +166,7 @@ commas, according to publication date:
 
     # Leave the rest of the views (detail, results, vote) unchanged
 
-There's a problem here, though: the page's design is hard-coded in the view. If
+There's a problem here, though: the page's design is hardcoded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python by
 creating a template that the view can use.

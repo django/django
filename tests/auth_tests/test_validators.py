@@ -1,4 +1,5 @@
 import os
+from unittest import mock
 
 from django.contrib.auth import validators
 from django.contrib.auth.models import User
@@ -132,17 +133,40 @@ class MinimumLengthValidatorTest(SimpleTestCase):
         with self.assertRaises(ValidationError) as cm:
             MinimumLengthValidator().validate("1234567")
         self.assertEqual(cm.exception.messages, [expected_error % 8])
-        self.assertEqual(cm.exception.error_list[0].code, "password_too_short")
+        error = cm.exception.error_list[0]
+        self.assertEqual(error.code, "password_too_short")
+        self.assertEqual(error.params, {"min_length": 8})
 
         with self.assertRaises(ValidationError) as cm:
             MinimumLengthValidator(min_length=3).validate("12")
         self.assertEqual(cm.exception.messages, [expected_error % 3])
+        error = cm.exception.error_list[0]
+        self.assertEqual(error.code, "password_too_short")
+        self.assertEqual(error.params, {"min_length": 3})
 
     def test_help_text(self):
         self.assertEqual(
             MinimumLengthValidator().get_help_text(),
             "Your password must contain at least 8 characters.",
         )
+
+    @mock.patch("django.contrib.auth.password_validation.ngettext")
+    def test_l10n(self, mock_ngettext):
+        with self.subTest("get_error_message"):
+            MinimumLengthValidator().get_error_message()
+            mock_ngettext.assert_called_with(
+                "This password is too short. It must contain at least %d character.",
+                "This password is too short. It must contain at least %d characters.",
+                8,
+            )
+        mock_ngettext.reset()
+        with self.subTest("get_help_text"):
+            MinimumLengthValidator().get_help_text()
+            mock_ngettext.assert_called_with(
+                "Your password must contain at least %(min_length)d " "character.",
+                "Your password must contain at least %(min_length)d " "characters.",
+                8,
+            )
 
     def test_custom_error(self):
         class CustomMinimumLengthValidator(MinimumLengthValidator):
