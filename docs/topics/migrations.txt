@@ -580,7 +580,7 @@ which takes two arguments - the first is an :doc:`app registry
 loaded into it to match where in your history the migration sits, and the
 second is a :doc:`SchemaEditor </ref/schema-editor>`, which you can use to
 manually effect database schema changes (but beware, doing this can confuse
-the migration autodetector!)
+the migration autodetector).
 
 Let's write a migration that populates our new ``name`` field with the combined
 values of ``first_name`` and ``last_name`` (we've come to our senses and
@@ -680,7 +680,7 @@ write it back out into a new set of migration files.
 
 These files are marked to say they replace the previously-squashed migrations,
 so they can coexist with the old migration files, and Django will intelligently
-switch between them depending where you are in the history. If you're still
+switch between them depending on where you are in the history. If you're still
 part-way through the set of migrations that you squashed, it will keep using
 them until it hits the end and then switch to the squashed history, while new
 installs will use the new squashed migration and skip all the old ones.
@@ -775,7 +775,7 @@ for basic values, and doesn't specify import paths).
 Django can serialize the following:
 
 - ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``, ``NoneType``
-- ``list``, ``set``, ``tuple``, ``dict``, ``range``.
+- ``list``, ``set``, ``tuple``, ``dict``, ``range``
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
 - :class:`zoneinfo.ZoneInfo` instances
@@ -783,14 +783,14 @@ Django can serialize the following:
 - ``enum.Enum``  and ``enum.Flag`` instances
 - ``uuid.UUID`` instances
 - :func:`functools.partial` and :class:`functools.partialmethod` instances
-  which have serializable ``func``, ``args``, and ``keywords`` values.
+  which have serializable ``func``, ``args``, and ``keywords`` values
 - Pure and concrete path objects from :mod:`pathlib`. Concrete paths are
   converted to their pure path equivalent, e.g. :class:`pathlib.PosixPath` to
-  :class:`pathlib.PurePosixPath`.
+  :class:`pathlib.PurePosixPath`
 - :class:`os.PathLike` instances, e.g. :class:`os.DirEntry`, which are
-  converted to ``str`` or ``bytes`` using :func:`os.fspath`.
-- ``LazyObject`` instances which wrap a serializable value.
-- Enumeration types (e.g. ``TextChoices`` or ``IntegerChoices``) instances.
+  converted to ``str`` or ``bytes`` using :func:`os.fspath`
+- ``LazyObject`` instances which wrap a serializable value
+- Enumeration types (e.g. ``TextChoices`` or ``IntegerChoices``) instances
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be
   in module's top-level scope)
