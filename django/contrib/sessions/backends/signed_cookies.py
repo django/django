@@ -10,13 +10,18 @@ class SessionStore(SessionBase):
         if signature fails.
         """
         try:
-            return signing.loads(
+            payload_value, timestamp = signing.loads(
                 self.session_key,
                 serializer=self.serializer,
-                # This doesn't handle non-default expiry dates, see #19201
                 max_age=self.get_session_cookie_age(),
                 salt="django.contrib.sessions.backends.signed_cookies",
+                return_timestamp=True,
             )
+            signing.check_signature_expiry(
+                timestamp, max_age=payload_value.get("_session_expiry")
+            )
+            return payload_value
+
         except Exception:
             # BadSignature, ValueError, or unpickling exceptions. If any of
             # these happen, reset the session.
