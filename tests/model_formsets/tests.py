@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.forms.formsets import formset_factory
 from django.forms.models import (
+    BaseInlineFormSet,
     BaseModelFormSet,
     ModelForm,
     _get_foreign_key,
@@ -2432,3 +2433,55 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
             formset.empty_form.renderer, ModelFormWithDefaultRenderer.default_renderer
         )
         self.assertIsInstance(formset.renderer, DjangoTemplates)
+
+
+class BaseInlineFormSetTest(TestCase):
+
+    def test_inline_formset_with_custom_auto_id(self):
+        """
+        The auto_id attribute can be set to a custom value.
+        """
+
+        class PoemModelForm(ModelForm):
+            pass
+
+        poet = Poet.objects.create(name="test")
+        poet.poem_set.create(name="first test poem")
+        poet.poem_set.create(name="second test poem")
+        PoemInlineFormSet = inlineformset_factory(
+            Poet,
+            Poem,
+            form=PoemModelForm,
+            formset=BaseInlineFormSet,
+            fields=("name",),
+            extra=0,
+        )
+
+        # The auto_id attribute can be set to a string template using keyword argument.
+
+        inlineformset = PoemInlineFormSet(None, instance=poet, auto_id="id_custom_%s")
+        self.assertEqual(inlineformset.forms[0].auto_id, "id_custom_%s")
+
+        # Using positional argument
+        inlineformset = PoemInlineFormSet(
+            None, None, poet, False, None, None, "id_custom_%s"
+        )
+        self.assertEqual(inlineformset.forms[0].auto_id, "id_custom_%s")
+
+        # The auto_id attribute can be set to True using keyword argument.
+
+        inlineformset = PoemInlineFormSet(None, instance=poet, auto_id=True)
+        self.assertEqual(inlineformset.forms[0].auto_id, True)
+
+        # Using positional argument
+        inlineformset = PoemInlineFormSet(None, None, poet, False, None, None, True)
+        self.assertEqual(inlineformset.forms[0].auto_id, True)
+
+        # The auto_id attribute can be set to False using keyword argument.
+
+        inlineformset = PoemInlineFormSet(None, instance=poet, auto_id=False)
+        self.assertEqual(inlineformset.forms[0].auto_id, False)
+
+        # Using positional argument
+        inlineformset = PoemInlineFormSet(None, None, poet, False, None, None, False)
+        self.assertEqual(inlineformset.forms[0].auto_id, False)
