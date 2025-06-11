@@ -63,7 +63,7 @@ toolbar may not render. When this happens and you're unable to
 resolve the issue yourself, there are options available to you.
 
 #. If the problem is with a specific package, check if there's a
-   troubleshooting of FAQ in the package's documentation. For example the
+   troubleshooting guide or FAQ in the package's documentation. For example the
    Django Debug Toolbar has a `Tips section
    <https://django-debug-toolbar.readthedocs.io/en/latest/tips.html>`_ that
    outlines troubleshooting options.
