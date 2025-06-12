@@ -29,6 +29,7 @@ from django.db.models import (
     FloatField,
     Func,
     IntegerField,
+    JSONField,
     Max,
     Min,
     Model,
@@ -81,6 +82,7 @@ from .models import (
     Company,
     Employee,
     Experiment,
+    JSONFieldModel,
     Manager,
     Number,
     RemoteEmployee,
@@ -364,6 +366,21 @@ class BasicExpressionsTests(TestCase):
         self.assertQuerySetEqual(
             Number.objects.all(), [None, None], lambda n: n.float, ordered=False
         )
+
+    @skipUnlessDBFeature("supports_json_field")
+    def test_update_jsonfield_case_when_key_is_null(self):
+        obj = JSONFieldModel.objects.create(data={"key": None})
+        updated = JSONFieldModel.objects.update(
+            data=Case(
+                When(
+                    data__key=Value(None, JSONField()),
+                    then=Value({"key": "something"}, JSONField()),
+                ),
+            )
+        )
+        self.assertEqual(updated, 1)
+        obj.refresh_from_db()
+        self.assertEqual(obj.data, {"key": "something"})
 
     def test_filter_with_join(self):
         # F Expressions can also span joins
