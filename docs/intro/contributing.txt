@@ -231,7 +231,7 @@ While Django's test suite is running, you'll see a stream of characters
 representing the status of each test as it completes. ``E`` indicates that an
 error was raised during a test, and ``F`` indicates that a test's assertions
 failed. Both of these are considered to be test failures. Meanwhile, ``x`` and
-``s`` indicated expected failures and skipped tests, respectively. Dots indicate
+``s`` indicate expected failures and skipped tests, respectively. Dots indicate
 passing tests.
 
 Skipped tests are typically due to missing external libraries required to run
