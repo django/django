@@ -10,6 +10,7 @@ from django.contrib.gis.gdal import (
 )
 from django.contrib.gis.gdal.geometries import CircularString, CurvePolygon
 from django.contrib.gis.geos import GEOSException
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.template import Context
 from django.template.engine import Engine
 from django.test import SimpleTestCase
@@ -872,11 +873,15 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(geom.geom_type.num, 2001)
 
     def test_point_m_dimension_geos(self):
-        """GEOSGeometry does not yet support the M dimension."""
-        geom = OGRGeometry("POINT ZM (1 2 3 4)")
-        self.assertEqual(geom.geos.wkt, "POINT Z (1 2 3)")
-        geom = OGRGeometry("POINT M (1 2 3)")
-        self.assertEqual(geom.geos.wkt, "POINT (1 2)")
+        """GEOSGeometry supports the M dimension for GEOS versions > 3.12.0."""
+        geo_zm = OGRGeometry("POINT ZM (1 2 3 4)")
+        geo_m = OGRGeometry("POINT M (1 2 3)")
+        if geos_version_tuple() > (3, 12):
+            self.assertEqual(geo_zm.geos.wkt, "POINT ZM (1 2 3 4)")
+            self.assertEqual(geo_m.geos.wkt, "POINT M (1 2 3)")
+        else:
+            self.assertEqual(geo_zm.geos.wkt, "POINT Z (1 2 3)")
+            self.assertEqual(geo_m.geos.wkt, "POINT (1 2)")
 
     def test_centroid(self):
         point = OGRGeometry("POINT (1 2 3)")
