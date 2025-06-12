@@ -9,4 +9,6 @@ Django 5.2.4 fixes several bugs in 5.2.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.2.3 where ``Value(None, JSONField())`` used in
+  a :class:`~django.db.models.expressions.When` condition was incorrectly
+  serialized as SQL ``NULL`` instead of JSON ``null`` (:ticket:`36453`).
