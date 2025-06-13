@@ -3721,6 +3721,7 @@ class ModelToDictTests(TestCase):
         self.assertEqual(data, [blue])
 
 
+@skipUnlessDBFeature("supports_table_check_constraints")
 class ConstraintValidationTests(TestCase):
     def test_unique_constraint_refs_excluded_field(self):
         obj = ConstraintsModel.objects.create(name="product", price="1.00")
