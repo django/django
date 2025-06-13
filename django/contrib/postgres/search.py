@@ -11,6 +11,8 @@ from django.db.models import (
 from django.db.models.expressions import CombinedExpression, register_combinable_fields
 from django.db.models.functions import Cast, Coalesce
 
+from .utils import CheckPostgresInstalledMixin
+
 
 class SearchVectorExact(Lookup):
     lookup_name = "exact"
@@ -29,12 +31,12 @@ class SearchVectorExact(Lookup):
         return "%s @@ %s" % (lhs, rhs), params
 
 
-class SearchVectorField(Field):
+class SearchVectorField(CheckPostgresInstalledMixin, Field):
     def db_type(self, connection):
         return "tsvector"
 
 
-class SearchQueryField(Field):
+class SearchQueryField(CheckPostgresInstalledMixin, Field):
     def db_type(self, connection):
         return "tsquery"
 
