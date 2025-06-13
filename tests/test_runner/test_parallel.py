@@ -1,12 +1,15 @@
+import ctypes
+import multiprocessing
 import pickle
 import sys
 import unittest
+from unittest import mock
 from unittest.case import TestCase
 from unittest.result import TestResult
 from unittest.suite import TestSuite, _ErrorHolder
 
 from django.test import SimpleTestCase
-from django.test.runner import ParallelTestSuite, RemoteTestResult
+from django.test.runner import ParallelTestSuite, RemoteTestResult, _init_worker
 
 try:
     import tblib.pickling_support
@@ -211,6 +214,47 @@ class RemoteTestResultTest(SimpleTestCase):
         result = RemoteTestResult()
         result.addDuration(None, 2.3)
         self.assertEqual(result.collectedDurations, [("None", 2.3)])
+
+
+@mock.patch("django.test.runner.connections")
+@mock.patch("django.test.runner.call_command")
+@mock.patch("django.test.runner.setup_test_environment")
+@mock.patch("django.setup")
+@mock.patch("multiprocessing.get_start_method")
+class InitWorkerTests(SimpleTestCase):
+    def test_calls_setup_functions_when_start_method_is_spawn(self, *mocks):
+        mocks[0].return_value = "spawn"
+
+        counter = multiprocessing.Value(ctypes.c_int, 0)
+
+        _init_worker(counter, initial_settings={"default": {}}, serialized_contents={})
+
+        mocks[1].assert_called_once()
+        mocks[2].assert_called_once()
+        mocks[3].assert_called_once_with(
+            "check", verbosity=mock.ANY, databases=mock.ANY
+        )
+
+    def test_does_not_call_setup_functions_when_start_method_is_not_spawn(self, *mocks):
+        mocks[0].return_value = "fork"
+
+        _init_worker(multiprocessing.Value(ctypes.c_int, 0))
+
+        mocks[1].assert_not_called()
+        mocks[2].assert_not_called()
+        mocks[3].assert_not_called()
+
+    def test_sets_up_worker_connection_with_incremented_worker_id(self, *mocks):
+        mocks[0].return_value = "fork"
+
+        connection_mock = mock.MagicMock()
+
+        mocks[4].__iter__.return_value = {"default": connection_mock}
+        mocks[4].__getitem__.return_value = connection_mock
+
+        _init_worker(multiprocessing.Value(ctypes.c_int, 0))
+
+        connection_mock.creation.setup_worker_connection.assert_called_once_with(1)
 
 
 class ParallelTestSuiteTest(SimpleTestCase):
