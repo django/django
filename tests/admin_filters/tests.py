@@ -430,7 +430,7 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][0]
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]["display"], "None")
-        self.assertEqual(choices[-1]["query_string"], "?none_or_null__isnull=True")
+        self.assertEqual(choices[-1]["query_string"], {"none_or_null__isnull": "True"})
 
     def test_datefieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)
@@ -457,11 +457,10 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?date_registered__gte=%s&date_registered__lt=%s"
-            % (
-                self.today,
-                self.tomorrow,
-            ),
+            {
+                "date_registered__gte": str(self.today),
+                "date_registered__lt": str(self.tomorrow),
+            },
         )
 
         request = self.request_factory.get(
@@ -495,11 +494,10 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?date_registered__gte=%s&date_registered__lt=%s"
-            % (
-                self.today.replace(day=1),
-                self.next_month,
-            ),
+            {
+                "date_registered__gte": str(self.today.replace(day=1)),
+                "date_registered__lt": str(self.next_month),
+            },
         )
 
         request = self.request_factory.get(
@@ -530,11 +528,10 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?date_registered__gte=%s&date_registered__lt=%s"
-            % (
-                self.today.replace(month=1, day=1),
-                self.next_year,
-            ),
+            {
+                "date_registered__gte": str(self.today.replace(month=1, day=1)),
+                "date_registered__lt": str(self.next_year),
+            },
         )
 
         request = self.request_factory.get(
@@ -560,11 +557,10 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?date_registered__gte=%s&date_registered__lt=%s"
-            % (
-                str(self.one_week_ago),
-                str(self.tomorrow),
-            ),
+            {
+                "date_registered__gte": str(self.one_week_ago),
+                "date_registered__lt": str(self.tomorrow),
+            },
         )
 
         # Null/not null queries
@@ -582,8 +578,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "date registered")
         choice = select_by(filterspec.choices(changelist), "display", "No date")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?date_registered__isnull=True")
-
+        self.assertEqual(choice["query_string"], {"date_registered__isnull": "True"})
         request = self.request_factory.get("/", {"date_registered__isnull": "False"})
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
@@ -600,7 +595,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "date registered")
         choice = select_by(filterspec.choices(changelist), "display", "Has date")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?date_registered__isnull=False")
+        self.assertEqual(choice["query_string"], {"date_registered__isnull": "False"})
 
     @unittest.skipIf(
         sys.platform == "win32",
@@ -628,8 +623,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "year")
         choices = list(filterspec.choices(changelist))
         self.assertIs(choices[-1]["selected"], True)
-        self.assertEqual(choices[-1]["query_string"], "?year__isnull=True")
-
+        self.assertEqual(choices[-1]["query_string"], {"year__isnull": "True"})
         request = self.request_factory.get("/", {"year": "2002"})
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
@@ -639,7 +633,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "year")
         choices = list(filterspec.choices(changelist))
         self.assertIs(choices[2]["selected"], True)
-        self.assertEqual(choices[2]["query_string"], "?year=2002")
+        self.assertEqual(choices[2]["query_string"], {"year": "2002"})
 
     def test_allvaluesfieldlistfilter_custom_qs(self):
         # Make sure that correct filters are returned with custom querysets
@@ -654,9 +648,9 @@ class ListFiltersTests(TestCase):
         # books written by alfred (which is the filtering criteria set by
         # BookAdminWithCustomQueryset.get_queryset())
         self.assertEqual(3, len(choices))
-        self.assertEqual(choices[0]["query_string"], "?")
-        self.assertEqual(choices[1]["query_string"], "?year=1999")
-        self.assertEqual(choices[2]["query_string"], "?year=2009")
+        self.assertEqual(choices[0]["query_string"], {})
+        self.assertEqual(choices[1]["query_string"], {"year": "1999"})
+        self.assertEqual(choices[2]["query_string"], {"year": "2009"})
 
     def test_relatedfieldlistfilter_foreignkey(self):
         modeladmin = BookAdmin(Book, site)
@@ -687,7 +681,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "Verbose Author")
         choices = list(filterspec.choices(changelist))
         self.assertIs(choices[-1]["selected"], True)
-        self.assertEqual(choices[-1]["query_string"], "?author__isnull=True")
+        self.assertEqual(choices[-1]["query_string"], {"author__isnull": "True"})
 
         request = self.request_factory.get("/", {"author__id__exact": self.alfred.pk})
         request.user = self.alfred
@@ -699,9 +693,7 @@ class ListFiltersTests(TestCase):
         # order of choices depends on User model, which has no order
         choice = select_by(filterspec.choices(changelist), "display", "alfred")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(
-            choice["query_string"], "?author__id__exact=%d" % self.alfred.pk
-        )
+        self.assertEqual(choice["query_string"], {"author__id__exact": self.alfred.pk})
 
     def test_relatedfieldlistfilter_foreignkey_ordering(self):
         """RelatedFieldListFilter ordering respects ModelAdmin.ordering."""
@@ -789,7 +781,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "Verbose Contributors")
         choices = list(filterspec.choices(changelist))
         self.assertIs(choices[-1]["selected"], True)
-        self.assertEqual(choices[-1]["query_string"], "?contributors__isnull=True")
+        self.assertEqual(choices[-1]["query_string"], {"contributors__isnull": "True"})
 
         request = self.request_factory.get(
             "/", {"contributors__id__exact": self.bob.pk}
@@ -803,7 +795,7 @@ class ListFiltersTests(TestCase):
         choice = select_by(filterspec.choices(changelist), "display", "bob")
         self.assertIs(choice["selected"], True)
         self.assertEqual(
-            choice["query_string"], "?contributors__id__exact=%d" % self.bob.pk
+            choice["query_string"], {"contributors__id__exact": self.bob.pk}
         )
 
     def test_relatedfieldlistfilter_reverse_relationships(self):
@@ -823,7 +815,9 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "book")
         choices = list(filterspec.choices(changelist))
         self.assertIs(choices[-1]["selected"], True)
-        self.assertEqual(choices[-1]["query_string"], "?books_authored__isnull=True")
+        self.assertEqual(
+            choices[-1]["query_string"], {"books_authored__isnull": "True"}
+        )
 
         request = self.request_factory.get(
             "/", {"books_authored__id__exact": self.bio_book.pk}
@@ -839,7 +833,7 @@ class ListFiltersTests(TestCase):
         )
         self.assertIs(choice["selected"], True)
         self.assertEqual(
-            choice["query_string"], "?books_authored__id__exact=%d" % self.bio_book.pk
+            choice["query_string"], {"books_authored__id__exact": self.bio_book.pk}
         )
 
         # M2M relationship -----
@@ -856,7 +850,9 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "book")
         choices = list(filterspec.choices(changelist))
         self.assertIs(choices[-1]["selected"], True)
-        self.assertEqual(choices[-1]["query_string"], "?books_contributed__isnull=True")
+        self.assertEqual(
+            choices[-1]["query_string"], {"books_contributed__isnull": "True"}
+        )
 
         request = self.request_factory.get(
             "/", {"books_contributed__id__exact": self.django_book.pk}
@@ -873,7 +869,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice["selected"], True)
         self.assertEqual(
             choice["query_string"],
-            "?books_contributed__id__exact=%d" % self.django_book.pk,
+            {"books_contributed__id__exact": self.django_book.pk},
         )
 
         # With one book, the list filter should appear because there is also a
@@ -1079,7 +1075,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "is best seller")
         choice = select_by(filterspec.choices(changelist), "display", "No")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?is_best_seller__exact=0")
+        self.assertEqual(choice["query_string"], {"is_best_seller__exact": "0"})
 
         request = self.request_factory.get("/", {"is_best_seller__exact": 1})
         request.user = self.alfred
@@ -1094,7 +1090,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "is best seller")
         choice = select_by(filterspec.choices(changelist), "display", "Yes")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?is_best_seller__exact=1")
+        self.assertEqual(choice["query_string"], {"is_best_seller__exact": "1"})
 
         request = self.request_factory.get("/", {"is_best_seller__isnull": "True"})
         request.user = self.alfred
@@ -1109,7 +1105,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "is best seller")
         choice = select_by(filterspec.choices(changelist), "display", "Unknown")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?is_best_seller__isnull=True")
+        self.assertEqual(choice["query_string"], {"is_best_seller__isnull": "True"})
 
     def test_booleanfieldlistfilter_choices(self):
         modeladmin = BookAdmin(Book, site)
@@ -1130,9 +1126,9 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "availability")
         choice = select_by(filterspec.choices(changelist), "display", "Paid")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?availability__exact=0")
+        self.assertEqual(choice["query_string"], {"availability__exact": "0"})
         # True.
-        request = self.request_factory.get("/", {"availability__exact": 1})
+        request = self.request_factory.get("/", {"availability__exact": "1"})
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
         queryset = changelist.get_queryset(request)
@@ -1141,7 +1137,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "availability")
         choice = select_by(filterspec.choices(changelist), "display", "Free")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?availability__exact=1")
+        self.assertEqual(choice["query_string"], {"availability__exact": "1"})
         # None.
         request = self.request_factory.get("/", {"availability__isnull": "True"})
         request.user = self.alfred
@@ -1152,7 +1148,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "availability")
         choice = select_by(filterspec.choices(changelist), "display", "Obscure")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?availability__isnull=True")
+        self.assertEqual(choice["query_string"], {"availability__isnull": "True"})
         # All.
         request = self.request_factory.get("/")
         request.user = self.alfred
@@ -1166,7 +1162,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "availability")
         choice = select_by(filterspec.choices(changelist), "display", "All")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(choice["query_string"], "?")
+        self.assertEqual(choice["query_string"], {"availability__exact": None})
 
     def test_fieldlistfilter_underscorelookup_tuple(self):
         """
@@ -1223,7 +1219,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[0]["display"], "All")
         self.assertIs(choices[0]["selected"], True)
-        self.assertEqual(choices[0]["query_string"], "?")
+        self.assertEqual(choices[0]["query_string"], {})
 
         # Look for books in the 1980s ----------------------------------------
         request = self.request_factory.get("/", {"publication-decade": "the 80s"})
@@ -1240,7 +1236,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[1]["display"], "the 1980's")
         self.assertIs(choices[1]["selected"], True)
-        self.assertEqual(choices[1]["query_string"], "?publication-decade=the+80s")
+        self.assertEqual(choices[1]["query_string"], {"publication-decade": "the 80s"})
 
         # Look for books in the 1990s ----------------------------------------
         request = self.request_factory.get("/", {"publication-decade": "the 90s"})
@@ -1257,7 +1253,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]["display"], "the 1990's")
         self.assertIs(choices[2]["selected"], True)
-        self.assertEqual(choices[2]["query_string"], "?publication-decade=the+90s")
+        self.assertEqual(choices[2]["query_string"], {"publication-decade": "the 90s"})
 
         # Look for books in the 2000s ----------------------------------------
         request = self.request_factory.get("/", {"publication-decade": "the 00s"})
@@ -1274,7 +1270,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[3]["display"], "the 2000's")
         self.assertIs(choices[3]["selected"], True)
-        self.assertEqual(choices[3]["query_string"], "?publication-decade=the+00s")
+        self.assertEqual(choices[3]["query_string"], {"publication-decade": "the 00s"})
 
         # Combine multiple filters -------------------------------------------
         request = self.request_factory.get(
@@ -1293,19 +1289,13 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[3]["display"], "the 2000's")
         self.assertIs(choices[3]["selected"], True)
-        self.assertEqual(
-            choices[3]["query_string"],
-            "?author__id__exact=%s&publication-decade=the+00s" % self.alfred.pk,
-        )
+        self.assertEqual(choices[3]["query_string"], {"publication-decade": "the 00s"})
 
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(filterspec.title, "Verbose Author")
         choice = select_by(filterspec.choices(changelist), "display", "alfred")
         self.assertIs(choice["selected"], True)
-        self.assertEqual(
-            choice["query_string"],
-            "?author__id__exact=%s&publication-decade=the+00s" % self.alfred.pk,
-        )
+        self.assertEqual(choice["query_string"], {"author__id__exact": self.alfred.pk})
 
     def test_listfilter_without_title(self):
         """
@@ -1370,15 +1360,15 @@ class ListFiltersTests(TestCase):
 
         self.assertEqual(choices[0]["display"], "All")
         self.assertIs(choices[0]["selected"], True)
-        self.assertEqual(choices[0]["query_string"], "?")
+        self.assertEqual(choices[0]["query_string"], {})
 
         self.assertEqual(choices[1]["display"], "the 1990's")
         self.assertIs(choices[1]["selected"], False)
-        self.assertEqual(choices[1]["query_string"], "?publication-decade=the+90s")
+        self.assertEqual(choices[1]["query_string"], {"publication-decade": "the 90s"})
 
         self.assertEqual(choices[2]["display"], "the 2000's")
         self.assertIs(choices[2]["selected"], False)
-        self.assertEqual(choices[2]["query_string"], "?publication-decade=the+00s")
+        self.assertEqual(choices[2]["query_string"], {"publication-decade": "the 00s"})
 
     def _test_facets(self, modeladmin, request, query_string=None):
         request.user = self.alfred
@@ -1445,7 +1435,10 @@ class ListFiltersTests(TestCase):
                 self.assertChoicesDisplay(choices, expected_displays)
                 if query_string:
                     for choice in choices:
-                        self.assertIn(query_string, choice["query_string"])
+                        self.assertIn(
+                            query_string,
+                            {**changelist.filter_params, **choice["query_string"]},
+                        )
 
     def test_facets_always(self):
         modeladmin = DecadeFilterBookAdminWithAlwaysFacets(Book, site)
@@ -1521,7 +1514,10 @@ class ListFiltersTests(TestCase):
                 choices = list(filterspec.choices(changelist))
                 self.assertChoicesDisplay(choices, expected_displays)
                 for choice in choices:
-                    self.assertIn("_facets", choice["query_string"])
+                    self.assertIn(
+                        "_facets",
+                        {**changelist.filter_params, **choice["query_string"]},
+                    )
 
     def test_facets_disallowed(self):
         modeladmin = DecadeFilterBookAdminDisallowFacets(Book, site)
@@ -1588,10 +1584,10 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][0]
         choices = list(filterspec.choices(changelist))
         expected_choice_values = [
-            ("All", False, "?"),
-            ("alfred", True, f"?author__id__exact={self.alfred.pk}"),
-            ("bob", True, f"?author__id__exact={self.bob.pk}"),
-            ("lisa", False, f"?author__id__exact={self.lisa.pk}"),
+            ("All", False, {"author__id__exact": None}),
+            ("alfred", True, {"author__id__exact": self.alfred.pk}),
+            ("bob", True, {"author__id__exact": self.bob.pk}),
+            ("lisa", False, {"author__id__exact": self.lisa.pk}),
         ]
         for i, (display, selected, query_string) in enumerate(expected_choice_values):
             self.assertEqual(choices[i]["display"], display)
@@ -1618,11 +1614,15 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][3]
         choices = list(filterspec.choices(changelist))
         expected_choice_values = [
-            ("All", False, "?"),
-            ("Non-Fictional", True, "?category__exact=non-fiction"),
-            ("Fictional", True, "?category__exact=fiction"),
-            ("We don't know", False, "?category__exact="),
-            ("Not categorized", False, "?category__isnull=True"),
+            ("All", False, {"category__exact": None}),
+            ("Non-Fictional", True, {"category__exact": "non-fiction"}),
+            ("Fictional", True, {"category__exact": "fiction"}),
+            ("We don't know", False, {"category__exact": ""}),
+            (
+                "Not categorized",
+                False,
+                {"category__exact": None, "category__isnull": "True"},
+            ),
         ]
         for i, (display, selected, query_string) in enumerate(expected_choice_values):
             self.assertEqual(choices[i]["display"], display)
@@ -1652,10 +1652,10 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][5]
         choices = list(filterspec.choices(changelist))
         expected_choice_values = [
-            ("All", False, "?"),
-            ("alfred@example.com", False, "?author__email=alfred%40example.com"),
-            ("bob@example.com", True, "?author__email=bob%40example.com"),
-            ("lisa@example.com", True, "?author__email=lisa%40example.com"),
+            ("All", False, {"author__email": None}),
+            ("alfred@example.com", False, {"author__email": "alfred@example.com"}),
+            ("bob@example.com", True, {"author__email": "bob@example.com"}),
+            ("lisa@example.com", True, {"author__email": "lisa@example.com"}),
         ]
         for i, (display, selected, query_string) in enumerate(expected_choice_values):
             self.assertEqual(choices[i]["display"], display)
@@ -1679,7 +1679,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, "number")
         choices = list(filterspec.choices(changelist))
         self.assertIs(choices[2]["selected"], True)
-        self.assertEqual(choices[2]["query_string"], "?no=207")
+        self.assertEqual(choices[2]["query_string"], {"no": "207"})
 
     def test_parameter_ends_with__in__or__isnull(self):
         """
@@ -1702,7 +1702,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]["display"], "the 1990's")
         self.assertIs(choices[2]["selected"], True)
-        self.assertEqual(choices[2]["query_string"], "?decade__in=the+90s")
+        self.assertEqual(choices[2]["query_string"], {"decade__in": "the 90s"})
 
         # When it ends with '__isnull' ---------------------------------------
         modeladmin = DecadeFilterBookAdminParameterEndsWith__Isnull(Book, site)
@@ -1720,7 +1720,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]["display"], "the 1990's")
         self.assertIs(choices[2]["selected"], True)
-        self.assertEqual(choices[2]["query_string"], "?decade__isnull=the+90s")
+        self.assertEqual(choices[2]["query_string"], {"decade__isnull": "the 90s"})
 
     def test_lookup_with_non_string_value(self):
         """
@@ -1742,7 +1742,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[1]["display"], "DEV")
         self.assertIs(choices[1]["selected"], True)
         self.assertEqual(
-            choices[1]["query_string"], "?department=%s" % self.john.department.pk
+            choices[1]["query_string"], {"department": self.john.department.pk}
         )
 
     def test_lookup_with_non_string_value_underscored(self):
@@ -1768,7 +1768,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choices[1]["selected"], True)
         self.assertEqual(
             choices[1]["query_string"],
-            "?department__whatever=%s" % self.john.department.pk,
+            {"department__whatever": self.john.department.pk},
         )
 
     def test_fk_with_to_field(self):
@@ -1794,9 +1794,9 @@ class ListFiltersTests(TestCase):
         self.assertCountEqual(
             choices,
             [
-                ("All", True, "?"),
-                ("Development", False, "?department__code__exact=DEV"),
-                ("Design", False, "?department__code__exact=DSN"),
+                ("All", True, {}),
+                ("Development", False, {"department__code__exact": "DEV"}),
+                ("Design", False, {"department__code__exact": "DSN"}),
             ],
         )
 
@@ -1819,9 +1819,9 @@ class ListFiltersTests(TestCase):
         self.assertCountEqual(
             choices,
             [
-                ("All", False, "?"),
-                ("Development", True, "?department__code__exact=DEV"),
-                ("Design", False, "?department__code__exact=DSN"),
+                ("All", False, {"department__code__exact": None}),
+                ("Development", True, {"department__code__exact": "DEV"}),
+                ("Design", False, {"department__code__exact": "DSN"}),
             ],
         )
 
@@ -1989,15 +1989,15 @@ class ListFiltersTests(TestCase):
 
         self.assertEqual(choices[0]["display"], "All")
         self.assertIs(choices[0]["selected"], True)
-        self.assertEqual(choices[0]["query_string"], "?")
+        self.assertEqual(choices[0]["query_string"], {"author__isempty": None})
 
         self.assertEqual(choices[1]["display"], "Empty")
         self.assertIs(choices[1]["selected"], False)
-        self.assertEqual(choices[1]["query_string"], "?author__isempty=1")
+        self.assertEqual(choices[1]["query_string"], {"author__isempty": "1"})
 
         self.assertEqual(choices[2]["display"], "Not empty")
         self.assertIs(choices[2]["selected"], False)
-        self.assertEqual(choices[2]["query_string"], "?author__isempty=0")
+        self.assertEqual(choices[2]["query_string"], {"author__isempty": "0"})
 
     def test_emptylistfieldfilter_non_empty_field(self):
         class EmployeeAdminWithEmptyFieldListFilter(ModelAdmin):
