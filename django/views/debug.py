@@ -65,9 +65,10 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     the values returned from sys.exc_info() and friends.
     """
     reporter = get_exception_reporter_class(request)(request, exc_type, exc_value, tb)
-    if request.accepts("text/html"):
+    preferred_type = request.get_preferred_type(["text/html", "text/plain"])
+    if preferred_type == "text/html":
         html = reporter.get_traceback_html()
-        return HttpResponse(html, status=status_code)
+        return HttpResponse(html, status=status_code, content_type="text/html")
     else:
         text = reporter.get_traceback_text()
         return HttpResponse(
