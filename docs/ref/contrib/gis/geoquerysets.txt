@@ -702,6 +702,34 @@ PostGIS equivalent:
 
 .. _distance-lookups:
 
+.. fieldlookup:: geom_type
+
+``geom_type``
+-----------------
+
+*Availability*: `PostGIS <https://postgis.net/docs/GeometryType.html>`__,
+Oracle, MariaDB, MySQL, SpatiaLite
+
+Returns the geometry type of the geometry field.
+
+Example::
+
+    Shape.objects.filter(poly__geom_type=GeometryType("circle"))
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``GeometryType(geom)``
+MariaDB     ``ST_GeometryType(geom)``
+MySQL       ``ST_GeometryType(geom)``
+Oracle      ``SDO_GEOMETRY.GET_GTYPE(geom)``
+SpatiaLite  ``GeometryType(geom)``
+==========  ==========================
+
+Note that the ``GeometryType`` functions returns the string type but
+``SDO_GEOMETRY.GET_GTYPE`` function returns the type encoded as a number.
+Thus, those numbers are mapped to the string counterparts as per `Oracle's documentation <https://docs.oracle.com/database/121/SPATL/sdo_geometry-object-type.htm#GUID-4D84CE67-67E4-4A84-8255-C586E765A94B__G1013735>`_
+
 Distance Lookups
 ================
 
