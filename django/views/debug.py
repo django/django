@@ -71,7 +71,11 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
         return HttpResponse(html, status=status_code, content_type="text/html")
     else:
         text = reporter.get_traceback_text()
-        return HttpResponse(text, status=status_code, content_type="text/plain")
+        return HttpResponse(
+            text,
+            status=status_code,
+            content_type="text/plain; charset=utf-8",
+        )
 
 
 @functools.lru_cache
