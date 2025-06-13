@@ -73,6 +73,7 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
         text = reporter.get_traceback_text()
         return HttpResponse(text, status=status_code, content_type="text/plain")
 
+
 @functools.lru_cache
 def get_default_exception_reporter_filter():
     # Instantiate the default filter for the first time and cache it.
