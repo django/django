@@ -194,6 +194,32 @@ displayed.
 Proof of concepts which use over 100 KB of data to be processed by the DTL will
 be considered invalid.
 
+AI-Assisted Reports
+~~~~~~~~~~~~~~~~~~~
+
+There has been a growing number of security reports generated partially or
+entirely using large language models (LLMs). Many of these contain inaccurate,
+misleading, or fictitious content. While AI tools can help draft or analyze
+reports, they must not replace human understanding and review.
+
+If you use AI tools to help prepare a report, you must:
+
+* **Disclose** that AI tools were used in the report and specify which one.
+* **Verify** that the issue describes a real, reproducible vulnerability.
+* **Avoid** fabricated code, placeholder text, or references to non-existent
+  Django features.
+
+Reports that appear to be unverified AI output will be closed without response.
+Repeated low-quality submissions may result in a ban from future reporting.
+
+We align with similar policies adopted by other major open-source projects,
+which have described the flood of unverified AI-generated reports as
+disruptive, counterproductive, and a drain on limited security team resources.
+
+Django's security process depends on accurate and responsible reports. Please
+support the project by ensuring that any AI-assisted submissions meet a high
+standard of clarity and technical accuracy.
+
 .. _security-report-evaluation:
 
 How does Django evaluate a report
