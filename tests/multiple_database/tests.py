@@ -2530,6 +2530,34 @@ class RouteForWriteTestCase(TestCase):
         self.assertEqual(e.model, Book)
         self.assertEqual(e.hints, {"instance": auth})
 
+    def test_generic_rel_update(self):
+        book = Book.objects.create(
+            title="Pro Django", published=datetime.date(2008, 12, 16)
+        )
+        Review.objects.create(source="Python Monthly", content_object=book)
+
+        with self.assertRaises(RouterUsed) as cm:
+            with self.override_router():
+                book.reviews.update(source="Python Daily")
+        e = cm.exception
+        self.assertEqual(e.mode, RouterUsed.WRITE)
+        self.assertEqual(e.model, Review)
+        self.assertEqual(e.hints, {"instance": book})
+
+    def test_generic_rel_delete(self):
+        book = Book.objects.create(
+            title="Pro Django", published=datetime.date(2008, 12, 16)
+        )
+        Review.objects.create(source="Python Monthly", content_object=book)
+
+        with self.assertRaises(RouterUsed) as cm:
+            with self.override_router():
+                book.reviews.all().delete()
+        e = cm.exception
+        self.assertEqual(e.mode, RouterUsed.WRITE)
+        self.assertEqual(e.model, Review)
+        self.assertEqual(e.hints, {"instance": book})
+
 
 class NoRelationRouter:
     """Disallow all relations."""
