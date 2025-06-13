@@ -135,8 +135,9 @@ below) will also have a couple of extra methods:
 
     Saves a new file with the file name and contents provided. This will not
     replace the existing file, but will create a new file and update the object
-    to point to it. If ``save`` is ``True``, the model's ``save()`` method will
-    be called once the file is saved. That is, these two lines:
+    to point to it. If ``save`` is ``True``, the model's
+    :meth:`~django.db.models.Model.save` method will be called once the file is
+    saved. That is, these two lines:
 
     .. code-block:: pycon
 
@@ -152,6 +153,17 @@ below) will also have a couple of extra methods:
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as
     :class:`~django.core.files.base.ContentFile`.
+
+    This method will not pass any additional arguments like ``update_fields``
+    to the model's :meth:`~django.db.models.Model.save` method. To provide
+    additional arguments to the model's :meth:`~django.db.models.Model.save`
+    method, set ``save`` to ``False`` and then call the model's ``save()``
+    method directly:
+
+    .. code-block:: pycon
+
+        >>> car.photo.save("myphoto.jpg", content, save=False)
+        >>> car.save(update_fields=["photo"])
 
 .. method:: File.delete(save=True)
 
