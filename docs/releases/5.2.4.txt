@@ -9,4 +9,6 @@ Django 5.2.4 fixes several bugs in 5.2.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.2.2 where :meth:`HttpRequest.get_preferred_type()
+  <django.http.HttpRequest.get_preferred_type>` incorrectly preferred more
+  specific media types with a lower quality (:ticket:`36447`).
