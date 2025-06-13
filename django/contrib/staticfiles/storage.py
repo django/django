@@ -11,6 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
+from django.utils.jslex import find_import_export_strings
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -48,34 +49,6 @@ class HashedFilesMixin:
     default_template = """url("%(url)s")"""
     max_post_process_passes = 5
     support_js_module_import_aggregation = False
-    _js_module_import_aggregation_patterns = (
-        "*.js",
-        (
-            (
-                (
-                    r"""(?P<matched>import"""
-                    r"""(?s:(?P<import>[\s\{].*?|\*\s*as\s*\w+))"""
-                    r"""\s*from\s*['"](?P<url>[./].*?)["']\s*;)"""
-                ),
-                """import%(import)s from "%(url)s";""",
-            ),
-            (
-                (
-                    r"""(?P<matched>export(?s:(?P<exports>[\s\{].*?))"""
-                    r"""\s*from\s*["'](?P<url>[./].*?)["']\s*;)"""
-                ),
-                """export%(exports)s from "%(url)s";""",
-            ),
-            (
-                r"""(?P<matched>import\s*['"](?P<url>[./].*?)["']\s*;)""",
-                """import"%(url)s";""",
-            ),
-            (
-                r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""",
-                """import("%(url)s")""",
-            ),
-        ),
-    )
     patterns = (
         (
             "*.css",
@@ -108,8 +81,6 @@ class HashedFilesMixin:
     keep_intermediate_files = True
 
     def __init__(self, *args, **kwargs):
-        if self.support_js_module_import_aggregation:
-            self.patterns += (self._js_module_import_aggregation_patterns,)
         super().__init__(*args, **kwargs)
         self._patterns = {}
         self.hashed_files = {}
@@ -368,6 +339,50 @@ class HashedFilesMixin:
                         content = original_file.read().decode("utf-8")
                     except UnicodeDecodeError as exc:
                         yield name, None, exc, False
+
+                    # for javascript files that contain import and export
+                    # parse with jslex first
+                    complex_adjustments = False
+                    if self.support_js_module_import_aggregation and name.endswith(
+                        ".js"
+                    ):
+                        complex_adjustments = "import" in content or (
+                            "export" in content and "from" in content
+                        )
+
+                    if complex_adjustments:
+                        import_matches = find_import_export_strings(content)
+
+                        result_parts = []
+                        last_position = 0
+
+                        for import_name, position in import_matches:
+                            converter_function = self.url_converter(
+                                name, hashed_files, "%(url)s"
+                            )
+                            # converter_function has good logic about what should and
+                            # shouldn't be replaced so worth reusing, but as it is used
+                            # as part of the re.sub function it expects a matched_group
+                            matched_group = re.match(
+                                "(?P<matched>(?P<url>" + re.escape(import_name) + "))",
+                                import_name,
+                            )
+
+                            try:
+                                replacement = converter_function(matched_group)
+                            except ValueError as exc:
+                                yield name, None, exc, False
+
+                            result_parts.append(content[last_position:position])
+                            # Add the replacement
+                            result_parts.append(replacement)
+                            # Update position tracker
+                            last_position = position + len(import_name)
+
+                        # Add the remaining part of the original string
+                        result_parts.append(content[last_position:])
+                        content = "".join(result_parts)
+
                     for extension, patterns in self._patterns.items():
                         if matches_patterns(path, (extension,)):
                             for pattern, template in patterns:
