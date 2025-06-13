@@ -1311,7 +1311,7 @@ example:
     >>> Dog.objects.filter(data__has_key="owner")
     <QuerySet [<Dog: Meg>]>
 
-.. fieldlookup:: jsonfield.has_any_keys
+.. fieldlookup:: jsonfield.has_keys
 
 ``has_keys``
 ~~~~~~~~~~~~
@@ -1328,7 +1328,7 @@ For example:
     >>> Dog.objects.filter(data__has_keys=["breed", "owner"])
     <QuerySet [<Dog: Meg>]>
 
-.. fieldlookup:: jsonfield.has_keys
+.. fieldlookup:: jsonfield.has_any_keys
 
 ``has_any_keys``
 ~~~~~~~~~~~~~~~~
