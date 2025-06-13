@@ -371,8 +371,18 @@ class AuthenticationForm(forms.Form):
             else:
                 self.confirm_login_allowed(self.user_cache)
 
-        return self.cleaned_data
+        self.run_extra_validation()
 
+        return self.cleaned_data
+    def run_extra_validation(self):
+        """
+        Hook method for extra validation (e.g., CAPTCHA).
+        Override this in subclasses.
+        """
+        pass
+
+
+    
     def confirm_login_allowed(self, user):
         """
         Controls whether the given User may log in. This is a policy setting,
