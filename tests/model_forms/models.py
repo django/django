@@ -529,6 +529,7 @@ class ConstraintsModel(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     class Meta:
+        required_db_features = {"supports_table_check_constraints"}
         constraints = [
             models.UniqueConstraint(
                 "name",
