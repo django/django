@@ -410,12 +410,12 @@ areas, such as section-wide navigation.
 
 Here are some tips for working with inheritance:
 
-* If you use :ttag:`{% extends %}<extends>` in a template, it must be the first template
-  tag in that template. Template inheritance won't work, otherwise.
+* If you use :ttag:`{% extends %}<extends>` in a template, it must be the first
+  template tag in that template. Template inheritance won't work, otherwise.
 
-* More :ttag:`{% block %}<block>` tags in your base templates are better. Remember,
-  child templates don't have to define all parent blocks, so you can fill
-  in reasonable defaults in a number of blocks, then only define the ones
+* More :ttag:`{% block %}<block>` tags in your base templates are better.
+  Remember, child templates don't have to define all parent blocks, so you can
+  fill in reasonable defaults in a number of blocks, then only define the ones
   you need later. It's better to have more hooks than fewer hooks.
 
 * If you find yourself duplicating content in a number of templates, it
@@ -750,8 +750,8 @@ tag in a template:
 
     {{ 45000|intcomma }}
 
-In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which then
-makes the ``intcomma`` filter available for use. If you've enabled
+In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which
+then makes the ``intcomma`` filter available for use. If you've enabled
 :mod:`django.contrib.admindocs`, you can consult the documentation area in your
 admin to find the list of custom libraries in your installation.
 
@@ -762,8 +762,8 @@ Example:
 
     {% load humanize i18n %}
 
-See :doc:`/howto/custom-template-tags` for information on writing your own custom
-template libraries.
+See :doc:`/howto/custom-template-tags` for information on writing your own
+custom template libraries.
 
 Custom libraries and template inheritance
 -----------------------------------------

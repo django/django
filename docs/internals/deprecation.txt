@@ -803,7 +803,7 @@ details on these changes.
   :func:`~django.template.loader.get_template` and
   :func:`~django.template.loader.select_template` won't accept a
   :class:`~django.template.Context` in their
-  :meth:`~django.template.backends.base.Template.render()` method anymore.
+  :meth:`~django.template.backends.base.Template.render` method anymore.
 
 * :doc:`Template response APIs </ref/template-response>` will enforce the use
   of :class:`dict` and backend-dependent template objects instead of
@@ -1092,8 +1092,9 @@ details on these changes.
   (``django.contrib.gis.sitemaps.views.index`` and
   ``django.contrib.gis.sitemaps.views.sitemap``).
 
-* ``django.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter and
-  ``django.utils.html.clean_html`` will be removed following an accelerated deprecation.
+* ``django.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter
+  and ``django.utils.html.clean_html`` will be removed following an accelerated
+  deprecation.
 
 .. _deprecation-removed-in-1.7:
 
@@ -1231,8 +1232,8 @@ details on these changes.
 * Setting the ``is_safe`` and ``needs_autoescape`` flags as attributes of
   template filter functions will no longer be supported.
 
-* The attribute ``HttpRequest.raw_post_data`` was renamed to ``HttpRequest.body``
-  in 1.4. The backward compatibility will be removed --
+* The attribute ``HttpRequest.raw_post_data`` was renamed to
+  ``HttpRequest.body`` in 1.4. The backward compatibility will be removed --
   ``HttpRequest.raw_post_data`` will no longer work.
 
 * The value for the ``post_url_continue`` parameter in

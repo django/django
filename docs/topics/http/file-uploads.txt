@@ -67,8 +67,9 @@ described in :ref:`binding-uploaded-files`. This would look something like:
             form = UploadFileForm()
         return render(request, "upload.html", {"form": form})
 
-Notice that we have to pass :attr:`request.FILES <django.http.HttpRequest.FILES>`
-into the form's constructor; this is how file data gets bound into a form.
+Notice that we have to pass :attr:`request.FILES
+<django.http.HttpRequest.FILES>` into the form's constructor; this is how file
+data gets bound into a form.
 
 Here's a common way you might handle an uploaded file::
 

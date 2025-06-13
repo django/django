@@ -32,8 +32,8 @@ The default value for this setting in Django 1.3.6 is ``['*']`` (matching any
 host), for backwards-compatibility, but we strongly encourage all sites to set
 a more restrictive value.
 
-This host validation is disabled when ``DEBUG`` is ``True`` or when running tests.
-
+This host validation is disabled when ``DEBUG`` is ``True`` or when running
+tests.
 
 XML deserialization
 ===================

@@ -180,7 +180,7 @@ more details.
 Marking strings as no-op
 ------------------------
 
-Use the function :func:`django.utils.translation.gettext_noop()` to mark a
+Use the function :func:`django.utils.translation.gettext_noop` to mark a
 string as a translation string without translating it. The string is later
 translated from a variable.
 
@@ -192,7 +192,7 @@ such as when the string is presented to the user.
 Pluralization
 -------------
 
-Use the function :func:`django.utils.translation.ngettext()` to specify
+Use the function :func:`django.utils.translation.ngettext` to specify
 pluralized messages.
 
 ``ngettext()`` takes three arguments: the singular translation string, the
@@ -290,8 +290,8 @@ Contextual markers
 Sometimes words have several meanings, such as ``"May"`` in English, which
 refers to a month name and to a verb. To enable translators to translate
 these words correctly in different contexts, you can use the
-:func:`django.utils.translation.pgettext()` function, or the
-:func:`django.utils.translation.npgettext()` function if the string needs
+:func:`django.utils.translation.pgettext` function, or the
+:func:`django.utils.translation.npgettext` function if the string needs
 pluralization. Both take a context string as the first variable.
 
 In the resulting ``.po`` file, the string will then appear as often as there are
@@ -502,10 +502,10 @@ directly with the ``number`` argument::
 Formatting strings: ``format_lazy()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Python's :meth:`str.format()` method will not work when either the
-``format_string`` or any of the arguments to :meth:`str.format()`
+Python's :meth:`str.format` method will not work when either the
+``format_string`` or any of the arguments to :meth:`str.format`
 contains lazy translation objects. Instead, you can use
-:func:`django.utils.text.format_lazy()`, which creates a lazy object
+:func:`django.utils.text.format_lazy`, which creates a lazy object
 that runs the ``str.format()`` method only when the result is included
 in a string. For example::
 
@@ -571,12 +571,12 @@ Similar access to this information is available for template code. See below.
 Internationalization: in template code
 ======================================
 
-Translations in :doc:`Django templates </ref/templates/language>` uses two template
-tags and a slightly different syntax than in Python code. To give your template
-access to these tags, put ``{% load i18n %}`` toward the top of your template.
-As with all template tags, this tag needs to be loaded in all templates which
-use translations, even those templates that extend from other templates which
-have already loaded the ``i18n`` tag.
+Translations in :doc:`Django templates </ref/templates/language>` uses two
+template tags and a slightly different syntax than in Python code. To give your
+template access to these tags, put ``{% load i18n %}`` toward the top of your
+template. As with all template tags, this tag needs to be loaded in all
+templates which use translations, even those templates that extend from other
+templates which have already loaded the ``i18n`` tag.
 
 .. warning::
 
@@ -693,8 +693,8 @@ You can use multiple expressions inside a single ``blocktranslate`` tag:
 .. note:: The previous more verbose format is still supported:
    ``{% blocktranslate with book|title as book_t and author|title as author_t %}``
 
-Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`) are
-not allowed inside a ``blocktranslate`` tag.
+Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`)
+are not allowed inside a ``blocktranslate`` tag.
 
 If resolving one of the block arguments fails, ``blocktranslate`` will fall
 back to the default language by deactivating the currently active language
@@ -827,7 +827,8 @@ tag:
     <p>{% blocktranslate %}A multiline translatable
     literal.{% endblocktranslate %}</p>
 
-or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-comments>`:
+or with the ``{#`` ... ``#}``
+:ref:`one-line comment constructs <template-comments>`:
 
 .. code-block:: html+django
 
@@ -999,7 +1000,8 @@ There are also some filters available for convenience:
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
 * ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
-* ``{{ LANGUAGE_CODE|language_name_translated }}`` ("německy", when active language is Czech)
+* ``{{ LANGUAGE_CODE|language_name_translated }}`` ("německy", when active
+  language is Czech)
 
 Internationalization: in JavaScript code
 ========================================
@@ -1224,7 +1226,7 @@ in the future.
 ~~~~~~~~~~~~
 
 The ``pgettext`` function behaves like the Python variant
-(:func:`~django.utils.translation.pgettext()`), providing a contextually
+(:func:`~django.utils.translation.pgettext`), providing a contextually
 translated word::
 
     document.write(pgettext("month name", "May"))
@@ -1233,7 +1235,7 @@ translated word::
 ~~~~~~~~~~~~~
 
 The ``npgettext`` function also behaves like the Python variant
-(:func:`~django.utils.translation.npgettext()`), providing a **pluralized**
+(:func:`~django.utils.translation.npgettext`), providing a **pluralized**
 contextually translated word:
 
 .. code-block:: javascript
@@ -1365,7 +1367,7 @@ Django provides two mechanisms to internationalize URL patterns:
   the language to activate from the requested URL.
 
 * Making URL patterns themselves translatable via the
-  :func:`django.utils.translation.gettext_lazy()` function.
+  :func:`django.utils.translation.gettext_lazy` function.
 
 .. warning::
 
@@ -1864,9 +1866,9 @@ The ``set_language`` redirect view
 
 .. function:: set_language(request)
 
-As a convenience, Django comes with a view, :func:`django.views.i18n.set_language`,
-that sets a user's language preference and redirects to a given URL or, by default,
-back to the previous page.
+As a convenience, Django comes with a view,
+:func:`django.views.i18n.set_language`, that sets a user's language preference
+and redirects to a given URL or, by default, back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
 
@@ -1929,12 +1931,12 @@ redirected in the ``redirect_to`` context variable.
 Explicitly setting the active language
 --------------------------------------
 
-You may want to set the active language for the current session explicitly. Perhaps
-a user's language preference is retrieved from another system, for example.
-You've already been introduced to :func:`django.utils.translation.activate()`. That
-applies to the current thread only. To persist the language for the entire
-session in a cookie, set the :setting:`LANGUAGE_COOKIE_NAME` cookie on the
-response::
+You may want to set the active language for the current session explicitly.
+Perhaps a user's language preference is retrieved from another system, for
+example. You've already been introduced to
+:func:`django.utils.translation.activate`. That applies to the current thread
+only. To persist the language for the entire session in a cookie, set the
+:setting:`LANGUAGE_COOKIE_NAME` cookie on the response::
 
     from django.conf import settings
     from django.http import HttpResponse
@@ -1945,7 +1947,7 @@ response::
     response = HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
 
-You would typically want to use both: :func:`django.utils.translation.activate()`
+You would typically want to use both: :func:`django.utils.translation.activate`
 changes the language for this thread, and setting the cookie makes this
 preference persist in future requests.
 
@@ -1979,14 +1981,14 @@ Calling this function with the value ``'de'`` will give you ``"Willkommen"``,
 regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
 
 Functions of particular interest are
-:func:`django.utils.translation.get_language()` which returns the language used
-in the current thread, :func:`django.utils.translation.activate()` which
+:func:`django.utils.translation.get_language` which returns the language used
+in the current thread, :func:`django.utils.translation.activate` which
 activates a translation catalog for the current thread, and
-:func:`django.utils.translation.check_for_language()`
+:func:`django.utils.translation.check_for_language`
 which checks if the given language is supported by Django.
 
 To help write more concise code, there is also a context manager
-:func:`django.utils.translation.override()` that stores the current language on
+:func:`django.utils.translation.override` that stores the current language on
 enter and restores it on exit. With it, the above example becomes::
 
     from django.utils import translation
@@ -2211,9 +2213,10 @@ All message file repositories are structured the same way. They are:
 * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
 * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
-To create message files, you use the :djadmin:`django-admin makemessages <makemessages>`
-tool. And you use :djadmin:`django-admin compilemessages <compilemessages>`
-to produce the binary ``.mo`` files that are used by ``gettext``.
+To create message files, you use the
+:djadmin:`django-admin makemessages <makemessages>` tool. And you use
+:djadmin:`django-admin compilemessages <compilemessages>` to produce the binary
+``.mo`` files that are used by ``gettext``.
 
 You can also run :djadmin:`django-admin compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all

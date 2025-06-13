@@ -509,7 +509,7 @@ Simple block tags
 
 When a section of rendered template needs to be passed into a custom tag,
 Django provides the ``simple_block_tag`` helper function to accomplish this.
-Similar to :meth:`~django.template.Library.simple_tag()`, this function accepts
+Similar to :meth:`~django.template.Library.simple_tag`, this function accepts
 a custom tag function, but with the additional ``content`` argument, which
 contains the rendered content as defined inside the tag. This allows dynamic
 template sections to be easily incorporated into custom tags.
@@ -1301,8 +1301,8 @@ Here's how a simplified ``{% comment %}`` tag might be implemented::
     different in that it allows broken template tags to appear between
     ``{% comment %}`` and ``{% endcomment %}``. It does so by calling
     ``parser.skip_past('endcomment')`` instead of ``parser.parse(('endcomment',))``
-    followed by ``parser.delete_first_token()``, thus avoiding the generation of a
-    node list.
+    followed by ``parser.delete_first_token()``, thus avoiding the generation of
+    a node list.
 
 ``parser.parse()`` takes a tuple of names of block tags *to parse until*. It
 returns an instance of ``django.template.NodeList``, which is a list of
