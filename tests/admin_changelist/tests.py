@@ -2238,21 +2238,27 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         cases = [
             # Order ascending by `name`.
-            ("th.sortable.column-name", ("name",)),
+            ("th.sortable.column-name a.toggle.ascending", ("name",)),
             # Order descending by `name`.
-            ("th.sortable.column-name", ("-name",)),
+            ("th.sortable.column-name a.toggle.descending", ("-name",)),
             # Order ascending by `parent__name`.
-            ("th.sortable.column-parent__name", ("parent__name", "-name")),
+            (
+                "th.sortable.column-parent__name a.toggle.ascending",
+                ("parent__name", "-name"),
+            ),
             # Order descending by `parent__name`.
-            ("th.sortable.column-parent__name", ("-parent__name", "-name")),
+            (
+                "th.sortable.column-parent__name a.toggle.descending",
+                ("-parent__name", "-name"),
+            ),
             # Order ascending by `parent__parent__name`.
             (
-                "th.sortable.column-parent__parent__name",
+                "th.sortable.column-parent__parent__name a.toggle.ascending",
                 ("parent__parent__name", "-parent__name", "-name"),
             ),
             # Order descending by `parent__parent__name`.
             (
-                "th.sortable.column-parent__parent__name",
+                "th.sortable.column-parent__parent__name a.toggle.descending",
                 ("-parent__parent__name", "-parent__name", "-name"),
             ),
         ]
