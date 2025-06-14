@@ -15,13 +15,7 @@ from django.db.models.expressions import (
 )
 from django.db.models.functions import Collate
 from django.db.models.lookups import GreaterThan
-from django.test import (
-    SimpleTestCase,
-    TestCase,
-    override_settings,
-    skipIfDBFeature,
-    skipUnlessDBFeature,
-)
+from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
 from django.utils import timezone
 
 from .models import (
@@ -44,47 +38,56 @@ class DefaultTests(TestCase):
         self.assertEqual(a.headline, "Default headline")
         self.assertLess((now - a.pub_date).seconds, 5)
 
-    @skipUnlessDBFeature(
-        "can_return_columns_from_insert", "supports_expression_defaults"
-    )
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_field_db_defaults_returning(self):
         a = DBArticle()
         a.save()
         self.assertIsInstance(a.id, int)
-        self.assertEqual(a.headline, "Default headline")
-        self.assertIsInstance(a.pub_date, datetime)
-        self.assertEqual(a.cost, Decimal("3.33"))
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 3
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(a.headline, "Default headline")
+            self.assertIsInstance(a.pub_date, datetime)
+            self.assertEqual(a.cost, Decimal("3.33"))
 
-    @skipIfDBFeature("can_return_columns_from_insert")
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_field_db_defaults_refresh(self):
         a = DBArticle()
         a.save()
-        a.refresh_from_db()
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 3
+        )
         self.assertIsInstance(a.id, int)
-        self.assertEqual(a.headline, "Default headline")
-        self.assertIsInstance(a.pub_date, datetime)
-        self.assertEqual(a.cost, Decimal("3.33"))
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(a.headline, "Default headline")
+            self.assertIsInstance(a.pub_date, datetime)
+            self.assertEqual(a.cost, Decimal("3.33"))
 
     def test_null_db_default(self):
         obj1 = DBDefaults.objects.create()
-        if not connection.features.can_return_columns_from_insert:
-            obj1.refresh_from_db()
-        self.assertEqual(obj1.null, 1.1)
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(obj1.null, 1.1)
 
         obj2 = DBDefaults.objects.create(null=None)
-        self.assertIsNone(obj2.null)
+        with self.assertNumQueries(0):
+            self.assertIsNone(obj2.null)
 
     @skipUnlessDBFeature("supports_expression_defaults")
     @override_settings(USE_TZ=True)
     def test_db_default_function(self):
         m = DBDefaultsFunction.objects.create()
-        if not connection.features.can_return_columns_from_insert:
-            m.refresh_from_db()
-        self.assertAlmostEqual(m.number, pi)
-        self.assertEqual(m.year, timezone.now().year)
-        self.assertAlmostEqual(m.added, pi + 4.5)
-        self.assertEqual(m.multiple_subfunctions, 4.5)
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 4
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertAlmostEqual(m.number, pi)
+            self.assertEqual(m.year, timezone.now().year)
+            self.assertAlmostEqual(m.added, pi + 4.5)
+            self.assertEqual(m.multiple_subfunctions, 4.5)
 
     @skipUnlessDBFeature("insert_test_table_with_defaults")
     def test_both_default(self):
@@ -125,14 +128,15 @@ class DefaultTests(TestCase):
         child2 = DBDefaultsFK.objects.create(language_code=parent2)
         self.assertEqual(child2.language_code, parent2)
 
-    @skipUnlessDBFeature(
-        "can_return_columns_from_insert", "supports_expression_defaults"
-    )
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_case_when_db_default_returning(self):
         m = DBDefaultsFunction.objects.create()
-        self.assertEqual(m.case_when, 3)
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(m.case_when, 3)
 
-    @skipIfDBFeature("can_return_columns_from_insert")
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_case_when_db_default_no_returning(self):
         m = DBDefaultsFunction.objects.create()
