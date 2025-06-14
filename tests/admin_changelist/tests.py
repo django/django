@@ -981,7 +981,8 @@ class ChangeListTests(TestCase):
         admin = SwallowAdmin(Swallow, custom_site)
         cl = admin.get_changelist_instance(request)
         template = Template(
-            "{% load admin_list %}{% spaceless %}{% pagination cl %}{% endspaceless %}"
+            "{% load admin_list %}{% spaceless %}{% pagination cl.pagination %}"
+            "{% endspaceless %}"
         )
         context = Context({"cl": cl, "opts": cl.opts})
         pagination_output = template.render(context)
@@ -1894,7 +1895,18 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.get_ordering_field_columns(), {2: "asc"})
 
-    # RemovedInDjango70Warning.
+
+# RemovedInDjango70Warning: Remove this class.
+@override_settings(ROOT_URLCONF="admin_changelist.urls")
+class DeprecationTests(TestCase):
+    factory = RequestFactory()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="deprecation", email="deprecation@u.com", password="xxx"
+        )
+
     def test_page_num_warning(self):
         msg = (
             "ChangeList().page_num attribute is deprecated. "
@@ -1907,7 +1919,6 @@ class ChangeListTests(TestCase):
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
             cl.page_num
 
-    # RemovedInDjango70Warning.
     def test_show_all_attribute_warning(self):
         msg = (
             "ChangeList().show_all attribute is deprecated. "
@@ -1920,7 +1931,6 @@ class ChangeListTests(TestCase):
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
             cl.show_all
 
-    # RemovedInDjango70Warning.
     def test_can_show_all_attribute_warning(self):
         msg = (
             "ChangeList().can_show_all attribute is deprecated. "
@@ -1933,7 +1943,6 @@ class ChangeListTests(TestCase):
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
             cl.can_show_all
 
-    # RemovedInDjango70Warning.
     def test_multi_page_attribute_warning(self):
         msg = (
             "ChangeList().multi_page attribute is deprecated. "
@@ -1946,7 +1955,6 @@ class ChangeListTests(TestCase):
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
             cl.multi_page
 
-    # RemovedInDjango70Warning.
     def test_paginator_attribute_warning(self):
         msg = (
             "ChangeList().paginator attribute is deprecated. "
@@ -1958,42 +1966,6 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
             cl.paginator
-
-    # RemovedInDjango70Warning.
-    def test_pagination_warning(self):
-        from django.contrib.admin.templatetags.admin_list import pagination
-
-        msg = (
-            "pagination is deprecated. "
-            "use django.contrib.admin.pagination.Pagination.pagination_context "
-            "instead. Pagination now provides pagination_required, page_range, "
-            "show_all_url(need_show_all_link) as attributes."
-        )
-        m = ChildAdmin(Child, custom_site)
-        request = self.factory.get("/child/")
-        request.user = self.superuser
-        cl = m.get_changelist_instance(request)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
-            pagination(cl)
-
-    # RemovedInDjango70Warning.
-    def test_paginator_number_tag_warning(self):
-        from django.template import Context, Template
-
-        msg = (
-            "paginator_number is deprecated. "
-            "use django.contrib.admin.pagination.Pagination.render_page "
-            "instead. paginator_number template tag has been "
-            "replaced by an method in the Pagination class."
-        )
-        template = Template("{% load admin_list %}{% paginator_number cl 1 %}")
-        m = ChildAdmin(Child, custom_site)
-        request = self.factory.get("/child/")
-        request.user = self.superuser
-        cl = m.get_changelist_instance(request)
-        context = Context({"cl": cl})
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
-            template.render(context)
 
 
 class GetAdminLogTests(TestCase):

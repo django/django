@@ -50,6 +50,7 @@ class AdminHistoryViewTests(TestCase):
         )
 
 
+# RemovedInDjango70Warning: Remove this class.
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class SeleniumTests(AdminSeleniumTestCase):
     available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
@@ -85,19 +86,19 @@ class SeleniumTests(AdminSeleniumTestCase):
         description = self.selenium.find_element(By.CSS_SELECTOR, "#%s" % labelledby)
         self.assertHTMLEqual(
             description.get_attribute("outerHTML"),
-            '<h2 id="pagination" class="visually-hidden">Pagination user entries</h2>',
+            '<h2 id="pagination" class="visually-hidden">Pagination log entries</h2>',
         )
         self.assertTrue(paginator.is_displayed())
         aria_current_link = paginator.find_elements(By.CSS_SELECTOR, "[aria-current]")
         self.assertEqual(len(aria_current_link), 1)
-        # The current page.
+        # Current page.
         current_page_link = aria_current_link[0]
         self.assertEqual(current_page_link.get_attribute("aria-current"), "page")
         self.assertEqual(current_page_link.get_attribute("href"), "")
         self.assertIn("%s log entries" % LogEntry.objects.count(), paginator.text)
         self.assertIn(str(Paginator.ELLIPSIS), paginator.text)
         self.assertEqual(current_page_link.text, "1")
-        # The last page.
+        # Last page.
         last_page_link = self.selenium.find_element(By.XPATH, "//ul/li[last()]/a")
         self.assertTrue(last_page_link.text, "20")
         # Select the second page.
@@ -109,24 +110,3 @@ class SeleniumTests(AdminSeleniumTestCase):
         rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
         self.assertIn("Changed something 101", rows[0].text)
         self.assertIn("Changed something 200", rows[-1].text)
-
-    def test_custom_pagination_attributes(self):
-        from selenium.webdriver.common.by import By
-
-        user_history_url = reverse(
-            "admin7:auth_user_history", args=(self.superuser.pk,)
-        )
-        self.selenium.get(self.live_server_url + user_history_url)
-
-        rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
-        self.assertIn("Changed something 1", rows[0].text)
-        self.assertIn("Changed something 50", rows[-1].text)
-        last_page_link = self.selenium.find_element(By.CSS_SELECTOR, ".end")
-        self.assertTrue(last_page_link.text, "22")
-        # Select Show all
-        show_all = self.selenium.find_element(By.CSS_SELECTOR, "p.paginator a.showall")
-        self.assertEqual(show_all.text, "Show all")
-        show_all.click()
-        rows = self.selenium.find_elements(By.CSS_SELECTOR, "#change-history tbody tr")
-        self.assertIn("Changed something 1", rows[0].text)
-        self.assertIn("Changed something 1100", rows[-1].text)

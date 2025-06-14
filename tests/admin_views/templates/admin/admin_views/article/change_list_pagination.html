@@ -1,7 +1,0 @@
-{% extends "admin/admin_views/article/pagination.html" %}
-{% load admin_list %}
-{% load i18n %}
-
-{% block pagination_tools %}
-{% if cl.formset and cl.result_count %}<input type="submit" name="_save" class="default" value="{% translate 'Save' %}">{% endif %}
-{% endblock %}

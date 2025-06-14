@@ -1,5 +1,4 @@
 import datetime
-import warnings
 
 from django.contrib.admin.pagination import ALL_VAR, PAGE_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
@@ -20,11 +19,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.template import Library
+from django.template.defaulttags import querystring
 from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
 from django.utils import formats, timezone
-from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -36,21 +35,14 @@ register = Library()
 
 
 @register.simple_tag
-def paginator_number(cl, i):
+def paginator_number(pagination, i):
     """
     Generate an individual page index link in a paginated list.
     """
-    warnings.warn(
-        "paginator_number is deprecated. "
-        "use django.contrib.admin.pagination.Pagination.render_page instead. "
-        "paginator_number template tag has been replaced by an method in the "
-        "Pagination class.",
-        RemovedInDjango70Warning,
-        stacklevel=2,
-    )
-    if i == cl.paginator.ELLIPSIS:
-        return format_html("{} ", cl.paginator.ELLIPSIS)
-    elif i == cl.page_num:
+    paginator = pagination.paginator
+    if i == paginator.ELLIPSIS:
+        return format_html("{} ", paginator.ELLIPSIS)
+    elif i == pagination.page_num:
         return format_html(
             '<a role="button" href="" aria-current="page">{}</a> ',
             i,
@@ -58,32 +50,30 @@ def paginator_number(cl, i):
     else:
         return format_html(
             '<a role="button" href="{}">{}</a> ',
-            cl.get_query_string({PAGE_VAR: i}),
+            querystring(None, {**pagination.params, PAGE_VAR: i}),
             i,
         )
 
 
-def pagination(cl):
+def pagination(pagination):
     """
     Generate the series of links to the pages in a paginated list.
     """
-    warnings.warn(
-        "pagination is deprecated. "
-        "use django.contrib.admin.pagination.Pagination.pagination_context instead. "
-        "Pagination now provides pagination_required, page_range, "
-        "show_all_url(need_show_all_link) as attributes.",
-        RemovedInDjango70Warning,
-        stacklevel=2,
+    pagination_required = pagination.multi_page and not (
+        pagination.show_all and pagination.can_show_all
     )
-    pagination_required = (not cl.show_all or not cl.can_show_all) and cl.multi_page
     page_range = (
-        cl.paginator.get_elided_page_range(cl.page_num) if pagination_required else []
+        pagination.paginator.get_elided_page_range(pagination.page_num)
+        if pagination_required
+        else []
     )
-    need_show_all_link = cl.can_show_all and not cl.show_all and cl.multi_page
+    need_show_all_link = (
+        pagination.can_show_all and not pagination.show_all and pagination.multi_page
+    )
     return {
-        "cl": cl,
+        "pagination": pagination,
         "pagination_required": pagination_required,
-        "show_all_url": need_show_all_link and cl.get_query_string({ALL_VAR: ""}),
+        "show_all_url": need_show_all_link and {ALL_VAR: ""},
         "page_range": page_range,
         "ALL_VAR": ALL_VAR,
         "1": 1,
@@ -95,19 +85,8 @@ def pagination_tag(parser, token):
     return InclusionAdminNode(
         parser,
         token,
-        func=lambda pagination, **kwargs: pagination.pagination_context(**kwargs),
+        func=pagination,
         template_name="pagination.html",
-        takes_context=False,
-    )
-
-
-@register.tag(name="change_list_pagination")
-def changelist_pagination_tag(parser, token):
-    return InclusionAdminNode(
-        parser,
-        token,
-        func=lambda pagination, **kwargs: pagination.pagination_context(**kwargs),
-        template_name="change_list_pagination.html",
         takes_context=False,
     )
 

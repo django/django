@@ -836,7 +836,8 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_pagination_class(self, request):
         """
-        Return the Pagination class for use on pages where pagination is required.
+        Return the Pagination class for use on pages where pagination is
+        required.
         """
         from django.contrib.admin.pagination import Pagination
 
@@ -2264,7 +2265,6 @@ class ModelAdmin(BaseModelAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
-        from django.contrib.admin.pagination import PAGE_VAR
 
         # First check if the user can see this history.
         model = self.model
@@ -2301,8 +2301,6 @@ class ModelAdmin(BaseModelAdmin):
             "title": _("Change history: %s") % obj,
             "subtitle": None,
             "action_list": pagination.get_objects(),
-            "page_range": pagination.page_range,
-            "page_var": PAGE_VAR,
             "pagination_required": pagination.paginator.count > 100,
             "pagination": pagination,
             "module_name": str(capfirst(self.opts.verbose_name_plural)),
