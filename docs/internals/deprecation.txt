@@ -28,6 +28,9 @@ details on these changes.
 
 * The ``URLIZE_ASSUME_HTTPS`` transitional setting will be removed.
 
+* Using a percent sign in a column alias or annotation will raise
+  ``ValueError``.
+
 * Support for setting the ``ADMINS`` or ``MANAGERS`` settings to a list of
   (name, address) tuples will be removed.
 
