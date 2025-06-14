@@ -9,4 +9,6 @@ Django 5.2.4 fixes several bugs in 5.2.3.
 Bugfixes
 ========
 
-* ...
+* Fixed an crash when performing an ``__in`` lookup between a composite
+  primary key and a subquery on backends that don't natively support tuple
+  lookups (:ticket:`36464`).
