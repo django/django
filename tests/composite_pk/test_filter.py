@@ -1,3 +1,6 @@
+from unittest.mock import patch
+
+from django.db import connection
 from django.db.models import (
     Case,
     F,
@@ -245,6 +248,10 @@ class CompositePKFilterTests(TestCase):
         self.assertIs(
             Comment.objects.filter(user=self.user_1).contains(self.comment_1), True
         )
+
+    def test_filter_query_does_not_mutate(self):
+        queryset = User.objects.filter(comments__in=Comment.objects.all())
+        self.assertEqual(str(queryset.query), str(queryset.query))
 
     def test_filter_users_by_comments_in(self):
         c1, c2, c3, c4, c5 = (
@@ -541,3 +548,12 @@ class CompositePKFilterTests(TestCase):
                 ).filter(filtered_tokens=(1, 1)),
                 [self.tenant_1],
             )
+
+
+@skipUnlessDBFeature("supports_tuple_lookups")
+class CompositePKFilterTupleLookupFallbackTests(CompositePKFilterTests):
+    def setUp(self):
+        feature_patch = patch.object(
+            connection.features, "supports_tuple_lookups", False
+        )
+        self.enterContext(feature_patch)
