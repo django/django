@@ -43,10 +43,19 @@
     border-bottom: 1px solid var(--hairline-color);
 }
 
-#changelist .paginator {
-    color: var(--body-quiet-color);
+#changelist .footer {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid var(--hairline-color);
     border-bottom: 1px solid var(--hairline-color);
+}
+
+#changelist .footer .paginator {
+    color: var(--body-quiet-color);
     background: var(--body-bg);
+    border: none;
+    padding: 0;
     overflow: hidden;
 }
 

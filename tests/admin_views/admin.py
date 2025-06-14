@@ -382,6 +382,7 @@ class BarAccountAdmin(admin.StackedInline):
 
 class PersonaAdmin(admin.ModelAdmin):
     inlines = (FooAccountAdmin, BarAccountAdmin)
+    list_per_page = 10
 
 
 class CustomPaginator(Paginator):
@@ -397,12 +398,10 @@ class CustomPaginatorAdmin(PersonaAdmin):
 
 
 class CustomPagination(Pagination):
-    def render_page(self, i):
-        if i == self.page_num:
-            return format_html(
-                '<span class="this-page custom-pagination">{}</span> ', i
-            )
-        return super().render_page(i)
+
+    def setup(self, request):
+        self.list_per_page += 10
+        super().setup(request)
 
 
 class PersonaCustomPaginationAdmin(admin.ModelAdmin):

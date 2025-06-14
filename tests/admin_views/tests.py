@@ -12,6 +12,7 @@ from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
+from django.contrib.admin.templatetags.admin_list import pagination as pagination_tag
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.utils import quote
@@ -1665,7 +1666,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(
             reverse("namespaced_admin:admin_views_persona_changelist")
         )
-        self.assertContains(response, '<a href="?p=20" class="end">20</a>')
+        self.assertContains(
+            response, '<a role="button" href="?p=20" class="end">20</a>'
+        )
 
 
 @override_settings(
@@ -4851,32 +4854,16 @@ class AdminPaginationTest(TestCase):
         )
         self.assertEqual(queryset.count(), 100)
         self.assertEqual(pagination.result_count, 100)
-        self.assertEqual(list(pagination.page_range), [1, 2])
-
+        self.assertTrue(pagination.multi_page)
+        self.assertTrue(pagination.can_show_all)
+        self.assertEqual(len(pagination.get_objects()), 50)
         pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 30, 100, model_admin
+            request, Persona, queryset, 200, 50, model_admin
         )
-        self.assertEqual(list(pagination.page_range), [1, 2, 3, 4])
-        queryset = queryset[:50]
-        pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 10, 100, model_admin
-        )
-        self.assertEqual(queryset.count(), 50)
-        self.assertEqual(pagination.result_count, 50)
-        self.assertEqual(list(pagination.page_range), [1, 2, 3, 4, 5])
-
-    def test_pagination_max_show_all(self):
-        request = self.factory.get("/persona/")
-        model_admin = PersonaAdmin(Persona, site)
-        queryset = Persona.objects.order_by("id")
-        pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 100, 200, model_admin
-        )
+        self.assertEqual(pagination.result_count, 100)
+        self.assertFalse(pagination.multi_page)
+        self.assertFalse(pagination.can_show_all)
         self.assertEqual(len(pagination.get_objects()), 100)
-        pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 10, 50, model_admin
-        )
-        self.assertEqual(len(pagination.get_objects()), 10)
 
     def test_pagination_page_range(self):
         model_admin = CityAdmin(City, site)
@@ -4904,69 +4891,13 @@ class AdminPaginationTest(TestCase):
                     request, City, City.objects.order_by("id"), 10, 200, model_admin
                 )
                 pagination.page_num = number
-                self.assertEqual(list(pagination.page_range), expected)
-
-    def test_pagination_render_page_button(self):
-        request = self.factory.get("/persona/")
-        model_admin = PersonaAdmin(Persona, site)
-        queryset = Persona.objects.order_by("id")
-        pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 2, 200, model_admin
-        )
-        pagination.page_num = 2
-        self.assertHTMLEqual(pagination.render_page(1), '<a href="?p=1">1</a>')
-        self.assertHTMLEqual(
-            pagination.render_page(2), '<span class="this-page">2</span>'
-        )
-        self.assertHTMLEqual(
-            pagination.render_page(pagination.paginator.ELLIPSIS),
-            f"{Paginator.ELLIPSIS} ",
-        )
-        self.assertHTMLEqual(
-            pagination.render_page(50), '<a href="?p=50" class="end">50</a>'
-        )
-
-        self.assertEqual(list(pagination.page_range), [1, 2, 3, 4, 5, "…", 49, 50])
-        self.assertHTMLEqual(
-            pagination.all_rendered_pages,
-            '<a href="?p=1">1</a> '
-            '<span class="this-page">2</span> '
-            '<a href="?p=3">3</a> '
-            '<a href="?p=4">4</a> '
-            '<a href="?p=5">5</a> '
-            f" {Paginator.ELLIPSIS} "
-            '<a href="?p=49">49</a> '
-            '<a href="?p=50" class="end">50</a>',
-        )
-
-    def test_show_all_url_visible(self):
-        request = self.factory.get("/persona?_facets=True")
-        model_admin = PersonaAdmin(Persona, site)
-        queryset = Persona.objects.order_by("id")
-        self.assertEqual(queryset.count(), 100)
-        pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 50, 200, model_admin
-        )
-        self.assertEqual(pagination.show_all_url, "?_facets=True&all=")
-        pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 200, 400, model_admin
-        )
-        self.assertEqual(pagination.show_all_url, None)
-        pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 20, 50, model_admin
-        )
-        self.assertEqual(pagination.show_all_url, None)
-        request = self.factory.get("/persona?all=")
-        pagination = model_admin.get_pagination_instance(
-            request, Persona, queryset, 50, 200, model_admin
-        )
-        self.assertEqual(pagination.show_all_url, None)
+                self.assertEqual(
+                    list(pagination_tag(pagination)["page_range"]), expected
+                )
 
     def test_custom_pagination(self):
         response = self.client.get(reverse("admin7:admin_views_persona_changelist"))
-        self.assertContains(
-            response, '<span class="this-page custom-pagination">1</span>'
-        )
+        self.assertContains(response, '<a role="button" href="?p=5" class="end">5</a>')
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -7030,12 +6961,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         from selenium.webdriver.common.by import By
 
         self.admin_login(
-            username="super", password="secret", login_url=reverse("admin7:index")
+            username="super", password="secret", login_url=reverse("admin:index")
         )
         for i in range(1, 201):
             Persona.objects.create(name=f"persona-{i}")
         self.selenium.get(
-            self.live_server_url + reverse("admin7:admin_views_persona_changelist")
+            self.live_server_url + reverse("admin:admin_views_persona_changelist")
         )
         paginator = self.selenium.find_element(By.CSS_SELECTOR, ".paginator")
         self.assertTrue(paginator.is_displayed())
