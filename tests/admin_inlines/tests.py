@@ -1900,7 +1900,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         self.assertCountSeleniumElements(rows_selector, 3)
         add_button = self.selenium.find_element(
-            By.LINK_TEXT, "Add another Inner4 stacked"
+            By.XPATH, "//button[contains(text(), 'Add another Inner4 stacked')]"
         )
         add_button.click()
         self.assertCountSeleniumElements(rows_selector, 4)
@@ -1920,14 +1920,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertCountSeleniumElements(rows_selector, 3)
 
         add_button = self.selenium.find_element(
-            By.LINK_TEXT, "Add another Inner4 stacked"
+            By.XPATH, "//button[contains(text(), 'Add another Inner4 stacked')]"
         )
         add_button.click()
         add_button.click()
 
         self.assertCountSeleniumElements(rows_selector, 5)
         for delete_link in self.selenium.find_elements(
-            By.CSS_SELECTOR, "%s .inline-deletelink" % inline_id
+            By.CSS_SELECTOR, "%s button.inline-deletelink" % inline_id
         ):
             delete_link.click()
         with self.disable_implicit_wait():
@@ -1948,8 +1948,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertCountSeleniumElements(rows_selector, 3)
 
         add_button = self.selenium.find_element(
-            By.LINK_TEXT,
-            "Add another Inner4 stacked",
+            By.XPATH, "//button[contains(text(), 'Add another Inner4 stacked')]"
         )
         add_button.click()
         add_button.click()
@@ -1983,7 +1982,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.assertEqual("Please correct the duplicate values below.", errorlist.text)
         delete_link = self.selenium.find_element(
-            By.CSS_SELECTOR, "#inner4stacked_set-4 .inline-deletelink"
+            By.CSS_SELECTOR, "#inner4stacked_set-4 button.inline-deletelink"
         )
         delete_link.click()
         self.assertCountSeleniumElements(rows_selector, 4)
@@ -2014,7 +2013,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertCountSeleniumElements(rows_selector, 3)
 
         add_button = self.selenium.find_element(
-            By.LINK_TEXT, "Add another Inner4 tabular"
+            By.XPATH, "//button[contains(text(), 'Add another Inner4 tabular')]"
         )
         add_button.click()
         add_button.click()
@@ -2051,7 +2050,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.assertEqual("Please correct the duplicate values below.", errorlist.text)
         delete_link = self.selenium.find_element(
-            By.CSS_SELECTOR, "#inner4tabular_set-4 .inline-deletelink"
+            By.CSS_SELECTOR, "#inner4tabular_set-4 button.inline-deletelink"
         )
         delete_link.click()
 
@@ -2095,7 +2094,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         # Add an inline
-        self.selenium.find_element(By.LINK_TEXT, "Add another Profile").click()
+        self.selenium.find_element(
+            By.XPATH, "//button[contains(text(), 'Add another Profile')]"
+        ).click()
 
         # The inline has been added, it has the right id, and it contains the
         # correct fields.
@@ -2113,7 +2114,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             ".dynamic-profile_set#profile_set-1 input[name=profile_set-1-last_name]", 1
         )
         # Let's add another one to be sure
-        self.selenium.find_element(By.LINK_TEXT, "Add another Profile").click()
+        self.selenium.find_element(
+            By.XPATH, "//button[contains(text(), 'Add another Profile')]"
+        ).click()
         self.assertCountSeleniumElements(".dynamic-profile_set", 3)
         self.assertEqual(
             self.selenium.find_elements(By.CSS_SELECTOR, ".dynamic-profile_set")[
@@ -2189,10 +2192,18 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         # Add a few inlines
-        self.selenium.find_element(By.LINK_TEXT, "Add another Profile").click()
-        self.selenium.find_element(By.LINK_TEXT, "Add another Profile").click()
-        self.selenium.find_element(By.LINK_TEXT, "Add another Profile").click()
-        self.selenium.find_element(By.LINK_TEXT, "Add another Profile").click()
+        self.selenium.find_element(
+            By.XPATH, "//button[contains(text(), 'Add another Profile')]"
+        ).click()
+        self.selenium.find_element(
+            By.XPATH, "//button[contains(text(), 'Add another Profile')]"
+        ).click()
+        self.selenium.find_element(
+            By.XPATH, "//button[contains(text(), 'Add another Profile')]"
+        ).click()
+        self.selenium.find_element(
+            By.XPATH, "//button[contains(text(), 'Add another Profile')]"
+        ).click()
         self.assertCountSeleniumElements(
             "#profile_set-group table tr.dynamic-profile_set", 5
         )
@@ -2215,12 +2226,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element(
             By.CSS_SELECTOR,
             "form#profilecollection_form tr.dynamic-profile_set#profile_set-1 "
-            "td.delete a",
+            "td.delete button",
         ).click()
         self.selenium.find_element(
             By.CSS_SELECTOR,
             "form#profilecollection_form tr.dynamic-profile_set#profile_set-2 "
-            "td.delete a",
+            "td.delete button",
         ).click()
         # The rows are gone and the IDs have been re-sequenced
         self.assertCountSeleniumElements(
@@ -2273,7 +2284,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.live_server_url + reverse("admin:admin_inlines_teacher_add")
         )
         add_text = gettext("Add another %(verbose_name)s") % {"verbose_name": "Child"}
-        self.selenium.find_element(By.LINK_TEXT, add_text).click()
+        self.selenium.find_element(
+            By.XPATH, f"//button[contains(text(), '{add_text}')]"
+        ).click()
         test_fields = ["#id_child_set-0-name", "#id_child_set-1-name"]
         summaries = self.selenium.find_elements(By.TAG_NAME, "summary")
         self.assertEqual(len(summaries), 3)
@@ -2440,7 +2453,9 @@ class SeleniumTests(AdminSeleniumTestCase):
                 self.assertIn("Available attendant", available.text)
                 self.assertIn("Chosen attendant", chosen.text)
                 # Added inline should also have the correct verbose_name.
-                self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
+                self.selenium.find_element(
+                    By.XPATH, "//button[contains(text(), 'Add another Class')]"
+                ).click()
                 available = self.selenium.find_element(
                     By.CSS_SELECTOR, css_available_selector % 1
                 )
@@ -2450,7 +2465,9 @@ class SeleniumTests(AdminSeleniumTestCase):
                 self.assertIn("Available attendant", available.text)
                 self.assertIn("Chosen attendant", chosen.text)
                 # Third inline should also have the correct verbose_name.
-                self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
+                self.selenium.find_element(
+                    By.XPATH, "//button[contains(text(), 'Add another Class')]"
+                ).click()
                 available = self.selenium.find_element(
                     By.CSS_SELECTOR, css_available_selector % 2
                 )
@@ -2522,7 +2539,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             "fieldset.module tbody tr.dynamic-sighting_set:not(.original) td.delete",
         )
         self.assertIn(
-            '<a role="button" class="inline-deletelink" href="#">',
+            '<button type="button" class="inline-deletelink">',
             delete.get_attribute("innerHTML"),
         )
         self.take_screenshot("loaded")
