@@ -101,7 +101,7 @@ class Lookup(Expression):
         return Value(self.lhs)
 
     def get_db_prep_lookup(self, value, connection):
-        return ("%s", [value])
+        return ("%s", (value,))
 
     def process_lhs(self, compiler, connection, lhs=None):
         lhs = lhs or self.lhs
@@ -415,7 +415,7 @@ class IExact(BuiltinLookup):
     def process_rhs(self, qn, connection):
         rhs, params = super().process_rhs(qn, connection)
         if params:
-            params[0] = connection.ops.prep_for_iexact_query(params[0])
+            params = (connection.ops.prep_for_iexact_query(params[0]), *params[1:])
         return rhs, params
 
 
@@ -603,8 +603,9 @@ class PatternLookup(BuiltinLookup):
     def process_rhs(self, qn, connection):
         rhs, params = super().process_rhs(qn, connection)
         if self.rhs_is_direct_value() and params and not self.bilateral_transforms:
-            params[0] = self.param_pattern % connection.ops.prep_for_like_query(
-                params[0]
+            params = (
+                self.param_pattern % connection.ops.prep_for_like_query(params[0]),
+                *params[1:],
             )
         return rhs, params
 
@@ -686,8 +687,9 @@ class Regex(BuiltinLookup):
         else:
             lhs, lhs_params = self.process_lhs(compiler, connection)
             rhs, rhs_params = self.process_rhs(compiler, connection)
+            params = (*lhs_params, *rhs_params)
             sql_template = connection.ops.regex_lookup(self.lookup_name)
-            return sql_template % (lhs, rhs), lhs_params + rhs_params
+            return sql_template % (lhs, rhs), params
 
 
 @Field.register_lookup
