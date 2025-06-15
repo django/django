@@ -142,7 +142,7 @@ QUnit.test('initMapWidgetInSection initializes widgets and skips __prefix__', fu
     wrapper1.innerHTML = `
         <textarea id="id_point"></textarea>
         <div class="dj_map" id="id_point_map"></div>
-        <script type="application/json" id="mapwidget-options">
+        <script type="application/json">
             { "geom_name": "Point" }
         </script>
     `;
@@ -154,7 +154,7 @@ QUnit.test('initMapWidgetInSection initializes widgets and skips __prefix__', fu
     wrapper2.innerHTML = `
         <textarea id="id_fake"></textarea>
         <div class="dj_map" id="id_fake_map"></div>
-        <script type="application/json" id="mapwidget-options">
+        <script type="application/json">
             { "geom_name": "MultiPoint" }
         </script>
     `;
