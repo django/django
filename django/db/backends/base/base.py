@@ -37,7 +37,7 @@ class NotImplementedInterface:
         raise NotImplementedError(f"Attribute '{name}' is not implemented")
 
 
-class AbstractBaseDatabaseWrapper:
+class _AbstractBaseDatabaseWrapper:
     """Represent a database connection."""
 
     # Mapping of Field objects to their column types.
@@ -869,7 +869,7 @@ class AbstractBaseDatabaseWrapper:
     'clean_savepoints',
     'set_autocommit',
 ])
-class BaseDatabaseWrapper(SyncMixin, AbstractBaseDatabaseWrapper):
+class BaseDatabaseWrapper(SyncMixin, _AbstractBaseDatabaseWrapper):
     is_async = False
 
     def cursor(self):
@@ -930,7 +930,7 @@ class BaseDatabaseWrapper(SyncMixin, AbstractBaseDatabaseWrapper):
         return self.SchemaEditorClass(self, *args, **kwargs)
 
 
-class AsyncBaseDatabaseWrapper(AsyncMixin, AbstractBaseDatabaseWrapper):
+class AsyncBaseDatabaseWrapper(AsyncMixin, _AbstractBaseDatabaseWrapper):
     is_async = True
 
     client_class = NotImplementedInterface
