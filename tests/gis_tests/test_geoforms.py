@@ -212,7 +212,7 @@ class GeometryFieldTest(SimpleTestCase):
             "id": "id_p",
             "geom_name": "Point",
         }
-        expected = json_script(attrs, "mapwidget-options")
+        expected = json_script(attrs)
         self.assertInHTML(expected, rendered)
 
 
@@ -303,7 +303,7 @@ class SpecializedFieldTest(SimpleTestCase):
                 "id": map_field.id_for_label,
                 "geom_name": geom_name,
             }
-            expected = json_script(attrs, "mapwidget-options")
+            expected = json_script(attrs)
             self.assertInHTML(expected, rendered)
         self.assertIn("gis/js/OLMapWidget.js", str(form_instance.media))
 
@@ -473,7 +473,7 @@ class OSMWidgetTest(SimpleTestCase):
             "id": "id_p",
             "geom_name": "Point",
         }
-        expected = json_script(attrs, "mapwidget-options")
+        expected = json_script(attrs)
         self.assertInHTML(expected, rendered)
 
 

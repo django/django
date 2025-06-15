@@ -6,5 +6,5 @@
     {% if widget.attrs.display_raw %}<p>{% translate "Debugging window (serialized value)" %}</p>{% endif %}
     <textarea id="{{ widget.attrs.id }}" class="vSerializedField required" cols="150" rows="10" name="{{ widget.name }}"
               {% if not widget.attrs.display_raw %} hidden{% endif %}>{{ serialized }}</textarea>
-    {{ widget.attrs|json_script:"mapwidget-options" }}
+    {{ widget.attrs|json_script }}
 </div>
