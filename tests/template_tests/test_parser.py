@@ -126,6 +126,16 @@ class ParserTests(SimpleTestCase):
         ):
             Variable({})
 
+        # Variables should raise when invalid characters in name.
+        for c in ["+", "-"]:
+            with self.subTest(invalid_character=c):
+                variable_name = f"variable{c}name"
+                with self.assertRaisesMessage(
+                    TemplateSyntaxError,
+                    f"Invalid character ('{c}') in variable name: '{variable_name}'",
+                ):
+                    Variable(variable_name)
+
     def test_filter_args_count(self):
         parser = Parser("")
         register = Library()
@@ -174,6 +184,7 @@ class ParserTests(SimpleTestCase):
     def test_filter_numeric_argument_parsing(self):
         p = Parser("", builtins=[filter_library])
 
+        # Values that resolve to a numeric literal.
         cases = {
             "5": 5,
             "-5": -5,
@@ -193,6 +204,7 @@ class ParserTests(SimpleTestCase):
                     FilterExpression(f"0|default:{num}", p).resolve({}), expected
                 )
 
+        # Values that are interpreted as names of variables that do not exist.
         invalid_numbers = [
             "abc123",
             "123abc",
@@ -205,8 +217,6 @@ class ParserTests(SimpleTestCase):
             "1e2.0",
             "1e2a",
             "1e2e3",
-            "1e-",
-            "1e-a",
         ]
 
         for num in invalid_numbers:
@@ -215,4 +225,18 @@ class ParserTests(SimpleTestCase):
                     FilterExpression(num, p).resolve({}, ignore_failures=True)
                 )
                 with self.assertRaises(VariableDoesNotExist):
+                    FilterExpression(f"0|default:{num}", p).resolve({})
+
+        # Values that are interpreted as an invalid variable name.
+        invalid_numbers_and_var_names = [
+            "1e-",
+            "1e-a",
+            "1+1",
+            "1-1",
+        ]
+        for num in invalid_numbers_and_var_names:
+            with self.subTest(num=num):
+                with self.assertRaises(TemplateSyntaxError):
+                    FilterExpression(num, p).resolve({})
+                with self.assertRaises(TemplateSyntaxError):
                     FilterExpression(f"0|default:{num}", p).resolve({})
