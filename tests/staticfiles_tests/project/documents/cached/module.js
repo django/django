@@ -47,3 +47,6 @@ r = /import/;
  * @param {HTMLElement} elt
  * @returns {import("./htmx").HtmxTriggerSpecification[]}
  */
+
+//Technically valid but not supported as it should be a real edge case
+`${import("./module_test.js")}`

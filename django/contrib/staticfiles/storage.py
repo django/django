@@ -49,6 +49,7 @@ class HashedFilesMixin:
     default_template = """url("%(url)s")"""
     max_post_process_passes = 5
     support_js_module_import_aggregation = False
+    adjust_functions = {"*.js": ("_process_js_modules",)}
     patterns = (
         (
             "*.css",
@@ -175,6 +176,62 @@ class HashedFilesMixin:
         """
         return self._url(self.stored_name, name, force)
 
+    def _should_adjust_url(self, url):
+        """
+        Return whether this is a url that should be adjusted
+        """
+        # Ignore absolute/protocol-relative and data-uri URLs.
+        if re.match(r"^[a-z]+:", url) or url.startswith("//"):
+            return False
+
+        # Ignore absolute URLs that don't point to a static file (dynamic
+        # CSS / JS?). Note that STATIC_URL cannot be empty.
+        if url.startswith("/") and not url.startswith(settings.STATIC_URL):
+            return False
+
+        # Strip off the fragment so a path-like fragment won't interfere.
+        url_path, _ = urldefrag(url)
+
+        # Ignore URLs without a path
+        if not url_path:
+            return False
+        return True
+
+    def _adjust_url(self, url, name, hashed_files):
+        """
+        Return the hashed url without affecting fragements
+        """
+        # Strip off the fragment so a path-like fragment won't interfere.
+        url_path, fragment = urldefrag(url)
+
+        if url_path.startswith("/"):
+            # Otherwise the condition above would have returned prematurely.
+            assert url_path.startswith(settings.STATIC_URL)
+            target_name = url_path.removeprefix(settings.STATIC_URL)
+        else:
+            # We're using the posixpath module to mix paths and URLs conveniently.
+            source_name = name if os.sep == "/" else name.replace(os.sep, "/")
+            target_name = posixpath.join(posixpath.dirname(source_name), url_path)
+
+        # Determine the hashed name of the target file with the storage backend.
+        hashed_url = self._url(
+            self._stored_name,
+            unquote(target_name),
+            force=True,
+            hashed_files=hashed_files,
+        )
+
+        transformed_url = "/".join(
+            url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
+        )
+
+        # Restore the fragment that was stripped off earlier.
+        if fragment:
+            transformed_url += ("?#" if "?#" in url else "#") + fragment
+
+        # Return the hashed version to the file
+        return unquote(transformed_url)
+
     def url_converter(self, name, hashed_files, template=None):
         """
         Return the custom URL converter for the given file name.
@@ -193,50 +250,11 @@ class HashedFilesMixin:
             matched = matches["matched"]
             url = matches["url"]
 
-            # Ignore absolute/protocol-relative and data-uri URLs.
-            if re.match(r"^[a-z]+:", url) or url.startswith("//"):
-                return matched
-
-            # Ignore absolute URLs that don't point to a static file (dynamic
-            # CSS / JS?). Note that STATIC_URL cannot be empty.
-            if url.startswith("/") and not url.startswith(settings.STATIC_URL):
-                return matched
-
-            # Strip off the fragment so a path-like fragment won't interfere.
-            url_path, fragment = urldefrag(url)
-
-            # Ignore URLs without a path
-            if not url_path:
-                return matched
-
-            if url_path.startswith("/"):
-                # Otherwise the condition above would have returned prematurely.
-                assert url_path.startswith(settings.STATIC_URL)
-                target_name = url_path.removeprefix(settings.STATIC_URL)
-            else:
-                # We're using the posixpath module to mix paths and URLs conveniently.
-                source_name = name if os.sep == "/" else name.replace(os.sep, "/")
-                target_name = posixpath.join(posixpath.dirname(source_name), url_path)
-
-            # Determine the hashed name of the target file with the storage backend.
-            hashed_url = self._url(
-                self._stored_name,
-                unquote(target_name),
-                force=True,
-                hashed_files=hashed_files,
-            )
-
-            transformed_url = "/".join(
-                url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
-            )
-
-            # Restore the fragment that was stripped off earlier.
-            if fragment:
-                transformed_url += ("?#" if "?#" in url else "#") + fragment
-
-            # Return the hashed version to the file
-            matches["url"] = unquote(transformed_url)
-            return template % matches
+            if self._should_adjust_url(url):
+                # Return the hashed version to the file
+                matches["url"] = self._adjust_url(url, name, hashed_files)
+                return template % matches
+            return matched
 
         return converter
 
@@ -340,48 +358,11 @@ class HashedFilesMixin:
                     except UnicodeDecodeError as exc:
                         yield name, None, exc, False
 
-                    # for javascript files that contain import and export
-                    # parse with jslex first
-                    complex_adjustments = False
-                    if self.support_js_module_import_aggregation and name.endswith(
-                        ".js"
-                    ):
-                        complex_adjustments = "import" in content or (
-                            "export" in content and "from" in content
-                        )
-
-                    if complex_adjustments:
-                        import_matches = find_import_export_strings(content)
-
-                        result_parts = []
-                        last_position = 0
-
-                        for import_name, position in import_matches:
-                            converter_function = self.url_converter(
-                                name, hashed_files, "%(url)s"
-                            )
-                            # converter_function has good logic about what should and
-                            # shouldn't be replaced so worth reusing, but as it is used
-                            # as part of the re.sub function it expects a matched_group
-                            matched_group = re.match(
-                                "(?P<matched>(?P<url>" + re.escape(import_name) + "))",
-                                import_name,
-                            )
-
-                            try:
-                                replacement = converter_function(matched_group)
-                            except ValueError as exc:
-                                yield name, None, exc, False
-
-                            result_parts.append(content[last_position:position])
-                            # Add the replacement
-                            result_parts.append(replacement)
-                            # Update position tracker
-                            last_position = position + len(import_name)
-
-                        # Add the remaining part of the original string
-                        result_parts.append(content[last_position:])
-                        content = "".join(result_parts)
+                    for extension, function_names in self.adjust_functions.items():
+                        if matches_patterns(path, (extension,)):
+                            for function_name in function_names:
+                                function = getattr(self, function_name)
+                                content = function(name, content, hashed_files)
 
                     for extension, patterns in self._patterns.items():
                         if matches_patterns(path, (extension,)):
@@ -424,6 +405,40 @@ class HashedFilesMixin:
                 hashed_files[hash_key] = hashed_name
 
                 yield name, hashed_name, processed, substitutions
+
+    def _process_js_modules(self, name, content, hashed_files):
+        """Process JavaScript import/export statements."""
+        if not self.support_js_module_import_aggregation:
+            return content
+        complex_adjustments = "import" in content or (
+            "export" in content and "from" in content
+        )
+
+        if not complex_adjustments:
+            return content
+
+        import_matches = find_import_export_strings(content)
+
+        if not import_matches:
+            return content
+
+        result_parts = []
+        last_position = 0
+
+        for import_name, position in import_matches:
+            if self._should_adjust_url(import_name):
+                # Add content before this import
+                result_parts.append(content[last_position:position])
+
+                # Process the import
+                replacement = self._adjust_url(import_name, name, hashed_files)
+                result_parts.append(replacement)
+                # Update position tracker
+                last_position = position + len(import_name)
+
+        # Add remaining content
+        result_parts.append(content[last_position:])
+        return "".join(result_parts)
 
     def clean_name(self, name):
         return name.replace("\\", "/")
