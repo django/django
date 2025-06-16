@@ -1,6 +1,8 @@
 """JsLex: a lexer for JavaScript"""
 
-# Originally from https://bitbucket.org/ned/jslex
+# originally contributed by Ned Batchelder, the author of jslex
+# See https://github.com/django/django/commit/64e19ffb4ee32767861d25c874f0d2dfc75618b7
+# jslex is also published at https://github.com/nedbat/jslex
 import re
 
 
@@ -107,11 +109,11 @@ class JsLexer(Lexer):
             "keyword",
             literals(
                 """
-                           break case catch class const continue debugger
+                           async await break case catch class const continue debugger
                            default delete do else enum export extends
                            finally for function if import in instanceof
-                           new return super switch this throw try typeof
-                           var void while with
+                           let new return static super switch this throw try typeof
+                           var void while with yield
                            """,
                 suffix=r"\b",
             ),
@@ -126,21 +128,27 @@ class JsLexer(Lexer):
                   """,
             next="div",
         ),
-        Tok("hnum", r"0[xX][0-9a-fA-F]+", next="div"),
+        Tok("hbigint", r"0[xX][0-9a-fA-F]+(_[0-9a-fA-F]+)*n", next="div"),
+        Tok("hnum", r"0[xX][0-9a-fA-F]+(_[0-9a-fA-F]+)*", next="div"),
+        Tok("bbigint", r"0[bB][01]+(_[01]+)*n", next="div"),
+        Tok("bnum", r"0[bB][01]+(_[01]+)*", next="div"),
+        Tok("obigint", r"0[oO][0-7]+(_[0-7]+)*n", next="div"),
+        Tok("onum", r"0[oO][0-7]+(_[0-7]+)*", next="div"),
+        Tok("dbigint", r"(0|[1-9][0-9]*(_[0-9]+)*)n", next="div"),
         Tok("onum", r"0[0-7]+"),
         Tok(
             "dnum",
             r"""
-                    (   (0|[1-9][0-9]*)     # DecimalIntegerLiteral
+                    (   (0|[1-9][0-9]*(_[0-9]+)*)     # DecimalIntegerLiteral
                         \.                  # dot
-                        [0-9]*              # DecimalDigits-opt
+                        [0-9]*(_[0-9]+)*    # DecimalDigits-opt
                         ([eE][-+]?[0-9]+)?  # ExponentPart-opt
                     |
                         \.                  # dot
-                        [0-9]+              # DecimalDigits
+                        [0-9]+(_[0-9]+)*    # DecimalDigits
                         ([eE][-+]?[0-9]+)?  # ExponentPart-opt
                     |
-                        (0|[1-9][0-9]*)     # DecimalIntegerLiteral
+                        (0|[1-9][0-9]*(_[0-9]+)*)     # DecimalIntegerLiteral
                         ([eE][-+]?[0-9]+)?  # ExponentPart-opt
                     )
                     """,
@@ -150,9 +158,9 @@ class JsLexer(Lexer):
             "punct",
             literals(
                 """
-                         >>>= === !== >>> <<= >>= <= >= == != << >> &&
-                         || += -= *= %= &= |= ^=
-                         """
+                >>>= === !== >>> <<= >>= <= >= == != << >> &&= && => ?. ??= ??
+                **=  ** ||= || += -= *= %= &= |= ^=
+                """
             ),
             next="reg",
         ),
@@ -160,7 +168,7 @@ class JsLexer(Lexer):
         Tok("punct", literals("{ } ( [ . ; , < > + - * % & | ^ ! ~ ? : ="), next="reg"),
         Tok("string", r'"([^"\\]|(\\(.|\n)))*?"', next="div"),
         Tok("string", r"'([^'\\]|(\\(.|\n)))*?'", next="div"),
-        Tok("string", r"`([^'\\]|(\\(.|\n)))*?`", next="div"),
+        Tok("string", r"`([^`\\]|(\\(.|\n))|\$\{[^}]*\})*?`", next="div"),
     ]
 
     both_after = [
