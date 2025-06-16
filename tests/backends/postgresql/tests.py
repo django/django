@@ -16,7 +16,13 @@ from django.db import (
     transaction,
 )
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.test import TestCase, override_settings, skipUnlessDBFeature, TransactionTestCase
+from django.test import (
+    TestCase,
+    override_settings,
+    skipUnlessDBFeature,
+    TransactionTestCase,
+    AsyncTestCase,
+)
 
 try:
     from django.db.backends.postgresql.psycopg_any import errors, is_psycopg3
@@ -626,6 +632,43 @@ class Tests(TestCase):
         conn = new_connection.connection
         self.assertIs(
             CustomDatabaseWrapper(settings)._configure_connection(conn), False
+        )
+
+
+class AsyncDatabaseWrapperTests(AsyncTestCase):
+    databases = {"default", "other"}
+
+    async def test_ensure_timezone_without_connection(self):
+        async_connection = async_connections["other"]
+        self.assertEqual(
+            await async_connection.ensure_timezone(),
+            False,
+        )
+
+    @override_settings(TIME_ZONE="Africa/Nairobi", USE_TZ=True)
+    async def test_ensure_timezone_with_existing_connection(self):
+        async_connection = async_connections[DEFAULT_DB_ALIAS]
+
+        # Clear cached properties
+        async_connection.timezone
+        del async_connection.timezone
+        async_connection.timezone_name
+        del async_connection.timezone_name
+
+        async with async_connection.cursor() as cursor:
+            await cursor.execute("SELECT 1;")
+
+        self.assertEqual(
+            await async_connection.ensure_timezone(),
+            True,
+        )
+
+    async def test_pg_version(self):
+        async_connection = async_connections[DEFAULT_DB_ALIAS]
+
+        self.assertEqual(
+            len(await async_connection.get_database_version()),
+            2
         )
 
 
