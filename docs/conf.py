@@ -132,7 +132,7 @@ html_theme = "djangodocs"
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ["_theme"]
-
+templates_path = ['_templates']
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
 #html_title = None
