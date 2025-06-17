@@ -671,6 +671,14 @@ class AsyncDatabaseWrapperTests(AsyncTestCase):
             2
         )
 
+    async def test_is_usable(self):
+        async_connection = async_connections[DEFAULT_DB_ALIAS]
+
+        self.assertEqual(
+            await async_connection.is_usable(),
+            True
+        )
+
 
 @skipUnlessDBFeature("supports_async")
 @unittest.skipUnless(
