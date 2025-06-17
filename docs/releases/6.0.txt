@@ -84,7 +84,17 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :class:`~django.contrib.postgres.operations.CreateExtension`,
+  :class:`~django.contrib.postgres.operations.BloomExtension`,
+  :class:`~django.contrib.postgres.operations.BtreeGinExtension`,
+  :class:`~django.contrib.postgres.operations.BtreeGistExtension`,
+  :class:`~django.contrib.postgres.operations.CITextExtension`,
+  :class:`~django.contrib.postgres.operations.CryptoExtension`,
+  :class:`~django.contrib.postgres.operations.HStoreExtension`,
+  :class:`~django.contrib.postgres.operations.TrigramExtension`,
+  and :class:`~django.contrib.postgres.operations.UnaccentExtension` classes
+  now support ``hints``.
+  See :ref:`topics-db-multi-db-hints` for more details on database hints.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
