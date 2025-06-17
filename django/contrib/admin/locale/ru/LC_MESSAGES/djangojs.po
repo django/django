@@ -11,81 +11,91 @@
 # Panasoft, 2021
 # Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2022-2023
 # Андрей Щуров <shurov9009@gmail.com>, 2016
+# Дмитрий Загайнов <dmitry.zagaynov+github@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
-"2012,2014-2015,2022-2023\n"
+"POT-Creation-Date: 2025-06-17 11:26+0600\n"
+"PO-Revision-Date: 2025-06-17 11:00+0600\n"
+"Last-Translator: Дмитрий Загайнов <dmitry.zagaynov+github@gmail.com>, 2025\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:45
 #, javascript-format
 msgid "Available %s"
 msgstr "Доступные %s"
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:49
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Это список всех доступных %s. Вы можете выбрать некоторые из них, выделив их "
-"в поле ниже и кликнув \"Выбрать\", либо двойным щелчком."
+"Выделите нужные %s для добавления и затем нажмите кнопку со стрелкой вправо."
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:61
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
-"Начните вводить текст в этом поле, чтобы отфитровать список доступных %s."
+"Начните вводить текст в этом поле, чтобы отфильтровать список доступных %s."
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:66
+#: contrib/admin/static/admin/js/SelectFilter2.js:126
 msgid "Filter"
 msgstr "Фильтр"
 
-msgid "Choose all"
-msgstr "Выбрать все"
-
+#: contrib/admin/static/admin/js/SelectFilter2.js:73
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Нажмите, чтобы выбрать все %s сразу."
+msgid "Choose all %s"
+msgstr "Выбрать все %s"
 
-msgid "Choose"
-msgstr "Выбрать"
+#: contrib/admin/static/admin/js/SelectFilter2.js:85
+#, javascript-format
+msgid "Choose selected %s"
+msgstr "Выбрать выбранные %s"
 
-msgid "Remove"
-msgstr "Удалить"
+#: contrib/admin/static/admin/js/SelectFilter2.js:93
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Убрать выбранные %s"
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:105
 #, javascript-format
 msgid "Chosen %s"
 msgstr "Выбранные %s"
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:109
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Это список выбранных %s. Вы можете удалить некоторые из них, выделив их в "
-"поле ниже и кликнув \"Удалить\", либо двойным щелчком."
+"Выделите нужные %s для удаления из списка и затем нажмите кнопку со стрелкой "
+"влево."
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:121
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr ""
 "Набирайте символы в этом поле, чтобы отфильтровать список выбранных %s."
 
-msgid "Remove all"
-msgstr "Удалить все"
+#: contrib/admin/static/admin/js/SelectFilter2.js:142
+msgid "(click to clear)"
+msgstr "(нажмите чтобы очистить)"
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:146
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Нажмите чтобы удалить все %s сразу."
+msgid "Remove all %s"
+msgstr "Убрать все %s"
 
+#: contrib/admin/static/admin/js/SelectFilter2.js:240
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
@@ -94,6 +104,7 @@ msgstr[1] "%s выбранных объекта не видны"
 msgstr[2] "%s выбранных объектов не видны"
 msgstr[3] "%s выбранных объектов не видны"
 
+#: contrib/admin/static/admin/js/actions.js:67
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "Выбран %(sel)s из %(cnt)s"
@@ -101,6 +112,7 @@ msgstr[1] "Выбрано %(sel)s из %(cnt)s"
 msgstr[2] "Выбрано %(sel)s из %(cnt)s"
 msgstr[3] "Выбрано %(sel)s из %(cnt)s"
 
+#: contrib/admin/static/admin/js/actions.js:161
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -108,6 +120,7 @@ msgstr ""
 "Имеются несохраненные изменения в отдельных полях для редактирования. Если "
 "вы запустите действие, несохраненные изменения будут потеряны."
 
+#: contrib/admin/static/admin/js/actions.js:174
 msgid ""
 "You have selected an action, but you haven’t saved your changes to "
 "individual fields yet. Please click OK to save. You’ll need to re-run the "
@@ -117,6 +130,7 @@ msgstr ""
 "полях для редактирования. Нажмите OK, чтобы сохранить изменения. После "
 "сохранения вам придется запустить действие еще раз."
 
+#: contrib/admin/static/admin/js/actions.js:175
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
 "fields. You’re probably looking for the Go button rather than the Save "
@@ -126,21 +140,28 @@ msgstr ""
 "воспользоваться кнопкой \"Выполнить\", а не кнопкой \"Сохранить\". Если это "
 "так, то нажмите \"Отмена\", чтобы вернуться в интерфейс редактирования."
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:13
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:110
 msgid "Now"
 msgstr "Сейчас"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:14
 msgid "Midnight"
 msgstr "Полночь"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:15
 msgid "6 a.m."
 msgstr "6 утра"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:16
 msgid "Noon"
 msgstr "Полдень"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:17
 msgid "6 p.m."
 msgstr "6 вечера"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:78
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -149,6 +170,7 @@ msgstr[1] "Внимание: Ваше локальное время опереж
 msgstr[2] "Внимание: Ваше локальное время опережает время сервера на %s часов."
 msgstr[3] "Внимание: Ваше локальное время опережает время сервера на %s часов."
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:86
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
@@ -161,190 +183,284 @@ msgstr[2] ""
 msgstr[3] ""
 "Внимание: Ваше локальное время отстаёт от времени сервера на %s часов."
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:129
+#, fuzzy
+#| msgid "Choose a time"
 msgid "Choose a Time"
 msgstr "Выберите время"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:159
 msgid "Choose a time"
 msgstr "Выберите время"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:176
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:335
 msgid "Cancel"
 msgstr "Отмена"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:240
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:320
 msgid "Today"
 msgstr "Сегодня"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:257
 msgid "Choose a Date"
 msgstr "Выберите дату"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:314
 msgid "Yesterday"
 msgstr "Вчера"
 
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:326
 msgid "Tomorrow"
 msgstr "Завтра"
 
+#: contrib/admin/static/admin/js/calendar.js:11
 msgid "January"
 msgstr "Январь"
 
+#: contrib/admin/static/admin/js/calendar.js:12
 msgid "February"
 msgstr "Февраль"
 
+#: contrib/admin/static/admin/js/calendar.js:13
 msgid "March"
 msgstr "Март"
 
+#: contrib/admin/static/admin/js/calendar.js:14
 msgid "April"
 msgstr "Апрель"
 
+#: contrib/admin/static/admin/js/calendar.js:15
 msgid "May"
 msgstr "Май"
 
+#: contrib/admin/static/admin/js/calendar.js:16
 msgid "June"
 msgstr "Июнь"
 
+#: contrib/admin/static/admin/js/calendar.js:17
 msgid "July"
 msgstr "Июль"
 
+#: contrib/admin/static/admin/js/calendar.js:18
 msgid "August"
 msgstr "Август"
 
+#: contrib/admin/static/admin/js/calendar.js:19
 msgid "September"
 msgstr "Сентябрь"
 
+#: contrib/admin/static/admin/js/calendar.js:20
 msgid "October"
 msgstr "Октябрь"
 
+#: contrib/admin/static/admin/js/calendar.js:21
 msgid "November"
 msgstr "Ноябрь"
 
+#: contrib/admin/static/admin/js/calendar.js:22
 msgid "December"
 msgstr "Декабрь"
 
+#: contrib/admin/static/admin/js/calendar.js:25
 msgctxt "abbrev. month January"
 msgid "Jan"
 msgstr "Янв"
 
+#: contrib/admin/static/admin/js/calendar.js:26
 msgctxt "abbrev. month February"
 msgid "Feb"
 msgstr "Фев"
 
+#: contrib/admin/static/admin/js/calendar.js:27
 msgctxt "abbrev. month March"
 msgid "Mar"
 msgstr "Мар"
 
+#: contrib/admin/static/admin/js/calendar.js:28
 msgctxt "abbrev. month April"
 msgid "Apr"
 msgstr "Апр"
 
+#: contrib/admin/static/admin/js/calendar.js:29
 msgctxt "abbrev. month May"
 msgid "May"
 msgstr "Май"
 
+#: contrib/admin/static/admin/js/calendar.js:30
 msgctxt "abbrev. month June"
 msgid "Jun"
 msgstr "Июн"
 
+#: contrib/admin/static/admin/js/calendar.js:31
 msgctxt "abbrev. month July"
 msgid "Jul"
 msgstr "Июл"
 
+#: contrib/admin/static/admin/js/calendar.js:32
 msgctxt "abbrev. month August"
 msgid "Aug"
 msgstr "Авг"
 
+#: contrib/admin/static/admin/js/calendar.js:33
 msgctxt "abbrev. month September"
 msgid "Sep"
 msgstr "Сен"
 
+#: contrib/admin/static/admin/js/calendar.js:34
 msgctxt "abbrev. month October"
 msgid "Oct"
 msgstr "Окт"
 
+#: contrib/admin/static/admin/js/calendar.js:35
 msgctxt "abbrev. month November"
 msgid "Nov"
 msgstr "Ноя"
 
+#: contrib/admin/static/admin/js/calendar.js:36
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Дек"
 
+#: contrib/admin/static/admin/js/calendar.js:39
 msgid "Sunday"
 msgstr "Воскресенье"
 
+#: contrib/admin/static/admin/js/calendar.js:40
 msgid "Monday"
 msgstr "Понедельник"
 
+#: contrib/admin/static/admin/js/calendar.js:41
 msgid "Tuesday"
 msgstr "Вторник"
 
+#: contrib/admin/static/admin/js/calendar.js:42
 msgid "Wednesday"
 msgstr "Среда"
 
+#: contrib/admin/static/admin/js/calendar.js:43
 msgid "Thursday"
 msgstr "Четверг"
 
+#: contrib/admin/static/admin/js/calendar.js:44
 msgid "Friday"
 msgstr "Пятница"
 
+#: contrib/admin/static/admin/js/calendar.js:45
 msgid "Saturday"
 msgstr "Суббота"
 
+#: contrib/admin/static/admin/js/calendar.js:48
 msgctxt "abbrev. day Sunday"
 msgid "Sun"
 msgstr "Вс"
 
+#: contrib/admin/static/admin/js/calendar.js:49
 msgctxt "abbrev. day Monday"
 msgid "Mon"
 msgstr "Пн"
 
+#: contrib/admin/static/admin/js/calendar.js:50
 msgctxt "abbrev. day Tuesday"
 msgid "Tue"
 msgstr "Вт"
 
+#: contrib/admin/static/admin/js/calendar.js:51
 msgctxt "abbrev. day Wednesday"
 msgid "Wed"
 msgstr "Ср"
 
+#: contrib/admin/static/admin/js/calendar.js:52
 msgctxt "abbrev. day Thursday"
 msgid "Thur"
 msgstr "Чт"
 
+#: contrib/admin/static/admin/js/calendar.js:53
 msgctxt "abbrev. day Friday"
 msgid "Fri"
 msgstr "Пт"
 
+#: contrib/admin/static/admin/js/calendar.js:54
 msgctxt "abbrev. day Saturday"
 msgid "Sat"
 msgstr "Сб"
 
+#: contrib/admin/static/admin/js/calendar.js:57
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "В"
 
+#: contrib/admin/static/admin/js/calendar.js:58
 msgctxt "one letter Monday"
 msgid "M"
 msgstr "П"
 
+#: contrib/admin/static/admin/js/calendar.js:59
 msgctxt "one letter Tuesday"
 msgid "T"
 msgstr "В"
 
+#: contrib/admin/static/admin/js/calendar.js:60
 msgctxt "one letter Wednesday"
 msgid "W"
 msgstr "С"
 
+#: contrib/admin/static/admin/js/calendar.js:61
 msgctxt "one letter Thursday"
 msgid "T"
 msgstr "Ч"
 
+#: contrib/admin/static/admin/js/calendar.js:62
 msgctxt "one letter Friday"
 msgid "F"
 msgstr "П"
 
+#: contrib/admin/static/admin/js/calendar.js:63
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
 
-msgid "Show"
-msgstr "Показать"
+#, javascript-format
+#~ msgid ""
+#~ "This is the list of available %s. You may choose some by selecting them "
+#~ "in the box below and then clicking the \"Choose\" arrow between the two "
+#~ "boxes."
+#~ msgstr ""
+#~ "Это список всех доступных %s. Вы можете выбрать некоторые из них, выделив "
+#~ "их в поле ниже и кликнув \"Выбрать\", либо двойным щелчком."
 
-msgid "Hide"
-msgstr "Скрыть"
+#~ msgid "Choose all"
+#~ msgstr "Выбрать все"
+
+#, javascript-format
+#~ msgid "Click to choose all %s at once."
+#~ msgstr "Нажмите, чтобы выбрать все %s сразу."
+
+#~ msgid "Choose"
+#~ msgstr "Выбрать"
+
+#~ msgid "Remove"
+#~ msgstr "Удалить"
+
+#, javascript-format
+#~ msgid ""
+#~ "This is the list of chosen %s. You may remove some by selecting them in "
+#~ "the box below and then clicking the \"Remove\" arrow between the two "
+#~ "boxes."
+#~ msgstr ""
+#~ "Это список выбранных %s. Вы можете удалить некоторые из них, выделив их в "
+#~ "поле ниже и кликнув \"Удалить\", либо двойным щелчком."
+
+#~ msgid "Remove all"
+#~ msgstr "Удалить все"
+
+#, javascript-format
+#~ msgid "Click to remove all chosen %s at once."
+#~ msgstr "Нажмите чтобы удалить все %s сразу."
+
+#~ msgid "Show"
+#~ msgstr "Показать"
+
+#~ msgid "Hide"
+#~ msgstr "Скрыть"
