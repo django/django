@@ -2978,6 +2978,92 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes, "otherapp", 0, 0, model_name="book", name="book_title_author_idx"
         )
 
+    def test_remove_field_with_model_options(self):
+        before_state = [
+            ModelState("testapp", "Animal", []),
+            ModelState(
+                "testapp",
+                "Dog",
+                fields=[
+                    ("name", models.CharField(max_length=100)),
+                    (
+                        "animal",
+                        models.ForeignKey("testapp.Animal", on_delete=models.CASCADE),
+                    ),
+                ],
+                options={
+                    "indexes": [
+                        models.Index(fields=("animal", "name"), name="animal_name_idx")
+                    ],
+                    "constraints": [
+                        models.UniqueConstraint(
+                            fields=("animal", "name"), name="animal_name_idx"
+                        ),
+                    ],
+                },
+            ),
+        ]
+        changes = self.get_changes(before_state, [])
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "testapp",
+            0,
+            [
+                "RemoveIndex",
+                "RemoveConstraint",
+                "RemoveField",
+                "DeleteModel",
+                "DeleteModel",
+            ],
+        )
+
+    def test_remove_field_with_remove_index_or_constraint_dependency(self):
+        before_state = [
+            ModelState("testapp", "Category", []),
+            ModelState(
+                "testapp",
+                "Model",
+                fields=[
+                    ("date", models.DateField(auto_now=True)),
+                    (
+                        "category",
+                        models.ForeignKey(
+                            "testapp.Category", models.SET_NULL, null=True
+                        ),
+                    ),
+                ],
+                options={
+                    "constraints": [
+                        models.UniqueConstraint(
+                            fields=("date", "category"), name="unique_category_for_date"
+                        ),
+                    ]
+                },
+            ),
+        ]
+        changes = self.get_changes(
+            before_state,
+            [
+                ModelState(
+                    "testapp",
+                    "Model",
+                    fields=[
+                        ("date", models.DateField(auto_now=True)),
+                    ],
+                ),
+            ],
+        )
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "testapp",
+            0,
+            ["RemoveConstraint", "RemoveField", "DeleteModel"],
+        )
+
     def test_rename_indexes(self):
         book_renamed_indexes = ModelState(
             "otherapp",

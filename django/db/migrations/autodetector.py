@@ -29,6 +29,7 @@ class OperationDependency(
         ALTER = 2
         REMOVE_ORDER_WRT = 3
         ALTER_FOO_TOGETHER = 4
+        REMOVE_INDEX_OR_CONSTRAINT = 5
 
     @cached_property
     def model_name_lower(self):
@@ -528,6 +529,18 @@ class MigrationAutodetector:
                 )
                 and operation.name_lower == dependency.model_name_lower
             )
+        # Field is removed and part of an index/constraint.
+        elif (
+            dependency.field_name is not None
+            and dependency.type == OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT
+        ):
+            return (
+                isinstance(
+                    operation,
+                    (operations.RemoveIndex, operations.RemoveConstraint),
+                )
+                and operation.model_name_lower == dependency.model_name_lower
+            )
         # Unknown dependency. Raise an error.
         else:
             raise ValueError("Can't handle dependency %r" % (dependency,))
@@ -931,6 +944,24 @@ class MigrationAutodetector:
                         unique_together=None,
                     ),
                 )
+            if indexes := model_state.options.pop("indexes", None):
+                for index in indexes:
+                    self.add_operation(
+                        app_label,
+                        operations.RemoveIndex(
+                            model_name=model_name,
+                            name=index.name,
+                        ),
+                    )
+            if constraints := model_state.options.pop("constraints", None):
+                for constraint in constraints:
+                    self.add_operation(
+                        app_label,
+                        operations.RemoveConstraint(
+                            model_name=model_name,
+                            name=constraint.name,
+                        ),
+                    )
             # Then remove each related field
             for name in sorted(related_fields):
                 self.add_operation(
@@ -939,6 +970,14 @@ class MigrationAutodetector:
                         model_name=model_name,
                         name=name,
                     ),
+                    dependencies=[
+                        OperationDependency(
+                            app_label,
+                            model_name,
+                            name,
+                            OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT,
+                        ),
+                    ],
                 )
             # Finally, remove the model.
             # This depends on both the removal/alteration of all incoming fields
@@ -1180,7 +1219,7 @@ class MigrationAutodetector:
                 name=field_name,
             ),
             # We might need to depend on the removal of an
-            # order_with_respect_to or index/unique_together operation;
+            # order_with_respect_to or index/constraint/unique_together operation;
             # this is safely ignored if there isn't one
             dependencies=[
                 OperationDependency(
@@ -1194,6 +1233,12 @@ class MigrationAutodetector:
                     model_name,
                     field_name,
                     OperationDependency.Type.ALTER_FOO_TOGETHER,
+                ),
+                OperationDependency(
+                    app_label,
+                    model_name,
+                    field_name,
+                    OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT,
                 ),
             ],
         )
