@@ -1,0 +1,11 @@
+{% extends "!doc.html" %}
+
+
+
+{% block warning %}
+  <div class="version-warning">
+    <p><strong>Note:</strong> You are viewing the development version of the docs.
+    <a href="https://docs.djangoproject.com/en/stable/">Click here for the stable version.</a></p>
+  </div>
+  {{ super() }}
+{% endblock %}
