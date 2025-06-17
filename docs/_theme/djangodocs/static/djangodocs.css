@@ -139,40 +139,5 @@ div#contents ul ul li { margin-top: 0.3em;}
 
 /*** IE hacks ***/
 * pre { width: 100%; }
-.version-warning {
-  background: linear-gradient(120deg, #ff6ec4, #7873f5);
-  color: #ffffff;
-  padding: 18px 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  font-family: 'Fira Code', monospace;
-  font-size: 17px;
-  text-align: center;
-  margin: 2rem auto;
-  max-width: 1000px;
-  animation: floatIn 0.5s ease-in-out;
-  position: relative;
-}
 
-.version-warning a {
-  color: #ffffcc;
-  font-weight: bold;
-  text-decoration: none;
-  padding-left: 6px;
-}
-
-.version-warning a:hover {
-  text-decoration: underline;
-}
-
-@keyframes floatIn {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
