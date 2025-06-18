@@ -34,6 +34,10 @@ html[data-theme="light"],
 
     --error-fg: #ba2121;
 
+    --message-debug-bg: #efefef;
+    --message-debug-icon: url(../img/icon-debug.svg);
+    --message-info-bg: #ccefff;
+    --message-info-icon: url(../img/icon-info.svg);
     --message-success-bg: #dfd;
     --message-success-icon: url(../img/icon-yes.svg);
     --message-warning-bg: #ffc;
@@ -642,11 +646,26 @@ ul.messagelist li {
     margin: 0 0 10px 0;
     color: var(--body-fg);
     word-break: break-word;
-    background-color: var(--message-success-bg);
-    background-image: var(--message-success-icon);
+    background-color: var(--message-info-bg);
+    background-image: var(--message-info-icon);
     background-position: 40px 12px;
     background-repeat: no-repeat;
     background-size: 16px auto;
+}
+
+ul.messagelist li.debug {
+    background-color: var(--message-debug-bg);
+    background-image: var(--message-debug-icon);
+}
+
+ul.messagelist li.info {
+    background-color: var(--message-info-bg);
+    background-image: var(--message-info-icon);
+}
+
+ul.messagelist li.success {
+    background-color: var(--message-success-bg);
+    background-image: var(--message-success-icon);
 }
 
 ul.messagelist li.warning {
