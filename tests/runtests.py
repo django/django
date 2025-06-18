@@ -248,6 +248,7 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         "fields.W342",  # ForeignKey(unique=True) -> OneToOneField
+        "postgres.E005",  # django.contrib.postgres must be installed to use feature.
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.

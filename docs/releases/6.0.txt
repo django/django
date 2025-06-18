@@ -73,6 +73,9 @@ Minor features
   function rotates a geometry by a specified angle around the origin or a
   specified point.
 
+* The new :attr:`.BaseGeometryWidget.base_layer` attribute allows specifying a
+  JavaScript map base layer, enabling customization of map tile providers.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -81,7 +84,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Model fields, indexes, and constraints from :mod:`django.contrib.postgres`
+  now include system checks to verify that ``django.contrib.postgres`` is an
+  installed app.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -331,6 +336,11 @@ Miscellaneous
 * The undocumented ``django.utils.http.parse_header_parameters()`` function is
   refactored to use Python's :py:class:`email.message.Message` for parsing.
   Input headers exceeding 10000 characters will now raise :exc:`ValueError`.
+
+* Widgets from :mod:`django.contrib.gis.forms.widgets` now render without
+  inline JavaScript in templates. If you have customized any geometry widgets
+  or their templates, you may need to :ref:`update them
+  <geometry-widgets-customization>` to match the new layout.
 
 .. _deprecated-features-6.0:
 

@@ -31,6 +31,7 @@ QUnit.test('init', function(assert) {
     assert.equal($('.selector-chosen .selector-chosen-title .helptext').text(), 'Remove things by selecting them and then select the "Remove" arrow button.');
     assert.equal($('.selector-filter label .help-tooltip')[0].getAttribute("aria-label"), "Type into this box to filter down the list of available things.");
     assert.equal($('.selector-filter label .help-tooltip')[1].getAttribute("aria-label"), "Type into this box to filter down the list of selected things.");
+    assert.equal($('#test button:not([type="button"])').length, 0);
 });
 
 QUnit.test('filtering available options', function(assert) {

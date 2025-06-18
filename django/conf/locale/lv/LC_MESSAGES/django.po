@@ -1212,7 +1212,7 @@ msgid "Forbidden"
 msgstr "Aizliegts"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "CSRF pārbaude neizdevās. Pieprasījums pārtrauks."
+msgstr "CSRF pārbaude neizdevās. Pieprasījums pārtraukts."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "

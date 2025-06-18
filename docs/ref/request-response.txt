@@ -445,6 +445,41 @@ Methods
         >>> request.get_preferred_type(["application/xml", "text/plain"])
         None
 
+    If the mime type includes parameters, these are also considered when
+    determining the preferred media type. For example, with an ``Accept``
+    header of ``text/vcard;version=3.0,text/html;q=0.5``, the return value of
+    ``request.get_preferred_type()`` depends on the available media types:
+
+    .. code-block:: pycon
+
+        >>> request.get_preferred_type(
+        ...     [
+        ...         "text/vcard; version=4.0",
+        ...         "text/vcard; version=3.0",
+        ...         "text/vcard",
+        ...         "text/directory",
+        ...     ]
+        ... )
+        "text/vcard; version=3.0"
+        >>> request.get_preferred_type(
+        ...     [
+        ...         "text/vcard; version=4.0",
+        ...         "text/html",
+        ...     ]
+        ... )
+        "text/html"
+        >>> request.get_preferred_type(
+        ...     [
+        ...         "text/vcard; version=4.0",
+        ...         "text/vcard",
+        ...         "text/directory",
+        ...     ]
+        ... )
+        None
+
+    (For further details on how content negotiation is performed, see
+    :rfc:`9110#section-12.5.1`.)
+
     Most browsers send ``Accept: */*`` by default, meaning they don't have a
     preference, in which case the first item in ``media_types`` would be
     returned.

@@ -9,13 +9,13 @@ from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
-from ..utils import prefix_validation_error
+from ..utils import CheckPostgresInstalledMixin, prefix_validation_error
 from .utils import AttributeSetter
 
 __all__ = ["ArrayField"]
 
 
-class ArrayField(CheckFieldDefaultMixin, Field):
+class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
         "item_invalid": _("Item %(nth)s in the array did not validate:"),
@@ -73,6 +73,8 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                     "%s (%s)" % (base_check.msg, base_check.id)
                     for base_check in base_checks
                     if isinstance(base_check, checks.Error)
+                    # Prevent duplication of E005 in an E001 check.
+                    and not base_check.id == "postgres.E005"
                 )
                 if error_messages:
                     errors.append(
