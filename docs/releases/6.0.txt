@@ -348,6 +348,13 @@ Miscellaneous
   or their templates, you may need to :ref:`update them
   <geometry-widgets-customization>` to match the new layout.
 
+* Message levels ``messages.DEBUG`` and ``messages.INFO`` now have distinct
+  icons and CSS styling in the admin. Previously, these used the same icon and
+  styling as the ``messages.SUCCESS`` level. Since
+  :meth:`.ModelAdmin.message_user` uses the ``messages.INFO`` level by default,
+  set the level to ``messages.SUCCESS`` to retain the previous icon and
+  styling.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
