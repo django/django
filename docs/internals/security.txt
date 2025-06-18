@@ -55,6 +55,17 @@ set up, run, and reproduce the issue.
 
 Please do not attach screenshots of code.
 
+Use supported versions of dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django only :ref:`officially supports <faq-python-version-support>` the latest
+micro release (A.B.C) of Python. Vulnerabilities must be reproducible when all
+relevant dependencies (not limited to Python) are at supported versions.
+
+For example, vulnerabilities that only occur when Django is run on a version of
+Python that is no longer receiving security updates ("end-of-life") are **not
+considered valid**, even if that version is listed as supported by Django.
+
 User input must be sanitized
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -57,7 +57,10 @@ Django version Python versions
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
-supported. You can find the latest micro version for each series on the `Python
+supported. Python versions that have reached end-of-life are no longer
+maintained by the Python project and therefore should not be used with Django.
+
+You can find the latest supported micro version for each series on the `Python
 download page <https://www.python.org/downloads/>`_.
 
 We will support a Python version up to and including the first Django LTS
