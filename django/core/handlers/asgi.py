@@ -320,9 +320,7 @@ class ASGIHandler(base.BaseHandler):
                 value = value.encode("latin1")
             response_headers.append((bytes(header), bytes(value)))
         for c in response.cookies.values():
-            response_headers.append(
-                (b"Set-Cookie", c.output(header="").encode("ascii").strip())
-            )
+            response_headers.append((b"Set-Cookie", c.OutputString().encode("ascii")))
         # Initial response message.
         await send(
             {
