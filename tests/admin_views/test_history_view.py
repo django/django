@@ -50,6 +50,7 @@ class AdminHistoryViewTests(TestCase):
         )
 
 
+# RemovedInDjango70Warning: Remove this class.
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class SeleniumTests(AdminSeleniumTestCase):
     available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
@@ -81,7 +82,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         paginator = self.selenium.find_element(By.CSS_SELECTOR, ".paginator")
         self.assertTrue(paginator.is_displayed())
-        self.assertIn("%s entries" % LogEntry.objects.count(), paginator.text)
+        self.assertIn("%s log entries" % LogEntry.objects.count(), paginator.text)
         self.assertIn(str(Paginator.ELLIPSIS), paginator.text)
         # The current page.
         current_page_link = self.selenium.find_element(
