@@ -375,6 +375,10 @@ class StoredGeneratedFieldAsPrimaryKeyTests(StoredGeneratedFieldTests):
             "Cannot retrieve deferred field 'id' from an unsaved model.",
         )
 
+    def test_as_pk_using_create(self):
+        obj = GeneratedModelAsPrimaryKey.objects.create(integer=1)
+        self.assertEqual(obj.pk, 2)
+
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")
 class VirtualGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):

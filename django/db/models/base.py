@@ -674,7 +674,10 @@ class Model(AltersData, metaclass=ModelBase):
 
     def _get_pk_val(self, meta=None):
         meta = meta or self._meta
-        return getattr(self, meta.pk.attname)
+        try:
+            return getattr(self, meta.pk.attname)
+        except AttributeError:
+            return None
 
     def _set_pk_val(self, value):
         for parent_link in self._meta.parents.values():
