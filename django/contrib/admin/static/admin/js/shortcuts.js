@@ -56,6 +56,9 @@
 
     function showDialogOnClick() {
         const dialogButton = document.getElementById("open-shortcuts");
+        if(!dialogButton) {
+            return;
+        }
         dialogButton.addEventListener("click", showShortcutsDialog);
     }
 
