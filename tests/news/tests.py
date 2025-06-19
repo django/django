@@ -1,6 +1,8 @@
 from contextlib import contextmanager
 from pathlib import Path
 
+from selenium.webdriver.remote.webelement import WebElement
+
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.test import modify_settings, override_settings
@@ -9,8 +11,6 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 from .models import Article
-
-from selenium.webdriver.remote.webelement import WebElement
 
 SIZES = ["docs_size"]
 
@@ -174,8 +174,10 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
 
     @screenshot_cases(SIZES)
     def test_article_with_two_newspapers(self):
-        """Test creating an article attached to 2 newspapers and capture the newspaper raw ids input field."""
+        """Test creating an article attached to 2 newspapers and capture the newspaper
+        raw ids input field."""
         from selenium.webdriver.common.by import By
+
         from .models import Newspaper
 
         # Create two newspapers with IDs 1 and 2
