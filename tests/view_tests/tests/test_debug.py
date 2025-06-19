@@ -253,13 +253,28 @@ class DebugViewTests(SimpleTestCase):
             status_code=500,
             html=True,
         )
+
         with self.assertLogs("django.request", "ERROR"):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(
             response,
             "Raised during: view_tests.views.raises500",
-            status_code=500,
+            status_code=500
         )
+        self.assertEqual(
+            response["Content-Type"], "text/plain; charset=utf-8"
+        )
+
+    def test_technical_500_content_type_negotiation(self):
+        with self.assertLogs("django.request", "ERROR"):
+            response = self.client.get("/raises500/", headers={"Accept": "text/plain"})
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response["Content-Type"], "text/plain; charset=utf-8")
+
+        with self.assertLogs("django.request", "ERROR"):
+            response = self.client.get("/raises500/", headers={"Accept": "text/html"})
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response["Content-Type"], "text/html")
 
     def test_classbased_technical_500(self):
         with self.assertLogs("django.request", "ERROR"):
