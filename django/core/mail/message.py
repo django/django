@@ -1,21 +1,14 @@
 import email.message
 import email.policy
 import mimetypes
-import warnings
 from collections import namedtuple
 from datetime import datetime, timezone
 from email.headerregistry import Address, AddressHeader
-from email.mime.base import MIMEBase
 from email.utils import make_msgid
 from pathlib import Path
 
 from django.conf import settings
-from django.core.mail._deprecated import (  # NOQA: F401; RemovedInDjango70Warning
-    forbid_multi_line_headers,
-    sanitize_address,
-)
 from django.core.mail.utils import DNS_NAME
-from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.encoding import force_bytes, force_str, punycode
 from django.utils.timezone import get_current_timezone
 
@@ -85,9 +78,6 @@ class EmailMessage:
         if attachments:
             for attachment in attachments:
                 if isinstance(attachment, email.message.MIMEPart):
-                    self.attach(attachment)
-                elif isinstance(attachment, MIMEBase):
-                    # RemovedInDjango70Warning: MIMEBase attachment support.
                     self.attach(attachment)
                 else:
                     self.attach(*attachment)
@@ -165,18 +155,6 @@ class EmailMessage:
                     "instance is provided."
                 )
             self.attachments.append(filename)
-        elif isinstance(filename, MIMEBase):
-            warnings.warn(
-                "MIMEBase attachments are deprecated."
-                " Use an email.message.MIMEPart instead.",
-                RemovedInDjango70Warning,
-            )
-            if content is not None or mimetype is not None:
-                raise ValueError(
-                    "content and mimetype must not be given when a MIMEBase "
-                    "instance is provided."
-                )
-            self.attachments.append(filename)
         elif content is None:
             raise ValueError("content must be provided.")
         else:
@@ -224,18 +202,9 @@ class EmailMessage:
 
     def _add_attachments(self, msg):
         if self.attachments:
-            if hasattr(self, "mixed_subtype"):
-                # RemovedInDjango70Warning
-                raise AttributeError(
-                    "EmailMessage no longer supports the"
-                    " undocumented `mixed_subtype` attribute"
-                )
             msg.make_mixed()
             for attachment in self.attachments:
                 if isinstance(attachment, email.message.MIMEPart):
-                    msg.attach(attachment)
-                elif isinstance(attachment, MIMEBase):
-                    # RemovedInDjango70Warning
                     msg.attach(attachment)
                 else:
                     self._add_attachment(msg, *attachment)
@@ -378,12 +347,6 @@ class EmailMultiAlternatives(EmailMessage):
         if self.body or not self.alternatives:
             super()._add_bodies(msg)
         if self.alternatives:
-            if hasattr(self, "alternative_subtype"):
-                # RemovedInDjango70Warning
-                raise AttributeError(
-                    "EmailMultiAlternatives no longer supports the"
-                    " undocumented `alternative_subtype` attribute"
-                )
             msg.make_alternative()
             encoding = self.encoding or settings.DEFAULT_CHARSET
             for alternative in self.alternatives:

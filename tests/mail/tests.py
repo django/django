@@ -38,7 +38,6 @@ from django.core.mail import (
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
-from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.translation import gettext_lazy
 
 try:
@@ -2011,40 +2010,12 @@ class BaseEmailBackendTests(MailTestsMixin):
                 mail_func("hi", "there")
                 self.assertEqual(self.get_mailbox_content(), [])
 
-    # RemovedInDjango70Warning.
-    def test_deprecated_admins_managers_tuples(self):
-        tests = (
-            [("nobody", "nobody@example.com"), ("other", "other@example.com")],
-            [["nobody", "nobody@example.com"], ["other", "other@example.com"]],
-        )
-        for setting, mail_func in (
-            ("ADMINS", mail_admins),
-            ("MANAGERS", mail_managers),
-        ):
-            msg = (
-                f"Using (name, address) pairs in the {setting} setting is deprecated."
-                " Replace with a list of email address strings."
-            )
-            for value in tests:
-                self.flush_mailbox()
-                with (
-                    self.subTest(setting=setting, value=value),
-                    self.settings(**{setting: value}),
-                ):
-                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
-                        mail_func("subject", "content")
-                    message = self.get_the_message()
-                    expected_to = ", ".join([str(address) for _, address in value])
-                    self.assertEqual(message.get_all("to"), [expected_to])
-
     def test_wrong_admins_managers(self):
         tests = (
             "test@example.com",
             gettext_lazy("test@example.com"),
-            # RemovedInDjango70Warning: uncomment these cases when support for
-            # deprecated (name, address) tuples is removed.
-            #    [("nobody", "nobody@example.com"), ("other", "other@example.com")],
-            #    [["nobody", "nobody@example.com"], ["other", "other@example.com"]],
+            [("nobody", "nobody@example.com"), ("other", "other@example.com")],
+            [["nobody", "nobody@example.com"], ["other", "other@example.com"]],
             [("name", "test", "example.com")],
             [("Name <test@example.com",)],
             [[]],
@@ -2793,7 +2764,6 @@ class LegacyAPINotUsedTests(SimpleTestCase):
     allowed_exceptions = {
         # Compatibility in EmailMessage.attachments special cases:
         "email.message.Message",
-        "email.mime.base.MIMEBase",  # RemovedInDjango70Warning: MIMEBase.
         # No replacement in modern email API:
         "email.utils.make_msgid",
     }
