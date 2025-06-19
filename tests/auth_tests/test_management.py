@@ -8,13 +8,22 @@ from unittest import mock
 
 from django.apps import apps
 from django.contrib.auth import get_permission_codename, management
-from django.contrib.auth.management import create_permissions, get_default_username
+from django.contrib.auth.management import (
+    RenamePermission,
+    create_permissions,
+    get_default_username,
+    update_permissions,
+)
 from django.contrib.auth.management.commands import changepassword, createsuperuser
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import migrations
+from django.db import connection, migrations
+from django.db.migrations import Migration
+from django.db.migrations.operations.models import RenameModel
+from django.db.migrations.state import ProjectState
+from django.db.models.signals import pre_migrate
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
@@ -1519,6 +1528,186 @@ class CreatePermissionsTests(TestCase):
                 content_type__app_label=opts.app_label,
                 codename=codename,
             ).exists()
+        )
+
+
+class RenamePermissionTests(TestCase):
+
+    def setUp(self):
+        ct, _ = ContentType.objects.get_or_create(
+            app_label="auth_tests", model="OldModel"
+        )
+
+        Permission.objects.get_or_create(
+            codename="change_oldmodel", name="Can change oldmodel", content_type=ct
+        )
+        pre_migrate.connect(update_permissions)
+
+    def tearDown(self):
+        pre_migrate.disconnect(update_permissions)
+
+    def test_fake_migration_plan(self):
+        class FakeRenameMigration(Migration):
+            def __init__(self):
+                super().__init__("0001_fake", "auth_tests")
+                self.operations = [
+                    RenameModel(old_name="OldModel", new_name="NewModel")
+                ]
+
+        fake_migration = FakeRenameMigration()
+        fake_plan = [(fake_migration, False)]
+
+        pre_migrate.send(
+            sender=self.__class__,
+            app_config="auth_tests",
+            plan=fake_plan,
+            verbosity=1,
+            interactive=False,
+            using="default",
+        )
+
+        state = ProjectState.from_apps(apps)
+
+        for op in fake_migration.operations:
+            if isinstance(op, RenamePermission):
+                op.database_forwards(
+                    app_label="auth_tests",
+                    schema_editor=connection.schema_editor(),
+                    from_state=state,
+                    to_state=state.clone(),
+                )
+
+        self.assertFalse(
+            Permission.objects.filter(
+                codename="change_oldmodel", name="Can change oldmodel"
+            ).exists()
+        )
+
+        self.assertTrue(
+            Permission.objects.filter(
+                codename="change_newmodel", name="Can change newmodel"
+            ).exists()
+        )
+
+    def test_rename_skipped_if_router_disallows(self):
+        rename_op = RenamePermission("auth_tests", "OldModel", "NewModel")
+
+        with mock.patch("django.db.router.allow_migrate_model", return_value=False):
+            rename_op.rename_forward(apps, schema_editor=connection.schema_editor())
+
+        self.assertTrue(Permission.objects.filter(codename="change_oldmodel").exists())
+        self.assertFalse(Permission.objects.filter(codename="change_newmodel").exists())
+
+    def test_rename_backward_does_nothing_if_no_permissions(self):
+        # Clean slate for the test app
+        Permission.objects.filter(content_type__app_label="auth_tests").delete()
+
+        rename_op = RenamePermission("auth_tests", "OldModel", "NewModel")
+
+        # Should not raise or change anything
+        rename_op.rename_backward(apps=apps, schema_editor=connection.schema_editor())
+
+        # Ensure no permissions related to this model were created
+        self.assertFalse(
+            Permission.objects.filter(
+                codename__in=["change_oldmodel", "change_newmodel"]
+            ).exists()
+        )
+
+    def test_rename_backward_renames_permission_back(self):
+        # Make sure both content types exist
+        old_ct, _ = ContentType.objects.get_or_create(
+            app_label="auth_tests", model="OldModel"
+        )
+        new_ct, _ = ContentType.objects.get_or_create(
+            app_label="auth_tests", model="NewModel"
+        )
+
+        # Create "new" permission
+        Permission.objects.create(
+            codename="change_newmodel", name="Can change newmodel", content_type=new_ct
+        )
+
+        rename_op = RenamePermission("auth_tests", "OldModel", "NewModel")
+
+        # Perform backward rename
+        rename_op.rename_backward(apps=apps, schema_editor=connection.schema_editor())
+
+        self.assertTrue(
+            Permission.objects.filter(
+                codename="change_oldmodel",
+                name="Can change oldmodel",
+                content_type=old_ct,
+            ).exists()
+        )
+
+        self.assertFalse(
+            Permission.objects.filter(
+                codename="change_newmodel",
+                name="Can change newmodel",
+                content_type=new_ct,
+            ).exists()
+        )
+
+    def test_rename_permission_integrity_error(self):
+        # Use the SAME content type for both permissions to create a real conflict
+        old_ct, _ = ContentType.objects.get_or_create(
+            app_label="auth_tests", model="OldModel"
+        )
+
+        # Create conflicting permission FIRST
+        Permission.objects.get_or_create(
+            codename="change_newmodel", name="Can change newmodel", content_type=old_ct
+        )
+
+        # Then create the permission to be renamed
+        Permission.objects.get_or_create(
+            codename="change_oldmodel", name="Can change oldmodel", content_type=old_ct
+        )
+
+        class FakeRenameMigration(Migration):
+            def __init__(self):
+                super().__init__("0001_fake", "auth_tests")
+                self.operations = [
+                    RenameModel(old_name="OldModel", new_name="NewModel")
+                ]
+
+        fake_migration = FakeRenameMigration()
+        fake_plan = [(fake_migration, False)]
+
+        pre_migrate.send(
+            sender=self.__class__,
+            app_config="auth_tests",
+            plan=fake_plan,
+            verbosity=1,
+            interactive=False,
+            using="default",
+        )
+
+        state = ProjectState.from_apps(apps)
+
+        for op in fake_migration.operations:
+            if isinstance(op, RenamePermission):
+                op.database_forwards(
+                    app_label="auth_tests",
+                    schema_editor=connection.schema_editor(),
+                    from_state=state,
+                    to_state=state.clone(),
+                )
+
+        # Assert: old permission still exists because renaming failed
+        self.assertTrue(
+            Permission.objects.filter(
+                codename="change_oldmodel", name="Can change oldmodel"
+            ).exists()
+        )
+
+        # Assert: conflicting new permission still exists unchanged
+        self.assertEqual(
+            Permission.objects.filter(
+                codename="change_newmodel", name="Can change newmodel"
+            ).count(),
+            1,
         )
 
 
