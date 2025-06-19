@@ -238,7 +238,7 @@ class DeferredAttribute:
         """
         opts = instance._meta
         link_field = opts.get_ancestor_link(self.field.model)
-        if self.field.primary_key and self.field != link_field:
+        if link_field and self.field.primary_key and self.field != link_field:
             return getattr(instance, link_field.attname)
         return None
 
