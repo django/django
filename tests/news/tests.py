@@ -15,11 +15,15 @@ SIZES = ["docs_size"]
 
 @modify_settings(INSTALLED_APPS={"append": "django.contrib.flatpages"})
 @override_settings(ROOT_URLCONF="news.urls")
-class SeleniumTests(AdminSeleniumTestCase):
+class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
+    """Selenium tests for generating images for the Django documentation."""
+
     available_apps = AdminSeleniumTestCase.available_apps + [
         "django.contrib.flatpages",
         "news",
     ]
+
+    path = Path.cwd().parent / "docs" / "ref" / "contrib" / "admin" / "_images"
 
     def setUp(self):
         self.superuser = User.objects.create_superuser(
@@ -31,14 +35,25 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.admin_login(username="admin", password="secret")
 
+        # TODO: This shouldn't be necessary
+        """Sets light mode in local storage to avoid auto dark mode."""
+        self.selenium.execute_script("localStorage.setItem('theme', 'light');")
+
+    def tearDown(self):
+        """Reset the local storage to default."""
+        self.selenium.execute_script("localStorage.removeItem('theme');")
+
     @contextmanager
     def docs_size(self):
         with ChangeWindowSize(800, 800, self.selenium):
             yield
 
-    def take_screenshot(self, name):
-        path = Path.cwd().parent / "docs" / "ref" / "contrib" / "admin" / "_images"
+    def take_window_screenshot(self, filename):
+        """Take a screenshot of the full window."""
+        path = self.path
         assert path.exists()
+        self.selenium.save_screenshot(path / f"{filename}.png")
+
         self.selenium.save_screenshot(path / f"{name}.png")
 
     def hide_nav_sidebar(self):
@@ -88,10 +103,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         filter_link = self.selenium.find_element(By.CSS_SELECTOR, "details summary")
         # Simulate a hover.
         ActionChains(self.selenium).move_to_element(filter_link).perform()
-        self.take_screenshot("list_filter")
+        self.take_window_screenshot("list_filter")
 
         self.selenium.find_element(By.NAME, "action").click()
-        self.take_screenshot("admin-actions")
+        self.take_window_screenshot("admin-actions")
 
     @screenshot_cases(SIZES)
     def test_flatpages_fieldsets(self):
@@ -104,12 +119,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.hide_nav_sidebar()
         self.change_header_display("none")
 
-        fieldset = self.selenium.find_element(
-            By.ID, "fieldset-0-advanced-options-1-heading"
-        )
+        fieldset = self.selenium.find_element(By.ID, "fieldset-0-1-heading")
         # Simulate a hover.
         ActionChains(self.selenium).move_to_element(fieldset).perform()
-        self.take_screenshot("fieldsets")
+        self.take_window_screenshot("fieldsets")
 
     @screenshot_cases(SIZES)
     def test_articles_actions(self):
@@ -147,9 +160,11 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element(By.NAME, "action").click()
         ActionChains(self.selenium).send_keys(Keys.ARROW_DOWN).perform()
         ActionChains(self.selenium).send_keys(Keys.ARROW_DOWN).perform()
-        self.take_screenshot("adding-actions-to-the-modeladmin")
+        self.take_window_screenshot("adding-actions-to-the-modeladmin")
 
         self.selenium.find_element(
             By.CSS_SELECTOR, 'button[type="submit"][name="index"]'
         ).click()
+        self.take_window_screenshot("actions-as-modeladmin-methods")
+
         self.take_screenshot("actions-as-modeladmin-methods")
