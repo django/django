@@ -387,6 +387,15 @@ class EmailMessage:
         email.Message or EmailMessage object, as well as a str.
         """
         basetype, subtype = mimetype.split("/", 1)
+        if basetype == "text" and isinstance(content, bytes):
+            # This duplicates logic from EmailMessage.attach() to properly
+            # handle EmailMessage.attachments not created through attach().
+            try:
+                content = content.decode()
+            except UnicodeDecodeError:
+                mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+                basetype, subtype = mimetype.split("/", 1)
+
         if basetype == "text":
             encoding = self.encoding or settings.DEFAULT_CHARSET
             attachment = SafeMIMEText(content, subtype, encoding)
