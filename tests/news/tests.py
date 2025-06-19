@@ -10,6 +10,8 @@ from django.utils.text import slugify
 
 from .models import Article
 
+from selenium.webdriver.remote.webelement import WebElement
+
 SIZES = ["docs_size"]
 
 
@@ -54,7 +56,10 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
         assert path.exists()
         self.selenium.save_screenshot(path / f"{filename}.png")
 
-        self.selenium.save_screenshot(path / f"{name}.png")
+    def take_element_screenshot(self, element: WebElement, filename: str):
+        """Take a screenshot of a specific element."""
+        full_path = self.path / f"{filename}.png"
+        element.screenshot(str(full_path))
 
     def hide_nav_sidebar(self):
         """Hide the navigation sidebar if it's open."""
@@ -167,4 +172,33 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
         ).click()
         self.take_window_screenshot("actions-as-modeladmin-methods")
 
-        self.take_screenshot("actions-as-modeladmin-methods")
+    @screenshot_cases(SIZES)
+    def test_article_with_two_newspapers(self):
+        """Test creating an article attached to 2 newspapers and capture the newspaper raw ids input field."""
+        from selenium.webdriver.common.by import By
+        from .models import Newspaper
+
+        # Create two newspapers with IDs 1 and 2
+        newspaper1 = Newspaper.objects.create(id=1, name="Daily News")
+        newspaper2 = Newspaper.objects.create(id=2, name="Weekly Times")
+
+        # Create an article attached to both newspapers
+        article = Article.objects.create(
+            title="Test Article",
+            status="p",
+        )
+        article.newspaper.add(newspaper1, newspaper2)
+
+        # Navigate to the article edit page
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:news_article_change", args=[article.id])
+        )
+        self.hide_nav_sidebar()
+        self.change_header_display("none")
+
+        # Capture the raw_id_fields screenshot
+        # TODO: For some reason the magnifying glass is not shown (lookup icon)
+        # There are no loading JS errors
+        newspaper_field = self.selenium.find_element(By.CLASS_NAME, "field-newspaper")
+        self.take_element_screenshot(newspaper_field, "raw_id_fields")

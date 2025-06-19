@@ -10,6 +10,7 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = ["title", "status"]
     ordering = ["title"]
     actions = ["make_published"]
+    raw_id_fields = ["newspaper"]
 
     @admin.action(description="Mark selected stories as published")
     def make_published(self, request, queryset):
