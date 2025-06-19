@@ -67,6 +67,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_covering_indexes = True
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = False
+    supports_generated_columns_as_pk = True
     can_rename_index = True
     test_collations = {
         "deterministic": "C",

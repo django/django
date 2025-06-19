@@ -365,6 +365,7 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         self.assertEqual(obj.b, 2)
 
 
+@skipUnlessDBFeature("supports_generated_columns_as_pk")
 class StoredGeneratedFieldAsPrimaryKeyTests(StoredGeneratedFieldTests):
     def test_generatedfield_raises_attributeerror(self):
         obj = GeneratedModelAsPrimaryKey(integer=1)

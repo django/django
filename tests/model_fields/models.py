@@ -724,3 +724,6 @@ class GeneratedModelAsPrimaryKey(models.Model):
         db_persist=True,
     )
     integer = models.IntegerField()
+
+    class Meta:
+        required_db_features = {"supports_generated_columns_as_pk"}
