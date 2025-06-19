@@ -1,0 +1,29 @@
+{% extends "admin/shortcuts.html" %}
+{% load i18n %}
+
+{% block extra_shortcuts %}
+  {{ block.super }}
+  <section>
+    <h3>{% if change %}{% translate "Change Form" %}{% else %}{% translate "Add Form" %}{% endif %}</h3>
+    <ul>
+      <li>
+        <div class="shortcut-description">{% translate "Save and go to change list" %}</div>
+        <div class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>s</kbd></div>
+      </li>
+      <li>
+        <div class="shortcut-description">{% translate "Save and add another" %}</div>
+        <div class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>a</kbd></div>
+      </li>
+      <li>
+        <div class="shortcut-description">{% translate "Save and continue editing" %}</div>
+        <div class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>c</kbd></div>
+      </li>
+      {% if change %}
+        <li>
+          <div class="shortcut-description">{% translate "Delete" %}</div>
+          <div class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>d</kbd></div>
+        </li>
+      {% endif %}
+    </ul>
+  </section>
+{% endblock %}

@@ -4,6 +4,7 @@
 {% block title %}{% if errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrahead %}{{ block.super }}
 <script src="{% url 'admin:jsi18n' %}"></script>
+<script src="{% static "admin/js/shortcuts_changeform.js" %}"></script>
 {{ media }}
 {% endblock %}
 
@@ -79,4 +80,8 @@
 
 </div>
 </form></div>
+{% endblock %}
+
+{% block shortcuts %}
+  {% include "admin/change_form_shortcuts.html" %}
 {% endblock %}

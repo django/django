@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
   <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
 {% endif %}
+<link rel="stylesheet" href="{% static "admin/css/shortcuts.css" %}">
+<script src="{% static "admin/js/shortcuts.js" %}"></script>
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}{% endblock %}
@@ -110,7 +112,12 @@
         <!-- END Content -->
       </main>
     </div>
-    <footer id="footer">{% block footer %}{% endblock %}</footer>
+    <footer id="footer">
+      {% block shortcuts %}
+        {% include "admin/shortcuts.html" %}
+      {% endblock %}
+      {% block footer %}{% endblock %}
+    </footer>
 </div>
 <!-- END Container -->
 

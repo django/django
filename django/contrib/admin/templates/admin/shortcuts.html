@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<button id="open-shortcuts" data-keyboard-shortcut="?">
+    <kbd>?</kbd>
+</button>
+<dialog class="keyboard-shortcuts" id="shortcuts-dialog">
+    <div class="dialog-heading">
+    <h2>{% translate "Keyboard shortcuts" %}</h2>
+    <form method="dialog">
+        <button aria-label="{% translate 'Close' %}">&#10006;</button>
+    </form>
+    </div>
+    <section>
+    <h3>{% translate "Global" %}</h3>
+    <ul>
+        <li>
+        <div class="shortcut-description">{% translate "Show this dialog" %}</div>
+        <div class="shortcut-keys"><kbd>?</kbd></div>
+        </li>
+        <li>
+        <div class="shortcut-description">{% translate "Go to the site index" %}</div>
+        <div class="shortcut-keys"><kbd>g</kbd> <kbd>i</kbd></div>
+        </li>
+    </ul>
+    </section>
+    {% block extra_shortcuts %}{% endblock %}
+</dialog>
