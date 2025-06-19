@@ -19,6 +19,7 @@ from django.test.utils import isolate_apps
 from .models import (
     Foo,
     GeneratedModel,
+    GeneratedModelAsPrimaryKey,
     GeneratedModelCheckConstraint,
     GeneratedModelCheckConstraintVirtual,
     GeneratedModelFieldWithConverters,
@@ -362,6 +363,17 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         self.assertEqual(obj.id, 1)
         self.assertEqual(obj.a, 2)
         self.assertEqual(obj.b, 2)
+
+
+class StoredGeneratedFieldAsPrimaryKeyTests(StoredGeneratedFieldTests):
+    def test_generatedfield_raises_attributeerror(self):
+        obj = GeneratedModelAsPrimaryKey(integer=1)
+        with self.assertRaises(AttributeError) as e:
+            obj.id
+        self.assertEqual(
+            e.exception.args[0],
+            "Cannot retrieve deferred field 'id' from an unsaved model.",
+        )
 
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")

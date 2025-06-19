@@ -714,3 +714,13 @@ class GeneratedModelUniqueConstraintVirtual(GeneratedModelVirtualBase):
                 F("a"), name="Generated model unique constraint virtual a"
             ),
         ]
+
+
+class GeneratedModelAsPrimaryKey(models.Model):
+    id = models.GeneratedField(
+        primary_key=True,
+        expression=F("integer") + 1,
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+    integer = models.IntegerField()
