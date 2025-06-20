@@ -49,17 +49,23 @@
   height: 30px;
 }
 
-.keyboard-shortcuts ul {
-  list-style: none;
-  margin: 0;
+.keyboard-shortcuts dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
   padding: 0;
+  margin: 0;
 }
 
-.keyboard-shortcuts ul li {
-  align-items: center;
-  column-gap: 1em;
-  display: flex;
-  justify-content: space-between;
+.shortcut-description, .shortcut-keys {
   border-top: 1px solid var(--border-color);
   padding: 1em;
+  margin: 0;
+}
+
+.shortcut-keys {
+  text-align: right;
+}
+
+dt.shortcut-description {
+  font-weight: normal; /* Revert bold styling from base.css for dt */
 }

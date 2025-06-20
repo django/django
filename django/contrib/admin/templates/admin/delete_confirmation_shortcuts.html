@@ -2,18 +2,15 @@
 {% load i18n %}
 
 {% block extra_shortcuts %}
-  {{ block.super }}
-  <section>
-    <h3>{% translate "Delete Confirmation" %}</h3>
-    <ul>
-      <li>
-        <div class="shortcut-description">{% translate "Confirm deletion" %}</div>
-        <div class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>y</kbd></div>
-      </li>
-      <li>
-        <div class="shortcut-description">{% translate "Cancel deletion" %}</div>
-        <div class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>n</kbd></div>
-      </li>
-    </ul>
-  </section>
+{{ block.super }}
+<section>
+  <h3>{% translate "Delete Confirmation" %}</h3>
+  <dl>
+    <dt class="shortcut-description">{% translate "Confirm deletion" %}</dt>
+    <dd class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>y</kbd></dd>
+
+    <dt class="shortcut-description">{% translate "Cancel deletion" %}</dt>
+    <dd class="shortcut-keys"><kbd class="alt">Alt</kbd> + <kbd>n</kbd></dd>
+  </dl>
+</section>
 {% endblock %}

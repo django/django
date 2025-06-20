@@ -47,8 +47,8 @@ class AdminKeyboardShorcutsTests(TestCase):
         response = self.client.get(reverse("test_admin_keyboard_shortcuts:index"))
         self.assertContains(
             response,
-            '<div class="shortcut-description">Show this dialog</div>'
-            '<div class="shortcut-keys"><kbd>?</kbd></div>',
+            '<dt class="shortcut-description">Show this dialog</dt>'
+            '<dd class="shortcut-keys"><kbd>?</kbd></dd>',
             html=True,
         )
 
