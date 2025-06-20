@@ -674,10 +674,7 @@ class Model(AltersData, metaclass=ModelBase):
 
     def _get_pk_val(self, meta=None):
         meta = meta or self._meta
-        try:
-            return getattr(self, meta.pk.attname)
-        except AttributeError:
-            return None
+        return getattr(self, meta.pk.attname)
 
     def _set_pk_val(self, value):
         for parent_link in self._meta.parents.values():
@@ -1066,10 +1063,15 @@ class Model(AltersData, metaclass=ModelBase):
                 if f.name in update_fields or f.attname in update_fields
             ]
 
-        if not self._is_pk_set(meta):
-            pk_val = meta.pk.get_pk_value_on_save(self)
-            setattr(self, meta.pk.attname, pk_val)
-        pk_set = self._is_pk_set(meta)
+        pk_set = False
+        try:
+            if not self._is_pk_set(meta):
+                pk_val = meta.pk.get_pk_value_on_save(self)
+                setattr(self, meta.pk.attname, pk_val)
+            pk_set = self._is_pk_set(meta)
+        # if pk is deferred then this will raise an AttributeError
+        except AttributeError:
+            pass
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False

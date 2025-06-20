@@ -378,12 +378,24 @@ class StoredGeneratedFieldAsPrimaryKeyTests(StoredGeneratedFieldTests):
 
     def test_as_pk_using_create(self):
         obj = GeneratedModelAsPrimaryKey.objects.create(integer=1)
-        self.assertEqual(obj.pk, 2)
+        if connection.features.can_return_columns_from_insert:
+            self.assertEqual(obj.pk, 2)
+        else:
+            with self.assertRaises(AttributeError):
+                obj.pk
+            obj = GeneratedModelAsPrimaryKey.objects.get()
+            self.assertEqual(obj.pk, 2)
 
     def test_as_pk_using_save(self):
         obj = GeneratedModelAsPrimaryKey(integer=1)
         obj.save()
-        self.assertEqual(obj.pk, 2)
+        if connection.features.can_return_columns_from_insert:
+            self.assertEqual(obj.pk, 2)
+        else:
+            with self.assertRaises(AttributeError):
+                obj.pk
+            obj = GeneratedModelAsPrimaryKey.objects.get()
+            self.assertEqual(obj.pk, 2)
 
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")
