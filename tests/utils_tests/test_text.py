@@ -6,11 +6,17 @@ from django.core.exceptions import SuspiciousFileOperation
 from django.test import SimpleTestCase
 from django.utils import text
 from django.utils.functional import lazystr
-from django.utils.text import format_lazy
+from django.utils.text import format_lazy,slugify
 from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = len("\U0001F4A9") == 1
 
+class SlugifyExtractTests(SimpleTestCase):
+    def test_slugify_remove_special_chars(self):
+        self.assertEqual(slugify("Hello , World!"),"hello-world")
+        
+    def test_slugify_unicode(self):
+        self.assertEqual(slugify("Café crème"),"cafe-creme")
 
 class TestUtilsText(SimpleTestCase):
     def test_get_text_list(self):
