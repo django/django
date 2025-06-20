@@ -3,7 +3,7 @@ from math import ceil
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db import connection
-from django.db.models import F, IntegerField, Value
+from django.db.models import F, IntegerField, JSONField, Value
 from django.db.models.functions import Coalesce, Lower
 from django.db.utils import IntegrityError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
@@ -318,6 +318,15 @@ class BulkUpdateTests(TestCase):
                 obj.refresh_from_db()
                 sql_null_qs = JSONFieldNullable.objects.filter(json_field__isnull=True)
                 self.assertSequenceEqual(sql_null_qs, [obj])
+
+    @skipUnlessDBFeature("supports_json_field")
+    def test_json_field_json_null_value(self):
+        obj = JSONFieldNullable.objects.create(json_field={})
+        obj.json_field = Value(None, output_field=JSONField())
+        JSONFieldNullable.objects.bulk_update([obj], fields=["json_field"])
+        obj.refresh_from_db()
+        json_null_qs = JSONFieldNullable.objects.filter(json_field=None)
+        self.assertSequenceEqual(json_null_qs, [obj])
 
     def test_nullable_fk_after_related_save(self):
         parent = RelatedObject.objects.create()

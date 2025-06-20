@@ -1174,6 +1174,9 @@ class Value(SQLiteNumericMixin, Expression):
             if hasattr(output_field, "get_placeholder"):
                 return output_field.get_placeholder(val, compiler, connection), [val]
         if val is None:
+            if output_field.__class__.__name__ == "JSONField":
+                # Return JSON null in case the field is JSONField.
+                return "'null'", []
             # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
             # use a literal SQL NULL
