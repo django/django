@@ -57,7 +57,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = True
-    supports_generated_columns_as_pk = True
+
+    @cached_property
+    def supports_generated_columns_as_pk(self):
+        return not self.connection.mysql_is_mariadb
 
     supports_json_negative_indexing = False
 
