@@ -133,10 +133,10 @@ class SkippingTestCase(SimpleTestCase):
             raise ValueError
 
         self._assert_skipping(test_func, unittest.SkipTest)
-        self._assert_skipping(test_func2, ValueError)
+        self._assert_skipping(test_func2, AttributeError)
         self._assert_skipping(test_func3, unittest.SkipTest)
         self._assert_skipping(test_func4, unittest.SkipTest)
-        self._assert_skipping(test_func5, ValueError)
+        self._assert_skipping(test_func5, AttributeError)
 
         class SkipTestCase(SimpleTestCase):
             @skipIfDBFeature("missing")
