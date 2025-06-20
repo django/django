@@ -171,3 +171,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_rows_from_bulk_insert = property(
         operator.attrgetter("can_return_columns_from_insert")
     )
+
+    can_return_rows_from_update = property(
+        operator.attrgetter("can_return_columns_from_insert")
+    )
