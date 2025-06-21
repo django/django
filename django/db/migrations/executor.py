@@ -190,8 +190,40 @@ class MigrationExecutor:
             for key in self.loader.applied_migrations
             if key in self.loader.graph.nodes
         }
+        # For backwards migration, we also need to consider applied migrations
+        # that are not in the current graph (likely replaced migrations)
+        applied_replaced_migrations = {}
+        for key in self.loader.applied_migrations:
+            if (
+                key not in self.loader.graph.nodes
+                and key in self.loader.disk_migrations
+            ):
+                applied_replaced_migrations[key] = self.loader.disk_migrations[key]
         if self.progress_callback:
             self.progress_callback("render_start")
+
+        # Apply replaced migrations first to build the correct base state
+        # These are migrations that are applied but not in the current graph
+        # (because they were replaced by squashed migrations)
+        replaced_migration_keys_applied = set()
+        for key, migration in applied_replaced_migrations.items():
+            # Only apply if this replaced migration is not going to be handled
+            # by a replacement migration in the full_plan
+            should_apply = True
+            for (
+                replacement_key,
+                replacement_migration,
+            ) in self.loader.replacements.items():
+                if key in getattr(replacement_migration, "replaces", []):
+                    # Check if the replacement is in the full plan
+                    plan_migration_keys = [(m.app_label, m.name) for m, _ in full_plan]
+                    if replacement_key in plan_migration_keys:
+                        should_apply = False
+                        break
+            if should_apply:
+                migration.mutate_state(state, preserve=False)
+                replaced_migration_keys_applied.add(key)
+
         for migration, _ in full_plan:
             if not migrations_to_run:
                 # We remove every migration that we applied from this set so

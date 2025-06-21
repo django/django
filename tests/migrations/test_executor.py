@@ -5,6 +5,7 @@ from django.db import DatabaseError, connection, migrations, models
 from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
+from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.state import ProjectState
 from django.test import (
@@ -842,6 +843,150 @@ class ExecutorTests(MigrationTestBase):
         # 0 queries, since the query for has_table is being mocked.
         with self.assertNumQueries(0):
             executor.migrate([], plan=[])
+
+    def test_backwards_migration_to_replaced_with_cross_app_deps(self):
+        """
+        Test for Django migration bug #36168 fix.
+
+        Validates that backwards migration to replaced migrations works
+        correctly when there are cross-app dependencies.
+
+        The scenario: App A has squashed migrations that replace earlier
+        migrations, App B depends on the replaced migrations from App A,
+        and attempting to migrate backwards to a replaced migration should
+        not fail with FieldDoesNotExist errors.
+        """
+        # Create mock migrations for testing
+        app_a_0001 = type(
+            "Migration",
+            (migrations.Migration,),
+            {
+                "dependencies": [],
+                "operations": [
+                    migrations.CreateModel(
+                        name="ModelA",
+                        fields=[
+                            ("id", models.AutoField(primary_key=True)),
+                            ("name", models.CharField(max_length=100)),
+                        ],
+                    ),
+                ],
+            },
+        )("0001_initial", "test_app_a")
+
+        app_a_0002 = type(
+            "Migration",
+            (migrations.Migration,),
+            {
+                "dependencies": [("test_app_a", "0001_initial")],
+                "operations": [
+                    migrations.AddField(
+                        model_name="modela",
+                        name="extra_field",
+                        field=models.CharField(max_length=50, default=""),
+                    ),
+                ],
+            },
+        )("0002_add_field", "test_app_a")
+
+        app_a_squashed = type(
+            "Migration",
+            (migrations.Migration,),
+            {
+                "dependencies": [],
+                "replaces": [
+                    ("test_app_a", "0001_initial"),
+                    ("test_app_a", "0002_add_field"),
+                ],
+                "operations": [
+                    migrations.CreateModel(
+                        name="ModelA",
+                        fields=[
+                            ("id", models.AutoField(primary_key=True)),
+                            ("name", models.CharField(max_length=100)),
+                            (
+                                "extra_field",
+                                models.CharField(max_length=50, default=""),
+                            ),
+                        ],
+                    ),
+                ],
+            },
+        )("0001_squashed_0002", "test_app_a")
+
+        # App B depends on the REPLACED migration (0002_add_field)
+        app_b_0001 = type(
+            "Migration",
+            (migrations.Migration,),
+            {
+                # Depends on replaced migration!
+                "dependencies": [("test_app_a", "0002_add_field")],
+                "operations": [
+                    migrations.CreateModel(
+                        name="ModelB",
+                        fields=[
+                            ("id", models.AutoField(primary_key=True)),
+                            (
+                                "model_a",
+                                models.ForeignKey(
+                                    "test_app_a.ModelA", on_delete=models.CASCADE
+                                ),
+                            ),
+                            ("description", models.TextField()),
+                        ],
+                    ),
+                ],
+            },
+        )("0001_initial", "test_app_b")
+
+        # Set up executor with mock migrations
+        executor = MigrationExecutor(connection)
+        loader = MigrationLoader(connection)
+
+        # Mock the migrations
+        loader.disk_migrations = {
+            ("test_app_a", "0001_initial"): app_a_0001,
+            ("test_app_a", "0002_add_field"): app_a_0002,
+            ("test_app_a", "0001_squashed_0002"): app_a_squashed,
+            ("test_app_b", "0001_initial"): app_b_0001,
+        }
+
+        loader.replacements = {
+            ("test_app_a", "0001_initial"): ("test_app_a", "0001_squashed_0002"),
+            ("test_app_a", "0002_add_field"): ("test_app_a", "0001_squashed_0002"),
+        }
+
+        # Simulate all migrations being applied
+        loader.applied_migrations = {
+            ("test_app_a", "0001_initial"),
+            ("test_app_a", "0002_add_field"),
+            ("test_app_a", "0001_squashed_0002"),
+            ("test_app_b", "0001_initial"),
+        }
+
+        executor.loader = loader
+
+        # Build the graph
+        loader.build_graph()
+
+        # Test: migrate backwards to a replaced migration
+        # This used to fail with FieldDoesNotExist before the fix
+        try:
+            target = [("test_app_a", "0001_initial")]
+            plan = executor.migration_plan(target)
+
+            # The plan should not be empty when migrating to a replaced migration
+            self.assertTrue(plan, "Migration plan should not be empty")
+
+            # This is where the bug used to occur - during state computation
+            # for backwards migration with replaced migrations
+            if plan:
+                final_state = executor._migrate_all_backwards(plan, plan, fake=True)
+                # If we get here without exception, the fix worked
+                self.assertIsInstance(final_state, ProjectState)
+
+        except Exception as e:
+            self.fail(f"Backwards migration to replaced migration failed: {e}")
 
 
 class FakeLoader:
