@@ -1,0 +1,230 @@
+.. _content-security-policy:
+
+=============================
+Content Security Policy (CSP)
+=============================
+
+.. versionadded:: 6.0
+
+.. module:: django.middleware.csp
+   :synopsis: Middleware for Content Security Policy headers
+
+Content Security Policy (CSP) is a web security standard that helps prevent
+attacks by controlling the sources from which content can be loaded. CSP
+enforcement plays an important role in a comprehensive :doc:`security strategy
+</topics/security>`.
+
+For detailed information on how to enable and configure CSP in your Django
+project, refer to the :ref:`Using CSP <using-csp>` documentation.
+
+.. _csp-settings:
+
+CSP settings
+============
+
+Django's CSP middleware is configured using the settings ``SECURE_CSP`` and
+``SECURE_CSP_REPORT_ONLY`` in your ``settings.py`` file.
+
+Overview
+--------
+The `Content-Security-Policy specification`_ defines two distinct headers with
+complementary purposes:
+
+- ``Content-Security-Policy``: Enforces the CSP rules, blocking any content that
+  violates the specified directives.
+- ``Content-Security-Policy-Report-Only``: Monitors and reports violations
+  without enforcing the policy, allowing for non-intrusive testing.
+
+.. _`Content-Security-Policy specification`: https://www.w3.org/TR/CSP3/
+
+Configuration options
+---------------------
+:setting:`SECURE_CSP`
+
+- Used to define the **enforced policy**.
+- Sets the ``Content-Security-Policy`` HTTP header.
+- Actively blocks content that violates the specified CSP directives.
+
+.. _content-security-policy-report-only:
+
+:setting:`SECURE_CSP_REPORT_ONLY`
+
+- Used to define the **report-only policy**.
+- Sets the ``Content-Security-Policy-Report-Only`` HTTP header.
+- Monitors and reports violations without blocking content, useful for testing or debugging CSP rules.
+- A ``report-uri`` directive should be set to capture these reports.
+
+.. warning::
+
+   When a CSP violation occurs, browsers typically report details directly to
+   the developer console, offering immediate feedback during development. To
+   also receive these reports programmatically via network requests, your policy
+   must include a ``report-uri`` or ``report-to`` directive specifying the
+   URL(s). Django helps configure these directives in your settings, but
+   browsers will only send reports if the reporting directive is present. Django
+   does not include built-in functionality to receive, store, or analyze these
+   networked reports. Implementing a reporting endpoint or using a third-party
+   service is necessary to collect this data for monitoring policy violations.
+
+
+These configuration options can be used independently or together, depending on
+your needs:
+
+- **Testing a new policy**: Use ``SECURE_CSP_REPORT_ONLY`` alone to observe
+  potential violations without blocking content. Once the policy is tested and
+  ready, move it to the ``SECURE_CSP`` setting for enforcement.
+- **Stable implementation**: Use ``SECURE_CSP`` alone when your policy is
+  well-tested and ready to enforce.
+- **Iterative development**: Use both simultaneously when you have
+  an existing enforced policy but want to test changes. The enforced policy
+  maintains security while the report-only policy helps evaluate proposed
+  modifications.
+
+.. warning::
+
+   The report-only mode (using :setting:`SECURE_CSP_REPORT_ONLY`) is valuable
+   for testing and refining a policy without breaking site functionality.
+   However, remember it *does not prevent violations*; it only instructs the
+   browser to send violation reports and offers no direct protection on its own.
+
+Structure of the settings
+-------------------------
+
+The ``SECURE_CSP`` and ``SECURE_CSP_REPORT_ONLY`` settings are configured as
+Python dictionaries. The *keys* of these dictionaries correspond to `Content
+Security Policy directives
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>`_,
+and the *values* can be lists, sets, or tuples of strings representing the
+allowed sources or policies for that directive. Note that if a set is used as a
+value, it will be automatically sorted to guarantee consistent output.
+
+This is a minimal to show the structure::
+
+    from django.middleware.constants import CSP
+
+    SECURE_CSP = {
+        "default-src": [CSP.SELF],
+        "img-src": ["data:", CSP.SELF, "https://images.example.com"],
+        "frame-src": [CSP.NONE],
+    }
+
+.. warning::
+
+   Django's CSP middleware helps construct and deliver the
+   ``Content-Security-Policy`` header based on your settings, but it *does not
+   validate* that the directives and values you provide conform to the latest
+   CSP specifications. Ensuring your policy is syntactically correct and uses
+   valid directives and values remains the developer's responsibility; using
+   browser developer tools and external CSP validators during development is
+   recommended.
+
+.. _csp-constants:
+
+CSP constants
+=============
+
+Django provides predefined constants representing common Content Security Policy
+source expression keywords (like ``'self'``, ``'none'``, ``'unsafe-inline'``)
+for use within the directive values configured in the :setting:`SECURE_CSP` setting.
+
+Using these constants, available via the :class:`~django.middleware.constants.CSP`
+enum, is recommended over using raw strings. It helps prevent typos and ensures
+the use of the exact, correctly formatted strings required by the CSP specification.
+
+.. module:: django.middleware.constants
+   :synopsis: Constants for Content Security Policy
+
+.. class:: CSP
+
+   An enum providing standardized constants for common CSP source expressions.
+
+   .. attribute:: NONE
+
+      Represents ``'none'`` - blocks loading resources of the specified type.
+
+   .. attribute:: REPORT_SAMPLE
+
+      Represents ``'report-sample'`` - instructs the browser to include a
+      sample of the violating code in violation reports (note potential
+      security implications of reporting sensitive data).
+
+   .. attribute:: SELF
+
+      Represents ``'self'`` - allows loading resources from the same origin
+      (same scheme, host, and port).
+
+   .. attribute:: STRICT_DYNAMIC
+
+      Represents ``'strict-dynamic'`` - allows script execution for scripts
+      loaded via a trusted script possessing a valid nonce or hash. This often
+      allows dynamically added scripts without needing ``'unsafe-inline'``.
+
+   .. attribute:: UNSAFE_EVAL
+
+      Represents ``'unsafe-eval'`` - allows the use of ``eval()`` and similar
+      methods for creating code from strings. Generally discouraged.
+
+   .. attribute:: UNSAFE_HASHES
+
+      Represents ``'unsafe-hashes'`` - allows inline event handlers (like
+      ``onclick``) and certain ``javascript:`` URIs if their hash matches a
+      specified hash source in the policy. Requires CSP level 3.
+
+   .. attribute:: UNSAFE_INLINE
+
+      Represents ``'unsafe-inline'`` - allows inline resources, such as inline
+      ``<script>`` elements, ``javascript:`` URLs, and inline ``<style>``
+      elements. Generally discouraged for scripts.
+
+   .. attribute:: WASM_UNSAFE_EVAL
+
+      Represents ``'wasm-unsafe-eval'`` - allows the loading and execution of
+      WebAssembly modules without needing to allow ``'unsafe-eval'`` for scripts.
+
+   .. attribute:: NONCE
+
+      Special placeholder value (the string ``"<CSP_NONCE_SENTINEL>"``) used in your
+      :setting:`SECURE_CSP` configuration within ``script-src`` or ``style-src``
+      directives to enable nonce functionality.
+
+      This is not a standard CSP keyword but a Django-specific placeholder
+      processed by the :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`.
+      The middleware replaces this placeholder with a unique, securely generated
+      nonce value for each request. This allows specific inline scripts or styles
+      (those marked with the matching nonce attribute) to execute even when
+      ``'unsafe-inline'`` is not specified.
+
+.. _csp-nonce:
+
+Nonce usage
+===========
+
+A CSP nonce ("number used once") is a unique, random value generated by the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` for each HTTP
+response. It provides a mechanism to allow specific inline ``<script>`` or
+``<style>`` elements to execute, without needing to resort to the less secure
+``'unsafe-inline'`` source expression.
+
+The process works by:
+
+1. Generating a unique nonce value per response.
+2. Including this nonce in the ``Content-Security-Policy`` header.
+3. Adding a ``nonce=...`` attribute to specific inline script or style tags in
+   your HTML.
+
+The browser will then execute only those inline elements whose nonce attribute
+matches the value specified in the header, effectively blocking unauthorized
+inline scripts, such as those introduced through Cross-Site Scripting (XSS)
+attacks.
+
+The :attr:`django.middleware.constants.CSP.NONCE` constant acts as a required
+placeholder in your settings. The middleware looks for this specific value within
+your configured directives (``script-src`` or ``style-src``) to know where the
+generated ``nonce-...`` value should be inserted in the final CSP header.
+
+.. warning::
+
+   Nonces are single-use tokens. If your project uses caching, take into
+   consideration that caching can potentially lead to mismatches between the CSP
+   header and the content, requiring careful cache configuration to ensure
+   consistency.
