@@ -226,7 +226,7 @@ class CompositePKChecksTests(TestCase):
         "supports_virtual_generated_columns",
         "supports_stored_generated_columns",
     )
-    def test_composite_pk_cannot_include_generated_field(self):
+    def test_composite_pk_can_include_generated_field(self):
         class Foo(models.Model):
             pk = models.CompositePrimaryKey("id", "foo")
             id = models.IntegerField()
@@ -236,17 +236,8 @@ class CompositePKChecksTests(TestCase):
                 db_persist=connection.features.supports_stored_generated_columns,
             )
 
-        self.assertEqual(
-            Foo.check(databases=self.databases),
-            [
-                checks.Error(
-                    "'foo' cannot be included in the composite primary key.",
-                    hint="'foo' field is a generated field.",
-                    obj=Foo,
-                    id="models.E042",
-                ),
-            ],
-        )
+        # Delegated responsibility to database to report whether this is allowed.
+        self.assertEqual(Foo.check(databases=self.databases), [])
 
     def test_composite_pk_cannot_include_non_local_field(self):
         class Foo(models.Model):

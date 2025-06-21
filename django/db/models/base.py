@@ -1761,8 +1761,6 @@ class Model(AltersData, metaclass=ModelBase):
                 hint = f"{field_name!r} field has no column."
             elif field.null:
                 hint = f"{field_name!r} field may not set 'null=True'."
-            elif field.generated:
-                hint = f"{field_name!r} field is a generated field."
             elif field not in meta.local_fields:
                 hint = f"{field_name!r} field is not a local field."
             else:
