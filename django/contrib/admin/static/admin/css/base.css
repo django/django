@@ -388,7 +388,7 @@ thead th.sorted {
     background: var(--selected-bg);
 }
 
-thead th.sorted .text {
+thead th.sortable .text {
     padding-right: 42px;
 }
 
@@ -407,19 +407,19 @@ table thead th .text a:focus, table thead th .text a:hover {
     background: var(--selected-bg);
 }
 
-thead th.sorted a.sortremove {
-    visibility: hidden;
+table thead th .sort {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    padding: 0px 5px;
+    align-items: center;
 }
 
-table thead th.sorted:hover a.sortremove {
-    visibility: visible;
-}
-
-table thead th.sorted .sortoptions {
-    display: block;
-    padding: 9px 5px 0 5px;
-    float: right;
-    text-align: right;
+table thead th .sort .sortoptions {
+    display: flex;
+    flex-direction: column;
 }
 
 table thead th.sorted .sortpriority {
@@ -431,8 +431,7 @@ table thead th.sorted .sortpriority {
     margin-right: 2px;
 }
 
-table thead th.sorted .sortoptions a {
-    position: relative;
+table thead th .sortoptions a {
     width: 14px;
     height: 14px;
     display: inline-block;
@@ -440,47 +439,24 @@ table thead th.sorted .sortoptions a {
     background-size: 14px auto;
 }
 
-table thead th.sorted .sortoptions a.sortremove {
-    background-position: 0 0;
+table thead th .sortoptions a.ascending,
+table thead th .sortoptions a.ascending.applied:hover {
+    background-position: 0 6px;
 }
 
-table thead th.sorted .sortoptions a.sortremove:after {
-    content: '\\';
-    position: absolute;
-    top: -6px;
-    left: 3px;
-    font-weight: 200;
-    font-size: 1.125rem;
-    color: var(--body-quiet-color);
+table thead th .sortoptions a.descending,
+table thead th .sortoptions a.descending.applied:hover {
+    background-position: 0 -34px;
 }
 
-table thead th.sorted .sortoptions a.sortremove:focus:after,
-table thead th.sorted .sortoptions a.sortremove:hover:after {
-    color: var(--link-fg);
+table thead th .sortoptions a.ascending:hover,
+table thead th .sortoptions a.ascending.applied {
+    background-position: 0 -8px;
 }
 
-table thead th.sorted .sortoptions a.sortremove:focus,
-table thead th.sorted .sortoptions a.sortremove:hover {
-    background-position: 0 -14px;
-}
-
-table thead th.sorted .sortoptions a.ascending {
-    background-position: 0 -28px;
-}
-
-table thead th.sorted .sortoptions a.ascending:focus,
-table thead th.sorted .sortoptions a.ascending:hover {
-    background-position: 0 -42px;
-}
-
-table thead th.sorted .sortoptions a.descending {
-    top: 1px;
-    background-position: 0 -56px;
-}
-
-table thead th.sorted .sortoptions a.descending:focus,
-table thead th.sorted .sortoptions a.descending:hover {
-    background-position: 0 -70px;
+table thead th .sortoptions a.descending:hover,
+table thead th .sortoptions a.descending.applied {
+    background-position: 0 -48px;
 }
 
 /* FORM DEFAULTS */

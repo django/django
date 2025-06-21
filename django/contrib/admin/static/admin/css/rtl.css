@@ -63,11 +63,12 @@ div.breadcrumbs {
 
 /* SORTABLE TABLES */
 
-table thead th.sorted .sortoptions {
-   float: left;
+table thead th .sort {
+    right: unset;
+    left: 0;
 }
 
-thead th.sorted .text {
+thead th.sortable .text {
     padding-right: 0;
     padding-left: 42px;
 }

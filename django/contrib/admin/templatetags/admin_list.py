@@ -139,9 +139,8 @@ def result_headers(cl):
             new_order_type = {"asc": "desc", "desc": "asc"}[order_type]
 
         # build new ordering param
-        o_list_primary = []  # URL for making this field the primary sort
-        o_list_remove = []  # URL for removing this field from sort
-        o_list_toggle = []  # URL for toggling order type for this field
+        # URL for toggling ascending, descending order for this field
+        o_list_toggle = {"asc": [], "desc": []}
 
         def make_qs_param(t, n):
             return ("-" if t == "desc" else "") + str(n)
@@ -151,17 +150,16 @@ def result_headers(cl):
                 param = make_qs_param(new_order_type, j)
                 # We want clicking on this header to bring the ordering to the
                 # front
-                o_list_primary.insert(0, param)
-                o_list_toggle.append(param)
+                o_list_toggle[new_order_type].append(param)
                 # o_list_remove - omit
             else:
                 param = make_qs_param(ot, j)
-                o_list_primary.append(param)
-                o_list_toggle.append(param)
-                o_list_remove.append(param)
+                o_list_toggle["asc"].append(param)
+                o_list_toggle["desc"].append(param)
 
         if i not in ordering_field_columns:
-            o_list_primary.insert(0, make_qs_param(new_order_type, i))
+            o_list_toggle["asc"].insert(0, make_qs_param("asc", i))
+            o_list_toggle["desc"].insert(0, make_qs_param("desc", i))
 
         yield {
             "text": text,
@@ -169,9 +167,12 @@ def result_headers(cl):
             "sorted": is_sorted,
             "ascending": order_type == "asc",
             "sort_priority": sort_priority,
-            "url_primary": cl.get_query_string({ORDER_VAR: ".".join(o_list_primary)}),
-            "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove)}),
-            "url_toggle": cl.get_query_string({ORDER_VAR: ".".join(o_list_toggle)}),
+            "url_ascending": cl.get_query_string(
+                {ORDER_VAR: ".".join(o_list_toggle["asc"])}
+            ),
+            "url_descending": cl.get_query_string(
+                {ORDER_VAR: ".".join(o_list_toggle["desc"])}
+            ),
             "class_attrib": (
                 format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
             ),
