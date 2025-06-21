@@ -218,6 +218,9 @@ TEMPLATES = []
 # Default form rendering class.
 FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 
+# Default text to use for the blank choice in form `<select>` controls.
+BLANK_CHOICE_LABEL = gettext_noop("- Select an option -")
+
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = "webmaster@localhost"
