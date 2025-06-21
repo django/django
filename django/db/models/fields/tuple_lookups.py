@@ -1,9 +1,10 @@
 import itertools
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models import Field
+from django.db import models
 from django.db.models.expressions import (
     ColPairs,
+    Exists,
     Func,
     ResolvedOuterRef,
     Subquery,
@@ -25,7 +26,7 @@ from django.db.models.sql.where import AND, OR, WhereNode
 class Tuple(Func):
     allows_composite_expressions = True
     function = ""
-    output_field = Field()
+    output_field = models.Field()
 
     def __len__(self):
         return len(self.source_expressions)
@@ -351,7 +352,29 @@ class TupleIn(TupleLookupMixin, In):
         rhs = self.rhs
         if not rhs:
             raise EmptyResultSet
-        if not self.rhs_is_direct_value():
+        if isinstance(rhs, Query):
+            if (rhs_len := rhs._subquery_fields_len) != (lhs_len := len(self.lhs)):
+                raise ValueError(
+                    f"The QuerySet value for the 'in' lookup must have {lhs_len} "
+                    f"selected fields (received {rhs_len})"
+                )
+            rhs = rhs.clone()
+            if not rhs.has_select_fields:
+                rhs.clear_select_clause()
+                rhs.add_fields(["pk"])
+            rhs_exprs = itertools.chain.from_iterable(
+                (
+                    select_expr
+                    if isinstance((select_expr := select[0]), ColPairs)
+                    else [select_expr]
+                )
+                for select in rhs.get_compiler(connection=connection).get_select()[0]
+            )
+            rhs.add_q(
+                models.Q(*[Exact(col, val) for col, val in zip(self.lhs, rhs_exprs)])
+            )
+            return compiler.compile(Exists(rhs))
+        elif not self.rhs_is_direct_value():
             return super(TupleLookupMixin, self).as_sql(compiler, connection)
 
         # e.g.: (a, b, c) in [(x1, y1, z1), (x2, y2, z2)] as SQL:
