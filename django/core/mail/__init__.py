@@ -13,14 +13,10 @@ from django.core.exceptions import ImproperlyConfigured
 # backends and the subsequent reorganization (See #10355)
 from django.core.mail.message import (
     DEFAULT_ATTACHMENT_MIME_TYPE,
-    BadHeaderError,
     EmailAlternative,
     EmailAttachment,
     EmailMessage,
     EmailMultiAlternatives,
-    SafeMIMEMultipart,
-    SafeMIMEText,
-    forbid_multi_line_headers,
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
@@ -33,12 +29,8 @@ __all__ = [
     "DNS_NAME",
     "EmailMessage",
     "EmailMultiAlternatives",
-    "SafeMIMEText",
-    "SafeMIMEMultipart",
     "DEFAULT_ATTACHMENT_MIME_TYPE",
     "make_msgid",
-    "BadHeaderError",
-    "forbid_multi_line_headers",
     "get_connection",
     "send_mail",
     "send_mass_mail",
@@ -46,6 +38,11 @@ __all__ = [
     "mail_managers",
     "EmailAlternative",
     "EmailAttachment",
+    # RemovedInDjango70Warning:
+    "BadHeaderError",
+    "SafeMIMEText",
+    "SafeMIMEMultipart",
+    "forbid_multi_line_headers",
 ]
 
 
@@ -192,3 +189,34 @@ def mail_managers(
         fail_silently=fail_silently,
         connection=connection,
     )
+
+
+# RemovedInDjango70Warning
+_deprecate_on_import = {
+    "BadHeaderError": "BadHeaderError is deprecated. Replace with ValueError.",
+    "SafeMIMEText": (
+        "SafeMIMEText is deprecated. The return value"
+        " of EmailMessage.message() is an email.message.EmailMessage."
+    ),
+    "SafeMIMEMultipart": (
+        "SafeMIMEMultipart is deprecated. The return value"
+        " of EmailMessage.message() is an email.message.EmailMessage."
+    ),
+    "forbid_multi_line_headers": (
+        "The internal API forbid_multi_line_headers() is deprecated."
+    ),
+}
+
+
+# RemovedInDjango70Warning
+# Issue deprecation warnings at time of import.
+def __getattr__(name):
+    try:
+        msg = _deprecate_on_import[name]
+    except KeyError:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
+    else:
+        from django.core.mail import _deprecated
+
+        warnings.warn(msg, category=RemovedInDjango70Warning)
+        return getattr(_deprecated, name)
