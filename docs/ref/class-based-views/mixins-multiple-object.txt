@@ -78,8 +78,9 @@ Multiple object mixins
 
     .. attribute:: ordering
 
-        A string or list of strings specifying the ordering to apply to the ``queryset``.
-        Valid values are the same as those for :meth:`~django.db.models.query.QuerySet.order_by`.
+        A string or list of strings specifying the ordering to apply to the
+        ``queryset``. Valid values are the same as those for
+        :meth:`~django.db.models.query.QuerySet.order_by`.
 
     .. attribute:: paginate_by
 

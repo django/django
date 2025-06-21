@@ -189,11 +189,13 @@ Model fields
 * **fields.E121**: ``max_length`` must be a positive integer.
 * **fields.W122**: ``max_length`` is ignored when used with
   ``<integer field type>``.
-* **fields.E130**: ``DecimalField``\s must define a ``decimal_places`` attribute.
+* **fields.E130**: ``DecimalField``\s must define a ``decimal_places``
+  attribute.
 * **fields.E131**: ``decimal_places`` must be a non-negative integer.
 * **fields.E132**: ``DecimalField``\s must define a ``max_digits`` attribute.
 * **fields.E133**: ``max_digits`` must be a positive integer.
-* **fields.E134**: ``max_digits`` must be greater or equal to ``decimal_places``.
+* **fields.E134**: ``max_digits`` must be greater or equal to
+  ``decimal_places``.
 * **fields.E140**: ``FilePathField``\s must have either ``allow_files`` or
   ``allow_folders`` set to True.
 * **fields.E150**: ``GenericIPAddressField``\s cannot have ``blank=True`` if
@@ -583,8 +585,8 @@ Signals
 -------
 
 * **signals.E001**: ``<handler>`` was connected to the ``<signal>`` signal with
-  a lazy reference to the sender ``<app label>.<model>``, but app ``<app label>``
-  isn't installed or doesn't provide model ``<model>``.
+  a lazy reference to the sender ``<app label>.<model>``, but app
+  ``<app label>`` isn't installed or doesn't provide model ``<model>``.
 
 Templates
 ---------

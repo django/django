@@ -279,8 +279,8 @@ object of the given template rendered with the given context.
 Raising a 404 error
 ===================
 
-Now, let's tackle the question detail view -- the page that displays the question text
-for a given poll. Here's the view:
+Now, let's tackle the question detail view -- the page that displays the
+question text for a given poll. Here's the view:
 
 .. code-block:: python
     :caption: ``polls/views.py``
@@ -375,15 +375,15 @@ like:
     </ul>
 
 The template system uses dot-lookup syntax to access variable attributes. In
-the example of ``{{ question.question_text }}``, first Django does a dictionary lookup
-on the object ``question``. Failing that, it tries an attribute lookup -- which
-works, in this case. If attribute lookup had failed, it would've tried a
+the example of ``{{ question.question_text }}``, first Django does a dictionary
+lookup on the object ``question``. Failing that, it tries an attribute lookup --
+which works, in this case. If attribute lookup had failed, it would've tried a
 list-index lookup.
 
 Method-calling happens in the :ttag:`{% for %}<for>` loop:
 ``question.choice_set.all`` is interpreted as the Python code
-``question.choice_set.all()``, which returns an iterable of ``Choice`` objects and is
-suitable for use in the :ttag:`{% for %}<for>` tag.
+``question.choice_set.all()``, which returns an iterable of ``Choice`` objects
+and is suitable for use in the :ttag:`{% for %}<for>` tag.
 
 See the :doc:`template guide </topics/templates>` for more about templates.
 

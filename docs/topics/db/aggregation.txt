@@ -322,12 +322,14 @@ We can also ask for the oldest book of any of those managed by every publisher:
     >>> Publisher.objects.aggregate(oldest_pubdate=Min("book__pubdate"))
 
 (The resulting dictionary will have a key called ``'oldest_pubdate'``. If no
-such alias were specified, it would be the rather long ``'book__pubdate__min'``.)
+such alias were specified, it would be the rather long
+``'book__pubdate__min'``.)
 
 This doesn't apply just to foreign keys. It also works with many-to-many
 relations. For example, we can ask for every author, annotated with the total
-number of pages considering all the books the author has (co-)authored (note how we
-use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many hop):
+number of pages considering all the books the author has (co-)authored (note how
+we use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many
+hop):
 
 .. code-block:: pycon
 

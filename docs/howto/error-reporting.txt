@@ -90,8 +90,8 @@ regular expression objects. For example::
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not* be
 reported. Neither will any URL starting with ``/phpmyadmin/``.
 
-The following example shows how to exclude some conventional URLs that browsers and
-crawlers often request::
+The following example shows how to exclude some conventional URLs that browsers
+and crawlers often request::
 
     import re
 

@@ -116,8 +116,8 @@ enforced immediately after every command.
 
 .. warning::
 
-    Deferred exclusion constraints may lead to a `performance penalty
-    <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
+    Deferred exclusion constraints may lead to a
+    `performance penalty <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
 
 ``include``
 -----------

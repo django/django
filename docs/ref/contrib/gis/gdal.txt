@@ -1284,10 +1284,10 @@ blue.
 .. note::
 
     For raster data there is no difference between a raster instance and its
-    data source. Unlike for the Geometry objects, :class:`GDALRaster` objects are
-    always a data source. Temporary rasters can be instantiated in memory
-    using the corresponding driver, but they will be of the same class as file-based
-    raster sources.
+    data source. Unlike for the Geometry objects, :class:`GDALRaster` objects
+    are always a data source. Temporary rasters can be instantiated in memory
+    using the corresponding driver, but they will be of the same class as
+    file-based raster sources.
 
 .. class:: GDALRaster(ds_input, write=False)
 
@@ -1358,8 +1358,8 @@ blue.
 
     .. attribute:: name
 
-        The name of the source which is equivalent to the input file path or the name
-        provided upon instantiation.
+        The name of the source which is equivalent to the input file path or the
+        name provided upon instantiation.
 
         .. code-block:: pycon
 
@@ -1368,11 +1368,12 @@ blue.
 
     .. attribute:: driver
 
-        The name of the GDAL driver used to handle the input file. For ``GDALRaster``\s created
-        from a file, the driver type is detected automatically. The creation of rasters from
-        scratch is an in-memory raster by default (``'MEM'``), but can be
-        altered as needed. For instance, use ``GTiff`` for a ``GeoTiff`` file.
-        For a list of file types, see also the `GDAL Raster Formats`__ list.
+        The name of the GDAL driver used to handle the input file. For
+        ``GDALRaster``\s created from a file, the driver type is detected
+        automatically. The creation of rasters from scratch is an in-memory
+        raster by default (``'MEM'``), but can be altered as needed. For
+        instance, use ``GTiff`` for a ``GeoTiff`` file. For a list of file
+        types, see also the `GDAL Raster Formats`__ list.
 
         __ https://gdal.org/drivers/raster/
 
@@ -1792,19 +1793,19 @@ blue.
 
     .. method:: data(data=None, offset=None, size=None, shape=None)
 
-        The accessor to the pixel values of the ``GDALBand``. Returns the complete
-        data array if no parameters are provided. A subset of the pixel array can
-        be requested by specifying an offset and block size as tuples.
+        The accessor to the pixel values of the ``GDALBand``. Returns the
+        complete data array if no parameters are provided. A subset of the pixel
+        array can be requested by specifying an offset and block size as tuples.
 
-        If NumPy is available, the data is returned as NumPy array. For performance
-        reasons, it is highly recommended to use NumPy.
+        If NumPy is available, the data is returned as NumPy array. For
+        performance reasons, it is highly recommended to use NumPy.
 
-        Data is written to the ``GDALBand`` if the ``data`` parameter is provided.
-        The input can be of one of the following types - packed string, buffer, list,
-        array, and NumPy array. The number of items in the input should normally
-        correspond to the total number of pixels in the band, or to the number
-        of pixels for a specific block of pixel values if the ``offset`` and
-        ``size`` parameters are provided.
+        Data is written to the ``GDALBand`` if the ``data`` parameter is
+        provided. The input can be of one of the following types - packed
+        string, buffer, list, array, and NumPy array. The number of items in the
+        input should normally correspond to the total number of pixels in the
+        band, or to the number of pixels for a specific block of pixel values if
+        the ``offset`` and ``size`` parameters are provided.
 
         If the number of items in the input is different from the target pixel
         block, the ``shape`` parameter must be specified. The shape is a tuple

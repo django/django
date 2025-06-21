@@ -108,9 +108,9 @@ All are optional.
 
 .. attribute:: BaseSpatialField.srid
 
-Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry field to
-the given value. Defaults to 4326 (also known as `WGS84`__, units are in degrees
-of longitude and latitude).
+Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry
+field to the given value. Defaults to 4326 (also known as `WGS84`__, units are
+in degrees of longitude and latitude).
 
 __ https://en.wikipedia.org/wiki/WGS84
 
@@ -131,22 +131,22 @@ are not.
 Most people are familiar with using latitude and longitude to reference a
 location on the earth's surface.  However, latitude and longitude are angles,
 not distances. In other words, while the shortest path between two points on
-a flat surface is a straight line, the shortest path between two points on a curved
-surface (such as the earth) is an *arc* of a `great circle`__. [#fnthematic]_  Thus,
-additional computation is required to obtain distances in planar units (e.g.,
-kilometers and miles).  Using a geographic coordinate system may introduce
-complications for the developer later on. For example, SpatiaLite does not have
-the capability to perform distance calculations between geometries using
-geographic coordinate systems, e.g. constructing a query to  find all points
-within 5 miles of a county boundary stored as WGS84.
+a flat surface is a straight line, the shortest path between two points on a
+curved surface (such as the earth) is an *arc* of a `great circle`__.
+[#fnthematic]_  Thus, additional computation is required to obtain distances in
+planar units (e.g., kilometers and miles).  Using a geographic coordinate system
+may introduce complications for the developer later on. For example, SpatiaLite
+does not have the capability to perform distance calculations between geometries
+using geographic coordinate systems, e.g. constructing a query to  find all
+points within 5 miles of a county boundary stored as WGS84.
 [#fndist]_
 
 Portions of the earth's surface may projected onto a two-dimensional, or
 Cartesian, plane.  Projected coordinate systems are especially convenient
 for region-specific applications, e.g., if you know that your database will
-only cover geometries in `North Kansas`__, then you may consider using projection
-system specific to that region.  Moreover, projected coordinate systems are
-defined in Cartesian units (such as meters or feet), easing distance
+only cover geometries in `North Kansas`__, then you may consider using
+projection system specific to that region.  Moreover, projected coordinate
+systems are defined in Cartesian units (such as meters or feet), easing distance
 calculations.
 
 .. note::
@@ -261,8 +261,8 @@ geography column to a geometry type in the query::
     )
 
 For more information, the PostGIS documentation contains a helpful section on
-determining `when to use geography data type over geometry data type
-<https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
+determining
+`when to use geography data type over geometry data type <https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`__.
 
 .. rubric:: Footnotes
 .. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <https://www.ogc.org/standard/sfs/>`_.
