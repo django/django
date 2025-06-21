@@ -76,6 +76,12 @@ Minor features
 * The new :attr:`.BaseGeometryWidget.base_layer` attribute allows specifying a
   JavaScript map base layer, enabling customization of map tile providers.
 
+* :lookup:`coveredby` and :lookup:`isvalid` lookups,
+  :class:`~django.contrib.gis.db.models.Collect` aggregation, and
+  :class:`~django.contrib.gis.db.models.functions.GeoHash` and
+  :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
+  are now supported on MariaDB 12.0.1+.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

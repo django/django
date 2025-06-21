@@ -346,9 +346,12 @@ class RelatedGeoModelTest(TestCase):
             )
         )
         city = qs.get(name="Aurora")
-        self.assertIsInstance(city.parcel_centroid, Point)
-        self.assertAlmostEqual(city.parcel_centroid[0], 3.2128, 4)
-        self.assertAlmostEqual(city.parcel_centroid[1], 1.5, 4)
+        if connection.ops.mariadb:
+            self.assertIsNone(city.parcel_centroid)
+        else:
+            self.assertIsInstance(city.parcel_centroid, Point)
+            self.assertAlmostEqual(city.parcel_centroid[0], 3.2128, 4)
+            self.assertAlmostEqual(city.parcel_centroid[1], 1.5, 4)
 
     @skipUnlessDBFeature("supports_make_line_aggr")
     def test_make_line_filter(self):
