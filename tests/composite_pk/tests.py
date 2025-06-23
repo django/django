@@ -17,7 +17,7 @@ from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
 from django.test import TestCase
 
-from .models import Comment, Post, Tenant, TimeStamped, User
+from .models import AutoId, Comment, Post, Tenant, TimeStamped, User
 
 
 class CommentForm(forms.ModelForm):
@@ -219,6 +219,12 @@ class CompositePKTests(TestCase):
             FieldError, "Unknown field(s) (pk) specified for Comment"
         ):
             self.assertIsNone(modelform_factory(Comment, fields=["pk"]))
+
+    def test_autoid_in_composite_pk(self):
+        obj = AutoId.objects.create(name="Automatically generated ID")
+        self.assertEqual(obj.id, 1)
+        self.assertEqual(AutoId._meta.pk.fields[0].name, "id")
+        self.assertEqual(AutoId._meta.pk.fields[1].name, "name")
 
 
 class CompositePKFixturesTests(TestCase):

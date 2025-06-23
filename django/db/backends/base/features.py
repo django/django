@@ -62,6 +62,9 @@ class BaseDatabaseFeatures:
     # Can an object be saved without an explicit primary key?
     supports_unspecified_pk = False
 
+    # Can the method of auto incrementing IDs be declared as part of a composite PK?
+    supports_autofields_in_composite_pk = True
+
     # Can a fixture contain forward references? i.e., are
     # FK constraints checked at the end of transaction, or
     # at the end of each save operation?

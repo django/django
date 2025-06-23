@@ -60,3 +60,12 @@ class TimeStamped(models.Model):
     id = models.SmallIntegerField(unique=True)
     created = models.DateTimeField(auto_now_add=True)
     text = models.TextField(default="", blank=True)
+
+
+class AutoId(models.Model):
+    pk = models.CompositePrimaryKey("id", "name")
+    id = models.BigAutoField()
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        required_db_features = ["supports_autofields_in_composite_pk"]
