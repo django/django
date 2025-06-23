@@ -26,8 +26,8 @@ For example, here's a validator that only allows even numbers::
                 params={"value": value},
             )
 
-You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
-argument::
+You can add this to a model field via the field's
+:attr:`~django.db.models.Field.validators` argument::
 
     from django.db import models
 
@@ -353,8 +353,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. data:: validate_image_file_extension
 
     Uses Pillow to ensure that ``value.name`` (``value`` is a
-    :class:`~django.core.files.File`) has `a valid image extension
-    <https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html>`_.
+    :class:`~django.core.files.File`) has
+    `a valid image extension <https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html>`__.
 
 ``ProhibitNullCharactersValidator``
 -----------------------------------

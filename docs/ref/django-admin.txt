@@ -55,8 +55,9 @@ App names
 ---------
 
 Many commands take a list of "app names." An "app name" is the basename of
-the package containing your models. For example, if your :setting:`INSTALLED_APPS`
-contains the string ``'mysite.blog'``, the app name is ``blog``.
+the package containing your models. For example, if your
+:setting:`INSTALLED_APPS` contains the string ``'mysite.blog'``, the app name is
+``blog``.
 
 Determining the version
 -----------------------
@@ -1051,12 +1052,12 @@ together:
 .. django-admin-option:: --managers
 
 Mails the email addresses specified in :setting:`MANAGERS` using
-:meth:`~django.core.mail.mail_managers()`.
+:meth:`~django.core.mail.mail_managers`.
 
 .. django-admin-option:: --admins
 
 Mails the email addresses specified in :setting:`ADMINS` using
-:meth:`~django.core.mail.mail_admins()`.
+:meth:`~django.core.mail.mail_admins`.
 
 ``shell``
 ---------
@@ -1513,7 +1514,7 @@ Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
 
 Using ``--parallel`` without a value, or with the value ``auto``, runs one test
-process per core according to :func:`multiprocessing.cpu_count()`. You can
+process per core according to :func:`multiprocessing.cpu_count`. You can
 override this by passing the desired number of processes, e.g.
 ``--parallel 4``, or by setting the :envvar:`DJANGO_TEST_PROCESSES` environment
 variable.
@@ -1586,7 +1587,7 @@ as :option:`unittest's --buffer option<unittest.-b>`.
 
 .. django-admin-option:: --no-faulthandler
 
-Django automatically calls :func:`faulthandler.enable()` when starting the
+Django automatically calls :func:`faulthandler.enable` when starting the
 tests, which allows it to print a traceback if the interpreter crashes. Pass
 ``--no-faulthandler`` to disable this behavior.
 
@@ -1622,9 +1623,9 @@ For example, this command:
 
 This is useful in a number of ways:
 
-* When you're writing :doc:`unit tests </topics/testing/overview>` of how your views
-  act with certain fixture data, you can use ``testserver`` to interact with
-  the views in a web browser, manually.
+* When you're writing :doc:`unit tests </topics/testing/overview>` of how your
+  views act with certain fixture data, you can use ``testserver`` to interact
+  with the views in a web browser, manually.
 
 * Let's say you're developing your Django application and have a "pristine"
   copy of a database that you'd like to interact with. You can dump your
@@ -2074,8 +2075,8 @@ Bash completion
 ---------------
 
 If you use the Bash shell, consider installing the Django bash completion
-script, which lives in :source:`extras/django_bash_completion` in the Django source
-distribution. It enables tab-completion of ``django-admin`` and
+script, which lives in :source:`extras/django_bash_completion` in the Django
+source distribution. It enables tab-completion of ``django-admin`` and
 ``manage.py`` commands, so you can, for instance...
 
 * Type ``django-admin``.
@@ -2139,7 +2140,8 @@ Examples::
       management.call_command(loaddata.Command(), "test_data", verbosity=0)
 
 Note that command options that take no arguments are passed as keywords
-with ``True`` or ``False``, as you can see with the ``interactive`` option above.
+with ``True`` or ``False``, as you can see with the ``interactive`` option
+above.
 
 Named arguments can be passed by using either one of the following syntaxes::
 

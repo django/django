@@ -107,8 +107,9 @@ Django also gives developers power to write :ref:`raw queries
 <executing-raw-queries>` or execute :ref:`custom sql <executing-custom-sql>`.
 These capabilities should be used sparingly and you should always be careful to
 properly escape any parameters that the user can control. In addition, you
-should exercise caution when using :meth:`~django.db.models.query.QuerySet.extra`
-and :class:`~django.db.models.expressions.RawSQL`.
+should exercise caution when using
+:meth:`~django.db.models.query.QuerySet.extra` and
+:class:`~django.db.models.expressions.RawSQL`.
 
 Clickjacking protection
 =======================
@@ -188,9 +189,9 @@ cache poisoning attacks, and poisoning links in emails.
 Because even seemingly-secure web server configurations are susceptible to fake
 ``Host`` headers, Django validates ``Host`` headers against the
 :setting:`ALLOWED_HOSTS` setting in the
-:meth:`django.http.HttpRequest.get_host()` method.
+:meth:`django.http.HttpRequest.get_host` method.
 
-This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+This validation only applies via :meth:`~django.http.HttpRequest.get_host`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 

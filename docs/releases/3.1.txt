@@ -654,7 +654,7 @@ Miscellaneous
   :attr:`~django.http.HttpResponse.content`.
 
 * ``django.utils.decorators.classproperty()`` decorator is made public and
-  moved to :class:`django.utils.functional.classproperty()`.
+  moved to :class:`django.utils.functional.classproperty`.
 
 * :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
   negative numbers which round to zero.

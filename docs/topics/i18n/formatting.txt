@@ -114,8 +114,8 @@ For example:
     {{ value|localize }}
 
 To disable localization on a single value, use :tfilter:`unlocalize`. To control
-localization over a large section of a template, use the :ttag:`localize` template
-tag.
+localization over a large section of a template, use the :ttag:`localize`
+template tag.
 
 .. templatefilter:: unlocalize
 

@@ -28,9 +28,9 @@ Measurements
 
 .. class:: Area(expression, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area>`_,
-Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area>`__, Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__
+, SpatiaLite
 
 Accepts a single geographic field or expression and returns the area of the
 field as an :class:`~django.contrib.gis.measure.Area` measure.
@@ -43,9 +43,9 @@ geographic SRSes.
 
 .. class:: Distance(expr1, expr2, spheroid=None, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-relation-functions-object-shapes.html#function_st-distance>`__,
-`PostGIS <https://postgis.net/docs/ST_Distance.html>`__, Oracle, SpatiaLite
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/spatial-relation-functions-object-shapes.html#function_st-distance>`__
+, `PostGIS <https://postgis.net/docs/ST_Distance.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the distance between
 them, as a :class:`~django.contrib.gis.measure.Distance` object. On MySQL, a raw
@@ -92,7 +92,8 @@ queryset is calculated:
 
 .. class:: GeometryDistance(expr1, expr2, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/geometry_distance_knn.html>`__
+*Availability*: `PostGIS
+<https://postgis.net/docs/geometry_distance_knn.html>`__
 
 Accepts two geographic fields or expressions and returns the distance between
 them. When used in an :meth:`~django.db.models.query.QuerySet.order_by` clause,
@@ -103,9 +104,9 @@ it provides index-assisted nearest-neighbor result sets.
 
 .. class:: Length(expression, spheroid=True, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-length>`__,
-Oracle, `PostGIS <https://postgis.net/docs/ST_Length.html>`__, SpatiaLite
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-length>`__
+, Oracle, `PostGIS <https://postgis.net/docs/ST_Length.html>`__, SpatiaLite
 
 Accepts a single geographic linestring or multilinestring field or expression
 and returns its length as a :class:`~django.contrib.gis.measure.Distance`
@@ -150,7 +151,8 @@ south = ``π``; west = ``3π/2``.
 
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
+*Availability*: `PostGIS
+<https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
 `Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
 SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_,
 SpatiaLite 5.1+
@@ -165,8 +167,8 @@ The ``num_seg`` parameter is used only on PostGIS.
 
 .. class:: Centroid(expression, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-centroid>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-centroid>`__,
 `PostGIS <https://postgis.net/docs/ST_Centroid.html>`__, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the ``centroid``
@@ -188,8 +190,8 @@ point on geometry A that is closest to geometry B.
 
 .. class:: Envelope(expression, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
 `Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
 spatial-operators-reference.html#GUID-ACED800F-3435-44AA-9606-D40934A23ED0>`__,
 `PostGIS <https://postgis.net/docs/ST_Envelope.html>`__, SpatiaLite
@@ -205,8 +207,8 @@ representing the bounding box of the geometry.
 *Availability*: `PostGIS <https://postgis.net/docs/ST_LineLocatePoint.html>`__,
 SpatiaLite
 
-Returns a float between 0 and 1 representing the location of the closest point on
-``linestring`` to the given ``point``, as a fraction of the 2D line length.
+Returns a float between 0 and 1 representing the location of the closest point
+on ``linestring`` to the given ``point``, as a fraction of the 2D line length.
 
 ``PointOnSurface``
 ------------------
@@ -227,8 +229,8 @@ Operations
 
 .. class:: Difference(expr1, expr2, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-difference>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-difference>`__,
 `PostGIS <https://postgis.net/docs/ST_Difference.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
@@ -240,8 +242,8 @@ geometry B.
 
 .. class:: Intersection(expr1, expr2, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-intersection>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-intersection>`__,
 `PostGIS <https://postgis.net/docs/ST_Intersection.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
@@ -252,8 +254,7 @@ intersection between them.
 
 .. class:: SymDifference(expr1, expr2, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-symdifference>`__,
+*Availability*: MariaDB, `MySQL <https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-symdifference>`__,
 `PostGIS <https://postgis.net/docs/ST_SymDifference.html>`__, Oracle,
 SpatiaLite
 
@@ -266,8 +267,8 @@ parameters.
 
 .. class:: Union(expr1, expr2, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-union>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-union>`__,
 `PostGIS <https://postgis.net/docs/ST_Union.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the union of both
@@ -399,8 +400,8 @@ Input format
 
 .. class:: FromWKB(expression, srid=0, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-wkb-functions.html#function_st-geomfromwkb>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-wkb-functions.html#function_st-geomfromwkb>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromWKB.html>`__, SpatiaLite
 
 Creates geometry from `Well-known binary (WKB)`_ representation. The optional
@@ -412,8 +413,8 @@ Creates geometry from `Well-known binary (WKB)`_ representation. The optional
 
 .. class:: FromWKT(expression, srid=0, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-wkt-functions.html#function_st-geomfromtext>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-wkt-functions.html#function_st-geomfromtext>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromText.html>`__, SpatiaLite
 
 Creates geometry from `Well-known text (WKT)`_ representation. The optional
@@ -428,8 +429,8 @@ Output format
 
 .. class:: AsGeoJSON(expression, bbox=False, crs=False, precision=8, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `GeoJSON
@@ -551,8 +552,8 @@ __ https://www.w3.org/Graphics/SVG/
 
 .. class:: AsWKB(expression, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-asbinary>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-asbinary>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsBinary.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Well-known
@@ -570,8 +571,8 @@ Example:
 
 .. class:: AsWKT(expression, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-astext>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-astext>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsText.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Well-known text
@@ -589,8 +590,7 @@ Example:
 
 .. class:: GeoHash(expression, precision=None, **extra)
 
-*Availability*: `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__,
+*Availability*: `MySQL <https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__,
 `PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite
 (LWGEOM/RTTOPO)
 
@@ -620,8 +620,7 @@ geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
 
 .. class:: IsValid(expr)
 
-*Availability*: `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__,
+*Availability*: `MySQL <https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__,
 `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is well formed.
@@ -642,8 +641,8 @@ Accepts a single geographic field or expression and returns the memory size
 
 .. class:: NumGeometries(expression, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-geometrycollection-property-functions.html#function_st-numgeometries>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-geometrycollection-property-functions.html#function_st-numgeometries>`__,
 `PostGIS <https://postgis.net/docs/ST_NumGeometries.html>`__, Oracle,
 SpatiaLite
 
@@ -658,8 +657,8 @@ On MySQL, returns ``None`` for single geometries.
 
 .. class:: NumPoints(expression, **extra)
 
-*Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-numpoints>`__,
+*Availability*: MariaDB,
+`MySQL <https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-numpoints>`__,
 `PostGIS <https://postgis.net/docs/ST_NPoints.html>`__, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the number of points

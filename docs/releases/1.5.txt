@@ -200,27 +200,29 @@ tag's content.
 Retrieval of ``ContentType`` instances associated with proxy models
 -------------------------------------------------------------------
 
-The methods :meth:`ContentTypeManager.get_for_model() <django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>`
-and :meth:`ContentTypeManager.get_for_models() <django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>`
-have a new keyword argument – respectively ``for_concrete_model`` and ``for_concrete_models``.
-By passing ``False`` using this argument it is now possible to retrieve the
-:class:`ContentType <django.contrib.contenttypes.models.ContentType>`
-associated with proxy models.
+The methods :meth:`ContentTypeManager.get_for_model()
+<django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>`
+and :meth:`ContentTypeManager.get_for_models()
+<django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>`
+have a new keyword argument – respectively ``for_concrete_model`` and
+``for_concrete_models``. By passing ``False`` using this argument it is now
+possible to retrieve the :class:`ContentType
+<django.contrib.contenttypes.models.ContentType>` associated with proxy models.
 
 New ``view`` variable in class-based views context
 --------------------------------------------------
 
 In all :doc:`generic class-based views </topics/class-based-views/index>`
-(or any class-based view inheriting from ``ContextMixin``), the context dictionary
-contains a ``view`` variable that points to the ``View`` instance.
+(or any class-based view inheriting from ``ContextMixin``), the context
+dictionary contains a ``view`` variable that points to the ``View`` instance.
 
 GeoDjango
 ---------
 
 * :class:`~django.contrib.gis.geos.LineString` and
   :class:`~django.contrib.gis.geos.MultiLineString` GEOS objects now support the
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.interpolate()` and
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
+  :meth:`~django.contrib.gis.geos.GEOSGeometry.interpolate` and
+  :meth:`~django.contrib.gis.geos.GEOSGeometry.project` methods
   (so-called linear referencing).
 
 * The ``wkb`` and ``hex`` properties of
@@ -365,7 +367,7 @@ Backwards incompatible changes in 1.5
 The new :setting:`ALLOWED_HOSTS` setting validates the request's ``Host``
 header and protects against host-poisoning attacks. This setting is now
 required whenever :setting:`DEBUG` is ``False``, or else
-:meth:`django.http.HttpRequest.get_host()` will raise
+:meth:`django.http.HttpRequest.get_host` will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`. For more details see the
 :setting:`full documentation<ALLOWED_HOSTS>` for the new setting.
 
@@ -624,7 +626,7 @@ fragile, and must now be changed to be able to run independently.
 The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
 after form validation. When the form doesn't validate, it contains only the
 fields that passed validation. You should test the success of the validation
-with the :meth:`~django.forms.Form.is_valid()` method and not with the
+with the :meth:`~django.forms.Form.is_valid` method and not with the
 presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
 on the form.
 
@@ -692,9 +694,9 @@ Miscellaneous
   and now F() expressions will always use the same relations as other lookups
   within the same ``filter()`` call.
 
-* The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you need
-  HTML validation against pre-HTML5 Strict DTDs, you should add a div around it
-  in your pages.
+* The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you
+  need HTML validation against pre-HTML5 Strict DTDs, you should add a div
+  around it in your pages.
 
 * The template tags library ``adminmedia``, which only contained the
   deprecated template tag ``{% admin_media_prefix %}``, was removed.

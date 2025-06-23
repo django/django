@@ -450,8 +450,8 @@ operator ``?|``. For example:
 ``has_keys``
 ~~~~~~~~~~~~
 
-Returns objects where all of the given keys are in the data. Uses the SQL operator
-``?&``. For example:
+Returns objects where all of the given keys are in the data. Uses the SQL
+operator ``?&``. For example:
 
 .. code-block:: pycon
 
@@ -741,8 +741,8 @@ passed range.
 ``not_gt``
 ^^^^^^^^^^
 
-The returned ranges do not contain any points greater than the passed range, that
-is the upper bound of the returned range is at most the upper bound of the
+The returned ranges do not contain any points greater than the passed range,
+that is the upper bound of the returned range is at most the upper bound of the
 passed range.
 
     >>> Event.objects.filter(ages__not_gt=NumericRange(3, 10))

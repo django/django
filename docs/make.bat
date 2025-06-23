@@ -36,6 +36,7 @@ if "%1" == "help" (
 	echo.  doctest    to run all doctests embedded in the documentation if enabled
 	echo.  spelling   to check for typos in documentation
 	echo.  black      to apply the black formatting to code blocks in documentation
+	echo.  lint       to check the documentation for sphinx linting errors
 	goto end
 )
 
@@ -203,6 +204,13 @@ if "%1" == "black" (
 	)
 	echo.
 	echo.Code blocks reformatted
+)
+
+if "%1" == "lint" (
+	python lint.py
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.Documentation lint complete.
 )
 
 :end

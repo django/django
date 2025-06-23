@@ -94,8 +94,8 @@ additional metadata.
    Django follows the :ref:`DRY Principle <dry>`. The goal is to define your
    data model in one place and automatically derive things from it.
 
-   This includes the migrations - unlike in Ruby On Rails, for example, migrations
-   are entirely derived from your models file, and are essentially a
+   This includes the migrations - unlike in Ruby On Rails, for example,
+   migrations are entirely derived from your models file, and are essentially a
    history that Django can roll through to update your database schema to
    match your current models.
 
@@ -166,7 +166,8 @@ That small bit of model code gives Django a lot of information. With it, Django
 is able to:
 
 * Create a database schema (``CREATE TABLE`` statements) for this app.
-* Create a Python database-access API for accessing ``Question`` and ``Choice`` objects.
+* Create a Python database-access API for accessing ``Question`` and ``Choice``
+  objects.
 
 But first we need to tell our project that the ``polls`` app is installed.
 
@@ -223,8 +224,8 @@ they're designed to be human-editable in case you want to manually tweak how
 Django changes things.
 
 There's a command that will run the migrations for you and manage your database
-schema automatically - that's called :djadmin:`migrate`, and we'll come to it in a
-moment - but first, let's see what SQL that migration would run. The
+schema automatically - that's called :djadmin:`migrate`, and we'll come to it in
+a moment - but first, let's see what SQL that migration would run. The
 :djadmin:`sqlmigrate` command takes migration names and returns their SQL:
 
 .. console::
@@ -628,8 +629,8 @@ edit it to look like this:
 Explore the free admin functionality
 ------------------------------------
 
-Now that we've registered ``Question``, Django knows that it should be displayed on
-the admin index page:
+Now that we've registered ``Question``, Django knows that it should be displayed
+on the admin index page:
 
 .. image:: _images/admin03t.png
    :alt: Django admin index page, now with polls displayed
