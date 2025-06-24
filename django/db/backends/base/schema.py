@@ -1,3 +1,4 @@
+import sys
 import logging
 import operator
 from datetime import datetime
@@ -19,6 +20,7 @@ from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
 
+SQLMIGRATE_COMMAND_NAME = "sqlmigrate"
 logger = logging.getLogger("django.db.backends.schema")
 
 
@@ -609,14 +611,17 @@ class BaseDatabaseSchemaEditor:
         """
         olds = {tuple(fields) for fields in old_unique_together}
         news = {tuple(fields) for fields in new_unique_together}
-        # Deleted uniques
-        for fields in olds.difference(news):
-            self._delete_composed_index(
-                model,
-                fields,
-                {"unique": True, "primary_key": False},
-                self.sql_delete_unique,
-            )
+
+        # in sqlmigrate command composed constraints are not deleted
+        if not SQLMIGRATE_COMMAND_NAME in sys.argv:
+            # Deleted uniques
+            for fields in olds.difference(news):
+                self._delete_composed_index(
+                    model,
+                    fields,
+                    {"unique": True, "primary_key": False},
+                    self.sql_delete_unique,
+                )
         # Created uniques
         for field_names in news.difference(olds):
             fields = [model._meta.get_field(field) for field in field_names]
