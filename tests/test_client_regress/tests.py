@@ -385,7 +385,7 @@ class AssertTemplateUsedTests(TestDataMixin, TestCase):
 
 
 @override_settings(ROOT_URLCONF="test_client_regress.urls")
-class AssertRedirectsTests(SimpleTestCase):
+class AssertRedirectsTests(ExtraAssertMixin, SimpleTestCase):
     def test_redirect_page(self):
         "An assertion is raised if the original page couldn't be retrieved as expected"
         # This page will redirect with code 301, not 302
@@ -407,6 +407,34 @@ class AssertRedirectsTests(SimpleTestCase):
                 "(expected 302)",
                 str(e),
             )
+
+    def test_followed_redirect_unexpected_initial_status_code(self):
+        response = self.client.get("/permanent_redirect_view/", follow=True)
+        msg = (
+            "Initial response didn't redirect as expected: Response code was 301 "
+            "(expected 302)"
+        )
+        self.assertRaisesPrefixedMessage(
+            self.assertRedirects,
+            response,
+            "/get_view/",
+            expected_msg=msg,
+        )
+
+    def test_followed_redirect_unexpected_final_status_code(self):
+        response = self.client.get("/redirect_view/", follow=True)
+        msg = (
+            "Response didn't redirect as expected: Final Response code was 200 "
+            "(expected 403)"
+        )
+        self.assertRaisesPrefixedMessage(
+            self.assertRedirects,
+            response,
+            "/get_view/",
+            status_code=302,
+            target_status_code=403,
+            expected_msg=msg,
+        )
 
     def test_lost_query(self):
         """
