@@ -537,6 +537,7 @@ PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 # password using different algorithms will be converted automatically
 # upon login
 PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.PepperedPBKDF2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
     "django.contrib.auth.hashers.Argon2PasswordHasher",

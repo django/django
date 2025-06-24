@@ -18,4 +18,9 @@ class Command(TemplateCommand):
         # Create a random SECRET_KEY to put it in the main settings.
         options["secret_key"] = SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
 
+        # Create a random pepper value to put it in the main settings.
+        options["password_pepper"] = (
+            SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
+        )
+
         super().handle("project", project_name, target, **options)
