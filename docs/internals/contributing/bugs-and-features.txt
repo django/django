@@ -21,15 +21,15 @@ Before reporting a bug on the `ticket tracker
 * Check that someone hasn't already filed the bug report by `searching`_ or
   running `custom queries`_ in the ticket tracker.
 
-* Don't use the ticket system to ask support questions. Use the `Django Forum`_
+* Don't use the ticket system to ask support questions. Use the |django-forum|
   or the `Django Discord server`_ for that.
 
 * Don't reopen issues that have been marked "wontfix" without finding consensus
-  to do so on the `Django Forum`_.
+  to do so on the |django-forum|.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
-  discussion to the `Django Forum`_.
+  discussion to the |django-forum|.
 
 Well-written bug reports are *incredibly* helpful. However, there's a certain
 amount of overhead involved in working with any bug tracking system so your
@@ -39,7 +39,7 @@ particular:
 * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might
   be a well-known question.
 
-* **Do** ask on `Django Forum`_ or the `Django Discord server`_ *first* if
+* **Do** ask on |django-forum| or the `Django Discord server`_ *first* if
   you're not sure if what you're seeing is a bug.
 
 * **Do** write complete, reproducible, specific bug reports. You must
@@ -49,10 +49,10 @@ particular:
   small test case is the best way to report a bug, as it gives us a
   helpful way to confirm the bug quickly.
 
-* **Don't** post to `Django Forum`_ only to announce that you have filed a
-  bug report. All the tickets are mailed to another list, |django-updates|,
-  which is tracked by developers and interested community members; we see them
-  as they are filed.
+* **Don't** post to |django-forum| only to announce that you have filed a bug
+  report. All the tickets are mailed to another list, |django-updates|, which
+  is tracked by developers and interested community members; we see them as
+  they are filed.
 
 To understand the lifecycle of your ticket once you have created it, refer to
 :doc:`triaging-tickets`.
@@ -150,7 +150,7 @@ stages:
 * Done
 
 Occasionally, discussions on feature ideas or the direction of Django may take
-place on the Django Forum. These discussions may include informal votes, which
+place on the |django-forum|. These discussions may include informal votes, which
 follow the voting style invented by Apache and used on Python itself, where
 votes are given as +1, +0, -0, or -1.
 Roughly translated, these votes mean:
@@ -169,6 +169,5 @@ suitable voting period, if an obvious consensus arises we'll follow the votes.
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
-.. _Django Forum: https://forum.djangoproject.com/
 .. _Django Discord server: https://chat.djangoproject.com
 .. _new feature ideas: https://github.com/orgs/django/projects/24/
