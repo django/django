@@ -601,7 +601,7 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             render_to_string("template_used/base.html")
 
         msg = (
-            "Template 'template_used/base.html' was expected to be rendered "
+            "2 != 3 : Template 'template_used/base.html' was expected to be rendered "
             "3 time(s) but was actually rendered 2 time(s)."
         )
         with self.assertRaisesMessage(AssertionError, msg):

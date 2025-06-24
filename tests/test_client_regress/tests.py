@@ -367,27 +367,26 @@ class AssertTemplateUsedTests(TestDataMixin, TestCase):
 
 @override_settings(ROOT_URLCONF="test_client_regress.urls")
 class AssertRedirectsTests(SimpleTestCase):
-    def test_redirect_page(self):
-        "An assertion is raised if the original page couldn't be retrieved as expected"
+    def test_unexpected_status_code(self):
+        """
+        An assertion is raised if the original page couldn't be retrieved
+        as expected.
+        """
         # This page will redirect with code 301, not 302
         response = self.client.get("/permanent_redirect_view/")
-        try:
+        msg = (
+            "301 != 302 : Response didn't redirect as expected: Response code was "
+            "301 (expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/")
-        except AssertionError as e:
-            self.assertIn(
-                "Response didn't redirect as expected: Response code was 301 "
-                "(expected 302)",
-                str(e),
-            )
 
-        try:
+        msg = (
+            "301 != 302 : abc: Response didn't redirect as expected: Response code "
+            "was 301 (expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Response didn't redirect as expected: Response code was 301 "
-                "(expected 302)",
-                str(e),
-            )
 
     def test_lost_query(self):
         """
@@ -431,26 +430,22 @@ class AssertRedirectsTests(SimpleTestCase):
         retrieved as expected.
         """
         response = self.client.get("/double_redirect_view/")
-        try:
+        msg = (
+            "301 != 200 : Couldn't retrieve redirection page "
+            "'/permanent_redirect_view/': response code was 301 (expected 200)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             # The redirect target responds with a 301 code, not 200
             self.assertRedirects(response, "http://testserver/permanent_redirect_view/")
-        except AssertionError as e:
-            self.assertIn(
-                "Couldn't retrieve redirection page '/permanent_redirect_view/': "
-                "response code was 301 (expected 200)",
-                str(e),
-            )
 
-        try:
+        msg = (
+            "301 != 200 : abc: Couldn't retrieve redirection page "
+            "'/permanent_redirect_view/': response code was 301 (expected 200)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             # The redirect target responds with a 301 code, not 200
             self.assertRedirects(
                 response, "http://testserver/permanent_redirect_view/", msg_prefix="abc"
-            )
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Couldn't retrieve redirection page '/permanent_redirect_view/': "
-                "response code was 301 (expected 200)",
-                str(e),
             )
 
     def test_redirect_chain(self):
