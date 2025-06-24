@@ -383,6 +383,46 @@ class AssertRedirectsTests(SimpleTestCase):
                 str(e),
             )
 
+    def test_followed_redirect_unexpected_initial_status_code(self):
+        response = self.client.get("/permanent_redirect_view/", follow=True)
+        msg = (
+            "Initial response didn't redirect as expected: "
+            "Response code was 301 (expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRedirects(response, "/get_view/")
+
+        msg = (
+            "abc: Initial response didn't redirect as expected: "
+            "Response code was 301 (expected 302)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRedirects(response, "/get_view/", msg_prefix="abc")
+
+    def test_followed_redirect_unexpected_final_status_code(self):
+        response = self.client.get("/redirect_view/", follow=True)
+        msg = (
+            "Response didn't redirect as expected: Final Response "
+            "code was 200 (expected 403)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRedirects(
+                response, "/get_view/", status_code=302, target_status_code=403
+            )
+
+        msg = (
+            "abc: Response didn't redirect as expected: Final "
+            "Response code was 200 (expected 403)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRedirects(
+                response,
+                "/get_view/",
+                status_code=302,
+                target_status_code=403,
+                msg_prefix="abc",
+            )
+
     def test_lost_query(self):
         """
         An assertion is raised if the redirect location doesn't preserve GET
