@@ -37,8 +37,8 @@ class TestDataMixin:
 
 @override_settings(ROOT_URLCONF="test_client_regress.urls")
 class AssertContainsTests(SimpleTestCase):
-    def test_contains(self):
-        "Responses can be inspected for content, including counting repeated substrings"
+
+    def test_basic_contains_not_contains(self):
         response = self.client.get("/no_template_view/")
 
         self.assertNotContains(response, "never")
@@ -48,154 +48,144 @@ class AssertContainsTests(SimpleTestCase):
         self.assertContains(response, "twice")
         self.assertContains(response, "twice", 2)
 
-        try:
+    def test_contains_with_wrong_status_code(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = "Couldn't retrieve content: Response code was 200 (expected 999)"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "text", status_code=999)
-        except AssertionError as e:
-            self.assertIn(
-                "Couldn't retrieve content: Response code was 200 (expected 999)",
-                str(e),
-            )
-        try:
+
+        msg = "abc: Couldn't retrieve content: Response code was 200 (expected 999)"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "text", status_code=999, msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Couldn't retrieve content: Response code was 200 (expected 999)",
-                str(e),
-            )
 
-        try:
+    def test_not_contains_with_wrong_status_code(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = "Couldn't retrieve content: Response code was 200 (expected 999)"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertNotContains(response, "text", status_code=999)
-        except AssertionError as e:
-            self.assertIn(
-                "Couldn't retrieve content: Response code was 200 (expected 999)",
-                str(e),
-            )
-        try:
+
+        msg = "abc: Couldn't retrieve content: Response code was 200 (expected 999)"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertNotContains(response, "text", status_code=999, msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Couldn't retrieve content: Response code was 200 (expected 999)",
-                str(e),
-            )
 
-        try:
+    def test_not_contains_failure(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = (
+            "1 != 0 : 'once' unexpectedly found in the following response\n"
+            f"{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertNotContains(response, "once")
-        except AssertionError as e:
-            self.assertIn(
-                "'once' unexpectedly found in the following response\n"
-                f"{response.content}",
-                str(e),
-            )
-        try:
+
+        msg = (
+            "abc: 'once' unexpectedly found in the following response"
+            f"\n{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertNotContains(response, "once", msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: 'once' unexpectedly found in the following response\n"
-                f"{response.content}",
-                str(e),
-            )
 
-        try:
+    def test_count_mismatch(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = (
+            "Found 0 instances of 'never' (expected 1) in the following response\n"
+            f"{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "never", 1)
-        except AssertionError as e:
-            self.assertIn(
-                "Found 0 instances of 'never' (expected 1) in the following response\n"
-                f"{response.content}",
-                str(e),
-            )
-        try:
+
+        msg = (
+            "abc: Found 0 instances of 'never' (expected 1) in the following response\n"
+            f"{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "never", 1, msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Found 0 instances of 'never' (expected 1) in the following "
-                f"response\n{response.content}",
-                str(e),
-            )
 
-        try:
+    def test_unexpected_presence(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = (
+            "1 != 0 : Found 1 instances of 'once' (expected 0) in the following "
+            f"response\n{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "once", 0)
-        except AssertionError as e:
-            self.assertIn(
-                "Found 1 instances of 'once' (expected 0) in the following response\n"
-                f"{response.content}",
-                str(e),
-            )
-        try:
+
+        msg = (
+            "1 != 0 : abc: Found 1 instances of 'once' (expected 0) in the following "
+            f"response\n{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "once", 0, msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Found 1 instances of 'once' (expected 0) in the following "
-                f"response\n{response.content}",
-                str(e),
-            )
 
-        try:
+    def test_insufficient_count(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = (
+            "Found 1 instances of 'once' (expected 2) in the following response\n"
+            f"{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "once", 2)
-        except AssertionError as e:
-            self.assertIn(
-                "Found 1 instances of 'once' (expected 2) in the following response\n"
-                f"{response.content}",
-                str(e),
-            )
-        try:
+
+        msg = (
+            "abc: Found 1 instances of 'once' (expected 2) in the following response\n"
+            f"{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "once", 2, msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Found 1 instances of 'once' (expected 2) in the following "
-                f"response\n{response.content}",
-                str(e),
-            )
 
-        try:
+    def test_excessive_count(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = (
+            "Found 2 instances of 'twice' (expected 1) in the following response\n"
+            f"{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "twice", 1)
-        except AssertionError as e:
-            self.assertIn(
-                "Found 2 instances of 'twice' (expected 1) in the following response\n"
-                f"{response.content}",
-                str(e),
-            )
-        try:
+
+        msg = (
+            "abc: Found 2 instances of 'twice' (expected 1) in the following response\n"
+            f"{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "twice", 1, msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Found 2 instances of 'twice' (expected 1) in the following "
-                f"response\n{response.content}",
-                str(e),
-            )
 
-        try:
+    def test_missing_content(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = f"Couldn't find 'thrice' in the following response\n{response.content}"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "thrice")
-        except AssertionError as e:
-            self.assertIn(
-                f"Couldn't find 'thrice' in the following response\n{response.content}",
-                str(e),
-            )
-        try:
+
+        msg = (
+            f"abc: Couldn't find 'thrice' in the following response\n{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "thrice", msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Couldn't find 'thrice' in the following response\n"
-                f"{response.content}",
-                str(e),
-            )
 
-        try:
+    def test_missing_content_with_count(self):
+        response = self.client.get("/no_template_view/")
+
+        msg = (
+            "0 != 3 : Found 0 instances of 'thrice' (expected 3) in the following "
+            f"response\n{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "thrice", 3)
-        except AssertionError as e:
-            self.assertIn(
-                "Found 0 instances of 'thrice' (expected 3) in the following response\n"
-                f"{response.content}",
-                str(e),
-            )
-        try:
-            self.assertContains(response, "thrice", 3, msg_prefix="abc")
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Found 0 instances of 'thrice' (expected 3) in the following "
-                f"response\n{response.content}",
-                str(e),
-            )
 
+        msg = (
+            "0 != 3 : abc: Found 0 instances of 'thrice' (expected 3) in the following "
+            f"response\n{response.content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertContains(response, "thrice", 3, msg_prefix="abc")
+
+    def test_long_content(self):
         long_content = (
             b"This is a very very very very very very very very long message which "
             b"exceeds the max limit of truncation."
@@ -212,7 +202,10 @@ class AssertContainsTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertContains(response, "This", 3)
 
-        msg = f"'very' unexpectedly found in the following response\n{long_content}"
+        msg = (
+            "8 != 0 : 'very' unexpectedly found in the following response\n"
+            f"{long_content}"
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertNotContains(response, "very")
 
