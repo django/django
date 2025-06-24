@@ -125,6 +125,11 @@ When rendering a ``CustomForm`` instance, the following HTML is included:
 
 
 See :ref:`custom-boundfield` for more details about this feature.
+Moving model between apps
+-------------------------
+
+The migration framework now detects and supports moving models moving between
+apps. See :ref:`moving-model-between-apps` for details.
 
 Minor features
 --------------
