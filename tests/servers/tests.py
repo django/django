@@ -3,7 +3,9 @@ Tests for django.core.servers.
 """
 
 import errno
+import io
 import os
+import re
 import socket
 import threading
 import unittest
@@ -13,9 +15,9 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from django.conf import settings
-from django.core.servers.basehttp import ThreadedWSGIServer, WSGIServer
+from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler, WSGIServer
 from django.db import DEFAULT_DB_ALIAS, connection, connections
-from django.test import LiveServerTestCase, override_settings
+from django.test import LiveServerTestCase, SimpleTestCase, override_settings
 from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
 
 from .models import Person
@@ -423,3 +425,31 @@ class LiveServerThreadedTests(LiveServerBase):
         )
         with self.urlopen(url) as f:
             self.assertIn(b"emily", f.read())
+
+
+class LogSanitizationTests(SimpleTestCase):
+    def test_log_message_strips_ansi_escape_codes(self):
+        log_output = io.StringIO()
+
+        class DummyHandler(WSGIRequestHandler):
+            def address_string(self): return "127.0.0.1"
+            def log_date_time_string(self): return "now"
+
+            def __init__(self):
+                # Simulate WSGIRequestHandler setup
+                self.requestline = "\x1b[31mHACK\x1b[0m"
+                self.request_version = "HTTP/1.1"
+                self.command = "GET"
+                self.path = "/"
+                self.headers = {}
+                self.wfile = log_output
+                self.request = None  # 👈 Prevents AttributeError in log_message
+                self.server = type("S", (), {"get_app_logger": lambda s, n: None})()
+
+        handler = DummyHandler()
+        handler.log_message("%s %s", handler.requestline, "404")
+        logged = log_output.getvalue()
+
+        # Look for ANSI escape sequences like \x1b[31m
+        ansi_escape = re.compile(r'\x1b\[[0-9;]*m')
+        self.assertFalse(ansi_escape.search(logged), "ANSI escape codes should not appear in logs")

@@ -8,6 +8,7 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 """
 
 import logging
+import re
 import socket
 import socketserver
 import sys
@@ -20,9 +21,14 @@ from django.core.wsgi import get_wsgi_application
 from django.db import connections
 from django.utils.module_loading import import_string
 
+_ansi_escape = re.compile(r'\x1b\[[0-9;]*m')
+
 __all__ = ("WSGIServer", "WSGIRequestHandler")
 
 logger = logging.getLogger("django.server")
+
+def strip_ansi(s):
+    return _ansi_escape.sub('', s)
 
 
 def get_internal_wsgi_application():
@@ -210,6 +216,8 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         else:
             level = logger.info
 
+        # ✅ Sanitize all string arguments to avoid ANSI injection
+        args = tuple(strip_ansi(arg) if isinstance(arg, str) else arg for arg in args)
         level(format, *args, extra=extra)
 
     def get_environ(self):
