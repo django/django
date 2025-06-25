@@ -77,7 +77,11 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
     def get_capability(cls, browser):
         from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-        return getattr(DesiredCapabilities, browser.upper())
+        caps = getattr(DesiredCapabilities, browser.upper())
+        if browser == "chrome":
+            caps["goog:loggingPrefs"] = {"browser": "ALL"}
+
+        return caps
 
     def create_options(self):
         options = self.import_options(self.browser)()
@@ -236,6 +240,19 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         path = Path.cwd() / "screenshots" / filename
         path.parent.mkdir(exist_ok=True, parents=True)
         self.selenium.save_screenshot(path)
+
+    def get_browser_logs(self, source=None, level="ALL"):
+        """Return Chrome console logs filtered by level and optionally source."""
+        try:
+            logs = self.selenium.get_log("browser")
+        except AttributeError:
+            logs = []
+        return [
+            log
+            for log in logs
+            if (level == "ALL" or log["level"] == level)
+            and (source is None or log["source"] == source)
+        ]
 
     @classmethod
     def _quit_selenium(cls):
