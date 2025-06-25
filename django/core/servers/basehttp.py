@@ -182,6 +182,11 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         return self.client_address[0]
 
     def log_message(self, format, *args):
+        escaped_args = tuple(
+            a.encode("unicode_escape").decode("ascii") if isinstance(a,str) else a
+            for a in args
+        )
+
         extra = {
             "request": self.request,
             "server_time": self.log_date_time_string(),
@@ -210,7 +215,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         else:
             level = logger.info
 
-        level(format, *args, extra=extra)
+        level(format, *escaped_args, extra=extra)
 
     def get_environ(self):
         # Strip all headers with underscores in the name before constructing
