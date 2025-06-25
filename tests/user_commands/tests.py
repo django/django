@@ -565,11 +565,15 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
 
     def test_run_formatters_handles_oserror_for_black_path(self):
+        test_files_path = Path(__file__).parent / "test_files"
         cases = [
-            (FileNotFoundError, "nonexistent"),
+            (
+                FileNotFoundError,
+                str(test_files_path / "nonexistent"),
+            ),
             (
                 OSError if sys.platform == "win32" else PermissionError,
-                str(Path(__file__).parent / "test_files" / "black"),
+                str(test_files_path / "black"),
             ),
         ]
         for exception, location in cases:
