@@ -177,6 +177,25 @@ one of the following:
 * If, and only if, you are sure the word you are using is correct - add it
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
 
+.. _documentation-code-block-format-check:
+
+Code block format check
+-----------------------
+
+All Python code blocks should be formatted using the :pypi:`blacken-docs`
+auto-formatter. This is automatically run by the :ref:`pre-commit hook
+<coding-style-pre-commit>` if configured.
+
+The check can also be run manually: provided that ``blacken-docs`` is installed,
+run the following command from the ``docs`` directory:
+
+.. console::
+
+     $ make black
+
+The formatter will report any issues by printing them to the terminal and will
+reformat code blocks where possible.
+
 .. _documentation-link-check:
 
 Link check
@@ -304,10 +323,6 @@ documentation:
   You can prefix the target with a ``~`` (that's a tilde) to get only the
   "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
   display a link with the title "auth".
-
-* All Python code blocks should be formatted using the :pypi:`blacken-docs`
-  auto-formatter. This will be run by :ref:`pre-commit
-  <coding-style-pre-commit>` if that is configured.
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
