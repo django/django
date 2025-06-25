@@ -1,6 +1,6 @@
-import sys
 import logging
 import operator
+import sys
 from datetime import datetime
 
 from django.conf import settings
@@ -613,7 +613,7 @@ class BaseDatabaseSchemaEditor:
         news = {tuple(fields) for fields in new_unique_together}
 
         # in sqlmigrate command composed constraints are not deleted
-        if not SQLMIGRATE_COMMAND_NAME in sys.argv:
+        if SQLMIGRATE_COMMAND_NAME not in sys.argv:
             # Deleted uniques
             for fields in olds.difference(news):
                 self._delete_composed_index(
