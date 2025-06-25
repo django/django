@@ -215,6 +215,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         self.assertNotIn("\x1b[31m", log)
         self.assertIn("\\x1b[31mALERT\\x1b[0m", log)
 
+
 class WSGIServerTestCase(SimpleTestCase):
     request_factory = RequestFactory()
 

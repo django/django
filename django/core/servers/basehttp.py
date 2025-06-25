@@ -183,7 +183,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
 
     def log_message(self, format, *args):
         escaped_args = tuple(
-            a.encode("unicode_escape").decode("ascii") if isinstance(a,str) else a
+            a.encode("unicode_escape").decode("ascii") if isinstance(a, str) else a
             for a in args
         )
 
