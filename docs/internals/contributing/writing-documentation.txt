@@ -152,10 +152,29 @@ To edit this page, for example, we would edit the file
 :source:`docs/internals/contributing/writing-documentation.txt` and rebuild the
 HTML with ``make html``.
 
+.. _documentation-checks:
+
+Documentation quality checks
+----------------------------
+
+Several checks help maintain Django's documentation quality, including
+:ref:`spelling <documentation-spelling-check>` and
+:ref:`code block formatting <documentation-code-block-format-check>`.
+
+These checks are run automatically in CI and must pass before documentation
+changes can be merged. They can also be run locally with a single command:
+
+.. console::
+
+     $ make check
+
+This command runs all current checks and will include any new checks added in
+the future.
+
 .. _documentation-spelling-check:
 
 Spelling check
---------------
+~~~~~~~~~~~~~~
 
 Before you commit your docs, it's a good idea to run the spelling checker.
 You'll need to install :pypi:`sphinxcontrib-spelling` first. Then from the
@@ -180,7 +199,7 @@ one of the following:
 .. _documentation-code-block-format-check:
 
 Code block format check
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 All Python code blocks should be formatted using the :pypi:`blacken-docs`
 auto-formatter. This is automatically run by the :ref:`pre-commit hook
