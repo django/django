@@ -196,6 +196,18 @@ blacken-docs package installed, you can run the following command from the
 Any errors identified by the formatter will be printed to the terminal and will
 be automatically reformatted when possible.
 
+.. _documentation-checks-in-ci:
+
+Documentation checks in CI
+--------------------------
+
+The spelling check and code block format checks are run in CI and are required
+to pass before documentation changes can be merged. These two checks can be run
+in a single command with
+
+.. console::
+
+     $ make check
 .. _documentation-link-check:
 
 Link check
