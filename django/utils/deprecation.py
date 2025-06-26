@@ -238,7 +238,8 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
                 else message_template_plural
             )
             message = message_template.format(
-                remapped_names=", ".join(remapped_names), func_name=func_name
+                remapped_names=", ".join(f"'{name}'" for name in remapped_names),
+                func_name=func_name,
             )
             warnings.warn(message, deprecation_warning, stacklevel=3)
 
