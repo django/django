@@ -102,6 +102,11 @@ class SeleniumTests(AdminSeleniumTestCase):
     def test_go_to_index(self):
         from selenium.webdriver.common.by import By
 
+        # Url other than admin index to start with
+        self.selenium.get(
+            self.live_server_url
+            + reverse("test_admin_keyboard_shortcuts:password_change")
+        )
         body = self.selenium.find_element(By.TAG_NAME, "body")
         with self.wait_page_loaded():
             body.send_keys("gi")
