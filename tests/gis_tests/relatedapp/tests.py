@@ -1,6 +1,6 @@
 from django.contrib.gis.db.models import Collect, Count, Extent, F, MakeLine, Q, Union
 from django.contrib.gis.db.models.functions import Centroid
-from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
+from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point, WKTWriter
 from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
@@ -100,9 +100,22 @@ class RelatedGeoModelTest(TestCase):
 
         # Ordering of points in the result of the union is not defined and
         # implementation-dependent (DB backend, GEOS version)
-        self.assertEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u1})
-        self.assertEqual({p.ewkt for p in ref_u2}, {p.ewkt for p in u2})
-        self.assertEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u3})
+        for point in [*u1, *u2, *u3]:
+            self.assertEqual(point.srid, 4326)
+
+        wkt_w = WKTWriter(trim=True, precision=6)
+        self.assertEqual(
+            {wkt_w.write(p).decode("utf-8") for p in ref_u1},
+            {wkt_w.write(p).decode("utf-8") for p in u1},
+        )
+        self.assertEqual(
+            {wkt_w.write(p).decode("utf-8") for p in ref_u2},
+            {wkt_w.write(p).decode("utf-8") for p in u2},
+        )
+        self.assertEqual(
+            {wkt_w.write(p).decode("utf-8") for p in ref_u1},
+            {wkt_w.write(p).decode("utf-8") for p in u3},
+        )
 
     def test05_select_related_fk_to_subclass(self):
         """
