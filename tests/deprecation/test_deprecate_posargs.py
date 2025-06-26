@@ -5,8 +5,12 @@ from django.utils.deprecation import RemovedAfterNextVersionWarning, deprecate_p
 
 
 class DeprecatePosargsTests(SimpleTestCase):
+    # Note: these tests use the generic RemovedAfterNextVersionWarning
+    # so they don't need to be updated each release. In actual use,
+    # you must substitute a specific RemovedInDjangoXXWarning.
+
     def test_all_keyword_only_params(self):
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a", "b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
         def some_func(*, a=1, b=2):
             return a, b
 
@@ -19,7 +23,7 @@ class DeprecatePosargsTests(SimpleTestCase):
         self.assertEqual(result, (10, 20))
 
     def test_some_keyword_only_params(self):
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
         def some_func(a, *, b=1):
             return a, b
 
@@ -32,7 +36,7 @@ class DeprecatePosargsTests(SimpleTestCase):
         self.assertEqual(result, (10, 20))
 
     def test_no_warning_when_not_needed(self):
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
         def some_func(a=0, *, b=1):
             return a, b
 
@@ -54,11 +58,11 @@ class DeprecatePosargsTests(SimpleTestCase):
     def test_change_to_variations(self):
         """The "change to" recommendation reflects how the function is called."""
 
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a", "b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
         def some_func(*, a=1, b=2):
             return a, b
 
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
         def other_func(a=1, *, b=2, c=3):
             return a, b, c
 
@@ -109,7 +113,7 @@ class DeprecatePosargsTests(SimpleTestCase):
         """
 
         # Original signature: some_func(b=2, a=1)
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b", "a"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["b", "a"])
         def some_func(*, aa_new=0, a=1, b=2):
             return aa_new, a, b
 
@@ -121,7 +125,7 @@ class DeprecatePosargsTests(SimpleTestCase):
         self.assertEqual(result, (0, 10, 20))
 
     def test_detects_duplicate_arguments(self):
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b", "c"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["b", "c"])
         def func(a, *, b=1, c=2):
             return a, b, c
 
@@ -142,7 +146,7 @@ class DeprecatePosargsTests(SimpleTestCase):
                 func(0, 10, 20, b=12, c=22)
 
     def test_detects_extra_positional_arguments(self):
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
         def func(a, *, b=1):
             return a, b
 
@@ -155,7 +159,7 @@ class DeprecatePosargsTests(SimpleTestCase):
 
     def test_avoids_remapping_to_new_keyword_arguments(self):
         # Only 'b' is moving; 'c' was added later.
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
         def func(a, *, b=1, c=2):
             return a, b, c
 
@@ -169,7 +173,7 @@ class DeprecatePosargsTests(SimpleTestCase):
     def test_variable_kwargs(self):
         """Works with **kwargs."""
 
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
         def some_func(a, *, b=1, **kwargs):
             return a, b, kwargs
 
@@ -206,7 +210,7 @@ class DeprecatePosargsTests(SimpleTestCase):
             self.assertEqual(result, (10, 20, {"c": 30}))
 
     def test_positional_only_params(self):
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["c"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["c"])
         def some_func(a, /, b, *, c=3):
             return a, b, c
 
@@ -225,22 +229,22 @@ class DeprecatePosargsTests(SimpleTestCase):
         """
 
         class SomeClass:
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a", "b"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
             def __init__(self, *, a=0, b=1):
                 self.a = a
                 self.b = b
 
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a", "b"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
             def some_method(self, *, a, b=1):
                 return self.a, self.b, a, b
 
             @staticmethod
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a", "b"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
             def some_static_method(*, a, b=1):
                 return a, b
 
             @classmethod
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a", "b"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
             def some_class_method(cls, *, a, b=1):
                 return cls.__name__, a, b
 
@@ -310,7 +314,7 @@ class DeprecatePosargsTests(SimpleTestCase):
         ):
 
             class SomeClass:
-                @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a"])
+                @deprecate_posargs(RemovedAfterNextVersionWarning, ["a"])
                 @classmethod
                 def some_class_method(cls, *, a):
                     pass
@@ -322,7 +326,7 @@ class DeprecatePosargsTests(SimpleTestCase):
         ):
 
             class SomeClass:
-                @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a"])
+                @deprecate_posargs(RemovedAfterNextVersionWarning, ["a"])
                 @staticmethod
                 def some_static_method(*, a):
                     pass
@@ -330,7 +334,7 @@ class DeprecatePosargsTests(SimpleTestCase):
     async def test_async(self):
         """A decorated async function is still async."""
 
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a", "b"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
         async def some_func(*, a, b=1):
             return a, b
 
@@ -356,7 +360,7 @@ class DeprecatePosargsTests(SimpleTestCase):
         Please don't try to deprecate lambda args! What does that even mean?!
         (But if it happens, the decorator should do something reasonable.)
         """
-        lambda_func = deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])(
+        lambda_func = deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])(
             lambda a, *, b=1: (a, b)
         )
         with self.assertWarnsMessage(
@@ -370,7 +374,7 @@ class DeprecatePosargsTests(SimpleTestCase):
     def test_bare_init(self):
         """Can't replace '__init__' with class name if not in a class."""
 
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a"])
+        @deprecate_posargs(RemovedAfterNextVersionWarning, ["a"])
         def __init__(*, a):
             pass
 
@@ -384,7 +388,7 @@ class DeprecatePosargsTests(SimpleTestCase):
     def test_warning_stacklevel(self):
         """The warning points to caller, not the decorator implementation."""
 
-        @deprecate_posargs(RemovedAfterNextVersionWarning, moved="a")
+        @deprecate_posargs(RemovedAfterNextVersionWarning, "a")
         def some_func(*, a):
             return a
 
@@ -400,7 +404,7 @@ class DeprecatePosargsTests(SimpleTestCase):
             " (after a `*` entry in the parameters list).",
         ):
 
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
             def func(a, b=1):
                 return a, b
 
@@ -410,7 +414,7 @@ class DeprecatePosargsTests(SimpleTestCase):
             "@deprecate_posargs() cannot be used with variable positional `*args`.",
         ):
 
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
             def func(*args, b=1):
                 return args, b
 
@@ -421,7 +425,7 @@ class DeprecatePosargsTests(SimpleTestCase):
             " (Apply it to the __init__ method.)",
         ):
 
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
             class NotThisClass:
                 pass
 
@@ -431,7 +435,7 @@ class DeprecatePosargsTests(SimpleTestCase):
             "@deprecate_posargs() `moved` names must all be keyword-only parameters.",
         ):
 
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["a", "b"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
             def func(a, *, b=1):
                 return a, b
 
@@ -441,7 +445,7 @@ class DeprecatePosargsTests(SimpleTestCase):
             "@deprecate_posargs() `moved` names must all be keyword-only parameters.",
         ):
 
-            @deprecate_posargs(RemovedAfterNextVersionWarning, moved=["b", "c"])
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["b", "c"])
             def func(a, *, b=1, **kwargs):
                 return a, b, kwargs
 
@@ -455,9 +459,7 @@ class DeprecatePosargsTests(SimpleTestCase):
             """Docstring."""
             return a, b, c
 
-        decorated = deprecate_posargs(RemovedAfterNextVersionWarning, moved=["c"])(
-            original
-        )
+        decorated = deprecate_posargs(RemovedAfterNextVersionWarning, ["c"])(original)
         self.assertEqual(original.__name__, decorated.__name__)
         self.assertEqual(original.__qualname__, decorated.__qualname__)
         self.assertEqual(original.__doc__, decorated.__doc__)

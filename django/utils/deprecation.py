@@ -85,11 +85,15 @@ class RenameMethodsBase(type):
         return new_class
 
 
-def deprecate_posargs(category, *, moved):
+def deprecate_posargs(deprecation_warning, moved, /):
     """
     Function/method decorator to deprecate some or all positional arguments.
-    The decorated function will map any positional arguments after the `*`
+    The decorated function will map any positional arguments after the ``*``
     to the corresponding keyword arguments and issue a deprecation warning.
+
+    The decorator takes two arguments: a RemovedInDjangoXXWarning warning
+    category and a list of parameter names that have been changed from
+    positional-or-keyword to keyword-only, in their original positional order.
 
     Works on both functions and methods. To apply to a class constructor,
     decorate its __init__() method. To apply to a staticmethod or classmethod,
@@ -102,32 +106,29 @@ def deprecate_posargs(category, *, moved):
 
     to::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, moved=["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
         def some_func(request, *, option1, option2=True):
             ...
 
-    `moved` must be a list of the formerly positional-or-keyword parameters
-    that are now keyword-only, in their original positional order.
-
-    After the deprecation period, remove the decorator (but keep the `*`)::
+    After the deprecation period, remove the decorator (but keep the ``*``)::
 
         def some_func(request, *, option1, option2=True):
             ...
 
-    Caution: during the deprecation period, do not add any new _positional_
-    parameters or change the remaining (un-moved) ones. This attempt to add
+    Caution: during the deprecation period, do not add any new *positional*
+    parameters or change the remaining ones. For example, this attempt to add
     a new param would break code using the deprecated option posargs::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, moved=["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
         def some_func(request, wrong_new_param=None, *, option1, option2=True):
             # Broken: existing code may set wrong_new_param to option1's value.
             ...
 
-    However, it's acceptable to add new _keyword-only_ parameters and to re-order
-    the existing ones (so long as `moved` remains in the original order).
-    This change will work without breaking existing code::
+    However, it's acceptable to add new *keyword-only* parameters and to re-order
+    the existing ones, so long as the list passed to @deprecate_posargs is kept
+    in the original order. This change will work without breaking existing code::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, moved=["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
         def some_func(request, *, new_param=None, option2=True, option1):
             ...
 
@@ -191,14 +192,9 @@ def deprecate_posargs(category, *, moved):
             # The class isn't defined yet, but its name is in __qualname__.
             # Some examples: "ClassName.__init__", "Nested.ClassName.__init__",
             # "MyTests.test_case.<locals>.ClassName.__init__".
-            try:
-                local_name = func.__qualname__.rsplit("<locals>.", 1)[-1]
-                class_name = local_name.replace(".__init__", "")
-            except (AttributeError, IndexError, TypeError):
-                # __init__ outside a class or other oddity. The __name__ is fine.
-                pass
-            else:
-                func_name = class_name
+            local_name = func.__qualname__.rsplit("<locals>.", 1)[-1]
+            class_name = local_name.replace(".__init__", "")
+            func_name = class_name
 
         if num_positional_params > num_bound_params:
             # Clarify that only "some" (not all) positional arguments are affected.
@@ -258,7 +254,7 @@ def deprecate_posargs(category, *, moved):
             replacement = f"{func_name}({replacement_args_str})"
 
             message = message_template.format(replacement=replacement)
-            warnings.warn(message, category, stacklevel=3)
+            warnings.warn(message, deprecation_warning, stacklevel=3)
 
             return remaining_args, updated_kwargs
 
