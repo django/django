@@ -42,6 +42,9 @@ class AdminKeyboardShorcutsTests(TestCase):
         self.assertNotContains(
             response, '<dialog class="keyboard-shortcuts" id="shortcuts-dialog">'
         )
+        self.assertNotContains(
+            response, '<script src="/static/admin/js/shortcuts.js"></script>'
+        )
 
     def test_shortcuts_dialog_descriptions(self):
         response = self.client.get(reverse("test_admin_keyboard_shortcuts:index"))
