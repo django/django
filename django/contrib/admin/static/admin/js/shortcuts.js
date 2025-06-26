@@ -15,9 +15,7 @@
     }
 
     let previousKey = undefined;
-    const shortcutFunctions = new Map([
-        ["g i", () => { document.location.href = "/admin/"; }],
-    ]);
+    const shortcutFunctions = new Map();
 
     function registerDeclarativeShortcuts() {
         const elements = document.querySelectorAll('[data-keyboard-shortcut]');
