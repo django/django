@@ -665,15 +665,13 @@ You're almost done! All that's left to do now is:
    ``VERSION = (4, 1, 2, 'alpha', 0)`` (:commit:`example commit
    <a4d19953d46247ee1992b3427fe652e941524272>`).
 
-#. Add the release in `Trac's versions list`_ if necessary (and make it the
-   default by changing the ``default_version`` setting in the
-   code.djangoproject.com's `trac.ini`__, if it's a final release). The new X.Y
-   version should be added after the alpha release and the default version
-   should be updated after "dot zero" release.
-
-   __ https://github.com/django/code.djangoproject.com/blob/main/trac-env/conf/trac.ini
+#. If this was an alpha release, add the release in `Trac's versions list`_.
 
 #. If this was a final release:
+
+   #. Update the ``default_version`` setting in the code.djangoproject.com's
+      ``trac.ini`` file (`example PR
+      <https://github.com/django/code.djangoproject.com/pull/268>`__).
 
    #. Update the current stable branch and remove the pre-release branch in the
       `Django release process
