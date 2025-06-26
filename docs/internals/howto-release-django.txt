@@ -251,8 +251,8 @@ A few days before any release
    `PR updating translations for 4.2
    <https://github.com/django/django/pull/16715>`_).
 
-    Once merged, forward port the changes into ``main`` (:commit:`example
-    commit <cb27e5b9c0703fb0edd70b2138e3e53a78c9551d>`).
+   Once merged, forward port the changes into ``main`` (:commit:`example commit
+   <cb27e5b9c0703fb0edd70b2138e3e53a78c9551d>`).
 
 #. :ref:`Update the django-admin manual page <django-admin-manpage>`:
 
