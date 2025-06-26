@@ -85,7 +85,7 @@ class RenameMethodsBase(type):
         return new_class
 
 
-def deprecate_posargs(deprecation_warning, moved, /):
+def deprecate_posargs(deprecation_warning, remappable_names, /):
     """
     Function/method decorator to deprecate some or all positional arguments.
     The decorated function will map any positional arguments after the ``*``
@@ -137,11 +137,11 @@ def deprecate_posargs(deprecation_warning, moved, /):
     """
 
     message_template_singular = (
-        "Passing positional argument {moved_names_str} to {func_name}()"
+        "Passing positional argument {remapped_names} to {func_name}()"
         " is deprecated. Change it to a keyword arg."
     )
     message_template_plural = (
-        "Passing positional arguments {moved_names_str} to {func_name}()"
+        "Passing positional arguments {remapped_names} to {func_name}()"
         " is deprecated. Change them to keyword args."
     )
 
@@ -176,15 +176,15 @@ def deprecate_posargs(deprecation_warning, moved, /):
             )
         if any(
             name not in params or params[name].kind != inspect.Parameter.KEYWORD_ONLY
-            for name in moved
+            for name in remappable_names
         ):
             raise TypeError(
-                "@deprecate_posargs() `moved` names must"
+                "@deprecate_posargs() remappable_names must"
                 " all be keyword-only parameters."
             )
 
-        num_moveable_args = len(moved)
-        max_positional_args = num_positional_params + num_moveable_args
+        num_remappable_args = len(remappable_names)
+        max_positional_args = num_positional_params + num_remappable_args
 
         func_name = func.__name__
         if func_name == "__init__":
@@ -206,16 +206,20 @@ def deprecate_posargs(deprecation_warning, moved, /):
                 raise TypeError(
                     f"{func_name}() takes"
                     f" at most {max_positional_args} positional argument(s)"
-                    f" (including {num_moveable_args} deprecated)"
+                    f" (including {num_remappable_args} deprecated)"
                     f" but {num_positional_args} were given."
                 )
 
-            moved_names = moved[: num_positional_args - num_positional_params]
-            conflicts = set(moved_names) & set(kwargs)
+            # Identify which of the potentially _remappable_ params
+            # are actually being _remapped_ in this particular call.
+            remapped_names = remappable_names[
+                : num_positional_args - num_positional_params
+            ]
+            conflicts = set(remapped_names) & set(kwargs)
             if conflicts:
                 # Report duplicate param names in original parameter order.
                 conflicts_str = ", ".join(
-                    f"'{name}'" for name in moved_names if name in conflicts
+                    f"'{name}'" for name in remapped_names if name in conflicts
                 )
                 raise TypeError(
                     f"{func_name}() got both deprecated positional and keyword"
@@ -223,19 +227,18 @@ def deprecate_posargs(deprecation_warning, moved, /):
                 )
 
             # Do the remapping.
-            moved_kwargs = dict(zip(moved_names, args[num_positional_params:]))
+            remapped_kwargs = dict(zip(remapped_names, args[num_positional_params:]))
             remaining_args = args[:num_positional_params]
-            updated_kwargs = kwargs | moved_kwargs
+            updated_kwargs = kwargs | remapped_kwargs
 
             # Issue the deprecation warning.
-            moved_names_str = ", ".join(moved_names)
             message_template = (
                 message_template_singular
-                if len(moved_names) == 1
+                if len(remapped_names) == 1
                 else message_template_plural
             )
             message = message_template.format(
-                moved_names_str=moved_names_str, func_name=func_name
+                remapped_names=", ".join(remapped_names), func_name=func_name
             )
             warnings.warn(message, deprecation_warning, stacklevel=3)
 

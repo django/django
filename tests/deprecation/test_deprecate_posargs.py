@@ -71,7 +71,7 @@ class DeprecatePosargsTests(SimpleTestCase):
 
     def test_allows_reordering_keyword_only_params(self):
         """
-        Because `moved` reflects the original positional argument order,
+        Because remappable_names reflects the original positional argument order,
         keyword-only params can be freely added and rearranged.
         """
 
@@ -393,25 +393,30 @@ class DeprecatePosargsTests(SimpleTestCase):
             class NotThisClass:
                 pass
 
-    def test_decorator_requires_moved_be_keyword_only(self):
+    def test_decorator_requires_remappable_names_be_keyword_only(self):
+        """remappable_names cannot refer to positional-or-keyword params."""
         with self.assertRaisesMessage(
             TypeError,
-            "@deprecate_posargs() `moved` names must all be keyword-only parameters.",
+            "@deprecate_posargs() remappable_names"
+            " must all be keyword-only parameters.",
         ):
 
             @deprecate_posargs(RemovedAfterNextVersionWarning, ["a", "b"])
             def func(a, *, b=1):
                 return a, b
 
-    def test_decorator_requires_moved_be_named(self):
+    def test_decorator_requires_remappable_names_exist(self):
+        """remappable_names cannot refer to variable kwargs."""
         with self.assertRaisesMessage(
             TypeError,
-            "@deprecate_posargs() `moved` names must all be keyword-only parameters.",
+            "@deprecate_posargs() remappable_names"
+            " must all be keyword-only parameters.",
         ):
 
             @deprecate_posargs(RemovedAfterNextVersionWarning, ["b", "c"])
             def func(a, *, b=1, **kwargs):
-                return a, b, kwargs
+                c = kwargs.get("c")
+                return a, b, c
 
     def test_decorator_preserves_metadata(self):
         """
