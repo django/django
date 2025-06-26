@@ -136,6 +136,15 @@ def deprecate_posargs(deprecation_warning, moved, /):
     it won't be significant, but use with care in performance-critical code paths.
     """
 
+    message_template_singular = (
+        "Passing positional argument {moved_names_str} to {func_name}()"
+        " is deprecated. Change it to a keyword arg."
+    )
+    message_template_plural = (
+        "Passing positional arguments {moved_names_str} to {func_name}()"
+        " is deprecated. Change them to keyword args."
+    )
+
     def decorator(func):
         if isinstance(func, type):
             raise TypeError(
@@ -177,15 +186,6 @@ def deprecate_posargs(deprecation_warning, moved, /):
         num_moveable_args = len(moved)
         max_positional_args = num_positional_params + num_moveable_args
 
-        param_names = list(params.keys())
-
-        # The deprecation message logic needs to know if func is a bound method.
-        # Because decorators always receive plain, unbound functions, the class
-        # information is not available here. (inspect.ismethod(func) will always
-        # return False, and func.__self__ will never be set.) This only affects
-        # message construction, not argument mapping logic, so it's fine to just
-        # look for the customary bound parameter names.
-        num_bound_params = 1 if param_names[0] in ("self", "cls") else 0
         func_name = func.__name__
         if func_name == "__init__":
             # In the warning, show "ClassName(...)" rather than "__init__(...)".
@@ -195,18 +195,6 @@ def deprecate_posargs(deprecation_warning, moved, /):
             local_name = func.__qualname__.rsplit("<locals>.", 1)[-1]
             class_name = local_name.replace(".__init__", "")
             func_name = class_name
-
-        if num_positional_params > num_bound_params:
-            # Clarify that only "some" (not all) positional arguments are affected.
-            message_template = (
-                "Use of some positional arguments is deprecated."
-                " Change to `{replacement}`."
-            )
-        else:
-            message_template = (
-                "Use of positional arguments is deprecated."
-                " Change to `{replacement}`."
-            )
 
         def remap_deprecated_args(args, kwargs):
             """
@@ -239,21 +227,16 @@ def deprecate_posargs(deprecation_warning, moved, /):
             remaining_args = args[:num_positional_params]
             updated_kwargs = kwargs | moved_kwargs
 
-            # Issue the deprecation warning. Construct a suggested replacement
-            # showing the affected arguments:
-            #     "Change to `func_name(..., kwonly1=..., kwonly2=..., ...)`."
-            # - Initial "..." represents remaining (non-remapped) positional args,
-            #   excluding `self` or `cls`.
-            # - Trailing "..." represents other (non-remapped) keyword args.
-            replacement_args = [f"{name}=..." for name in moved_names]
-            if len(remaining_args) > num_bound_params:
-                replacement_args.insert(0, "...")
-            if kwargs:
-                replacement_args.append("...")
-            replacement_args_str = ", ".join(replacement_args)
-            replacement = f"{func_name}({replacement_args_str})"
-
-            message = message_template.format(replacement=replacement)
+            # Issue the deprecation warning.
+            moved_names_str = ", ".join(moved_names)
+            message_template = (
+                message_template_singular
+                if len(moved_names) == 1
+                else message_template_plural
+            )
+            message = message_template.format(
+                moved_names_str=moved_names_str, func_name=func_name
+            )
             warnings.warn(message, deprecation_warning, stacklevel=3)
 
             return remaining_args, updated_kwargs
