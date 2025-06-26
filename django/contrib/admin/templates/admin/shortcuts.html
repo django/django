@@ -1,9 +1,9 @@
 {% load i18n %}
 
-<button id="open-shortcuts" data-keyboard-shortcut="?">
+<button id="open-shortcuts" aria-keyshortcuts="?">
   <kbd>?</kbd>
 </button>
-<a id="admin_index_link" href="{% url 'admin:index' %}" data-keyboard-shortcut="g i" hidden></a>
+<a id="admin_index_link" href="{% url 'admin:index' %}" aria-keyshortcuts="g i" hidden></a>
 
 <dialog class="keyboard-shortcuts" id="shortcuts-dialog">
   <div class="dialog-heading">

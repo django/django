@@ -27,7 +27,7 @@ class AdminKeyboardShorcutsTests(TestCase):
     def test_shortcuts_dialog_on_index(self):
         response = self.client.get(reverse("test_admin_keyboard_shortcuts:index"))
         self.assertContains(
-            response, '<button id="open-shortcuts" data-keyboard-shortcut="?">'
+            response, '<button id="open-shortcuts" aria-keyshortcuts="?">'
         )
         self.assertContains(
             response, '<dialog class="keyboard-shortcuts" id="shortcuts-dialog">'
@@ -37,7 +37,7 @@ class AdminKeyboardShorcutsTests(TestCase):
         self.client.logout()
         response = self.client.get(reverse("test_admin_keyboard_shortcuts:login"))
         self.assertNotContains(
-            response, '<button id="open-shortcuts" data-keyboard-shortcut="?">'
+            response, '<button id="open-shortcuts" aria-keyshortcuts="?">'
         )
         self.assertNotContains(
             response, '<dialog class="keyboard-shortcuts" id="shortcuts-dialog">'
