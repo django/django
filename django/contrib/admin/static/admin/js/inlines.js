@@ -355,5 +355,11 @@
                 break;
             }
         });
+
+        // Close collapsible inlines that don't have the "open" class
+        // This is done after autocomplete initialization to prevent width calculation issues
+        $('.js-inline-admin-formset fieldset.module.collapse:not(.open) details[open]').each(function() {
+            this.removeAttribute('open');
+        });
     });
 }
