@@ -5,7 +5,7 @@ from django.db import transaction
 from django.tasks.exceptions import ResultDoesNotExist
 from django.tasks.signals import task_enqueued
 from django.tasks.task import ResultStatus, TaskResult
-from django.tasks.utils import get_random_id
+from django.tasks.utils import get_random_id, json_normalize
 from django.utils import timezone
 
 from .base import BaseTaskBackend
@@ -36,8 +36,8 @@ class DummyBackend(BaseTaskBackend):
             started_at=None,
             last_attempted_at=None,
             finished_at=None,
-            args=args,
-            kwargs=kwargs,
+            args=json_normalize(args),
+            kwargs=json_normalize(kwargs),
             backend=self.alias,
             errors=[],
             worker_ids=[],

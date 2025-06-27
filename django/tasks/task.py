@@ -10,7 +10,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 
 from .exceptions import ResultDoesNotExist
-from .utils import get_module_path, json_normalize
+from .utils import get_module_path
 
 DEFAULT_TASK_BACKEND_ALIAS = "default"
 DEFAULT_QUEUE_NAME = "default"
@@ -111,17 +111,13 @@ class Task:
         """
         Queue up the task to be executed
         """
-        return self.get_backend().enqueue(
-            self, json_normalize(args), json_normalize(kwargs)
-        )
+        return self.get_backend().enqueue(self, args, kwargs)
 
     async def aenqueue(self, *args, **kwargs):
         """
         Queue up a task function (or coroutine) to be executed
         """
-        return await self.get_backend().aenqueue(
-            self, json_normalize(args), json_normalize(kwargs)
-        )
+        return await self.get_backend().aenqueue(self, args, kwargs)
 
     def get_result(self, result_id):
         """
