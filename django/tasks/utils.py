@@ -1,11 +1,10 @@
 import inspect
 import json
-import random
 import time
 from functools import wraps
 from traceback import format_exception
 
-from django.utils.crypto import RANDOM_STRING_CHARS
+from django.utils.crypto import get_random_string
 
 
 def is_module_level_function(func):
@@ -64,8 +63,5 @@ def get_random_id():
     Return a random string for use as a task or worker id.
 
     Whilst 64 characters is the max, just use 32 as a sensible middle-ground.
-
-    This should be much faster than `get_random_string`, since
-    it's not cryptographically secure.
     """
-    return "".join(random.choices(RANDOM_STRING_CHARS, k=32))
+    return get_random_string(32)
