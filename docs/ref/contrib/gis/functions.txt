@@ -85,7 +85,8 @@ queryset is calculated:
     express the value in the units of your choice. For example,
     ``city.distance.mi`` is the distance value in miles and
     ``city.distance.km`` is the distance value in kilometers. See
-    :doc:`measure` for usage details and the list of :ref:`supported_units`.
+    :doc:`/ref/contrib/gis/measure` for usage details and the list of
+    :ref:`supported_units`.
 
 ``GeometryDistance``
 --------------------

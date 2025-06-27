@@ -942,8 +942,8 @@ Configuring the rendering of a form's widgets
 
 .. attribute:: Form.default_renderer
 
-Specifies the :doc:`renderer <renderers>` to use for the form. Defaults to
-``None`` which means to use the default renderer specified by the
+Specifies the :doc:`renderer </ref/forms/renderers>` to use for the form.
+Defaults to ``None`` which means to use the default renderer specified by the
 :setting:`FORM_RENDERER` setting.
 
 You can set this as a class attribute when declaring your form or use the
@@ -1070,9 +1070,9 @@ Customizing the error list format
 
     .. attribute:: renderer
 
-        Specifies the :doc:`renderer <renderers>` to use for ``ErrorList``.
-        Defaults to ``None`` which means to use the default renderer
-        specified by the :setting:`FORM_RENDERER` setting.
+        Specifies the :doc:`renderer </ref/forms/renderers>` to use for
+        ``ErrorList``. Defaults to ``None`` which means to use the default
+        renderer specified by the :setting:`FORM_RENDERER` setting.
 
     .. attribute:: field_id
 

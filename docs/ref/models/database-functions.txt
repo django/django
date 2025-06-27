@@ -7,8 +7,8 @@ Database Functions
 
 The classes documented below provide a way for users to use functions provided
 by the underlying database as annotations, aggregations, or filters in Django.
-Functions are also :doc:`expressions <expressions>`, so they can be used and
-combined with other expressions like :ref:`aggregate functions
+Functions are also :doc:`expressions </ref/models/expressions>`, so they can be
+used and combined with other expressions like :ref:`aggregate functions
 <aggregation-functions>`.
 
 We'll be using the following model in examples of each function::

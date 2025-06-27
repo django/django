@@ -54,7 +54,8 @@ Write some documentation
 
 Django's documentation is great but it can always be improved. Did you find a
 typo? Do you think that something should be clarified? Go ahead and suggest a
-documentation patch! See also the guide on :doc:`writing-documentation`.
+documentation patch! See also the guide on
+:doc:`/internals/contributing/writing-documentation`.
 
 .. note::
 

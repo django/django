@@ -1436,7 +1436,7 @@ default templates used by the :class:`ModelAdmin` views:
     The ``delete_queryset()`` method is given the ``HttpRequest`` and a
     ``QuerySet`` of objects to be deleted. Override this method to customize
     the deletion process for the "delete selected objects" :doc:`action
-    <actions>`.
+    </ref/contrib/admin/actions>`.
 
 .. method:: ModelAdmin.save_formset(request, form, formset, change)
 
@@ -2055,7 +2055,7 @@ default templates used by the :class:`ModelAdmin` views:
 .. method:: ModelAdmin.get_deleted_objects(objs, request)
 
     A hook for customizing the deletion process of the :meth:`delete_view` and
-    the "delete selected" :doc:`action <actions>`.
+    the "delete selected" :doc:`action </ref/contrib/admin/actions>`.
 
     The ``objs`` argument is a homogeneous iterable of objects (a ``QuerySet``
     or a list of model instances) to be deleted, and ``request`` is the

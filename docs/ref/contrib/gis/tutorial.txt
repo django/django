@@ -22,9 +22,9 @@ familiarize yourself with Django first.
 
 .. note::
 
-    GeoDjango has additional requirements beyond what Django requires --
-    please consult the :doc:`installation documentation <install/index>`
-    for more details.
+    GeoDjango has additional requirements beyond what Django requires -- please
+    consult the :doc:`installation documentation
+    </ref/contrib/gis/install/index>` for more details.
 
 This tutorial will guide you through the creation of a geographic web
 application for viewing the `world borders`_. [#]_ Some of the code
@@ -49,8 +49,8 @@ Create a Spatial Database
 Typically no special setup is required, so you can create a database as you
 would for any other project. We provide some tips for selected databases:
 
-* :doc:`install/postgis`
-* :doc:`install/spatialite`
+* :doc:`/ref/contrib/gis/install/postgis`
+* :doc:`/ref/contrib/gis/install/spatialite`
 
 Create a New Project
 --------------------
@@ -305,7 +305,7 @@ Importing Spatial Data
 ======================
 
 This section will show you how to import the world borders shapefile into the
-database via GeoDjango models using the :doc:`layermapping`.
+database via GeoDjango models using the :doc:`/ref/contrib/gis/layermapping`.
 
 There are many different ways to import data into a spatial database --
 besides the tools included within GeoDjango, you may also use the following:
@@ -531,11 +531,13 @@ Next, import the ``load`` module, call the ``run`` routine, and watch
 
 Try ``ogrinspect``
 ------------------
+
 Now that you've seen how to define geographic models and import data with the
-:doc:`layermapping`, it's possible to further automate this process with
-use of the :djadmin:`ogrinspect` management command. The :djadmin:`ogrinspect`
-command  introspects a GDAL-supported vector data source (e.g., a shapefile)
-and generates a model definition and ``LayerMapping`` dictionary automatically.
+:doc:`/ref/contrib/gis/layermapping`, it's possible to further automate this
+process with use of the :djadmin:`ogrinspect` management command. The
+:djadmin:`ogrinspect` command  introspects a GDAL-supported vector data source
+(e.g., a shapefile) and generates a model definition and ``LayerMapping``
+dictionary automatically.
 
 The general usage of the command goes as follows:
 
@@ -637,10 +639,10 @@ a ``contains`` lookup using the ``pnt_wkt`` as the parameter:
 Here, you retrieved a ``QuerySet`` with only one model: the border of the
 United States (exactly what you would expect).
 
-Similarly, you may also use a :doc:`GEOS geometry object <geos>`.
-Here, you can combine the ``intersects`` spatial lookup with the ``get``
-method to retrieve only the ``WorldBorder`` instance for San Marino instead
-of a queryset:
+Similarly, you may also use a :doc:`GEOS geometry object
+</ref/contrib/gis/geos>`. Here, you can combine the ``intersects`` spatial
+lookup with the ``get`` method to retrieve only the ``WorldBorder`` instance
+for San Marino instead of a queryset:
 
 .. code-block:: pycon
 
@@ -649,8 +651,8 @@ of a queryset:
     >>> WorldBorder.objects.get(mpoly__intersects=pnt)
     <WorldBorder: San Marino>
 
-The ``contains`` and ``intersects`` lookups are just a subset of the
-available queries -- the :doc:`db-api` documentation has more.
+The ``contains`` and ``intersects`` lookups are just a subset of the available
+queries -- the :doc:`/ref/contrib/gis/db-api` documentation has more.
 
 .. _automatic-spatial-transformations:
 
@@ -748,7 +750,7 @@ Geographic annotations
 
 GeoDjango also offers a set of geographic annotations to compute distances and
 several other operations (intersection, difference, etc.). See the
-:doc:`functions` documentation.
+:doc:`/ref/contrib/gis/functions` documentation.
 
 Putting your data on the map
 ============================

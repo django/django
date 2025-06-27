@@ -504,6 +504,6 @@ JavaScript style
 ================
 
 For details about the JavaScript code style used by Django, see
-:doc:`javascript`.
+:doc:`/internals/contributing/writing-code/javascript`.
 
 .. _editorconfig: https://editorconfig.org/

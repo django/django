@@ -156,7 +156,7 @@ Geometry Lookups
 ----------------
 
 Geographic queries with geometries take the following general form (assuming
-the ``Zipcode`` model used in the :doc:`model-api`):
+the ``Zipcode`` model used in the :doc:`/ref/contrib/gis/model-api`):
 
 .. code-block:: text
 
@@ -192,7 +192,8 @@ used to pass a band index. On the right hand side, a tuple of the raster and
 band index can be specified.
 
 This results in the following general form for lookups involving rasters
-(assuming the ``Elevation`` model used in the :doc:`model-api`):
+(assuming the ``Elevation`` model used in the
+:doc:`/ref/contrib/gis/model-api`):
 
 .. code-block:: text
 
@@ -234,11 +235,10 @@ Distance Queries
 Introduction
 ------------
 
-Distance calculations with spatial data is tricky because, unfortunately,
-the Earth is not flat. Some distance queries with fields in a geographic
-coordinate system may have to be expressed differently because of
-limitations in PostGIS. Please see the :ref:`selecting-an-srid` section
-in the :doc:`model-api` documentation for more details.
+Distance calculations with spatial data is tricky because, unfortunately, the
+Earth is not flat. Some distance queries with fields in a geographic coordinate
+system may have to be expressed differently because of limitations in PostGIS.
+Please see the :ref:`selecting-an-srid` section for more details.
 
 .. _distance-lookups-intro:
 
