@@ -156,7 +156,7 @@ def get_deleted_objects(objs, request, admin_site):
                     "%s:%s_%s_change"
                     % (admin_site.name, opts.app_label, opts.model_name),
                     None,
-                    (quote(obj.pk),),
+                    (quote(obj.pk_str),),
                 )
             except NoReverseMatch:
                 # Change url doesn't exist -- don't display link to edit
