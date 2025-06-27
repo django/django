@@ -2693,7 +2693,7 @@ class (i.e. ``mypackage.backends.whatever.WhateverBackend``).
 
 Default: ``True``
 
-Whether a task should be enqueued at the end of the current transaction (if there
+Whether a task should be enqueued after the current transaction (if there
 is one) commits successfully, rather than enqueueing immediately.
 
 This can also be configured on a per-task basis.
