@@ -387,7 +387,7 @@ Then, you can help out by:
     several that are useful for triaging tickets and reviewing proposals as
     suggested above.
 
-    You can also find more :doc:`new-contributors`.
+    You can also find more :doc:`/internals/contributing/new-contributors`.
 
     .. _Reports page: https://code.djangoproject.com/wiki/Reports
 

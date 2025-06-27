@@ -15,7 +15,8 @@ If you are fixing a really trivial issue, for example changing a word in the
 documentation, the preferred way to provide the patch is using GitHub pull
 requests without a Trac ticket.
 
-See the :doc:`working-with-git` for more details on how to use pull requests.
+See the :doc:`/internals/contributing/writing-code/working-with-git` for more
+details on how to use pull requests.
 
 "Claiming" tickets
 ==================
@@ -109,19 +110,20 @@ requirements:
 
 * The code required to fix a problem or add a feature is an essential part
   of a solution, but it is not the only part. A good fix should also include a
-  :doc:`regression test <unit-tests>` to validate the behavior that has been
-  fixed and to prevent the problem from arising again. Also, if some tickets
-  are relevant to the code that you've written, mention the ticket numbers in
-  some comments in the test so that one can easily trace back the relevant
-  discussions after your patch gets committed, and the tickets get closed.
+  :doc:`regression test </internals/contributing/writing-code/unit-tests>` to
+  validate the behavior that has been fixed and to prevent the problem from
+  arising again. Also, if some tickets are relevant to the code that you've
+  written, mention the ticket numbers in some comments in the test so that one
+  can easily trace back the relevant discussions after your patch gets
+  committed, and the tickets get closed.
 
 * If the code adds a new feature, or modifies the behavior of an existing
   feature, the change should also contain documentation.
 
 When you think your work is ready to be reviewed, send :doc:`a GitHub pull
-request <working-with-git>`.
-If you can't send a pull request for some reason, you can also use patches in
-Trac. When using this style, follow these guidelines.
+request </internals/contributing/writing-code/working-with-git>`. If you can't
+send a pull request for some reason, you can also use patches in Trac. When
+using this style, follow these guidelines.
 
 * Submit patches in the format returned by the ``git diff`` command.
 

@@ -340,7 +340,8 @@ extra attribute ``field_lower`` produced, roughly, from the following SQL:
         ...
         LOWER("db_table"."field") as "field_lower"
 
-See :doc:`database-functions` for a list of built-in database functions.
+See :doc:`/ref/models/database-functions` for a list of built-in database
+functions.
 
 The ``Func`` API is as follows:
 
@@ -582,7 +583,7 @@ Conditional expressions
 
 Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic in queries. Django natively supports SQL ``CASE``
-expressions. For more details see :doc:`conditional-expressions`.
+expressions. For more details see :doc:`/ref/models/conditional-expressions`.
 
 ``Subquery()`` expressions
 --------------------------

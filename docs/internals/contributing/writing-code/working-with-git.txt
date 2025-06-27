@@ -142,7 +142,7 @@ When you think your work is ready to be pulled into Django, you should create
 a pull request at GitHub. A good pull request means:
 
 * commits with one logical change in each, following the
-  :doc:`coding style <coding-style>`,
+  :doc:`coding style </internals/contributing/writing-code/coding-style>`,
 
 * well-formed messages for each commit: a summary line and then paragraphs
   wrapped at 72 characters thereafter -- see the :ref:`committing guidelines

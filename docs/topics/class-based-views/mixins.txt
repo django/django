@@ -5,8 +5,8 @@ Using mixins with class-based views
 .. caution::
 
     This is an advanced topic. A working knowledge of :doc:`Django's
-    class-based views<index>` is advised before exploring these
-    techniques.
+    class-based views </topics/class-based-views/index>` is advised before
+    exploring these techniques.
 
 Django's built-in class-based views provide a lot of functionality,
 but some of it you may want to use separately. For instance, you may
@@ -120,9 +120,9 @@ but the main one that most people are going to use is
 ``<app_label>/<model_name>_detail.html``. The ``_detail`` part can be changed
 by setting
 :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
-on a subclass to something else. (For instance, the :doc:`generic edit
-views<generic-editing>` use ``_form`` for create and update views, and
-``_confirm_delete`` for delete views.)
+on a subclass to something else. (For instance, the :doc:`generic edit views
+</topics/class-based-views/generic-editing>` use ``_form`` for create and
+update views, and ``_confirm_delete`` for delete views.)
 
 ``ListView``: working with many Django objects
 ----------------------------------------------
@@ -213,8 +213,8 @@ in the subclass. However if we want our processing to work on a particular
 object, identified from the URL, we'll want the functionality provided by
 :class:`~django.views.generic.detail.SingleObjectMixin`.
 
-We'll demonstrate this with the ``Author`` model we used in the
-:doc:`generic class-based views introduction<generic-display>`.
+We'll demonstrate this with the ``Author`` model we used in the :doc:`generic
+class-based views introduction </topics/class-based-views/generic-display>`.
 
 .. code-block:: python
     :caption: ``views.py``
@@ -390,11 +390,11 @@ increasingly complex as you try to do so, and a good rule of thumb is:
 
 .. hint::
 
-    Each of your views should use only mixins or views from one of the
-    groups of generic class-based views: :doc:`detail,
-    list<generic-display>`, :doc:`editing<generic-editing>` and
-    date. For example it's fine to combine
-    :class:`TemplateView` (built in view) with
+    Each of your views should use only mixins or views from one of the groups
+    of generic class-based views: :doc:`detail, list
+    </topics/class-based-views/generic-display>`, :doc:`editing
+    </topics/class-based-views/generic-editing>` and date. For example it's
+    fine to combine :class:`TemplateView` (built in view) with
     :class:`~django.views.generic.list.MultipleObjectMixin` (generic list), but
     you're likely to have problems combining ``SingleObjectMixin`` (generic
     detail) with ``MultipleObjectMixin`` (generic list).

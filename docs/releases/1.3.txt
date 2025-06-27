@@ -266,7 +266,7 @@ and in Django 1.5 will raise an ``ImproperlyConfigured`` exception.
 Everything else
 ---------------
 
-Django :doc:`1.1 <1.1>` and :doc:`1.2 <1.2>` added
+Django :doc:`1.1 </releases/1.1>` and :doc:`1.2 </releases/1.2>` added
 lots of big ticket items to Django, like multiple-database support,
 model validation, and a session-based messages framework. However,
 this focus on big features came at the cost of lots of smaller
