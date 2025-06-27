@@ -6,6 +6,7 @@ from .models import AllFieldsModel
 
 NON_CONCRETE_FIELDS = (
     models.ForeignObject,
+    models.ManyToManyField,
     GenericForeignKey,
     GenericRelation,
 )
