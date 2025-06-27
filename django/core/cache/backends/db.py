@@ -1,7 +1,8 @@
 "Database cache backend."
+
 import base64
 import pickle
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
@@ -124,7 +125,7 @@ class DatabaseCache(BaseDatabaseCache):
             if timeout is None:
                 exp = datetime.max
             else:
-                tz = timezone.utc if settings.USE_TZ else None
+                tz = UTC if settings.USE_TZ else None
                 exp = datetime.fromtimestamp(timeout, tz=tz)
             exp = exp.replace(microsecond=0)
             if num > self._max_entries:

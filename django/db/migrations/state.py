@@ -1,4 +1,5 @@
 import copy
+import typing
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import partial
@@ -969,6 +970,7 @@ class ModelState:
             bases = tuple(
                 (apps.get_model(base) if isinstance(base, str) else base)
                 for base in self.bases
+                if base != typing.Generic
             )
         except LookupError:
             raise InvalidBasesError(

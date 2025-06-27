@@ -19,7 +19,7 @@ QUnit.test('init', function(assert) {
     assert.equal($('.selector-chooseall').prop("tagName"), "BUTTON");
     assert.equal($('.selector-add').text(), "Choose selected things");
     assert.equal($('.selector-add').prop("tagName"), "BUTTON");
-    assert.equal($('.selector-remove').text(), "Remove selected chosen things");
+    assert.equal($('.selector-remove').text(), "Remove selected things");
     assert.equal($('.selector-remove').prop("tagName"), "BUTTON");
     assert.equal($('.selector-clearall').text(), "Remove all things");
     assert.equal($('.selector-clearall').prop("tagName"), "BUTTON");
@@ -31,6 +31,7 @@ QUnit.test('init', function(assert) {
     assert.equal($('.selector-chosen .selector-chosen-title .helptext').text(), 'Remove things by selecting them and then select the "Remove" arrow button.');
     assert.equal($('.selector-filter label .help-tooltip')[0].getAttribute("aria-label"), "Type into this box to filter down the list of available things.");
     assert.equal($('.selector-filter label .help-tooltip')[1].getAttribute("aria-label"), "Type into this box to filter down the list of selected things.");
+    assert.equal($('#test button:not([type="button"])').length, 0);
 });
 
 QUnit.test('filtering available options', function(assert) {

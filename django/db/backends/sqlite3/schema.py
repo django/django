@@ -16,7 +16,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
     )
     sql_create_column_inline_fk = sql_create_inline_fk
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
     sql_alter_table_comment = None

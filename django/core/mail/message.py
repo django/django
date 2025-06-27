@@ -2,7 +2,7 @@ import mimetypes
 from collections import namedtuple
 from email import charset as Charset
 from email import encoders as Encoders
-from email import generator, message_from_string
+from email import generator, message_from_bytes
 from email.errors import HeaderParseError
 from email.header import Header
 from email.headerregistry import Address, parser
@@ -17,7 +17,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils.encoding import force_str, punycode
+from django.utils.encoding import force_bytes, force_str, punycode
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -152,7 +152,7 @@ class MIMEMixin:
 
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):
     def __setitem__(self, name, val):
-        # message/rfc822 attachments must be ASCII
+        # Per RFC 2046 Section 5.2.1, message/rfc822 attachment headers must be ASCII.
         name, val = forbid_multi_line_headers(name, val, "ascii")
         MIMEMessage.__setitem__(self, name, val)
 
@@ -191,8 +191,8 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         MIMEMultipart.__setitem__(self, name, val)
 
 
-EmailAlternative = namedtuple("Alternative", ["content", "mimetype"])
-EmailAttachment = namedtuple("Attachment", ["filename", "content", "mimetype"])
+EmailAlternative = namedtuple("EmailAlternative", ["content", "mimetype"])
+EmailAttachment = namedtuple("EmailAttachment", ["filename", "content", "mimetype"])
 
 
 class EmailMessage:
@@ -387,6 +387,15 @@ class EmailMessage:
         email.Message or EmailMessage object, as well as a str.
         """
         basetype, subtype = mimetype.split("/", 1)
+        if basetype == "text" and isinstance(content, bytes):
+            # This duplicates logic from EmailMessage.attach() to properly
+            # handle EmailMessage.attachments not created through attach().
+            try:
+                content = content.decode()
+            except UnicodeDecodeError:
+                mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+                basetype, subtype = mimetype.split("/", 1)
+
         if basetype == "text":
             encoding = self.encoding or settings.DEFAULT_CHARSET
             attachment = SafeMIMEText(content, subtype, encoding)
@@ -399,7 +408,7 @@ class EmailMessage:
             elif not isinstance(content, Message):
                 # For compatibility with existing code, parse the message
                 # into an email.Message object if it is not one already.
-                content = message_from_string(force_str(content))
+                content = message_from_bytes(force_bytes(content))
 
             attachment = SafeMIMEMessage(content, subtype)
         else:

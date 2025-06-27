@@ -121,7 +121,7 @@ Here's an example, which generates the same CSV file as above::
             headers={"Content-Disposition": 'attachment; filename="somefilename.csv"'},
         )
 
-        # The data is hard-coded here, but you could load it from a database or
+        # The data is hardcoded here, but you could load it from a database or
         # some other source.
         csv_data = (
             ("First row", "Foo", "Bar", "Baz"),

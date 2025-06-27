@@ -230,9 +230,8 @@ class Collector:
         """
         Return the objs in suitably sized batches for the used connection.
         """
-        field_names = [field.name for field in fields]
         conn_batch_size = max(
-            connections[self.using].ops.bulk_batch_size(field_names, objs), 1
+            connections[self.using].ops.bulk_batch_size(fields, objs), 1
         )
         if len(objs) > conn_batch_size:
             return [

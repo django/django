@@ -1,14 +1,14 @@
 """
- The GDAL/OGR library uses an Envelope structure to hold the bounding
- box information for a geometry.  The envelope (bounding box) contains
- two pairs of coordinates, one for the lower left coordinate and one
- for the upper right coordinate:
+The GDAL/OGR library uses an Envelope structure to hold the bounding
+box information for a geometry.  The envelope (bounding box) contains
+two pairs of coordinates, one for the lower left coordinate and one
+for the upper right coordinate:
 
-                           +----------o Upper right; (max_x, max_y)
-                           |          |
-                           |          |
-                           |          |
- Lower left (min_x, min_y) o----------+
+                          +----------o Upper right; (max_x, max_y)
+                          |          |
+                          |          |
+                          |          |
+Lower left (min_x, min_y) o----------+
 """
 
 from ctypes import Structure, c_double
@@ -21,6 +21,7 @@ from django.contrib.gis.gdal.error import GDALException
 #   https://gdal.org/doxygen/ogr__core_8h_source.html
 class OGREnvelope(Structure):
     "Represent the OGREnvelope C Structure."
+
     _fields_ = [
         ("MinX", c_double),
         ("MaxX", c_double),

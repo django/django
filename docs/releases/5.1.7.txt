@@ -1,0 +1,34 @@
+==========================
+Django 5.1.7 release notes
+==========================
+
+*March 6, 2025*
+
+Django 5.1.7 fixes a security issue with severity "moderate" and several bugs
+in 5.1.6.
+
+CVE-2025-26699: Potential denial-of-service vulnerability in ``django.utils.text.wrap()``
+=========================================================================================
+
+The ``wrap()`` and :tfilter:`wordwrap` template filter were subject to a
+potential denial-of-service attack when used with very long strings.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 5.1 where the ``{% querystring %}`` template tag
+  returned an empty string rather than ``"?"`` when all parameters had been
+  removed from the query string (:ticket:`36182`).
+
+* Fixed a bug in Django 5.1 where ``FileSystemStorage``, with
+  ``allow_overwrite`` set to ``True``, did not truncate the overwritten file
+  content (:ticket:`36191`).
+
+* Fixed a regression in Django 5.1 where the ``count`` and ``exists`` methods
+  of ``ManyToManyField`` related managers would always return ``0`` and
+  ``False`` when the intermediary model back references used ``to_field``
+  (:ticket:`36197`).
+
+* Fixed a regression in Django 5.1 where the ``pre_save`` and ``post_save``
+  signals for ``LogEntry`` were not sent when deleting a single object in the
+  admin (:ticket:`36217`).

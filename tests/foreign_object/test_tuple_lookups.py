@@ -63,9 +63,11 @@ class TupleLookupsTests(TestCase):
                 )
 
     def test_exact_subquery(self):
-        with self.assertRaisesMessage(
-            ValueError, "'exact' doesn't support multi-column subqueries."
-        ):
+        msg = (
+            "The QuerySet value for the exact lookup must have 2 selected "
+            "fields (received 1)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
             self.assertSequenceEqual(
                 Contact.objects.filter(customer=subquery).order_by("id"), ()
@@ -140,11 +142,11 @@ class TupleLookupsTests(TestCase):
     def test_tuple_in_subquery_must_have_2_fields(self):
         lhs = (F("customer_code"), F("company_code"))
         rhs = Customer.objects.values_list("customer_id").query
-        with self.assertRaisesMessage(
-            ValueError,
-            "'in' subquery lookup of ('customer_code', 'company_code') "
-            "must have 2 fields (received 1)",
-        ):
+        msg = (
+            "The QuerySet value for the 'in' lookup must have 2 selected "
+            "fields (received 1)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             TupleIn(lhs, rhs)
 
     def test_tuple_in_subquery(self):

@@ -2,7 +2,7 @@
 Django 4.2.19 release notes
 ===========================
 
-*Expected February 5, 2025*
+*February 5, 2025*
 
 Django 4.2.19 fixes a regression in 4.2.18.
 

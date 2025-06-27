@@ -1,6 +1,6 @@
 import re
-from datetime import date, datetime, timezone
-from decimal import Decimal
+from datetime import UTC, date, datetime
+from decimal import Decimal, InvalidOperation
 
 from django import template
 from django.template import defaultfilters
@@ -66,14 +66,15 @@ def ordinal(value):
 @register.filter(is_safe=True)
 def intcomma(value, use_l10n=True):
     """
-    Convert an integer to a string containing commas every three digits.
-    For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
+    Convert an integer or float (or a string representation of either) to a
+    string containing commas every three digits. Format localization is
+    respected. For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
     """
     if use_l10n:
         try:
             if not isinstance(value, (float, Decimal)):
-                value = int(value)
-        except (TypeError, ValueError):
+                value = Decimal(value)
+        except (TypeError, ValueError, InvalidOperation):
             return intcomma(value, False)
         else:
             return number_format(value, use_l10n=True, force_grouping=True)
@@ -223,29 +224,36 @@ class NaturalTimeFormatter:
         # and time unit.
         "past-second": ngettext_lazy("a second ago", "%(count)s seconds ago", "count"),
         "now": gettext_lazy("now"),
-        # Translators: please keep a non-breaking space (U+00A0) between count
-        # and time unit.
+        # fmt: off
+        # fmt turned off to avoid black splitting the ngettext_lazy calls to multiple
+        # lines, as this results in gettext missing the 'Translators:' comments.
         "future-second": ngettext_lazy(
+            # Translators: please keep a non-breaking space (U+00A0) between count
+            # and time unit.
             "a second from now", "%(count)s seconds from now", "count"
         ),
-        # Translators: please keep a non-breaking space (U+00A0) between count
-        # and time unit.
         "future-minute": ngettext_lazy(
-            "a minute from now", "%(count)s minutes from now", "count"
+            # Translators: please keep a non-breaking space (U+00A0) between count
+            # and time unit.
+            "a minute from now", "%(count)s minutes from now", "count",
         ),
-        # Translators: please keep a non-breaking space (U+00A0) between count
-        # and time unit.
         "future-hour": ngettext_lazy(
-            "an hour from now", "%(count)s hours from now", "count"
+            # Translators: please keep a non-breaking space (U+00A0) between count
+            # and time unit.
+            "an hour from now", "%(count)s hours from now", "count",
         ),
+        # fmt: on
         # Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
         "future-day": gettext_lazy("%(delta)s from now"),
     }
     past_substrings = {
-        # Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
+        # fmt: off
         "year": npgettext_lazy(
-            "naturaltime-past", "%(num)d year", "%(num)d years", "num"
+            # Translators: 'naturaltime-past' strings will be included in
+            # '%(delta)s ago'
+            "naturaltime-past", "%(num)d year", "%(num)d years", "num",
         ),
+        # fmt:on
         "month": npgettext_lazy(
             "naturaltime-past", "%(num)d month", "%(num)d months", "num"
         ),
@@ -261,11 +269,13 @@ class NaturalTimeFormatter:
         ),
     }
     future_substrings = {
-        # Translators: 'naturaltime-future' strings will be included in
-        # '%(delta)s from now'.
+        # fmt: off
         "year": npgettext_lazy(
-            "naturaltime-future", "%(num)d year", "%(num)d years", "num"
+            # Translators: 'naturaltime-future' strings will be included in
+            # '%(delta)s from now'.
+            "naturaltime-future", "%(num)d year", "%(num)d years", "num",
         ),
+        # fmt: on
         "month": npgettext_lazy(
             "naturaltime-future", "%(num)d month", "%(num)d months", "num"
         ),
@@ -288,7 +298,7 @@ class NaturalTimeFormatter:
         if not isinstance(value, date):  # datetime is a subclass of date
             return value
 
-        now = datetime.now(timezone.utc if is_aware(value) else None)
+        now = datetime.now(UTC if is_aware(value) else None)
         if value < now:
             delta = now - value
             if delta.days != 0:

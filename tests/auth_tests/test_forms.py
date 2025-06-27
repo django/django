@@ -1,8 +1,10 @@
 import datetime
 import re
+import sys
 import urllib.parse
 from unittest import mock
 
+from django import forms
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm,
     AdminUserCreationForm,
@@ -13,6 +15,7 @@ from django.contrib.auth.forms import (
     ReadOnlyPasswordHashField,
     ReadOnlyPasswordHashWidget,
     SetPasswordForm,
+    SetPasswordMixin,
     UserChangeForm,
     UserCreationForm,
     UsernameField,
@@ -24,13 +27,14 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
-from django.forms import forms
 from django.forms.fields import CharField, Field, IntegerField
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
+from django.views.debug import technical_500_response
+from django.views.decorators.debug import sensitive_variables
 
 from .models.custom_user import (
     CustomUser,
@@ -411,6 +415,19 @@ class CustomUserCreationFormTest(TestDataMixin, TestCase):
         self.assertIs(form.is_valid(), True)
         user = form.save(commit=True)
         self.assertSequenceEqual(user.orgs.all(), [organization])
+
+    def test_custom_form_with_non_required_password(self):
+        class CustomUserCreationForm(BaseUserCreationForm):
+            password1 = forms.CharField(required=False)
+            password2 = forms.CharField(required=False)
+            another_field = forms.CharField(required=True)
+
+        data = {
+            "username": "testclientnew",
+            "another_field": "Content",
+        }
+        form = CustomUserCreationForm(data)
+        self.assertIs(form.is_valid(), True, form.errors)
 
 
 class UserCreationFormTest(BaseUserCreationFormTest):
@@ -1072,7 +1089,9 @@ class UserChangeFormTest(TestDataMixin, TestCase):
                 "Set password",
             ),
         ]
-        password_reset_link = r'<a class="button" href="([^"]*)">([^<]*)</a>'
+        password_reset_link = (
+            r'<a role="button" class="button" href="([^"]*)">([^<]*)</a>'
+        )
         for username, expected_help_text, expected_button_label in cases:
             with self.subTest(username=username):
                 user = User.objects.get(username=username)
@@ -1421,8 +1440,32 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
             "    <strong>hash</strong>: "
             "       <bdi>WmCkn9**************************************</bdi>"
             "  </p>"
-            '  <p><a class="button" href="../password/">Reset password</a></p>'
+            '  <p><a role="button" class="button" href="../password/">'
+            "Reset password</a></p>"
             "</div>",
+        )
+
+    def test_render_no_password(self):
+        widget = ReadOnlyPasswordHashWidget()
+        self.assertHTMLEqual(
+            widget.render("name", None, {}),
+            "<div><p><strong>No password set.</p><p>"
+            '<a role="button" class="button" href="../password/">Set password</a>'
+            "</p></div>",
+        )
+
+    @override_settings(
+        PASSWORD_HASHERS=["django.contrib.auth.hashers.PBKDF2PasswordHasher"]
+    )
+    def test_render_invalid_password_format(self):
+        widget = ReadOnlyPasswordHashWidget()
+        value = "pbkdf2_sh"
+        self.assertHTMLEqual(
+            widget.render("name", value, {}),
+            "<div><p>"
+            "<strong>Invalid password format or unknown hashing algorithm.</strong>"
+            '</p><p><a role="button" class="button" href="../password/">Reset password'
+            "</a></p></div>",
         )
 
     def test_readonly_field_has_changed(self):
@@ -1671,3 +1714,50 @@ class AdminUserCreationFormTest(BaseUserCreationFormTest):
         u = form.save()
         self.assertEqual(u.username, data["username"])
         self.assertFalse(u.has_usable_password())
+
+
+class SensitiveVariablesTest(TestDataMixin, TestCase):
+    @sensitive_variables("data")
+    def test_passwords_marked_as_sensitive_in_admin_forms(self):
+        data = {
+            "password1": "passwordsensitive",
+            "password2": "sensitivepassword",
+            "usable_password": "true",
+        }
+        forms = [
+            AdminUserCreationForm({**data, "username": "newusername"}),
+            AdminPasswordChangeForm(self.u1, data),
+        ]
+
+        password1_fragment = """
+         <td>password1</td>
+         <td class="code"><pre>&#x27;********************&#x27;</pre></td>
+         """
+        password2_fragment = """
+         <td>password2</td>
+         <td class="code"><pre>&#x27;********************&#x27;</pre></td>
+        """
+        error = ValueError("Forced error")
+        for form in forms:
+            with self.subTest(form=form):
+                with mock.patch.object(
+                    SetPasswordMixin, "validate_passwords", side_effect=error
+                ):
+                    try:
+                        form.is_valid()
+                    except ValueError:
+                        exc_info = sys.exc_info()
+                    else:
+                        self.fail("Form validation should have failed.")
+
+                response = technical_500_response(RequestFactory().get("/"), *exc_info)
+
+                self.assertNotContains(response, "sensitivepassword", status_code=500)
+                self.assertNotContains(response, "passwordsensitive", status_code=500)
+                self.assertContains(response, str(error), status_code=500)
+                self.assertContains(
+                    response, password1_fragment, html=True, status_code=500
+                )
+                self.assertContains(
+                    response, password2_fragment, html=True, status_code=500
+                )

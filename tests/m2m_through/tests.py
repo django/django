@@ -533,3 +533,11 @@ class M2mThroughToFieldsTests(TestCase):
             [choice[0] for choice in field.get_choices(include_blank=False)],
             ["pea", "potato", "tomato"],
         )
+
+    def test_count(self):
+        self.assertEqual(self.curry.ingredients.count(), 3)
+        self.assertEqual(self.tomato.recipes.count(), 1)
+
+    def test_exists(self):
+        self.assertTrue(self.curry.ingredients.exists())
+        self.assertTrue(self.tomato.recipes.exists())

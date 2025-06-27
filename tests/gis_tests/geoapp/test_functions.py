@@ -559,7 +559,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # Exact value depends on database and version.
         self.assertTrue(20 <= ptown.size <= 105)
 
-    @skipUnlessDBFeature("has_NumGeom_function")
+    @skipUnlessDBFeature("has_NumGeometries_function")
     def test_num_geom(self):
         # Both 'countries' only have two geometries.
         for c in Country.objects.annotate(num_geom=functions.NumGeometries("mpoly")):
@@ -576,7 +576,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             else:
                 self.assertEqual(1, city.num_geom)
 
-    @skipUnlessDBFeature("has_NumPoint_function")
+    @skipUnlessDBFeature("has_NumPoints_function")
     def test_num_points(self):
         coords = [(-95.363151, 29.763374), (-95.448601, 29.713803)]
         Track.objects.create(name="Foo", line=LineString(coords))
@@ -611,6 +611,41 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         )
         coords.reverse()
         self.assertEqual(tuple(coords), track.reverse_geom.coords)
+
+    @skipUnlessDBFeature("has_Rotate_function")
+    def test_rotate(self):
+        angle = math.pi
+        tests = [
+            {"angle": angle},
+            {"angle": angle, "origin": Point(0, 0)},
+            {"angle": angle, "origin": Point(1, 1)},
+        ]
+        for params in tests:
+            with self.subTest(params=params):
+                qs = Country.objects.annotate(
+                    rotated=functions.Rotate("mpoly", **params)
+                )
+                for country in qs:
+                    for p1, p2 in zip(country.mpoly, country.rotated):
+                        for r1, r2 in zip(p1, p2):
+                            for c1, c2 in zip(r1.coords, r2.coords):
+                                origin = params.get("origin")
+                                if origin is None:
+                                    origin = Point(0, 0)
+                                self.assertAlmostEqual(-c1[0] + 2 * origin.x, c2[0], 5)
+                                self.assertAlmostEqual(-c1[1] + 2 * origin.y, c2[1], 5)
+
+    @skipUnlessDBFeature("has_Rotate_function")
+    def test_rotate_invalid_params(self):
+        angle = math.pi
+        bad_params_tests = [
+            {"angle": angle, "origin": 0},
+            {"angle": angle, "origin": [0, 0]},
+        ]
+        msg = "origin argument must be a Point"
+        for params in bad_params_tests:
+            with self.subTest(params=params), self.assertRaisesMessage(TypeError, msg):
+                functions.Rotate("mpoly", **params)
 
     @skipUnlessDBFeature("has_Scale_function")
     def test_scale(self):

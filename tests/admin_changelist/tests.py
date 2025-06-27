@@ -946,6 +946,41 @@ class ChangeListTests(TestCase):
         self.assertEqual(cl.paginator.count, 30)
         self.assertEqual(list(cl.paginator.page_range), [1, 2, 3])
 
+    def test_pagination_render(self):
+        objs = [Swallow(origin=f"Swallow {i}", load=i, speed=i) for i in range(1, 5)]
+        Swallow.objects.bulk_create(objs)
+
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+
+        admin = SwallowAdmin(Swallow, custom_site)
+        cl = admin.get_changelist_instance(request)
+        template = Template(
+            "{% load admin_list %}{% spaceless %}{% pagination cl %}{% endspaceless %}"
+        )
+        context = Context({"cl": cl, "opts": cl.opts})
+        pagination_output = template.render(context)
+        self.assertTrue(
+            pagination_output.startswith(
+                '<nav class="paginator" aria-labelledby="pagination">'
+            )
+        )
+        self.assertInHTML(
+            '<h2 id="pagination" class="visually-hidden">Pagination swallows</h2>',
+            pagination_output,
+        )
+        self.assertTrue(pagination_output.endswith("</nav>"))
+        self.assertInHTML(
+            '<li><a role="button" href="" aria-current="page">1</a></li>',
+            pagination_output,
+        )
+        self.assertInHTML(
+            '<li><a role="button" href="?p=2">2</a></li>',
+            pagination_output,
+        )
+        self.assertEqual(pagination_output.count('aria-current="page"'), 1)
+        self.assertEqual(pagination_output.count('href=""'), 1)
+
     def test_computed_list_display_localization(self):
         """
         Regression test for #13196: output of functions should be  localized
@@ -1074,6 +1109,17 @@ class ChangeListTests(TestCase):
             response,
             '<a href="/admin/admin_changelist/genre/%s/change/">'
             "http://blues_history.com</a>" % g.pk,
+        )
+
+    def test_blank_str_display_links(self):
+        self.client.force_login(self.superuser)
+        gc = GrandChild.objects.create(name="          ")
+        response = self.client.get(
+            reverse("admin:admin_changelist_grandchild_changelist")
+        )
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_changelist/grandchild/%s/change/">-</a>' % gc.pk,
         )
 
     def test_clear_all_filters_link(self):
@@ -1734,7 +1780,12 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         self.assertContains(
             response,
-            '<form id="changelist-search" method="get" role="search">',
+            '<h2 id="changelist-search-form" class="visually-hidden">Search bands</h2>',
+        )
+        self.assertContains(
+            response,
+            '<form id="changelist-search" method="get" role="search" '
+            'aria-labelledby="changelist-search-form">',
         )
 
     def test_search_bar_total_link_preserves_options(self):
@@ -1834,7 +1885,7 @@ class GetAdminLogTests(TestCase):
         """{% get_admin_log %} works without specifying a user."""
         user = User(username="jondoe", password="secret", email="super@example.com")
         user.save()
-        LogEntry.objects.log_actions(user.pk, [user], 1, single_object=True)
+        LogEntry.objects.log_actions(user.pk, [user], 1)
         context = Context({"log_entries": LogEntry.objects.all()})
         t = Template(
             "{% load log %}"

@@ -1,10 +1,10 @@
 """
- This module houses the ctypes initialization procedures, as well
- as the notice and error handler function callbacks (get called
- when an error occurs in GEOS).
+This module houses the ctypes initialization procedures, as well
+as the notice and error handler function callbacks (get called
+when an error occurs in GEOS).
 
- This module also houses GEOS Pointer utilities, including
- get_pointer_arr(), and GEOM_PTR.
+This module also houses GEOS Pointer utilities, including
+get_pointer_arr(), and GEOM_PTR.
 """
 
 import logging

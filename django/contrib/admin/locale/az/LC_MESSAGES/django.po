@@ -5,16 +5,16 @@
 # Emin Mastizada <emin@linux.com>, 2016
 # Konul Allahverdiyeva <english.koni@gmail.com>, 2016
 # Nicat Məmmədov <n1c4t97@gmail.com>, 2022
-# Nijat Mammadov, 2024
+# Nijat Mammadov, 2024-2025
 # Sevdimali <sevdimaliisayev@mail.ru>, 2024
 # Zulfugar Ismayilzadeh <zulfuqar.ismayilzada@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Sevdimali <sevdimaliisayev@mail.ru>, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Nijat Mammadov, 2024-2025\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -35,8 +35,8 @@ msgstr "%(count)d %(items)s uğurla silindi."
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s silinə bilməz"
 
-msgid "Are you sure?"
-msgstr "Əminsinizmi?"
+msgid "Delete multiple objects"
+msgstr "Birdən çox obyekt sil"
 
 msgid "Administration"
 msgstr "Administrasiya"
@@ -96,16 +96,16 @@ msgid "Add another %(verbose_name)s"
 msgstr "Daha bir %(verbose_name)s əlavə et"
 
 msgid "Remove"
-msgstr "Yığışdır"
+msgstr "Yığışdırılma"
 
 msgid "Addition"
-msgstr "Əlavə"
+msgstr "Əlavə olunma"
 
 msgid "Change"
-msgstr "Dəyiş"
+msgstr "Dəyişiklik"
 
 msgid "Deletion"
-msgstr "Silmə"
+msgstr "Silinmə"
 
 msgid "action time"
 msgstr "əməliyyat vaxtı"
@@ -174,7 +174,7 @@ msgid "Deleted {name} “{object}”."
 msgstr "{name} “{object}” silindi."
 
 msgid "No fields changed."
-msgstr "Heç bir sahə dəyişmədi."
+msgstr "Heç bir sahə dəyişdirilmədi."
 
 msgid "None"
 msgstr "Heç biri"
@@ -243,11 +243,11 @@ msgstr "%s əlavə et"
 
 #, python-format
 msgid "Change %s"
-msgstr "%s dəyiş"
+msgstr "%s obyektini dəyiş"
 
 #, python-format
 msgid "View %s"
-msgstr "%s gör"
+msgstr "%s obyektinə bax"
 
 msgid "Database error"
 msgstr "Verilənlər bazası xətası"
@@ -267,6 +267,9 @@ msgstr[1] "Bütün %(total_count)s seçildi"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s-dan/dən 0 seçilib"
+
+msgid "Delete"
+msgstr "Sil"
 
 #, python-format
 msgid "Change history: %s"
@@ -310,13 +313,13 @@ msgid "We’re sorry, but the requested page could not be found."
 msgstr "Üzr istəyirik, amma sorğulanan səhifə tapılmadı."
 
 msgid "Home"
-msgstr "Ev"
+msgstr "Ana səhifə"
 
 msgid "Server error"
-msgstr "Serverdə xəta"
+msgstr "Server xətası"
 
 msgid "Server error (500)"
-msgstr "Serverdə xəta (500)"
+msgstr "Server xətası (500)"
 
 msgid "Server Error <em>(500)</em>"
 msgstr "Serverdə xəta <em>(500)</em>"
@@ -340,7 +343,7 @@ msgstr "Bütün səhifələr üzrə obyektləri seçmək üçün bura klikləyin
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr "Hamısını seç (%(total_count)s %(module_name)s) "
+msgstr "Hamısını seç (%(total_count)s %(module_name)s)"
 
 msgid "Clear selection"
 msgstr "Seçimi təmizlə"
@@ -352,6 +355,15 @@ msgstr "Menyu sətri"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s tətbiqetməsindəki modellər"
 
+msgid "Model name"
+msgstr "Model adı"
+
+msgid "Add link"
+msgstr "Keçid əlavə et"
+
+msgid "Change or view list link"
+msgstr "Siyahı keçidini dəyişdir və ya bax"
+
 msgid "Add"
 msgstr "Əlavə et"
 
@@ -361,15 +373,13 @@ msgstr "Bax"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Heç nəyə baxmağa və ya dəyişməyə icazəniz yoxdur."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Əvvəlcə istifacəçi adı və şifrəni daxil edin. Daha sonra siz daha çox "
-"istifadəçi seçimlərinə düzəliş edə biləcəksiniz."
+"Hesab yaratdıqdan sonra daha çox istifadəçi seçimlərini redaktə edə "
+"biləcəksiniz."
 
-msgid "Enter a username and password."
-msgstr "İstifadəçi adını və şifrəni daxil edin."
+msgid "Error:"
+msgstr "Xəta:"
 
 msgid "Change password"
 msgstr "Şifrəni dəyiş"
@@ -455,9 +465,6 @@ msgstr "Görünüşü dəyiş (halhazırkı: aydın)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Görünüşü dəyiş (halhazırkı: qaranlıq)"
 
-msgid "Delete"
-msgstr "Sil"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -493,9 +500,6 @@ msgstr "Bəli, əminəm"
 msgid "No, take me back"
 msgstr "Xeyr, geri qayıt"
 
-msgid "Delete multiple objects"
-msgstr "Bir neçə obyekt sil"
-
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -527,7 +531,7 @@ msgstr "Silinsin?"
 
 #, python-format
 msgid " By %(filter_title)s "
-msgstr " %(filter_title)s görə "
+msgstr "\"%(filter_title)s\" filtrına görə "
 
 msgid "Summary"
 msgstr "İcmal"
@@ -570,8 +574,8 @@ msgstr ""
 "%(username)s olaraq daxil olmusunuz, amma bu səhifəyə icazəniz yoxdur. Başqa "
 "bir hesaba daxil olmaq istərdiniz?"
 
-msgid "Forgotten your password or username?"
-msgstr "Şifrə və ya istifadəçi adını unutmusuz?"
+msgid "Forgotten your login credentials?"
+msgstr "Giriş məlumatlarınızı unutmusunuz?"
 
 msgid "Toggle navigation"
 msgstr "Naviqasiyanı dəyiş"
@@ -734,8 +738,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Növbəti səhifəyə keçid alın və yeni şifrəni seçin:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "İstifadəçi adınız, əgər unutmusunuzsa:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Əgər unutmusunuzsa, siz:"
 
 msgid "Thanks for using our site!"
 msgstr "Bizim saytdan istifadə etdiyiniz üçün təşəkkür edirik!"

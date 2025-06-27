@@ -9,7 +9,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import functools
 import sys
 from os.path import abspath, dirname, join
 
@@ -195,7 +194,7 @@ intersphinx_mapping = {
 intersphinx_cache_limit = 90  # days
 
 # The 'versionadded' and 'versionchanged' directives are overridden.
-suppress_warnings = ["app.add_directive"]
+suppress_warnings = ["app.add_directive", "epub.duplicated_toc_entry"]
 
 # -- Options for HTML output ---------------------------------------------------
 
@@ -446,8 +445,11 @@ epub_cover = ("", "epub-cover.html")
 # If false, no index is generated.
 # epub_use_index = True
 
-linkcode_resolve = functools.partial(
-    github_links.github_linkcode_resolve,
-    version=version,
-    next_version=django_next_version,
-)
+
+def version_github_linkcode_resolve(domain, info):
+    return github_links.github_linkcode_resolve(
+        domain, info, version=version, next_version=django_next_version
+    )
+
+
+linkcode_resolve = version_github_linkcode_resolve

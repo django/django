@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from django.core.exceptions import ValidationError
 from django.forms import DateTimeField
@@ -40,7 +40,7 @@ class DateTimeFieldTest(SimpleTestCase):
             ("2014-09-23T22:34:41", datetime(2014, 9, 23, 22, 34, 41)),
             ("2014-09-23T22:34", datetime(2014, 9, 23, 22, 34)),
             ("2014-09-23", datetime(2014, 9, 23, 0, 0)),
-            ("2014-09-23T22:34Z", datetime(2014, 9, 23, 22, 34, tzinfo=timezone.utc)),
+            ("2014-09-23T22:34Z", datetime(2014, 9, 23, 22, 34, tzinfo=UTC)),
             (
                 "2014-09-23T22:34+07:00",
                 datetime(2014, 9, 23, 22, 34, tzinfo=get_fixed_timezone(420)),
@@ -57,7 +57,7 @@ class DateTimeFieldTest(SimpleTestCase):
                 " 2014-09-23T22:34:41.614804 ",
                 datetime(2014, 9, 23, 22, 34, 41, 614804),
             ),
-            (" 2014-09-23T22:34Z ", datetime(2014, 9, 23, 22, 34, tzinfo=timezone.utc)),
+            (" 2014-09-23T22:34Z ", datetime(2014, 9, 23, 22, 34, tzinfo=UTC)),
         ]
         f = DateTimeField()
         for value, expected_datetime in tests:

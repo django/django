@@ -19,7 +19,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
     sql_alter_column_no_default_null = sql_alter_column_no_default
 
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_column_inline_fk = (
         "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s"
     )

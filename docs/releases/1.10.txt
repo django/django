@@ -687,13 +687,13 @@ If you have an old Django project with MD5 or SHA1 (even salted) encoded
 passwords, be aware that these can be cracked fairly easily with today's
 hardware. To make Django users acknowledge continued use of weak hashers, the
 following hashers are removed from the default :setting:`PASSWORD_HASHERS`
-setting::
+setting:
 
-    "django.contrib.auth.hashers.SHA1PasswordHasher"
-    "django.contrib.auth.hashers.MD5PasswordHasher"
-    "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"
-    "django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"
-    "django.contrib.auth.hashers.CryptPasswordHasher"
+* ``"django.contrib.auth.hashers.SHA1PasswordHasher"``
+* ``"django.contrib.auth.hashers.MD5PasswordHasher"``
+* ``"django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"``
+* ``"django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"``
+* ``"django.contrib.auth.hashers.CryptPasswordHasher"``
 
 Consider using a :ref:`wrapped password hasher <wrapping-password-hashers>` to
 strengthen the hashes in your database. If that's not feasible, add the

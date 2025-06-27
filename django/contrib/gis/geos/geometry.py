@@ -1,6 +1,6 @@
 """
- This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
- inherit from this object.
+This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
+inherit from this object.
 """
 
 import re
@@ -252,8 +252,15 @@ class GEOSGeometryBase(GEOSBase):
 
     @property
     def hasz(self):
-        "Return whether the geometry has a 3D dimension."
+        "Return whether the geometry has a Z dimension."
         return capi.geos_hasz(self.ptr)
+
+    @property
+    def hasm(self):
+        "Return whether the geometry has a M dimension."
+        if geos_version_tuple() < (3, 12):
+            raise GEOSException("GEOSGeometry.hasm requires GEOS >= 3.12.0.")
+        return capi.geos_hasm(self.ptr)
 
     @property
     def ring(self):

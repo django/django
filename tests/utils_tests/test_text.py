@@ -9,7 +9,7 @@ from django.utils.functional import lazystr
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy, override
 
-IS_WIDE_BUILD = len("\U0001F4A9") == 1
+IS_WIDE_BUILD = len("\U0001f4a9") == 1
 
 
 class TestUtilsText(SimpleTestCase):
@@ -76,16 +76,16 @@ class TestUtilsText(SimpleTestCase):
         # Ensure the final length is calculated correctly when there are
         # combining characters with no precomposed form, and that combining
         # characters are not split up.
-        truncator = text.Truncator("-B\u030AB\u030A----8")
-        self.assertEqual("-B\u030A…", truncator.chars(3))
-        self.assertEqual("-B\u030AB\u030A-…", truncator.chars(5))
-        self.assertEqual("-B\u030AB\u030A----8", truncator.chars(8))
+        truncator = text.Truncator("-B\u030aB\u030a----8")
+        self.assertEqual("-B\u030a…", truncator.chars(3))
+        self.assertEqual("-B\u030aB\u030a-…", truncator.chars(5))
+        self.assertEqual("-B\u030aB\u030a----8", truncator.chars(8))
 
         # Ensure the length of the end text is correctly calculated when it
         # contains combining characters with no precomposed form.
         truncator = text.Truncator("-----")
-        self.assertEqual("---B\u030A", truncator.chars(4, "B\u030A"))
-        self.assertEqual("-----", truncator.chars(5, "B\u030A"))
+        self.assertEqual("---B\u030a", truncator.chars(4, "B\u030a"))
+        self.assertEqual("-----", truncator.chars(5, "B\u030a"))
 
         # Make a best effort to shorten to the desired length, but requesting
         # a length shorter than the ellipsis shouldn't break

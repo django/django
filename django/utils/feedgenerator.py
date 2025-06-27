@@ -277,7 +277,7 @@ class SyndicationFeed:
                     if latest_date is None or item_date > latest_date:
                         latest_date = item_date
 
-        return latest_date or datetime.datetime.now(tz=datetime.timezone.utc)
+        return latest_date or datetime.datetime.now(tz=datetime.UTC)
 
 
 class Enclosure:

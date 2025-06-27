@@ -263,7 +263,16 @@ class ASGIHandler(base.BaseHandler):
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
             if "body" in message:
-                body_file.write(message["body"])
+                on_disk = getattr(body_file, "_rolled", False)
+                if on_disk:
+                    async_write = sync_to_async(
+                        body_file.write,
+                        thread_sensitive=False,
+                    )
+                    await async_write(message["body"])
+                else:
+                    body_file.write(message["body"])
+
             # Quit out if that's the end.
             if not message.get("more_body", False):
                 break
@@ -311,9 +320,7 @@ class ASGIHandler(base.BaseHandler):
                 value = value.encode("latin1")
             response_headers.append((bytes(header), bytes(value)))
         for c in response.cookies.values():
-            response_headers.append(
-                (b"Set-Cookie", c.output(header="").encode("ascii").strip())
-            )
+            response_headers.append((b"Set-Cookie", c.OutputString().encode("ascii")))
         # Initial response message.
         await send(
             {
@@ -326,8 +333,8 @@ class ASGIHandler(base.BaseHandler):
         if response.streaming:
             # - Consume via `__aiter__` and not `streaming_content` directly, to
             #   allow mapping of a sync iterator.
-            # - Use aclosing() when consuming aiter.
-            #   See https://github.com/python/cpython/commit/6e8dcda
+            # - Use aclosing() when consuming aiter. See
+            #   https://github.com/python/cpython/commit/6e8dcdaaa49d4313bf9fab9f9923ca5828fbb10e
             async with aclosing(aiter(response)) as content:
                 async for part in content:
                     for chunk, _ in self.chunk_bytes(part):

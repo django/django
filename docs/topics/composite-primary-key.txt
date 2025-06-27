@@ -113,8 +113,8 @@ To work around this limitation, ``ForeignObject`` can be used as an
 alternative::
 
     class Foo(models.Model):
-        item_order_id = models.IntegerField()
-        item_product_id = models.CharField(max_length=20)
+        item_order_id = models.CharField(max_length=20)
+        item_product_id = models.IntegerField()
         item = models.ForeignObject(
             OrderLineItem,
             on_delete=models.CASCADE,
@@ -124,7 +124,7 @@ alternative::
 
 ``ForeignObject`` is much like ``ForeignKey``, except that it doesn't create
 any columns (e.g. ``item_id``), foreign key constraints or indexes in the
-database.
+database, and the ``on_delete`` argument is ignored.
 
 .. warning::
 

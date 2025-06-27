@@ -25,12 +25,14 @@ class geos_char_p(c_char_p):
 # ### ctypes factory classes ###
 class GeomOutput(GEOSFuncFactory):
     "For GEOS routines that return a geometry."
+
     restype = GEOM_PTR
     errcheck = staticmethod(check_geom)
 
 
 class IntFromGeom(GEOSFuncFactory):
     "Argument is a geometry, return type is an integer."
+
     argtypes = [GEOM_PTR]
     restype = c_int
     errcheck = staticmethod(check_minus_one)
@@ -38,6 +40,7 @@ class IntFromGeom(GEOSFuncFactory):
 
 class StringFromGeom(GEOSFuncFactory):
     "Argument is a Geometry, return type is a string."
+
     argtypes = [GEOM_PTR]
     restype = geos_char_p
     errcheck = staticmethod(check_string)

@@ -49,14 +49,19 @@
     padding: 8px;
 }
 
-.selector-chosen-title label {
+.aligned .selector-chosen-title label {
     color: var(--header-link-color);
+    width: 100%;
 }
 
 .selector-available-title {
     background: var(--darkened-bg);
     color: var(--body-quiet-color);
     padding: 8px;
+}
+
+.aligned .selector-available-title label {
+    width: 100%;
 }
 
 .selector .selector-filter {

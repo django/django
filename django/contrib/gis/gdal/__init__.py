@@ -1,29 +1,29 @@
 """
- This module houses ctypes interfaces for GDAL objects.  The following GDAL
- objects are supported:
+This module houses ctypes interfaces for GDAL objects.  The following GDAL
+objects are supported:
 
- CoordTransform: Used for coordinate transformations from one spatial
-  reference system to another.
+CoordTransform: Used for coordinate transformations from one spatial
+ reference system to another.
 
- Driver: Wraps an OGR data source driver.
+Driver: Wraps an OGR data source driver.
 
- DataSource: Wrapper for the OGR data source object, supports
-  OGR-supported data sources.
+DataSource: Wrapper for the OGR data source object, supports
+ OGR-supported data sources.
 
- Envelope: A ctypes structure for bounding boxes (GDAL library
-  not required).
+Envelope: A ctypes structure for bounding boxes (GDAL library
+ not required).
 
- OGRGeometry: Object for accessing OGR Geometry functionality.
+OGRGeometry: Object for accessing OGR Geometry functionality.
 
- OGRGeomType: A class for representing the different OGR Geometry
-  types (GDAL library not required).
+OGRGeomType: A class for representing the different OGR Geometry
+ types (GDAL library not required).
 
- SpatialReference: Represents OSR Spatial Reference objects.
+SpatialReference: Represents OSR Spatial Reference objects.
 
- The GDAL library will be imported from the system path using the default
- library name for the current OS. The default library path may be overridden
- by setting `GDAL_LIBRARY_PATH` in your settings with the path to the GDAL C
- library on your system.
+The GDAL library will be imported from the system path using the default
+library name for the current OS. The default library path may be overridden
+by setting `GDAL_LIBRARY_PATH` in your settings with the path to the GDAL C
+library on your system.
 """
 
 from django.contrib.gis.gdal.datasource import DataSource

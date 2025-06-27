@@ -184,54 +184,68 @@ Release process
 Django uses a time-based release schedule, with feature releases every eight
 months or so.
 
-After each feature release, the release manager will announce a timeline for
-the next feature release.
+After each feature release, the release manager will publish a timeline for the
+next feature release. The timeline for an upcoming feature release can be found
+in the corresponding wiki roadmap page, e.g.
+https://code.djangoproject.com/wiki/Version6.0Roadmap.
 
-Release cycle
--------------
+Feature release schedule and stages
+-----------------------------------
 
-Each release cycle consists of three parts:
+Active development / Pre-feature freeze
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Phase one: feature proposal
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Work begins on the feature release ``A.B`` after the feature freeze of the
+previous release, i.e. when the ``stable/A.B-1.x`` branch is forked.
 
-The first phase of the release process will include figuring out what major
-features to include in the next version. This should include a good deal of
-preliminary work on those features -- working code trumps grand design.
+You can find the current branch under active development in the
+`Django release process
+<https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
 
-Major features for an upcoming release will be added to the wiki roadmap page,
-e.g. https://code.djangoproject.com/wiki/Version1.11Roadmap.
+Feature freeze / Alpha release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Phase two: development
-~~~~~~~~~~~~~~~~~~~~~~
+All major and minor features, including deprecations and breaking changes, must
+be merged by the feature freeze. Any features not done by this point will be
+deferred to the next feature release.
 
-The second part of the release schedule is the "heads-down" working period.
-Using the roadmap produced at the end of phase one, we'll all work very hard to
-get everything on it done.
+At this point, the ``stable/A.B.x`` branch will be forked from ``main``.
 
-At the end of phase two, any unfinished features will be postponed until the
-next release.
+Non-release blocking bug fix freeze / Beta release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Phase two will culminate with an alpha release. At this point, the
-``stable/A.B.x`` branch will be forked from ``main``.
+After the alpha, all bug fixes merged in ``main`` are also backported to
+``stable/A.B.x``. Refactors are backported at the discretion of the merger.
+Mergers will be more and more conservative with backports, to avoid introducing
+regressions.
 
-Phase three: bugfixes
-~~~~~~~~~~~~~~~~~~~~~
+In parallel to this phase, ``main`` can continue to receive new features, to be
+released in the ``A.B+1`` cycle.
 
-The last part of a release cycle is spent fixing bugs -- no new features will
-be accepted during this time. We'll try to release a beta release one month
-after the alpha and a release candidate one month after the beta.
+Translation string freeze / Release candidate release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If there is still a consistent stream of release blockers coming in at the
+planned release candidate date, a beta 2 will be released to encourage further
+testing and the release candidate date will be pushed out ~1 month.
 
 The release candidate marks the string freeze, and it happens at least two
-weeks before the final release. After this point, new translatable strings
-must not be added.
+weeks before the final release. Translators can then submit updated
+translations for inclusion in the final release. After this point, new
+translatable strings must not be added.
 
-During this phase, mergers will be more and more conservative with backports,
-to avoid introducing regressions. After the release candidate, only release
-blockers and documentation fixes should be backported.
+After the release candidate, only release blockers and documentation fixes are
+backported.
 
-In parallel to this phase, ``main`` can receive new features, to be released
-in the ``A.B+1`` cycle.
+Final release
+~~~~~~~~~~~~~
+
+Ideally, the final release will ship two weeks after the last release
+candidate.
+
+If there are major bugs still being found 2 weeks after the release candidate,
+there will be a decision on how to proceed (likely another release candidate
+would be issued and the final release date will be pushed out).
 
 Bug-fix releases
 ----------------

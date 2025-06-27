@@ -39,6 +39,7 @@ from django.db.models.functions import (
 from django.db.models.sql.query import get_field_names_from_opts
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     Author,
@@ -969,6 +970,24 @@ class NonAggregateAnnotationTestCase(TestCase):
         ):
             Book.objects.annotate(BooleanField(), Value(False), is_book=True)
 
+    def test_complex_annotations_must_have_an_alias(self):
+        complex_annotations = [
+            F("rating") * F("price"),
+            Value("title"),
+            Case(When(pages__gte=400, then=Value("Long")), default=Value("Short")),
+            Subquery(
+                Book.objects.filter(publisher_id=OuterRef("pk"))
+                .order_by("-pubdate")
+                .values("name")[:1]
+            ),
+            Exists(Book.objects.filter(publisher_id=OuterRef("pk"))),
+        ]
+        msg = "Complex annotations require an alias"
+        for annotation in complex_annotations:
+            with self.subTest(annotation=annotation):
+                with self.assertRaisesMessage(TypeError, msg):
+                    Book.objects.annotate(annotation)
+
     def test_chaining_annotation_filter_with_m2m(self):
         qs = (
             Author.objects.filter(
@@ -1139,6 +1158,11 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_alias_sql_injection(self):
         crafted_alias = """injected_name" from "annotations_book"; --"""
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # msg = (
+        #    "Column aliases cannot contain whitespace characters, quotation marks, "
+        #    "semicolons, percent signs, or SQL comments."
+        # )
         msg = (
             "Column aliases cannot contain whitespace characters, quotation marks, "
             "semicolons, or SQL comments."
@@ -1158,10 +1182,17 @@ class NonAggregateAnnotationTestCase(TestCase):
             "ali/*as",
             "alias*/",
             "alias;",
+            # RemovedInDjango70Warning: When the deprecation ends, add this case.
+            # "alias%",
             # [] are used by MSSQL.
             "alias[",
             "alias]",
         ]
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # msg = (
+        #    "Column aliases cannot contain whitespace characters, quotation marks, "
+        #    "semicolons, percent signs, or SQL comments."
+        # )
         msg = (
             "Column aliases cannot contain whitespace characters, quotation marks, "
             "semicolons, or SQL comments."
@@ -1170,6 +1201,11 @@ class NonAggregateAnnotationTestCase(TestCase):
             with self.subTest(crafted_alias):
                 with self.assertRaisesMessage(ValueError, msg):
                     Book.objects.annotate(**{crafted_alias: Value(1)})
+
+    def test_alias_containing_percent_sign_deprecation(self):
+        msg = "Using percent signs in a column alias is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango70Warning, msg):
+            Book.objects.annotate(**{"alias%": Value(1)})
 
     @skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
     @skipUnlessDBFeature("supports_json_field")
@@ -1452,8 +1488,17 @@ class AliasTests(TestCase):
                 with self.assertRaisesMessage(FieldError, msg):
                     getattr(qs, operation)("rating_alias")
 
+    def test_alias_after_values(self):
+        qs = Book.objects.values_list("pk").alias(other_pk=F("pk"))
+        self.assertEqual(qs.get(pk=self.b1.pk), (self.b1.pk,))
+
     def test_alias_sql_injection(self):
         crafted_alias = """injected_name" from "annotations_book"; --"""
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # msg = (
+        #    "Column aliases cannot contain whitespace characters, quotation marks, "
+        #    "semicolons, percent signs, or SQL comments."
+        # )
         msg = (
             "Column aliases cannot contain whitespace characters, quotation marks, "
             "semicolons, or SQL comments."

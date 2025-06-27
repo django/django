@@ -257,6 +257,18 @@ class BaseDatabaseFeatures:
     # expressions?
     supports_aggregate_filter_clause = False
 
+    # Does the database support ORDER BY in aggregate expressions?
+    supports_aggregate_order_by_clause = False
+
+    # Does the database backend support DISTINCT when using multiple arguments in an
+    # aggregate expression? For example, Sqlite treats the "delimiter" argument of
+    # STRING_AGG/GROUP_CONCAT as an extra argument and does not allow using a custom
+    # delimiter along with DISTINCT.
+    supports_aggregate_distinct_multiple_argument = True
+
+    # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
+    supports_any_value = False
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
@@ -277,10 +289,6 @@ class BaseDatabaseFeatures:
     # functionality of the procedure isn't important.
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
-
-    # SQL to create a table with a composite primary key for use by the Django
-    # test suite.
-    create_test_table_with_composite_primary_key = None
 
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
@@ -342,6 +350,8 @@ class BaseDatabaseFeatures:
     json_key_contains_list_matching_requires_list = False
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
+    # Does the backend support negative JSON array indexing?
+    supports_json_negative_indexing = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True
@@ -367,6 +377,9 @@ class BaseDatabaseFeatures:
 
     # Does the backend support unlimited character columns?
     supports_unlimited_charfield = False
+
+    # Does the backend support native tuple lookups (=, >, <, IN)?
+    supports_tuple_lookups = True
 
     # Collation names for use by the Django test suite.
     test_collations = {
@@ -394,6 +407,9 @@ class BaseDatabaseFeatures:
 
     def __init__(self, connection):
         self.connection = connection
+
+    def __del__(self):
+        del self.connection
 
     @cached_property
     def supports_explaining_query_execution(self):

@@ -183,7 +183,7 @@ PostGIS     ``ST_ContainsProperly(poly, geom)``
 -------------
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_CoveredBy.html>`__,
-Oracle, MariaDB 11.7+, MySQL, PGRaster (Bilateral), SpatiaLite
+Oracle, MariaDB, MySQL, PGRaster (Bilateral), SpatiaLite
 
 Tests if no point in the geometry field is outside the lookup geometry.
 [#fncovers]_
@@ -204,7 +204,11 @@ SpatiaLite  ``CoveredBy(poly, geom)``
 
 .. versionchanged:: 5.2
 
-    MySQL and MariaDB 11.7+ support was added.
+    MySQL support was added.
+
+.. versionchanged:: 6.0
+
+    MariaDB 12.0.1+ support was added.
 
 .. fieldlookup:: covers
 
@@ -391,9 +395,9 @@ MariaDB, MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
 Oracle                               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
 ===================================  ================================================================
 
-.. versionchanged:: 5.2
+.. versionchanged:: 6.0
 
-    MariaDB 11.7+ support was added.
+    MariaDB 12.0.1+ support was added.
 
 .. fieldlookup:: overlaps
 
@@ -894,9 +898,9 @@ aggregate, except it can be several orders of magnitude faster than performing
 a union because it rolls up geometries into a collection or multi object, not
 caring about dissolving boundaries.
 
-.. versionchanged:: 5.2
+.. versionchanged:: 6.0
 
-    MariaDB 11.7+ support was added.
+    MariaDB 12.0.1+ support was added.
 
 ``Extent``
 ~~~~~~~~~~

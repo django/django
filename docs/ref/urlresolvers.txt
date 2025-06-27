@@ -132,7 +132,7 @@ For example:
 
 A lazily evaluated version of `reverse()`_.
 
-.. function:: reverse_lazy(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+.. function:: reverse_lazy(viewname, urlconf=None, args=None, kwargs=None, current_app=None, *, query=None, fragment=None)
 
 It is useful for when you need to use a URL reversal before your project's
 URLConf is loaded. Some common cases where this function is necessary are:
@@ -146,6 +146,10 @@ URLConf is loaded. Some common cases where this function is necessary are:
 
 * providing a reversed URL as a default value for a parameter in a function's
   signature.
+
+.. versionchanged:: 5.2
+
+    The ``query`` and ``fragment`` arguments were added.
 
 ``resolve()``
 =============

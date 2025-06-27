@@ -432,10 +432,10 @@ that is, when you retrieve data using QuerySet methods like ``get()``,
 Some database column types accept parameters, such as ``CHAR(25)``, where the
 parameter ``25`` represents the maximum column length. In cases like these,
 it's more flexible if the parameter is specified in the model rather than being
-hard-coded in the ``db_type()`` method. For example, it wouldn't make much
-sense to have a ``CharMaxlength25Field``, shown here::
+hardcoded in the ``db_type()`` method. For example, it wouldn't make much sense
+to have a ``CharMaxlength25Field``, shown here::
 
-    # This is a silly example of hard-coded parameters.
+    # This is a silly example of hardcoded parameters.
     class CharMaxlength25Field(models.Field):
         def db_type(self, connection):
             return "char(25)"

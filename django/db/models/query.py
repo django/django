@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+from functools import reduce
 from itertools import chain, islice
 
 from asgiref.sync import sync_to_async
@@ -20,10 +21,10 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import AutoField, DateField, DateTimeField, Field, sql
+from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, F, Value, When
+from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
@@ -33,7 +34,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.functional import cached_property, partition
+from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
 MAX_GET_RESULTS = 21
@@ -165,7 +166,9 @@ class RawModelIterable(BaseIterable):
                 annotation_fields,
             ) = self.queryset.resolve_model_init_order()
             model_cls = self.queryset.model
-            if model_cls._meta.pk.attname not in model_init_names:
+            if any(
+                f.attname not in model_init_names for f in model_cls._meta.pk_fields
+            ):
                 raise exceptions.FieldDoesNotExist(
                     "Raw query must include the primary key"
                 )
@@ -670,22 +673,20 @@ class QuerySet(AltersData):
     acreate.alters_data = True
 
     def _prepare_for_bulk_create(self, objs):
-        from django.db.models.expressions import DatabaseDefault
-
-        connection = connections[self.db]
+        objs_with_pk, objs_without_pk = [], []
         for obj in objs:
-            if not obj._is_pk_set():
-                # Populate new PK values.
+            if isinstance(obj.pk, DatabaseDefault):
+                objs_without_pk.append(obj)
+            elif obj._is_pk_set():
+                objs_with_pk.append(obj)
+            else:
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
-            if not connection.features.supports_default_keyword_in_bulk_insert:
-                for field in obj._meta.fields:
-                    if field.generated:
-                        continue
-                    value = getattr(obj, field.attname)
-                    if isinstance(value, DatabaseDefault):
-                        setattr(obj, field.attname, field.db_default)
-
+                if obj._is_pk_set():
+                    objs_with_pk.append(obj)
+                else:
+                    objs_without_pk.append(obj)
             obj._prepare_related_fields_for_save(operation_name="bulk_create")
+        return objs_with_pk, objs_without_pk
 
     def _check_bulk_create_options(
         self, ignore_conflicts, update_conflicts, update_fields, unique_fields
@@ -798,9 +799,9 @@ class QuerySet(AltersData):
         self._for_write = True
         fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
-        self._prepare_for_bulk_create(objs)
+        objs_with_pk, objs_without_pk = self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_without_pk, objs_with_pk = partition(lambda o: o._is_pk_set(), objs)
+            self._handle_order_with_respect_to(objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
@@ -841,6 +842,37 @@ class QuerySet(AltersData):
 
         return objs
 
+    def _handle_order_with_respect_to(self, objs):
+        if objs and (order_wrt := self.model._meta.order_with_respect_to):
+            get_filter_kwargs_for_object = order_wrt.get_filter_kwargs_for_object
+            attnames = list(get_filter_kwargs_for_object(objs[0]))
+            group_keys = set()
+            obj_groups = []
+            for obj in objs:
+                group_key = tuple(get_filter_kwargs_for_object(obj).values())
+                group_keys.add(group_key)
+                obj_groups.append((obj, group_key))
+            filters = [
+                Q.create(list(zip(attnames, group_key))) for group_key in group_keys
+            ]
+            next_orders = (
+                self.model._base_manager.using(self.db)
+                .filter(reduce(operator.or_, filters))
+                .values_list(*attnames)
+                .annotate(_order__max=Max("_order") + 1)
+            )
+            # Create mapping of group values to max order.
+            group_next_orders = dict.fromkeys(group_keys, 0)
+            group_next_orders.update(
+                (tuple(group_key), next_order) for *group_key, next_order in next_orders
+            )
+            # Assign _order values to new objects.
+            for obj, group_key in obj_groups:
+                if getattr(obj, "_order", None) is None:
+                    group_next_order = group_next_orders[group_key]
+                    obj._order = group_next_order
+                    group_next_orders[group_key] += 1
+
     bulk_create.alters_data = True
 
     async def abulk_create(
@@ -874,11 +906,12 @@ class QuerySet(AltersData):
         objs = tuple(objs)
         if not all(obj._is_pk_set() for obj in objs):
             raise ValueError("All bulk_update() objects must have a primary key set.")
-        fields = [self.model._meta.get_field(name) for name in fields]
+        opts = self.model._meta
+        fields = [opts.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
-        all_pk_fields = set(self.model._meta.pk_fields)
-        for parent in self.model._meta.all_parents:
+        all_pk_fields = set(opts.pk_fields)
+        for parent in opts.all_parents:
             all_pk_fields.update(parent._meta.pk_fields)
         if any(f in all_pk_fields for f in fields):
             raise ValueError("bulk_update() cannot be used with primary key fields.")
@@ -892,7 +925,9 @@ class QuerySet(AltersData):
         # and once in the WHEN. Each field will also have one CAST.
         self._for_write = True
         connection = connections[self.db]
-        max_batch_size = connection.ops.bulk_batch_size(["pk", "pk"] + fields, objs)
+        max_batch_size = connection.ops.bulk_batch_size(
+            [opts.pk, opts.pk, *fields], objs
+        )
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         requires_casting = connection.features.requires_casted_case_in_updates
         batches = (objs[i : i + batch_size] for i in range(0, len(objs), batch_size))
@@ -1145,7 +1180,9 @@ class QuerySet(AltersData):
             if not id_list:
                 return {}
             filter_key = "{}__in".format(field_name)
-            batch_size = connections[self.db].features.max_query_params
+            max_params = connections[self.db].features.max_query_params or 0
+            num_fields = len(opts.pk_fields) if field_name == "pk" else 1
+            batch_size = max_params // num_fields
             id_list = tuple(id_list)
             # If the database has a limit on the number of query parameters
             # (e.g. SQLite), retrieve objects in batches if necessary.
@@ -1248,8 +1285,9 @@ class QuerySet(AltersData):
                 new_order_by.append(col)
         query.order_by = tuple(new_order_by)
 
-        # Clear any annotations so that they won't be present in subqueries.
-        query.annotations = {}
+        # Clear SELECT clause as all annotation references were inlined by
+        # add_update_values() already.
+        query.clear_select_clause()
         with transaction.mark_for_rollback_on_error(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
         self._result_cache = None
@@ -1371,24 +1409,33 @@ class QuerySet(AltersData):
                 "field."
             )
 
-        field_names = {f for f in fields if not hasattr(f, "resolve_expression")}
+        field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []
         expressions = {}
         counter = 1
         for field in fields:
+            field_name = field
+            expression = None
             if hasattr(field, "resolve_expression"):
-                field_id_prefix = getattr(
+                field_name = getattr(
                     field, "default_alias", field.__class__.__name__.lower()
                 )
-                while True:
-                    field_id = field_id_prefix + str(counter)
+                expression = field
+                # For backward compatibility reasons expressions are always
+                # prefixed with the counter even if their default alias doesn't
+                # collide with field names. Changing this logic could break
+                # some usage of named=True.
+                seen = True
+            elif seen := field_names[field_name]:
+                expression = F(field_name)
+            if seen:
+                field_name_prefix = field_name
+                while (field_name := f"{field_name_prefix}{counter}") in field_names:
                     counter += 1
-                    if field_id not in field_names:
-                        break
-                expressions[field_id] = field
-                _fields.append(field_id)
-            else:
-                _fields.append(field)
+            if expression is not None:
+                expressions[field_name] = expression
+            field_names[field_name] = True
+            _fields.append(field_name)
 
         clone = self._values(*_fields, **expressions)
         clone._iterable_class = (
@@ -1524,9 +1571,7 @@ class QuerySet(AltersData):
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
-        clone.query.combined_queries = (self.query,) + tuple(
-            qs.query for qs in other_qs
-        )
+        clone.query.combined_queries = (self.query, *(qs.query for qs in other_qs))
         clone.query.combinator = combinator
         clone.query.combinator_all = all
         return clone
@@ -1540,6 +1585,8 @@ class QuerySet(AltersData):
             if len(qs) == 1:
                 return qs[0]
             return qs[0]._combinator_query("union", *qs[1:], all=all)
+        elif not other_qs:
+            return self
         return self._combinator_query("union", *other_qs, all=all)
 
     def intersection(self, *other_qs):
@@ -1643,14 +1690,16 @@ class QuerySet(AltersData):
         )
         annotations = {}
         for arg in args:
-            # The default_alias property may raise a TypeError.
+            # The default_alias property raises TypeError if default_alias
+            # can't be set automatically or AttributeError if it isn't an
+            # attribute.
             try:
                 if arg.default_alias in kwargs:
                     raise ValueError(
                         "The named annotation '%s' conflicts with the "
                         "default name for another annotation." % arg.default_alias
                     )
-            except TypeError:
+            except (TypeError, AttributeError):
                 raise TypeError("Complex annotations require an alias")
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
@@ -1964,10 +2013,6 @@ class QuerySet(AltersData):
             self._known_related_objects.setdefault(field, {}).update(objects)
 
     def resolve_expression(self, *args, **kwargs):
-        if self._fields and len(self._fields) > 1:
-            # values() queryset can only be used as nested queries
-            # if they are set up to select only a single field.
-            raise TypeError("Cannot use multi-field values as a filter value.")
         query = self.query.resolve_expression(*args, **kwargs)
         query._db = self._db
         return query
@@ -2070,7 +2115,9 @@ class RawQuerySet:
         """Resolve the init field names and value positions."""
         converter = connections[self.db].introspection.identifier_converter
         model_init_fields = [
-            f for f in self.model._meta.fields if converter(f.column) in self.columns
+            field
+            for column_name, field in self.model_fields.items()
+            if column_name in self.columns
         ]
         annotation_fields = [
             (column, pos)
@@ -2185,10 +2232,13 @@ class RawQuerySet:
     def model_fields(self):
         """A dict mapping column names to model field names."""
         converter = connections[self.db].introspection.identifier_converter
-        model_fields = {}
-        for field in self.model._meta.fields:
-            model_fields[converter(field.column)] = field
-        return model_fields
+        return {
+            converter(field.column): field
+            for field in self.model._meta.fields
+            # Fields with None "column" should be ignored
+            # (e.g. CompositePrimaryKey).
+            if field.column
+        }
 
 
 class Prefetch:
@@ -2665,7 +2715,11 @@ class RelatedPopulator:
             )
 
         self.model_cls = klass_info["model"]
-        self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
+        # A primary key must have all of its constituents not-NULL as
+        # NULL != NULL and thus NULL cannot be referenced through a foreign
+        # relationship. Therefore checking for a single member of the primary
+        # key is enough to determine if the referenced object exists or not.
+        self.pk_idx = self.init_list.index(self.model_cls._meta.pk_fields[0].attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
         self.local_setter = klass_info["local_setter"]
         self.remote_setter = klass_info["remote_setter"]

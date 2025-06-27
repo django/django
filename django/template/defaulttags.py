@@ -4,12 +4,13 @@ import re
 import sys
 import warnings
 from collections import namedtuple
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from itertools import cycle as itertools_cycle
 from itertools import groupby
 
 from django.conf import settings
+from django.http import QueryDict
 from django.utils import timezone
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -206,7 +207,10 @@ class ForNode(Node):
             unpack = num_loopvars > 1
             # Create a forloop value in the context.  We'll update counters on each
             # iteration just below.
-            loop_dict = context["forloop"] = {"parentloop": parentloop}
+            loop_dict = context["forloop"] = {
+                "parentloop": parentloop,
+                "length": len_values,
+            }
             for i, item in enumerate(values):
                 # Shortcuts for current loop iteration number.
                 loop_dict["counter0"] = i
@@ -1170,42 +1174,62 @@ def now(parser, token):
 
 
 @register.simple_tag(name="querystring", takes_context=True)
-def querystring(context, query_dict=None, **kwargs):
+def querystring(context, *args, **kwargs):
     """
-    Add, remove, and change parameters of a ``QueryDict`` and return the result
-    as a query string. If the ``query_dict`` argument is not provided, default
-    to ``request.GET``.
+    Build a query string using `args` and `kwargs` arguments.
+
+    This tag constructs a new query string by adding, removing, or modifying
+    parameters from the given positional and keyword arguments. Positional
+    arguments must be mappings (such as `QueryDict` or `dict`), and
+    `request.GET` is used as the starting point if `args` is empty.
+
+    Keyword arguments are treated as an extra, final mapping. These mappings
+    are processed sequentially, with later arguments taking precedence.
+
+    A query string prefixed with `?` is returned.
+
+    Raise TemplateSyntaxError if a positional argument is not a mapping or if
+    keys are not strings.
 
     For example::
 
+        {# Set a parameter on top of `request.GET` #}
         {% querystring foo=3 %}
 
-    To remove a key::
-
+        {# Remove a key from `request.GET` #}
         {% querystring foo=None %}
 
-    To use with pagination::
-
+        {# Use with pagination #}
         {% querystring page=page_obj.next_page_number %}
 
-    A custom ``QueryDict`` can also be used::
-
+        {# Use a custom ``QueryDict`` #}
         {% querystring my_query_dict foo=3 %}
+
+        {# Use multiple positional and keyword arguments #}
+        {% querystring my_query_dict my_dict foo=3 bar=None %}
     """
-    if query_dict is None:
-        query_dict = context.request.GET
-    query_dict = query_dict.copy()
-    for key, value in kwargs.items():
-        if value is None:
-            if key in query_dict:
-                del query_dict[key]
-        elif isinstance(value, Iterable) and not isinstance(value, str):
-            query_dict.setlist(key, value)
-        else:
-            query_dict[key] = value
-    if not query_dict:
-        return ""
-    query_string = query_dict.urlencode()
+    if not args:
+        args = [context.request.GET]
+    params = QueryDict(mutable=True)
+    for d in [*args, kwargs]:
+        if not isinstance(d, Mapping):
+            raise TemplateSyntaxError(
+                "querystring requires mappings for positional arguments (got "
+                "%r instead)." % d
+            )
+        for key, value in d.items():
+            if not isinstance(key, str):
+                raise TemplateSyntaxError(
+                    "querystring requires strings for mapping keys (got %r "
+                    "instead)." % key
+                )
+            if value is None:
+                params.pop(key, None)
+            elif isinstance(value, Iterable) and not isinstance(value, str):
+                params.setlist(key, value)
+            else:
+                params[key] = value
+    query_string = params.urlencode() if params else ""
     return f"?{query_string}"
 
 

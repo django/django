@@ -32,9 +32,9 @@ from .schema import DatabaseSchemaEditor
 from .validation import DatabaseValidation
 
 version = Database.version_info
-if version < (1, 4, 3):
+if version < (2, 2, 1):
     raise ImproperlyConfigured(
-        "mysqlclient 1.4.3 or newer is required; you have %s." % Database.__version__
+        "mysqlclient 2.2.1 or newer is required; you have %s." % Database.__version__
     )
 
 
@@ -254,12 +254,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @async_unsafe
     def get_new_connection(self, conn_params):
         connection = Database.connect(**conn_params)
-        # bytes encoder in mysqlclient doesn't work and was added only to
-        # prevent KeyErrors in Django < 2.0. We can remove this workaround when
-        # mysqlclient 2.1 becomes the minimal mysqlclient supported by Django.
-        # See https://github.com/PyMySQL/mysqlclient/issues/489
-        if connection.encoders.get(bytes) is bytes:
-            connection.encoders.pop(bytes)
         return connection
 
     def init_connection_state(self):

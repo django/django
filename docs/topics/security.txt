@@ -5,6 +5,16 @@ Security in Django
 This document is an overview of Django's security features. It includes advice
 on securing a Django-powered site.
 
+.. _sanitize-user-input:
+
+Always sanitize user input
+==========================
+
+The golden rule of web application security is to never trust user-controlled
+data. Hence, all user input should be sanitized before being used in your
+application. See the :doc:`forms documentation </topics/forms/index>` for
+details on validating user inputs in Django.
+
 .. _cross-site-scripting:
 
 Cross site scripting (XSS) protection

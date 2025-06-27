@@ -45,7 +45,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: python -m pip install isort
+      - run: python -m pip install "isort<6"
       - name: isort
         # Pinned to v3.0.0.
         uses: liskin/gh-problem-matcher-wrap@e7b7beaaafa52524748b31a381160759d68d61fb

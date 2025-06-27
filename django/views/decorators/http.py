@@ -110,7 +110,7 @@ def condition(etag_func=None, last_modified_func=None):
             if last_modified_func:
                 if dt := last_modified_func(request, *args, **kwargs):
                     if not timezone.is_aware(dt):
-                        dt = timezone.make_aware(dt, datetime.timezone.utc)
+                        dt = timezone.make_aware(dt, datetime.UTC)
                     res_last_modified = int(dt.timestamp())
             # The value from etag_func() could be quoted or unquoted.
             res_etag = etag_func(request, *args, **kwargs) if etag_func else None

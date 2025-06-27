@@ -28,6 +28,7 @@ from .models import (
     OtherTypesArrayModel,
     PostgreSQLModel,
     Tag,
+    WithSizeArrayModel,
 )
 
 try:
@@ -215,6 +216,16 @@ class TestQuerying(PostgreSQLTestCase):
                 NullableIntegerArrayModel(order=5, field=None),
             ]
         )
+
+    def test_bulk_create_with_sized_arrayfield(self):
+        objs = WithSizeArrayModel.objects.bulk_create(
+            [
+                WithSizeArrayModel(field=[1, 2]),
+                WithSizeArrayModel(field=[3, 4]),
+            ]
+        )
+        self.assertEqual(objs[0].field, [1, 2])
+        self.assertEqual(objs[1].field, [3, 4])
 
     def test_empty_list(self):
         NullableIntegerArrayModel.objects.create(field=[])
@@ -912,6 +923,7 @@ class TestMigrations(TransactionTestCase):
     def test_deconstruct(self):
         field = ArrayField(models.IntegerField())
         name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(kwargs.keys(), {"base_field"})
         new = ArrayField(*args, **kwargs)
         self.assertEqual(type(new.base_field), type(field.base_field))
         self.assertIsNot(new.base_field, field.base_field)

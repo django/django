@@ -256,6 +256,8 @@ Unlike other cache backends, the database cache does not support automatic
 culling of expired entries at the database level. Instead, expired cache
 entries are culled each time ``add()``, ``set()``, or ``touch()`` is called.
 
+.. _database-caching-creating-the-table:
+
 Creating the cache table
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -281,6 +283,8 @@ table. It will only create missing tables.
 
 To print the SQL that would be run, rather than run it, use the
 :option:`createcachetable --dry-run` option.
+
+.. _database-caching-multiple-databases:
 
 Multiple databases
 ~~~~~~~~~~~~~~~~~~
@@ -323,6 +327,8 @@ the cache backend will use the ``default`` database.
 
 And if you don't use the database cache backend, you don't need to worry about
 providing routing instructions for the database cache model.
+
+.. _filesystem-caching:
 
 Filesystem caching
 ------------------
@@ -411,6 +417,8 @@ cross-process caching is possible. This also means the local memory cache isn't
 particularly memory-efficient, so it's probably not a good choice for
 production environments. It's nice for development.
 
+.. _dummy-caching:
+
 Dummy caching (for development)
 -------------------------------
 
@@ -427,6 +435,8 @@ activate dummy caching, set :setting:`BACKEND <CACHES-BACKEND>` like so::
             "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         }
     }
+
+.. _using-a-custom-cache-backend:
 
 Using a custom cache backend
 ----------------------------
@@ -716,7 +726,7 @@ Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
 Specifying per-view cache in the URLconf
 ----------------------------------------
 
-The examples in the previous section have hard-coded the fact that the view is
+The examples in the previous section have hardcoded the fact that the view is
 cached, because ``cache_page`` alters the ``my_view`` function in place. This
 approach couples your view to the cache system, which is not ideal for several
 reasons. For instance, you might want to reuse the view functions on another,

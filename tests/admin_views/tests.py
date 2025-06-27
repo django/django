@@ -69,6 +69,7 @@ from .models import (
     Collector,
     Color,
     ComplexSortedPerson,
+    Country,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -134,6 +135,7 @@ from .models import (
     UnchangeableObject,
     UndeletableObject,
     UnorderedObject,
+    UserMessenger,
     UserProxy,
     Villain,
     Vodcast,
@@ -874,7 +876,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:admin_views_thing_changelist"))
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
             msg_prefix="Expected filter not found in changelist view",
         )
         self.assertNotContains(
@@ -929,7 +932,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(changelist_url)
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
         )
         filters = {
             "chap__id__exact": {
@@ -1069,7 +1073,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+            '<search id="changelist-filter" '
+            'aria-labelledby="changelist-filter-header">',
         )
         self.assertContains(
             response,
@@ -1820,6 +1825,11 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         response = user_admin.user_change_password(request, str(user.pk))
         self.assertContains(response, '<div class="help">')
 
+    def test_custom_password_change_form(self):
+        self.client.force_login(self.superuser)
+        response = self.client.get(reverse("admin4:password_change"))
+        self.assertContains(response, "Custom old password label")
+
     def test_extended_bodyclass_template_index(self):
         """
         The admin/index.html template uses block.super in the bodyclass block.
@@ -1934,9 +1944,9 @@ class AdminViewFormUrlTest(TestCase):
             reverse("admin:admin_views_restaurant_add", current_app=self.current_app),
             {"name": "test_value"},
         )
-        # this would be the usual behaviour
+        # this would be the usual behavior
         self.assertNotContains(response, 'value="test_value"')
-        # this is the overridden behaviour
+        # this is the overridden behavior
         self.assertContains(response, 'value="overridden_value"')
 
 
@@ -2677,8 +2687,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<label>Extra form field:</label>")
         self.assertContains(
             response,
-            '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close'
-            "</a>",
+            '<a role="button" href="/test_admin/admin/admin_views/article/" '
+            'class="closelink">Close</a>',
         )
         self.assertEqual(response.context["title"], "View article")
         post = self.client.post(article_change_url, change_dict)
@@ -2829,8 +2839,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(
             response,
-            '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close'
-            "</a>",
+            '<a role="button" href="/test_admin/admin9/admin_views/article/" '
+            'class="closelink">Close</a>',
         )
 
     def test_change_view_save_as_new(self):
@@ -3878,21 +3888,18 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             [cls.m1],
             2,
             change_message="Changed something",
-            single_object=True,
         )
         LogEntry.objects.log_actions(
             user_pk,
             [cls.m1],
             1,
             change_message="Added something",
-            single_object=True,
         )
         LogEntry.objects.log_actions(
             user_pk,
             [cls.m1],
             3,
             change_message="Deleted something",
-            single_object=True,
         )
 
     def setUp(self):
@@ -4053,7 +4060,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             args=(quote(self.pk),),
         )
         self.assertContains(
-            response, '<a href="%s" class="historylink"' % escape(expected_link)
+            response,
+            '<a role="button" href="%s" class="historylink"' % escape(expected_link),
         )
 
     def test_redirect_on_add_view_continue_button(self):
@@ -6445,6 +6453,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         ActionChains(self.selenium).move_to_element(delete_parent).click().perform()
         self.wait_for_and_switch_to_popup()
         self.selenium.find_element(By.XPATH, '//input[@value="Yes, I’m sure"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_parent"))
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
@@ -6579,6 +6588,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         self.selenium.find_element(By.ID, "id_title").send_keys("test3")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 3, 1)
         self.selenium.switch_to.window(popup_window_test2)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test3").id)
@@ -6587,6 +6597,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 2, 1)
         self.selenium.switch_to.window(popup_window_test)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test2").id)
@@ -6595,6 +6606,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(base_window)
         select = Select(self.selenium.find_element(By.ID, "id_next_box"))
         next_box_id = str(Box.objects.get(title="test").id)
@@ -6691,11 +6703,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
+        argentina = Country.objects.get(name="Argentina")
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
-            """
+            f"""
             <option value="" selected="">---------</option>
-            <option value="1" selected="">Argentina</option>
+            <option value="{argentina.pk}" selected="">Argentina</option>
             """,
         )
         # Argentina isn't added to the living_country select nor selected by
@@ -6729,12 +6742,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
+        spain = Country.objects.get(name="Spain")
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
-            """
+            f"""
             <option value="" selected="">---------</option>
-            <option value="1" selected="">Argentina</option>
-            <option value="2">Spain</option>
+            <option value="{argentina.pk}" selected="">Argentina</option>
+            <option value="{spain.pk}">Spain</option>
             """,
         )
 
@@ -6771,12 +6785,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
+        italy = spain
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
-            """
+            f"""
             <option value="" selected="">---------</option>
-            <option value="1" selected="">Argentina</option>
-            <option value="2">Italy</option>
+            <option value="{argentina.pk}" selected="">Argentina</option>
+            <option value="{italy.pk}">Italy</option>
             """,
         )
         # Italy is added to the living_country select and it's also selected by
@@ -6830,15 +6845,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + add_url)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 1")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and add another"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and add another"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 1)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 2")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and add another"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and add another"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 2)
 
     def test_redirect_on_add_view_continue_button(self):
@@ -6851,13 +6868,44 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + add_url)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input.send_keys("Test section 1")
-        self.selenium.find_element(
-            By.XPATH, '//input[@value="Save and continue editing"]'
-        ).click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and continue editing"]'
+            ).click()
         self.assertEqual(Section.objects.count(), 1)
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    @override_settings(MESSAGE_LEVEL=10)
+    def test_messages(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import Select
+
+        with override_settings(MESSAGE_LEVEL=10):
+            self.admin_login(
+                username="super", password="secret", login_url=reverse("admin:index")
+            )
+            UserMessenger.objects.create()
+            for level in ["warning", "info", "error", "success", "debug"]:
+                self.selenium.get(
+                    self.live_server_url
+                    + reverse("admin:admin_views_usermessenger_changelist"),
+                )
+                checkbox = self.selenium.find_element(
+                    By.CSS_SELECTOR, "tr input.action-select"
+                )
+                checkbox.click()
+                Select(self.selenium.find_element(By.NAME, "action")).select_by_value(
+                    f"message_{level}"
+                )
+                self.selenium.find_element(By.XPATH, '//button[text()="Run"]').click()
+                message = self.selenium.find_element(
+                    By.CSS_SELECTOR, "ul.messagelist li"
+                )
+                self.assertEqual(message.get_attribute("innerText"), f"Test {level}")
+                self.take_screenshot(level)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -7134,7 +7182,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         url = reverse("admin:admin_views_pizza_change", args=(pizza.pk,))
         with self.settings(LANGUAGE_CODE="fr"):
             response = self.client.get(url)
-        self.assertContains(response, "<label>Toppings\u00A0:</label>", html=True)
+        self.assertContains(response, "<label>Toppings\u00a0:</label>", html=True)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -8285,13 +8333,14 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the history link.
         history_link = re.search(
-            '<a href="(.*?)" class="historylink">History</a>', response.text
+            '<a role="button" href="(.*?)" class="historylink">History</a>',
+            response.text,
         )
         self.assertURLEqual(history_link[1], self.get_history_url())
 
         # Check the delete link.
         delete_link = re.search(
-            '<a href="(.*?)" class="deletelink">Delete</a>', response.text
+            '<a role="button" href="(.*?)" class="deletelink">Delete</a>', response.text
         )
         self.assertURLEqual(delete_link[1], self.get_delete_url())
 
@@ -8331,7 +8380,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.client.force_login(viewuser)
         response = self.client.get(self.get_change_url())
         close_link = re.search(
-            '<a href="(.*?)" class="closelink">Close</a>', response.text
+            '<a role="button" href="(.*?)" class="closelink">Close</a>', response.text
         )
         close_link = close_link[1].replace("&amp;", "&")
         self.assertURLEqual(close_link, self.get_changelist_url())
@@ -8776,7 +8825,7 @@ class GetFormsetsWithInlinesArgumentTest(TestCase):
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class AdminSiteFinalCatchAllPatternTests(TestCase):
     """
-    Verifies the behaviour of the admin catch-all view.
+    Verifies the behavior of the admin catch-all view.
 
     * Anonynous/non-staff users are redirected to login for all URLs, whether
       otherwise valid or not.

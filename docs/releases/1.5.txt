@@ -591,7 +591,7 @@ sequences automatically together with the database flushing actions described
 above.
 
 This has been changed so no sequences are implicitly reset. This can cause
-:class:`~django.test.TransactionTestCase` tests that depend on hard-coded
+:class:`~django.test.TransactionTestCase` tests that depend on hardcoded
 primary key values to break.
 
 The new :attr:`~django.test.TransactionTestCase.reset_sequences` attribute can

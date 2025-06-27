@@ -240,8 +240,8 @@ class HttpResponseBase:
         if expires is not None:
             if isinstance(expires, datetime.datetime):
                 if timezone.is_naive(expires):
-                    expires = timezone.make_aware(expires, datetime.timezone.utc)
-                delta = expires - datetime.datetime.now(tz=datetime.timezone.utc)
+                    expires = timezone.make_aware(expires, datetime.UTC)
+                delta = expires - datetime.datetime.now(tz=datetime.UTC)
                 # Add one second so the date matches exactly (a fraction of
                 # time gets lost between converting to a timedelta and
                 # then the date string).

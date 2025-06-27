@@ -34,7 +34,7 @@ else:
     )
     from django.utils.functional import classproperty
     from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PY312, PYPY
+    from django.utils.version import PYPY
 
 
 try:
@@ -247,6 +247,7 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         "fields.W342",  # ForeignKey(unique=True) -> OneToOneField
+        "postgres.E005",  # django.contrib.postgres must be installed to use feature.
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
@@ -691,15 +692,14 @@ if __name__ == "__main__":
             "Same as unittest -k option. Can be used multiple times."
         ),
     )
-    if PY312:
-        parser.add_argument(
-            "--durations",
-            dest="durations",
-            type=int,
-            default=None,
-            metavar="N",
-            help="Show the N slowest test cases (N=0 for all).",
-        )
+    parser.add_argument(
+        "--durations",
+        dest="durations",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Show the N slowest test cases (N=0 for all).",
+    )
 
     options = parser.parse_args()
 

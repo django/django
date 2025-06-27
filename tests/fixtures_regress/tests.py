@@ -1,7 +1,6 @@
 # Unittests for fixtures.
 import json
 import os
-import re
 import unittest
 from io import StringIO
 from pathlib import Path
@@ -425,11 +424,6 @@ class TestFixtures(TestCase):
 
         # Output order isn't guaranteed, so check for parts
         data = out.getvalue()
-
-        # Get rid of artifacts like '000000002' to eliminate the differences
-        # between different Python versions.
-        data = re.sub("0{6,}[0-9]", "", data)
-
         animals_data = sorted(
             [
                 {

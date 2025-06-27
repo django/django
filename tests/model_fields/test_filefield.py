@@ -12,7 +12,6 @@ from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.db import IntegrityError, models
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
-from django.utils.version import PY311
 
 from .models import Document
 
@@ -80,10 +79,9 @@ class FileFieldTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg) as cm:
             d.save()
 
-        if PY311:
-            self.assertEqual(
-                cm.exception.__notes__, ["Pass a 'name' argument to ContentFile."]
-            )
+        self.assertEqual(
+            cm.exception.__notes__, ["Pass a 'name' argument to ContentFile."]
+        )
 
     def test_delete_content_file(self):
         file = ContentFile(b"", name="foo")

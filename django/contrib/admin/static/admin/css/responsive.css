@@ -337,16 +337,8 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-        padding-left: 55px;
-        background-position: 30px 12px;
-    }
-
-    ul.messagelist li.error {
-        background-position: 30px 12px;
-    }
-
-    ul.messagelist li.warning {
-        background-position: 30px 14px;
+        padding: 10px 10px 10px 55px;
+        background-position-x: 30px;
     }
 
     /* Login */
@@ -739,16 +731,8 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-        padding-left: 40px;
-        background-position: 15px 12px;
-    }
-
-    ul.messagelist li.error {
-        background-position: 15px 12px;
-    }
-
-    ul.messagelist li.warning {
-        background-position: 15px 14px;
+        padding: 10px 10px 10px 40px;
+        background-position-x: 15px;
     }
 
     /* Paginator */

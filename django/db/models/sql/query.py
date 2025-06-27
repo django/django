@@ -10,7 +10,9 @@ all about the internals of models in order to get the information it needs.
 import copy
 import difflib
 import functools
+import inspect
 import sys
+import warnings
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
@@ -42,12 +44,17 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
 
 __all__ = ["Query", "RawQuery"]
 
+# RemovedInDjango70Warning: When the deprecation ends, replace with:
+# Quotation marks ('"`[]), whitespace characters, semicolons, percent signs
+# or inline SQL comments are forbidden in column aliases.
+# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|%|--|/\*|\*/")
 # Quotation marks ('"`[]), whitespace characters, semicolons, or inline
 # SQL comments are forbidden in column aliases.
 FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
@@ -1206,9 +1213,23 @@ class Query(BaseExpression):
         return alias or seen[None]
 
     def check_alias(self, alias):
+        # RemovedInDjango70Warning: When the deprecation ends, remove.
+        if "%" in alias:
+            if "aggregate" in {frame.function for frame in inspect.stack()}:
+                stacklevel = 5
+            else:
+                # annotate() and alias().
+                stacklevel = 6
+            warnings.warn(
+                "Using percent signs in a column alias is deprecated.",
+                stacklevel=stacklevel,
+                category=RemovedInDjango70Warning,
+            )
         if FORBIDDEN_ALIAS_PATTERN.search(alias):
             raise ValueError(
                 "Column aliases cannot contain whitespace characters, quotation marks, "
+                # RemovedInDjango70Warning: When the deprecation ends, replace with:
+                # "semicolons, percent signs, or SQL comments."
                 "semicolons, or SQL comments."
             )
 
@@ -1221,8 +1242,17 @@ class Query(BaseExpression):
         else:
             self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
-        if self.selected:
+        if select and self.selected:
             self.selected[alias] = alias
+
+    @property
+    def _subquery_fields_len(self):
+        if self.has_select_fields:
+            return sum(
+                len(self.model._meta.pk_fields) if field == "pk" else 1
+                for field in self.selected
+            )
+        return len(self.model._meta.pk_fields)
 
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()
@@ -1616,7 +1646,7 @@ class Query(BaseExpression):
     def add_filter(self, filter_lhs, filter_rhs):
         self.add_q(Q((filter_lhs, filter_rhs)))
 
-    def add_q(self, q_object):
+    def add_q(self, q_object, reuse_all=False):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
@@ -1630,7 +1660,11 @@ class Query(BaseExpression):
         existing_inner = {
             a for a in self.alias_map if self.alias_map[a].join_type == INNER
         }
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        if reuse_all:
+            can_reuse = set(self.alias_map)
+        else:
+            can_reuse = self.used_aliases
+        clause, _ = self._add_q(q_object, can_reuse)
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
@@ -1710,6 +1744,7 @@ class Query(BaseExpression):
                     "relations deeper than the relation_name (got %r for "
                     "%r)." % (lookup, filtered_relation.relation_name)
                 )
+        filtered_relation = filtered_relation.clone()
         filtered_relation.condition = rename_prefix_from_q(
             filtered_relation.relation_name,
             alias,
@@ -1946,6 +1981,8 @@ class Query(BaseExpression):
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)
+            if join.filtered_relation and can_reuse is not None:
+                can_reuse.add(alias)
         return JoinInfo(final_field, targets, opts, joins, path, final_transformer)
 
     def trim_joins(self, targets, joins, path):
@@ -2327,6 +2364,9 @@ class Query(BaseExpression):
             self.append_annotation_mask(group_by_annotations)
             self.select = tuple(values_select.values())
             self.values_select = tuple(values_select)
+            if self.selected is not None:
+                for index, value_select in enumerate(values_select):
+                    self.selected[value_select] = index
         group_by = list(self.select)
         for alias, annotation in self.annotation_select.items():
             if not (group_by_cols := annotation.get_group_by_cols()):

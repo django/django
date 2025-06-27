@@ -568,7 +568,7 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
         storage = DummyStorage()
         self.assertEqual(
             storage.get_modified_time("name"),
-            datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc),
+            datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC),
         )
         with self.assertRaisesMessage(
             NotImplementedError, "This backend doesn't support absolute paths."

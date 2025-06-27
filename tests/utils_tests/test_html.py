@@ -4,6 +4,8 @@ from datetime import datetime
 from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape,
@@ -22,6 +24,7 @@ from django.utils.html import (
 from django.utils.safestring import mark_safe
 
 
+@override_settings(URLIZE_ASSUME_HTTPS=True)
 class TestUtilsHtml(SimpleTestCase):
     def check_output(self, function, value, output=None):
         """
@@ -142,16 +145,29 @@ class TestUtilsHtml(SimpleTestCase):
             ("><!" + ("&" * 16000) + "D", "><!" + ("&" * 16000) + "D"),
             ("X<<<<br>br>br>br>X", "XX"),
             ("<" * 50 + "a>" * 50, ""),
+            (">" + "<a" * 500 + "a", ">" + "<a" * 500 + "a"),
+            ("<a" * 49 + "a" * 951, "<a" * 49 + "a" * 951),
+            ("<" + "a" * 1_002, "<" + "a" * 1_002),
         )
         for value, output in items:
             with self.subTest(value=value, output=output):
                 self.check_output(strip_tags, value, output)
                 self.check_output(strip_tags, lazystr(value), output)
 
-    def test_strip_tags_suspicious_operation(self):
+    def test_strip_tags_suspicious_operation_max_depth(self):
         value = "<" * 51 + "a>" * 51, "<a>"
         with self.assertRaises(SuspiciousOperation):
             strip_tags(value)
+
+    def test_strip_tags_suspicious_operation_large_open_tags(self):
+        items = [
+            ">" + "<a" * 501,
+            "<a" * 50 + "a" * 950,
+        ]
+        for value in items:
+            with self.subTest(value=value):
+                with self.assertRaises(SuspiciousOperation):
+                    strip_tags(value)
 
     def test_strip_tags_files(self):
         # Test with more lengthy content (also catching performance regressions)
@@ -264,8 +280,26 @@ class TestUtilsHtml(SimpleTestCase):
 
     def test_smart_urlquote(self):
         items = (
-            ("http://öäü.com/", "http://xn--4ca9at.com/"),
-            ("http://öäü.com/öäü/", "http://xn--4ca9at.com/%C3%B6%C3%A4%C3%BC/"),
+            # IDN is encoded as percent-encoded ("quoted") UTF-8 (#36013).
+            ("http://öäü.com/", "http://%C3%B6%C3%A4%C3%BC.com/"),
+            ("https://faß.example.com", "https://fa%C3%9F.example.com"),
+            (
+                "http://öäü.com/öäü/",
+                "http://%C3%B6%C3%A4%C3%BC.com/%C3%B6%C3%A4%C3%BC/",
+            ),
+            (
+                # Valid under IDNA 2008, but was invalid in IDNA 2003.
+                "https://މިހާރު.com",
+                "https://%DE%89%DE%A8%DE%80%DE%A7%DE%83%DE%AA.com",
+            ),
+            (
+                # Valid under WHATWG URL Specification but not IDNA 2008.
+                "http://👓.ws",
+                "http://%F0%9F%91%93.ws",
+            ),
+            # Pre-encoded IDNA is left unchanged.
+            ("http://xn--iny-zx5a.com/idna2003", "http://xn--iny-zx5a.com/idna2003"),
+            ("http://xn--fa-hia.com/idna2008", "http://xn--fa-hia.com/idna2008"),
             # Everything unsafe is quoted, !*'();:@&=+$,/?#[]~ is considered
             # safe as per RFC.
             (
@@ -287,8 +321,10 @@ class TestUtilsHtml(SimpleTestCase):
                 "django",
             ),
             ("http://.www.f oo.bar/", "http://.www.f%20oo.bar/"),
+            ('http://example.com">', "http://example.com%22%3E"),
+            ("http://10.22.1.1/", "http://10.22.1.1/"),
+            ("http://[fd00::1]/", "http://[fd00::1]/"),
         )
-        # IDNs are properly quoted
         for value, output in items:
             with self.subTest(value=value, output=output):
                 self.assertEqual(smart_urlquote(value), output)
@@ -349,23 +385,33 @@ class TestUtilsHtml(SimpleTestCase):
         tests = (
             (
                 "Search for google.com/?q=! and see.",
-                'Search for <a href="http://google.com/?q=">google.com/?q=</a>! and '
+                'Search for <a href="https://google.com/?q=">google.com/?q=</a>! and '
                 "see.",
             ),
             (
                 "Search for google.com/?q=1&lt! and see.",
-                'Search for <a href="http://google.com/?q=1%3C">google.com/?q=1&lt'
+                'Search for <a href="https://google.com/?q=1%3C">google.com/?q=1&lt'
                 "</a>! and see.",
             ),
             (
                 lazystr("Search for google.com/?q=!"),
-                'Search for <a href="http://google.com/?q=">google.com/?q=</a>!',
+                'Search for <a href="https://google.com/?q=">google.com/?q=</a>!',
+            ),
+            (
+                "http://www.foo.bar/",
+                '<a href="http://www.foo.bar/">http://www.foo.bar/</a>',
+            ),
+            (
+                "Look on www.نامه‌ای.com.",
+                "Look on <a "
+                'href="https://www.%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D8%A7%DB%8C.com"'
+                ">www.نامه‌ای.com</a>.",
             ),
             ("foo@example.com", '<a href="mailto:foo@example.com">foo@example.com</a>'),
             (
                 "test@" + "한.글." * 15 + "aaa",
                 '<a href="mailto:test@'
-                + "xn--6q8b.xn--bj0b." * 15
+                + "%ED%95%9C.%EA%B8%80." * 15
                 + 'aaa">'
                 + "test@"
                 + "한.글." * 15
@@ -374,20 +420,36 @@ class TestUtilsHtml(SimpleTestCase):
             (
                 # RFC 6068 requires a mailto URI to percent-encode a number of
                 # characters that can appear in <addr-spec>.
-                "yes;this=is&a%valid!email@example.com",
-                '<a href="mailto:yes%3Bthis%3Dis%26a%25valid%21email@example.com"'
-                ">yes;this=is&a%valid!email@example.com</a>",
+                "yes+this=is&a%valid!email@example.com",
+                '<a href="mailto:yes%2Bthis%3Dis%26a%25valid%21email@example.com"'
+                ">yes+this=is&a%valid!email@example.com</a>",
             ),
             (
-                # Urlizer shouldn't urlize the "?org" part of this. But since
-                # it does, RFC 6068 requires percent encoding the "?".
-                "test@example.com?org",
-                '<a href="mailto:test@example.com%3Forg">test@example.com?org</a>',
+                "foo@faß.example.com",
+                '<a href="mailto:foo@fa%C3%9F.example.com">foo@faß.example.com</a>',
+            ),
+            (
+                "idna-2008@މިހާރު.example.mv",
+                '<a href="mailto:idna-2008@%DE%89%DE%A8%DE%80%DE%A7%DE%83%DE%AA.ex'
+                'ample.mv">idna-2008@މިހާރު.example.mv</a>',
             ),
         )
         for value, output in tests:
             with self.subTest(value=value):
                 self.assertEqual(urlize(value), output)
+
+    @override_settings(URLIZE_ASSUME_HTTPS=False)
+    def test_urlize_http_default_warning(self):
+        msg = (
+            "The default protocol will be changed from HTTP to HTTPS in Django 7.0. "
+            "Set the URLIZE_ASSUME_HTTPS transitional setting to True to opt into "
+            "using HTTPS as the new default protocol."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            self.assertEqual(
+                urlize("Visit example.com"),
+                'Visit <a href="http://example.com">example.com</a>',
+            )
 
     def test_urlize_unchanged_inputs(self):
         tests = (
@@ -402,6 +464,8 @@ class TestUtilsHtml(SimpleTestCase):
             "foo@.example.com",
             "foo@localhost",
             "foo@localhost.",
+            "test@example?;+!.com",
+            "email me@example.com,then I'll respond",
             # trim_punctuation catastrophic tests
             "(" * 100_000 + ":" + ")" * 100_000,
             "(" * 100_000 + "&:" + ")" * 100_000,

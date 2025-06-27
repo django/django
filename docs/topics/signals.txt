@@ -314,7 +314,7 @@ Whether synchronous or asynchronous, receivers will be correctly adapted to
 whether ``send()`` or ``asend()`` is used. Synchronous receivers will be
 called using :func:`~.sync_to_async` when invoked via ``asend()``. Asynchronous
 receivers will be called using :func:`~.async_to_sync` when invoked via
-``sync()``. Similar to the :ref:`case for middleware <async_performance>`,
+``send()``. Similar to the :ref:`case for middleware <async_performance>`,
 there is a small performance cost to adapting receivers in this way. Note that
 in order to reduce the number of sync/async calling-style switches within a
 ``send()`` or ``asend()`` call, the receivers are grouped by whether or not

@@ -200,7 +200,7 @@ enforced immediately after every command.
 .. admonition:: MySQL, MariaDB, and SQLite.
 
     Deferrable unique constraints are ignored on MySQL, MariaDB, and SQLite as
-    neither supports them.
+    they do not support them.
 
 .. warning::
 

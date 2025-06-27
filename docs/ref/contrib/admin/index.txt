@@ -2614,6 +2614,13 @@ we can do this with inline admin models. Suppose we have the following models::
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
+        class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["person", "group"], name="unique_person_group"
+                )
+            ]
+
 The first step in displaying this intermediate model in the admin is to
 define an inline class for the ``Membership`` model::
 
@@ -2651,6 +2658,7 @@ It is possible to use an inline with generically related objects. Let's say
 you have the following models::
 
     from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.contrib.contenttypes.models import ContentType
     from django.db import models
 
 
@@ -2979,6 +2987,13 @@ Templates can override or extend base admin templates as described in
 .. attribute:: AdminSite.logout_template
 
     Path to a custom template that will be used by the admin site logout view.
+
+.. attribute:: AdminSite.password_change_form
+
+    .. versionadded:: 6.0
+
+    Subclass of :class:`~django.contrib.auth.forms.PasswordChangeForm` that
+    will be used by the admin site password change view.
 
 .. attribute:: AdminSite.password_change_template
 

@@ -15,7 +15,7 @@ from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django.core.management.base import CommandError, SystemCheckError
+from django.core.management.base import SystemCheckError
 from django.test import SimpleTestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.runner import (
     DiscoverRunner,
@@ -32,7 +32,6 @@ from django.test.utils import (
     get_unique_databases_and_mirrors,
     iter_test_cases,
 )
-from django.utils.version import PY312
 
 from .models import B, Person, Through
 
@@ -479,7 +478,6 @@ class ManageCommandTests(unittest.TestCase):
             )
         self.assertIn("Total run took", stderr.getvalue())
 
-    @unittest.skipUnless(PY312, "unittest --durations option requires Python 3.12")
     def test_durations(self):
         with captured_stderr() as stderr:
             call_command(
@@ -489,17 +487,6 @@ class ManageCommandTests(unittest.TestCase):
                 testrunner="test_runner.tests.MockTestRunner",
             )
         self.assertIn("durations=10", stderr.getvalue())
-
-    @unittest.skipIf(PY312, "unittest --durations option requires Python 3.12")
-    def test_durations_lt_py312(self):
-        msg = "Error: unrecognized arguments: --durations=10"
-        with self.assertRaises(CommandError, msg=msg):
-            call_command(
-                "test",
-                "--durations=10",
-                "sites",
-                testrunner="test_runner.tests.MockTestRunner",
-            )
 
 
 # Isolate from the real environment.
@@ -944,8 +931,9 @@ class SetupDatabasesTests(unittest.TestCase):
             with mock.patch("django.test.utils.connections", new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            verbosity=0, autoclobber=False, serialize=True, keepdb=False
+            verbosity=0, autoclobber=False, keepdb=False
         )
+        mocked_db_creation.return_value.serialize_db_to_string.assert_called_once_with()
 
 
 @skipUnlessDBFeature("supports_sequence_reset")

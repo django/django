@@ -55,8 +55,9 @@
         if (elem.classList.contains('vManyToManyRawIdAdminField') && elem.value) {
             elem.value += ',' + chosenId;
         } else {
-            document.getElementById(name).value = chosenId;
+            elem.value = chosenId;
         }
+        $(elem).trigger('change');
         const index = relatedWindows.indexOf(win);
         if (index > -1) {
             relatedWindows.splice(index, 1);
@@ -205,6 +206,7 @@
     window.dismissChangeRelatedObjectPopup = dismissChangeRelatedObjectPopup;
     window.dismissDeleteRelatedObjectPopup = dismissDeleteRelatedObjectPopup;
     window.dismissChildPopups = dismissChildPopups;
+    window.relatedWindows = relatedWindows;
 
     // Kept for backward compatibility
     window.showAddAnotherPopup = showRelatedObjectPopup;

@@ -1,19 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# coby2023t, 2025
 # ilay <ilay@ilay.tw>, 2012
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
 # tcc <tcchou@tcchou.org>, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016
+# YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: coby2023t, 2025\n"
+"Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,31 +29,27 @@ msgstr "可用 %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"可用的 %s 列表。你可以在下方的方框內選擇後，點擊兩個方框中的\"選取\"箭頭以選"
-"取。"
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "想選擇 %s 可先選取它們再點 \"選取\" 箭頭按鈕。"
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "輸入到這個方框以過濾可用的 %s 列表。"
+msgstr "在此框輸入以過濾可用的 %s 列表。"
 
 msgid "Filter"
 msgstr "過濾器"
 
-msgid "Choose all"
-msgstr "全選"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "選取全部 %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "點擊以一次選取所有的 %s"
+msgid "Choose selected %s"
+msgstr "選擇已選取的 %s"
 
-msgid "Choose"
-msgstr "選取"
-
-msgid "Remove"
-msgstr "移除"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "移除選取的 %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,18 +57,24 @@ msgstr "%s 被選"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"選取的 %s 列表。你可以在下方的方框內選擇後，點擊兩個方框中的\"移除\"箭頭以移"
-"除。"
-
-msgid "Remove all"
-msgstr "全部移除"
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr "想移除 %s 可先選取它們再點 \"移除\" 箭頭按鈕。"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "點擊以一次移除所有選取的 %s"
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "在此框輸入以過濾所選的 %s 列表。"
+
+msgid "(click to clear)"
+msgstr "(點擊清除)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "移除全部 %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s所選選項不可見"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -82,38 +86,23 @@ msgid ""
 msgstr "你尚未儲存一個可編輯欄位的變更。如果你執行動作, 未儲存的變更將會遺失。"
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"你已選了一個動作, 但有一個可編輯欄位的變更尚未儲存。請點選 OK 進行儲存。你需"
+"你已選了一個操作, 但有一個可編輯欄位的變更尚未儲存。請點選 OK 進行儲存。你需"
 "要重新執行該動作。"
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"你已選了一個動作, 但沒有任何改變。你可能動到 '去' 按鈕, 而不是 '儲存' 按鈕。"
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "備註：您的電腦時間比伺服器快 %s 小時。"
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "備註：您的電腦時間比伺服器慢 %s 小時。"
+"你已選了一個操作, 但沒有任何改變。你可能動到 '執行' 按鈕, 而不是 '儲存' 按"
+"鈕。"
 
 msgid "Now"
 msgstr "現在"
-
-msgid "Choose a Time"
-msgstr "選擇一個時間"
-
-msgid "Choose a time"
-msgstr "選擇一個時間"
 
 msgid "Midnight"
 msgstr "午夜"
@@ -126,6 +115,22 @@ msgstr "中午"
 
 msgid "6 p.m."
 msgstr "下午 6 點"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "備註：您的電腦時間比伺服器快 %s 小時。"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "備註：您的電腦時間比伺服器慢 %s 小時。"
+
+msgid "Choose a Time"
+msgstr "選擇一個時間"
+
+msgid "Choose a time"
+msgstr "選擇一個時間"
 
 msgid "Cancel"
 msgstr "取消"
@@ -178,6 +183,103 @@ msgstr "十一月"
 msgid "December"
 msgstr "十二月"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "一月"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "二月"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "三月"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "四月"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "五月"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "六月"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "七月"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "八月"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "九月"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "十月"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "十一月"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "十二月"
+
+msgid "Sunday"
+msgstr "星期日"
+
+msgid "Monday"
+msgstr "星期一"
+
+msgid "Tuesday"
+msgstr "星期二"
+
+msgid "Wednesday"
+msgstr "星期三"
+
+msgid "Thursday"
+msgstr "星期四"
+
+msgid "Friday"
+msgstr "星期五"
+
+msgid "Saturday"
+msgstr "星期六"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "星期日"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "星期一"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "星期二"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "星期三"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "星期四"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "星期五"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "星期六"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "日"
@@ -205,9 +307,3 @@ msgstr "五"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "六"
-
-msgid "Show"
-msgstr "顯示"
-
-msgid "Hide"
-msgstr "隱藏"

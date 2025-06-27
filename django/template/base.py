@@ -199,6 +199,14 @@ class Template:
         except Exception as e:
             if self.engine.debug:
                 e.template_debug = self.get_exception_info(e, e.token)
+            if (
+                isinstance(e, TemplateSyntaxError)
+                and self.origin.name != UNKNOWN_SOURCE
+                and e.args
+            ):
+                raw_message = e.args[0]
+                e.raw_error_message = raw_message
+                e.args = (f"Template: {self.origin.name}, {raw_message}", *e.args[1:])
             raise
 
     def get_exception_info(self, exception, token):
@@ -633,19 +641,18 @@ constant_string = constant_string.replace("\n", "")
 
 filter_raw_string = r"""
 ^(?P<constant>%(constant)s)|
-^(?P<var>[%(var_chars)s]+|%(num)s)|
+^(?P<var>[%(var_chars)s]+)|
  (?:\s*%(filter_sep)s\s*
      (?P<filter_name>\w+)
          (?:%(arg_sep)s
              (?:
               (?P<constant_arg>%(constant)s)|
-              (?P<var_arg>[%(var_chars)s]+|%(num)s)
+              (?P<var_arg>[%(var_chars)s]+)
              )
          )?
  )""" % {
     "constant": constant_string,
-    "num": r"[-+.]?\d[\d.e]*",
-    "var_chars": r"\w\.",
+    "var_chars": r"\w\.\+-",
     "filter_sep": re.escape(FILTER_SEPARATOR),
     "arg_sep": re.escape(FILTER_ARGUMENT_SEPARATOR),
 }
@@ -845,6 +852,13 @@ class Variable:
                         "Variables and attributes may "
                         "not begin with underscores: '%s'" % var
                     )
+                # Disallow characters that are allowed in numbers but not in a
+                # variable name.
+                for c in ["+", "-"]:
+                    if c in var:
+                        raise TemplateSyntaxError(
+                            "Invalid character ('%s') in variable name: '%s'" % (c, var)
+                        )
                 self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
 
     def resolve(self, context):

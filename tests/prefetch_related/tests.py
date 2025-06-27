@@ -3,7 +3,7 @@ from unittest import mock
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
-from django.db.models import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models import F, Prefetch, QuerySet, prefetch_related_objects
 from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
@@ -16,6 +16,7 @@ from django.test.utils import CaptureQueriesContext
 
 from .models import (
     Article,
+    ArticleCustomUUID,
     Author,
     Author2,
     AuthorAddress,
@@ -36,6 +37,7 @@ from .models import (
     Qualification,
     Reader,
     Room,
+    SelfDirectedEmployee,
     TaggedItem,
     Teacher,
     WordEntry,
@@ -361,7 +363,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
                     Query,
                     "add_q",
                     autospec=True,
-                    side_effect=lambda self, q: add_q(self, q),
+                    side_effect=lambda self, q, reuse_all: add_q(self, q),
                 ) as add_q_mock:
                     list(Book.objects.prefetch_related(relation))
                     self.assertEqual(add_q_mock.call_count, 1)
@@ -391,6 +393,58 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Book.objects.prefetch_related("authors").iterator()
+
+    def test_m2m_join_reuse(self):
+        FavoriteAuthors.objects.bulk_create(
+            [
+                FavoriteAuthors(
+                    author=self.author1, likes_author=self.author3, is_active=True
+                ),
+                FavoriteAuthors(
+                    author=self.author1,
+                    likes_author=self.author4,
+                    is_active=False,
+                ),
+                FavoriteAuthors(
+                    author=self.author2, likes_author=self.author3, is_active=True
+                ),
+                FavoriteAuthors(
+                    author=self.author2, likes_author=self.author4, is_active=True
+                ),
+            ]
+        )
+        with self.assertNumQueries(2):
+            authors = list(
+                Author.objects.filter(
+                    pk__in=[self.author1.pk, self.author2.pk]
+                ).prefetch_related(
+                    Prefetch(
+                        "favorite_authors",
+                        queryset=(
+                            Author.objects.annotate(
+                                active_favorite=F("likes_me__is_active"),
+                            ).filter(active_favorite=True)
+                        ),
+                        to_attr="active_favorite_authors",
+                    )
+                )
+            )
+        self.assertEqual(authors[0].active_favorite_authors, [self.author3])
+        self.assertEqual(
+            authors[1].active_favorite_authors, [self.author3, self.author4]
+        )
+
+    def test_prefetch_queryset_child_class(self):
+        employee = SelfDirectedEmployee.objects.create(name="Foo")
+        employee.boss = employee
+        employee.save()
+        with self.assertNumQueries(2):
+            retrieved_employee = SelfDirectedEmployee.objects.prefetch_related(
+                Prefetch("boss", SelfDirectedEmployee.objects.all())
+            ).get()
+        with self.assertNumQueries(0):
+            self.assertEqual(retrieved_employee, employee)
+            self.assertEqual(retrieved_employee.boss, retrieved_employee)
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -1046,7 +1100,7 @@ class CustomPrefetchTests(TestCase):
             Query,
             "add_q",
             autospec=True,
-            side_effect=lambda self, q: add_q(self, q),
+            side_effect=lambda self, q, reuse_all: add_q(self, q),
         ) as add_q_mock:
             list(
                 House.objects.prefetch_related(
@@ -1138,6 +1192,14 @@ class GenericRelationTests(TestCase):
         Comment.objects.create(comment="awesome", content_object_uuid=article)
         qs = Comment.objects.prefetch_related("content_object_uuid")
         self.assertEqual([c.content_object_uuid for c in qs], [article])
+
+    def test_prefetch_GFK_uses_prepped_primary_key(self):
+        article = ArticleCustomUUID.objects.create(name="Blanche")
+        Comment.objects.create(comment="Enchantment", content_object_uuid=article)
+        obj = Comment.objects.prefetch_related("content_object_uuid").get(
+            comment="Enchantment"
+        )
+        self.assertEqual(obj.content_object_uuid, article)
 
     def test_prefetch_GFK_fk_pk(self):
         book = Book.objects.create(title="Poems")
@@ -1253,6 +1315,20 @@ class GenericRelationTests(TestCase):
                     (self.book2.pk, ct.pk, self.book2),
                 ],
             )
+
+    def test_reverse_generic_relation(self):
+        # Create two distinct bookmarks to ensure the bookmark and
+        # tagged item models primary are offset.
+        first_bookmark = Bookmark.objects.create()
+        second_bookmark = Bookmark.objects.create()
+        TaggedItem.objects.create(
+            content_object=first_bookmark, favorite=second_bookmark
+        )
+        with self.assertNumQueries(2):
+            obj = TaggedItem.objects.prefetch_related("favorite_bookmarks").get()
+        with self.assertNumQueries(0):
+            prefetched_bookmarks = obj.favorite_bookmarks.all()
+            self.assertQuerySetEqual(prefetched_bookmarks, [second_bookmark])
 
 
 class MultiTableInheritanceTest(TestCase):

@@ -38,8 +38,9 @@ from .models import (
     Book,
     Category,
     Character,
-    Colour,
-    ColourfulItem,
+    Color,
+    ColorfulItem,
+    ConstraintsModel,
     CustomErrorMessage,
     CustomFF,
     CustomFieldForExclusionModel,
@@ -2997,18 +2998,18 @@ class OtherModelFormTests(TestCase):
         """
         ModelChoiceField should respect a prefetch_related() on its queryset.
         """
-        blue = Colour.objects.create(name="blue")
-        red = Colour.objects.create(name="red")
-        multicolor_item = ColourfulItem.objects.create()
-        multicolor_item.colours.add(blue, red)
-        red_item = ColourfulItem.objects.create()
-        red_item.colours.add(red)
+        blue = Color.objects.create(name="blue")
+        red = Color.objects.create(name="red")
+        multicolor_item = ColorfulItem.objects.create()
+        multicolor_item.colors.add(blue, red)
+        red_item = ColorfulItem.objects.create()
+        red_item.colors.add(red)
 
         class ColorModelChoiceField(forms.ModelChoiceField):
             def label_from_instance(self, obj):
-                return ", ".join(c.name for c in obj.colours.all())
+                return ", ".join(c.name for c in obj.colors.all())
 
-        field = ColorModelChoiceField(ColourfulItem.objects.prefetch_related("colours"))
+        field = ColorModelChoiceField(ColorfulItem.objects.prefetch_related("colors"))
         # CPython < 3.14 calls ModelChoiceField.__len__() when coercing to
         # tuple. PyPy and Python 3.14+ don't call __len__() and so .count()
         # isn't called on the QuerySet. The following would trigger an extra
@@ -3090,13 +3091,13 @@ class OtherModelFormTests(TestCase):
         )
 
     def test_iterable_model_m2m(self):
-        class ColourfulItemForm(forms.ModelForm):
+        class ColorfulItemForm(forms.ModelForm):
             class Meta:
-                model = ColourfulItem
+                model = ColorfulItem
                 fields = "__all__"
 
-        colour = Colour.objects.create(name="Blue")
-        form = ColourfulItemForm()
+        color = Color.objects.create(name="Blue")
+        form = ColorfulItemForm()
         self.maxDiff = 1024
         self.assertHTMLEqual(
             form.as_p(),
@@ -3104,12 +3105,12 @@ class OtherModelFormTests(TestCase):
             <p>
             <label for="id_name">Name:</label>
             <input id="id_name" type="text" name="name" maxlength="50" required></p>
-            <p><label for="id_colours">Colours:</label>
-            <select multiple name="colours" id="id_colours" required>
+            <p><label for="id_colors">Colors:</label>
+            <select multiple name="colors" id="id_colors" required>
             <option value="%(blue_pk)s">Blue</option>
             </select></p>
             """
-            % {"blue_pk": colour.pk},
+            % {"blue_pk": color.pk},
         )
 
     def test_callable_field_default(self):
@@ -3708,13 +3709,51 @@ class StrictAssignmentTests(SimpleTestCase):
 class ModelToDictTests(TestCase):
     def test_many_to_many(self):
         """Data for a ManyToManyField is a list rather than a lazy QuerySet."""
-        blue = Colour.objects.create(name="blue")
-        red = Colour.objects.create(name="red")
-        item = ColourfulItem.objects.create()
-        item.colours.set([blue])
-        data = model_to_dict(item)["colours"]
+        blue = Color.objects.create(name="blue")
+        red = Color.objects.create(name="red")
+        item = ColorfulItem.objects.create()
+        item.colors.set([blue])
+        data = model_to_dict(item)["colors"]
         self.assertEqual(data, [blue])
-        item.colours.set([red])
+        item.colors.set([red])
         # If data were a QuerySet, it would be reevaluated here and give "red"
         # instead of the original value.
         self.assertEqual(data, [blue])
+
+
+@skipUnlessDBFeature("supports_table_check_constraints")
+class ConstraintValidationTests(TestCase):
+    def test_unique_constraint_refs_excluded_field(self):
+        obj = ConstraintsModel.objects.create(name="product", price="1.00")
+        data = {
+            "id": "",
+            "name": obj.name,
+            "price": "1337.00",
+            "category": obj.category,
+        }
+        ConstraintsModelForm = modelform_factory(ConstraintsModel, fields="__all__")
+        ExcludeCategoryForm = modelform_factory(ConstraintsModel, exclude=["category"])
+        full_form = ConstraintsModelForm(data)
+        exclude_category_form = ExcludeCategoryForm(data)
+        self.assertTrue(exclude_category_form.is_valid())
+        self.assertFalse(full_form.is_valid())
+        self.assertEqual(
+            full_form.errors, {"__all__": ["This product already exists."]}
+        )
+
+    def test_check_constraint_refs_excluded_field(self):
+        data = {
+            "id": "",
+            "name": "priceless",
+            "price": "0.00",
+            "category": "category 1",
+        }
+        ConstraintsModelForm = modelform_factory(ConstraintsModel, fields="__all__")
+        ExcludePriceForm = modelform_factory(ConstraintsModel, exclude=["price"])
+        full_form = ConstraintsModelForm(data)
+        exclude_price_form = ExcludePriceForm(data)
+        self.assertTrue(exclude_price_form.is_valid())
+        self.assertFalse(full_form.is_valid())
+        self.assertEqual(
+            full_form.errors, {"__all__": ["Price must be greater than zero."]}
+        )

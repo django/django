@@ -1,8 +1,8 @@
-============================================
-Django 5.2 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 5.2 release notes
+========================
 
-*Expected April 2025*
+*April 2, 2025*
 
 Welcome to Django 5.2!
 
@@ -166,9 +166,6 @@ Minor features
   * :meth:`.User.ahas_perm`
   * :meth:`.User.ahas_perms`
   * :meth:`.User.ahas_module_perms`
-  * :meth:`.User.aget_user_permissions`
-  * :meth:`.User.aget_group_permissions`
-  * :meth:`.User.ahas_perm`
   * :meth:`.ModelBackend.aauthenticate`
   * :meth:`.ModelBackend.aget_user_permissions`
   * :meth:`.ModelBackend.aget_group_permissions`
@@ -198,12 +195,6 @@ Minor features
   :meth:`.OGRGeometry.get_curve_geometry` methods.
 
 * :lookup:`coveredby` and :lookup:`covers` lookup are now supported on MySQL.
-
-* :lookup:`coveredby` and :lookup:`isvalid` lookups,
-  :class:`~django.contrib.gis.db.models.Collect` aggregation, and
-  :class:`~django.contrib.gis.db.models.functions.GeoHash` and
-  :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
-  are now supported on MariaDB 11.7+.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -285,7 +276,8 @@ Management Commands
 
 * A new warning is displayed when running :djadmin:`runserver`, indicating that
   it is unsuitable for production. This warning can be suppressed by setting
-  the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to ``"true"``.
+  the :envvar:`DJANGO_RUNSERVER_HIDE_WARNING` environment variable to
+  ``"true"``.
 
 * The :djadmin:`makemigrations` and :djadmin:`migrate` commands  have a new
   ``Command.autodetector`` attribute for subclasses to override in order to use
@@ -380,9 +372,9 @@ Tests
 URLs
 ~~~~
 
-* :func:`~django.urls.reverse` now accepts ``query`` and ``fragment`` keyword
-  arguments, allowing the addition of a query string and/or fragment identifier
-  in the generated URL, respectively.
+* :func:`~django.urls.reverse` and :func:`~django.urls.reverse_lazy` now accept
+  ``query`` and ``fragment`` keyword arguments, allowing the addition of a
+  query string and/or fragment identifier in the generated URL, respectively.
 
 Utilities
 ~~~~~~~~~
@@ -496,3 +488,7 @@ Miscellaneous
   ``django.contrib.postgres.aggregates.JSONBAgg``, and
   ``django.contrib.postgres.aggregates.StringAgg`` is deprecated in favor
   of the ``order_by`` argument.
+
+* Support for subclasses of ``RemoteUserMiddleware`` that override
+  ``process_request()`` without overriding ``aprocess_request()`` is
+  deprecated.

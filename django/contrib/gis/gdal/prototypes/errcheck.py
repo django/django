@@ -1,6 +1,6 @@
 """
- This module houses the error-checking routines used by the GDAL
- ctypes prototypes.
+This module houses the error-checking routines used by the GDAL
+ctypes prototypes.
 """
 
 from ctypes import c_void_p, string_at

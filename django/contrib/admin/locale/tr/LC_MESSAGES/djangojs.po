@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2016,2019-2023
+# BouRock, 2015-2016,2019-2023,2025
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2011
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: BouRock, 2015-2016,2019-2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: BouRock, 2015-2016,2019-2023,2025\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -27,11 +27,8 @@ msgstr "Mevcut %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Bu mevcut %s listesidir. Aşağıdaki kutudan bazılarını işaretleyerek ve ondan "
-"sonra iki kutu arasındaki \"Seçin\" okuna tıklayarak seçebilirsiniz."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "Bunları seçerek %s seçin ve ardından \"Seç\" ok düğmesine tıklayın."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -40,18 +37,17 @@ msgstr "Mevcut %s listesini süzmek için bu kutu içine yazın."
 msgid "Filter"
 msgstr "Süzgeç"
 
-msgid "Choose all"
-msgstr "Tümünü seçin"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Tüm %s seç"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Bir kerede tüm %s seçilmesi için tıklayın."
+msgid "Choose selected %s"
+msgstr "Seçilen %s seç"
 
-msgid "Choose"
-msgstr "Seçin"
-
-msgid "Remove"
-msgstr "Kaldır"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Seçilen %s kaldır"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,23 +55,20 @@ msgstr "Seçilen %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Bu seçilen %s listesidir. Aşağıdaki kutudan bazılarını işaretleyerek ve "
-"ondan sonra iki kutu arasındaki \"Kaldır\" okuna tıklayarak "
-"kaldırabilirsiniz."
+"Bunları seçerek %s kaldırın ve ardından \"Kaldır\" ok düğmesine tıklayın."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Seçilen %s listesini süzmek için bu kutu içine yazın."
 
-msgid "Remove all"
-msgstr "Tümünü kaldır"
+msgid "(click to clear)"
+msgstr "(temizlemek için tıklayın)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Bir kerede tüm seçilen %s kaldırılması için tıklayın."
+msgid "Remove all %s"
+msgstr "Tüm %s kaldır"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -320,9 +313,3 @@ msgstr "C"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Ct"
-
-msgid "Show"
-msgstr "Göster"
-
-msgid "Hide"
-msgstr "Gizle"

@@ -106,15 +106,20 @@ class MinimumLengthValidator:
 
     def validate(self, password, user=None):
         if len(password) < self.min_length:
-            raise ValidationError(self.get_error_message(), code="password_too_short")
+            raise ValidationError(
+                self.get_error_message(),
+                code="password_too_short",
+                params={"min_length": self.min_length},
+            )
 
     def get_error_message(self):
-        return ngettext(
-            "This password is too short. It must contain at least %d character."
-            % self.min_length,
-            "This password is too short. It must contain at least %d characters."
-            % self.min_length,
-            self.min_length,
+        return (
+            ngettext(
+                "This password is too short. It must contain at least %d character.",
+                "This password is too short. It must contain at least %d characters.",
+                self.min_length,
+            )
+            % self.min_length
         )
 
     def get_help_text(self):
@@ -185,7 +190,7 @@ class UserAttributeSimilarityValidator:
             if not value or not isinstance(value, str):
                 continue
             value_lower = value.lower()
-            value_parts = re.split(r"\W+", value_lower) + [value_lower]
+            value_parts = [*re.split(r"\W+", value_lower), value_lower]
             for value_part in value_parts:
                 if exceeds_maximum_length_ratio(
                     password, self.max_similarity, value_part
@@ -222,7 +227,7 @@ class CommonPasswordValidator:
 
     The password is rejected if it occurs in a provided list of passwords,
     which may be gzipped. The list Django ships with contains 20000 common
-    passwords (lowercased and deduplicated), created by Royce Williams:
+    passwords (unhexed, lowercased and deduplicated), created by Royce Williams:
     https://gist.github.com/roycewilliams/226886fd01572964e1431ac8afc999ce
     The password list must be lowercased to match the comparison in validate().
     """

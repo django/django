@@ -45,6 +45,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # does by uppercasing all identifiers.
     ignores_table_name_case = True
     supports_index_on_text_field = False
+    supports_aggregate_order_by_clause = True
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE "TEST_PROCEDURE" AS
             V_I INTEGER;
@@ -59,14 +60,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     """
-    create_test_table_with_composite_primary_key = """
-        CREATE TABLE test_table_composite_pk (
-            column_1 NUMBER(11) NOT NULL,
-            column_2 NUMBER(11) NOT NULL,
-            PRIMARY KEY (column_1, column_2)
-        )
-    """
     supports_callproc_kwargs = True
+    supports_any_value = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_ignore_conflicts = False
@@ -79,6 +74,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
     supports_json_field_contains = False
+    supports_json_negative_indexing = False
     supports_collation_on_textfield = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
@@ -216,3 +212,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def bare_select_suffix(self):
         return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"
+
+    @cached_property
+    def supports_tuple_lookups(self):
+        # Support is known to be missing on 23.2 but available on 23.4.
+        return self.connection.oracle_version >= (23, 4)

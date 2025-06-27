@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017,2020-2022
+# Aarni Koskela, 2015,2017,2020-2022,2025
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023
@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Aarni Koskela, 2015,2017,2020-2022,2025\n"
 "Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -34,8 +34,8 @@ msgstr "%(count)d \"%(items)s\"-kohdetta poistettu."
 msgid "Cannot delete %(name)s"
 msgstr "Ei voida poistaa: %(name)s"
 
-msgid "Are you sure?"
-msgstr "Oletko varma?"
+msgid "Delete multiple objects"
+msgstr "Poista useita kohteita"
 
 msgid "Administration"
 msgstr "Hallinta"
@@ -184,7 +184,7 @@ msgstr ""
 "vaihtoehtoja."
 
 msgid "Select this object for an action - {}"
-msgstr ""
+msgstr "Valitse tämä kohde toiminnolle - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -202,10 +202,6 @@ msgstr "{name} \"{obj}\" on lisätty. Voit lisätä toisen {name}-kohteen alla."
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" on muokattu. Voit muokata sitä edelleen alla."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" on lisätty. Voit muokata sitä edelleen alla."
 
 #, python-brace-format
 msgid ""
@@ -265,6 +261,9 @@ msgstr[1] "Kaikki %(total_count)s valittu"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 valittuna %(cnt)s mahdollisesta"
+
+msgid "Delete"
+msgstr "Poista"
 
 #, python-format
 msgid "Change history: %s"
@@ -349,6 +348,15 @@ msgstr "Murupolut"
 msgid "Models in the %(name)s application"
 msgstr "Sovelluksen %(name)s mallit"
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "Lisää"
 
@@ -358,18 +366,17 @@ msgstr "Näytä"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Sinulla ei ole oikeutta näyttää tai muokata mitään."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Syötä ensin käyttäjätunnus ja salasana. Sen jälkeen voit muokata muita "
-"käyttäjän tietoja."
 
-msgid "Enter a username and password."
-msgstr "Syötä käyttäjätunnus ja salasana."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Vaihda salasana"
+
+msgid "Set password"
+msgstr "Aseta salasana"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -379,6 +386,19 @@ msgstr[1] "Korjaa alla olevat virheet."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Syötä käyttäjän <strong>%(username)s</strong> uusi salasana."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Tämä toiminto <strong>kytkee päälle</strong> salasanapohjaisen kirjautumisen "
+"tälle käyttäjälle."
+
+msgid "Disable password-based authentication"
+msgstr "Ota salasanapohjainen kirjautuminen pois päältä"
+
+msgid "Enable password-based authentication"
+msgstr "Kytke salasanapohjainen kirjautuminen käyttöön"
 
 msgid "Skip to main content"
 msgstr "Siirry pääsisältöön"
@@ -428,16 +448,13 @@ msgid "Toggle sorting"
 msgstr "Kytke järjestäminen"
 
 msgid "Toggle theme (current theme: auto)"
-msgstr ""
+msgstr "Vaihda teemaa (nyt: automaattinen)"
 
 msgid "Toggle theme (current theme: light)"
-msgstr ""
+msgstr "Vaihda teemaa (nyt: vaalea)"
 
 msgid "Toggle theme (current theme: dark)"
-msgstr ""
-
-msgid "Delete"
-msgstr "Poista"
+msgstr "Vaihda teemaa (nyt: tumma)"
 
 #, python-format
 msgid ""
@@ -473,9 +490,6 @@ msgstr "Kyllä, olen varma"
 
 msgid "No, take me back"
 msgstr "Ei, mennään takaisin"
-
-msgid "Delete multiple objects"
-msgstr "Poista useita kohteita"
 
 #, python-format
 msgid ""
@@ -550,8 +564,8 @@ msgstr ""
 "Olet kirjautunut käyttäjänä %(username)s, mutta sinulla ei ole pääsyä tälle "
 "sivulle. Haluaisitko kirjautua eri tilille?"
 
-msgid "Forgotten your password or username?"
-msgstr "Unohditko salasanasi tai käyttäjätunnuksesi?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Kytke navigaatio"
@@ -715,8 +729,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Määrittele uusi salasanasi oheisella sivulla:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Käyttäjätunnuksesi siltä varalta, että olet unohtanut sen:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Kiitos vierailustasi sivuillamme!"
@@ -739,7 +753,7 @@ msgid "Reset my password"
 msgstr "Nollaa salasanani"
 
 msgid "Select all objects on this page for an action"
-msgstr ""
+msgstr "Valitse kaikki tämän sivun kohteet toiminnolle"
 
 msgid "All dates"
 msgstr "Kaikki päivät"

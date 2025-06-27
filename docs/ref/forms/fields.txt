@@ -1142,7 +1142,7 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: assume_scheme
 
         The scheme assumed for URLs provided without one. Defaults to
-        ``"http"``. For example, if ``assume_scheme`` is ``"https"`` and the
+        ``"https"``. For example, if ``assume_scheme`` is ``"https"`` and the
         provided value is ``"example.com"``, the normalized value will be
         ``"https://example.com"``.
 

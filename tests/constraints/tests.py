@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from unittest import mock
 
 from django.core.exceptions import ValidationError
@@ -359,6 +360,22 @@ class CheckConstraintTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             constraint_with_pk.validate(ChildModel, ChildModel(id=1, age=1))
         constraint_with_pk.validate(ChildModel, ChildModel(pk=1, age=1), exclude={"pk"})
+
+    def test_validate_fk_attname(self):
+        constraint_with_fk = models.CheckConstraint(
+            condition=models.Q(uniqueconstraintproduct_ptr_id__isnull=False),
+            name="parent_ptr_present",
+        )
+        with self.assertRaisesMessage(
+            ValidationError, "Constraint “parent_ptr_present” is violated."
+        ):
+            constraint_with_fk.validate(
+                ChildUniqueConstraintProduct, ChildUniqueConstraintProduct()
+            )
+        constraint_with_fk.validate(
+            ChildUniqueConstraintProduct,
+            ChildUniqueConstraintProduct(uniqueconstraintproduct_ptr_id=1),
+        )
 
     @skipUnlessDBFeature("supports_json_field")
     def test_validate_jsonfield_exact(self):
@@ -1028,6 +1045,23 @@ class UniqueConstraintTests(TestCase):
             UniqueConstraintProduct,
             UniqueConstraintProduct(name=self.p1.name.upper()),
             exclude={"name"},
+        )
+
+    def test_validate_field_transform(self):
+        updated_date = datetime(2005, 7, 26)
+        UniqueConstraintProduct.objects.create(name="p1", updated=updated_date)
+        constraint = models.UniqueConstraint(
+            models.F("updated__date"), name="date_created_unique"
+        )
+        msg = "Constraint “date_created_unique” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintProduct,
+                UniqueConstraintProduct(updated=updated_date),
+            )
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(updated=updated_date + timedelta(days=1)),
         )
 
     def test_validate_ordered_expression(self):

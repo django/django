@@ -4,7 +4,7 @@
 # Adiyat Mubarak <adiyatmubarak@gmail.com>, 2017
 # Bayu Satiyo <itsyuukunz@gmail.com>, 2024
 # Claude Paroz <claude@2xlibre.net>, 2018
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2023
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016,2020
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2013-04-25 06:49+0000\n"
-"Last-Translator: Bayu Satiyo <itsyuukunz@gmail.com>, 2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -354,7 +354,7 @@ msgid "Enter a valid value."
 msgstr "Masukkan nilai yang valid."
 
 msgid "Enter a valid domain name."
-msgstr ""
+msgstr "Masukkan nama domain yang sah."
 
 msgid "Enter a valid URL."
 msgstr "Masukkan URL yang valid."
@@ -381,16 +381,16 @@ msgstr ""
 
 #, python-format
 msgid "Enter a valid %(protocol)s address."
-msgstr ""
+msgstr "Masukkan alamat %(protocol)s yang sah."
 
 msgid "IPv4"
-msgstr ""
+msgstr "IPv4"
 
 msgid "IPv6"
-msgstr ""
+msgstr "IPv6"
 
 msgid "IPv4 or IPv6"
-msgstr ""
+msgstr "IPv4 atau IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Hanya masukkan angka yang dipisahkan dengan koma."
@@ -690,8 +690,8 @@ msgid "Value must be valid JSON."
 msgstr "Nilai harus JSON yang valid."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Salinan %(model)s dengan %(field)s %(value)r tidak ada."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Kunci Asing (tipe tergantung dari bidang yang berkaitan)"

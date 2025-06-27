@@ -21,6 +21,8 @@ Python compatibility
 Django 6.0 supports Python 3.12 and 3.13. We **highly recommend** and only
 officially support the latest release of each series.
 
+The Django 5.2.x series is the last to support Python 3.10 and 3.11.
+
 Third-party library support for older version of Django
 =======================================================
 
@@ -41,12 +43,14 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The Font Awesome Free icon set (version 6.7.2) is now used for the admin
+  interface icons.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`.AdminSite.password_change_form` attribute allows customizing
+  the form used in the admin site password change view.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,7 +66,21 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`.GEOSGeometry.hasm` property checks whether the geometry has
+  the M dimension.
+
+* The new :class:`~django.contrib.gis.db.models.functions.Rotate` database
+  function rotates a geometry by a specified angle around the origin or a
+  specified point.
+
+* The new :attr:`.BaseGeometryWidget.base_layer` attribute allows specifying a
+  JavaScript map base layer, enabling customization of map tile providers.
+
+* :lookup:`coveredby` and :lookup:`isvalid` lookups,
+  :class:`~django.contrib.gis.db.models.Collect` aggregation, and
+  :class:`~django.contrib.gis.db.models.functions.GeoHash` and
+  :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
+  are now supported on MariaDB 12.0.1+.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,7 +90,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Model fields, indexes, and constraints from :mod:`django.contrib.postgres`
+  now include system checks to verify that ``django.contrib.postgres`` is an
+  installed app.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,17 +182,58 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :djadmin:`startproject` and :djadmin:`startapp` commands now create the
+  custom target directory if it doesn't exist.
 
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Squashed migrations can now themselves be squashed before being transitioned
+  to normal migrations.
+
+* Migrations now support serialization of :class:`zoneinfo.ZoneInfo` instances.
+
+* Serialization of deconstructible objects now supports keyword arguments with
+  names that are not valid Python identifiers.
 
 Models
 ~~~~~~
 
-* ...
+* :doc:`Constraints </ref/models/constraints>` now implement a ``check()``
+  method that is already registered with the check framework.
+
+* The new ``order_by`` argument for :class:`~django.db.models.Aggregate` allows
+  specifying the ordering of the elements in the result.
+
+* The new :attr:`.Aggregate.allow_order_by` class attribute determines whether
+  the aggregate function allows passing an ``order_by`` keyword argument.
+
+* The new :class:`~django.db.models.StringAgg` aggregate returns the input
+  values concatenated into a string, separated by the ``delimiter`` string.
+  This aggregate was previously supported only for PostgreSQL.
+
+* The :meth:`~django.db.models.Model.save` method now raises a specialized
+  :exc:`Model.NotUpdated <django.db.models.Model.NotUpdated>` exception, when
+  :ref:`a forced update <ref-models-force-insert>` results in no affected rows,
+  instead of a generic :exc:`django.db.DatabaseError`.
+
+* :meth:`.QuerySet.raw` now supports models with a
+  :class:`~django.db.models.CompositePrimaryKey`.
+
+* :class:`~django.db.models.JSONField` now supports
+  :ref:`negative array indexing <key-index-and-path-transforms>` on SQLite.
+
+* The new :class:`~django.db.models.AnyValue` aggregate returns an arbitrary
+  value from the non-null input values. This is supported on SQLite, MySQL,
+  Oracle, and PostgreSQL 16+.
+
+Pagination
+~~~~~~~~~~
+
+* The new :class:`~django.core.paginator.AsyncPaginator` and
+  :class:`~django.core.paginator.AsyncPage` provide async implementations of
+  :class:`~django.core.paginator.Paginator` and
+  :class:`~django.core.paginator.Page` respectively.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -197,7 +258,15 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The new variable ``forloop.length`` is now available within a :ttag:`for`
+  loop.
+
+* The :ttag:`querystring` template tag now consistently prefixes the returned
+  query string with a ``?``, ensuring reliable link generation behavior.
+
+* The :ttag:`querystring` template tag now accepts multiple positional
+  arguments, which must be mappings, such as :class:`~django.http.QueryDict`
+  or :class:`dict`.
 
 Tests
 ~~~~~
@@ -230,12 +299,61 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
+  ``serialize_db_to_string()`` instead.
+
+* :class:`~django.db.backends.base.schema.BaseDatabaseSchemaEditor` and
+  PostgreSQL backends no longer use ``CASCADE`` when dropping a column.
+
+Dropped support for MariaDB 10.5
+--------------------------------
+
+Upstream support for MariaDB 10.5 ends in June 2025. Django 6.0 supports
+MariaDB 10.6 and higher.
+
+Dropped support for Python < 3.12
+---------------------------------
+
+Because Python 3.12 is now the minimum supported version for Django, any
+optional dependencies must also meet that requirement. The following versions
+of each library are the first to add or confirm compatibility with Python 3.12:
+
+* ``aiosmtpd`` 1.4.5
+* ``argon2-cffi`` 23.1.0
+* ``bcrypt`` 4.1.1
+* ``geoip2`` 4.8.0
+* ``Pillow`` 10.1.0
+* ``mysqlclient`` 2.2.1
+* ``numpy`` 1.26.0
+* ``PyYAML`` 6.0.2
+* ``psycopg`` 3.1.12
+* ``psycopg2`` 2.9.9
+* ``redis-py`` 5.1.0
+* ``selenium`` 4.23.0
+* ``sqlparse`` 0.5.0
+* ``tblib`` 3.0.0
 
 Miscellaneous
 -------------
 
-* ...
+* The :ref:`JSON <serialization-formats-json>` serializer now writes a newline
+  at the end of the output, even without the ``indent`` option set.
+
+* The undocumented ``django.utils.http.parse_header_parameters()`` function is
+  refactored to use Python's :py:class:`email.message.Message` for parsing.
+  Input headers exceeding 10000 characters will now raise :exc:`ValueError`.
+
+* Widgets from :mod:`django.contrib.gis.forms.widgets` now render without
+  inline JavaScript in templates. If you have customized any geometry widgets
+  or their templates, you may need to :ref:`update them
+  <geometry-widgets-customization>` to match the new layout.
+
+* Message levels ``messages.DEBUG`` and ``messages.INFO`` now have distinct
+  icons and CSS styling in the admin. Previously, these used the same icon and
+  styling as the ``messages.SUCCESS`` level. Since
+  :meth:`.ModelAdmin.message_user` uses the ``messages.INFO`` level by default,
+  set the level to ``messages.SUCCESS`` to retain the previous icon and
+  styling.
 
 .. _deprecated-features-6.0:
 
@@ -245,7 +363,32 @@ Features deprecated in 6.0
 Miscellaneous
 -------------
 
-* ...
+* ``BaseDatabaseCreation.create_test_db(serialize)`` is deprecated. Use
+  ``serialize_db_to_string()`` instead.
+
+* The PostgreSQL ``StringAgg`` class is deprecated in favor of the generally
+  available :class:`~django.db.models.StringAgg` class.
+
+* The PostgreSQL ``OrderableAggMixin`` is deprecated in favor of the
+  ``order_by`` attribute now available on the ``Aggregate`` class.
+
+* The default protocol in :tfilter:`urlize` and :tfilter:`urlizetrunc` will
+  change from HTTP to HTTPS in Django 7.0. Set the transitional setting
+  ``URLIZE_ASSUME_HTTPS`` to ``True`` to opt into assuming HTTPS during the
+  Django 6.x release cycle.
+
+* ``URLIZE_ASSUME_HTTPS`` transitional setting is deprecated.
+
+* Setting :setting:`ADMINS` or :setting:`MANAGERS` to a list of (name, address)
+  tuples is deprecated. Set to a list of email address strings instead. Django
+  never used the name portion. To include a name, format the address string as
+  ``'"Name" <address>'`` or use Python's :func:`email.utils.formataddr`.
+
+* Support for the ``orphans`` argument being larger than or equal to the
+  ``per_page`` argument of :class:`django.core.paginator.Paginator` and
+  :class:`django.core.paginator.AsyncPaginator` is deprecated.
+
+* Using a percent sign in a column alias or annotation is deprecated.
 
 Features removed in 6.0
 =======================
@@ -280,7 +423,7 @@ to remove usage of these features.
 * The ``get_joining_columns()`` method of ``ForeignObject`` and
   ``ForeignObjectRel`` is removed.
 
-* The ``ForeignObject.get_reverse_joining_columns()`` method is be removed.
+* The ``ForeignObject.get_reverse_joining_columns()`` method is removed.
 
 * Support for ``cx_Oracle`` is removed.
 

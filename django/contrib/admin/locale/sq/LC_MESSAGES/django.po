@@ -2,15 +2,15 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011,2015
-# Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2024
+# Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2025
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2025\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -31,8 +31,8 @@ msgstr "U fshinë me sukses %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "S’mund të fshijë %(name)s"
 
-msgid "Are you sure?"
-msgstr "Jeni i sigurt?"
+msgid "Delete multiple objects"
+msgstr "Fshini disa objekte njëherësh"
 
 msgid "Administration"
 msgstr "Administrim"
@@ -128,10 +128,10 @@ msgid "change message"
 msgstr "mesazh ndryshimi"
 
 msgid "log entry"
-msgstr "zë regjistrimi"
+msgstr "zë regjistri"
 
 msgid "log entries"
-msgstr "zëra regjistrimi"
+msgstr "zëra regjistri"
 
 #, python-format
 msgid "Added “%(object)s”."
@@ -263,6 +263,9 @@ msgstr[1] "Krejt %(total_count)s të përzgjedhurat"
 msgid "0 of %(cnt)s selected"
 msgstr "0 nga %(cnt)s të përzgjedhur"
 
+msgid "Delete"
+msgstr "Fshije"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Ndryshoni historikun: %s"
@@ -324,7 +327,7 @@ msgstr ""
 "do të duhej ndrequr pa humbur kohë. Faleminderit për durimin."
 
 msgid "Run the selected action"
-msgstr "Xhiro veprimin e përzgjedhur"
+msgstr "Kryej veprimin e përzgjedhur"
 
 msgid "Go"
 msgstr "Shko tek"
@@ -346,6 +349,15 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "Modele te aplikacioni %(name)s"
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "Shtoni"
 
@@ -355,15 +367,11 @@ msgstr "Shiheni"
 msgid "You don’t have permission to view or edit anything."
 msgstr "S’keni leje të shihni apo të përpunoni gjë."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Së pari, jepni një emër përdoruesi dhe një fjalëkalim. Mandej, do të jeni në "
-"gjendje të përpunoni më tepër mundësi përdoruesi."
 
-msgid "Enter a username and password."
-msgstr "Jepni emër përdoruesi dhe fjalëkalim."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Ndryshoni fjalëkalimin"
@@ -450,9 +458,6 @@ msgstr "Ndërroni temën (temë e tanishme: e çelët)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Ndërroni temën (temë e tanishme: e errët)"
 
-msgid "Delete"
-msgstr "Fshije"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -460,7 +465,7 @@ msgid ""
 "following types of objects:"
 msgstr ""
 "Fshirja e %(object_name)s '%(escaped_object)s' do të shpinte në fshirjen e "
-"objekteve të lidhur me të, por llogaria juaj nuk ka leje për fshirje të "
+"objekteve të lidhur me të, por llogaria juaj s’ka leje për fshirje të "
 "objekteve të llojeve të mëposhtëm:"
 
 #, python-format
@@ -476,8 +481,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Jeni i sigurt se doni të fshihet %(object_name)s \"%(escaped_object)s\"? "
-"Krejt objektet vijues të lidhur me të do të fshihen:"
+"Jeni i sigurt se doni të fshihet %(object_name)s “%(escaped_object)s”? Krejt "
+"objektet vijues të lidhur me të do të fshihen:"
 
 msgid "Objects"
 msgstr "Objekte"
@@ -488,9 +493,6 @@ msgstr "Po, jam i sigurt"
 msgid "No, take me back"
 msgstr "Jo, kthemëni mbrapsht"
 
-msgid "Delete multiple objects"
-msgstr "Fshini disa objekte njëherësh"
-
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -498,7 +500,7 @@ msgid ""
 "types of objects:"
 msgstr ""
 "Fshirja e %(objects_name)s të përzgjedhur do të shpjerë në fshirjen e "
-"objekteve të lidhur me të, por llogaria juaj nuk ka leje të fshijë llojet "
+"objekteve të lidhur me të, por llogaria juaj s’ka leje të fshijë llojet "
 "vijuese të objekteve:"
 
 #, python-format
@@ -562,11 +564,11 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
-"Jeni mirëfilltësuar si %(username)s, por s’jeni i autorizuar të hyni në këtë "
-"faqe. Do të donit të hyni në një llogari tjetër?"
+"Keni bërë mirëfilltësimin si %(username)s, por s’jeni i autorizuar të hyni "
+"në këtë faqe. Do të donit të hyni në një llogari tjetër?"
 
-msgid "Forgotten your password or username?"
-msgstr "Harruat fjalëkalimin ose emrin tuaj të përdoruesit?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Shfaqni/fshihni lëvizjen"
@@ -598,7 +600,7 @@ msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Ky objekt nuk ka historik ndryshimesh. Gjasat janë të mos ketë qenë shtuar "
+"Ky objekt s’ka historik ndryshimesh. Gjasat janë të mos ketë qenë shtuar "
 "përmes këtij sajti admin."
 
 msgid "Show all"
@@ -670,7 +672,7 @@ msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Ju lutemi, për hir të sigurisë, jepni fjalëkalimin tuaj të vjetër,dhe mandej "
+"Ju lutemi, për hir të sigurisë, jepni fjalëkalimin tuaj të vjetër dhe mandej "
 "jepeni dy herë fjalëkalimin tuaj të ri, që të mund të verifikojmë se i keni "
 "shtypur saktë."
 
@@ -733,8 +735,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Ju lutemi, shkoni te faqja vijuese dhe zgjidhni një fjalëkalim të ri:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Emri juaj i përdoruesit, në rast se e keni harruar:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Faleminderit që përdorni sajtin tonë!"

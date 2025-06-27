@@ -146,6 +146,11 @@ Transactions do not yet work in async mode. If you have a piece of code that
 needs transactions behavior, we recommend you write that piece as a single
 synchronous function and call it using :func:`sync_to_async`.
 
+:ref:`Persistent database connections <persistent-database-connections>`, set
+via the :setting:`CONN_MAX_AGE` setting, should also be disabled in async mode.
+Instead, use your database backend's built-in connection pooling if available,
+or investigate a third-party connection pooling option if required.
+
 .. _async_performance:
 
 Performance

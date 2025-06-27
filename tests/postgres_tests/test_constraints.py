@@ -309,7 +309,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
 
     def test_invalid_expressions(self):
         msg = "The expressions must be a list of 2-tuples."
-        for expressions in (["foo"], [("foo")], [("foo_1", "foo_2", "foo_3")]):
+        for expressions in (["foo"], [("foo",)], [("foo_1", "foo_2", "foo_3")]):
             with self.subTest(expressions), self.assertRaisesMessage(ValueError, msg):
                 ExclusionConstraint(
                     index_type="GIST",
@@ -796,6 +796,17 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                 room=room102,
             ),
             exclude={"datespan", "start", "end", "room"},
+        )
+        # Constraints with excluded fields in condition are ignored.
+        constraint.validate(
+            HotelReservation,
+            HotelReservation(
+                datespan=(datetimes[1].date(), datetimes[2].date()),
+                start=datetimes[1],
+                end=datetimes[2],
+                room=room102,
+            ),
+            exclude={"cancelled"},
         )
 
     def test_range_overlaps_custom(self):

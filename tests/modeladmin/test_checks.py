@@ -222,6 +222,7 @@ class FieldsetsCheckTests(CheckTestCase):
             ValidationTestModel,
             "There are duplicate field(s) in 'fieldsets[0][1]'.",
             "admin.E012",
+            "Remove duplicates of 'name'.",
         )
 
     def test_duplicate_fields_in_fieldsets(self):
@@ -236,6 +237,7 @@ class FieldsetsCheckTests(CheckTestCase):
             ValidationTestModel,
             "There are duplicate field(s) in 'fieldsets[1][1]'.",
             "admin.E012",
+            "Remove duplicates of 'name'.",
         )
 
     def test_fieldsets_with_custom_form_validation(self):
@@ -255,6 +257,7 @@ class FieldsCheckTests(CheckTestCase):
             ValidationTestModel,
             "The value of 'fields' contains duplicate field(s).",
             "admin.E006",
+            "Remove duplicates of 'name'.",
         )
 
     def test_inline(self):

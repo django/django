@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023,2025
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2020-2021
@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023,2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -29,12 +29,9 @@ msgstr "Pieejams %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Šis ir saraksts ar pieejamajiem %s. Tev ir jāizvēlas atbilstošās vērtības "
-"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu "
-"\"Izvēlēties\", lai pārvietotu starp izvēļu sarakstiem."
+"Izvēlēties %s tos atzīmējot un tad izvēloties \"Izvēlēties\" bultiņas pogu."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -44,18 +41,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Filtrs"
 
-msgid "Choose all"
-msgstr "Izvēlēties visu"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Izvēlēties visus %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Izvēlies, lai pievienotu visas %s izvēles vienā reizē."
+msgid "Choose selected %s"
+msgstr "Izvēlieties atzīmētos %s"
 
-msgid "Choose"
-msgstr "Izvēlies"
-
-msgid "Remove"
-msgstr "Izņemt"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Noņemt atzīmētos %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -63,23 +59,19 @@ msgstr "Izvēlies %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"Šis ir saraksts ar izvēlētajiem %s. Tev ir jāizvēlas atbilstošās vērtības "
-"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izņemt\", "
-"lai izņemtu no izvēlēto ierakstu saraksta."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr "Noņemt %s tos atzīmējot un tad izvēloties \"Noņemt\" bultiņas pogu."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Rakstiet šajā laukā, lai filtrētu atlasīto %s sarakstu."
 
-msgid "Remove all"
-msgstr "Izņemt visu"
+msgid "(click to clear)"
+msgstr "(klikšķiniet, lai notīrītu)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Izvēlies, lai izņemtu visas %s izvēles vienā reizē."
+msgid "Remove all %s"
+msgstr "Noņemt visu %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -327,9 +319,3 @@ msgstr "Pk"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Se"
-
-msgid "Show"
-msgstr "Parādīt"
-
-msgid "Hide"
-msgstr "Slēpt"

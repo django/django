@@ -2,7 +2,7 @@ import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
@@ -261,20 +261,15 @@ class LookupTests(TestCase):
 
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering_with_batch_size(self):
-        old_max_query_params = connection.features.max_query_params
-        connection.features.max_query_params = 1
-        try:
-            articles = (
-                Article.objects.order_by("author_id", "-pub_date")
-                .distinct("author_id")
-                .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
-            )
+        qs = Article.objects.order_by("author_id", "-pub_date").distinct("author_id")
+        with (
+            mock.patch.object(connection.features.__class__, "max_query_params", 1),
+            self.assertNumQueries(2),
+        ):
             self.assertEqual(
-                articles,
+                qs.in_bulk([self.au1.id, self.au2.id], field_name="author_id"),
                 {self.au1.id: self.a4, self.au2.id: self.a5},
             )
-        finally:
-            connection.features.max_query_params = old_max_query_params
 
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_distinct_field(self):
@@ -788,6 +783,14 @@ class LookupTests(TestCase):
             )
         sql = ctx.captured_queries[0]["sql"]
         self.assertIn("IN (%s)" % self.a1.pk, sql)
+
+    def test_in_select_mismatch(self):
+        msg = (
+            "The QuerySet value for the 'in' lookup must have 1 "
+            "selected fields (received 2)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.filter(id__in=Article.objects.values("id", "headline"))
 
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
@@ -1363,6 +1366,14 @@ class LookupTests(TestCase):
         )
         authors = Author.objects.filter(id=authors_max_ids[:1])
         self.assertEqual(authors.get(), newest_author)
+
+    def test_exact_query_rhs_with_selected_columns_mismatch(self):
+        msg = (
+            "The QuerySet value for the exact lookup must have 1 "
+            "selected fields (received 2)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.filter(id=Author.objects.values("id", "name")[:1])
 
     def test_isnull_non_boolean_value(self):
         msg = "The QuerySet value for an isnull lookup must be True or False."

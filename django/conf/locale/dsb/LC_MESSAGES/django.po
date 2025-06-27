@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2024
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 06:49+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2025\n"
 "Language-Team: Lower Sorbian (http://app.transifex.com/django/django/"
 "language/dsb/)\n"
 "MIME-Version: 1.0\n"
@@ -707,8 +707,8 @@ msgid "Value must be valid JSON."
 msgstr "Gódnota musy płaśiwy JSON byś."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Instanca %(model)s z  %(field)s %(value)r njeeksistěrujo."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "Instanca %(model)s z  %(field)s %(value)r njejo płaśiwa wólba."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Cuzy kluc (typ póstaja se pśez wótpowědne pólo)"

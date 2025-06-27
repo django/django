@@ -2,7 +2,10 @@
 Tools for sending email.
 """
 
+import warnings
+
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 # Imported for backwards compatibility and for the sake
 # of a cleaner namespace. These symbols used to be in
@@ -21,6 +24,8 @@ from django.core.mail.message import (
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
+from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.functional import Promise
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -119,41 +124,71 @@ def send_mass_mail(
     return connection.send_messages(messages)
 
 
-def mail_admins(
-    subject, message, fail_silently=False, connection=None, html_message=None
+def _send_server_message(
+    *,
+    setting_name,
+    subject,
+    message,
+    html_message=None,
+    fail_silently=False,
+    connection=None,
 ):
-    """Send a message to the admins, as defined by the ADMINS setting."""
-    if not settings.ADMINS:
+    recipients = getattr(settings, setting_name)
+    if not recipients:
         return
-    if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in settings.ADMINS):
-        raise ValueError("The ADMINS setting must be a list of 2-tuples.")
+
+    # RemovedInDjango70Warning.
+    if all(isinstance(a, (list, tuple)) and len(a) == 2 for a in recipients):
+        warnings.warn(
+            f"Using (name, address) pairs in the {setting_name} setting is deprecated."
+            " Replace with a list of email address strings.",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        recipients = [a[1] for a in recipients]
+
+    if not isinstance(recipients, (list, tuple)) or not all(
+        isinstance(address, (str, Promise)) for address in recipients
+    ):
+        raise ImproperlyConfigured(
+            f"The {setting_name} setting must be a list of email address strings."
+        )
+
     mail = EmailMultiAlternatives(
-        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
-        message,
-        settings.SERVER_EMAIL,
-        [a[1] for a in settings.ADMINS],
+        subject="%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        body=message,
+        from_email=settings.SERVER_EMAIL,
+        to=recipients,
         connection=connection,
     )
     if html_message:
         mail.attach_alternative(html_message, "text/html")
     mail.send(fail_silently=fail_silently)
+
+
+def mail_admins(
+    subject, message, fail_silently=False, connection=None, html_message=None
+):
+    """Send a message to the admins, as defined by the ADMINS setting."""
+    _send_server_message(
+        setting_name="ADMINS",
+        subject=subject,
+        message=message,
+        html_message=html_message,
+        fail_silently=fail_silently,
+        connection=connection,
+    )
 
 
 def mail_managers(
     subject, message, fail_silently=False, connection=None, html_message=None
 ):
     """Send a message to the managers, as defined by the MANAGERS setting."""
-    if not settings.MANAGERS:
-        return
-    if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in settings.MANAGERS):
-        raise ValueError("The MANAGERS setting must be a list of 2-tuples.")
-    mail = EmailMultiAlternatives(
-        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
-        message,
-        settings.SERVER_EMAIL,
-        [a[1] for a in settings.MANAGERS],
+    _send_server_message(
+        setting_name="MANAGERS",
+        subject=subject,
+        message=message,
+        html_message=html_message,
+        fail_silently=fail_silently,
         connection=connection,
     )
-    if html_message:
-        mail.attach_alternative(html_message, "text/html")
-    mail.send(fail_silently=fail_silently)

@@ -74,6 +74,8 @@ from django.db import (
     transaction,
 )
 from django.db.models import Manager, Q, Window, signals
+from django.db.models.expressions import ColPairs
+from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
@@ -109,7 +111,10 @@ def _filter_prefetch_queryset(queryset, field_name, instances):
         if high_mark is not None:
             predicate &= LessThanOrEqual(window, high_mark)
         queryset.query.clear_limits()
-    return queryset.filter(predicate)
+    # All pre-existing JOINs must be re-used when applying the predicate to
+    # avoid unintended spanning of multi-valued relationships.
+    queryset.query.add_q(predicate, reuse_all=True)
+    return queryset
 
 
 class ForwardManyToOneDescriptor:
@@ -164,23 +169,22 @@ class ForwardManyToOneDescriptor:
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = {instance_attr(inst): inst for inst in instances}
-        related_field = self.field.foreign_related_fields[0]
         remote_field = self.field.remote_field
-
-        # FIXME: This will need to be revisited when we introduce support for
-        # composite fields. In the meantime we take this practical approach to
-        # solve a regression on 1.6 when the reverse manager is hidden
-        # (related_name ends with a '+'). Refs #21410.
-        # The check for len(...) == 1 is a special case that allows the query
-        # to be join-less and smaller. Refs #21760.
-        if remote_field.hidden or len(self.field.foreign_related_fields) == 1:
-            query = {
-                "%s__in"
-                % related_field.name: {instance_attr(inst)[0] for inst in instances}
-            }
-        else:
-            query = {"%s__in" % self.field.related_query_name(): instances}
-        queryset = queryset.filter(**query)
+        related_fields = [
+            queryset.query.resolve_ref(field.name).target
+            for field in self.field.foreign_related_fields
+        ]
+        queryset = queryset.filter(
+            TupleIn(
+                ColPairs(
+                    queryset.model._meta.db_table,
+                    related_fields,
+                    related_fields,
+                    self.field,
+                ),
+                list(instances_dict),
+            )
+        )
         # There can be only one object prefetched for each instance so clear
         # ordering if the query allows it without side effects.
         queryset.query.clear_ordering()
@@ -760,7 +764,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             for rel_obj in queryset:
                 if not self.field.is_cached(rel_obj):
                     instance = instances_dict[rel_obj_attr(rel_obj)]
-                    setattr(rel_obj, self.field.name, instance)
+                    self.field.set_cached_value(rel_obj, instance)
             cache_name = self.field.remote_field.cache_name
             return queryset, rel_obj_attr, instance_attr, False, cache_name, False
 
@@ -1119,7 +1123,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
             queryset = _filter_prefetch_queryset(
-                queryset._next_is_sticky(), self.query_field_name, instances
+                queryset, self.query_field_name, instances
             )
 
             # M2M: need to annotate the query in order to get the primary model
@@ -1171,7 +1175,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 return None
             hints = {"instance": self.instance}
             manager = self.through._base_manager.db_manager(db, hints=hints)
-            filters = {self.source_field_name: self.instance.pk}
+            filters = {self.source_field_name: self.related_val[0]}
             # Nullable target rows must be excluded as well as they would have
             # been filtered out from an INNER JOIN.
             if self.target_field.null:

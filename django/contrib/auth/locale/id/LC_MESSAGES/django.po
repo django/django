@@ -1,20 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2018,2020-2021,2023
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2018,2020-2021,2023-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011,2013
 # rodin <romihardiyanto@gmail.com>, 2013-2016
-# sag᠎e <laymonage@gmail.com>, 2019
+# sag​e <laymonage@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>, "
-"2015-2016,2018,2020-2021,2023\n"
+"2015-2016,2018,2020-2021,2023-2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -36,12 +36,22 @@ msgstr "Tanggal penting"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objek %(name)s dengan primary key %(key)r tidak ditemukan."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Data yang diajukan konflik. Silahkan coba kembali."
+
 msgid "Password changed successfully."
 msgstr "Sandi berhasil diubah."
+
+msgid "Password-based authentication was disabled."
+msgstr "Autentifikasi berdasarkan-sandi telah ditiadakan."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Ganti sandi: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Setel sandi: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autentikasi dan Otorisasi"
@@ -52,11 +62,17 @@ msgstr "sandi"
 msgid "last login"
 msgstr "masuk terakhir"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Format sandi tidak valid atau algoritma hash yang tidak dikenal."
+
 msgid "No password set."
 msgstr "Belum ada sandi yang disetel."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Format sandi tidak valid atau algoritma hash yang tidak dikenal."
+msgid "Reset password"
+msgstr "Setel kembali sandi"
+
+msgid "Set password"
+msgstr "Setel sandi"
 
 msgid "The two password fields didn’t match."
 msgstr "Dua bidang sandi tidak cocok."
@@ -71,11 +87,33 @@ msgid "Enter the same password as before, for verification."
 msgstr "Masukkan sandi yang sama seperti sebelumnya, untuk verifikasi."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Sandi mentah tidak disimpan, jadi tidak ada cara melihat sandi pengguna ini, "
-"tetapi anda dapat merubah sandi menggunakan <a href=\"{}\">formulir ini</a>."
+"Apakah pengguna dapat mengautentifikasi menggunakan sandi atau tidak. Jika "
+"ditiadakan, mereka mungkin masih dapat autentidikasi menggunakan backend "
+"lain, seperti Single Sign-On atau LDAP."
+
+msgid "Password-based authentication"
+msgstr "Autentidikasi berdasarkan-sandi"
+
+msgid "Enabled"
+msgstr "Diadakan"
+
+msgid "Disabled"
+msgstr "Ditiadakan"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Sandi mentah tidak disimpan, sehingga tidak mungkin melihat sandi pengguna."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Mengadakan autentifikasi berdasarkan-sandi untuk pengguna ini dengan "
+"menyetel sandi."
 
 #, python-format
 msgid ""
@@ -102,9 +140,6 @@ msgstr "Sandi lama Anda yang dimasukkan salah. Masukkan sekali lagi."
 
 msgid "Old password"
 msgstr "Sandi lama"
-
-msgid "Password (again)"
-msgstr "Sandi (ulangi)"
 
 msgid "algorithm"
 msgstr "algoritme"
@@ -230,15 +265,10 @@ msgid "users"
 msgstr "pengguna"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Kata sandi terlalu singkat. Kata sandi harus memuat setidaknya "
-"%(min_length)d karakter."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

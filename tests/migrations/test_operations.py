@@ -2055,8 +2055,13 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 4)
         # Test the database alteration
         self.assertColumnExists("test_rmfl_pony", "pink")
-        with connection.schema_editor() as editor:
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
             operation.database_forwards("test_rmfl", editor, project_state, new_state)
+        self.assertGreater(len(ctx.captured_queries), 0)
+        self.assertNotIn("CASCADE", ctx.captured_queries[-1]["sql"])
         self.assertColumnNotExists("test_rmfl_pony", "pink")
         # And test reversal
         with connection.schema_editor() as editor:

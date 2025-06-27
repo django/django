@@ -150,7 +150,7 @@ class BaseDatabaseWrapper:
         if not settings.USE_TZ:
             return None
         elif self.settings_dict["TIME_ZONE"] is None:
-            return datetime.timezone.utc
+            return datetime.UTC
         else:
             return zoneinfo.ZoneInfo(self.settings_dict["TIME_ZONE"])
 
@@ -221,7 +221,6 @@ class BaseDatabaseWrapper:
 
     def init_connection_state(self):
         """Initialize the database connection settings."""
-        global RAN_DB_VERSION_CHECK
         if self.alias not in RAN_DB_VERSION_CHECK:
             self.check_database_version_supported()
             RAN_DB_VERSION_CHECK.add(self.alias)

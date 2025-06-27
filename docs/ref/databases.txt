@@ -40,6 +40,10 @@ database connection at the end of each request. To enable persistent
 connections, set :setting:`CONN_MAX_AGE` to a positive integer of seconds. For
 unlimited persistent connections, set it to ``None``.
 
+When using ASGI, persistent connections should be disabled. Instead, use your
+database backend's built-in connection pooling if available, or investigate a
+third-party connection pooling option if required.
+
 Connection management
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -115,8 +119,8 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
-2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
+Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
+2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended.
 
 .. note::
 
@@ -231,7 +235,7 @@ configuration in :setting:`DATABASES`::
 Role
 ----
 
-If you need to use a different role for database connections than the role use
+If you need to use a different role for database connections than the role used
 to establish the connection, set it in the :setting:`OPTIONS` part of your
 database configuration in :setting:`DATABASES`::
 
@@ -417,7 +421,7 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 MariaDB notes
 =============
 
-Django supports MariaDB 10.5 and higher.
+Django supports MariaDB 10.6 and higher.
 
 To use MariaDB, use the MySQL backend, which is shared between the two. See the
 :ref:`MySQL notes <mysql-notes>` for more details.
@@ -486,7 +490,7 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.4.3 or later.
+Django requires `mysqlclient`_ 2.2.1 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -774,7 +778,7 @@ a :exc:`~django.db.NotSupportedError` is raised.
 =============== ========= =====
 Option          MariaDB   MySQL
 =============== ========= =====
-``SKIP LOCKED`` X (≥10.6) X
+``SKIP LOCKED`` X         X
 ``NOWAIT``      X         X
 ``OF``                    X
 ``NO KEY``
@@ -824,7 +828,7 @@ Substring matching and case sensitivity
 
 For all SQLite versions, there is some slightly counterintuitive behavior when
 attempting to match some types of strings.  These are triggered when using the
-:lookup:`iexact` or :lookup:`contains` filters in Querysets. The behavior
+:lookup:`iexact` or :lookup:`contains` filters in querysets. The behavior
 splits into two cases:
 
 1. For substring matching, all matches are done case-insensitively. That is a
@@ -1135,19 +1139,6 @@ alternatively set ``"pool"`` to be a dict::
 
 .. _`create_pool()`: https://python-oracledb.readthedocs.io/en/latest/user_guide/connection_handling.html#connection-pooling
 
-Threaded option
----------------
-
-If you plan to run Django in a multithreaded environment (e.g. Apache using the
-default MPM module on any modern operating system), then you **must** set
-the ``threaded`` option of your Oracle database configuration to ``True``::
-
-    "OPTIONS": {
-        "threaded": True,
-    }
-
-Failure to do this may result in crashes and other odd behavior.
-
 INSERT ... RETURNING INTO
 -------------------------
 
@@ -1213,8 +1204,8 @@ string, and the data is silently converted to reflect this assumption.
 ``TextField`` limitations
 -------------------------
 
-The Oracle backend stores ``TextFields`` as ``NCLOB`` columns. Oracle imposes
-some limitations on the usage of such LOB columns in general:
+The Oracle backend stores each ``TextField`` as an ``NCLOB`` column. Oracle
+imposes some limitations on the usage of such LOB columns in general:
 
 * LOB columns may not be used as primary keys.
 

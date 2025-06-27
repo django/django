@@ -1,4 +1,6 @@
+from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models import F
 from django.test import TestCase
 
 from .models import Comment, Tenant, TimeStamped, Token, User
@@ -175,3 +177,17 @@ class CompositePKUpdateTests(TestCase):
 
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.update(user=User())
+
+    def test_cant_update_pk_field(self):
+        qs = Comment.objects.filter(user__email=self.user_1.email)
+        msg = "Composite primary key fields must be updated individually."
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.update(pk=(1, 10))
+
+    def test_update_value_not_composite(self):
+        msg = (
+            "Composite primary keys expressions are not allowed in this "
+            "query (text=F('pk'))."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Comment.objects.update(text=F("pk"))

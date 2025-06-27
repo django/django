@@ -1,5 +1,5 @@
 """
- Error checking functions for GEOS ctypes prototype functions.
+Error checking functions for GEOS ctypes prototype functions.
 """
 
 from ctypes import c_void_p, string_at
