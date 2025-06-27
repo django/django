@@ -68,7 +68,7 @@ Attributes of ``Task`` cannot be modified.
 
 .. attribute:: Task.run_after
 
-    The earliest time the ``Task`` will be executed, or ``None`` to have no time set.
+    The earliest time the ``Task`` will be executed, or ``None`` if not constrained.
 
     Defaults to ``None``.
 
