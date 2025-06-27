@@ -1,7 +1,7 @@
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
 from django.utils.module_loading import import_string
 
-from . import checks, signal_handlers  # noqa
+from . import checks, signals  # noqa
 from .exceptions import InvalidTaskBackendError
 from .task import (
     DEFAULT_QUEUE_NAME,
