@@ -36,6 +36,9 @@ In the above example, ``email_users`` is a :class:`Task` instance.
 If the ``Task`` is not valid, according to the backend,
 :exc:`django.tasks.exceptions.InvalidTaskError` is raised.
 
+Additionally, ``task`` accepts a ``takes_context`` argument, which controls whether
+the task function accepts a :class:`TaskContext`. See :ref:`task-context` for details.
+
 .. class:: Task
 
 Represents a task to be run in the background. Tasks should be defined using
@@ -124,6 +127,24 @@ Attributes of ``Task`` cannot be modified.
 
     The ``async`` variant of :meth:`get_result <Task.get_result>`.
 
+Task context
+============
+
+.. class:: TaskContext
+
+Contains context for the running task. Context only passed to a task if it was
+defined with ``takes_context=True``.
+
+Attributes of ``TaskContext`` cannot be modified.
+
+.. attribute:: TaskContext.task_result
+
+    The :class:`TaskResult` currently being run.
+
+.. attribute:: TaskContext.attempt
+
+    The current attempt of this task, starting from 1.
+
 Task results
 ============
 
@@ -131,9 +152,9 @@ Task results
 
     An Enum representing the status of a :class:`TaskResult`.
 
-.. attribute:: ResultStatus.NEW
+.. attribute:: ResultStatus.READY
 
-    The :class:`Task` has not been run.
+    The :class:`Task` has just been enqueued, or is ready to be executed again.
 
 .. attribute:: ResultStatus.RUNNING
 
@@ -183,6 +204,10 @@ Attributes of ``TaskResult`` cannot be modified.
 
     The time when the ``Task`` began execution.
 
+.. attribute:: TaskResult.last_attempted_at
+
+    The time when the ``Task`` was last attempted to be executed.
+
 .. attribute:: TaskResult.finished_at
 
     The time when the ``Task`` finished execution, whether it failed or succeeded.
@@ -191,19 +216,10 @@ Attributes of ``TaskResult`` cannot be modified.
 
     The backend the result is from.
 
-.. attribute:: TaskResult.exception_class
+.. attribute:: TaskResult.errors
 
-    The exception class raised when executing the ``Task``.
-
-    If the ``Task`` has not finished, ``ValueError`` is raised. If the ``Task`` finished
-    successfully, the exception class is ``None``.
-
-.. attribute:: TaskResult.traceback
-
-    The exception traceback from the raised exception when the ``Task`` failed.
-
-    If the Task has not finished, ``ValueError`` is raised. If the ``Task`` finished
-    successfully, the traceback is ``None``.
+    A list of :class:`TaskError` instances for the errors raised as part of each
+    execution of the task.
 
 .. attribute:: TaskResult.return_value
 
@@ -222,6 +238,32 @@ Attributes of ``TaskResult`` cannot be modified.
 .. attribute:: TaskResult.is_finished
 
     Whether the ``Task`` has finished (successfully or not).
+
+.. attribute:: TaskResult.attempts
+
+    The number of times the task has been run.
+
+    If the task is currently running, it does not count as an attempt.
+
+.. attribute:: TaskResult.worker_ids
+
+    The ids of the workers which have executed the task.
+
+
+Task errors
+-----------
+
+.. class:: TaskError
+
+Contains information about the error raised as part of a task's execution.
+
+.. attribute:: TaskError.traceback
+
+    The traceback (as a string) from the raised exception when the ``Task`` failed.
+
+.. attribute:: TaskError.exception_class
+
+    The exception class raised when executing the ``Task``.
 
 Backends
 ========

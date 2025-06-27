@@ -61,7 +61,7 @@ def get_module_path(val):
 
 def get_random_id():
     """
-    Return a random string for use as a task id.
+    Return a random string for use as a task or worker id.
 
     Whilst 64 characters is the max, just use 32 as a sensible middle-ground.
 

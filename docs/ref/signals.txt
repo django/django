@@ -725,6 +725,18 @@ Arguments that are sent with this signal:
 ``task_result``
     The enqueued :class:`TaskResult <django.tasks.TaskResult>`.
 
+.. data:: django.tasks.signals.task_started
+
+Sent when a task has started executing.
+
+Arguments that are sent with this signal:
+
+``sender``
+    The backend class which the task was enqueued on to.
+
+``task_result``
+    The started :class:`TaskResult <django.tasks.TaskResult>`.
+
 .. data:: django.tasks.signals.task_finished
 
 Sent once a task has finished executing, successfully or otherwise.

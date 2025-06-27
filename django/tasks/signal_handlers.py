@@ -5,7 +5,7 @@ from asgiref.local import Local
 from django.core.signals import setting_changed
 from django.dispatch import receiver
 
-from .signals import task_enqueued, task_finished
+from .signals import task_enqueued, task_finished, task_started
 from .task import ResultStatus
 
 logger = logging.getLogger("django.tasks")
@@ -30,6 +30,16 @@ def log_task_enqueued(sender, task_result, **kwargs):
         task_result.id,
         task_result.task.module_path,
         task_result.backend,
+    )
+
+
+@receiver(task_started)
+def log_task_started(sender, task_result, **kwargs):
+    logger.info(
+        "Task id=%s path=%s state=%s",
+        task_result.id,
+        task_result.task.module_path,
+        task_result.status,
     )
 
 

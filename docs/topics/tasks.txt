@@ -73,7 +73,7 @@ Dummy backend
 -------------
 
 The dummy backend doesn't execute enqueued Tasks at all, instead storing results
-for later use. Task results will forever remain in the ``NEW`` state.
+for later use. Task results will forever remain in the ``READY`` state.
 
 This backend is not intended for use in production - it is provided as a
 convenience that can be used during development and testing.
@@ -220,8 +220,38 @@ The ``task`` decorator accepts a few keyword arguments to customize the Task:
 These arguments correspond to attributes on the created
 :class:`Task <django.tasks.Task>`.
 
+Additionally, ``task`` accepts a ``takes_context`` argument, which controls whether
+the task function accepts context about its execution. See :ref:`task-context` for details.
+
 By convention, Tasks should be defined in a ``tasks.py`` file, however this is
 not enforced.
+
+.. _task-context:
+
+Task context
+------------
+
+Sometimes, the running task may need to know context about how it was enqueued,
+and how it is being executed. This can be accessed by taking a ``context`` argument,
+which is an instance of :class:`django.tasks.TaskContext`.
+
+To receive the task context as an argument to your task function, pass ``takes_context``
+when defining it::
+
+    from django.core.mail import send_mail
+    from django.tasks import task
+
+
+    @task(takes_context=True)
+    def email_users(context, emails, subject, message):
+        return send_mail(
+            subject=subject, message=message, from_email=None, recipient_list=emails
+        )
+
+The context has the following attributes:
+
+* :attr:`task_result <django.tasks.TaskContext.task_result>`
+* :attr:`attempt <django.tasks.TaskContext.attempt>`
 
 Modifying tasks
 ---------------
@@ -357,17 +387,20 @@ If your Task function returns something, it can be retrieved from the
 
 If the Task has not finished executing, or has failed, :exc:`ValueError` is raised.
 
-Exceptions
-----------
+Errors
+------
 
 If the Task doesn't succeed, and instead raises an exception, either
-as part of the Task or as part of running it, the exception class is saved
-to the :attr:`django.tasks.TaskResult.exception_class` attribute::
+as part of the Task or as part of running it, the exception and traceback are saved
+to the :attr:`django.tasks.TaskResult.errors` list.
 
-    assert result.exception_class == ValueError
+Each entry in ``errors`` is a :class:`django.tasks.TaskError` containing information
+about error raised during the execution::
+
+    assert result.errors[0].exception_class == ValueError
 
 Note that this is just the type of exception, and contains no other values.
 The traceback information is reduced to a string which you can use to help
 debugging::
 
-    print(result.traceback)
+    print(result.errors[0].traceback)

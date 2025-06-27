@@ -1,6 +1,6 @@
 import time
 
-from django.tasks import task
+from django.tasks import TaskContext, task
 
 
 @task()
@@ -69,3 +69,14 @@ def hang() -> None:
 @task()
 def sleep_for(seconds: float) -> None:
     time.sleep(seconds)
+
+
+@task(takes_context=True)
+def get_task_id(context) -> str:
+    return context.task_result.id
+
+
+@task(takes_context=True)
+def test_context(context, attempt) -> None:
+    assert isinstance(context, TaskContext)
+    assert context.attempt == attempt

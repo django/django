@@ -10,6 +10,7 @@ from django.tasks.exceptions import InvalidTaskError
 from django.tasks.task import MAX_PRIORITY, MIN_PRIORITY, Task
 from django.tasks.utils import is_module_level_function
 from django.utils import timezone
+from django.utils.inspect import get_func_args
 
 
 class BaseTaskBackend(metaclass=ABCMeta):
@@ -51,6 +52,15 @@ class BaseTaskBackend(metaclass=ABCMeta):
 
         if not self.supports_async_task and iscoroutinefunction(task.func):
             raise InvalidTaskError("Backend does not support async tasks")
+
+        task_func_args = get_func_args(task.func)
+
+        if task.takes_context and (
+            not task_func_args or task_func_args[0] != "context"
+        ):
+            raise InvalidTaskError(
+                "Task takes context but does not have a first argument of 'context'"
+            )
 
         if (
             task.priority < MIN_PRIORITY

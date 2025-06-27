@@ -32,6 +32,7 @@ class ImmediateBackendTestCase(SimpleTestCase):
                 self.assertEqual(result.status, ResultStatus.SUCCEEDED)
                 self.assertTrue(result.is_finished)
                 self.assertIsNotNone(result.started_at)
+                self.assertIsNotNone(result.last_attempted_at)
                 self.assertIsNotNone(result.finished_at)
                 self.assertGreaterEqual(result.started_at, result.enqueued_at)
                 self.assertGreaterEqual(result.finished_at, result.started_at)
@@ -39,6 +40,7 @@ class ImmediateBackendTestCase(SimpleTestCase):
                 self.assertEqual(result.task, task)
                 self.assertEqual(result.args, [1])
                 self.assertEqual(result.kwargs, {"two": 3})
+                self.assertEqual(result.attempts, 1)
 
     async def test_enqueue_task_async(self):
         for task in [test_tasks.noop_task, test_tasks.noop_task_async]:
@@ -48,6 +50,7 @@ class ImmediateBackendTestCase(SimpleTestCase):
                 self.assertEqual(result.status, ResultStatus.SUCCEEDED)
                 self.assertTrue(result.is_finished)
                 self.assertIsNotNone(result.started_at)
+                self.assertIsNotNone(result.last_attempted_at)
                 self.assertIsNotNone(result.finished_at)
                 self.assertGreaterEqual(result.started_at, result.enqueued_at)
                 self.assertGreaterEqual(result.finished_at, result.started_at)
@@ -55,6 +58,7 @@ class ImmediateBackendTestCase(SimpleTestCase):
                 self.assertEqual(result.task, task)
                 self.assertEqual(result.args, [])
                 self.assertEqual(result.kwargs, {})
+                self.assertEqual(result.attempts, 1)
 
     def test_catches_exception(self):
         test_data = [
@@ -86,13 +90,16 @@ class ImmediateBackendTestCase(SimpleTestCase):
                     result.return_value
                 self.assertTrue(result.is_finished)
                 self.assertIsNotNone(result.started_at)
+                self.assertIsNotNone(result.last_attempted_at)
                 self.assertIsNotNone(result.finished_at)
                 self.assertGreaterEqual(result.started_at, result.enqueued_at)
                 self.assertGreaterEqual(result.finished_at, result.started_at)
-                self.assertEqual(result.exception_class, exception)
+                self.assertEqual(result.errors[0].exception_class, exception)
+                traceback = result.errors[0].traceback
                 self.assertTrue(
-                    result.traceback
-                    and result.traceback.endswith(f"{exception.__name__}: {message}\n")
+                    traceback
+                    and traceback.endswith(f"{exception.__name__}: {message}\n"),
+                    traceback,
                 )
                 self.assertEqual(result.task, task)
                 self.assertEqual(result.args, [])
@@ -116,13 +123,16 @@ class ImmediateBackendTestCase(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, "Task failed"):
             result.return_value
         self.assertIsNotNone(result.started_at)
+        self.assertIsNotNone(result.last_attempted_at)
         self.assertIsNotNone(result.finished_at)
         self.assertGreaterEqual(result.started_at, result.enqueued_at)
         self.assertGreaterEqual(result.finished_at, result.started_at)
 
         self.assertIsNone(result._return_value)
-        self.assertEqual(result.exception_class, ValueError)
-        self.assertIn('ValueError(ValueError("This task failed"))', result.traceback)
+        self.assertEqual(result.errors[0].exception_class, ValueError)
+        self.assertIn(
+            'ValueError(ValueError("This task failed"))', result.errors[0].traceback
+        )
 
         self.assertEqual(result.task, test_tasks.complex_exception)
         self.assertEqual(result.args, [])
@@ -194,8 +204,36 @@ class ImmediateBackendTestCase(SimpleTestCase):
         with self.assertLogs("django.tasks", level="DEBUG") as captured_logs:
             result = test_tasks.noop_task.enqueue()
 
+        self.assertEqual(len(captured_logs.output), 3)
+
         self.assertIn("enqueued", captured_logs.output[0])
         self.assertIn(result.id, captured_logs.output[0])
+
+        self.assertIn("state=RUNNING", captured_logs.output[1])
+        self.assertIn(result.id, captured_logs.output[1])
+
+        self.assertIn("state=SUCCEEDED", captured_logs.output[2])
+        self.assertIn(result.id, captured_logs.output[2])
+
+    def test_failed_logs(self):
+        with self.assertLogs("django.tasks", level="DEBUG") as captured_logs:
+            result = test_tasks.failing_task_value_error.enqueue()
+
+        self.assertEqual(len(captured_logs.output), 3)
+        self.assertIn("state=RUNNING", captured_logs.output[1])
+        self.assertIn(result.id, captured_logs.output[1])
+
+        self.assertIn("state=FAILED", captured_logs.output[2])
+        self.assertIn(result.id, captured_logs.output[2])
+
+    def test_takes_context(self):
+        result = test_tasks.get_task_id.enqueue()
+
+        self.assertEqual(result.return_value, result.id)
+
+    def test_context(self):
+        result = test_tasks.test_context.enqueue(1)
+        self.assertEqual(result.status, ResultStatus.SUCCEEDED)
 
 
 class ImmediateBackendTransactionTestCase(TransactionTestCase):
@@ -219,10 +257,12 @@ class ImmediateBackendTransactionTestCase(TransactionTestCase):
             result = test_tasks.noop_task.enqueue()
 
             self.assertIsNone(result.enqueued_at)
-            self.assertEqual(result.status, ResultStatus.NEW)
+            self.assertEqual(result.attempts, 0)
+            self.assertEqual(result.status, ResultStatus.READY)
 
         self.assertEqual(result.status, ResultStatus.SUCCEEDED)
         self.assertIsNotNone(result.enqueued_at)
+        self.assertEqual(result.attempts, 1)
 
     @override_settings(
         TASKS={
@@ -264,7 +304,7 @@ class ImmediateBackendTransactionTestCase(TransactionTestCase):
             result = test_tasks.noop_task.enqueue()
 
             self.assertIsNone(result.enqueued_at)
-            self.assertEqual(result.status, ResultStatus.NEW)
+            self.assertEqual(result.status, ResultStatus.READY)
 
         self.assertEqual(result.status, ResultStatus.SUCCEEDED)
 
@@ -289,6 +329,6 @@ class ImmediateBackendTransactionTestCase(TransactionTestCase):
             result = test_tasks.enqueue_on_commit_task.enqueue()
 
             self.assertIsNone(result.enqueued_at)
-            self.assertEqual(result.status, ResultStatus.NEW)
+            self.assertEqual(result.status, ResultStatus.READY)
 
         self.assertEqual(result.status, ResultStatus.SUCCEEDED)

@@ -7,6 +7,7 @@ from .task import (
     DEFAULT_QUEUE_NAME,
     DEFAULT_TASK_BACKEND_ALIAS,
     ResultStatus,
+    TaskContext,
     TaskResult,
     task,
 )
@@ -19,6 +20,7 @@ __all__ = [
     "task",
     "ResultStatus",
     "TaskResult",
+    "TaskContext",
 ]
 
 
