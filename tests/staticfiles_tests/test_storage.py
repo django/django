@@ -568,6 +568,20 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertEqual(manifest_hash, "")
         self.assertEqual(manifest_content, {"dummy.txt": "dummy.txt"})
 
+    def test_staticfile_content_consistency(self):
+        manifest_file_content_orig = storage.staticfiles_storage.read_manifest()
+        hashed_files = storage.staticfiles_storage.hashed_files
+        # Change the order of the hashed files
+        with mock.patch.object(
+            storage.staticfiles_storage,
+            "hashed_files",
+            dict(reversed(hashed_files.items())),
+        ):
+            storage.staticfiles_storage.save_manifest()
+        manifest_file_content = storage.staticfiles_storage.read_manifest()
+        # The manifest file content should not change.
+        self.assertEqual(manifest_file_content_orig, manifest_file_content)
+
 
 @override_settings(
     STATIC_URL="/",

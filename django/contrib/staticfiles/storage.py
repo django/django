@@ -496,11 +496,12 @@ class ManifestFilesMixin(HashedFilesMixin):
             self.save_manifest()
 
     def save_manifest(self):
+        sorted_hashed_files = sorted(self.hashed_files.items())
         self.manifest_hash = self.file_hash(
-            None, ContentFile(json.dumps(sorted(self.hashed_files.items())).encode())
+            None, ContentFile(json.dumps(sorted_hashed_files).encode())
         )
         payload = {
-            "paths": self.hashed_files,
+            "paths": dict(sorted_hashed_files),
             "version": self.manifest_version,
             "hash": self.manifest_hash,
         }
