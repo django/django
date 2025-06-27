@@ -157,43 +157,32 @@ class AdvancedTests(TestCase):
         self.assertEqual(bar_qs[0].foo_id, b_foo.target)
 
     def test_update_m2m_field(self):
-        msg = (
-            "Cannot update model field "
-            "<django.db.models.fields.related.ManyToManyField: m2m_foo> "
-            "(only non-relations and foreign keys permitted)."
-        )
+        rel = "<django.db.models.fields.related.ManyToManyField: m2m_foo>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
         with self.assertRaisesMessage(FieldError, msg):
             Bar.objects.update(m2m_foo="whatever")
 
     def test_update_reverse_m2m_descriptor(self):
-        msg = (
-            "Cannot update model field <ManyToManyRel: update.bar> "
-            "(only non-relations and foreign keys permitted)."
-        )
+        rel = "<ManyToManyRel: update.bar>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
         with self.assertRaisesMessage(FieldError, msg):
             Foo.objects.update(m2m_foo="whatever")
 
     def test_update_reverse_fk_descriptor(self):
-        msg = (
-            "Cannot update model field <ManyToOneRel: update.bar> "
-            "(only non-relations and foreign keys permitted)."
-        )
+        rel = "<ManyToOneRel: update.bar>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
         with self.assertRaisesMessage(FieldError, msg):
             Foo.objects.update(bar="whatever")
 
     def test_update_reverse_o2o_descriptor(self):
-        msg = (
-            "Cannot update model field <OneToOneRel: update.bar> "
-            "(only non-relations and foreign keys permitted)."
-        )
+        rel = "<OneToOneRel: update.bar>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
         with self.assertRaisesMessage(FieldError, msg):
             Foo.objects.update(o2o_bar="whatever")
 
     def test_update_reverse_mti_parent_link_descriptor(self):
-        msg = (
-            "Cannot update model field <OneToOneRel: update.uniquenumberchild> "
-            "(only non-relations and foreign keys permitted)."
-        )
+        rel = "<OneToOneRel: update.uniquenumberchild>"
+        msg = f"Cannot update model field {rel} (only concrete fields are permitted)."
         with self.assertRaisesMessage(FieldError, msg):
             UniqueNumber.objects.update(uniquenumberchild="whatever")
 
