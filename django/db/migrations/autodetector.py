@@ -496,20 +496,14 @@ class MigrationAutodetector:
                 and operation.name_lower == dependency.model_name_lower
             )
         # Field being altered
-        elif (
-            dependency.field_name is not None
-            and dependency.type == OperationDependency.Type.ALTER
-        ):
+        elif dependency.type == OperationDependency.Type.ALTER:
             return (
                 isinstance(operation, operations.AlterField)
                 and operation.model_name_lower == dependency.model_name_lower
                 and operation.name_lower == dependency.field_name_lower
             )
         # order_with_respect_to being unset for a field
-        elif (
-            dependency.field_name is not None
-            and dependency.type == OperationDependency.Type.REMOVE_ORDER_WRT
-        ):
+        elif dependency.type == OperationDependency.Type.REMOVE_ORDER_WRT:
             return (
                 isinstance(operation, operations.AlterOrderWithRespectTo)
                 and operation.name_lower == dependency.model_name_lower
@@ -517,10 +511,7 @@ class MigrationAutodetector:
                 != dependency.field_name_lower
             )
         # Field is removed and part of an index/unique_together
-        elif (
-            dependency.field_name is not None
-            and dependency.type == OperationDependency.Type.ALTER_FOO_TOGETHER
-        ):
+        elif dependency.type == OperationDependency.Type.ALTER_FOO_TOGETHER:
             return (
                 isinstance(
                     operation,
