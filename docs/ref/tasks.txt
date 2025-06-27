@@ -88,7 +88,7 @@ Attributes of ``Task`` cannot be modified.
 
     By default, this is is the name of the function decorated with :func:`task`.
 
-.. method:: Task.using()
+.. method:: Task.using(**kwargs)
 
     Creates a new ``Task`` with modified defaults. The existing ``Task`` is
     left unchanged.
