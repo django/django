@@ -198,7 +198,7 @@ Attributes of ``TaskResult`` cannot be modified.
     The time when the ``Task`` was enqueued.
 
     If :attr:`Task.enqueue_on_commit` was set, this is the time the transaction
-    completed.
+    committed.
 
 .. attribute:: TaskResult.started_at
 
