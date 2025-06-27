@@ -98,7 +98,7 @@ class ExceptionTracebackTestCase(SimpleTestCase):
         else:
             self.fail("ZeroDivisionError not raised")
 
-    def test_complex_exception(self) -> None:
+    def test_complex_exception(self):
         try:
             {}[datetime.datetime.now()]
         except KeyError as e:

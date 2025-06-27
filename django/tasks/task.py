@@ -301,5 +301,5 @@ class TaskContext:
     task_result: TaskResult
 
     @property
-    def attempt(self) -> int:
+    def attempt(self):
         return self.task_result.attempts

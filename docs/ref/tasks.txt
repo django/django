@@ -19,7 +19,7 @@ A decorator that defines a :class:`Task`::
 
 
     @task
-    def email_users(emails, subject, message) -> int:
+    def email_users(emails, subject, message):
         return send_mail(
             subject=subject, message=message, from_email=None, recipient_list=emails
         )

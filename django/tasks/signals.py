@@ -15,7 +15,7 @@ task_started = Signal()
 
 
 @receiver(setting_changed)
-def clear_tasks_handlers(*, setting: str, **kwargs: dict) -> None:
+def clear_tasks_handlers(*, setting: str, **kwargs: dict):
     """
     Reset the connection handler whenever the settings change
     """
