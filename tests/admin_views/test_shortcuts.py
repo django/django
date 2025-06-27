@@ -1,10 +1,15 @@
+from contextlib import contextmanager
+
 from django.contrib import admin
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import path, reverse
 
+from .admin import Color
+
 site = admin.AdminSite(name="test_admin_keyboard_shortcuts")
+site.register(Color)
 
 urlpatterns = [
     path("test_admin_keyboard_shortcuts/", site.urls),
@@ -72,6 +77,27 @@ class SeleniumTests(AdminSeleniumTestCase):
             login_url=reverse("test_admin_keyboard_shortcuts:index"),
         )
 
+    @contextmanager
+    def assertElementClicked(self, css_selector):
+        """
+        Modifies the element's onclick handler
+        to set a data attribute when clicked, and asserts that the element is clicked
+        by checking for that attribute after the context block.
+        """
+        from selenium.webdriver.common.by import By
+
+        self.selenium.execute_script(
+            f"""
+            document.querySelector("{css_selector}").onclick = function() {{
+                this.setAttribute("data-clicked", "true");
+            }};
+            """
+        )
+        yield
+
+        el = self.selenium.find_element(By.CSS_SELECTOR, css_selector)
+        self.assertEqual(el.get_attribute("data-clicked"), "true")
+
     def test_shortcuts_dialog_open_close_with_buttons(self):
         from selenium.webdriver.common.by import By
 
@@ -94,7 +120,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         body = self.selenium.find_element(By.TAG_NAME, "body")
         dialog = self.selenium.find_element(By.ID, "shortcuts-dialog")
 
-        body.send_keys("?")
+        with self.assertElementClicked("#open-shortcuts"):
+            body.send_keys("?")
         self.assertTrue(dialog.is_displayed())
         body.send_keys(Keys.ESCAPE)
         self.assertFalse(dialog.is_displayed())
@@ -114,3 +141,15 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.current_url,
             self.live_server_url + reverse("test_admin_keyboard_shortcuts:index"),
         )
+
+    def test_changeform_add(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.selenium.get(
+            self.live_server_url
+            + reverse("test_admin_keyboard_shortcuts:admin_views_color_add")
+        )
+        body = self.selenium.find_element(By.TAG_NAME, "body")
+        with self.assertElementClicked("input[name=_save]"):
+            body.send_keys(Keys.ALT, "s")
