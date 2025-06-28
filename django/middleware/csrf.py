@@ -264,6 +264,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 secure=settings.CSRF_COOKIE_SECURE,
                 httponly=settings.CSRF_COOKIE_HTTPONLY,
                 samesite=settings.CSRF_COOKIE_SAMESITE,
+                partitioned=settings.CSRF_COOKIE_PARTITIONED,
             )
             # Set the Vary header since content varies with the CSRF cookie.
             patch_vary_headers(response, ("Cookie",))

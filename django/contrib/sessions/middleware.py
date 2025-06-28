@@ -39,6 +39,7 @@ class SessionMiddleware(MiddlewareMixin):
                 path=settings.SESSION_COOKIE_PATH,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 samesite=settings.SESSION_COOKIE_SAMESITE,
+                partitioned=settings.SESSION_COOKIE_PARTITIONED,
             )
             need_vary_cookie = True
         else:
@@ -74,6 +75,7 @@ class SessionMiddleware(MiddlewareMixin):
                         secure=settings.SESSION_COOKIE_SECURE or None,
                         httponly=settings.SESSION_COOKIE_HTTPONLY or None,
                         samesite=settings.SESSION_COOKIE_SAMESITE,
+                        partitioned=settings.SESSION_COOKIE_PARTITIONED,
                     )
                     # With a session cookie set, it must be varied on.
                     need_vary_cookie = True
