@@ -268,20 +268,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         conn_params.pop("assume_role", None)
         conn_params.pop("isolation_level", None)
+        conn_params.pop("server_side_binding", None)
 
         pool_options = conn_params.pop("pool", None)
         if pool_options and not is_psycopg3:
             raise ImproperlyConfigured("Database pooling requires psycopg >= 3")
 
-        server_side_binding = conn_params.pop("server_side_binding", None)
-        conn_params.setdefault(
-            "cursor_factory",
-            (
-                ServerBindingCursor
-                if is_psycopg3 and server_side_binding is True
-                else Cursor
-            ),
-        )
         if settings_dict["USER"]:
             conn_params["user"] = settings_dict["USER"]
         if settings_dict["PASSWORD"]:
@@ -296,9 +288,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             )
             # Disable prepared statements by default to keep connection poolers
             # working. Can be reenabled via OPTIONS in the settings dict.
-            conn_params["prepare_threshold"] = conn_params.pop(
-                "prepare_threshold", None
-            )
+            if "prepare_threshold" not in conn_params:
+                conn_params["prepare_threshold"] = None
         return conn_params
 
     @async_unsafe
@@ -405,28 +396,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def create_cursor(self, name=None):
+        ssb = self.settings_dict["OPTIONS"].get("server_side_binding")
+        cursor_factory = self.settings_dict["OPTIONS"].get("cursor_factory")
+
         if name:
-            if is_psycopg3 and (
-                self.settings_dict["OPTIONS"].get("server_side_binding") is not True
-            ):
-                # psycopg >= 3 forces the usage of server-side bindings for
-                # named cursors so a specialized class that implements
-                # server-side cursors while performing client-side bindings
-                # must be used if `server_side_binding` is disabled (default).
-                cursor = ServerSideCursor(
-                    self.connection,
-                    name=name,
-                    scrollable=False,
-                    withhold=self.connection.autocommit,
-                )
-            else:
-                # In autocommit mode, the cursor will be used outside of a
-                # transaction, hence use a holdable cursor.
-                cursor = self.connection.cursor(
-                    name, scrollable=False, withhold=self.connection.autocommit
-                )
+            # In autocommit mode, the cursor will be used outside of a
+            # transaction, hence use a holdable cursor.
+            cursor = _server_cursor_factory(ssb, cursor_factory)(
+                self.connection,
+                name=name,
+                scrollable=False,
+                withhold=self.connection.autocommit,
+            )
         else:
-            cursor = self.connection.cursor()
+            cursor = _cursor_factory(ssb, cursor_factory)(self.connection)
 
         if is_psycopg3:
             # Register the cursor timezone only if the connection disagrees, to
@@ -571,15 +554,32 @@ if is_psycopg3:
             return args
 
     class ServerBindingCursor(CursorMixin, Database.Cursor):
-        pass
+        """
+        Cursor that performs server-side parameter binding.
+
+        This is the default in psycopg3.
+        """
 
     class Cursor(CursorMixin, Database.ClientCursor):
-        pass
-
-    class ServerSideCursor(
-        CursorMixin, Database.client_cursor.ClientCursorMixin, Database.ServerCursor
-    ):
         """
+        Cursor that performs client-side parameter binding.
+
+        This is the default in Django.
+        """
+
+    class ServerCursor(CursorMixin, Database.ServerCursor):
+        """
+        Cursor that performs server-side parameter binding and uses
+        server side cursors.
+
+        This is the default for named cursors in psycopg3.
+        """
+
+    class ServerSideCursor(Database.client_cursor.ClientCursorMixin, ServerCursor):
+        """
+        Cursor that performs client-side parameter binding and uses
+        server side cursors.
+
         psycopg >= 3 forces the usage of server-side bindings when using named
         cursors but the ORM doesn't yet support the systematic generation of
         prepareable SQL (#20516).
@@ -591,7 +591,17 @@ if is_psycopg3:
         Mixing ClientCursorMixin in wouldn't be necessary if Cursor allowed to
         specify how parameters should be bound instead, which ServerCursor
         would inherit, but that's not the case.
+
+        This is the default for named cursors in Django.
         """
+
+    def _cursor_factory(server_side_binding, cursor_factory):
+        if cursor_factory:
+            return cursor_factory
+        return ServerBindingCursor if server_side_binding else Cursor
+
+    def _server_cursor_factory(server_side_binding, cursor_factory):
+        return ServerCursor if server_side_binding else ServerSideCursor
 
     class CursorDebugWrapper(BaseCursorDebugWrapper):
         def copy(self, statement):
@@ -600,6 +610,11 @@ if is_psycopg3:
 
 else:
     Cursor = psycopg2.extensions.cursor
+
+    def _cursor_factory(server_side_binding, cursor_factory):
+        return cursor_factory or Cursor
+
+    _server_cursor_factory = _cursor_factory
 
     class CursorDebugWrapper(BaseCursorDebugWrapper):
         def copy_expert(self, sql, file, *args):
