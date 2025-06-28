@@ -13,6 +13,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     minimum_database_version = (3, 31)
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
+    supports_autofields_in_composite_pk = False
     supports_timezones = False
     supports_transactions = True
     atomic_transactions = False
