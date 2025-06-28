@@ -35,7 +35,7 @@
     <form method="post">{% csrf_token %}
     <div>
     {% for obj in queryset %}
-    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk_str|unlocalize }}">
     {% endfor %}
     <input type="hidden" name="action" value="delete_selected">
     <input type="hidden" name="post" value="yes">
