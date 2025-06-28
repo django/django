@@ -427,6 +427,10 @@ Miscellaneous
 
 * Using a percent sign in a column alias or annotation is deprecated.
 
+* Support for a double-dot variable lookup like ``{{ book..title }}`` which
+  maps to a lookup of the empty string before the next lookup of the named
+  attribute is deprecated.
+
 Features removed in 6.0
 =======================
 
