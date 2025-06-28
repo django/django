@@ -134,8 +134,14 @@ class JSONField(CheckFieldDefaultMixin, Field):
                 params={"value": value},
             )
 
+    def to_python(self, value):
+        if type(value) is str:
+            return json.loads(value)
+        else:
+            return super().to_python(value)
+
     def value_to_string(self, obj):
-        return self.value_from_object(obj)
+        return json.dumps(self.value_from_object(obj))
 
     def formfield(self, **kwargs):
         return super().formfield(
