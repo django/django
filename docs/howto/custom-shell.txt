@@ -54,6 +54,46 @@ Running this customized ``shell`` command with ``verbosity=2`` would show:
       from django.contrib.sessions.models import Session
       from django.urls import resolve, reverse
 
+.. _handling-model-name-collisions:
+
+Handling model name collisions
+------------------------------
+
+If multiple apps define models with the same name, the model from the app listed earlier in 
+:setting:`INSTALLED_APPS` will be imported, overwriting any previously imported model with 
+the same name. For example, if both ``apps.cart.models`` and ``apps.order.models`` define a 
+``Line`` model, and ``apps.cart`` is listed before ``apps.order`` in :setting:`INSTALLED_APPS`, 
+only the ``Line`` model from ``apps.cart.models`` will be available in the shell.
+
+This behavior can be confusing, especially when using ``--verbosity=2`` with ``isort`` installed, 
+as the displayed import order may not match the actual import precedence. The model from the app 
+listed earlier in :setting:`INSTALLED_APPS` always takes precedence, regardless of the order shown 
+in the verbose output.
+
+To handle model name collisions, you can:
+
+1. Use the ``--no-imports`` flag to disable automatic imports and manually import the models you need.
+2. Create a custom shell command that overrides ``get_auto_imports()`` to provide aliases for colliding models:
+
+   .. code-block:: python
+       :caption: ``myapp/management/commands/shell.py``
+
+       from django.core.management.commands import shell
+
+
+       class Command(shell.Command):
+           def get_auto_imports(self):
+               # Get all default imports
+               imports = super().get_auto_imports()
+               # Add aliases for colliding models
+               imports.extend(
+                   [
+                       "apps.cart.models.Line as CartLine",
+                       "apps.order.models.Line as OrderLine",
+                   ]
+               )
+               return imports
+
 If an overridden ``shell`` command includes paths that cannot be imported,
 these errors are shown when ``verbosity`` is set to ``1`` or higher. Duplicate
 imports are automatically handled.
