@@ -118,6 +118,7 @@ class BasicCustomPKTests(TestCase):
         # The primary key can be accessed via the pk property on the model.
         e = Employee.objects.get(pk=123)
         self.assertEqual(e.pk, 123)
+        self.assertEqual(e.pk_str, "123")
         # Or we can use the real attribute name for the primary key:
         self.assertEqual(e.employee_code, 123)
 

@@ -372,7 +372,8 @@ class PropertyNamesTests(SimpleTestCase):
         with self.assertRaisesMessage(AttributeError, "Instance only"):
             AbstractPerson.test_instance_only_descriptor
         self.assertEqual(
-            AbstractPerson._meta._property_names, frozenset(["pk", "test_property"])
+            AbstractPerson._meta._property_names,
+            frozenset(["pk", "pk_str", "test_property"]),
         )
 
 
