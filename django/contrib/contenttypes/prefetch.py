@@ -23,7 +23,7 @@ class GenericPrefetch(Prefetch):
         obj_dict["querysets"] = []
         for queryset in self.querysets:
             if queryset is not None:
-                queryset = queryset._chain()
+                queryset = queryset._clone()
                 # Prevent the QuerySet from being evaluated
                 queryset._result_cache = []
                 queryset._prefetch_done = True
