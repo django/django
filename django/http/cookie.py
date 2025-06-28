@@ -7,6 +7,8 @@ SimpleCookie = cookies.SimpleCookie
 # Independent Partitioned State). This is needed for Chrome's third-party
 # cookie handling in iframes.
 # https://developers.google.com/privacy-sandbox/3pcd/chips
+# Only patch if Python version doesn't have native support for it.
+# Python 3.14+ has native support for partitioned cookies.
 if "partitioned" not in cookies.Morsel._flags:
     cookies.Morsel._flags.add("partitioned")
     cookies.Morsel._reserved.setdefault("partitioned", "Partitioned")
