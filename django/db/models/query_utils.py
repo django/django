@@ -220,7 +220,7 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
-                if not instance._is_pk_set():
+                if self.field.primary_key or not instance._is_pk_set():
                     raise AttributeError(
                         f"Cannot retrieve deferred field {field_name!r} "
                         "from an unsaved model."
@@ -238,7 +238,7 @@ class DeferredAttribute:
         """
         opts = instance._meta
         link_field = opts.get_ancestor_link(self.field.model)
-        if self.field.primary_key and self.field != link_field:
+        if link_field and self.field.primary_key and self.field != link_field:
             return getattr(instance, link_field.attname)
         return None
 
