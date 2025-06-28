@@ -3,7 +3,7 @@ from http import cookies
 # For backwards compatibility in Django 2.1.
 SimpleCookie = cookies.SimpleCookie
 
-# Add support for the Partitioned cookie attribute (CHIPS - Cookies Having 
+# Add support for the Partitioned cookie attribute (CHIPS - Cookies Having
 # Independent Partitioned State). This is needed for Chrome's third-party
 # cookie handling in iframes.
 # https://developers.google.com/privacy-sandbox/3pcd/chips
