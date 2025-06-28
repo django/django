@@ -4,8 +4,6 @@ from django.db.models import F
 from django.test import TestCase, skipUnlessAnyDBFeature
 from django.test.utils import isolate_apps
 
-from .models import AutoId
-
 
 @isolate_apps("composite_pk")
 class CompositePKChecksTests(TestCase):
@@ -272,6 +270,11 @@ class CompositePKChecksTests(TestCase):
         )
 
     def test_autofield_in_composite_pk_does_not_require_primary_key(self):
+        class AutoId(models.Model):
+            pk = models.CompositePrimaryKey("id", "name")
+            id = models.BigAutoField()
+            name = models.CharField(max_length=255)
+
         if connection.features.supports_autofields_in_composite_pk:
             self.assertEqual(AutoId.check(databases=self.databases), [])
         else:

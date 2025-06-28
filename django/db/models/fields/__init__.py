@@ -2790,20 +2790,25 @@ class AutoFieldMixin:
         super().__init__(*args, **kwargs)
 
     def check(self, **kwargs):
+        databases = kwargs.get("databases") or []
         return [
             *super().check(**kwargs),
-            *self._check_primary_key(kwargs.get("databases", ["default"])),
+            *self._check_primary_key(databases),
         ]
 
     def _check_primary_key(self, databases):
         if not (
             self.primary_key
             or (
-                all(
-                    connections[db].features.supports_autofields_in_composite_pk
-                    for db in databases
+                (
+                    all(
+                        connections[db].features.supports_autofields_in_composite_pk
+                        for db in databases
+                    )
+                    or "supports_autofields_in_composite_pk"
+                    in self.model._meta.required_db_features
                 )
-                and self in getattr(self.model._meta.pk, "fields", [])
+                and self in self.model._meta.pk_fields
             )
         ):
             return [

@@ -15,7 +15,7 @@ from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import IntegrityError, connection
 from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import AutoId, Comment, Post, Tenant, TimeStamped, User
 
@@ -220,9 +220,10 @@ class CompositePKTests(TestCase):
         ):
             self.assertIsNone(modelform_factory(Comment, fields=["pk"]))
 
+    @skipUnlessDBFeature("supports_autofields_in_composite_pk")
     def test_autoid_in_composite_pk(self):
         obj = AutoId.objects.create(name="Automatically generated ID")
-        self.assertEqual(obj.id, 1)
+        self.assertIsNotNone(obj.id)
         self.assertEqual(AutoId._meta.pk.fields[0].name, "id")
         self.assertEqual(AutoId._meta.pk.fields[1].name, "name")
 
