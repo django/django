@@ -38,6 +38,7 @@ class BaseDatabaseFeatures:
     can_use_chunked_reads = True
     can_return_columns_from_insert = False
     can_return_rows_from_bulk_insert = False
+    can_return_rows_from_update = False
     has_bulk_insert = True
     uses_savepoints = True
     can_release_savepoints = False
