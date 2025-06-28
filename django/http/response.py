@@ -238,7 +238,8 @@ class HttpResponseBase:
         - ``datetime.timedelta`` object.
 
         ``partitioned`` can be:
-        - True to enable partitioned cookies (CHIPS - Cookies Having Independent Partitioned State)
+        - True to enable partitioned cookies (CHIPS - Cookies Having
+          Independent Partitioned State)
         - False (default) for standard cookie behavior
         """
         self.cookies[key] = value
@@ -290,7 +291,9 @@ class HttpResponseBase:
         value = signing.get_cookie_signer(salt=key + salt).sign(value)
         return self.set_cookie(key, value, **kwargs)
 
-    def delete_cookie(self, key, path="/", domain=None, samesite=None, partitioned=False):
+    def delete_cookie(
+        self, key, path="/", domain=None, samesite=None, partitioned=False
+    ):
         # Browsers can ignore the Set-Cookie header if the cookie doesn't use
         # the secure flag and:
         # - the cookie name starts with "__Host-" or "__Secure-", or
