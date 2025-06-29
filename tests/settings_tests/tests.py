@@ -338,6 +338,17 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, "Incorrect timezone setting: test"):
             settings._setup()
 
+    def test_unable_to_import_settings_module(self):
+        msg = "Settings module 'fake_settings_module' could not be imported"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            Settings("fake_settings_module")
+
+    def test_unable_to_import_a_random_module(self):
+        exc = ModuleNotFoundError("No module named 'fake_module'", name="fake_module")
+        with mock.patch("importlib.import_module", side_effect=exc):
+            with self.assertRaisesMessage(ImportError, "No module named 'fake_module'"):
+                Settings("fake_settings_module")
+
 
 class TestComplexSettingOverride(SimpleTestCase):
     def setUp(self):
