@@ -368,6 +368,18 @@ This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own CSRF cookie.
 
+.. setting:: CSRF_COOKIE_PARTITIONED
+
+``CSRF_COOKIE_PARTITIONED``
+---------------------------
+
+Default: ``False``
+
+Whether to use partitioned cookies for the CSRF cookie. When set to ``True``,
+the CSRF cookie will be marked with the ``Partitioned`` attribute,
+making it a partitioned third-party cookie when used in cross-site contexts.
+This helps prevent cross-site request forgery attacks in third-party iframe.
+
 .. setting:: CSRF_COOKIE_SAMESITE
 
 ``CSRF_COOKIE_SAMESITE``
@@ -2034,6 +2046,18 @@ name permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting), and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the one.
 
+.. setting:: LANGUAGE_COOKIE_PARTITIONED
+
+``LANGUAGE_COOKIE_PARTITIONED``
+-------------------------------
+
+Default: ``False``
+
+Whether to use partitioned cookies for the language cookie. When set to ``True``,
+the language cookie will be marked with the ``Partitioned`` attribute,
+making it a partitioned third-party cookie when used in cross-site contexts.
+This helps with language preference persistence in third-party iframe.
+
 .. setting:: LANGUAGE_COOKIE_SAMESITE
 
 ``LANGUAGE_COOKIE_SAMESITE``
@@ -3688,6 +3712,19 @@ This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own session cookie.
 
+.. setting:: SESSION_COOKIE_PARTITIONED
+
+``SESSION_COOKIE_PARTITIONED``
+------------------------------
+
+Default: ``False``
+
+Whether to use partitioned cookies for the session cookie. When set to ``True``,
+the session cookie will be marked with the ``Partitioned`` attribute,
+making it a partitioned third-party cookie when used in cross-site contexts.
+This is useful for Django applications that need to maintain sessions when
+embedded as third-party content in iframe.
+
 .. setting:: SESSION_COOKIE_SAMESITE
 
 ``SESSION_COOKIE_SAMESITE``
@@ -4064,6 +4101,7 @@ Internationalization (``i18n``)
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
 * :setting:`LANGUAGE_COOKIE_HTTPONLY`
 * :setting:`LANGUAGE_COOKIE_NAME`
+* :setting:`LANGUAGE_COOKIE_PARTITIONED`
 * :setting:`LANGUAGE_COOKIE_PATH`
 * :setting:`LANGUAGE_COOKIE_SAMESITE`
 * :setting:`LANGUAGE_COOKIE_SECURE`
@@ -4142,6 +4180,7 @@ Security
 
   * :setting:`CSRF_COOKIE_DOMAIN`
   * :setting:`CSRF_COOKIE_NAME`
+  * :setting:`CSRF_COOKIE_PARTITIONED`
   * :setting:`CSRF_COOKIE_PATH`
   * :setting:`CSRF_COOKIE_SAMESITE`
   * :setting:`CSRF_COOKIE_SECURE`
