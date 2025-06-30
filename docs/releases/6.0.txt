@@ -292,7 +292,11 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :meth:`.HttpResponse.set_cookie`, :meth:`.HttpResponse.set_signed_cookie`,
+  and :meth:`.HttpResponse.delete_cookie` methods now support the
+  ``partitioned`` parameter, enabling CHIPS (Cookies Having Independent
+  Partitioned State). This feature improves privacy by preventing cross-site
+  tracking while allowing cookies to work in embedded contexts like iframe.
 
 Security
 ~~~~~~~~
