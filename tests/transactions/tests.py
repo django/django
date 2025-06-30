@@ -359,6 +359,28 @@ class AtomicErrorsTests(TransactionTestCase):
         self.assertIsInstance(cm.exception.__cause__, IntegrityError)
         self.assertEqual(Reporter.objects.get(pk=r1.pk).last_name, "Haddock")
 
+    def test_atomic_prevents_queries_in_broken_transaction_cause_attribution(self):
+        # Trigger a previous atomic rollback to populate cause.
+        with self.assertRaises(Exception), transaction.atomic():
+            raise Exception("First failure")
+
+        with (
+            self.assertRaises(transaction.TransactionManagementError) as ctx,
+            transaction.atomic(),
+        ):
+            try:
+                with transaction.atomic(savepoint=False):
+                    raise Exception("Second failure")
+            except Exception:
+                pass
+            try:
+                with transaction.atomic(savepoint=False):
+                    raise Exception("Third failure")
+            except Exception:
+                pass
+            Reporter.objects.count()
+        self.assertEqual(str(ctx.exception.__cause__), "Second failure")
+
     @skipIfDBFeature("atomic_transactions")
     def test_atomic_allows_queries_after_fixing_transaction(self):
         r1 = Reporter.objects.create(first_name="Archibald", last_name="Haddock")
