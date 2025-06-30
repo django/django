@@ -741,10 +741,10 @@ class BaseDatabaseWrapper:
                 try:
                     func()
                 except Exception as e:
-                    logger.error(
-                        f"Error calling {func.__qualname__} in on_commit() (%s).",
+                    name = getattr(func, "__qualname__", func)
+                    logger.exception(
+                        f"Error calling {name} in on_commit() (%s).",
                         e,
-                        exc_info=True,
                     )
             else:
                 func()
@@ -759,11 +759,11 @@ class BaseDatabaseWrapper:
                 try:
                     func()
                 except Exception as e:
-                    logger.error(
-                        f"Error calling {func.__qualname__} in on_commit() during "
+                    name = getattr(func, "__qualname__", func)
+                    logger.exception(
+                        f"Error calling {name} in on_commit() during "
                         f"transaction (%s).",
                         e,
-                        exc_info=True,
                     )
             else:
                 func()
