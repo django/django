@@ -237,10 +237,6 @@ class HttpResponseBase:
         - int/float specifying seconds,
         - ``datetime.timedelta`` object.
 
-        ``partitioned`` can be:
-        - True to enable partitioned cookies (CHIPS - Cookies Having
-          Independent Partitioned State)
-        - False (default) for standard cookie behavior
         """
         self.cookies[key] = value
         if expires is not None:
