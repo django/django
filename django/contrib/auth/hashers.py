@@ -5,6 +5,9 @@ import hashlib
 import importlib
 import math
 import warnings
+from concurrent.futures import ThreadPoolExecutor
+
+from asgiref.sync import sync_to_async
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -22,6 +25,9 @@ from django.utils.translation import gettext_noop as _
 UNUSABLE_PASSWORD_PREFIX = "!"  # This will never be a valid encoded hash
 UNUSABLE_PASSWORD_SUFFIX_LENGTH = (
     40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
+)
+CHECK_PASSWORD_THREAD_POOL_EXECUTOR = ThreadPoolExecutor(
+    max_workers=settings.CHECK_PASSWORD_EXECUTOR_MAX_WORKERS
 )
 
 
@@ -85,7 +91,15 @@ def check_password(password, encoded, setter=None, preferred="default"):
 
 async def acheck_password(password, encoded, setter=None, preferred="default"):
     """See check_password()."""
-    is_correct, must_update = verify_password(password, encoded, preferred=preferred)
+
+    # Unload CPU intensive process on a separate thread to avoid
+    # blocking the event-loop.
+    is_correct, must_update = await sync_to_async(
+        verify_password,
+        thread_sensitive=False,
+        executor=CHECK_PASSWORD_THREAD_POOL_EXECUTOR,
+    )(password, encoded, preferred=preferred)
+
     if setter and is_correct and must_update:
         await setter(password)
     return is_correct
