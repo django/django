@@ -252,7 +252,7 @@ class RedirectView(View):
 
         args = self.request.META.get("QUERY_STRING", "")
         if args and self.query_string:
-            url = "%s?%s" % (url, args)
+            url = "%s%s%s" % (url, "&" if "?" in url else "?", args)
         return url
 
     def get(self, request, *args, **kwargs):
