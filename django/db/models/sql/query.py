@@ -2544,10 +2544,13 @@ class Query(BaseExpression):
                         annotation_names.append(f)
                         selected[f] = f
                     elif f in self.annotations:
-                        raise FieldError(
-                            f"Cannot select the '{f}' alias. Use annotate() to "
-                            "promote it."
-                        )
+                        if f not in self.annotation_select:
+                            raise FieldError(
+                                f"Cannot select the '{f}' alias. Use annotate() to "
+                                "promote it."
+                            )
+                        annotation_names.append(f)
+                        selected[f] = f
                     else:
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if
@@ -2557,6 +2560,8 @@ class Query(BaseExpression):
                         selected[f] = len(field_names)
                         field_names.append(f)
             self.set_extra_mask(extra_names)
+            if self.annotation_select_mask:
+                annotation_names = set(annotation_names) | self.annotation_select_mask
             self.set_annotation_mask(annotation_names)
         else:
             field_names = [f.attname for f in self.model._meta.concrete_fields]
