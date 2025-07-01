@@ -151,7 +151,8 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the :setting:`SESSION_COOKIE_PARTITIONED` setting to set the ``Partitioned``
+  cookie flag on session cookies.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -183,7 +184,8 @@ Cache
 CSRF
 ~~~~
 
-* ...
+* Added the :setting:`CSRF_COOKIE_PARTITIONED` setting to set the ``Partitioned``
+  cookie flag on CSRF cookies.
 
 Decorators
 ~~~~~~~~~~
@@ -223,7 +225,8 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the :setting:`LANGUAGE_COOKIE_PARTITIONED` setting to set the ``Partitioned``
+  cookie flag on language cookies.
 
 Logging
 ~~~~~~~

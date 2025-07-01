@@ -1033,7 +1033,9 @@ Methods
       The `Partitioned`_ attribute is particularly useful for third-party
       services that need to maintain state in embedded contexts.
 
-      .. versionadded:: 6.0
+      .. versionchanged:: 6.0
+
+        The ``partitioned`` argument was added.
 
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value

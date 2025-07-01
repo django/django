@@ -236,7 +236,6 @@ class HttpResponseBase:
         ``max_age`` can be:
         - int/float specifying seconds,
         - ``datetime.timedelta`` object.
-
         """
         self.cookies[key] = value
         if expires is not None:

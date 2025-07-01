@@ -377,6 +377,8 @@ its own CSRF cookie.
 ``CSRF_COOKIE_PARTITIONED``
 ---------------------------
 
+.. versionadded:: 6.0
+
 Default: ``False``
 
 Whether to use partitioned cookies for the CSRF cookie. When set to ``True``,
@@ -1960,6 +1962,8 @@ deletes the one.
 ``LANGUAGE_COOKIE_PARTITIONED``
 -------------------------------
 
+.. versionadded:: 6.0
+
 Default: ``False``
 
 Whether to use partitioned cookies for the language cookie. When set to ``True``,
@@ -3447,6 +3451,8 @@ its own session cookie.
 
 ``SESSION_COOKIE_PARTITIONED``
 ------------------------------
+
+.. versionadded:: 6.0
 
 Default: ``False``
 
