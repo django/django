@@ -27,6 +27,15 @@ from django.utils.translation import gettext_lazy as _
 ACTION_CHECKBOX_NAME = "_selected_action"
 
 
+class CollapsibleMixin:
+    """Mixin for admin components that can be collapsed."""
+
+    @cached_property
+    def should_collapse(self):
+        """Return True if the component should be collapsed (closed) by default."""
+        return self.is_collapsible and "open" not in self.classes
+
+
 class ActionForm(forms.Form):
     action = forms.ChoiceField(label=_("Action:"))
     select_across = forms.BooleanField(
@@ -97,7 +106,7 @@ class AdminForm:
         return media
 
 
-class Fieldset:
+class Fieldset(CollapsibleMixin):
     def __init__(
         self,
         form,
@@ -124,11 +133,6 @@ class Fieldset:
         if any(field in self.fields for field in self.form.errors):
             return False
         return "collapse" in self.classes
-
-    @cached_property
-    def should_collapse(self):
-        """Return True if the fieldset should be collapsed (closed) by default."""
-        return self.is_collapsible and "open" not in self.classes
 
     def __iter__(self):
         for field in self.fields:
@@ -303,7 +307,7 @@ class AdminReadonlyField:
         return conditional_escape(result_repr)
 
 
-class InlineAdminFormSet:
+class InlineAdminFormSet(CollapsibleMixin):
     """
     A wrapper around an inline formset for use in the admin system.
     """
@@ -447,11 +451,6 @@ class InlineAdminFormSet:
         if any(self.formset.errors):
             return False
         return "collapse" in self.classes
-
-    @cached_property
-    def should_collapse(self):
-        """Return True if the inline should be collapsed (closed) by default."""
-        return self.is_collapsible and "open" not in self.classes
 
     def non_form_errors(self):
         return self.formset.non_form_errors()
