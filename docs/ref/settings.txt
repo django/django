@@ -373,12 +373,16 @@ its own CSRF cookie.
 ``CSRF_COOKIE_PARTITIONED``
 ---------------------------
 
+.. versionadded:: 6.2
+
 Default: ``False``
 
 Whether to use partitioned cookies for the CSRF cookie. When set to ``True``,
-the CSRF cookie will be marked with the ``Partitioned`` attribute,
-making it a partitioned third-party cookie when used in cross-site contexts.
-This helps prevent cross-site request forgery attacks in third-party iframe.
+the CSRF cookie is set with the ``Partitioned`` attribute, making it a
+partitioned third-party cookie when used in cross-site contexts, such as a
+third-party ``<iframe>``. Browsers require partitioned cookies to also be
+marked ``Secure``, so this setting must be used together with
+:setting:`CSRF_COOKIE_SECURE` set to ``True``.
 
 .. setting:: CSRF_COOKIE_SAMESITE
 
@@ -2051,12 +2055,16 @@ deletes the one.
 ``LANGUAGE_COOKIE_PARTITIONED``
 -------------------------------
 
+.. versionadded:: 6.2
+
 Default: ``False``
 
-Whether to use partitioned cookies for the language cookie. When set to ``True``,
-the language cookie will be marked with the ``Partitioned`` attribute,
-making it a partitioned third-party cookie when used in cross-site contexts.
-This helps with language preference persistence in third-party iframe.
+Whether to use partitioned cookies for the language cookie. When set to
+``True``, the language cookie is set with the ``Partitioned`` attribute,
+making it a partitioned third-party cookie when used in cross-site contexts,
+such as a third-party ``<iframe>``. Browsers require partitioned cookies to
+also be marked ``Secure``, so this setting must be used together with
+:setting:`LANGUAGE_COOKIE_SECURE` set to ``True``.
 
 .. setting:: LANGUAGE_COOKIE_SAMESITE
 
@@ -3717,13 +3725,17 @@ its own session cookie.
 ``SESSION_COOKIE_PARTITIONED``
 ------------------------------
 
+.. versionadded:: 6.2
+
 Default: ``False``
 
-Whether to use partitioned cookies for the session cookie. When set to ``True``,
-the session cookie will be marked with the ``Partitioned`` attribute,
+Whether to use partitioned cookies for the session cookie. When set to
+``True``, the session cookie is set with the ``Partitioned`` attribute,
 making it a partitioned third-party cookie when used in cross-site contexts.
 This is useful for Django applications that need to maintain sessions when
-embedded as third-party content in iframe.
+embedded as third-party content in an ``<iframe>``. Browsers require
+partitioned cookies to also be marked ``Secure``, so this setting must be
+used together with :setting:`SESSION_COOKIE_SECURE` set to ``True``.
 
 .. setting:: SESSION_COOKIE_SAMESITE
 

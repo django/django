@@ -1054,11 +1054,15 @@ Methods
     * Use ``partitioned=True`` to enable CHIPS (Cookies Having Independent
       Partitioned State). This allows cookies to be partitioned by top-level
       site, which improves privacy by preventing cross-site tracking while
-      still allowing the cookie to work in embedded contexts like iframe.
-      The `Partitioned`_ attribute is particularly useful for third-party
-      services that need to maintain state in embedded contexts.
+      still allowing the cookie to work in embedded contexts such as an
+      ``<iframe>``. The `Partitioned`_ attribute is particularly useful for
+      third-party services that need to maintain state in embedded contexts.
+      Browsers require partitioned cookies to also be marked ``Secure``, so
+      ``partitioned=True`` must be used together with ``secure=True``.
 
-      .. versionadded:: 6.0
+      .. versionchanged:: 6.2
+
+        The ``partitioned`` argument was added.
 
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value

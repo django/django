@@ -78,7 +78,8 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :setting:`SESSION_COOKIE_PARTITIONED` setting allows setting the
+  ``Partitioned`` attribute on session cookies.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +121,8 @@ CSP
 CSRF
 ~~~~
 
-* ...
+* The new :setting:`CSRF_COOKIE_PARTITIONED` setting allows setting the
+  ``Partitioned`` attribute on CSRF cookies.
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -165,7 +167,8 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :setting:`LANGUAGE_COOKIE_PARTITIONED` setting allows setting the
+  ``Partitioned`` attribute on language cookies.
 
 Logging
 ~~~~~~~
@@ -200,7 +203,11 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``partitioned`` argument of :meth:`.HttpResponse.set_cookie`,
+  :meth:`.HttpResponse.set_signed_cookie`, and
+  :meth:`.HttpResponse.delete_cookie` allows setting the ``Partitioned``
+  attribute on cookies, enabling CHIPS (Cookies Having Independent Partitioned
+  State).
 
 Security
 ~~~~~~~~
