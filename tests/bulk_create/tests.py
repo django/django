@@ -14,6 +14,7 @@ from django.db.models import FileField, Value
 from django.db.models.functions import Lower, Now
 from django.test import (
     TestCase,
+    TransactionTestCase,
     override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
@@ -884,3 +885,35 @@ class BulkCreateTests(TestCase):
     def test_db_default_primary_key(self):
         (obj,) = DbDefaultPrimaryKey.objects.bulk_create([DbDefaultPrimaryKey()])
         self.assertIsInstance(obj.id, datetime)
+
+
+@skipUnlessDBFeature("supports_transactions", "has_bulk_insert")
+class BulkCreateTransactionTests(TransactionTestCase):
+    available_apps = ["bulk_create"]
+
+    def test_no_unnecessary_transaction(self):
+        with self.assertNumQueries(1):
+            Country.objects.bulk_create(
+                [Country(id=1, name="France", iso_two_letter="FR")]
+            )
+        with self.assertNumQueries(1):
+            Country.objects.bulk_create([Country(name="Canada", iso_two_letter="CA")])
+
+    def test_objs_with_and_without_pk(self):
+        with self.assertNumQueries(4):
+            Country.objects.bulk_create(
+                [
+                    Country(id=1, name="France", iso_two_letter="FR"),
+                    Country(name="Canada", iso_two_letter="CA"),
+                ]
+            )
+
+    def test_multiple_batches(self):
+        with self.assertNumQueries(4):
+            Country.objects.bulk_create(
+                [
+                    Country(name="France", iso_two_letter="FR"),
+                    Country(name="Canada", iso_two_letter="CA"),
+                ],
+                batch_size=1,
+            )
