@@ -1923,7 +1923,14 @@ class QuerySet(AltersData):
         max_batch_size = max(ops.bulk_batch_size(fields, objs), 1)
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         inserted_rows = []
-        bulk_return = connection.features.can_return_rows_from_bulk_insert
+        returning_fields = (
+            self.model._meta.db_returning_fields
+            if (
+                connection.features.can_return_rows_from_bulk_insert
+                and (on_conflict is None or on_conflict == OnConflict.UPDATE)
+            )
+            else None
+        )
         batches = [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]
         if len(batches) > 1:
             context = transaction.atomic(using=self.db, savepoint=False)
@@ -1931,21 +1938,7 @@ class QuerySet(AltersData):
             context = nullcontext()
         with context:
             for item in batches:
-                if bulk_return and (
-                    on_conflict is None or on_conflict == OnConflict.UPDATE
-                ):
-                    inserted_rows.extend(
-                        self._insert(
-                            item,
-                            fields=fields,
-                            using=self.db,
-                            on_conflict=on_conflict,
-                            update_fields=update_fields,
-                            unique_fields=unique_fields,
-                            returning_fields=self.model._meta.db_returning_fields,
-                        )
-                    )
-                else:
+                inserted_rows.extend(
                     self._insert(
                         item,
                         fields=fields,
@@ -1953,7 +1946,9 @@ class QuerySet(AltersData):
                         on_conflict=on_conflict,
                         update_fields=update_fields,
                         unique_fields=unique_fields,
+                        returning_fields=returning_fields,
                     )
+                )
         return inserted_rows
 
     def _chain(self):
