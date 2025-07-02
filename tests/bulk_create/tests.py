@@ -15,10 +15,10 @@ from django.db.models.functions import Lower, Now
 from django.test import (
     TestCase,
     TransactionTestCase,
-    override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
 from .models import (
@@ -217,12 +217,11 @@ class BulkCreateTests(TestCase):
 
     @skipUnlessDBFeature("has_bulk_insert")
     def test_large_batch_efficiency(self):
-        with override_settings(DEBUG=True):
-            connection.queries_log.clear()
+        with CaptureQueriesContext(connection) as ctx:
             TwoFields.objects.bulk_create(
                 [TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)]
             )
-            self.assertLess(len(connection.queries), 10)
+            self.assertLess(len(ctx), 10)
 
     def test_large_batch_mixed(self):
         """
@@ -248,15 +247,14 @@ class BulkCreateTests(TestCase):
         Test inserting a large batch with objects having primary key set
         mixed together with objects without PK set.
         """
-        with override_settings(DEBUG=True):
-            connection.queries_log.clear()
+        with CaptureQueriesContext(connection) as ctx:
             TwoFields.objects.bulk_create(
                 [
                     TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i + 1)
                     for i in range(100000, 101000)
                 ]
             )
-            self.assertLess(len(connection.queries), 10)
+            self.assertLess(len(ctx), 10)
 
     def test_explicit_batch_size(self):
         objs = [TwoFields(f1=i, f2=i) for i in range(0, 4)]
