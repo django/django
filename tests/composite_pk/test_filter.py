@@ -586,10 +586,11 @@ class CompositePKFilterTests(TestCase):
 @skipUnlessDBFeature("supports_tuple_lookups")
 class CompositePKFilterTupleLookupFallbackTests(CompositePKFilterTests):
     def setUp(self):
-        feature_patch = patch.object(
+        feature_patch_1 = patch.object(
             connection.features, "supports_tuple_lookups", False
         )
-        feature_patch = patch.object(
+        feature_patch_2 = patch.object(
             connection.features, "supports_tuple_comparison_against_subquery", False
         )
-        self.enterContext(feature_patch)
+        self.enterContext(feature_patch_1)
+        self.enterContext(feature_patch_2)
