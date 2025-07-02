@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+from contextlib import nullcontext
 from functools import reduce
 from itertools import chain, islice
 
@@ -800,7 +801,11 @@ class QuerySet(AltersData):
         fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
         objs_with_pk, objs_without_pk = self._prepare_for_bulk_create(objs)
-        with transaction.atomic(using=self.db, savepoint=False):
+        if objs_with_pk and objs_without_pk:
+            context = transaction.atomic(using=self.db, savepoint=False)
+        else:
+            context = nullcontext()
+        with context:
             self._handle_order_with_respect_to(objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
@@ -1917,11 +1922,28 @@ class QuerySet(AltersData):
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         inserted_rows = []
         bulk_return = connection.features.can_return_rows_from_bulk_insert
-        for item in [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if bulk_return and (
-                on_conflict is None or on_conflict == OnConflict.UPDATE
-            ):
-                inserted_rows.extend(
+        batches = [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]
+        if len(batches) > 1:
+            context = transaction.atomic(using=self.db, savepoint=False)
+        else:
+            context = nullcontext()
+        with context:
+            for item in batches:
+                if bulk_return and (
+                    on_conflict is None or on_conflict == OnConflict.UPDATE
+                ):
+                    inserted_rows.extend(
+                        self._insert(
+                            item,
+                            fields=fields,
+                            using=self.db,
+                            on_conflict=on_conflict,
+                            update_fields=update_fields,
+                            unique_fields=unique_fields,
+                            returning_fields=self.model._meta.db_returning_fields,
+                        )
+                    )
+                else:
                     self._insert(
                         item,
                         fields=fields,
@@ -1929,18 +1951,7 @@ class QuerySet(AltersData):
                         on_conflict=on_conflict,
                         update_fields=update_fields,
                         unique_fields=unique_fields,
-                        returning_fields=self.model._meta.db_returning_fields,
                     )
-                )
-            else:
-                self._insert(
-                    item,
-                    fields=fields,
-                    using=self.db,
-                    on_conflict=on_conflict,
-                    update_fields=update_fields,
-                    unique_fields=unique_fields,
-                )
         return inserted_rows
 
     def _chain(self):
