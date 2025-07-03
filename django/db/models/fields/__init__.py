@@ -14,7 +14,7 @@ from django.conf import settings
 from django.core import checks, exceptions, validators
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
+from django.db.models.query_utils import DeferredAttribute, Q, RegisterLookupMixin
 from django.db.utils import NotSupportedError
 from django.utils import timezone
 from django.utils.choices import (
@@ -1071,12 +1071,14 @@ class Field(RegisterLookupMixin):
             return self.choices
         rel_model = self.remote_field.model
         limit_choices_to = limit_choices_to or self.get_limit_choices_to()
+        if not isinstance(limit_choices_to, Q):
+            limit_choices_to = Q(**limit_choices_to)
         choice_func = operator.attrgetter(
             self.remote_field.get_related_field().attname
             if hasattr(self.remote_field, "get_related_field")
             else "pk"
         )
-        qs = rel_model._default_manager.complex_filter(limit_choices_to)
+        qs = rel_model._default_manager.filter(limit_choices_to)
         if ordering:
             qs = qs.order_by(*ordering)
         return (blank_choice if include_blank else []) + [
