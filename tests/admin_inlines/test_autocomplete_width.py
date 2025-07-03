@@ -14,7 +14,7 @@ from django.contrib import admin
 from django.contrib.admin.helpers import InlineAdminFormSet
 from django.contrib.auth.models import User
 from django.db import models
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
 
 
 class TestAuthor(models.Model):
