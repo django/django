@@ -196,8 +196,8 @@ class MigrationAutodetector:
 
         # Create the renamed fields and store them in self.renamed_fields.
         # They are used by create_altered_indexes(), generate_altered_fields(),
-        # generate_removed_altered_index/unique_together(), and
-        # generate_altered_index/unique_together().
+        # generate_removed_altered_unique_together(), and
+        # generate_altered_unique_together().
         self.create_renamed_fields()
         # Create the altered indexes and store them in self.altered_indexes.
         # This avoids the same computation in generate_removed_indexes()
