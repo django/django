@@ -61,9 +61,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # `SELECT ST_AsHEXEWKB(ST_GeomFromText('POINT(0 1)', 4326));`
         hexewkb_2d = b"0101000020E61000000000000000000000000000000000F03F"
         # `SELECT ST_AsHEXEWKB(ST_GeomFromEWKT('SRID=4326;POINT(0 1 2)'));`
-        hexewkb_3d = (
-            b"01010000A0E61000000000000000000000000000000000F03F0000000000000040"
-        )
+        hexewkb_3d = b"01010000A0E61000000000000000000000000000000000F03F0000000000000040"  # noqa: E501
 
         pnt_2d = Point(0, 1, srid=4326)
         pnt_3d = Point(0, 1, 2, srid=4326)
@@ -85,6 +83,16 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         # Redundant sanity check.
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
+
+    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
+    def test_4d_hexewkb(self):
+        ogc_hex_4d = b"01010000C00000000000000000000000000000F03F00000000000000400000000000000000"  # noqa: E501
+        hexewkb_4d = b"01010000E0E61000000000000000000000000000000000F03F00000000000000400000000000000000"  # noqa: E501
+        pnt_4d = Point(0, 1, 2, 0, srid=4326)
+        self.assertEqual(ogc_hex_4d, pnt_4d.hex)
+        self.assertEqual(hexewkb_4d, pnt_4d.hexewkb)
+        self.assertIs(GEOSGeometry(hexewkb_4d).hasm, True)
+        self.assertEqual(memoryview(a2b_hex(hexewkb_4d)), pnt_4d.ewkb)
 
     def test_kml(self):
         "Testing KML output."
@@ -1109,7 +1117,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         gc[:] = ()
         self.assertEqual(gc, GeometryCollection())
 
-    def test_threed(self):
+    def test_3d(self):
         "Testing three-dimensional geometries."
         # Testing a 3D Point
         pnt = Point(2, 3, 8)
@@ -1126,6 +1134,25 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             ls.__setitem__(0, (1.0, 2.0))
         ls[0] = (1.0, 2.0, 3.0)
         self.assertEqual((1.0, 2.0, 3.0), ls[0])
+
+    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
+    def test_4d(self):
+        "Testing four-dimensional geometries."
+        # Testing a 4D Point
+        pnt = Point(2, 3, 8, 0)
+        self.assertEqual((2.0, 3.0, 8.0, 0.0), pnt.coords)
+        with self.assertRaises(TypeError):
+            pnt.tuple = (1.0, 2.0, 3.0)
+        pnt.coords = (1.0, 2.0, 3.0, 0.0)
+        self.assertEqual((1.0, 2.0, 3.0, 0.0), pnt.coords)
+
+        # Testing a 4D LineString
+        ls = LineString((2.0, 3.0, 8.0, 0.0), (50.0, 250.0, -117.0, 1.0))
+        self.assertEqual(((2.0, 3.0, 8.0, 0.0), (50.0, 250.0, -117.0, 1.0)), ls.tuple)
+        with self.assertRaises(TypeError):
+            ls.__setitem__(0, (1.0, 2.0, 3.0))
+        ls[0] = (1.0, 2.0, 3.0, 0.0)
+        self.assertEqual((1.0, 2.0, 3.0, 0.0), ls[0])
 
     def test_distance(self):
         "Testing the distance() function."
@@ -1262,6 +1289,11 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         g1_3d = fromstr("POINT(5 23 8)")
         self.assertIsInstance(g1_3d.ogr, gdal.OGRGeometry)
         self.assertEqual(g1_3d.ogr.z, 8)
+
+        if geos_version_tuple() > (3, 12):
+            g1_4d = fromstr("POINT(5 23 8 0)")
+            self.assertIsInstance(g1_4d.ogr, gdal.OGRGeometry)
+            self.assertEqual(g1_4d.ogr.m, 0)
 
         g2 = fromstr("LINESTRING(0 0, 5 5, 23 23)", srid=4326)
         self.assertIsInstance(g2.ogr, gdal.OGRGeometry)
