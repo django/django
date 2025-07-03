@@ -31,6 +31,11 @@ class CollapsibleMixin:
     """Mixin for admin components that can be collapsed."""
 
     @cached_property
+    def is_collapsible(self):
+        """Return True if the component can be collapsed."""
+        return "collapse" in self.classes
+
+    @cached_property
     def should_collapse(self):
         """Return True if the component should be collapsed (closed) by default."""
         return self.is_collapsible and "open" not in self.classes
@@ -132,7 +137,7 @@ class Fieldset(CollapsibleMixin):
     def is_collapsible(self):
         if any(field in self.fields for field in self.form.errors):
             return False
-        return "collapse" in self.classes
+        return super().is_collapsible
 
     def __iter__(self):
         for field in self.fields:
@@ -450,7 +455,7 @@ class InlineAdminFormSet(CollapsibleMixin):
     def is_collapsible(self):
         if any(self.formset.errors):
             return False
-        return "collapse" in self.classes
+        return super().is_collapsible
 
     def non_form_errors(self):
         return self.formset.non_form_errors()
