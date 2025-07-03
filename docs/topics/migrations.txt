@@ -13,19 +13,17 @@ migrations, when to run them, and the common problems you might run into.
 The Commands
 ============
 
-There are several commands which you will use to interact with migrations
+There are several commands you will use to interact with migrations
 and Django's handling of database schema:
 
-* :djadmin:`migrate`, which is responsible for applying and unapplying
-  migrations.
+* :djadmin:`migrate`: applies and reverts migrations.
 
-* :djadmin:`makemigrations`, which is responsible for creating new migrations
-  based on the changes you have made to your models.
+* :djadmin:`makemigrations`: creates new migrations based on the changes
+  you have made to your models.
 
-* :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
+* :djadmin:`sqlmigrate`: displays the SQL statements for a migration.
 
-* :djadmin:`showmigrations`, which lists a project's migrations and their
-  status.
+* :djadmin:`showmigrations`: lists a project's migrations and their status.
 
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
