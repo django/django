@@ -190,9 +190,25 @@ def urlsafe_base64_decode(s):
     Decode a base64 encoded string. Add back any trailing equal signs that
     might have been stripped.
     """
-    s = s.encode()
+    # Accept both ``str`` and ``bytes`` inputs. The previous implementation
+    # unconditionally called ``encode()`` which raised ``AttributeError`` when
+    # a ``bytes`` instance was supplied. Converting the input to ``bytes``
+    # explicitly avoids that issue and broadens the function's usability.
+    if isinstance(s, str):
+        s_bytes = s.encode()
+    elif isinstance(s, (bytes, bytearray)):
+        s_bytes = bytes(s)
+    else:
+        raise TypeError(
+            "urlsafe_base64_decode() expects a str, bytes, or bytearray, "
+            f"not {type(s).__name__}."
+        )
+
+    # Base64 strings must have a length that is a multiple of 4. Add the minimal
+    # required padding using ``=`` characters before decoding.
+    padded = s_bytes + b"=" * (-len(s_bytes) % 4)
     try:
-        return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b"="))
+        return base64.urlsafe_b64decode(padded)
     except (LookupError, BinasciiError) as e:
         raise ValueError(e)
 
