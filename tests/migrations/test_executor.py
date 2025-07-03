@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.apps.registry import apps as global_apps
+from django.core.management import call_command
 from django.db import DatabaseError, connection, migrations, models
 from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
@@ -9,6 +10,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.state import ProjectState
 from django.test import (
     SimpleTestCase,
+    TransactionTestCase,
     modify_settings,
     override_settings,
     skipUnlessDBFeature,
@@ -996,3 +998,37 @@ class ExecutorUnitTests(SimpleTestCase):
         plan = executor.migration_plan({a1})
 
         self.assertEqual(plan, [])
+
+
+@override_settings(
+    INSTALLED_APPS=[
+        "migrations.test_backwards_to_replaced_migration.squashme",
+        "migrations.test_backwards_to_replaced_migration.triggerfailingcode",
+    ],
+    MIGRATION_MODULES={
+        "squashme": (
+            "migrations.test_backwards_to_replaced_migration.squashme.migrations"
+        ),
+        "triggerfailingcode": (
+            "migrations.test_backwards_to_replaced_migration."
+            "triggerfailingcode.migrations"
+        ),
+    },
+)
+class BackwardsToReplacedMigrationTest(TransactionTestCase):
+    available_apps = [
+        "migrations.test_backwards_to_replaced_migration.squashme",
+        "migrations.test_backwards_to_replaced_migration.triggerfailingcode",
+    ]
+
+    def test_backwards_to_replaced_migration_with_squash(self):
+        """
+        Simulates applying a squashed migration, then attempting to
+        migrate backwards to a replaced migration. This should now
+        succeed without raising FieldDoesNotExist or other exceptions.
+        """
+        # Step 1: Apply all migrations normally
+        call_command("migrate", verbosity=0)
+
+        # Step 2: Migrate backwards to replaced migration
+        call_command("migrate", "triggerfailingcode", "0001_initial", verbosity=0)

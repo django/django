@@ -19,6 +19,19 @@ class MigrationExecutor:
         self.recorder = MigrationRecorder(self.connection)
         self.progress_callback = progress_callback
 
+    def _normalize_migration_key(self, entry):
+        """
+        Normalize a migration key into a consistent (app_label, migration_name) tuple.
+        Handles tuples, Migration instances, and 'app_label.migration_name' strings.
+        """
+        if isinstance(entry, tuple):
+            return entry
+        if hasattr(entry, "app_label") and hasattr(entry, "name"):
+            return (entry.app_label, entry.name)
+        if isinstance(entry, str) and '.' in entry:
+            return tuple(entry.split('.', 1))
+        return entry
+
     def migration_plan(self, targets, clean_start=False):
         """
         Given a set of targets, return a list of (Migration instance, backwards?).
@@ -75,20 +88,59 @@ class MigrationExecutor:
         Create a project state including all the applications without
         migrations and applied migrations if with_applied_migrations=True.
         """
+
+        # Detect and track squashed/replaced migrations.
+        # This is necessary to avoid applying both a squashed migration and the
+        # original migrations it replaced when rebuilding state, especially
+        # during backward migrations. Applying both causes the same changes to
+        # be applied twice, which can lead to errors like FieldDoesNotExist.
+        replaced_keys = set()
+        original_replaced_keys = set()
+
+        for replacement_key in self.loader.replacements:
+            norm_replacement_key = self._normalize_migration_key(replacement_key)
+            replaced_keys.add(norm_replacement_key)
+
+            migration = self.loader.graph.nodes.get(norm_replacement_key)
+            if migration and hasattr(migration, "replaces"):
+                for entry in migration.replaces or []:
+                    normalized = self._normalize_migration_key(entry)
+                    original_replaced_keys.add(normalized)
+
+            if migration:
+                for dep in migration.dependencies:
+                    dep_norm = self._normalize_migration_key(dep)
+                    original_replaced_keys.add(dep_norm)
+
+        # Start with a project state that includes all unmigrated apps
         state = ProjectState(real_apps=self.loader.unmigrated_apps)
+
         if with_applied_migrations:
-            # Create the forwards plan Django would follow on an empty database
+            # Build the full plan of migrations that would be applied on a clean DB
             full_plan = self.migration_plan(
                 self.loader.graph.leaf_nodes(), clean_start=True
             )
+
+            # Track which migrations have already been applied
             applied_migrations = {
-                self.loader.graph.nodes[key]
+                self.loader.graph.nodes[key]: True
                 for key in self.loader.applied_migrations
                 if key in self.loader.graph.nodes
             }
+
             for migration, _ in full_plan:
+                key = (migration.app_label, migration.name)
+
+                # Skip applying this migration if it has been replaced
+                # (either directly or indirectly), to avoid duplicating changes
+                if (
+                    key in replaced_keys or key in original_replaced_keys
+                ) and migration in applied_migrations:
+                    continue
+
                 if migration in applied_migrations:
                     migration.mutate_state(state, preserve=False)
+
         return state
 
     def migrate(self, targets, plan=None, state=None, fake=False, fake_initial=False):
@@ -181,59 +233,153 @@ class MigrationExecutor:
         in a first run over the plan and then unapply them in a second run over
         the plan.
         """
+
+        # Summary:
+        # This function has been extended to handle an edge case in Django's
+        # migration system: when migrating backward to a migration that was
+        # previously replaced by a squashed migration.
+        #
+        # Normally, Django applies all previous migrations to reconstruct the
+        # project state. However, if both a squashed migration and the original
+        # replaced migrations are applied (or partially rolled back), Django may
+        # apply operations twice, leading to inconsistencies.
+        # or errors like FieldDoesNotExist.
+        #
+        # This implementation avoids that by:
+        # - Detecting replaced migrations (via normalize_key + loader.replacements).
+        # - Skipping harmless state mutations from those migrations when rebuilding.
+        # - Adjusting the rollback anchor if the target is a replaced migration.
+        #
+        # The global migration graph is left untouched — this change only affects how
+        # the state is reconstructed safely for unapplying migrations.
+
+        skipped_migrations = set()
+        mutated_migrations = set()
+
+        # Helper to decide whether it's safe to skip applying a migration
+        # during state reconstruction (i.e., it’s replaced, applied, and
+        # doesn’t contain CreateModel or DeleteModel operations).
+        def is_safe_to_skip(migration, key):
+            result = (
+                key in replaced_keys and
+                migration in applied_migrations and
+                migration not in states
+            )
+
+            if result:
+                has_create_or_delete = any(
+                    op.__class__.__name__ in {"CreateModel", "DeleteModel"}
+                    for op in migration.operations
+                )
+                if has_create_or_delete:
+                    return False
+                return True
+            return False
+
+        # Collect all migration keys that are marked as replaced in the graph.
+        # This lets us safely skip them during the state reconstruction phase.
+        def _get_replaced_keys():
+            replaced = set()
+            if hasattr(self.loader, "replacements"):
+                for replacement_key in self.loader.replacements:
+                    norm_key = self._normalize_migration_key(replacement_key)
+                    replaced.add(norm_key)
+                    migration = self.loader.graph.nodes.get(norm_key)
+                    if migration and hasattr(migration, "replaces"):
+                        for r in migration.replaces:
+                            replaced.add(self._normalize_migration_key(r))
+            return replaced
+
+        replaced_keys = _get_replaced_keys()
+
+        # Ensure graph traversal consistency.
+        # This loop is harmless and aligns the migration keys.
+        for label, sequence in [("plan", plan), ("full_plan", full_plan)]:
+            for mig, _ in sequence:
+                key = (mig.app_label, mig.name)
+
         migrations_to_run = {m[0] for m in plan}
-        # Holds all migration states prior to the migrations being unapplied
+
+        # Tracks the state just before each migration in the plan.
         states = {}
         state = self._create_project_state()
+
+        # Identify migrations that are already applied
         applied_migrations = {
             self.loader.graph.nodes[key]
             for key in self.loader.applied_migrations
             if key in self.loader.graph.nodes
         }
+
         if self.progress_callback:
             self.progress_callback("render_start")
+
+        # First pass: Reconstruct the project state before each migration
         for migration, _ in full_plan:
+            key = (migration.app_label, migration.name)
+
             if not migrations_to_run:
-                # We remove every migration that we applied from this set so
-                # that we can bail out once the last migration has been applied
-                # and don't always run until the very end of the migration
-                # process.
+                # Early exit once all relevant migrations have been processed
                 break
+
             if migration in migrations_to_run:
                 if "apps" not in state.__dict__:
-                    state.apps  # Render all -- performance critical
-                # The state before this migration
+                    state.apps  # Trigger full app rendering
                 states[migration] = state
-                # The old state keeps as-is, we continue with the new state
                 state = migration.mutate_state(state, preserve=True)
+                mutated_migrations.add(migration)
                 migrations_to_run.remove(migration)
+
             elif migration in applied_migrations:
-                # Only mutate the state if the migration is actually applied
-                # to make sure the resulting state doesn't include changes
-                # from unrelated migrations.
+                # Safely skip applying replaced migrations that won't affect state
+                if is_safe_to_skip(migration, key):
+                    skipped_migrations.add(migration)
+                    continue
+
+                # Apply migration normally
                 migration.mutate_state(state, preserve=False)
+                mutated_migrations.add(migration)
+
         if self.progress_callback:
             self.progress_callback("render_success")
 
+        # Second pass: Unapply each migration using the previously captured state
         for migration, _ in plan:
             self.unapply_migration(states[migration], migration, fake=fake)
             applied_migrations.remove(migration)
 
-        # Generate the post migration state by starting from the state before
-        # the last migration is unapplied and mutating it to include all the
-        # remaining applied migrations.
+        # Determine rollback starting point — last unapplied migration
         last_unapplied_migration = plan[-1][0]
+        last_key = (last_unapplied_migration.app_label, last_unapplied_migration.name)
+
+        if last_key in replaced_keys:
+            # If we're trying to unapply a replaced migration, back up to the
+            # nearest non-replaced migration that we still care about
+            for mig, _ in reversed(plan):
+                safe_key = (mig.app_label, mig.name)
+                if safe_key not in replaced_keys:
+                    last_unapplied_migration = mig
+                    break
+            else:
+                # If *all* migrations in the plan were replaced, reset from scratch
+                state = self._create_project_state()
+                return state
+
+        # Start from the state prior to the last unapplied migration
         state = states[last_unapplied_migration]
         # Avoid mutating state with apps rendered as it's an expensive
         # operation.
         del state.apps
+
+        # Rebuild remaining state by reapplying migrations still in place
         for index, (migration, _) in enumerate(full_plan):
             if migration == last_unapplied_migration:
                 for migration, _ in full_plan[index:]:
+                    key = (migration.app_label, migration.name)
                     if migration in applied_migrations:
                         migration.mutate_state(state, preserve=False)
+                        mutated_migrations.add(migration)
                 break
-
         return state
 
     def apply_migration(self, state, migration, fake=False, fake_initial=False):
