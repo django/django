@@ -51,6 +51,7 @@ class SetLanguageTests(TestCase):
         self.assertEqual(language_cookie["httponly"], "")
         self.assertEqual(language_cookie["samesite"], "")
         self.assertEqual(language_cookie["secure"], "")
+        self.assertEqual(language_cookie["partitioned"], "")
 
     def test_setlang_unsafe_next(self):
         """
@@ -190,6 +191,7 @@ class SetLanguageTests(TestCase):
             "LANGUAGE_COOKIE_HTTPONLY": True,
             "LANGUAGE_COOKIE_SAMESITE": "Strict",
             "LANGUAGE_COOKIE_SECURE": True,
+            "LANGUAGE_COOKIE_PARTITIONED": True,
         }
         with self.settings(**test_settings):
             post_data = {"language": "pl", "next": "/views/"}
@@ -202,6 +204,7 @@ class SetLanguageTests(TestCase):
             self.assertIs(language_cookie["httponly"], True)
             self.assertEqual(language_cookie["samesite"], "Strict")
             self.assertIs(language_cookie["secure"], True)
+            self.assertIs(language_cookie["partitioned"], True)
 
     def test_setlang_decodes_http_referer_url(self):
         """
