@@ -1,0 +1,22 @@
+{% extends "admin/shortcuts.html" %}
+{% load i18n %}
+
+{% block advanced_shortcuts %}
+{{ block.super }}
+<section>
+  <h3>{% translate "Change List Navigation" %}</h3>
+  <dl>
+    <dt class="shortcut-description">{% translate "Focus next row" %}</dt>
+    <dd class="shortcut-keys"><kbd>j</kbd></dd>
+
+    <dt class="shortcut-description">{% translate "Focus previous row" %}</dt>
+    <dd class="shortcut-keys"><kbd>k</kbd></dd>
+
+    <dt class="shortcut-description">{% translate "Toggle row selection" %}</dt>
+    <dd class="shortcut-keys"><kbd>x</kbd></dd>
+
+    <dt class="shortcut-description">{% translate "Focus actions dropdown" %}</dt>
+    <dd class="shortcut-keys"><kbd>a</kbd></dd>
+  </dl>
+</section>
+{% endblock %}

@@ -1,7 +1,20 @@
 'use strict';
 {
-    const inputNonTextFieldTypes = ['submit', 'reset', 'checkbox', 'radio', 'file', 'button'];
+    window.advShortcutsEnabled = localStorage.getItem('django.admin.advShortcutsEnabled') || 'false';
+    const toggleAdvShortcuts = document.getElementById('toggle-adv-shortcuts');
+    if (window.advShortcutsEnabled === 'true') {
+        toggleAdvShortcuts.checked = true;
+    }
+    toggleAdvShortcuts.addEventListener('change', function() {
+        if (window.advShortcutsEnabled === 'true') {
+            window.advShortcutsEnabled = 'false';
+        } else {
+            window.advShortcutsEnabled = 'true';
+        }
+        localStorage.setItem('django.admin.advShortcutsEnabled', window.advShortcutsEnabled);
+    });
 
+    const inputNonTextFieldTypes = ['submit', 'reset', 'checkbox', 'radio', 'file', 'button'];
     function isFocusedTextField() {
         const tag = document.activeElement.nodeName;
         const type = document.activeElement.type;
@@ -13,6 +26,7 @@
             isContentEditable
         );
     }
+    window.isFocusedTextField = isFocusedTextField;
 
     let previousKey = undefined;
     const shortcutFunctions = new Map();

@@ -23,4 +23,9 @@
     </dl>
   </section>
   {% block extra_shortcuts %}{% endblock %}
+  <div class="adv-shortcuts-container">
+    <label for="toggle-adv-shortcuts">{% translate "Enable advanced shortcuts" %}</label>
+    <input type="checkbox" id="toggle-adv-shortcuts">
+    {% block advanced_shortcuts %}{% endblock %}
+  </div>
 </dialog>
