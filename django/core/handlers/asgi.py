@@ -94,9 +94,15 @@ class ASGIRequest(HttpRequest):
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode("latin1")
-            if corrected_name in self.META:
-                value = self.META[corrected_name] + "," + value
-            self.META[corrected_name] = value
+            if corrected_name == "HTTP_COOKIE":
+                existing = self.META.get("HTTP_COOKIE")
+                if existing is not None:
+                    value = existing + value
+                self.META["HTTP_COOKIE"] = value
+            else:
+                if corrected_name in self.META:
+                    value = self.META[corrected_name] + "," + value
+                self.META[corrected_name] = value
         # Pull out request encoding, if provided.
         self._set_content_type_params(self.META)
         # Directly assign the body file to be our stream.

@@ -732,3 +732,27 @@ class ASGITest(SimpleTestCase):
                 await handler.read_body(receive_rolled)
         # The second write should have rolled over to disk.
         self.assertTrue(any(t != loop_thread for t in called_threads))
+
+    def test_multiple_cookie_headers_http2(self):
+        scope = {
+            "type": "http",
+            "asgi": {"version": "3.0", "spec_version": "2.3"},
+            "http_version": "2.0",
+            "method": "GET",
+            "scheme": "http",
+            "path": "/",
+            "raw_path": b"/",
+            "query_string": b"",
+            "root_path": "",
+            "headers": [
+                (b"cookie", b"a=abc;"),
+                (b"cookie", b"b=def;"),
+                (b"cookie", b"c=ghi;"),
+            ],
+            "client": ("127.0.0.1", 10000),
+            "server": ("127.0.0.1", 8000),
+            "extensions": {},
+        }
+        request = ASGIRequest(scope, None)
+        self.assertEqual(request.META["HTTP_COOKIE"], "a=abc;b=def;c=ghi;")
+        self.assertEqual(request.COOKIES, {"a": "abc", "b": "def", "c": "ghi"})
