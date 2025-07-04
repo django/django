@@ -45,7 +45,7 @@
     }
 
     function handleKeyDown(event) {
-        if (window.advShortcutsEnabled === 'false') { return; }
+        if (window.shortcutsEnabled === 'false') { return; }
         if (window.isFocusedTextField()) { return; }
         switch (event.code) {
         case "KeyK":

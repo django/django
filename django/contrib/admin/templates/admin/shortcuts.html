@@ -12,6 +12,8 @@
       <button aria-label="{% translate 'Close' %}">&#10006;</button>
     </form>
   </div>
+  <label for="toggle-shortcuts">{% translate "Use keyboard shortcuts" %}</label>
+  <input type="checkbox" id="toggle-shortcuts">
   <section>
     <h3>{% translate "Global" %}</h3>
     <dl>
@@ -23,9 +25,4 @@
     </dl>
   </section>
   {% block extra_shortcuts %}{% endblock %}
-  <div class="adv-shortcuts-container">
-    <label for="toggle-adv-shortcuts">{% translate "Enable advanced shortcuts" %}</label>
-    <input type="checkbox" id="toggle-adv-shortcuts">
-    {% block advanced_shortcuts %}{% endblock %}
-  </div>
 </dialog>

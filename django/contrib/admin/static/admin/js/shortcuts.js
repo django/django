@@ -1,17 +1,17 @@
 'use strict';
 {
-    window.advShortcutsEnabled = localStorage.getItem('django.admin.advShortcutsEnabled') || 'false';
-    const toggleAdvShortcuts = document.getElementById('toggle-adv-shortcuts');
-    if (window.advShortcutsEnabled === 'true') {
-        toggleAdvShortcuts.checked = true;
+    window.shortcutsEnabled = localStorage.getItem('django.admin.shortcutsEnabled') || 'false';
+    const toggleShortcuts = document.getElementById('toggle-shortcuts');
+    if (window.shortcutsEnabled === 'true') {
+        toggleShortcuts.checked = true;
     }
-    toggleAdvShortcuts.addEventListener('change', function() {
-        if (window.advShortcutsEnabled === 'true') {
-            window.advShortcutsEnabled = 'false';
+    toggleShortcuts.addEventListener('change', function() {
+        if (window.shortcutsEnabled === 'true') {
+            window.shortcutsEnabled = 'false';
         } else {
-            window.advShortcutsEnabled = 'true';
+            window.shortcutsEnabled = 'true';
         }
-        localStorage.setItem('django.admin.advShortcutsEnabled', window.advShortcutsEnabled);
+        localStorage.setItem('django.admin.shortcutsEnabled', window.shortcutsEnabled);
     });
 
     const inputNonTextFieldTypes = ['submit', 'reset', 'checkbox', 'radio', 'file', 'button'];
@@ -75,6 +75,9 @@
     }
 
     function handleKeyDown(event) {
+        if (window.shortcutsEnabled === 'false') {
+            return;
+        }
         // If we're in a focused text field, don't apply keyboard shortcuts
         if (isFocusedTextField()) {
             return;

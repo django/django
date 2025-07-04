@@ -70,14 +70,10 @@ dt.shortcut-description {
   font-weight: normal; /* Revert bold styling from base.css for dt */
 }
 
-.adv-shortcuts-container {
-  margin-top: 1em;
-}
-
-#toggle-adv-shortcuts {
+#toggle-shortcuts {
   margin-left: .5em;
 }
 
-#toggle-adv-shortcuts:not(:checked) ~ section {
-  opacity: 0.5; /* gray out advanced shortcuts sections when toggle is off */
+#toggle-shortcuts:not(:checked) ~ section {
+  opacity: 0.5; /* gray out shortcuts sections when toggle is off */
 }
