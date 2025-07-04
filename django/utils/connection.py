@@ -1,3 +1,7 @@
+from abc import ABC, abstractmethod
+import asyncio
+from contextlib import asynccontextmanager
+
 from asgiref.local import Local
 
 from django.conf import settings as django_settings
@@ -31,14 +35,14 @@ class ConnectionDoesNotExist(Exception):
     pass
 
 
-class BaseConnectionHandler:
+class AbstractConnectionHandler(ABC):
+    thread_critical = False
     settings_name = None
     exception_class = ConnectionDoesNotExist
-    thread_critical = False
 
     def __init__(self, settings=None):
         self._settings = settings
-        self._connections = Local(self.thread_critical)
+        self._connections = Local(thread_critical=self.thread_critical)
 
     @cached_property
     def settings(self):
@@ -50,6 +54,7 @@ class BaseConnectionHandler:
             settings = getattr(django_settings, self.settings_name)
         return settings
 
+    @abstractmethod
     def create_connection(self, alias):
         raise NotImplementedError("Subclasses must implement create_connection().")
 
@@ -80,6 +85,51 @@ class BaseConnectionHandler:
             if not initialized_only or hasattr(self._connections, alias)
         ]
 
+
+class BaseConnectionHandler(AbstractConnectionHandler):
+
     def close_all(self):
         for conn in self.all(initialized_only=True):
             conn.close()
+
+
+class BaseAsyncConnectionHandler(AbstractConnectionHandler):
+
+    async def close_all(self):
+        await asyncio.gather(*[
+            conn.close()
+            for conn in self.all(initialized_only=True)
+        ])
+
+    @asynccontextmanager
+    async def independent_connection(self):
+        """
+        Creates an isolated connection to enable parallel queries.
+
+        Django reuses connections per-thread, which can block concurrent async
+        queries. This context temporarily removes existing connections, allowing new,
+        independent ones to be used inside the block.
+
+        Example:
+
+            async def load():
+                async with connections.independent_connection():
+                    await fetch_data(connections['default'])
+
+            await asyncio.gather(load(), load(), load())
+        """
+        connections = self.all()
+
+        try:
+            for conn in connections:
+                self[conn.alias] = self.create_connection(conn.alias)
+            yield
+        finally:
+            close_task = asyncio.gather(*[
+                conn.close() for conn in self.all()
+            ])
+
+            for conn in connections:
+                self[conn.alias] = conn
+
+            await close_task
