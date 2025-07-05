@@ -282,6 +282,18 @@ The default integer number of seconds to cache a page for the
 
 See :doc:`/topics/cache`.
 
+.. setting:: CHECK_PASSWORD_EXECUTOR_MAX_WORKERS
+
+``CHECK_PASSWORD_EXECUTOR_MAX_WORKERS``
+---------------------------------------
+
+Default: ``None``
+
+The maximum number of ThreadPoolExecutor workers (max_workers) which will be
+used to offload the CPU heavy hashing process of
+:func:`~django.contrib.auth.hashers.acheck_password` onto a separate thread,
+preventing the event loop from being blocked and thereby improving performance.
+
 .. _settings-csrf:
 
 .. setting:: CSRF_COOKIE_AGE
