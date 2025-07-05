@@ -13,7 +13,7 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.functions import Concat, Lower
+from django.db.models.functions import Concat, Lower, Upper
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_lru_cache
 
@@ -1453,6 +1453,100 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["RemoveField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name")
+
+    def test_remove_generated_field_before_its_base_field(self):
+        initial_state = [
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("name", models.CharField(max_length=20)),
+                    (
+                        "upper_name",
+                        models.GeneratedField(
+                            expression=Upper("name"),
+                            db_persist=True,
+                            output_field=models.CharField(),
+                        ),
+                    ),
+                ],
+            ),
+        ]
+        updated_state = [ModelState("testapp", "Author", [])]
+        changes = self.get_changes(initial_state, updated_state)
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "RemoveField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="upper_name")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="name")
+
+    def test_remove_generated_field_before_multiple_base_fields(self):
+        initial_state = [
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("first_name", models.CharField(max_length=20)),
+                    ("last_name", models.CharField(max_length=20)),
+                    (
+                        "full_name",
+                        models.GeneratedField(
+                            expression=Concat("first_name", "last_name"),
+                            db_persist=True,
+                            output_field=models.CharField(),
+                        ),
+                    ),
+                ],
+            ),
+        ]
+        updated_state = [ModelState("testapp", "Author", [])]
+        changes = self.get_changes(initial_state, updated_state)
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(
+            changes, "testapp", 0, ["RemoveField", "RemoveField", "RemoveField"]
+        )
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="full_name")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="first_name")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="last_name")
+
+    def test_remove_generated_field_and_one_of_multiple_base_fields(self):
+        initial_state = [
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("first_name", models.CharField(max_length=20)),
+                    ("last_name", models.CharField(max_length=20)),
+                    (
+                        "full_name",
+                        models.GeneratedField(
+                            expression=Concat("first_name", "last_name"),
+                            db_persist=True,
+                            output_field=models.CharField(),
+                        ),
+                    ),
+                ],
+            ),
+        ]
+        # Only remove full_name and first_name.
+        updated_state = [
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("last_name", models.CharField(max_length=20)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(initial_state, updated_state)
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "testapp",
+            0,
+            ["RemoveField", "RemoveField"],
+        )
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="full_name")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="first_name")
 
     def test_alter_field(self):
         """Tests autodetection of new fields."""
