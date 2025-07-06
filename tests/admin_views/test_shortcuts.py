@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import path, reverse
 
-from .admin import Language, LanguageAdmin
+from .admin import Language, LanguageAdmin, Paper
 
 
 class Shortcuts:
@@ -34,6 +34,7 @@ class Shortcuts:
 
 site = admin.AdminSite(name="test_admin_keyboard_shortcuts")
 site.register(Language, LanguageAdmin)
+site.register(Paper)
 
 urlpatterns = [
     path("test_admin_keyboard_shortcuts/", site.urls),
@@ -362,3 +363,109 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         self.perform_shortcut(Shortcuts.ChangeList.FOCUS_ACTIONS_DROPDOWN)
         self.assertEqual(self.selenium.switch_to.active_element, actions_dropdown)
+
+    def test_shortcut_changeform_save(self):
+        from selenium.webdriver.common.by import By
+
+        self.selenium.get(
+            self.live_server_url
+            + reverse("test_admin_keyboard_shortcuts:admin_views_paper_add")
+        )
+
+        title_input = self.selenium.find_element(By.ID, "id_title")
+        title_input.send_keys("p1")
+
+        with self.wait_page_loaded():
+            self.perform_shortcut(Shortcuts.ChangeForm.SAVE)
+        self.assertEqual(Paper.objects.count(), 1)
+        self.assertEqual(
+            self.selenium.current_url,
+            self.live_server_url
+            + reverse("test_admin_keyboard_shortcuts:admin_views_paper_changelist"),
+        )
+
+    def test_shortcut_changeform_save_and_add_another(self):
+        from selenium.webdriver.common.by import By
+
+        self.selenium.get(
+            self.live_server_url
+            + reverse("test_admin_keyboard_shortcuts:admin_views_paper_add")
+        )
+
+        title_input = self.selenium.find_element(By.ID, "id_title")
+        title_input.send_keys("p1")
+
+        with self.wait_page_loaded():
+            self.perform_shortcut(Shortcuts.ChangeForm.SAVE_AND_ADD_ANOTHER)
+        self.assertEqual(Paper.objects.count(), 1)
+        self.assertEqual(
+            self.selenium.current_url,
+            self.live_server_url
+            + reverse("test_admin_keyboard_shortcuts:admin_views_paper_add"),
+        )
+
+    def test_shortcut_changeform_save_and_continue_editing(self):
+        from selenium.webdriver.common.by import By
+
+        self.selenium.get(
+            self.live_server_url
+            + reverse("test_admin_keyboard_shortcuts:admin_views_paper_add")
+        )
+
+        title_input = self.selenium.find_element(By.ID, "id_title")
+        title_input.send_keys("t1")
+
+        with self.wait_page_loaded():
+            self.perform_shortcut(Shortcuts.ChangeForm.SAVE_AND_CONTINUE)
+        self.assertEqual(Paper.objects.count(), 1)
+
+        # check if on changeform page for that same saved object
+        paper = Paper.objects.first()
+        self.assertEqual(
+            self.selenium.current_url,
+            self.live_server_url
+            + reverse(
+                "test_admin_keyboard_shortcuts:admin_views_paper_change",
+                args=(paper.pk,),
+            ),
+        )
+
+    def test_shortcut_changeform_delete(self):
+        paper = Paper.objects.create(title="p1")
+        self.selenium.get(
+            self.live_server_url
+            + reverse(
+                "test_admin_keyboard_shortcuts:admin_views_paper_change",
+                args=(paper.pk,),
+            )
+        )
+
+        with self.wait_page_loaded():
+            self.perform_shortcut(Shortcuts.ChangeForm.DELETE)
+        self.assertEqual(
+            self.selenium.current_url,
+            self.live_server_url
+            + reverse(
+                "test_admin_keyboard_shortcuts:admin_views_paper_delete",
+                args=(paper.pk,),
+            ),
+        )
+
+        # Cancel delete
+        with self.wait_page_loaded():
+            self.perform_shortcut(Shortcuts.DeleteConfirmation.CANCEL_DELETE)
+        self.assertEqual(Paper.objects.count(), 1)
+        self.assertEqual(
+            self.selenium.current_url,
+            self.live_server_url
+            + reverse(
+                "test_admin_keyboard_shortcuts:admin_views_paper_change",
+                args=(paper.pk,),
+            ),
+        )
+
+        with self.wait_page_loaded():
+            self.perform_shortcut(Shortcuts.ChangeForm.DELETE)
+        # Confirm delete
+        self.perform_shortcut(Shortcuts.DeleteConfirmation.CONFIRM_DELETE)
+        self.assertEqual(Paper.objects.count(), 0)
