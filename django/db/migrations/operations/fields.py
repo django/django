@@ -1,5 +1,5 @@
 from django.db.migrations.utils import field_references
-from django.db.models import NOT_PROVIDED
+from django.db.models import NOT_PROVIDED, Model
 from django.utils.copy import replace
 from django.utils.functional import cached_property
 
@@ -49,12 +49,19 @@ class FieldOperation(Operation):
         if model_name_lower == self.model_name_lower:
             if name == self.name:
                 return True
-            elif (
-                self.field
-                and hasattr(self.field, "from_fields")
-                and name in self.field.from_fields
-            ):
-                return True
+            if self.field:
+                if (
+                    hasattr(self.field, "from_fields")
+                    and name in self.field.from_fields
+                ):
+                    return True
+                elif self.field.generated and any(
+                    field_name == name
+                    for field_name, *_ in Model._get_expr_references(
+                        self.field.expression
+                    )
+                ):
+                    return True
         # Check if this operation remotely references the field.
         if self.field is None:
             return False
