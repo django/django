@@ -78,6 +78,9 @@ class BaseDatabaseFeatures:
     # Does the backend ignore unnecessary ORDER BY clauses in subqueries?
     ignores_unnecessary_order_by_in_subqueries = True
 
+    # Is there a true datatype for boolean?
+    has_native_boolean_field = False
+
     # Is there a true datatype for uuid?
     has_native_uuid_field = False
 

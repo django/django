@@ -2,7 +2,7 @@ import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
-from unittest import mock, skipUnless
+from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
@@ -19,6 +19,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Abs, Cast, Length, Substr
 from django.db.models.lookups import (
     Exact,
@@ -29,7 +30,7 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import ignore_warnings, isolate_apps, register_lookup
 from django.utils.deprecation import RemovedInDjango70Warning
 
@@ -1561,10 +1562,10 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             list(Article.objects.filter(author=Author.objects.all()[1:]))
 
-    @skipUnless(connection.vendor == "mysql", "MySQL-specific workaround.")
+    @skipIfDBFeature("has_native_boolean_field")
     def test_exact_booleanfield(self):
-        # MySQL ignores indexes with boolean fields unless they're compared
-        # directly to a boolean value.
+        # Most database without a native boolean types ignore indexes on them
+        # unless they're compared directly to a literal value.
         product = Product.objects.create(name="Paper", qty_target=5000)
         Stock.objects.create(product=product, short=False, qty_available=5100)
         stock_1 = Stock.objects.create(product=product, short=True, qty_available=180)
@@ -1575,10 +1576,41 @@ class LookupTests(TestCase):
             str(qs.query),
         )
 
-    @skipUnless(connection.vendor == "mysql", "MySQL-specific workaround.")
+    @skipIfDBFeature("has_native_boolean_field")
     def test_exact_booleanfield_annotation(self):
-        # MySQL ignores indexes with boolean fields unless they're compared
-        # directly to a boolean value.
+        # Most database without a native boolean types ignore indexes on them
+        # unless they're compared directly to a literal value.
+        product = Product.objects.create(name="Paper", qty_target=5000)
+        Stock.objects.create(product=product, short=False, qty_available=5100)
+        stock_1 = Stock.objects.create(product=product, short=True, qty_available=180)
+        qs = Stock.objects.annotate(
+            short_annotation=F("short"),
+        ).filter(short_annotation=True)
+        self.assertSequenceEqual(qs, [stock_1])
+        self.assertIn(" = True", str(qs.query))
+        # ExpressionWrapper should be unwrapped.
+        qs = Stock.objects.annotate(
+            short_wrapper=ExpressionWrapper(
+                F("short"),
+                output_field=BooleanField(),
+            )
+        ).filter(short_wrapper=True)
+        self.assertSequenceEqual(qs, [stock_1])
+        self.assertIn(" = True", str(qs.query))
+        # Q which resolve to WhereNode should not be compared to a boolean
+        # value as it's compatible by definition.
+        qs = Author.objects.annotate(
+            node=Q(alias="a1"),
+        ).filter(node=True)
+        self.assertSequenceEqual(qs, [self.au1])
+        self.assertNotIn(" = True", str(qs.query))
+        # EXISTS(...) shouldn't be compared to a boolean value.
+        qs = Author.objects.annotate(
+            exists=Exists(Author.objects.filter(alias="a1", pk=OuterRef("pk"))),
+        ).filter(exists=True)
+        self.assertSequenceEqual(qs, [self.au1])
+        self.assertNotIn(" = True", str(qs.query))
+        # CASE shouldn't be compared to a boolean value.
         qs = Author.objects.annotate(
             case=Case(
                 When(alias="a1", then=True),
@@ -1587,17 +1619,15 @@ class LookupTests(TestCase):
             )
         ).filter(case=True)
         self.assertSequenceEqual(qs, [self.au1])
-        self.assertIn(" = True", str(qs.query))
-
-        qs = Author.objects.annotate(
-            wrapped=ExpressionWrapper(Q(alias="a1"), output_field=BooleanField()),
-        ).filter(wrapped=True)
-        self.assertSequenceEqual(qs, [self.au1])
-        self.assertIn(" = True", str(qs.query))
-        # EXISTS(...) shouldn't be compared to a boolean value.
-        qs = Author.objects.annotate(
-            exists=Exists(Author.objects.filter(alias="a1", pk=OuterRef("pk"))),
-        ).filter(exists=True)
+        self.assertEqual(str(qs.query).count(" = True"), 1)
+        # Conditional usage of RawSQL usage should not be compared to a boolean
+        # value.
+        queryset = Author.objects.all()
+        compiler = queryset.query.get_compiler(connection=connection)
+        sql, params = compiler.compile(Q(alias="a1").resolve_expression(queryset.query))
+        qs = Author.objects.alias(
+            raw=RawSQL(sql, params, BooleanField()),
+        ).filter(raw=True)
         self.assertSequenceEqual(qs, [self.au1])
         self.assertNotIn(" = True", str(qs.query))
 
