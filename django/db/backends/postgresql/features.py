@@ -13,6 +13,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_rows_from_bulk_insert = True
     can_return_rows_from_update = True
     has_real_datatype = True
+    has_native_boolean_field = True
     has_native_uuid_field = True
     has_native_duration_field = True
     has_native_json_field = True
