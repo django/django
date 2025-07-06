@@ -8,6 +8,30 @@ from django.urls import path, reverse
 
 from .admin import Language, LanguageAdmin
 
+
+class Shortcuts:
+    class Global:
+        SHOW_DIALOG = "?"
+        CLOSE_DIALOG = "Escape"
+        GO_TO_INDEX = "g i"
+
+    class ChangeList:
+        FOCUS_PREV_ROW = "k"
+        FOCUS_NEXT_ROW = "j"
+        TOGGLE_ROW_SELECTION = "x"
+        FOCUS_ACTIONS_DROPDOWN = "a"
+
+    class ChangeForm:
+        SAVE = "Alt+s"
+        SAVE_AND_CONTINUE = "Alt+c"
+        SAVE_AND_ADD_ANOTHER = "Alt+a"
+        DELETE = "Alt+d"
+
+    class DeleteConfirmation:
+        CONFIRM_DELETE = "Alt+y"
+        CANCEL_DELETE = "Alt+n"
+
+
 site = admin.AdminSite(name="test_admin_keyboard_shortcuts")
 site.register(Language, LanguageAdmin)
 
@@ -32,7 +56,9 @@ class AdminKeyboardShorcutsTests(TestCase):
     def test_shortcuts_dialog_on_index(self):
         response = self.client.get(reverse("test_admin_keyboard_shortcuts:index"))
         self.assertContains(
-            response, '<button id="open-shortcuts" aria-keyshortcuts="?">'
+            response,
+            '<button id="open-shortcuts"'
+            f' aria-keyshortcuts="{Shortcuts.Global.SHOW_DIALOG}">',
         )
         self.assertContains(
             response, '<dialog class="keyboard-shortcuts" id="shortcuts-dialog">'
@@ -43,7 +69,9 @@ class AdminKeyboardShorcutsTests(TestCase):
         self.client.logout()
         response = self.client.get(reverse("test_admin_keyboard_shortcuts:login"))
         self.assertNotContains(
-            response, '<button id="open-shortcuts" aria-keyshortcuts="?">'
+            response,
+            '<button id="open-shortcuts"'
+            f' aria-keyshortcuts="{Shortcuts.Global.SHOW_DIALOG}">',
         )
         self.assertNotContains(
             response, '<dialog class="keyboard-shortcuts" id="shortcuts-dialog">'
@@ -57,7 +85,7 @@ class AdminKeyboardShorcutsTests(TestCase):
         self.assertContains(
             response,
             '<dt class="shortcut-description">Show this dialog</dt>'
-            '<dd class="shortcut-keys"><kbd>?</kbd></dd>',
+            f'<dd class="shortcut-keys"><kbd>{Shortcuts.Global.SHOW_DIALOG}</kbd></dd>',
             html=True,
         )
 
@@ -80,6 +108,36 @@ class SeleniumTests(AdminSeleniumTestCase):
         open_btn.click()
         yield
         close_btn.click()
+
+    def perform_shortcut(self, shortcut):
+        """Perform the keyboard shortcut using Selenium."""
+        from selenium.webdriver.common.action_chains import ActionChains
+        from selenium.webdriver.common.keys import Keys
+
+        # split the shortcut keys string into list of list of keys
+        # e.g. "Ctrl+S Alt+Shift+X" -> [["Ctrl", "S"], ["Alt", "Shift", "X"]]
+        key_combos = [key_combo.split("+") for key_combo in shortcut.split(" ")]
+
+        # parse modifiers
+        special_keys = {
+            "ctrl": Keys.CONTROL,
+            "alt": Keys.ALT,
+            "shift": Keys.SHIFT,
+            "escape": Keys.ESCAPE,
+        }
+        key_combos = [
+            [special_keys.get(key.lower(), key) for key in combo]
+            for combo in key_combos
+        ]
+
+        # perform the key combinations
+        actions = ActionChains(self.selenium)
+        for combo in key_combos:
+            for key in combo:
+                actions.key_down(key)
+            for key in combo:
+                actions.key_up(key)
+        actions.perform()
 
     def setUp(self):
         self.superuser = User.objects.create_superuser(
@@ -161,34 +219,29 @@ class SeleniumTests(AdminSeleniumTestCase):
                 toggle.click()
 
         # "?" shortcut key does not open the shortcuts dialog
-        self.selenium.find_element(By.TAG_NAME, "body").send_keys("?")
+        self.perform_shortcut(Shortcuts.Global.SHOW_DIALOG)
         self.assertFalse(
             self.selenium.find_element(By.ID, "shortcuts-dialog").is_displayed()
         )
 
     def test_shortcut_global_open_shortcuts_dialog(self):
         from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
 
-        body = self.selenium.find_element(By.TAG_NAME, "body")
         dialog = self.selenium.find_element(By.ID, "shortcuts-dialog")
 
-        body.send_keys("?")
+        self.perform_shortcut(Shortcuts.Global.SHOW_DIALOG)
         self.assertTrue(dialog.is_displayed())
-        body.send_keys(Keys.ESCAPE)
+        self.perform_shortcut(Shortcuts.Global.CLOSE_DIALOG)
         self.assertFalse(dialog.is_displayed())
 
     def test_shortcut_global_go_to_index(self):
-        from selenium.webdriver.common.by import By
-
         # Url other than admin index to start with
         self.selenium.get(
             self.live_server_url
-            + reverse("test_admin_keyboard_shortcuts:password_change")
+            + reverse("test_admin_keyboard_shortcuts:admin_views_language_changelist")
         )
-        body = self.selenium.find_element(By.TAG_NAME, "body")
         with self.wait_page_loaded():
-            body.send_keys("gi")
+            self.perform_shortcut(Shortcuts.Global.GO_TO_INDEX)
         self.assertEqual(
             self.selenium.current_url,
             self.live_server_url + reverse("test_admin_keyboard_shortcuts:index"),
@@ -205,7 +258,6 @@ class SeleniumTests(AdminSeleniumTestCase):
             + reverse("test_admin_keyboard_shortcuts:admin_views_language_changelist")
         )
 
-        body = self.selenium.find_element(By.TAG_NAME, "body")
         action_toggle_checkbox = self.selenium.find_element(By.ID, "action-toggle")
         l1_checkbox = self.selenium.find_element(
             By.CSS_SELECTOR, "input[name='_selected_action'][value='l1']"
@@ -216,17 +268,17 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # On first trigger, "focus next row" shortcut
         # focuses Select all objects checkbox
-        body.send_keys("j")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_NEXT_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, action_toggle_checkbox)
 
-        body.send_keys("j")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_NEXT_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l1_checkbox)
 
-        body.send_keys("j")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_NEXT_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l2_checkbox)
 
         # Rolls over from last row/checkbox to the first row/checkbox
-        body.send_keys("j")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_NEXT_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, action_toggle_checkbox)
 
     def test_shortcut_changelist_focus_previous_row(self):
@@ -240,7 +292,6 @@ class SeleniumTests(AdminSeleniumTestCase):
             + reverse("test_admin_keyboard_shortcuts:admin_views_language_changelist")
         )
 
-        body = self.selenium.find_element(By.TAG_NAME, "body")
         l1_checkbox = self.selenium.find_element(
             By.CSS_SELECTOR, "input[name='_selected_action'][value='l1']"
         )
@@ -249,10 +300,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         # On first trigger, "focus previous row" shortcut focuses last row/checkbox
-        body.send_keys("k")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l2_checkbox)
 
-        body.send_keys("k")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l1_checkbox)
 
     def test_shortcut_changelist_toggle_row_selection(self):
@@ -266,7 +317,6 @@ class SeleniumTests(AdminSeleniumTestCase):
             + reverse("test_admin_keyboard_shortcuts:admin_views_language_changelist")
         )
 
-        body = self.selenium.find_element(By.TAG_NAME, "body")
         action_toggle_checkbox = self.selenium.find_element(By.ID, "action-toggle")
         l1_checkbox = self.selenium.find_element(
             By.CSS_SELECTOR, "input[name='_selected_action'][value='l1']"
@@ -276,21 +326,22 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         # Mark l2
-        body.send_keys("k")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l2_checkbox)
 
-        body.send_keys("x")
+        self.perform_shortcut(Shortcuts.ChangeList.TOGGLE_ROW_SELECTION)
         self.assertTrue(l2_checkbox.is_selected())
 
         # Unmark l2
-        body.send_keys("x")
+        self.perform_shortcut(Shortcuts.ChangeList.TOGGLE_ROW_SELECTION)
         self.assertFalse(l2_checkbox.is_selected())
 
         # Mark action toggle checkbox
-        body.send_keys("kk")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, action_toggle_checkbox)
 
-        body.send_keys("x")
+        self.perform_shortcut(Shortcuts.ChangeList.TOGGLE_ROW_SELECTION)
         self.assertTrue(action_toggle_checkbox.is_selected())
         self.assertTrue(l1_checkbox.is_selected())
         self.assertTrue(l2_checkbox.is_selected())
@@ -305,10 +356,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             + reverse("test_admin_keyboard_shortcuts:admin_views_language_changelist")
         )
 
-        body = self.selenium.find_element(By.TAG_NAME, "body")
         actions_dropdown = self.selenium.find_element(
             By.CSS_SELECTOR, "select[name='action']"
         )
 
-        body.send_keys("a")
+        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_ACTIONS_DROPDOWN)
         self.assertEqual(self.selenium.switch_to.active_element, actions_dropdown)
