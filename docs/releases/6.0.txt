@@ -83,6 +83,12 @@ Minor features
 * The Font Awesome Free icon set (version 6.7.2) is now used for the admin
   interface icons.
 
+* Collapsible fieldsets and inlines now support an ``"open"`` class. When used
+  together with the ``"collapse"`` class, the fieldset or inline will be
+  collapsible but start in the expanded state. This fixes autocomplete field
+  width calculation issues in collapsed fieldsets and inlines on Chromium-based
+  browsers.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
