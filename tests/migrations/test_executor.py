@@ -845,6 +845,77 @@ class ExecutorTests(MigrationTestBase):
         with self.assertNumQueries(0):
             executor.migrate([], plan=[])
 
+    @override_settings(
+        MIGRATION_MODULES={
+            "migrations": "migrations.test_migrations_multi_squashed_backward",
+            "migrations2": "migrations2.test_migrations_multi_squashed_backward",
+        }
+    )
+    def test_migrations_multi_squashed_backward(self):
+        executor = MigrationExecutor(connection)
+        recorder = MigrationRecorder(connection)
+
+        try:
+            plan = executor.migration_plan([
+                (
+                    "migrations",
+                    "0002_squashed_0003_foo_another_field"
+                ),
+                (
+                    "migrations2",
+                    "0001_squashed_0002_baz_baz"
+                ),
+            ])
+
+            self.assertEqual(
+                plan,
+                [
+                    (
+                        executor.loader.graph.nodes[
+                            "migrations",
+                            "0001_initial"
+                        ],
+                        False
+                    ),
+                    (
+                        executor.loader.graph.nodes[
+                            "migrations",
+                            "0002_squashed_0003_foo_another_field"
+                        ],
+                        False
+                    ),
+                    (
+                        executor.loader.graph.nodes[
+                            "migrations2",
+                            "0001_squashed_0002_baz_baz"
+                        ],
+                        False
+                    ),
+                ],
+            )
+
+            # Fake forward
+            executor.migrate([
+                (
+                    "migrations",
+                    "0002_squashed_0003_foo_another_field"
+                ),
+                (
+                    "migrations2",
+                    "0001_squashed_0002_baz_baz"
+                ),
+            ], fake=True)
+
+            # Fake backward
+            executor.migrate([
+                ("migrations2", "0001_initial"),
+            ], fake=True)
+
+        finally:
+            # clean up
+            executor = MigrationExecutor(connection)
+            recorder.migration_qs.all().delete()
+
 
 class FakeLoader:
     def __init__(self, graph, applied):
