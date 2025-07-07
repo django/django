@@ -852,69 +852,73 @@ class ExecutorTests(MigrationTestBase):
         }
     )
     def test_migrations_multi_squashed_backward(self):
-        executor = MigrationExecutor(connection)
-        recorder = MigrationRecorder(connection)
-
+        forward_executor = MigrationExecutor(connection)
+        forward_plan = forward_executor.migration_plan(
+            [
+                ("migrations", "0002_squashed_0003_foo_another_field"),
+                ("migrations2", "0001_squashed_0002_baz_baz"),
+            ]
+        )
         try:
-            plan = executor.migration_plan([
-                (
-                    "migrations",
-                    "0002_squashed_0003_foo_another_field"
-                ),
-                (
-                    "migrations2",
-                    "0001_squashed_0002_baz_baz"
-                ),
-            ])
-
             self.assertEqual(
-                plan,
+                forward_plan,
                 [
                     (
-                        executor.loader.graph.nodes[
-                            "migrations",
-                            "0001_initial"
+                        forward_executor.loader.graph.nodes[
+                            "migrations", "0001_initial"
                         ],
-                        False
+                        False,
                     ),
                     (
-                        executor.loader.graph.nodes[
-                            "migrations",
-                            "0002_squashed_0003_foo_another_field"
+                        forward_executor.loader.graph.nodes[
+                            "migrations", "0002_squashed_0003_foo_another_field"
                         ],
-                        False
+                        False,
                     ),
                     (
-                        executor.loader.graph.nodes[
-                            "migrations2",
-                            "0001_squashed_0002_baz_baz"
+                        forward_executor.loader.graph.nodes[
+                            "migrations2", "0001_squashed_0002_baz_baz"
                         ],
-                        False
+                        False,
                     ),
                 ],
             )
+            forward_executor.migrate(None, forward_plan)
+            forward_executor.loader.build_graph()
 
-            # Fake forward
-            executor.migrate([
-                (
-                    "migrations",
-                    "0002_squashed_0003_foo_another_field"
-                ),
-                (
-                    "migrations2",
-                    "0001_squashed_0002_baz_baz"
-                ),
-            ], fake=True)
+            self.assertIn(
+                ("migrations", "0001_initial"),
+                forward_executor.loader.applied_migrations,
+            )
+            self.assertIn(
+                ("migrations", "0002_squashed_0003_foo_another_field"),
+                forward_executor.loader.applied_migrations,
+            )
+            self.assertIn(
+                ("migrations2", "0001_squashed_0002_baz_baz"),
+                forward_executor.loader.applied_migrations,
+            )
 
-            # Fake backward
-            executor.migrate([
-                ("migrations2", "0001_initial"),
-            ], fake=True)
+            # backward
+            backward_executor = MigrationExecutor(connection)
+            backward_plan = backward_executor.migration_plan(
+                [("migrations2", "0001_initial")]
+            )
+
+            backward_executor.migrate(None, backward_plan)
+            self.assertTrue(backward_plan)
 
         finally:
             # clean up
-            executor = MigrationExecutor(connection)
-            recorder.migration_qs.all().delete()
+            cleanup_executor = MigrationExecutor(connection)
+
+            cleanup_executor.loader.build_graph()
+            cleanup_executor.migrate(
+                [
+                    ("migrations", None),
+                    ("migrations2", None),
+                ]
+            )
 
 
 class FakeLoader:
