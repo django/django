@@ -2557,3 +2557,4 @@ class StackedInline(InlineModelAdmin):
 
 class TabularInline(InlineModelAdmin):
     template = "admin/edit_inline/tabular.html"
+    

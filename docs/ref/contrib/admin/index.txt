@@ -3537,9 +3537,10 @@ The ``staff_member_required`` decorator
       ``/admin/login/?next=/admin/polls/question/3/``.
 
     Example usage::
+    
+    .. code-block:: python
 
         from django.contrib.admin.views.decorators import staff_member_required
-
 
         @staff_member_required
         def my_view(request): ...

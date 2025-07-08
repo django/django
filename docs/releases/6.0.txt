@@ -82,6 +82,8 @@ Minor features
 
 * The Font Awesome Free icon set (version 6.7.2) is now used for the admin
   interface icons.
+* Added optional ``ModelAdmin.estimated_count`` to display approximate row
+  counts using database metadata with automatic fallback to ``COUNT(*)``.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

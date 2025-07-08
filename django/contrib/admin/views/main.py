@@ -630,3 +630,4 @@ class ChangeList:
             args=(quote(pk),),
             current_app=self.model_admin.admin_site.name,
         )
+    

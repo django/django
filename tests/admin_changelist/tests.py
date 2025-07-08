@@ -2368,3 +2368,4 @@ class SeleniumTests(AdminSeleniumTestCase):
                     GrandChild.objects.all().order_by(*ordering)
                 )
                 self.assertEqual(find_result_row_texts(), expected)
+                
