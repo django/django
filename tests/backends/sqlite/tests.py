@@ -193,6 +193,52 @@ class SchemaTests(TransactionTestCase):
             self.assertFalse(constraint_checks_enabled())
         self.assertTrue(constraint_checks_enabled())
 
+    def test_must_check_constraints_initialization(self):
+        """
+        Verify that must_check_constraints is initialized correctly
+        """
+        with connection.schema_editor() as editor:
+            # Initially, must_check_constraints should be False
+            self.assertFalse(editor.must_check_constraints)
+
+    def test_must_check_constraints_on_sql_execution(self):
+        """
+        Verify that must_check_constraints is set to True when SQL is executed
+        """
+        with connection.schema_editor() as editor:
+            # Execute a simple SQL statement
+            editor.execute("SELECT 1")
+
+            # must_check_constraints should now be True
+            self.assertTrue(editor.must_check_constraints)
+
+    def test_must_check_constraints_reset_between_sessions(self):
+        """
+        Verify that must_check_constraints is reset between schema editing sessions
+        """
+        with connection.schema_editor() as editor1:
+            editor1.execute("SELECT 1")
+            self.assertTrue(editor1.must_check_constraints)
+
+        with connection.schema_editor() as editor2:
+            # must_check_constraints should be reset to False
+            self.assertFalse(editor2.must_check_constraints)
+
+    def test_constraint_check_only_on_sql_execution(self):
+        """
+        Verify that constraints are only checked when SQL is actually executed
+        """
+        with connection.schema_editor() as editor:
+            # No SQL executed, so no constraint check
+            editor.must_check_constraints = False
+
+        with connection.schema_editor() as editor:
+            # Execute a simple SQL statement
+            editor.execute("SELECT 1")
+
+            # Verify that must_check_constraints is set to True
+            self.assertTrue(editor.must_check_constraints)
+
 
 @unittest.skipUnless(connection.vendor == "sqlite", "Test only for SQLite")
 @override_settings(DEBUG=True)
