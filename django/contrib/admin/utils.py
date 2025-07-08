@@ -618,3 +618,31 @@ def _get_changed_field_labels_from_form(form, changed_data):
             verbose_field_name = field_name
         changed_field_labels.append(str(verbose_field_name))
     return changed_field_labels
+
+
+def estimate_row_count(model, connection):
+    """Return an estimated number of rows for ``model`` using ``connection``.
+
+    Return ``None`` if estimation isn't supported or fails.
+    """
+    table = model._meta.db_table
+    try:
+        with connection.cursor() as cursor:
+            if connection.vendor == "postgresql":
+                cursor.execute(
+                    "SELECT reltuples::BIGINT FROM pg_class WHERE relname = %s",
+                    [table],
+                )
+                row = cursor.fetchone()
+                if row:
+                    return int(row[0])
+            elif connection.vendor == "mysql":
+                cursor.execute("SHOW TABLE STATUS WHERE Name = %s", [table])
+                row = cursor.fetchone()
+                if row:
+                    return int(row[4])
+            else:
+                return None
+    except Exception:
+        return None
+    return None

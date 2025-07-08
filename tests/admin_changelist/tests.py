@@ -1,4 +1,5 @@
 import datetime
+import unittest
 from unittest import mock
 
 from django.contrib import admin
@@ -40,6 +41,7 @@ from .admin import (
     DynamicListFilterChildAdmin,
     DynamicSearchFieldsChildAdmin,
     EmptyValueChildAdmin,
+    EstimatedCountAdmin,
     EventAdmin,
     FilteredChildAdmin,
     GrandChildAdmin,
@@ -516,6 +518,74 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         cl.get_results(request)
         self.assertIsInstance(cl.paginator, CustomPaginator)
+
+    def test_estimated_count_flag_respects_estimation_logic(self):
+        parent = Parent.objects.create(name="parent")
+        for i in range(3):
+            Child.objects.create(name=f"name {i}", parent=parent)
+
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+
+        m = EstimatedCountAdmin(Child, custom_site)
+        cl = m.get_changelist_instance(request)
+        with (
+            mock.patch(
+                "django.contrib.admin.utils.estimate_row_count", return_value=42
+            ) as mocked_estimate,
+            mock.patch.object(
+                cl.root_queryset, "count", side_effect=AssertionError("count called")
+            ),
+            mock.patch.object(
+                cl.queryset, "count", side_effect=AssertionError("count called")
+            ),
+        ):
+            cl.get_results(request)
+            mocked_estimate.assert_called()
+        self.assertEqual(cl.paginator.count, 42)
+        self.assertEqual(cl.result_count, 42)
+        self.assertEqual(cl.full_result_count, 42)
+
+    def test_estimated_count_fallback_uses_count(self):
+        parent = Parent.objects.create(name="parent")
+        for i in range(3):
+            Child.objects.create(name=f"name {i}", parent=parent)
+
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+
+        m = EstimatedCountAdmin(Child, custom_site)
+
+        def fake_count(self):
+            return 99
+
+        with (
+            mock.patch(
+                "django.contrib.admin.utils.estimate_row_count", return_value=None
+            ),
+            mock.patch("django.db.models.query.QuerySet.count", fake_count),
+        ):
+            cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.paginator.count, 99)
+        self.assertEqual(cl.result_count, 99)
+        self.assertEqual(cl.full_result_count, 99)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_estimated_count_postgresql_integration(self):
+        parent = Parent.objects.create(name="parent")
+        for i in range(5):
+            Child.objects.create(name=f"name {i}", parent=parent)
+
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+
+        m = EstimatedCountAdmin(Child, custom_site)
+        with connection.cursor() as cursor:
+            cursor.execute(f"ANALYZE {Child._meta.db_table}")
+        cl = m.get_changelist_instance(request)
+        cl.get_results(request)
+        self.assertIsInstance(cl.paginator.count, int)
+        self.assertGreaterEqual(cl.paginator.count, 0)
 
     def test_distinct_for_m2m_in_list_filter(self):
         """

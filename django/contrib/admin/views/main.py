@@ -296,15 +296,29 @@ class ChangeList:
         paginator = self.model_admin.get_paginator(
             request, self.queryset, self.list_per_page
         )
-        # Get the number of objects, with admin filters applied.
-        result_count = paginator.count
+        estimate = None
+        if self.model_admin.estimated_count:
+            from django.contrib.admin.utils import estimate_row_count
+            from django.db import connections
+
+            connection = connections[self.root_queryset.db]
+            estimate = estimate_row_count(self.model, connection)
+        if estimate is not None:
+            paginator.count = estimate
+            result_count = estimate
+        else:
+            # Get the number of objects, with admin filters applied.
+            result_count = paginator.count
 
         # Get the total number of objects, with no admin filters applied.
         # Note this isn't necessarily the same as result_count in the case of
         # no filtering. Filters defined in list_filters may still apply some
         # default filtering which may be removed with query parameters.
         if self.model_admin.show_full_result_count:
-            full_result_count = self.root_queryset.count()
+            if estimate is not None:
+                full_result_count = estimate
+            else:
+                full_result_count = self.root_queryset.count()
         else:
             full_result_count = None
         can_show_all = result_count <= self.list_max_show_all
