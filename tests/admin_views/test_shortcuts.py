@@ -9,27 +9,29 @@ from django.urls import path, reverse
 from .admin import Language, LanguageAdmin, Paper
 
 
-class Shortcuts:
-    class Global:
-        SHOW_DIALOG = "?"
-        CLOSE_DIALOG = "Escape"
-        GO_TO_INDEX = "g i"
+class GlobalShortcuts:
+    SHOW_DIALOG = "?"
+    CLOSE_DIALOG = "Escape"
+    GO_TO_INDEX = "g i"
 
-    class ChangeList:
-        FOCUS_PREV_ROW = "k"
-        FOCUS_NEXT_ROW = "j"
-        TOGGLE_ROW_SELECTION = "x"
-        FOCUS_ACTIONS_DROPDOWN = "a"
 
-    class ChangeForm:
-        SAVE = "Alt+s"
-        SAVE_AND_CONTINUE = "Alt+c"
-        SAVE_AND_ADD_ANOTHER = "Alt+a"
-        DELETE = "Alt+d"
+class ChangeListShortcuts:
+    FOCUS_PREV_ROW = "k"
+    FOCUS_NEXT_ROW = "j"
+    TOGGLE_ROW_SELECTION = "x"
+    FOCUS_ACTIONS_DROPDOWN = "a"
 
-    class DeleteConfirmation:
-        CONFIRM_DELETE = "Alt+y"
-        CANCEL_DELETE = "Alt+n"
+
+class ChangeFormShortcuts:
+    SAVE = "Alt+s"
+    SAVE_AND_CONTINUE = "Alt+c"
+    SAVE_AND_ADD_ANOTHER = "Alt+a"
+    DELETE = "Alt+d"
+
+
+class DeleteConfirmationShortcuts:
+    CONFIRM_DELETE = "Alt+y"
+    CANCEL_DELETE = "Alt+n"
 
 
 site = admin.AdminSite(name="test_admin_keyboard_shortcuts")
@@ -59,7 +61,7 @@ class AdminKeyboardShorcutsTests(TestCase):
         self.assertContains(
             response,
             '<button id="open-shortcuts"'
-            f' aria-keyshortcuts="{Shortcuts.Global.SHOW_DIALOG}">',
+            f' aria-keyshortcuts="{GlobalShortcuts.SHOW_DIALOG}">',
         )
         self.assertContains(
             response, '<dialog class="keyboard-shortcuts" id="shortcuts-dialog">'
@@ -72,7 +74,7 @@ class AdminKeyboardShorcutsTests(TestCase):
         self.assertNotContains(
             response,
             '<button id="open-shortcuts"'
-            f' aria-keyshortcuts="{Shortcuts.Global.SHOW_DIALOG}">',
+            f' aria-keyshortcuts="{GlobalShortcuts.SHOW_DIALOG}">',
         )
         self.assertNotContains(
             response, '<dialog class="keyboard-shortcuts" id="shortcuts-dialog">'
@@ -86,7 +88,7 @@ class AdminKeyboardShorcutsTests(TestCase):
         self.assertContains(
             response,
             '<dt class="shortcut-description">Show this dialog</dt>'
-            f'<dd class="shortcut-keys"><kbd>{Shortcuts.Global.SHOW_DIALOG}</kbd></dd>',
+            f'<dd class="shortcut-keys"><kbd>{GlobalShortcuts.SHOW_DIALOG}</kbd></dd>',
             html=True,
         )
 
@@ -214,7 +216,7 @@ class SeleniumTests(AdminSeleniumTestCase):
                 toggle.click()
 
         # "?" shortcut key does not open the shortcuts dialog
-        self.perform_shortcut(Shortcuts.Global.SHOW_DIALOG)
+        self.perform_shortcut(GlobalShortcuts.SHOW_DIALOG)
         self.assertFalse(
             self.selenium.find_element(By.ID, "shortcuts-dialog").is_displayed()
         )
@@ -224,9 +226,9 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         dialog = self.selenium.find_element(By.ID, "shortcuts-dialog")
 
-        self.perform_shortcut(Shortcuts.Global.SHOW_DIALOG)
+        self.perform_shortcut(GlobalShortcuts.SHOW_DIALOG)
         self.assertTrue(dialog.is_displayed())
-        self.perform_shortcut(Shortcuts.Global.CLOSE_DIALOG)
+        self.perform_shortcut(GlobalShortcuts.CLOSE_DIALOG)
         self.assertFalse(dialog.is_displayed())
 
     def test_shortcut_global_go_to_index(self):
@@ -236,7 +238,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             + reverse("test_admin_keyboard_shortcuts:admin_views_language_changelist")
         )
         with self.wait_page_loaded():
-            self.perform_shortcut(Shortcuts.Global.GO_TO_INDEX)
+            self.perform_shortcut(GlobalShortcuts.GO_TO_INDEX)
         self.assertEqual(
             self.selenium.current_url,
             self.live_server_url + reverse("test_admin_keyboard_shortcuts:index"),
@@ -263,17 +265,17 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # On first trigger, "focus next row" shortcut
         # focuses Select all objects checkbox
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_NEXT_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_NEXT_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, action_toggle_checkbox)
 
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_NEXT_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_NEXT_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l1_checkbox)
 
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_NEXT_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_NEXT_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l2_checkbox)
 
         # Rolls over from last row/checkbox to the first row/checkbox
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_NEXT_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_NEXT_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, action_toggle_checkbox)
 
     def test_shortcut_changelist_focus_previous_row(self):
@@ -295,10 +297,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         # On first trigger, "focus previous row" shortcut focuses last row/checkbox
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_PREV_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l2_checkbox)
 
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_PREV_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l1_checkbox)
 
     def test_shortcut_changelist_toggle_row_selection(self):
@@ -321,22 +323,22 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         # Mark l2
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_PREV_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, l2_checkbox)
 
-        self.perform_shortcut(Shortcuts.ChangeList.TOGGLE_ROW_SELECTION)
+        self.perform_shortcut(ChangeListShortcuts.TOGGLE_ROW_SELECTION)
         self.assertTrue(l2_checkbox.is_selected())
 
         # Unmark l2
-        self.perform_shortcut(Shortcuts.ChangeList.TOGGLE_ROW_SELECTION)
+        self.perform_shortcut(ChangeListShortcuts.TOGGLE_ROW_SELECTION)
         self.assertFalse(l2_checkbox.is_selected())
 
         # Mark action toggle checkbox
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_PREV_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_PREV_ROW)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_PREV_ROW)
         self.assertEqual(self.selenium.switch_to.active_element, action_toggle_checkbox)
 
-        self.perform_shortcut(Shortcuts.ChangeList.TOGGLE_ROW_SELECTION)
+        self.perform_shortcut(ChangeListShortcuts.TOGGLE_ROW_SELECTION)
         self.assertTrue(action_toggle_checkbox.is_selected())
         self.assertTrue(l1_checkbox.is_selected())
         self.assertTrue(l2_checkbox.is_selected())
@@ -355,7 +357,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             By.CSS_SELECTOR, "select[name='action']"
         )
 
-        self.perform_shortcut(Shortcuts.ChangeList.FOCUS_ACTIONS_DROPDOWN)
+        self.perform_shortcut(ChangeListShortcuts.FOCUS_ACTIONS_DROPDOWN)
         self.assertEqual(self.selenium.switch_to.active_element, actions_dropdown)
 
     def test_shortcut_changeform_save(self):
@@ -370,7 +372,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         title_input.send_keys("p1")
 
         with self.wait_page_loaded():
-            self.perform_shortcut(Shortcuts.ChangeForm.SAVE)
+            self.perform_shortcut(ChangeFormShortcuts.SAVE)
         self.assertEqual(Paper.objects.count(), 1)
         self.assertEqual(
             self.selenium.current_url,
@@ -390,7 +392,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         title_input.send_keys("p1")
 
         with self.wait_page_loaded():
-            self.perform_shortcut(Shortcuts.ChangeForm.SAVE_AND_ADD_ANOTHER)
+            self.perform_shortcut(ChangeFormShortcuts.SAVE_AND_ADD_ANOTHER)
         self.assertEqual(Paper.objects.count(), 1)
         self.assertEqual(
             self.selenium.current_url,
@@ -410,7 +412,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         title_input.send_keys("t1")
 
         with self.wait_page_loaded():
-            self.perform_shortcut(Shortcuts.ChangeForm.SAVE_AND_CONTINUE)
+            self.perform_shortcut(ChangeFormShortcuts.SAVE_AND_CONTINUE)
         self.assertEqual(Paper.objects.count(), 1)
 
         # check if on changeform page for that same saved object
@@ -435,7 +437,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         with self.wait_page_loaded():
-            self.perform_shortcut(Shortcuts.ChangeForm.DELETE)
+            self.perform_shortcut(ChangeFormShortcuts.DELETE)
         self.assertEqual(
             self.selenium.current_url,
             self.live_server_url
@@ -447,7 +449,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Cancel delete
         with self.wait_page_loaded():
-            self.perform_shortcut(Shortcuts.DeleteConfirmation.CANCEL_DELETE)
+            self.perform_shortcut(DeleteConfirmationShortcuts.CANCEL_DELETE)
         self.assertEqual(Paper.objects.count(), 1)
         self.assertEqual(
             self.selenium.current_url,
@@ -459,7 +461,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         with self.wait_page_loaded():
-            self.perform_shortcut(Shortcuts.ChangeForm.DELETE)
+            self.perform_shortcut(ChangeFormShortcuts.DELETE)
         # Confirm delete
-        self.perform_shortcut(Shortcuts.DeleteConfirmation.CONFIRM_DELETE)
+        self.perform_shortcut(DeleteConfirmationShortcuts.CONFIRM_DELETE)
         self.assertEqual(Paper.objects.count(), 0)
