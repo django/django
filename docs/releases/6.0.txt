@@ -392,6 +392,9 @@ Miscellaneous
   set the level to ``messages.SUCCESS`` to retain the previous icon and
   styling.
 
+* The minimum supported version of ``asgiref`` is increased from 3.8.1 to
+  3.9.1.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
