@@ -152,13 +152,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             login_url=reverse("test_admin_keyboard_shortcuts:index"),
         )
 
-        # Enable shortcuts for most of the tests
-        self.selenium.execute_script(
-            "localStorage.setItem('django.admin.shortcutsEnabled', 'true')"
-        )
-        self.selenium.refresh()
-
-    def test_shortcuts_toggle_off_by_default(self):
+    def test_shortcuts_toggle_on_by_default(self):
         from selenium.webdriver.common.by import By
 
         self.selenium.execute_script(
@@ -166,7 +160,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.selenium.refresh()
         toggle = self.selenium.find_element(By.ID, "toggle-shortcuts")
-        self.assertFalse(toggle.is_selected())
+        self.assertTrue(toggle.is_selected())
 
     def test_shortcuts_toggle_state_persists(self):
         from selenium.webdriver.common.by import By

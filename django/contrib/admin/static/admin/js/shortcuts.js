@@ -1,6 +1,6 @@
 'use strict';
 {
-    window.shortcutsEnabled = localStorage.getItem('django.admin.shortcutsEnabled') || 'false';
+    window.shortcutsEnabled = localStorage.getItem('django.admin.shortcutsEnabled') || 'true';
     const toggleShortcuts = document.getElementById('toggle-shortcuts');
     if (window.shortcutsEnabled === 'true') {
         toggleShortcuts.checked = true;
