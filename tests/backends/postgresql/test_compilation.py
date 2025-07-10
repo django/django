@@ -1,10 +1,11 @@
 import unittest
+from datetime import date
 
 from django.db import connection
 from django.db.models.expressions import RawSQL
 from django.test import TestCase
 
-from ..models import Square
+from ..models import Article, Reporter, Square
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
@@ -27,3 +28,17 @@ class BulkCreateUnnestTests(TestCase):
                 [Square(root=2, square=4), Square(root=3, square=9)]
             )
         self.assertIn("UNNEST", ctx[0]["sql"])
+
+    def test_unnest_eligible_foreign_keys(self):
+        reporter = Reporter.objects.create()
+        with self.assertNumQueries(1) as ctx:
+            articles = Article.objects.bulk_create(
+                [
+                    Article(pub_date=date.today(), reporter=reporter),
+                    Article(pub_date=date.today(), reporter=reporter),
+                ]
+            )
+        self.assertIn("UNNEST", ctx[0]["sql"])
+        self.assertEqual(
+            [article.reporter for article in articles], [reporter, reporter]
+        )
