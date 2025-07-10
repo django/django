@@ -857,28 +857,15 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin(Song, AdminSite()).check()
         self.assertEqual(errors, [])
 
-    def test_graceful_m2m_fail(self):
-        """
-        Regression test for #12203/#12237 - Fail more gracefully when a M2M field that
-        specifies the 'through' option is included in the 'fields' or the 'fieldsets'
-        ModelAdmin options.
-        """
-
+    def test_allow_m2m_with_through(self):
         class BookAdmin(admin.ModelAdmin):
             fields = ["authors"]
 
         errors = BookAdmin(Book, AdminSite()).check()
-        expected = [
-            checks.Error(
-                "The value of 'fields' cannot include the ManyToManyField 'authors', "
-                "because that field manually specifies a relationship model.",
-                obj=BookAdmin,
-                id="admin.E013",
-            )
-        ]
+        expected = []
         self.assertEqual(errors, expected)
 
-    def test_cannot_include_through(self):
+    def test_m2m_can_include_through(self):
         class FieldsetBookAdmin(admin.ModelAdmin):
             fieldsets = (
                 ("Header 1", {"fields": ("name",)}),
@@ -886,15 +873,7 @@ class SystemChecksTestCase(SimpleTestCase):
             )
 
         errors = FieldsetBookAdmin(Book, AdminSite()).check()
-        expected = [
-            checks.Error(
-                "The value of 'fieldsets[1][1][\"fields\"]' cannot include the "
-                "ManyToManyField 'authors', because that field manually specifies a "
-                "relationship model.",
-                obj=FieldsetBookAdmin,
-                id="admin.E013",
-            )
-        ]
+        expected = []
         self.assertEqual(errors, expected)
 
     def test_nested_fields(self):
