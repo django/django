@@ -1337,6 +1337,34 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
             status_code=403,
         )
 
+    @override_settings(CSRF_COOKIE_PARTITIONED=True)
+    def test_csrf_cookie_partitioned(self):
+        """
+        The Partitioned attribute is set on the CSRF cookie when
+        CSRF_COOKIE_PARTITIONED is True.
+        """
+        req = self._get_request()
+        mw = CsrfViewMiddleware(token_view)
+        mw.process_view(req, token_view, (), {})
+        resp = mw(req)
+        self.assertIs(resp.cookies["csrftoken"]["partitioned"], True)
+
+    @override_settings(CSRF_COOKIE_PARTITIONED=False)
+    def test_csrf_cookie_not_partitioned(self):
+        """
+        The Partitioned attribute is not set on the CSRF cookie when
+        CSRF_COOKIE_PARTITIONED is False.
+        """
+        req = self._get_request()
+        mw = CsrfViewMiddleware(token_view)
+        mw.process_view(req, token_view, (), {})
+        resp = mw(req)
+        self.assertEqual(resp.cookies["csrftoken"]["partitioned"], "")
+        self.assertNotIn(
+            "Partitioned",
+            str(resp.cookies["csrftoken"]),
+        )
+
 
 @override_settings(CSRF_USE_SESSIONS=True, CSRF_COOKIE_DOMAIN=None)
 class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):

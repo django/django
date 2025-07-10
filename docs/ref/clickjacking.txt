@@ -88,7 +88,10 @@ that tells the middleware not to set the header::
 
     If you want to submit a form or access a session cookie within a frame or
     iframe, you may need to modify the :setting:`CSRF_COOKIE_SAMESITE` or
-    :setting:`SESSION_COOKIE_SAMESITE` settings.
+    :setting:`SESSION_COOKIE_SAMESITE` settings. Additionally, you can use the
+    ``partitioned`` parameter in :meth:`~django.http.HttpResponse.set_cookie`
+    to enable CHIPS (Cookies Having Independent Partitioned State), which allows
+    cookies to work in embedded contexts while preventing cross-site tracking.
 
 Setting ``X-Frame-Options`` per view
 ------------------------------------
