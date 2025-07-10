@@ -344,7 +344,9 @@ class BaseForm(RenderableFormMixin):
             field = bf.field
             try:
                 self.cleaned_data[name] = field._clean_bound_field(bf)
-                if (field_clean := getattr(self, f"clean_{name}", sentinel)) is not sentinel:
+                if (
+                    field_clean := getattr(self, f"clean_{name}", sentinel)
+                ) is not sentinel:
                     value = field_clean()
                     self.cleaned_data[name] = value
             except ValidationError as e:
