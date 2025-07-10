@@ -228,21 +228,38 @@ class ForwardManyToOneDescriptor:
         try:
             rel_obj = self.field.get_cached_value(instance)
         except KeyError:
+            rel_obj = None
             has_value = None not in self.field.get_local_related_value(instance)
-            ancestor_link = (
-                instance._meta.get_ancestor_link(self.field.model)
-                if has_value
-                else None
-            )
-            if ancestor_link and ancestor_link.is_cached(instance):
+            current_instance = instance
+            keep_going = has_value
+            while keep_going:
+                ancestor_link = current_instance._meta.get_ancestor_link(
+                    self.field.model
+                )
                 # An ancestor link will exist if this field is defined on a
                 # multi-table inheritance parent of the instance's class.
-                ancestor = ancestor_link.get_cached_value(instance)
-                # The value might be cached on an ancestor if the instance
-                # originated from walking down the inheritance chain.
-                rel_obj = self.field.get_cached_value(ancestor, default=None)
-            else:
-                rel_obj = None
+                if (
+                    ancestor_link
+                    and (
+                        ancestor := ancestor_link.get_cached_value(
+                            current_instance, None
+                        )
+                    )
+                    is not None
+                ):
+                    # The value might be cached on an ancestor if the instance
+                    # originated from walking down the inheritance chain.
+                    rel_obj = self.field.get_cached_value(ancestor, default=None)
+                    if rel_obj is not None:
+                        # We found it in the cache
+                        keep_going = False
+                    else:
+                        # Keep going with further ancestors
+                        current_instance = ancestor
+                else:
+                    # no more ancestor or the ancestor instance is not cached
+                    rel_obj = None
+                    keep_going = False
             if rel_obj is None and has_value:
                 rel_obj = self.get_object(instance)
                 remote_field = self.field.remote_field
@@ -1095,16 +1112,54 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return queryset._next_is_sticky().filter(**self.core_filters)
 
         def get_prefetch_cache(self):
-            try:
-                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
-            except (AttributeError, KeyError):
-                return None
+            current_instance = self.instance
+            while True:
+                try:
+                    return current_instance._prefetched_objects_cache[
+                        self.prefetch_cache_name
+                    ]
+                except (AttributeError, KeyError):
+                    pass
+                # Walk up the ancestor-chain (if cached) to try and find
+                # a prefetch in an ancestor
+                ancestor_link = current_instance._meta.get_ancestor_link(
+                    rel.field.model
+                )
+                if (
+                    not ancestor_link
+                    or (
+                        current_instance := ancestor_link.get_cached_value(
+                            current_instance, None
+                        )
+                    )
+                    is None
+                ):
+                    return None
 
         def _remove_prefetched_objects(self):
-            try:
-                self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
-            except (AttributeError, KeyError):
-                pass  # nothing to clear from cache
+            current_instance = self.instance
+            while True:
+                try:
+                    current_instance._prefetched_objects_cache.pop(
+                        self.prefetch_cache_name
+                    )
+                except (AttributeError, KeyError):
+                    pass  # nothing to clear from cache
+                # Walk up the ancestor-chain (if cached) to try and find
+                # a prefetch in an ancestor
+                ancestor_link = current_instance._meta.get_ancestor_link(
+                    rel.field.model
+                )
+                if (
+                    not ancestor_link
+                    or (
+                        current_instance := ancestor_link.get_cached_value(
+                            current_instance, None
+                        )
+                    )
+                    is None
+                ):
+                    break
 
         def get_queryset(self):
             if (cache := self.get_prefetch_cache()) is not None:
