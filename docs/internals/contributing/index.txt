@@ -110,7 +110,9 @@ encounter or assist in triaging existing tickets to ensure a smooth development
 workflow.
 
 Django also has a :ref:`process for suggesting ideas <requesting-features>`
-where you can join the community in discussing ideas for new features.
+where you can join the community in discussing ideas for new features. Beyond
+the Django codebase, there's a `vibrant ecosystem`_ that is maintained by the
+community that you can contribute to.
 
 Explore the ways you can make a difference below, and join us in making Django
 better for everyone.
@@ -122,5 +124,6 @@ better for everyone.
    triaging-tickets
 
 .. _ticket tracker: https://code.djangoproject.com/
+.. _vibrant ecosystem: https://www.djangoproject.com/community/ecosystem/
 
 We're looking forward to working with you. Welcome aboard!
