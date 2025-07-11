@@ -350,6 +350,9 @@ class BaseDatabaseFeatures:
     json_key_contains_list_matching_requires_list = False
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
+    # Does the backend implement support for JSON_ARRAY(... ABSENT ON NULL)
+    # and JSON_OBJECT(... ABSENT ON NULL)?
+    supports_json_absent_on_null = True
     # Does the backend support negative JSON array indexing?
     supports_json_negative_indexing = True
 

@@ -9,10 +9,18 @@ class JSONArray(Func):
     function = "JSON_ARRAY"
     output_field = JSONField()
 
+    def __init__(self, *expressions, absent_on_null=False):
+        self.absent_on_null = absent_on_null
+        super().__init__(*expressions)
+
     def as_sql(self, compiler, connection, **extra_context):
         if not connection.features.supports_json_field:
             raise NotSupportedError(
                 "JSONFields are not supported on this database backend."
+            )
+        if self.absent_on_null and not connection.features.supports_json_absent_on_null:
+            raise NotSupportedError(
+                "ABSENT ON NULL is not supported by this database backend."
             )
         return super().as_sql(compiler, connection, **extra_context)
 
@@ -21,16 +29,30 @@ class JSONArray(Func):
         # default. Adds the NULL ON NULL clause to keep NULL values in the
         # array, mapping them to JSON null values, which matches the behavior
         # of SQLite.
-        null_on_null = "NULL ON NULL" if len(self.get_source_expressions()) > 0 else ""
+        if not self.get_source_expressions():
+            on_null = ""
+        elif self.absent_on_null:
+            on_null = "ABSENT ON NULL"
+        else:
+            on_null = "NULL ON NULL"
 
         return self.as_sql(
             compiler,
             connection,
-            template=(
-                f"%(function)s(%(expressions)s {null_on_null} RETURNING {returning})"
-            ),
+            template=f"%(function)s(%(expressions)s {on_null} RETURNING {returning})",
             **extra_context,
         )
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        if self.absent_on_null:
+            # SQLite does not natively support ABSENT ON NULL. Use a custom defined
+            # function which strips null values.
+            extra_context.setdefault(
+                "template",
+                "django_json_strip_nulls(%(function)s(%(expressions)s))",
+            )
+
+        return super().as_sql(compiler, connection, **extra_context)
 
     def as_postgresql(self, compiler, connection, **extra_context):
         # Casting source expressions is only required using JSONB_BUILD_ARRAY
