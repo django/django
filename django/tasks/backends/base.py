@@ -3,8 +3,8 @@ from inspect import iscoroutinefunction
 
 from asgiref.sync import sync_to_async
 
-from django.core.checks import messages
 from django.conf import settings
+from django.core.checks import messages
 from django.db import connections
 from django.tasks import DEFAULT_QUEUE_NAME
 from django.tasks.exceptions import InvalidTaskError
