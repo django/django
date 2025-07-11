@@ -13,8 +13,10 @@ from django.core.validators import (
     DomainNameValidator,
     EmailValidator,
     FileExtensionValidator,
+    MaxFileSizeValidator,
     MaxLengthValidator,
     MaxValueValidator,
+    MinFileSizeValidator,
     MinLengthValidator,
     MinValueValidator,
     ProhibitNullCharactersValidator,
@@ -939,3 +941,167 @@ class TestValidatorEquality(TestCase):
             DomainNameValidator(message="custom error message"),
             DomainNameValidator(message="custom error message", code="custom_code"),
         )
+
+
+class TestMaxFileSizeValidator(SimpleTestCase):
+    class MaxFile:
+        def __init__(self, size, name="file.txt"):
+            self.size = size
+            self.name = name
+
+    def test_file_size_under_limit(self):
+        validator = MaxFileSizeValidator(1024)
+        file = self.MaxFile(1023)
+        validator(file)  # Should not raise
+
+    def test_file_size_exact_limit(self):
+        validator = MaxFileSizeValidator(1024)
+        file = self.MaxFile(1024)
+        validator(file)  # Should not raise
+
+    def test_file_size_over_limit(self):
+        validator = MaxFileSizeValidator(1024)
+        file = self.MaxFile(1025)
+        with self.assertRaises(ValidationError) as cm:
+            validator(file)
+        self.assertIn("File too large", str(cm.exception))
+
+    def test_custom_message(self):
+        validator = MaxFileSizeValidator(100, message="Custom error: %(max_size)s")
+        file = self.MaxFile(101)
+        with self.assertRaises(ValidationError) as cm:
+            validator(file)
+        self.assertIn("Custom error", str(cm.exception))
+
+    def test_equality(self):
+        v1 = MaxFileSizeValidator(100)
+        v2 = MaxFileSizeValidator(100)
+        v3 = MaxFileSizeValidator(200)
+        self.assertEqual(v1, v2)
+        self.assertNotEqual(v1, v3)
+
+    def test_missing_size_attribute(self):
+        class NoSize:
+            pass
+
+        validator = MaxFileSizeValidator(100)
+        file = NoSize()
+        with self.assertRaises(AttributeError):
+            validator(file)
+
+    def test_negative_file_size(self):
+        validator = MaxFileSizeValidator(100)
+        file = self.MaxFile(-1)
+        validator(file)  # Should not raise, as -1 < 100
+
+    def test_zero_file_size(self):
+        validator = MaxFileSizeValidator(100)
+        file = self.MaxFile(0)
+        validator(file)  # Should not raise
+
+    def test_non_integer_max_size(self):
+        validator = MaxFileSizeValidator(100.5)
+        file = self.MaxFile(101)
+        with self.assertRaises(ValidationError):
+            validator(file)
+
+    def test_file_size_one_byte_over(self):
+        validator = MaxFileSizeValidator(100)
+        file = self.MaxFile(101)
+        with self.assertRaises(ValidationError):
+            validator(file)
+
+    def test_file_size_one_byte_under(self):
+        validator = MaxFileSizeValidator(100)
+        file = self.MaxFile(99)
+        validator(file)  # Should not raise
+
+    def test_custom_code(self):
+        validator = MaxFileSizeValidator(100, code="custom_code")
+        file = self.MaxFile(101)
+        with self.assertRaises(ValidationError) as cm:
+            validator(file)
+        self.assertIn("custom_code", cm.exception.code)
+
+
+class TestMinFileSizeValidator(SimpleTestCase):
+    class MinFile:
+        def __init__(self, size, name="file.txt"):
+            self.size = size
+            self.name = name
+
+    def test_file_size_over_limit(self):
+        validator = MinFileSizeValidator(1024)
+        file = self.MinFile(1025)
+        validator(file)  # Should not raise
+
+    def test_file_size_exact_limit(self):
+        validator = MinFileSizeValidator(1024)
+        file = self.MinFile(1024)
+        validator(file)  # Should not raise
+
+    def test_file_size_under_limit(self):
+        validator = MinFileSizeValidator(1024)
+        file = self.MinFile(1023)
+        with self.assertRaises(ValidationError) as cm:
+            validator(file)
+        self.assertIn("File too small", str(cm.exception))
+
+    def test_custom_message(self):
+        validator = MinFileSizeValidator(100, message="Custom error: %(min_size)s")
+        file = self.MinFile(99)
+        with self.assertRaises(ValidationError) as cm:
+            validator(file)
+        self.assertIn("Custom error", str(cm.exception))
+
+    def test_equality(self):
+        v1 = MinFileSizeValidator(100)
+        v2 = MinFileSizeValidator(100)
+        v3 = MinFileSizeValidator(200)
+        self.assertEqual(v1, v2)
+        self.assertNotEqual(v1, v3)
+
+    def test_missing_size_attribute(self):
+        class NoSize:
+            pass
+
+        validator = MinFileSizeValidator(100)
+        file = NoSize()
+        with self.assertRaises(AttributeError):
+            validator(file)
+
+    def test_negative_file_size(self):
+        validator = MinFileSizeValidator(100)
+        file = self.MinFile(-1)
+        with self.assertRaises(ValidationError):
+            validator(file)
+
+    def test_zero_file_size(self):
+        validator = MinFileSizeValidator(100)
+        file = self.MinFile(0)
+        with self.assertRaises(ValidationError):
+            validator(file)
+
+    def test_non_integer_min_size(self):
+        validator = MinFileSizeValidator(100.5)
+        file = self.MinFile(100)
+        with self.assertRaises(ValidationError):
+            validator(file)
+
+    def test_file_size_one_byte_under(self):
+        validator = MinFileSizeValidator(100)
+        file = self.MinFile(99)
+        with self.assertRaises(ValidationError):
+            validator(file)
+
+    def test_file_size_one_byte_over(self):
+        validator = MinFileSizeValidator(100)
+        file = self.MinFile(101)
+        validator(file)  # Should not raise
+
+    def test_custom_code(self):
+        validator = MinFileSizeValidator(100, code="custom_code")
+        file = self.MinFile(99)
+        with self.assertRaises(ValidationError) as cm:
+            validator(file)
+        self.assertIn("custom_code", cm.exception.code)

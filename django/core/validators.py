@@ -675,3 +675,77 @@ class ProhibitNullCharactersValidator:
             and self.message == other.message
             and self.code == other.code
         )
+
+
+@deconstructible
+class MaxFileSizeValidator:
+    """
+    Validate that the file size does not exceed the given maximum (in bytes).
+    Args:
+        max_size (int): Maximum file size in bytes.
+    Raises:
+        ValidationError: If the file is too large.
+    """
+
+    message = _("File too large. Size should not exceed %(max_size)s.")
+    code = "max_file_size"
+
+    def __init__(self, max_size: int, message=None, code=None):
+        self.max_size = max_size
+        if message is not None:
+            self.message = message
+        if code is not None:
+            self.code = code
+
+    def __call__(self, value):
+        if value.size > self.max_size:
+            raise ValidationError(
+                self.message,
+                code=self.code,
+                params={"max_size": self.max_size, "value": value},
+            )
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, MaxFileSizeValidator)
+            and self.max_size == other.max_size
+            and self.message == other.message
+            and self.code == other.code
+        )
+
+
+@deconstructible
+class MinFileSizeValidator:
+    """
+    Validate that the file size is at least the given minimum (in bytes).
+    Args:
+        min_size (int): Minimum file size in bytes.
+    Raises:
+        ValidationError: If the file is too small.
+    """
+
+    message = _("File too small. Size should be at least %(min_size)s.")
+    code = "min_file_size"
+
+    def __init__(self, min_size: int, message=None, code=None):
+        self.min_size = min_size
+        if message is not None:
+            self.message = message
+        if code is not None:
+            self.code = code
+
+    def __call__(self, value):
+        if value.size < self.min_size:
+            raise ValidationError(
+                self.message,
+                code=self.code,
+                params={"min_size": self.min_size, "value": value},
+            )
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, MinFileSizeValidator)
+            and self.min_size == other.min_size
+            and self.message == other.message
+            and self.code == other.code
+        )

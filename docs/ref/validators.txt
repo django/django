@@ -347,6 +347,60 @@ to, or in lieu of custom ``field.clean()`` methods.
         type. Files can be renamed to have any extension no matter what data
         they contain.
 
+``MaxFileSizeValidator``
+----------------------
+
+.. class:: MaxFileSizeValidator(max_size, message=None, code=None)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of ``'max_file_size'`` if the size of ``value.size`` (where ``value`` is a :class:`~django.core.files.File` or file-like object) is greater than ``max_size`` (in bytes).
+
+    :param max_size: The maximum allowed file size, in bytes.
+    :param message: If not ``None``, overrides :attr:`.message`.
+    :param code: If not ``None``, overrides :attr:`code`.
+
+    .. attribute:: message
+
+        The error message used by :exc:`~django.core.exceptions.ValidationError` if validation fails. Defaults to ``"File too large. Size should not exceed %(max_size)s."``.
+
+    .. attribute:: code
+
+        The error code used by :exc:`~django.core.exceptions.ValidationError` if validation fails. Defaults to ``"max_file_size"``.
+
+    Example::
+
+        from django.core.validators import MaxFileSizeValidator
+        from django.db import models
+
+        class MyModel(models.Model):
+            file = models.FileField(validators=[MaxFileSizeValidator(1024*1024)])  # 1MB max
+
+``MinFileSizeValidator``
+----------------------
+
+.. class:: MinFileSizeValidator(min_size, message=None, code=None)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of ``'min_file_size'`` if the size of ``value.size`` (where ``value`` is a :class:`~django.core.files.File` or file-like object) is less than ``min_size`` (in bytes).
+
+    :param min_size: The minimum allowed file size, in bytes.
+    :param message: If not ``None``, overrides :attr:`.message`.
+    :param code: If not ``None``, overrides :attr:`code`.
+
+    .. attribute:: message
+
+        The error message used by :exc:`~django.core.exceptions.ValidationError` if validation fails. Defaults to ``"File too small. Size should be at least %(min_size)s."``.
+
+    .. attribute:: code
+
+        The error code used by :exc:`~django.core.exceptions.ValidationError` if validation fails. Defaults to ``"min_file_size"``.
+
+    Example::
+
+        from django.core.validators import MinFileSizeValidator
+        from django.db import models
+
+        class MyModel(models.Model):
+            file = models.FileField(validators=[MinFileSizeValidator(1024)])  # 1KB min
+
 ``validate_image_file_extension``
 ---------------------------------
 
