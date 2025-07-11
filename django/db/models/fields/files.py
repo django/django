@@ -323,7 +323,7 @@ class FileField(Field):
 
     def pre_save(self, model_instance, add):
         file = super().pre_save(model_instance, add)
-        if file.name is None and file._file is not None:
+        if not file.name and file._file is not None:
             exc = FieldError(
                 f"File for {self.name} must have "
                 "the name attribute specified to be saved."
