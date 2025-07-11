@@ -24,7 +24,7 @@ else:
     from django.conf import settings
     from django.core.exceptions import ImproperlyConfigured
     from django.db import connection, connections
-    from django.test import TestCase, TransactionTestCase
+    from django.test import TestCase, TransactionTestCase, AsyncTestCase
     from django.test.runner import get_max_test_processes, parallel_type
     from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
@@ -317,6 +317,7 @@ def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
 
     TransactionTestCase.available_apps = classproperty(no_available_apps)
     TestCase.available_apps = None
+    AsyncTestCase.available_apps = None
 
     # Set an environment variable that other code may consult to see if
     # Django's own test suite is running.
