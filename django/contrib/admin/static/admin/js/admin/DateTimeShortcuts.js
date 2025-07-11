@@ -441,7 +441,7 @@
                 }
             }
 
-            // Recalculate the clockbox position
+            // Recalculate the calendarbox position
             // is it left-to-right or right-to-left layout ?
             if (window.getComputedStyle(document.body).direction !== 'rtl') {
                 cal_box.style.left = findPosX(cal_link) + 17 + 'px';
@@ -455,14 +455,44 @@
 
             cal_box.style.display = 'block';
             
-            // Focus on the first focusable element in the calendar box
-            const firstFocusableElement = cal_box.querySelector('a[href], button, [tabindex]:not([tabindex="-1"])');
-            if (firstFocusableElement) {
-                firstFocusableElement.focus();
-            } else {
-                cal_box.focus();
+            // Try to focus on today's date, otherwise focus on first date cell
+            const today = new Date();
+            const todayDay = today.getDate();
+
+            // Find today's date cell in the calendar
+            const allDateCells = cal_box.querySelectorAll('td a');
+            let todaysDateCell = null;
+
+            for (const dateCell of allDateCells) {
+                const cellText = dateCell.textContent.trim();
+                if (cellText === todayDay.toString()) {
+                    // Make sure it's not from previous/next month
+                    const cellParent = dateCell.parentElement;
+                    if (!cellParent.classList.contains('other') && !cellParent.classList.contains('noday')) {
+                        todaysDateCell = dateCell;
+                        break;
+                    }
+                }
             }
-            
+
+            // Focus on today's date if found, otherwise focus on first available date
+            if (todaysDateCell) {
+                todaysDateCell.focus();
+            } else {
+                const firstDateCell = cal_box.querySelector('td a');
+                if (firstDateCell) {
+                    firstDateCell.focus();
+                } else {
+                    // Fallback to first focusable element
+                    const firstFocusableElement = cal_box.querySelector('a[href], button, [tabindex]:not([tabindex="-1"])');
+                    if (firstFocusableElement) {
+                        firstFocusableElement.focus();
+                    } else {
+                        cal_box.focus();
+                    }
+                }
+            }
+
             document.addEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
         },
         dismissCalendar: function(num) {
