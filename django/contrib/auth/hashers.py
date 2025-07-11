@@ -16,6 +16,7 @@ from django.utils.crypto import (
     get_random_string,
     pbkdf2,
 )
+from django.utils.encoding import force_bytes, smart_str
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -396,7 +397,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
         argon2 = self._load_library()
         params = self.params()
         data = argon2.low_level.hash_secret(
-            password.encode(),
+            force_bytes(password),
             salt.encode(),
             time_cost=params.time_cost,
             memory_cost=params.memory_cost,
@@ -499,7 +500,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
-        password = password.encode()
+        password = force_bytes(password)
         # Hash the password prior to using bcrypt to prevent password
         # truncation as described in #20138.
         if self.digest is not None:
@@ -585,7 +586,7 @@ class ScryptPasswordHasher(BasePasswordHasher):
         r = r or self.block_size
         p = p or self.parallelism
         hash_ = hashlib.scrypt(
-            password.encode(),
+            force_bytes(password),
             salt=salt.encode(),
             n=n,
             r=r,
@@ -655,7 +656,7 @@ class MD5PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
-        hash = hashlib.md5((salt + password).encode()).hexdigest()
+        hash = hashlib.md5((salt + smart_str(password)).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def decode(self, encoded):

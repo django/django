@@ -5,6 +5,7 @@ from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX,
     UNUSABLE_PASSWORD_SUFFIX_LENGTH,
+    Argon2PasswordHasher,
     BasePasswordHasher,
     BCryptPasswordHasher,
     BCryptSHA256PasswordHasher,
@@ -519,6 +520,74 @@ class TestUtilsHashPass(SimpleTestCase):
                 with self.subTest(hasher_class.__name__, salt=salt):
                     with self.assertRaisesMessage(ValueError, msg):
                         hasher.encode("password", salt)
+
+    def test_password_str(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            ScryptPasswordHasher,
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                encoded = hasher.encode("password", hasher.salt())
+                self.assertIs(hasher.verify(b"password", encoded), True)
+                self.assertIs(hasher.verify("password", encoded), True)
+
+    @skipUnless(argon2, "argon2-cffi not installed")
+    def test_password_str_argon2(self):
+        hasher = Argon2PasswordHasher()
+        encoded = hasher.encode("password", hasher.salt())
+        self.assertIs(hasher.verify(b"password", encoded), True)
+        self.assertIs(hasher.verify("password", encoded), True)
+
+    @skipUnless(bcrypt, "bcrypt not installed")
+    def test_password_str_bcrypt(self):
+        hasher_classes = [
+            BCryptPasswordHasher,
+            BCryptSHA256PasswordHasher,
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                encoded = hasher.encode("password", hasher.salt())
+                self.assertIs(hasher.verify(b"password", encoded), True)
+                self.assertIs(hasher.verify("password", encoded), True)
+
+    def test_password_bytes(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            ScryptPasswordHasher,
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                encoded = hasher.encode(b"password", hasher.salt())
+                self.assertIs(hasher.verify(b"password", encoded), True)
+                self.assertIs(hasher.verify("password", encoded), True)
+
+    @skipUnless(argon2, "argon2-cffi not installed")
+    def test_password_bytes_argon2(self):
+        hasher = Argon2PasswordHasher()
+        encoded = hasher.encode(b"password", hasher.salt())
+        self.assertIs(hasher.verify(b"password", encoded), True)
+        self.assertIs(hasher.verify("password", encoded), True)
+
+    @skipUnless(bcrypt, "bcrypt not installed")
+    def test_password_bytes_bcrypt(self):
+        hasher_classes = [
+            BCryptPasswordHasher,
+            BCryptSHA256PasswordHasher,
+        ]
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                encoded = hasher.encode(b"password", hasher.salt())
+                self.assertTrue(hasher.verify(b"password", encoded))
+                self.assertTrue(hasher.verify("password", encoded))
 
     def test_encode_password_required(self):
         hasher_classes = [
