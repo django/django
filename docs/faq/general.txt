@@ -218,3 +218,14 @@ If you need a publication date, use the year of release of the version you're
 referencing (e.g., 2013 for v1.5)
 
 .. _APA style: https://apastyle.apa.org/
+
+Where can I find more Django resources?
+=======================================
+
+The Steering Council maintains a collection of Django third-party packages,
+organizations and resources at
+https://www.djangoproject.com/community/ecosystem/.
+
+That page will be updated to contain links to various Django content such as
+podcasts, videos, conferences, blogs, books, and learning resources. It also
+features popular, robust, community-maintained packages.
