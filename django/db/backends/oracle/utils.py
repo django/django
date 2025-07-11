@@ -4,7 +4,7 @@ import decimal
 from .base import Database
 
 
-class InsertVar:
+class BoundVar:
     """
     A late-binding cursor variable that can be passed to Cursor.execute
     as a parameter, in order to receive the id of the row created by an
