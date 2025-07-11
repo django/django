@@ -19,6 +19,7 @@
         },
         dismissClockFunc: [],
         dismissCalendarFunc: [],
+        lastFocusedElement: null, // Store the last focused element before opening popup
         calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
         calendarDivName2: 'calendarin', // name of <div> that contains calendar
         calendarLinkName: 'calendarlink', // name of the link that is used to toggle
@@ -153,6 +154,7 @@
             clock_box.style.position = 'absolute';
             clock_box.className = 'clockbox module';
             clock_box.id = DateTimeShortcuts.clockDivName + num;
+            clock_box.tabIndex = -1; // Make focusable but not in tab order
             document.body.appendChild(clock_box);
             clock_box.addEventListener('click', function(e) { e.stopPropagation(); });
 
@@ -179,6 +181,36 @@
                 DateTimeShortcuts.dismissClock(num);
             });
 
+            // Handle tab navigation within the popup (after content is created)
+            clock_box.addEventListener('keydown', function(event) {
+                if (event.key === 'Tab') {
+                    // Get all focusable elements in the popup
+                    const focusableElements = clock_box.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+                    
+                    if (event.shiftKey) {
+                        // Shift+Tab: if focused on first element, close popup and return to trigger
+                        if (document.activeElement === firstElement) {
+                            event.preventDefault();
+                            DateTimeShortcuts.dismissClock(num);
+                            if (DateTimeShortcuts.lastFocusedElement) {
+                                DateTimeShortcuts.lastFocusedElement.focus();
+                            }
+                        }
+                    } else {
+                        // Tab: if focused on last element, close popup and continue to next field
+                        if (document.activeElement === lastElement) {
+                            event.preventDefault();
+                            DateTimeShortcuts.dismissClock(num);
+                            if (DateTimeShortcuts.lastFocusedElement) {
+                                DateTimeShortcuts.focusNextElement(DateTimeShortcuts.lastFocusedElement);
+                            }
+                        }
+                    }
+                }
+            });
+
             document.addEventListener('keyup', function(event) {
                 if (event.which === 27) {
                     // ESC key closes popup
@@ -190,6 +222,9 @@
         openClock: function(num) {
             const clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
             const clock_link = document.getElementById(DateTimeShortcuts.clockLinkName + num);
+
+            // Store the currently focused element before opening popup
+            DateTimeShortcuts.lastFocusedElement = clock_link;
 
             // Recalculate the clockbox position
             // is it left-to-right or right-to-left layout ?
@@ -205,6 +240,15 @@
 
             // Show the clock box
             clock_box.style.display = 'block';
+            
+            // Focus on the first focusable element in the clock box
+            const firstFocusableElement = clock_box.querySelector('a[href], button, [tabindex]:not([tabindex="-1"])');
+            if (firstFocusableElement) {
+                firstFocusableElement.focus();
+            } else {
+                clock_box.focus();
+            }
+            
             document.addEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
         },
         dismissClock: function(num) {
@@ -283,8 +327,39 @@
             cal_box.style.position = 'absolute';
             cal_box.className = 'calendarbox module';
             cal_box.id = DateTimeShortcuts.calendarDivName1 + num;
+            cal_box.tabIndex = -1; // Make focusable but not in tab order
             document.body.appendChild(cal_box);
             cal_box.addEventListener('click', function(e) { e.stopPropagation(); });
+
+            // Handle tab navigation within the popup
+            cal_box.addEventListener('keydown', function(event) {
+                if (event.key === 'Tab') {
+                    // Get all focusable elements in the popup
+                    const focusableElements = cal_box.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+                    
+                    if (event.shiftKey) {
+                        // Shift+Tab: if focused on first element, close popup and return to trigger
+                        if (document.activeElement === firstElement) {
+                            event.preventDefault();
+                            DateTimeShortcuts.dismissCalendar(num);
+                            if (DateTimeShortcuts.lastFocusedElement) {
+                                DateTimeShortcuts.lastFocusedElement.focus();
+                            }
+                        }
+                    } else {
+                        // Tab: if focused on last element, close popup and continue to next field
+                        if (document.activeElement === lastElement) {
+                            event.preventDefault();
+                            DateTimeShortcuts.dismissCalendar(num);
+                            if (DateTimeShortcuts.lastFocusedElement) {
+                                DateTimeShortcuts.focusNextElement(DateTimeShortcuts.lastFocusedElement);
+                            }
+                        }
+                    }
+                }
+            });
 
             // next-prev links
             const cal_nav = quickElement('div', cal_box);
@@ -349,7 +424,10 @@
             const cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
             const cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName + num);
             const inp = DateTimeShortcuts.calendarInputs[num];
-
+            
+            // Store the currently focused element before opening popup
+            DateTimeShortcuts.lastFocusedElement = cal_link;
+            
             // Determine if the current value in the input has a valid date.
             // If so, draw the calendar with that date's year and month.
             if (inp.value) {
@@ -363,7 +441,7 @@
                 }
             }
 
-            // Recalculate the clockbox position
+            // Recalculate the calendarbox position
             // is it left-to-right or right-to-left layout ?
             if (window.getComputedStyle(document.body).direction !== 'rtl') {
                 cal_box.style.left = findPosX(cal_link) + 17 + 'px';
@@ -376,11 +454,87 @@
             cal_box.style.top = Math.max(0, findPosY(cal_link) - 75) + 'px';
 
             cal_box.style.display = 'block';
+            
+            // Try to focus on today's date, otherwise focus on first date cell
+            const today = new Date();
+            const todayDay = today.getDate();
+
+            // Find today's date cell in the calendar
+            const allDateCells = cal_box.querySelectorAll('td a');
+            let todaysDateCell = null;
+
+            for (const dateCell of allDateCells) {
+                const cellText = dateCell.textContent.trim();
+                if (cellText === todayDay.toString()) {
+                    // Make sure it's not from previous/next month
+                    const cellParent = dateCell.parentElement;
+                    if (!cellParent.classList.contains('other') && !cellParent.classList.contains('noday')) {
+                        todaysDateCell = dateCell;
+                        break;
+                    }
+                }
+            }
+
+            // Focus on today's date if found, otherwise focus on first available date
+            if (todaysDateCell) {
+                todaysDateCell.focus();
+            } else {
+                const firstDateCell = cal_box.querySelector('td a');
+                if (firstDateCell) {
+                    firstDateCell.focus();
+                } else {
+                    // Fallback to first focusable element
+                    const firstFocusableElement = cal_box.querySelector('a[href], button, [tabindex]:not([tabindex="-1"])');
+                    if (firstFocusableElement) {
+                        firstFocusableElement.focus();
+                    } else {
+                        cal_box.focus();
+                    }
+                }
+            }
+
             document.addEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
         },
         dismissCalendar: function(num) {
             document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
             document.removeEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
+        },
+        // Helper function to focus the next element in the tab order
+        focusNextElement: function(currentElement) {
+            // Get all tabbable elements in the document, excluding hidden popup elements
+            const allTabbableElements = document.querySelectorAll(
+                'input:not([disabled]):not([tabindex="-1"]), ' +
+                'button:not([disabled]):not([tabindex="-1"]), ' +
+                'select:not([disabled]):not([tabindex="-1"]), ' +
+                'textarea:not([disabled]):not([tabindex="-1"]), ' +
+                'a[href]:not([tabindex="-1"]), ' +
+                '[tabindex]:not([tabindex="-1"])'
+            );
+            
+            // Filter out elements that are inside hidden popup containers or are not visible
+            const visibleTabbableElements = Array.from(allTabbableElements).filter(element => {
+                // Check if element is inside a popup
+                const popupParent = element.closest('.calendarbox, .clockbox');
+                if (popupParent && popupParent.style.display === 'none') {
+                    return true; // Include if popup is hidden
+                } else if (popupParent && popupParent.style.display !== 'none') {
+                    return false; // Exclude if popup is visible
+                }
+                
+                // Check if element is visible
+                const style = window.getComputedStyle(element);
+                return style.display !== 'none' && style.visibility !== 'hidden';
+            });
+            
+            const currentIndex = visibleTabbableElements.indexOf(currentElement);
+            
+            // Focus the next element in tab order
+            if (currentIndex !== -1 && currentIndex + 1 < visibleTabbableElements.length) {
+                visibleTabbableElements[currentIndex + 1].focus();
+            } else if (visibleTabbableElements.length > 0) {
+                // If we're at the end, wrap to the beginning
+                visibleTabbableElements[0].focus();
+            }
         },
         drawPrev: function(num) {
             DateTimeShortcuts.calendars[num].drawPreviousMonth();
