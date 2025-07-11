@@ -684,6 +684,10 @@ class Model(AltersData, metaclass=ModelBase):
 
     pk = property(_get_pk_val, _set_pk_val)
 
+    @property
+    def pk_str(self):
+        return self._meta.pk.value_to_string(self)
+
     def _is_pk_set(self, meta=None):
         pk_val = self._get_pk_val(meta)
         return not (

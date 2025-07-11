@@ -366,7 +366,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                 "admin:view_on_site",
                 kwargs={
                     "content_type_id": get_content_type_for_model(obj).pk,
-                    "object_id": obj.pk,
+                    "object_id": obj.pk_str,
                 },
                 current_app=self.admin_site.name,
             )
@@ -990,7 +990,7 @@ class ModelAdmin(BaseModelAdmin):
             ),
         }
         checkbox = forms.CheckboxInput(attrs, lambda value: False)
-        return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
+        return checkbox.render(helpers.ACTION_CHECKBOX_NAME, obj.pk_str)
 
     @staticmethod
     def _get_action_description(func, name):
@@ -1376,7 +1376,7 @@ class ModelAdmin(BaseModelAdmin):
         preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
         obj_url = reverse(
             "admin:%s_%s_change" % (opts.app_label, opts.model_name),
-            args=(quote(obj.pk),),
+            args=(quote(obj.pk_str),),
             current_app=self.admin_site.name,
         )
         # Add a link to the object's change form if the user can edit the obj.
