@@ -371,8 +371,9 @@ to, or in lieu of custom ``field.clean()`` methods.
         from django.core.validators import MaxFileSizeValidator
         from django.db import models
 
+
         class MyModel(models.Model):
-            file = models.FileField(validators=[MaxFileSizeValidator(1024*1024)])  # 1MB max
+            file = models.FileField(validators=[MaxFileSizeValidator(1024 * 1024)])  # 1MB max
 
 ``MinFileSizeValidator``
 ------------------------
@@ -397,6 +398,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         from django.core.validators import MinFileSizeValidator
         from django.db import models
+
 
         class MyModel(models.Model):
             file = models.FileField(validators=[MinFileSizeValidator(1024)])  # 1KB min
