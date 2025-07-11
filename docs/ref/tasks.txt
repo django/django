@@ -82,11 +82,9 @@ Attributes of ``Task`` cannot be modified.
 
 .. attribute:: Task.name
 
-    An identifier for a ``Task``. Potentially useful for debugging.
+    The name of the function decorated with :func:`task`. Potentially useful for debugging.
 
     A Task's name is not necessarily unique.
-
-    By default, this is is the name of the function decorated with :func:`task`.
 
 .. method:: Task.using(**kwargs)
 
