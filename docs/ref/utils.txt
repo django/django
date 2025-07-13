@@ -746,7 +746,7 @@ escaping HTML.
     is anything contained within ``<>``.
 
     Absolutely NO guarantee is provided about the resulting string being
-    HTML safe. So NEVER mark safe the result of a ``strip_tag`` call without
+    HTML safe. So NEVER mark safe the result of a ``strip_tags`` call without
     escaping it first, for example with :func:`~django.utils.html.escape`.
 
     For example::
