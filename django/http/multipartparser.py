@@ -55,7 +55,7 @@ class MultiPartParser:
 
     boundary_re = _lazy_re_compile(r"[ -~]{0,200}[!-~]")
 
-    def __init__(self, META, input_data, upload_handlers, encoding=None):
+    def __init__(self, META, input_data, upload_handlers, encoding=None, parsers=None):
         """
         Initialize the MultiPartParser object.
 
@@ -113,6 +113,7 @@ class MultiPartParser:
         self._encoding = encoding or settings.DEFAULT_CHARSET
         self._content_length = content_length
         self._upload_handlers = upload_handlers
+        self._parsers = parsers
 
     def parse(self):
         # Call the actual parse routine and close all open files in case of
@@ -237,21 +238,38 @@ class MultiPartParser:
                         data = field_stream.read(size=read_size)
                         num_bytes_read += len(data)
 
-                    # Add two here to make the check consistent with the
-                    # x-www-form-urlencoded check that includes '&='.
-                    num_bytes_read += len(field_name) + 2
-                    if (
-                        settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
-                        and num_bytes_read > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
-                    ):
-                        raise RequestDataTooBig(
-                            "Request body exceeded "
-                            "settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
+                    try:
+                        content_type = meta_data["content-type"][0].strip()
+                    except KeyError:
+                        content_type = None
+                    selected_parser = None
+                    if content_type:
+                        for parser in self._parsers:
+                            if parser.can_handle(content_type):
+                                selected_parser = parser
+                                break
+                    if selected_parser:
+                        # TODO maybe .parse() shouldn't return an empty MultiValueDict
+                        # for files if it's not needed
+                        self._post.appendlist(
+                            field_name, selected_parser.parse(data)[0]
                         )
+                    else:
+                        # Add two here to make the check consistent with the
+                        # x-www-form-urlencoded check that includes '&='.
+                        num_bytes_read += len(field_name) + 2
+                        if (
+                            settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
+                            and num_bytes_read > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
+                        ):
+                            raise RequestDataTooBig(
+                                "Request body exceeded "
+                                "settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
+                            )
 
-                    self._post.appendlist(
-                        field_name, force_str(data, encoding, errors="replace")
-                    )
+                        self._post.appendlist(
+                            field_name, force_str(data, encoding, errors="replace")
+                        )
                 elif item_type == FILE:
                     # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FILES.
                     num_files += 1
