@@ -55,7 +55,7 @@ class GISLookup(Lookup):
 
     def get_db_prep_lookup(self, value, connection):
         # get_db_prep_lookup is called by process_rhs from super class
-        return ("%s", [connection.ops.Adapter(value)])
+        return ("%s", (connection.ops.Adapter(value),))
 
     def process_rhs(self, compiler, connection):
         if isinstance(self.rhs, Query):
@@ -284,7 +284,7 @@ class RelateLookup(GISLookup):
         elif not isinstance(pattern, str) or not self.pattern_regex.match(pattern):
             raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
         sql, params = super().process_rhs(compiler, connection)
-        return sql, [*params, pattern]
+        return sql, (*params, pattern)
 
 
 @BaseSpatialField.register_lookup
@@ -352,7 +352,7 @@ class DWithinLookup(DistanceLookupBase):
         dist_sql, dist_params = self.process_distance(compiler, connection)
         self.template_params["value"] = dist_sql
         rhs_sql, params = super().process_rhs(compiler, connection)
-        return rhs_sql, params + dist_params
+        return rhs_sql, (*params, *dist_params)
 
 
 class DistanceLookupFromFunction(DistanceLookupBase):
@@ -367,7 +367,7 @@ class DistanceLookupFromFunction(DistanceLookupBase):
         dist_sql, dist_params = self.process_distance(compiler, connection)
         return (
             "%(func)s %(op)s %(dist)s" % {"func": sql, "op": self.op, "dist": dist_sql},
-            params + dist_params,
+            (*params, *dist_params),
         )
 
 
