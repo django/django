@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 
 from django.core.exceptions import SuspiciousOperation
@@ -117,6 +118,21 @@ class TestUtilsHtml(SimpleTestCase):
                 self.check_output(linebreaks, lazystr(value), output)
 
     def test_strip_tags(self):
+        # Python fixed a quadratic-time issue in HTMLParser in 3.13.6, 3.12.12,
+        # 3.11.14, 3.10.19, and 3.9.24. The fix slightly changes HTMLParser's
+        # output, so tests for particularly malformed input must handle both
+        # old and new results. The check below is temporary until all supported
+        # Python versions and CI workers include the fix. See:
+        # https://github.com/python/cpython/commit/6eb6c5db
+        min_fixed = {
+            (3, 14): (3, 14),
+            (3, 13): (3, 13, 6),
+            (3, 12): (3, 12, 12),
+            (3, 11): (3, 11, 14),
+            (3, 10): (3, 10, 19),
+            (3, 9): (3, 9, 24),
+        }
+        htmlparser_fixed = sys.version_info >= min_fixed[sys.version_info[:2]]
         items = (
             (
                 "<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>",
@@ -144,10 +160,16 @@ class TestUtilsHtml(SimpleTestCase):
             ("&gotcha&#;<>", "&gotcha&#;<>"),
             ("<sc<!-- -->ript>test<<!-- -->/script>", "ript>test"),
             ("<script>alert()</script>&h", "alert()h"),
-            ("><!" + ("&" * 16000) + "D", "><!" + ("&" * 16000) + "D"),
+            (
+                "><!" + ("&" * 16000) + "D",
+                ">" if htmlparser_fixed else "><!" + ("&" * 16000) + "D",
+            ),
             ("X<<<<br>br>br>br>X", "XX"),
             ("<" * 50 + "a>" * 50, ""),
-            (">" + "<a" * 500 + "a", ">" + "<a" * 500 + "a"),
+            (
+                ">" + "<a" * 500 + "a",
+                ">" if htmlparser_fixed else ">" + "<a" * 500 + "a",
+            ),
             ("<a" * 49 + "a" * 951, "<a" * 49 + "a" * 951),
             ("<" + "a" * 1_002, "<" + "a" * 1_002),
         )
