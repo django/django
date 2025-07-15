@@ -869,7 +869,7 @@ Usage example:
     >>> author.json_array
     ['margaret smith', 'msmith', 50, null]
 
-If you want to omit null values, you can do so by passing ``absent_on_null=True``:
+Set the ``absent_on_null`` parameter to ``True`` to omit null values.
 
 .. versionadded:: 6.0
 
