@@ -51,7 +51,7 @@ class JSONArrayConcatTests(TestCase):
 
 
 @skipIfDBFeature("has_json_object_function")
-class JSONArrayConcaNotSupportedTests(TestCase):
+class JSONArrayConcatNotSupportedTests(TestCase):
     def test_not_supported(self):
         msg = "Concatenating JSON arrays is not supported on this database backend."
         with self.assertRaisesMessage(NotSupportedError, msg):
