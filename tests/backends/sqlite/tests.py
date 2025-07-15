@@ -1,5 +1,6 @@
 import os
 import re
+import sqlite3
 import tempfile
 import threading
 import unittest
@@ -215,15 +216,28 @@ class LastExecutedQueryTest(TestCase):
         substituted = "SELECT '\"''\\'"
         self.assertEqual(connection.queries[-1]["sql"], substituted)
 
-    def test_large_number_of_parameters(self):
-        # If SQLITE_MAX_VARIABLE_NUMBER (default = 999) has been changed to be
-        # greater than SQLITE_MAX_COLUMN (default = 2000), last_executed_query
-        # can hit the SQLITE_MAX_COLUMN limit (#26063).
-        with connection.cursor() as cursor:
-            sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
-            params = list(range(2001))
-            # This should not raise an exception.
-            cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
+    def test_parameter_count_exceeds_variable_or_column_limit(self):
+        sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 1001)
+        params = list(range(1001))
+        for label, limit, current_limit in [
+            (
+                "variable",
+                sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER,
+                connection.features.max_query_params,
+            ),
+            (
+                "column",
+                sqlite3.SQLITE_LIMIT_COLUMN,
+                connection.connection.getlimit(sqlite3.SQLITE_LIMIT_COLUMN),
+            ),
+        ]:
+            with self.subTest(limit=label):
+                connection.connection.setlimit(limit, 1000)
+                self.addCleanup(connection.connection.setlimit, limit, current_limit)
+                with connection.cursor() as cursor:
+                    # This should not raise an exception.
+                    cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
+                connection.connection.setlimit(limit, current_limit)
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
