@@ -1751,13 +1751,13 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             "body\n",
             "from@example.com",
             ["to@example.com"],
-            ["bcc@example.com"],
-            connection,
-            [EmailAttachment("file.txt", "attachment\n", "text/plain")],
-            {"X-Header": "custom header"},
-            ["cc@example.com"],
-            ["reply-to@example.com"],
-            # (New options can be added below here, ideally as keyword-only args.)
+            # (New options can be added below here as keyword-only args.)
+            bcc=["bcc@example.com"],
+            connection=connection,
+            attachments=[EmailAttachment("file.txt", "attachment\n", "text/plain")],
+            headers={"X-Header": "custom header"},
+            cc=["cc@example.com"],
+            reply_to=["reply-to@example.com"],
         )
 
         message = email.message()
@@ -1791,12 +1791,14 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             "original body\n",
             "original-from@example.com",
             ["original-to@example.com"],
-            ["original-bcc@example.com"],
-            original_connection,
-            [EmailAttachment("original.txt", "original attachment\n", "text/plain")],
-            {"X-Header": "original header"},
-            ["original-cc@example.com"],
-            ["original-reply-to@example.com"],
+            bcc=["original-bcc@example.com"],
+            connection=original_connection,
+            attachments=[
+                EmailAttachment("original.txt", "original attachment\n", "text/plain")
+            ],
+            headers={"X-Header": "original header"},
+            cc=["original-cc@example.com"],
+            reply_to=["original-reply-to@example.com"],
         )
         email.subject = "new subject"
         email.body = "new body\n"
@@ -1835,6 +1837,123 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         )
         self.assertIs(email.get_connection(), new_connection)
         self.assertNotIn("original", message.as_string())
+
+
+# RemovedInDjango70Warning.
+class MailDeprecatedPositionalArgsTests(SimpleTestCase):
+
+    def assertDeprecatedIn70(self, params, name):
+        return self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            f"Passing positional argument(s) {params} to {name}() is deprecated.",
+        )
+
+    def test_get_connection(self):
+        with self.assertDeprecatedIn70("'fail_silently'", "get_connection"):
+            mail.get_connection(
+                "django.core.mail.backends.dummy.EmailBackend",
+                # Deprecated positional arg:
+                True,
+            )
+
+    def test_send_mail(self):
+        with self.assertDeprecatedIn70(
+            "'fail_silently', 'auth_user', 'auth_password', 'connection', "
+            "'html_message'",
+            "send_mail",
+        ):
+            send_mail(
+                "subject",
+                "message",
+                "from@example.com",
+                ["to@example.com"],
+                # Deprecated positional args:
+                True,
+                "username",
+                "password",
+                mail.get_connection(),
+                "html message",
+            )
+
+    def test_send_mass_mail(self):
+        with self.assertDeprecatedIn70(
+            "'fail_silently', 'auth_user', 'auth_password', 'connection'",
+            "send_mass_mail",
+        ):
+            send_mass_mail(
+                [],
+                # Deprecated positional args:
+                True,
+                "username",
+                "password",
+                mail.get_connection(),
+            )
+
+    def test_mail_admins(self):
+        with self.assertDeprecatedIn70(
+            "'fail_silently', 'connection', 'html_message'", "mail_admins"
+        ):
+            mail_admins(
+                "subject",
+                "message",
+                # Deprecated positional args:
+                True,
+                mail.get_connection(),
+                "html message",
+            )
+
+    def test_mail_managers(self):
+        with self.assertDeprecatedIn70(
+            "'fail_silently', 'connection', 'html_message'", "mail_managers"
+        ):
+            mail_managers(
+                "subject",
+                "message",
+                # Deprecated positional args:
+                True,
+                mail.get_connection(),
+                "html message",
+            )
+
+    def test_email_message_init(self):
+        with self.assertDeprecatedIn70(
+            "'bcc', 'connection', 'attachments', 'headers', 'cc', 'reply_to'",
+            "EmailMessage",
+        ):
+            EmailMessage(
+                "subject",
+                "body\n",
+                "from@example.com",
+                ["to@example.com"],
+                # Deprecated positional args:
+                ["bcc@example.com"],
+                mail.get_connection(),
+                [EmailAttachment("file.txt", "attachment\n", "text/plain")],
+                {"X-Header": "custom header"},
+                ["cc@example.com"],
+                ["reply-to@example.com"],
+            )
+
+    def test_email_multi_alternatives_init(self):
+        with self.assertDeprecatedIn70(
+            "'bcc', 'connection', 'attachments', 'headers', 'alternatives', 'cc', "
+            "'reply_to'",
+            "EmailMultiAlternatives",
+        ):
+            EmailMultiAlternatives(
+                "subject",
+                "body\n",
+                "from@example.com",
+                ["to@example.com"],
+                # Deprecated positional args:
+                ["bcc@example.com"],
+                mail.get_connection(),
+                [EmailAttachment("file.txt", "attachment\n", "text/plain")],
+                {"X-Header": "custom header"},
+                [EmailAlternative("html body", "text/html")],
+                ["cc@example.com"],
+                ["reply-to@example.com"],
+            )
 
 
 @requires_tz_support

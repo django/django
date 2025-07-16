@@ -38,6 +38,9 @@ details on these changes.
   argument of ``django.core.paginator.Paginator`` and
   ``django.core.paginator.AsyncPaginator`` will no longer be allowed.
 
+* The :mod:`django.core.mail` APIs will no longer accept certain parameters as
+  positional arguments. These must be passed as keyword arguments instead.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
