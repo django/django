@@ -1065,14 +1065,15 @@ Mails the email addresses specified in :setting:`ADMINS` using
 
 Starts the Python interactive interpreter.
 
-All models from installed apps are automatically imported into the shell
-environment. Models from apps listed earlier in :setting:`INSTALLED_APPS` take
-precedence. For a ``--verbosity`` of 2 or higher, the automatically imported
-objects will be listed. To disable automatic importing entirely, use the
-``--no-imports`` flag.
+All models from installed apps are automatically imported into the shell environment.
+When multiple models share the same name, the one from the app listed earlier in
+:setting:`INSTALLED_APPS` takes precedence. See
+:ref:`handling-model-name-collisions` for details.
 
-See the guide on :ref:`customizing this behavior
-<customizing-shell-auto-imports>` to add or remove automatic imports.
+If ``--verbosity`` is ``2`` or higher, the imported objects will be listed.
+To disable automatic importing, use the :option:`--no-imports <shell --no-imports>` flag.
+
+See :ref:`customizing-shell-auto-imports` for guidance on adding or removing automatic imports.
 
 .. versionchanged:: 5.2
 
