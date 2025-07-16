@@ -404,6 +404,10 @@ class SimpleTestCase(unittest.TestCase):
         def enterClassContext(cls, cm):
             return _enter_context(cm, cls.addClassCleanup)
 
+        # Backport of unittest.TestCase.enterContext() from Python 3.11.
+        def enterContext(self, cm):
+            return _enter_context(cm, self.addCleanup)
+
     def settings(self, **kwargs):
         """
         A context manager that temporarily sets a setting and reverts to the
