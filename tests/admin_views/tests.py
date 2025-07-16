@@ -6204,6 +6204,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         user = User.objects.create_user(username="new", password="newuser")
         url = self.live_server_url + reverse("admin:auth_user_change", args=[user.id])
         self.selenium.get(url)
+        self.trigger_resize()
 
         # Scroll to the User permissions section.
         user_permissions = self.selenium.find_element(
@@ -6243,9 +6244,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             ).perform()
 
         # Move focus to other element.
-        self.selenium.find_element(
-            By.CSS_SELECTOR, "#id_user_permissions_selected_input"
-        ).click()
+        body = self.selenium.find_element(By.TAG_NAME, "body")
+        body.send_keys(Keys.TAB)
         self.take_screenshot("selectbox-chosen-perms-some-selected")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])

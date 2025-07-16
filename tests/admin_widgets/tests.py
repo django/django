@@ -1541,6 +1541,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             )
 
             self.wait_page_ready()
+            self.trigger_resize()
             self.execute_basic_operations("vertical", "students")
             self.execute_basic_operations("horizontal", "alumni")
 
