@@ -413,18 +413,18 @@
                             const daysPerWeek = 7;
                             
                             switch (event.key) {
-                                case 'ArrowRight':
-                                    nextIndex = (currentIndex + 1) % dateLinks.length;
-                                    break;
-                                case 'ArrowLeft':
-                                    nextIndex = (currentIndex - 1 + dateLinks.length) % dateLinks.length;
-                                    break;
-                                case 'ArrowDown':
-                                    nextIndex = (currentIndex + daysPerWeek) % dateLinks.length;
-                                    break;
-                                case 'ArrowUp':
-                                    nextIndex = (currentIndex - daysPerWeek + dateLinks.length) % dateLinks.length;
-                                    break;
+                            case 'ArrowRight':
+                                nextIndex = (currentIndex + 1) % dateLinks.length;
+                                break;
+                            case 'ArrowLeft':
+                                nextIndex = (currentIndex - 1 + dateLinks.length) % dateLinks.length;
+                                break;
+                            case 'ArrowDown':
+                                nextIndex = (currentIndex + daysPerWeek) % dateLinks.length;
+                                break;
+                            case 'ArrowUp':
+                                nextIndex = (currentIndex - daysPerWeek + dateLinks.length) % dateLinks.length;
+                                break;
                             }
                             
                             if (nextIndex !== undefined && dateLinks[nextIndex]) {
@@ -530,16 +530,12 @@
             // If so, draw the calendar with that date's year and month.
             if (inp.value) {
                 const format = get_format('DATE_INPUT_FORMATS')[0];
-                try {
-                    const selected = inp.value.strptime(format);
-                    const year = selected.getUTCFullYear();
-                    const month = selected.getUTCMonth() + 1;
-                    const re = /\d{4}/;
-                    if (re.test(year.toString()) && month >= 1 && month <= 12) {
-                        DateTimeShortcuts.calendars[num].drawDate(month, year, selected);
-                    }
-                } catch (e) {
-                    // Invalid date format, continue to fallback logic
+                const selected = inp.value.strptime(format);
+                const year = selected.getUTCFullYear();
+                const month = selected.getUTCMonth() + 1;
+                const re = /\d{4}/;
+                if (re.test(year.toString()) && month >= 1 && month <= 12) {
+                    DateTimeShortcuts.calendars[num].drawDate(month, year, selected);
                 }
             }
 
@@ -566,24 +562,20 @@
             // Check if input has a valid date and try to focus on it
             if (inp.value) {
                 const format = get_format('DATE_INPUT_FORMATS')[0];
-                try {
-                    const selected = inp.value.strptime(format);
-                    const selectedDay = selected.getUTCDate();
-                    
-                    // Find the selected date in the calendar
-                    const allDateCells = cal_box.querySelectorAll('td a');
-                    for (const dateCell of allDateCells) {
-                        const cellText = dateCell.textContent.trim();
-                        if (cellText === selectedDay.toString()) {
-                            const cellParent = dateCell.parentElement;
-                            if (!cellParent.classList.contains('other') && !cellParent.classList.contains('noday')) {
-                                focusTarget = dateCell;
-                                break;
-                            }
+                const selected = inp.value.strptime(format);
+                const selectedDay = selected.getUTCDate();
+                
+                // Find the selected date in the calendar
+                const allDateCells = cal_box.querySelectorAll('td a');
+                for (const dateCell of allDateCells) {
+                    const cellText = dateCell.textContent.trim();
+                    if (cellText === selectedDay.toString()) {
+                        const cellParent = dateCell.parentElement;
+                        if (!cellParent.classList.contains('other') && !cellParent.classList.contains('noday')) {
+                            focusTarget = dateCell;
+                            break;
                         }
                     }
-                } catch (e) {
-                    // Invalid date format, continue to fallback logic
                 }
             }
             
