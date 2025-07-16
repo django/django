@@ -19,9 +19,7 @@ jobs:
         id: vars
         run: |
           BASE="${{ github.event.pull_request.base.ref }}"
-          HEAD="${{ github.event.pull_request.head.ref }}"
           echo "BASE=$BASE" >> $GITHUB_ENV
-          echo "HEAD=$HEAD" >> $GITHUB_ENV
           VERSION="${BASE#stable/}"
           echo "prefix=[$VERSION]" >> $GITHUB_OUTPUT
 
@@ -35,15 +33,15 @@ jobs:
           fi
           echo "✅ PR title has the required prefix."
 
-      - name: Fetch base and head branches
+      - name: Fetch relevant branches
         run: |
-          git fetch origin $BASE
-          git fetch origin $HEAD
+          git fetch origin $BASE:base
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr
 
       - name: Check commit messages prefix
         run: |
           PREFIX="${{ steps.vars.outputs.prefix }}"
-          COMMITS=$(git rev-list origin/${BASE}..origin/${HEAD})
+          COMMITS=$(git rev-list base..pr)
           echo "Checking commit messages for required prefix: $PREFIX"
           FAIL=0
           for SHA in $COMMITS; do
