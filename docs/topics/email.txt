@@ -582,7 +582,7 @@ instance of the email backend that you can use.
 
 .. currentmodule:: django.core.mail
 
-.. function:: get_connection(backend=None, fail_silently=False, *args, **kwargs)
+.. function:: get_connection(backend=None, fail_silently=False, **kwargs)
 
 By default, a call to ``get_connection()`` will return an instance of the
 email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
@@ -592,7 +592,7 @@ The ``fail_silently`` argument controls how the backend should handle errors.
 If ``fail_silently`` is True, exceptions during the email sending process
 will be silently ignored.
 
-All other arguments are passed directly to the constructor of the
+All other keyword arguments are passed directly to the constructor of the
 email backend.
 
 Django ships with several email sending backends. With the exception of the
