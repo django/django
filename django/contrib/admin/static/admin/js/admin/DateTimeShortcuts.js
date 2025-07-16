@@ -117,7 +117,6 @@
             const clock_link = document.createElement('a');
             clock_link.href = '#';
             clock_link.id = DateTimeShortcuts.clockLinkName + num;
-            clock_link.setAttribute('aria-label', gettext('Choose a Time'));
             clock_link.setAttribute('title', gettext('Choose a Time'));
             clock_link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -128,8 +127,7 @@
 
             quickElement(
                 'span', clock_link, '',
-                'class', 'clock-icon',
-                'aria-hidden', 'true'
+                'class', 'clock-icon'
             );
             shortcuts_span.appendChild(document.createTextNode('\u00A0'));
             shortcuts_span.appendChild(now_link);
@@ -157,25 +155,18 @@
             clock_box.className = 'clockbox module';
             clock_box.id = DateTimeShortcuts.clockDivName + num;
             clock_box.tabIndex = -1; // Make focusable but not in tab order
-            // Add ARIA attributes for better screen reader support
-            clock_box.setAttribute('role', 'dialog');
-            clock_box.setAttribute('aria-label', gettext('Choose a time'));
-            clock_box.setAttribute('aria-modal', 'true');
             document.body.appendChild(clock_box);
             clock_box.addEventListener('click', function(e) { e.stopPropagation(); });
 
             quickElement('h2', clock_box, gettext('Choose a time'));
             const time_list = quickElement('ul', clock_box);
             time_list.className = 'timelist';
-            time_list.setAttribute('role', 'list');
-            time_list.setAttribute('aria-label', gettext('Time options'));
             // The list of choices can be overridden in JavaScript like this:
             // DateTimeShortcuts.clockHours.name = [['3 a.m.', 3]];
             // where name is the name attribute of the <input>.
             const name = typeof DateTimeShortcuts.clockHours[inp.name] === 'undefined' ? 'default_' : inp.name;
             DateTimeShortcuts.clockHours[name].forEach(function(element) {
                 const list_item = quickElement('li', time_list);
-                list_item.setAttribute('role', 'listitem');
                 const time_link = quickElement('a', list_item, gettext(element[0]), 'role', 'button', 'href', '#');
                 time_link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -189,51 +180,6 @@
             cancel_link.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.dismissClock(num);
-            });
-
-            // Handle tab navigation within the popup (after content is created)
-            clock_box.addEventListener('keydown', function(event) {
-                if (event.key === 'Tab') {
-                    // Get all focusable elements in the popup
-                    const focusableElements = clock_box.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
-                    const firstElement = focusableElements[0];
-                    const lastElement = focusableElements[focusableElements.length - 1];
-                    
-                    if (event.shiftKey) {
-                        // Shift+Tab: if focused on first element, close popup and return to trigger
-                        if (document.activeElement === firstElement) {
-                            event.preventDefault();
-                            DateTimeShortcuts.dismissClock(num);
-                            if (DateTimeShortcuts.lastFocusedElement) {
-                                DateTimeShortcuts.lastFocusedElement.focus();
-                            }
-                        }
-                    } else {
-                        // Tab: if focused on last element, close popup and continue to next field
-                        if (document.activeElement === lastElement) {
-                            event.preventDefault();
-                            DateTimeShortcuts.dismissClock(num);
-                            if (DateTimeShortcuts.lastFocusedElement) {
-                                DateTimeShortcuts.focusNextElement(DateTimeShortcuts.lastFocusedElement);
-                            }
-                        }
-                    }
-                } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                    // Handle arrow key navigation within the time list
-                    event.preventDefault();
-                    const focusableElements = clock_box.querySelectorAll('ul.timelist a, .calendar-cancel a');
-                    const currentIndex = Array.from(focusableElements).indexOf(document.activeElement);
-                    
-                    if (currentIndex !== -1) {
-                        let nextIndex;
-                        if (event.key === 'ArrowDown') {
-                            nextIndex = (currentIndex + 1) % focusableElements.length;
-                        } else {
-                            nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
-                        }
-                        focusableElements[nextIndex].focus();
-                    }
-                }
             });
 
             document.addEventListener('keyup', function(event) {
@@ -321,7 +267,6 @@
             const cal_link = document.createElement('a');
             cal_link.href = '#';
             cal_link.id = DateTimeShortcuts.calendarLinkName + num;
-            cal_link.setAttribute('aria-label', gettext('Choose a Date'));
             cal_link.setAttribute('title', gettext('Choose a Date'));
             cal_link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -331,8 +276,7 @@
             });
             quickElement(
                 'span', cal_link, '',
-                'class', 'date-icon',
-                'aria-hidden', 'true'
+                'class', 'date-icon'
             );
             shortcuts_span.appendChild(document.createTextNode('\u00A0'));
             shortcuts_span.appendChild(today_link);
@@ -362,99 +306,14 @@
             cal_box.className = 'calendarbox module';
             cal_box.id = DateTimeShortcuts.calendarDivName1 + num;
             cal_box.tabIndex = -1; // Make focusable but not in tab order
-            // Add ARIA attributes for better screen reader support
-            cal_box.setAttribute('role', 'dialog');
-            cal_box.setAttribute('aria-label', gettext('Choose a Date'));
-            cal_box.setAttribute('aria-modal', 'true');
             document.body.appendChild(cal_box);
             cal_box.addEventListener('click', function(e) { e.stopPropagation(); });
-
-            // Handle tab navigation within the popup
-            cal_box.addEventListener('keydown', function(event) {
-                if (event.key === 'Tab') {
-                    // Get all focusable elements in the popup
-                    const focusableElements = cal_box.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
-                    const firstElement = focusableElements[0];
-                    const lastElement = focusableElements[focusableElements.length - 1];
-                    
-                    if (event.shiftKey) {
-                        // Shift+Tab: if focused on first element, close popup and return to trigger
-                        if (document.activeElement === firstElement) {
-                            event.preventDefault();
-                            DateTimeShortcuts.dismissCalendar(num);
-                            if (DateTimeShortcuts.lastFocusedElement) {
-                                DateTimeShortcuts.lastFocusedElement.focus();
-                            }
-                        }
-                    } else {
-                        // Tab: if focused on last element, close popup and continue to next field
-                        if (document.activeElement === lastElement) {
-                            event.preventDefault();
-                            DateTimeShortcuts.dismissCalendar(num);
-                            if (DateTimeShortcuts.lastFocusedElement) {
-                                DateTimeShortcuts.focusNextElement(DateTimeShortcuts.lastFocusedElement);
-                            }
-                        }
-                    }
-                } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft' || 
-                          event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                    // Handle arrow key navigation within the calendar grid
-                    event.preventDefault();
-                    const activeElement = document.activeElement;
-                    
-                    // Check if we're in the calendar grid
-                    const calendarGrid = cal_box.querySelector('.calendar');
-                    if (calendarGrid && calendarGrid.contains(activeElement)) {
-                        const dateLinks = calendarGrid.querySelectorAll('td a');
-                        const currentIndex = Array.from(dateLinks).indexOf(activeElement);
-                        
-                        if (currentIndex !== -1) {
-                            let nextIndex;
-                            const daysPerWeek = 7;
-                            
-                            switch (event.key) {
-                            case 'ArrowRight':
-                                nextIndex = (currentIndex + 1) % dateLinks.length;
-                                break;
-                            case 'ArrowLeft':
-                                nextIndex = (currentIndex - 1 + dateLinks.length) % dateLinks.length;
-                                break;
-                            case 'ArrowDown':
-                                nextIndex = (currentIndex + daysPerWeek) % dateLinks.length;
-                                break;
-                            case 'ArrowUp':
-                                nextIndex = (currentIndex - daysPerWeek + dateLinks.length) % dateLinks.length;
-                                break;
-                            }
-                            
-                            if (nextIndex !== undefined && dateLinks[nextIndex]) {
-                                dateLinks[nextIndex].focus();
-                            }
-                        }
-                    } else {
-                        // Handle navigation in other areas (shortcuts, navigation buttons)
-                        const focusableElements = cal_box.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
-                        const currentIndex = Array.from(focusableElements).indexOf(activeElement);
-                        
-                        if (currentIndex !== -1) {
-                            let nextIndex;
-                            if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-                                nextIndex = (currentIndex + 1) % focusableElements.length;
-                            } else {
-                                nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
-                            }
-                            focusableElements[nextIndex].focus();
-                        }
-                    }
-                }
-            });
 
             // next-prev links
             const cal_nav = quickElement('div', cal_box);
             const cal_nav_prev = quickElement('a', cal_nav, '<', 'href', '#');
             cal_nav_prev.className = 'calendarnav-previous';
             cal_nav_prev.setAttribute('role', 'button');
-            cal_nav_prev.setAttribute('aria-label', gettext('Previous month'));
             cal_nav_prev.setAttribute('title', gettext('Previous month'));
             cal_nav_prev.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -464,7 +323,6 @@
             const cal_nav_next = quickElement('a', cal_nav, '>', 'href', '#');
             cal_nav_next.className = 'calendarnav-next';
             cal_nav_next.setAttribute('role', 'button');
-            cal_nav_next.setAttribute('aria-label', gettext('Next month'));
             cal_nav_next.setAttribute('title', gettext('Next month'));
             cal_nav_next.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -474,16 +332,12 @@
             // main box
             const cal_main = quickElement('div', cal_box, '', 'id', DateTimeShortcuts.calendarDivName2 + num);
             cal_main.className = 'calendar';
-            cal_main.setAttribute('role', 'grid');
-            cal_main.setAttribute('aria-label', gettext('Calendar'));
             DateTimeShortcuts.calendars[num] = new Calendar(DateTimeShortcuts.calendarDivName2 + num, DateTimeShortcuts.handleCalendarCallback(num));
             DateTimeShortcuts.calendars[num].drawCurrent();
 
             // calendar shortcuts
             const shortcuts = quickElement('div', cal_box);
             shortcuts.className = 'calendar-shortcuts';
-            shortcuts.setAttribute('role', 'group');
-            shortcuts.setAttribute('aria-label', gettext('Quick date selection'));
             let day_link = quickElement('a', shortcuts, gettext('Yesterday'), 'role', 'button', 'href', '#');
             day_link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -554,29 +408,16 @@
             cal_box.style.display = 'block';
             
             // For screen readers, focus on the most relevant date:
-            // 1. If input has a valid date, focus on that date
+            // 1. If input has a valid date, focus on that date (using selected class)
             // 2. Otherwise, focus on today's date if visible
             // 3. Fallback to first available date
             let focusTarget = null;
             
-            // Check if input has a valid date and try to focus on it
-            if (inp.value) {
-                const format = get_format('DATE_INPUT_FORMATS')[0];
-                const selected = inp.value.strptime(format);
-                const selectedDay = selected.getUTCDate();
-                
-                // Find the selected date in the calendar
-                const allDateCells = cal_box.querySelectorAll('td a');
-                for (const dateCell of allDateCells) {
-                    const cellText = dateCell.textContent.trim();
-                    if (cellText === selectedDay.toString()) {
-                        const cellParent = dateCell.parentElement;
-                        if (!cellParent.classList.contains('other') && !cellParent.classList.contains('noday')) {
-                            focusTarget = dateCell;
-                            break;
-                        }
-                    }
-                }
+            // Check if there's a selected date (using the selected class)
+            focusTarget = cal_box.querySelector('td.selected a');
+            if (!focusTarget) {
+                // look for selected class on the link itself
+                focusTarget = cal_box.querySelector('td a.selected');
             }
             
             // If no selected date found, try to focus on today's date
