@@ -10,8 +10,6 @@ class ModelOptionsCacheTest(SimpleTestCase):
 
     def test_cached_properties_cleared_after_cache_clear(self):
         class TestModel(models.Model):
-            """Simple test model for cache testing"""
-
             name = models.CharField(max_length=100)
             email = models.EmailField()
             created_at = models.DateTimeField(auto_now_add=True)
@@ -41,10 +39,8 @@ class ModelOptionsCacheTest(SimpleTestCase):
             except Exception as e:
                 self.fail(f"Failed to access cached property '{attr_name}': {e}")
 
-        # Clear the cache
         opts._expire_cache()
 
-        # Verify all cached properties were cleared
         for attr_name in cached_properties:
             with self.subTest(property=attr_name):
                 self.assertNotIn(
