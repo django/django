@@ -50,10 +50,10 @@ specific template and custom headers, you can use the following approach::
 
     # Then, create a multipart email instance.
     msg = EmailMultiAlternatives(
-        "Subject here",
-        text_content,
-        "from@example.com",
-        ["to@example.com"],
+        subject="Subject here",
+        body=text_content,
+        from_email="from@example.com",
+        to=["to@example.com"],
         headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )
 
@@ -337,14 +337,14 @@ but must be in the given order if positional arguments are used:
 
 The following parameters must be given as keyword arguments if used:
 
+* ``cc``: A list or tuple of recipient addresses used in the "Cc" header
+  when sending the email.
+
 * ``bcc``: A list or tuple of addresses used in the "Bcc" header when
   sending the email.
 
-* ``connection``: An :ref:`email backend <topic-email-backends>` instance. Use
-  this parameter if you are sending the ``EmailMessage`` via ``send()`` and you
-  want to use the same connection for multiple messages. If omitted, a new
-  connection is created when ``send()`` is called. This parameter is ignored
-  when using :ref:`send_messages() <topics-sending-multiple-emails>`.
+* ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
+  header when sending the email.
 
 * ``attachments``: A list of attachments to put on the message. These can
   be instances of :class:`~email.mime.base.MIMEBase` or
@@ -361,11 +361,11 @@ The following parameters must be given as keyword arguments if used:
   caller to ensure header names and values are in the correct format for
   an email message. The corresponding attribute is ``extra_headers``.
 
-* ``cc``: A list or tuple of recipient addresses used in the "Cc" header
-  when sending the email.
-
-* ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
-  header when sending the email.
+* ``connection``: An :ref:`email backend <topic-email-backends>` instance. Use
+  this parameter if you are sending the ``EmailMessage`` via ``send()`` and you
+  want to use the same connection for multiple messages. If omitted, a new
+  connection is created when ``send()`` is called. This parameter is ignored
+  when using :ref:`send_messages() <topics-sending-multiple-emails>`.
 
 .. deprecated:: 6.0
 
@@ -377,10 +377,10 @@ For example::
     from django.core.mail import EmailMessage
 
     email = EmailMessage(
-        "Hello",
-        "Body goes here",
-        "from@example.com",
-        ["to1@example.com", "to2@example.com"],
+        subject="Hello",
+        body="Body goes here",
+        from_email="from@example.com",
+        to=["to1@example.com", "to2@example.com"],
         bcc=["bcc@example.com"],
         reply_to=["another@example.com"],
         headers={"Message-ID": "foo"},
