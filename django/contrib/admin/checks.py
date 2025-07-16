@@ -331,11 +331,15 @@ class BaseModelAdminChecks:
                     id="admin.E005",
                 )
             ]
-        fields = flatten(obj.fields)
-        if len(fields) != len(set(fields)):
+        field_counts = collections.Counter(flatten(obj.fields))
+        if duplicate_fields := [
+            field for field, count in field_counts.items() if count > 1
+        ]:
             return [
                 checks.Error(
                     "The value of 'fields' contains duplicate field(s).",
+                    hint="Remove duplicates of %s."
+                    % ", ".join(map(repr, duplicate_fields)),
                     obj=obj.__class__,
                     id="admin.E006",
                 )
@@ -397,11 +401,20 @@ class BaseModelAdminChecks:
                 id="admin.E008",
             )
 
-        seen_fields.extend(flatten(fieldset[1]["fields"]))
-        if len(seen_fields) != len(set(seen_fields)):
+        fieldset_fields = flatten(fieldset[1]["fields"])
+        seen_fields.extend(fieldset_fields)
+        field_counts = collections.Counter(seen_fields)
+        fieldset_fields_set = set(fieldset_fields)
+        if duplicate_fields := [
+            field
+            for field, count in field_counts.items()
+            if count > 1 and field in fieldset_fields_set
+        ]:
             return [
                 checks.Error(
                     "There are duplicate field(s) in '%s[1]'." % label,
+                    hint="Remove duplicates of %s."
+                    % ", ".join(map(repr, duplicate_fields)),
                     obj=obj.__class__,
                     id="admin.E012",
                 )
@@ -469,10 +482,15 @@ class BaseModelAdminChecks:
             return must_be(
                 "a list or tuple", option="exclude", obj=obj, id="admin.E014"
             )
-        elif len(obj.exclude) > len(set(obj.exclude)):
+        field_counts = collections.Counter(obj.exclude)
+        if duplicate_fields := [
+            field for field, count in field_counts.items() if count > 1
+        ]:
             return [
                 checks.Error(
                     "The value of 'exclude' contains duplicate field(s).",
+                    hint="Remove duplicates of %s."
+                    % ", ".join(map(repr, duplicate_fields)),
                     obj=obj.__class__,
                     id="admin.E015",
                 )

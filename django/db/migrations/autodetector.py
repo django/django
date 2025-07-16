@@ -29,6 +29,7 @@ class OperationDependency(
         ALTER = 2
         REMOVE_ORDER_WRT = 3
         ALTER_FOO_TOGETHER = 4
+        REMOVE_INDEX_OR_CONSTRAINT = 5
 
     @cached_property
     def model_name_lower(self):
@@ -195,8 +196,8 @@ class MigrationAutodetector:
 
         # Create the renamed fields and store them in self.renamed_fields.
         # They are used by create_altered_indexes(), generate_altered_fields(),
-        # generate_removed_altered_index/unique_together(), and
-        # generate_altered_index/unique_together().
+        # generate_removed_altered_unique_together(), and
+        # generate_altered_unique_together().
         self.create_renamed_fields()
         # Create the altered indexes and store them in self.altered_indexes.
         # This avoids the same computation in generate_removed_indexes()
@@ -527,6 +528,18 @@ class MigrationAutodetector:
                     (operations.AlterUniqueTogether, operations.AlterIndexTogether),
                 )
                 and operation.name_lower == dependency.model_name_lower
+            )
+        # Field is removed and part of an index/constraint.
+        elif (
+            dependency.field_name is not None
+            and dependency.type == OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT
+        ):
+            return (
+                isinstance(
+                    operation,
+                    (operations.RemoveIndex, operations.RemoveConstraint),
+                )
+                and operation.model_name_lower == dependency.model_name_lower
             )
         # Unknown dependency. Raise an error.
         else:
@@ -931,6 +944,24 @@ class MigrationAutodetector:
                         unique_together=None,
                     ),
                 )
+            if indexes := model_state.options.pop("indexes", None):
+                for index in indexes:
+                    self.add_operation(
+                        app_label,
+                        operations.RemoveIndex(
+                            model_name=model_name,
+                            name=index.name,
+                        ),
+                    )
+            if constraints := model_state.options.pop("constraints", None):
+                for constraint in constraints:
+                    self.add_operation(
+                        app_label,
+                        operations.RemoveConstraint(
+                            model_name=model_name,
+                            name=constraint.name,
+                        ),
+                    )
             # Then remove each related field
             for name in sorted(related_fields):
                 self.add_operation(
@@ -939,6 +970,14 @@ class MigrationAutodetector:
                         model_name=model_name,
                         name=name,
                     ),
+                    dependencies=[
+                        OperationDependency(
+                            app_label,
+                            model_name,
+                            name,
+                            OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT,
+                        ),
+                    ],
                 )
             # Finally, remove the model.
             # This depends on both the removal/alteration of all incoming fields
@@ -1180,7 +1219,7 @@ class MigrationAutodetector:
                 name=field_name,
             ),
             # We might need to depend on the removal of an
-            # order_with_respect_to or index/unique_together operation;
+            # order_with_respect_to or index/constraint/unique_together operation;
             # this is safely ignored if there isn't one
             dependencies=[
                 OperationDependency(
@@ -1194,6 +1233,12 @@ class MigrationAutodetector:
                     model_name,
                     field_name,
                     OperationDependency.Type.ALTER_FOO_TOGETHER,
+                ),
+                OperationDependency(
+                    app_label,
+                    model_name,
+                    field_name,
+                    OperationDependency.Type.REMOVE_INDEX_OR_CONSTRAINT,
                 ),
             ],
         )
@@ -1459,6 +1504,29 @@ class MigrationAutodetector:
             old_kwargs.pop(attr, None)
         for attr in new_constraint.non_db_attrs:
             new_kwargs.pop(attr, None)
+
+        # Replace renamed fields if the db_column is preserved.
+        for (
+            _,
+            _,
+            rem_db_column,
+            rem_field_name,
+            _,
+            _,
+            field,
+            field_name,
+        ) in self.renamed_operations:
+            if field.db_column and rem_db_column == field.db_column:
+                new_fields = new_kwargs["fields"]
+                try:
+                    new_field_idx = new_fields.index(field_name)
+                except ValueError:
+                    continue
+                new_kwargs["fields"] = tuple(
+                    new_fields[:new_field_idx]
+                    + (rem_field_name,)
+                    + new_fields[new_field_idx + 1 :]
+                )
 
         return (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
 

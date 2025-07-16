@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+from functools import reduce
 from itertools import chain, islice
 
 from asgiref.sync import sync_to_async
@@ -20,7 +21,7 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import AutoField, DateField, DateTimeField, Field, sql
+from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
@@ -800,6 +801,7 @@ class QuerySet(AltersData):
         objs = list(objs)
         objs_with_pk, objs_without_pk = self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
+            self._handle_order_with_respect_to(objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
@@ -839,6 +841,37 @@ class QuerySet(AltersData):
                     obj_without_pk._state.db = self.db
 
         return objs
+
+    def _handle_order_with_respect_to(self, objs):
+        if objs and (order_wrt := self.model._meta.order_with_respect_to):
+            get_filter_kwargs_for_object = order_wrt.get_filter_kwargs_for_object
+            attnames = list(get_filter_kwargs_for_object(objs[0]))
+            group_keys = set()
+            obj_groups = []
+            for obj in objs:
+                group_key = tuple(get_filter_kwargs_for_object(obj).values())
+                group_keys.add(group_key)
+                obj_groups.append((obj, group_key))
+            filters = [
+                Q.create(list(zip(attnames, group_key))) for group_key in group_keys
+            ]
+            next_orders = (
+                self.model._base_manager.using(self.db)
+                .filter(reduce(operator.or_, filters))
+                .values_list(*attnames)
+                .annotate(_order__max=Max("_order") + 1)
+            )
+            # Create mapping of group values to max order.
+            group_next_orders = dict.fromkeys(group_keys, 0)
+            group_next_orders.update(
+                (tuple(group_key), next_order) for *group_key, next_order in next_orders
+            )
+            # Assign _order values to new objects.
+            for obj, group_key in obj_groups:
+                if getattr(obj, "_order", None) is None:
+                    group_next_order = group_next_orders[group_key]
+                    obj._order = group_next_order
+                    group_next_orders[group_key] += 1
 
     bulk_create.alters_data = True
 
@@ -1147,7 +1180,9 @@ class QuerySet(AltersData):
             if not id_list:
                 return {}
             filter_key = "{}__in".format(field_name)
-            batch_size = connections[self.db].features.max_query_params
+            max_params = connections[self.db].features.max_query_params or 0
+            num_fields = len(opts.pk_fields) if field_name == "pk" else 1
+            batch_size = max_params // num_fields
             id_list = tuple(id_list)
             # If the database has a limit on the number of query parameters
             # (e.g. SQLite), retrieve objects in batches if necessary.
@@ -1250,8 +1285,9 @@ class QuerySet(AltersData):
                 new_order_by.append(col)
         query.order_by = tuple(new_order_by)
 
-        # Clear any annotations so that they won't be present in subqueries.
-        query.annotations = {}
+        # Clear SELECT clause as all annotation references were inlined by
+        # add_update_values() already.
+        query.clear_select_clause()
         with transaction.mark_for_rollback_on_error(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
         self._result_cache = None
@@ -1549,6 +1585,8 @@ class QuerySet(AltersData):
             if len(qs) == 1:
                 return qs[0]
             return qs[0]._combinator_query("union", *qs[1:], all=all)
+        elif not other_qs:
+            return self
         return self._combinator_query("union", *other_qs, all=all)
 
     def intersection(self, *other_qs):
@@ -2077,7 +2115,9 @@ class RawQuerySet:
         """Resolve the init field names and value positions."""
         converter = connections[self.db].introspection.identifier_converter
         model_init_fields = [
-            f for f in self.model._meta.fields if converter(f.column) in self.columns
+            field
+            for column_name, field in self.model_fields.items()
+            if column_name in self.columns
         ]
         annotation_fields = [
             (column, pos)
@@ -2192,10 +2232,13 @@ class RawQuerySet:
     def model_fields(self):
         """A dict mapping column names to model field names."""
         converter = connections[self.db].introspection.identifier_converter
-        model_fields = {}
-        for field in self.model._meta.fields:
-            model_fields[converter(field.column)] = field
-        return model_fields
+        return {
+            converter(field.column): field
+            for field in self.model._meta.fields
+            # Fields with None "column" should be ignored
+            # (e.g. CompositePrimaryKey).
+            if field.column
+        }
 
 
 class Prefetch:
@@ -2672,7 +2715,11 @@ class RelatedPopulator:
             )
 
         self.model_cls = klass_info["model"]
-        self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
+        # A primary key must have all of its constituents not-NULL as
+        # NULL != NULL and thus NULL cannot be referenced through a foreign
+        # relationship. Therefore checking for a single member of the primary
+        # key is enough to determine if the referenced object exists or not.
+        self.pk_idx = self.init_list.index(self.model_cls._meta.pk_fields[0].attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
         self.local_setter = klass_info["local_setter"]
         self.remote_setter = klass_info["remote_setter"]

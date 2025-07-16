@@ -41,6 +41,13 @@ class DeconstructibleInstances:
         return ("DeconstructibleInstances", [], {})
 
 
+@deconstructible
+class DeconstructibleArbitrary:
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+
 class Money(decimal.Decimal):
     def deconstruct(self):
         return (
@@ -292,6 +299,18 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(value.max_length, new_value.max_length)
         self.assertEqual(value.null, new_value.null)
         self.assertEqual(value.unique, new_value.unique)
+
+    def assertSerializedFunctoolsPartialEqual(
+        self, value, expected_string, expected_imports
+    ):
+        string, imports = MigrationWriter.serialize(value)
+        self.assertEqual(string, expected_string)
+        self.assertEqual(imports, expected_imports)
+        result = self.serialize_round_trip(value)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, value.keywords)
+        return result
 
     def test_serialize_numbers(self):
         self.assertSerializedEqual(1)
@@ -888,19 +907,59 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(datetime.timedelta(minutes=42))
 
     def test_serialize_functools_partial(self):
+        value = functools.partial(datetime.timedelta)
+        string, imports = MigrationWriter.serialize(value)
+        self.assertSerializedFunctoolsPartialEqual(
+            value,
+            "functools.partial(datetime.timedelta)",
+            {"import datetime", "import functools"},
+        )
+
+    def test_serialize_functools_partial_posarg(self):
+        value = functools.partial(datetime.timedelta, 1)
+        string, imports = MigrationWriter.serialize(value)
+        self.assertSerializedFunctoolsPartialEqual(
+            value,
+            "functools.partial(datetime.timedelta, 1)",
+            {"import datetime", "import functools"},
+        )
+
+    def test_serialize_functools_partial_kwarg(self):
+        value = functools.partial(datetime.timedelta, seconds=2)
+        string, imports = MigrationWriter.serialize(value)
+        self.assertSerializedFunctoolsPartialEqual(
+            value,
+            "functools.partial(datetime.timedelta, seconds=2)",
+            {"import datetime", "import functools"},
+        )
+
+    def test_serialize_functools_partial_mixed(self):
         value = functools.partial(datetime.timedelta, 1, seconds=2)
-        result = self.serialize_round_trip(value)
-        self.assertEqual(result.func, value.func)
-        self.assertEqual(result.args, value.args)
-        self.assertEqual(result.keywords, value.keywords)
+        string, imports = MigrationWriter.serialize(value)
+        self.assertSerializedFunctoolsPartialEqual(
+            value,
+            "functools.partial(datetime.timedelta, 1, seconds=2)",
+            {"import datetime", "import functools"},
+        )
+
+    def test_serialize_functools_partial_non_identifier_keyword(self):
+        value = functools.partial(datetime.timedelta, **{"kebab-case": 1})
+        string, imports = MigrationWriter.serialize(value)
+        self.assertSerializedFunctoolsPartialEqual(
+            value,
+            "functools.partial(datetime.timedelta, **{'kebab-case': 1})",
+            {"import datetime", "import functools"},
+        )
 
     def test_serialize_functools_partialmethod(self):
         value = functools.partialmethod(datetime.timedelta, 1, seconds=2)
-        result = self.serialize_round_trip(value)
+        string, imports = MigrationWriter.serialize(value)
+        result = self.assertSerializedFunctoolsPartialEqual(
+            value,
+            "functools.partialmethod(datetime.timedelta, 1, seconds=2)",
+            {"import datetime", "import functools"},
+        )
         self.assertIsInstance(result, functools.partialmethod)
-        self.assertEqual(result.func, value.func)
-        self.assertEqual(result.args, value.args)
-        self.assertEqual(result.keywords, value.keywords)
 
     def test_serialize_type_none(self):
         self.assertSerializedEqual(NoneType)
@@ -1142,6 +1201,24 @@ class WriterTests(SimpleTestCase):
             string,
             "models.CharField(default=migrations.test_writer.DeconstructibleInstances)",
         )
+
+    def test_serialize_non_identifier_keyword_args(self):
+        instance = DeconstructibleArbitrary(
+            **{"kebab-case": 1, "my_list": [1, 2, 3], "123foo": {"456bar": set()}},
+            regular="kebab-case",
+            **{"simple": 1, "complex": 3.1416},
+        )
+        string, imports = MigrationWriter.serialize(instance)
+        self.assertEqual(
+            string,
+            "migrations.test_writer.DeconstructibleArbitrary(complex=3.1416, "
+            "my_list=[1, 2, 3], regular='kebab-case', simple=1, "
+            "**{'123foo': {'456bar': set()}, 'kebab-case': 1})",
+        )
+        self.assertEqual(imports, {"import migrations.test_writer"})
+        result = self.serialize_round_trip(instance)
+        self.assertEqual(result.args, instance.args)
+        self.assertEqual(result.kwargs, instance.kwargs)
 
     def test_register_serializer(self):
         class ComplexSerializer(BaseSerializer):

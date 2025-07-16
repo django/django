@@ -42,12 +42,14 @@ def paginator_number(cl, i):
     if i == cl.paginator.ELLIPSIS:
         return format_html("{} ", cl.paginator.ELLIPSIS)
     elif i == cl.page_num:
-        return format_html('<span class="this-page">{}</span> ', i)
+        return format_html(
+            '<a role="button" href="" aria-current="page">{}</a> ',
+            i,
+        )
     else:
         return format_html(
-            '<a role="button" href="{}"{}>{}</a> ',
+            '<a role="button" href="{}">{}</a> ',
             cl.get_query_string({PAGE_VAR: i}),
-            mark_safe(' class="end"' if i == cl.paginator.num_pages else ""),
             i,
         )
 

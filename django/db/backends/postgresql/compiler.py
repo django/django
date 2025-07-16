@@ -40,7 +40,8 @@ class SQLInsertCompiler(BaseSQLInsertCompiler):
             # unnest'able (e.g. array and geometry types are known to be
             # problematic).
             or any(
-                field.get_internal_type() not in self.connection.data_types
+                (field.target_field if field.is_relation else field).get_internal_type()
+                not in self.connection.data_types
                 for field in fields
             )
             # Compilable cannot be combined in an array of literal values.

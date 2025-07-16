@@ -294,6 +294,14 @@ class BulkCreateTests(TestCase):
             Country.objects.bulk_create(objs, batch_size=max_batch_size + 1)
 
     @skipUnlessDBFeature("has_bulk_insert")
+    def test_max_batch_size(self):
+        objs = [Country(name=f"Country {i}") for i in range(1000)]
+        fields = ["name", "iso_two_letter", "description"]
+        max_batch_size = connection.ops.bulk_batch_size(fields, objs)
+        with self.assertNumQueries(ceil(len(objs) / max_batch_size)):
+            Country.objects.bulk_create(objs)
+
+    @skipUnlessDBFeature("has_bulk_insert")
     def test_bulk_insert_expressions(self):
         Restaurant.objects.bulk_create(
             [

@@ -115,7 +115,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 ).fetchone()
                 if has_json_constraint:
                     json_columns.add(column)
-        return [
+        table_description = [
             FieldInfo(
                 name,
                 data_type,
@@ -126,7 +126,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 not notnull,
                 default,
                 collations.get(name),
-                pk == 1,
+                bool(pk),
                 name in json_columns,
             )
             for cid, name, data_type, notnull, default, pk, hidden in table_info
@@ -137,6 +137,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 3,  # Stored generated column.
             ]
         ]
+        # If the primary key is composed of multiple columns they should not
+        # be individually marked as pk.
+        primary_key = [
+            index for index, field_info in enumerate(table_description) if field_info.pk
+        ]
+        if len(primary_key) > 1:
+            for index in primary_key:
+                table_description[index] = table_description[index]._replace(pk=False)
+        return table_description
 
     def get_sequences(self, cursor, table_name, table_fields=()):
         pk_col = self.get_primary_key_column(cursor, table_name)

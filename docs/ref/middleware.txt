@@ -607,6 +607,26 @@ You can add Cross Site Request Forgery protection to individual views using the
 
 Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.
 
+Content Security Policy middleware
+----------------------------------
+
+.. currentmodule:: django.middleware.csp
+
+.. class:: ContentSecurityPolicyMiddleware
+
+.. versionadded:: 6.0
+
+Adds support for Content Security Policy (CSP), which helps mitigate risks such
+as Cross-Site Scripting (XSS) and data injection attacks by controlling the
+sources of content that can be loaded in the browser. See the
+:ref:`csp-overview` documentation for details on configuring policies.
+
+This middleware sets the following headers on the response depending on the
+available settings:
+
+* ``Content-Security-Policy``, based on :setting:`SECURE_CSP`.
+* ``Content-Security-Policy-Report-Only``, based on :setting:`SECURE_CSP_REPORT_ONLY`.
+
 .. _middleware-ordering:
 
 Middleware ordering
@@ -690,6 +710,12 @@ Here are some hints about the ordering of various Django middleware classes:
 
    After any middleware that modifies the ``Vary`` header: that header is used
    to pick a value for the cache hash-key.
+
+#. :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`
+
+   Can be placed near the bottom, but ensure any middleware that accesses
+   :ref:`csp_nonce <csp-nonce>` is positioned after it, so the nonce is
+   properly included in the response header.
 
 #. :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
 

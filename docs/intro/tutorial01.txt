@@ -45,21 +45,16 @@ including database configuration, Django-specific options and
 application-specific settings.
 
 From the command line, ``cd`` into a directory where you'd like to store your
-code and create a new directory named ``djangotutorial``. (This directory name
-doesn't matter to Django; you can rename it to anything you like.)
-
-.. console::
-
-   $ mkdir djangotutorial
-
-Then, run the following command to bootstrap a new Django project:
+code and run the following command to bootstrap a new Django project:
 
 .. console::
 
    $ django-admin startproject mysite djangotutorial
 
-This will create a project called ``mysite`` inside the ``djangotutorial``
-directory. If it didn't work, see :ref:`troubleshooting-django-admin`.
+This will create a directory ``djangotutorial`` with a project called
+``mysite`` inside. The directory name doesn't matter to Django; you can rename
+it to anything you like. If it didn't work, see
+:ref:`troubleshooting-django-admin`.
 
 .. note::
 

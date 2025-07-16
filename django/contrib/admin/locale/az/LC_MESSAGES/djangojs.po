@@ -5,14 +5,14 @@
 # Emin Mastizada <emin@linux.com>, 2016,2020
 # Emin Mastizada <emin@linux.com>, 2016
 # Nicat Məmmədov <n1c4t97@gmail.com>, 2022
-# Nijat Mammadov, 2024
+# Nijat Mammadov, 2024-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-25 15:04-0500\n"
 "PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Nijat Mammadov, 2024\n"
+"Last-Translator: Nijat Mammadov, 2024-2025\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -29,6 +29,8 @@ msgstr "Mövcud %s"
 msgid ""
 "Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
+" Seçmək istədikləriniz %s elementlərini işarələyin və sonra \"Seç\" (ox) "
+"düyməsini basın."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,15 +41,15 @@ msgstr "Süzgəc"
 
 #, javascript-format
 msgid "Choose all %s"
-msgstr ""
+msgstr "Bütün %s elementlərini seç"
 
 #, javascript-format
 msgid "Choose selected %s"
-msgstr ""
+msgstr "İşarələnmiş %s elementini seçin"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr ""
+msgstr "İşarələnmiş %s elementini sil"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -57,17 +59,19 @@ msgstr "Seçilmiş %s"
 msgid ""
 "Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
+" Silmək istədikləriniz %s elementlərini işarələyin və sonra \"Sil\" "
+"düyməsini basın."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Seçilmiş %s siyahısını filtrləmək üçün bu xanaya yazın"
 
 msgid "(click to clear)"
-msgstr ""
+msgstr "(təmizləmək üçün toxunun)"
 
 #, javascript-format
 msgid "Remove all %s"
-msgstr ""
+msgstr "Bütün %s elementlərini sil"
 
 #, javascript-format
 msgid "%s selected option not visible"

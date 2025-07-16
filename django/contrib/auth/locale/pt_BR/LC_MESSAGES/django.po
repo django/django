@@ -20,15 +20,15 @@
 # Guilherme <guilherme0xff@proton.me>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
-# Rafael Fontenelle <rffontenelle@gmail.com>, 2022
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2022,2025
 # Sandro <sandrossv@hotmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>, 2022,2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -76,11 +76,11 @@ msgstr "senha"
 msgid "last login"
 msgstr "último login"
 
-msgid "No password set."
-msgstr "Nenhuma senha definida."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de senha inválido ou algoritmo de hash desconhecido."
+
+msgid "No password set."
+msgstr "Nenhuma senha definida."
 
 msgid "Reset password"
 msgstr "Reconfigurar senha"
@@ -91,15 +91,6 @@ msgstr "Configurar senha"
 msgid "The two password fields didn’t match."
 msgstr "Os dois campos de senha não correspondem."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Se este usuário conseguirá autenticar usando uma senha ou não. Se "
-"desabilitado ainda será possível autenticar utilizando outros métodos, como "
-"Login Único ou LDAP."
-
 msgid "Password"
 msgstr "Senha"
 
@@ -108,6 +99,15 @@ msgstr "Confirmação de senha"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Informe a mesma senha informada anteriormente, para verificação."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Se este usuário conseguirá autenticar usando uma senha ou não. Se "
+"desabilitado ainda será possível autenticar utilizando outros métodos, como "
+"Login Único ou LDAP."
 
 msgid "Password-based authentication"
 msgstr "Autenticação baseada em senha"
@@ -282,21 +282,15 @@ msgid "users"
 msgstr "usuários"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
-"caracteres."
+"Esta senha é muito curta. Ela precisa conter pelo menos %d caractere."
 msgstr[1] ""
-"Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
-"caracteres."
+"Esta senha é muito curta. Ela precisa conter pelo menos %d caracteres."
 msgstr[2] ""
-"Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
-"caracteres."
+"Esta senha é muito curta. Ela precisa conter pelo menos %d caracteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

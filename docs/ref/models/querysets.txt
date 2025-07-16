@@ -3943,6 +3943,60 @@ when the queryset (or grouping) contains no entries.
 Keyword arguments that can provide extra context for the SQL generated
 by the aggregate.
 
+``AnyValue``
+~~~~~~~~~~~~
+
+.. versionadded:: 6.0
+
+.. class:: AnyValue(expression, output_field=None, filter=None, default=None, **extra)
+
+    Returns an arbitrary value from the non-null input values.
+
+    * Default alias: ``<field>__anyvalue``
+    * Return type: same as input field, or ``output_field`` if supplied. If the
+      queryset or grouping is empty, ``default`` is returned.
+
+    Usage example:
+
+    .. code-block:: pycon
+
+        >>> # Get average rating for each year along with a sample headline
+        >>> # from that year.
+        >>> from django.db.models import AnyValue, Avg, F, Q
+        >>> sample_headline = AnyValue("headline")
+        >>> Entry.objects.values(
+        ...     pub_year=F("pub_date__year"),
+        ... ).annotate(
+        ...     avg_rating=Avg("rating"),
+        ...     sample_headline=sample_headline,
+        ... )
+
+        >>> # Get a sample headline from each year with rating greater than 4.5.
+        >>> sample_headline = AnyValue(
+        ...     "headline",
+        ...     filter=Q(rating__gt=4.5),
+        ... )
+        >>> Entry.objects.values(
+        ...     pub_year=F("pub_date__year"),
+        ... ).annotate(
+        ...     avg_rating=Avg("rating"),
+        ...     sample_headline=sample_headline,
+        ... )
+
+    Supported on SQLite, MySQL, Oracle, and PostgreSQL 16+.
+
+    .. admonition:: MySQL with ``ONLY_FULL_GROUP_BY`` enabled
+
+        When the ``ONLY_FULL_GROUP_BY`` SQL mode is enabled on MySQL it may be
+        necessary to use ``AnyValue`` if an aggregation includes a mix of
+        aggregate and non-aggregate functions. Using ``AnyValue`` allows the
+        non-aggregate function to be referenced in the select list when
+        database cannot determine that it is functionally dependent on the
+        columns in the `group by`_ clause. See the :ref:`aggregation
+        documentation <aggregation-mysql-only-full-group-by>` for more details.
+
+        .. _group by: https://dev.mysql.com/doc/refman/8.4/en/group-by-handling.html
+
 ``Avg``
 ~~~~~~~
 

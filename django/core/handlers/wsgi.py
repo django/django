@@ -128,7 +128,7 @@ class WSGIHandler(base.BaseHandler):
         status = "%d %s" % (response.status_code, response.reason_phrase)
         response_headers = [
             *response.items(),
-            *(("Set-Cookie", c.output(header="")) for c in response.cookies.values()),
+            *(("Set-Cookie", c.OutputString()) for c in response.cookies.values()),
         ]
         start_response(status, response_headers)
         if getattr(response, "file_to_stream", None) is not None and environ.get(

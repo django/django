@@ -13,6 +13,8 @@ permissions:
 
 jobs:
   no_ticket:
+    # Only trigger on the main Django repository
+    if: github.repository == 'django/django'
     name: "Flag if no Trac ticket is found in the title"
     runs-on: ubuntu-latest
     steps:

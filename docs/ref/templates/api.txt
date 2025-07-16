@@ -802,6 +802,18 @@ This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
 
+``django.template.context_processors.csp``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: csp(request)
+
+.. versionadded:: 6.0
+
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``csp_nonce``, providing a securely generated, request-specific nonce suitable
+for use under a Content Security Policy. See :ref:`CSP nonce usage <csp-nonce>`
+for details.
+
 ``django.template.context_processors.request``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

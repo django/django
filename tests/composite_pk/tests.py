@@ -147,6 +147,22 @@ class CompositePKTests(TestCase):
         result = Comment.objects.in_bulk([self.comment.pk])
         self.assertEqual(result, {self.comment.pk: self.comment})
 
+    @unittest.mock.patch.object(
+        type(connection.features), "max_query_params", new_callable=lambda: 10
+    )
+    def test_in_bulk_batching(self, mocked_max_query_params):
+        Comment.objects.all().delete()
+        num_requiring_batching = (connection.features.max_query_params // 2) + 1
+        comments = [
+            Comment(id=i, tenant=self.tenant, user=self.user)
+            for i in range(1, num_requiring_batching + 1)
+        ]
+        Comment.objects.bulk_create(comments)
+        id_list = list(Comment.objects.values_list("pk", flat=True))
+        with self.assertNumQueries(2):
+            comment_dict = Comment.objects.in_bulk(id_list=id_list)
+        self.assertQuerySetEqual(comment_dict, id_list)
+
     def test_iterator(self):
         """
         Test the .iterator() method of composite_pk models.
@@ -183,6 +199,14 @@ class CompositePKTests(TestCase):
             self.assertEqual(user.id, self.user.id)
         with self.assertNumQueries(1):
             self.assertEqual(user.email, self.user.email)
+
+    def test_select_related(self):
+        Comment.objects.create(tenant=self.tenant, id=2)
+        with self.assertNumQueries(1):
+            comments = list(Comment.objects.select_related("user").order_by("pk"))
+            self.assertEqual(len(comments), 2)
+            self.assertEqual(comments[0].user, self.user)
+            self.assertIsNone(comments[1].user)
 
     def test_model_forms(self):
         fields = ["tenant", "id", "user_id", "text", "integer"]

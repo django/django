@@ -1,0 +1,14 @@
+===========================
+Django 5.1.11 release notes
+===========================
+
+*June 10, 2025*
+
+Django 5.1.11 fixes a potential log injection issue in 5.1.10.
+
+Bugfixes
+========
+
+* Fixed a log injection possibility by migrating remaining response logging
+  to ``django.utils.log.log_response()``, which safely escapes arguments such
+  as the request path to prevent unsafe log output (:cve:`2025-48432`).

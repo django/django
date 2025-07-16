@@ -5,15 +5,15 @@
 # Emin Mastizada <emin@linux.com>, 2018,2020
 # Emin Mastizada <emin@linux.com>, 2016
 # Nicat Məmmədov <n1c4t97@gmail.com>, 2022
-# Nijat Mammadov, 2024
+# Nijat Mammadov, 2024-2025
 # Sevdimali <sevdimaliisayev@mail.ru>, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Sevdimali <sevdimaliisayev@mail.ru>, 2024\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Nijat Mammadov, 2024-2025\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -61,11 +61,11 @@ msgstr "şifrə"
 msgid "last login"
 msgstr "son daxilolma"
 
-msgid "No password set."
-msgstr "Şifrə təyin olunmayıb."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Xətalı şifrə formatı və ya bilinməyən heş alqoritması."
+
+msgid "No password set."
+msgstr "Şifrə təyin olunmayıb."
 
 msgid "Reset password"
 msgstr "Şifrəni sıfırla"
@@ -76,15 +76,6 @@ msgstr "Şifrə təyin et"
 msgid "The two password fields didn’t match."
 msgstr "Şifrə xanalarının dəyərləri eyni deyil."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"İstifadəçinin şifrə ilə autentifikasiya edib-etməyəcəyi. Əgər deaktiv "
-"edilsə, onlar yenə də Single Sign-On və ya LDAP kimi digər backend-lərdən "
-"istifadə edərək autentifikasiya edə bilərlər."
-
 msgid "Password"
 msgstr "Şifrə"
 
@@ -93,6 +84,15 @@ msgstr "Şifrənin təsdiqi"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Təsdiqləmək üçün əvvəlki ilə eyni şifrəni daxil edin."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"İstifadəçinin şifrə ilə autentifikasiya edib-etməyəcəyi. Əgər deaktiv "
+"edilsə, onlar yenə də Single Sign-On və ya LDAP kimi digər backend-lərdən "
+"istifadə edərək autentifikasiya edə bilərlər."
 
 msgid "Password-based authentication"
 msgstr "Şifrə əsaslı autentifikasiya"
@@ -263,15 +263,11 @@ msgid "users"
 msgstr "istifadəçilər"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] "Bu parol çox qısadır. Ən az %(min_length)d işarə olmalıdır."
-msgstr[1] ""
-"Bu şifrə çox qısadır. Ən azı %(min_length)d simvoldan ibarət olmalıdır."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Şifrə çox qısadır. Şifrədə ən az %d simvol olmalıdır."
+msgstr[1] "Şifrə çox qısadır. Şifrədə ən az %d simvol olmalıdır."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

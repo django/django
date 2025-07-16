@@ -3,16 +3,17 @@
 # Translators:
 # Goto Hayato <habita.gh@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023
-# Taichi Taniguchi, 2022
+# Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023,2025
+# TANIGUCHI Taichi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023\n"
+"PO-Revision-Date: 2025-03-25 15:04-0500\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, "
+"2012,2014-2016,2023,2025\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -27,11 +28,8 @@ msgstr "利用可能 %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"これが使用可能な %s のリストです。下のボックスで項目を選択し、2つのボックス間"
-"の \"選択\"の矢印をクリックして、いくつかを選択することができます。"
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "%sを選択するには、項目を選択してから\"選択\"矢印ボタンを選択します。"
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -40,18 +38,17 @@ msgstr "使用可能な %s のリストを絞り込むには、このボック�
 msgid "Filter"
 msgstr "フィルター"
 
-msgid "Choose all"
-msgstr "全て選択"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "%sをすべて選択"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "クリックするとすべての %s を選択します。"
+msgid "Choose selected %s"
+msgstr "選択された%sを選択"
 
-msgid "Choose"
-msgstr "選択"
-
-msgid "Remove"
-msgstr "削除"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "選択された%sを削除"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,22 +56,19 @@ msgstr "選択された %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"これが選択された %s のリストです。下のボックスで選択し、2つのボックス間の "
-"\"削除\"矢印をクリックして一部を削除することができます。"
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr "%sを削除するには、項目を選択してから\"削除\"矢印ボタンを選択します。"
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "選択された%sのリストを絞り込むには、このボックスに入力します。"
 
-msgid "Remove all"
-msgstr "すべて削除"
+msgid "(click to clear)"
+msgstr "(クリックでクリア)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "クリックするとすべての %s を選択から削除します。"
+msgid "Remove all %s"
+msgstr "%sをすべて削除"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -314,9 +308,3 @@ msgstr "金"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "土"
-
-msgid "Show"
-msgstr "表示"
-
-msgid "Hide"
-msgstr "非表示"

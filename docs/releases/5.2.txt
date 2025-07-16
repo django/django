@@ -488,3 +488,7 @@ Miscellaneous
   ``django.contrib.postgres.aggregates.JSONBAgg``, and
   ``django.contrib.postgres.aggregates.StringAgg`` is deprecated in favor
   of the ``order_by`` argument.
+
+* Support for subclasses of ``RemoteUserMiddleware`` that override
+  ``process_request()`` without overriding ``aprocess_request()`` is
+  deprecated.

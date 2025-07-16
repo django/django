@@ -1,6 +1,6 @@
 import re
 from datetime import UTC, date, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django import template
 from django.template import defaultfilters
@@ -66,14 +66,15 @@ def ordinal(value):
 @register.filter(is_safe=True)
 def intcomma(value, use_l10n=True):
     """
-    Convert an integer to a string containing commas every three digits.
-    For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
+    Convert an integer or float (or a string representation of either) to a
+    string containing commas every three digits. Format localization is
+    respected. For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
     """
     if use_l10n:
         try:
             if not isinstance(value, (float, Decimal)):
-                value = int(value)
-        except (TypeError, ValueError):
+                value = Decimal(value)
+        except (TypeError, ValueError, InvalidOperation):
             return intcomma(value, False)
         else:
             return number_format(value, use_l10n=True, force_grouping=True)

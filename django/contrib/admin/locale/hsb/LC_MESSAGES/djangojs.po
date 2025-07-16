@@ -47,7 +47,7 @@ msgstr "Wubrane %swubrać"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr ""
+msgstr "Wubrane %s wotstronić"
 
 #, javascript-format
 msgid "Chosen %s"

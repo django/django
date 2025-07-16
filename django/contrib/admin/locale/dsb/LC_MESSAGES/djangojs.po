@@ -46,7 +46,7 @@ msgstr "Markěrujśo wubrane %s"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr ""
+msgstr "Wubrane %s wótwónoźeś"
 
 #, javascript-format
 msgid "Chosen %s"

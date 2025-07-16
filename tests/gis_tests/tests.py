@@ -1,8 +1,9 @@
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import ProgrammingError
+from django.db import ProgrammingError, connection
 from django.db.backends.base.base import NO_DB_ALIAS
+from django.test import TestCase
 
 try:
     from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
@@ -10,6 +11,16 @@ try:
     HAS_POSTGRES = True
 except ImportError:
     HAS_POSTGRES = False
+
+
+class BaseSpatialFeaturesTests(TestCase):
+    def test_invalid_has_func_function(self):
+        msg = (
+            'DatabaseFeatures.has_Invalid_function isn\'t valid. Is "Invalid" '
+            "missing from BaseSpatialOperations.unsupported_functions?"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            connection.features.has_Invalid_function
 
 
 if HAS_POSTGRES:

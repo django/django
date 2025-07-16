@@ -10,6 +10,7 @@ of a DjangoTemplates backend and used by RequestContext.
 import itertools
 
 from django.conf import settings
+from django.middleware.csp import get_nonce
 from django.middleware.csrf import get_token
 from django.utils.functional import SimpleLazyObject, lazy
 
@@ -87,3 +88,10 @@ def media(request):
 
 def request(request):
     return {"request": request}
+
+
+def csp(request):
+    """
+    Add the CSP nonce to the context.
+    """
+    return {"csp_nonce": get_nonce(request)}

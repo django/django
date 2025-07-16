@@ -1,8 +1,10 @@
 import datetime
+from math import ceil
 
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models import F
-from django.db.models.functions import Lower
+from django.db import connection
+from django.db.models import F, IntegerField, Value
+from django.db.models.functions import Coalesce, Lower
 from django.db.utils import IntegrityError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 
@@ -68,6 +70,15 @@ class BulkUpdateNoteTests(TestCase):
     def test_batch_size(self):
         with self.assertNumQueries(len(self.notes)):
             Note.objects.bulk_update(self.notes, fields=["note"], batch_size=1)
+
+    def test_max_batch_size(self):
+        max_batch_size = connection.ops.bulk_batch_size(
+            # PK is used twice, see comment in bulk_update().
+            [Note._meta.pk, Note._meta.pk, Note._meta.get_field("note")],
+            self.notes,
+        )
+        with self.assertNumQueries(ceil(len(self.notes) / max_batch_size)):
+            Note.objects.bulk_update(self.notes, fields=["note"])
 
     def test_unsaved_models(self):
         objs = self.notes + [Note(note="test", misc="test")]
@@ -288,6 +299,25 @@ class BulkUpdateTests(TestCase):
         self.assertCountEqual(
             JSONFieldNullable.objects.filter(json_field__has_key="c"), objs
         )
+
+    @skipUnlessDBFeature("supports_json_field")
+    def test_json_field_sql_null(self):
+        obj = JSONFieldNullable.objects.create(json_field={})
+        test_cases = [
+            ("direct_none_assignment", None),
+            ("value_none_assignment", Value(None)),
+            (
+                "expression_none_assignment",
+                Coalesce(None, None, output_field=IntegerField()),
+            ),
+        ]
+        for label, value in test_cases:
+            with self.subTest(case=label):
+                obj.json_field = value
+                JSONFieldNullable.objects.bulk_update([obj], fields=["json_field"])
+                obj.refresh_from_db()
+                sql_null_qs = JSONFieldNullable.objects.filter(json_field__isnull=True)
+                self.assertSequenceEqual(sql_null_qs, [obj])
 
     def test_nullable_fk_after_related_save(self):
         parent = RelatedObject.objects.create()

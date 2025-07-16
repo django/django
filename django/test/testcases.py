@@ -1582,9 +1582,7 @@ def _deferredSkip(condition, reason, name):
 def skipIfDBFeature(*features):
     """Skip a test if a database has at least one of the named features."""
     return _deferredSkip(
-        lambda: any(
-            getattr(connection.features, feature, False) for feature in features
-        ),
+        lambda: any(getattr(connection.features, feature) for feature in features),
         "Database has feature(s) %s" % ", ".join(features),
         "skipIfDBFeature",
     )
@@ -1593,9 +1591,7 @@ def skipIfDBFeature(*features):
 def skipUnlessDBFeature(*features):
     """Skip a test unless a database has all the named features."""
     return _deferredSkip(
-        lambda: not all(
-            getattr(connection.features, feature, False) for feature in features
-        ),
+        lambda: not all(getattr(connection.features, feature) for feature in features),
         "Database doesn't support feature(s): %s" % ", ".join(features),
         "skipUnlessDBFeature",
     )
@@ -1604,9 +1600,7 @@ def skipUnlessDBFeature(*features):
 def skipUnlessAnyDBFeature(*features):
     """Skip a test unless a database has any of the named features."""
     return _deferredSkip(
-        lambda: not any(
-            getattr(connection.features, feature, False) for feature in features
-        ),
+        lambda: not any(getattr(connection.features, feature) for feature in features),
         "Database doesn't support any of the feature(s): %s" % ", ".join(features),
         "skipUnlessAnyDBFeature",
     )

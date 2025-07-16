@@ -2,7 +2,7 @@ import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
@@ -261,20 +261,15 @@ class LookupTests(TestCase):
 
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_preserve_ordering_with_batch_size(self):
-        old_max_query_params = connection.features.max_query_params
-        connection.features.max_query_params = 1
-        try:
-            articles = (
-                Article.objects.order_by("author_id", "-pub_date")
-                .distinct("author_id")
-                .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
-            )
+        qs = Article.objects.order_by("author_id", "-pub_date").distinct("author_id")
+        with (
+            mock.patch.object(connection.features.__class__, "max_query_params", 1),
+            self.assertNumQueries(2),
+        ):
             self.assertEqual(
-                articles,
+                qs.in_bulk([self.au1.id, self.au2.id], field_name="author_id"),
                 {self.au1.id: self.a4, self.au2.id: self.a5},
             )
-        finally:
-            connection.features.max_query_params = old_max_query_params
 
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_distinct_field(self):

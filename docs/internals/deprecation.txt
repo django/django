@@ -28,6 +28,9 @@ details on these changes.
 
 * The ``URLIZE_ASSUME_HTTPS`` transitional setting will be removed.
 
+* Using a percent sign in a column alias or annotation will raise
+  ``ValueError``.
+
 * Support for setting the ``ADMINS`` or ``MANAGERS`` settings to a list of
   (name, address) tuples will be removed.
 
@@ -54,6 +57,10 @@ details on these changes.
   functions ``django.contrib.postgres.aggregates.ArrayAgg``,
   ``django.contrib.postgres.aggregates.JSONBAgg``, and
   ``django.contrib.postgres.aggregates.StringAgg`` will be removed.
+
+* Support for subclasses of ``RemoteUserMiddleware`` that override
+  ``process_request()`` without overriding ``aprocess_request()`` will be
+  removed.
 
 .. _deprecation-removed-in-6.0:
 

@@ -93,19 +93,29 @@ class DecimalSerializer(BaseSerializer):
         return repr(self.value), {"from decimal import Decimal"}
 
 
-class DeconstructableSerializer(BaseSerializer):
+class DeconstructibleSerializer(BaseSerializer):
     @staticmethod
     def serialize_deconstructed(path, args, kwargs):
-        name, imports = DeconstructableSerializer._serialize_path(path)
+        name, imports = DeconstructibleSerializer._serialize_path(path)
         strings = []
         for arg in args:
             arg_string, arg_imports = serializer_factory(arg).serialize()
             strings.append(arg_string)
             imports.update(arg_imports)
+        non_ident_kwargs = {}
         for kw, arg in sorted(kwargs.items()):
-            arg_string, arg_imports = serializer_factory(arg).serialize()
-            imports.update(arg_imports)
-            strings.append("%s=%s" % (kw, arg_string))
+            if kw.isidentifier():
+                arg_string, arg_imports = serializer_factory(arg).serialize()
+                imports.update(arg_imports)
+                strings.append("%s=%s" % (kw, arg_string))
+            else:
+                non_ident_kwargs[kw] = arg
+        if non_ident_kwargs:
+            # Serialize non-identifier keyword arguments as a dict.
+            kw_string, kw_imports = serializer_factory(non_ident_kwargs).serialize()
+            strings.append(f"**{kw_string}")
+            imports.update(kw_imports)
+
         return "%s(%s)" % (name, ", ".join(strings)), imports
 
     @staticmethod
@@ -197,23 +207,11 @@ class FunctionTypeSerializer(BaseSerializer):
 
 class FunctoolsPartialSerializer(BaseSerializer):
     def serialize(self):
-        # Serialize functools.partial() arguments
-        func_string, func_imports = serializer_factory(self.value.func).serialize()
-        args_string, args_imports = serializer_factory(self.value.args).serialize()
-        keywords_string, keywords_imports = serializer_factory(
-            self.value.keywords
-        ).serialize()
-        # Add any imports needed by arguments
-        imports = {"import functools", *func_imports, *args_imports, *keywords_imports}
-        return (
-            "functools.%s(%s, *%s, **%s)"
-            % (
-                self.value.__class__.__name__,
-                func_string,
-                args_string,
-                keywords_string,
-            ),
-            imports,
+        partial_name = self.value.__class__.__name__
+        return DeconstructibleSerializer.serialize_deconstructed(
+            f"functools.{partial_name}",
+            (self.value.func, *self.value.args),
+            self.value.keywords,
         )
 
 
@@ -231,13 +229,13 @@ class IterableSerializer(BaseSerializer):
         return value % (", ".join(strings)), imports
 
 
-class ModelFieldSerializer(DeconstructableSerializer):
+class ModelFieldSerializer(DeconstructibleSerializer):
     def serialize(self):
         attr_name, path, args, kwargs = self.value.deconstruct()
         return self.serialize_deconstructed(path, args, kwargs)
 
 
-class ModelManagerSerializer(DeconstructableSerializer):
+class ModelManagerSerializer(DeconstructibleSerializer):
     def serialize(self):
         as_manager, manager_path, qs_path, args, kwargs = self.value.deconstruct()
         if as_manager:
@@ -397,7 +395,7 @@ def serializer_factory(value):
         return TypeSerializer(value)
     # Anything that knows how to deconstruct itself.
     if hasattr(value, "deconstruct"):
-        return DeconstructableSerializer(value)
+        return DeconstructibleSerializer(value)
     for type_, serializer_cls in Serializer._registry.items():
         if isinstance(value, type_):
             return serializer_cls(value)

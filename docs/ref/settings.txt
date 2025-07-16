@@ -2363,6 +2363,94 @@ Unless set to ``None``, the
 :ref:`cross-origin-opener-policy` header on all responses that do not already
 have it to the value provided.
 
+.. setting:: SECURE_CSP
+
+``SECURE_CSP``
+--------------
+
+.. versionadded:: 6.0
+
+Default: ``{}``
+
+This setting defines the directives used by the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`, which
+generates and adds a :ref:`Content-Security-Policy <csp-overview>` (CSP) header
+to all responses that do not already include one.
+
+The ``Content-Security-Policy`` header instructs browsers to restrict which
+resources a page is allowed to load. A properly configured CSP can block
+content that violates defined rules, helping prevent cross-site scripting (XSS)
+and other content injection attacks by explicitly declaring trusted sources for
+content such as scripts, styles, images, fonts, and more.
+
+The setting must be a mapping (typically a dictionary) of directive names to
+their values. Each key should be a valid CSP directive such as ``default-src``
+or ``script-src``. The corresponding value can be a list, tuple, or set of
+source expressions or URLs to allow for that directive. If a set is used, it
+will be automatically sorted to ensure consistent output in the generated
+headers.
+
+This example illustrates the expected structure, using the constants defined in
+:ref:`csp-constants`::
+
+    from django.utils.csp import CSP
+
+    SECURE_CSP = {
+        "default-src": [CSP.SELF],
+        "img-src": ["data:", CSP.SELF, "https://images.example.com"],
+        "frame-src": [CSP.NONE],
+    }
+
+.. admonition:: Directives validation
+
+   Django's CSP middleware helps construct and send the appropriate header
+   based on your settings, but it does **not validate** that the directives and
+   values conform to the CSP specification. It is your responsibility to ensure
+   that the configuration is syntactically and semantically correct. Use
+   browser developer tools or external CSP validators during development.
+
+   For a list of available directives and their values, refer to the `MDN
+   documentation on CSP directives
+   <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>`_.
+
+
+.. setting:: SECURE_CSP_REPORT_ONLY
+
+``SECURE_CSP_REPORT_ONLY``
+--------------------------
+
+.. versionadded:: 6.0
+
+Default: ``{}``
+
+This setting is just like :setting:`SECURE_CSP`, but instead of enforcing the
+policy, it instructs the
+:class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` to apply a
+``Content-Security-Policy-Report-Only`` header to responses, which allows
+browsers to monitor and report policy violations without blocking content. This
+is useful for testing and refining a policy before enforcement.
+
+Most browsers log CSP violations to the developer console and can optionally
+send them to a reporting endpoint. To collect these reports, the ``report-uri``
+directive must be defined (see :ref:`csp-reports` for more details).
+
+As noted in the `MDN documentation on Content-Security-Policy-Report-Only
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only>`_,
+the ``report-uri`` directive must be specified for reports to be sent;
+otherwise, the header has no reporting effect (other than logging to the
+browser's developer tools console).
+
+Following the example from the :setting:`SECURE_CSP` setting::
+
+    from django.utils.csp import CSP
+
+    SECURE_CSP_REPORT_ONLY = {
+        "default-src": [CSP.SELF],
+        "img-src": ["data:", CSP.SELF, "https://images.example.com"],
+        "frame-src": [CSP.NONE],
+        "report-uri": "/my-site/csp/reports/",
+    }
+
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
 ``SECURE_HSTS_INCLUDE_SUBDOMAINS``
@@ -3749,6 +3837,8 @@ HTTP
 
   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
   * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+  * :setting:`SECURE_CSP`
+  * :setting:`SECURE_CSP_REPORT_ONLY`
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
   * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`

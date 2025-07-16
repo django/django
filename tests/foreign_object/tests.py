@@ -450,6 +450,15 @@ class MultiColumnFKTests(TestCase):
         normal_groups_lists = [list(p.groups.all()) for p in Person.objects.all()]
         self.assertEqual(groups_lists, normal_groups_lists)
 
+    def test_refresh_foreign_object(self):
+        member = Membership.objects.create(
+            membership_country=self.usa, person=self.bob, group=self.cia
+        )
+        member.person = self.jim
+        with self.assertNumQueries(1):
+            member.refresh_from_db()
+        self.assertEqual(member.person, self.bob)
+
     @translation.override("fi")
     def test_translations(self):
         a1 = Article.objects.create(pub_date=datetime.date.today())

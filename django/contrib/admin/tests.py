@@ -1,24 +1,27 @@
 from contextlib import contextmanager
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import modify_settings
+from django.test import modify_settings, override_settings
 from django.test.selenium import SeleniumTestCase
-from django.utils.deprecation import MiddlewareMixin
+from django.utils.csp import CSP
 from django.utils.translation import gettext as _
 
 # Make unittest ignore frames in this module when reporting failures.
 __unittest = True
 
 
-class CSPMiddleware(MiddlewareMixin):
-    """The admin's JavaScript should be compatible with CSP."""
-
-    def process_response(self, request, response):
-        response.headers["Content-Security-Policy"] = "default-src 'self'"
-        return response
-
-
-@modify_settings(MIDDLEWARE={"append": "django.contrib.admin.tests.CSPMiddleware"})
+@modify_settings(
+    MIDDLEWARE={"append": "django.middleware.csp.ContentSecurityPolicyMiddleware"}
+)
+@override_settings(
+    SECURE_CSP={
+        "default-src": [CSP.NONE],
+        "connect-src": [CSP.SELF],
+        "img-src": [CSP.SELF],
+        "script-src": [CSP.SELF],
+        "style-src": [CSP.SELF],
+    },
+)
 class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
     available_apps = [
         "django.contrib.admin",
@@ -27,6 +30,11 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         "django.contrib.sessions",
         "django.contrib.sites",
     ]
+
+    def tearDown(self):
+        # Ensure that no CSP violations were logged in the browser.
+        self.assertEqual(self.get_browser_logs(source="security"), [])
+        super().tearDown()
 
     def wait_until(self, callback, timeout=10):
         """
