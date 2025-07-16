@@ -176,6 +176,7 @@ def setup_databases(
     *,
     time_keeper=None,
     keepdb=False,
+    use_clones=False,
     debug_sql=False,
     parallel=0,
     aliases=None,
@@ -201,21 +202,30 @@ def setup_databases(
             if first_alias is None:
                 first_alias = alias
                 with time_keeper.timed("  Creating '%s'" % alias):
-                    connection.creation.create_test_db(
+                    new_db_name = connection.creation.create_test_db(
                         verbosity=verbosity,
                         autoclobber=not interactive,
                         keepdb=keepdb,
                     )
                     if serialized_aliases is None or alias in serialized_aliases:
                         serialize_connections.append(connection)
-                if parallel > 1:
-                    for index in range(parallel):
+
+                if use_clones and not parallel:
+                    parallel = 1
+                if parallel > 1 or use_clones:
+                    for index in range(1, parallel + 1):
                         with time_keeper.timed("  Cloning '%s'" % alias):
                             connection.creation.clone_test_db(
-                                suffix=str(index + 1),
+                                suffix=str(index),
                                 verbosity=verbosity,
-                                keepdb=keepdb,
+                                keepdb=False if use_clones else keepdb,
                             )
+                if use_clones and parallel == 1:
+                    # Set db to the lone clone
+                    cloned_db_name = "%s_1" % new_db_name
+                    settings.DATABASES[connection.alias]["NAME"] = cloned_db_name
+                    connection.settings_dict["NAME"] = cloned_db_name
+
             # Configure all other connections as mirrors of the first one
             else:
                 connections[alias].creation.set_as_test_mirror(

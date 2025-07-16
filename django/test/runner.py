@@ -693,6 +693,7 @@ class DiscoverRunner:
         verbosity=1,
         interactive=True,
         failfast=False,
+        use_clones=False,
         keepdb=False,
         reverse=False,
         debug_mode=False,
@@ -715,7 +716,8 @@ class DiscoverRunner:
         self.verbosity = verbosity
         self.interactive = interactive
         self.failfast = failfast
-        self.keepdb = keepdb
+        self.use_clones = use_clones
+        self.keepdb = keepdb or use_clones
         self.reverse = reverse
         self.debug_mode = debug_mode
         self.debug_sql = debug_sql
@@ -768,6 +770,11 @@ class DiscoverRunner:
         )
         parser.add_argument(
             "--keepdb", action="store_true", help="Preserves the test DB between runs."
+        )
+        parser.add_argument(
+            "--use-clones",
+            action="store_true",
+            help="Runs all tests against fresh clones of the test DB. ",
         )
         parser.add_argument(
             "--shuffle",
@@ -1010,6 +1017,7 @@ class DiscoverRunner:
             keepdb=self.keepdb,
             debug_sql=self.debug_sql,
             parallel=self.parallel,
+            use_clones=self.use_clones,
             **kwargs,
         )
 
