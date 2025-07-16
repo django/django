@@ -2792,7 +2792,7 @@ class LegacyAPINotUsedTests(SimpleTestCase):
     allowed_exceptions = {
         # Compatibility in EmailMessage.attachments special cases:
         "email.message.Message",
-        "email.mime.base.MIMEBase",
+        "email.mime.base.MIMEBase",  # RemovedInDjango70Warning: MIMEBase.
         # No replacement in modern email API:
         "email.utils.make_msgid",
     }
