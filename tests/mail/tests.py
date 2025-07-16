@@ -1701,9 +1701,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(message.policy, policy.default)
 
     def test_message_policy_smtputf8(self):
-        # With SMTPUTF8, the message uses utf-8 directly in headers (not RFC 2047
-        # encoded-words). Note this is the only spec-compliant way to send to
-        # a non-ASCII localpart.
+        # With SMTPUTF8, the message uses utf-8 directly in headers (not
+        # RFC 2047 encoded-words). Note this is the only spec-compliant way
+        # to send to a non-ASCII localpart.
         email = EmailMessage(
             subject="Detta ämne innehåller icke-ASCII-tecken",
             to=["nøn-åscîi@example.com"],
@@ -1729,7 +1729,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
         # Uses something 7bit compatible when policy requires it. Should pick
         # the shorter of quoted-printable (for this body) or base64 (for this
-        # attachment), but must not use 8bit. (Decoding to "ascii" verifies that.)
+        # attachment), but must not use 8bit. (Decoding to "ascii" verifies
+        # that.)
         policy_7bit = policy.default.clone(cte_type="7bit")
         msg_bytes = email.message(policy=policy_7bit).as_bytes()
         msg_ascii = msg_bytes.decode("ascii")
@@ -2816,7 +2817,8 @@ class LegacyAPINotUsedTests(SimpleTestCase):
 
     class ImportCollector(ast.NodeVisitor):
         """
-        Collect all imports from an AST as a set of fully-qualified dotted names.
+        Collect all imports from an AST as a set of fully-qualified dotted
+        names.
         """
 
         def __init__(self, source=None):

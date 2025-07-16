@@ -387,8 +387,9 @@ Email
   of :class:`~django.core.mail.EmailMessage` and
   :class:`~django.core.mail.EmailMultiAlternatives` are no longer supported.
 
-* The undocumented ``encoding`` property of :class:`~django.core.mail.EmailMessage`
-  no longer supports Python legacy :py:class:`email.charset.Charset` objects.
+* The undocumented ``encoding`` property of
+  :class:`~django.core.mail.EmailMessage` no longer supports Python legacy
+  :py:class:`email.charset.Charset` objects.
 
 * The internal implementations of :class:`~django.core.mail.EmailMessage` and
   :class:`~django.core.mail.EmailMultiAlternatives` have changed significantly.

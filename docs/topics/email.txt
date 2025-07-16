@@ -336,7 +336,8 @@ All parameters are optional and can be set at any time prior to calling the
 
 .. versionchanged:: 6.0
 
-    Added support for attaching Python's :class:`~email.message.MIMEPart` items.
+    Added support for attaching Python's :class:`~email.message.MIMEPart`
+    items.
 
 .. deprecated:: 6.0
 
@@ -445,8 +446,8 @@ The class has the following methods:
 
     .. versionchanged:: 6.0
 
-        Added support for Python's modern email :class:`~email.message.MIMEPart`
-        attachments
+        Added support for Python's modern email
+        :class:`~email.message.MIMEPart` attachments.
 
     .. deprecated:: 6.0
 
