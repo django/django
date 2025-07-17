@@ -202,12 +202,13 @@ options are optional.
 
 This option may be used for customizing the coordinate dimension of the
 geometry field.  By default, it is set to 2, for representing two-dimensional
-geometries.  For spatial backends that support it, it may be set to 3 for
-three-dimensional support.
+geometries.  For spatial backends that support it, it may be set to 3 or 4 for
+three-dimensional or four-dimensional support.
 
 .. note::
 
     At this time 3D support is limited to the PostGIS and SpatiaLite backends.
+    At this time 4D support is limited to the PostGIS backend.
 
 ``geography``
 -------------
