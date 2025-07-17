@@ -635,6 +635,18 @@ Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
     MariaDB 12.0.1+ support was added.
 
+``GeometryType``
+----------------
+
+.. versionadded:: 6.0
+
+.. class:: GeometryType(expr)
+
+*Availability*: `PostGIS <https://postgis.net/docs/GeometryType.html>`__,
+Oracle 23c+, MariaDB, MySQL, SpatiaLite
+
+Accepts a geographic field or expression and returns its geometry type.
+
 ``MemSize``
 -----------
 

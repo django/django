@@ -54,6 +54,7 @@ class BaseSpatialOperations:
         "FromWKT",
         "GeoHash",
         "GeometryDistance",
+        "GeometryType",
         "Intersection",
         "IsEmpty",
         "IsValid",

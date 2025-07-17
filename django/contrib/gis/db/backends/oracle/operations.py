@@ -18,6 +18,7 @@ from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.operations import DatabaseOperations
+from django.utils.functional import cached_property
 
 DEFAULT_TOLERANCE = "0.05"
 
@@ -117,23 +118,28 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         "dwithin": SDODWithin(),
     }
 
-    unsupported_functions = {
-        "AsKML",
-        "AsSVG",
-        "Azimuth",
-        "ClosestPoint",
-        "ForcePolygonCW",
-        "GeoHash",
-        "GeometryDistance",
-        "IsEmpty",
-        "LineLocatePoint",
-        "MakeValid",
-        "MemSize",
-        "Rotate",
-        "Scale",
-        "SnapToGrid",
-        "Translate",
-    }
+    @cached_property
+    def unsupported_functions(self):
+        unsupported = {
+            "AsKML",
+            "AsSVG",
+            "Azimuth",
+            "ClosestPoint",
+            "ForcePolygonCW",
+            "GeoHash",
+            "GeometryDistance",
+            "IsEmpty",
+            "LineLocatePoint",
+            "MakeValid",
+            "MemSize",
+            "Rotate",
+            "Scale",
+            "SnapToGrid",
+            "Translate",
+        }
+        if self.connection.oracle_version < (23,):
+            unsupported.add("GeometryType")
+        return unsupported
 
     def geo_quote_name(self, name):
         return super().geo_quote_name(name).upper()

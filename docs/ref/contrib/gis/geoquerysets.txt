@@ -399,6 +399,32 @@ Oracle                               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(p
 
     MariaDB 12.0.1+ support was added.
 
+.. fieldlookup:: geom_type
+
+``geom_type``
+-------------
+
+.. versionadded:: 6.0
+
+*Availability*: `PostGIS <https://postgis.net/docs/GeometryType.html>`__,
+Oracle 23c+, MariaDB, MySQL, SpatiaLite
+
+Returns the geometry type of the geometry field.
+
+Example::
+
+    Zipcode.objects.filter(poly__geom_type="POLYGON")
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``GeometryType(geom)``
+MariaDB     ``ST_GeometryType(geom)``
+MySQL       ``ST_GeometryType(geom)``
+Oracle      ``SDO_GEOMETRY.GET_GTYPE(geom)``
+SpatiaLite  ``GeometryType(geom)``
+==========  ==========================
+
 .. fieldlookup:: overlaps
 
 ``overlaps``
