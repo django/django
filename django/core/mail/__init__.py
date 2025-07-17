@@ -2,8 +2,6 @@
 Tools for sending email.
 """
 
-import warnings
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
@@ -13,18 +11,13 @@ from django.core.exceptions import ImproperlyConfigured
 # backends and the subsequent reorganization (See #10355)
 from django.core.mail.message import (
     DEFAULT_ATTACHMENT_MIME_TYPE,
-    BadHeaderError,
     EmailAlternative,
     EmailAttachment,
     EmailMessage,
     EmailMultiAlternatives,
-    SafeMIMEMultipart,
-    SafeMIMEText,
-    forbid_multi_line_headers,
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
-from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import Promise
 from django.utils.module_loading import import_string
 
@@ -33,12 +26,8 @@ __all__ = [
     "DNS_NAME",
     "EmailMessage",
     "EmailMultiAlternatives",
-    "SafeMIMEText",
-    "SafeMIMEMultipart",
     "DEFAULT_ATTACHMENT_MIME_TYPE",
     "make_msgid",
-    "BadHeaderError",
-    "forbid_multi_line_headers",
     "get_connection",
     "send_mail",
     "send_mass_mail",
@@ -136,16 +125,6 @@ def _send_server_message(
     recipients = getattr(settings, setting_name)
     if not recipients:
         return
-
-    # RemovedInDjango70Warning.
-    if all(isinstance(a, (list, tuple)) and len(a) == 2 for a in recipients):
-        warnings.warn(
-            f"Using (name, address) pairs in the {setting_name} setting is deprecated."
-            " Replace with a list of email address strings.",
-            RemovedInDjango70Warning,
-            stacklevel=2,
-        )
-        recipients = [a[1] for a in recipients]
 
     if not isinstance(recipients, (list, tuple)) or not all(
         isinstance(address, (str, Promise)) for address in recipients
