@@ -1472,6 +1472,12 @@ subsequent run. Unless the :setting:`MIGRATE <TEST_MIGRATE>` test setting is
 ``False``, any unapplied migrations will also be applied to the test database
 before running the test suite.
 
+.. django-admin-option:: --use-clones
+
+Similar to ``--keepdb``, but only runs tests against fresh clones of the
+test database. This ensures it will never be modified at the cost of additional
+database copies. Previous test copies will be automatically overwritten.
+
 .. django-admin-option:: --shuffle [SEED]
 
 Randomizes the order of tests before running them. This can help detect tests

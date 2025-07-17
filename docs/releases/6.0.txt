@@ -310,7 +310,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Django test runner now supports a ``--use-clones`` option to always run tests
+  against fresh clones of the test database.
 
 URLs
 ~~~~

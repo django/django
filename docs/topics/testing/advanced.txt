@@ -525,7 +525,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used by ``run_tests()`` to set up, execute
 and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, shuffle=False, logger=None, durations=None, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, use_clones=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, shuffle=False, logger=None, durations=None, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -550,6 +550,10 @@ and tear down the test suite.
     If ``keepdb`` is ``True``, the test suite will use the existing database,
     or create one if necessary. If ``False``, a new database will be created,
     prompting the user to remove the existing one, if present.
+
+    If ``use_clones`` is ``True``, the test suite will only run tests against
+    fresh copies of the test database.  It is similar to ``keepdb``, but it
+    will automatically overwrite existing clones.
 
     If ``reverse`` is ``True``, test cases will be executed in the opposite
     order. This could be useful to debug tests that aren't properly isolated
@@ -763,7 +767,7 @@ utility methods in the ``django.test.utils`` module.
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
 
-.. function:: setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0, aliases=None, serialized_aliases=None, **kwargs)
+.. function:: setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, use_clones=False, debug_sql=False, parallel=0, aliases=None, serialized_aliases=None, **kwargs)
 
     Creates the test databases.
 
