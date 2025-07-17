@@ -119,6 +119,9 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
   are now supported on MariaDB 12.0.1+.
 
+* Introduced :lookup:`geom_type` lookup to allow filtering by geometry type
+
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

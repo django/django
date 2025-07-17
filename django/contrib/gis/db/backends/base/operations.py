@@ -73,6 +73,7 @@ class BaseSpatialOperations:
         "Transform",
         "Translate",
         "Union",
+        "GeometryType",
     }
 
     # Constructors

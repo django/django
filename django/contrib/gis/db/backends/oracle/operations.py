@@ -89,6 +89,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         "SymDifference": "SDO_GEOM.SDO_XOR",
         "Transform": "SDO_CS.TRANSFORM",
         "Union": "SDO_GEOM.SDO_UNION",
+        "GeometryType": "SDO_GEOM.GET_GTYPE",
     }
 
     # We want to get SDO Geometries as WKT because it is much easier to
