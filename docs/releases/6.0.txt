@@ -105,6 +105,45 @@ with :func:`~django.template.Engine.get_template`,
 :func:`~django.shortcuts.render`, :ttag:`{% include %}<include>`, and other
 template-loading tools, enabling more modular and maintainable templates
 without needing to split components into separate files.
+Background task framework
+-------------------------
+
+Django now includes a built-in tasks framework for running code outside the
+HTTP request–response cycle, allowing you to offload work, such as sending
+emails or processing data, to background workers. Django currently only handles
+task creation and queuing. It does not provide a worker mechanism to run tasks.
+The actual execution must be handled by infrastructure outside Django, such as a
+separate process or service.
+
+Tasks are defined with the :meth:`~django.tasks.task` decorator::
+
+    from django.core.mail import send_mail
+    from django.tasks import task
+
+
+    @task
+    def email_users(emails, subject, message):
+        return send_mail(subject, message, None, emails)
+
+They can then be enqueued for execution by a configured task backend::
+
+    email_users.enqueue(
+        emails=["user@example.com"],
+        subject="You have a message",
+        message="Hello there!",
+    )
+
+Backends can be configured via the :setting:`TASKS` setting. Django provides
+two built-in backends, mainly for development and testing:
+
+* :class:`~django.tasks.backends.immediate.ImmediateBackend` – Runs tasks
+  immediately in the same process.
+* :class:`~django.tasks.backends.dummy.DummyBackend` – Stores tasks without
+  running them, leaving results in the :attr:`~django.tasks.ResultStatus.READY`
+  state.
+
+For more information, see :doc:`/topics/tasks`. For in-depth guidance, see the
+:doc:`reference documentation </ref/tasks>`.
 
 Minor features
 --------------
