@@ -588,6 +588,12 @@ Signals
   a lazy reference to the sender ``<app label>.<model>``, but app ``<app label>``
   isn't installed or doesn't provide model ``<model>``.
 
+Tasks
+-----
+
+* **tasks.E001**: ``ENQUEUE_ON_COMMIT`` cannot be used when no databases are
+  configured.
+
 Templates
 ---------
 
