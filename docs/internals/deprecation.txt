@@ -38,6 +38,9 @@ details on these changes.
   argument of ``django.core.paginator.Paginator`` and
   ``django.core.paginator.AsyncPaginator`` will no longer be allowed.
 
+* Support for double-dot variable lookup, like ``{{ book..title }}``,
+  is removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
