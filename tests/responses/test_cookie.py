@@ -118,6 +118,15 @@ class SetCookieTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             HttpResponse().set_cookie("example", samesite="invalid")
 
+    def test_partitioned_cookie(self):
+        response = HttpResponse()
+        response.set_cookie("example", partitioned=True)
+        example_cookie = response.cookies["example"]
+        self.assertIn(
+            "; %s" % cookies.Morsel._reserved["partitioned"], str(example_cookie)
+        )
+        self.assertIs(response.cookies["example"]["partitioned"], True)
+
 
 class DeleteCookieTests(SimpleTestCase):
     def test_default(self):
@@ -130,6 +139,7 @@ class DeleteCookieTests(SimpleTestCase):
         self.assertEqual(cookie["secure"], "")
         self.assertEqual(cookie["domain"], "")
         self.assertEqual(cookie["samesite"], "")
+        self.assertEqual(cookie["partitioned"], "")
 
     def test_delete_cookie_secure_prefix(self):
         """
@@ -154,24 +164,6 @@ class DeleteCookieTests(SimpleTestCase):
         response = HttpResponse()
         response.delete_cookie("c", samesite="lax")
         self.assertEqual(response.cookies["c"]["samesite"], "lax")
-
-    def test_partitioned_cookie(self):
-        """Test that partitioned cookie attribute is set correctly."""
-        response = HttpResponse()
-        response.set_cookie("example", partitioned=True)
-        example_cookie = response.cookies["example"]
-        self.assertIn(
-            "; %s" % cookies.Morsel._reserved["partitioned"], str(example_cookie)
-        )
-        self.assertIs(example_cookie["partitioned"], True)
-
-    def test_partitioned_cookie_default(self):
-        """Test that partitioned defaults to False."""
-        response = HttpResponse()
-        response.set_cookie("example")
-        example_cookie = response.cookies["example"]
-        self.assertEqual(example_cookie["partitioned"], "")
-        self.assertNotIn("Partitioned", str(example_cookie))
 
     def test_delete_cookie_partitioned(self):
         """Test that delete_cookie respects partitioned attribute."""
