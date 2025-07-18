@@ -355,7 +355,7 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
             "  import shell\n"
             "  import django\n"
             "  from django.conf import settings\n"
-            "  from django.db import connection, reset_queries, models\n"
+            "  from django.db import connection, models, reset_queries\n"
             "  from django.db.models import functions\n"
             "  from django.utils import timezone\n"
             "  from django.contrib.contenttypes.models import ContentType\n"
@@ -411,7 +411,7 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
             1: "6 objects imported automatically (use -v 2 for details).",
             2: "6 objects imported automatically:\n\n"
             "  from django.conf import settings\n"
-            "  from django.db import connection, reset_queries, models\n"
+            "  from django.db import connection, models, reset_queries\n"
             "  from django.db.models import functions\n"
             "  from django.utils import timezone",
         }

@@ -133,9 +133,9 @@ class Command(BaseCommand):
         [
             "django.conf.settings",
             "django.db.connection",
-            "django.db.reset_queries",
             "django.db.models",
             "django.db.models.functions",
+            "django.db.reset_queries",
             "django.utils.timezone",
             "django.contrib.sessions.models.Session",
             "django.contrib.contenttypes.models.ContentType",
@@ -149,9 +149,9 @@ class Command(BaseCommand):
         default_imports = [
             "django.conf.settings",
             "django.db.connection",
-            "django.db.reset_queries",
             "django.db.models",
             "django.db.models.functions",
+            "django.db.reset_queries",
             "django.utils.timezone",
         ]
         app_models_imports = default_imports + [
