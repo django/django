@@ -364,6 +364,7 @@ def django_tests(
     interactive,
     failfast,
     keepdb,
+    use_clones,
     reverse,
     test_labels,
     debug_sql,
@@ -413,6 +414,7 @@ def django_tests(
         interactive=interactive,
         failfast=failfast,
         keepdb=keepdb,
+        use_clones=use_clones,
         reverse=reverse,
         debug_sql=debug_sql,
         parallel=parallel,
@@ -566,6 +568,11 @@ if __name__ == "__main__":
         "--keepdb",
         action="store_true",
         help="Tells Django to preserve the test database between runs.",
+    )
+    parser.add_argument(
+        "--use-clones",
+        action="store_true",
+        help="Runs all tests against fresh clones of the test DB.",
     )
     parser.add_argument(
         "--settings",
@@ -791,6 +798,7 @@ if __name__ == "__main__":
                 options.interactive,
                 options.failfast,
                 options.keepdb,
+                options.use_clones,
                 options.reverse,
                 options.modules,
                 options.debug_sql,

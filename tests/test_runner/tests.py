@@ -936,6 +936,87 @@ class SetupDatabasesTests(unittest.TestCase):
         mocked_db_creation.return_value.serialize_db_to_string.assert_called_once_with()
 
 
+@mock.patch(
+    "django.test.utils.get_unique_databases_and_mirrors",
+    return_value=({"_": ("prod_db", ["default"])}, {}),
+)
+@mock.patch("django.test.utils.settings")
+class RunnerUseClonesTests(unittest.TestCase):
+    prod_db = "prod_db"
+    test_db = "test_prod_db"
+
+    def setUp(self):
+        self.connections = mock.MagicMock()
+        self.cr = self.connections["default"].creation
+        self.c_settings = self.connections["default"].settings_dict
+        self.connections["default"].alias = "default"
+        self.cr.create_test_db.return_value = self.test_db
+
+    def test_setup_database_defaults(self, *mocks):
+        # Sanity check
+        runner = DiscoverRunner(verbosity=0, keepdb=False, use_clones=False, parallel=0)
+        with mock.patch("django.test.utils.connections", new=self.connections):
+            old_config = runner.setup_databases(aliases={"default": False})
+        self.cr.create_test_db.assert_called_once()
+        self.cr.clone_test_db.assert_not_called()
+        self.assertEqual(old_config[0][1], self.prod_db)
+        self.connections["default"].settings_dict.__setitem__.assert_not_called()
+
+    def test_setup_database_keepdb(self, *mocks):
+        runner = DiscoverRunner(verbosity=0, keepdb=True, use_clones=False, parallel=0)
+        with mock.patch("django.test.utils.connections", new=self.connections):
+            runner.setup_databases(aliases={"default": False})
+        self.cr.create_test_db.assert_called_once()
+        c_kwargs = self.cr.create_test_db.call_args.kwargs
+        self.assertTrue(c_kwargs["keepdb"])
+        self.cr.clone_test_db.assert_not_called()
+
+    def test_setup_database_keepdb_parallel(self, *mocks):
+        runner = DiscoverRunner(verbosity=0, keepdb=True, use_clones=False, parallel=2)
+        with mock.patch("django.test.utils.connections", new=self.connections):
+            runner.setup_databases(aliases={"default": False})
+        self.assertEqual(self.cr.clone_test_db.call_count, runner.parallel)
+        c_kwargs = self.cr.clone_test_db.call_args.kwargs
+        self.assertTrue(c_kwargs["keepdb"])
+
+    def test_use_clones_sets_keepdb(self, *mocks):
+        runner = DiscoverRunner(keepdb=False, use_clones=True)
+        self.assertTrue(runner.keepdb)
+
+    def test_setup_database_use_clones(self, *mocks):
+        runner = DiscoverRunner(verbosity=0, use_clones=True)
+        for x in [0, 1]:
+            with self.subTest(parallel=x):
+                runner.parallel = x
+                with mock.patch("django.test.utils.connections", new=self.connections):
+                    old_config = runner.setup_databases(aliases={"default": False})
+                # Created the test db with keepdb
+                self.cr.create_test_db.assert_called_once()
+                self.assertTrue(self.cr.create_test_db.call_args.kwargs["keepdb"])
+                # Created the clone and destroyed an existing one
+                self.cr.clone_test_db.assert_called_once()
+                self.assertFalse(self.cr.clone_test_db.call_args.kwargs["keepdb"])
+                # Database name was set to clone
+                self.c_settings.__setitem__.assert_called_once_with(
+                    "NAME", "%s_1" % self.test_db
+                )
+                # Original database name is still the same
+                self.assertEqual(old_config[0][1], self.prod_db)
+                # Reset call counts
+                self.cr.create_test_db.call_count = 0
+                self.cr.clone_test_db.call_count = 0
+                self.c_settings.__setitem__.call_count = 0
+
+    def test_setup_database_use_clones_parallel(self, *mocks):
+        runner = DiscoverRunner(verbosity=0, use_clones=True, parallel=2)
+        with mock.patch("django.test.utils.connections", new=self.connections):
+            runner.setup_databases(aliases={"default": False})
+        # Created multiple clones
+        self.assertEqual(self.cr.clone_test_db.call_count, runner.parallel)
+        # Database name not changed
+        self.c_settings.__setitem__.assert_not_called()
+
+
 @skipUnlessDBFeature("supports_sequence_reset")
 class AutoIncrementResetTest(TransactionTestCase):
     """

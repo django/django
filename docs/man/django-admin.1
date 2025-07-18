@@ -1861,6 +1861,14 @@ subsequent run. Unless the \fI\%MIGRATE\fP test setting is
 before running the test suite.
 .INDENT 0.0
 .TP
+.B \-\-use-clones
+.UNINDENT
+.sp
+Similar to \fB\-\-keepdb\fP, but only runs tests against fresh clones of the
+test database. This ensures it will never be modified at the cost of additional
+database copies. Previous test copies will be automatically overwritten.
+.INDENT 0.0
+.TP
 .B \-\-shuffle [SEED]
 .UNINDENT
 .sp
