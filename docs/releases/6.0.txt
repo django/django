@@ -285,7 +285,11 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* The new ``return_timestamp`` parameter for
+  :func:`~django.core.signing.loads`,
+  :meth:`~django.core.signing.TimestampSigner.unsign`, and
+  :meth:`~django.core.signing.TimestampSigner.unsign_object` determines whether
+  a tuple containing the unsigned object and the timestamp is returned.
 
 Serialization
 ~~~~~~~~~~~~~

@@ -233,6 +233,21 @@ class TestTimestampSigner(SimpleTestCase):
             with self.assertRaises(signing.SignatureExpired):
                 signer.unsign(ts, max_age=10)
 
+    def test_return_timestamp(self):
+        value = "hello"
+        with freeze_time(123456888):
+            signer = signing.TimestampSigner(key="predictable-key")
+            signed_obj = signer.sign_object(value)
+            data_and_time = signer.unsign_object(signed_obj, return_timestamp=True)
+            self.assertEqual(data_and_time, (value, 123456888))
+
+    def test_return_timestamp_dump_loads(self):
+        value = {"foo": "bar", "baz": 42}
+        with freeze_time(123456789):
+            signed_data = signing.dumps(value)
+            data_and_time = signing.loads(signed_data, return_timestamp=True)
+            self.assertEqual(data_and_time, (value, 123456789))
+
 
 class TestBase62(SimpleTestCase):
     def test_base62(self):
