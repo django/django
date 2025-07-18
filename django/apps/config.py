@@ -14,46 +14,47 @@ class AppConfig:
     """Class representing a Django application and its configuration."""
 
     def __init__(self, app_name, app_module):
-        # Full Python path to the application e.g. 'django.contrib.admin'.
-        self.name = app_name
+    """
+    Initialize the AppConfig with name and module.
+    
+    Args:
+        app_name (str): Full Python path to the application.
+        app_module (module): Module object for the application.
+    """
 
-        # Root module for the application e.g. <module 'django.contrib.admin'
-        # from 'django/contrib/admin/__init__.py'>.
-        self.module = app_module
+    # Store the full Python path of the application (e.g., 'django.contrib.admin')
+    self.name = app_name
 
-        # Reference to the Apps registry that holds this AppConfig. Set by the
-        # registry when it registers the AppConfig instance.
-        self.apps = None
+    # Store the reference to the module object (e.g., <module 'django.contrib.admin'>)
+    self.module = app_module
 
-        # The following attributes could be defined at the class level in a
-        # subclass, hence the test-and-set pattern.
+    # This will later hold a reference to the global apps registry
+    self.apps = None
 
-        # Last component of the Python path to the application e.g. 'admin'.
-        # This value must be unique across a Django project.
-        if not hasattr(self, "label"):
-            self.label = app_name.rpartition(".")[2]
-        if not self.label.isidentifier():
-            raise ImproperlyConfigured(
-                "The app label '%s' is not a valid Python identifier." % self.label
-            )
+    # If 'label' is not already set, extract the last part of the module path
+    # For example, 'django.contrib.admin' becomes 'admin'
+    if not hasattr(self, "label"):
+        self.label = app_name.rpartition(".")[2]
 
-        # Human-readable name for the application e.g. "Admin".
-        if not hasattr(self, "verbose_name"):
-            self.verbose_name = self.label.title()
+    # Ensure the label is a valid Python identifier (e.g., no spaces, starts with letter, etc.)
+    if not self.label.isidentifier():
+        raise ImproperlyConfigured(
+            f"The app label '{self.label}' is not a valid Python identifier."
+        )
 
-        # Filesystem path to the application directory e.g.
-        # '/path/to/django/contrib/admin'.
-        if not hasattr(self, "path"):
-            self.path = self._path_from_module(app_module)
+    # If verbose_name is not set, create a human-readable name using the label (e.g., 'Admin')
+    if not hasattr(self, "verbose_name"):
+        self.verbose_name = self.label.title()
 
-        # Module containing models e.g. <module 'django.contrib.admin.models'
-        # from 'django/contrib/admin/models.py'>. Set by import_models().
-        # None if the application doesn't have a models module.
-        self.models_module = None
+    # Determine the file system path to the application if not already set
+    if not hasattr(self, "path"):
+        self.path = self._path_from_module(app_module)
 
-        # Mapping of lowercase model names to model classes. Initially set to
-        # None to prevent accidental access before import_models() runs.
-        self.models = None
+    # Will hold the models module (if any), e.g., django.contrib.admin.models
+    self.models_module = None
+
+    # Will hold the dictionary of model names to model classes after models are imported
+    self.models = None
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.label)
