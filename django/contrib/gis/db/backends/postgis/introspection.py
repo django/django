@@ -37,7 +37,7 @@ class PostGISIntrospection(DatabaseIntrospection):
         """
         The geometry type OID used by PostGIS does not indicate the particular
         type of field that a geometry column is (e.g., whether it's a
-        PointField or a PolygonField).  Thus, this routine queries the PostGIS
+        PointField or a PolygonField). Thus, this routine queries the PostGIS
         metadata tables to determine the geometry type.
         """
         with self.connection.cursor() as cursor:

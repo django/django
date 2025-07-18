@@ -100,7 +100,7 @@ def get_token(request):
 
     A side effect of calling this function is to make the csrf_protect
     decorator and the CsrfViewMiddleware add a CSRF cookie and a 'Vary: Cookie'
-    header to the outgoing response.  For this reason, you may need to use this
+    header to the outgoing response. For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.
     """
     if "CSRF_COOKIE" in request.META:
@@ -201,7 +201,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
     # requires_csrf_token decorator.
     def _accept(self, request):
         # Avoid checking the request twice by adding a custom attribute to
-        # request.  This will be relevant when both decorator and middleware
+        # request. This will be relevant when both decorator and middleware
         # are used.
         request.csrf_processing_done = True
         return None

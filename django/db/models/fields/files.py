@@ -388,10 +388,10 @@ class ImageFileDescriptor(FileDescriptor):
 
         # To prevent recalculating image dimensions when we are instantiating
         # an object from the database (bug #11084), only update dimensions if
-        # the field had a value before this assignment.  Since the default
+        # the field had a value before this assignment. Since the default
         # value for FileField subclasses is an instance of field.attr_class,
         # previous_file will only be None when we are called from
-        # Model.__init__().  The ImageField.update_dimension_fields method
+        # Model.__init__(). The ImageField.update_dimension_fields method
         # hooked up to the post_init signal handles the Model.__init__() cases.
         # Assignment happening outside of Model.__init__() will trigger the
         # update right here.
@@ -476,8 +476,8 @@ class ImageField(FileField):
         Update field's width and height fields, if defined.
 
         This method is hooked up to model's post_init signal to update
-        dimensions after instantiating a model instance.  However, dimensions
-        won't be updated if the dimensions fields are already populated.  This
+        dimensions after instantiating a model instance. However, dimensions
+        won't be updated if the dimensions fields are already populated. This
         avoids unnecessary recalculation when loading an object from the
         database.
 
@@ -505,9 +505,9 @@ class ImageField(FileField):
         )
         # When both dimension fields have values, we are most likely loading
         # data from the database or updating an image field that already had
-        # an image stored.  In the first case, we don't want to update the
+        # an image stored. In the first case, we don't want to update the
         # dimension fields because we are already getting their values from the
-        # database.  In the second case, we do want to update the dimensions
+        # database. In the second case, we do want to update the dimensions
         # fields and will skip this return because force will be True since we
         # were called from ImageFileDescriptor.__set__.
         if dimension_fields_filled and not force:

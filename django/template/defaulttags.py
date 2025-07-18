@@ -87,7 +87,7 @@ class CsrfTokenNode(Node):
             if settings.DEBUG:
                 warnings.warn(
                     "A {% csrf_token %} was used in a template, but the context "
-                    "did not provide the value.  This is usually caused by not "
+                    "did not provide the value. This is usually caused by not "
                     "using RequestContext."
                 )
             return ""
@@ -205,7 +205,7 @@ class ForNode(Node):
                 values = reversed(values)
             num_loopvars = len(self.loopvars)
             unpack = num_loopvars > 1
-            # Create a forloop value in the context.  We'll update counters on each
+            # Create a forloop value in the context. We'll update counters on each
             # iteration just below.
             loop_dict = context["forloop"] = {
                 "parentloop": parentloop,
@@ -720,7 +720,7 @@ def do_filter(parser, token):
         filter_name = getattr(func, "_filter_name", None)
         if filter_name in ("escape", "safe"):
             raise TemplateSyntaxError(
-                '"filter %s" is not permitted.  Use the "autoescape" tag instead.'
+                '"filter %s" is not permitted. Use the "autoescape" tag instead.'
                 % filter_name
             )
     nodelist = parser.parse(("endfilter",))

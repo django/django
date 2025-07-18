@@ -1026,7 +1026,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return must_inherit_from(
                     parent="ListFilter", option=label, obj=obj, id="admin.E113"
                 )
-            # ...  but not a FieldListFilter.
+            # ... but not a FieldListFilter.
             elif issubclass(item, FieldListFilter):
                 return [
                     checks.Error(

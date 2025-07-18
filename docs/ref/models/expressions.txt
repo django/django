@@ -830,7 +830,7 @@ an expression that's compatible in a window clause.
 
 The ``partition_by`` argument accepts an expression or a sequence of
 expressions (column names should be wrapped in an ``F``-object) that control
-the partitioning of the rows.  Partitioning narrows which rows are used to
+the partitioning of the rows. Partitioning narrows which rows are used to
 compute the result set.
 
 The :ref:`output_field<output-field>` is specified either as an argument or by

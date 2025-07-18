@@ -149,7 +149,7 @@ following methods:
     This class follows the :ref:`Query Expression API <query-expression>`, which
     implies that you can use ``<expression>__<transform1>__<transform2>``. It's
     a specialized :ref:`Func() expression <func-expressions>` that only accepts
-    one argument.  It can also be used on the right hand side of a filter or
+    one argument. It can also be used on the right hand side of a filter or
     directly as an annotation.
 
     .. attribute:: bilateral

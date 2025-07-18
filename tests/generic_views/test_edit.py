@@ -177,7 +177,7 @@ class CreateViewTests(TestCase):
 
     def test_create_without_redirect(self):
         msg = (
-            "No URL to redirect to.  Either provide a url or define a "
+            "No URL to redirect to. Either provide a url or define a "
             "get_absolute_url method on the Model."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -339,7 +339,7 @@ class UpdateViewTests(TestCase):
 
     def test_update_without_redirect(self):
         msg = (
-            "No URL to redirect to.  Either provide a url or define a "
+            "No URL to redirect to. Either provide a url or define a "
             "get_absolute_url method on the Model."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):

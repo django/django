@@ -1,6 +1,6 @@
 """
 The GDAL/OGR library uses an Envelope structure to hold the bounding
-box information for a geometry.  The envelope (bounding box) contains
+box information for a geometry. The envelope (bounding box) contains
 two pairs of coordinates, one for the lower left coordinate and one
 for the upper right coordinate:
 
@@ -33,7 +33,7 @@ class OGREnvelope(Structure):
 class Envelope:
     """
     The Envelope object is a C structure that contains the minimum and
-    maximum X, Y coordinates for a rectangle bounding box.  The naming
+    maximum X, Y coordinates for a rectangle bounding box. The naming
     of the variables is compatible with the OGR Envelope structure.
     """
 

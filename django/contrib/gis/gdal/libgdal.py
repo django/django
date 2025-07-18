@@ -71,7 +71,7 @@ if lib_path is None:
 lgdal = CDLL(lib_path)
 
 # On Windows, the GDAL binaries have some OSR routines exported with
-# STDCALL, while others are not.  Thus, the library will also need to
+# STDCALL, while others are not. Thus, the library will also need to
 # be loaded up as WinDLL for said OSR functions that require the
 # different calling convention.
 if os.name == "nt":

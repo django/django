@@ -9,8 +9,8 @@ from .widgets import OpenLayersWidget
 
 class GeometryField(forms.Field):
     """
-    This is the basic form field for a Geometry.  Any textual input that is
-    accepted by GEOSGeometry is accepted by this form.  By default,
+    This is the basic form field for a Geometry. Any textual input that is
+    accepted by GEOSGeometry is accepted by this form. By default,
     this includes WKT, HEXEWKB, WKB (in a buffer), and GeoJSON.
     """
 
