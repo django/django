@@ -610,9 +610,8 @@ class ChangeList:
         return False
 
     def url_for_result(self, result):
-        pk = getattr(result, self.pk_attname)
         return reverse(
             "admin:%s_%s_change" % (self.opts.app_label, self.opts.model_name),
-            args=(quote(pk),),
+            args=(quote(result.pk_str),),
             current_app=self.model_admin.admin_site.name,
         )
