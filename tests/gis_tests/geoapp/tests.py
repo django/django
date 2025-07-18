@@ -133,7 +133,7 @@ class GeoModelTest(TestCase):
             tx = Country.objects.get(mpoly__intersects=other_srid_pnt)
         self.assertEqual("Texas", tx.name)
 
-        # Creating San Antonio.  Remember the Alamo.
+        # Creating San Antonio. Remember the Alamo.
         sa = City.objects.create(name="San Antonio", point=other_srid_pnt)
 
         # Now verifying that San Antonio was transformed correctly

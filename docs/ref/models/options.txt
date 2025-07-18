@@ -181,7 +181,7 @@ not be looking at your Django code. For example::
     includes
 
     #. Adding an automatic primary key field to the model if you don't
-       declare it.  To avoid confusion for later code readers, it's
+       declare it. To avoid confusion for later code readers, it's
        recommended to specify all the columns from the database table you
        are modeling when using unmanaged models.
 

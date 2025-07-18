@@ -137,7 +137,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
     tries to test the features that can handle 3D and that are also
-    available within GeoDjango.  For more information, see the PostGIS docs
+    available within GeoDjango. For more information, see the PostGIS docs
     on the routines that support 3D:
 
     https://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions

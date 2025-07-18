@@ -55,7 +55,7 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(
             expected,
             got,
-            "For '%s', expected %s but got %s.  Paginator parameters were: %s"
+            "For '%s', expected %s but got %s. Paginator parameters were: %s"
             % (name, expected, got, params),
         )
 
@@ -65,7 +65,7 @@ class PaginationTests(SimpleTestCase):
         self.assertEqual(
             expected,
             await got(),
-            "For '%s', expected %s but got %s.  Paginator parameters were: %s"
+            "For '%s', expected %s but got %s. Paginator parameters were: %s"
             % (name, expected, got, params),
         )
 

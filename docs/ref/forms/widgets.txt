@@ -225,7 +225,7 @@ foundation for custom widgets.
 .. class:: Widget(attrs=None)
 
     This abstract class cannot be rendered, but provides the basic attribute
-    :attr:`~Widget.attrs`.  You may also implement or override the
+    :attr:`~Widget.attrs`. You may also implement or override the
     :meth:`~Widget.render()` method on custom widgets.
 
     .. attribute:: Widget.attrs

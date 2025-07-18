@@ -303,7 +303,7 @@ class BaseCache:
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Set a bunch of values in the cache at once from a dict of key/value
-        pairs.  For certain backends (memcached), this is much more efficient
+        pairs. For certain backends (memcached), this is much more efficient
         than calling set() multiple times.
 
         If timeout is given, use that timeout for the key; otherwise use the

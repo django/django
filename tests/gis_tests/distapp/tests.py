@@ -158,7 +158,7 @@ class DistanceTest(TestCase):
         """
         Test distance lookups on geodetic coordinate systems.
         """
-        # Line is from Canberra to Sydney.  Query is for all other cities within
+        # Line is from Canberra to Sydney. Query is for all other cities within
         # a 100km of that line (which should exclude only Hobart & Adelaide).
         line = GEOSGeometry("LINESTRING(144.9630 -37.8143,151.2607 -33.8870)", 4326)
         dist_qs = AustraliaCity.objects.filter(point__distance_lte=(line, D(km=100)))
@@ -670,7 +670,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         # Having our buffer in the SRID of the transformation and of the field
         # -- should get the same results. The first buffer has no need for
         # transformation SQL because it is the same SRID as what was given
-        # to `transform()`.  The second buffer will need to be transformed,
+        # to `transform()`. The second buffer will need to be transformed,
         # however.
         buf1 = z.poly.centroid.buffer(100)
         buf2 = buf1.transform(4269, clone=True)

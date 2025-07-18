@@ -30,7 +30,7 @@ def get_view_name(view_func):
 
 def parse_docstring(docstring):
     """
-    Parse out the parts of a docstring.  Return (title, body, metadata).
+    Parse out the parts of a docstring. Return (title, body, metadata).
     """
     if not docstring:
         return "", "", {}

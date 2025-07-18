@@ -32,7 +32,7 @@ class ActionAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs
-        # list.  Remove the existing one(s) first
+        # list. Remove the existing one(s) first
         from django.urls import re_path
 
         def wrap(view):

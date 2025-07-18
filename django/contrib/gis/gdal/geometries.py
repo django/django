@@ -5,7 +5,7 @@ OGRGeometry may be instantiated when reading geometries from OGR Data Sources
 (e.g. SHP files), or when given OGC WKT (a string).
 
 While the 'full' API is not present yet, the API is "pythonic" unlike
-the traditional and "next-generation" OGR Python bindings.  One major
+the traditional and "next-generation" OGR Python bindings. One major
 advantage OGR Geometries have over their GEOS counterparts is support
 for spatial reference systems and their transformation.
 
@@ -454,7 +454,7 @@ class OGRGeometry(GDALBase):
         """
         Transform this geometry to a different spatial reference system.
         May take a CoordTransform object, a SpatialReference object, string
-        WKT or PROJ, and/or an integer SRID.  By default, return nothing
+        WKT or PROJ, and/or an integer SRID. By default, return nothing
         and transform the geometry in-place. However, if the `clone` keyword is
         set, return a transformed clone of this geometry.
         """

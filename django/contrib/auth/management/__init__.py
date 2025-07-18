@@ -80,7 +80,7 @@ def create_permissions(
     )
 
     # Find all the Permissions that have a content_type for a model we're
-    # looking for.  We don't need to check for codenames since we already have
+    # looking for. We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
     all_perms = set(
         Permission.objects.using(using)

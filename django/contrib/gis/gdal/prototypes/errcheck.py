@@ -37,9 +37,9 @@ def check_const_string(result, func, cargs, offset=None, cpl=False):
 def check_string(result, func, cargs, offset=-1, str_result=False):
     """
     Check the string output returned from the given function, and free
-    the string pointer allocated by OGR.  The `str_result` keyword
+    the string pointer allocated by OGR. The `str_result` keyword
     may be used when the result is the string pointer, otherwise
-    the OGR error code is assumed.  The `offset` keyword may be used
+    the OGR error code is assumed. The `offset` keyword may be used
     to extract the string pointer passed in by-reference at the given
     slice offset in the function arguments.
     """
@@ -134,7 +134,7 @@ def check_pointer(result, func, cargs):
 def check_str_arg(result, func, cargs):
     """
     This is for the OSRGet[Angular|Linear]Units functions, which
-    require that the returned string pointer not be freed.  This
+    require that the returned string pointer not be freed. This
     returns both the double and string values.
     """
     dbl = result

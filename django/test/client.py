@@ -177,7 +177,7 @@ class ClientHandler(BaseHandler):
         request_started.connect(close_old_connections)
         request = WSGIRequest(environ)
         # sneaky little hack so that we can easily get round
-        # CsrfViewMiddleware.  This makes life easier, and is probably
+        # CsrfViewMiddleware. This makes life easier, and is probably
         # required for backwards compatibility with external tests against
         # admin views.
         request._dont_enforce_csrf_checks = not self.enforce_csrf_checks
