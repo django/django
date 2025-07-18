@@ -223,3 +223,8 @@ class CustomUserAdmin(UserAdmin):
 
 
 site.register(ProxyUser, CustomUserAdmin)
+
+
+class EstimatedCountAdmin(admin.ModelAdmin):
+    estimated_count = True
+    
