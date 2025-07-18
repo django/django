@@ -109,7 +109,7 @@ class LayerMapping:
         """
         A LayerMapping object is initialized using the given Model (not an instance),
         a DataSource (or string path to an OGR-supported data file), and a mapping
-        dictionary.  See the module level docstring for more details and keyword
+        dictionary. See the module level docstring for more details and keyword
         argument usage.
         """
         # Getting the DataSource and the associated Layer.
@@ -195,7 +195,7 @@ class LayerMapping:
         need to increment through each feature in the Layer.
         """
         # The geometry field of the model is set here.
-        # TODO: Support more than one geometry field / model.  However, this
+        # TODO: Support more than one geometry field / model. However, this
         # depends on the GDAL Driver in use.
         self.geom_field = False
         self.fields = {}
@@ -263,7 +263,7 @@ class LayerMapping:
                     )
 
                 # Setting the `geom_field` attribute w/the name of the model field
-                # that is a Geometry.  Also setting the coordinate dimension
+                # that is a Geometry. Also setting the coordinate dimension
                 # attribute.
                 self.geom_field = field_name
                 self.coord_dim = coord_dim
@@ -570,7 +570,7 @@ class LayerMapping:
 
          fid_range:
            May be set with a slice or tuple of (begin, end) feature ID's to map
-           from the data source.  In other words, this keyword enables the user
+           from the data source. In other words, this keyword enables the user
            to selectively import a subset range of features in the geographic
            data source.
 
@@ -581,13 +581,13 @@ class LayerMapping:
 
          progress:
            When this keyword is set, status information will be printed giving
-           the number of features processed and successfully saved.  By default,
+           the number of features processed and successfully saved. By default,
            progress information will pe printed every 1000 features processed,
            however, this default may be overridden by setting this keyword with an
            integer for the desired interval.
 
          stream:
-           Status information will be written to this file handle.  Defaults to
+           Status information will be written to this file handle. Defaults to
            using `sys.stdout`, but any object with a `write` method is supported.
 
          silent:
@@ -596,7 +596,7 @@ class LayerMapping:
 
          strict:
            Execution of the model mapping will cease upon the first error
-           encountered.  The default behavior is to attempt to continue.
+           encountered. The default behavior is to attempt to continue.
         """
         # Getting the default Feature ID range.
         default_range = self.check_fid_range(fid_range)

@@ -309,7 +309,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # these are set in single statement it isn't clear what is supposed
         # to happen.
         cursor.execute("ALTER SESSION SET NLS_TERRITORY = 'AMERICA'")
-        # Set Oracle date to ANSI date format.  This only needs to execute
+        # Set Oracle date to ANSI date format. This only needs to execute
         # once when we create a new connection. We also set the Territory
         # to 'AMERICA' which forces Sunday to evaluate to a '1' in
         # TO_CHAR().
@@ -578,8 +578,8 @@ class FormatStylePlaceholderCursor:
             return [p.force_bytes for p in params]
 
     def _fix_for_params(self, query, params, unify_by_values=False):
-        # oracledb wants no trailing ';' for SQL statements.  For PL/SQL, it
-        # it does want a trailing ';' but not a trailing '/'.  However, these
+        # oracledb wants no trailing ';' for SQL statements. For PL/SQL, it
+        # does want a trailing ';' but not a trailing '/'. However, these
         # characters must be included in the original query in case the query
         # is being passed to SQL*Plus.
         if query.endswith(";") or query.endswith("/"):

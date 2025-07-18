@@ -763,7 +763,7 @@ class ModelFormsetTest(TestCase):
 
     def test_inline_formsets_save_as_new(self):
         # The save_as_new parameter lets you re-associate the data to a new
-        # instance.  This is used in the admin for save_as functionality.
+        # instance. This is used in the admin for save_as functionality.
         AuthorBooksFormSet = inlineformset_factory(
             Author, Book, can_delete=False, extra=2, fields="__all__"
         )

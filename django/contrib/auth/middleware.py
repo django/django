@@ -137,7 +137,7 @@ class RemoteUserMiddleware:
         if not hasattr(request, "user"):
             raise ImproperlyConfigured(
                 "The Django remote user auth middleware requires the"
-                " authentication middleware to be installed.  Edit your"
+                " authentication middleware to be installed. Edit your"
                 " MIDDLEWARE setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class."
@@ -166,7 +166,7 @@ class RemoteUserMiddleware:
         # to authenticate the user.
         user = auth.authenticate(request, remote_user=username)
         if user:
-            # User is valid.  Set request.user and persist user in the session
+            # User is valid. Set request.user and persist user in the session
             # by logging the user in.
             request.user = user
             auth.login(request, user)
@@ -194,7 +194,7 @@ class RemoteUserMiddleware:
         if not hasattr(request, "user"):
             raise ImproperlyConfigured(
                 "The Django remote user auth middleware requires the"
-                " authentication middleware to be installed.  Edit your"
+                " authentication middleware to be installed. Edit your"
                 " MIDDLEWARE setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class."
@@ -226,7 +226,7 @@ class RemoteUserMiddleware:
         # to authenticate the user.
         user = await auth.aauthenticate(request, remote_user=username)
         if user:
-            # User is valid.  Set request.user and persist user in the session
+            # User is valid. Set request.user and persist user in the session
             # by logging the user in.
             request.user = user
             await auth.alogin(request, user)

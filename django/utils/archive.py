@@ -101,7 +101,7 @@ class Archive:
 
 class BaseArchive:
     """
-    Base Archive class.  Implementations should inherit this class.
+    Base Archive class. Implementations should inherit this class.
     """
 
     @staticmethod

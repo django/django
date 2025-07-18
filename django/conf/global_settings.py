@@ -223,7 +223,7 @@ FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 DEFAULT_FROM_EMAIL = "webmaster@localhost"
 
 # Subject-line prefix for email messages send with django.core.mail.mail_admins
-# or ...mail_managers.  Make sure to include the trailing space.
+# or ...mail_managers. Make sure to include the trailing space.
 EMAIL_SUBJECT_PREFIX = "[Django] "
 
 # Whether to append trailing slashes to URLs.
@@ -533,9 +533,8 @@ LOGOUT_REDIRECT_URL = None
 # The number of seconds a password reset link is valid for (default: 3 days).
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 
-# the first hasher in this list is the preferred algorithm.  any
-# password using different algorithms will be converted automatically
-# upon login
+# The first hasher in this list is the preferred algorithm. Any password using
+# different algorithms will be converted automatically upon login.
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",

@@ -14,7 +14,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     def __init__(self, *args, **kwargs):
         """
         Initialize on the given sequence -- may take lists, tuples, NumPy arrays
-        of X,Y pairs, or Point objects.  If Point objects are used, ownership is
+        of X,Y pairs, or Point objects. If Point objects are used, ownership is
         _not_ transferred to the LineString object.
 
         Examples:

@@ -3,7 +3,7 @@ This module contains the spatial lookup types, and the `get_geo_where_clause`
 routine for Oracle Spatial.
 
 Please note that WKT support is broken on the XE version, and thus
-this backend will not work on such platforms.  Specifically, XE lacks
+this backend will not work on such platforms. Specifically, XE lacks
 support for an internal JVM, and Java libraries are required to use
 the WKT constructors.
 """
@@ -95,7 +95,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     # We want to get SDO Geometries as WKT because it is much easier to
     # instantiate GEOS proxies from WKT than SDO_GEOMETRY(...) strings.
     # However, this adversely affects performance (i.e., Java is called
-    # to convert to WKT on every query).  If someone wishes to write a
+    # to convert to WKT on every query). If someone wishes to write a
     # SDO_GEOMETRY(...) parser in Python, let me know =)
     select = "SDO_UTIL.TO_WKBGEOMETRY(%s)"
 

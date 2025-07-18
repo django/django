@@ -82,7 +82,7 @@ wkb_reader_destroy = GEOSFuncFactory("GEOSWKBReader_destroy", argtypes=[WKB_READ
 class WKBReadFunc(GEOSFuncFactory):
     # Although the function definitions take `const unsigned char *`
     # as their parameter, we use c_char_p here so the function may
-    # take Python strings directly as parameters.  Inside Python there
+    # take Python strings directly as parameters. Inside Python there
     # is not a difference between signed and unsigned characters, so
     # it is not a problem.
     argtypes = [WKB_READ_PTR, c_char_p, c_size_t]
@@ -318,7 +318,7 @@ class WKBWriter(IOBase):
 
 
 # `ThreadLocalIO` object holds instances of the WKT and WKB reader/writer
-# objects that are local to the thread.  The `GEOSGeometry` internals
+# objects that are local to the thread. The `GEOSGeometry` internals
 # access these instances by calling the module-level functions, defined
 # below.
 class ThreadLocalIO(threading.local):

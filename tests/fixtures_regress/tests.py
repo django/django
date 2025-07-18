@@ -722,7 +722,7 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting(self):
         """
-        It doesn't matter what order you mention the models,  Store *must* be
+        It doesn't matter what order you mention the models, Store *must* be
         serialized before then Person, and both must be serialized before Book.
         """
         sorted_deps = serializers.sort_dependencies(
@@ -897,7 +897,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
     def test_dependency_sorting_m2m_complex(self):
         """
         M2M relations with explicit through models should NOT count as
-        dependencies.  The through model itself will have dependencies, though.
+        dependencies. The through model itself will have dependencies, though.
         """
         sorted_deps = serializers.sort_dependencies(
             [("fixtures_regress", [M2MComplexA, M2MComplexB, M2MThroughAB])]

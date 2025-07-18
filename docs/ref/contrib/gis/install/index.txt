@@ -50,7 +50,7 @@ spatial databases currently supported.
     open source spatial database.
 
 The geospatial libraries required for a GeoDjango installation depends
-on the spatial database used.  The following lists the library requirements,
+on the spatial database used. The following lists the library requirements,
 supported versions, and any notes for each of the supported database backends:
 
 ==================  ==============================  ==================  =========================================
@@ -108,7 +108,7 @@ If you can't find the solution to your problem here then participate in the
 community!  You can:
 
 * Ask your question on the `GeoDjango`__ forum.
-* File a ticket on the `Django trac`__ if you think there's a bug.  Make
+* File a ticket on the `Django trac`__ if you think there's a bug. Make
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
@@ -133,9 +133,9 @@ system.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A user may set this environment variable to customize the library paths
-they want to use.  The typical library directory for software
-built from source is ``/usr/local/lib``.  Thus, ``/usr/local/lib`` needs
-to be included in the ``LD_LIBRARY_PATH`` variable.  For example, the user
+they want to use. The typical library directory for software
+built from source is ``/usr/local/lib``. Thus, ``/usr/local/lib`` needs
+to be included in the ``LD_LIBRARY_PATH`` variable. For example, the user
 could place the following in their bash profile:
 
 .. code-block:: shell
@@ -148,7 +148,7 @@ Setting system library path
 On GNU/Linux systems, there is typically a file in ``/etc/ld.so.conf``, which may include
 additional paths from files in another directory, such as ``/etc/ld.so.conf.d``.
 As the root user, add the custom library path (like ``/usr/local/lib``) on a
-new line in ``ld.so.conf``.  This is *one* example of how to do so:
+new line in ``ld.so.conf``. This is *one* example of how to do so:
 
 .. code-block:: shell
 
@@ -156,8 +156,8 @@ new line in ``ld.so.conf``.  This is *one* example of how to do so:
     $ sudo ldconfig
 
 For OpenSolaris users, the system library path may be modified using the
-``crle`` utility.  Run ``crle`` with no options to see the current configuration
-and use ``crle -l`` to set with the new library path.  Be *very* careful when
+``crle`` utility. Run ``crle`` with no options to see the current configuration
+and use ``crle -l`` to set with the new library path. Be *very* careful when
 modifying the system library path:
 
 .. code-block:: shell
@@ -170,9 +170,9 @@ Install ``binutils``
 ~~~~~~~~~~~~~~~~~~~~
 
 GeoDjango uses the ``find_library`` function (from the ``ctypes.util`` Python
-module) to discover libraries.  The ``find_library`` routine uses a program
+module) to discover libraries. The ``find_library`` routine uses a program
 called ``objdump`` (part of the ``binutils`` package) to verify a shared
-library on GNU/Linux systems.  Thus, if ``binutils`` is not installed on your
+library on GNU/Linux systems. Thus, if ``binutils`` is not installed on your
 Linux system then Python's ctypes may not be able to find your library even if
 your library path is set correctly and geospatial libraries were built perfectly.
 
@@ -216,7 +216,7 @@ Python
 ~~~~~~
 
 Although macOS comes with Python installed, users can use `framework
-installers`__ provided by the Python Software Foundation.  An advantage to
+installers`__ provided by the Python Software Foundation. An advantage to
 using the installer is that macOS's Python will remain "pristine" for internal
 operating system use.
 
@@ -293,7 +293,7 @@ MacPorts
 ~~~~~~~~
 
 `MacPorts`__ may be used to install GeoDjango prerequisites on computers
-running macOS.  Because MacPorts still builds the software from source,
+running macOS. Because MacPorts still builds the software from source,
 `Xcode`_ is required.
 
 Summary:
@@ -344,7 +344,7 @@ PostgreSQL
 ~~~~~~~~~~
 
 Download the latest `PostgreSQL 15.x installer`__ from the
-`EnterpriseDB`__ website.  After downloading, run the installer, follow the
+`EnterpriseDB`__ website. After downloading, run the installer, follow the
 on-screen directions, and keep the default options unless you know the
 consequences of changing them.
 
@@ -392,7 +392,7 @@ OSGeo4W
 
 The `OSGeo4W installer`_ helps to install the PROJ, GDAL, and GEOS libraries
 required by GeoDjango. First, download the `OSGeo4W installer`_, and
-run it. Select :menuselection:`Express Web-GIS Install` and click next.  In the
+run it. Select :menuselection:`Express Web-GIS Install` and click next. In the
 'Select Packages' list, ensure that GDAL is selected. If any other packages are
 enabled by default, they are not required by GeoDjango and may be unchecked
 safely. After clicking next and accepting the license agreements, the packages
@@ -406,7 +406,7 @@ Modify Windows environment
 
 In order to use GeoDjango, you will need to add your OSGeo4W
 directories to your Windows system ``Path``, as well as create ``GDAL_DATA``
-and ``PROJ_LIB`` environment variables.  The following set of commands,
+and ``PROJ_LIB`` environment variables. The following set of commands,
 executable with ``cmd.exe``, will set this up. Restart your device
 once this is complete for new environment variables to be recognized:
 

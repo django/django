@@ -208,7 +208,7 @@ class LayerMapTest(TestCase):
         )
 
         # If a mapping is specified as a collection, all OGR fields that
-        # are not collections will be converted into them.  For example,
+        # are not collections will be converted into them. For example,
         # a Point column would be converted to MultiPoint. Other things being done
         # w/the keyword args:
         #  `transform=False`: Specifies that no transform is to be done; this
@@ -217,7 +217,7 @@ class LayerMapTest(TestCase):
         #
         #  `unique='name'`: Creates models on the condition that they have
         #    unique county names; geometries from each feature however will be
-        #    appended to the geometry collection of the unique model.  Thus,
+        #    appended to the geometry collection of the unique model. Thus,
         #    all of the various islands in Honolulu county will be in one
         #    database record with a MULTIPOLYGON type.
         lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique="name")
@@ -270,7 +270,7 @@ class LayerMapTest(TestCase):
         lm.save(fid_range=slice(None, 1), silent=True, strict=True)  # layer[:1]
 
         # Only Pueblo & Honolulu counties should be present because of
-        # the `unique` keyword.  Have to set `order_by` on this QuerySet
+        # the `unique` keyword. Have to set `order_by` on this QuerySet
         # or else MySQL will return a different ordering than the other dbs.
         qs = County.objects.order_by("name")
         self.assertEqual(2, qs.count())
@@ -290,7 +290,7 @@ class LayerMapTest(TestCase):
             self.county_helper(county_feat=False)
 
     def test_model_inheritance(self):
-        "Tests LayerMapping on inherited models.  See #12093."
+        "Tests LayerMapping on inherited models. See #12093."
         icity_mapping = {
             "name": "Name",
             "population": "Population",
@@ -310,7 +310,7 @@ class LayerMapTest(TestCase):
         self.assertEqual(3, ICity2.objects.count())
 
     def test_invalid_layer(self):
-        "Tests LayerMapping on invalid geometries.  See #15378."
+        "Tests LayerMapping on invalid geometries. See #15378."
         invalid_mapping = {"point": "POINT"}
         lm = LayerMapping(Invalid, invalid_shp, invalid_mapping, source_srs=4326)
         lm.save(silent=True)

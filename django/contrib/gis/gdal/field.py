@@ -8,7 +8,7 @@ from django.utils.encoding import force_str
 
 
 # For more information, see the OGR C API source code:
-#  https://gdal.org/api/vector_c_api.html
+# https://gdal.org/api/vector_c_api.html
 #
 # The OGR_Fld_* routines are relevant here.
 class Field(GDALBase):

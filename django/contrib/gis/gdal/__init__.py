@@ -1,5 +1,5 @@
 """
-This module houses ctypes interfaces for GDAL objects.  The following GDAL
+This module houses ctypes interfaces for GDAL objects. The following GDAL
 objects are supported:
 
 CoordTransform: Used for coordinate transformations from one spatial
