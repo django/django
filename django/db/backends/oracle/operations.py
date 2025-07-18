@@ -372,7 +372,7 @@ END;
         return value.read()
 
     def quote_name(self, name):
-        # SQL92 requires delimited (quoted) names to be case-sensitive.  When
+        # SQL92 requires delimited (quoted) names to be case-sensitive. When
         # not quoted, Oracle has case-insensitive behavior for identifiers, but
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.

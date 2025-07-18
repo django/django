@@ -484,5 +484,5 @@ def import_library(name):
         return module.register
     except AttributeError:
         raise InvalidTemplateLibrary(
-            "Module  %s does not have a variable named 'register'" % name,
+            "Module %s does not have a variable named 'register'" % name,
         )

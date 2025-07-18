@@ -609,7 +609,7 @@ class GEOSGeometryBase(GEOSBase):
     def simplify(self, tolerance=0.0, preserve_topology=False):
         """
         Return the Geometry, simplified using the Douglas-Peucker algorithm
-        to the specified tolerance (higher tolerance => less points).  If no
+        to the specified tolerance (higher tolerance => less points). If no
         tolerance provided, defaults to 0.
 
         By default, don't preserve topology - e.g. polygons can be split,

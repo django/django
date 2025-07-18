@@ -235,7 +235,7 @@ class DataSourceTest(SimpleTestCase):
         # See ticket #9448.
         def get_layer():
             # This DataSource object is not accessible outside this
-            # scope.  However, a reference should still be kept alive
+            # scope. However, a reference should still be kept alive
             # on the `Layer` returned.
             ds = DataSource(source.ds)
             return ds[0]
@@ -332,7 +332,7 @@ class DataSourceTest(SimpleTestCase):
         self.assertEqual(1, len(feats))
         self.assertEqual("Houston", feats[0].get("Name"))
 
-        # Clearing the spatial filter by setting it to None.  Now
+        # Clearing the spatial filter by setting it to None. Now
         # should indicate that there are 3 features in the Layer.
         lyr.spatial_filter = None
         self.assertEqual(3, len(lyr))

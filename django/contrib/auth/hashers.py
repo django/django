@@ -314,7 +314,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     Secure password hashing using the PBKDF2 algorithm (recommended)
 
     Configured to use PBKDF2 + HMAC + SHA256.
-    The result is a 64 byte binary string.  Iterations may be changed
+    The result is a 64 byte binary string. Iterations may be changed
     safely but you must rename the algorithm if you change SHA256.
     """
 
@@ -486,7 +486,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
     Secure password hashing using the bcrypt algorithm (recommended)
 
     This is considered by many to be the most secure algorithm but you
-    must first install the bcrypt library.  Please be warned that
+    must first install the bcrypt library. Please be warned that
     this library depends on native C code and might cause portability
     issues.
     """
@@ -559,7 +559,7 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
     Secure password hashing using the bcrypt algorithm
 
     This is considered by many to be the most secure algorithm but you
-    must first install the bcrypt library.  Please be warned that
+    must first install the bcrypt library. Please be warned that
     this library depends on native C code and might cause portability
     issues.
 

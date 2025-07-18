@@ -338,12 +338,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         If get_token() is not called, the view middleware does not
         add a cookie.
         """
-        # This is important to make pages cacheable.  Pages which do call
+        # This is important to make pages cacheable. Pages which do call
         # get_token(), assuming they use the token, are not cacheable because
         # the token is specific to the user
         req = self._get_request()
         # non_token_view_using_request_processor does not call get_token(), but
-        # does use the csrf request processor.  By using this, we are testing
+        # does use the csrf request processor. By using this, we are testing
         # that the view processor is properly lazy and doesn't call get_token()
         # until needed.
         mw = CsrfViewMiddleware(non_token_view_using_request_processor)

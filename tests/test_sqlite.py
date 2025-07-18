@@ -9,7 +9,7 @@
 #
 # The different databases that Django supports behave differently in certain
 # situations, so it is recommended to run the test suite against as many
-# database backends as possible.  You may want to create a separate settings
+# database backends as possible. You may want to create a separate settings
 # file for each of the backends you test against.
 
 DATABASES = {

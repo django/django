@@ -199,7 +199,7 @@ def sort_dependencies(app_list, allow_cycles=False):
                     if hasattr(rel_model, "natural_key") and rel_model != model:
                         deps.append(rel_model)
             # Also add a dependency for any simple M2M relation with a model
-            # that defines a natural key.  M2M relations with explicit through
+            # that defines a natural key. M2M relations with explicit through
             # models don't count as dependencies.
             for field in model._meta.many_to_many:
                 if field.remote_field.through._meta.auto_created:

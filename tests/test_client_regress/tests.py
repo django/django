@@ -822,7 +822,7 @@ class TemplateExceptionTests(SimpleTestCase):
             self.client.get("/no_such_view/")
 
 
-# We need two different tests to check URLconf substitution -  one to check
+# We need two different tests to check URLconf substitution - one to check
 # it was changed, and another one (without self.urls) to check it was reverted on
 # teardown. This pair of tests relies upon the alphabetical ordering of test execution.
 @override_settings(ROOT_URLCONF="test_client_regress.urls")

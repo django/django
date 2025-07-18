@@ -142,7 +142,7 @@ class CallableVariablesTests(TestCase):
         c = Context({"my_doodad": my_doodad})
 
         # Since ``my_doodad.do_not_call_in_templates`` is True, the template
-        # system will not try to call our doodad.  We can access its attributes
+        # system will not try to call our doodad. We can access its attributes
         # as normal, and we don't have access to the dict that it returns when
         # called.
         t = self.engine.from_string("{{ my_doodad.value }}")

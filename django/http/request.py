@@ -232,7 +232,7 @@ class HttpRequest:
         """
         Attempt to return a signed cookie. If the signature fails or the
         cookie has expired, raise an exception, unless the `default` argument
-        is provided,  in which case return that value.
+        is provided, in which case return that value.
         """
         try:
             cookie_value = self.COOKIES[key]
