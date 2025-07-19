@@ -38,7 +38,13 @@ from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.core.signals import setting_changed
-from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    async_connections,
+    connection,
+    connections,
+    transaction,
+)
 from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -1404,6 +1410,7 @@ class TestCase(TransactionTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        async_connections._from_testcase = True
         if not (
             cls._databases_support_transactions()
             and cls._databases_support_savepoints()
