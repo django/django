@@ -16,8 +16,8 @@ from django.contrib.gis.geos import (
 )
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
-from django.db.models import F, IntegerField, Sum, Value
-from django.test import TestCase, skipUnlessAnyDBFeature, skipUnlessDBFeature
+from django.db.models import IntegerField, Sum, Value
+from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
 from .models import (
@@ -898,47 +898,40 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 name="Dallas"
             )
 
-
-@skipUnlessAnyDBFeature("has_GeometryType_function")
-class GeometryTypeFunctionTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.features = [
-            Feature.objects.create(name="Point", geom=Point(0, 0)),
-            Feature.objects.create(name="LineString", geom=LineString((0, 0), (1, 1))),
-            Feature.objects.create(
-                name="Polygon", geom=Polygon(((0, 0), (1, 0), (1, 1), (0, 0)))
-            ),
-            Feature.objects.create(
-                name="MultiPoint", geom=MultiPoint(Point(0, 0), Point(1, 1))
-            ),
-            Feature.objects.create(
-                name="MultiLineString",
-                geom=MultiLineString(
-                    LineString((0, 0), (1, 1)), LineString((1, 1), (2, 2))
+    @skipUnlessDBFeature("has_GeometryType_function")
+    def test_geometry_type(self):
+        Feature.objects.bulk_create(
+            [
+                Feature(name="Point", geom=Point(0, 0)),
+                Feature(name="LineString", geom=LineString((0, 0), (1, 1))),
+                Feature(name="Polygon", geom=Polygon(((0, 0), (1, 0), (1, 1), (0, 0)))),
+                Feature(name="MultiPoint", geom=MultiPoint(Point(0, 0), Point(1, 1))),
+                Feature(
+                    name="MultiLineString",
+                    geom=MultiLineString(
+                        LineString((0, 0), (1, 1)), LineString((1, 1), (2, 2))
+                    ),
                 ),
-            ),
-            Feature.objects.create(
-                name="MultiPolygon",
-                geom=MultiPolygon(
-                    Polygon(((0, 0), (1, 0), (1, 1), (0, 0))),
-                    Polygon(((1, 1), (2, 1), (2, 2), (1, 1))),
+                Feature(
+                    name="MultiPolygon",
+                    geom=MultiPolygon(
+                        Polygon(((0, 0), (1, 0), (1, 1), (0, 0))),
+                        Polygon(((1, 1), (2, 1), (2, 2), (1, 1))),
+                    ),
                 ),
-            ),
-        ]
-
-    def test_geometry_type_transform(self):
-        qs = Feature.objects.annotate(geom_type=F("geom__geom_type"))
+            ]
+        )
 
         expected_results = {
-            "Point": "POINT",
-            "LineString": "LINESTRING",
-            "Polygon": "POLYGON",
-            "MultiPoint": "MULTIPOINT",
-            "MultiLineString": "MULTILINESTRING",
-            "MultiPolygon": "MULTIPOLYGON",
+            ("POINT", Point),
+            ("LINESTRING", LineString),
+            ("POLYGON", Polygon),
+            ("MULTIPOINT", MultiPoint),
+            ("MULTILINESTRING", MultiLineString),
+            ("MULTIPOLYGON", MultiPolygon),
         }
 
-        for feature in qs:
-            expected_type = expected_results[feature.name]
-            self.assertEqual(feature.geom_type.upper(), expected_type)
+        for geom_type, geom_class in expected_results:
+            with self.subTest(geom_type=geom_type):
+                obj = Feature.objects.filter(geom__geom_type=geom_type).get()
+                self.assertIsInstance(obj.geom, geom_class)

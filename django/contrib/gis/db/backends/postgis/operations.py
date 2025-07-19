@@ -177,6 +177,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             "FromWKB": "ST_GeomFromWKB",
             "FromWKT": "ST_GeomFromText",
             "NumPoints": "ST_NPoints",
+            "GeometryType": "GeometryType",
         }
         return function_names
 

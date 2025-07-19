@@ -54,6 +54,7 @@ class BaseSpatialOperations:
         "FromWKT",
         "GeoHash",
         "GeometryDistance",
+        "GeometryType",
         "Intersection",
         "IsEmpty",
         "IsValid",
@@ -73,7 +74,6 @@ class BaseSpatialOperations:
         "Transform",
         "Translate",
         "Union",
-        "GeometryType",
     }
 
     # Constructors
