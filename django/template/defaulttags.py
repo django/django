@@ -1626,7 +1626,6 @@ class DefinePartialNode(Node):
         self.nodelist = nodelist
 
     def render(self, context):
-        """Set content into context and return empty string"""
         return self.nodelist.render(context) if self.inline else ""
 
 
