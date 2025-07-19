@@ -1592,7 +1592,6 @@ class TemplateProxy:
             sspos, sepos = m.span()
             starter, name, inline = m.groups()
             endm = partial_end_tag_re.search(full_source, sepos + 1)
-            assert endm, "End tag must be present"
             espos, eepos = endm.span()
             if name == partial_name:
                 # Include the full partial definition from opening to closing tag.

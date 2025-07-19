@@ -364,3 +364,52 @@ class RobustPartialHandlingTest(TestCase):
         self.assertEqual(template_with_partial.template.engine, self.engine.engine)
         rendered_content = template_with_partial.render({})
         self.assertEqual("TEST-PARTIAL-CONTENT", rendered_content.strip())
+
+
+class FindPartialSourceTest(TestCase):
+    """Test the find_partial_source method of TemplateProxy"""
+
+    def setUp(self):
+        self.engine = engines["django"]
+
+    def test_find_partial_source_success(self):
+        template = self.engine.get_template("partial_examples.html")
+        partial_proxy = template.template.extra_data["template-partials"][
+            "test-partial"
+        ]
+
+        result = partial_proxy.source
+
+        expected = """{% partialdef test-partial %}
+TEST-PARTIAL-CONTENT
+{% endpartialdef %}"""
+        self.assertEqual(result.strip(), expected.strip())
+
+    def test_find_partial_source_with_inline(self):
+        template = self.engine.get_template("partial_examples.html")
+        partial_proxy = template.template.extra_data["template-partials"][
+            "inline-partial"
+        ]
+
+        result = partial_proxy.source
+
+        expected = """{% partialdef inline-partial inline %}
+INLINE-CONTENT
+{% endpartialdef %}"""
+        self.assertEqual(result.strip(), expected.strip())
+
+    def test_find_partial_source_nonexistent_partial(self):
+        template = self.engine.get_template("partial_examples.html")
+        partial_proxy = template.template.extra_data["template-partials"][
+            "test-partial"
+        ]
+
+        result = partial_proxy.find_partial_source(
+            template.template.source, "nonexistent-partial"
+        )
+
+        self.assertEqual(result, "")
+
+    def test_find_partial_source_unclosed_partialdef_raises_error(self):
+        with self.assertRaises(TemplateSyntaxError):
+            self.engine.get_template("partial_broken_unclosed.html")
