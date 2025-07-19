@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin  # noqa
 from django.contrib.flatpages.admin import FlatPageAdmin  # noqa
 from django.utils.translation import ngettext
 
-from .models import Article
+from .models import Article, Newspaper
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -27,4 +27,10 @@ class ArticleAdmin(admin.ModelAdmin):
         )
 
 
+class NewspaperAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+    ordering = ["name"]
+
+
 admin.site.register(Article, ArticleAdmin)
+admin.site.register(Newspaper, NewspaperAdmin)

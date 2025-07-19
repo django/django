@@ -200,7 +200,5 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
         self.change_header_display("none")
 
         # Capture the raw_id_fields screenshot
-        # TODO: For some reason the magnifying glass is not shown (lookup icon)
-        # There are no loading JS errors
         newspaper_field = self.selenium.find_element(By.CLASS_NAME, "field-newspaper")
         self.take_element_screenshot(newspaper_field, "raw_id_fields")
