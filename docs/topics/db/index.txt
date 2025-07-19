@@ -23,5 +23,4 @@ Generally, each model maps to a single database table.
    optimization
    instrumentation
    fixtures
-   postgresql-collations
    examples/index
