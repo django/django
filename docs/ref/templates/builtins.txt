@@ -972,19 +972,21 @@ Usage:
 
     {% partial partial_name %}
 
-The ``partial_name`` argument is the string identifier of the partial to render.
+The ``partial_name`` argument is the identifier of the partial to render.
 
 Example:
 
 .. code-block:: html+django
 
     {% partialdef button %}
-        <button class="btn">{{ button_text }}</button>
+        <button>Submit</button>
     {% endpartialdef %}
 
     {% partial button %}
     {% partial button %}
+    {% partial button %}
 
+This example will define a partial named ``button`` and render it three times.
 
 .. templatetag:: partialdef
 
