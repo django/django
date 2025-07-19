@@ -811,9 +811,9 @@ a.deletelink:focus, a.deletelink:hover {
     font-size: 0.625rem;
     font-weight: bold;
     padding-left: 0;
-    float: right;
-    position: relative;
-    margin-top: -48px;
+    position: absolute;
+    top: 15px;
+    right: 30px;
 }
 
 .object-tools li {
@@ -915,6 +915,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #content {
+    position: relative;
     padding: 20px 40px;
 }
 
