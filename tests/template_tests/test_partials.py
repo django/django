@@ -35,6 +35,20 @@ class PartialTagsTestCase(TestCase):
         rendered = template.render({})
         self.assertEqual("INLINE-CONTENT", rendered.strip())
 
+    def test_invalid_name_raises_template_does_not_exist(self):
+        engine = engines["django"]
+        with self.assertRaises(TemplateDoesNotExist):
+            engine.get_template(123)
+
+        with self.assertRaises(TemplateDoesNotExist):
+            engine.get_template(None)
+
+        with self.assertRaises(TemplateDoesNotExist):
+            engine.get_template("")
+
+        with self.assertRaises(TemplateDoesNotExist):
+            engine.get_template("#")
+
     def test_undefined_partial_error(self):
         template = """
         {% partial testing-partial %}
