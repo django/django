@@ -76,11 +76,15 @@ class DatabaseValidation(BaseDatabaseValidation):
                 )
             )
 
-        if field_type.startswith("numeric") and hasattr(field, 'max_digits') and hasattr(field, 'decimal_places'):
+        if (
+            field_type.startswith("numeric")
+            and hasattr(field, "max_digits")
+            and hasattr(field, "decimal_places")
+        ):
             if field.max_digits > 65:
                 errors.append(
                     checks.Warning(
-                        "%s does not support DecimalField with max_digits > 65." 
+                        "%s does not support DecimalField with max_digits > 65."
                         % self.connection.display_name,
                         obj=field,
                         id="mysql.W004",

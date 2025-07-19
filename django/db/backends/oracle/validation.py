@@ -23,26 +23,29 @@ class DatabaseValidation(BaseDatabaseValidation):
                 )
             )
 
-        if field_type.startswith("number") and hasattr(field, 'max_digits') and hasattr(field, 'decimal_places'):
+        if (
+            field_type.startswith("number")
+            and hasattr(field, "max_digits")
+            and hasattr(field, "decimal_places")
+        ):
             if field.max_digits > 38:
                 errors.append(
                     checks.Warning(
-                        "%s does not support DecimalField with max_digits > 38." 
+                        "%s does not support DecimalField with max_digits > 38."
                         % self.connection.display_name,
                         obj=field,
                         id="oracle.W001",
                     )
                 )
-            
+
             if field.decimal_places > 127:
                 errors.append(
                     checks.Warning(
-                        "%s does not support DecimalField with decimal_places > 127." 
+                        "%s does not support DecimalField with decimal_places > 127."
                         % self.connection.display_name,
                         obj=field,
                         id="oracle.W002",
                     )
                 )
-            
 
         return errors
