@@ -1,6 +1,9 @@
 from contextlib import contextmanager
 from pathlib import Path
 
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 
 from django.contrib.admin.tests import AdminSeleniumTestCase
@@ -17,7 +20,7 @@ SIZES = ["docs_size"]
 
 @modify_settings(INSTALLED_APPS={"append": "django.contrib.flatpages"})
 @override_settings(ROOT_URLCONF="news.urls")
-class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
+class AdminDocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
     """Selenium tests for generating images for the Django documentation."""
 
     available_apps = AdminSeleniumTestCase.available_apps + [
@@ -63,8 +66,6 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
 
     def hide_nav_sidebar(self):
         """Hide the navigation sidebar if it's open."""
-        from selenium.webdriver.common.by import By
-
         if self.selenium.find_element(By.ID, "nav-sidebar").is_displayed():
             self.selenium.find_element(By.CSS_SELECTOR, "#toggle-nav-sidebar").click()
         self.selenium.execute_script(
@@ -81,9 +82,6 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
 
     @screenshot_cases(SIZES)
     def test_user_actions(self):
-        from selenium.webdriver import ActionChains
-        from selenium.webdriver.common.by import By
-
         users = [
             ("Adrian", "Holovaty", False),
             ("Admin", "User", True),
@@ -115,9 +113,6 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
 
     @screenshot_cases(SIZES)
     def test_flatpages_fieldsets(self):
-        from selenium.webdriver import ActionChains
-        from selenium.webdriver.common.by import By
-
         self.selenium.get(
             self.live_server_url + reverse("admin:flatpages_flatpage_add")
         )
@@ -131,10 +126,6 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
 
     @screenshot_cases(SIZES)
     def test_articles_actions(self):
-        from selenium.webdriver import ActionChains
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
-
         stories = [
             ("A New Human-like Species Discovered in Deep Burial Chamber", "p"),
             ("Django 1.9 Released", "d"),
@@ -176,7 +167,6 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
     def test_article_with_two_newspapers(self):
         """Test creating an article attached to 2 newspapers and capture the newspaper
         raw ids input field."""
-        from selenium.webdriver.common.by import By
 
         from .models import Newspaper
 
@@ -202,3 +192,60 @@ class DocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
         # Capture the raw_id_fields screenshot
         newspaper_field = self.selenium.find_element(By.CLASS_NAME, "field-newspaper")
         self.take_element_screenshot(newspaper_field, "raw_id_fields")
+
+
+@modify_settings(INSTALLED_APPS={"append": "django.contrib.flatpages"})
+@override_settings(ROOT_URLCONF="news.urls")
+class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
+    """Selenium tests for generating Django admin images used in the Django tutorial"""
+
+    available_apps = AdminSeleniumTestCase.available_apps + [
+        "django.contrib.flatpages",
+        "news",
+    ]
+
+    path = Path.cwd().parent / "docs" / "intro" / "_images"
+
+    def setUp(self):
+        self.superuser = User.objects.create_superuser(
+            username="admin",
+            password="secret",
+            email="admin@example.com",
+            first_name="Admin",
+            last_name="Super",
+        )
+
+        # TODO: This shouldn't be necessary
+        """Sets light mode in local storage to avoid auto dark mode."""
+        try:
+            self.selenium.execute_script("localStorage.setItem('theme', 'light');")
+        except Exception:
+            # If localStorage is not available, we can skip this step.
+            pass
+
+    def tearDown(self):
+        self.selenium.execute_script("localStorage.removeItem('theme');")
+
+    @contextmanager
+    def docs_size(self):
+        with ChangeWindowSize(800, 800, self.selenium):
+            yield
+
+    def take_window_screenshot(self, filename):
+        """Take a screenshot of the full window."""
+        path = self.path
+        assert path.exists()
+        self.selenium.save_screenshot(path / f"{filename}.png")
+
+    def take_element_screenshot(self, element: WebElement, filename: str):
+        """Take a screenshot of a specific element."""
+        full_path = self.path / f"{filename}.png"
+        element.screenshot(str(full_path))
+
+    @screenshot_cases(SIZES)
+    def test_tutorial_admin_login(self):
+        """Take a screenshot of the admin login form"""
+        self.selenium.get(self.live_server_url + reverse("admin:index"))
+
+        login_form = self.selenium.find_element(By.ID, "container")
+        self.take_element_screenshot(login_form, "admin01")
