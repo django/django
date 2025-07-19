@@ -1004,22 +1004,8 @@ Usage:
         <!-- partial content -->
     {% endpartialdef %}
 
-The ``{% partialdef %}`` tag can be used with one or two arguments. The
-arguments are:
-
-================  =============================================================
-Argument          Description
-================  =============================================================
-``partial_name``  String identifier for the partial (required).
-``inline``        The word ``inline``, which if given, renders the partial
-                  content immediately in addition to defining it.
-================  =============================================================
-
-Examples:
-
-* ``{% partialdef card %}...{% endpartialdef %}`` defines a partial named "card".
-* ``{% partialdef header inline %}...{% endpartialdef %}`` defines and immediately
-  renders a partial named "header".
+The ``{% partialdef %}`` tag takes a required ``partial_name`` argument, which
+is a identifier for the partial:
 
 .. code-block:: html+django
 
@@ -1029,6 +1015,11 @@ Examples:
             <p>{{ content }}</p>
         </div>
     {% endpartialdef %}
+
+To define and render a partial immediately in the same place, use the ``inline``
+option:
+
+.. code-block:: html+django
 
     {% partialdef header inline %}
         <header>Site Header</header>
