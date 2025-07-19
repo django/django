@@ -26,7 +26,7 @@ th {
 }
 
 .object-tools {
-    float: left;
+    left: 30px;
 }
 
 thead th:first-child,

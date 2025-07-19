@@ -442,7 +442,7 @@ input[type="submit"], button {
     }
 
     .object-tools {
-        float: none;
+        position: static;
         margin: 0 0 15px;
         padding: 0;
         overflow: hidden;
