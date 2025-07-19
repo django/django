@@ -69,6 +69,13 @@ PostgreSQL
 PostgreSQL is the most capable of all the databases here in terms of schema
 support.
 
+.. warning::
+
+    When using PostgreSQL, adding non-deterministic collations to existing
+    unique :class:`CharField`\s will cause database errors. Use
+    :class:`~django.db.models.UniqueConstraint` instead, or see
+    :doc:`../db/postgresql-collations` for details.
+
 MySQL
 -----
 

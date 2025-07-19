@@ -268,6 +268,13 @@ ones:
 :attr:`~Field.unique`
     If ``True``, this field must be unique throughout the table.
 
+    .. warning::
+
+        When using PostgreSQL, adding non-deterministic collations to existing
+        unique :class:`CharField`\s will cause database errors. Use
+        :class:`~django.db.models.UniqueConstraint` instead, or see
+        :doc:`postgresql-collations` for details.
+
 Again, these are just short descriptions of the most common field options. Full
 details can be found in the :ref:`common model field option reference
 <common-model-field-options>`.
