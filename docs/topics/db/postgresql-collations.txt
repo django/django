@@ -52,13 +52,12 @@ Instead of ``unique=True`` on the field, use :class:`~django.db.models.UniqueCon
     from django.db import models
     from django.db.models import UniqueConstraint
 
+
     class User(models.Model):
-        email = models.CharField(max_length=255, db_collation='case_insensitive')
-        
+        email = models.CharField(max_length=255, db_collation="case_insensitive")
+
         class Meta:
-            constraints = [
-                UniqueConstraint(fields=['email'], name='unique_user_email')
-            ]
+            constraints = [UniqueConstraint(fields=["email"], name="unique_user_email")]
 
 Add both together
 ~~~~~~~~~~~~~~~~~
@@ -71,9 +70,7 @@ the same migration:
     # models.py
     class User(models.Model):
         email = models.CharField(
-            max_length=255, 
-            unique=True, 
-            db_collation='case_insensitive'
+            max_length=255, unique=True, db_collation="case_insensitive"
         )
 
 Manual index management
@@ -85,13 +82,12 @@ For advanced cases, manually manage indexes using :class:`~django.db.models.Inde
 
     from django.db import models
 
+
     class User(models.Model):
-        email = models.CharField(max_length=255, db_collation='case_insensitive')
-        
+        email = models.CharField(max_length=255, db_collation="case_insensitive")
+
         class Meta:
-            indexes = [
-                models.Index(fields=['email'], name='user_email_idx')
-            ]
+            indexes = [models.Index(fields=["email"], name="user_email_idx")]
 
 Migration strategy
 -----------------
@@ -108,32 +104,29 @@ fields:
     # migration.py
     from django.db import migrations, models
 
+
     class Migration(migrations.Migration):
         dependencies = [
-            ('myapp', '0001_initial'),
+            ("myapp", "0001_initial"),
         ]
 
         operations = [
             # Remove unique constraint
             migrations.AlterUniqueTogether(
-                name='user',
+                name="user",
                 unique_together=set(),
             ),
             # Add collation
             migrations.AlterField(
-                model_name='user',
-                name='email',
-                field=models.CharField(
-                    max_length=255,
-                    db_collation='case_insensitive'
-                ),
+                model_name="user",
+                name="email",
+                field=models.CharField(max_length=255, db_collation="case_insensitive"),
             ),
             # Re-add unique constraint via Meta
             migrations.AddConstraint(
-                model_name='user',
+                model_name="user",
                 constraint=models.UniqueConstraint(
-                    fields=['email'],
-                    name='unique_user_email'
+                    fields=["email"], name="unique_user_email"
                 ),
             ),
         ]
@@ -150,11 +143,7 @@ If possible, use deterministic collations that are compatible with
 .. code-block:: python
 
     # Use binary collation (deterministic)
-    email = models.CharField(
-        max_length=255, 
-        unique=True, 
-        db_collation='C'
-    )
+    email = models.CharField(max_length=255, unique=True, db_collation="C")
 
 Handle case sensitivity in application logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -167,6 +156,7 @@ Instead of relying on database-level case-insensitive collations:
     class UserManager(models.Manager):
         def get_by_email(self, email):
             return self.filter(email__iexact=email).first()
+
 
     class User(models.Model):
         email = models.CharField(max_length=255, unique=True)
