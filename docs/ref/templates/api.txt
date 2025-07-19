@@ -164,17 +164,17 @@ overridden by what's passed by
 
     .. code-block:: python
 
-        # Load entire template
+        # Load an entire template.
         template = engine.get_template("template.html")
 
-        # Load specific partial from template
+        # Load a specific fragment from a template.
         partial = engine.get_template("template.html#partial_name")
+
+    When loading partials, this method returns a template object that behaves 
+    like a regular :class:`Template` but contains only the partial's content.
 
     See :ref:`template-partials` for more information about defining and using
     template partials.
-
-    When loading partials, the method returns a template object that behaves 
-    like a regular :class:`Template` but contains only the partial's content.
 
     .. versionchanged:: 6.0
 

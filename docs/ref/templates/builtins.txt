@@ -993,7 +993,7 @@ Example:
 
 .. versionadded:: 6.0
 
-Defines a reusable template partial that can be rendered multiple times within
+Defines a reusable template fragment that can be rendered multiple times within
 the same template or accessed directly via template loading or inclusion.
 
 Usage:

@@ -282,9 +282,7 @@ class ResponseContextWithPartialTests(TestCase):
         urls_module = ModuleType("partial_test_urls")
         urls_module.urlpatterns = [path("sample/", sample_view, name="sample-view")]
 
-        with override_settings(
-            ROOT_URLCONF=urls_module,
-        ):
+        with override_settings(ROOT_URLCONF=urls_module):
             response = self.client.get(reverse("sample-view"))
 
         self.assertEqual(response.status_code, 200)

@@ -1628,10 +1628,7 @@ class DefinePartialNode(Node):
 
     def render(self, context):
         """Set content into context and return empty string"""
-        if self.inline:
-            return self.nodelist.render(context)
-        else:
-            return ""
+         return self.nodelist.render(context) if self.inline else ""
 
 
 class RenderPartialNode(Node):
@@ -1661,22 +1658,17 @@ def partialdef_func(parser, token):
     The optional ``inline`` argument will render the contents of the partial
     where it is defined.
     """
-    # Parse the tag
     tokens = token.split_contents()
 
-    # check we have the expected number of tokens before trying to assign them
-    # via indexes
-    if len(tokens) not in (2, 3):
-        raise TemplateSyntaxError(
-            "%r tag requires 2-3 arguments" % token.contents.split()[0]
-        )
+    # Check the number of tokens before trying to assign them via indexes.
+    if (tokens_len := len(tokens)) not in (2, 3):
+        name = token.contents.split()[0]
+        raise TemplateSyntaxError(f"{name} tag requires 2-3 arguments")
 
     partial_name = tokens[1]
-
-    try:
+    if tokens_len > 2:
         inline = tokens[2]
-    except IndexError:
-        # the inline argument is optional, so fallback to not using it
+    else:
         inline = False
 
     if inline and inline != "inline":
@@ -1686,14 +1678,14 @@ def partialdef_func(parser, token):
             DeprecationWarning,
         )
 
-    # Parse the content until the end tag
+    # Parse the content until the end tag.
     acceptable_endpartials = ("endpartialdef", f"endpartialdef {partial_name}")
     nodelist = parser.parse(acceptable_endpartials)
     endpartial = parser.next_token()
     if endpartial.contents not in acceptable_endpartials:
         parser.invalid_block_tag(endpartial, "endpartialdef", acceptable_endpartials)
 
-    # Store the partial nodelist in the parser.extra_data attribute,
+    # Store the partial nodelist in the parser.extra_data attribute.
     parser.extra_data.setdefault("template-partials", {})
     parser.extra_data["template-partials"][partial_name] = TemplateProxy(
         nodelist, parser.origin, partial_name
@@ -1729,7 +1721,6 @@ class SubDictionaryWrapper:
             )
 
 
-# Define the partial tag to render the partial content.
 @register.tag(name="partial")
 def partial_func(parser, token):
     """
@@ -1740,7 +1731,6 @@ def partial_func(parser, token):
 
         {% partial partial_name %}
     """
-    # Parse the tag
     try:
         tag_name, partial_name = token.split_contents()
     except ValueError:
