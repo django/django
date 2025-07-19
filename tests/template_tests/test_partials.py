@@ -315,3 +315,55 @@ class ResponseWithMultiplePartsTests(TestCase):
         for response in [response1, response2, response3]:
             self.assertIn(b"Main Content", response.content)
             self.assertIn(b"Extra Content", response.content)
+
+
+class RobustPartialHandlingTest(TestCase):
+
+    def setUp(self):
+        self.engine = engines["django"]
+
+    def test_template_without_extra_data_attribute(self):
+
+        class TemplateWithoutExtraData:
+            def render(self, context):
+                return "rendered content"
+
+        with mock.patch.object(
+            self.engine.engine, "get_template", return_value=TemplateWithoutExtraData()
+        ):
+            with self.assertRaises(TemplateDoesNotExist):
+                self.engine.get_template("some_template.html#some_partial")
+
+    def test_template_with_non_dict_extra_data(self):
+
+        class TemplateWithInvalidExtraData:
+            def __init__(self, extra_data):
+                self.extra_data = extra_data
+
+            def render(self, context):
+                return "rendered content"
+
+        with mock.patch.object(
+            self.engine.engine,
+            "get_template",
+            return_value=TemplateWithInvalidExtraData(None),
+        ):
+            with self.assertRaises(TemplateDoesNotExist):
+                self.engine.get_template("template.html#partial")
+
+    def test_template_with_non_dict_partial_contents(self):
+
+        class TemplateWithInvalidPartialContents:
+            def __init__(self, partial_contents):
+                self.extra_data = {"template-partials": partial_contents}
+
+            def render(self, context):
+                return "rendered content"
+
+        with mock.patch.object(
+            self.engine.engine,
+            "get_template",
+            return_value=TemplateWithInvalidPartialContents(None),
+        ):
+            with self.assertRaises(TemplateDoesNotExist):
+                self.engine.get_template("template.html#partial")

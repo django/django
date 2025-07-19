@@ -81,24 +81,26 @@ class DjangoTemplates(BaseEngine):
             # for None, int, object, etc.
             raise TemplateDoesNotExist(template_name)
 
+        if not template_name:
+            raise TemplateDoesNotExist(template_name)
+
         try:
             template = self.engine.get_template(template_name)
         except TemplateDoesNotExist as exc:
             reraise(exc, self)
-        except IsADirectoryError:
-            # empty template name ""
-            raise TemplateDoesNotExist(template_name)
 
         if not partial_name:
             return Template(template, self)
 
-        extra_data = getattr(template, "extra_data")
-        partial_contents = extra_data.get("template-partials", {})
+        try:
+            extra_data = getattr(template, "extra_data", {})
+            partial_contents = extra_data.get("template-partials", {})
+        except AttributeError:
+            raise TemplateDoesNotExist(partial_name, tried=[template_name])
 
         try:
             partial = partial_contents[partial_name]
-        except KeyError:
-            # Partial not found on this template.
+        except (KeyError, TypeError):
             raise TemplateDoesNotExist(partial_name, tried=[template_name])
         partial.engine = self.engine
 
