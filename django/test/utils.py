@@ -25,6 +25,7 @@ from django.core.signals import request_started, setting_changed
 from django.db import DEFAULT_DB_ALIAS, connections, reset_queries
 from django.db.models.options import Options
 from django.template import Template
+from django.template.defaulttags import TemplateProxy
 from django.test.signals import template_rendered
 from django.urls import get_script_prefix, set_script_prefix
 from django.utils.translation import deactivate
@@ -147,7 +148,9 @@ def setup_test_environment(debug=None):
     settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
     saved_data.template_render = Template._render
+    saved_data.template_proxy_render = TemplateProxy._render
     Template._render = instrumented_test_render
+    TemplateProxy._render = instrumented_test_render
 
     mail.outbox = []
 
@@ -165,6 +168,7 @@ def teardown_test_environment():
     settings.DEBUG = saved_data.debug
     settings.EMAIL_BACKEND = saved_data.email_backend
     Template._render = saved_data.template_render
+    TemplateProxy._render = saved_data.template_proxy_render
 
     del _TestState.saved_data
     del mail.outbox

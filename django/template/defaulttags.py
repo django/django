@@ -40,6 +40,9 @@ from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal
 
+partial_start_tag_re = re.compile(r"\{%\s*(partialdef)\s+([\w-]+)(\s+inline)?\s*%}")
+partial_end_tag_re = re.compile(r"\{%\s*endpartialdef\s*%}")
+
 register = Library()
 
 
@@ -1564,3 +1567,173 @@ def do_with(parser, token):
     nodelist = parser.parse(("endwith",))
     parser.delete_first_token()
     return WithNode(None, None, nodelist, extra_context=extra_context)
+
+
+class TemplateProxy:
+    """
+    A lightweight Template lookalike used for template partials.
+
+    Wraps nodelist as partial, in order to bind context.
+    """
+
+    def __init__(self, nodelist, origin, name):
+        self.nodelist = nodelist
+        self.origin = origin
+        self.name = name
+
+    def get_exception_info(self, exception, token):
+        template = self.origin.loader.get_template(self.origin.template_name)
+        return template.get_exception_info(exception, token)
+
+    def find_partial_source(self, full_source, partial_name):
+        result = ""
+        pos = 0
+        for m in partial_start_tag_re.finditer(full_source, pos):
+            sspos, sepos = m.span()
+            starter, name, inline = m.groups()
+            endm = partial_end_tag_re.search(full_source, sepos + 1)
+            espos, eepos = endm.span()
+            if name == partial_name:
+                # Include the full partial definition from opening to closing tag.
+                result = full_source[sspos:eepos]
+                break
+            pos = eepos + 1
+        return result
+
+    @property
+    def source(self):
+        template = self.origin.loader.get_template(self.origin.template_name)
+        return self.find_partial_source(template.source, self.name)
+
+    def _render(self, context):
+        return self.nodelist.render(context)
+
+    def render(self, context):
+        with context.render_context.push_state(self):
+            if context.template is None:
+                with context.bind_template(self):
+                    context.template_name = self.name
+                    return self._render(context)
+            else:
+                return self._render(context)
+
+
+class DefinePartialNode(Node):
+    def __init__(self, partial_name, inline, nodelist):
+        self.partial_name = partial_name
+        self.inline = inline
+        self.nodelist = nodelist
+
+    def render(self, context):
+        return self.nodelist.render(context) if self.inline else ""
+
+
+class RenderPartialNode(Node):
+    def __init__(self, partial_name, partial_mapping):
+        # Defer lookup of nodelist to runtime.
+        self.partial_name = partial_name
+        self.partial_mapping = partial_mapping
+
+    def render(self, context):
+        return self.partial_mapping[self.partial_name].render(context)
+
+
+@register.tag(name="partialdef")
+def partialdef_func(parser, token):
+    """
+    Declare a partial that can be used later in the template.
+
+    Usage::
+
+        {% partialdef partial_name %}
+        Partial content goes here
+        {% endpartialdef %}
+
+    Stores the nodelist in the context under the key "partial_contents" and can
+    be retrieved using the {% partial %} tag.
+
+    The optional ``inline`` argument will render the contents of the partial
+    where it is defined.
+    """
+    tokens = token.split_contents()
+
+    # Check the number of tokens before trying to assign them via indexes.
+    if (tokens_len := len(tokens)) not in (2, 3):
+        name = token.contents.split()[0]
+        raise TemplateSyntaxError(f"{name} tag requires 2-3 arguments")
+
+    partial_name = tokens[1]
+    if tokens_len > 2:
+        inline = tokens[2]
+    else:
+        inline = False
+
+    if inline and inline != "inline":
+        warnings.warn(
+            "The 'inline' argument does not have any parameters; "
+            "either use 'inline' or remove it completely.",
+            DeprecationWarning,
+        )
+
+    # Parse the content until the end tag.
+    acceptable_endpartials = ("endpartialdef", f"endpartialdef {partial_name}")
+    nodelist = parser.parse(acceptable_endpartials)
+    endpartial = parser.next_token()
+    if endpartial.contents not in acceptable_endpartials:
+        parser.invalid_block_tag(endpartial, "endpartialdef", acceptable_endpartials)
+
+    # Store the partial nodelist in the parser.extra_data attribute.
+    parser.extra_data.setdefault("template-partials", {})
+    parser.extra_data["template-partials"][partial_name] = TemplateProxy(
+        nodelist, parser.origin, partial_name
+    )
+
+    return DefinePartialNode(partial_name, inline, nodelist)
+
+
+class SubDictionaryWrapper:
+    """
+    Wrap a parent dictionary, allowing deferred access to a sub-dictionary by key.
+    The parser.extra_data storage may not yet be populated when a partial node
+    is defined, so defer access until rendering.
+    """
+
+    def __init__(self, parent_dict, lookup_key):
+        self.parent_dict = parent_dict
+        self.lookup_key = lookup_key
+
+    def __getitem__(self, key):
+        try:
+            partials_content = self.parent_dict[self.lookup_key]
+        except KeyError:
+            raise TemplateSyntaxError(
+                f"No partials are defined. You are trying to access '{key}' partial"
+            )
+
+        try:
+            return partials_content[key]
+        except KeyError:
+            raise TemplateSyntaxError(
+                f"You are trying to access an undefined partial '{key}'"
+            )
+
+
+@register.tag(name="partial")
+def partial_func(parser, token):
+    """
+    Render a partial that was previously declared using
+    the {% partialdef %} tag.
+
+    Usage::
+
+        {% partial partial_name %}
+    """
+    try:
+        tag_name, partial_name = token.split_contents()
+    except ValueError:
+        raise TemplateSyntaxError("%r tag requires a single argument" % tag_name)
+
+    extra_data = getattr(parser, "extra_data")
+    partial_mapping = SubDictionaryWrapper(extra_data, "template-partials")
+
+    return RenderPartialNode(partial_name, partial_mapping=partial_mapping)

@@ -957,6 +957,76 @@ output (as a string) inside a variable. This is useful if you want to use
     {% now "Y" as current_year %}
     {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
+.. templatetag:: partial
+
+``partial``
+-----------
+
+.. versionadded:: 6.0
+
+Renders a partial that was defined with :ttag:`partialdef`.
+
+Usage:
+
+.. code-block:: html+django
+
+    {% partial partial_name %}
+
+The ``partial_name`` argument is the identifier of the partial to render.
+
+Example:
+
+.. code-block:: html+django
+
+    {% partialdef button %}
+        <button>Submit</button>
+    {% endpartialdef %}
+
+    {% partial button %}
+    {% partial button %}
+    {% partial button %}
+
+This example will define a partial named ``button`` and render it three times.
+
+.. templatetag:: partialdef
+
+``partialdef``
+--------------
+
+.. versionadded:: 6.0
+
+Defines a reusable template fragment that can be rendered multiple times within
+the same template or accessed directly via template loading or inclusion.
+
+Usage:
+
+.. code-block:: html+django
+
+    {% partialdef partial_name %}
+        <!-- partial content -->
+    {% endpartialdef %}
+
+The ``{% partialdef %}`` tag takes a required ``partial_name`` argument, which
+is a identifier for the partial:
+
+.. code-block:: html+django
+
+    {% partialdef card %}
+        <div class="card">
+            <h3>{{ title }}</h3>
+            <p>{{ content }}</p>
+        </div>
+    {% endpartialdef %}
+
+To define and render a partial immediately in the same place, use the ``inline``
+option:
+
+.. code-block:: html+django
+
+    {% partialdef header inline %}
+        <header>Site Header</header>
+    {% endpartialdef %}
+
 .. templatetag:: querystring
 
 ``querystring``
