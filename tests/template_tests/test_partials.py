@@ -12,50 +12,51 @@ from django.urls import path, reverse
 
 
 class PartialTagsTestCase(TestCase):
+
+    @property
+    def engine(self):
+        return engines["django"]
+
     def test_partial_tags(self):
         template = """
         {% partialdef testing-partial %}HERE IS THE TEST CONTENT{% endpartialdef %}
         {% partial testing-partial %}
         """
 
-        engine = engines["django"]
-        t = engine.from_string(template)
+        t = self.engine.from_string(template)
         rendered = t.render({})
 
         self.assertEqual("HERE IS THE TEST CONTENT", rendered.strip())
 
     def test_just_partial_from_loader(self):
-        engine = engines["django"]
 
-        template = engine.get_template("partial_examples.html#test-partial")
+        template = self.engine.get_template("partial_examples.html#test-partial")
         rendered = template.render({})
         self.assertEqual("TEST-PARTIAL-CONTENT", rendered.strip())
 
-        template = engine.get_template("partial_examples.html#inline-partial")
+        template = self.engine.get_template("partial_examples.html#inline-partial")
         rendered = template.render({})
         self.assertEqual("INLINE-CONTENT", rendered.strip())
 
     def test_invalid_name_raises_template_does_not_exist(self):
-        engine = engines["django"]
         with self.assertRaises(TemplateDoesNotExist):
-            engine.get_template(123)
+            self.engine.get_template(123)
 
         with self.assertRaises(TemplateDoesNotExist):
-            engine.get_template(None)
+            self.engine.get_template(None)
 
         with self.assertRaises(TemplateDoesNotExist):
-            engine.get_template("")
+            self.engine.get_template("")
 
         with self.assertRaises(TemplateDoesNotExist):
-            engine.get_template("#")
+            self.engine.get_template("#")
 
     def test_undefined_partial_error(self):
         template = """
         {% partial testing-partial %}
         """
 
-        engine = engines["django"]
-        t = engine.from_string(template)
+        t = self.engine.from_string(template)
         with self.assertRaisesMessage(
             TemplateSyntaxError,
             "No partials are defined. You are trying to access 'testing-partial' "
@@ -64,13 +65,12 @@ class PartialTagsTestCase(TestCase):
             t.render({})
 
     def test_template_source(self):
-        engine = engines["django"]
-        partial = engine.get_template("partial_examples.html#test-partial")
+        partial = self.engine.get_template("partial_examples.html#test-partial")
         self.assertEqual(
             partial.template.source,
             "{% partialdef test-partial %}\nTEST-PARTIAL-CONTENT\n{% endpartialdef %}",
         )
-        partial = engine.get_template("partial_examples.html#inline-partial")
+        partial = self.engine.get_template("partial_examples.html#inline-partial")
         self.assertEqual(
             partial.template.source,
             "{% partialdef inline-partial inline %}\nINLINE-CONTENT\n"
@@ -84,8 +84,7 @@ class PartialTagsTestCase(TestCase):
         {% endpartialdef %}
         """
 
-        engine = engines["django"]
-        t = engine.from_string(template)
+        t = self.engine.from_string(template)
         rendered = t.render({})
 
         self.assertEqual("HERE IS THE TEST CONTENT", rendered.strip())
@@ -99,8 +98,7 @@ class PartialTagsTestCase(TestCase):
         AFTER
         """
 
-        engine = engines["django"]
-        t = engine.from_string(dedent(template))
+        t = self.engine.from_string(dedent(template))
         rendered = t.render({})
 
         self.assertEqual(
@@ -115,8 +113,7 @@ class PartialTagsTestCase(TestCase):
         {% partial testing-partial %}
         """
 
-        engine = engines["django"]
-        t = engine.from_string(template)
+        t = self.engine.from_string(template)
         rendered = t.render({})
 
         self.assertEqual("HERE IS THE TEST CONTENT", rendered.strip())
@@ -130,12 +127,10 @@ class PartialTagsTestCase(TestCase):
         """
 
         with self.assertRaises(TemplateSyntaxError):
-            engine = engines["django"]
-            engine.from_string(template)
+            self.engine.from_string(template)
 
     def test_full_template_from_loader(self):
-        engine = engines["django"]
-        template = engine.get_template("partial_examples.html")
+        template = self.engine.get_template("partial_examples.html")
         rendered = template.render({})
 
         # Check the partial was rendered twice
@@ -143,9 +138,8 @@ class PartialTagsTestCase(TestCase):
         self.assertEqual(1, rendered.count("INLINE-CONTENT"))
 
     def test_chained_exception_forwarded(self):
-        engine = engines["django"]
         with self.assertRaises(TemplateDoesNotExist) as ex:
-            engine.get_template("not_there.html#not-a-partial")
+            self.engine.get_template("not_there.html#not-a-partial")
 
         self.assertTrue(len(ex.exception.tried) > 0)
         origin, _ = ex.exception.tried[0]
@@ -163,8 +157,7 @@ class PartialTagsTestCase(TestCase):
         {% endblock %}
         """
 
-        engine = engines["django"]
-        template = engine.from_string(template_string)
+        template = self.engine.from_string(template_string)
         rendered = template.render({})
 
         self.assertIn("Main content with", rendered)
@@ -172,8 +165,7 @@ class PartialTagsTestCase(TestCase):
 
     def test_template_inclusion_with_partial(self):
 
-        engine = engines["django"]
-        parent_template = engine.get_template("partial_parent.html")
+        parent_template = self.engine.get_template("partial_parent.html")
         rendered = parent_template.render({})
         self.assertIn("MAIN TEMPLATE START", rendered)
         self.assertIn("INCLUDED TEMPLATE START", rendered)
@@ -191,8 +183,7 @@ class PartialTagsTestCase(TestCase):
         {% endpartialdef %}
         TEMPLATE END
         """
-        engine = engines["django"]
-        template = engine.from_string(template_content)
+        template = self.engine.from_string(template_content)
         rendered = template.render({})
         self.assertIn("TEMPLATE START", rendered)
         self.assertIn("THIS IS THE SKELETON PARTIAL CONTENT", rendered)
@@ -208,8 +199,7 @@ class PartialTagsTestCase(TestCase):
         {% partial not-defined-partial %}
         """
 
-        engine = engines["django"]
-        t = engine.from_string(template)
+        t = self.engine.from_string(template)
         with self.assertRaisesMessage(
             TemplateSyntaxError,
             "You are trying to access an undefined partial 'not-defined-partial'",
@@ -221,8 +211,7 @@ class PartialTagsTestCase(TestCase):
         template = """
         {% partial not-defined-partial %}
         """
-        engine = engines["django"]
-        t = engine.from_string(template)
+        t = self.engine.from_string(template)
         with self.assertRaisesMessage(
             TemplateSyntaxError,
             "No partials are defined. You are trying to access "
@@ -317,8 +306,9 @@ class ResponseWithMultiplePartsTests(TestCase):
 
 class RobustPartialHandlingTest(TestCase):
 
-    def setUp(self):
-        self.engine = engines["django"]
+    @property
+    def engine(self):
+        return engines["django"]
 
     def test_template_without_extra_data_attribute(self):
 
