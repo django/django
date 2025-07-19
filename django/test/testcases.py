@@ -1,4 +1,5 @@
 import difflib
+import inspect
 import json
 import logging
 import pickle
@@ -25,7 +26,7 @@ from urllib.parse import (
 )
 from urllib.request import url2pathname
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync, iscoroutinefunction, AsyncSingleThreadContext
 
 from django.apps import apps
 from django.conf import settings
@@ -38,7 +39,7 @@ from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.core.signals import setting_changed
-from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction, async_connections
 from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -60,6 +61,7 @@ logger = logging.getLogger("django.test")
 
 __all__ = (
     "TestCase",
+    "AsyncTestCase",
     "TransactionTestCase",
     "SimpleTestCase",
     "skipIfDBFeature",
@@ -1116,17 +1118,22 @@ class TransactionTestCase(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls._async_single_thread_context = AsyncSingleThreadContext()
+        cls._async_single_thread_context.__enter__()
+
         super().setUpClass()
-        if not issubclass(cls, TestCase):
+        if not issubclass(cls, (TestCase, AsyncTestCase)):
             cls._pre_setup()
             cls._pre_setup_ran_eagerly = True
 
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        if not issubclass(cls, TestCase) and cls._available_apps_calls_balanced > 0:
+        if not issubclass(cls, (TestCase, AsyncTestCase)) and cls._available_apps_calls_balanced > 0:
             apps.unset_available_apps()
             cls._available_apps_calls_balanced -= 1
+
+        cls._async_single_thread_context.__exit__(None, None, None)
 
     @classmethod
     def _pre_setup(cls):
@@ -1235,8 +1242,8 @@ class TransactionTestCase(SimpleTestCase):
                 # tests (e.g., losing a timezone setting causing objects to be
                 # created with the wrong time). To make sure this doesn't
                 # happen, get a clean connection at the start of every test.
-                for conn in connections.all(initialized_only=True):
-                    conn.close()
+                close_sync_connections()
+                async_to_sync(close_async_connections)()
         finally:
             if self.__class__.available_apps is not None:
                 apps.unset_available_apps()
@@ -1298,6 +1305,16 @@ class TransactionTestCase(SimpleTestCase):
             func(*args, **kwargs)
 
 
+async def close_async_connections():
+    for conn in async_connections.all(initialized_only=True):
+        await conn.close()
+
+
+def close_sync_connections():
+    for conn in connections.all(initialized_only=True):
+        conn.close()
+
+
 def connections_support_transactions(aliases=None):
     """
     Return whether or not all (or specified) connections support
@@ -1311,6 +1328,15 @@ def connections_support_transactions(aliases=None):
     return all(conn.features.supports_transactions for conn in conns)
 
 
+async def async_connections_support_transactions(aliases=None):
+    conns = (
+        async_connections.all()
+        if aliases is None
+        else (async_connections[alias] for alias in aliases)
+    )
+    return all(conn.features.supports_transactions for conn in conns)
+
+
 def connections_support_savepoints(aliases=None):
     """
     Return whether or not all (or specified) connections support savepoints.
@@ -1319,6 +1345,15 @@ def connections_support_savepoints(aliases=None):
         connections.all()
         if aliases is None
         else (connections[alias] for alias in aliases)
+    )
+    return all(conn.features.uses_savepoints for conn in conns)
+
+
+async def async_connections_support_savepoints(aliases=None):
+    conns = (
+        async_connections.all()
+        if aliases is None
+        else (async_connections[alias] for alias in aliases)
     )
     return all(conn.features.uses_savepoints for conn in conns)
 
@@ -1440,8 +1475,10 @@ class TestCase(TransactionTestCase):
             and cls._databases_support_savepoints()
         ):
             cls._rollback_atomics(cls.cls_atomics)
-            for conn in connections.all(initialized_only=True):
-                conn.close()
+
+            close_sync_connections()
+            async_to_sync(close_async_connections)()
+
         super().tearDownClass()
 
     @classmethod
@@ -1522,6 +1559,153 @@ class TestCase(TransactionTestCase):
                             callback()
 
                 if callback_count == len(connections[using].run_on_commit):
+                    break
+                start_count = callback_count
+
+
+class AsyncTestCase(TransactionTestCase):
+
+    @classmethod
+    async def _async_enter_atomics(cls):
+        """Open atomic blocks for multiple databases."""
+        atomics = {}
+        for db_name in cls._databases_names():
+            atomic = transaction.async_atomic(using=db_name)
+            atomic._from_testcase = True
+            await atomic.__aenter__()
+            atomics[db_name] = atomic
+        return atomics
+
+    @classmethod
+    async def _async_rollback_atomics(cls, atomics):
+        """Rollback atomic blocks opened by the previous method."""
+        for db_name in reversed(cls._databases_names()):
+            await transaction.aset_rollback(True, using=db_name)
+            await atomics[db_name].__aexit__(None, None, None)
+
+    @classmethod
+    def _databases_support_transactions(cls):
+        return async_to_sync(async_connections_support_transactions)(cls.databases)
+
+    @classmethod
+    def _databases_support_savepoints(cls):
+        return async_to_sync(async_connections_support_savepoints)(cls.databases)
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if not (
+            cls._databases_support_transactions()
+            and cls._databases_support_savepoints()
+        ):
+            return
+
+        cls.cls_atomics = async_to_sync(cls._async_enter_atomics)()
+        pre_attrs = cls.__dict__.copy()
+
+        try:
+            async_to_sync(cls.asyncSetUpTestData)()
+        except Exception:
+            async_to_sync(cls._async_rollback_atomics)(cls.cls_atomics)
+            raise
+        for name, value in cls.__dict__.items():
+            if value is not pre_attrs.get(name):
+                setattr(cls, name, TestData(name, value))
+
+    @classmethod
+    def tearDownClass(cls):
+        if (
+            cls._databases_support_transactions()
+            and cls._databases_support_savepoints()
+        ):
+            async_to_sync(cls._async_rollback_atomics)(cls.cls_atomics)
+
+            close_sync_connections()
+            async_to_sync(close_async_connections)()
+
+        super().tearDownClass()
+
+    @classmethod
+    async def asyncSetUpTestData(cls):
+        """Load initial data for the TestCase."""
+        pass
+
+    def _should_reload_connections(self):
+        if self._databases_support_transactions():
+            return False
+        return super()._should_reload_connections()
+
+    @classmethod
+    def _fixture_setup(cls):
+        if not cls._databases_support_transactions():
+            # If the backend does not support transactions, we should reload
+            # class data before each test
+            async_to_sync(cls.asyncSetUpTestData)()
+            return super()._fixture_setup()
+
+        if cls.reset_sequences:
+            raise TypeError("reset_sequences cannot be used on TestCase instances")
+
+        cls.atomics = async_to_sync(cls._async_enter_atomics)()
+
+        if not cls._databases_support_savepoints():
+            async_to_sync(cls.asyncSetUpTestData)()
+
+    async def _check_constraints(self, db_name):
+        await async_connections[db_name].check_constraints()
+
+    def _fixture_teardown(self):
+        if not self._databases_support_transactions():
+            return super()._fixture_teardown()
+        try:
+            for db_name in reversed(self._databases_names()):
+                if async_to_sync(self._should_check_constraints)(db_name):
+                    async_to_sync(self._check_constraints)(db_name)
+        finally:
+            async_to_sync(self._async_rollback_atomics)(self.atomics)
+
+    async def _should_check_constraints(self, db_name):
+        connection = async_connections[db_name]
+        return (
+            connection.features.can_defer_constraint_checks
+            and not connection.needs_rollback
+            and await connection.is_usable()
+        )
+
+    @classmethod
+    @contextmanager
+    async def captureOnCommitCallbacks(cls, *, using=DEFAULT_DB_ALIAS, execute=False):
+        """Context manager to capture transaction.on_commit() callbacks."""
+        callbacks = []
+        start_count = len(async_connections[using].run_on_commit)
+        try:
+            yield callbacks
+        finally:
+            while True:
+                callback_count = len(async_connections[using].run_on_commit)
+                for _, callback, robust in async_connections[using].run_on_commit[
+                    start_count:
+                ]:
+                    callbacks.append(callback)
+                    if execute:
+                        if robust:
+                            try:
+                                res = callback()
+                                if inspect.isawaitable(res):
+                                    await res
+                            except Exception as e:
+                                logger.error(
+                                    f"Error calling {callback.__qualname__} in "
+                                    f"on_commit() (%s).",
+                                    e,
+                                    exc_info=True,
+                                )
+                        else:
+                            res = callback()
+                            if inspect.isawaitable(res):
+                                await res
+
+                if callback_count == len(async_connections[using].run_on_commit):
                     break
                 start_count = callback_count
 
