@@ -1004,8 +1004,8 @@ Usage:
         <!-- partial content -->
     {% endpartialdef %}
 
-The ``{% partialdef %}`` tag can be used with one or two arguments.
-The arguments are:
+The ``{% partialdef %}`` tag can be used with one or two arguments. The
+arguments are:
 
 ================  =============================================================
 Argument          Description
