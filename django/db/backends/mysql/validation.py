@@ -41,6 +41,7 @@ class DatabaseValidation(BaseDatabaseValidation):
         No character (varchar) fields can have a length exceeding 255
         characters if they have a unique index on them.
         MySQL doesn't support a database index on some data types.
+        MySQL has limits on DECIMAL/NUMERIC precision.
         """
         errors = []
         if (
@@ -74,4 +75,16 @@ class DatabaseValidation(BaseDatabaseValidation):
                     id="fields.W162",
                 )
             )
+
+        if field_type.startswith("numeric") and hasattr(field, 'max_digits') and hasattr(field, 'decimal_places'):
+            if field.max_digits > 65:
+                errors.append(
+                    checks.Warning(
+                        "%s does not support DecimalField with max_digits > 65." 
+                        % self.connection.display_name,
+                        obj=field,
+                        id="mysql.W004",
+                    )
+                )
+
         return errors
