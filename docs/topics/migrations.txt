@@ -72,9 +72,9 @@ support.
 .. warning::
 
     When using PostgreSQL, adding non-deterministic collations to existing
-    unique :class:`CharField`\s will cause database errors. Use
+    unique :class:`~django.db.models.CharField`\s will cause database errors. Use
     :class:`~django.db.models.UniqueConstraint` instead, or see
-    :doc:`../db/postgresql-collations` for details.
+    :doc:`postgresql-collations </topics/db/postgresql-collations>` for details.
 
 MySQL
 -----

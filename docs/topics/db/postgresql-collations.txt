@@ -4,13 +4,13 @@ PostgreSQL collations and unique constraints
 .. warning::
 
     When using PostgreSQL, adding non-deterministic collations to existing unique
-    :class:`CharField`\s will cause database errors. This is a known limitation
+    :class:`~django.db.models.CharField`\s will cause database errors. This is a known limitation
     in Django (Ticket #34898).
 
 The problem
-----------
+-----------
 
-When you have a :class:`CharField` with ``unique=True`` and try to add a
+When you have a :class:`~django.db.models.CharField` with ``unique=True`` and try to add a
 non-deterministic collation to it, PostgreSQL will crash with:
 
 .. code-block:: text
@@ -22,7 +22,7 @@ indexes for unique text fields, which are incompatible with non-deterministic
 collations.
 
 When this occurs
----------------
+----------------
 
 * ✅ **Works**: Adding both unique constraint and collation together
 * ✅ **Works**: Adding collation first, then unique constraint
@@ -30,7 +30,7 @@ When this occurs
 * ❌ **Fails**: Same issue affects ``db_index=True`` fields
 
 What are non-deterministic collations?
--------------------------------------
+--------------------------------------
 
 Non-deterministic collations don't always produce the same result for the same
 input. Common examples include:
@@ -40,10 +40,10 @@ input. Common examples include:
 * **ICU-based collations**: ``und-u-ks-level2`` (case-insensitive)
 
 Recommended solutions
---------------------
+---------------------
 
 Use Meta constraints instead (Recommended)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of ``unique=True`` on the field, use :class:`~django.db.models.UniqueConstraint`:
 
@@ -74,7 +74,7 @@ the same migration:
         )
 
 Manual index management
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 For advanced cases, manually manage indexes using :class:`~django.db.models.Index`:
 
@@ -90,7 +90,7 @@ For advanced cases, manually manage indexes using :class:`~django.db.models.Inde
             indexes = [models.Index(fields=["email"], name="user_email_idx")]
 
 Migration strategy
------------------
+------------------
 
 If you're upgrading from Django 5.0 to 5.1 and have existing case-insensitive
 fields:
@@ -132,10 +132,10 @@ fields:
         ]
 
 Alternative approaches
----------------------
+----------------------
 
 Use deterministic collations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If possible, use deterministic collations that are compatible with
 ``varchar_pattern_ops``:
@@ -146,7 +146,7 @@ If possible, use deterministic collations that are compatible with
     email = models.CharField(max_length=255, unique=True, db_collation="C")
 
 Handle case sensitivity in application logic
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of relying on database-level case-insensitive collations:
 
@@ -163,7 +163,7 @@ Instead of relying on database-level case-insensitive collations:
         objects = UserManager()
 
 Best practices
--------------
+--------------
 
 1. **Prefer** :class:`~django.db.models.UniqueConstraint` **over** ``unique=True``
    for complex cases
@@ -173,14 +173,14 @@ Best practices
 5. **Use deterministic collations** when possible for better compatibility
 
 Related issues
--------------
+--------------
 
 * This issue also affects ``db_index=True`` fields
-* Similar problems occur with ``text_pattern_ops`` on :class:`TextField`\s
+* Similar problems occur with ``text_pattern_ops`` on :class:`~django.db.models.TextField`\s
 * Consider using :class:`~django.db.models.Index` for explicit index control
 
 Getting help
------------
+------------
 
 If you encounter this issue:
 
@@ -191,10 +191,10 @@ If you encounter this issue:
 .. _Django ticket #34898: https://code.djangoproject.com/ticket/34898
 
 Technical details
-----------------
+-----------------
 
 What is varchar_pattern_ops?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``varchar_pattern_ops`` is a PostgreSQL operator class that provides pattern
 matching operators (like ``LIKE``, ``ILIKE``, ``~``, ``~*``) for varchar/text
@@ -202,7 +202,7 @@ columns. It's automatically created for unique text fields to optimize pattern
 matching queries.
 
 Why non-deterministic collations fail
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PostgreSQL's ``varchar_pattern_ops`` indexes work by creating a predictable
 ordering of characters for pattern matching. Non-deterministic collations break
