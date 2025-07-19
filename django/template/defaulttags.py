@@ -1595,7 +1595,7 @@ class TemplateProxy:
             assert endm, "End tag must be present"
             espos, eepos = endm.span()
             if name == partial_name:
-                # Include the full partial definition from opening to closing tag
+                # Include the full partial definition from opening to closing tag.
                 result = full_source[sspos:eepos]
                 break
             pos = eepos + 1
