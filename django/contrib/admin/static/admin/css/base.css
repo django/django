@@ -236,9 +236,6 @@ details summary {
     cursor: pointer;
 }
 
-details summary:hover {
-    color: var(--link-hover-color);
-}
 
 blockquote {
     font-size: 0.6875rem;
