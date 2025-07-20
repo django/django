@@ -430,7 +430,7 @@ class ChangeListTests(TestCase):
 
         # make sure that list editable fields are rendered in divs correctly
         editable_name_field = (
-            '<input name="form-0-name" value="name" class="vTextField" '
+            '<input name="form-0-name" value="name" class="vTextField" aria-labelledby="name" '
             'maxlength="30" type="text" id="id_form-0-name">'
         )
         self.assertInHTML(
