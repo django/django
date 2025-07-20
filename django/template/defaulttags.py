@@ -1669,10 +1669,9 @@ def partialdef_func(parser, token):
         inline = False
 
     if inline and inline != "inline":
-        warnings.warn(
+        raise TemplateSyntaxError(
             "The 'inline' argument does not have any parameters; "
-            "either use 'inline' or remove it completely.",
-            DeprecationWarning,
+            "either use 'inline' or remove it completely."
         )
 
     # Parse the content until the end tag.

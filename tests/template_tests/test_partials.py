@@ -219,6 +219,19 @@ class PartialTagsTestCase(TestCase):
         ):
             t.render({})
 
+    def test_invalid_inline_argument_raises_syntax_error(self):
+        template = """
+        {% partialdef test-partial inline=true %}
+        Content
+        {% endpartialdef %}
+        """
+        with self.assertRaisesMessage(
+            TemplateSyntaxError,
+            "The 'inline' argument does not have any parameters; "
+            "either use 'inline' or remove it completely.",
+        ):
+            self.engine.from_string(template)
+
 
 class PartialTagsCacheTestCase(TestCase):
     def test_partials_use_cached_loader_when_configured(self):
