@@ -220,6 +220,9 @@ def items_for_result(cl, result, form):
         link_to_changelist = link_in_col(first, field_name, cl)
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
+            label, label_attr = label_for_field(
+                field_name, cl.model, model_admin=cl.model_admin, return_attr=True
+            )
         except ObjectDoesNotExist:
             result_repr = empty_value_display
         else:
@@ -306,6 +309,8 @@ def items_for_result(cl, result, form):
                 )
             ):
                 bf = form[field_name]
+                if not label_attr:
+                    bf.field.widget.attrs["aria-labelledby"] = slugify(label)
                 result_repr = mark_safe(str(bf.errors) + str(bf))
             yield format_html("<td{}>{}</td>", row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
