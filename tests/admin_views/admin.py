@@ -431,6 +431,8 @@ class PodcastAdmin(admin.ModelAdmin):
     list_display = ("name", "release_date")
     list_editable = ("release_date",)
     date_hierarchy = "release_date"
+    list_filter = ("name",)
+    search_fields = ("name",)
     ordering = ("name",)
 
 
