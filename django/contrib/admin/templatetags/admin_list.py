@@ -26,7 +26,7 @@ from django.urls import NoReverseMatch
 from django.utils import formats, timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.text import capfirst
+from django.utils.text import capfirst, slugify
 from django.utils.translation import gettext as _
 
 from .base import InclusionAdminNode
@@ -167,6 +167,7 @@ def result_headers(cl):
 
         yield {
             "text": text,
+            "id": slugify(text),
             "sortable": True,
             "sorted": is_sorted,
             "ascending": order_type == "asc",
