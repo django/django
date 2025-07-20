@@ -25,8 +25,8 @@
     min-height: 400px;
 }
 
-.change-list .filtered .results, .change-list .filtered .paginator,
-.filtered #toolbar, .filtered div.xfull {
+.change-list .filtered .results, .filtered #toolbar,
+.filtered div.xfull {
     width: auto;
 }
 
