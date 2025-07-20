@@ -1665,14 +1665,13 @@ def partialdef_func(parser, token):
     partial_name = tokens[1]
     if tokens_len > 2:
         inline = tokens[2]
+        if inline != "inline":
+            raise TemplateSyntaxError(
+                "The 'inline' argument does not have any parameters; "
+                "either use 'inline' or remove it completely."
+            )
     else:
         inline = False
-
-    if inline and inline != "inline":
-        raise TemplateSyntaxError(
-            "The 'inline' argument does not have any parameters; "
-            "either use 'inline' or remove it completely."
-        )
 
     # Parse the content until the end tag.
     acceptable_endpartials = ("endpartialdef", f"endpartialdef {partial_name}")
