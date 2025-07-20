@@ -242,7 +242,7 @@ details summary {
 
 blockquote {
     font-size: 0.6875rem;
-    color: #777;
+    color: var(--body-quiet-color);
     margin-left: 2px;
     padding-left: 10px;
     border-left: 5px solid #ddd;
