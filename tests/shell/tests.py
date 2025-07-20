@@ -5,14 +5,17 @@ import unittest
 from unittest import mock
 
 from django import __version__
+from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import CommandError, call_command
 from django.core.management.commands import shell
-from django.db import connection
+from django.db import connection, models, reset_queries
+from django.db.models import functions
 from django.test import SimpleTestCase
 from django.test.utils import captured_stdin, captured_stdout, override_settings
 from django.urls import resolve, reverse
+from django.utils import timezone
 
 from .models import Marker, Phone
 
@@ -79,6 +82,8 @@ class ShellCommandTestCase(SimpleTestCase):
                 )
                 assertError(error, p.stdout)
                 self.assertNotIn("Marker", p.stdout)
+                self.assertNotIn("reset_queries", p.stdout)
+                self.assertNotIn("imported automatically", p.stdout)
 
             with self.subTest(verbosity=verbosity, get_auto_imports="without-models"):
                 with mock.patch(
@@ -214,12 +219,34 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
         self.assertEqual(
             namespace,
             {
+                "settings": settings,
+                "connection": connection,
+                "reset_queries": reset_queries,
+                "models": models,
+                "functions": functions,
+                "timezone": timezone,
                 "Marker": Marker,
                 "Phone": Phone,
                 "ContentType": ContentType,
                 "Group": Group,
                 "Permission": Permission,
                 "User": User,
+            },
+        )
+
+    @override_settings(INSTALLED_APPS=[])
+    def test_get_namespace_default_imports(self):
+        namespace = shell.Command().get_namespace()
+
+        self.assertEqual(
+            namespace,
+            {
+                "settings": settings,
+                "connection": connection,
+                "reset_queries": reset_queries,
+                "models": models,
+                "functions": functions,
+                "timezone": timezone,
             },
         )
 
@@ -243,7 +270,6 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
                 return super().get_auto_imports() + [
                     "django.urls.reverse",
                     "django.urls.resolve",
-                    "django.db.connection",
                 ]
 
         namespace = TestCommand().get_namespace()
@@ -251,9 +277,14 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
         self.assertEqual(
             namespace,
             {
-                "connection": connection,
                 "resolve": resolve,
                 "reverse": reverse,
+                "settings": settings,
+                "connection": connection,
+                "reset_queries": reset_queries,
+                "models": models,
+                "functions": functions,
+                "timezone": timezone,
                 "Marker": Marker,
                 "Phone": Phone,
                 "ContentType": ContentType,
@@ -295,7 +326,7 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
         self.assertEqual(len(namespace), len(cmd.get_auto_imports()))
         self.assertEqual(
             stdout.getvalue().strip(),
-            "6 objects imported automatically (use -v 2 for details).",
+            "12 objects imported automatically (use -v 2 for details).",
         )
 
     @override_settings(INSTALLED_APPS=["shell", "django.contrib.contenttypes"])
@@ -320,9 +351,13 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
 
         self.assertEqual(
             stdout.getvalue().strip(),
-            "7 objects imported automatically:\n\n"
+            "13 objects imported automatically:\n\n"
             "  import shell\n"
             "  import django\n"
+            "  from django.conf import settings\n"
+            "  from django.db import connection, models, reset_queries\n"
+            "  from django.db.models import functions\n"
+            "  from django.utils import timezone\n"
             "  from django.contrib.contenttypes.models import ContentType\n"
             "  from shell.models import Phone, Marker\n"
             "  from django.urls import reverse, resolve",
@@ -350,12 +385,35 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
                     TestCommand().get_namespace(verbosity=verbosity)
                     self.assertEqual(stdout.getvalue().strip(), expected)
 
-    @override_settings(INSTALLED_APPS=[])
-    def test_message_with_stdout_no_installed_apps(self):
+    def test_message_with_stdout_zero_object(self):
+        class TestCommand(shell.Command):
+            def get_auto_imports(self):
+                return []
+
+        with captured_stdout() as stdout:
+            TestCommand().get_namespace(verbosity=2)
+
         cases = {
             0: "",
             1: "0 objects imported automatically.",
             2: "0 objects imported automatically.",
+        }
+        for verbosity, expected in cases.items():
+            with self.subTest(verbosity=verbosity):
+                with captured_stdout() as stdout:
+                    TestCommand().get_namespace(verbosity=verbosity)
+                    self.assertEqual(stdout.getvalue().strip(), expected)
+
+    @override_settings(INSTALLED_APPS=[])
+    def test_message_with_stdout_no_installed_apps(self):
+        cases = {
+            0: "",
+            1: "6 objects imported automatically (use -v 2 for details).",
+            2: "6 objects imported automatically:\n\n"
+            "  from django.conf import settings\n"
+            "  from django.db import connection, models, reset_queries\n"
+            "  from django.db.models import functions\n"
+            "  from django.utils import timezone",
         }
         for verbosity, expected in cases.items():
             with self.subTest(verbosity=verbosity):
@@ -379,7 +437,11 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
     def test_message_with_stdout_listing_objects_with_isort(self):
         sorted_imports = (
             "  from shell.models import Marker, Phone\n\n"
-            "  from django.contrib.contenttypes.models import ContentType"
+            "  from django.db import connection, models, reset_queries\n"
+            "  from django.db.models import functions\n"
+            "  from django.contrib.contenttypes.models import ContentType\n"
+            "  from django.conf import settings\n"
+            "  from django.utils import timezone"
         )
         mock_isort_code = mock.Mock(code=mock.MagicMock(return_value=sorted_imports))
 
@@ -399,7 +461,7 @@ class ShellCommandAutoImportsTestCase(SimpleTestCase):
 
         self.assertEqual(
             stdout.getvalue().strip(),
-            "6 objects imported automatically:\n\n" + sorted_imports,
+            "12 objects imported automatically:\n\n" + sorted_imports,
         )
 
     def test_override_get_auto_imports(self):

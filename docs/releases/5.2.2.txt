@@ -1,0 +1,63 @@
+==========================
+Django 5.2.2 release notes
+==========================
+
+*June 4, 2025*
+
+Django 5.2.2 fixes a security issue with severity "low" and several bugs in
+5.2.1.
+
+CVE-2025-48432: Potential log injection via unescaped request path
+==================================================================
+
+Internal HTTP response logging used ``request.path`` directly, allowing control
+characters (e.g. newlines or ANSI escape sequences) to be written unescaped
+into logs. This could enable log injection or forgery, letting attackers
+manipulate log appearance or structure, especially in logs processed by
+external systems or viewed in terminals.
+
+Although this does not directly impact Django's security model, it poses risks
+when logs are consumed or interpreted by other tools. To fix this, the internal
+``django.utils.log.log_response()`` function now escapes all positional
+formatting arguments using a safe encoding.
+
+Bugfixes
+========
+
+* Fixed a crash when using ``select_related`` against a ``ForeignObject``
+  originating from a model with a ``CompositePrimaryKey`` (:ticket:`36373`).
+
+* Fixed a bug in Django 5.2 where subqueries using ``"pk"`` to reference models
+  with a ``CompositePrimaryKey`` failed to raise ``ValueError`` when too many
+  or too few columns were selected (:ticket:`36392`).
+
+* Fixed a regression in Django 5.2 that caused a crash when no arguments were
+  passed into ``QuerySet.union()`` (:ticket:`36388`).
+
+* Fixed a regression in Django 5.2 where subclasses of ``RemoteUserMiddleware``
+  that had overridden ``process_request()`` were no longer supported
+  (:ticket:`36390`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using ``OuterRef``
+  in the ``filter`` argument of an ``Aggregate`` expression (:ticket:`36404`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using ``OuterRef``
+  in PostgreSQL aggregate functions ``ArrayAgg``, ``StringAgg``, and
+  ``JSONBAgg`` (:ticket:`36405`).
+
+* Fixed a regression in Django 5.2 where admin's ``filter_horizontal`` buttons
+  lacked ``type="button"``, causing them to intercept form submission when
+  pressing the Enter key (:ticket:`36423`).
+
+* Fixed a bug in Django 5.2 where calling ``QuerySet.in_bulk()`` with an
+  ``id_list`` argument on models with a ``CompositePrimaryKey`` failed to
+  observe database parameter limits (:ticket:`36416`).
+
+* Fixed a bug in Django 5.2 where :meth:`HttpRequest.get_preferred_type()
+  <django.http.HttpRequest.get_preferred_type>` did not account for media type
+  parameters in ``Accept`` headers, reducing specificity in content negotiation
+  (:ticket:`36411`).
+
+* Fixed a regression in Django 5.2 that caused a crash when using
+  ``QuerySet.prefetch_related()`` to prefetch a foreign key with a ``Prefetch``
+  queryset for a subclass of the foreign target (:ticket:`36432`).

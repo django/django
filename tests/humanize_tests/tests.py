@@ -196,8 +196,8 @@ class HumanizeTests(SimpleTestCase):
             None,
             "1,234,567",
             "-1,234,567",
-            "１,２３４,５６７.１２",
-            "-１,２３４,５６７.１２",
+            "1,234,567.12",
+            "-1,234,567.12",
             "the quick brown fox jumped over the lazy dog",
         )
         with translation.override("en"):
@@ -238,7 +238,7 @@ class HumanizeTests(SimpleTestCase):
             "-１２３４５６７.１２",
             "the quick brown fox jumped over the lazy dog",
         )
-        result_list = (
+        result_list_en = (
             "100",
             "-100",
             "1,000",
@@ -268,13 +268,49 @@ class HumanizeTests(SimpleTestCase):
             None,
             "1,234,567",
             "-1,234,567",
-            "１,２３４,５６７.１２",
-            "-１,２３４,５６７.１２",
+            "1,234,567.12",
+            "-1,234,567.12",
+            "the quick brown fox jumped over the lazy dog",
+        )
+        result_list_de = (
+            "100",
+            "-100",
+            "1.000",
+            "-1.000",
+            "10.123",
+            "-10.123",
+            "10.311",
+            "-10.311",
+            "1.000.000",
+            "-1.000.000",
+            "1.234.567,25",
+            "-1.234.567,25",
+            "100",
+            "-100",
+            "1.000",
+            "-1.000",
+            "10.123",
+            "-10.123",
+            "10.311",
+            "-10.311",
+            "1.000.000",
+            "-1.000.000",
+            "1.234.567,1234567",
+            "-1.234.567,1234567",
+            "1.234.567,1234567",
+            "-1.234.567,1234567",
+            None,
+            "1.234.567",
+            "-1.234.567",
+            "1.234.567,12",
+            "-1.234.567,12",
             "the quick brown fox jumped over the lazy dog",
         )
         with self.settings(USE_THOUSAND_SEPARATOR=False):
             with translation.override("en"):
-                self.humanize_tester(test_list, result_list, "intcomma")
+                self.humanize_tester(test_list, result_list_en, "intcomma")
+            with translation.override("de"):
+                self.humanize_tester(test_list, result_list_de, "intcomma")
 
     def test_intcomma_without_number_grouping(self):
         # Regression for #17414

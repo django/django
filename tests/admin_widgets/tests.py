@@ -4,6 +4,7 @@ import re
 import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
+from pathlib import Path
 from unittest import skipUnless
 
 from django import forms
@@ -1540,6 +1541,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             )
 
             self.wait_page_ready()
+            self.trigger_resize()
             self.execute_basic_operations("vertical", "students")
             self.execute_basic_operations("horizontal", "alumni")
 
@@ -1736,12 +1738,54 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         self.assertCountSeleniumElements("#id_students_to > option", 2)
 
+    def test_form_submission_via_enter_key_with_filter_horizontal(self):
+        """
+        The main form can be submitted correctly by pressing the enter key.
+        There is no shadowing from other buttons inside the form.
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.school.students.set([self.peter])
+        self.school.alumni.set([self.lisa])
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+        )
+
+        self.wait_page_ready()
+        self.select_option("#id_students_from", str(self.lisa.id))
+        self.selenium.find_element(By.ID, "id_students_add").click()
+        self.select_option("#id_alumni_from", str(self.peter.id))
+        self.selenium.find_element(By.ID, "id_alumni_add").click()
+
+        # Trigger form submission via Enter key on a text input field.
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input.click()
+        name_input.send_keys(Keys.ENTER)
+
+        # Form was submitted, success message should be shown.
+        self.wait_for_text(
+            "li.success", "The school “School of Awesome” was changed successfully."
+        )
+
+        # Changes should be stored properly in the database.
+        school = School.objects.get(id=self.school.id)
+        self.assertSequenceEqual(
+            school.students.all().order_by("name"), [self.lisa, self.peter]
+        )
+        self.assertSequenceEqual(
+            school.alumni.all().order_by("name"), [self.lisa, self.peter]
+        )
+
 
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def setUp(self):
         super().setUp()
-        Band.objects.create(id=42, name="Bogey Blues")
-        Band.objects.create(id=98, name="Green Potatoes")
+        self.blues = Band.objects.create(name="Bogey Blues")
+        self.potatoes = Band.objects.create(name="Green Potatoes")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_ForeignKey(self):
@@ -1763,23 +1807,23 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "lookup_id_main_band").click()
         self.wait_for_and_switch_to_popup()
         link = self.selenium.find_element(By.LINK_TEXT, "Bogey Blues")
-        self.assertIn("/band/42/", link.get_attribute("href"))
+        self.assertIn(f"/band/{self.blues.pk}/", link.get_attribute("href"))
         link.click()
 
         # The field now contains the selected band's id
         self.selenium.switch_to.window(main_window)
-        self.wait_for_value("#id_main_band", "42")
+        self.wait_for_value("#id_main_band", str(self.blues.pk))
 
         # Reopen the popup window and click on another band
         self.selenium.find_element(By.ID, "lookup_id_main_band").click()
         self.wait_for_and_switch_to_popup()
         link = self.selenium.find_element(By.LINK_TEXT, "Green Potatoes")
-        self.assertIn("/band/98/", link.get_attribute("href"))
+        self.assertIn(f"/band/{self.potatoes.pk}/", link.get_attribute("href"))
         link.click()
 
         # The field now contains the other selected band's id
         self.selenium.switch_to.window(main_window)
-        self.wait_for_value("#id_main_band", "98")
+        self.wait_for_value("#id_main_band", str(self.potatoes.pk))
 
     def test_many_to_many(self):
         from selenium.webdriver.common.by import By
@@ -1810,23 +1854,25 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "lookup_id_supporting_bands").click()
         self.wait_for_and_switch_to_popup()
         link = self.selenium.find_element(By.LINK_TEXT, "Bogey Blues")
-        self.assertIn("/band/42/", link.get_attribute("href"))
+        self.assertIn(f"/band/{self.blues.pk}/", link.get_attribute("href"))
         link.click()
 
         # The field now contains the selected band's id
         self.selenium.switch_to.window(main_window)
-        self.wait_for_value("#id_supporting_bands", "42")
+        self.wait_for_value("#id_supporting_bands", str(self.blues.pk))
 
         # Reopen the popup window and click on another band
         self.selenium.find_element(By.ID, "lookup_id_supporting_bands").click()
         self.wait_for_and_switch_to_popup()
         link = self.selenium.find_element(By.LINK_TEXT, "Green Potatoes")
-        self.assertIn("/band/98/", link.get_attribute("href"))
+        self.assertIn(f"/band/{self.potatoes.pk}/", link.get_attribute("href"))
         link.click()
 
         # The field now contains the two selected bands' ids
         self.selenium.switch_to.window(main_window)
-        self.wait_for_value("#id_supporting_bands", "42,98")
+        self.wait_for_value(
+            "#id_supporting_bands", f"{self.blues.pk},{self.potatoes.pk}"
+        )
 
 
 class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
@@ -1906,7 +1952,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
     name_input_id = "id_name"
     photo_input_id = "id_photo"
-    tests_files_folder = "%s/files" % os.getcwd()
+    tests_files_folder = "%s/files" % Path(__file__).parent.parent
     clear_checkbox_id = "photo-clear_id"
 
     def _submit_and_wait(self):

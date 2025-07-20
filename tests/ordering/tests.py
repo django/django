@@ -3,15 +3,18 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db.models import (
+    Case,
     CharField,
     Count,
     DateTimeField,
     F,
+    IntegerField,
     Max,
     OrderBy,
     OuterRef,
     Subquery,
     Value,
+    When,
 )
 from django.db.models.functions import Length, Upper
 from django.test import TestCase
@@ -525,6 +528,17 @@ class OrderingTests(TestCase):
         # Order by constant.
         qs = Article.objects.order_by(Value("1", output_field=CharField()), "-headline")
         self.assertSequenceEqual(qs, [self.a4, self.a3, self.a2, self.a1])
+
+    def test_order_by_case_when_constant_value(self):
+        qs = Article.objects.order_by(
+            Case(
+                When(pk__in=[], then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            ).desc(),
+            "pk",
+        )
+        self.assertSequenceEqual(qs, [self.a1, self.a2, self.a3, self.a4])
 
     def test_related_ordering_duplicate_table_reference(self):
         """

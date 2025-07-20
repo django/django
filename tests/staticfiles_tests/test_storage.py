@@ -235,6 +235,13 @@ class TestHashedFiles:
             self.assertIn(b"other.d41d8cd98f00.css", content)
         self.assertPostCondition()
 
+    def test_css_data_uri_with_nested_url(self):
+        relpath = self.hashed_file_path("cached/data_uri_with_nested_url.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b'url("data:image/svg+xml,url(%23b) url(%23c)")', content)
+        self.assertPostCondition()
+
     def test_css_source_map(self):
         relpath = self.hashed_file_path("cached/source_map.css")
         self.assertEqual(relpath, "cached/source_map.b2fceaf426aa.css")
@@ -560,6 +567,20 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         manifest_content, manifest_hash = storage.staticfiles_storage.load_manifest()
         self.assertEqual(manifest_hash, "")
         self.assertEqual(manifest_content, {"dummy.txt": "dummy.txt"})
+
+    def test_manifest_file_consistent_content(self):
+        original_manifest_content = storage.staticfiles_storage.read_manifest()
+        hashed_files = storage.staticfiles_storage.hashed_files
+        # Force a change in the order of the hashed files.
+        with mock.patch.object(
+            storage.staticfiles_storage,
+            "hashed_files",
+            dict(reversed(hashed_files.items())),
+        ):
+            storage.staticfiles_storage.save_manifest()
+        manifest_file_content = storage.staticfiles_storage.read_manifest()
+        # The manifest file content should not change.
+        self.assertEqual(original_manifest_content, manifest_file_content)
 
 
 @override_settings(

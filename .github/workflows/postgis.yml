@@ -1,0 +1,61 @@
+name: GeoDjango Tests
+
+on:
+  pull_request:
+    types: [labeled, synchronize, opened, reopened]
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+   contents: read
+
+jobs:
+  postgis-latest:
+    if: contains(github.event.pull_request.labels.*.name, 'geodjango')
+    runs-on: ubuntu-latest
+    name: Latest PostGIS
+    services:
+      postgres:
+        image: postgis/postgis:latest
+        env:
+          POSTGRES_DB: geodjango
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install libmemcached-dev for pylibmc
+        run: sudo apt install libmemcached-dev
+      - name: Install geospatial dependencies
+        run: sudo apt install -y binutils libproj-dev gdal-bin
+      - name: Print PostGIS versions
+        env:
+          POSTGRES_DB: geodjango
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: postgres
+        run: |
+          PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h localhost -c "SELECT PostGIS_full_version();"
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Create PostgreSQL settings file
+        run: mv ./.github/workflows/data/test_postgis.py.tpl ./tests/test_postgis.py
+      - name: Run PostGIS tests
+        run: python -Wall tests/runtests.py -v2 --settings=test_postgis

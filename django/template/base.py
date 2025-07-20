@@ -852,6 +852,13 @@ class Variable:
                         "Variables and attributes may "
                         "not begin with underscores: '%s'" % var
                     )
+                # Disallow characters that are allowed in numbers but not in a
+                # variable name.
+                for c in ["+", "-"]:
+                    if c in var:
+                        raise TemplateSyntaxError(
+                            "Invalid character ('%s') in variable name: '%s'" % (c, var)
+                        )
                 self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
 
     def resolve(self, context):

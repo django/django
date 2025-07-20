@@ -10,13 +10,14 @@
 # jnns, 2016
 # Markus Holtermann <info@markusholtermann.eu>, 2020,2023
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
+# Ronny Vedrilla, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Markus Holtermann <info@markusholtermann.eu>, 2020,2023\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Ronny Vedrilla, 2025\n"
 "Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,8 +37,8 @@ msgstr "Erfolgreich %(count)d %(items)s gelöscht."
 msgid "Cannot delete %(name)s"
 msgstr "Kann %(name)s nicht löschen"
 
-msgid "Are you sure?"
-msgstr "Sind Sie sicher?"
+msgid "Delete multiple objects"
+msgstr "Mehrere Objekte löschen"
 
 msgid "Administration"
 msgstr "Administration"
@@ -210,11 +211,6 @@ msgstr ""
 "werden."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} „{obj}“ wurde erfolgreich hinzugefügt und kann unten geändert werden."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -274,6 +270,9 @@ msgstr[1] "Alle %(total_count)s ausgewählt"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 von %(cnt)s ausgewählt"
+
+msgid "Delete"
+msgstr "Löschen"
 
 #, python-format
 msgid "Change history: %s"
@@ -359,6 +358,15 @@ msgstr "„Brotkrümel“"
 msgid "Models in the %(name)s application"
 msgstr "Modelle der %(name)s-Anwendung"
 
+msgid "Model name"
+msgstr "Modellname"
+
+msgid "Add link"
+msgstr "Link hinzufügen"
+
+msgid "Change or view list link"
+msgstr "Linkliste bearbeiten oder ansehen"
+
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -370,18 +378,17 @@ msgstr ""
 "Das Benutzerkonto besitzt nicht die nötigen Rechte, um etwas anzusehen oder "
 "zu ändern."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Bitte zuerst einen Benutzernamen und ein Passwort eingeben. Danach können "
-"weitere Optionen für den Benutzer geändert werden."
 
-msgid "Enter a username and password."
-msgstr "Bitte einen Benutzernamen und ein Passwort eingeben."
+msgid "Error:"
+msgstr "Fehler:"
 
 msgid "Change password"
 msgstr "Passwort ändern"
+
+msgid "Set password"
+msgstr "Passwort setzen"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -393,6 +400,17 @@ msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Bitte geben Sie ein neues Passwort für den Benutzer <strong>%(username)s</"
 "strong> ein."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Zum Hauptinhalt springen"
@@ -450,9 +468,6 @@ msgstr "Design wechseln (aktuelles Design: hell)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Design wechseln (aktuelles Design: dunkel)"
 
-msgid "Delete"
-msgstr "Löschen"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -487,9 +502,6 @@ msgstr "Ja, ich bin sicher"
 
 msgid "No, take me back"
 msgstr "Nein, bitte abbrechen"
-
-msgid "Delete multiple objects"
-msgstr "Mehrere Objekte löschen"
 
 #, python-format
 msgid ""
@@ -565,8 +577,8 @@ msgstr ""
 "Sie sind als %(username)s angemeldet, aber nicht autorisiert, auf diese "
 "Seite zuzugreifen. Wollen Sie sich mit einem anderen Account anmelden?"
 
-msgid "Forgotten your password or username?"
-msgstr "Benutzername oder Passwort vergessen?"
+msgid "Forgotten your login credentials?"
+msgstr "Zugangsdaten vergessen?"
 
 msgid "Toggle navigation"
 msgstr "Navigation ein-/ausblenden"
@@ -734,8 +746,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Bitte öffnen Sie folgende Seite, um Ihr neues Passwort einzugeben:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Der Benutzername, falls vergessen:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Vielen Dank, dass Sie unsere Website benutzen!"

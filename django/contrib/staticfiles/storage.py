@@ -80,7 +80,8 @@ class HashedFilesMixin:
         (
             "*.css",
             (
-                r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+                r"""(?P<matched>url\((?P<quote>['"]{0,1})"""
+                r"""\s*(?P<url>.*?)(?P=quote)\))""",
                 (
                     r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
                     """@import url("%(url)s")""",
@@ -495,11 +496,12 @@ class ManifestFilesMixin(HashedFilesMixin):
             self.save_manifest()
 
     def save_manifest(self):
+        sorted_hashed_files = sorted(self.hashed_files.items())
         self.manifest_hash = self.file_hash(
-            None, ContentFile(json.dumps(sorted(self.hashed_files.items())).encode())
+            None, ContentFile(json.dumps(sorted_hashed_files).encode())
         )
         payload = {
-            "paths": self.hashed_files,
+            "paths": dict(sorted_hashed_files),
             "version": self.manifest_version,
             "hash": self.manifest_hash,
         }

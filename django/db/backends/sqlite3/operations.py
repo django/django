@@ -30,8 +30,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def bulk_batch_size(self, fields, objs):
         """
-        SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
-        999 variables per query.
+        SQLite has a variable limit defined by SQLITE_LIMIT_VARIABLE_NUMBER
+        (reflected in max_query_params).
 
         If there's only a single field to insert, the limit is 500
         (SQLITE_MAX_COMPOUND_SELECT).
@@ -441,3 +441,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def force_group_by(self):
         return ["GROUP BY TRUE"] if Database.sqlite_version_info < (3, 39) else []
+
+    def format_json_path_numeric_index(self, num):
+        return "[#%s]" % num if num < 0 else super().format_json_path_numeric_index(num)
