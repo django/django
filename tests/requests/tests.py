@@ -860,7 +860,7 @@ class HostValidationTests(SimpleTestCase):
             "HTTP_X_FORWARDED_HOST": "example.com",
             "HTTP_X_FORWARDED_PORT": "8080",
         }
-        # Should NOT use the X-Forwarded-Port header
+        # Should NOT use the X-Forwarded-Host header
         self.assertEqual(request.get_host(), "original.com:8080")
         self.assertEqual(request.get_port(), "8080")
 
