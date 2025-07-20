@@ -245,7 +245,7 @@ blockquote {
     color: var(--body-quiet-color);
     margin-left: 2px;
     padding-left: 10px;
-    border-left: 5px solid var(--body-quiet-color);
+    border-left: 5px solid currentColor;
 }
 
 code, pre {
