@@ -584,6 +584,14 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         ).message()
         self.assertEqual(message.get_all("Reply-To"), ["reply_to@example.com"])
 
+    def test_lazy_headers(self):
+        message = EmailMessage(
+            subject=gettext_lazy("subject"),
+            headers={"List-Unsubscribe": gettext_lazy("list-unsubscribe")},
+        ).message()
+        self.assertEqual(message.get_all("Subject"), ["subject"])
+        self.assertEqual(message.get_all("List-Unsubscribe"), ["list-unsubscribe"])
+
     def test_multiple_message_call(self):
         """
         Regression for #13259 - Make sure that headers are not changed when
