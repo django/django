@@ -52,12 +52,10 @@ Python style
   that :pep:`8` is only a guide, so respect the style of the surrounding code
   as a primary goal.
 
-  An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
-  code to 79 characters if it means the code looks significantly uglier or is
-  harder to read. We allow up to 88 characters as this is the line length used
-  by ``black``. This check is included when you run ``flake8``. Documentation,
-  comments, and docstrings should be wrapped at 79 characters, even though
-  :pep:`8` suggests 72.
+  An exception to :pep:`8` is our rules on line lengths. We allow up to 88
+  characters in code, as this is the line length used by ``black``.
+  Documentation, comments, and docstrings should be wrapped at 79 characters.
+  These limits are checked when ``flake8`` is run.
 
 * String variable interpolation may use
   :py:ref:`%-formatting <old-string-formatting>`, :py:ref:`f-strings
