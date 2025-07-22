@@ -417,17 +417,43 @@ class InlineAdminFormSet:
                     "help_text": form_field.help_text,
                 }
 
+    def get_inline_add_text(self):
+        """
+        Return 'Add XXX' or 'Add another XXX' depending on related object
+        presence.
+        """
+        verbose_name = capfirst(self.opts.verbose_name)
+        parent_instance = self.formset.instance
+        fk = getattr(self.formset, "fk", None)
+
+        if parent_instance.pk is None or isinstance(fk, OneToOneField):
+            return gettext("Add %(verbose_name)s") % {"verbose_name": verbose_name}
+
+        has_object = any(
+            inlineadminform.original is not None for inlineadminform in self
+        ) or (
+            # When the user has add but lacks change permission,
+            # formset.get_queryset within iter returns None, so we fallback to
+            # a direct DB lookup to detect if a related object exists.
+            self.has_add_permission
+            and self.opts.model._base_manager.filter(
+                **{self.formset.fk.name: parent_instance}
+            ).exists()
+        )
+
+        if has_object:
+            return gettext("Add another %(verbose_name)s") % {
+                "verbose_name": verbose_name
+            }
+        return gettext("Add %(verbose_name)s") % {"verbose_name": verbose_name}
+
     def inline_formset_data(self):
-        verbose_name = self.opts.verbose_name
         return json.dumps(
             {
                 "name": "#%s" % self.formset.prefix,
                 "options": {
                     "prefix": self.formset.prefix,
-                    "addText": gettext("Add another %(verbose_name)s")
-                    % {
-                        "verbose_name": capfirst(verbose_name),
-                    },
+                    "addText": self.get_inline_add_text(),
                     "deleteText": gettext("Remove"),
                 },
             }
