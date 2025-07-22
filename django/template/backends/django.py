@@ -93,14 +93,11 @@ class DjangoTemplates(BaseEngine):
             return Template(template, self)
 
         extra_data = getattr(template, "extra_data", {})
-        try:
-            partial_contents = extra_data.get("template-partials", {})
-        except AttributeError:
-            raise TemplateDoesNotExist(partial_name, tried=[template_name])
 
+        extra_data = getattr(template, "extra_data", {})
         try:
-            partial = partial_contents[partial_name]
-        except (KeyError, TypeError):
+            partial = extra_data.get("template-partials")[partial_name]
+        except (AttributeError, KeyError, TypeError):
             raise TemplateDoesNotExist(partial_name, tried=[template_name])
         partial.engine = self.engine
 
