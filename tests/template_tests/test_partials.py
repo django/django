@@ -29,14 +29,17 @@ class PartialTagsTestCase(TestCase):
         self.assertEqual("HERE IS THE TEST CONTENT", rendered.strip())
 
     def test_just_partial_from_loader(self):
-
-        template = self.engine.get_template("partial_examples.html#test-partial")
-        rendered = template.render({})
-        self.assertEqual("TEST-PARTIAL-CONTENT", rendered.strip())
-
-        template = self.engine.get_template("partial_examples.html#inline-partial")
-        rendered = template.render({})
-        self.assertEqual("INLINE-CONTENT", rendered.strip())
+        cases = [
+            ("test-partial", "TEST-PARTIAL-CONTENT"),
+            ("inline-partial", "INLINE-CONTENT"),
+        ]
+        for partial_name, expected in cases:
+            with self.subTest(partial_name=partial_name):
+                template = self.engine.get_template(
+                    f"partial_examples.html#{partial_name}"
+                )
+                rendered = template.render({})
+                self.assertEqual(rendered.strip(), expected)
 
     def test_invalid_name_raises_template_does_not_exist(self):
         with self.assertRaises(TemplateDoesNotExist):
