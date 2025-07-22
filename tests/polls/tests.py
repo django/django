@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from pathlib import Path
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -34,21 +35,27 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
             email="admin@example.com",
         )
 
-        # TODO: This shouldn't be necessary
-        """Sets light mode in local storage to avoid auto dark mode."""
-        try:
-            self.selenium.execute_script("localStorage.setItem('theme', 'light');")
-        except Exception:
-            # If localStorage is not available, we can skip this step.
-            pass
+        from .models import Question
 
-    def tearDown(self):
-        self.selenium.execute_script("localStorage.removeItem('theme');")
+        Question.objects.create(id=1, question_text="What's up?", pub_date="2025-07-01")
+
+    #     # TODO: This shouldn't be necessary
+    #     """Sets light mode in local storage to avoid auto dark mode."""
+    #     self.selenium.execute_script("localStorage.setItem('theme', 'light');")
+
+    # def tearDown(self):
+    #     """Reset the local storage to default."""
+    #     self.selenium.execute_script("localStorage.removeItem('theme');")
 
     def hide_nav_sidebar(self):
         """Hide the navigation sidebar if it's open."""
-        if self.selenium.find_element(By.ID, "nav-sidebar").is_displayed():
-            self.selenium.find_element(By.CSS_SELECTOR, "#toggle-nav-sidebar").click()
+        try:
+            if self.selenium.find_element(By.ID, "nav-sidebar").is_displayed():
+                self.selenium.find_element(
+                    By.CSS_SELECTOR, "#toggle-nav-sidebar"
+                ).click()
+        except NoSuchElementException:
+            pass
         self.selenium.execute_script(
             'document.getElementById("toggle-nav-sidebar").style.display = "none";'
         )
@@ -76,14 +83,6 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
         """Take a screenshot of a specific element."""
         full_path = self.path / f"{filename}.png"
         element.screenshot(str(full_path))
-
-    @screenshot_cases(SIZES)
-    def test_tutorial_admin_login(self):
-        """Take a screenshot of the admin login form"""
-        self.selenium.get(self.live_server_url + reverse("admin:index"))
-
-        login_form = self.selenium.find_element(By.ID, "container")
-        self.take_element_screenshot(login_form, "admin01")
 
     def take_cropped_screenshot(
         self,
@@ -131,6 +130,14 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
         cropped_image.save(self.path / f"{filename}.png")
 
     @screenshot_cases(SIZES)
+    def test_tutorial_admin_login(self):
+        """Take a screenshot of the admin login form"""
+        self.selenium.get(self.live_server_url + reverse("admin:index"))
+
+        login_form = self.selenium.find_element(By.ID, "container")
+        self.take_element_screenshot(login_form, "admin01")
+
+    @screenshot_cases(SIZES)
     def test_tutorial_admin_main_page(self):
         """Take a screenshot of the main admin page"""
 
@@ -143,7 +150,7 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
         # Take the 2nd screenshot
         self.take_cropped_screenshot(screenshot, "admin02", 800, 400, left=0, top=0)
 
-        # Take the 3rd screenshot - 140 pixels down
+        # Take the 3rd screenshot - 140 pixels below the top to avoid the navbar
         self.take_cropped_screenshot(screenshot, "admin03t", 800, 400, left=0, top=140)
 
     @screenshot_cases(SIZES)
@@ -151,8 +158,9 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
         """Take a screenshot of the question model list"""
 
         from polls.models import Question
+        from selenium.webdriver.common.action_chains import ActionChains
 
-        q = Question.objects.create(question_text="What's up?", pub_date="2025-07-01")
+        q = Question.objects.get(question_text="What's up?")
 
         # Simulate creating a question via the admin interface
         # to be shown in the screenshot
@@ -193,24 +201,79 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
         # Then click “Save and continue editing.”
 
         # TODO: This doesn't take into account i18n
+        actions = ActionChains(self.selenium)
         today_button = self.selenium.find_element(By.PARTIAL_LINK_TEXT, "Today")
-        today_button.click()
         now_button = self.selenium.find_element(By.PARTIAL_LINK_TEXT, "Now")
-        now_button.click()
         save_continue_button = self.selenium.find_element(By.NAME, "_continue")
-        save_continue_button.click()
+
+        actions.click(today_button).click(now_button).click(
+            save_continue_button
+        ).perform()
+
+        # Wait 1 seconds for the request to be processed
+        # Not sure why selenium.implicitly_wait(1) doesnt stops
+        import time
+
+        time.sleep(1)
 
         # admin06t - Admin change history for question model
-        # Click on the history link to view the change history
-        history_link = self.selenium.find_element(By.PARTIAL_LINK_TEXT, "HISTORY")
-        history_link.click()
+        # Navigate to the change history of the question model
+        self.selenium.get(
+            self.live_server_url + reverse("admin:polls_question_history", args=(1,))
+        )
         history_content = self.selenium.find_element(By.ID, "content")
         self.take_element_screenshot(history_content, "admin06t")
 
-    # admin07t - It's like admin05t but with the fields changed
-    # admin08t - It's like admin07t but added section for date called Date information
-    # admin09t - Add choice form
-    # admin10t - Add question form with choices. Date informaation collpased
+    @screenshot_cases(SIZES)
+    def test_tutorial_question_part_seven(self):
+        """Generate admin images of the part 7 of the tutorial"""
+
+        from polls.models import Question
+
+        from django.contrib import admin
+
+        class QuestionAdmin(admin.ModelAdmin):
+            fields = ["pub_date", "question_text"]
+
+        # Modify the admin interface to screenshot it
+        if admin.site.is_registered(Question):
+            admin.site.unregister(Question)
+
+        admin.site.register(Question, QuestionAdmin)
+
+        self.admin_login(username="admin", password="secret")
+
+        # Go to the Question model edit page
+        self.selenium.get(
+            self.live_server_url + reverse("admin:polls_question_change", args=(1,))
+        )
+
+        self.hide_nav_sidebar()
+        self.change_header_display("none")
+
+        # Take a screenshot of the change question form
+        # similar to admin05t but with the fields changed
+        question_content = self.selenium.find_element(By.ID, "content")
+        self.take_element_screenshot(question_content, "admin07")
+
+        # HACK Modify the registered admin in runtime
+        admin.site.get_model_admin(Question).fieldsets = [
+            (None, {"fields": ["question_text"]}),
+            ("Date information", {"fields": ["pub_date"]}),
+        ]
+
+        self.selenium.refresh()
+
+        # Take a screenshot of the change question form with the new fieldsets
+        question_content = self.selenium.find_element(By.ID, "content")
+        self.take_element_screenshot(question_content, "admin08t")
+
+        # admin09t - Screenshot Add choice form
+        self.selenium.get(self.live_server_url + reverse("admin:polls_choice_add"))
+        choice_content = self.selenium.find_element(By.ID, "content")
+        self.take_element_screenshot(choice_content, "admin09")
+
+    # admin10t - Add question form with choices. Date information collapsed
     # admin11t - Choices tabular inline simple
     # admin12t - Question model list with question created
     # admin13t - Question model list with filter
