@@ -10,7 +10,12 @@ from django.utils.module_loading import (
     autodiscover_modules,
     import_string,
     module_has_submodule,
+    get_model_by_label,
+    lazy_model
 )
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.functional import SimpleLazyObject
 
 
 class DefaultLoader(unittest.TestCase):
@@ -226,3 +231,43 @@ class CustomLoader(EggLoader):
     def tearDown(self):
         super().tearDown()
         sys.path_hooks.pop(0)
+
+
+class GetModelByLabelTests(SimpleTestCase):
+    def test_valid_model_label(self):
+        model = get_model_by_label("auth.User")
+        self.assertEqual(model, get_user_model())
+
+    def test_invalid_format_raises(self):
+        with self.assertRaises(ImproperlyConfigured):
+            get_model_by_label("badlabel")
+
+    def test_nonexistent_model_raises(self):
+        with self.assertRaises(ImproperlyConfigured):
+            get_model_by_label("auth.DoesNotExist")
+
+    def test_non_string_input(self):
+        with self.assertRaises(ImproperlyConfigured):
+            get_model_by_label(12345)
+
+
+class LazyModelTests(SimpleTestCase):
+    def test_returns_simple_lazy_object(self):
+        lazy = lazy_model("auth.User")
+        self.assertIsInstance(lazy, SimpleLazyObject)
+
+    def test_resolves_correct_model(self):
+        from django.contrib.auth.models import User
+        lazy = lazy_model("auth.User")
+        self.assertEqual(lazy, User)
+
+
+    def test_invalid_model_label_raises_on_access(self):
+        lazy = lazy_model("auth.DoesNotExist")
+        with self.assertRaises(ImproperlyConfigured):
+            _ = lazy.__class__
+
+    def test_invalid_format_raises_on_access(self):
+        lazy = lazy_model("badlabel")
+        with self.assertRaises(ImproperlyConfigured):
+            _ = lazy.__class__

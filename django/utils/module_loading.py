@@ -3,7 +3,10 @@ import os
 import sys
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
+from functools import lru_cache
 
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.functional import SimpleLazyObject
 
 def cached_import(module_path, class_name):
     # Check whether module is loaded and fully initialized.
@@ -105,3 +108,41 @@ def module_dir(module):
         if filename is not None:
             return os.path.dirname(filename)
     raise ValueError("Cannot determine directory containing %s" % module)
+
+
+from django.core.exceptions import ImproperlyConfigured, AppRegistryNotReady
+
+@lru_cache(maxsize=None)
+def get_model_by_label(model_label: str):
+    """
+    Return a model class from a string label in the form 'app_label.ModelName'.
+
+    Useful for lazy loading models, e.g. in settings or signals, to avoid circular imports.
+
+    Raises:
+        ImproperlyConfigured: if the string is malformed or model can't be found.
+    """
+    if not isinstance(model_label, str):
+        raise ImproperlyConfigured(f"Model label must be a string, got {type(model_label).__name__}.")
+    try:
+        app_label, model_name = model_label.split('.')
+    except ValueError:
+        raise ImproperlyConfigured(
+            f"Invalid model label '{model_label}': must be in the format 'app_label.ModelName'."
+        )
+    try:
+        from django.apps import apps
+        model = apps.get_model(app_label, model_name)
+    except (LookupError, AppRegistryNotReady) as e:
+        raise ImproperlyConfigured(
+            f"Model '{model_label}' could not be found: {e}"
+        ) from e
+    if model is None:
+        raise ImproperlyConfigured(
+            f"Model '{model_label}' could not be found. Ensure the app and model name are correct."
+        )
+    return model
+
+
+def lazy_model(model_label: str):
+    return SimpleLazyObject(lambda: get_model_by_label(model_label))
