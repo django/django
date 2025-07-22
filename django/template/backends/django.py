@@ -75,14 +75,14 @@ class DjangoTemplates(BaseEngine):
         return Template(self.engine.from_string(template_code), self)
 
     def get_template(self, template_name):
+        original_name = template_name
         try:
             template_name, _, partial_name = template_name.partition("#")
         except AttributeError:
-            # for None, int, object, etc.
-            raise TemplateDoesNotExist(template_name)
+            raise TemplateDoesNotExist(original_name)
 
         if not template_name:
-            raise TemplateDoesNotExist(template_name)
+            raise TemplateDoesNotExist(original_name)
 
         try:
             template = self.engine.get_template(template_name)

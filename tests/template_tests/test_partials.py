@@ -45,7 +45,7 @@ class PartialTagsTestCase(TestCase):
         for template_name in [123, None, "", "#", "#name"]:
             with (
                 self.subTest(template_name=template_name),
-                self.assertRaisesMessage(TemplateDoesNotExist, template_name),
+                self.assertRaisesMessage(TemplateDoesNotExist, str(template_name)),
             ):
                 self.engine.get_template(template_name)
 
@@ -200,7 +200,7 @@ class PartialTagsTestCase(TestCase):
         t = self.engine.from_string(template)
         with self.assertRaisesMessage(
             TemplateSyntaxError,
-            "You are trying to access an undefined partial 'not-defined-partial'",
+            "Partial 'not-defined-partial' is not defined in the current template.",
         ):
             t.render({})
 
