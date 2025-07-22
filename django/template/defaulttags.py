@@ -1712,7 +1712,7 @@ class SubDictionaryWrapper:
             return partials_content[key]
         except KeyError:
             raise TemplateSyntaxError(
-                f"You are trying to access an undefined partial '{key}'"
+                f"Partial '{key}' is not defined in the current template."
             )
 
 
