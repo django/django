@@ -95,9 +95,10 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
         top: int = 0,
     ):
         """
-        Take a cropped screenshot of the current page.
+        Take a cropped screenshot of a screenshot.
 
         Parameters:
+            image: Screenshot image in bytes
             filename: Name of the output file (without extension)
             width: Width of the cropped area in pixels
             height: Height of the cropped area in pixels
@@ -141,3 +142,6 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
 
         # Take the 2nd screenshot
         self.take_cropped_screenshot(screenshot, "admin02", 1000, 400, left=0, top=0)
+
+        # Take the 3rd screenshot - 140 pixels down
+        self.take_cropped_screenshot(screenshot, "admin03t", 1000, 400, left=0, top=140)
