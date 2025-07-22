@@ -177,6 +177,7 @@ rather than creating directories.
     public records or a small poll app. A project is a collection of
     configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
+    If your website contains just one app, it's recommended to name it ``core``.
 
 Your apps can live anywhere in your :ref:`Python path <tut-searchpath>`. In
 this tutorial, we'll create our poll app inside the ``djangotutorial`` folder.
