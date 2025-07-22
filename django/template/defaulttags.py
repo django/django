@@ -1719,8 +1719,7 @@ class SubDictionaryWrapper:
 @register.tag(name="partial")
 def partial_func(parser, token):
     """
-    Render a partial that was previously declared using
-    the {% partialdef %} tag.
+    Render a partial that was declared using the {% partialdef %} tag.
 
     Usage::
 
