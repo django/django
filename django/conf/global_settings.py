@@ -22,7 +22,7 @@ DEBUG = False
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # People who get code error notifications. In the format
-# [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
+# ["email@example.com", '"Full Name" <anotheremail@example.com>']
 ADMINS = []
 
 # List of IP addresses, as strings, that:
