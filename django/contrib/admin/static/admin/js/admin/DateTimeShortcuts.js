@@ -212,6 +212,9 @@
             // Show the clock box
             clock_box.style.display = 'block';
             
+            // Add focus loop for keyboard navigation
+            DateTimeShortcuts.addFocusLoop(clock_box);
+            
             // Focus on the "Now" option for better screen reader experience
             // Screen readers can then navigate the dialog naturally
             const nowLink = clock_box.querySelector('ul.timelist li:first-child a');
@@ -230,7 +233,18 @@
             document.addEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
         },
         dismissClock: function(num) {
-            document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
+            const clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
+            clock_box.style.display = 'none';
+            
+            // Remove focus loop
+            DateTimeShortcuts.removeFocusLoop(clock_box);
+            
+            // Restore focus to the trigger button
+            if (DateTimeShortcuts.lastFocusedElement) {
+                DateTimeShortcuts.lastFocusedElement.focus();
+                DateTimeShortcuts.lastFocusedElement = null;
+            }
+            
             document.removeEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
         },
         handleClockQuicklink: function(num, val) {
@@ -407,6 +421,9 @@
 
             cal_box.style.display = 'block';
             
+            // Add focus loop for keyboard navigation
+            DateTimeShortcuts.addFocusLoop(cal_box);
+            
             // For screen readers, focus on the most relevant date:
             // 1. If input has a valid date, focus on that date (using selected class)
             // 2. Otherwise, focus on today's date if visible
@@ -459,44 +476,52 @@
             document.addEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
         },
         dismissCalendar: function(num) {
-            document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
+            const cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
+            cal_box.style.display = 'none';
+            
+            // Remove focus loop
+            DateTimeShortcuts.removeFocusLoop(cal_box);
+            
+            // Restore focus to the trigger button
+            if (DateTimeShortcuts.lastFocusedElement) {
+                DateTimeShortcuts.lastFocusedElement.focus();
+                DateTimeShortcuts.lastFocusedElement = null;
+            }
+            
             document.removeEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
         },
-        // Helper function to focus the next element in the tab order
-        focusNextElement: function(currentElement) {
-            // Get all tabbable elements in the document, excluding hidden popup elements
-            const allTabbableElements = document.querySelectorAll(
-                'input:not([disabled]):not([tabindex="-1"]), ' +
-                'button:not([disabled]):not([tabindex="-1"]), ' +
-                'select:not([disabled]):not([tabindex="-1"]), ' +
-                'textarea:not([disabled]):not([tabindex="-1"]), ' +
-                'a[href]:not([tabindex="-1"]), ' +
-                '[tabindex]:not([tabindex="-1"])'
+        // Add focus loop to keep focus within the popup even after reaching the last focusable element
+        addFocusLoop: function(container) {
+            const focusableElements = container.querySelectorAll(
+                'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
             );
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
             
-            // Filter out elements that are inside hidden popup containers or are not visible
-            const visibleTabbableElements = Array.from(allTabbableElements).filter(element => {
-                // Check if element is inside a popup
-                const popupParent = element.closest('.calendarbox, .clockbox');
-                if (popupParent && popupParent.style.display === 'none') {
-                    return true; // Include if popup is hidden
-                } else if (popupParent && popupParent.style.display !== 'none') {
-                    return false; // Exclude if popup is visible
+            function loopFocus(e) {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) { // Shift + Tab
+                        if (document.activeElement === firstFocusable) {
+                            e.preventDefault();
+                            lastFocusable.focus();
+                        }
+                    } else { // Tab
+                        if (document.activeElement === lastFocusable) {
+                            e.preventDefault();
+                            firstFocusable.focus();
+                        }
+                    }
                 }
-                
-                // Check if element is visible
-                const style = window.getComputedStyle(element);
-                return style.display !== 'none' && style.visibility !== 'hidden';
-            });
+            }
             
-            const currentIndex = visibleTabbableElements.indexOf(currentElement);
-            
-            // Focus the next element in tab order
-            if (currentIndex !== -1 && currentIndex + 1 < visibleTabbableElements.length) {
-                visibleTabbableElements[currentIndex + 1].focus();
-            } else if (visibleTabbableElements.length > 0) {
-                // If we're at the end, wrap to the beginning
-                visibleTabbableElements[0].focus();
+            container.addEventListener('keydown', loopFocus);
+            container.focusloopHandler = loopFocus; // Store reference for cleanup
+        },
+        // Remove focus loop
+        removeFocusLoop: function(container) {
+            if (container.focusloopHandler) {
+                container.removeEventListener('keydown', container.focusloopHandler);
+                delete container.focusloopHandler;
             }
         },
         drawPrev: function(num) {
