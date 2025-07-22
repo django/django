@@ -13,12 +13,14 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError as WrappedDatabaseError
 from django.db import connections
-from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
-from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
+from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper, AsyncBaseDatabaseWrapper
+from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper, AsyncCursorDebugWrapper as BaseAsyncCursorDebugWrapper
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils.version import get_version_tuple
+from django.utils.sync_async import sync_async_method_adapter
+from django.utils.decorators import apply_method_decorator
 
 try:
     try:
@@ -86,9 +88,10 @@ def _get_varchar_column(data):
     return "varchar(%(max_length)s)" % data
 
 
-class DatabaseWrapper(BaseDatabaseWrapper):
+class BaseDatabaseWrapperMixin:
     vendor = "postgresql"
     display_name = "PostgreSQL"
+
     # This dictionary maps Field objects to their associated PostgreSQL column
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
@@ -170,16 +173,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     Database = Database
-    SchemaEditorClass = DatabaseSchemaEditor
     # Classes instantiated in __init__().
-    client_class = DatabaseClient
-    creation_class = DatabaseCreation
     features_class = DatabaseFeatures
-    introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx = 0
     _connection_pools = {}
+
+    @property
+    def _connection_pool_cls(self):
+        raise NotImplementedError
 
     @property
     def pool(self):
@@ -196,22 +199,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if pool_options is True:
                 pool_options = {}
 
-            try:
-                from psycopg_pool import ConnectionPool
-            except ImportError as err:
-                raise ImproperlyConfigured(
-                    "Error loading psycopg_pool module.\nDid you install psycopg[pool]?"
-                ) from err
-
             connect_kwargs = self.get_connection_params()
             # Ensure we run in autocommit, Django properly sets it later on.
             connect_kwargs["autocommit"] = True
             enable_checks = self.settings_dict["CONN_HEALTH_CHECKS"]
-            pool = ConnectionPool(
+            pool = self._connection_pool_cls(
                 kwargs=connect_kwargs,
                 open=False,  # Do not open the pool during startup.
                 configure=self._configure_connection,
-                check=ConnectionPool.check_connection if enable_checks else None,
+                check=self._connection_pool_cls.check_connection if enable_checks else None,
                 **pool_options,
             )
             # setdefault() ensures that multiple threads don't set this in
@@ -222,17 +218,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         return self._connection_pools[self.alias]
 
+    @sync_async_method_adapter
     def close_pool(self):
         if self.pool:
-            self.pool.close()
+            yield self.pool.close()
             del self._connection_pools[self.alias]
+            yield
 
+    @sync_async_method_adapter
     def get_database_version(self):
         """
         Return a tuple of the database's version.
         E.g. for pg_version 120004, return (12, 4).
         """
-        return divmod(self.pg_version, 10000)
+        pg_version = yield self.pg_version
+        yield divmod(pg_version, 10000)
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -277,9 +277,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn_params.setdefault(
             "cursor_factory",
             (
-                ServerBindingCursor
+                self.server_cursor_cls
                 if is_psycopg3 and server_side_binding is True
-                else Cursor
+                else self.cursor_cls
             ),
         )
         if settings_dict["USER"]:
@@ -301,7 +301,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             )
         return conn_params
 
-    @async_unsafe
+    @property
+    def _connect(self):
+        raise NotImplementedError
+
+    @sync_async_method_adapter
     def get_new_connection(self, conn_params):
         # self.isolation_level must be set:
         # - after connecting to the database in order to obtain the database's
@@ -326,10 +330,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 )
         if self.pool:
             # If nothing else has opened the pool, open it now.
-            self.pool.open()
-            connection = self.pool.getconn()
+            yield self.pool.open()
+            connection = yield self.pool.getconn()
         else:
-            connection = self.Database.connect(**conn_params)
+            connection = yield self._connect(**conn_params)
         if set_isolation_level:
             connection.isolation_level = self.isolation_level
         if not is_psycopg3:
@@ -339,45 +343,65 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             psycopg2.extras.register_default_jsonb(
                 conn_or_curs=connection, loads=lambda x: x
             )
-        return connection
 
+        yield connection
+
+    @sync_async_method_adapter
     def ensure_timezone(self):
         # Close the pool so new connections pick up the correct timezone.
-        self.close_pool()
+        yield self.close_pool()
         if self.connection is None:
-            return False
-        return self._configure_timezone(self.connection)
+            yield False
+            return
+        yield self._configure_timezone(self.connection)
 
+    @sync_async_method_adapter
     def _configure_timezone(self, connection):
         conn_timezone_name = connection.info.parameter_status("TimeZone")
         timezone_name = self.timezone_name
-        if timezone_name and conn_timezone_name != timezone_name:
-            with connection.cursor() as cursor:
-                cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
-            return True
-        return False
 
+        if timezone_name and conn_timezone_name != timezone_name:
+            cursor_ctx = self.manual_context(connection.cursor())
+            cursor = yield cursor_ctx.enter()
+            try:
+                yield cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
+            finally:
+                yield cursor_ctx.close()
+
+            yield True
+            return
+
+        yield False
+
+    @sync_async_method_adapter
     def _configure_role(self, connection):
         if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
-            with connection.cursor() as cursor:
-                sql = self.ops.compose_sql("SET ROLE %s", [new_role])
-                cursor.execute(sql)
-            return True
-        return False
+            cursor_ctx = self.manual_context(connection.cursor())
+            cursor = yield cursor_ctx.enter()
+            try:
+                yield cursor.execute(self.ops.compose_sql("SET ROLE %s", [new_role]))
+            finally:
+                yield cursor_ctx.close()
 
+            yield True
+            return
+        yield False
+
+    @sync_async_method_adapter
     def _configure_connection(self, connection):
         # This function is called from init_connection_state and from the
         # psycopg pool itself after a connection is opened.
 
         # Commit after setting the time zone.
-        commit_tz = self._configure_timezone(connection)
+        commit_tz = yield self._configure_timezone(connection)
         # Set the role on the connection. This is useful if the credential used
         # to login is not the same as the role that owns database resources. As
         # can be the case when using temporary or ephemeral credentials.
-        commit_role = self._configure_role(connection)
+        commit_role = yield self._configure_role(connection)
 
-        return commit_role or commit_tz
+        yield commit_role or commit_tz
 
+    @sync_async_method_adapter
     def _close(self):
         if self.connection is not None:
             # `wrap_database_errors` only works for `putconn` as long as there
@@ -388,22 +412,31 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     # Ensure the correct pool is returned. This is a workaround
                     # for tests so a pool can be changed on setting changes
                     # (e.g. USE_TZ, TIME_ZONE).
-                    self.connection._pool.putconn(self.connection)
+                    yield self.connection._pool.putconn(self.connection)
+                    yield
                     # Connection can no longer be used.
                     self.connection = None
                 else:
-                    return self.connection.close()
+                    yield self.connection.close()
 
+    @sync_async_method_adapter
     def init_connection_state(self):
-        super().init_connection_state()
+        yield super().init_connection_state()
 
         if self.connection is not None and not self.pool:
-            commit = self._configure_connection(self.connection)
+            commit = yield self._configure_connection(self.connection)
 
-            if commit and not self.get_autocommit():
-                self.connection.commit()
+            if commit:
+                autocommit_state = yield self.get_autocommit()
+                if not autocommit_state:
+                    yield self.connection.commit()
 
-    @async_unsafe
+        yield
+
+    @property
+    def _server_side_cursor_cls(self):
+        raise NotImplementedError
+
     def create_cursor(self, name=None):
         if name:
             if is_psycopg3 and (
@@ -413,7 +446,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 # named cursors so a specialized class that implements
                 # server-side cursors while performing client-side bindings
                 # must be used if `server_side_binding` is disabled (default).
-                cursor = ServerSideCursor(
+                cursor = self._server_side_cursor_cls(
                     self.connection,
                     name=name,
                     scrollable=False,
@@ -441,7 +474,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def tzinfo_factory(self, offset):
         return self.timezone
 
-    @async_unsafe
     def chunked_cursor(self):
         self._named_cursor_idx += 1
         # Get the current async task
@@ -469,9 +501,64 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             )
         )
 
+    @sync_async_method_adapter
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:
-            self.connection.autocommit = autocommit
+            yield self.connection.set_autocommit(autocommit)
+
+    @sync_async_method_adapter
+    def close_if_health_check_failed(self):
+        if self.pool:
+            # The pool only returns healthy connections.
+            yield
+            return
+        yield super().close_if_health_check_failed()
+
+    @property
+    def server_cursor_cls(self):
+        raise NotImplementedError
+
+    @property
+    def cursor_cls(self):
+        raise NotImplementedError
+
+
+@apply_method_decorator(async_unsafe, [
+    'get_new_connection',
+    'create_cursor',
+    'chunked_cursor',
+])
+class DatabaseWrapper(BaseDatabaseWrapperMixin, BaseDatabaseWrapper):
+    SchemaEditorClass = DatabaseSchemaEditor
+    client_class = DatabaseClient
+    creation_class = DatabaseCreation
+    introspection_class = DatabaseIntrospection
+
+    @property
+    def server_cursor_cls(self):
+        return ServerBindingCursor
+
+    @property
+    def cursor_cls(self):
+        return Cursor
+
+    @property
+    def _connection_pool_cls(self):
+        try:
+            from psycopg_pool import ConnectionPool
+            return ConnectionPool
+        except ImportError as err:
+            raise ImproperlyConfigured(
+                "Error loading psycopg_pool module.\nDid you install psycopg[pool]?"
+            ) from err
+
+    @property
+    def _connect(self):
+        return self.Database.connect
+
+    @property
+    def _server_side_cursor_cls(self):
+        return ServerSideCursor
 
     def check_constraints(self, table_names=None):
         """
@@ -493,12 +580,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
-
-    def close_if_health_check_failed(self):
-        if self.pool:
-            # The pool only returns healthy connections.
-            return
-        return super().close_if_health_check_failed()
 
     @contextmanager
     def _nodb_cursor(self):
@@ -549,6 +630,70 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
 if is_psycopg3:
 
+    class AsyncDatabaseWrapper(BaseDatabaseWrapperMixin, AsyncBaseDatabaseWrapper):
+
+        _pg_version = None
+
+        @property
+        def server_cursor_cls(self):
+            return AsyncServerBindingCursor
+
+        @property
+        def cursor_cls(self):
+            return AsyncCursor
+
+        @property
+        def _connection_pool_cls(self):
+            try:
+                from psycopg_pool import AsyncConnectionPool
+                return AsyncConnectionPool
+            except ImportError as err:
+                raise ImproperlyConfigured(
+                    "Error loading psycopg_pool module.\nDid you install psycopg[pool]?"
+                ) from err
+
+        @property
+        def _connect(self):
+            return self.Database.AsyncConnection.connect
+
+        @property
+        def _server_side_cursor_cls(self):
+            return AsyncServerSideCursor
+
+        async def check_constraints(self, table_names=None):
+            """
+            Check constraints by setting them to immediate. Return them to deferred
+            afterward.
+            """
+            async with self.cursor() as cursor:
+                await cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+                await cursor.execute("SET CONSTRAINTS ALL DEFERRED")
+
+        async def is_usable(self):
+            if self.connection is None:
+                return False
+            try:
+                # Use a psycopg cursor directly, bypassing Django's utilities.
+                async with self.connection.cursor() as cursor:
+                    await cursor.execute("SELECT 1")
+            except Database.Error:
+                return False
+            else:
+                return True
+
+        @property
+        async def pg_version(self):
+            if self._pg_version is not None:
+                return self._pg_version
+
+            async with self.temporary_connection():
+                self._pg_version = self.connection.info.server_version
+                return self._pg_version
+
+        def make_debug_cursor(self, cursor):
+            return AsyncCursorDebugWrapper(cursor, self)
+
+
     class CursorMixin:
         """
         A subclass of psycopg cursor implementing callproc.
@@ -597,6 +742,35 @@ if is_psycopg3:
         def copy(self, statement):
             with self.debug_sql(statement):
                 return self.cursor.copy(statement)
+
+    class AsyncServerBindingCursor(Database.AsyncClientCursor):
+        pass
+
+    class AsyncCursor(Database.AsyncClientCursor):
+        pass
+
+    class AsyncServerSideCursor(
+        Database.client_cursor.ClientCursorMixin,
+        Database.AsyncServerCursor,
+    ):
+        """
+        psycopg >= 3 forces the usage of server-side bindings when using named
+        cursors but the ORM doesn't yet support the systematic generation of
+        prepareable SQL (#20516).
+
+        ClientCursorMixin forces the usage of client-side bindings while
+        ServerCursor implements the logic required to declare and scroll
+        through named cursors.
+
+        Mixing ClientCursorMixin in wouldn't be necessary if Cursor allowed to
+        specify how parameters should be bound instead, which ServerCursor
+        would inherit, but that's not the case.
+        """
+
+    class AsyncCursorDebugWrapper(BaseAsyncCursorDebugWrapper):
+         def copy(self, statement):
+             with self.debug_sql(statement):
+                 return self.cursor.copy(statement)
 
 else:
     Cursor = psycopg2.extensions.cursor

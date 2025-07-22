@@ -1,4 +1,5 @@
-from contextlib import ContextDecorator, contextmanager
+from contextlib import AsyncContextDecorator, ContextDecorator, contextmanager
+from django.utils.sync_async import run_async_generator, run_sync_generator
 
 from django.db import (
     DEFAULT_DB_ALIAS,
@@ -6,6 +7,7 @@ from django.db import (
     Error,
     ProgrammingError,
     connections,
+    async_connections,
 )
 
 
@@ -23,6 +25,16 @@ def get_connection(using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     return connections[using]
+
+
+async def aget_connection(using=None):
+    """
+    Get an async database connection by name, or the default database
+    connection if no name is provided. This is a private API.
+    """
+    if using is None:
+        using = DEFAULT_DB_ALIAS
+    return async_connections[using]
 
 
 def get_autocommit(using=None):
@@ -97,6 +109,17 @@ def set_rollback(rollback, using=None):
     return get_connection(using).set_rollback(rollback)
 
 
+async def aset_rollback(rollback, using=None):
+    """
+    Async version of `set_rollback`.
+
+    Same behavior as `set_rollback`, but for asynchronous database
+    connections.
+    """
+    connection = await aget_connection(using)
+    return connection.set_rollback(rollback)
+
+
 @contextmanager
 def mark_for_rollback_on_error(using=None):
     """
@@ -138,8 +161,7 @@ def on_commit(func, using=None, robust=False):
 # Decorators / context managers #
 #################################
 
-
-class Atomic(ContextDecorator):
+class _BaseAtomic:
     """
     Guarantee the atomic execution of a given block.
 
@@ -148,10 +170,11 @@ class Atomic(ContextDecorator):
     When it's used as a decorator, __call__ wraps the execution of the
     decorated function in the instance itself, used as a context manager.
 
-    When it's used as a context manager, __enter__ creates a transaction or a
-    savepoint, depending on whether a transaction is already in progress, and
-    __exit__ commits the transaction or releases the savepoint on normal exit,
-    and rolls back the transaction or to the savepoint on exceptions.
+    When it's used as a context manager, entering the block creates a
+    transaction or a savepoint, depending on whether a transaction is already
+    in progress, and exiting the block commits the transaction or releases the
+    savepoint on normal exit, and rolls back the transaction or to the
+    savepoint on exceptions.
 
     It's possible to disable the creation of savepoints if the goal is to
     ensure that some code runs within a transaction without creating overhead.
@@ -179,8 +202,11 @@ class Atomic(ContextDecorator):
         self.durable = durable
         self._from_testcase = False
 
-    def __enter__(self):
-        connection = get_connection(self.using)
+    def get_connection(self, using):
+        raise NotImplementedError
+
+    def _enter_gen(self):
+        connection = yield self.get_connection(self.using)
 
         if (
             self.durable
@@ -191,11 +217,15 @@ class Atomic(ContextDecorator):
                 "A durable atomic block cannot be nested within another "
                 "atomic block."
             )
+
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
             connection.needs_rollback = False
-            if not connection.get_autocommit():
+
+            atomic_state = yield connection.get_autocommit()
+
+            if not atomic_state:
                 # Pretend we're already in an atomic block to bypass the code
                 # that disables autocommit to enter a transaction, and make a
                 # note to deal with this case in __exit__.
@@ -208,12 +238,12 @@ class Atomic(ContextDecorator):
             # second condition avoids creating useless savepoints and prevents
             # overwriting needs_rollback until the rollback is performed.
             if self.savepoint and not connection.needs_rollback:
-                sid = connection.savepoint()
+                sid = yield connection.savepoint()
                 connection.savepoint_ids.append(sid)
             else:
                 connection.savepoint_ids.append(None)
         else:
-            connection.set_autocommit(
+            yield connection.set_autocommit(
                 False, force_begin_transaction_with_broken_autocommit=True
             )
             connection.in_atomic_block = True
@@ -221,8 +251,10 @@ class Atomic(ContextDecorator):
         if connection.in_atomic_block:
             connection.atomic_blocks.append(self)
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        connection = get_connection(self.using)
+        yield
+
+    def _exit_gen(self, exc_type, exc_value, traceback):
+        connection = yield self.get_connection(self.using)
 
         if connection.in_atomic_block:
             connection.atomic_blocks.pop()
@@ -244,13 +276,13 @@ class Atomic(ContextDecorator):
                     # Release savepoint if there is one
                     if sid is not None:
                         try:
-                            connection.savepoint_commit(sid)
+                            yield connection.savepoint_commit(sid)
                         except DatabaseError:
                             try:
-                                connection.savepoint_rollback(sid)
+                                yield connection.savepoint_rollback(sid)
                                 # The savepoint won't be reused. Release it to
                                 # minimize overhead for the database server.
-                                connection.savepoint_commit(sid)
+                                yield connection.savepoint_commit(sid)
                             except Error:
                                 # If rolling back to a savepoint fails, mark for
                                 # rollback at a higher level and avoid shadowing
@@ -260,14 +292,14 @@ class Atomic(ContextDecorator):
                 else:
                     # Commit transaction
                     try:
-                        connection.commit()
+                        yield connection.commit()
                     except DatabaseError:
                         try:
-                            connection.rollback()
+                            yield connection.rollback()
                         except Error:
                             # An error during rollback means that something
                             # went wrong with the connection. Drop it.
-                            connection.close()
+                            yield connection.close()
                         raise
             else:
                 # This flag will be set to True again if there isn't a savepoint
@@ -280,10 +312,10 @@ class Atomic(ContextDecorator):
                         connection.needs_rollback = True
                     else:
                         try:
-                            connection.savepoint_rollback(sid)
+                            yield connection.savepoint_rollback(sid)
                             # The savepoint won't be reused. Release it to
                             # minimize overhead for the database server.
-                            connection.savepoint_commit(sid)
+                            yield connection.savepoint_commit(sid)
                         except Error:
                             # If rolling back to a savepoint fails, mark for
                             # rollback at a higher level and avoid shadowing
@@ -292,11 +324,11 @@ class Atomic(ContextDecorator):
                 else:
                     # Roll back transaction
                     try:
-                        connection.rollback()
+                        yield connection.rollback()
                     except Error:
                         # An error during rollback means that something
                         # went wrong with the connection. Drop it.
-                        connection.close()
+                        yield connection.close()
 
         finally:
             # Outermost block exit when autocommit was enabled.
@@ -304,7 +336,7 @@ class Atomic(ContextDecorator):
                 if connection.closed_in_transaction:
                     connection.connection = None
                 else:
-                    connection.set_autocommit(True)
+                    yield connection.set_autocommit(True)
             # Outermost block exit when autocommit was disabled.
             elif not connection.savepoint_ids and not connection.commit_on_exit:
                 if connection.closed_in_transaction:
@@ -312,15 +344,86 @@ class Atomic(ContextDecorator):
                 else:
                     connection.in_atomic_block = False
 
+        yield
+
+
+class Atomic(ContextDecorator, _BaseAtomic):
+    __doc__ = _BaseAtomic.__doc__
+
+    def get_connection(self, using):
+        return get_connection(using)
+
+    def __enter__(self):
+        run_sync_generator(self._enter_gen())
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        run_sync_generator(self._exit_gen(exc_type, exc_value, traceback))
+
+
+class AsyncAtomic(AsyncContextDecorator, _BaseAtomic):
+    __doc__ = _BaseAtomic.__doc__
+
+    async def get_connection(self, using):
+        return await aget_connection(using)
+
+    async def __aenter__(self):
+        await run_async_generator(self._enter_gen())
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        await run_async_generator(self._exit_gen(exc_type, exc_value, traceback))
+
 
 def atomic(using=None, savepoint=True, durable=False):
-    # Bare decorator: @atomic -- although the first argument is called
-    # `using`, it's actually the function being decorated.
+    """
+    Create a transactional scope for database operations.
+
+    This helper function returns an `Atomic` object that can be used
+    either as a decorator or a context manager. It starts a new database
+    transaction or, if a transaction is already in progress, creates
+    a savepoint.
+
+    Usage as a decorator:
+
+        @transaction.atomic(using=using)
+        def my_function():
+            ...
+
+    Equivalent usage as a context manager:
+
+        with transaction.atomic(using=using):
+            ...
+    """
+
     if callable(using):
         return Atomic(DEFAULT_DB_ALIAS, savepoint, durable)(using)
-    # Decorator: @atomic(...) or context manager: with atomic(...): ...
     else:
         return Atomic(using, savepoint, durable)
+
+
+def async_atomic(using=None, savepoint=True, durable=False):
+    """
+    Create a transactional scope for database operations.
+
+    This helper function returns an `AsyncAtomic` object that can be used
+    either as a decorator or a context manager. It starts a new database
+    transaction or, if a transaction is already in progress, creates
+    a savepoint.
+
+    Usage as a decorator:
+
+        @transaction.async_atomic(using=using)
+        async def my_function():
+            ...
+
+    Equivalent usage as a context manager:
+
+        async with transaction.async_atomic(using=using):
+            ...
+    """
+    if callable(using):
+        return AsyncAtomic(DEFAULT_DB_ALIAS, savepoint, durable)(using)
+    else:
+        return AsyncAtomic(using, savepoint, durable)
 
 
 def _non_atomic_requests(view, using):

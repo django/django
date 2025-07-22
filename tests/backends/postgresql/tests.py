@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import copy
 import unittest
 from io import StringIO
@@ -11,9 +12,17 @@ from django.db import (
     ProgrammingError,
     connection,
     connections,
+    async_connections,
+    transaction,
 )
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.test import TestCase, override_settings
+from django.test import (
+    TestCase,
+    override_settings,
+    skipUnlessDBFeature,
+    TransactionTestCase,
+    AsyncTestCase,
+)
 
 try:
     from django.db.backends.postgresql.psycopg_any import errors, is_psycopg3
@@ -28,6 +37,17 @@ def no_pool_connection(alias=None):
     # of a hack, but we cannot easily change the pool connections.
     new_connection.settings_dict["OPTIONS"]["pool"] = False
     return new_connection
+
+
+@asynccontextmanager
+async def with_async_no_pool_connection(alias=DEFAULT_DB_ALIAS):
+    async_connection = async_connections[alias]
+    assert not connection.settings_dict["OPTIONS"].get("pool")
+
+    try:
+        yield async_connection
+    finally:
+        await async_connection.close()
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
@@ -613,3 +633,229 @@ class Tests(TestCase):
         self.assertIs(
             CustomDatabaseWrapper(settings)._configure_connection(conn), False
         )
+
+
+class AsyncDatabaseWrapperTests(AsyncTestCase):
+    databases = {"default", "other"}
+
+    async def test_ensure_timezone_without_connection(self):
+        async_connection = async_connections["other"]
+        self.assertEqual(
+            await async_connection.ensure_timezone(),
+            False,
+        )
+
+    @override_settings(TIME_ZONE="Africa/Nairobi", USE_TZ=True)
+    async def test_ensure_timezone_with_existing_connection(self):
+        async_connection = async_connections[DEFAULT_DB_ALIAS]
+
+        # Clear cached properties
+        async_connection.timezone
+        del async_connection.timezone
+        async_connection.timezone_name
+        del async_connection.timezone_name
+
+        async with async_connection.cursor() as cursor:
+            await cursor.execute("SELECT 1;")
+
+        self.assertEqual(
+            await async_connection.ensure_timezone(),
+            True,
+        )
+
+    async def test_pg_version(self):
+        async_connection = async_connections[DEFAULT_DB_ALIAS]
+
+        self.assertEqual(
+            len(await async_connection.get_database_version()),
+            2
+        )
+
+    async def test_is_usable(self):
+        async_connection = async_connections[DEFAULT_DB_ALIAS]
+
+        self.assertEqual(
+            await async_connection.is_usable(),
+            True
+        )
+
+
+@skipUnlessDBFeature("supports_async")
+@unittest.skipUnless(
+    connection.vendor == "postgresql",
+    "PostgreSQL async transaction tests",
+)
+class AsyncDatabaseWrapperTransactionTests(TransactionTestCase):
+    available_apps = ["backends"]
+    databases = {"default", "other"}
+
+    def setUp(self):
+        with connection.cursor() as cursor:
+            cursor.execute("CREATE TABLE test (id SERIAL PRIMARY KEY);")
+
+    def tearDown(self):
+        with connection.cursor() as cursor:
+            cursor.execute("DROP TABLE test;")
+
+    async def create_item(self, conn):
+        async with conn.cursor() as cursor:
+            await cursor.execute("INSERT INTO test DEFAULT VALUES")
+
+    async def _row_count(self, conn):
+        async with conn.cursor() as cursor:
+            await cursor.execute("SELECT COUNT(*) FROM test;")
+            return (await cursor.fetchone())[0]
+
+    async def assert_row_count(self, expected):
+        async with with_async_no_pool_connection() as conn:
+            count = await self._row_count(conn)
+            self.assertEqual(count, expected)
+
+    async def test_set_autocommit_enable(self):
+        async with with_async_no_pool_connection() as conn:
+            await conn.set_autocommit(True)
+            await self.create_item(conn)
+
+        await self.assert_row_count(expected=1)
+
+    async def test_set_autocommit_enable_with_on_commit(self):
+        callback = mock.Mock()
+
+        async def async_fn(*args, **kwargs):
+            callback(*args, **kwargs)
+
+        def sync_fn(*args, **kwargs):
+            callback(*args, **kwargs)
+
+        async with with_async_no_pool_connection() as conn:
+            await conn.set_autocommit(True)
+            await conn.on_commit(async_fn)
+            await conn.on_commit(sync_fn)
+            callback.assert_has_calls([mock.call(), mock.call()])
+
+    async def test_set_autocommit_disable(self):
+        async with with_async_no_pool_connection() as conn:
+            await conn.set_autocommit(False)
+            await self.create_item(conn)
+
+        await self.assert_row_count(expected=0)
+
+    async def test_set_autocommit_disable_with_on_commit(self):
+        callback = mock.Mock()
+
+        async def async_fn(*args, **kwargs):
+            callback(*args, **kwargs)
+
+        async with with_async_no_pool_connection() as conn:
+            await conn.set_autocommit(False)
+            with self.assertRaises(transaction.TransactionManagementError):
+                await conn.on_commit(async_fn)
+
+        callback.assert_not_called()
+
+    async def test_get_autocommit(self):
+        async with with_async_no_pool_connection() as conn:
+            self.assertEqual(await conn.get_autocommit(), True)
+
+            await conn.set_autocommit(False)
+            self.assertEqual(await conn.get_autocommit(), False)
+
+    async def test_commit(self):
+        async with with_async_no_pool_connection() as conn:
+            await conn.set_autocommit(False)
+            await self.create_item(conn)
+            await conn.commit()
+
+        await self.assert_row_count(expected=1)
+
+    async def test_commit_missed(self):
+        async with with_async_no_pool_connection() as conn:
+            await conn.set_autocommit(False)
+            await self.create_item(conn)
+            await conn.commit()
+
+        await self.assert_row_count(expected=1)
+
+    async def test_rollback(self):
+        async with with_async_no_pool_connection() as conn:
+            await conn.set_autocommit(False)
+
+            await self.create_item(conn)
+            self.assertEqual(await self._row_count(conn), 1)
+
+            await conn.rollback()
+            self.assertEqual(await self._row_count(conn), 0)
+
+    async def test_on_commit(self):
+        callback = mock.Mock()
+
+        async def async_fn(*args, **kwargs):
+            callback(*args, **kwargs)
+
+        def sync_fn(*args, **kwargs):
+            callback(*args, **kwargs)
+
+        async with with_async_no_pool_connection() as conn:
+            async with transaction.async_atomic():
+                await conn.on_commit(async_fn)
+                await conn.on_commit(sync_fn)
+
+                callback.assert_not_called()
+
+            callback.assert_has_calls([mock.call(), mock.call()])
+
+    async def test_get_rollback(self):
+        async with with_async_no_pool_connection() as conn:
+            async with transaction.async_atomic():
+                self.assertEqual(conn.get_rollback(), False)
+
+                conn.set_rollback(True)
+                self.assertEqual(conn.get_rollback(), True)
+
+    async def test_get_rollback_without_atomic(self):
+        async with with_async_no_pool_connection() as conn:
+            with self.assertRaises(transaction.TransactionManagementError):
+                conn.get_rollback()
+
+    async def test_set_rollback(self):
+        async with with_async_no_pool_connection() as conn:
+            async with transaction.async_atomic():
+                has_rollback = conn.get_rollback()
+                conn.set_rollback(not has_rollback)
+
+                self.assertNotEqual(conn.get_rollback(), has_rollback)
+
+    async def test_set_rollback_without_atomic(self):
+        async with with_async_no_pool_connection() as conn:
+            with self.assertRaises(transaction.TransactionManagementError):
+                conn.set_rollback(True)
+
+    async def test_savepoint(self):
+        async with with_async_no_pool_connection() as conn:
+            async with transaction.async_atomic():
+                await self.create_item(conn)
+                await conn.savepoint()
+
+                await self.create_item(conn)
+
+            self.assertEqual(await self._row_count(conn), 2)
+
+    async def test_savepoint_rollback(self):
+        async with with_async_no_pool_connection() as conn:
+            async with transaction.async_atomic():
+                await self.create_item(conn)
+                sid = await conn.savepoint()
+
+                await self.create_item(conn)
+                await conn.savepoint_rollback(sid)
+
+            self.assertEqual(await self._row_count(conn), 1)
+
+    async def test_savepoint_commit(self):
+        async with with_async_no_pool_connection() as conn:
+            async with transaction.async_atomic():
+                sid = await conn.savepoint()
+                await self.create_item(conn)
+                await conn.savepoint_commit(sid)
+
+            self.assertEqual(await self._row_count(conn), 1)

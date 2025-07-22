@@ -25,6 +25,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_comments = True
     supports_tablespaces = True
     supports_transactions = True
+    supports_async = is_psycopg3
     can_introspect_materialized_views = True
     can_distinct_on_fields = True
     can_rollback_ddl = True

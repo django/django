@@ -10,11 +10,13 @@ from hashlib import md5
 from django.apps import apps
 from django.db import NotSupportedError
 from django.utils.dateparse import parse_time
+from django.utils.sync_async import sync_async_method_adapter, SyncMixin, AsyncMixin
 
 logger = logging.getLogger("django.db.backends")
 
 
-class CursorWrapper:
+class _AbstractCursorWrapper:
+
     def __init__(self, cursor, db):
         self.cursor = cursor
         self.db = db
@@ -29,10 +31,61 @@ class CursorWrapper:
 
     def __getattr__(self, attr):
         cursor_attr = getattr(self.cursor, attr)
-        if attr in CursorWrapper.WRAP_ERROR_ATTRS:
+        if attr in self.WRAP_ERROR_ATTRS:
             return self.db.wrap_database_errors(cursor_attr)
         else:
             return cursor_attr
+
+    # The following methods cannot be implemented in __getattr__, because the
+    # code must run when the method is invoked, not just when it is accessed.
+
+    @sync_async_method_adapter
+    def execute(self, sql, params=None):
+        yield self._execute_with_wrappers(
+            sql, params, many=False, executor=self._execute
+        )
+
+    @sync_async_method_adapter
+    def executemany(self, sql, param_list):
+        yield self._execute_with_wrappers(
+            sql, param_list, many=True, executor=self._executemany
+        )
+
+    @sync_async_method_adapter
+    def _execute_with_wrappers(self, sql, params, many, executor):
+        context = {"connection": self.db, "cursor": self}
+        for wrapper in reversed(self.db.execute_wrappers):
+            executor = functools.partial(wrapper, executor)
+        yield executor(sql, params, many, context)
+
+    @sync_async_method_adapter
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                yield self.cursor.execute(sql)
+                return
+            else:
+                yield self.cursor.execute(sql, params)
+                return
+
+    @sync_async_method_adapter
+    def _executemany(self, sql, param_list, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            yield self.cursor.executemany(sql, param_list)
+
+
+class CursorWrapper(SyncMixin, _AbstractCursorWrapper):
 
     def __iter__(self):
         with self.db.wrap_database_errors:
@@ -49,9 +102,6 @@ class CursorWrapper:
             self.close()
         except self.db.Database.Error:
             pass
-
-    # The following methods cannot be implemented in __getattr__, because the
-    # code must run when the method is invoked, not just when it is accessed.
 
     def callproc(self, procname, params=None, kparams=None):
         # Keyword parameters for callproc aren't supported in PEP 249, but the
@@ -75,55 +125,19 @@ class CursorWrapper:
                 params = params or ()
                 return self.cursor.callproc(procname, params, kparams)
 
-    def execute(self, sql, params=None):
-        return self._execute_with_wrappers(
-            sql, params, many=False, executor=self._execute
-        )
 
-    def executemany(self, sql, param_list):
-        return self._execute_with_wrappers(
-            sql, param_list, many=True, executor=self._executemany
-        )
-
-    def _execute_with_wrappers(self, sql, params, many, executor):
-        context = {"connection": self.db, "cursor": self}
-        for wrapper in reversed(self.db.execute_wrappers):
-            executor = functools.partial(wrapper, executor)
-        return executor(sql, params, many, context)
-
-    def _execute(self, sql, params, *ignored_wrapper_args):
-        # Raise a warning during app initialization (stored_app_configs is only
-        # ever set during testing).
-        if not apps.ready and not apps.stored_app_configs:
-            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
-        self.db.validate_no_broken_transaction()
-        with self.db.wrap_database_errors:
-            if params is None:
-                # params default might be backend specific.
-                return self.cursor.execute(sql)
-            else:
-                return self.cursor.execute(sql, params)
-
-    def _executemany(self, sql, param_list, *ignored_wrapper_args):
-        # Raise a warning during app initialization (stored_app_configs is only
-        # ever set during testing).
-        if not apps.ready and not apps.stored_app_configs:
-            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
-        self.db.validate_no_broken_transaction()
-        with self.db.wrap_database_errors:
-            return self.cursor.executemany(sql, param_list)
-
-
-class CursorDebugWrapper(CursorWrapper):
+class CursorDebugWrapperMixin:
     # XXX callproc isn't instrumented at this time.
 
+    @sync_async_method_adapter
     def execute(self, sql, params=None):
         with self.debug_sql(sql, params, use_last_executed_query=True):
-            return super().execute(sql, params)
+            yield super().execute(sql, params)
 
+    @sync_async_method_adapter
     def executemany(self, sql, param_list):
         with self.debug_sql(sql, param_list, many=True):
-            return super().executemany(sql, param_list)
+            yield super().executemany(sql, param_list)
 
     @contextmanager
     def debug_sql(
@@ -163,6 +177,34 @@ class CursorDebugWrapper(CursorWrapper):
             )
 
 
+class CursorDebugWrapper(CursorDebugWrapperMixin, CursorWrapper):
+    pass
+
+
+class AsyncCursorWrapper(AsyncMixin, _AbstractCursorWrapper):
+
+    async def __aiter__(self):
+        with self.db.wrap_database_errors:
+            async for item in self.cursor:
+                yield item
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, type, value, traceback):
+        # Close instead of passing through to avoid backend-specific behavior
+        # (#17671). Catch errors liberally because errors in cleanup code
+        # aren't useful.
+        try:
+            await self.close()
+        except self.db.Database.Error:
+            pass
+
+
+class AsyncCursorDebugWrapper(CursorDebugWrapperMixin, AsyncCursorWrapper):
+    pass
+
+
 @contextmanager
 def debug_transaction(connection, sql):
     start = time.monotonic()
@@ -176,18 +218,21 @@ def debug_transaction(connection, sql):
                 {
                     "sql": "%s" % sql,
                     "time": "%.3f" % duration,
+                    "async": connection.is_async,
                 }
             )
             logger.debug(
-                "(%.3f) %s; args=%s; alias=%s",
+                "(%.3f) %s; args=%s; alias=%s; async=%s",
                 duration,
                 sql,
                 None,
                 connection.alias,
+                connection.is_async,
                 extra={
                     "duration": duration,
                     "sql": sql,
                     "alias": connection.alias,
+                    "async": connection.is_async,
                 },
             )
 
