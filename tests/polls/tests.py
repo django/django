@@ -4,8 +4,10 @@ from pathlib import Path
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
+from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.test import modify_settings, override_settings
 from django.test.selenium import ChangeWindowSize, screenshot_cases
 from django.urls import reverse
@@ -139,7 +141,77 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
         screenshot = self.selenium.get_screenshot_as_png()
 
         # Take the 2nd screenshot
-        self.take_cropped_screenshot(screenshot, "admin02", 1000, 400, left=0, top=0)
+        self.take_cropped_screenshot(screenshot, "admin02", 800, 400, left=0, top=0)
 
         # Take the 3rd screenshot - 140 pixels down
-        self.take_cropped_screenshot(screenshot, "admin03t", 1000, 400, left=0, top=140)
+        self.take_cropped_screenshot(screenshot, "admin03t", 800, 400, left=0, top=140)
+
+    @screenshot_cases(SIZES)
+    def test_tutorial_question_model_list(self):
+        """Take a screenshot of the question model list"""
+
+        from polls.models import Question
+
+        q = Question.objects.create(question_text="What's up?", pub_date="2025-07-01")
+
+        # Simulate creating a question via the admin interface
+        # to be shown in the screenshot
+        LogEntry.objects.create(
+            user_id=self.superuser.pk,
+            content_type_id=ContentType.objects.get_for_model(Question).pk,
+            object_id=q.pk,
+            object_repr=str(q),
+            action_flag=ADDITION,
+            change_message="Added.",
+        )
+
+        self.admin_login(username="admin", password="secret")
+
+        # admin04t - Create a question and take a screenshot of the questions list
+
+        self.selenium.get(
+            self.live_server_url + reverse("admin:polls_question_changelist")
+        )
+
+        self.hide_nav_sidebar()
+        self.change_header_display("none")
+
+        content = self.selenium.find_element(By.ID, "content-start")
+        self.take_element_screenshot(content, "admin04t")
+
+        # admin05t - Edit question form
+
+        # click the What's up? question to open the change form
+        question_link = self.selenium.find_element(By.LINK_TEXT, "What's up?")
+        question_link.click()
+
+        # Take a screenshot of the change question form
+        question_content = self.selenium.find_element(By.ID, "content")
+        self.take_element_screenshot(question_content, "admin05t")
+
+        # Change the “Date published” by clicking the “Today” and “Now” shortcuts.
+        # Then click “Save and continue editing.”
+
+        # TODO: This doesn't take into account i18n
+        today_button = self.selenium.find_element(By.PARTIAL_LINK_TEXT, "Today")
+        today_button.click()
+        now_button = self.selenium.find_element(By.PARTIAL_LINK_TEXT, "Now")
+        now_button.click()
+        save_continue_button = self.selenium.find_element(By.NAME, "_continue")
+        save_continue_button.click()
+
+        # admin06t - Admin change history for question model
+        # Click on the history link to view the change history
+        history_link = self.selenium.find_element(By.PARTIAL_LINK_TEXT, "HISTORY")
+        history_link.click()
+        history_content = self.selenium.find_element(By.ID, "content")
+        self.take_element_screenshot(history_content, "admin06t")
+
+    # admin07t - It's like admin05t but with the fields changed
+    # admin08t - It's like admin07t but added section for date called Date information
+    # admin09t - Add choice form
+    # admin10t - Add question form with choices. Date informaation collpased
+    # admin11t - Choices tabular inline simple
+    # admin12t - Question model list with question created
+    # admin13t - Question model list with filter
+    # admin14t - Choices tabular inline expanded
