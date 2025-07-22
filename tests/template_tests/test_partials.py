@@ -42,17 +42,12 @@ class PartialTagsTestCase(TestCase):
                 self.assertEqual(rendered.strip(), expected)
 
     def test_invalid_name_raises_template_does_not_exist(self):
-        with self.assertRaises(TemplateDoesNotExist):
-            self.engine.get_template(123)
-
-        with self.assertRaises(TemplateDoesNotExist):
-            self.engine.get_template(None)
-
-        with self.assertRaises(TemplateDoesNotExist):
-            self.engine.get_template("")
-
-        with self.assertRaises(TemplateDoesNotExist):
-            self.engine.get_template("#")
+        for template_name in [123, None, "", "#", "#name"]:
+            with (
+                self.subTest(template_name=template_name),
+                self.assertRaisesMessage(TemplateDoesNotExist, template_name),
+            ):
+                self.engine.get_template(template_name)
 
     def test_undefined_partial_error(self):
         template = """
