@@ -30,8 +30,6 @@ class AdminDjangoTutorialImageGenerationSeleniumTests(AdminSeleniumTestCase):
             username="admin",
             password="secret",
             email="admin@example.com",
-            first_name="Admin",
-            last_name="Super",
         )
 
         # TODO: This shouldn't be necessary

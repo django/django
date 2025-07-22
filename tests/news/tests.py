@@ -35,8 +35,6 @@ class AdminDocsImageGenerationSeleniumTests(AdminSeleniumTestCase):
             username="admin",
             password="secret",
             email="admin@example.com",
-            first_name="Admin",
-            last_name="Super",
         )
         self.admin_login(username="admin", password="secret")
 
