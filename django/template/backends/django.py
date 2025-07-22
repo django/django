@@ -92,8 +92,8 @@ class DjangoTemplates(BaseEngine):
         if not partial_name:
             return Template(template, self)
 
+        extra_data = getattr(template, "extra_data", {})
         try:
-            extra_data = getattr(template, "extra_data", {})
             partial_contents = extra_data.get("template-partials", {})
         except AttributeError:
             raise TemplateDoesNotExist(partial_name, tried=[template_name])
