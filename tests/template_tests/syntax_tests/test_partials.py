@@ -1,7 +1,6 @@
 from unittest import mock
 
-from django.template import NodeList, TemplateSyntaxError
-from django.template.defaulttags import TemplateProxy
+from django.template import NodeList, PartialTemplate, TemplateSyntaxError
 from django.test import SimpleTestCase
 from django.views.debug import ExceptionReporter
 
@@ -271,8 +270,8 @@ Main content with {% partial test-partial %}
         exception_value = str(traceback_data.get("exception_value", ""))
         self.assertIn("Unclosed tag", exception_value)
 
-    def test_template_proxy_get_exception_info(self):
-        """Test that TemplateProxy.get_exception_info uses loader.get_template."""
+    def test_partial_template_get_exception_info(self):
+        """Test that PartialTemplate.get_exception_info uses loader.get_template."""
         mock_origin = mock.Mock()
         mock_origin.template_name = "test_template.html"
 
@@ -288,7 +287,7 @@ Main content with {% partial test-partial %}
         mock_template.get_exception_info.return_value = mock_exception_info
         mock_loader.get_template.return_value = mock_template
 
-        proxy = TemplateProxy(NodeList(), mock_origin, "test-partial")
+        proxy = PartialTemplate(NodeList(), mock_origin, "test-partial")
 
         test_exception = Exception("Test exception")
         mock_token = mock.Mock()

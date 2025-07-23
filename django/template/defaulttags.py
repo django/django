@@ -29,6 +29,7 @@ from .base import (
     VARIABLE_TAG_START,
     Node,
     NodeList,
+    PartialTemplate,
     TemplateSyntaxError,
     VariableDoesNotExist,
     kwarg_re,
@@ -39,9 +40,6 @@ from .context import Context
 from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal
-
-partial_start_tag_re = re.compile(r"\{%\s*(partialdef)\s+([\w-]+)(\s+inline)?\s*%}")
-partial_end_tag_re = re.compile(r"\{%\s*endpartialdef\s*%}")
 
 register = Library()
 
@@ -1569,55 +1567,6 @@ def do_with(parser, token):
     return WithNode(None, None, nodelist, extra_context=extra_context)
 
 
-class TemplateProxy:
-    """
-    A lightweight Template lookalike used for template partials.
-
-    Wraps nodelist as partial, in order to bind context.
-    """
-
-    def __init__(self, nodelist, origin, name):
-        self.nodelist = nodelist
-        self.origin = origin
-        self.name = name
-
-    def get_exception_info(self, exception, token):
-        template = self.origin.loader.get_template(self.origin.template_name)
-        return template.get_exception_info(exception, token)
-
-    def find_partial_source(self, full_source, partial_name):
-        result = ""
-        pos = 0
-        for m in partial_start_tag_re.finditer(full_source, pos):
-            sspos, sepos = m.span()
-            starter, name, inline = m.groups()
-            endm = partial_end_tag_re.search(full_source, sepos + 1)
-            espos, eepos = endm.span()
-            if name == partial_name:
-                # Include the full partial definition from opening to closing tag.
-                result = full_source[sspos:eepos]
-                break
-            pos = eepos + 1
-        return result
-
-    @property
-    def source(self):
-        template = self.origin.loader.get_template(self.origin.template_name)
-        return self.find_partial_source(template.source, self.name)
-
-    def _render(self, context):
-        return self.nodelist.render(context)
-
-    def render(self, context):
-        with context.render_context.push_state(self):
-            if context.template is None:
-                with context.bind_template(self):
-                    context.template_name = self.name
-                    return self._render(context)
-            else:
-                return self._render(context)
-
-
 class DefinePartialNode(Node):
     def __init__(self, partial_name, inline, nodelist):
         self.partial_name = partial_name
@@ -1682,7 +1631,7 @@ def partialdef_func(parser, token):
 
     # Store the partial nodelist in the parser.extra_data attribute.
     parser.extra_data.setdefault("template-partials", {})
-    parser.extra_data["template-partials"][partial_name] = TemplateProxy(
+    parser.extra_data["template-partials"][partial_name] = PartialTemplate(
         nodelist, parser.origin, partial_name
     )
 

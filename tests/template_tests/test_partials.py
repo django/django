@@ -201,7 +201,7 @@ class RobustPartialHandlingTest(TestCase):
 
 
 class FindPartialSourceTest(TestCase):
-    """Test the find_partial_source method of TemplateProxy"""
+    """Test the find_partial_source method of PartialTemplate"""
 
     def setUp(self):
         self.engine = engines["django"]
