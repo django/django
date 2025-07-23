@@ -40,6 +40,7 @@ from .context import Context
 from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal
+from .utils import SubDictionaryWrapper
 
 register = Library()
 
@@ -1636,33 +1637,6 @@ def partialdef_func(parser, token):
     )
 
     return DefinePartialNode(partial_name, inline, nodelist)
-
-
-class SubDictionaryWrapper:
-    """
-    Wrap a parent dictionary, allowing deferred access to a sub-dictionary by key.
-    The parser.extra_data storage may not yet be populated when a partial node
-    is defined, so defer access until rendering.
-    """
-
-    def __init__(self, parent_dict, lookup_key):
-        self.parent_dict = parent_dict
-        self.lookup_key = lookup_key
-
-    def __getitem__(self, key):
-        try:
-            partials_content = self.parent_dict[self.lookup_key]
-        except KeyError:
-            raise TemplateSyntaxError(
-                f"Partial '{key}' is not defined in the current template."
-            )
-
-        try:
-            return partials_content[key]
-        except KeyError:
-            raise TemplateSyntaxError(
-                f"Partial '{key}' is not defined in the current template."
-            )
 
 
 @register.tag(name="partial")
