@@ -51,9 +51,10 @@ class ExtraAssertMixin:
         :param method: The assertion method to test.
         :param method_args: Positional arguments to pass to the method.
         :param expected_msg: The expected base error message (required
-        keyword-only). :param msg_prefix: Optional prefix to be added to the
-        message in the second subTest. :param method_kwargs: Keyword arguments
-        to pass to the method.
+                             keyword-only).
+        :param msg_prefix: Optional prefix to be added to the message in the
+                           second subTest.
+        :param method_kwargs: Keyword arguments to pass to the method.
 
         Used internally for testing Django's assertions.
         """

@@ -181,8 +181,7 @@ class GEOSCoordSeq(GEOSBase):
     def kml(self):
         "Return the KML representation for the coordinates."
         # Getting the substitution string depending on whether the coordinates
-        # have
-        #  a Z dimension.
+        # have a Z dimension.
         if self.hasz:
             substr = "%s,%s,%s "
         else:

@@ -2279,9 +2279,14 @@ class BaseEmailBackendTests(MailTestsMixin):
             gettext_lazy("test@example.com"),
             # RemovedInDjango70Warning: uncomment these cases when support for
             # deprecated (name, address) tuples is removed.
-            #    [("nobody", "nobody@example.com"), ("other",
-            #    "other@example.com")], [["nobody", "nobody@example.com"],
-            #    ["other", "other@example.com"]],
+            #    [
+            #        ("nobody", "nobody@example.com"),
+            #        ("other", "other@example.com")
+            #    ],
+            #    [
+            #        ["nobody", "nobody@example.com"],
+            #        ["other", "other@example.com"]
+            #    ],
             [("name", "test", "example.com")],
             [("Name <test@example.com",)],
             [[]],

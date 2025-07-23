@@ -29,8 +29,14 @@ class Signal:
     Internal attributes:
 
         receivers:
-            [((id(receiver), id(sender)), ref(receiver), ref(sender),
-            is_async)]
+            [
+                (
+                    (id(receiver), id(sender)),
+                    ref(receiver),
+                    ref(sender),
+                    is_async,
+                )
+            ]
         sender_receivers_cache:
             WeakKeyDictionary[sender, list[receiver]]
     """

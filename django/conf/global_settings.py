@@ -343,8 +343,7 @@ FORMAT_MODULE_PATH = None
 DATE_FORMAT = "N j, Y"
 
 # Default formatting for datetime objects. See all available format strings
-# here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# here: https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATETIME_FORMAT = "N j, Y, P"
 
 # Default formatting for time objects. See all available format strings here:
@@ -362,8 +361,7 @@ YEAR_MONTH_FORMAT = "F Y"
 MONTH_DAY_FORMAT = "F j"
 
 # Default short formatting for date objects. See all available format strings
-# here:
-# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# here: https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 SHORT_DATE_FORMAT = "m/d/Y"
 
 # Default short formatting for datetime objects.

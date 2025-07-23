@@ -370,8 +370,8 @@ class TupleIn(TupleLookupMixin, In):
             return super(TupleLookupMixin, self).as_sql(compiler, connection)
 
         # e.g.: (a, b, c) in [(x1, y1, z1), (x2, y2, z2)] as SQL:
-        # WHERE (a = x1 AND b = y1 AND c = z1) OR (a = x2 AND b = y2 AND c =
-        # z2)
+        # WHERE (a = x1 AND b = y1 AND c = z1)
+        #    OR (a = x2 AND b = y2 AND c = z2)
         root = WhereNode([], connector=OR)
         lhs = self.lhs
 

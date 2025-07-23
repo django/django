@@ -76,8 +76,8 @@ class Join:
     def as_sql(self, compiler, connection):
         """
         Generate the full
-           LEFT OUTER JOIN sometable ON sometable.somecol =
-           othertable.othercol, params
+           LEFT OUTER JOIN sometable
+           ON sometable.somecol = othertable.othercol, params
         clause for this join.
         """
         join_conditions = []

@@ -127,17 +127,16 @@ class Field:
         # error_messages -- An optional dictionary to override the default
         #                   messages that the field will raise.
         # show_hidden_initial -- Boolean that specifies if it is needed to
-        # render a
-        #                        hidden widget with initial value after widget.
+        #                        render a hidden widget with initial value
+        #                        after widget.
         # validators -- List of additional validators to use
         # localize -- Boolean that specifies if the field should be localized.
         # disabled -- Boolean that specifies whether the field is disabled,
-        # that
-        #             is its widget is shown in the form but not editable.
+        #             that is its widget is shown in the form but not editable.
         # label_suffix -- Suffix to be added to the label. Overrides
         #                 form's label_suffix.
         # bound_field_class -- BoundField class to use in
-        # Field.get_bound_field.
+        #                      Field.get_bound_field.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         self.help_text = help_text

@@ -114,8 +114,8 @@ class BoundField(RenderableFieldMixin):
 
     def as_text(self, attrs=None, **kwargs):
         """
-        Return a string of HTML for representing this as an <input
-        type="text">.
+        Return a string of HTML for representing this as an
+        <input type="text">.
         """
         return self.as_widget(TextInput(), attrs, **kwargs)
 
@@ -125,8 +125,8 @@ class BoundField(RenderableFieldMixin):
 
     def as_hidden(self, attrs=None, **kwargs):
         """
-        Return a string of HTML for representing this as an <input
-        type="hidden">.
+        Return a string of HTML for representing this as an
+        <input type="hidden">.
         """
         return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
 
