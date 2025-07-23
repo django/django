@@ -93,8 +93,6 @@ class DjangoTemplates(BaseEngine):
             return Template(template, self)
 
         extra_data = getattr(template, "extra_data", {})
-
-        extra_data = getattr(template, "extra_data", {})
         try:
             partial = extra_data.get("template-partials")[partial_name]
         except (AttributeError, KeyError, TypeError):
