@@ -2,6 +2,7 @@ import datetime
 import math
 import re
 from decimal import Decimal
+from unittest import skipIf, skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
@@ -2763,7 +2764,7 @@ class JSONArrayAggTests(TestCase):
         )
         cls.b2.authors.add(cls.a2)
 
-    def test(self):
+    def test_text(self):
         vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("contact__name"))
         self.assertEqual(
             vals,
@@ -2808,6 +2809,21 @@ class JSONArrayAggTests(TestCase):
             jsonarrayagg=JSONArrayAgg("name", default=["<empty>"])
         )
         self.assertEqual(val, {"jsonarrayagg": ["<empty>"]})
+
+    @skipIf(
+        connection.vendor == "mysql",
+        "MySQL does not correctly support ORDER BY in JSON_ARRAYAGG.",
+    )
+    @skipUnlessDBFeature("supports_aggregate_order_by_clause")
+    def test_order_by(self):
+        val = Author.objects.aggregate(authors=JSONArrayAgg("name", order_by="-age"))
+        self.assertEqual(val, {"authors": ["Jacob Kaplan-Moss", "Adrian Holovaty"]})
+
+    @skipUnless(connection.vendor == "mysql", "JSONArrayAgg not supported.")
+    def test_order_by_not_supported(self):
+        msg = "JSONArrayAgg(order_by) is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.aggregate(arrayagg=JSONArrayAgg("age", order_by="-name"))
 
     def test_distinct_true(self):
         msg = "JSONArrayAgg does not allow distinct."

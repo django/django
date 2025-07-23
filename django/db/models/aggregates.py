@@ -13,7 +13,7 @@ from django.db.models.expressions import (
     Value,
     When,
 )
-from django.db.models.fields import IntegerField, TextField
+from django.db.models.fields import DateField, IntegerField, TextField
 from django.db.models.fields.json import JSONField
 from django.db.models.functions import Coalesce
 from django.db.models.functions.mixins import (
@@ -404,6 +404,7 @@ class Variance(NumericOutputFieldMixin, Aggregate):
 class JSONArrayAgg(Aggregate):
     function = "JSON_ARRAYAGG"
     output_field = JSONField()
+    allow_order_by = True
     arity = 1
 
     def as_sql(self, compiler, connection, **extra_context):
@@ -412,6 +413,13 @@ class JSONArrayAgg(Aggregate):
                 "JSONArrayAgg(filter) is not supported on this database backend."
             )
         return super().as_sql(compiler, connection, **extra_context)
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        if self.order_by is not None:
+            raise NotSupportedError(
+                "JSONArrayAgg(order_by) is not supported on this database backend."
+            )
+        return self.as_sql(compiler, connection, **extra_context)
 
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = self.as_sql(
@@ -444,16 +452,25 @@ class JSONArrayAgg(Aggregate):
             )
             return f"TO_JSONB({sql})", params
         extra_context.setdefault(
-            "template", "%(function)s(%(distinct)s%(expressions)s RETURNING JSONB)"
+            "template",
+            "%(function)s(%(distinct)s%(expressions)s%(order_by)s RETURNING JSONB)\
+            %(filter)s",
         )
         return self.as_sql(compiler, connection, **extra_context)
 
     def as_oracle(self, compiler, connection, **extra_context):
-        # Return same date field format as on other supported backends.
-        expression = self.get_source_expressions()[0]
-        internal_type = expression.output_field.get_internal_type()
-        if internal_type == "DateField":
-            extra_context.setdefault(
-                "template", "%(function)s(TO_CHAR(%(expressions)s, 'YYYY-MM-DD'))"
+        # Oracle turns DATE columns into ISO 8601 timestamp including T00:00:00
+        # suffixed when converting to JSON while other backends only include
+        # the date part.
+        source_expressions = self.get_source_expressions()
+        expression = source_expressions[0]
+        if isinstance(expression.output_field, DateField):
+            clone = self.copy()
+            clone.set_source_expressions(
+                [
+                    Func(expression, Value("YYYY-MM-DD"), function="TO_CHAR"),
+                    *source_expressions[1:],
+                ]
             )
+            return clone.as_sql(compiler, connection, **extra_context)
         return self.as_sql(compiler, connection, **extra_context)
