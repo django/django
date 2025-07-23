@@ -250,7 +250,8 @@ class AdminViewBasicTestCase(TestCase):
             "article_set-INITIAL_FORMS": "3",
             "article_set-MAX_NUM_FORMS": "0",
             "article_set-0-id": cls.a1.pk,
-            # there is no title in database, give one here or formset will fail.
+            # there is no title in database, give one here or formset will
+            # fail.
             "article_set-0-title": "Norske bostaver æøå skaper problemer",
             "article_set-0-content": "&lt;p&gt;Middle content&lt;/p&gt;",
             "article_set-0-date_0": "2008-03-18",
@@ -992,7 +993,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(changelist_url, {"notarealfield": "5"})
         self.assertRedirects(response, "%s?e=1" % changelist_url)
 
-        # Spanning relationships through a nonexistent related object (Refs #16716)
+        # Spanning relationships through a nonexistent related object (Refs
+        # #16716)
         response = self.client.get(changelist_url, {"notarealfield__whatever": "5"})
         self.assertRedirects(response, "%s?e=1" % changelist_url)
 
@@ -1037,9 +1039,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_named_group_field_choices_change_list(self):
         """
-        Ensures the admin changelist shows correct values in the relevant column
-        for rows corresponding to instances of a model in which a named group
-        has been used in the choices option of a field.
+        Ensures the admin changelist shows correct values in the relevant
+        column for rows corresponding to instances of a model in which a named
+        group has been used in the choices option of a field.
         """
         link1 = reverse("admin:admin_views_fabric_change", args=(self.fab1.pk,))
         link2 = reverse("admin:admin_views_fabric_change", args=(self.fab2.pk,))
@@ -1262,8 +1264,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_allowed_filtering_15103(self):
         """
         Regressions test for ticket 15103 - filtering on fields defined in a
-        ForeignKey 'limit_choices_to' should be allowed, otherwise raw_id_fields
-        can break.
+        ForeignKey 'limit_choices_to' should be allowed, otherwise
+        raw_id_fields can break.
         """
         # Filters should be allowed if they are defined on a ForeignKey
         # pointing to this model.
@@ -1353,7 +1355,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(
             reverse("admin:admin_views_unchangeableobject_changelist")
         )
-        # Check the format of the shown object -- shouldn't contain a change link
+        # Check the format of the shown object -- shouldn't contain a change
+        # link
         self.assertContains(
             response, '<th class="field-__str__">%s</th>' % o, html=True
         )
@@ -1963,7 +1966,8 @@ class AdminJavaScriptTest(TestCase):
 
     def test_js_minified_only_if_debug_is_false(self):
         """
-        The minified versions of the JS files are only used when DEBUG is False.
+        The minified versions of the JS files are only used when DEBUG is
+        False.
         """
         with override_settings(DEBUG=False):
             response = self.client.get(reverse("admin:admin_views_section_add"))
@@ -2346,7 +2350,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(login, ERROR_MESSAGE)
         new_user = User(username="jondoe", password="secret", email="super@example.com")
         new_user.save()
-        # check to ensure if there are multiple email addresses a user doesn't get a 500
+        # check to ensure if there are multiple email addresses a user doesn't
+        # get a 500
         login = self.client.post(login_url, self.super_email_login)
         self.assertContains(login, ERROR_MESSAGE)
 
@@ -2662,7 +2667,8 @@ class AdminViewPermissionsTest(TestCase):
         )
         article_changelist_url = reverse("admin:admin_views_article_changelist")
 
-        # add user should not be able to view the list of article or change any of them
+        # add user should not be able to view the list of article or change any
+        # of them
         self.client.force_login(self.adduser)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 403)
@@ -2744,7 +2750,8 @@ class AdminViewPermissionsTest(TestCase):
         )
         self.client.post(reverse("admin:logout"))
 
-        # Test redirection when using row-level change permissions. Refs #11513.
+        # Test redirection when using row-level change permissions. Refs
+        # #11513.
         r1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
         r2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
         r3 = RowLevelChangePermissionModel.objects.create(id=3, name="odd id mult 3")
@@ -3093,7 +3100,8 @@ class AdminViewPermissionsTest(TestCase):
 
     def test_history_view(self):
         """History view should restrict access."""
-        # add user should not be able to view the list of article or change any of them
+        # add user should not be able to view the list of article or change any
+        # of them
         self.client.force_login(self.adduser)
         response = self.client.get(
             reverse("admin:admin_views_article_history", args=(self.a1.pk,))
@@ -3116,7 +3124,8 @@ class AdminViewPermissionsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-        # Test redirection when using row-level change permissions. Refs #11513.
+        # Test redirection when using row-level change permissions. Refs
+        # #11513.
         rl1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
         rl2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
         logins = [
@@ -3180,12 +3189,14 @@ class AdminViewPermissionsTest(TestCase):
         user has permission to add that related item.
         """
         self.client.force_login(self.adduser)
-        # The user can't add sections yet, so they shouldn't see the "add section" link.
+        # The user can't add sections yet, so they shouldn't see the "add
+        # section" link.
         url = reverse("admin:admin_views_article_add")
         add_link_text = "add_id_section"
         response = self.client.get(url)
         self.assertNotContains(response, add_link_text)
-        # Allow the user to add sections too. Now they can see the "add section" link.
+        # Allow the user to add sections too. Now they can see the "add
+        # section" link.
         user = User.objects.get(username="adduser")
         perm = get_perm(Section, get_permission_codename("add", Section._meta))
         user.user_permissions.add(perm)
@@ -3313,7 +3324,8 @@ class AdminViewPermissionsTest(TestCase):
         # Logged in? Redirect.
         self.client.force_login(self.superuser)
         response = self.client.get(shortcut_url, follow=False)
-        # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
+        # Can't use self.assertRedirects() because User.get_absolute_url() is
+        # silly.
         self.assertEqual(response.status_code, 302)
         # Domain may depend on contrib.sites tests also run
         self.assertRegex(response.url, "http://(testserver|example.com)/dummy/foo/")
@@ -3538,7 +3550,10 @@ class AdminViewsNoUrlTest(TestCase):
         )
 
     def test_no_standard_modeladmin_urls(self):
-        """Admin index views don't break when user's ModelAdmin removes standard urls"""
+        """
+        Admin index views don't break when user's ModelAdmin removes standard
+        urls
+        """
         self.client.force_login(self.changeuser)
         r = self.client.get(reverse("admin:index"))
         # we shouldn't get a 500 error caused by a NoReverseMatch
@@ -3920,7 +3935,9 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, "Changed something")
 
     def test_get_change_view(self):
-        "Retrieving the object using urlencoded form of primary key should work"
+        """
+        Retrieving the object using urlencoded form of primary key should work
+        """
         response = self.client.get(
             reverse(
                 "admin:admin_views_modelwithstringprimarykey_change", args=(self.pk,)
@@ -3936,7 +3953,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get(
             reverse("admin:admin_views_modelwithstringprimarykey_changelist")
         )
-        # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
+        # this URL now comes through reverse(), thus url quoting and iri_to_uri
+        # encoding
         pk_final_url = escape(iri_to_uri(quote(self.pk)))
         change_url = reverse(
             "admin:admin_views_modelwithstringprimarykey_change", args=("__fk__",)
@@ -3976,7 +3994,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             "admin:admin_views_modelwithstringprimarykey_delete", args=(quote(self.pk),)
         )
         response = self.client.get(url)
-        # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
+        # this URL now comes through reverse(), thus url quoting and iri_to_uri
+        # encoding
         change_url = reverse(
             "admin:admin_views_modelwithstringprimarykey_change", args=("__fk__",)
         ).replace("__fk__", escape(iri_to_uri(quote(self.pk))))
@@ -3984,7 +4003,10 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
-        "A model with a primary key that ends with add or is `add` should be visible"
+        """
+        A model with a primary key that ends with add or is `add` should be
+        visible
+        """
         add_model = ModelWithStringPrimaryKey.objects.create(
             pk="i have something to add"
         )
@@ -4046,7 +4068,9 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
     def test_change_view_history_link(self):
-        """Object history button link should work and contain the pk value quoted."""
+        """
+        Object history button link should work and contain the pk value quoted.
+        """
         url = reverse(
             "admin:%s_modelwithstringprimarykey_change"
             % ModelWithStringPrimaryKey._meta.app_label,
@@ -4521,8 +4545,8 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, "Unordered object #1")
 
     def test_list_editable_action_submit(self):
-        # List editable changes should not be executed if the action "Go" button is
-        # used to submit the form.
+        # List editable changes should not be executed if the action "Go"
+        # button is used to submit the form.
         data = {
             "form-TOTAL_FORMS": "3",
             "form-INITIAL_FORMS": "3",
@@ -4606,9 +4630,8 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, '<td class="field-id">%d</td>' % story2.id, 1)
 
     def test_pk_hidden_fields_with_list_display_links(self):
-        """Similarly as test_pk_hidden_fields, but when the hidden pk fields are
-        referenced in list_display_links.
-        Refs #12475.
+        """Similarly as test_pk_hidden_fields, but when the hidden pk fields
+        are referenced in list_display_links. Refs #12475.
         """
         story1 = OtherStory.objects.create(
             title="The adventures of Guido",
@@ -5478,7 +5501,10 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Grommet.objects.all()[0].name, "Grommet 1 Updated")
 
     def test_char_pk_inline(self):
-        "A model with a character PK can be saved as inlines. Regression for #10992"
+        """
+        A model with a character PK can be saved as inlines. Regression for
+        #10992
+        """
         # First add a new inline
         self.post_data["doohickey_set-0-code"] = "DH1"
         self.post_data["doohickey_set-0-name"] = "Doohickey 1"
@@ -5513,7 +5539,10 @@ class AdminInlineTests(TestCase):
         self.assertEqual(DooHickey.objects.all()[0].name, "Doohickey 1 Updated")
 
     def test_integer_pk_inline(self):
-        "A model with an integer PK can be saved as inlines. Regression for #10992"
+        """
+        A model with an integer PK can be saved as inlines. Regression for
+        #10992
+        """
         # First add a new inline
         self.post_data["whatsit_set-0-index"] = "42"
         self.post_data["whatsit_set-0-name"] = "Whatsit 1"
@@ -6106,7 +6135,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(object_url)
         self.selenium.find_element(By.ID, "id_name").send_keys(" hello")
 
-        # The slugs got prepopulated didn't change since they were originally not empty
+        # The slugs got prepopulated didn't change since they were originally
+        # not empty
         slug1 = self.selenium.find_element(By.ID, "id_slug1").get_attribute("value")
         slug2 = self.selenium.find_element(By.ID, "id_slug2").get_attribute("value")
         self.assertEqual(slug1, "this-is-the-main-name-the-best-2012-02-18")
@@ -7168,7 +7198,8 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
     def test_correct_autoescaping(self):
         """
-        Make sure that non-field readonly elements are properly autoescaped (#24461)
+        Make sure that non-field readonly elements are properly autoescaped
+        (#24461)
         """
         section = Section.objects.create(name="<a>evil</a>")
         response = self.client.get(
@@ -7207,7 +7238,8 @@ class LimitChoicesToInAdminTest(TestCase):
             last_action=datetime.datetime.today() - datetime.timedelta(days=1),
         )
         response = self.client.get(reverse("admin:admin_views_stumpjoke_add"))
-        # The allowed option should appear twice; the limited option should not appear.
+        # The allowed option should appear twice; the limited option should not
+        # appear.
         self.assertContains(response, threepwood.username, count=2)
         self.assertNotContains(response, marley.username)
 

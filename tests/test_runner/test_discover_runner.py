@@ -364,7 +364,8 @@ class DiscoverRunnerTests(SimpleTestCase):
 
     def test_duplicates_ignored(self):
         """
-        Tests shouldn't be discovered twice when discovering on overlapping paths.
+        Tests shouldn't be discovered twice when discovering on overlapping
+        paths.
         """
         base_app = "forms_tests"
         sub_app = "forms_tests.field_tests"

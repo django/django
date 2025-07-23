@@ -420,9 +420,11 @@ class Command(BaseCommand):
             for locale in locales:
                 if not is_valid_locale(locale):
                     # Try to guess what valid locale it could be
-                    # Valid examples are: en_GB, shi_Latn_MA and nl_NL-x-informal
+                    # Valid examples are: en_GB, shi_Latn_MA and
+                    # nl_NL-x-informal
 
-                    # Search for characters followed by a non character (i.e. separator)
+                    # Search for characters followed by a non character (i.e.
+                    # separator)
                     match = re.match(
                         r"^(?P<language>[a-zA-Z]+)"
                         r"(?P<separator>[^a-zA-Z])"
@@ -464,8 +466,9 @@ class Command(BaseCommand):
 
     @cached_property
     def gettext_version(self):
-        # Gettext tools will output system-encoded bytestrings instead of UTF-8,
-        # when looking up the version. It's especially a problem on Windows.
+        # Gettext tools will output system-encoded bytestrings instead of
+        # UTF-8, when looking up the version. It's especially a problem on
+        # Windows.
         out, err, status = popen_wrapper(
             ["xgettext", "--version"],
             stdout_encoding=DEFAULT_LOCALE_ENCODING,

@@ -241,7 +241,10 @@ class TestInline(TestDataMixin, TestCase):
         )
 
     def test_no_parent_callable_lookup(self):
-        """Admin inline `readonly_field` shouldn't invoke parent ModelAdmin callable"""
+        """
+        Admin inline `readonly_field` shouldn't invoke parent ModelAdmin
+        callable
+        """
         # Identically named callable isn't present in the parent ModelAdmin,
         # rendering of the add view shouldn't explode
         response = self.client.get(reverse("admin:admin_inlines_novel_add"))
@@ -324,7 +327,9 @@ class TestInline(TestDataMixin, TestCase):
         self.assertContains(response, "Label from ModelForm.Meta")
 
     def test_inline_hidden_field_no_column(self):
-        """#18263 -- Make sure hidden fields don't get a column in tabular inlines"""
+        """
+        #18263 -- Make sure hidden fields don't get a column in tabular inlines
+        """
         parent = SomeParentModel.objects.create(name="a")
         SomeChildModel.objects.create(name="b", position="0", parent=parent)
         SomeChildModel.objects.create(name="c", position="1", parent=parent)
@@ -1232,7 +1237,8 @@ class TestInlinePermissions(TestCase):
         )
         self.user.user_permissions.add(permission)
         response = self.client.get(self.holder_change_url)
-        # Change permission on inner2s, so we can change existing but not add new
+        # Change permission on inner2s, so we can change existing but not add
+        # new
         self.assertContains(
             response,
             '<h2 id="inner2_set-heading" class="inline-heading">Inner2s</h2>',

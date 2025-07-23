@@ -167,7 +167,8 @@ class MailTestsMixin:
     def assertEndsWith(self, first, second):
         if not first.endswith(second):
             # Use assertEqual() for failure message with diffs. If first value
-            # is much longer than second, truncate start and prepend an ellipsis.
+            # is much longer than second, truncate start and prepend an
+            # ellipsis.
             self.longMessage = True
             max_len = len(second) + self.START_END_EXTRA_CONTEXT
             end_of_first = (
@@ -249,7 +250,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     @mock.patch("django.core.mail.message.MIMEText.set_payload")
     def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
-        """Line length check should encode the payload supporting `surrogateescape`.
+        """Line length check should encode the payload supporting
+        `surrogateescape`.
 
         Following https://github.com/python/cpython/issues/76511, newer
         versions of Python (3.12.3 and 3.13) ensure that a message's
@@ -260,7 +262,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         Line length checks in SafeMIMEText's set_payload should also use the
         same error handling strategy to avoid errors such as:
 
-        UnicodeEncodeError: 'utf-8' codec can't encode <...>: surrogates not allowed
+        UnicodeEncodeError: 'utf-8' codec can't encode <...>: surrogates not
+        allowed
 
         """
         # This test is specific to Python's legacy MIMEText. This can be safely
@@ -965,8 +968,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                     self.assertEqual(email.attachments[0].content, expected_content)
 
                     # Check attachments in the generated message.
-                    # (The actual content is not checked as variations in platform
-                    # line endings and rfc822 refolding complicate the logic.)
+                    # (The actual content is not checked as variations in
+                    # platform line endings and rfc822 refolding complicate the
+                    # logic.)
                     attachments = self.get_decoded_attachments(email)
                     self.assertEqual(len(attachments), 1)
                     actual = attachments[0]
@@ -979,7 +983,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         if possible and changes to DEFAULT_ATTACHMENT_MIME_TYPE if not.
         """
         email = EmailMessage()
-        # Mimetype guessing identifies these as text/plain from the .txt extensions.
+        # Mimetype guessing identifies these as text/plain from the .txt
+        # extensions.
         email.attach("utf8.txt", "ütƒ-8\n".encode())
         email.attach("not-utf8.txt", b"\x86unknown-encoding\n")
         attachments = self.get_decoded_attachments(email)
@@ -1093,8 +1098,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_attach_rfc822_message(self):
         """
-        EmailMessage.attach() docs: "If you specify a mimetype of message/rfc822,
-        it will also accept django.core.mail.EmailMessage and email.message.Message."
+        EmailMessage.attach() docs: "If you specify a mimetype of
+        message/rfc822, it will also accept django.core.mail.EmailMessage and
+        email.message.Message."
         """
         # django.core.mail.EmailMessage
         django_email = EmailMessage("child subject", "child body")
@@ -1124,8 +1130,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 self.assertIsInstance(email.attachments[0], EmailAttachment)
                 self.assertEqual(email.attachments[0].mimetype, "message/rfc822")
 
-                # Make sure it is serialized correctly: a message/rfc822 attachment
-                # whose "body" content (payload) is the "encapsulated" (child) message.
+                # Make sure it is serialized correctly: a message/rfc822
+                # attachment whose "body" content (payload) is the
+                # "encapsulated" (child) message.
                 attachments = self.get_raw_attachments(email)
                 self.assertEqual(len(attachments), 1)
                 rfc822_attachment = attachments[0]
@@ -1141,9 +1148,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 cte = rfc822_attachment.get("Content-Transfer-Encoding", "7bit")
                 self.assertIn(cte, ("7bit", "8bit", "binary"))
 
-                # Any properly declared CTE is allowed for the attached message itself
-                # (including quoted-printable or base64). For the plain ASCII content
-                # in this test, we'd expect 7bit.
+                # Any properly declared CTE is allowed for the attached message
+                # itself (including quoted-printable or base64). For the plain
+                # ASCII content in this test, we'd expect 7bit.
                 child_cte = attached_message.get("Content-Transfer-Encoding", "7bit")
                 self.assertEqual(child_cte, "7bit")
                 self.assertEqual(attached_message.get_content_type(), "text/plain")
@@ -1302,10 +1309,10 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: 8bit", s)
 
-        # Long body lines that require folding should use quoted-printable or base64,
-        # whichever is shorter. However, Python's legacy email API avoids re-folding
-        # non-ASCII text and just uses CTE 8bit. (The modern API would correctly choose
-        # base64 here. Any of these is deliverable.)
+        # Long body lines that require folding should use quoted-printable or
+        # base64, whichever is shorter. However, Python's legacy email API
+        # avoids re-folding non-ASCII text and just uses CTE 8bit. (The modern
+        # API would correctly choose base64 here. Any of these is deliverable.)
         msg = EmailMessage(
             body=(
                 "Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.\n"
@@ -1435,7 +1442,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         # EmailMessage.message() will not catch these cases, as it only calls
         # sanitize_address() if an address also includes non-ASCII chars.
         # Django detects these cases in the SMTP EmailBackend during sending.
-        # See SMTPBackendTests.test_avoids_sending_to_invalid_addresses() below.
+        # See SMTPBackendTests.test_avoids_sending_to_invalid_addresses()
+        # below.
         for email_address in (
             # Invalid address with two @ signs.
             "to@other.com@example.com",
@@ -1562,8 +1570,9 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         for header in headers:
             for email_address in cases:
                 with self.subTest(header=header, email_address=email_address):
-                    # Construct an EmailMessage with header set to email_address.
-                    # Specific constructor params vary by header.
+                    # Construct an EmailMessage with header set to
+                    # email_address. Specific constructor params vary by
+                    # header.
                     if header == "From":
                         email = EmailMessage(from_email=email_address)
                     elif header in ("To", "Cc", "Bcc", "Reply-To"):
@@ -1740,8 +1749,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_positional_arguments_order(self):
         """
-        EmailMessage class docs: "… is initialized with the following parameters
-        (in the given order, if positional arguments are used)."
+        EmailMessage class docs: "… is initialized with the following
+        parameters (in the given order, if positional arguments are used)."
         """
         connection = mail.get_connection()
         email = EmailMessage(
@@ -2064,10 +2073,10 @@ class BaseEmailBackendTests(MailTestsMixin):
 
     def test_send_long_lines(self):
         """
-        Email line length is limited to 998 chars by the RFC 5322 Section 2.1.1.
-        A message body containing longer lines is converted to quoted-printable
-        or base64 (whichever is shorter), to avoid having to insert newlines
-        in a way that alters the intended text.
+        Email line length is limited to 998 chars by the RFC 5322 Section
+        2.1.1. A message body containing longer lines is converted to
+        quoted-printable or base64 (whichever is shorter), to avoid having to
+        insert newlines in a way that alters the intended text.
         """
         # Django with Python's legacy email API uses quoted-printable for both
         # cases below. Python's modern API would prefer shorter base64 for the
@@ -2270,8 +2279,9 @@ class BaseEmailBackendTests(MailTestsMixin):
             gettext_lazy("test@example.com"),
             # RemovedInDjango70Warning: uncomment these cases when support for
             # deprecated (name, address) tuples is removed.
-            #    [("nobody", "nobody@example.com"), ("other", "other@example.com")],
-            #    [["nobody", "nobody@example.com"], ["other", "other@example.com"]],
+            #    [("nobody", "nobody@example.com"), ("other",
+            #    "other@example.com")], [["nobody", "nobody@example.com"],
+            #    ["other", "other@example.com"]],
             [("name", "test", "example.com")],
             [("Name <test@example.com",)],
             [[]],
@@ -2576,7 +2586,8 @@ class SMTPHandler:
         data = envelope.content
         mail_from = envelope.mail_from
 
-        # Convert SMTP's CRNL to NL, to simplify content checks in shared test cases.
+        # Convert SMTP's CRNL to NL, to simplify content checks in shared test
+        # cases.
         message = message_from_bytes(data.replace(b"\r\n", b"\n"))
         try:
             header_from = message["from"].addresses[0].addr_spec
@@ -2836,7 +2847,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
             self.assertTrue(msg)
 
             msg = msg.decode()
-            # The message only contains CRLF and not combinations of CRLF, LF, and CR.
+            # The message only contains CRLF and not combinations of CRLF, LF,
+            # and CR.
             msg = msg.replace("\r\n", "")
             self.assertNotIn("\r", msg)
             self.assertNotIn("\n", msg)
@@ -2873,7 +2885,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_avoids_sending_to_invalid_addresses(self):
         """
         Verify invalid addresses can't sneak into SMTP commands through
-        EmailMessage.all_recipients() (which is distinct from message header fields).
+        EmailMessage.all_recipients() (which is distinct from message header
+        fields).
         """
         backend = smtp.EmailBackend()
         backend.connection = mock.Mock()
@@ -2892,7 +2905,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         ):
             with self.subTest(email_address=email_address):
                 # Use bcc (which is only processed by SMTP backend) to ensure
-                # error is coming from SMTP backend, not EmailMessage.message().
+                # error is coming from SMTP backend, not
+                # EmailMessage.message().
                 email = EmailMessage(bcc=[email_address])
                 with self.assertRaisesMessage(ValueError, "Invalid address"):
                     backend.send_messages([email])

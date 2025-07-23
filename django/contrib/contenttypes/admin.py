@@ -67,8 +67,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
                     )
                 ]
 
-            # There's one or more GenericForeignKeys; make sure that one of them
-            # uses the right ct_field and ct_fk_field.
+            # There's one or more GenericForeignKeys; make sure that one of
+            # them uses the right ct_field and ct_fk_field.
             for gfk in gfks:
                 if gfk.ct_field == obj.ct_field and gfk.fk_field == obj.ct_fk_field:
                     return []

@@ -289,7 +289,8 @@ class BaseExpression:
            in this query
          * reuse: a set of reusable joins for multijoins
          * summarize: a terminal aggregate clause
-         * for_save: whether this expression about to be used in a save or update
+         * for_save: whether this expression about to be used in a save or
+           update
 
         Return: an Expression to be added to the query.
         """
@@ -349,9 +350,9 @@ class BaseExpression:
         As a guess, if the output fields of all source fields match then simply
         infer the same type here.
 
-        If a source's output field resolves to None, exclude it from this check.
-        If all sources are None, then an error is raised higher up the stack in
-        the output_field property.
+        If a source's output field resolves to None, exclude it from this
+        check. If all sources are None, then an error is raised higher up the
+        stack in the output_field property.
         """
         # This guess is mostly a bad idea, but there is quite a lot of code
         # (especially 3rd party Func subclasses) that depend on it, we'd need a
@@ -500,7 +501,8 @@ class BaseExpression:
         return sql, params
 
     def get_expression_for_validation(self):
-        # Ignore expressions that cannot be used during a constraint validation.
+        # Ignore expressions that cannot be used during a constraint
+        # validation.
         if not getattr(self, "constraint_validation_compatible", True):
             try:
                 (expression,) = self.get_source_expressions()
@@ -1264,7 +1266,8 @@ class Star(Expression):
 
 class DatabaseDefault(Expression):
     """
-    Expression to use DEFAULT keyword during insert otherwise the underlying expression.
+    Expression to use DEFAULT keyword during insert otherwise the underlying
+    expression.
     """
 
     def __init__(self, expression, output_field=None):
@@ -1625,7 +1628,8 @@ class When(Expression):
     ):
         c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
         if for_save and c.condition is not None:
-            # Resolve condition with for_save=False, since it's used as a filter.
+            # Resolve condition with for_save=False, since it's used as a
+            # filter.
             c.condition = self.condition.resolve_expression(
                 query, allow_joins, reuse, summarize, for_save=False
             )

@@ -9,7 +9,8 @@ class CSP(StrEnum):
     Content Security Policy constants for directive values and special tokens.
 
     These constants represent:
-    1. Standard quoted string values from the CSP spec (e.g., 'self', 'unsafe-inline')
+    1. Standard quoted string values from the CSP spec (e.g., 'self',
+       'unsafe-inline')
     2. Special placeholder tokens (NONCE) that get replaced by the middleware
 
     Using this enum instead of raw strings provides better type checking,
@@ -43,13 +44,15 @@ class CSP(StrEnum):
     WASM_UNSAFE_EVAL = "'wasm-unsafe-eval'"
 
     # Special placeholder that gets replaced by the middleware.
-    # The value itself is arbitrary and should not be mistaken for a real nonce.
+    # The value itself is arbitrary and should not be mistaken for a real
+    # nonce.
     NONCE = "<CSP_NONCE_SENTINEL>"
 
 
 class LazyNonce(SimpleLazyObject):
     """
-    Lazily generates a cryptographically secure nonce string, for use in CSP headers.
+    Lazily generates a cryptographically secure nonce string, for use in CSP
+    headers.
 
     The nonce is only generated when first accessed (e.g., via string
     interpolation or inside a template).
@@ -62,7 +65,8 @@ class LazyNonce(SimpleLazyObject):
 
         <script{% if csp_nonce %} nonce="{{ csp_nonce }}"...{% endif %}>
 
-    The `{% if %}` block will only render if the nonce has been evaluated elsewhere.
+    The `{% if %}` block will only render if the nonce has been evaluated
+    elsewhere.
 
     """
 

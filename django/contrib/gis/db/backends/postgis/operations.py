@@ -328,7 +328,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def _get_postgis_func(self, func):
         """
-        Helper routine for calling PostGIS functions and returning their result.
+        Helper routine for calling PostGIS functions and returning their
+        result.
         """
         # Close out the connection. See #9437.
         with self.connection.temporary_connection() as cursor:
@@ -340,7 +341,9 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_postgis_func("postgis_geos_version")
 
     def postgis_lib_version(self):
-        "Return the version number of the PostGIS library used with PostgreSQL."
+        """
+        Return the version number of the PostGIS library used with PostgreSQL.
+        """
         return self._get_postgis_func("postgis_lib_version")
 
     def postgis_proj_version(self):

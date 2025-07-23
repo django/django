@@ -210,8 +210,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city
         # WHERE name = 'Pueblo';
         svg1 = 'cx="-104.609252" cy="-38.255001"'
-        # Even though relative, only one point so it's practically the same except for
-        # the 'c' letter prefix on the x,y values.
+        # Even though relative, only one point so it's practically the same
+        # except for the 'c' letter prefix on the x,y values.
         svg2 = svg1.replace("c", "")
         self.assertEqual(
             svg1,
@@ -463,7 +463,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
 
     @skipUnlessDBFeature("has_Area_function")
     def test_area_with_regular_aggregate(self):
-        # Create projected country objects, for this test to work on all backends.
+        # Create projected country objects, for this test to work on all
+        # backends.
         for c in Country.objects.all():
             CountryWebMercator.objects.create(
                 name=c.name, mpoly=c.mpoly.transform(3857, clone=True)
@@ -684,7 +685,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
 
     @skipUnlessDBFeature("has_SnapToGrid_function")
     def test_snap_to_grid(self):
-        # Let's try and break snap_to_grid() with bad combinations of arguments.
+        # Let's try and break snap_to_grid() with bad combinations of
+        # arguments.
         for bad_args in ((), range(3), range(5)):
             with self.assertRaises(ValueError):
                 Country.objects.annotate(snap=functions.SnapToGrid("mpoly", *bad_args))
@@ -692,8 +694,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             with self.assertRaises(TypeError):
                 Country.objects.annotate(snap=functions.SnapToGrid("mpoly", *bad_args))
 
-        # Boundary for San Marino, courtesy of Bjorn Sandvik of thematicmapping.org
-        # from the world borders dataset he provides.
+        # Boundary for San Marino, courtesy of Bjorn Sandvik of
+        # thematicmapping.org from the world borders dataset he provides.
         wkt = (
             "MULTIPOLYGON(((12.41580 43.95795,12.45055 43.97972,12.45389 43.98167,"
             "12.46250 43.98472,12.47167 43.98694,12.49278 43.98917,"
@@ -817,9 +819,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         )
 
         if connection.ops.oracle:
-            # Should be able to execute the queries; however, they won't be the same
-            # as GEOS (because Oracle doesn't use GEOS internally like PostGIS or
-            # SpatiaLite).
+            # Should be able to execute the queries; however, they won't be the
+            # same as GEOS (because Oracle doesn't use GEOS internally like
+            # PostGIS or SpatiaLite).
             return
         for c in qs:
             self.assertTrue(c.mpoly.difference(geom).equals(c.difference))

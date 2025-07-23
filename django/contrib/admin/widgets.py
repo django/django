@@ -215,8 +215,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
-    A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
-    in a <select multiple> box.
+    A Widget for displaying ManyToMany ids in the "raw_id" interface rather
+    than in a <select multiple> box.
     """
 
     template_name = "admin/widgets/many_to_many_raw_id.html"
@@ -275,7 +275,8 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         if not isinstance(widget, AutocompleteMixin):
             self.attrs["data-context"] = "available-source"
         self.can_change_related = not multiple and can_change_related
-        # XXX: The deletion UX can be confusing when dealing with cascading deletion.
+        # XXX: The deletion UX can be confusing when dealing with cascading
+        # deletion.
         cascade = getattr(rel, "on_delete", None) is CASCADE
         self.can_delete_related = not multiple and not cascade and can_delete_related
         self.can_view_related = not multiple and can_view_related

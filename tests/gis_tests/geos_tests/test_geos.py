@@ -280,7 +280,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             ("POINT EMPTY", "LINESTRING EMPTY", False),
             # Empty inputs of different dimensions are not equals_identical.
             ("POINT EMPTY", "POINT Z EMPTY", False),
-            # Non-empty inputs of different dimensions are not equals_identical.
+            # Non-empty inputs of different dimensions are not
+            # equals_identical.
             ("POINT Z (1 2 3)", "POINT M (1 2 3)", False),
             ("POINT ZM (1 2 3 4)", "POINT Z (1 2 3)", False),
             # Inputs with different structure are not equals_identical.
@@ -371,7 +372,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(pnt, fromstr(p.wkt))
                 self.assertIs(pnt == prev, False)  # Use assertIs() to test __eq__.
 
-                # Making sure that the point's X, Y components are what we expect
+                # Making sure that the point's X, Y components are what we
+                # expect
                 self.assertAlmostEqual(p.x, pnt.tuple[0], 9)
                 self.assertAlmostEqual(p.y, pnt.tuple[1], 9)
 
@@ -753,12 +755,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         # These tests are needed to ensure sanity with writable geometries.
 
-        # Getting a polygon with interior rings, and pulling out the interior rings
+        # Getting a polygon with interior rings, and pulling out the interior
+        # rings
         poly = fromstr(self.geometries.polygons[1].wkt)
         ring1 = poly[0]
         ring2 = poly[1]
 
-        # These deletes should be 'harmless' since they are done on child geometries
+        # These deletes should be 'harmless' since they are done on child
+        # geometries
         del ring1
         del ring2
         ring1 = poly[0]
@@ -776,7 +780,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         for p in self.geometries.polygons:
             with self.subTest(p=p):
                 if p.ext_ring_cs:
-                    # Constructing the polygon and getting the coordinate sequence
+                    # Constructing the polygon and getting the coordinate
+                    # sequence
                     poly = fromstr(p.wkt)
                     cs = poly.exterior_ring.coord_seq
 
@@ -791,7 +796,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                     for expected_value, coord_sequence in zip(p.ext_ring_cs, cs):
                         self.assertEqual(expected_value, coord_sequence)
 
-                        # Construct the test value to set the coordinate sequence with
+                        # Construct the test value to set the coordinate
+                        # sequence with
                         if len(expected_value) == 2:
                             tset = (5, 23)
                         else:
@@ -956,8 +962,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 # Now assuring that each point in the buffer is almost equal
                 for exp_ring, buf_ring in zip(exp_buf, buf, strict=True):
                     for exp_point, buf_point in zip(exp_ring, buf_ring, strict=True):
-                        # Asserting the X, Y of each point are almost equal (due to
-                        # floating point imprecision).
+                        # Asserting the X, Y of each point are almost equal
+                        # (due to floating point imprecision).
                         self.assertAlmostEqual(exp_point[0], buf_point[0], 9)
                         self.assertAlmostEqual(exp_point[1], buf_point[1], 9)
 
@@ -1064,11 +1070,13 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 "initialize to LinearRings"
             )
             with self.subTest(p=p):
-                # Should only be able to use __setitem__ with LinearRing geometries.
+                # Should only be able to use __setitem__ with LinearRing
+                # geometries.
                 with self.assertRaisesMessage(TypeError, msg):
                     poly.__setitem__(0, LineString((1, 1), (2, 2)))
 
-                # Construct the new shell by adding 500 to every point in the old shell.
+                # Construct the new shell by adding 500 to every point in the
+                # old shell.
                 shell_tup = poly.shell.tuple
                 new_coords = []
                 for point in shell_tup:
@@ -1615,8 +1623,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_subclassing(self):
         """
-        GEOSGeometry subclass may itself be subclassed without being forced-cast
-        to the parent class during `__init__`.
+        GEOSGeometry subclass may itself be subclassed without being
+        forced-cast to the parent class during `__init__`.
         """
 
         class ExtendedPolygon(Polygon):
@@ -1629,7 +1637,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         ext_poly = ExtendedPolygon(((0, 0), (0, 1), (1, 1), (0, 0)), data=3)
         self.assertEqual(type(ext_poly), ExtendedPolygon)
-        # ExtendedPolygon.__str__ should be called (instead of Polygon.__str__).
+        # ExtendedPolygon.__str__ should be called (instead of
+        # Polygon.__str__).
         self.assertEqual(
             str(ext_poly), "EXT_POLYGON - data: 3 - POLYGON ((0 0, 0 1, 1 1, 0 0))"
         )

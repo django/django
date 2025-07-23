@@ -26,7 +26,8 @@ class Point(GEOSGeometry):
             # Here a tuple or list was passed in under the `x` parameter.
             coords = x
         elif isinstance(x, (float, int)) and isinstance(y, (float, int)):
-            # Here X, Y, and (optionally) Z were passed in individually, as parameters.
+            # Here X, Y, and (optionally) Z were passed in individually, as
+            # parameters.
             if isinstance(z, (float, int)):
                 coords = [x, y, z]
             else:

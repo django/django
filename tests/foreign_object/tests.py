@@ -72,7 +72,8 @@ class MultiColumnFKTests(TestCase):
             getattr(membership, "person")
 
     def test_reverse_query_returns_correct_result(self):
-        # Creating a valid membership because it has the same country has the person
+        # Creating a valid membership because it has the same country has the
+        # person
         Membership.objects.create(
             membership_country_id=self.usa.id,
             person_id=self.bob.id,

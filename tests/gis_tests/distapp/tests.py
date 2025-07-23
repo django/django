@@ -159,7 +159,7 @@ class DistanceTest(TestCase):
         Test distance lookups on geodetic coordinate systems.
         """
         # Line is from Canberra to Sydney. Query is for all other cities within
-        # a 100km of that line (which should exclude only Hobart & Adelaide).
+        # a 100km of that line (which should exclude only Hobart & # Adelaide).
         line = GEOSGeometry("LINESTRING(144.9630 -37.8143,151.2607 -33.8870)", 4326)
         dist_qs = AustraliaCity.objects.filter(point__distance_lte=(line, D(km=100)))
         expected_cities = [
@@ -221,9 +221,9 @@ class DistanceTest(TestCase):
         gq2 = Q(point__distance_gte=(wollongong.point, d2))
         qs1 = AustraliaCity.objects.exclude(name="Wollongong").filter(gq1 | gq2)
 
-        # Geodetic distance lookup but telling GeoDjango to use `distance_spheroid`
-        # instead (we should get the same results b/c accuracy variance won't matter
-        # in this test case).
+        # Geodetic distance lookup but telling GeoDjango to use
+        # `distance_spheroid` instead (we should get the same results b/c
+        # accuracy variance won't matter in this test case).
         querysets = [qs1]
         if connection.features.has_DistanceSpheroid_function:
             gq3 = Q(point__distance_lte=(wollongong.point, d1, "spheroid"))
@@ -532,7 +532,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         )
         for city, distance in zip(qs, distances):
             with self.subTest(city=city, distance=distance):
-                # Testing equivalence to within a meter (kilometer on SpatiaLite).
+                # Testing equivalence to within a meter (kilometer on
+                # SpatiaLite).
                 tol = -3 if connection.ops.spatialite else 0
                 self.assertAlmostEqual(distance, city.distance.m, tol)
 
@@ -588,7 +589,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
             with self.subTest(c=c):
                 self.assertAlmostEqual(spheroid_distances[i], c.distance.m, tol)
         if connection.ops.postgis or connection.ops.spatialite:
-            # PostGIS uses sphere-only distances by default, testing these as well.
+            # PostGIS uses sphere-only distances by default, testing these as
+            # well.
             qs = (
                 AustraliaCity.objects.exclude(id=hillsdale.id)
                 .annotate(distance=Distance("point", hillsdale.point))
@@ -663,7 +665,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
     @skipUnlessDBFeature("has_Distance_function", "has_Transform_function")
     def test_distance_transform(self):
         """
-        Test the `Distance` function used with `Transform` on a geographic field.
+        Test the `Distance` function used with `Transform` on a geographic
+        field.
         """
         # We'll be using a Polygon (created by buffering the centroid
         # of 77005 to 100m) -- which aren't allowed in geographic distance

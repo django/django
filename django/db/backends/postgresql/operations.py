@@ -221,8 +221,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return ["%s;" % " ".join(sql_parts)]
 
     def sequence_reset_by_name_sql(self, style, sequences):
-        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
-        # to reset sequence indices
+        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL
+        # statements to reset sequence indices
         sql = []
         for sequence_info in sequences:
             table_name = sequence_info["table"]

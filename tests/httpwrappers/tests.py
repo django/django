@@ -320,8 +320,8 @@ class HttpResponseTests(SimpleTestCase):
         self.assertEqual(r.headers["key"], "=?utf-8?b?4oCg?=")
         self.assertIn(b"=?utf-8?b?4oCg?=", r.serialize_headers())
 
-        # The response also converts string or bytes keys to strings, but requires
-        # them to contain ASCII
+        # The response also converts string or bytes keys to strings, but
+        # requires them to contain ASCII
         r = HttpResponse()
         del r.headers["Content-Type"]
         r.headers["foo"] = "bar"
@@ -350,8 +350,8 @@ class HttpResponseTests(SimpleTestCase):
         f = b"zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88"
         f = f.decode("utf-8")
         h.headers["Content-Disposition"] = 'attachment; filename="%s"' % f
-        # This one is triggering https://bugs.python.org/issue20747, that is Python
-        # will itself insert a newline in the header
+        # This one is triggering https://bugs.python.org/issue20747, that is
+        # Python will itself insert a newline in the header
         h.headers["Content-Disposition"] = (
             'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
         )

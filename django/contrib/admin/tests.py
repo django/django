@@ -218,9 +218,9 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
                 actual_values.append(option.get_attribute("value"))
             self.assertEqual(values, actual_values)
         else:
-            # Prevent the `find_elements(By.CSS_SELECTOR, …)` call from blocking
-            # if the selector doesn't match any options as we expect it
-            # to be the case.
+            # Prevent the `find_elements(By.CSS_SELECTOR, …)` call from
+            # blocking if the selector doesn't match any options as we expect
+            # it to be the case.
             with self.disable_implicit_wait():
                 self.wait_until(
                     lambda driver: not driver.find_elements(

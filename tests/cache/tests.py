@@ -156,7 +156,9 @@ class DummyCacheTests(SimpleTestCase):
         self.assertIsNone(cache.get("key2"))
 
     def test_has_key(self):
-        "The has_key method doesn't ever return True for the dummy cache backend"
+        """
+        The has_key method doesn't ever return True for the dummy cache backend
+        """
         cache.set("hello1", "goodbye1")
         self.assertIs(cache.has_key("hello1"), False)
         self.assertIs(cache.has_key("goodbye1"), False)
@@ -302,11 +304,10 @@ _caches_setting_base = {
 
 
 def caches_setting_for_tests(base=None, exclude=None, **params):
-    # `base` is used to pull in the memcached config from the original settings,
-    # `exclude` is a set of cache names denoting which `_caches_setting_base` keys
-    # should be omitted.
-    # `params` are test specific overrides and `_caches_settings_base` is the
-    # base config for the tests.
+    # `base` is used to pull in the memcached config from the original
+    # settings, `exclude` is a set of cache names denoting which
+    # `_caches_setting_base` keys should be omitted. `params` are test specific
+    # overrides and `_caches_settings_base` is the base config for the tests.
     # This results in the following search order:
     # params -> _caches_setting_base -> base
     base = base or {}
@@ -469,7 +470,8 @@ class BaseCacheTests:
         self.assertEqual(expensive_calculation.num_runs, 1)
 
     def test_cache_write_for_model_instance_with_deferred(self):
-        # Don't want fields with callable as default to be called on cache write
+        # Don't want fields with callable as default to be called on cache
+        # write
         expensive_calculation.num_runs = 0
         Poll.objects.all().delete()
         Poll.objects.create(question="What?")
@@ -493,7 +495,8 @@ class BaseCacheTests:
         self.assertEqual(expensive_calculation.num_runs, 1)
         runs_before_cache_read = expensive_calculation.num_runs
         cache.get("deferred_queryset")
-        # We only want the default expensive calculation run on creation and set
+        # We only want the default expensive calculation run on creation and
+        # set
         self.assertEqual(expensive_calculation.num_runs, runs_before_cache_read)
 
     def test_expiration(self):
@@ -1166,7 +1169,8 @@ class BaseCacheTests:
 @override_settings(
     CACHES=caches_setting_for_tests(
         BACKEND="django.core.cache.backends.db.DatabaseCache",
-        # Spaces are used in the table name to ensure quoting/escaping is working
+        # Spaces are used in the table name to ensure quoting/escaping is
+        # working
         LOCATION="test cache table",
     )
 )
@@ -1256,7 +1260,8 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
     @override_settings(
         CACHES=caches_setting_for_tests(
             BACKEND="django.core.cache.backends.db.DatabaseCache",
-            # Use another table name to avoid the 'table already exists' message.
+            # Use another table name to avoid the 'table already exists'
+            # message.
             LOCATION="createcachetable_dry_run_mode",
         )
     )
@@ -1409,7 +1414,9 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
 
     def test_incr_decr_timeout(self):
-        """incr/decr does not modify expiry time (matches memcached behavior)"""
+        """
+        incr/decr does not modify expiry time (matches memcached behavior)
+        """
         key = "value"
         _key = cache.make_key(key)
         cache.set(key, 1, timeout=cache.default_timeout * 10)
@@ -1560,9 +1567,9 @@ class BaseMemcachedTests(BaseCacheTests):
             self.assertEqual(cache.get("future_foo"), "bar")
 
     def test_memcached_deletes_key_on_failed_set(self):
-        # By default memcached allows objects up to 1MB. For the cache_db session
-        # backend to always use the current session, memcached needs to delete
-        # the old key if it fails to set.
+        # By default memcached allows objects up to 1MB. For the cache_db
+        # session backend to always use the current session, memcached needs to
+        # delete the old key if it fails to set.
         max_value_length = 2**20
 
         cache.set("small_value", "a")
@@ -1577,7 +1584,8 @@ class BaseMemcachedTests(BaseCacheTests):
             # deleted, so the return/exception behavior for the set() itself is
             # not important.
             pass
-        # small_value should be deleted, or set if configured to accept larger values
+        # small_value should be deleted, or set if configured to accept larger
+        # values
         value = cache.get("small_value")
         self.assertTrue(value is None or value == large_value)
 
@@ -2642,7 +2650,8 @@ class CacheMiddlewareTest(SimpleTestCase):
         response = default_view(request, "2")
         self.assertEqual(response.content, b"Hello World 1")
 
-        # Requesting the same view with the explicit cache should yield the same result
+        # Requesting the same view with the explicit cache should yield the
+        # same result
         response = explicit_default_view(request, "3")
         self.assertEqual(response.content, b"Hello World 1")
 

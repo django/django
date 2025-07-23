@@ -30,7 +30,8 @@ Example:
  >>> print(mpnt.proj)
  +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
  >>> print(mpnt)
- MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248 29.99979788655764)
+ MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248
+ 29.99979788655764)
 
  The OGRGeomType class is to make it easy to specify an OGR geometry type:
  >>> from django.contrib.gis.gdal import OGRGeomType
@@ -248,7 +249,10 @@ class OGRGeometry(GDALBase):
 
     @property
     def area(self):
-        "Return the area for a LinearRing, Polygon, or MultiPolygon; 0 otherwise."
+        """
+        Return the area for a LinearRing, Polygon, or MultiPolygon; 0
+        otherwise.
+        """
         return capi.get_area(self.ptr)
 
     @property
@@ -411,7 +415,8 @@ class OGRGeometry(GDALBase):
         else:
             byteorder = 0  # wkbXDR
         sz = self.wkb_size
-        # Creating the unsigned character buffer, and passing it in by reference.
+        # Creating the unsigned character buffer, and passing it in by
+        # reference.
         buf = (c_ubyte * sz)()
         # For backward compatibility, export old-style 99-402 extended
         # dimension types when geometry does not have an M dimension.
@@ -483,8 +488,8 @@ class OGRGeometry(GDALBase):
 
     # #### Topology Methods ####
     def _topology(self, func, other):
-        """A generalized function for topology operations, takes a GDAL function and
-        the other geometry to perform the operation on."""
+        """A generalized function for topology operations, takes a GDAL
+        function and the other geometry to perform the operation on."""
         if not isinstance(other, OGRGeometry):
             raise TypeError(
                 "Must use another OGRGeometry object for topology operations!"

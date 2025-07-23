@@ -281,7 +281,8 @@ class SimpleTestCase(unittest.TestCase):
                 # Dynamically created connections are always allowed.
                 and self.alias in connections
             ):
-                # Connection has not yet been established, but the alias is not allowed.
+                # Connection has not yet been established, but the alias is not
+                # allowed.
                 message = cls._disallowed_database_msg % {
                     "test": f"{cls.__module__}.{cls.__qualname__}",
                     "alias": self.alias,
@@ -1231,9 +1232,9 @@ class TransactionTestCase(SimpleTestCase):
             if self._should_reload_connections():
                 # Some DB cursors include SQL statements as part of cursor
                 # creation. If you have a test that does a rollback, the effect
-                # of these statements is lost, which can affect the operation of
-                # tests (e.g., losing a timezone setting causing objects to be
-                # created with the wrong time). To make sure this doesn't
+                # of these statements is lost, which can affect the operation
+                # of tests (e.g., losing a timezone setting causing objects to
+                # be created with the wrong time). To make sure this doesn't
                 # happen, get a clean connection at the start of every test.
                 for conn in connections.all(initialized_only=True):
                     conn.close()
@@ -1783,9 +1784,9 @@ class LiveServerTestCase(TransactionTestCase):
     framework, such as Selenium for example, instead of the built-in dummy
     client.
     It inherits from TransactionTestCase instead of TestCase because the
-    threads don't share the same transactions (unless if using in-memory sqlite)
-    and each thread needs to commit all their transactions so that the other
-    thread can see the changes.
+    threads don't share the same transactions (unless if using in-memory
+    sqlite) and each thread needs to commit all their transactions so that the
+    other thread can see the changes.
     """
 
     host = "localhost"

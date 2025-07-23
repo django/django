@@ -353,10 +353,10 @@ class StringAgg(Aggregate):
         extra_context["template"] = template
 
         c = self.copy()
-        # The creation of the delimiter SQL and the ordering of the parameters must be
-        # handled explicitly, as MySQL puts the delimiter at the end of the aggregate
-        # using the `SEPARATOR` declaration (rather than treating as an expression like
-        # other database backends).
+        # The creation of the delimiter SQL and the ordering of the parameters
+        # must be handled explicitly, as MySQL puts the delimiter at the end of
+        # the aggregate using the `SEPARATOR` declaration (rather than treating
+        # as an expression like other database backends).
         delimiter_params = []
         if c.delimiter:
             delimiter_sql, delimiter_params = compiler.compile(c.delimiter)

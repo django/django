@@ -424,9 +424,9 @@ class RequestsTests(SimpleTestCase):
         """
         Reading body after parsing multipart/form-data is not allowed
         """
-        # Because multipart is used for large amounts of data i.e. file uploads,
-        # we don't want the data held in memory twice, and we don't want to
-        # silence the error by setting body = '' either.
+        # Because multipart is used for large amounts of data i.e. file
+        # uploads, we don't want the data held in memory twice, and we don't
+        # want to silence the error by setting body = '' either.
         payload = FakePayload(
             "\r\n".join(
                 [
@@ -881,7 +881,8 @@ class RequestsTests(SimpleTestCase):
     def test_POST_after_body_read_and_stream_read_multipart(self):
         """
         POST should be populated even if body is read first, and then
-        the stream is read second. Using multipart/form-data instead of urlencoded.
+        the stream is read second. Using multipart/form-data instead of
+        urlencoded.
         """
         payload = FakePayload(
             "\r\n".join(

@@ -677,7 +677,8 @@ class SchemaTests(TransactionTestCase):
 
     def test_add_field_remove_field(self):
         """
-        Adding a field and removing it removes all deferred sql referring to it.
+        Adding a field and removing it removes all deferred sql referring to
+        it.
         """
         with connection.schema_editor() as editor:
             # Create a table with a unique constraint on the slug field.
@@ -762,7 +763,8 @@ class SchemaTests(TransactionTestCase):
         # Add some rows of data
         Author.objects.create(name="Andrew", height=30)
         Author.objects.create(name="Andrea")
-        # Add the field with a default it needs to cast (to string in this case)
+        # Add the field with a default it needs to cast (to string in this
+        # case)
         new_field = TestTransformField(default={1: 2})
         new_field.set_attributes_from_name("thing")
         with connection.schema_editor() as editor:
@@ -1317,7 +1319,8 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter_null_to_not_null(self):
         """
-        #23609 - Tests handling of default values when altering from NULL to NOT NULL.
+        #23609 - Tests handling of default values when altering from NULL to
+        NOT NULL.
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -3642,8 +3645,8 @@ class SchemaTests(TransactionTestCase):
 
     @skipIfDBFeature("supports_expression_indexes")
     def test_func_unique_constraint_unsupported(self):
-        # UniqueConstraint is ignored on databases that don't support indexes on
-        # expressions.
+        # UniqueConstraint is ignored on databases that don't support indexes
+        # on expressions.
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         constraint = UniqueConstraint(F("name"), name="func_name_uq")
@@ -4530,7 +4533,8 @@ class SchemaTests(TransactionTestCase):
 
     def test_remove_constraints_capital_letters(self):
         """
-        #23065 - Constraint names must be quoted if they contain capital letters.
+        #23065 - Constraint names must be quoted if they contain capital
+        letters.
         """
 
         def get_field(*args, field_class=IntegerField, **kwargs):
@@ -4622,7 +4626,8 @@ class SchemaTests(TransactionTestCase):
         self.assertNotIn("surname", columns)
         # Create a row
         Author.objects.create(name="Anonymous1")
-        # Add new CharField to ensure default will be used from effective_default
+        # Add new CharField to ensure default will be used from
+        # effective_default
         new_field = CharField(max_length=15, blank=True)
         new_field.set_attributes_from_name("surname")
         with connection.schema_editor() as editor:
@@ -5175,7 +5180,8 @@ class SchemaTests(TransactionTestCase):
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
             ["schema_book_title_2dfb2dff_like", "schema_book_title_2dfb2dff_uniq"],
         )
-        # Alter to remove both unique=True and db_index=True (should drop all indexes)
+        # Alter to remove both unique=True and db_index=True (should drop all
+        # indexes)
         new_field2 = CharField(max_length=100)
         new_field2.set_attributes_from_name("title")
         with connection.schema_editor() as editor:
@@ -5193,7 +5199,8 @@ class SchemaTests(TransactionTestCase):
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
             ["schema_book_title_2dfb2dff", "schema_book_title_2dfb2dff_like"],
         )
-        # Alter to set unique=True and remove db_index=True (should replace the index)
+        # Alter to set unique=True and remove db_index=True (should replace the
+        # index)
         old_field = BookWithoutAuthor._meta.get_field("title")
         new_field = CharField(max_length=100, unique=True)
         new_field.set_attributes_from_name("title")
@@ -5203,7 +5210,8 @@ class SchemaTests(TransactionTestCase):
             self.get_constraints_for_column(BookWithoutAuthor, "title"),
             ["schema_book_title_2dfb2dff_like", "schema_book_title_2dfb2dff_uniq"],
         )
-        # Alter to set db_index=True and remove unique=True (should restore index)
+        # Alter to set db_index=True and remove unique=True (should restore
+        # index)
         new_field2 = CharField(max_length=100, db_index=True)
         new_field2.set_attributes_from_name("title")
         with connection.schema_editor() as editor:

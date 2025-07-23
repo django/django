@@ -493,10 +493,10 @@ class Model(AltersData, metaclass=ModelBase):
         # Set up the storage for instance state
         self._state = ModelState()
 
-        # There is a rather weird disparity here; if kwargs, it's set, then args
-        # overrides it. It should be one or the other; don't duplicate the work
-        # The reason for the kwargs check is that standard iterator passes in by
-        # args, and instantiation for iteration is 33% faster.
+        # There is a rather weird disparity here; if kwargs, it's set, then
+        # args overrides it. It should be one or the other; don't duplicate the
+        # work The reason for the kwargs check is that standard iterator passes
+        # in by args, and instantiation for iteration is 33% faster.
         if len(args) > len(opts.concrete_fields):
             # Daft, but matches old exception sans the err msg.
             raise IndexError("Number of args exceeds number of fields")
@@ -504,9 +504,9 @@ class Model(AltersData, metaclass=ModelBase):
         if not kwargs:
             fields_iter = iter(opts.concrete_fields)
             # The ordering of the zip calls matter - zip throws StopIteration
-            # when an iter throws it. So if the first iter throws it, the second
-            # is *not* consumed. We rely on this, so don't change the order
-            # without changing the logic.
+            # when an iter throws it. So if the first iter throws it, the
+            # second is *not* consumed. We rely on this, so don't change the
+            # order without changing the logic.
             for val, field in zip(args, fields_iter):
                 if val is _DEFERRED:
                     continue
@@ -540,7 +540,8 @@ class Model(AltersData, metaclass=ModelBase):
                         is_related_object = True
                     except KeyError:
                         try:
-                            # Object instance wasn't passed in -- must be an ID.
+                            # Object instance wasn't passed in -- must be an
+                            # ID.
                             val = kwargs.pop(field.attname)
                         except KeyError:
                             val = field.get_default()
@@ -1079,7 +1080,8 @@ class Model(AltersData, metaclass=ModelBase):
             and all(f.has_default() or f.has_db_default() for f in meta.pk_fields)
         ):
             force_insert = True
-        # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
+        # If possible, try an UPDATE. If that doesn't update anything, do an
+        # INSERT.
         if pk_set and not force_insert:
             base_qs = cls._base_manager.using(using)
             values = [
@@ -1142,21 +1144,22 @@ class Model(AltersData, metaclass=ModelBase):
         if not values:
             # We can end up here when saving a model in inheritance chain where
             # update_fields doesn't target any field in current model. In that
-            # case we just say the update succeeded. Another case ending up here
-            # is a model with just PK - in that case check that the PK still
-            # exists.
+            # case we just say the update succeeded. Another case ending up
+            # here is a model with just PK - in that case check that the PK
+            # still exists.
             return update_fields is not None or filtered.exists()
         if self._meta.select_on_save and not forced_update:
             return (
                 filtered.exists()
                 and
-                # It may happen that the object is deleted from the DB right after
-                # this check, causing the subsequent UPDATE to return zero matching
-                # rows. The same result can occur in some rare cases when the
-                # database returns zero despite the UPDATE being executed
-                # successfully (a row is matched and updated). In order to
-                # distinguish these two cases, the object's existence in the
-                # database is again checked for if the UPDATE query returns 0.
+                # It may happen that the object is deleted from the DB right
+                # after this check, causing the subsequent UPDATE to return
+                # zero matching rows. The same result can occur in some rare
+                # cases when the database returns zero despite the UPDATE being
+                # executed successfully (a row is matched and updated). In
+                # order to distinguish these two cases, the object's existence
+                # in the database is again checked for if the UPDATE query
+                # returns 0.
                 (filtered._update(values) > 0 or filtered.exists())
             )
         return filtered._update(values) > 0
@@ -1347,7 +1350,8 @@ class Model(AltersData, metaclass=ModelBase):
         Hook for doing any extra model-wide validation after clean() has been
         called on every field by self.clean_fields. Any ValidationError raised
         by this method will not be associated with a particular field; it will
-        have a special-case association with the field defined by NON_FIELD_ERRORS.
+        have a special-case association with the field defined by
+        NON_FIELD_ERRORS.
         """
         pass
 
@@ -1878,7 +1882,9 @@ class Model(AltersData, metaclass=ModelBase):
 
     @classmethod
     def _check_m2m_through_same_relationship(cls):
-        """Check if no relationship model is used by more than one m2m field."""
+        """
+        Check if no relationship model is used by more than one m2m field.
+        """
 
         errors = []
         seen_intermediary_signatures = []
@@ -2003,7 +2009,8 @@ class Model(AltersData, metaclass=ModelBase):
 
     @classmethod
     def _check_column_name_clashes(cls):
-        # Store a list of column names which have already been used by other fields.
+        # Store a list of column names which have already been used by other
+        # fields.
         used_column_names = []
         errors = []
 

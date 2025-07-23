@@ -76,9 +76,10 @@ class GEOSGeometryBase(GEOSBase):
 
     def __deepcopy__(self, memodict):
         """
-        The `deepcopy` routine is used by the `Node` class of django.utils.tree;
-        thus, the protocol routine needs to be implemented to return correct
-        copies (clones) of these GEOS objects, which use C pointers.
+        The `deepcopy` routine is used by the `Node` class of
+        django.utils.tree; thus, the protocol routine needs to be implemented
+        to return correct copies (clones) of these GEOS objects, which use C
+        pointers.
         """
         return self.clone()
 
@@ -343,7 +344,8 @@ class GEOSGeometryBase(GEOSBase):
     def overlaps(self, other):
         """
         Return true if the DE-9IM intersection matrix for the two Geometries
-        is T*T***T** (for two points or two surfaces) 1*T***T** (for two curves).
+        is T*T***T** (for two points or two surfaces) 1*T***T** (for two
+        curves).
         """
         return capi.geos_overlaps(self.ptr, other.ptr)
 
@@ -542,9 +544,9 @@ class GEOSGeometryBase(GEOSBase):
         """
         Return a geometry that represents all points whose distance from this
         Geometry is less than or equal to distance. Calculations are in the
-        Spatial Reference System of this Geometry. The optional third parameter sets
-        the number of segment used to approximate a quarter circle (defaults to 8).
-        (Text from PostGIS documentation at ch. 6.1.3)
+        Spatial Reference System of this Geometry. The optional third parameter
+        sets the number of segment used to approximate a quarter circle
+        (defaults to 8). (Text from PostGIS documentation at ch. 6.1.3)
         """
         return self._topology(capi.geos_buffer(self.ptr, width, quadsegs))
 
@@ -567,9 +569,9 @@ class GEOSGeometryBase(GEOSBase):
     @property
     def centroid(self):
         """
-        The centroid is equal to the centroid of the set of component Geometries
-        of highest dimension (since the lower-dimension geometries contribute zero
-        "weight" to the centroid).
+        The centroid is equal to the centroid of the set of component
+        Geometries of highest dimension (since the lower-dimension geometries
+        contribute zero "weight" to the centroid).
         """
         return self._topology(capi.geos_centroid(self.ptr))
 
@@ -594,7 +596,10 @@ class GEOSGeometryBase(GEOSBase):
         return self._topology(capi.geos_envelope(self.ptr))
 
     def intersection(self, other):
-        "Return a Geometry representing the points shared by this Geometry and other."
+        """
+        Return a Geometry representing the points shared by this Geometry and
+        other.
+        """
         return self._topology(capi.geos_intersection(self.ptr, other.ptr))
 
     @property
@@ -603,7 +608,9 @@ class GEOSGeometryBase(GEOSBase):
         return self._topology(capi.geos_pointonsurface(self.ptr))
 
     def relate(self, other):
-        "Return the DE-9IM intersection matrix for this Geometry and the other."
+        """
+        Return the DE-9IM intersection matrix for this Geometry and the other.
+        """
         return capi.geos_relate(self.ptr, other.ptr).decode()
 
     def simplify(self, tolerance=0.0, preserve_topology=False):
@@ -636,7 +643,10 @@ class GEOSGeometryBase(GEOSBase):
         return self._topology(capi.geos_unary_union(self.ptr))
 
     def union(self, other):
-        "Return a Geometry representing all the points in this Geometry and other."
+        """
+        Return a Geometry representing all the points in this Geometry and
+        other.
+        """
         return self._topology(capi.geos_union(self.ptr, other.ptr))
 
     # #### Other Routines ####

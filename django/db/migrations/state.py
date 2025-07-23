@@ -73,9 +73,10 @@ def get_related_models_recursive(model):
 
     Relationships are either defined by explicit relational fields, like
     ForeignKey, ManyToManyField or OneToOneField, or by inheriting from another
-    model (a superclass is related to its subclasses, but not vice versa). Note,
-    however, that a model inheriting from a concrete model is also related to
-    its superclass through the implicit *_ptr OneToOneField on the subclass.
+    model (a superclass is related to its subclasses, but not vice versa).
+    Note, however, that a model inheriting from a concrete model is also
+    related to its superclass through the implicit *_ptr OneToOneField on the
+    subclass.
     """
     seen = set()
     queue = _get_related_models(model)

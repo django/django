@@ -127,7 +127,9 @@ class FunctionalTests(SimpleTestCase):
             self.assertCachedPropertyWorks(attr, Class)
 
     def test_cached_property_reuse_different_names(self):
-        """Disallow this case because the decorated function wouldn't be cached."""
+        """
+        Disallow this case because the decorated function wouldn't be cached.
+        """
         type_msg = (
             "Cannot assign the same cached_property to two different names ('a' and "
             "'b')."

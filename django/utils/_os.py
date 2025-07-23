@@ -22,7 +22,8 @@ def safe_join(base, *paths):
     #  a) The next character is the path separator (to prevent conditions like
     #     safe_join("/dir", "/../d"))
     #  b) The final path must be the same as the base path.
-    #  c) The base path must be the most root path (meaning either "/" or "C:\\")
+    #  c) The base path must be the most root path (meaning either "/" or
+    #     "C:\\")
     if (
         not normcase(final_path).startswith(normcase(base_path + sep))
         and normcase(final_path) != normcase(base_path)

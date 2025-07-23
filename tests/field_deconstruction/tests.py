@@ -333,7 +333,8 @@ class FieldDeconstructionTests(SimpleTestCase):
     def test_foreign_key_swapped(self):
         with isolate_lru_cache(apps.get_swappable_settings_name):
             # It doesn't matter that we swapped out user for permission;
-            # there's no validation. We just want to check the setting stuff works.
+            # there's no validation. We just want to check the setting stuff
+            # works.
             field = models.ForeignKey("auth.Permission", models.CASCADE)
             name, path, args, kwargs = field.deconstruct()
 
@@ -570,7 +571,8 @@ class FieldDeconstructionTests(SimpleTestCase):
     def test_many_to_many_field_swapped(self):
         with isolate_lru_cache(apps.get_swappable_settings_name):
             # It doesn't matter that we swapped out user for permission;
-            # there's no validation. We just want to check the setting stuff works.
+            # there's no validation. We just want to check the setting stuff
+            # works.
             field = models.ManyToManyField("auth.Permission")
             name, path, args, kwargs = field.deconstruct()
 

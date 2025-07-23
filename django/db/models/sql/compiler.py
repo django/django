@@ -52,10 +52,11 @@ class SQLCompiler:
         # they would return an empty result set.
         self.elide_empty = elide_empty
         self.quote_cache = {"*": "*"}
-        # The select, klass_info, and annotations are needed by QuerySet.iterator()
-        # these are set as a side-effect of executing the query. Note that we calculate
-        # separately a list of extra select columns needed for grammatical correctness
-        # of the query, but these columns are not included in self.select.
+        # The select, klass_info, and annotations are needed by
+        # QuerySet.iterator() these are set as a side-effect of executing the
+        # query. Note that we calculate separately a list of extra select
+        # columns needed for grammatical correctness of the query, but these
+        # columns are not included in self.select.
         self.select = None
         self.annotation_col_map = None
         self.klass_info = None
@@ -946,9 +947,9 @@ class SQLCompiler:
                 # If the query is used as a subquery, the extra selects would
                 # result in more columns than the left-hand side expression is
                 # expecting. This can happen when a subquery uses a combination
-                # of order_by() and distinct(), forcing the ordering expressions
-                # to be selected as well. Wrap the query in another subquery
-                # to exclude extraneous selects.
+                # of order_by() and distinct(), forcing the ordering
+                # expressions to be selected as well. Wrap the query in another
+                # subquery to exclude extraneous selects.
                 sub_selects = []
                 sub_params = []
                 for index, (select, _, alias) in enumerate(self.select, start=1):
@@ -2107,8 +2108,8 @@ class SQLUpdateCompiler(SQLCompiler):
             # If the result_type is NO_RESULTS then the aux_row_count is None.
             aux_row_count = query.get_compiler(self.using).execute_sql(result_type)
             if is_empty and aux_row_count:
-                # Returns the row count for any related updates as the number of
-                # rows updated.
+                # Returns the row count for any related updates as the number
+                # of rows updated.
                 row_count = aux_row_count
                 is_empty = False
         return row_count

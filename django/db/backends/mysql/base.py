@@ -22,7 +22,8 @@ except ImportError as err:
 from MySQLdb.constants import CLIENT, FIELD_TYPE
 from MySQLdb.converters import conversions
 
-# Some of these import MySQLdb, so import them after checking if it's installed.
+# Some of these import MySQLdb, so import them after checking if it's
+# installed.
 from .client import DatabaseClient
 from .creation import DatabaseCreation
 from .features import DatabaseFeatures
@@ -57,7 +58,8 @@ class CursorWrapper:
     exception instances and reraises them with the correct types.
 
     Implemented as a wrapper, rather than a subclass, so that it isn't stuck
-    to the particular underlying representation returned by Connection.cursor().
+    to the particular underlying representation returned by
+    Connection.cursor().
     """
 
     codes_for_integrityerror = (
@@ -101,9 +103,10 @@ class CursorWrapper:
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "mysql"
     # This dictionary maps Field objects to their associated MySQL column
-    # types, as strings. Column-type strings can contain format strings; they'll
-    # be interpolated against the values of Field.__dict__ before being output.
-    # If a column type is set to None, it won't be included in the output.
+    # types, as strings. Column-type strings can contain format strings;
+    # they'll be interpolated against the values of Field.__dict__ before being
+    # output. If a column type is set to None, it won't be included in the
+    # output.
 
     _data_types = {
         "AutoField": "integer AUTO_INCREMENT",
@@ -175,13 +178,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
-    # the right-hand side of the lookup isn't a raw string (it might be an expression
-    # or the result of a bilateral transformation).
-    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
-    # escaped on database side.
+    # the right-hand side of the lookup isn't a raw string (it might be an
+    # expression or the result of a bilateral transformation). In those cases,
+    # special characters for LIKE operators (e.g. \, *, _) should be escaped on
+    # database side.
     #
-    # Note: we use str.format() here for readability as '%' is used as a wildcard for
-    # the LIKE operator.
+    # Note: we use str.format() here for readability as '%' is used as a
+    # wildcard for the LIKE operator.
     pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\\', '\\\\'), '%%', '\%%'), '_', '\_')"
     pattern_ops = {
         "contains": "LIKE BINARY CONCAT('%%', {}, '%%')",

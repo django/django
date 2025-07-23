@@ -439,8 +439,8 @@ class TestCollectionDryRunManifestStaticFilesStorage(TestCollectionDryRun):
 class TestCollectionFilesOverride(CollectionTestCase):
     """
     Test overriding duplicated files by ``collectstatic`` management command.
-    Check for proper handling of apps order in installed apps even if file modification
-    dates are in different order:
+    Check for proper handling of apps order in installed apps even if file
+    modification dates are in different order:
         'staticfiles_test_app',
         'staticfiles_tests.apps.no_label',
     """
@@ -457,9 +457,9 @@ class TestCollectionFilesOverride(CollectionTestCase):
         self.orig_atime = os.path.getatime(self.orig_path)
 
         # prepare duplicate of file2.txt from a temporary app
-        # this file will have modification time older than no_label/static/file2.txt
-        # anyway it should be taken to STATIC_ROOT because the temporary app is before
-        # 'no_label' app in installed apps
+        # this file will have modification time older than
+        # no_label/static/file2.txt anyway it should be taken to STATIC_ROOT
+        # because the temporary app is before 'no_label' app in installed apps
         self.temp_app_path = os.path.join(self.temp_dir, "staticfiles_test_app")
         self.testfile_path = os.path.join(self.temp_app_path, "static", "file2.txt")
 

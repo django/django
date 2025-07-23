@@ -1,10 +1,12 @@
 # Django documentation build configuration file, created by
 # sphinx-quickstart on Thu Mar 27 09:06:53 2008.
 #
-# This file is execfile()d with the current directory set to its containing dir.
+# This file is execfile()d with the current directory set to its containing
+# dir.
 #
 # The contents of this file are pickled, so don't put values in the namespace
-# that aren't picklable (module imports are okay, they're removed automatically).
+# that aren't picklable (module imports are okay, they're removed
+# automatically).
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
@@ -40,8 +42,8 @@ import github_links  # NOQA
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "4.5.0"
 
-# Add any Sphinx extension module names here, as strings. They can be extensions
-# coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     "djangodocs",
     "sphinx.ext.extlinks",
@@ -79,7 +81,8 @@ linkcheck_ignore = [
 ]
 
 # Spelling check needs an additional module that is not installed by default.
-# Add it only if spelling check is requested so docs can be generated without it.
+# Add it only if spelling check is requested so docs can be generated without
+# it.
 if "spelling" in sys.argv:
     extensions.append("sphinxcontrib.spelling")
 
@@ -165,7 +168,8 @@ today_fmt = "%B %d, %Y"
 # directories to ignore when looking for source files.
 exclude_patterns = ["_build", "_theme", "requirements.txt"]
 
-# The reST default role (used for this markup: `text`) to use for all documents.
+# The reST default role (used for this markup: `text`) to use for all
+# documents.
 default_role = "default-role-error"
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -387,10 +391,10 @@ epub_copyright = copyright
 # The basename for the epub file. It defaults to the project name.
 # epub_basename = 'Django'
 
-# The HTML theme for the epub output. Since the default themes are not optimized
-# for small screen space, using the same theme for HTML and epub output is
-# usually not wise. This defaults to 'epub', a theme designed to save visual
-# space.
+# The HTML theme for the epub output. Since the default themes are not
+# optimized for small screen space, using the same theme for HTML and epub
+# output is usually not wise. This defaults to 'epub', a theme designed to save
+# visual space.
 epub_theme = "djangodocs-epub"
 
 # The language of the text. It defaults to the language option

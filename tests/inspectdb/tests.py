@@ -300,7 +300,9 @@ class InspectDBTestCase(TestCase):
         )
 
     def test_digits_column_name_introspection(self):
-        """Introspection of column names consist/start with digits (#16536/#17676)"""
+        """
+        Introspection of column names consist/start with digits (#16536/#17676)
+        """
         char_field_type = connection.features.introspected_field_types["CharField"]
         out = StringIO()
         call_command("inspectdb", "inspectdb_digitsincolumnname", stdout=out)

@@ -10,9 +10,9 @@ def get_callable(lookup_view):
     """
     Return a callable corresponding to lookup_view.
     * If lookup_view is already a callable, return it.
-    * If lookup_view is a string import path that can be resolved to a callable,
-      import that callable and return it, otherwise raise an exception
-      (ImportError or ViewDoesNotExist).
+    * If lookup_view is a string import path that can be resolved to a
+      callable, import that callable and return it, otherwise raise an
+      exception (ImportError or ViewDoesNotExist).
     """
     if callable(lookup_view):
         return lookup_view

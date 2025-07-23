@@ -250,7 +250,8 @@ class Deserializer(base.Deserializer):
                 continue
             field = Model._meta.get_field(field_name)
 
-            # As is usually the case, relation fields get the special treatment.
+            # As is usually the case, relation fields get the special
+            # treatment.
             if field.remote_field and isinstance(
                 field.remote_field, models.ManyToManyRel
             ):
@@ -303,7 +304,8 @@ class Deserializer(base.Deserializer):
             if hasattr(model._default_manager, "get_by_natural_key"):
                 keys = node.getElementsByTagName("natural")
                 if keys:
-                    # If there are 'natural' subelements, it must be a natural key
+                    # If there are 'natural' subelements, it must be a natural
+                    # key
                     field_value = [getInnerText(k).strip() for k in keys]
                     try:
                         obj = model._default_manager.db_manager(
@@ -343,7 +345,8 @@ class Deserializer(base.Deserializer):
             def m2m_convert(n):
                 keys = n.getElementsByTagName("natural")
                 if keys:
-                    # If there are 'natural' subelements, it must be a natural key
+                    # If there are 'natural' subelements, it must be a natural
+                    # key
                     field_value = [getInnerText(k).strip() for k in keys]
                     obj_pk = (
                         default_manager.db_manager(self.db)
@@ -394,7 +397,8 @@ class Deserializer(base.Deserializer):
 
 def getInnerText(node):
     """Get all the inner text of a DOM node (recursively)."""
-    # inspired by https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
+    # inspired by
+    # https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     inner_text = []
     for child in node.childNodes:
         if (

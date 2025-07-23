@@ -110,7 +110,8 @@ srlist = (
             (("projcs", 11), "AXIS"),
         ),
     ),
-    # This is really ESRI format, not WKT -- but the import should work the same
+    # This is really ESRI format, not WKT -- but the import should work the
+    # same
     TestSRS(
         'LOCAL_CS["Non-Earth (Meter)",LOCAL_DATUM["Local Datum",32767],'
         'UNIT["Meter",1],AXIS["X",EAST],AXIS["Y",NORTH]]',

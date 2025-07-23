@@ -205,7 +205,8 @@ class SettingsTests(SimpleTestCase):
             getattr(settings, "TEST")
 
     def test_class_decorator(self):
-        # SimpleTestCase can be decorated by override_settings, but not ut.TestCase
+        # SimpleTestCase can be decorated by override_settings, but not
+        # ut.TestCase
         class SimpleTestCaseSubclass(SimpleTestCase):
             pass
 
@@ -467,7 +468,8 @@ class IsOverriddenTest(SimpleTestCase):
 class TestListSettings(SimpleTestCase):
     """
     Make sure settings that should be lists or tuples throw
-    ImproperlyConfigured if they are set to a string instead of a list or tuple.
+    ImproperlyConfigured if they are set to a string instead of a list or
+    tuple.
     """
 
     list_or_tuple_settings = (

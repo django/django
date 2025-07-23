@@ -1293,7 +1293,9 @@ class WindowFunctionTests(TestCase):
         )
 
     def test_range_unbound(self):
-        """A query with RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING."""
+        """
+        A query with RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING.
+        """
         qs = Employee.objects.annotate(
             sum=Window(
                 expression=Sum("salary"),

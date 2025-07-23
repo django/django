@@ -136,8 +136,8 @@ class Queries1Tests(TestCase):
         ann2 = Annotation.objects.create(name="a2", tag=cls.t4)
         ann2.notes.add(cls.n2, cls.n3)
 
-        # Create these out of order so that sorting by 'id' will be different to sorting
-        # by 'info'. Helps detect some problems later.
+        # Create these out of order so that sorting by 'id' will be different
+        # to sorting by 'info'. Helps detect some problems later.
         cls.e2 = ExtraInfo.objects.create(
             info="e2", note=cls.n2, value=41, filterable=False
         )
@@ -176,8 +176,8 @@ class Queries1Tests(TestCase):
         cls.r2 = Report.objects.create(name="r2", creator=cls.a3)
         cls.r3 = Report.objects.create(name="r3")
 
-        # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
-        # will be rank3, rank2, rank1.
+        # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the
+        # Meta.ordering will be rank3, rank2, rank1.
         cls.rank1 = Ranking.objects.create(rank=2, author=cls.a2)
 
         cls.c1 = Cover.objects.create(title="first", item=cls.i4)
@@ -240,9 +240,9 @@ class Queries1Tests(TestCase):
             [self.i1],
         )
 
-        # Each filter call is processed "at once" against a single table, so this is
-        # different from the previous example as it tries to find tags that are two
-        # things at once (rather than two tags).
+        # Each filter call is processed "at once" against a single table, so
+        # this is different from the previous example as it tries to find tags
+        # that are two things at once (rather than two tags).
         self.assertSequenceEqual(
             Item.objects.filter(Q(tags=self.t1) & Q(tags=self.t2)), []
         )
@@ -306,16 +306,17 @@ class Queries1Tests(TestCase):
         )
 
     def test_ticket6074(self):
-        # Merging two empty result sets shouldn't leave a queryset with no constraints
-        # (which would match everything).
+        # Merging two empty result sets shouldn't leave a queryset with no
+        # constraints (which would match everything).
         self.assertSequenceEqual(Author.objects.filter(Q(id__in=[])), [])
         self.assertSequenceEqual(Author.objects.filter(Q(id__in=[]) | Q(id__in=[])), [])
 
     def test_tickets_1878_2939(self):
         self.assertEqual(Item.objects.values("creator").distinct().count(), 3)
 
-        # Create something with a duplicate 'name' so that we can test multi-column
-        # cases (which require some tricky SQL transformations under the covers).
+        # Create something with a duplicate 'name' so that we can test
+        # multi-column cases (which require some tricky SQL transformations
+        # under the covers).
         xx = Item(name="four", created=self.time1, creator=self.a2, note=self.n1)
         xx.save()
         self.assertEqual(
@@ -491,7 +492,8 @@ class Queries1Tests(TestCase):
             [self.i3],
         )
 
-        # Excluding from a relation that cannot be NULL should not use outer joins.
+        # Excluding from a relation that cannot be NULL should not use outer
+        # joins.
         query = Item.objects.exclude(creator__in=[self.a1, self.a2]).query
         self.assertNotIn(LOUTER, [x.join_type for x in query.alias_map.values()])
 
@@ -586,8 +588,8 @@ class Queries1Tests(TestCase):
         )
 
     def test_heterogeneous_qs_combination(self):
-        # Combining querysets built on different models should behave in a well-defined
-        # fashion. We raise an error.
+        # Combining querysets built on different models should behave in a
+        # well-defined fashion. We raise an error.
         msg = "Cannot combine queries on two different base models."
         with self.assertRaisesMessage(TypeError, msg):
             Author.objects.all() & Tag.objects.all()
@@ -641,8 +643,8 @@ class Queries1Tests(TestCase):
         # case, Cover is ordered by Item's default, which uses Note's default).
         self.assertSequenceEqual(Cover.objects.all(), [self.c1, self.c2])
 
-        # If the remote model does not have a default ordering, we order by its 'id'
-        # field.
+        # If the remote model does not have a default ordering, we order by its
+        # 'id' field.
         self.assertSequenceEqual(
             Item.objects.order_by("creator", "name"),
             [self.i1, self.i3, self.i2, self.i4],
@@ -1139,7 +1141,8 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 0)
         self.assertEqual(str(q.query).count("INNER JOIN"), 1)
 
-        # Querying without isnull should not convert anything to left outer join.
+        # Querying without isnull should not convert anything to left outer
+        # join.
         q = Tag.objects.filter(parent__parent=self.t1)
         self.assertSequenceEqual(q, [self.t4, self.t5])
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 0)
@@ -1173,7 +1176,8 @@ class Queries1Tests(TestCase):
         self.assertNotIn("INNER JOIN", str(q.query))
 
     def test_ticket_10790_5(self):
-        # Querying with isnull=False across m2m field should not create outer joins
+        # Querying with isnull=False across m2m field should not create outer
+        # joins
         q = Author.objects.filter(item__tags__isnull=False)
         self.assertSequenceEqual(q, [self.a1, self.a1, self.a2, self.a2, self.a4])
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 0)
@@ -1190,8 +1194,8 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("INNER JOIN"), 4)
 
     def test_ticket_10790_6(self):
-        # Querying with isnull=True across m2m field should not create inner joins
-        # and strip last outer join
+        # Querying with isnull=True across m2m field should not create inner
+        # joins and strip last outer join
         q = Author.objects.filter(item__tags__parent__parent__isnull=True)
         self.assertSequenceEqual(
             q,
@@ -1218,7 +1222,8 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("INNER JOIN"), 1)
 
     def test_ticket_10790_8(self):
-        # Querying with combined q-objects should also strip the left outer join
+        # Querying with combined q-objects should also strip the left outer
+        # join
         q = Tag.objects.filter(Q(parent__isnull=True) | Q(parent=self.t1))
         self.assertSequenceEqual(q, [self.t1, self.t2, self.t3])
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 0)
@@ -1656,14 +1661,15 @@ class Queries4Tests(TestCase):
         self.assertEqual(obj.person.details.data, "d2")
 
     def test_order_by_resetting(self):
-        # Calling order_by() with no parameters removes any existing ordering on the
-        # model. But it should still be possible to add new ordering after that.
+        # Calling order_by() with no parameters removes any existing ordering
+        # on the model. But it should still be possible to add new ordering
+        # after that.
         qs = Author.objects.order_by().order_by("name")
         self.assertIn("ORDER BY", qs.query.get_compiler(qs.db).as_sql()[0])
 
     def test_order_by_reverse_fk(self):
-        # It is possible to order by reverse of foreign key, although that can lead
-        # to duplicate results.
+        # It is possible to order by reverse of foreign key, although that can
+        # lead to duplicate results.
         c1 = SimpleCategory.objects.create(name="category1")
         c2 = SimpleCategory.objects.create(name="category2")
         CategoryItem.objects.create(category=c1)
@@ -2051,8 +2057,8 @@ class DisjunctiveFilterTests(TestCase):
     def test_ticket7872(self):
         # Another variation on the disjunctive filtering theme.
 
-        # For the purposes of this regression test, it's important that there is no
-        # Join object related to the LeafA we create.
+        # For the purposes of this regression test, it's important that there
+        # is no Join object related to the LeafA we create.
         l1 = LeafA.objects.create(data="first")
         self.assertSequenceEqual(LeafA.objects.all(), [l1])
         self.assertSequenceEqual(
@@ -2108,8 +2114,9 @@ class Queries6Tests(TestCase):
         self.assertFalse(qs)
 
     def test_nested_queries_sql(self):
-        # Nested queries should not evaluate the inner query as part of constructing the
-        # SQL (so we should see a nested query here, indicated by two "SELECT" calls).
+        # Nested queries should not evaluate the inner query as part of
+        # constructing the SQL (so we should see a nested query here, indicated
+        # by two "SELECT" calls).
         qs = Annotation.objects.filter(notes__in=Note.objects.filter(note="xyzzy"))
         self.assertEqual(qs.query.get_compiler(qs.db).as_sql()[0].count("SELECT"), 2)
 
@@ -2130,8 +2137,9 @@ class Queries6Tests(TestCase):
             [self.t1, self.t3],
         )
 
-        # This example is tricky because the parent could be NULL, so only checking
-        # parents with annotations omits some results (tag t1, in this case).
+        # This example is tricky because the parent could be NULL, so only
+        # checking parents with annotations omits some results (tag t1, in this
+        # case).
         self.assertSequenceEqual(
             Tag.objects.exclude(parent__annotation__name="a1"),
             [self.t1, self.t4, self.t5],
@@ -2215,7 +2223,8 @@ class RawQueriesTests(TestCase):
         Note.objects.create(note="n1", misc="foo", id=1)
 
     def test_ticket14729(self):
-        # Test representation of raw query with one or few parameters passed as list
+        # Test representation of raw query with one or few parameters passed as
+        # list
         query = "SELECT * FROM queries_note WHERE note = %s"
         params = ["n1"]
         qs = Note.objects.raw(query, params=params)
@@ -2579,7 +2588,8 @@ class QuerySetBitwiseOperationTests(TestCase):
 class CloneTests(TestCase):
     def test_evaluated_queryset_as_argument(self):
         """
-        If a queryset is already evaluated, it can still be used as a query arg.
+        If a queryset is already evaluated, it can still be used as a query
+        arg.
         """
         n = Note(note="Test1", misc="misc")
         n.save()
@@ -3124,8 +3134,8 @@ class ConditionalTests(TestCase):
         # recursive).
         self.assertSequenceEqual(LoopX.objects.order_by("y__x__y__x__id"), [])
 
-    # When grouping without specifying ordering, we add an explicit "ORDER BY NULL"
-    # portion in MySQL to prevent unnecessary sorting.
+    # When grouping without specifying ordering, we add an explicit "ORDER BY
+    # NULL" portion in MySQL to prevent unnecessary sorting.
     @skipUnlessDBFeature("requires_explicit_null_ordering_when_grouping")
     def test_null_ordering_added(self):
         query = Tag.objects.values_list("parent_id", flat=True).order_by().query

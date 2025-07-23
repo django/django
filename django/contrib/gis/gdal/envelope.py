@@ -39,8 +39,8 @@ class Envelope:
 
     def __init__(self, *args):
         """
-        The initialization function may take an OGREnvelope structure, 4-element
-        tuple or list, or 4 individual arguments.
+        The initialization function may take an OGREnvelope structure,
+        4-element tuple or list, or 4 individual arguments.
         """
 
         if len(args) == 1:

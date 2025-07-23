@@ -10,7 +10,8 @@ test_srs = (
         "srid": 4326,
         "auth_name": ("EPSG", True),
         "auth_srid": 4326,
-        # Only the beginning, because there are differences depending on installed libs
+        # Only the beginning, because there are differences depending on
+        # installed libs
         "srtext": 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84"',
         "proj_re": (
             r"\+proj=longlat (\+datum=WGS84 |\+towgs84=0,0,0,0,0,0,0 )\+no_defs ?"

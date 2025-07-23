@@ -17,8 +17,8 @@ from django.utils.functional import SimpleLazyObject, lazy
 
 def csrf(request):
     """
-    Context processor that provides a CSRF token, or the string 'NOTPROVIDED' if
-    it has not been provided by either a view decorator or the middleware
+    Context processor that provides a CSRF token, or the string 'NOTPROVIDED'
+    if it has not been provided by either a view decorator or the middleware
     """
 
     def _get_val():

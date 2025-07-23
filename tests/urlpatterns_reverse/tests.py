@@ -117,7 +117,8 @@ resolve_test_data = (
         (),
         {"arg2": "37"},
     ),
-    # Unnamed views should have None as the url_name. Regression data for #21157.
+    # Unnamed views should have None as the url_name. Regression data for
+    # #21157.
     (
         "/unnamed/normal/42/37/",
         None,
@@ -445,7 +446,8 @@ class URLPatternReverse(SimpleTestCase):
                     self.assertEqual(got, expected)
 
     def test_reverse_none(self):
-        # Reversing None should raise an error, not return the last un-named view.
+        # Reversing None should raise an error, not return the last un-named
+        # view.
         with self.assertRaises(NoReverseMatch):
             reverse(None)
 
@@ -661,7 +663,8 @@ class ResolverTests(SimpleTestCase):
             ("name-conflict", (), {"first": "arg"}, "conflict-first/arg/"),
             ("name-conflict", (), {"middle": "arg"}, "conflict-middle/arg/"),
             ("name-conflict", (), {"last": "arg"}, "conflict-last/arg/"),
-            # The number and order of the arguments don't interfere with reversing.
+            # The number and order of the arguments don't interfere with
+            # reversing.
             ("name-conflict", ("arg", "arg"), {}, "conflict/arg/arg/"),
         ]
         for name, args, kwargs, expected in test_urls:
@@ -851,8 +854,9 @@ class ReverseShortcutTests(SimpleTestCase):
         # Assert that we can redirect using UTF-8 strings
         res = redirect("/æøå/abc/")
         self.assertEqual(res.url, "/%C3%A6%C3%B8%C3%A5/abc/")
-        # Assert that no imports are attempted when dealing with a relative path
-        # (previously, the below would resolve in a UnicodeEncodeError from __import__ )
+        # Assert that no imports are attempted when dealing with a relative
+        # path (previously, the below would resolve in a UnicodeEncodeError
+        # from __import__ )
         res = redirect("/æøå.abc/")
         self.assertEqual(res.url, "/%C3%A6%C3%B8%C3%A5.abc/")
         res = redirect("os.path")

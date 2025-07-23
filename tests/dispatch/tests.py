@@ -146,7 +146,8 @@ class DispatcherTests(SimpleTestCase):
         try:
             self.assertIsNone(wref())
         finally:
-            # Disconnect after reference check since it flushes the tested cache.
+            # Disconnect after reference check since it flushes the tested
+            # cache.
             d_signal.disconnect(receiver_1_arg)
 
     def test_multiple_registration(self):

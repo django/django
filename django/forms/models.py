@@ -70,7 +70,8 @@ def construct_instance(form, instance, fields=None, exclude=None):
         if exclude and f.name in exclude:
             continue
         # Leave defaults for fields that aren't in POST data, except for
-        # checkbox inputs because they don't appear in POST data if not checked.
+        # checkbox inputs because they don't appear in POST data if not
+        # checked.
         if (
             f.has_default()
             and form[f.name].field.widget.value_omitted_from_data(
@@ -167,7 +168,8 @@ def fields_for_model(
     ``formfield_callback`` is a callable that takes a model field and returns
     a form field.
 
-    ``localized_fields`` is a list of names of fields which should be localized.
+    ``localized_fields`` is a list of names of fields which should be
+    localized.
 
     ``labels`` is a dictionary of model field names mapped to a label.
 
@@ -422,9 +424,9 @@ class BaseModelForm(BaseForm, AltersData):
             # Exclude empty fields that are not required by the form, if the
             # underlying model field is required. This keeps the model field
             # from raising a required error. Note: don't exclude the field from
-            # validation if the model field allows blanks. If it does, the blank
-            # value may be included in a unique check, so cannot be excluded
-            # from validation.
+            # validation if the model field allows blanks. If it does, the
+            # blank value may be included in a unique check, so cannot be
+            # excluded from validation.
             else:
                 form_field = self.fields[field]
                 field_value = self.cleaned_data.get(field)
@@ -612,7 +614,8 @@ def modelform_factory(
 
     ``widgets`` is a dictionary of model field names mapped to a widget.
 
-    ``localized_fields`` is a list of names of fields which should be localized.
+    ``localized_fields`` is a list of names of fields which should be
+    localized.
 
     ``formfield_callback`` is a callable that takes a model field and returns
     a form field.
@@ -860,7 +863,8 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                     for d in row_data
                 )
                 if row_data and None not in row_data:
-                    # if we've already seen it then we have a uniqueness failure
+                    # if we've already seen it then we have a uniqueness
+                    # failure
                     if row_data in seen_data:
                         # poke error messages into the right places and mark
                         # the form as invalid
@@ -887,7 +891,8 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                     and form.cleaned_data[field] is not None
                     and form.cleaned_data[unique_for] is not None
                 ):
-                    # if it's a date lookup we need to get the data for all the fields
+                    # if it's a date lookup we need to get the data for all the
+                    # fields
                     if lookup == "date":
                         date = form.cleaned_data[unique_for]
                         date_data = (date.year, date.month, date.day)
@@ -896,7 +901,8 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                     else:
                         date_data = (getattr(form.cleaned_data[unique_for], lookup),)
                     data = (form.cleaned_data[field], *date_data)
-                    # if we've already seen it then we have a uniqueness failure
+                    # if we've already seen it then we have a uniqueness
+                    # failure
                     if data in seen_data:
                         # poke error messages into the right places and mark
                         # the form as invalid
@@ -1181,7 +1187,8 @@ class BaseInlineFormSet(BaseModelFormSet):
             kwargs = {"pk_field": True}
         else:
             # The foreign key field might not be on the form, so we poke at the
-            # Model field to get the label, since we need that for error messages.
+            # Model field to get the label, since we need that for error
+            # messages.
             name = self.fk.name
             kwargs = {
                 "label": getattr(
@@ -1553,12 +1560,12 @@ class ModelChoiceField(ChoiceField):
             return self._choices
 
         # Otherwise, execute the QuerySet in self.queryset to determine the
-        # choices dynamically. Return a fresh ModelChoiceIterator that has not been
-        # consumed. Note that we're instantiating a new ModelChoiceIterator *each*
-        # time _get_choices() is called (and, thus, each time self.choices is
-        # accessed) so that we can ensure the QuerySet has not been consumed. This
-        # construct might look complicated but it allows for lazy evaluation of
-        # the queryset.
+        # choices dynamically. Return a fresh ModelChoiceIterator that has not
+        # been consumed. Note that we're instantiating a new
+        # ModelChoiceIterator *each* time _get_choices() is called (and, thus,
+        # each time self.choices is accessed) so that we can ensure the
+        # QuerySet has not been consumed. This construct might look complicated
+        # but it allows for lazy evaluation of the queryset.
         return self.iterator(self)
 
     choices = property(_get_choices, ChoiceField.choices.fset)

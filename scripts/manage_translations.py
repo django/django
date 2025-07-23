@@ -146,7 +146,8 @@ def _get_locale_dirs(resources, include_core=True):
     """
     Return a tuple (contrib name, absolute path) for all locale directories,
     optionally including the django core catalog.
-    If resources list is not None, filter directories matching resources content.
+    If resources list is not None, filter directories matching resources
+    content.
     """
     contrib_dir = os.path.join(os.getcwd(), "django", "contrib")
     dirs = []

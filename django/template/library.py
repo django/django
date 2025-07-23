@@ -72,7 +72,8 @@ class Library:
                 # @register.filter
                 return self.filter_function(name, **flags)
             else:
-                # @register.filter('somename') or @register.filter(name='somename')
+                # @register.filter('somename') or
+                # @register.filter(name='somename')
                 def dec(func):
                     return self.filter(name, func, **flags)
 

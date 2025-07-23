@@ -17,7 +17,8 @@ If the signature fails, a BadSignature exception is raised.
 'hello'
 >>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv42-modified")
 ...
-BadSignature: Signature "ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv42-modified" does not match
+BadSignature: Signature "ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv42-modified" does
+not match
 
 You can optionally compress the JSON prior to base64 encoding it to save
 space, using the compress=True argument. This checks if compression actually

@@ -196,7 +196,8 @@ class AdvancedTests(TestCase):
 
     def test_update_annotated_multi_table_queryset(self):
         """
-        Update of a queryset that's been annotated and involves multiple tables.
+        Update of a queryset that's been annotated and involves multiple
+        tables.
         """
         # Trivial annotated update
         qs = DataPoint.objects.annotate(related_count=Count("relatedpoint"))
