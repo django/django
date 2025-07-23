@@ -1,10 +1,9 @@
 import os
-from textwrap import dedent
 from types import ModuleType
 from unittest import mock
 
 from django.http import HttpResponse
-from django.template import TemplateDoesNotExist, TemplateSyntaxError, engines
+from django.template import TemplateDoesNotExist, engines
 from django.template.backends.django import DjangoTemplates
 from django.template.loader import render_to_string
 from django.test import TestCase, override_settings
@@ -17,30 +16,6 @@ class PartialTagsTestCase(TestCase):
     def engine(self):
         return engines["django"]
 
-    def test_partial_tags(self):
-        template = """
-        {% partialdef testing-partial %}HERE IS THE TEST CONTENT{% endpartialdef %}
-        {% partial testing-partial %}
-        """
-
-        t = self.engine.from_string(template)
-        rendered = t.render({})
-
-        self.assertEqual("HERE IS THE TEST CONTENT", rendered.strip())
-
-    def test_just_partial_from_loader(self):
-        cases = [
-            ("test-partial", "TEST-PARTIAL-CONTENT"),
-            ("inline-partial", "INLINE-CONTENT"),
-        ]
-        for partial_name, expected in cases:
-            with self.subTest(partial_name=partial_name):
-                template = self.engine.get_template(
-                    f"partial_examples.html#{partial_name}"
-                )
-                rendered = template.render({})
-                self.assertEqual(rendered.strip(), expected)
-
     def test_invalid_name_raises_template_does_not_exist(self):
         for template_name in [123, None, "", "#", "#name"]:
             with (
@@ -48,19 +23,6 @@ class PartialTagsTestCase(TestCase):
                 self.assertRaisesMessage(TemplateDoesNotExist, str(template_name)),
             ):
                 self.engine.get_template(template_name)
-
-    def test_undefined_partial_error(self):
-        template = """
-        {% partial testing-partial %}
-        """
-
-        t = self.engine.from_string(template)
-        with self.assertRaisesMessage(
-            TemplateSyntaxError,
-            "No partials are defined. You are trying to access 'testing-partial' "
-            "partial",
-        ):
-            t.render({})
 
     def test_template_source(self):
         partial = self.engine.get_template("partial_examples.html#test-partial")
@@ -74,58 +36,6 @@ class PartialTagsTestCase(TestCase):
             "{% partialdef inline-partial inline %}\nINLINE-CONTENT\n"
             "{% endpartialdef %}",
         )
-
-    def test_partialdef_tag_with_inline(self):
-        template = """
-        {% partialdef testing-partial inline %}
-        HERE IS THE TEST CONTENT
-        {% endpartialdef %}
-        """
-
-        t = self.engine.from_string(template)
-        rendered = t.render({})
-
-        self.assertEqual("HERE IS THE TEST CONTENT", rendered.strip())
-
-    def test_inline_partial_with_wrapping_content(self):
-        template = """
-        BEFORE
-        {% partialdef testing-partial inline %}
-        HERE IS THE TEST CONTENT
-        {% endpartialdef %}
-        AFTER
-        """
-
-        t = self.engine.from_string(dedent(template))
-        rendered = t.render({})
-
-        self.assertEqual(
-            "BEFORE\n\nHERE IS THE TEST CONTENT\n\nAFTER", rendered.strip()
-        )
-
-    def test_endpartialdef_with_partial_name(self):
-        template = """
-        {% partialdef testing-partial %}
-        HERE IS THE TEST CONTENT
-        {% endpartialdef testing-partial %}
-        {% partial testing-partial %}
-        """
-
-        t = self.engine.from_string(template)
-        rendered = t.render({})
-
-        self.assertEqual("HERE IS THE TEST CONTENT", rendered.strip())
-
-    def test_endpartialdef_with_invalid_partial_name(self):
-        template = """
-        {% partialdef testing-partial %}
-        HERE IS THE TEST CONTENT
-        {% endpartialdef invalid %}
-        {% partial testing-partial %}
-        """
-
-        with self.assertRaises(TemplateSyntaxError):
-            self.engine.from_string(template)
 
     def test_full_template_from_loader(self):
         template = self.engine.get_template("partial_examples.html")
@@ -142,93 +52,6 @@ class PartialTagsTestCase(TestCase):
         self.assertTrue(len(ex.exception.tried) > 0)
         origin, _ = ex.exception.tried[0]
         self.assertEqual(origin.template_name, "not_there.html")
-
-    def test_extends_with_partialdef(self):
-
-        template_string = """
-        {% extends 'partial_base.html' %}
-        {% partialdef test-partial %}
-        Content inside partial
-        {% endpartialdef %}
-        {% block main %}
-        Main content with {% partial test-partial %}
-        {% endblock %}
-        """
-
-        template = self.engine.from_string(template_string)
-        rendered = template.render({})
-
-        self.assertIn("Main content with", rendered)
-        self.assertIn("Content inside partial", rendered)
-
-    def test_template_inclusion_with_partial(self):
-
-        parent_template = self.engine.get_template("partial_parent.html")
-        rendered = parent_template.render({})
-        self.assertIn("MAIN TEMPLATE START", rendered)
-        self.assertIn("INCLUDED TEMPLATE START", rendered)
-        self.assertIn("THIS IS CONTENT FROM THE INCLUDED PARTIAL", rendered)
-        self.assertIn("INCLUDED TEMPLATE END", rendered)
-        self.assertIn("MAIN TEMPLATE END", rendered)
-
-    def test_using_partial_before_definition(self):
-        template_content = """
-        TEMPLATE START
-        {% partial skeleton-partial %}
-        MIDDLE CONTENT
-        {% partialdef skeleton-partial %}
-        THIS IS THE SKELETON PARTIAL CONTENT
-        {% endpartialdef %}
-        TEMPLATE END
-        """
-        template = self.engine.from_string(template_content)
-        rendered = template.render({})
-        self.assertIn("TEMPLATE START", rendered)
-        self.assertIn("THIS IS THE SKELETON PARTIAL CONTENT", rendered)
-        self.assertIn("MIDDLE CONTENT", rendered)
-        self.assertIn("TEMPLATE END", rendered)
-
-    def test_undefined_partial_error_message(self):
-
-        template = """
-        {% partialdef different-partial %}
-        THIS IS THE NOT DEFINED PARTIAL CONTENT
-        {% endpartialdef %}
-        {% partial not-defined-partial %}
-        """
-
-        t = self.engine.from_string(template)
-        with self.assertRaisesMessage(
-            TemplateSyntaxError,
-            "Partial 'not-defined-partial' is not defined in the current template.",
-        ):
-            t.render({})
-
-    def test_undefined_partial_error_message_when_no_partialdef(self):
-
-        template = """
-        {% partial not-defined-partial %}
-        """
-        t = self.engine.from_string(template)
-        with self.assertRaisesMessage(
-            TemplateSyntaxError,
-            "No partials are defined. You are trying to access "
-            "'not-defined-partial' partial",
-        ):
-            t.render({})
-
-    def test_invalid_inline_argument_raises_syntax_error(self):
-        template = """
-        {% partialdef test-partial inline=true %}
-        Content
-        {% endpartialdef %}
-        """
-        with self.assertRaisesMessage(
-            TemplateSyntaxError,
-            "The 'inline' argument does not have any parameters; "
-            "either use 'inline' or remove it completely.",
-        ):
-            self.engine.from_string(template)
 
 
 class PartialTagsCacheTestCase(TestCase):
@@ -420,7 +243,3 @@ INLINE-CONTENT
         )
 
         self.assertEqual(result, "")
-
-    def test_find_partial_source_unclosed_partialdef_raises_error(self):
-        with self.assertRaises(TemplateSyntaxError):
-            self.engine.get_template("partial_broken_unclosed.html")

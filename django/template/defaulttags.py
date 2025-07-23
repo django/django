@@ -1705,7 +1705,7 @@ class SubDictionaryWrapper:
             partials_content = self.parent_dict[self.lookup_key]
         except KeyError:
             raise TemplateSyntaxError(
-                f"No partials are defined. You are trying to access '{key}' partial"
+                f"Partial '{key}' is not defined in the current template."
             )
 
         try:
@@ -1725,10 +1725,10 @@ def partial_func(parser, token):
 
         {% partial partial_name %}
     """
-    try:
-        tag_name, partial_name = token.split_contents()
-    except ValueError:
-        raise TemplateSyntaxError("%r tag requires a single argument" % tag_name)
+    bits = token.split_contents()
+    if len(bits) != 2:
+        raise TemplateSyntaxError(f"'{bits[0]}' tag requires a single argument")
+    tag_name, partial_name = bits
 
     extra_data = getattr(parser, "extra_data")
     partial_mapping = SubDictionaryWrapper(extra_data, "template-partials")
