@@ -1910,7 +1910,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Chrome and Safari don't update related object links when selecting
         # the same option as previously submitted. As a consequence, the
-        # "pencil" and "eye" buttons remain disable, so select "---------"
+        # "pencil" and "eye" buttons remain disable, so select "- Select an option -"
         # first.
         select = Select(self.selenium.find_element(By.ID, "id_user"))
         select.select_by_index(0)

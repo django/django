@@ -234,7 +234,7 @@ documentation.
 .. _field-choices-blank-label:
 
 Unless :attr:`blank=False<Field.blank>` is set on the field along with a
-:attr:`~Field.default` then a label containing ``"---------"`` will be rendered
+:attr:`~Field.default` then a label containing ``"- Select an option -"`` will be rendered
 with the select box. To override this behavior, add a tuple to ``choices``
 containing ``None``; e.g. ``(None, 'Your String For Display')``.
 Alternatively, you can use an empty string instead of ``None`` where this makes
