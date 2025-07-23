@@ -3,7 +3,7 @@ from io import IOBase
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
-from django.http import HttpRequest, QueryDict, parse_cookie
+from django.http import HttpRequest, QueryDict, parse_cookie, parsers
 from django.urls import set_script_prefix
 from django.utils.encoding import repercent_broken_unicode
 from django.utils.functional import cached_property
@@ -78,6 +78,11 @@ class WSGIRequest(HttpRequest):
         self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
         self._read_started = False
         self.resolver_match = None
+        self._parsers = [
+            parsers.FormParser,
+            parsers.MultiPartParser,
+            parsers.JSONParser,
+        ]
 
     def _get_scheme(self):
         return self.environ.get("wsgi.url_scheme")

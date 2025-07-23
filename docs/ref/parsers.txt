@@ -1,0 +1,85 @@
+============
+HTTP Parsers
+============
+
+.. module:: django.http.parsers
+    :synopsis: Classes dealing with parsing HTTP requests.
+
+# TODO See about stitching this back into ``request-response.txt``
+
+Parsers
+=======
+
+.. class:: BaseParser
+
+    .. attribute:: media_type
+
+    The media types this class can accept. Example ``application/json``.
+
+    .. method:: can_handle(media_type)
+
+    This method accepts a media type and returns true if the parser can parse
+    this type. By default, this method compares the string provided to
+    :attr:`.media_type` and returns ``True`` if it's an exact match.
+
+    You may wish to customize this method if your custom parser can accept
+    multiple types.
+
+    .. method:: BaseParser.parse(request)
+
+    This method parses the requests body and returns a two-tuple being the
+    parsed ``data`` and ``FILES``. For parsers which do not return ``FILES`` an
+    empty ``MultiValueDict`` is returned.
+
+All parsers should inherit from the ``BaseParser`` class. This class has the
+following attributes and methods
+
+Provided parsers
+================
+
+Django provides the following parsers.
+
+.. class:: FormParser
+
+    .. attribute:: media_type
+
+        ``"application/x-www-form-urlencoded"``
+
+Parses HTML form content (). The ``parse()`` method returns a
+``QueryDict`` for ``data`` and an empty ``MultiValueDict`` for ``FILES``.
+
+.. class:: MultiPartParser
+
+    .. attribute:: media_type
+
+      ``"multipart/form-data"``
+
+Parses multipart form content and supports file uploads. The method returns
+a ``QueryDict`` for ``data`` and an ``MultiValueDict`` for ``FILES``.
+
+.. class:: JSONParser
+
+    .. attribute:: media_type
+
+      ``"application/json"``
+
+The ``parse()`` method deserializes JSON to a Python dictionary. This is
+returned for ``data`` and empty ``MultiValueDict`` is provided for ``FILES``.
+
+
+HttpRequest.Parsers
+===================
+
+``HttpRequest.parsers`` returns a list of parsers to be used when parsing a
+request's content. By default, the parsers list will be Django's included
+parsers (``FormParser, ``MultiPartParser``).
+
+Parsers can be customised by setting a list of parsers to be used on the
+request. This could be in a middleware or in a view, but must be done before
+``data`` or ``FILES`` is accessed. For example:
+
+.. code-block:: python
+
+    def index(request):
+        request.parsers = [MyCustomParser(), FormParser(), ...]
+        ...
