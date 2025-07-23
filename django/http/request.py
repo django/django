@@ -15,6 +15,7 @@ from django.core.exceptions import (
     ImproperlyConfigured,
     RequestDataTooBig,
     TooManyFieldsSent,
+    TooManyFilesSent,
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
@@ -28,7 +29,6 @@ from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, parse_header_parameters
 
 RAISE_ERROR = object()
-MAX_ALLOWED_FILES = 1000
 host_validation_re = r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::([0-9]+))?$"
 
 ParsedHostHeader = namedtuple("ParsedHostHeader", ["domain", "port", "combined"])
@@ -447,12 +447,7 @@ class HttpRequest:
                 data = self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
-                if len(self._files) > MAX_ALLOWED_FILES:
-                    raise MultiPartParserError(
-                        f"{len(self._files)} files processed. "
-                        f"Maximum {MAX_ALLOWED_FILES} files allowed."
-                    )
-            except MultiPartParserError:
+            except (MultiPartParserError, TooManyFilesSent):
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
