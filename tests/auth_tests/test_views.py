@@ -153,7 +153,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("http://", mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
-        # optional multipart text/html email has been added.  Make sure original,
+        # optional multipart text/html email has been added. Make sure original,
         # default functionality is 100% the same
         self.assertFalse(mail.outbox[0].message().is_multipart())
 

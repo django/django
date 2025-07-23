@@ -98,23 +98,28 @@ class LoggingAssertionMixin:
     def assertLogRecord(
         self,
         logger_cm,
-        level,
         msg,
+        levelno,
         status_code,
+        request=None,
         exc_class=None,
     ):
         self.assertEqual(
             records_len := len(logger_cm.records),
             1,
-            f"Wrong number of calls for {logger_cm=} in {level=} (expected 1, got "
+            f"Wrong number of calls for {logger_cm=} in {levelno=} (expected 1, got "
             f"{records_len}).",
         )
         record = logger_cm.records[0]
         self.assertEqual(record.getMessage(), msg)
+        self.assertEqual(record.levelno, levelno)
         self.assertEqual(record.status_code, status_code)
+        if request is not None:
+            self.assertEqual(record.request, request)
         if exc_class:
             self.assertIsNotNone(record.exc_info)
             self.assertEqual(record.exc_info[0], exc_class)
+        return record
 
     def assertLogsRequest(
         self, url, level, msg, status_code, logger="django.request", exc_class=None
@@ -124,7 +129,9 @@ class LoggingAssertionMixin:
                 self.client.get(url)
             except views.UncaughtException:
                 pass
-            self.assertLogRecord(cm, level, msg, status_code, exc_class)
+            self.assertLogRecord(
+                cm, msg, getattr(logging, level), status_code, exc_class=exc_class
+            )
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF="logging_tests.urls")
@@ -147,13 +154,27 @@ class HandlerLoggingTests(
             msg="Not Found: /does_not_exist/",
         )
 
+    def test_control_chars_escaped(self):
+        self.assertLogsRequest(
+            url="/%1B[1;31mNOW IN RED!!!1B[0m/",
+            level="WARNING",
+            status_code=404,
+            msg=r"Not Found: /\x1b[1;31mNOW IN RED!!!1B[0m/",
+        )
+
     async def test_async_page_not_found_warning(self):
-        logger = "django.request"
-        level = "WARNING"
-        with self.assertLogs(logger, level) as cm:
+        with self.assertLogs("django.request", "WARNING") as cm:
             await self.async_client.get("/does_not_exist/")
 
-        self.assertLogRecord(cm, level, "Not Found: /does_not_exist/", 404)
+        self.assertLogRecord(cm, "Not Found: /does_not_exist/", logging.WARNING, 404)
+
+    async def test_async_control_chars_escaped(self):
+        with self.assertLogs("django.request", "WARNING") as cm:
+            await self.async_client.get(r"/%1B[1;31mNOW IN RED!!!1B[0m/")
+
+        self.assertLogRecord(
+            cm, r"Not Found: /\x1b[1;31mNOW IN RED!!!1B[0m/", logging.WARNING, 404
+        )
 
     def test_page_not_found_raised(self):
         self.assertLogsRequest(
@@ -597,6 +618,15 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("SuspiciousOperation at /suspicious/", mail.outbox[0].body)
 
+    def test_response_logged(self):
+        with self.assertLogs("django.security.SuspiciousOperation", "ERROR") as handler:
+            response = self.client.get("/suspicious/")
+
+        self.assertLogRecord(
+            handler, "dubious", logging.ERROR, 400, request=response.wsgi_request
+        )
+        self.assertEqual(response.status_code, 400)
+
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):
     """
@@ -689,22 +719,9 @@ class LogFormattersTests(SimpleTestCase):
             )
 
 
-class LogResponseRealLoggerTests(TestCase):
+class LogResponseRealLoggerTests(LoggingAssertionMixin, TestCase):
 
     request = RequestFactory().get("/test-path/")
-
-    def assertResponseLogged(self, logger_cm, msg, levelno, status_code, request):
-        self.assertEqual(
-            records_len := len(logger_cm.records),
-            1,
-            f"Unexpected number of records for {logger_cm=} in {levelno=} (expected 1, "
-            f"got {records_len}).",
-        )
-        record = logger_cm.records[0]
-        self.assertEqual(record.getMessage(), msg)
-        self.assertEqual(record.levelno, levelno)
-        self.assertEqual(record.status_code, status_code)
-        self.assertEqual(record.request, request)
 
     def test_missing_response_raises_attribute_error(self):
         with self.assertRaises(AttributeError):
@@ -714,7 +731,7 @@ class LogResponseRealLoggerTests(TestCase):
         response = HttpResponse(status=403)
         with self.assertLogs("django.request", level="INFO") as cm:
             log_response(msg := "Missing request", response=response, request=None)
-        self.assertResponseLogged(cm, msg, logging.WARNING, 403, request=None)
+        self.assertLogRecord(cm, msg, logging.WARNING, 403, request=None)
 
     def test_logs_5xx_as_error(self):
         response = HttpResponse(status=508)
@@ -722,7 +739,7 @@ class LogResponseRealLoggerTests(TestCase):
             log_response(
                 msg := "Server error occurred", response=response, request=self.request
             )
-        self.assertResponseLogged(cm, msg, logging.ERROR, 508, self.request)
+        self.assertLogRecord(cm, msg, logging.ERROR, 508, self.request)
 
     def test_logs_4xx_as_warning(self):
         response = HttpResponse(status=418)
@@ -730,13 +747,13 @@ class LogResponseRealLoggerTests(TestCase):
             log_response(
                 msg := "This is a teapot!", response=response, request=self.request
             )
-        self.assertResponseLogged(cm, msg, logging.WARNING, 418, self.request)
+        self.assertLogRecord(cm, msg, logging.WARNING, 418, self.request)
 
     def test_logs_2xx_as_info(self):
         response = HttpResponse(status=201)
         with self.assertLogs("django.request", level="INFO") as cm:
             log_response(msg := "OK response", response=response, request=self.request)
-        self.assertResponseLogged(cm, msg, logging.INFO, 201, self.request)
+        self.assertLogRecord(cm, msg, logging.INFO, 201, self.request)
 
     def test_custom_log_level(self):
         response = HttpResponse(status=403)
@@ -747,14 +764,14 @@ class LogResponseRealLoggerTests(TestCase):
                 request=self.request,
                 level="debug",
             )
-        self.assertResponseLogged(cm, msg, logging.DEBUG, 403, self.request)
+        self.assertLogRecord(cm, msg, logging.DEBUG, 403, self.request)
 
     def test_logs_only_once_per_response(self):
         response = HttpResponse(status=500)
         with self.assertLogs("django.request", level="ERROR") as cm:
             log_response("First log", response=response, request=self.request)
             log_response("Second log", response=response, request=self.request)
-        self.assertResponseLogged(cm, "First log", logging.ERROR, 500, self.request)
+        self.assertLogRecord(cm, "First log", logging.ERROR, 500, self.request)
 
     def test_exc_info_output(self):
         response = HttpResponse(status=500)
@@ -768,9 +785,7 @@ class LogResponseRealLoggerTests(TestCase):
                     request=self.request,
                     exception=exc,
                 )
-        self.assertResponseLogged(
-            cm, "With exception", logging.ERROR, 500, self.request
-        )
+        self.assertLogRecord(cm, "With exception", logging.ERROR, 500, self.request)
         self.assertIn("ValueError", "\n".join(cm.output))  # Stack trace included
 
     def test_format_args_are_applied(self):
@@ -784,7 +799,7 @@ class LogResponseRealLoggerTests(TestCase):
                 request=self.request,
             )
         msg = "Something went wrong: DB error (42)"
-        self.assertResponseLogged(cm, msg, logging.ERROR, 500, self.request)
+        self.assertLogRecord(cm, msg, logging.ERROR, 500, self.request)
 
     def test_logs_with_custom_logger(self):
         handler = logging.StreamHandler(log_stream := StringIO())
@@ -806,3 +821,64 @@ class LogResponseRealLoggerTests(TestCase):
         self.assertEqual(
             f"WARNING:my.custom.logger:{msg}", log_stream.getvalue().strip()
         )
+
+    def test_unicode_escape_escaping(self):
+        test_cases = [
+            # Control characters.
+            ("line\nbreak", "line\\nbreak"),
+            ("carriage\rreturn", "carriage\\rreturn"),
+            ("tab\tseparated", "tab\\tseparated"),
+            ("formfeed\f", "formfeed\\x0c"),
+            ("bell\a", "bell\\x07"),
+            ("multi\nline\ntext", "multi\\nline\\ntext"),
+            # Slashes.
+            ("slash\\test", "slash\\\\test"),
+            ("back\\slash", "back\\\\slash"),
+            # Quotes.
+            ('quote"test"', 'quote"test"'),
+            ("quote'test'", "quote'test'"),
+            # Accented, composed characters, emojis and symbols.
+            ("café", "caf\\xe9"),
+            ("e\u0301", "e\\u0301"),  # e + combining acute
+            ("smile🙂", "smile\\U0001f642"),
+            ("weird ☃️", "weird \\u2603\\ufe0f"),
+            # Non-Latin alphabets.
+            ("Привет", "\\u041f\\u0440\\u0438\\u0432\\u0435\\u0442"),
+            ("你好", "\\u4f60\\u597d"),
+            # ANSI escape sequences.
+            ("escape\x1b[31mred\x1b[0m", "escape\\x1b[31mred\\x1b[0m"),
+            (
+                "/\x1b[1;31mCAUTION!!YOU ARE PWNED\x1b[0m/",
+                "/\\x1b[1;31mCAUTION!!YOU ARE PWNED\\x1b[0m/",
+            ),
+            (
+                "/\r\n\r\n1984-04-22 INFO    Listening on 0.0.0.0:8080\r\n\r\n",
+                "/\\r\\n\\r\\n1984-04-22 INFO    Listening on 0.0.0.0:8080\\r\\n\\r\\n",
+            ),
+            # Plain safe input.
+            ("normal-path", "normal-path"),
+            ("slash/colon:", "slash/colon:"),
+            # Non strings.
+            (0, "0"),
+            ([1, 2, 3], "[1, 2, 3]"),
+            ({"test": "🙂"}, "{'test': '🙂'}"),
+        ]
+
+        msg = "Test message: %s"
+        for case, expected in test_cases:
+            with (
+                self.assertLogs("django.request", level="ERROR") as cm,
+                self.subTest(case=case),
+            ):
+                response = HttpResponse(status=318)
+                log_response(msg, case, response=response, level="error")
+
+                record = self.assertLogRecord(
+                    cm,
+                    msg % expected,
+                    levelno=logging.ERROR,
+                    status_code=318,
+                    request=None,
+                )
+                # Log record is always a single line.
+                self.assertEqual(len(record.getMessage().splitlines()), 1)

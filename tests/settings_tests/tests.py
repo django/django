@@ -105,7 +105,7 @@ class FullyDecoratedTestCase(TestCase):
 class ClassDecoratedTestCaseSuper(TestCase):
     """
     Dummy class for testing max recursion error in child class call to
-    super().  Refs #17011.
+    super(). Refs #17011.
     """
 
     def test_max_recursion_error(self):

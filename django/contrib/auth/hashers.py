@@ -16,6 +16,7 @@ from django.utils.crypto import (
     get_random_string,
     pbkdf2,
 )
+from django.utils.encoding import force_bytes, force_str
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -252,7 +253,7 @@ class BasePasswordHasher:
     def _check_encode_args(self, password, salt):
         if password is None:
             raise TypeError("password must be provided.")
-        if not salt or "$" in salt:
+        if not salt or "$" in force_str(salt):  # salt can be str or bytes.
             raise ValueError("salt must be provided and cannot contain $.")
 
     def encode(self, password, salt):
@@ -313,7 +314,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     Secure password hashing using the PBKDF2 algorithm (recommended)
 
     Configured to use PBKDF2 + HMAC + SHA256.
-    The result is a 64 byte binary string.  Iterations may be changed
+    The result is a 64 byte binary string. Iterations may be changed
     safely but you must rename the algorithm if you change SHA256.
     """
 
@@ -324,6 +325,8 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt, iterations=None):
         self._check_encode_args(password, salt)
         iterations = iterations or self.iterations
+        password = force_str(password)
+        salt = force_str(salt)
         hash = pbkdf2(password, salt, iterations, digest=self.digest)
         hash = base64.b64encode(hash).decode("ascii").strip()
         return "%s$%d$%s$%s" % (self.algorithm, iterations, salt, hash)
@@ -396,8 +399,8 @@ class Argon2PasswordHasher(BasePasswordHasher):
         argon2 = self._load_library()
         params = self.params()
         data = argon2.low_level.hash_secret(
-            password.encode(),
-            salt.encode(),
+            force_bytes(password),
+            force_bytes(salt),
             time_cost=params.time_cost,
             memory_cost=params.memory_cost,
             parallelism=params.parallelism,
@@ -483,7 +486,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
     Secure password hashing using the bcrypt algorithm (recommended)
 
     This is considered by many to be the most secure algorithm but you
-    must first install the bcrypt library.  Please be warned that
+    must first install the bcrypt library. Please be warned that
     this library depends on native C code and might cause portability
     issues.
     """
@@ -499,7 +502,8 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
-        password = password.encode()
+        password = force_bytes(password)
+        salt = force_bytes(salt)
         # Hash the password prior to using bcrypt to prevent password
         # truncation as described in #20138.
         if self.digest is not None:
@@ -555,7 +559,7 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
     Secure password hashing using the bcrypt algorithm
 
     This is considered by many to be the most secure algorithm but you
-    must first install the bcrypt library.  Please be warned that
+    must first install the bcrypt library. Please be warned that
     this library depends on native C code and might cause portability
     issues.
 
@@ -585,8 +589,8 @@ class ScryptPasswordHasher(BasePasswordHasher):
         r = r or self.block_size
         p = p or self.parallelism
         hash_ = hashlib.scrypt(
-            password.encode(),
-            salt=salt.encode(),
+            password=force_bytes(password),
+            salt=force_bytes(salt),
             n=n,
             r=r,
             p=p,
@@ -594,7 +598,7 @@ class ScryptPasswordHasher(BasePasswordHasher):
             dklen=64,
         )
         hash_ = base64.b64encode(hash_).decode("ascii").strip()
-        return "%s$%d$%s$%d$%d$%s" % (self.algorithm, n, salt, r, p, hash_)
+        return "%s$%d$%s$%d$%d$%s" % (self.algorithm, n, force_str(salt), r, p, hash_)
 
     def decode(self, encoded):
         algorithm, work_factor, salt, block_size, parallelism, hash_ = encoded.split(
@@ -655,6 +659,8 @@ class MD5PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
+        password = force_str(password)
+        salt = force_str(salt)
         hash = hashlib.md5((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 

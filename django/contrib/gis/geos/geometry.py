@@ -353,7 +353,7 @@ class GEOSGeometryBase(GEOSBase):
         two Geometries match the elements in pattern.
         """
         if not isinstance(pattern, str) or len(pattern) > 9:
-            raise GEOSException("invalid intersection matrix pattern")
+            raise GEOSException("Invalid intersection matrix pattern.")
         return capi.geos_relatepattern(self.ptr, other.ptr, force_bytes(pattern))
 
     def touches(self, other):
@@ -506,7 +506,9 @@ class GEOSGeometryBase(GEOSBase):
             # source SRS.
             srid = None
         elif srid is None or srid < 0:
-            raise GEOSException("Calling transform() with no SRID set is not supported")
+            raise GEOSException(
+                "Calling transform() with no SRID set is not supported."
+            )
 
         # Creating an OGR Geometry, which is then transformed.
         g = gdal.OGRGeometry(self._ogr_ptr(), srid)
@@ -607,7 +609,7 @@ class GEOSGeometryBase(GEOSBase):
     def simplify(self, tolerance=0.0, preserve_topology=False):
         """
         Return the Geometry, simplified using the Douglas-Peucker algorithm
-        to the specified tolerance (higher tolerance => less points).  If no
+        to the specified tolerance (higher tolerance => less points). If no
         tolerance provided, defaults to 0.
 
         By default, don't preserve topology - e.g. polygons can be split,

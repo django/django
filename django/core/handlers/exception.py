@@ -116,16 +116,6 @@ def response_for_exception(request, exc):
             # exception would be raised.
             request._mark_post_parse_error()
 
-        # The request logger receives events for any problematic request
-        # The security logger receives events for all SuspiciousOperations
-        security_logger = logging.getLogger(
-            "django.security.%s" % exc.__class__.__name__
-        )
-        security_logger.error(
-            str(exc),
-            exc_info=exc,
-            extra={"status_code": 400, "request": request},
-        )
         if settings.DEBUG:
             response = debug.technical_500_response(
                 request, *sys.exc_info(), status_code=400
@@ -134,6 +124,17 @@ def response_for_exception(request, exc):
             response = get_exception_response(
                 request, get_resolver(get_urlconf()), 400, exc
             )
+        # The logger is set to django.security, which specifically captures
+        # SuspiciousOperation events, unlike the default django.request logger.
+        security_logger = logging.getLogger(f"django.security.{exc.__class__.__name__}")
+        log_response(
+            str(exc),
+            exception=exc,
+            request=request,
+            response=response,
+            level="error",
+            logger=security_logger,
+        )
 
     else:
         signals.got_request_exception.send(sender=None, request=request)

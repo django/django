@@ -708,7 +708,7 @@ class ResolverTests(SimpleTestCase):
         self.assertEqual(
             len(e.args[0]["tried"]),
             len(url_types_names),
-            "Wrong number of tried URLs returned.  Expected %s, got %s."
+            "Wrong number of tried URLs returned. Expected %s, got %s."
             % (len(url_types_names), len(e.args[0]["tried"])),
         )
         for tried, expected in zip(e.args[0]["tried"], url_types_names):
@@ -726,7 +726,7 @@ class ResolverTests(SimpleTestCase):
                             self.assertEqual(
                                 t.name,
                                 e["name"],
-                                'Wrong URL name.  Expected "%s", got "%s".'
+                                'Wrong URL name. Expected "%s", got "%s".'
                                 % (e["name"], t.name),
                             )
 

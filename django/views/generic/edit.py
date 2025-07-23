@@ -123,7 +123,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 url = self.object.get_absolute_url()
             except AttributeError:
                 raise ImproperlyConfigured(
-                    "No URL to redirect to.  Either provide a url or define"
+                    "No URL to redirect to. Either provide a url or define"
                     " a get_absolute_url method on the Model."
                 )
         return url

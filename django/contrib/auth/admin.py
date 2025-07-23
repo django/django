@@ -21,9 +21,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 
-csrf_protect_m = method_decorator(csrf_protect)
-sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
-
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
@@ -113,8 +110,7 @@ class UserAdmin(admin.ModelAdmin):
             lookup, value, request
         )
 
-    @sensitive_post_parameters_m
-    @csrf_protect_m
+    @method_decorator([sensitive_post_parameters(), csrf_protect])
     def add_view(self, request, form_url="", extra_context=None):
         if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
             return self._add_view(request, form_url, extra_context)
@@ -150,7 +146,7 @@ class UserAdmin(admin.ModelAdmin):
         extra_context.update(defaults)
         return super().add_view(request, form_url, extra_context)
 
-    @sensitive_post_parameters_m
+    @method_decorator(sensitive_post_parameters())
     def user_change_password(self, request, id, form_url=""):
         user = self.get_object(request, unquote(id))
         if not self.has_change_permission(request, user):

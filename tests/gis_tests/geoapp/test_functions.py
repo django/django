@@ -4,14 +4,31 @@ import re
 from decimal import Decimal
 
 from django.contrib.gis.db.models import GeometryField, PolygonField, functions
-from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon, fromstr
+from django.contrib.gis.geos import (
+    GEOSGeometry,
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon,
+    fromstr,
+)
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
 from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
-from .models import City, Country, CountryWebMercator, ManyPointModel, State, Track
+from .models import (
+    City,
+    Country,
+    CountryWebMercator,
+    Feature,
+    ManyPointModel,
+    State,
+    Track,
+)
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -559,7 +576,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # Exact value depends on database and version.
         self.assertTrue(20 <= ptown.size <= 105)
 
-    @skipUnlessDBFeature("has_NumGeom_function")
+    @skipUnlessDBFeature("has_NumGeometries_function")
     def test_num_geom(self):
         # Both 'countries' only have two geometries.
         for c in Country.objects.annotate(num_geom=functions.NumGeometries("mpoly")):
@@ -576,7 +593,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             else:
                 self.assertEqual(1, city.num_geom)
 
-    @skipUnlessDBFeature("has_NumPoint_function")
+    @skipUnlessDBFeature("has_NumPoints_function")
     def test_num_points(self):
         coords = [(-95.363151, 29.763374), (-95.448601, 29.713803)]
         Track.objects.create(name="Foo", line=LineString(coords))
@@ -880,3 +897,48 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             City.objects.annotate(union=functions.GeoFunc(1, "point")).get(
                 name="Dallas"
             )
+
+    @skipUnlessDBFeature("has_GeometryType_function")
+    def test_geometry_type(self):
+        Feature.objects.bulk_create(
+            [
+                Feature(name="Point", geom=Point(0, 0)),
+                Feature(name="LineString", geom=LineString((0, 0), (1, 1))),
+                Feature(name="Polygon", geom=Polygon(((0, 0), (1, 0), (1, 1), (0, 0)))),
+                Feature(name="MultiPoint", geom=MultiPoint(Point(0, 0), Point(1, 1))),
+                Feature(
+                    name="MultiLineString",
+                    geom=MultiLineString(
+                        LineString((0, 0), (1, 1)), LineString((1, 1), (2, 2))
+                    ),
+                ),
+                Feature(
+                    name="MultiPolygon",
+                    geom=MultiPolygon(
+                        Polygon(((0, 0), (1, 0), (1, 1), (0, 0))),
+                        Polygon(((1, 1), (2, 1), (2, 2), (1, 1))),
+                    ),
+                ),
+            ]
+        )
+
+        expected_results = {
+            ("POINT", Point),
+            ("LINESTRING", LineString),
+            ("POLYGON", Polygon),
+            ("MULTIPOINT", MultiPoint),
+            ("MULTILINESTRING", MultiLineString),
+            ("MULTIPOLYGON", MultiPolygon),
+        }
+
+        for geom_type, geom_class in expected_results:
+            with self.subTest(geom_type=geom_type):
+                obj = (
+                    Feature.objects.annotate(
+                        geometry_type=functions.GeometryType("geom")
+                    )
+                    .filter(geom__geom_type=geom_type)
+                    .get()
+                )
+                self.assertIsInstance(obj.geom, geom_class)
+                self.assertEqual(obj.geometry_type, geom_type)

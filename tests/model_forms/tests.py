@@ -600,7 +600,7 @@ class ModelFormBaseTest(TestCase):
     def test_mixmodel_form(self):
         class MixModelForm(BaseCategoryForm):
             """Don't allow more than one 'model' definition in the
-            inheritance hierarchy.  Technically, it would generate a valid
+            inheritance hierarchy. Technically, it would generate a valid
             form, but the fact that the resulting save method won't deal with
             multiple objects is likely to trip up people not familiar with the
             mechanics.
@@ -3721,6 +3721,7 @@ class ModelToDictTests(TestCase):
         self.assertEqual(data, [blue])
 
 
+@skipUnlessDBFeature("supports_table_check_constraints")
 class ConstraintValidationTests(TestCase):
     def test_unique_constraint_refs_excluded_field(self):
         obj = ConstraintsModel.objects.create(name="product", price="1.00")

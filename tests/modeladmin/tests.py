@@ -731,9 +731,9 @@ class ModelAdminTests(TestCase):
         )
 
     def test_foreign_key_as_radio_field(self):
-        # Now specify all the fields as radio_fields.  Widgets should now be
+        # Now specify all the fields as radio_fields. Widgets should now be
         # RadioSelect, and the choices list should have a first entry of 'None' if
-        # blank=True for the model field.  Finally, the widget should have the
+        # blank=True for the model field. Finally, the widget should have the
         # 'radiolist' attr, and 'inline' as well if the field is specified HORIZONTAL.
         class ConcertAdmin(ModelAdmin):
             radio_fields = {

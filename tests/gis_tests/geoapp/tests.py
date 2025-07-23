@@ -133,7 +133,7 @@ class GeoModelTest(TestCase):
             tx = Country.objects.get(mpoly__intersects=other_srid_pnt)
         self.assertEqual("Texas", tx.name)
 
-        # Creating San Antonio.  Remember the Alamo.
+        # Creating San Antonio. Remember the Alamo.
         sa = City.objects.create(name="San Antonio", point=other_srid_pnt)
 
         # Now verifying that San Antonio was transformed correctly
@@ -578,7 +578,12 @@ class GeoLookupTest(TestCase):
         # Testing within relation mask.
         ks = State.objects.get(name="Kansas")
         self.assertEqual(
-            "Lawrence", City.objects.get(point__relate=(ks.poly, within_mask)).name
+            "Lawrence",
+            # Remove ".filter(name="Lawrence")" once PostGIS 3.5.4 is released.
+            # https://lists.osgeo.org/pipermail/postgis-devel/2025-July/030581.html
+            City.objects.filter(name="Lawrence")
+            .get(point__relate=(ks.poly, within_mask))
+            .name,
         )
 
         # Testing intersection relation mask.

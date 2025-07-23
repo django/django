@@ -39,7 +39,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
     but also between 2007/08/10 and 2008/09/10 despite the delta being 393 days
     in the former case and 397 in the latter.
 
-    Up to `depth` adjacent units will be displayed.  For example,
+    Up to `depth` adjacent units will be displayed. For example,
     "2 weeks, 3 days" and "1 year, 3 months" are possible outputs, but
     "2 weeks, 3 hours" and "1 year, 5 days" are not.
 

@@ -5,7 +5,7 @@ is generated for the table on various manage.py operations.
 
 from django.db import models
 
-#  All of these models are created in the database by Django.
+# All of these models are created in the database by Django.
 
 
 class A01(models.Model):

@@ -183,7 +183,7 @@ PostGIS     ``ST_ContainsProperly(poly, geom)``
 -------------
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_CoveredBy.html>`__,
-Oracle, MySQL, PGRaster (Bilateral), SpatiaLite
+Oracle, MariaDB, MySQL, PGRaster (Bilateral), SpatiaLite
 
 Tests if no point in the geometry field is outside the lookup geometry.
 [#fncovers]_
@@ -197,6 +197,7 @@ Backend     SQL Equivalent
 ==========  =============================
 PostGIS     ``ST_CoveredBy(poly, geom)``
 Oracle      ``SDO_COVEREDBY(poly, geom)``
+MariaDB     ``MBRCoveredBy(poly, geom)``
 MySQL       ``MBRCoveredBy(poly, geom)``
 SpatiaLite  ``CoveredBy(poly, geom)``
 ==========  =============================
@@ -204,6 +205,10 @@ SpatiaLite  ``CoveredBy(poly, geom)``
 .. versionchanged:: 5.2
 
     MySQL support was added.
+
+.. versionchanged:: 6.0
+
+    MariaDB 12.0.1+ support was added.
 
 .. fieldlookup:: covers
 
@@ -374,8 +379,8 @@ Example::
 ``isvalid``
 -----------
 
-*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__,
-Oracle, SpatiaLite
+*Availability*: MariaDB, MySQL,
+`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Tests if the geometry is valid.
 
@@ -383,12 +388,42 @@ Example::
 
     Zipcode.objects.filter(poly__isvalid=True)
 
-==========================  ================================================================
-Backend                     SQL Equivalent
-==========================  ================================================================
-MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
-Oracle                      ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
-==========================  ================================================================
+===================================  ================================================================
+Backend                              SQL Equivalent
+===================================  ================================================================
+MariaDB, MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
+Oracle                               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
+===================================  ================================================================
+
+.. versionchanged:: 6.0
+
+    MariaDB 12.0.1+ support was added.
+
+.. fieldlookup:: geom_type
+
+``geom_type``
+-------------
+
+.. versionadded:: 6.0
+
+*Availability*: `PostGIS <https://postgis.net/docs/GeometryType.html>`__,
+Oracle 23c+, MariaDB, MySQL, SpatiaLite
+
+Returns the geometry type of the geometry field.
+
+Example::
+
+    Zipcode.objects.filter(poly__geom_type="POLYGON")
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``GeometryType(geom)``
+MariaDB     ``ST_GeometryType(geom)``
+MySQL       ``ST_GeometryType(geom)``
+Oracle      ``SDO_GEOMETRY.GET_GTYPE(geom)``
+SpatiaLite  ``GeometryType(geom)``
+==========  ==========================
 
 .. fieldlookup:: overlaps
 
@@ -880,14 +915,18 @@ Example:
 
 .. class:: Collect(geo_field, filter=None)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__, MySQL,
-SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__,
+MariaDB, MySQL, SpatiaLite
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :class:`Union`
 aggregate, except it can be several orders of magnitude faster than performing
 a union because it rolls up geometries into a collection or multi object, not
 caring about dissolving boundaries.
+
+.. versionchanged:: 6.0
+
+    MariaDB 12.0.1+ support was added.
 
 ``Extent``
 ~~~~~~~~~~

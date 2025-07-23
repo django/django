@@ -39,17 +39,22 @@ class BaseSpatialOperations:
         "AsGML",
         "AsKML",
         "AsSVG",
+        "AsWKB",
+        "AsWKT",
         "Azimuth",
         "BoundingCircle",
         "Centroid",
         "ClosestPoint",
         "Difference",
         "Distance",
+        "DistanceSpheroid",
         "Envelope",
+        "ForcePolygonCW",
         "FromWKB",
         "FromWKT",
         "GeoHash",
         "GeometryDistance",
+        "GeometryType",
         "Intersection",
         "IsEmpty",
         "IsValid",
@@ -112,7 +117,7 @@ class BaseSpatialOperations:
     def get_geom_placeholder(self, f, value, compiler):
         """
         Return the placeholder for the given geometry field with the given
-        value.  Depending on the spatial backend, the placeholder may contain a
+        value. Depending on the spatial backend, the placeholder may contain a
         stored procedure call to the transformation function of the spatial
         backend.
         """

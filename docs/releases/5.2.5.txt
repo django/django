@@ -1,0 +1,14 @@
+==========================
+Django 5.2.5 release notes
+==========================
+
+*Expected August 6, 2025*
+
+Django 5.2.5 fixes several bugs in 5.2.4.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.2.1 that prevented the usage of ``UNNEST``
+  PostgreSQL strategy of ``QuerySet.bulk_create()`` with foreign keys
+  (:ticket:`36502`).

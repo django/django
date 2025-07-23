@@ -117,6 +117,18 @@ def _filter_prefetch_queryset(queryset, field_name, instances):
     return queryset
 
 
+def _traverse_ancestors(model, starting_instance):
+    current_instance = starting_instance
+    while current_instance is not None:
+        ancestor_link = current_instance._meta.get_ancestor_link(model)
+        if not ancestor_link:
+            yield current_instance, None
+            break
+        ancestor = ancestor_link.get_cached_value(current_instance, None)
+        yield current_instance, ancestor
+        current_instance = ancestor
+
+
 class ForwardManyToOneDescriptor:
     """
     Accessor to the related object on the forward side of a many-to-one or
@@ -169,8 +181,11 @@ class ForwardManyToOneDescriptor:
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = {instance_attr(inst): inst for inst in instances}
-        related_fields = self.field.foreign_related_fields
         remote_field = self.field.remote_field
+        related_fields = [
+            queryset.query.resolve_ref(field.name).target
+            for field in self.field.foreign_related_fields
+        ]
         queryset = queryset.filter(
             TupleIn(
                 ColPairs(
@@ -225,21 +240,19 @@ class ForwardManyToOneDescriptor:
         try:
             rel_obj = self.field.get_cached_value(instance)
         except KeyError:
+            rel_obj = None
             has_value = None not in self.field.get_local_related_value(instance)
-            ancestor_link = (
-                instance._meta.get_ancestor_link(self.field.model)
-                if has_value
-                else None
-            )
-            if ancestor_link and ancestor_link.is_cached(instance):
-                # An ancestor link will exist if this field is defined on a
-                # multi-table inheritance parent of the instance's class.
-                ancestor = ancestor_link.get_cached_value(instance)
-                # The value might be cached on an ancestor if the instance
-                # originated from walking down the inheritance chain.
-                rel_obj = self.field.get_cached_value(ancestor, default=None)
-            else:
-                rel_obj = None
+            if has_value:
+                model = self.field.model
+                for current_instance, ancestor in _traverse_ancestors(model, instance):
+                    if ancestor:
+                        # The value might be cached on an ancestor if the
+                        # instance originated from walking down the inheritance
+                        # chain.
+                        rel_obj = self.field.get_cached_value(ancestor, default=None)
+                        if rel_obj is not None:
+                            break
+
             if rel_obj is None and has_value:
                 rel_obj = self.get_object(instance)
                 remote_field = self.field.remote_field
@@ -599,7 +612,7 @@ class ReverseManyToOneDescriptor:
     ``Parent.children`` is a ``ReverseManyToOneDescriptor`` instance.
 
     Most of the implementation is delegated to a dynamically defined manager
-    class built by ``create_forward_many_to_many_manager()`` defined below.
+    class built by ``create_reverse_many_to_one_manager()`` defined below.
     """
 
     def __init__(self, rel):
@@ -1092,16 +1105,23 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return queryset._next_is_sticky().filter(**self.core_filters)
 
         def get_prefetch_cache(self):
-            try:
-                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
-            except (AttributeError, KeyError):
-                return None
+            # Walk up the ancestor-chain (if cached) to try and find a prefetch
+            # in an ancestor.
+            for instance, _ in _traverse_ancestors(rel.field.model, self.instance):
+                try:
+                    return instance._prefetched_objects_cache[self.prefetch_cache_name]
+                except (AttributeError, KeyError):
+                    pass
+            return None
 
         def _remove_prefetched_objects(self):
-            try:
-                self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
-            except (AttributeError, KeyError):
-                pass  # nothing to clear from cache
+            # Walk up the ancestor-chain (if cached) to try and find a prefetch
+            # in an ancestor.
+            for instance, _ in _traverse_ancestors(rel.field.model, self.instance):
+                try:
+                    instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
+                except (AttributeError, KeyError):
+                    pass  # nothing to clear from cache
 
         def get_queryset(self):
             if (cache := self.get_prefetch_cache()) is not None:

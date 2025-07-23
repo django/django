@@ -135,6 +135,7 @@ from .models import (
     UnchangeableObject,
     UndeletableObject,
     UnorderedObject,
+    UserMessenger,
     UserProxy,
     Villain,
     Vodcast,
@@ -6203,6 +6204,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         user = User.objects.create_user(username="new", password="newuser")
         url = self.live_server_url + reverse("admin:auth_user_change", args=[user.id])
         self.selenium.get(url)
+        self.trigger_resize()
 
         # Scroll to the User permissions section.
         user_permissions = self.selenium.find_element(
@@ -6242,9 +6244,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             ).perform()
 
         # Move focus to other element.
-        self.selenium.find_element(
-            By.CSS_SELECTOR, "#id_user_permissions_selected_input"
-        ).click()
+        body = self.selenium.find_element(By.TAG_NAME, "body")
+        body.send_keys(Keys.TAB)
         self.take_screenshot("selectbox-chosen-perms-some-selected")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
@@ -6875,6 +6876,36 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input = self.selenium.find_element(By.ID, "id_name")
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    @override_settings(MESSAGE_LEVEL=10)
+    def test_messages(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import Select
+
+        with override_settings(MESSAGE_LEVEL=10):
+            self.admin_login(
+                username="super", password="secret", login_url=reverse("admin:index")
+            )
+            UserMessenger.objects.create()
+            for level in ["warning", "info", "error", "success", "debug"]:
+                self.selenium.get(
+                    self.live_server_url
+                    + reverse("admin:admin_views_usermessenger_changelist"),
+                )
+                checkbox = self.selenium.find_element(
+                    By.CSS_SELECTOR, "tr input.action-select"
+                )
+                checkbox.click()
+                Select(self.selenium.find_element(By.NAME, "action")).select_by_value(
+                    f"message_{level}"
+                )
+                self.selenium.find_element(By.XPATH, '//button[text()="Run"]').click()
+                message = self.selenium.find_element(
+                    By.CSS_SELECTOR, "ul.messagelist li"
+                )
+                self.assertEqual(message.get_attribute("innerText"), f"Test {level}")
+                self.take_screenshot(level)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

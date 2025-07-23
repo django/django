@@ -5,7 +5,7 @@ from django.test import TransactionTestCase
 
 class MigrateTests(TransactionTestCase):
     """
-    Tests running the migrate command in Geodjango.
+    Tests running the migrate command in GeoDjango.
     """
 
     available_apps = ["gis_tests.gis_migrations"]
@@ -24,7 +24,7 @@ class MigrateTests(TransactionTestCase):
 
     def test_migrate_gis(self):
         """
-        Tests basic usage of the migrate command when a model uses Geodjango
+        Tests basic usage of the migrate command when a model uses GeoDjango
         fields (#22001).
 
         It's also used to showcase an error in migrations where spatialite is

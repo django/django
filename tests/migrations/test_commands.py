@@ -445,7 +445,7 @@ class MigrateTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_showmigrations_list(self):
         """
-        showmigrations --list  displays migrations and whether or not they're
+        showmigrations --list displays migrations and whether or not they're
         applied.
         """
         out = io.StringIO()

@@ -575,7 +575,7 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
             rendered = t.render(Context())
             self.assertEqual(rendered, "May")
 
-            # Existing context...  using a literal
+            # Existing context... using a literal
             t = self.get_template(
                 "{% load i18n %}"
                 '{% blocktranslate context "month name" %}May{% endblocktranslate %}'
