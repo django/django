@@ -215,8 +215,8 @@ def naturaltime(value):
 
 class NaturalTimeFormatter:
     time_strings = {
-        # Translators: delta will contain a string like '2 months' or '1 month,
-        # 2 weeks'
+        # Translators: delta will contain a string like '2 months' or
+        # '1 month, 2 weeks'
         "past-day": gettext_lazy("%(delta)s ago"),
         # Translators: please keep a non-breaking space (U+00A0) between count
         # and time unit.
@@ -248,8 +248,8 @@ class NaturalTimeFormatter:
             "an hour from now", "%(count)s hours from now", "count",
         ),
         # fmt: on
-        # Translators: delta will contain a string like '2 months' or '1 month,
-        # 2 weeks'
+        # Translators: delta will contain a string like '2 months' or
+        # '1 month, 2 weeks'
         "future-day": gettext_lazy("%(delta)s from now"),
     }
     past_substrings = {

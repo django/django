@@ -2635,7 +2635,8 @@ class Query(BaseExpression):
 
         Return a lookup usable for doing outerq.filter(lookup=self) and a
         boolean indicating if the joins in the prefix contain a LEFT OUTER
-        join. _"""
+        join.
+        """
         all_paths = []
         for _, paths in names_with_path:
             all_paths.extend(paths)

@@ -756,8 +756,8 @@ class QuerySet(AltersData):
         save() on each of the instances, do not send any pre/post_save
         signals, and do not set the primary key attribute if it is an
         autoincrement field (except if
-        features.can_return_rows_from_bulk_insert=True). Multi-table models are
-        not supported.
+        features.can_return_rows_from_bulk_insert=True).
+        Multi-table models are not supported.
         """
         # When you bulk insert you don't get the primary keys back (if it's an
         # autoincrement, except if can_return_rows_from_bulk_insert=True), so
@@ -2561,7 +2561,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # of instances, and returns a tuple:
 
     # (queryset of instances of self.model that are related to passed in
-    # instances,
+    #  instances,
     #  callable that gets value to be matched for returned instances,
     #  callable that gets value to be matched for passed in instances,
     #  boolean that is True for singly related objects,
