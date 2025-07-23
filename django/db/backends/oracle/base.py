@@ -243,6 +243,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             "use_returning_into", True
         )
         self.features.can_return_columns_from_insert = use_returning_into
+        self.features.can_return_rows_from_update = use_returning_into
 
     @property
     def is_pool(self):
