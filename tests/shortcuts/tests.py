@@ -1,7 +1,11 @@
+from django.db.models import Q
+from django.http import Http404
 from django.http.response import HttpResponseRedirectBase
-from django.shortcuts import redirect
-from django.test import SimpleTestCase, override_settings
+from django.shortcuts import get_list_or_404, get_object_or_404, redirect
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import require_jinja2
+
+from .models import RelatedModel, SimpleModel
 
 
 @override_settings(ROOT_URLCONF="shortcuts.urls")
@@ -56,3 +60,36 @@ class RedirectTests(SimpleTestCase):
                 )
                 self.assertIsInstance(response, HttpResponseRedirectBase)
                 self.assertEqual(response.status_code, expected_status_code)
+
+
+class GetListObjectOr404Test(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.s1 = SimpleModel.objects.create(field=0)
+        cls.s2 = SimpleModel.objects.create(field=1)
+        cls.r1 = RelatedModel.objects.create(simple=cls.s1)
+
+    def test_get_object_or_404(self):
+        self.assertEqual(get_object_or_404(SimpleModel, field=1), self.s2)
+        self.assertEqual(get_object_or_404(SimpleModel, Q(field=0)), self.s1)
+        self.assertEqual(get_object_or_404(SimpleModel.objects.all(), field=1), self.s2)
+        self.assertEqual(
+            get_object_or_404(self.s1.relatedmodel_set, pk=self.r1.pk), self.r1
+        )
+        # Http404 is returned if no object is found.
+        msg = "No SimpleModel matches the given query."
+        with self.assertRaisesMessage(Http404, msg):
+            get_object_or_404(SimpleModel, field=2)
+
+    def test_get_list_or_404(self):
+        self.assertEqual(get_list_or_404(SimpleModel, field=1), [self.s2])
+        self.assertEqual(get_list_or_404(SimpleModel, Q(field=0)), [self.s1])
+        self.assertEqual(get_list_or_404(SimpleModel.objects.all(), field=1), [self.s2])
+        self.assertEqual(
+            get_list_or_404(self.s1.relatedmodel_set, pk=self.r1.pk), [self.r1]
+        )
+        # Http404 is returned if the list is empty.
+        msg = "No SimpleModel matches the given query."
+        with self.assertRaisesMessage(Http404, msg):
+            get_list_or_404(SimpleModel, field=2)
