@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import RegexValidator, validate_slug
 from django.db import connection, migrations, models
-from django.db.migrations.autodetector import MigrationAutodetector
+from django.db.migrations.autodetector import MigrationAutodetector, OperationDependency
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
@@ -1234,6 +1234,22 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertEqual(changes["testapp"][0].name, "0001_initial")
         self.assertEqual(changes["otherapp"][0].name, "0001_initial")
         self.assertNotIn("thirdapp", changes)
+
+    def test_check_dependency_invalid(self):
+        before = self.make_project_state([])
+        after = self.make_project_state([self.other_pony_food])
+        changes = self.get_changes([], [self.other_pony_food])
+        autodetector = MigrationAutodetector(before, after)
+        operation = changes["otherapp"][0].operations[0]
+        invalid_operation_type = -1
+        dependency = OperationDependency(
+            "dummy_app_label",
+            "dummy_model_name",
+            "dummy_field_name",
+            invalid_operation_type,
+        )
+        with self.assertRaisesMessage(ValueError, "Can't handle dependency"):
+            autodetector.check_dependency(operation, dependency)
 
     def test_custom_migration_name(self):
         """Tests custom naming of migrations for graph matching."""
