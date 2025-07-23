@@ -61,7 +61,8 @@ class AbstractInheritanceTests(SimpleTestCase):
     def test_diamond_shaped_multiple_inheritance_is_depth_first(self):
         """
         In contrast to standard Python MRO, resolution of inherited fields is
-        strictly depth-first, rather than breadth-first in diamond-shaped cases.
+        strictly depth-first, rather than breadth-first in diamond-shaped
+        cases.
 
         This is because a copy of the parent field descriptor is placed onto
         the model class in ModelBase.__new__(), rather than the attribute

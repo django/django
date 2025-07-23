@@ -141,8 +141,9 @@ def _ogrinspect(
     null=False,
 ):
     """
-    Helper routine for `ogrinspect` that generates GeoDjango models corresponding
-    to the given data source. See the `ogrinspect` docstring for more details.
+    Helper routine for `ogrinspect` that generates GeoDjango models
+    corresponding to the given data source. See the `ogrinspect` docstring for
+    more details.
     """
     # Getting the DataSource
     if isinstance(data_source, str):

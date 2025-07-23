@@ -517,8 +517,8 @@ class DeletionTests(TestCase):
         batch_size = connection.ops.bulk_batch_size(["pk"], objs)
         # The related fetches are done in batches.
         batches = ceil(len(objs) / batch_size)
-        # One query for Avatar.objects.all() and then one related fast delete for
-        # each batch.
+        # One query for Avatar.objects.all() and then one related fast delete
+        # for each batch.
         fetches_to_mem = 1 + batches
         # The Avatar objects are going to be deleted in batches of
         # GET_ITERATOR_CHUNK_SIZE.

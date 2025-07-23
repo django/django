@@ -379,7 +379,8 @@ class TestUtilsHashPass(SimpleTestCase):
             # Revert to the old iteration count and ...
             hasher.iterations = old_iterations
 
-            # ... check if the password would get updated to the new iteration count.
+            # ... check if the password would get updated to the new iteration
+            # count.
             self.assertTrue(check_password("letmein", encoded, setter))
             self.assertTrue(state["upgraded"])
         finally:

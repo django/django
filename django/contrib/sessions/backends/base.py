@@ -120,7 +120,9 @@ class SessionBase:
         del (await self._aget_session())[self.TEST_COOKIE_NAME]
 
     def encode(self, session_dict):
-        "Return the given session dictionary serialized and encoded as a string."
+        """
+        Return the given session dictionary serialized and encoded as a string.
+        """
         return signing.dumps(
             session_dict,
             salt=self.key_salt,

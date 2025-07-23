@@ -96,7 +96,8 @@ class Extract(TimezoneMixin, Transform):
                 "Extract input expression must be DateField, DateTimeField, "
                 "TimeField, or DurationField."
             )
-        # Passing dates to functions expecting datetimes is most likely a mistake.
+        # Passing dates to functions expecting datetimes is most likely a
+        # mistake.
         if type(field) is DateField and copy.lookup_name in (
             "hour",
             "minute",

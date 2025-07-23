@@ -227,8 +227,8 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         return OracleSpatialRefSys
 
     def modify_insert_params(self, placeholder, params):
-        """Drop out insert parameters for NULL placeholder. Needed for Oracle Spatial
-        backend due to #10888.
+        """Drop out insert parameters for NULL placeholder. Needed for Oracle
+        Spatial backend due to #10888.
         """
         if placeholder == "NULL":
             return []

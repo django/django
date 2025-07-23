@@ -518,7 +518,8 @@ class YearLteTests(TestCase):
 
     def test_custom_implementation_year_exact(self):
         try:
-            # Two ways to add a customized implementation for different backends:
+            # Two ways to add a customized implementation for different
+            # backends:
             # First is MonkeyPatch of the class.
             def as_custom_sql(self, compiler, connection):
                 lhs_sql, lhs_params = self.process_lhs(

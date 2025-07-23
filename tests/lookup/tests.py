@@ -174,7 +174,8 @@ class LookupTests(TestCase):
         )
 
     def test_in_bulk(self):
-        # in_bulk() takes a list of IDs and returns a dictionary mapping IDs to objects.
+        # in_bulk() takes a list of IDs and returns a dictionary mapping IDs to
+        # objects.
         arts = Article.objects.in_bulk([self.a1.id, self.a2.id])
         self.assertEqual(arts[self.a1.id], self.a1)
         self.assertEqual(arts[self.a2.id], self.a2)
@@ -375,7 +376,8 @@ class LookupTests(TestCase):
                 {"headline": "Article 1", "id": self.a1.id},
             ],
         )
-        # The values() method works with "extra" fields specified in extra(select).
+        # The values() method works with "extra" fields specified in
+        # extra(select).
         self.assertSequenceEqual(
             Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
                 "id", "id_plus_one"
@@ -415,7 +417,8 @@ class LookupTests(TestCase):
                 }
             ],
         )
-        # You can specify fields from forward and reverse relations, just like filter().
+        # You can specify fields from forward and reverse relations, just like
+        # filter().
         self.assertSequenceEqual(
             Article.objects.values("headline", "author__name"),
             [
@@ -660,8 +663,9 @@ class LookupTests(TestCase):
         )
 
     def test_escaping(self):
-        # Underscores, percent signs and backslashes have special meaning in the
-        # underlying SQL code, but Django handles the quoting of them automatically.
+        # Underscores, percent signs and backslashes have special meaning in
+        # the underlying SQL code, but Django handles the quoting of them
+        # automatically.
         a8 = Article.objects.create(
             headline="Article_ with underscore", pub_date=datetime(2005, 11, 20)
         )

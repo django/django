@@ -997,7 +997,8 @@ class Field(RegisterLookupMixin):
 
     def get_db_prep_value(self, value, connection, prepared=False):
         """
-        Return field's value prepared for interacting with the database backend.
+        Return field's value prepared for interacting with the database
+        backend.
 
         Used by the default implementations of get_db_prep_save().
         """
@@ -1927,8 +1928,8 @@ class EmailField(CharField):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        # We do not exclude max_length if it matches default as we want to change
-        # the default in future.
+        # We do not exclude max_length if it matches default as we want to
+        # change the default in future.
         return name, path, args, kwargs
 
     def formfield(self, **kwargs):

@@ -105,7 +105,8 @@ class JavaScriptCatalog(View):
 
     You can override the gettext domain for this view, but usually you don't
     want to do that as JavaScript messages go to the djangojs domain. This
-    might be needed if you deliver your JavaScript source from Django templates.
+    might be needed if you deliver your JavaScript source from Django
+    templates.
     """
 
     domain = "djangojs"
@@ -153,8 +154,8 @@ class JavaScriptCatalog(View):
     @property
     def _plural_string(self):
         """
-        Return the plural string (including nplurals) for this catalog language,
-        or None if no plural string is available.
+        Return the plural string (including nplurals) for this catalog
+        language, or None if no plural string is available.
         """
         if "" in self.translation._catalog:
             for line in self.translation._catalog[""].split("\n"):

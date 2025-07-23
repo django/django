@@ -637,7 +637,8 @@ def compare_xml(want, got):
     important. Ignore comment nodes, processing instructions, document type
     node, and leading and trailing whitespaces.
 
-    Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
+    Based on
+    https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
     _norm_whitespace_re = re.compile(r"[ \t\n][ \t\n]+")
 

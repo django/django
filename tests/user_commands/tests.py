@@ -488,8 +488,8 @@ class CommandRunTests(AdminScriptTestCase):
             "settings.py",
             apps=["django.contrib.staticfiles", "user_commands"],
             sdict={
-                # (staticfiles.E001) The STATICFILES_DIRS setting is not a tuple or
-                # list.
+                # (staticfiles.E001) The STATICFILES_DIRS setting is not a
+                # tuple or list.
                 "STATICFILES_DIRS": '"foo"',
             },
         )

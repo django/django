@@ -170,10 +170,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         # ForeignKey or ManyToManyFields
         if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
-            # Combine the field kwargs with any options for formfield_overrides.
-            # Make sure the passed in **kwargs override anything in
-            # formfield_overrides because **kwargs is more specific, and should
-            # always win.
+            # Combine the field kwargs with any options for
+            # formfield_overrides. Make sure the passed in **kwargs override
+            # anything in formfield_overrides because **kwargs is more
+            # specific, and should always win.
             if db_field.__class__ in self.formfield_overrides:
                 kwargs = {**self.formfield_overrides[db_field.__class__], **kwargs}
 
@@ -2182,8 +2182,8 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             return self._get_obj_does_not_exist_redirect(request, self.opts, object_id)
 
-        # Populate deleted_objects, a data structure of all related objects that
-        # will also be deleted.
+        # Populate deleted_objects, a data structure of all related objects
+        # that will also be deleted.
         (
             deleted_objects,
             model_count,

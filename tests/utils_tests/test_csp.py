@@ -67,8 +67,9 @@ class CSPBuildPolicyTest(SimpleTestCase):
         """
         Test that a set can be passed as a value.
 
-        Sets are often used in Django settings to ensure uniqueness, however, sets are
-        unordered. The middleware ensures consistency via sorting if a set is passed.
+        Sets are often used in Django settings to ensure uniqueness, however,
+        sets are unordered. The middleware ensures consistency via sorting if a
+        set is passed.
         """
         policy = {"default-src": {CSP.SELF, "foo.com", "bar.com"}}
         self.assertPolicyEqual(
@@ -147,7 +148,8 @@ class LazyNonceTests(SimpleTestCase):
             return result
 
         with patch("django.utils.csp.secrets.token_urlsafe", memento_token_urlsafe):
-            # Force usage, similar to template rendering, to generate the nonce.
+            # Force usage, similar to template rendering, to generate the
+            # nonce.
             val = str(nonce)
 
         self.assertTrue(nonce)

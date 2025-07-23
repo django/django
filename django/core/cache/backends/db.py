@@ -136,9 +136,9 @@ class DatabaseCache(BaseDatabaseCache):
             b64encoded = base64.b64encode(pickled).decode("latin1")
             try:
                 # Note: typecasting for datetimes is needed by some 3rd party
-                # database backends. All core backends work without typecasting,
-                # so be careful about changes here - test suite will NOT pick
-                # regressions.
+                # database backends. All core backends work without
+                # typecasting, so be careful about changes here - test suite
+                # will NOT pick regressions.
                 with transaction.atomic(using=db):
                     cursor.execute(
                         "SELECT %s, %s FROM %s WHERE %s = %%s"
@@ -198,7 +198,8 @@ class DatabaseCache(BaseDatabaseCache):
                     else:
                         return False  # touch failed.
             except DatabaseError:
-                # To be threadsafe, updates/inserts are allowed to fail silently
+                # To be threadsafe, updates/inserts are allowed to fail
+                # silently
                 return False
             else:
                 return True

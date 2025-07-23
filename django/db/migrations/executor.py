@@ -21,7 +21,8 @@ class MigrationExecutor:
 
     def migration_plan(self, targets, clean_start=False):
         """
-        Given a set of targets, return a list of (Migration instance, backwards?).
+        Given a set of targets, return a list of (Migration instance,
+        backwards?).
         """
         plan = []
         if clean_start:
@@ -29,7 +30,8 @@ class MigrationExecutor:
         else:
             applied = dict(self.loader.applied_migrations)
         for target in targets:
-            # If the target is (app_label, None), that means unmigrate everything
+            # If the target is (app_label, None), that means unmigrate
+            # everything
             if target[1] is None:
                 for root in self.loader.graph.root_nodes():
                     if root[0] == target[0]:

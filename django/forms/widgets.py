@@ -71,7 +71,8 @@ class MediaAsset:
         self.attributes = attributes
 
     def __eq__(self, other):
-        # Compare the path only, to ensure performant comparison in Media.merge.
+        # Compare the path only, to ensure performant comparison in
+        # Media.merge.
         return (self.__class__ is other.__class__ and self.path == other.path) or (
             isinstance(other, str) and self._path == other
         )
@@ -161,8 +162,8 @@ class Media:
         ]
 
     def render_css(self):
-        # To keep rendering order consistent, we can't just iterate over items().
-        # We need to sort the keys, and iterate over the sorted list.
+        # To keep rendering order consistent, we can't just iterate over
+        # items(). We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css)
         return chain.from_iterable(
             [
@@ -585,7 +586,8 @@ class ClearableFileInput(FileInput):
                 # checks the "clear" checkbox), we return a unique marker
                 # object that FileField will turn into a ValidationError.
                 return FILE_INPUT_CONTRADICTION
-            # False signals to clear any existing value, as opposed to just None
+            # False signals to clear any existing value, as opposed to just
+            # None
             return False
         return upload
 

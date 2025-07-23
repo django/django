@@ -18,7 +18,9 @@ class LoremIpsumTests(unittest.TestCase):
         self.assertEqual(words(7), "lorem ipsum dolor sit amet consectetur adipisicing")
 
     def test_common_words_in_string(self):
-        """words(n) starts with the 19 standard lorem ipsum words for n > 19."""
+        """
+        words(n) starts with the 19 standard lorem ipsum words for n > 19.
+        """
         self.assertTrue(
             words(25).startswith(
                 "lorem ipsum dolor sit amet consectetur adipisicing elit sed "

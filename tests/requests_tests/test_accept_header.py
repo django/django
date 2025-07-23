@@ -346,7 +346,8 @@ class AcceptHeaderTests(TestCase):
 
     def test_quality_for_media_type_rfc9110(self):
         """
-        Taken from https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1-18.
+        Taken from
+        https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1-18.
         """
         request = HttpRequest()
         request.META["HTTP_ACCEPT"] = (

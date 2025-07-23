@@ -252,9 +252,9 @@ class Atomic(ContextDecorator):
                                 # minimize overhead for the database server.
                                 connection.savepoint_commit(sid)
                             except Error:
-                                # If rolling back to a savepoint fails, mark for
-                                # rollback at a higher level and avoid shadowing
-                                # the original exception.
+                                # If rolling back to a savepoint fails, mark
+                                # for rollback at a higher level and avoid
+                                # shadowing the original exception.
                                 connection.needs_rollback = True
                             raise
                 else:
@@ -270,8 +270,8 @@ class Atomic(ContextDecorator):
                             connection.close()
                         raise
             else:
-                # This flag will be set to True again if there isn't a savepoint
-                # allowing to perform the rollback at this level.
+                # This flag will be set to True again if there isn't a
+                # savepoint allowing to perform the rollback at this level.
                 connection.needs_rollback = False
                 if connection.in_atomic_block:
                     # Roll back to savepoint if there is one, mark for rollback

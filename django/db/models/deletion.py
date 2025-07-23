@@ -82,8 +82,9 @@ def DO_NOTHING(collector, field, sub_objs, using):
 
 
 def get_candidate_relations_to_delete(opts):
-    # The candidate relations are the ones that come from N-1 and 1-1 relations.
-    # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
+    # The candidate relations are the ones that come from N-1 and 1-1
+    # relations. N-N  (i.e., many-to-many) relations aren't candidates for
+    # deletion.
     return (
         f
         for f in opts.get_fields(include_hidden=True)
@@ -434,8 +435,8 @@ class Collector:
             self.data[model] = sorted(instances, key=attrgetter("pk"))
 
         # if possible, bring the models in an order suitable for databases that
-        # don't support transactions or cannot defer constraint checks until the
-        # end of a transaction.
+        # don't support transactions or cannot defer constraint checks until
+        # the end of a transaction.
         self.sort()
         # number of objects deleted for each model label
         deleted_counter = Counter()

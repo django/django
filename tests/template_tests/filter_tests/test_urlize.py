@@ -296,7 +296,8 @@ class FunctionTests(SimpleTestCase):
 
     def test_trailing_period(self):
         """
-        #18644 - Check urlize trims trailing period when followed by parenthesis
+        #18644 - Check urlize trims trailing period when followed by
+        parenthesis
         """
         self.assertEqual(
             urlize("(Go to http://www.example.com/foo.)"),

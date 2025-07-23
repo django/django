@@ -907,7 +907,8 @@ class SetupDatabasesTests(unittest.TestCase):
                 },
             }
         )
-        # Using the real current name as old_name to not mess with the test suite.
+        # Using the real current name as old_name to not mess with the test
+        # suite.
         old_name = settings.DATABASES[db.DEFAULT_DB_ALIAS]["NAME"]
         with mock.patch("django.db.connections", new=tested_connections):
             tested_connections["default"].creation.destroy_test_db(
@@ -969,8 +970,9 @@ class AutoIncrementResetTest(TransactionTestCase):
 class EmptyDefaultDatabaseTest(unittest.TestCase):
     def test_empty_default_database(self):
         """
-        An empty default database in settings does not raise an ImproperlyConfigured
-        error when running a unit test that does not use a database.
+        An empty default database in settings does not raise an
+        ImproperlyConfigured error when running a unit test that does not use a
+        database.
         """
         tested_connections = db.ConnectionHandler({"default": {}})
         with mock.patch("django.db.connections", new=tested_connections):

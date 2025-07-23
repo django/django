@@ -316,7 +316,8 @@ class BaseModelAdminChecks:
 
     def _check_fields(self, obj):
         """Check that `fields` only refer to existing fields, doesn't contain
-        duplicates. Check if at most one of `fields` and `fieldsets` is defined.
+        duplicates. Check if at most one of `fields` and `fieldsets` is
+        defined.
         """
 
         if obj.fields is None:

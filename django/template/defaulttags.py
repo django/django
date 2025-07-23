@@ -205,8 +205,8 @@ class ForNode(Node):
                 values = reversed(values)
             num_loopvars = len(self.loopvars)
             unpack = num_loopvars > 1
-            # Create a forloop value in the context. We'll update counters on each
-            # iteration just below.
+            # Create a forloop value in the context. We'll update counters on
+            # each iteration just below.
             loop_dict = context["forloop"] = {
                 "parentloop": parentloop,
                 "length": len_values,
@@ -224,8 +224,8 @@ class ForNode(Node):
 
                 pop_context = False
                 if unpack:
-                    # If there are multiple loop variables, unpack the item into
-                    # them.
+                    # If there are multiple loop variables, unpack the item
+                    # into them.
                     try:
                         len_item = len(item)
                     except TypeError:  # not an iterable
@@ -293,8 +293,8 @@ class IfChangedNode(Node):
         # changes.
         if "forloop" in context:
             # Ifchanged is bound to the local for loop.
-            # When there is a loop-in-loop, the state is bound to the inner loop,
-            # so it resets when the outer loop continues.
+            # When there is a loop-in-loop, the state is bound to the inner
+            # loop, so it resets when the outer loop continues.
             return context["forloop"]
         else:
             # Using ifchanged outside loops. Effectively this is a no-op
@@ -1274,10 +1274,10 @@ def regroup(parser, token):
     and ``Trumpet``, and ``list`` is the list of musicians who play this
     instrument.
 
-    Note that ``{% regroup %}`` does not work when the list to be grouped is not
-    sorted by the key you are grouping by! This means that if your list of
-    musicians was not sorted by instrument, you'd need to make sure it is sorted
-    before using it, i.e.::
+    Note that ``{% regroup %}`` does not work when the list to be grouped is
+    not sorted by the key you are grouping by! This means that if your list of
+    musicians was not sorted by instrument, you'd need to make sure it is
+    sorted before using it, i.e.::
 
         {% regroup musicians|dictsort:"instrument" by instrument as grouped %}
     """

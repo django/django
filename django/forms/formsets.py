@@ -307,10 +307,10 @@ class BaseFormSet(RenderableFormMixin):
             raise AttributeError(
                 "'%s' object has no attribute 'ordered_forms'" % self.__class__.__name__
             )
-        # Construct _ordering, which is a list of (form_index, order_field_value)
-        # tuples. After constructing this list, we'll sort it by order_field_value
-        # so we have a way to get to the form indexes in the order specified
-        # by the form data.
+        # Construct _ordering, which is a list of (form_index,
+        # order_field_value) tuples. After constructing this list, we'll sort
+        # it by order_field_value so we have a way to get to the form indexes
+        # in the order specified by the form data.
         if not hasattr(self, "_ordering"):
             self._ordering = []
             for i, form in enumerate(self.forms):

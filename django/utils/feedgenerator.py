@@ -65,9 +65,10 @@ def _guess_stylesheet_mimetype(url):
     """
     mimetypedb = mimetypes.MimeTypes()
 
-    # The official mimetype for XSLT files is technically `application/xslt+xml`
-    # but as of 2024 almost no browser supports that (they all expect text/xsl).
-    # On top of that, windows seems to assume that the type for xsl is text/xml.
+    # The official mimetype for XSLT files is technically
+    # `application/xslt+xml` but as of 2024 almost no browser supports that
+    # (they all expect text/xsl). On top of that, windows seems to assume that
+    # the type for xsl is text/xml.
     mimetypedb.readfp(StringIO("text/xsl\txsl\ntext/xsl\txslt"))
 
     return mimetypedb.guess_type(url)
@@ -215,8 +216,8 @@ class SyndicationFeed:
 
     def root_attributes(self):
         """
-        Return extra attributes to place on the root (i.e. feed/channel) element.
-        Called from write().
+        Return extra attributes to place on the root (i.e. feed/channel)
+        element. Called from write().
         """
         return {}
 
@@ -235,7 +236,8 @@ class SyndicationFeed:
 
     def item_attributes(self, item):
         """
-        Return extra attributes to place on each item (i.e. item/entry) element.
+        Return extra attributes to place on each item (i.e. item/entry)
+        element.
         """
         return {}
 
@@ -295,8 +297,8 @@ class RssFeed(SyndicationFeed):
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding, short_empty_elements=True)
         handler.startDocument()
-        # Any stylesheet must come after the start of the document but before any tag.
-        # https://www.w3.org/Style/styling-XML.en.html
+        # Any stylesheet must come after the start of the document but before
+        # any tag. https://www.w3.org/Style/styling-XML.en.html
         self.add_stylesheets(handler)
         handler.startElement("rss", self.rss_attributes())
         handler.startElement("channel", self.root_attributes())

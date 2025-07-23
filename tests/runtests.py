@@ -715,7 +715,8 @@ if __name__ == "__main__":
     if options.screenshots and options.tags:
         parser.error("--screenshots and --tag are mutually exclusive.")
 
-    # Allow including a trailing slash on app_labels for tab completion convenience
+    # Allow including a trailing slash on app_labels for tab completion
+    # convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]
 
     mutually_exclusive_options = [

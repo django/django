@@ -300,7 +300,8 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
 class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, TestCase):
     def test_filter_choices_by_request_user(self):
         """
-        Ensure the user can only see their own cars in the foreign key dropdown.
+        Ensure the user can only see their own cars in the foreign key
+        dropdown.
         """
         self.client.force_login(self.superuser)
         response = self.client.get(reverse("admin:admin_widgets_cartire_add"))
@@ -1052,8 +1053,8 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_calendar_nonday_class(self):
         """
-        Ensure cells that are not days of the month have the `nonday` CSS class.
-        Refs #4574.
+        Ensure cells that are not days of the month have the `nonday` CSS
+        class. Refs #4574.
         """
         from selenium.webdriver.common.by import By
 
@@ -1184,9 +1185,9 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         date/time/datetime picker shortcuts work in the current time zone.
         Refs #20663.
 
-        This test case is fairly tricky, it relies on selenium still running the browser
-        in the default time zone "America/Chicago" despite `override_settings` changing
-        the time zone to "Asia/Singapore".
+        This test case is fairly tricky, it relies on selenium still running
+        the browser in the default time zone "America/Chicago" despite
+        `override_settings` changing the time zone to "Asia/Singapore".
         """
         from selenium.webdriver.common.by import By
 
@@ -1502,7 +1503,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(from_box, str(self.peter.id))
         self.select_option(from_box, str(self.lisa.id))
 
-        # Confirm they're selected after clicking inactive buttons: ticket #26575
+        # Confirm they're selected after clicking inactive buttons: ticket
+        # #26575
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
         self.selenium.find_element(By.ID, remove_button).click()
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
@@ -1515,7 +1517,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(to_box, str(self.jason.id))
         self.select_option(to_box, str(self.john.id))
 
-        # Confirm they're selected after clicking inactive buttons: ticket #26575
+        # Confirm they're selected after clicking inactive buttons: ticket
+        # #26575
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
         self.selenium.find_element(By.ID, choose_button).click()
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])

@@ -27,7 +27,8 @@ class BaseHandler:
         """
         Populate middleware lists from settings.MIDDLEWARE.
 
-        Must be called after the environment is fixed (see __call__ in subclasses).
+        Must be called after the environment is fixed (see __call__ in
+        subclasses).
         """
         self._view_middleware = []
         self._template_response_middleware = []

@@ -610,8 +610,8 @@ class HumanizeTests(SimpleTestCase):
 
     def test_inflection_for_timedelta(self):
         """
-        Translation of '%d day'/'%d month'/… may differ depending on the context
-        of the string it is inserted in.
+        Translation of '%d day'/'%d month'/… may differ depending on the
+        context of the string it is inserted in.
         """
         test_list = [
             # "%(delta)s ago" translations

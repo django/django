@@ -663,8 +663,8 @@ class ForeignObject(RelatedField):
                     frozenset(uc.fields) <= foreign_fields
                     for uc in remote_opts.total_unique_constraints
                 )
-                # If the model defines a composite primary key and the foreign key
-                # refers to it, the target is unique.
+                # If the model defines a composite primary key and the foreign
+                # key refers to it, the target is unique.
                 or (
                     frozenset(field.name for field in remote_opts.pk_fields)
                     == foreign_fields
@@ -746,8 +746,8 @@ class ForeignObject(RelatedField):
                 kwargs["to"] = self.remote_field.model.lower()
         else:
             kwargs["to"] = self.remote_field.model._meta.label_lower
-        # If swappable is True, then see if we're actually pointing to the target
-        # of a swap.
+        # If swappable is True, then see if we're actually pointing to the
+        # target of a swap.
         swappable_setting = self.swappable_setting
         if swappable_setting is not None:
             # If it's already a settings reference, error
@@ -1825,8 +1825,8 @@ class ManyToManyField(RelatedField):
                 kwargs["through"] = self.remote_field.through._meta.label
         if through_fields := getattr(self.remote_field, "through_fields", None):
             kwargs["through_fields"] = through_fields
-        # If swappable is True, then see if we're actually pointing to the target
-        # of a swap.
+        # If swappable is True, then see if we're actually pointing to the
+        # target of a swap.
         swappable_setting = self.swappable_setting
         if swappable_setting is not None:
             # If it's already a settings reference, error.

@@ -576,7 +576,8 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         ]
     )
     def test_custom_login_allowed_policy(self):
-        # The user is inactive, but our custom form policy allows them to log in.
+        # The user is inactive, but our custom form policy allows them to log
+        # in.
         data = {
             "username": "inactive",
             "password": "password",
@@ -1322,9 +1323,9 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     def test_save_plaintext_email(self):
         """
-        Test the PasswordResetForm.save() method with no html_email_template_name
-        parameter passed in.
-        Test to ensure original behavior is unchanged after the parameter was added.
+        Test the PasswordResetForm.save() method with no
+        html_email_template_name parameter passed in. Test to ensure original
+        behavior is unchanged after the parameter was added.
         """
         (user, username, email) = self.create_dummy_user()
         form = PasswordResetForm({"email": email})

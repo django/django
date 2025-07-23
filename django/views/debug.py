@@ -233,7 +233,8 @@ class SafeExceptionReporterFilter:
             return "{!r} while evaluating {!r}".format(e, value)
 
         if is_multivalue_dict:
-            # Cleanse MultiValueDicts (request.POST is the one we usually care about)
+            # Cleanse MultiValueDicts (request.POST is the one we usually care
+            # about)
             value = self.get_cleansed_multivaluedict(request, value)
         return value
 

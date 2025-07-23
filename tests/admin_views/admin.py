@@ -1264,8 +1264,8 @@ site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 
-# We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
-# That way we cover all four cases:
+# We intentionally register Promo and ChapterXtra1 but not Chapter nor
+# ChapterXtra2. That way we cover all four cases:
 #     related ForeignKey object registered in admin
 #     related ForeignKey object not registered in admin
 #     related OneToOne object registered in admin

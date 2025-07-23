@@ -1,5 +1,6 @@
 """
-Query subclasses which provide extra functionality beyond simple data retrieval.
+Query subclasses which provide extra functionality beyond simple data
+retrieval.
 """
 
 from django.core.exceptions import FieldError
@@ -116,7 +117,8 @@ class UpdateQuery(Query):
             if field.generated:
                 continue
             if hasattr(val, "resolve_expression"):
-                # Resolve expressions here so that annotations are no longer needed
+                # Resolve expressions here so that annotations are no longer
+                # needed
                 val = val.resolve_expression(self, allow_joins=False, for_save=True)
             self.values.append((field, model, val))
 

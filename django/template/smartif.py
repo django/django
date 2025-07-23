@@ -11,8 +11,8 @@ Parser and utilities for the smart 'if' tag
 
 class TokenBase:
     """
-    Base class for operators and literals, mainly for debugging and for throwing
-    syntax errors.
+    Base class for operators and literals, mainly for debugging and for
+    throwing syntax errors.
     """
 
     id = None  # node/token type name

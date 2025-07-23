@@ -51,7 +51,8 @@ class RelatedGeoModelTest(TestCase):
         e3 = aggs["location__point__extent"]
 
         # The tolerance value is to four decimal places because of differences
-        # between the Oracle and PostGIS spatial backends on the extent calculation.
+        # between the Oracle and PostGIS spatial backends on the extent
+        # calculation.
         tol = 4
         for ref, e in [(all_extent, e1), (txpa_extent, e2), (all_extent, e3)]:
             for ref_val, e_val in zip(ref, e):
@@ -85,8 +86,8 @@ class RelatedGeoModelTest(TestCase):
         p5 = Point(-95.363151, 29.763374)
 
         # The second union aggregate is for a union
-        # query that includes limiting information in the WHERE clause (in other
-        # words a `.filter()` precedes the call to `.aggregate(Union()`).
+        # query that includes limiting information in the WHERE clause (in
+        # other words a `.filter()` precedes the call to `.aggregate(Union()`).
         ref_u1 = MultiPoint(p1, p2, p4, p5, p3, srid=4326)
         ref_u2 = MultiPoint(p2, p3, srid=4326)
 
@@ -187,8 +188,8 @@ class RelatedGeoModelTest(TestCase):
         # Incrementing through each of the models, dictionaries, and tuples
         # returned by each QuerySet.
         for m, d, t in zip(gqs, gvqs, gvlqs):
-            # The values should be Geometry objects and not raw strings returned
-            # by the spatial database.
+            # The values should be Geometry objects and not raw strings
+            # returned by the spatial database.
             self.assertIsInstance(d["point"], GEOSGeometry)
             self.assertIsInstance(t[1], GEOSGeometry)
             self.assertEqual(m.point, d["point"])
@@ -208,7 +209,10 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(loc.point, def_loc.point)
 
     def test09_pk_relations(self):
-        "Ensuring correct primary key column is selected across relations. See #10757."
+        """
+        Ensuring correct primary key column is selected across relations. See
+        #10757.
+        """
         # The expected ID values -- notice the last two location IDs
         # are out of order. Dallas and Houston have location IDs that differ
         # from their PKs -- this is done to ensure that the related location
@@ -426,13 +430,16 @@ class RelatedGeoModelTest(TestCase):
         select_related on the related name manager of a unique FK.
         """
         qs = Article.objects.select_related("author__article")
-        # This triggers TypeError when `get_default_columns` has no `local_only`
-        # keyword. The TypeError is swallowed if QuerySet is actually
-        # evaluated as list generation swallows TypeError in CPython.
+        # This triggers TypeError when `get_default_columns` has no
+        # `local_only` keyword. The TypeError is swallowed if QuerySet is
+        # actually evaluated as list generation swallows TypeError in CPython.
         str(qs.query)
 
     def test16_annotated_date_queryset(self):
-        "Ensure annotated date querysets work if spatial backend is used. See #14648."
+        """
+        Ensure annotated date querysets work if spatial backend is used.  See
+        #14648.
+        """
         birth_years = [
             dt.year
             for dt in list(

@@ -199,18 +199,18 @@ class IgnoreDirectoryCompilationTests(MessageCompilationTests):
 
     def test_no_dirs_accidentally_skipped(self):
         os_walk_results = [
-            # To discover .po filepaths, compilemessages uses with a starting list of
-            # basedirs to inspect, which in this scenario are:
+            # To discover .po filepaths, compilemessages uses with a starting
+            # list of basedirs to inspect, which in this scenario are:
             #   ["conf/locale", "locale"]
-            # Then os.walk is used to discover other locale dirs, ignoring dirs matching
-            # `ignore_patterns`. Mock the results to place an ignored directory directly
-            # before and after a directory named "locale".
+            # Then os.walk is used to discover other locale dirs, ignoring dirs
+            # matching `ignore_patterns`. Mock the results to place an ignored
+            # directory directly before and after a directory named "locale".
             [("somedir", ["ignore", "locale", "ignore"], [])],
             # This will result in three basedirs discovered:
             #   ["conf/locale", "locale", "somedir/locale"]
-            # os.walk is called for each locale in each basedir looking for .po files.
-            # In this scenario, we need to mock os.walk results for "en", "fr", and "it"
-            # locales for each basedir:
+            # os.walk is called for each locale in each basedir looking for .po
+            # files. In this scenario, we need to mock os.walk results for
+            # "en", "fr", and "it" locales for each basedir:
             [("exclude/locale/LC_MESSAGES", [], ["en.po"])],
             [("exclude/locale/LC_MESSAGES", [], ["fr.po"])],
             [("exclude/locale/LC_MESSAGES", [], ["it.po"])],
@@ -277,8 +277,9 @@ class CompilationErrorHandling(MessageCompilationTests):
             call_command("compilemessages", locale=["ja"], verbosity=0)
 
     def test_msgfmt_error_including_non_ascii(self):
-        # po file contains invalid msgstr content (triggers non-ascii error content).
-        # Make sure the output of msgfmt is unaffected by the current locale.
+        # po file contains invalid msgstr content (triggers non-ascii error
+        # content). Make sure the output of msgfmt is unaffected by the current
+        # locale.
         env = os.environ.copy()
         env.update({"LC_ALL": "C"})
         with mock.patch(

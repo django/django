@@ -420,7 +420,8 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if getattr(callback, "csrf_exempt", False):
             return None
 
-        # Assume that anything not defined as 'safe' by RFC 9110 needs protection
+        # Assume that anything not defined as 'safe' by RFC 9110 needs
+        # protection
         if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
             return self._accept(request)
 

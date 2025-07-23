@@ -70,9 +70,9 @@ class GISLookup(Lookup):
         return placeholder % rhs, rhs_params
 
     def get_rhs_op(self, connection, rhs):
-        # Unlike BuiltinLookup, the GIS get_rhs_op() implementation should return
-        # an object (SpatialOperator) with an as_sql() method to allow for more
-        # complex computations (where the lhs part can be mixed in).
+        # Unlike BuiltinLookup, the GIS get_rhs_op() implementation should
+        # return an object (SpatialOperator) with an as_sql() method to allow
+        # for more complex computations (where the lhs part can be mixed in).
         return connection.ops.gis_operators[self.lookup_name]
 
     def as_sql(self, compiler, connection):
@@ -98,8 +98,8 @@ class GISLookup(Lookup):
 @BaseSpatialField.register_lookup
 class OverlapsLeftLookup(GISLookup):
     """
-    The overlaps_left operator returns true if A's bounding box overlaps or is to the
-    left of B's bounding box.
+    The overlaps_left operator returns true if A's bounding box overlaps or is
+    to the left of B's bounding box.
     """
 
     lookup_name = "overlaps_left"
@@ -108,8 +108,8 @@ class OverlapsLeftLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class OverlapsRightLookup(GISLookup):
     """
-    The 'overlaps_right' operator returns true if A's bounding box overlaps or is to the
-    right of B's bounding box.
+    The 'overlaps_right' operator returns true if A's bounding box overlaps or
+    is to the right of B's bounding box.
     """
 
     lookup_name = "overlaps_right"
@@ -118,8 +118,8 @@ class OverlapsRightLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class OverlapsBelowLookup(GISLookup):
     """
-    The 'overlaps_below' operator returns true if A's bounding box overlaps or is below
-    B's bounding box.
+    The 'overlaps_below' operator returns true if A's bounding box overlaps or
+    is below B's bounding box.
     """
 
     lookup_name = "overlaps_below"
@@ -128,8 +128,8 @@ class OverlapsBelowLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class OverlapsAboveLookup(GISLookup):
     """
-    The 'overlaps_above' operator returns true if A's bounding box overlaps or is above
-    B's bounding box.
+    The 'overlaps_above' operator returns true if A's bounding box overlaps or
+    is above B's bounding box.
     """
 
     lookup_name = "overlaps_above"
@@ -138,8 +138,8 @@ class OverlapsAboveLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class LeftLookup(GISLookup):
     """
-    The 'left' operator returns true if A's bounding box is strictly to the left
-    of B's bounding box.
+    The 'left' operator returns true if A's bounding box is strictly to the
+    left of B's bounding box.
     """
 
     lookup_name = "left"
@@ -148,8 +148,8 @@ class LeftLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class RightLookup(GISLookup):
     """
-    The 'right' operator returns true if A's bounding box is strictly to the right
-    of B's bounding box.
+    The 'right' operator returns true if A's bounding box is strictly to the
+    right of B's bounding box.
     """
 
     lookup_name = "right"
@@ -158,8 +158,8 @@ class RightLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class StrictlyBelowLookup(GISLookup):
     """
-    The 'strictly_below' operator returns true if A's bounding box is strictly below B's
-    bounding box.
+    The 'strictly_below' operator returns true if A's bounding box is strictly
+    below B's bounding box.
     """
 
     lookup_name = "strictly_below"
@@ -168,8 +168,8 @@ class StrictlyBelowLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class StrictlyAboveLookup(GISLookup):
     """
-    The 'strictly_above' operator returns true if A's bounding box is strictly above B's
-    bounding box.
+    The 'strictly_above' operator returns true if A's bounding box is strictly
+    above B's bounding box.
     """
 
     lookup_name = "strictly_above"
@@ -192,8 +192,8 @@ BaseSpatialField.register_lookup(SameAsLookup, "exact")
 @BaseSpatialField.register_lookup
 class BBContainsLookup(GISLookup):
     """
-    The 'bbcontains' operator returns true if A's bounding box completely contains
-    by B's bounding box.
+    The 'bbcontains' operator returns true if A's bounding box completely
+    contains by B's bounding box.
     """
 
     lookup_name = "bbcontains"
@@ -212,8 +212,8 @@ class BBOverlapsLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class ContainedLookup(GISLookup):
     """
-    The 'contained' operator returns true if A's bounding box is completely contained
-    by B's bounding box.
+    The 'contained' operator returns true if A's bounding box is completely
+    contained by B's bounding box.
     """
 
     lookup_name = "contained"

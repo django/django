@@ -47,7 +47,8 @@ class CSPMiddlewareTest(SimpleTestCase):
     @override_settings(SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]})
     def test_csp_basic_with_nonce_but_unused(self):
         """
-        Test if `request.csp_nonce` is never accessed, it is not added to the header.
+        Test if `request.csp_nonce` is never accessed, it is not added to the
+        header.
         """
         response = self.client.get("/csp-base/")
         nonce = response.text

@@ -195,7 +195,8 @@ class Player(models.Model):
         return self.name
 
 
-# Models for testing custom ModelForm save methods in formsets and inline formsets
+# Models for testing custom ModelForm save methods in formsets and inline
+# formsets
 class Poet(models.Model):
     name = models.CharField(max_length=100)
 

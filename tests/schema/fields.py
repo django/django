@@ -84,7 +84,8 @@ class CustomManyToManyField(RelatedField):
     def get_internal_type(self):
         return "ManyToManyField"
 
-    # Copy those methods from ManyToManyField because they don't call super() internally
+    # Copy those methods from ManyToManyField because they don't call super()
+    # internally
     contribute_to_related_class = models.ManyToManyField.__dict__[
         "contribute_to_related_class"
     ]

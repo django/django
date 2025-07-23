@@ -482,7 +482,8 @@ class Parser:
         nodelist = NodeList()
         while self.tokens:
             token = self.next_token()
-            # Use the raw values here for TokenType.* for a tiny performance boost.
+            # Use the raw values here for TokenType.* for a tiny performance
+            # boost.
             token_type = token.token_type.value
             if token_type == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
@@ -845,8 +846,8 @@ class Variable:
             try:
                 self.literal = mark_safe(unescape_string_literal(var))
             except ValueError:
-                # Otherwise we'll set self.lookups so that resolve() knows we're
-                # dealing with a bonafide variable
+                # Otherwise we'll set self.lookups so that resolve() knows
+                # we're dealing with a bonafide variable
                 if VARIABLE_ATTRIBUTE_SEPARATOR + "_" in var or var[0] == "_":
                     raise TemplateSyntaxError(
                         "Variables and attributes may "
@@ -907,7 +908,8 @@ class Variable:
                     # numpy < 1.9 and 1.9+ respectively
                 except (TypeError, AttributeError, KeyError, ValueError, IndexError):
                     try:  # attribute lookup
-                        # Don't return class attributes if the class is the context:
+                        # Don't return class attributes if the class is the
+                        # context:
                         if isinstance(current, BaseContext) and getattr(
                             type(current), bit
                         ):

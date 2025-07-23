@@ -494,8 +494,8 @@ class BaseDatabaseSchemaEditor:
         Return a quoted version of the value so it's safe to use in an SQL
         string. This is not safe against injection from user code; it is
         intended only for use in making SQL scripts or preparing default values
-        for particularly tricky backends (defaults are not user-defined, though,
-        so this is safe).
+        for particularly tricky backends (defaults are not user-defined,
+        though, so this is safe).
         """
         raise NotImplementedError()
 
@@ -1234,7 +1234,8 @@ class BaseDatabaseSchemaEditor:
             self.execute(self._create_primary_key_sql(model, new_field))
             # Update all referencing columns
             rels_to_update.extend(_related_non_m2m_objects(old_field, new_field))
-        # Handle our type alters on the other end of rels from the PK stuff above
+        # Handle our type alters on the other end of rels from the PK stuff
+        # above
         for old_rel, new_rel in rels_to_update:
             rel_db_params = new_rel.field.db_parameters(connection=self.connection)
             rel_type = rel_db_params["type"]
@@ -1483,7 +1484,8 @@ class BaseDatabaseSchemaEditor:
         )
         self.alter_field(
             new_field.remote_field.through,
-            # for self-referential models we need to alter field from the other end too
+            # for self-referential models we need to alter field from the other
+            # end too
             old_field.remote_field.through._meta.get_field(old_field.m2m_field_name()),
             new_field.remote_field.through._meta.get_field(new_field.m2m_field_name()),
         )

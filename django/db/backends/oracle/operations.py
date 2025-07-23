@@ -378,9 +378,9 @@ END;
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
             name = '"%s"' % truncate_name(name, self.max_name_length())
-        # Oracle puts the query text into a (query % args) construct, so % signs
-        # in names need to be escaped. The '%%' will be collapsed back to '%' at
-        # that stage so we aren't really making the name longer here.
+        # Oracle puts the query text into a (query % args) construct, so %
+        # signs in names need to be escaped. The '%%' will be collapsed back to
+        # '%' at that stage so we aren't really making the name longer here.
         name = name.replace("%", "%%")
         return name.upper()
 
@@ -589,8 +589,8 @@ END;
 
     def adapt_datetimefield_value(self, value):
         """
-        Transform a datetime value to an object compatible with what is expected
-        by the backend driver for datetime columns.
+        Transform a datetime value to an object compatible with what is
+        expected by the backend driver for datetime columns.
 
         If naive datetime is passed assumes that is in UTC. Normally Django
         models.DateTimeField makes sure that if USE_TZ is True passed datetime

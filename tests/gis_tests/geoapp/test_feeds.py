@@ -98,7 +98,8 @@ class GeoFeedTest(TestCase):
         items = chan.getElementsByTagName("item")
         self.assertEqual(len(items), City.objects.count())
 
-        # Ensuring the geo:lat and geo:lon element was added to each item in the feed.
+        # Ensuring the geo:lat and geo:lon element was added to each item in
+        # the feed.
         for item in items:
             self.assertChildNodes(
                 item, ["title", "link", "description", "guid", "geo:lat", "geo:lon"]

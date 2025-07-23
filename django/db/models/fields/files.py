@@ -176,11 +176,11 @@ class FileDescriptor(DeferredAttribute):
         # instance.file needs to ultimately return some instance of `File`,
         # probably a subclass. Additionally, this returned object needs to have
         # the FieldFile API so that users can easily do things like
-        # instance.file.path and have that delegated to the file storage engine.
-        # Easy enough if we're strict about assignment in __set__, but if you
-        # peek below you can see that we're not. So depending on the current
-        # value of the field we have to dynamically construct some sort of
-        # "thing" to return.
+        # instance.file.path and have that delegated to the file storage
+        # engine. Easy enough if we're strict about assignment in __set__, but
+        # if you peek below you can see that we're not. So depending on the
+        # current value of the field we have to dynamically construct some sort
+        # of "thing" to return.
 
         # The instance dict contains whatever was originally assigned
         # in __set__.
@@ -204,8 +204,8 @@ class FileDescriptor(DeferredAttribute):
             instance.__dict__[self.field.attname] = attr
 
         # Other types of files may be assigned as well, but they need to have
-        # the FieldFile interface added to them. Thus, we wrap any other type of
-        # File inside a FieldFile (well, the field's attr_class, which is
+        # the FieldFile interface added to them. Thus, we wrap any other type
+        # of File inside a FieldFile (well, the field's attr_class, which is
         # usually FieldFile).
         elif isinstance(file, File) and not isinstance(file, FieldFile):
             file_copy = self.field.attr_class(instance, self.field, file.name)
@@ -215,7 +215,8 @@ class FileDescriptor(DeferredAttribute):
 
         # Finally, because of the (some would say boneheaded) way pickle works,
         # the underlying FieldFile might not actually itself have an associated
-        # file. So we need to reset the details of the FieldFile in those cases.
+        # file. So we need to reset the details of the FieldFile in those
+        # cases.
         elif isinstance(file, FieldFile) and not hasattr(file, "field"):
             file.instance = instance
             file.field = self.field

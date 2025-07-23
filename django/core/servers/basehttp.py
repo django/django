@@ -234,7 +234,9 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
             pass
 
     def handle_one_request(self):
-        """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
+        """
+        Copy of WSGIRequestHandler.handle() but with different ServerHandler
+        """
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:
             self.requestline = ""
