@@ -1160,7 +1160,7 @@ class ModelFormsetTest(TestCase):
             'maxlength="100"></p>',
         )
 
-        # Custom primary keys with ForeignKey, OneToOneField and AutoField ############
+        # Custom primary keys with ForeignKey, OneToOneField and AutoField.
 
         place = Place.objects.create(pk=1, name="Giordanos", city="Chicago")
 

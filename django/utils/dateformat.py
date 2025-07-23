@@ -189,7 +189,8 @@ class TimeFormat(Formatter):
 
         # `offset` is a datetime.timedelta. For negative values (to the west of
         # UTC) only days can be negative (days=-1) and seconds are always
-        # positive. e.g. UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
+        # positive.
+        # e.g.: UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
         # Positive offsets have days=0
         return offset.days * 86400 + offset.seconds
 

@@ -1022,11 +1022,12 @@ class BaseDatabaseSchemaEditor:
         # will now be used in lieu of an index. The following lines from the
         # truth table show all True cases; the rest are False:
         #
-        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
-        # ------------------------------------------------------------------------------
-        # True               | False            | False              | False
-        # True               | False            | False              | True
-        # True               | False            | True               | True
+        #      old_field    |     new_field
+        # db_index | unique | db_index | unique
+        # -------------------------------------
+        # True     | False  | False    | False
+        # True     | False  | False    | True
+        # True     | False  | True     | True
         if (
             old_field.db_index
             and not old_field.unique
@@ -1210,11 +1211,12 @@ class BaseDatabaseSchemaEditor:
         # constraint will no longer be used in lieu of an index. The following
         # lines from the truth table show all True cases; the rest are False:
         #
-        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
-        # ------------------------------------------------------------------------------
-        # False              | False            | True               | False
-        # False              | True             | True               | False
-        # True               | True             | True               | False
+        #      old_field    |     new_field
+        # db_index | unique | db_index | unique
+        # -------------------------------------
+        # False    | False  | True     | False
+        # False    | True   | True     | False
+        # True     | True   | True     | False
         if (
             (not old_field.db_index or old_field.unique)
             and new_field.db_index

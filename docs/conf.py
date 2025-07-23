@@ -35,7 +35,7 @@ sys.path.append(abspath(join(dirname(__file__), "_ext")))
 # it lives in has been added to sys.path.
 import github_links  # NOQA
 
-# -- General configuration -----------------------------------------------------
+# -- General configuration --
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "4.5.0"
@@ -196,7 +196,7 @@ intersphinx_cache_limit = 90  # days
 # The 'versionadded' and 'versionchanged' directives are overridden.
 suppress_warnings = ["app.add_directive", "epub.duplicated_toc_entry"]
 
-# -- Options for HTML output ---------------------------------------------------
+# -- Options for HTML output --
 
 # The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
@@ -284,7 +284,7 @@ rst_epilog = """
 .. |django-updates| replace:: :ref:`django-updates <django-updates-mailing-list>`
 """  # NOQA
 
-# -- Options for LaTeX output --------------------------------------------------
+# -- Options for LaTeX output --
 
 # Use XeLaTeX for Unicode support.
 latex_engine = "xelatex"
@@ -310,7 +310,7 @@ latex_elements = {
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title, author, document class [howto/manual]).
+# (source start file, target name, title, author, document class).
 # latex_documents = []
 latex_documents = [
     (
@@ -343,7 +343,7 @@ latex_documents = [
 # latex_domain_indices = True
 
 
-# -- Options for manual page output --------------------------------------------
+# -- Options for manual page output --
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
@@ -358,7 +358,7 @@ man_pages = [
 ]
 
 
-# -- Options for Texinfo output ------------------------------------------------
+# -- Options for Texinfo output --
 
 # List of tuples (startdocname, targetname, title, author, dir_entry,
 # description, category, toctree_only)
@@ -376,7 +376,7 @@ texinfo_documents = [
 ]
 
 
-# -- Options for Epub output ---------------------------------------------------
+# -- Options for Epub output --
 
 # Bibliographic Dublin Core info.
 epub_title = project

@@ -279,7 +279,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         cascade = getattr(rel, "on_delete", None) is CASCADE
         self.can_delete_related = not multiple and not cascade and can_delete_related
         self.can_view_related = not multiple and can_view_related
-        # so we can check if the related object is registered with this AdminSite
+        # To check if the related object is registered with this AdminSite.
         self.admin_site = admin_site
 
     def __deepcopy__(self, memo):

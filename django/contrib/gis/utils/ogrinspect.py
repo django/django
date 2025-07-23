@@ -24,7 +24,7 @@ def mapping(data_source, geom_name="geom", layer_key=0, multi_geom=False):
     Keyword Arguments:
      `geom_name` => The name of the geometry field to use for the model.
 
-     `layer_key` => The key for specifying which layer in the DataSource to use;
+     `layer_key` => The key specifying which layer in the DataSource to use;
        defaults to 0 (the first layer). May be an integer index or a string
        identifier for the layer.
 
@@ -90,7 +90,7 @@ def ogrinspect(*args, **kwargs):
      `geom_name` => For specifying the model name for the Geometry Field.
        Otherwise will default to `geom`
 
-     `layer_key` => The key for specifying which layer in the DataSource to use;
+     `layer_key` => The key specifying which layer in the DataSource to use;
        defaults to 0 (the first layer). May be an integer index or a string
        identifier for the layer.
 

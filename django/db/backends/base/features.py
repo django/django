@@ -195,7 +195,8 @@ class BaseDatabaseFeatures:
     # Does the backend support introspection of CHECK constraints?
     can_introspect_check_constraints = True
 
-    # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
+    # Does the backend support 'pyformat' style:
+    # ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
     # supported by the Python driver
     supports_paramstyle_pyformat = True

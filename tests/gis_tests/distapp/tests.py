@@ -442,7 +442,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         # using the provided raw SQL statements.
         #  SELECT ST_Distance(
         #      point,
-        #      ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 32140)
+        #      ST_Transform(
+        #          ST_GeomFromText('POINT(-96.876369 29.905320)', 4326),
+        #          32140
+        #      )
         #  )
         #  FROM distapp_southtexascity;
         m_distances = [
@@ -458,7 +461,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         ]
         #  SELECT ST_Distance(
         #      point,
-        #      ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278)
+        #      ST_Transform(
+        #          ST_GeomFromText('POINT(-96.876369 29.905320)', 4326),
+        #          2278
+        #      )
         #  )
         #  FROM distapp_southtexascityft;
         ft_distances = [
@@ -502,7 +508,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         # Reference query:
         #  SELECT ST_distance_sphere(
         #      point,
-        #      ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)
+        #      ST_GeomFromText(
+        #          'LINESTRING(150.9020 -34.4245,150.8700 -34.5789)',
+        #          4326
+        #      )
         #  )
         #  FROM distapp_australiacity ORDER BY name;
         distances = [
@@ -542,7 +551,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         #      point,
         #      ST_GeomFromText('POINT(151.231341 -33.952685)', 4326)
         #  )
-        #  FROM distapp_australiacity WHERE (NOT (id = 11));  st_distance_sphere
+        #  FROM distapp_australiacity
+        #  WHERE (NOT (id = 11));  st_distance_sphere
         spheroid_distances = [
             60504.0628957201,
             77023.9489850262,
@@ -662,7 +672,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         z = SouthTexasZipcode.objects.get(name="77005")
 
         # Reference query:
-        # SELECT ST_Distance(ST_Transform("distapp_censuszipcode"."poly", 32140),
+        # SELECT ST_Distance(
+        #   ST_Transform("distapp_censuszipcode"."poly", 32140),
         #   ST_GeomFromText('<buffer_wkt>', 32140))
         # FROM "distapp_censuszipcode";
         dists_m = [3553.30384972258, 1243.18391525602, 2186.15439472242]
@@ -706,7 +717,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         # Reference query (should use `length_spheroid`).
         #  SELECT ST_length_spheroid(
         #      ST_GeomFromText('<wkt>', 4326)
-        #      'SPHEROID["WGS 84",6378137,298.257223563, AUTHORITY["EPSG","7030"]]'
+        #      'SPHEROID["WGS 84",6378137,298.257223563,
+        #        AUTHORITY["EPSG","7030"]]'
         #  );
         len_m1 = 473504.769553813
         len_m2 = 4617.668

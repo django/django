@@ -3067,7 +3067,7 @@ class OtherModelFormTests(TestCase):
             '<label for="id_url">The URL:</label><input type="text" name="url" '
             'maxlength="40" required id="id_url"></div>',
         )
-        # to_field_name should also work on ModelMultipleChoiceField ##################
+        # to_field_name should also work on ModelMultipleChoiceField.
 
         field = forms.ModelMultipleChoiceField(
             Inventory.objects.all(), to_field_name="barcode"

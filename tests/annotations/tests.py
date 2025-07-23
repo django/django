@@ -1160,8 +1160,8 @@ class NonAggregateAnnotationTestCase(TestCase):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation marks, "
-        #    "semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, quotation "
+        #    "marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
             "Column aliases cannot contain whitespace characters, quotation marks, "
@@ -1182,7 +1182,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             "ali/*as",
             "alias*/",
             "alias;",
-            # RemovedInDjango70Warning: When the deprecation ends, add this case.
+            # RemovedInDjango70Warning: When the deprecation ends, add this:
             # "alias%",
             # [] are used by MSSQL.
             "alias[",
@@ -1190,8 +1190,8 @@ class NonAggregateAnnotationTestCase(TestCase):
         ]
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation marks, "
-        #    "semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, quotation "
+        #    "marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
             "Column aliases cannot contain whitespace characters, quotation marks, "
@@ -1496,8 +1496,8 @@ class AliasTests(TestCase):
         crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation marks, "
-        #    "semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, quotation "
+        #    "marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
             "Column aliases cannot contain whitespace characters, quotation marks, "

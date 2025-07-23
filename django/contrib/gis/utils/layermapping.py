@@ -175,7 +175,7 @@ class LayerMapping:
         else:
             raise LayerMapError("Unrecognized transaction mode: %s" % transaction_mode)
 
-    # #### Checking routines used during initialization ####
+    # Checking routines used during initialization.
     def check_fid_range(self, fid_range):
         "Check the `fid_range` keyword."
         if fid_range:
@@ -339,7 +339,7 @@ class LayerMapping:
                 "Unique keyword argument must be set with a tuple, list, or string."
             )
 
-    # Keyword argument retrieval routines ####
+    # Keyword argument retrieval routines.
     def feature_kwargs(self, feat):
         """
         Given an OGR Feature, return a dictionary of keyword arguments for
@@ -384,7 +384,7 @@ class LayerMapping:
         else:
             return {fld: kwargs[fld] for fld in self.unique}
 
-    # #### Verification routines used in constructing model keyword arguments. ####
+    # Verification routines used in constructing model keyword arguments.
     def verify_ogr_field(self, ogr_field, model_field):
         """
         Verify if the OGR Field contents are acceptable to the model field. If
@@ -513,7 +513,7 @@ class LayerMapping:
         # Returning the WKT of the geometry.
         return g.wkt
 
-    # #### Other model methods ####
+    # Other model methods.
     def coord_transform(self):
         "Return the coordinate transformation object."
         SpatialRefSys = self.spatial_backend.spatial_ref_sys()

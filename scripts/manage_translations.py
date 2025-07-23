@@ -16,7 +16,7 @@
 # operation to the specified language or resource. For example, to get stats
 # for Spanish in contrib.admin, run:
 #
-#  $ python scripts/manage_translations.py lang_stats --language=es --resources=admin
+#  $ python scripts/manage_translations.py lang_stats -l es -r admin
 #
 # Also each command supports a --verbosity option to get progress feedback.
 
