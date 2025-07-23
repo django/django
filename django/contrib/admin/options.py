@@ -1629,7 +1629,7 @@ class ModelAdmin(BaseModelAdmin):
             # the action explicitly on all objects.
             selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
             if not selected and not select_across:
-                # Reminder that something needs to be selected or nothing will happen
+                # Something needs to be selected or nothing will happen.
                 msg = _(
                     "Items must be selected in order to perform "
                     "actions on them. No items have been changed."
@@ -2399,7 +2399,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return self.max_num
 
     def get_formset(self, request, obj=None, **kwargs):
-        """Return a BaseInlineFormSet class for use in admin add/change views."""
+        """Return a BaseInlineFormSet class for use in add/change views."""
         if "fields" in kwargs:
             fields = kwargs.pop("fields")
         else:

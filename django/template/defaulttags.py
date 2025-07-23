@@ -764,7 +764,7 @@ def firstof(parser, token):
 
     Or if only some variables should be escaped, you can use::
 
-        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
+        {% firstof var1 var2|safe var3 "<strong>fallback</strong>"|safe %}
     """
     bits = token.split_contents()[1:]
     asvar = None
@@ -825,20 +825,21 @@ def do_for(parser, token):
 
     The for loop sets a number of variables available within the loop:
 
-        ==========================  ================================================
-        Variable                    Description
-        ==========================  ================================================
-        ``forloop.counter``         The current iteration of the loop (1-indexed)
-        ``forloop.counter0``        The current iteration of the loop (0-indexed)
-        ``forloop.revcounter``      The number of iterations from the end of the
-                                    loop (1-indexed)
-        ``forloop.revcounter0``     The number of iterations from the end of the
-                                    loop (0-indexed)
-        ``forloop.first``           True if this is the first time through the loop
-        ``forloop.last``            True if this is the last time through the loop
-        ``forloop.parentloop``      For nested loops, this is the loop "above" the
-                                    current one
-        ==========================  ================================================
+        =======================  ==============================================
+        Variable                 Description
+        =======================  ==============================================
+        ``forloop.counter``      The current iteration of the loop (1-indexed)
+        ``forloop.counter0``     The current iteration of the loop (0-indexed)
+        ``forloop.revcounter``   The number of iterations from the end of the
+                                 loop (1-indexed)
+        ``forloop.revcounter0``  The number of iterations from the end of the
+                                 loop (0-indexed)
+        ``forloop.first``        True if this is the first time through the
+                                 loop
+        ``forloop.last``         True if this is the last time through the loop
+        ``forloop.parentloop``   For nested loops, this is the loop "above" the
+                                 current one
+        =======================  ==============================================
     """
     bits = token.split_contents()
     if len(bits) < 4:
@@ -1417,7 +1418,11 @@ def url(parser, token):
     For example, if you have a view ``app_name.views.client_details`` taking
     the client's id and the corresponding line in a URLconf looks like this::
 
-        path('client/<int:id>/', views.client_details, name='client-detail-view')
+        path(
+            'client/<int:id>/',
+            views.client_details,
+            name='client-detail-view',
+        )
 
     and this app's URLconf is included into the project's URLconf under some
     path::
@@ -1496,7 +1501,8 @@ def widthratio(parser, token):
     For example::
 
         <img src="bar.png" alt="Bar"
-             height="10" width="{% widthratio this_value max_value max_width %}">
+             height="10"
+             width="{% widthratio this_value max_value max_width %}">
 
     If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
     the image in the above example will be 88 pixels wide

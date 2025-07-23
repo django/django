@@ -61,8 +61,9 @@ def infix(bp, func):
                 return func(context, self.first, self.second)
             except Exception:
                 # Templates shouldn't throw exceptions when rendering. We are
-                # most likely to get exceptions for things like {% if foo in bar
-                # %} where 'bar' does not support 'in', so default to False
+                # most likely to get exceptions for things like:
+                # {% if foo in bar %}
+                # where 'bar' does not support 'in', so default to False.
                 return False
 
     return Operator

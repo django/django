@@ -86,9 +86,9 @@ class SpatialRefSysTest(TestCase):
             srs = self.SpatialRefSys.objects.get(srid=sd["srid"])
             self.assertEqual(sd["srid"], srs.srid)
 
-            # Some of the authority names are borked on Oracle, e.g., SRID=32140.
-            #  also, Oracle Spatial seems to add extraneous info to fields, hence the
-            #  the testing with the 'startswith' flag.
+            # Some of the authority names are borked on Oracle, e.g.,
+            # SRID=32140. Also, Oracle Spatial seems to add extraneous info to
+            # fields, hence the testing with the 'startswith' flag.
             auth_name, oracle_flag = sd["auth_name"]
             # Compare case-insensitively because srs.auth_name is lowercase
             # ("epsg") on Spatialite.

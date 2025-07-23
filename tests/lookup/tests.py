@@ -331,7 +331,7 @@ class LookupTests(TestCase):
             Author.objects.values_list().in_bulk()
 
     def test_values(self):
-        # values() returns a list of dictionaries instead of object instances --
+        # values() returns a list of dictionaries instead of object instances,
         # and you can specify which fields you want to retrieve.
         self.assertSequenceEqual(
             Article.objects.values("headline"),

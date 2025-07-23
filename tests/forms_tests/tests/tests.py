@@ -247,7 +247,7 @@ class ModelFormCallableModelDefault(TestCase):
 
 class FormsModelTestCase(TestCase):
     def test_unicode_filename(self):
-        # FileModel with Unicode filename and data #########################
+        # FileModel with Unicode filename and data.
         file1 = SimpleUploadedFile(
             "我隻氣墊船裝滿晒鱔.txt", "मेरी मँडराने वाली नाव सर्पमीनों से भरी ह".encode()
         )
@@ -263,7 +263,7 @@ class FormsModelTestCase(TestCase):
         m.delete()
 
     def test_boundary_conditions(self):
-        # Boundary conditions on a PositiveIntegerField #########################
+        # Boundary conditions on a PositiveIntegerField.
         class BoundaryForm(ModelForm):
             class Meta:
                 model = BoundaryModel

@@ -207,7 +207,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_assvg(self):
         with self.assertRaises(TypeError):
             City.objects.annotate(svg=functions.AsSVG("point", precision="foo"))
-        # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city WHERE name = 'Pueblo';
+        # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city
+        # WHERE name = 'Pueblo';
         svg1 = 'cx="-104.609252" cy="-38.255001"'
         # Even though relative, only one point so it's practically the same except for
         # the 'c' letter prefix on the x,y values.
@@ -737,7 +738,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             )
         )
 
-        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23))
+        # SELECT AsText(
+        #     ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23))
         # FROM "geoapp_country"
         # WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr(

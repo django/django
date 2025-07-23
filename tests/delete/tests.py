@@ -493,7 +493,7 @@ class DeletionTests(TestCase):
         # and there are no more cascades.
         # 1 query to find the users for the avatar.
         # 1 query to delete the user
-        # 1 query to null out user.avatar, because we can't defer the constraint
+        # 1 query to null out user.avatar, since we can't defer the constraint
         # 1 query to delete the avatar
         self.assertNumQueries(4, a.delete)
         self.assertFalse(User.objects.exists())
@@ -536,7 +536,7 @@ class DeletionTests(TestCase):
 
         # TEST_SIZE / batch_size (select related `T` instances)
         # + 1 (select related `U` instances)
-        # + TEST_SIZE / GET_ITERATOR_CHUNK_SIZE (delete `T` instances in batches)
+        # + TEST_SIZE / GET_ITERATOR_CHUNK_SIZE (delete `T` matches in batches)
         # + 1 (delete `s`)
         expected_num_queries = ceil(TEST_SIZE / batch_size)
         expected_num_queries += ceil(TEST_SIZE / GET_ITERATOR_CHUNK_SIZE) + 2

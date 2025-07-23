@@ -142,8 +142,8 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             self.wait_until(ec.staleness_of(old_page), timeout=timeout)
         except WebDriverException:
             # Issue in version 113+ of Chrome driver where a WebDriverException
-            # error is raised rather than a StaleElementReferenceException, see:
-            # https://issues.chromium.org/issues/42323468
+            # error is raised rather than a StaleElementReferenceException.
+            # See: https://issues.chromium.org/issues/42323468
             pass
 
         self.wait_page_ready(timeout=timeout)

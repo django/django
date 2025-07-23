@@ -18,7 +18,7 @@ class Point(GEOSGeometry):
 
         For example:
         >>> p = Point((5, 23))  # 2D point, passed in as a tuple
-        >>> p = Point(5, 23, 8)  # 3D point, passed in with individual parameters
+        >>> p = Point(5, 23, 8)  # 3D point, passed as individual parameters
         """
         if x is None:
             coords = []

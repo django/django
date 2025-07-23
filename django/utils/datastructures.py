@@ -51,7 +51,9 @@ class MultiValueDict(dict):
     A subclass of dictionary customized to handle multiple values for the
     same key.
 
-    >>> d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})
+    >>> d = MultiValueDict(
+    ...    {'name': ['Adrian', 'Simon'], 'position': ['Developer']}
+    ... )
     >>> d['name']
     'Simon'
     >>> d.getlist('name')

@@ -30,7 +30,7 @@ class Mixin:
 class OperationTests(OperationTestBase):
     """
     Tests running the operations and making sure they do what they say they do.
-    Each test looks at their state changing, and then their database operation -
+    Each test looks at their state changing, and then their database operation,
     both forwards and backwards.
     """
 
@@ -1539,7 +1539,7 @@ class OperationTests(OperationTestBase):
                     "digits",
                     models.CharField(max_length=10, default="42"),
                 ),
-                # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+                # Manual quoting is fragile and could trip on quotes.
                 migrations.AddField(
                     "Pony",
                     "quotes",
@@ -1584,7 +1584,7 @@ class OperationTests(OperationTestBase):
                     "digits",
                     models.TextField(default="42"),
                 ),
-                # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+                # Manual quoting is fragile and could trip on quotes.
                 migrations.AddField(
                     "Pony",
                     "quotes",
@@ -1629,7 +1629,7 @@ class OperationTests(OperationTestBase):
                     "digits",
                     models.BinaryField(default=b"42"),
                 ),
-                # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+                # Manual quoting is fragile and could trip on quotes.
                 migrations.AddField(
                     "Pony",
                     "quotes",

@@ -10,7 +10,9 @@ advantage OGR Geometries have over their GEOS counterparts is support
 for spatial reference systems and their transformation.
 
 Example:
- >>> from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
+ >>> from django.contrib.gis.gdal import (
+ ...     OGRGeometry, OGRGeomType, SpatialReference
+ ... )
  >>> wkt1, wkt2 = 'POINT(-90 30)', 'POLYGON((0 0, 5 0, 5 5, 0 5)'
  >>> pnt = OGRGeometry(wkt1)
  >>> print(pnt)
@@ -35,7 +37,8 @@ Example:
  >>> gt1 = OGRGeomType(3) # Using an integer for the type
  >>> gt2 = OGRGeomType('Polygon') # Using a string
  >>> gt3 = OGRGeomType('POLYGON') # It's case-insensitive
- >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
+ >>> # Equivalence works w/non-OGRGeomType objects:
+ >>> print(gt1 == 3, gt1 == 'Polygon')
  True True
 """
 
