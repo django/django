@@ -2,7 +2,6 @@ import codecs
 import copy
 import operator
 import re
-from collections import namedtuple
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
