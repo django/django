@@ -29,7 +29,9 @@ from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, parse_header_parameters
 
 RAISE_ERROR = object()
-host_validation_re = r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::([0-9]+))?$"
+host_validation_re = re.compile(
+    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::([0-9]+))?$"
+)
 
 ParsedHostHeader = namedtuple("ParsedHostHeader", ["domain", "port", "combined"])
 
