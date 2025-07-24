@@ -344,7 +344,7 @@ Methods
 .. method:: HttpRequest.get_port()
 
     Returns the originating port of the request using information from the
-    ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled)
+    ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled), ``HTTP_X_FORWARDED_HOST`` (if :setting:`USE_X_FORWARDED_HOST` is enabled and ``HTTP_X_FORWARDED_HOST`` contains a port), ``HTTP_HOST``,
     and ``SERVER_PORT`` ``META`` variables, in that order.
 
 .. method:: HttpRequest.get_full_path()
