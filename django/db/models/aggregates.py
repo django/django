@@ -425,12 +425,14 @@ class JSONArrayAgg(Aggregate):
         sql, params = self.as_sql(
             compiler, connection, function="JSON_GROUP_ARRAY", **extra_context
         )
-        # JSON_GROUP_ARRAY defaults to returning an empty array on an empty set.
-        # Modifies the SQL to support a custom default value to be returned,
-        # if a default argument is not passed, null is returned instead of [].
+        # JSON_GROUP_ARRAY defaults to returning an empty array on an empty
+        # set. Modifies the SQL to support a custom default value to be
+        # returned, if a default argument is not passed, null is returned
+        # instead of [].
         if (default := self.default) == []:
             return sql, params
-        # Ensure Count() is against the exact same parameters (filter, distinct)
+        # Ensure Count() is against the exact same parameters (filter,
+        # distinct)
         count = self.copy()
         count.__class__ = Count
         count_sql, count_params = compiler.compile(count)
