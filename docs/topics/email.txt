@@ -354,7 +354,7 @@ The following parameters must be given as keyword arguments if used:
   .. versionchanged:: 5.2
 
     Support for :class:`~django.core.mail.EmailAttachment` items of
-    ``attachments`` were added.
+    ``attachments`` was added.
 
 * ``headers``: A dictionary of extra headers to put on the message. The
   keys are the header name, values are the header values. It's up to the
