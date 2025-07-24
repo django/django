@@ -12,3 +12,6 @@ Bugfixes
 * Fixed a regression in Django 5.2.1 that prevented the usage of ``UNNEST``
   PostgreSQL strategy of ``QuerySet.bulk_create()`` with foreign keys
   (:ticket:`36502`).
+
+* Fixed a crash in Django 5.2 when filtering against a composite primary key
+  using a tuple containing expressions (:ticket:`36522`).
