@@ -442,19 +442,7 @@ input[type="submit"], button {
     }
 
     .object-tools {
-        float: none;
-        margin: 0 0 15px;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    .object-tools li {
-        height: auto;
-        margin-left: 0;
-    }
-
-    .object-tools li + li {
-        margin-left: 15px;
+        text-align: left;
     }
 
     /* Forms */
