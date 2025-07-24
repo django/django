@@ -808,19 +808,19 @@ a.deletelink:focus, a.deletelink:hover {
 /* OBJECT TOOLS */
 
 .object-tools {
-    font-size: 0.625rem;
-    font-weight: bold;
-    padding-left: 0;
-    float: right;
-    position: relative;
-    margin-top: -48px;
+    padding: 0;
+    overflow: hidden;
+    text-align: right;
+    margin: 0 0 15px;
 }
 
 .object-tools li {
-    display: block;
-    float: left;
-    margin-left: 5px;
-    height: 1rem;
+    display: inline-block;
+    height: auto;
+}
+
+.object-tools li + li {
+    margin-left: 15px;
 }
 
 .object-tools a {
