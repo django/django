@@ -29,6 +29,7 @@ from .base import (
     VARIABLE_TAG_START,
     Node,
     NodeList,
+    PartialTemplate,
     TemplateSyntaxError,
     VariableDoesNotExist,
     kwarg_re,
@@ -39,6 +40,7 @@ from .context import Context
 from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal
+from .utils import SubDictionaryWrapper
 
 register = Library()
 
@@ -1570,3 +1572,94 @@ def do_with(parser, token):
     nodelist = parser.parse(("endwith",))
     parser.delete_first_token()
     return WithNode(None, None, nodelist, extra_context=extra_context)
+
+
+class DefinePartialNode(Node):
+    def __init__(self, partial_name, inline, nodelist):
+        self.partial_name = partial_name
+        self.inline = inline
+        self.nodelist = nodelist
+
+    def render(self, context):
+        return self.nodelist.render(context) if self.inline else ""
+
+
+class RenderPartialNode(Node):
+    def __init__(self, partial_name, partial_mapping):
+        # Defer lookup of nodelist to runtime.
+        self.partial_name = partial_name
+        self.partial_mapping = partial_mapping
+
+    def render(self, context):
+        return self.partial_mapping[self.partial_name].render(context)
+
+
+@register.tag(name="partialdef")
+def partialdef_func(parser, token):
+    """
+    Declare a partial that can be used later in the template.
+
+    Usage::
+
+        {% partialdef partial_name %}
+        Partial content goes here
+        {% endpartialdef %}
+
+    Stores the nodelist in the context under the key "partial_contents" and can
+    be retrieved using the {% partial %} tag.
+
+    The optional ``inline`` argument will render the contents of the partial
+    where it is defined.
+    """
+    tokens = token.split_contents()
+
+    # Check the number of tokens before trying to assign them via indexes.
+    if (tokens_len := len(tokens)) not in (2, 3):
+        name = token.contents.split()[0]
+        raise TemplateSyntaxError(f"{name} tag requires 2-3 arguments")
+
+    partial_name = tokens[1]
+    if tokens_len > 2:
+        inline = tokens[2]
+        if inline != "inline":
+            raise TemplateSyntaxError(
+                "The 'inline' argument does not have any parameters; "
+                "either use 'inline' or remove it completely."
+            )
+    else:
+        inline = False
+
+    # Parse the content until the end tag.
+    acceptable_endpartials = ("endpartialdef", f"endpartialdef {partial_name}")
+    nodelist = parser.parse(acceptable_endpartials)
+    endpartial = parser.next_token()
+    if endpartial.contents not in acceptable_endpartials:
+        parser.invalid_block_tag(endpartial, "endpartialdef", acceptable_endpartials)
+
+    # Store the partial nodelist in the parser.extra_data attribute.
+    parser.extra_data.setdefault("template-partials", {})
+    parser.extra_data["template-partials"][partial_name] = PartialTemplate(
+        nodelist, parser.origin, partial_name
+    )
+
+    return DefinePartialNode(partial_name, inline, nodelist)
+
+
+@register.tag(name="partial")
+def partial_func(parser, token):
+    """
+    Render a partial that was declared using the {% partialdef %} tag.
+
+    Usage::
+
+        {% partial partial_name %}
+    """
+    bits = token.split_contents()
+    if len(bits) != 2:
+        raise TemplateSyntaxError(f"'{bits[0]}' tag requires a single argument")
+    tag_name, partial_name = bits
+
+    extra_data = getattr(parser, "extra_data")
+    partial_mapping = SubDictionaryWrapper(extra_data, "template-partials")
+
+    return RenderPartialNode(partial_name, partial_mapping=partial_mapping)

@@ -158,6 +158,29 @@ overridden by what's passed by
     Loads a template with the given name, compiles it and returns a
     :class:`Template` object.
 
+    **Partial loading:**
+
+    To load a specific partial from a template:
+
+    .. code-block:: python
+
+        # Load an entire template.
+        template = engine.get_template("template.html")
+
+        # Load a specific fragment from a template.
+        partial = engine.get_template("template.html#partial_name")
+
+    When loading partials, this method returns a template object that behaves 
+    like a regular :class:`Template` but contains only the partial's content.
+
+    See :ref:`template-partials` for more information about defining and using
+    template partials.
+
+    .. versionchanged:: 6.0
+
+        Added support for loading template partials using the
+        ``template_name#partial_name`` syntax.
+
 .. method:: Engine.select_template(template_name_list)
 
     Like :meth:`~Engine.get_template`, except it takes a list of names

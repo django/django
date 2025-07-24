@@ -88,6 +88,9 @@ UNKNOWN_SOURCE = "<unknown source>"
 # than instantiating SimpleLazyObject with _lazy_re_compile().
 tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
+partial_start_tag_re = re.compile(r"\{%\s*(partialdef)\s+([\w-]+)(\s+inline)?\s*%}")
+partial_end_tag_re = re.compile(r"\{%\s*endpartialdef\s*%}")
+
 logger = logging.getLogger("django.template")
 
 
@@ -286,6 +289,55 @@ class Template:
             "start": start,
             "end": end,
         }
+
+
+class PartialTemplate:
+    """
+    A lightweight Template lookalike used for template partials.
+
+    Wraps nodelist as partial, in order to bind context.
+    """
+
+    def __init__(self, nodelist, origin, name):
+        self.nodelist = nodelist
+        self.origin = origin
+        self.name = name
+
+    def get_exception_info(self, exception, token):
+        template = self.origin.loader.get_template(self.origin.template_name)
+        return template.get_exception_info(exception, token)
+
+    def find_partial_source(self, full_source, partial_name):
+        result = ""
+        pos = 0
+        for m in partial_start_tag_re.finditer(full_source, pos):
+            sspos, sepos = m.span()
+            starter, name, inline = m.groups()
+            endm = partial_end_tag_re.search(full_source, sepos + 1)
+            espos, eepos = endm.span()
+            if name == partial_name:
+                # Include the full partial definition from opening to closing tag.
+                result = full_source[sspos:eepos]
+                break
+            pos = eepos + 1
+        return result
+
+    @property
+    def source(self):
+        template = self.origin.loader.get_template(self.origin.template_name)
+        return self.find_partial_source(template.source, self.name)
+
+    def _render(self, context):
+        return self.nodelist.render(context)
+
+    def render(self, context):
+        with context.render_context.push_state(self):
+            if context.template is None:
+                with context.bind_template(self):
+                    context.template_name = self.name
+                    return self._render(context)
+            else:
+                return self._render(context)
 
 
 def linebreak_iter(template_source):

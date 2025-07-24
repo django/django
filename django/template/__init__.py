@@ -62,6 +62,7 @@ from .base import (  # NOQA isort:skip
     NodeList,
     Origin,
     Template,
+    PartialTemplate,
     Variable,
 )
 

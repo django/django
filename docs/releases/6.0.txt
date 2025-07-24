@@ -74,6 +74,21 @@ To get started, follow the :doc:`CSP how-to guide </howto/csp>`. For in-depth
 guidance, see the :ref:`CSP security overview <security-csp>` and the
 :doc:`reference docs </ref/csp>`.
 
+Template Partials
+-----------------
+
+The :ref:`Django Template Language <template-language-intro>` now supports
+:ref:`template partials <template-partials>` , making it easier to encapsulate
+and reuse small named fragments within a template file. The new tags
+:ttag:`{% partialdef %} <partialdef>` and :ttag:`{% partial %} <partial>`
+define a partial and render it, respectively.
+
+Partials can also be referenced using the ``template_name#partial_name`` syntax
+with :func:`~django.template.Engine.get_template`,
+:func:`~django.shortcuts.render`, :ttag:`{% include %}<include>`, and other
+template-loading tools, enabling more modular and maintainable templates
+without needing to split components into separate files.
+
 Minor features
 --------------
 
