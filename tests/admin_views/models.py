@@ -973,6 +973,12 @@ class Restaurant(models.Model):
     city = models.ForeignKey(City, models.CASCADE)
     name = models.CharField(max_length=100)
 
+    class Meta:
+        verbose_name = (
+            "very very very very very very very very very "
+            "loooooooooooooooooooooooooooooooooooooooooong name"
+        )
+
     def get_absolute_url(self):
         return "/dummy/%s/" % self.pk
 

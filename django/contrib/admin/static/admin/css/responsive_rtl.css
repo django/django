@@ -34,15 +34,6 @@
         background-position: calc(100% - 8px) 9px;
     }
 
-    [dir="rtl"] .object-tools li {
-        float: right;
-    }
-
-    [dir="rtl"] .object-tools li + li {
-        margin-left: 0;
-        margin-right: 15px;
-    }
-
     [dir="rtl"] .dashboard .module table td a {
         padding-left: 0;
         padding-right: 16px;
@@ -72,6 +63,11 @@
         margin-left: 0;
         margin-right: 0;
     }
+
+    [dir="rtl"] .object-tools {
+        text-align: right;
+    }
+
     [dir="rtl"] .aligned .vCheckboxLabel {
         padding: 1px 5px 0 0;
     }
