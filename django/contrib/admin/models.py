@@ -36,7 +36,7 @@ class LogEntryManager(models.Manager):
                 content_type_id=ContentType.objects.get_for_model(
                     obj, for_concrete_model=False
                 ).id,
-                object_id=obj.pk,
+                object_id=obj.pk_str,
                 object_repr=str(obj)[:200],
                 action_flag=action_flag,
                 change_message=change_message,
