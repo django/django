@@ -33,7 +33,14 @@ host_validation_re = re.compile(
     r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::([0-9]+))?$"
 )
 
-ParsedHostHeader = namedtuple("ParsedHostHeader", ["domain", "port", "combined"])
+
+class ParsedHostHeader:
+    __slots__ = ("domain", "port", "combined")
+
+    def __init__(self, domain, port, combined):
+        self.domain = domain
+        self.port = port
+        self.combined = combined
 
 
 class UnreadablePostError(OSError):
