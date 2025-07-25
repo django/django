@@ -3,7 +3,7 @@ from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
-from django.core.exceptions import BadRequest, DisallowedHost, ImproperlyConfigured
+from django.core.exceptions import BadRequest, DisallowedHost
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.uploadhandler import MemoryFileUploadHandler
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
