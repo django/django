@@ -1,4 +1,5 @@
 from io import StringIO
+from unittest import skipIf
 
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
@@ -21,15 +22,18 @@ from django.db.models import F, OuterRef, Subquery
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
-from ..utils import skipUnlessGISLookup
+from ..utils import cannot_save_multipoint, skipUnlessGISLookup
 from .models import (
     City,
     Country,
     Feature,
+    GeometryCollectionModel,
+    Lines,
     MinusOneSRID,
     MultiFields,
     NonConcreteModel,
     PennsylvaniaCity,
+    Points,
     State,
     ThreeDimensionalFeature,
     Track,
@@ -267,6 +271,48 @@ class GeoModelTest(TestCase):
                 g = LineString(srid=4326)
             self.assertEqual(feature.geom, g)
             self.assertEqual(feature.geom.srid, g.srid)
+
+
+class SaveLoadTests(TestCase):
+    def test_multilinestringfield(self):
+        geom = MultiLineString(
+            LineString((0, 0), (1, 1), (5, 5)),
+            LineString((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)),
+        )
+        obj = Lines.objects.create(geom=geom)
+        obj.refresh_from_db()
+        self.assertEqual(obj.geom.tuple, geom.tuple)
+
+    def test_multilinestring_with_linearring(self):
+        geom = MultiLineString(
+            LineString((0, 0), (1, 1), (5, 5)),
+            LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)),
+        )
+        obj = Lines.objects.create(geom=geom)
+        obj.refresh_from_db()
+        self.assertEqual(obj.geom.tuple, geom.tuple)
+        self.assertEqual(obj.geom[1].__class__.__name__, "LineString")
+        self.assertEqual(obj.geom[0].tuple, geom[0].tuple)
+        # LinearRings are transformed to LineString.
+        self.assertEqual(obj.geom[1].__class__.__name__, "LineString")
+        self.assertEqual(obj.geom[1].tuple, geom[1].tuple)
+
+    @skipIf(cannot_save_multipoint, "MariaDB cannot save MultiPoint due to a bug.")
+    def test_multipointfield(self):
+        geom = MultiPoint(Point(1, 1), Point(0, 0))
+        obj = Points.objects.create(geom=geom)
+        obj.refresh_from_db()
+        self.assertEqual(obj.geom, geom)
+
+    def test_geometrycollectionfield(self):
+        geom = GeometryCollection(
+            Point(2, 2),
+            LineString((0, 0), (2, 2)),
+            Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))),
+        )
+        obj = GeometryCollectionModel.objects.create(geom=geom)
+        obj.refresh_from_db()
+        self.assertIs(obj.geom.equals(geom), True)
 
 
 class GeoLookupTest(TestCase):
