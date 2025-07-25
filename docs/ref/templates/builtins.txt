@@ -1181,8 +1181,8 @@ Note that ``{% regroup %}`` does not order its input! Our example relies on
 the fact that the ``cities`` list was ordered by ``country`` in the first place.
 If the ``cities`` list did *not* order its members by ``country``, the
 regrouping would naively display more than one group for a single country. For
-example, say the ``cities`` list was set to this (note that the countries are not
-grouped together):
+example, say the ``cities`` list was set to this (note that the countries are
+not grouped together):
 
 .. code-block:: python
 

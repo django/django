@@ -320,8 +320,8 @@ Here's what the "base.html" template, including the use of :doc:`static files
     </html>
 
 Simplistically, it defines the look-and-feel of the site (with the site's logo),
-and provides "holes" for child templates to fill. This means that a site redesign
-can be done by changing a single file -- the base template.
+and provides "holes" for child templates to fill. This means that a site
+redesign can be done by changing a single file -- the base template.
 
 It also lets you create multiple versions of a site, with different base
 templates, while reusing child templates. Django's creators have used this

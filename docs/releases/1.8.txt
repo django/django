@@ -123,7 +123,7 @@ initialization at the class level using transactions and savepoints. Database
 backends which do not support transactions, like MySQL with the MyISAM storage
 engine, will still be able to run these tests but won't benefit from the
 improvements. Tests are now run within two nested
-:func:`~django.db.transaction.atomic()` blocks: one for the whole class and one
+:func:`~django.db.transaction.atomic` blocks: one for the whole class and one
 for each test.
 
 * The class method
@@ -219,7 +219,8 @@ Minor features
   available.
 
 * It is now allowed to include a subquery as a geographic lookup argument, for
-  example ``City.objects.filter(point__within=Country.objects.filter(continent='Africa').values('mpoly'))``.
+  example
+  ``City.objects.filter(point__within=Country.objects.filter(continent='Africa').values('mpoly'))``.
 
 * The SpatiaLite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
@@ -242,7 +243,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Session cookie is now deleted after
-  :meth:`~django.contrib.sessions.backends.base.SessionBase.flush()` is called.
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.flush` is called.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -327,7 +328,7 @@ Forms
 * Form widgets now render attributes with a value of ``True`` or ``False``
   as HTML5 boolean attributes.
 
-* The new :meth:`~django.forms.Form.has_error()` method allows checking
+* The new :meth:`~django.forms.Form.has_error` method allows checking
   if a specific error has happened.
 
 * If :attr:`~django.forms.Form.required_css_class` is defined on a form, then
@@ -366,21 +367,22 @@ Generic Views
   may now specify the ordering applied to the
   :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` by setting
   :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` or overriding
-  :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering()`.
+  :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering`.
 
 * The new :attr:`SingleObjectMixin.query_pk_and_slug
   <django.views.generic.detail.SingleObjectMixin.query_pk_and_slug>`
   attribute allows changing the behavior of
-  :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+  :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
   so that it'll perform its lookup using both the primary key and the slug.
 
-* The :meth:`~django.views.generic.edit.FormMixin.get_form()` method doesn't
-  require a ``form_class`` to be provided anymore. If not provided ``form_class``
-  defaults to :meth:`~django.views.generic.edit.FormMixin.get_form_class()`.
+* The :meth:`~django.views.generic.edit.FormMixin.get_form` method doesn't
+  require a ``form_class`` to be provided anymore. If not provided
+  ``form_class`` defaults to
+  :meth:`~django.views.generic.edit.FormMixin.get_form_class`.
 
 * Placeholders in :attr:`ModelFormMixin.success_url
   <django.views.generic.edit.ModelFormMixin.success_url>` now support the Python
-  :py:meth:`str.format()` syntax. The legacy ``%(<foo>)s`` syntax is still
+  :py:meth:`str.format` syntax. The legacy ``%(<foo>)s`` syntax is still
   supported but will be removed in Django 1.10.
 
 Internationalization
@@ -675,7 +677,7 @@ Related object operations are run in a transaction
 --------------------------------------------------
 
 Some operations on related objects such as
-:meth:`~django.db.models.fields.related.RelatedManager.add()` or direct
+:meth:`~django.db.models.fields.related.RelatedManager.add` or direct
 assignment ran multiple data modifying queries without wrapping them in
 transactions. To reduce the risk of data corruption, all data modifying methods
 that affect multiple related objects (i.e. ``add()``, ``remove()``,
@@ -917,12 +919,12 @@ for users who haven't logged in, you can run this query::
 Priority of context processors for ``TemplateResponse`` brought in line with ``render``
 ---------------------------------------------------------------------------------------
 
-The :class:`~django.template.response.TemplateResponse` constructor is designed to be a
-drop-in replacement for the :func:`~django.shortcuts.render` function. However,
-it had a slight incompatibility, in that for ``TemplateResponse``, context data
-from the passed in context dictionary could be shadowed by context data returned
-from context processors, whereas for ``render`` it was the other way
-around. This was a bug, and the behavior of ``render`` is more appropriate,
+The :class:`~django.template.response.TemplateResponse` constructor is designed
+to be a drop-in replacement for the :func:`~django.shortcuts.render` function.
+However, it had a slight incompatibility, in that for ``TemplateResponse``,
+context data from the passed in context dictionary could be shadowed by context
+data returned from context processors, whereas for ``render`` it was the other
+way around. This was a bug, and the behavior of ``render`` is more appropriate,
 since it allows the globally defined context processors to be overridden locally
 in the view. If you were relying on the fact context data in a
 ``TemplateResponse`` could be overridden using a context processor, you will
@@ -1182,7 +1184,7 @@ Miscellaneous
   this will not happen any longer. It might be that new database migrations are
   generated (once) after migrating to 1.8.
 
-* :func:`django.utils.translation.get_language()` now returns ``None`` instead
+* :func:`django.utils.translation.get_language` now returns ``None`` instead
   of :setting:`LANGUAGE_CODE` when translations are temporarily deactivated.
 
 * When a translation doesn't exist for a specific literal, the fallback is now
@@ -1281,9 +1283,9 @@ written (and is better written) as::
         url("^other/$", views.otherview),
     )
 
-Thus ``patterns()`` serves little purpose and is a burden when teaching new users
-(answering the newbie's question "why do I need this empty string as the first
-argument to ``patterns()``?"). For these reasons, we are deprecating it.
+Thus ``patterns()`` serves little purpose and is a burden when teaching new
+users (answering the newbie's question "why do I need this empty string as the
+first argument to ``patterns()``?"). For these reasons, we are deprecating it.
 Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
 ``django.conf.urls.url()`` instances. For example::
 
@@ -1494,8 +1496,8 @@ in ``.values()`` calls or in aggregates. It has been replaced with
 
 The new approach doesn't call the :meth:`~django.db.models.Field.to_python`
 method on assignment as was the case with ``SubfieldBase``. If you need that
-behavior, reimplement the ``Creator`` class `from Django's source code
-<https://github.com/django/django/blob/stable/1.8.x/django/db/models/fields/subclassing.py#L31-L44>`_
+behavior, reimplement the ``Creator`` class
+`from Django's source code <https://github.com/django/django/blob/stable/1.8.x/django/db/models/fields/subclassing.py#L31-L44>`_
 in your project.
 
 ``django.utils.checksums``
@@ -1521,10 +1523,10 @@ to construct the "view on site" URL. This URL is now accessible using the
 sure to provide a default value for the ``form_class`` argument since it's
 now optional.
 
-Rendering templates loaded by :func:`~django.template.loader.get_template()` with a :class:`~django.template.Context`
----------------------------------------------------------------------------------------------------------------------
+Rendering templates loaded by :func:`~django.template.loader.get_template` with a :class:`~django.template.Context`
+-------------------------------------------------------------------------------------------------------------------
 
-The return type of :func:`~django.template.loader.get_template()` has changed
+The return type of :func:`~django.template.loader.get_template` has changed
 in Django 1.8: instead of a :class:`django.template.Template`, it returns a
 ``Template`` instance whose exact type depends on which backend loaded it.
 
@@ -1533,7 +1535,7 @@ Both classes provide a ``render()`` method, however, the former takes a
 :class:`dict`. This change is enforced through a deprecation path for Django
 templates.
 
-All this also applies to :func:`~django.template.loader.select_template()`.
+All this also applies to :func:`~django.template.loader.select_template`.
 
 :class:`~django.template.Template` and :class:`~django.template.Context` classes in template responses
 ------------------------------------------------------------------------------------------------------
@@ -1589,9 +1591,9 @@ pass a :class:`dict` in the ``context`` parameter instead. If you're passing a
 The following functions will no longer accept a ``dirs`` parameter to override
 ``TEMPLATE_DIRS`` in Django 1.10:
 
-* :func:`django.template.loader.get_template()`
-* :func:`django.template.loader.select_template()`
-* :func:`django.shortcuts.render()`
+* :func:`django.template.loader.get_template`
+* :func:`django.template.loader.select_template`
+* :func:`django.shortcuts.render`
 * ``django.shortcuts.render_to_response()``
 
 The parameter didn't work consistently across different template loaders and
@@ -1651,8 +1653,8 @@ added in Django 1.7. In Django 1.7.2, its functionality was moved to
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
 ``MIDDLEWARE_CLASSES``.
 
-In Django 1.10, session verification will be enabled regardless of whether or not
-``SessionAuthenticationMiddleware`` is enabled (at which point
+In Django 1.10, session verification will be enabled regardless of whether or
+not ``SessionAuthenticationMiddleware`` is enabled (at which point
 ``SessionAuthenticationMiddleware`` will have no significance). You can add it
 to your ``MIDDLEWARE_CLASSES`` sometime before then to opt-in. Please read the
 :ref:`upgrade considerations <session-invalidation-on-password-change>` first.

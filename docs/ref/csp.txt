@@ -46,7 +46,8 @@ The :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is
 configured using the following settings:
 
 * :setting:`SECURE_CSP`: defines the **enforced Content Security Policy**.
-* :setting:`SECURE_CSP_REPORT_ONLY`: defines a **report-only Content Security Policy**.
+* :setting:`SECURE_CSP_REPORT_ONLY`: defines a **report-only Content Security
+  Policy**.
 
 .. admonition:: These settings can be used independently or together
 
@@ -68,8 +69,8 @@ Policy violation reports
 
 When a CSP violation occurs, browsers typically log details to the developer
 console, providing immediate feedback during development. To also receive these
-reports programmatically, the policy must include a `reporting directive
-<https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy#reporting_directives>`_
+reports programmatically, the policy must include a
+`reporting directive <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy#reporting_directives>`_
 such as ``report-uri`` that specifies where violation data should be sent.
 
 Django supports configuring these directives via the

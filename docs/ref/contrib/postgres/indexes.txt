@@ -98,8 +98,8 @@ available from the ``django.contrib.postgres.indexes`` module.
     :class:`~django.contrib.postgres.fields.HStoreField` or the :ref:`range
     fields <range-fields>`.
 
-    To use this index on data types not in the built-in `gist operator classes
-    <https://www.postgresql.org/docs/current/gist.html#GIST-BUILTIN-OPCLASSES>`_,
+    To use this index on data types not in the built-in
+    `gist operator classes <https://www.postgresql.org/docs/current/gist.html#GIST-BUILTIN-OPCLASSES>`_,
     you need to activate the `btree_gist extension
     <https://www.postgresql.org/docs/current/btree-gist.html>`_ on PostgreSQL.
     You can install it using the

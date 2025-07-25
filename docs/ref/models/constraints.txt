@@ -204,8 +204,8 @@ enforced immediately after every command.
 
 .. warning::
 
-    Deferred unique constraints may lead to a `performance penalty
-    <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
+    Deferred unique constraints may lead to a
+    `performance penalty <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
 
 ``include``
 -----------

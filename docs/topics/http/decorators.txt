@@ -102,8 +102,8 @@ caching based on specific request headers.
 
 .. function:: vary_on_headers(*headers)
 
-    The ``Vary`` header defines which request headers a cache mechanism should take
-    into account when building its cache key.
+    The ``Vary`` header defines which request headers a cache mechanism should
+    take into account when building its cache key.
 
     See :ref:`using vary headers <using-vary-headers>`.
 

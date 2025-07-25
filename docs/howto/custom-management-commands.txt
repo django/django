@@ -99,7 +99,8 @@ Accepting optional arguments
 
 The same ``closepoll`` could be easily modified to delete a given poll instead
 of closing it by accepting additional command line options. These custom
-options can be added in the :meth:`~BaseCommand.add_arguments` method like this::
+options can be added in the :meth:`~BaseCommand.add_arguments` method like
+this::
 
     class Command(BaseCommand):
         def add_arguments(self, parser):

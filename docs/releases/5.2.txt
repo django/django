@@ -73,7 +73,7 @@ See :doc:`/topics/composite-primary-key` for more details.
 Simplified override of :class:`~django.forms.BoundField`
 --------------------------------------------------------
 
-Prior to version 5.2, overriding :meth:`.Field.get_bound_field()` was the only
+Prior to version 5.2, overriding :meth:`.Field.get_bound_field` was the only
 option to use a custom :class:`~django.forms.BoundField`. Django now supports
 specifying the following attributes to customize form rendering:
 

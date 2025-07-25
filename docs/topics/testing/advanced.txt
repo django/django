@@ -19,10 +19,10 @@ a black box, with exactly known inputs, testing for specific outputs.
 The API for the :class:`~django.test.RequestFactory` is a slightly
 restricted subset of the test client API:
 
-* It only has access to the HTTP methods :meth:`~Client.get()`,
-  :meth:`~Client.post()`, :meth:`~Client.put()`,
-  :meth:`~Client.delete()`, :meth:`~Client.head()`,
-  :meth:`~Client.options()`, and :meth:`~Client.trace()`.
+* It only has access to the HTTP methods :meth:`~Client.get`,
+  :meth:`~Client.post`, :meth:`~Client.put`,
+  :meth:`~Client.delete`, :meth:`~Client.head`,
+  :meth:`~Client.options`, and :meth:`~Client.trace`.
 
 * These methods accept all the same arguments *except* for
   ``follow``. Since this is just a factory for producing
@@ -158,8 +158,8 @@ and the settings file includes a list of the domains supported by the project::
     ALLOWED_HOSTS = ["www.djangoproject.dev", "docs.djangoproject.dev", ...]
 
 Another option is to add the required hosts to :setting:`ALLOWED_HOSTS` using
-:meth:`~django.test.override_settings()` or
-:attr:`~django.test.SimpleTestCase.modify_settings()`. This option may be
+:meth:`~django.test.override_settings` or
+:attr:`~django.test.SimpleTestCase.modify_settings`. This option may be
 preferable in standalone apps that can't package their own settings file or
 for projects where the list of domains is not static (e.g., subdomains for
 multitenancy). For example, you could write a test for the domain
@@ -661,7 +661,7 @@ Methods
 
     Override this class method to add custom arguments accepted by the
     :djadmin:`test` management command. See
-    :py:meth:`argparse.ArgumentParser.add_argument()` for details about adding
+    :py:meth:`argparse.ArgumentParser.add_argument` for details about adding
     arguments to a parser.
 
 .. method:: DiscoverRunner.setup_test_environment(**kwargs)
