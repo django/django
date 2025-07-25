@@ -13,6 +13,7 @@ from django.http import (
 from django.template import loader
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import Promise
+from django.utils.translation import gettext as _
 
 
 def render(
@@ -90,7 +91,7 @@ def get_object_or_404(klass, *args, **kwargs):
         return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist:
         raise Http404(
-            "No %s matches the given query." % queryset.model._meta.object_name
+            _("No %s matches the given query." % queryset.model._meta.object_name)
         )
 
 
@@ -108,7 +109,9 @@ async def aget_object_or_404(klass, *args, **kwargs):
     try:
         return await queryset.aget(*args, **kwargs)
     except queryset.model.DoesNotExist:
-        raise Http404(f"No {queryset.model._meta.object_name} matches the given query.")
+        raise Http404(
+            _("No %s matches the given query." % queryset.model._meta.object_name)
+        )
 
 
 def get_list_or_404(klass, *args, **kwargs):
@@ -131,7 +134,7 @@ def get_list_or_404(klass, *args, **kwargs):
     obj_list = list(queryset.filter(*args, **kwargs))
     if not obj_list:
         raise Http404(
-            "No %s matches the given query." % queryset.model._meta.object_name
+            _("No %s matches the given query." % queryset.model._meta.object_name)
         )
     return obj_list
 
@@ -149,7 +152,9 @@ async def aget_list_or_404(klass, *args, **kwargs):
         )
     obj_list = [obj async for obj in queryset.filter(*args, **kwargs)]
     if not obj_list:
-        raise Http404(f"No {queryset.model._meta.object_name} matches the given query.")
+        raise Http404(
+            _("No %s matches the given query." % queryset.model._meta.object_name)
+        )
     return obj_list
 
 
