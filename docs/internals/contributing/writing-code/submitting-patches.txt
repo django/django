@@ -145,6 +145,27 @@ Regardless of the way you submit your work, follow these steps.
 .. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
 
+AI-Assisted Contributions
+-------------------------
+
+As explained in the :ref:`security reporting guidelines <ai-assistance>`, if
+you use AI tools while preparing a pull request, you must:
+
+* Disclose which AI tools were used and what they were used for (e.g.,
+  generating code, drafting commit messages, writing documentation).
+
+* Review and verify all AI-generated output. Ensure the code aligns with
+  Django's architecture, includes appropriate tests, and passes the full test
+  suite.
+
+* Double-check the proposal against the :ref:`patch-review-checklist`.
+
+Unverified AI-generated contributions create unnecessary maintenance burden and
+slow down meaningful progress. Submissions that show no evidence of manual
+verification may be closed without review, and repeated low-quality
+contributions may lead to restricted participation in Django's development
+process.
+
 Contributions which require community feedback
 ==============================================
 
