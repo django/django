@@ -220,6 +220,9 @@ class HttpRequest:
                 )
             raise DisallowedHost(msg)
 
+        if not validate_port(parsed_host.port):
+            raise DisallowedHost("The port provided is not valid")
+
         return parsed_host
 
     def get_host(self):
@@ -884,3 +887,16 @@ def validate_host(host, allowed_hosts):
     return any(
         pattern == "*" or is_same_domain(host, pattern) for pattern in allowed_hosts
     )
+
+
+def validate_port(port):
+    """
+    Validate the given port for this site.
+
+    Checks that the port is a number and that it's between 1 and 65535.
+
+    Note: This function doesn't instantly return False if the port contains leading zeros.
+
+    Return ``True`` for a valid port, ``False`` otherwise.
+    """
+    return port.isdigit() and 1 <= int(port) <= 65535
