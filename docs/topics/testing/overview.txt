@@ -158,8 +158,11 @@ when all the tests have been executed.
 
 You can prevent the test databases from being destroyed by using the
 :option:`test --keepdb` option. This will preserve the test database between
-runs. If the database does not exist, it will first be created. Any migrations
-will also be applied in order to keep it up to date.
+runs. You can prevent any changes to the test database by using
+the :option:`test --use-clones` option, which preserves the test database but
+destroys any clones and runs tests against fresh copies. If the database does
+not exist, it will first be created. Any migrations will also be applied in
+order to keep it up to date.
 
 As described in the previous section, if a test run is forcefully interrupted,
 the test database may not be destroyed. On the next run, you'll be asked
@@ -382,7 +385,10 @@ Preserving the test database
 
 The :option:`test --keepdb` option preserves the test database between test
 runs. It skips the create and destroy actions which can greatly decrease the
-time to run tests.
+time to run tests. The :option:`test --use-clones` option further prevents any
+changes to the test database at the cost of additional database copies. The
+increase in time is usually negligible and the :option:`test --timing` flag
+will show exactly how much time it adds.
 
 Avoiding disk access for media files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
