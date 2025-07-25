@@ -48,7 +48,7 @@ Running this customized ``shell`` command with ``verbosity=2`` would show:
 .. console::
 
     13 objects imported automatically:
-	
+
       from django.db import connection, reset_queries, models
       from django.conf import settings
       from django.contrib.admin.models import LogEntry
