@@ -35,6 +35,12 @@ class FunctionTests(SimpleTestCase):
     def test_non_string_input(self):
         self.assertEqual(center(123, 5), " 123 ")
 
+    def test_odd_input(self):
+        self.assertEqual(center("odd", 6), " odd  ")
+
+    def test_even_input(self):
+        self.assertEqual(center("even", 7), " even  ")
+
     def test_widths(self):
         value = "something"
         for i in range(-1, len(value) + 1):
