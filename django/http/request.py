@@ -188,7 +188,7 @@ class HttpRequest:
 
             if use_x_fw_port and "HTTP_X_FORWARDED_PORT" in self.META:
                 if port_in_x_fw_host:
-                    raise ImproperlyConfigured(
+                    raise DisallowedHost(
                         "HTTP_X_FORWARDED_HOST contains a port number "
                         "and USE_X_FORWARDED_PORT is set to True"
                     )

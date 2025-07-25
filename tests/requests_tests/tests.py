@@ -1396,7 +1396,7 @@ class HostValidationTests(SimpleTestCase):
             "HTTP_X_FORWARDED_PORT": "8080",
         }
         # Should use the X-Forwarded-Port header
-        with self.assertRaises(ImproperlyConfigured):
+        with self.assertRaises(DisallowedHost):
             request.get_host()
 
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
