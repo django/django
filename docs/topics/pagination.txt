@@ -31,7 +31,7 @@ accessing the items for each page:
     >>> p.num_pages
     2
     >>> type(p.page_range)
-    <class 'range_iterator'>
+    <class 'range'>
     >>> p.page_range
     range(1, 3)
 
