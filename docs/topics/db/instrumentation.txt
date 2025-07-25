@@ -12,7 +12,8 @@ The wrappers are modeled after :doc:`middleware </topics/http/middleware>` --
 they are callables which take another callable as one of their arguments. They
 call that callable to invoke the (possibly wrapped) database query, and they
 can do what they want around that call. They are, however, created and
-installed by user code, and so don't need a separate factory like middleware do.
+installed by user code, and so don't need a separate factory like middleware
+do.
 
 Installing a wrapper is done in a context manager -- so the wrappers are
 temporary and specific to some flow in your code.

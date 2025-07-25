@@ -8,7 +8,8 @@ Django Utils
 This document covers all stable modules in ``django.utils``. Most of the
 modules in ``django.utils`` are designed for internal use and only the
 following parts can be considered stable and thus backwards compatible as per
-the :ref:`internal release deprecation policy <internal-release-deprecation-policy>`.
+the :ref:`internal release deprecation policy
+<internal-release-deprecation-policy>`.
 
 ``django.utils.cache``
 ======================
@@ -297,7 +298,8 @@ The functions defined in this module share the following properties:
 ==============================
 
 .. module:: django.utils.feedgenerator
-   :synopsis: Syndication feed generation library -- used for generating RSS, etc.
+   :synopsis: Syndication feed generation library -- used for generating RSS,
+       etc.
 
 Sample usage:
 
@@ -322,14 +324,16 @@ Sample usage:
 For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
 
-For definitions of the different versions of RSS, see:
-https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
+For definitions of the different versions of RSS, see `The myth of RSS
+compatibility
+<https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss>`__.
 
 .. function:: get_tag_uri(url, date)
 
     Creates a TagURI.
 
-    See https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See `How to make a good ID in Atom
+    <https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id>`__.
 
 ``Stylesheet``
 --------------
@@ -367,8 +371,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
     .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, stylesheets=None, **kwargs)
 
-        Initialize the feed with the given dictionary of metadata, which applies
-        to the entire feed.
+        Initialize the feed with the given dictionary of metadata, which
+        applies to the entire feed.
 
         Any extra keyword arguments you pass to ``__init__`` will be stored in
         ``self.feed``.
@@ -387,7 +391,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         Adds an item to the feed. All args are expected to be strings except
         ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
-        objects, and ``enclosures``, which is a list of ``Enclosure`` instances.
+        objects, and ``enclosures``, which is a list of ``Enclosure``
+        instances.
 
     .. method:: num_items()
 
@@ -518,7 +523,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         if person.friends:
             ...
 
-    The cached value can be treated like an ordinary attribute of the instance::
+    The cached value can be treated like an ordinary attribute of the
+    instance::
 
         # clear it, requiring re-computation next time it's called
         person.__dict__.pop("friends", None)
@@ -695,8 +701,8 @@ escaping HTML.
     :func:`conditional_escape`.
 
     ``args_generator`` should be an iterator that yields arguments to pass to
-    :func:`format_html`, either sequences of positional arguments or mappings of
-    keyword arguments.
+    :func:`format_html`, either sequences of positional arguments or mappings
+    of keyword arguments.
 
     For example, tuples can be used for positional arguments::
 
@@ -837,7 +843,8 @@ Functions for working with Python modules.
 ===========================
 
 .. module:: django.utils.safestring
-   :synopsis: Functions and classes for working with strings that can be displayed safely without further escaping in HTML.
+   :synopsis: Functions and classes for working with strings that can be
+       displayed safely without further escaping in HTML.
 
 Functions and classes for working with "safe strings": strings that can be
 displayed safely without further escaping in HTML. Marking something as a "safe
@@ -1166,8 +1173,8 @@ For a complete discussion on the usage of the following see the
     ``strict`` is ``True``, or if there is no generic variant and ``strict``
     is ``False``.
 
-    If ``strict`` is ``False`` (the default), a country-specific variant may
-    be returned when neither the language code nor its generic variant is found.
+    If ``strict`` is ``False`` (the default), a country-specific variant may be
+    returned when neither the language code nor its generic variant is found.
     For example, if only ``'es-co'`` is in :setting:`LANGUAGES`, that's
     returned for ``lang_code``\s like ``'es'`` and ``'es-ar'``. Those matches
     aren't returned if ``strict=True``.

@@ -45,10 +45,10 @@ either all or none of the changes will be committed.
 
 .. warning::
 
-    While the simplicity of this transaction model is appealing, it also makes it
-    inefficient when traffic increases. Opening a transaction for every view has
-    some overhead. The impact on performance depends on the query patterns of your
-    application and on how well your database handles locking.
+    While the simplicity of this transaction model is appealing, it also makes
+    it inefficient when traffic increases. Opening a transaction for every view
+    has some overhead. The impact on performance depends on the query patterns
+    of your application and on how well your database handles locking.
 
 .. admonition:: Per-request transactions and streaming responses
 

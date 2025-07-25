@@ -28,8 +28,8 @@ whose name doesn't begin with an underscore. For example:
         tests.py
         views.py
 
-In this example, the ``closepoll`` command will be made available to any project
-that includes the ``polls`` application in :setting:`INSTALLED_APPS`.
+In this example, the ``closepoll`` command will be made available to any
+project that includes the ``polls`` application in :setting:`INSTALLED_APPS`.
 
 The ``_private.py`` module will not be available as a management command.
 
@@ -73,13 +73,12 @@ look like this::
 .. _management-commands-output:
 
 .. note::
-    When you are using management commands and wish to provide console
-    output, you should write to ``self.stdout`` and ``self.stderr``,
-    instead of printing to ``stdout`` and ``stderr`` directly. By
-    using these proxies, it becomes much easier to test your custom
-    command. Note also that you don't need to end messages with a newline
-    character, it will be added automatically, unless you specify the ``ending``
-    parameter::
+    When you are using management commands and wish to provide console output,
+    you should write to ``self.stdout`` and ``self.stderr``, instead of
+    printing to ``stdout`` and ``stderr`` directly. By using these proxies, it
+    becomes much easier to test your custom command. Note also that you don't
+    need to end messages with a newline character, it will be added
+    automatically, unless you specify the ``ending`` parameter::
 
         self.stdout.write("Unterminated line", ending="")
 
@@ -99,7 +98,8 @@ Accepting optional arguments
 
 The same ``closepoll`` could be easily modified to delete a given poll instead
 of closing it by accepting additional command line options. These custom
-options can be added in the :meth:`~BaseCommand.add_arguments` method like this::
+options can be added in the :meth:`~BaseCommand.add_arguments` method like
+this::
 
     class Command(BaseCommand):
         def add_arguments(self, parser):
@@ -273,7 +273,8 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     Django.
 
     You can customize the instance by overriding this method and calling
-    ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser` parameters.
+    ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser`
+    parameters.
 
 .. method:: BaseCommand.add_arguments(parser)
 

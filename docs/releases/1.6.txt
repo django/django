@@ -1,6 +1,6 @@
-=========================
- Django 1.6 release notes
-=========================
+========================
+Django 1.6 release notes
+========================
 
 .. note::
 
@@ -10,11 +10,11 @@
     a very dear friend and developer.
 
     Malcolm was a long-time contributor to Django, a model community member, a
-    brilliant mind, and a friend. His contributions to Django — and to many other
-    open source projects — are nearly impossible to enumerate. Many on the core
-    Django team had their first patches reviewed by him; his mentorship enriched
-    us. His consideration, patience, and dedication will always be an inspiration
-    to us.
+    brilliant mind, and a friend. His contributions to Django — and to many
+    other open source projects — are nearly impossible to enumerate. Many on
+    the core Django team had their first patches reviewed by him; his
+    mentorship enriched us. His consideration, patience, and dedication will
+    always be an inspiration to us.
 
     This release of Django is for Malcolm.
 
@@ -126,9 +126,10 @@ binary data in the database.
 GeoDjango form widgets
 ----------------------
 
-GeoDjango now provides :doc:`form fields and widgets </ref/contrib/gis/forms-api>`
-for its geo-specialized fields. They are OpenLayers-based by default, but they
-can be customized to use any other JS framework.
+GeoDjango now provides :doc:`form fields and widgets
+</ref/contrib/gis/forms-api>` for its geo-specialized fields. They are
+OpenLayers-based by default, but they can be customized to use any other JS
+framework.
 
 ``check`` management command added for verifying compatibility
 --------------------------------------------------------------
@@ -341,10 +342,11 @@ Minor features
   :ref:`see the updated recommendation <raising-validation-error>` for raising
   a ``ValidationError``.
 
-* :class:`~django.contrib.admin.ModelAdmin` now preserves filters on the list view
-  after creating, editing or deleting an object. It's possible to restore the previous
-  behavior of clearing filters by setting the
-  :attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to ``False``.
+* :class:`~django.contrib.admin.ModelAdmin` now preserves filters on the list
+  view after creating, editing or deleting an object. It's possible to restore
+  the previous behavior of clearing filters by setting the
+  :attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to
+  ``False``.
 
 * Added
   :meth:`FormMixin.get_prefix<django.views.generic.edit.FormMixin.get_prefix>`
@@ -450,8 +452,8 @@ Custom user models in tests
 ---------------------------
 
 The introduction of the new test runner has also slightly changed the way that
-test models are imported. As a result, any test that overrides ``AUTH_USER_MODEL``
-to test behavior with one of Django's test user models (
+test models are imported. As a result, any test that overrides
+``AUTH_USER_MODEL`` to test behavior with one of Django's test user models (
 ``django.contrib.auth.tests.custom_user.CustomUser`` and
 ``django.contrib.auth.tests.custom_user.ExtensionUser``) must now
 explicitly import the User model in your test module::
@@ -471,7 +473,8 @@ error reporting:
 
 .. code-block:: pytb
 
-    ImproperlyConfigured: AUTH_USER_MODEL refers to model 'auth.CustomUser' that has not been installed
+    ImproperlyConfigured: AUTH_USER_MODEL refers to model 'auth.CustomUser' that
+    has not been installed
 
 Time zone-aware ``day``, ``month``, and ``week_day`` lookups
 ------------------------------------------------------------
@@ -652,10 +655,11 @@ hardcoded sentence:
 
   *Hold down "Control", or "Command" on a Mac, to select more than one.*
 
-(or its translation to the active locale) imposed as the help legend shown along
-them if neither :attr:`model <django.db.models.Field.help_text>` nor :attr:`form
-<django.forms.Field.help_text>` ``help_text`` attributes were specified by the
-user (or this string was appended to any ``help_text`` that was provided).
+(or its translation to the active locale) imposed as the help legend shown
+along them if neither :attr:`model <django.db.models.Field.help_text>` nor
+:attr:`form <django.forms.Field.help_text>` ``help_text`` attributes were
+specified by the user (or this string was appended to any ``help_text`` that
+was provided).
 
 Since this happened at the model layer, there was no way to prevent the text
 from appearing in cases where it wasn't applicable such as form fields that
@@ -871,8 +875,8 @@ Miscellaneous
   corresponding field type.
 
 * Form field's :attr:`~django.forms.Field.error_messages` that contain a
-  placeholder should now always use a named placeholder (``"Value '%(value)s' is
-  too big"`` instead of ``"Value '%s' is too big"``). See the corresponding
+  placeholder should now always use a named placeholder (``"Value '%(value)s'
+  is too big"`` instead of ``"Value '%s' is too big"``). See the corresponding
   field documentation for details about the names of the placeholders. The
   changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
   :class:`~django.forms.ModelMultipleChoiceField`.
@@ -949,10 +953,10 @@ Miscellaneous
   release: blank passwords are now valid.
 
 * The admin :attr:`~django.contrib.admin.ModelAdmin.changelist_view` previously
-  accepted a ``pop`` GET parameter to signify it was to be displayed in a popup.
-  This parameter has been renamed to ``_popup`` to be consistent with the rest
-  of the admin views. You should update your custom templates if they use the
-  previous parameter name.
+  accepted a ``pop`` GET parameter to signify it was to be displayed in a
+  popup. This parameter has been renamed to ``_popup`` to be consistent with
+  the rest of the admin views. You should update your custom templates if they
+  use the previous parameter name.
 
 * :meth:`~django.core.validators.validate_email` now accepts email addresses
   with ``localhost`` as the domain.
@@ -964,11 +968,12 @@ Miscellaneous
   been removed. Use ``socket.error`` provided by the standard library instead.
   This change was also released in Django 1.5.5.
 
-* The signature of :meth:`django.views.generic.base.RedirectView.get_redirect_url`
-  has changed and now accepts positional arguments as well (``*args, **kwargs``).
-  Any unnamed captured group will now be passed to ``get_redirect_url()``
-  which may result in a ``TypeError`` if you don't update the signature of your
-  custom method.
+* The signature of
+  :meth:`django.views.generic.base.RedirectView.get_redirect_url` has changed
+  and now accepts positional arguments as well (``*args, **kwargs``). Any
+  unnamed captured group will now be passed to ``get_redirect_url()`` which may
+  result in a ``TypeError`` if you don't update the signature of your custom
+  method.
 
 .. _deprecated-features-1.6:
 
@@ -992,7 +997,8 @@ current APIs are deprecated:
 
 Django's comment framework has been deprecated and is no longer supported. It
 will be available in Django 1.6 and 1.7, and removed in Django 1.8. Most users
-will be better served with a custom solution, or a hosted product like Disqus__.
+will be better served with a custom solution, or a hosted product like
+Disqus__.
 
 The code formerly known as ``django.contrib.comments`` is `still available
 in an external repository`__.
@@ -1131,9 +1137,10 @@ must support old Django versions, you should write::
     return get_queryset()  # etc
 
 In the general case of a custom manager that both implements its own
-``get_queryset`` method and calls that method, and needs to work with older Django
-versions, and libraries that have not been updated yet, it is useful to define
-a ``get_queryset_compat`` method as below and use it internally to your manager::
+``get_queryset`` method and calls that method, and needs to work with older
+Django versions, and libraries that have not been updated yet, it is useful to
+define a ``get_queryset_compat`` method as below and use it internally to your
+manager::
 
     class YourCustomManager(models.Manager):
         def get_queryset(self):
@@ -1152,8 +1159,8 @@ a ``get_queryset_compat`` method as below and use it internally to your manager:
             return get_queryset()
 
 This helps to minimize the changes that are needed, but also works correctly in
-the case of subclasses (such as ``RelatedManagers`` from Django 1.5) which might
-override either ``get_query_set`` or ``get_queryset``.
+the case of subclasses (such as ``RelatedManagers`` from Django 1.5) which
+might override either ``get_query_set`` or ``get_queryset``.
 
 
 ``shortcut`` view and URLconf
@@ -1179,23 +1186,23 @@ with::
 ``ModelForm`` without ``fields`` or ``exclude``
 -----------------------------------------------
 
-Previously, if you wanted a :class:`~django.forms.ModelForm` to use all fields on
-the model, you could simply omit the ``Meta.fields`` attribute, and all fields
-would be used.
+Previously, if you wanted a :class:`~django.forms.ModelForm` to use all fields
+on the model, you could simply omit the ``Meta.fields`` attribute, and all
+fields would be used.
 
 This can lead to security problems where fields are added to the model and,
 unintentionally, automatically become editable by end users. In some cases,
-particular with boolean fields, it is possible for this problem to be completely
-invisible. This is a form of `Mass assignment vulnerability
+particular with boolean fields, it is possible for this problem to be
+completely invisible. This is a form of `Mass assignment vulnerability
 <https://en.wikipedia.org/wiki/Mass_assignment_vulnerability>`_.
 
 For this reason, this behavior is deprecated, and using the ``Meta.exclude``
 option is strongly discouraged. Instead, all fields that are intended for
 inclusion in the form should be listed explicitly in the ``fields`` attribute.
 
-If this security concern really does not apply in your case, there is a shortcut
-to explicitly indicate that all fields should be used - use the special value
-``"__all__"`` for the fields attribute::
+If this security concern really does not apply in your case, there is a
+shortcut to explicitly indicate that all fields should be used - use the
+special value ``"__all__"`` for the fields attribute::
 
     class MyModelForm(ModelForm):
         class Meta:
@@ -1220,9 +1227,9 @@ The generic views :class:`~django.views.generic.edit.CreateView` and
 security problem described in the section above, because they can automatically
 create a ``ModelForm`` that uses all fields for a model.
 
-For this reason, if you use these views for editing models, you must also supply
-the ``fields`` attribute (new in Django 1.6), which is a list of model fields
-and works in the same way as the :class:`~django.forms.ModelForm`
+For this reason, if you use these views for editing models, you must also
+supply the ``fields`` attribute (new in Django 1.6), which is a list of model
+fields and works in the same way as the :class:`~django.forms.ModelForm`
 ``Meta.fields`` attribute. Alternatively, you can set the ``form_class``
 attribute to a ``ModelForm`` that explicitly defines the fields to be used.
 Defining an ``UpdateView`` or ``CreateView`` subclass to be used with a model
@@ -1233,10 +1240,10 @@ but without an explicit list of fields is deprecated.
 Munging of help text of model form fields for ``ManyToManyField`` fields
 ------------------------------------------------------------------------
 
-All special handling of the ``help_text`` attribute of ``ManyToManyField`` model
-fields performed by standard model or model form fields as described in
+All special handling of the ``help_text`` attribute of ``ManyToManyField``
+model fields performed by standard model or model form fields as described in
 :ref:`m2m-help_text` above is deprecated and will be removed in Django 1.8.
 
-Help text of these fields will need to be handled either by applications, custom
-form fields or widgets, just like happens with the rest of the model field
-types.
+Help text of these fields will need to be handled either by applications,
+custom form fields or widgets, just like happens with the rest of the model
+field types.

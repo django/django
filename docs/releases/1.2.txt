@@ -49,8 +49,8 @@ These are just the highlights; full details and a complete list of features
 Wherever possible these features have been introduced in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
 
-However, a handful of features *have* changed in ways that, for some users, will be
-backwards-incompatible. The big changes are:
+However, a handful of features *have* changed in ways that, for some users,
+will be backwards-incompatible. The big changes are:
 
 * Support for Python 2.3 has been dropped. See the full notes
   below.
@@ -139,13 +139,13 @@ perform any validation of the instance's data.
 Improved CSRF protection
 ------------------------
 
-Django now has much improved protection against :doc:`Cross-Site Request Forgery
-(CSRF) attacks</ref/csrf>`. This type of attack occurs when a malicious
+Django now has much improved protection against :doc:`Cross-Site Request
+Forgery (CSRF) attacks</ref/csrf>`. This type of attack occurs when a malicious
 website contains a link, a form button or some JavaScript that is intended to
 perform some action on your website, using the credentials of a logged-in user
-who visits the malicious site in their browser. A related type of attack, "login
-CSRF," where an attacking site tricks a user's browser into logging into a site
-with someone else's credentials, is also covered.
+who visits the malicious site in their browser. A related type of attack,
+"login CSRF," where an attacking site tricks a user's browser into logging into
+a site with someone else's credentials, is also covered.
 
 .. _messages-framework:
 
@@ -184,8 +184,8 @@ Relaxed requirements for usernames
 ----------------------------------
 
 The built-in :class:`~django.contrib.auth.models.User` model's
-:attr:`~django.contrib.auth.models.User.username` field now allows a wider range
-of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
+:attr:`~django.contrib.auth.models.User.username` field now allows a wider
+range of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
 
 Email backends
 --------------
@@ -297,8 +297,8 @@ Both the :djadmin:`test` subcommand of ``django-admin.py`` and the
 ``--failfast`` option. When specified, this option causes the test runner to
 exit after encountering a failure instead of continuing with the test run. In
 addition, the handling of ``Ctrl-C`` during a test run has been improved to
-trigger a graceful exit from the test run that reports details of the tests that
-were run before the interruption.
+trigger a graceful exit from the test run that reports details of the tests
+that were run before the interruption.
 
 ``BigIntegerField``
 -------------------
@@ -308,11 +308,11 @@ Models can now use a 64-bit :class:`~django.db.models.BigIntegerField` type.
 Improved localization
 ---------------------
 
-Django's :doc:`internationalization framework </topics/i18n/index>` has been expanded
-with locale-aware formatting and form processing. That means, if enabled, dates
-and numbers on templates will be displayed using the format specified for the
-current locale. Django will also use localized formats when parsing data in
-forms. See :doc:`/topics/i18n/formatting` for more details.
+Django's :doc:`internationalization framework </topics/i18n/index>` has been
+expanded with locale-aware formatting and form processing. That means, if
+enabled, dates and numbers on templates will be displayed using the format
+specified for the current locale. Django will also use localized formats when
+parsing data in forms. See :doc:`/topics/i18n/formatting` for more details.
 
 ``readonly_fields`` in ``ModelAdmin``
 -------------------------------------
@@ -631,24 +631,24 @@ wrapping other objects of unknown type.
 
 In Django 1.1 and earlier, it handled introspection in a non-standard way,
 depending on wrapped objects implementing a public method named
-``get_all_members()``. Since this could easily lead to name clashes, it has been
-changed to use the standard Python introspection method, involving
+``get_all_members()``. Since this could easily lead to name clashes, it has
+been changed to use the standard Python introspection method, involving
 ``__members__`` and ``__dir__()``.
 
 If you used ``LazyObject`` in your own code
-and implemented the ``get_all_members()`` method for wrapped objects, you'll need
-to make a couple of changes:
+and implemented the ``get_all_members()`` method for wrapped objects, you'll
+need to make a couple of changes:
 
-First, if your class does not have special requirements for introspection (i.e.,
-you have not implemented ``__getattr__()`` or other methods that allow for
-attributes not discoverable by normal mechanisms), you can simply remove the
-``get_all_members()`` method. The default implementation on ``LazyObject`` will
-do the right thing.
+First, if your class does not have special requirements for introspection
+(i.e., you have not implemented ``__getattr__()`` or other methods that allow
+for attributes not discoverable by normal mechanisms), you can simply remove
+the ``get_all_members()`` method. The default implementation on ``LazyObject``
+will do the right thing.
 
 If you have more complex requirements for introspection, first rename the
 ``get_all_members()`` method to ``__dir__()``. This is the standard
-introspection method for Python 2.6 and above. If you require support for Python
-versions earlier than 2.6, add the following code to the class::
+introspection method for Python 2.6 and above. If you require support for
+Python versions earlier than 2.6, add the following code to the class::
 
     __members__ = property(lambda self: self.__dir__())
 
@@ -743,9 +743,9 @@ will need to update your FormSet and/or admin definitions.
 ``email_re``
 ------------
 
-An undocumented regular expression for validating email addresses has been moved
-from ``django.form.fields`` to ``django.core.validators``. You will need to
-update your imports if you are using it.
+An undocumented regular expression for validating email addresses has been
+moved from ``django.form.fields`` to ``django.core.validators``. You will need
+to update your imports if you are using it.
 
 .. _deprecated-features-1.2:
 
@@ -911,7 +911,8 @@ User Messages API
 
 The API for storing messages in the user ``Message`` model (via
 ``user.message_set.create``) is now deprecated and will be removed in Django
-1.4 according to the standard :doc:`release process </internals/release-process>`.
+1.4 according to the standard
+:doc:`release process </internals/release-process>`.
 
 To upgrade your code, you need to replace any instances of this::
 

@@ -145,7 +145,7 @@ if __name__ == "__main__":
                 "--disable",
                 "line-too-long",  # Disable sphinx-lint version
                 "--max-line-length",
-                "80",
+                "79",
                 *params,
             ]
         )

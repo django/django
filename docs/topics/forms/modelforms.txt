@@ -311,7 +311,8 @@ the form level.
 
 You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
 validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
-to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
+to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta``
+class::
 
     from django.core.exceptions import NON_FIELD_ERRORS
     from django.forms import ModelForm
@@ -440,9 +441,10 @@ fields, especially when new fields are added to a model. Depending on how the
 form is rendered, the problem may not even be visible on the web page.
 
 The alternative approach would be to include all fields automatically, or
-remove only some. This fundamental approach is known to be much less secure
-and has led to serious exploits on major websites (e.g. `GitHub
-<https://github.blog/2012-03-04-public-key-security-vulnerability-and-mitigation/>`_).
+remove only some. This fundamental approach is known to be much less secure and
+has led to serious exploits on major websites (e.g. `GitHub
+<https://github.blog/2012-03-04-public-key-security-vulnerability-and-mitigation/>`__
+).
 
 There are, however, two shortcuts available for cases where you can guarantee
 these security concerns do not apply to you:
@@ -472,13 +474,13 @@ these security concerns do not apply to you:
    ``birth_date``, this will result in the fields ``name`` and ``birth_date``
    being present on the form.
 
-If either of these are used, the order the fields appear in the form will be the
-order the fields are defined in the model, with ``ManyToManyField`` instances
-appearing last.
+If either of these are used, the order the fields appear in the form will be
+the order the fields are defined in the model, with ``ManyToManyField``
+instances appearing last.
 
-In addition, Django applies the following rule: if you set ``editable=False`` on
-the model field, *any* form created from the model via ``ModelForm`` will not
-include that field.
+In addition, Django applies the following rule: if you set ``editable=False``
+on the model field, *any* form created from the model via ``ModelForm`` will
+not include that field.
 
 .. note::
 
@@ -546,11 +548,12 @@ The ``widgets`` dictionary accepts either widget instances (e.g.,
 dictionary is ignored for a model field with a non-empty ``choices`` attribute.
 In this case, you must override the form field to use a different widget.
 
-Similarly, you can specify the ``labels``, ``help_texts`` and ``error_messages``
-attributes of the inner ``Meta`` class if you want to further customize a field.
+Similarly, you can specify the ``labels``, ``help_texts`` and
+``error_messages`` attributes of the inner ``Meta`` class if you want to
+further customize a field.
 
-For example if you wanted to customize the wording of all user facing strings for
-the ``name`` field::
+For example if you wanted to customize the wording of all user facing strings
+for the ``name`` field::
 
     from django.utils.translation import gettext_lazy as _
 
@@ -633,14 +636,14 @@ the field declaratively and setting its ``validators`` parameter::
     ``ModelForm`` is a regular ``Form`` which can automatically generate
     certain fields. The fields that are automatically generated depend on
     the content of the ``Meta`` class and on which fields have already been
-    defined declaratively. Basically, ``ModelForm`` will **only** generate fields
-    that are **missing** from the form, or in other words, fields that weren't
-    defined declaratively.
+    defined declaratively. Basically, ``ModelForm`` will **only** generate
+    fields that are **missing** from the form, or in other words, fields that
+    weren't defined declaratively.
 
     Fields defined declaratively are left as-is, therefore any customizations
-    made to ``Meta`` attributes such as ``widgets``, ``labels``, ``help_texts``,
-    or ``error_messages`` are ignored; these only apply to fields that are
-    generated automatically.
+    made to ``Meta`` attributes such as ``widgets``, ``labels``,
+    ``help_texts``, or ``error_messages`` are ignored; these only apply to
+    fields that are generated automatically.
 
     Similarly, fields defined declaratively do not draw their attributes like
     ``max_length`` or ``required`` from the corresponding model. If you want to
@@ -677,8 +680,8 @@ the field declaratively and setting its ``validators`` parameter::
     contents of the corresponding model field. When they are not compatible,
     you will get a ``ValueError`` as no implicit conversion takes place.
 
-    See the :doc:`form field documentation </ref/forms/fields>` for more information
-    on fields and their arguments.
+    See the :doc:`form field documentation </ref/forms/fields>` for more
+    information on fields and their arguments.
 
 Enabling localization of fields
 -------------------------------
@@ -739,12 +742,12 @@ There are a couple of things to note, however.
   because these classes rely on different metaclasses and a class can only have
   one metaclass.
 
-* It's possible to declaratively remove a ``Field`` inherited from a parent class by
-  setting the name to be ``None`` on the subclass.
+* It's possible to declaratively remove a ``Field`` inherited from a parent
+  class by setting the name to be ``None`` on the subclass.
 
   You can only use this technique to opt out from a field defined declaratively
-  by a parent class; it won't prevent the ``ModelForm`` metaclass from generating
-  a default field. To opt-out from default fields, see
+  by a parent class; it won't prevent the ``ModelForm`` metaclass from
+  generating a default field. To opt-out from default fields, see
   :ref:`modelforms-selecting-fields`.
 
 Providing initial values
@@ -1279,7 +1282,8 @@ a particular author, you could do this:
 
 .. seealso::
 
-    :ref:`Manually rendered can_delete and can_order <manually-rendered-can-delete-and-can-order>`.
+    :ref:`Manually rendered can_delete and can_order
+    <manually-rendered-can-delete-and-can-order>`.
 
 Overriding methods on an ``InlineFormSet``
 ------------------------------------------

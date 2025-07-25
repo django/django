@@ -192,9 +192,9 @@ the user's name. You'd need something like this in your template:
         <input type="submit" value="OK">
     </form>
 
-This tells the browser to return the form data to the URL ``/your-name/``, using
-the ``POST`` method. It will display a text field, labeled "Your name:", and a
-button marked "OK". If the template context contains a ``current_name``
+This tells the browser to return the form data to the URL ``/your-name/``,
+using the ``POST`` method. It will display a text field, labeled "Your name:",
+and a button marked "OK". If the template context contains a ``current_name``
 variable, that will be used to pre-fill the ``your_name`` field.
 
 You'll need a view that renders the template containing the HTML form, and
@@ -203,8 +203,9 @@ that can supply the ``current_name`` field as appropriate.
 When the form is submitted, the ``POST`` request which is sent to the server
 will contain the form data.
 
-Now you'll also need a view corresponding to that ``/your-name/`` URL which will
-find the appropriate key/value pairs in the request, and then process them.
+Now you'll also need a view corresponding to that ``/your-name/`` URL which
+will find the appropriate key/value pairs in the request, and then process
+them.
 
 This is a very simple form. In practice, a form might contain dozens or
 hundreds of fields, many of which might need to be prepopulated, and we might
@@ -343,12 +344,12 @@ from that ``{{ form }}`` by Django's template language.
 
 .. admonition:: Forms and Cross Site Request Forgery protection
 
-    Django ships with an easy-to-use :doc:`protection against Cross Site Request
-    Forgeries </ref/csrf>`. When submitting a form via ``POST`` with
-    CSRF protection enabled you must use the :ttag:`csrf_token` template tag
-    as in the preceding example. However, since CSRF protection is not
-    directly tied to forms in templates, this tag is omitted from the
-    following examples in this document.
+    Django ships with an easy-to-use :doc:`protection against Cross Site
+    Request Forgeries </ref/csrf>`. When submitting a form via ``POST`` with
+    CSRF protection enabled you must use the :ttag:`csrf_token` template tag as
+    in the preceding example. However, since CSRF protection is not directly
+    tied to forms in templates, this tag is omitted from the following examples
+    in this document.
 
 .. admonition:: HTML5 input types and browser validation
 
@@ -381,8 +382,8 @@ detail is rarely important.
 
     In fact if your form is going to be used to directly add or edit a Django
     model, a :doc:`ModelForm </topics/forms/modelforms>` can save you a great
-    deal of time, effort, and code, because it will build a form, along with the
-    appropriate fields and their attributes, from a ``Model`` class.
+    deal of time, effort, and code, because it will build a form, along with
+    the appropriate fields and their attributes, from a ``Model`` class.
 
 Bound and unbound form instances
 --------------------------------

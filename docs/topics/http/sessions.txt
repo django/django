@@ -131,10 +131,10 @@ and the :setting:`SECRET_KEY` setting.
     When using the cookies backend the session data can be read by the client.
 
     A MAC (Message Authentication Code) is used to protect the data against
-    changes by the client, so that the session data will be invalidated when being
-    tampered with. The same invalidation happens if the client storing the
-    cookie (e.g. your user's browser) can't store all of the session cookie and
-    drops data. Even though Django compresses the data, it's still entirely
+    changes by the client, so that the session data will be invalidated when
+    being tampered with. The same invalidation happens if the client storing
+    the cookie (e.g. your user's browser) can't store all of the session cookie
+    and drops data. Even though Django compresses the data, it's still entirely
     possible to exceed the :rfc:`common limit of 4096 bytes <2965#section-5.3>`
     per cookie.
 
@@ -578,8 +578,8 @@ calls ``save()`` and loops until an unused ``session_key`` is generated.
 
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is a normal Django model. The ``Session`` model is defined in
-:source:`django/contrib/sessions/models.py`. Because it's a normal model, you can
-access sessions using the normal Django database API:
+:source:`django/contrib/sessions/models.py`. Because it's a normal model, you
+can access sessions using the normal Django database API:
 
 .. code-block:: pycon
 
@@ -728,11 +728,12 @@ domain. This makes session fixation possible if cookies are permitted from
 subdomains not controlled by trusted users.
 
 For example, an attacker could log into ``good.example.com`` and get a valid
-session for their account. If the attacker has control over ``bad.example.com``,
-they can use it to send their session key to you since a subdomain is permitted
-to set cookies on ``*.example.com``. When you visit ``good.example.com``,
-you'll be logged in as the attacker and might inadvertently enter your
-sensitive personal data (e.g. credit card info) into the attacker's account.
+session for their account. If the attacker has control over
+``bad.example.com``, they can use it to send their session key to you since a
+subdomain is permitted to set cookies on ``*.example.com``. When you visit
+``good.example.com``, you'll be logged in as the attacker and might
+inadvertently enter your sensitive personal data (e.g. credit card info) into
+the attacker's account.
 
 Another possible attack would be if ``good.example.com`` sets its
 :setting:`SESSION_COOKIE_DOMAIN` to ``"example.com"`` which would cause
@@ -839,7 +840,8 @@ You can also customize the model manager by subclassing
 
     .. method:: encode(session_dict)
 
-        Returns the given session dictionary serialized and encoded as a string.
+        Returns the given session dictionary serialized and encoded as a
+        string.
 
         Encoding is performed by the session store class tied to a model class.
 

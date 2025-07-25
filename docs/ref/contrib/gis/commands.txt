@@ -68,7 +68,8 @@ of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
 
 .. django-admin-option:: --no-imports
 
-    Suppresses the ``from django.contrib.gis.db import models`` import statement.
+    Suppresses the ``from django.contrib.gis.db import models`` import
+    statement.
 
 .. django-admin-option:: --null NULL
 

@@ -168,9 +168,9 @@ and ``comment.modified``.
 
 .. class:: Least(*expressions, **extra)
 
-Accepts a list of at least two field names or expressions and returns the
-least value. Each argument must be of a similar type, so mixing text and numbers
-will result in a database error.
+Accepts a list of at least two field names or expressions and returns the least
+value. Each argument must be of a similar type, so mixing text and numbers will
+result in a database error.
 
 .. warning::
 
@@ -565,8 +565,8 @@ value. If ``output_field`` is omitted, it will default to the ``output_field``
 of ``expression``. A ``tzinfo`` subclass, usually provided by :mod:`zoneinfo`,
 can be passed to truncate a value in a specific timezone.
 
-Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
-return:
+Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in
+``kind``\s return:
 
 * "year": 2015-01-01 00:00:00+00:00
 * "quarter": 2015-04-01 00:00:00+00:00
@@ -1823,7 +1823,8 @@ Usage example:
 
 Returns a substring of length ``length`` from the field or expression starting
 at position ``pos``. The position is 1-indexed, so the position must be greater
-than 0. If ``length`` is ``None``, then the rest of the string will be returned.
+than 0. If ``length`` is ``None``, then the rest of the string will be
+returned.
 
 Usage example:
 

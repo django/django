@@ -299,11 +299,11 @@ __ https://gdal.org/drivers/vector/
     ``Feature`` wraps an OGR feature. You never create a ``Feature`` object
     directly. Instead, you retrieve them from a :class:`Layer` object. Each
     feature consists of a geometry and a set of fields containing additional
-    properties. The geometry of a field is accessible via its ``geom`` property,
-    which returns an :class:`OGRGeometry` object. A ``Feature`` behaves like a
-    standard Python container for its fields, which it returns as :class:`Field`
-    objects: you can access a field directly by its index or name, or you can
-    iterate over a feature's fields, e.g. in a ``for`` loop.
+    properties. The geometry of a field is accessible via its ``geom``
+    property, which returns an :class:`OGRGeometry` object. A ``Feature``
+    behaves like a standard Python container for its fields, which it returns
+    as :class:`Field` objects: you can access a field directly by its index or
+    name, or you can iterate over a feature's fields, e.g. in a ``for`` loop.
 
     .. attribute:: geom
 
@@ -537,9 +537,9 @@ coordinate transformation:
     .. method:: __getitem__()
 
     Returns the point at the specified index for a :class:`LineString`, the
-    interior ring at the specified index for a :class:`Polygon`, or the geometry
-    at the specified index in a :class:`GeometryCollection`. Not applicable to
-    other geometry types.
+    interior ring at the specified index for a :class:`Polygon`, or the
+    geometry at the specified index in a :class:`GeometryCollection`. Not
+    applicable to other geometry types.
 
     .. attribute:: dimension
 
@@ -1273,28 +1273,28 @@ Raster Data Objects
 ----------------
 
 :class:`GDALRaster` is a wrapper for the GDAL raster source object that
-supports reading data from a variety of GDAL-supported geospatial file
-formats and data sources using a consistent interface. Each
-data source is represented by a :class:`GDALRaster` object which contains
-one or more layers of data named bands. Each band, represented by a
-:class:`GDALBand` object, contains georeferenced image data. For example, an RGB
-image is represented as three bands: one for red, one for green, and one for
-blue.
+supports reading data from a variety of GDAL-supported geospatial file formats
+and data sources using a consistent interface. Each data source is represented
+by a :class:`GDALRaster` object which contains one or more layers of data named
+bands. Each band, represented by a :class:`GDALBand` object, contains
+georeferenced image data. For example, an RGB image is represented as three
+bands: one for red, one for green, and one for blue.
 
 .. note::
 
     For raster data there is no difference between a raster instance and its
-    data source. Unlike for the Geometry objects, :class:`GDALRaster` objects are
-    always a data source. Temporary rasters can be instantiated in memory
-    using the corresponding driver, but they will be of the same class as file-based
-    raster sources.
+    data source. Unlike for the Geometry objects, :class:`GDALRaster` objects
+    are always a data source. Temporary rasters can be instantiated in memory
+    using the corresponding driver, but they will be of the same class as
+    file-based raster sources.
 
 .. class:: GDALRaster(ds_input, write=False)
 
     The constructor for ``GDALRaster`` accepts two parameters. The first
     parameter defines the raster source, and the second parameter defines if a
-    raster should be opened in write mode. For newly-created rasters, the second
-    parameter is ignored and the new raster is always created in write mode.
+    raster should be opened in write mode. For newly-created rasters, the
+    second parameter is ignored and the new raster is always created in write
+    mode.
 
     The first parameter can take three forms: a string or
     :class:`~pathlib.Path` representing a file path (filesystem or GDAL virtual
@@ -1358,8 +1358,8 @@ blue.
 
     .. attribute:: name
 
-        The name of the source which is equivalent to the input file path or the name
-        provided upon instantiation.
+        The name of the source which is equivalent to the input file path or
+        the name provided upon instantiation.
 
         .. code-block:: pycon
 
@@ -1368,11 +1368,12 @@ blue.
 
     .. attribute:: driver
 
-        The name of the GDAL driver used to handle the input file. For ``GDALRaster``\s created
-        from a file, the driver type is detected automatically. The creation of rasters from
-        scratch is an in-memory raster by default (``'MEM'``), but can be
-        altered as needed. For instance, use ``GTiff`` for a ``GeoTiff`` file.
-        For a list of file types, see also the `GDAL Raster Formats`__ list.
+        The name of the GDAL driver used to handle the input file. For
+        ``GDALRaster``\s created from a file, the driver type is detected
+        automatically. The creation of rasters from scratch is an in-memory
+        raster by default (``'MEM'``), but can be altered as needed. For
+        instance, use ``GTiff`` for a ``GeoTiff`` file. For a list of file
+        types, see also the `GDAL Raster Formats`__ list.
 
         __ https://gdal.org/drivers/raster/
 
@@ -1572,10 +1573,11 @@ blue.
         for file-based rasters the warp function will create a new raster on
         disk.
 
-        The only parameter that is set differently from the source raster is the
-        name. The default value of the raster name is the name of the source
-        raster appended with ``'_copy' + source_driver_name``. For file-based
-        rasters it is recommended to provide the file path of the target raster.
+        The only parameter that is set differently from the source raster is
+        the name. The default value of the raster name is the name of the
+        source raster appended with ``'_copy' + source_driver_name``. For
+        file-based rasters it is recommended to provide the file path of the
+        target raster.
 
         The resampling algorithm used for warping can be specified with the
         ``resampling`` argument. The default is ``NearestNeighbor``, and the
@@ -1714,7 +1716,8 @@ blue.
 
     .. attribute:: pixel_count
 
-        The total number of pixels in this band. Is equal to ``width * height``.
+        The total number of pixels in this band. Is equal to ``width *
+        height``.
 
     .. method:: statistics(refresh=False, approximate=False)
 
@@ -1764,8 +1767,8 @@ blue.
     .. attribute:: nodata_value
 
         The "no data" value for a band is generally a special marker value used
-        to mark pixels that are not valid data. Such pixels should generally not
-        be displayed, nor contribute to analysis operations.
+        to mark pixels that are not valid data. Such pixels should generally
+        not be displayed, nor contribute to analysis operations.
 
         To delete an existing "no data" value, set this property to ``None``.
 
@@ -1780,31 +1783,32 @@ blue.
 
         The color interpretation for the band, as an integer between 0and 16.
         If ``as_string`` is ``True``, the data type is returned as a string
-        with the following possible values:
-        ``GCI_Undefined``, ``GCI_GrayIndex``, ``GCI_PaletteIndex``,
-        ``GCI_RedBand``, ``GCI_GreenBand``, ``GCI_BlueBand``, ``GCI_AlphaBand``,
+        with the following possible values: ``GCI_Undefined``,
+        ``GCI_GrayIndex``, ``GCI_PaletteIndex``, ``GCI_RedBand``,
+        ``GCI_GreenBand``, ``GCI_BlueBand``, ``GCI_AlphaBand``,
         ``GCI_HueBand``, ``GCI_SaturationBand``, ``GCI_LightnessBand``,
         ``GCI_CyanBand``, ``GCI_MagentaBand``, ``GCI_YellowBand``,
         ``GCI_BlackBand``, ``GCI_YCbCr_YBand``, ``GCI_YCbCr_CbBand``, and
         ``GCI_YCbCr_CrBand``. ``GCI_YCbCr_CrBand`` also represents ``GCI_Max``
-        because both correspond to the integer 16, but only ``GCI_YCbCr_CrBand``
-        is returned as a string.
+        because both correspond to the integer 16, but only
+        ``GCI_YCbCr_CrBand`` is returned as a string.
 
     .. method:: data(data=None, offset=None, size=None, shape=None)
 
-        The accessor to the pixel values of the ``GDALBand``. Returns the complete
-        data array if no parameters are provided. A subset of the pixel array can
-        be requested by specifying an offset and block size as tuples.
+        The accessor to the pixel values of the ``GDALBand``. Returns the
+        complete data array if no parameters are provided. A subset of the
+        pixel array can be requested by specifying an offset and block size as
+        tuples.
 
-        If NumPy is available, the data is returned as NumPy array. For performance
-        reasons, it is highly recommended to use NumPy.
+        If NumPy is available, the data is returned as NumPy array. For
+        performance reasons, it is highly recommended to use NumPy.
 
-        Data is written to the ``GDALBand`` if the ``data`` parameter is provided.
-        The input can be of one of the following types - packed string, buffer, list,
-        array, and NumPy array. The number of items in the input should normally
-        correspond to the total number of pixels in the band, or to the number
-        of pixels for a specific block of pixel values if the ``offset`` and
-        ``size`` parameters are provided.
+        Data is written to the ``GDALBand`` if the ``data`` parameter is
+        provided. The input can be of one of the following types - packed
+        string, buffer, list, array, and NumPy array. The number of items in
+        the input should normally correspond to the total number of pixels in
+        the band, or to the number of pixels for a specific block of pixel
+        values if the ``offset`` and ``size`` parameters are provided.
 
         If the number of items in the input is different from the target pixel
         block, the ``shape`` parameter must be specified. The shape is a tuple
@@ -1927,8 +1931,8 @@ Key               Default  Usage
 .. object:: datatype
 
     Integer representing the data type for all the bands. Defaults to ``6``
-    (Float32). All bands of a new raster are required to have the same datatype.
-    The value mapping is:
+    (Float32). All bands of a new raster are required to have the same
+    datatype. The value mapping is:
 
     ===== =============== ===================================
     Value GDAL Pixel Type Description

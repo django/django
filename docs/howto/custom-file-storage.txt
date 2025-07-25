@@ -16,8 +16,9 @@ You'll need to follow these steps:
 
         class MyStorage(Storage): ...
 
-#. Django must be able to instantiate your storage system without any arguments.
-   This means that any settings should be taken from ``django.conf.settings``::
+#. Django must be able to instantiate your storage system without any
+   arguments. This means that any settings should be taken from
+   ``django.conf.settings``::
 
         from django.conf import settings
         from django.core.files.storage import Storage
@@ -36,10 +37,10 @@ You'll need to follow these steps:
    In addition, if your class provides local file storage, it must override
    the ``path()`` method.
 
-#. Your storage class must be :ref:`deconstructible <custom-deconstruct-method>`
-   so it can be serialized when it's used on a field in a migration. As long
-   as your field has arguments that are themselves
-   :ref:`serializable <migration-serializing>`, you can use the
+#. Your storage class must be :ref:`deconstructible
+   <custom-deconstruct-method>`  so it can be serialized when it's used on a
+   field in a migration. As long as your field has arguments that are
+   themselves :ref:`serializable <migration-serializing>`, you can use the
    ``django.utils.deconstruct.deconstructible`` class decorator for this
    (that's what Django uses on FileSystemStorage).
 
@@ -73,16 +74,16 @@ objects. These are:
 **Required**.
 
 Called by ``Storage.open()``, this is the actual mechanism the storage class
-uses to open the file. This must return a ``File`` object, though in most cases,
-you'll want to return some subclass here that implements logic specific to the
-backend storage system. The :exc:`FileNotFoundError` exception should be raised
-when a file doesn't exist.
+uses to open the file. This must return a ``File`` object, though in most
+cases, you'll want to return some subclass here that implements logic specific
+to the backend storage system. The :exc:`FileNotFoundError` exception should be
+raised when a file doesn't exist.
 
 .. method:: _save(name, content)
 
 Called by ``Storage.save()``. The ``name`` will already have gone through
-``get_valid_name()`` and ``get_available_name()``, and the ``content`` will be a
-``File`` object itself.
+``get_valid_name()`` and ``get_available_name()``, and the ``content`` will be
+a ``File`` object itself.
 
 Should return the actual name of the file saved (usually the ``name`` passed
 in, but if the storage needs to change the file name return the new name

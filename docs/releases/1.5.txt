@@ -18,11 +18,11 @@ Overview
 
 The biggest new feature in Django 1.5 is the `configurable User model`_. Before
 Django 1.5, applications that wanted to use Django's auth framework
-(:mod:`django.contrib.auth`) were forced to use Django's definition of a "user".
-In Django 1.5, you can now swap out the ``User`` model for one that you write
-yourself. This could be a simple extension to the existing ``User`` model -- for
-example, you could add a Twitter or Facebook ID field -- or you could completely
-replace the ``User`` with one totally customized for your site.
+(:mod:`django.contrib.auth`) were forced to use Django's definition of a
+"user". In Django 1.5, you can now swap out the ``User`` model for one that you
+write yourself. This could be a simple extension to the existing ``User`` model
+-- for example, you could add a Twitter or Facebook ID field -- or you could
+completely replace the ``User`` with one totally customized for your site.
 
 Django 1.5 is also the first release with `Python 3 support`_! We're labeling
 this support "experimental" because we don't yet consider it production-ready,
@@ -50,11 +50,11 @@ However, as with previous releases, Django 1.5 ships with some minor
 :ref:`backwards incompatible changes <backwards-incompatible-1.5>`; people
 upgrading from previous versions of Django should read that list carefully.
 
-One deprecated feature worth noting is the shift to "new-style" :ttag:`url` tag.
-Prior to Django 1.3, syntax like ``{% url myview %}`` was interpreted
+One deprecated feature worth noting is the shift to "new-style" :ttag:`url`
+tag. Prior to Django 1.3, syntax like ``{% url myview %}`` was interpreted
 incorrectly (Django considered ``"myview"`` to be a literal name of a view, not
-a template variable named ``myview``). Django 1.3 and above introduced the
-``{% load url from future %}`` syntax to bring in the corrected behavior where
+a template variable named ``myview``). Django 1.3 and above introduced the ``{%
+load url from future %}`` syntax to bring in the corrected behavior where
 ``myview`` was seen as a variable.
 
 The upshot of this is that if you are not using ``{% load url from future %}``
@@ -69,16 +69,16 @@ Django 1.5 requires Python 2.6.5 or above, though we **highly recommend**
 Python 2.7.3 or above. Support for Python 2.5 and below has been dropped.
 
 This change should affect only a small number of Django users, as most
-operating-system vendors today are shipping Python 2.6 or newer as their default
-version. If you're still using Python 2.5, however, you'll need to stick to
-Django 1.4 until you can upgrade your Python version. Per :doc:`our support
-policy </internals/release-process>`, Django 1.4 will continue to receive
-security support until the release of Django 1.6.
+operating-system vendors today are shipping Python 2.6 or newer as their
+default version. If you're still using Python 2.5, however, you'll need to
+stick to Django 1.4 until you can upgrade your Python version. Per :doc:`our
+support policy </internals/release-process>`, Django 1.4 will continue to
+receive security support until the release of Django 1.6.
 
 Django 1.5 does not run on a Jython final release, because Jython's latest
 release doesn't currently support Python 2.6. However, Jython currently does
-offer an alpha release featuring 2.7 support, and Django 1.5 supports that alpha
-release.
+offer an alpha release featuring 2.7 support, and Django 1.5 supports that
+alpha release.
 
 Python 3 support
 ----------------
@@ -200,28 +200,30 @@ tag's content.
 Retrieval of ``ContentType`` instances associated with proxy models
 -------------------------------------------------------------------
 
-The methods :meth:`ContentTypeManager.get_for_model() <django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>`
-and :meth:`ContentTypeManager.get_for_models() <django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>`
-have a new keyword argument – respectively ``for_concrete_model`` and ``for_concrete_models``.
-By passing ``False`` using this argument it is now possible to retrieve the
-:class:`ContentType <django.contrib.contenttypes.models.ContentType>`
-associated with proxy models.
+The methods :meth:`ContentTypeManager.get_for_model()
+<django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>`
+and :meth:`ContentTypeManager.get_for_models()
+<django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>`
+have a new keyword argument – respectively ``for_concrete_model`` and
+``for_concrete_models``. By passing ``False`` using this argument it is now
+possible to retrieve the :class:`ContentType
+<django.contrib.contenttypes.models.ContentType>` associated with proxy models.
 
 New ``view`` variable in class-based views context
 --------------------------------------------------
 
 In all :doc:`generic class-based views </topics/class-based-views/index>`
-(or any class-based view inheriting from ``ContextMixin``), the context dictionary
-contains a ``view`` variable that points to the ``View`` instance.
+(or any class-based view inheriting from ``ContextMixin``), the context
+dictionary contains a ``view`` variable that points to the ``View`` instance.
 
 GeoDjango
 ---------
 
 * :class:`~django.contrib.gis.geos.LineString` and
-  :class:`~django.contrib.gis.geos.MultiLineString` GEOS objects now support the
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.interpolate` and
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.project` methods
-  (so-called linear referencing).
+  :class:`~django.contrib.gis.geos.MultiLineString` GEOS objects now support
+  the :meth:`~django.contrib.gis.geos.GEOSGeometry.interpolate` and
+  :meth:`~django.contrib.gis.geos.GEOSGeometry.project` methods (so-called
+  linear referencing).
 
 * The ``wkb`` and ``hex`` properties of
   :class:`~django.contrib.gis.geos.GEOSGeometry` objects preserve the Z
@@ -305,10 +307,10 @@ Django 1.5 also includes several smaller improvements worth noting:
   in templates.
 
 * It's not required any more to have ``404.html`` and ``500.html`` templates in
-  the root templates directory. Django will output some basic error messages for
-  both situations when those templates are not found. It's still recommended as
-  good practice to provide those templates in order to present pretty error
-  pages to the user.
+  the root templates directory. Django will output some basic error messages
+  for both situations when those templates are not found. It's still
+  recommended as good practice to provide those templates in order to present
+  pretty error pages to the user.
 
 * :mod:`django.contrib.auth` provides a new signal that is emitted
   whenever a user fails to login successfully. See
@@ -425,8 +427,8 @@ Non-form data in HTTP requests
 ------------------------------
 
 :attr:`request.POST <django.http.HttpRequest.POST>` will no longer include data
-posted via HTTP requests with non form-specific content-types in the header.
-In prior versions, data posted with content-types other than
+posted via HTTP requests with non form-specific content-types in the header. In
+prior versions, data posted with content-types other than
 :mimetype:`multipart/form-data` or
 :mimetype:`application/x-www-form-urlencoded` would still end up represented in
 the :attr:`request.POST <django.http.HttpRequest.POST>` attribute. Developers
@@ -606,8 +608,8 @@ tests are now executed in the following order:
 
 * First, all unit tests (including :class:`unittest.TestCase`,
   :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
-  :class:`~django.test.TransactionTestCase`) are run with no particular ordering
-  guaranteed nor enforced among them.
+  :class:`~django.test.TransactionTestCase`) are run with no particular
+  ordering guaranteed nor enforced among them.
 
 * Then any other tests (e.g. doctests) that may alter the database without
   restoring it to its original state are run.
@@ -679,8 +681,8 @@ Miscellaneous
   needs. The new default value is ``0o666`` (octal) and the current umask value
   is first masked out.
 
-* The :class:`F expressions <django.db.models.F>` supported bitwise operators by
-  ``&`` and ``|``. These operators are now available using ``.bitand()`` and
+* The :class:`F expressions <django.db.models.F>` supported bitwise operators
+  by ``&`` and ``|``. These operators are now available using ``.bitand()`` and
   ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be
   consistent with :ref:`Q() expressions <complex-lookups-with-q>` and
   ``QuerySet`` combining where the operators are used as boolean AND and OR
@@ -692,9 +694,9 @@ Miscellaneous
   and now F() expressions will always use the same relations as other lookups
   within the same ``filter()`` call.
 
-* The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you need
-  HTML validation against pre-HTML5 Strict DTDs, you should add a div around it
-  in your pages.
+* The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you
+  need HTML validation against pre-HTML5 Strict DTDs, you should add a div
+  around it in your pages.
 
 * The template tags library ``adminmedia``, which only contained the
   deprecated template tag ``{% admin_media_prefix %}``, was removed.

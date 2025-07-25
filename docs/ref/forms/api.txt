@@ -45,10 +45,10 @@ your :class:`Form` class constructor:
     >>> f = ContactForm(data)
 
 In this dictionary, the keys are the field names, which correspond to the
-attributes in your :class:`Form` class. The values are the data you're trying to
-validate. These will usually be strings, but there's no requirement that they be
-strings; the type of data you pass depends on the :class:`Field`, as we'll see
-in a moment.
+attributes in your :class:`Form` class. The values are the data you're trying
+to validate. These will usually be strings, but there's no requirement that
+they be strings; the type of data you pass depends on the :class:`Field`, as
+we'll see in a moment.
 
 .. attribute:: Form.is_bound
 
@@ -90,8 +90,8 @@ validation for fields that are interdependent. See
 .. method:: Form.is_valid()
 
 The primary task of a :class:`Form` object is to validate data. With a bound
-:class:`Form` instance, call the :meth:`~Form.is_valid` method to run validation
-and return a boolean designating whether the data was valid:
+:class:`Form` instance, call the :meth:`~Form.is_valid` method to run
+validation and return a boolean designating whether the data was valid:
 
 .. code-block:: pycon
 
@@ -506,12 +506,12 @@ fields. In this example, the data dictionary doesn't include a value for the
     >>> f.cleaned_data
     {'nick_name': '', 'first_name': 'John', 'last_name': 'Lennon'}
 
-In this above example, the ``cleaned_data`` value for ``nick_name`` is set to an
-empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
-empty values as an empty string. Each field type knows what its "blank" value
-is -- e.g., for ``DateField``, it's ``None`` instead of the empty string. For
-full details on each field's behavior in this case, see the "Empty value" note
-for each field in the :ref:`built-in-fields` section below.
+In this above example, the ``cleaned_data`` value for ``nick_name`` is set to
+an empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s
+treat empty values as an empty string. Each field type knows what its "blank"
+value is -- e.g., for ``DateField``, it's ``None`` instead of the empty string.
+For full details on each field's behavior in this case, see the "Empty value"
+note for each field in the :ref:`built-in-fields` section below.
 
 You can write code to perform validation for particular form fields (based on
 their name) or for the form as a whole (considering combinations of various
@@ -1255,8 +1255,8 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.form
 
-    The :class:`~django.forms.Form` instance this :class:`~django.forms.BoundField`
-    is bound to.
+    The :class:`~django.forms.Form` instance this
+    :class:`~django.forms.BoundField` is bound to.
 
 .. attribute:: BoundField.help_text
 
@@ -1264,8 +1264,8 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.html_name
 
-    The name that will be used in the widget's HTML ``name`` attribute. It takes
-    the form :attr:`~django.forms.Form.prefix` into account.
+    The name that will be used in the widget's HTML ``name`` attribute. It
+    takes the form :attr:`~django.forms.Form.prefix` into account.
 
 .. attribute:: BoundField.id_for_label
 
@@ -1380,7 +1380,8 @@ Methods of ``BoundField``
 
 .. method:: BoundField.as_hidden(attrs=None, **kwargs)
 
-    Returns a string of HTML for representing this as an ``<input type="hidden">``.
+    Returns a string of HTML for representing this as an
+    ``<input type="hidden">``.
 
     ``**kwargs`` are passed to :meth:`~django.forms.BoundField.as_widget`.
 
@@ -1484,8 +1485,8 @@ Methods of ``BoundField``
 
 .. method:: BoundField.value()
 
-    Use this method to render the raw value of this field as it would be rendered
-    by a ``Widget``:
+    Use this method to render the raw value of this field as it would be
+    rendered by a ``Widget``:
 
     .. code-block:: pycon
 

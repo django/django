@@ -61,8 +61,8 @@ Some technical notes:
 Using models
 ============
 
-Once you have defined your models, you need to tell Django you're going to *use*
-those models. Do this by editing your settings file and changing the
+Once you have defined your models, you need to tell Django you're going to
+*use* those models. Do this by editing your settings file and changing the
 :setting:`INSTALLED_APPS` setting to add the name of the module that contains
 your ``models.py``.
 
@@ -117,15 +117,15 @@ determine a few things:
 * The column type, which tells the database what kind of data to store (e.g.
   ``INTEGER``, ``VARCHAR``, ``TEXT``).
 
-* The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a form
-  field (e.g. ``<input type="text">``, ``<select>``).
+* The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a
+  form field (e.g. ``<input type="text">``, ``<select>``).
 
 * The minimal validation requirements, used in Django's admin and in
   automatically-generated forms.
 
-Django ships with dozens of built-in field types; you can find the complete list
-in the :ref:`model field reference <model-field-types>`. You can easily write
-your own fields if Django's built-in ones don't do the trick; see
+Django ships with dozens of built-in field types; you can find the complete
+list in the :ref:`model field reference <model-field-types>`. You can easily
+write your own fields if Django's built-in ones don't do the trick; see
 :doc:`/howto/custom-model-fields`.
 
 Field options
@@ -134,13 +134,13 @@ Field options
 Each field takes a certain set of field-specific arguments (documented in the
 :ref:`model field reference <model-field-types>`). For example,
 :class:`~django.db.models.CharField` (and its subclasses) require a
-:attr:`~django.db.models.CharField.max_length` argument which specifies the size
-of the ``VARCHAR`` database field used to store the data.
+:attr:`~django.db.models.CharField.max_length` argument which specifies the
+size of the ``VARCHAR`` database field used to store the data.
 
 There's also a set of common arguments available to all field types. All are
 optional. They're fully explained in the :ref:`reference
-<common-model-field-options>`, but here's a quick summary of the most often-used
-ones:
+<common-model-field-options>`, but here's a quick summary of the most
+often-used ones:
 
 :attr:`~Field.null`
     If ``True``, Django will store empty values as ``NULL`` in the database.
@@ -284,10 +284,9 @@ type specified per app in :attr:`AppConfig.default_auto_field
 
     id = models.BigAutoField(primary_key=True)
 
-If you'd like to specify a custom primary key, specify
-:attr:`primary_key=True <Field.primary_key>` on one of your fields. If Django
-sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
-``id`` column.
+If you'd like to specify a custom primary key, specify :attr:`primary_key=True
+<Field.primary_key>` on one of your fields. If Django sees you've explicitly
+set :attr:`Field.primary_key`, it won't add the automatic ``id`` column.
 
 Each model requires exactly one field to have :attr:`primary_key=True
 <Field.primary_key>` (either explicitly declared or automatically added).
@@ -301,8 +300,8 @@ Each field type, except for :class:`~django.db.models.ForeignKey`,
 :class:`~django.db.models.ManyToManyField` and
 :class:`~django.db.models.OneToOneField`, takes an optional first positional
 argument -- a verbose name. If the verbose name isn't given, Django will
-automatically create it using the field's attribute name, converting underscores
-to spaces.
+automatically create it using the field's attribute name, converting
+underscores to spaces.
 
 In this example, the verbose name is ``"person's first name"``::
 
@@ -366,9 +365,9 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
         manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
         # ...
 
-You can also create :ref:`recursive relationships <recursive-relationships>` (an
-object with a many-to-one relationship to itself) and :ref:`relationships to
-models not yet defined <lazy-relationships>`; see :ref:`the model field
+You can also create :ref:`recursive relationships <recursive-relationships>`
+(an object with a many-to-one relationship to itself) and :ref:`relationships
+to models not yet defined <lazy-relationships>`; see :ref:`the model field
 reference <ref-foreignkey>` for details.
 
 It's suggested, but not required, that the name of a
@@ -390,8 +389,8 @@ want. For example::
     <foreign-key-arguments>`. These options help define how the relationship
     should work; all are optional.
 
-    For details on accessing backwards-related objects, see the
-    :ref:`Following relationships backward example <backwards-related-objects>`.
+    For details on accessing backwards-related objects, see the :ref:`Following
+    relationships backward example <backwards-related-objects>`.
 
     For sample code, see the :doc:`Many-to-one relationship model example
     </topics/db/examples/many_to_one>`.
@@ -465,8 +464,8 @@ matching pizzas and toppings, a standard
 you may need to associate data with the relationship between two models.
 
 For example, consider the case of an application tracking the musical groups
-which musicians belong to. There is a many-to-many relationship between a person
-and the groups of which they are a member, so you could use a
+which musicians belong to. There is a many-to-many relationship between a
+person and the groups of which they are a member, so you could use a
 :class:`~django.db.models.ManyToManyField` to represent this relationship.
 However, there is a lot of detail about the membership that you might want to
 collect, such as the date at which the person joined the group.
@@ -524,11 +523,11 @@ There are a few restrictions on the intermediate model:
 * Your intermediate model must contain one - and *only* one - foreign key
   to the source model (this would be ``Group`` in our example), or you must
   explicitly specify the foreign keys Django should use for the relationship
-  using :attr:`ManyToManyField.through_fields <ManyToManyField.through_fields>`.
-  If you have more than one foreign key and ``through_fields`` is not
-  specified, a validation error will be raised. A similar restriction applies
-  to the foreign key to the target model (this would be ``Person`` in our
-  example).
+  using :attr:`ManyToManyField.through_fields
+  <ManyToManyField.through_fields>`. If you have more than one foreign key and
+  ``through_fields`` is not specified, a validation error will be raised. A
+  similar restriction applies to the foreign key to the target model (this
+  would be ``Person`` in our example).
 
 * For a model which has a many-to-many relationship to itself through an
   intermediary model, two foreign keys to the same model are permitted, but
@@ -800,13 +799,13 @@ Give your model metadata by using an inner ``class Meta``, like so::
             verbose_name_plural = "oxen"
 
 Model metadata is "anything that's not a field", such as ordering options
-(:attr:`~Options.ordering`), database table name (:attr:`~Options.db_table`), or
-human-readable singular and plural names (:attr:`~Options.verbose_name` and
+(:attr:`~Options.ordering`), database table name (:attr:`~Options.db_table`),
+or human-readable singular and plural names (:attr:`~Options.verbose_name` and
 :attr:`~Options.verbose_name_plural`). None are required, and adding ``class
 Meta`` to a model is completely optional.
 
-A complete list of all possible ``Meta`` options can be found in the :doc:`model
-option reference </ref/models/options>`.
+A complete list of all possible ``Meta`` options can be found in the
+:doc:`model option reference </ref/models/options>`.
 
 .. _model-attributes:
 
@@ -827,9 +826,10 @@ Model attributes
 Model methods
 =============
 
-Define custom methods on a model to add custom "row-level" functionality to your
-objects. Whereas :class:`~django.db.models.Manager` methods are intended to do
-"table-wide" things, model methods should act on a particular model instance.
+Define custom methods on a model to add custom "row-level" functionality to
+your objects. Whereas :class:`~django.db.models.Manager` methods are intended
+to do "table-wide" things, model methods should act on a particular model
+instance.
 
 This is a valuable technique for keeping business logic in one place -- the
 model.
@@ -1059,11 +1059,12 @@ still only creating one database table per child model at the database level.
 ``Meta`` inheritance
 ~~~~~~~~~~~~~~~~~~~~
 
-When an abstract base class is created, Django makes any :ref:`Meta <meta-options>`
-inner class you declared in the base class available as an
-attribute. If a child class does not declare its own :ref:`Meta <meta-options>`
-class, it will inherit the parent's :ref:`Meta <meta-options>`. If the child wants to
-extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example::
+When an abstract base class is created, Django makes any
+:ref:`Meta <meta-options>` inner class you declared in the base class available
+as an attribute. If a child class does not declare its own
+:ref:`Meta <meta-options>` class, it will inherit the parent's
+:ref:`Meta <meta-options>`. If the child wants to extend the parent's
+:ref:`Meta <meta-options>` class, it can subclass it. For example::
 
     from django.db import models
 
@@ -1087,10 +1088,11 @@ base classes don't automatically become abstract classes themselves. To make
 an abstract base class that inherits from another abstract base class, you need
 to explicitly set ``abstract=True`` on the child.
 
-Some attributes won't make sense to include in the :ref:`Meta <meta-options>` class of an
-abstract base class. For example, including ``db_table`` would mean that all
-the child classes (the ones that don't specify their own :ref:`Meta <meta-options>`) would use
-the same database table, which is almost certainly not what you want.
+Some attributes won't make sense to include in the :ref:`Meta <meta-options>`
+class of an abstract base class. For example, including ``db_table`` would mean
+that all the child classes (the ones that don't specify their own
+:ref:`Meta <meta-options>`) would use the same database table, which is almost
+certainly not what you want.
 
 Due to the way Python inheritance works, if a child class inherits from
 multiple abstract base classes, only the :ref:`Meta <meta-options>` options
@@ -1181,15 +1183,15 @@ Along with another app ``rare/models.py``::
         pass
 
 The reverse name of the ``common.ChildA.m2m`` field will be
-``common_childa_related`` and the reverse query name will be ``common_childas``.
-The reverse name of the ``common.ChildB.m2m`` field will be
+``common_childa_related`` and the reverse query name will be
+``common_childas``. The reverse name of the ``common.ChildB.m2m`` field will be
 ``common_childb_related`` and the reverse query name will be
 ``common_childbs``. Finally, the reverse name of the ``rare.ChildB.m2m`` field
 will be ``rare_childb_related`` and the reverse query name will be
 ``rare_childbs``. It's up to you how you use the ``'%(class)s'`` and
-``'%(app_label)s'`` portion to construct your related name or related query name
-but if you forget to use it, Django will raise errors when you perform system
-checks (or run :djadmin:`migrate`).
+``'%(app_label)s'`` portion to construct your related name or related query
+name but if you forget to use it, Django will raise errors when you perform
+system checks (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1269,11 +1271,11 @@ You can override that field by declaring your own
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the multi-table inheritance situation, it doesn't make sense for a child
-class to inherit from its parent's :ref:`Meta <meta-options>` class. All the :ref:`Meta <meta-options>` options
-have already been applied to the parent class and applying them again would
-normally only lead to contradictory behavior (this is in contrast with the
-abstract base class case, where the base class doesn't exist in its own
-right).
+class to inherit from its parent's :ref:`Meta <meta-options>` class. All the
+:ref:`Meta <meta-options>` options have already been applied to the parent
+class and applying them again would normally only lead to contradictory
+behavior (this is in contrast with the abstract base class case, where the base
+class doesn't exist in its own right).
 
 So a child model does not have access to its parent's :ref:`Meta
 <meta-options>` class. However, there are a few limited cases where the child
@@ -1359,7 +1361,8 @@ Proxy models are declared like normal models. You tell Django that it's a
 proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
 the ``Meta`` class to ``True``.
 
-For example, suppose you want to add a method to the ``Person`` model. You can do it like this::
+For example, suppose you want to add a method to the ``Person`` model. You can
+do it like this::
 
     from django.db import models
 

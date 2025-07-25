@@ -6,8 +6,8 @@ Introduction
 ============
 
 GeoDjango is an included contrib module for Django that turns it into a
-world-class geographic web framework. GeoDjango strives to make it as simple
-as possible to create geographic web applications, like location-based services.
+world-class geographic web framework. GeoDjango strives to make it as simple as
+possible to create geographic web applications, like location-based services.
 Its features include:
 
 * Django model fields for `OGC`_ geometries and raster data.
@@ -310,8 +310,8 @@ database via GeoDjango models using the :doc:`layermapping`.
 There are many different ways to import data into a spatial database --
 besides the tools included within GeoDjango, you may also use the following:
 
-* `ogr2ogr`_: A command-line utility included with GDAL that
-  can import many vector data formats into PostGIS, MySQL, and Oracle databases.
+* `ogr2ogr`_: A command-line utility included with GDAL that can import many
+  vector data formats into PostGIS, MySQL, and Oracle databases.
 * `shp2pgsql`_: This utility included with PostGIS imports ESRI shapefiles into
   PostGIS.
 
@@ -375,12 +375,12 @@ You can see the layer's geometry type and how many features it contains:
 .. note::
 
     Unfortunately, the shapefile data format does not allow for greater
-    specificity with regards to geometry types. This shapefile, like
-    many others, actually includes ``MultiPolygon`` geometries, not Polygons.
-    It's important to use a more general field type in models: a
-    GeoDjango ``MultiPolygonField`` will accept a ``Polygon`` geometry, but a
-    ``PolygonField`` will not accept a ``MultiPolygon`` type geometry. This
-    is why the ``WorldBorder`` model defined above uses a ``MultiPolygonField``.
+    specificity with regards to geometry types. This shapefile, like many
+    others, actually includes ``MultiPolygon`` geometries, not Polygons. It's
+    important to use a more general field type in models: a GeoDjango
+    ``MultiPolygonField`` will accept a ``Polygon`` geometry, but a
+    ``PolygonField`` will not accept a ``MultiPolygon`` type geometry. This is
+    why the ``WorldBorder`` model defined above uses a ``MultiPolygonField``.
 
 The :class:`~django.contrib.gis.gdal.Layer` may also have a spatial reference
 system associated with it. If it does, the ``srs`` attribute will return a
@@ -412,18 +412,22 @@ units of degrees.
 In addition, shapefiles also support attribute fields that may contain
 additional data. Here are the fields on the World Borders layer:
 
+.. code-block:: pycon
+
     >>> print(lyr.fields)
     ['FIPS', 'ISO2', 'ISO3', 'UN', 'NAME', 'AREA', 'POP2005', 'REGION', 'SUBREGION', 'LON', 'LAT']
 
 The following code will let you examine the OGR types (e.g. integer or
 string) associated with each of the fields:
 
+.. code-block:: pycon
+
     >>> [fld.__name__ for fld in lyr.field_types]
     ['OFTString', 'OFTString', 'OFTString', 'OFTInteger', 'OFTString', 'OFTInteger', 'OFTInteger64', 'OFTInteger', 'OFTInteger', 'OFTReal', 'OFTReal']
 
-You can iterate over each feature in the layer and extract information from both
-the feature's geometry (accessed via the ``geom`` attribute) as well as the
-feature's attribute fields (whose **values** are accessed via ``get()``
+You can iterate over each feature in the layer and extract information from
+both the feature's geometry (accessed via the ``geom`` attribute) as well as
+the feature's attribute fields (whose **values** are accessed via ``get()``
 method):
 
 .. code-block:: pycon
@@ -769,7 +773,8 @@ application with the following code::
 
     admin.site.register(WorldBorder, admin.ModelAdmin)
 
-Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
+Next, edit your ``urls.py`` in the ``geodjango`` application folder as
+follows::
 
     from django.contrib import admin
     from django.urls import include, path

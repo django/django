@@ -145,10 +145,11 @@ When GeoDjango can't find GEOS, this error is raised:
 
     ImportError: Could not find the GEOS library (tried "geos_c"). Try setting GEOS_LIBRARY_PATH in your settings.
 
-The most common solution is to properly configure your :ref:`libsettings` *or* set
-:ref:`geoslibrarypath` in your settings.
+The most common solution is to properly configure your :ref:`libsettings` *or*
+set :ref:`geoslibrarypath` in your settings.
 
-If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binutils`.
+If using a binary package of GEOS (e.g., on Ubuntu), you may need to
+:ref:`binutils`.
 
 .. _geoslibrarypath:
 
@@ -169,7 +170,8 @@ GEOS C library. For example:
     The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.
 
-See also :ref:`My logs are filled with GEOS-related errors <geos-exceptions-in-logfile>`.
+See also :ref:`My logs are filled with GEOS-related errors
+<geos-exceptions-in-logfile>`.
 
 .. _proj4:
 
@@ -192,8 +194,8 @@ PROJ < 7.x) [#]_:
 
     $ wget https://download.osgeo.org/proj/proj-data-X.Y.tar.gz
 
-Next, untar the source code archive, and extract the datum shifting files in the
-``data`` subdirectory. This must be done *prior* to configuration:
+Next, untar the source code archive, and extract the datum shifting files in
+the ``data`` subdirectory. This must be done *prior* to configuration:
 
 .. code-block:: shell
 

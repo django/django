@@ -155,10 +155,10 @@ file-serving functionality: It doesn't know about the finders feature of the
 collected under :setting:`STATIC_ROOT`.
 
 Because of this, ``staticfiles`` ships its own
-:class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase`, a subclass
-of the built-in one that has the ability to transparently serve all the assets
-during execution of these tests in a way very similar to what we get at
-development time with ``DEBUG = True``, i.e. without having to collect them
+:class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase`, a
+subclass of the built-in one that has the ability to transparently serve all
+the assets during execution of these tests in a way very similar to what we get
+at development time with ``DEBUG = True``, i.e. without having to collect them
 using :djadmin:`collectstatic` first.
 
 Deployment

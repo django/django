@@ -117,7 +117,8 @@ requirements::
             "print": ["newspaper.css"],
         }
 
-If this last CSS definition were to be rendered, it would become the following HTML:
+If this last CSS definition were to be rendered, it would become the following
+HTML:
 
 .. code-block:: html+django
 

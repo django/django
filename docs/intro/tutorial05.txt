@@ -122,7 +122,8 @@ tests earlier, but it's never too late to get started.
 Sometimes it's difficult to figure out where to get started with writing tests.
 If you have written several thousand lines of Python, choosing something to
 test might not be easy. In such a case, it's fruitful to write your first test
-the next time you make a change, either when you add a new feature or fix a bug.
+the next time you make a change, either when you add a new feature or fix a
+bug.
 
 So let's do that right away.
 
@@ -135,9 +136,10 @@ We identify a bug
 -----------------
 
 Fortunately, there's a little bug in the ``polls`` application for us to fix
-right away: the ``Question.was_published_recently()`` method returns ``True`` if
-the ``Question`` was published within the last day (which is correct) but also if
-the ``Question``’s ``pub_date`` field is in the future (which certainly isn't).
+right away: the ``Question.was_published_recently()`` method returns ``True``
+if the ``Question`` was published within the last day (which is correct) but
+also if the ``Question``’s ``pub_date`` field is in the future (which certainly
+isn't).
 
 Confirm the bug by using the :djadmin:`shell` to check the method on a question
 whose date lies in the future:
@@ -191,9 +193,9 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
             future_question = Question(pub_date=time)
             self.assertIs(future_question.was_published_recently(), False)
 
-Here we have created a :class:`django.test.TestCase` subclass with a method that
-creates a ``Question`` instance with a ``pub_date`` in the future. We then check
-the output of ``was_published_recently()`` - which *ought* to be False.
+Here we have created a :class:`django.test.TestCase` subclass with a method
+that creates a ``Question`` instance with a ``pub_date`` in the future. We then
+check the output of ``was_published_recently()`` - which *ought* to be False.
 
 Running tests
 -------------
@@ -242,8 +244,8 @@ What happened is this:
 
 * it looked for test methods - ones whose names begin with ``test``
 
-* in ``test_was_published_recently_with_future_question`` it created a ``Question``
-  instance whose ``pub_date`` field is 30 days in the future
+* in ``test_was_published_recently_with_future_question`` it created a
+  ``Question`` instance whose ``pub_date`` field is 30 days in the future
 
 * ... and using the ``assertIs()`` method, it discovered that its
   ``was_published_recently()`` returns ``True``, though we wanted it to return
@@ -255,10 +257,10 @@ occurred.
 Fixing the bug
 --------------
 
-We already know what the problem is: ``Question.was_published_recently()`` should
-return ``False`` if its ``pub_date`` is in the future. Amend the method in
-``models.py``, so that it will only return ``True`` if the date is also in the
-past:
+We already know what the problem is: ``Question.was_published_recently()``
+should return ``False`` if its ``pub_date`` is in the future. Amend the method
+in ``models.py``, so that it will only return ``True`` if the date is also in
+the past:
 
 .. code-block:: python
     :caption: ``polls/models.py``
@@ -292,8 +294,8 @@ More comprehensive tests
 ------------------------
 
 While we're here, we can further pin down the ``was_published_recently()``
-method; in fact, it would be positively embarrassing if in fixing one bug we had
-introduced another.
+method; in fact, it would be positively embarrassing if in fixing one bug we
+had introduced another.
 
 Add two more test methods to the same class, to test the behavior of the method
 more comprehensively:
@@ -320,8 +322,9 @@ more comprehensively:
         recent_question = Question(pub_date=time)
         self.assertIs(recent_question.was_published_recently(), True)
 
-And now we have three tests that confirm that ``Question.was_published_recently()``
-returns sensible values for past, recent, and future questions.
+And now we have three tests that confirm that
+``Question.was_published_recently()`` returns sensible values for past, recent,
+and future questions.
 
 Again, ``polls`` is a minimal application, but however complex it grows in the
 future and whatever other code it interacts with, we now have some guarantee
@@ -644,19 +647,19 @@ code is suffering from test bloat, which brings us to:
 When testing, more is better
 ============================
 
-It might seem that our tests are growing out of control. At this rate there will
-soon be more code in our tests than in our application, and the repetition
+It might seem that our tests are growing out of control. At this rate there
+will soon be more code in our tests than in our application, and the repetition
 is unaesthetic, compared to the elegant conciseness of the rest of our code.
 
 **It doesn't matter**. Let them grow. For the most part, you can write a test
 once and then forget about it. It will continue performing its useful function
 as you continue to develop your program.
 
-Sometimes tests will need to be updated. Suppose that we amend our views so that
-only ``Question`` entries with associated ``Choice`` instances are published.
-In that case, many of our existing tests will fail - *telling us exactly which
-tests need to be amended to bring them up to date*, so to that extent tests
-help look after themselves.
+Sometimes tests will need to be updated. Suppose that we amend our views so
+that only ``Question`` entries with associated ``Choice`` instances are
+published. In that case, many of our existing tests will fail - *telling us
+exactly which tests need to be amended to bring them up to date*, so to that
+extent tests help look after themselves.
 
 At worst, as you continue developing, you might find that you have some tests
 that are now redundant. Even that's not a problem; in testing redundancy is

@@ -61,7 +61,8 @@ Fields
 
     .. attribute:: user_permissions
 
-        Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+        Many-to-many relationship to
+        :class:`~django.contrib.auth.models.Permission`
 
     .. attribute:: is_staff
 
@@ -79,8 +80,8 @@ Fields
         flag but the default backend
         (:class:`~django.contrib.auth.backends.ModelBackend`) and the
         :class:`~django.contrib.auth.backends.RemoteUserBackend` do. You can
-        use :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`
-        or :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
+        use :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend` or
+        :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend`
         if you want to allow inactive users to login. In this case, you'll also
         want to customize the
         :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
@@ -124,9 +125,9 @@ Attributes
     .. attribute:: is_anonymous
 
         Read-only attribute which is always ``False``. This is a way of
-        differentiating :class:`~models.User` and :class:`~models.AnonymousUser`
-        objects. Generally, you should prefer using
-        :attr:`~django.contrib.auth.models.User.is_authenticated` to this
+        differentiating :class:`~models.User` and
+        :class:`~models.AnonymousUser` objects. Generally, you should prefer
+        using :attr:`~django.contrib.auth.models.User.is_authenticated` to this
         attribute.
 
 Methods
@@ -246,8 +247,8 @@ Methods
 
         Returns ``True`` if the user has the specified permission, where perm
         is in the format ``"<app label>.<permission codename>"``. (see
-        documentation on :ref:`permissions <topic-authorization>`). If the user is
-        inactive, this method will always return ``False``. For an active
+        documentation on :ref:`permissions <topic-authorization>`). If the user
+        is inactive, this method will always return ``False``. For an active
         superuser, this method will always return ``True``.
 
         If ``obj`` is passed in, this method won't check for a permission for
@@ -330,7 +331,8 @@ Manager methods
         allow setting arbitrary fields on a :ref:`custom user model
         <auth-custom-user>`.
 
-        See :ref:`Creating users <topics-auth-creating-users>` for example usage.
+        See :ref:`Creating users <topics-auth-creating-users>` for example
+        usage.
 
         .. versionchanged:: 5.2
 
@@ -523,10 +525,11 @@ can be used for notification when a user logs in or out.
         The name of the module used for authentication.
 
     ``credentials``
-        A dictionary of keyword arguments containing the user credentials that were
-        passed to :func:`~django.contrib.auth.authenticate` or your own custom
-        authentication backend. Credentials matching a set of 'sensitive' patterns,
-        (including password) will not be sent in the clear as part of the signal.
+        A dictionary of keyword arguments containing the user credentials that
+        were passed to :func:`~django.contrib.auth.authenticate` or your own
+        custom authentication backend. Credentials matching a set of
+        'sensitive' patterns (including password) will not be sent in the clear
+        as part of the signal.
 
     ``request``
         The :class:`~django.http.HttpRequest` object, if one was provided to
@@ -615,11 +618,11 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     :class:`~django.contrib.auth.models.User` and
     :class:`~django.contrib.auth.models.PermissionsMixin`.
 
-    :meth:`has_perm`, :meth:`get_all_permissions`, :meth:`get_user_permissions`,
-    and :meth:`get_group_permissions` allow an object to be passed as a
-    parameter for object-specific permissions, but this backend does not
-    implement them other than returning an empty set of permissions if
-    ``obj is not None``.
+    :meth:`has_perm`, :meth:`get_all_permissions`,
+    :meth:`get_user_permissions`, and :meth:`get_group_permissions` allow an
+    object to be passed as a parameter for object-specific permissions, but
+    this backend does not implement them other than returning an empty set of
+    permissions if ``obj is not None``.
 
     :meth:`with_perm` also allows an object to be passed as a parameter, but
     unlike others methods it returns an empty queryset if ``obj is not None``.
@@ -678,8 +681,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         *Asynchronous version*: ``aget_all_permissions()``
 
-        Returns the set of permission strings the ``user_obj`` has, including both
-        user permissions and group permissions. Returns an empty set if
+        Returns the set of permission strings the ``user_obj`` has, including
+        both user permissions and group permissions. Returns an empty set if
         :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
 
@@ -740,7 +743,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. class:: AllowAllUsersModelBackend
 
     Same as :class:`ModelBackend` except that it doesn't reject inactive users
-    because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
+    because :meth:`~ModelBackend.user_can_authenticate` always returns
+    ``True``.
 
     When using this backend, you'll likely want to customize the
     :class:`~django.contrib.auth.forms.AuthenticationForm` used by the

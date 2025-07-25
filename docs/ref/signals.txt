@@ -10,8 +10,8 @@ using the :meth:`~django.dispatch.Signal.send` method.
     See the documentation on the :doc:`signal dispatcher </topics/signals>` for
     information regarding how to register for and receive signals.
 
-    The :doc:`authentication framework </topics/auth/index>` sends :ref:`signals when
-    a user is logged in / out <topics-auth-signals>`.
+    The :doc:`authentication framework </topics/auth/index>` sends
+    :ref:`signals when a user is logged in / out <topics-auth-signals>`.
 
 Model signals
 =============
@@ -36,8 +36,8 @@ model system.
     ``__init__()`` or :meth:`~django.db.models.Model.save` that you can
     override in your own code.
 
-    If you override these methods on your model, you must call the parent class'
-    methods for these signals to be sent.
+    If you override these methods on your model, you must call the parent
+    class' methods for these signals to be sent.
 
     Note also that Django stores signal handlers as weak references by default,
     so if your handler is a local function, it may be garbage collected. To
@@ -601,7 +601,8 @@ Arguments sent with this signal:
 .. data:: django.core.signals.got_request_exception
    :module:
 
-This signal is sent whenever Django encounters an exception while processing an incoming HTTP request.
+This signal is sent whenever Django encounters an exception while processing an
+incoming HTTP request.
 
 Arguments sent with this signal:
 

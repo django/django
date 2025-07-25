@@ -160,7 +160,8 @@ it is not.
 If you don't have access to the request object, you can use the
 ``get_current()`` method of the :class:`~django.contrib.sites.models.Site`
 model's manager. You should then ensure that your settings file does contain
-the :setting:`SITE_ID` setting. This example is equivalent to the previous one::
+the :setting:`SITE_ID` setting. This example is equivalent to the previous
+one::
 
     from django.contrib.sites.models import Site
 
@@ -291,9 +292,10 @@ Caching the current ``Site`` object
 ===================================
 
 As the current site is stored in the database, each call to
-``Site.objects.get_current()`` could result in a database query. But Django is a
-little cleverer than that: on the first request, the current site is cached, and
-any subsequent call returns the cached data instead of hitting the database.
+``Site.objects.get_current()`` could result in a database query. But Django is
+a little cleverer than that: on the first request, the current site is cached,
+and any subsequent call returns the cached data instead of hitting the
+database.
 
 If for any reason you want to force a database query, you can tell Django to
 clear the cache using ``Site.objects.clear_cache()``::
@@ -344,8 +346,9 @@ your model explicitly. For example::
         on_site = CurrentSiteManager()
 
 With this model, ``Photo.objects.all()`` will return all ``Photo`` objects in
-the database, but ``Photo.on_site.all()`` will return only the ``Photo`` objects
-associated with the current site, according to the :setting:`SITE_ID` setting.
+the database, but ``Photo.on_site.all()`` will return only the ``Photo``
+objects associated with the current site, according to the :setting:`SITE_ID`
+setting.
 
 Put another way, these two statements are equivalent::
 
@@ -381,8 +384,9 @@ demonstrates this::
         objects = models.Manager()
         on_site = CurrentSiteManager("publish_on")
 
-If you attempt to use :class:`~django.contrib.sites.managers.CurrentSiteManager`
-and pass a field name that doesn't exist, Django will raise a ``ValueError``.
+If you attempt to use
+:class:`~django.contrib.sites.managers.CurrentSiteManager` and pass a field
+name that doesn't exist, Django will raise a ``ValueError``.
 
 Finally, note that you'll probably want to keep a normal
 (non-site-specific) ``Manager`` on your model, even if you use

@@ -61,12 +61,13 @@ To activate sitemap generation on your Django site, add this line to your
         name="django.contrib.sitemaps.views.sitemap",
     )
 
-This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
+This tells Django to build a sitemap when a client accesses
+:file:`/sitemap.xml`.
 
 The name of the sitemap file is not important, but the location is. Search
 engines will only index links in your sitemap for the current URL level and
-below. For instance, if :file:`sitemap.xml` lives in your root directory, it may
-reference any URL in your site. However, if your sitemap lives at
+below. For instance, if :file:`sitemap.xml` lives in your root directory, it
+may reference any URL in your site. However, if your sitemap lives at
 :file:`/content/sitemap.xml`, it may only reference URLs that begin with
 :file:`/content/`.
 
@@ -424,8 +425,9 @@ The sitemap framework also has the ability to create a sitemap index that
 references individual sitemap files, one per each section defined in your
 ``sitemaps`` dictionary. The only differences in usage are:
 
-* You use two views in your URLconf: :func:`django.contrib.sitemaps.views.index`
-  and :func:`django.contrib.sitemaps.views.sitemap`.
+* You use two views in your URLconf:
+  :func:`django.contrib.sitemaps.views.index` and
+  :func:`django.contrib.sitemaps.views.sitemap`.
 * The :func:`django.contrib.sitemaps.views.sitemap` view should take a
   ``section`` keyword argument.
 

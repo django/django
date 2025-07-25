@@ -84,7 +84,8 @@ special requirements; see below for examples.
 You don't even need to provide a ``success_url`` for
 :class:`~django.views.generic.edit.CreateView` or
 :class:`~django.views.generic.edit.UpdateView` - they will use
-:meth:`~django.db.models.Model.get_absolute_url` on the model object if available.
+:meth:`~django.db.models.Model.get_absolute_url` on the model object if
+available.
 
 If you want to use a custom :class:`~django.forms.ModelForm` (for instance to
 add extra validation), set
@@ -146,8 +147,9 @@ inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the
 form class in another way, the attribute is required and the view will raise
 an :exc:`~django.core.exceptions.ImproperlyConfigured` exception if it's not.
 
-If you specify both the :attr:`~django.views.generic.edit.ModelFormMixin.fields`
-and :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
+If you specify both the
+:attr:`~django.views.generic.edit.ModelFormMixin.fields` and
+:attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
 :exc:`~django.core.exceptions.ImproperlyConfigured` exception will be raised.
 
 Finally, we hook these new views into the URLconf:

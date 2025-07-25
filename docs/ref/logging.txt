@@ -164,7 +164,8 @@ Messages to this logger have the following extra context:
 
 * ``status_code``: The HTTP response code associated with the request.
 
-* ``request``: The request object (a :py:class:`socket.socket`) that generated the logging message.
+* ``request``: The request object (a :py:class:`socket.socket`) that generated
+  the logging message.
 
 .. _django-template-logger:
 
@@ -290,8 +291,8 @@ Other ``django.security`` loggers not based on ``SuspiciousOperation`` are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Logs the SQL queries that are executed during schema changes to the database by
-the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
-queries executed by :class:`~django.db.migrations.operations.RunPython`.
+the :doc:`migrations framework </topics/migrations>`. Note that it won't log
+the queries executed by :class:`~django.db.migrations.operations.RunPython`.
 Messages to this logger have ``params`` and ``sql`` in their extra context (but
 unlike ``django.db.backends``, not duration). The values have the same meaning
 as explained in :ref:`django-db-logger`.
@@ -453,5 +454,5 @@ logging module.
 
 .. class:: RequireDebugTrue()
 
-    This filter is similar to :class:`RequireDebugFalse`, except that records are
-    passed only when :setting:`DEBUG` is ``True``.
+    This filter is similar to :class:`RequireDebugFalse`, except that records
+    are passed only when :setting:`DEBUG` is ``True``.

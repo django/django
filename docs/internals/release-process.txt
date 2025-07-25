@@ -45,8 +45,8 @@ security purposes, please see :doc:`our security policies <security>`.
     bugs and/or security issues.
 
     These releases will be 100% compatible with the associated feature release,
-    unless this is impossible for security reasons or to prevent data loss.
-    So the answer to "should I upgrade to the latest patch release?" will always
+    unless this is impossible for security reasons or to prevent data loss. So
+    the answer to "should I upgrade to the latest patch release?" will always
     be "yes."
 
   Long-term support release
@@ -123,8 +123,8 @@ See also the :ref:`deprecating-a-feature` guide.
 Supported versions
 ==================
 
-At any moment in time, Django's developer team will support a set of releases to
-varying levels. See `the supported versions section
+At any moment in time, Django's developer team will support a set of releases
+to varying levels. See `the supported versions section
 <https://www.djangoproject.com/download/#supported-versions>`_ of the download
 page for the current state of support for each version.
 

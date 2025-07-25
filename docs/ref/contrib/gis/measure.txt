@@ -206,6 +206,7 @@ Measurement API
     Alias for :class:`Area` class.
 
 .. rubric:: Footnotes
-.. [#] `Robert Coup <https://koordinates.com/>`_ is the initial author of the measure objects,
-       and was inspired by Brian Beck's work in `geopy <https://github.com/geopy/geopy/>`_
-       and Geoff Biggs' PhD work on dimensioned units for robotics.
+.. [#] `Robert Coup <https://koordinates.com/>`_ is the initial author of the
+       measure objects, and was inspired by Brian Beck's work in `geopy
+       <https://github.com/geopy/geopy/>`_ and Geoff Biggs' PhD work on
+       dimensioned units for robotics.

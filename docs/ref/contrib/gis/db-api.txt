@@ -45,7 +45,8 @@ model):
     >>> z = Zipcode(code=77096, poly="POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))")
     >>> z.save()
 
-:class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models:
+:class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save
+geometric models:
 
 .. code-block:: pycon
 
@@ -72,8 +73,8 @@ transform procedure:
     ... )  # printing the last SQL statement executed (requires DEBUG=True)
     INSERT INTO "geoapp_zipcode" ("code", "poly") VALUES (78212, ST_Transform(ST_GeomFromWKB('\\001 ... ', 3084), 4326))
 
-Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
-(Well Known Text [#fnwkt]_), HEXEWKB (PostGIS specific -- a WKB geometry in
+Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object,
+WKT (Well Known Text [#fnwkt]_), HEXEWKB (PostGIS specific -- a WKB geometry in
 hexadecimal [#fnewkb]_), and GeoJSON (see :rfc:`7946`). Essentially, if the
 input is not a ``GEOSGeometry`` object, the geometry field will attempt to
 create a ``GEOSGeometry`` instance from the input.
@@ -169,10 +170,10 @@ For example:
     >>> qs = Zipcode.objects.filter(poly__contains=pnt)
     >>> qs = Elevation.objects.filter(poly__contains=rst)
 
-In this case, ``poly`` is the geographic field, :lookup:`contains <gis-contains>`
-is the spatial lookup type, ``pnt`` is the parameter (which may be a
-:class:`~django.contrib.gis.geos.GEOSGeometry` object or a string of
-GeoJSON , WKT, or HEXEWKB), and ``rst`` is a
+In this case, ``poly`` is the geographic field,
+:lookup:`contains <gis-contains>` is the spatial lookup type, ``pnt`` is the
+parameter (which may be a :class:`~django.contrib.gis.geos.GEOSGeometry` object
+or a string of GeoJSON , WKT, or HEXEWKB), and ``rst`` is a
 :class:`~django.contrib.gis.gdal.GDALRaster` object.
 
 .. _spatial-lookup-raster:
@@ -181,9 +182,9 @@ Raster Lookups
 --------------
 
 The raster lookup syntax is similar to the syntax for geometries. The only
-difference is that a band index can be specified as additional input. If no band
-index is specified, the first band is used by default (index ``0``). In that
-case the syntax is identical to the syntax for geometry lookups.
+difference is that a band index can be specified as additional input. If no
+band index is specified, the first band is used by default (index ``0``). In
+that case the syntax is identical to the syntax for geometry lookups.
 
 To specify the band index, an additional parameter can be specified on both
 sides of the lookup. On the left hand side, the double underscore syntax is
@@ -215,10 +216,11 @@ hand side, ``geom`` is a geometry input and ``rst`` is a
 :class:`~django.contrib.gis.gdal.GDALRaster` object. The band index defaults to
 ``0`` in the first two queries and is set to ``1`` on the others.
 
-While all spatial lookups can be used with raster objects on both sides, not all
-underlying operators natively accept raster input. For cases where the operator
-expects geometry input, the raster is automatically converted to a geometry.
-It's important to keep this in mind when interpreting the lookup results.
+While all spatial lookups can be used with raster objects on both sides, not
+all underlying operators natively accept raster input. For cases where the
+operator expects geometry input, the raster is automatically converted to a
+geometry. It's important to keep this in mind when interpreting the lookup
+results.
 
 The type of raster support is listed for all lookups in the :ref:`compatibility
 table <spatial-lookup-compatibility>`. Lookups involving rasters are currently
@@ -261,7 +263,8 @@ The following distance lookups are available:
 Distance lookups take a tuple parameter comprising:
 
 #. A geometry or raster to base calculations from; and
-#. A number or :class:`~django.contrib.gis.measure.Distance` object containing the distance.
+#. A number or :class:`~django.contrib.gis.measure.Distance` object containing
+   the distance.
 
 If a :class:`~django.contrib.gis.measure.Distance` object is used,
 it may be expressed in any units (the SQL generated will use units
@@ -271,16 +274,16 @@ to be in the units of the field.
 .. note::
 
     In PostGIS, ``ST_Distance_Sphere`` does *not* limit the geometry types
-    geographic distance queries are performed with. [#fndistsphere15]_  However,
-    these queries may take a long time, as great-circle distances must be
-    calculated on the fly for *every* row in the query. This is because the
+    geographic distance queries are performed with. [#fndistsphere15]_
+    However, these queries may take a long time, as great-circle distances must
+    be calculated on the fly for *every* row in the query. This is because the
     spatial index on traditional geometry fields cannot be used.
 
     For much better performance on WGS84 distance queries, consider using
     :ref:`geography columns <geography-type>` in your database instead because
     they are able to use their spatial index in distance queries.
-    You can tell GeoDjango to use a geography column by setting ``geography=True``
-    in your field definition.
+    You can tell GeoDjango to use a geography column by setting
+    ``geography=True`` in your field definition.
 
 For example, let's say we have a ``SouthTexasCity`` model (from the
 :source:`GeoDjango distance tests <tests/gis_tests/distapp/models.py>` ) on a

@@ -118,8 +118,8 @@ The ``view``, ``kwargs`` and ``name`` arguments are the same as for
 
     A function that takes a full Python import path to another URLconf module
     that should be "included" in this place. Optionally, the :term:`application
-    namespace` and :term:`instance namespace` where the entries will be included
-    into can also be specified.
+    namespace` and :term:`instance namespace` where the entries will be
+    included into can also be specified.
 
     Usually, the application namespace should be specified by the included
     module. If an application namespace is set, the ``namespace`` argument
@@ -132,8 +132,10 @@ The ``view``, ``kwargs`` and ``name`` arguments are the same as for
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: str
-    :arg pattern_list: Iterable of :func:`~django.urls.path` and/or :func:`~django.urls.re_path` instances.
-    :arg app_namespace: Application namespace for the URL entries being included
+    :arg pattern_list: Iterable of :func:`~django.urls.path`
+        and/or :func:`~django.urls.re_path` instances.
+    :arg app_namespace: Application namespace for the URL entries being
+        included
     :type app_namespace: str
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
@@ -176,8 +178,8 @@ Helper function to return a URL pattern for serving files in debug mode::
 .. data:: handler400
 
 A callable, or a string representing the full Python import path to the view
-that should be called if the HTTP client has sent a request that caused an error
-condition and a response with a status code of 400.
+that should be called if the HTTP client has sent a request that caused an
+error condition and a response with a status code of 400.
 
 By default, this is :func:`django.views.defaults.bad_request`. If you
 implement a custom view, be sure it accepts ``request`` and ``exception``

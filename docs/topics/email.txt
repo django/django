@@ -108,8 +108,8 @@ if used.
   If unspecified, an instance of the default backend will be used.
   See the documentation on :ref:`Email backends <topic-email-backends>`
   for more details.
-* ``html_message``: If ``html_message`` is provided, the resulting email will be a
-  :mimetype:`multipart/alternative` email with ``message`` as the
+* ``html_message``: If ``html_message`` is provided, the resulting email will
+  be a :mimetype:`multipart/alternative` email with ``message`` as the
   :mimetype:`text/plain` content type and ``html_message`` as the
   :mimetype:`text/html` content type.
 
@@ -535,8 +535,8 @@ Django's email library, you can do this using the
 
     .. attribute:: alternatives
 
-        A list of :class:`~django.core.mail.EmailAlternative` named tuples. This
-        is particularly useful in tests::
+        A list of :class:`~django.core.mail.EmailAlternative` named tuples.
+        This is particularly useful in tests::
 
             self.assertEqual(len(msg.alternatives), 1)
             self.assertEqual(msg.alternatives[0].content, html_content)

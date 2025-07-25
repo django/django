@@ -85,20 +85,21 @@ You can evaluate a ``QuerySet`` in the following ways:
           print("There is at least one Entry with the headline Test")
 
   Note: If you only want to determine if at least one result exists (and don't
-  need the actual objects), it's more efficient to use :meth:`~QuerySet.exists`.
+  need the actual objects), it's more efficient to use
+  :meth:`~QuerySet.exists`.
 
 .. _pickling QuerySets:
 
 Pickling ``QuerySet``\s
 -----------------------
 
-If you :mod:`pickle` a ``QuerySet``, this will force all the results to be loaded
-into memory prior to pickling. Pickling is usually used as a precursor to
-caching and when the cached queryset is reloaded, you want the results to
+If you :mod:`pickle` a ``QuerySet``, this will force all the results to be
+loaded into memory prior to pickling. Pickling is usually used as a precursor
+to caching and when the cached queryset is reloaded, you want the results to
 already be present and ready for use (reading from the database can take some
 time, defeating the purpose of caching). This means that when you unpickle a
-``QuerySet``, it contains the results at the moment it was pickled, rather
-than the results that are currently in the database.
+``QuerySet``, it contains the results at the moment it was pickled, rather than
+the results that are currently in the database.
 
 If you only want to pickle the necessary information to recreate the
 ``QuerySet`` from the database at a later time, pickle the ``query`` attribute
@@ -207,8 +208,8 @@ The lookup parameters (``**kwargs``) should be in the format described in
 `Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
 underlying SQL statement.
 
-If you need to execute more complex queries (for example, queries with ``OR`` statements),
-you can use :class:`Q objects <django.db.models.Q>` (``*args``).
+If you need to execute more complex queries (for example, queries with ``OR``
+statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
 ``exclude()``
 ~~~~~~~~~~~~~
@@ -249,8 +250,8 @@ In SQL terms, that evaluates to:
 
 Note the second example is more restrictive.
 
-If you need to execute more complex queries (for example, queries with ``OR`` statements),
-you can use :class:`Q objects <django.db.models.Q>` (``*args``).
+If you need to execute more complex queries (for example, queries with ``OR``
+statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
 ``annotate()``
 ~~~~~~~~~~~~~~
@@ -536,8 +537,8 @@ field names, the database will only compare the specified field names.
 
 .. note::
     When you specify field names, you *must* provide an ``order_by()`` in the
-    ``QuerySet``, and the fields in ``order_by()`` must start with the fields in
-    ``distinct()``, in the same order.
+    ``QuerySet``, and the fields in ``order_by()`` must start with the fields
+    in ``distinct()``, in the same order.
 
     For example, ``SELECT DISTINCT ON (a)`` gives you the first row for each
     value in column ``a``. If you don't specify an order, you'll get some
@@ -1102,7 +1103,7 @@ following models::
         # ...
         author = models.ForeignKey(Person, on_delete=models.CASCADE)
 
-... then a call to ``Book.objects.select_related('author__hometown').get(id=4)``
+Then a call to ``Book.objects.select_related('author__hometown').get(id=4)``
 will cache the related ``Person`` *and* the related ``City``::
 
     # Hits the database with joins to the author and hometown tables.
@@ -1124,7 +1125,8 @@ You can also refer to the reverse direction of a
 ``select_related`` — that is, you can traverse a
 :class:`~django.db.models.OneToOneField` back to the object on which the field
 is defined. Instead of specifying the field name, use the :attr:`related_name
-<django.db.models.ForeignKey.related_name>` for the field on the related object.
+<django.db.models.ForeignKey.related_name>` for the field on the related
+object.
 
 There may be some situations where you wish to call ``select_related()`` with a
 lot of related objects, or where you don't know all of the relations. In these
@@ -1153,15 +1155,15 @@ Returns a ``QuerySet`` that will automatically retrieve, in a single batch,
 related objects for each of the specified lookups.
 
 This has a similar purpose to ``select_related``, in that both are designed to
-stop the deluge of database queries that is caused by accessing related objects,
-but the strategy is quite different.
+stop the deluge of database queries that is caused by accessing related
+objects, but the strategy is quite different.
 
-``select_related`` works by creating an SQL join and including the fields of the
-related object in the ``SELECT`` statement. For this reason, ``select_related``
-gets the related objects in the same database query. However, to avoid the much
-larger result set that would result from joining across a 'many' relationship,
-``select_related`` is limited to single-valued relationships - foreign key and
-one-to-one.
+``select_related`` works by creating an SQL join and including the fields of
+the related object in the ``SELECT`` statement. For this reason,
+``select_related`` gets the related objects in the same database query.
+However, to avoid the much larger result set that would result from joining
+across a 'many' relationship, ``select_related`` is limited to single-valued
+relationships - foreign key and one-to-one.
 
 ``prefetch_related``, on the other hand, does a separate lookup for each
 relationship, and does the 'joining' in Python. This allows it to prefetch
@@ -1240,8 +1242,8 @@ If you have an iterable of model instances, you can prefetch related attributes
 on those instances using the :func:`~django.db.models.prefetch_related_objects`
 function.
 
-Note that the result cache of the primary ``QuerySet`` and all specified related
-objects will then be fully loaded into memory. This changes the typical
+Note that the result cache of the primary ``QuerySet`` and all specified
+related objects will then be fully loaded into memory. This changes the typical
 behavior of a ``QuerySet``, which normally tries to avoid loading all objects
 into memory before they are needed, even after a query has been executed in the
 database.
@@ -1329,16 +1331,16 @@ save both memory and CPU time.
 
 While ``prefetch_related`` supports prefetching ``GenericForeignKey``
 relationships, the number of queries will depend on the data. Since a
-``GenericForeignKey`` can reference data in multiple tables, one query per table
-referenced is needed, rather than one query for all the items. There could be
-additional queries on the ``ContentType`` table if the relevant rows have not
-already been fetched.
+``GenericForeignKey`` can reference data in multiple tables, one query per
+table referenced is needed, rather than one query for all the items. There
+could be additional queries on the ``ContentType`` table if the relevant rows
+have not already been fetched.
 
 ``prefetch_related`` in most cases will be implemented using an SQL query that
-uses the 'IN' operator. This means that for a large ``QuerySet`` a large 'IN' clause
-could be generated, which, depending on the database, might have performance
-problems of its own when it comes to parsing or executing the SQL query. Always
-profile for your use case!
+uses the 'IN' operator. This means that for a large ``QuerySet`` a large 'IN'
+clause could be generated, which, depending on the database, might have
+performance problems of its own when it comes to parsing or executing the SQL
+query. Always profile for your use case!
 
 If you use ``iterator()`` to run the query, ``prefetch_related()`` calls will
 only be observed if a value for ``chunk_size`` is provided.
@@ -1372,8 +1374,8 @@ applicable to reduce the number of queries even further:
     ...     Prefetch("restaurants", queryset=Restaurant.objects.select_related("best_pizza"))
     ... )
 
-You can also assign the prefetched result to a custom attribute with the optional
-``to_attr`` argument. The result will be stored directly in a list.
+You can also assign the prefetched result to a custom attribute with the
+optional ``to_attr`` argument. The result will be stored directly in a list.
 
 This allows prefetching the same relation multiple times with a different
 ``QuerySet``; for instance:
@@ -1386,8 +1388,8 @@ This allows prefetching the same relation multiple times with a different
     ...     Prefetch("pizzas", queryset=vegetarian_pizzas, to_attr="vegetarian_menu"),
     ... )
 
-Lookups created with custom ``to_attr`` can still be traversed as usual by other
-lookups:
+Lookups created with custom ``to_attr`` can still be traversed as usual by
+other lookups:
 
 .. code-block:: pycon
 
@@ -1397,8 +1399,9 @@ lookups:
     ...     "vegetarian_menu__toppings",
     ... )
 
-Using ``to_attr`` is recommended when filtering down the prefetch result as it is
-less ambiguous than storing a filtered result in the related manager's cache:
+Using ``to_attr`` is recommended when filtering down the prefetch result as it
+is less ambiguous than storing a filtered result in the related manager's
+cache:
 
 .. code-block:: pycon
 
@@ -1486,8 +1489,8 @@ database selected by the outer query. All of the following are valid:
 
         >>> prefetch_related("pizza_list__toppings", Prefetch("pizzas", to_attr="pizza_list"))
 
-    This will trigger an ``AttributeError`` because ``'pizza_list'`` doesn't exist yet
-    when ``'pizza_list__toppings'`` is being processed.
+    This will trigger an ``AttributeError`` because ``'pizza_list'`` doesn't
+    exist yet when ``'pizza_list__toppings'`` is being processed.
 
     This consideration is not limited to the use of ``Prefetch`` objects. Some
     advanced techniques may require that the lookups be performed in a
@@ -1510,7 +1513,7 @@ generated by a ``QuerySet``.
     Use it only if you cannot express your query using other queryset methods.
     If you do need to use it, please `file a ticket
     <https://code.djangoproject.com/newticket>`_ using the `QuerySet.extra
-    keyword <https://code.djangoproject.com/query?status=assigned&status=new&keywords=~QuerySet.extra>`_
+    keyword <https://code.djangoproject.com/query?keywords=~QuerySet.extra>`_
     with your use case (please check the list of existing tickets first) so
     that we can enhance the QuerySet API to allow removing ``extra()``. We are
     no longer improving or fixing bugs for this method.
@@ -1707,13 +1710,13 @@ of the arguments is required, but you should use at least one of them.
 
 .. warning::
 
-    If you are performing queries on MySQL, note that MySQL's silent type coercion
-    may cause unexpected results when mixing types. If you query on a string
-    type column, but with an integer value, MySQL will coerce the types of all values
-    in the table to an integer before performing the comparison. For example, if your
-    table contains the values ``'abc'``, ``'def'`` and you query for ``WHERE mycolumn=0``,
-    both rows will match. To prevent this, perform the correct typecasting
-    before using the value in a query.
+    If you are performing queries on MySQL, note that MySQL's silent type
+    coercion may cause unexpected results when mixing types. If you query on a
+    string type column, but with an integer value, MySQL will coerce the types
+    of all values in the table to an integer before performing the comparison.
+    For example, if your table contains the values ``'abc'``, ``'def'`` and you
+    query for ``WHERE mycolumn=0``, both rows will match. To prevent this,
+    perform the correct typecasting before using the value in a query.
 
 ``defer()``
 ~~~~~~~~~~~
@@ -1946,8 +1949,8 @@ By default, ``select_for_update()`` locks all rows that are selected by the
 query. For example, rows of related objects specified in :meth:`select_related`
 are locked in addition to rows of the queryset's model. If this isn't desired,
 specify the related objects you want to lock in ``select_for_update(of=(...))``
-using the same fields syntax as :meth:`select_related`. Use the value ``'self'``
-to refer to the queryset's model.
+using the same fields syntax as :meth:`select_related`. Use the value
+``'self'`` to refer to the queryset's model.
 
 .. admonition:: Lock parents models in ``select_for_update(of=(...))``
 
@@ -2191,7 +2194,8 @@ can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
 
 *Asynchronous version*: ``acreate()``
 
-A convenience method for creating an object and saving it all in one step.  Thus::
+A convenience method for creating an object and saving it all in one step.
+Thus::
 
     p = Person.objects.create(first_name="Bruce", last_name="Springsteen")
 
@@ -2252,9 +2256,9 @@ found, ``get_or_create()`` returns a tuple of that object and ``False``.
 
     This method is atomic assuming that the database enforces uniqueness of the
     keyword arguments (see :attr:`~django.db.models.Field.unique` or
-    :attr:`~django.db.models.Options.unique_together`). If the fields used in the
-    keyword arguments do not have a uniqueness constraint, concurrent calls to
-    this method may result in multiple rows with the same parameters being
+    :attr:`~django.db.models.Options.unique_together`). If the fields used in
+    the keyword arguments do not have a uniqueness constraint, concurrent calls
+    to this method may result in multiple rows with the same parameters being
     inserted.
 
 You can specify more complex conditions for the retrieved object by chaining
@@ -2306,10 +2310,11 @@ whenever a request to a page has a side effect on your data. For more, see
 
 .. warning::
 
-  You can use ``get_or_create()`` through :class:`~django.db.models.ManyToManyField`
-  attributes and reverse relations. In that case you will restrict the queries
-  inside the context of that relation. That could lead you to some integrity
-  problems if you don't use it consistently.
+  You can use ``get_or_create()`` through
+  :class:`~django.db.models.ManyToManyField` attributes and reverse relations.
+  In that case you will restrict the queries inside the context of that
+  relation. That could lead you to some integrity problems if you don't use it
+  consistently.
 
   Being the following models::
 
@@ -2336,10 +2341,10 @@ whenever a request to a page has a side effect on your data. For more, see
       >>> book.chapters.get_or_create(title="Chapter 1")
       # Raises IntegrityError
 
-  This is happening because it's trying to get or create "Chapter 1" through the
-  book "Ulysses", but it can't do either: the relation can't fetch that chapter
-  because it isn't related to that book, but it can't create it either because
-  ``title`` field should be unique.
+  This is happening because it's trying to get or create "Chapter 1" through
+  the book "Ulysses", but it can't do either: the relation can't fetch that
+  chapter because it isn't related to that book, but it can't create it either
+  because ``title`` field should be unique.
 
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -2904,7 +2909,8 @@ you could do this:
 
     >>> Entry.objects.filter(pub_date__year=2010).update(comments_on=False)
 
-(This assumes your ``Entry`` model has fields ``pub_date`` and ``comments_on``.)
+(This assumes your ``Entry`` model has fields ``pub_date`` and
+``comments_on``.)
 
 You can update multiple fields — there's no limit on how many. For example,
 here we update the ``comments_on`` and ``headline`` fields:
@@ -3909,8 +3915,8 @@ Strings that reference fields on the model, transforms of the field, or
 ``output_field``
 ~~~~~~~~~~~~~~~~
 
-An optional argument that represents the :doc:`model field </ref/models/fields>`
-of the return value
+An optional argument that represents the :doc:`model field
+</ref/models/fields>` of the return value
 
 .. note::
 

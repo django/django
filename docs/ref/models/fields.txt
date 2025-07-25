@@ -39,17 +39,17 @@ The following arguments are available to all field types. All are optional.
 
 .. attribute:: Field.null
 
-If ``True``, Django will store empty values as ``NULL`` in the database. Default
-is ``False``.
+If ``True``, Django will store empty values as ``NULL`` in the database.
+Default is ``False``.
 
 Avoid using :attr:`~Field.null` on string-based fields such as
 :class:`CharField` and :class:`TextField`. The Django convention is to use an
-empty string, not ``NULL``, as the "no data" state for string-based fields. If a
-string-based field has ``null=False``, empty strings can still be saved for "no
-data". If a string-based field has ``null=True``, that means it has two possible
-values for "no data": ``NULL``, and the empty string. In most cases, it's
-redundant to have two possible values for "no data". One exception is when a
-:class:`CharField` has both ``unique=True`` and ``blank=True`` set. In this
+empty string, not ``NULL``, as the "no data" state for string-based fields. If
+a string-based field has ``null=False``, empty strings can still be saved for
+"no data". If a string-based field has ``null=True``, that means it has two
+possible values for "no data": ``NULL``, and the empty string. In most cases,
+it's redundant to have two possible values for "no data". One exception is when
+a :class:`CharField` has both ``unique=True`` and ``blank=True`` set. In this
 situation, ``null=True`` is required to avoid unique constraint violations when
 saving multiple objects with blank values.
 
@@ -60,8 +60,8 @@ set ``blank=True`` if you wish to permit empty values in forms, as the
 
 .. note::
 
-    When using the Oracle database backend, the value ``NULL`` will be stored to
-    denote the empty string regardless of this attribute.
+    When using the Oracle database backend, the value ``NULL`` will be stored
+    to denote the empty string regardless of this attribute.
 
 ``blank``
 ---------
@@ -464,10 +464,10 @@ support tablespaces for indexes, this option is ignored.
 The default value for the field. This can be a value or a callable object. If
 callable it will be called every time a new object is created.
 
-The default can't be a mutable object (model instance, ``list``, ``set``, etc.),
-as a reference to the same instance of that object would be used as the default
-value in all new model instances. Instead, wrap the desired default in a
-callable. For example, if you want to specify a default ``dict`` for
+The default can't be a mutable object (model instance, ``list``, ``set``,
+etc.), as a reference to the same instance of that object would be used as the
+default value in all new model instances. Instead, wrap the desired default in
+a callable. For example, if you want to specify a default ``dict`` for
 :class:`~django.db.models.JSONField`, use a function::
 
     def contact_default():
@@ -506,12 +506,12 @@ validation <validating-objects>`. Default is ``True``.
 .. attribute:: Field.error_messages
 
 The ``error_messages`` argument lets you override the default messages that the
-field will raise. Pass in a dictionary with keys matching the error messages you
-want to override.
+field will raise. Pass in a dictionary with keys matching the error messages
+you want to override.
 
-Error message keys include ``null``, ``blank``, ``invalid``, ``invalid_choice``,
-``unique``, and ``unique_for_date``. Additional error message keys are
-specified for each field in the `Field types`_ section below.
+Error message keys include ``null``, ``blank``, ``invalid``,
+``invalid_choice``, ``unique``, and ``unique_for_date``. Additional error
+message keys are specified for each field in the `Field types`_ section below.
 
 These error messages often don't propagate to forms. See
 :ref:`considerations-regarding-model-errormessages`.
@@ -654,10 +654,10 @@ Field types
 
 .. class:: AutoField(**options)
 
-An :class:`IntegerField` that automatically increments
-according to available IDs. You usually won't need to use this directly; a
-primary key field will automatically be added to your model if you don't specify
-otherwise. See :ref:`automatic-primary-key-fields`.
+An :class:`IntegerField` that automatically increments according to available
+IDs. You usually won't need to use this directly; a primary key field will
+automatically be added to your model if you don't specify otherwise. See
+:ref:`automatic-primary-key-fields`.
 
 ``BigAutoField``
 ----------------
@@ -815,8 +815,8 @@ The default form widget for this field is a
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
-The options ``auto_now_add``, ``auto_now``, and ``default`` are mutually exclusive.
-Any combination of these options will result in an error.
+The options ``auto_now_add``, ``auto_now``, and ``default`` are mutually
+exclusive. Any combination of these options will result in an error.
 
 .. note::
     As currently implemented, setting ``auto_now`` or ``auto_now_add`` to
@@ -944,8 +944,8 @@ Has the following optional arguments:
 
 .. attribute:: FileField.upload_to
 
-    This attribute provides a way of setting the upload directory and file name,
-    and can be set in two ways. In both cases, the value is passed to the
+    This attribute provides a way of setting the upload directory and file
+    name, and can be set in two ways. In both cases, the value is passed to the
     :meth:`Storage.save() <django.core.files.storage.Storage.save>` method.
 
     If you specify a string value or a :class:`~pathlib.Path`, it may contain
@@ -968,9 +968,9 @@ Has the following optional arguments:
     handles ``upload_to``.
 
     ``upload_to`` may also be a callable, such as a function. This will be
-    called to obtain the upload path, including the filename. This callable must
-    accept two arguments and return a Unix-style path (with forward slashes)
-    to be passed along to the storage system. The two arguments are:
+    called to obtain the upload path, including the filename. This callable
+    must accept two arguments and return a Unix-style path (with forward
+    slashes) to be passed along to the storage system. The two arguments are:
 
     ======================  ===============================================
     Argument                Description
@@ -1030,11 +1030,11 @@ takes a few steps:
    ``{{ object.mug_shot.url }}``.
 
 For example, say your :setting:`MEDIA_ROOT` is set to ``'/home/media'``, and
-:attr:`~FileField.upload_to` is set to ``'photos/%Y/%m/%d'``. The ``'%Y/%m/%d'``
-part of :attr:`~FileField.upload_to` is :func:`~time.strftime` formatting;
-``'%Y'`` is the four-digit year, ``'%m'`` is the two-digit month and ``'%d'`` is
-the two-digit day. If you upload a file on Jan. 15, 2007, it will be saved in
-the directory ``/home/media/photos/2007/01/15``.
+:attr:`~FileField.upload_to` is set to ``'photos/%Y/%m/%d'``. The
+``'%Y/%m/%d'`` part of :attr:`~FileField.upload_to` is :func:`~time.strftime`
+formatting; ``'%Y'`` is the four-digit year, ``'%m'`` is the two-digit month
+and ``'%d'`` is the two-digit day. If you upload a file on Jan. 15, 2007, it
+will be saved in the directory ``/home/media/photos/2007/01/15``.
 
 If you wanted to retrieve the uploaded file's on-disk filename, or the file's
 size, you could use the :attr:`~django.core.files.File.name` and
@@ -1044,9 +1044,9 @@ information on the available attributes and methods, see the
 topic guide.
 
 .. note::
-    The file is saved as part of saving the model in the database, so the actual
-    file name used on disk cannot be relied on until after the model has been
-    saved.
+    The file is saved as part of saving the model in the database, so the
+    actual file name used on disk cannot be relied on until after the model has
+    been saved.
 
 The uploaded file's relative URL can be obtained using the
 :attr:`~django.db.models.fields.files.FieldFile.url` attribute. Internally,
@@ -1085,9 +1085,10 @@ file.
 The API of :class:`FieldFile` mirrors that of :class:`~django.core.files.File`,
 with one key difference: *The object wrapped by the class is not necessarily a
 wrapper around Python's built-in file object.* Instead, it is a wrapper around
-the result of the :attr:`Storage.open()<django.core.files.storage.Storage.open>`
-method, which may be a :class:`~django.core.files.File` object, or it may be a
-custom storage's implementation of the :class:`~django.core.files.File` API.
+the result of the
+:attr:`Storage.open()<django.core.files.storage.Storage.open>` method, which
+may be a :class:`~django.core.files.File` object, or it may be a custom
+storage's implementation of the :class:`~django.core.files.File` API.
 
 In addition to the API inherited from :class:`~django.core.files.File` such as
 ``read()`` and ``write()``, :class:`FieldFile` includes several methods that
@@ -1226,7 +1227,8 @@ directory on the filesystem. Has some special arguments, of which the first is
 .. attribute:: FilePathField.recursive
 
     Optional. Either ``True`` or ``False``. Default is ``False``. Specifies
-    whether all subdirectories of :attr:`~FilePathField.path` should be included
+    whether all subdirectories of :attr:`~FilePathField.path` should be
+    included
 
 .. attribute:: FilePathField.allow_files
 
@@ -1269,11 +1271,11 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 .. admonition:: ``FloatField`` vs. ``DecimalField``
 
     The :class:`FloatField` class is sometimes mixed up with the
-    :class:`DecimalField` class. Although they both represent real numbers, they
-    represent those numbers differently. ``FloatField`` uses Python's ``float``
-    type internally, while ``DecimalField`` uses Python's ``Decimal`` type. For
-    information on the difference between the two, see Python's documentation
-    for the :mod:`decimal` module.
+    :class:`DecimalField` class. Although they both represent real numbers,
+    they represent those numbers differently. ``FloatField`` uses Python's
+    ``float`` type internally, while ``DecimalField`` uses Python's ``Decimal``
+    type. For information on the difference between the two, see Python's
+    documentation for the :mod:`decimal` module.
 
 ``GeneratedField``
 ------------------
@@ -1375,8 +1377,9 @@ values are stored as null.
 Inherits all attributes and methods from :class:`FileField`, but also
 validates that the uploaded object is a valid image.
 
-In addition to the special attributes that are available for :class:`FileField`,
-an :class:`ImageField` also has ``height`` and ``width`` attributes.
+In addition to the special attributes that are available for
+:class:`FileField`, an :class:`ImageField` also has ``height`` and ``width``
+attributes.
 
 To facilitate querying on those attributes, :class:`ImageField` has the
 following optional arguments:
@@ -1517,8 +1520,8 @@ all databases supported by Django.
 .. class:: SlugField(max_length=50, **options)
 
 :term:`Slug <slug>` is a newspaper term. A slug is a short label for something,
-containing only letters, numbers, underscores or hyphens. They're generally used
-in URLs.
+containing only letters, numbers, underscores or hyphens. They're generally
+used in URLs.
 
 Like a CharField, you can specify :attr:`~CharField.max_length` (read the note
 about database portability and :attr:`~CharField.max_length` in that section,
@@ -2014,9 +2017,9 @@ that control how the relationship functions.
     :class:`ManyToManyField` is assumed to be symmetrical -- that is, if I am
     your friend, then you are my friend.
 
-    If you do not want symmetry in many-to-many relationships with ``self``, set
-    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Django to
-    add the descriptor for the reverse relationship, allowing
+    If you do not want symmetry in many-to-many relationships with ``self``,
+    set :attr:`~ManyToManyField.symmetrical` to ``False``. This will force
+    Django to add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
 .. attribute:: ManyToManyField.through
@@ -2183,12 +2186,12 @@ that control how the relationship functions.
 
 .. attribute:: ManyToManyField.swappable
 
-    Controls the migration framework's reaction if this :class:`ManyToManyField`
-    is pointing at a swappable model. If it is ``True`` - the default -
-    then if the :class:`ManyToManyField` is pointing at a model which matches
-    the current value of ``settings.AUTH_USER_MODEL`` (or another swappable
-    model setting) the relationship will be stored in the migration using
-    a reference to the setting, not to the model directly.
+    Controls the migration framework's reaction if this
+    :class:`ManyToManyField` is pointing at a swappable model. If it is
+    ``True`` - the default - then if the :class:`ManyToManyField` is pointing
+    at a model which matches the current value of ``settings.AUTH_USER_MODEL``
+    (or another swappable model setting) the relationship will be stored in the
+    migration using a reference to the setting, not to the model directly.
 
     You only want to override this to be ``False`` if you are sure your
     model should always point toward the swapped-in model - for example,
@@ -2476,7 +2479,8 @@ Field API reference
       value)
     * when it saves to the database (Python value -> database backend value)
 
-    When querying, :meth:`get_db_prep_value` and :meth:`get_prep_value` are used:
+    When querying, :meth:`get_db_prep_value` and :meth:`get_prep_value` are
+    used:
 
     .. method:: get_prep_value(value)
 
@@ -2572,8 +2576,8 @@ Field API reference
         Returns the default :class:`django.forms.Field` of this field for
         :class:`~django.forms.ModelForm`.
 
-        If :meth:`~Field.formfield` is overridden to return ``None``, this field
-        is excluded from the :class:`~django.forms.ModelForm`.
+        If :meth:`~Field.formfield` is overridden to return ``None``, this
+        field is excluded from the :class:`~django.forms.ModelForm`.
 
         By default, if both ``form_class`` and ``choices_form_class`` are
         ``None``, it uses :class:`~django.forms.CharField`. If the field has
@@ -2587,8 +2591,9 @@ Field API reference
         Returns a 4-tuple with enough information to recreate the field:
 
         1. The name of the field on the model.
-        2. The import path of the field (e.g. ``"django.db.models.IntegerField"``).
-           This should be the most portable version, so less specific may be better.
+        2. The import path of the field (e.g.
+           ``"django.db.models.IntegerField"``). This should be the most
+           portable version, so less specific may be better.
         3. A list of positional arguments.
         4. A dict of keyword arguments.
 
@@ -2598,9 +2603,10 @@ Field API reference
 Registering and fetching lookups
 ================================
 
-``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
-The API can be used to customize which lookups are available for a field class
-and its instances, and how lookups are fetched from a field.
+``Field`` implements the :ref:`lookup registration API
+<lookup-registration-api>`. The API can be used to customize which lookups are
+available for a field class and its instances, and how lookups are fetched from
+a field.
 
 .. _model-field-attributes:
 

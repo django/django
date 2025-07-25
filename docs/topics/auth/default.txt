@@ -1042,8 +1042,8 @@ arguments in the URLconf, these will be passed on to the view. For example::
         ),
     ]
 
-All views are :doc:`class-based </topics/class-based-views/index>`, which allows
-you to easily customize them by subclassing.
+All views are :doc:`class-based </topics/class-based-views/index>`, which
+allows you to easily customize them by subclassing.
 
 .. _all-authentication-views:
 
@@ -1155,8 +1155,8 @@ implementation details see :ref:`using-the-views`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
     If you'd prefer not to call the template :file:`registration/login.html`,
-    you can pass the ``template_name`` parameter via the extra arguments to
-    the ``as_view`` method in your URLconf. For example, this URLconf line would
+    you can pass the ``template_name`` parameter via the extra arguments to the
+    ``as_view`` method in your URLconf. For example, this URLconf line would
     use :file:`myapp/login.html` instead::
 
         path("accounts/login/", auth_views.LoginView.as_view(template_name="myapp/login.html")),
@@ -1799,8 +1799,8 @@ the logged-in user has any permissions in the ``foo`` app:
     {% if perms.foo %}
 
 Evaluating a two-level-attribute lookup as a boolean is a proxy to
-:meth:`User.has_perm() <django.contrib.auth.models.User.has_perm>`. For example,
-to check if the logged-in user has the permission ``foo.add_vote``:
+:meth:`User.has_perm() <django.contrib.auth.models.User.has_perm>`. For
+example, to check if the logged-in user has the permission ``foo.add_vote``:
 
 .. code-block:: html+django
 

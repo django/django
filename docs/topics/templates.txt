@@ -381,9 +381,10 @@ must provide a ``render()`` method with the following signature:
     If ``context`` is provided, it must be a :class:`dict`. If it isn't
     provided, the engine will render the template with an empty context.
 
-    If ``request`` is provided, it must be an :class:`~django.http.HttpRequest`.
-    Then the engine must make it, as well as the CSRF token, available in the
-    template. How this is achieved is up to each backend.
+    If ``request`` is provided, it must be an
+    :class:`~django.http.HttpRequest`. Then the engine must make it, as well as
+    the CSRF token, available in the template. How this is achieved is up to
+    each backend.
 
 Here's an example of the search algorithm. For this example the
 :setting:`TEMPLATES` setting is::
@@ -411,8 +412,8 @@ will look for, in order:
 * ``/home/html/default/story_detail.html`` (``'django'`` engine)
 * ``/home/html/jinja2/story_detail.html`` (``'jinja2'`` engine)
 
-If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
-here's what Django will look for:
+If you call ``select_template(['story_253_detail.html',
+'story_detail.html'])``, here's what Django will look for:
 
 * ``/home/html/example.com/story_253_detail.html`` (``'django'`` engine)
 * ``/home/html/default/story_253_detail.html`` (``'django'`` engine)
@@ -634,12 +635,12 @@ adds defaults that differ from Jinja2's for a few options:
 
   .. admonition:: Using context processors with Jinja2 templates is discouraged.
 
-    Context processors are useful with Django templates because Django templates
-    don't support calling functions with arguments. Since Jinja2 doesn't have
-    that limitation, it's recommended to put the function that you would use as a
-    context processor in the global variables available to the template using
-    ``jinja2.Environment`` as described below. You can then call that function in
-    the template:
+    Context processors are useful with Django templates because Django
+    templates don't support calling functions with arguments. Since Jinja2
+    doesn't have that limitation, it's recommended to put the function that you
+    would use as a context processor in the global variables available to the
+    template using ``jinja2.Environment`` as described below. You can then call
+    that function in the template:
 
     .. code-block:: jinja
 
@@ -655,8 +656,8 @@ adds defaults that differ from Jinja2's for a few options:
     * Needing the result in every template.
     * Using the result multiple times in each template.
 
-    Unless all of these conditions are met, passing a function to the template is
-    more in line with the design of Jinja2.
+    Unless all of these conditions are met, passing a function to the template
+    is more in line with the design of Jinja2.
 
 The default configuration is purposefully kept to a minimum. If a template is
 rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),

@@ -115,9 +115,10 @@ overridden by what's passed by
 
       It defaults to ``'utf-8'``.
 
-    * ``'libraries'``: A dictionary of labels and dotted Python paths of template
-      tag modules to register with the template engine. This is used to add new
-      libraries or provide alternate labels for existing ones. For example::
+    * ``'libraries'``: A dictionary of labels and dotted Python paths of
+      template tag modules to register with the template engine. This is used
+      to add new libraries or provide alternate labels for existing ones. For
+      example::
 
           Engine(
               libraries={
@@ -136,8 +137,8 @@ overridden by what's passed by
               builtins=["myapp.builtins"],
           )
 
-      Tags and filters from built-in libraries can be used without first calling
-      the :ttag:`{% load %}<load>` tag.
+      Tags and filters from built-in libraries can be used without first
+      calling the :ttag:`{% load %}<load>` tag.
 
 .. staticmethod:: Engine.get_default()
 
@@ -434,11 +435,11 @@ Django's template language has no way to escape the characters used for its own
 syntax. For example, the :ttag:`templatetag` tag is required if you need to
 output character sequences like ``{%`` and ``%}``.
 
-A similar issue exists if you want to include these sequences in template filter
-or tag arguments. For example, when parsing a block tag, Django's template
-parser looks for the first occurrence of ``%}`` after a ``{%``. This prevents
-the use of ``"%}"`` as a string literal. For example, a ``TemplateSyntaxError``
-will be raised for the following expressions:
+A similar issue exists if you want to include these sequences in template
+filter or tag arguments. For example, when parsing a block tag, Django's
+template parser looks for the first occurrence of ``%}`` after a ``{%``. This
+prevents the use of ``"%}"`` as a string literal. For example, a
+``TemplateSyntaxError`` will be raised for the following expressions:
 
 .. code-block:: html+django
 
@@ -588,8 +589,8 @@ tags <howto-writing-custom-template-tags>`.
 
 .. method:: Context.flatten()
 
-Using ``flatten()`` method you can get whole ``Context`` stack as one dictionary
-including builtin variables.
+Using ``flatten()`` method you can get whole ``Context`` stack as one
+dictionary including builtin variables.
 
 .. code-block:: pycon
 
@@ -600,7 +601,8 @@ including builtin variables.
     >>> c.flatten()
     {'True': True, 'None': None, 'foo': 'first level', 'False': False, 'bar': 'second level'}
 
-A ``flatten()`` method is also internally used to make ``Context`` objects comparable.
+A ``flatten()`` method is also internally used to make ``Context`` objects
+comparable.
 
 .. code-block:: pycon
 
