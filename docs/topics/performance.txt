@@ -248,7 +248,8 @@ Other database-related tips
 Enabling :ref:`persistent-database-connections` can speed up connections to the
 database accounts for a significant part of the request processing time.
 
-This helps a lot on virtualized hosts with limited network performance, for example.
+This helps a lot on virtualized hosts with limited network performance, for
+example.
 
 HTTP performance
 ================
@@ -272,7 +273,8 @@ needed.
 Compresses responses for all modern browsers, saving bandwidth and transfer
 time. Note that GZipMiddleware is currently considered a security risk, and is
 vulnerable to attacks that nullify the protection provided by TLS/SSL. See the
-warning in :class:`~django.middleware.gzip.GZipMiddleware` for more information.
+warning in :class:`~django.middleware.gzip.GZipMiddleware` for more
+information.
 
 Sessions
 --------
@@ -297,8 +299,8 @@ optimization gains.
 By taking advantage of web browsers' caching abilities, you can
 eliminate network hits entirely for a given file after the initial download.
 
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends a
-content-dependent tag to the filenames of :doc:`static files
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends
+a content-dependent tag to the filenames of :doc:`static files
 </ref/contrib/staticfiles>` to make it safe for browsers to cache them
 long-term without missing future changes - when a file changes, so will the
 tag, so browsers will reload the asset automatically.

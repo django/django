@@ -471,7 +471,8 @@ Building the artifacts
 
 .. admonition:: Optionally use helper scripts
 
-    You can streamline some of the steps below using helper scripts from the Wiki:
+    You can streamline some of the steps below using helper scripts from the
+    Wiki:
 
     * `Release script
       <https://code.djangoproject.com/wiki/ReleaseScript>`_

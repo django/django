@@ -113,9 +113,9 @@ All attributes should be considered read-only, unless stated otherwise.
 
     It's possible that a request can come in via POST with an empty ``POST``
     dictionary -- if, say, a form is requested via the POST HTTP method but
-    does not include form data. Therefore, you shouldn't use ``if request.POST``
-    to check for use of the POST method; instead, use ``if request.method ==
-    "POST"`` (see :attr:`HttpRequest.method`).
+    does not include form data. Therefore, you shouldn't use ``if
+    request.POST`` to check for use of the POST method; instead, use ``if
+    request.method == "POST"`` (see :attr:`HttpRequest.method`).
 
     ``POST`` does *not* include file-upload information. See :attr:`FILES`.
 
@@ -127,13 +127,15 @@ All attributes should be considered read-only, unless stated otherwise.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="">``. Each
-    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
+    value in ``FILES`` is an
+    :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
     ``FILES`` will only contain data if the request method was POST and the
-    ``<form>`` that posted to the request had ``enctype="multipart/form-data"``.
-    Otherwise, ``FILES`` will be a blank dictionary-like object.
+    ``<form>`` that posted to the request had
+    ``enctype="multipart/form-data"``. Otherwise, ``FILES`` will be a blank
+    dictionary-like object.
 
 .. attribute:: HttpRequest.META
 
@@ -541,10 +543,10 @@ Methods
 .. class:: QueryDict
 
 In an :class:`HttpRequest` object, the :attr:`~HttpRequest.GET` and
-:attr:`~HttpRequest.POST` attributes are instances of ``django.http.QueryDict``,
-a dictionary-like class customized to deal with multiple values for the same
-key. This is necessary because some HTML form elements, notably
-``<select multiple>``, pass multiple values for the same key.
+:attr:`~HttpRequest.POST` attributes are instances of
+``django.http.QueryDict``, a dictionary-like class customized to deal with
+multiple values for the same key. This is necessary because some HTML form
+elements, notably ``<select multiple>``, pass multiple values for the same key.
 
 The ``QueryDict``\ s at ``request.POST`` and ``request.GET`` will be immutable
 when accessed in a normal request/response cycle. To get a mutable version you
@@ -573,8 +575,8 @@ a subclass of dictionary. Exceptions are outlined here:
     instantiating one yourself, you can make it mutable by passing
     ``mutable=True`` to its ``__init__()``.
 
-    Strings for setting both keys and values will be converted from ``encoding``
-    to ``str``. If ``encoding`` is not set, it defaults to
+    Strings for setting both keys and values will be converted from
+    ``encoding`` to ``str``. If ``encoding`` is not set, it defaults to
     :setting:`DEFAULT_CHARSET`.
 
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
@@ -613,8 +615,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.__contains__(key)
 
-    Returns ``True`` if the given key is set. This lets you do, e.g., ``if "foo"
-    in request.GET``.
+    Returns ``True`` if the given key is set. This lets you do, e.g., ``if
+    "foo" in request.GET``.
 
 .. method:: QueryDict.get(key, default=None)
 
@@ -623,7 +625,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.setdefault(key, default=None)
 
-    Like :meth:`dict.setdefault`, except it uses :meth:`__setitem__` internally.
+    Like :meth:`dict.setdefault`, except it uses :meth:`__setitem__`
+    internally.
 
 .. method:: QueryDict.update(other_dict)
 
@@ -643,8 +646,8 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.items()
 
     Like :meth:`dict.items`, except this uses the same last-value logic as
-    :meth:`__getitem__` and returns an iterator object instead of a view object.
-    For example:
+    :meth:`__getitem__` and returns an iterator object instead of a view
+    object. For example:
 
     .. code-block:: pycon
 
@@ -843,9 +846,9 @@ You can also set headers on instantiation:
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
 to use the :func:`~django.utils.cache.patch_cache_control` and
 :func:`~django.utils.cache.patch_vary_headers` methods from
-:mod:`django.utils.cache`, since these fields can have multiple, comma-separated
-values. The "patch" methods ensure that other values, e.g. added by a
-middleware, are not removed.
+:mod:`django.utils.cache`, since these fields can have multiple,
+comma-separated values. The "patch" methods ensure that other values, e.g.
+added by a middleware, are not removed.
 
 HTTP header fields cannot contain newlines. An attempt to set a header field
 containing a newline character (CR or LF) will raise ``BadHeaderError``
@@ -1110,11 +1113,11 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 .. class:: HttpResponseRedirect
 
     The first argument to the constructor is required -- the path to redirect
-    to. This can be a fully qualified URL
-    (e.g. ``'https://www.yahoo.com/search/'``), an absolute path with no domain
-    (e.g. ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that
-    last case, the client browser will reconstruct the full URL itself
-    according to the current path.
+    to. This can be a fully qualified URL (e.g.
+    ``'https://www.yahoo.com/search/'``), an absolute path with no domain (e.g.
+    ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that last
+    case, the client browser will reconstruct the full URL itself according to
+    the current path.
 
     The constructor accepts an optional ``preserve_request`` keyword argument
     that defaults to ``False``, producing a response with a 302 status code. If

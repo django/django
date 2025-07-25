@@ -104,19 +104,19 @@ templates.
 The built-in levels, which can be imported from ``django.contrib.messages``
 directly, are:
 
-=========== ========
+=========== =========================================================================================
 Constant    Purpose
-=========== ========
+=========== =========================================================================================
 ``DEBUG``   Development-related messages that will be ignored (or removed) in a production deployment
 ``INFO``    Informational messages for the user
 ``SUCCESS`` An action was successful, e.g. "Your profile was updated successfully"
 ``WARNING`` A failure did not occur but may be imminent
 ``ERROR``   An action was **not** successful or some other failure occurred
-=========== ========
+=========== =========================================================================================
 
-The :setting:`MESSAGE_LEVEL` setting can be used to change the minimum recorded level
-(or it can be `changed per request`_). Attempts to add messages of a level less
-than this will be ignored.
+The :setting:`MESSAGE_LEVEL` setting can be used to change the minimum recorded
+level (or it can be `changed per request`_). Attempts to add messages of a
+level less than this will be ignored.
 
 .. _`changed per request`: `Changing the minimum recorded level per-request`_
 

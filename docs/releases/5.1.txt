@@ -98,8 +98,9 @@ unauthenticated requests by using the new
 support setting ``login_url`` or ``redirect_field_name`` via the
 :class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
 
-To enable this, add ``"django.contrib.auth.middleware.LoginRequiredMiddleware"``
-to your :setting:`MIDDLEWARE` setting.
+To enable this, add
+``"django.contrib.auth.middleware.LoginRequiredMiddleware"`` to your
+:setting:`MIDDLEWARE` setting.
 
 Minor features
 --------------

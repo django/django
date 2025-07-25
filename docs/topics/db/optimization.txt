@@ -21,8 +21,8 @@ your requirements. Sometimes optimizing for one will be detrimental to the
 other, but sometimes they will help each other. Also, work that is done by the
 database process might not have the same cost (to you) as the same amount of
 work done in your Python process. It is up to you to decide what your
-priorities are, where the balance must lie, and profile all of these as required
-since this will depend on your application and server.
+priorities are, where the balance must lie, and profile all of these as
+required since this will depend on your application and server.
 
 With everything that follows, remember to profile after every change to ensure
 that the change is a benefit, and a big enough benefit given the decrease in
@@ -202,8 +202,8 @@ Retrieve everything at once if you know you will need it
 Hitting the database multiple times for different parts of a single 'set' of
 data that you will need all parts of is, in general, less efficient than
 retrieving it all in one query. This is particularly important if you have a
-query that is executed in a loop, and could therefore end up doing many database
-queries, when only one was needed. So:
+query that is executed in a loop, and could therefore end up doing many
+database queries, when only one was needed. So:
 
 Use ``QuerySet.select_related()`` and ``prefetch_related()``
 ------------------------------------------------------------
@@ -332,9 +332,9 @@ anything driven from the normal database object :doc:`signals </ref/signals>`.
 Use foreign key values directly
 -------------------------------
 
-If you only need a foreign key value, use the foreign key value that is already on
-the object you've got, rather than getting the whole related object and taking
-its primary key. i.e. do::
+If you only need a foreign key value, use the foreign key value that is already
+on the object you've got, rather than getting the whole related object and
+taking its primary key. i.e. do::
 
    entry.blog_id
 

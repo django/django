@@ -46,7 +46,8 @@ The :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is
 configured using the following settings:
 
 * :setting:`SECURE_CSP`: defines the **enforced Content Security Policy**.
-* :setting:`SECURE_CSP_REPORT_ONLY`: defines a **report-only Content Security Policy**.
+* :setting:`SECURE_CSP_REPORT_ONLY`: defines a **report-only Content Security
+  Policy**.
 
 .. admonition:: These settings can be used independently or together
 

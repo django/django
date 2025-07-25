@@ -101,10 +101,10 @@ Finally, there is the :func:`fromfile` factory method which returns a
 
     You find many ``TypeError`` or ``AttributeError`` exceptions filling your
     web server's log files. This generally means that you are creating GEOS
-    objects at the top level of some of your Python modules. Then, due to a race
-    condition in the garbage collector, your module is garbage collected before
-    the GEOS object. To prevent this, create :class:`GEOSGeometry` objects
-    inside the local scope of your functions/methods.
+    objects at the top level of some of your Python modules. Then, due to a
+    race condition in the garbage collector, your module is garbage collected
+    before the GEOS object. To prevent this, create :class:`GEOSGeometry`
+    objects inside the local scope of your functions/methods.
 
 Geometries are Pythonic
 -----------------------
@@ -439,8 +439,8 @@ return a boolean.
 
 .. method:: GEOSGeometry.contains(other)
 
-    Returns ``True`` if :meth:`other.within(this) <GEOSGeometry.within>` returns
-    ``True``.
+    Returns ``True`` if :meth:`other.within(this) <GEOSGeometry.within>`
+    returns ``True``.
 
 .. method:: GEOSGeometry.covers(other)
 
@@ -456,8 +456,8 @@ return a boolean.
 
     This predicate is similar to :meth:`GEOSGeometry.contains`, but is more
     inclusive (i.e. returns ``True`` for more cases). In particular, unlike
-    :meth:`~GEOSGeometry.contains` it does not distinguish between points in the
-    boundary and in the interior of geometries. For most situations,
+    :meth:`~GEOSGeometry.contains` it does not distinguish between points in
+    the boundary and in the interior of geometries. For most situations,
     ``covers()`` should be preferred to :meth:`~GEOSGeometry.contains`. As an
     added benefit, ``covers()`` is more amenable to optimization and hence
     should outperform :meth:`~GEOSGeometry.contains`.
@@ -507,9 +507,9 @@ return a boolean.
 
 .. method:: GEOSGeometry.relate_pattern(other, pattern)
 
-    Returns ``True`` if the elements in the DE-9IM intersection matrix
-    for this geometry and the other matches the given ``pattern`` --
-    a string of nine characters from the alphabet: {``T``, ``F``, ``*``, ``0``}.
+    Returns ``True`` if the elements in the DE-9IM intersection matrix for this
+    geometry and the other matches the given ``pattern`` -- a string of nine
+    characters from the alphabet: {``T``, ``F``, ``*``, ``0``}.
 
 .. method:: GEOSGeometry.touches(other)
 
@@ -548,9 +548,9 @@ Topological Methods
 .. method:: GEOSGeometry.interpolate_normalized(distance)
 
     Given a distance (float), returns the point (or closest point) within the
-    geometry (:class:`LineString` or :class:`MultiLineString`) at that distance.
-    The normalized version takes the distance as a float between 0 (origin) and
-    1 (endpoint).
+    geometry (:class:`LineString` or :class:`MultiLineString`) at that
+    distance. The normalized version takes the distance as a float between 0
+    (origin) and 1 (endpoint).
 
     Reverse of :meth:`GEOSGeometry.project`.
 
@@ -583,10 +583,10 @@ Topological Methods
 
     By default, this function does not preserve topology. For example,
     :class:`Polygon` objects can be split, be collapsed into lines, or
-    disappear. :class:`Polygon` holes can be created or disappear, and lines may
-    cross. By specifying ``preserve_topology=True``, the result will have the
-    same dimension and number of components as the input; this is significantly
-    slower, however.
+    disappear. :class:`Polygon` holes can be created or disappear, and lines
+    may cross. By specifying ``preserve_topology=True``, the result will have
+    the same dimension and number of components as the input; this is
+    significantly slower, however.
 
 .. method:: GEOSGeometry.sym_difference(other)
 
@@ -633,13 +633,13 @@ Topological Properties
 
     The result obeys the following contract:
 
-    * Unioning a set of :class:`LineString`\s has the effect of fully noding and
-      dissolving the linework.
+    * Unioning a set of :class:`LineString`\s has the effect of fully noding
+      and dissolving the linework.
 
-    * Unioning a set of :class:`Polygon`\s will always return a :class:`Polygon`
-      or :class:`MultiPolygon` geometry (unlike :meth:`GEOSGeometry.union`,
-      which may return geometries of lower dimension if a topology collapse
-      occurs).
+    * Unioning a set of :class:`Polygon`\s will always return a
+      :class:`Polygon` or :class:`MultiPolygon` geometry (unlike
+      :meth:`GEOSGeometry.union`, which may return geometries of lower
+      dimension if a topology collapse occurs).
 
 Other Properties & Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -655,7 +655,8 @@ Other Properties & Methods
 
 .. method:: GEOSGeometry.clone()
 
-    This method returns a :class:`GEOSGeometry` that is a clone of the original.
+    This method returns a :class:`GEOSGeometry` that is a clone of the
+    original.
 
 .. method:: GEOSGeometry.distance(geom)
 
@@ -678,8 +679,8 @@ Other Properties & Methods
 
     Returns a GEOS ``PreparedGeometry`` for the contents of this geometry.
     ``PreparedGeometry`` objects are optimized for the contains, intersects,
-    covers, crosses, disjoint, overlaps, touches and within operations. Refer to
-    the :ref:`prepared-geometries` documentation for more information.
+    covers, crosses, disjoint, overlaps, touches and within operations. Refer
+    to the :ref:`prepared-geometries` documentation for more information.
 
 .. attribute:: GEOSGeometry.srs
 
@@ -810,8 +811,8 @@ Other Properties & Methods
 
     ``Polygon`` objects may be instantiated by passing in parameters that
     represent the rings of the polygon. The parameters must either be
-    :class:`LinearRing` instances, or a sequence that may be used to construct a
-    :class:`LinearRing`:
+    :class:`LinearRing` instances, or a sequence that may be used to construct
+    a :class:`LinearRing`:
 
     .. code-block:: pycon
 
@@ -973,7 +974,8 @@ Geometry Factories
 
     :param file_h: input file that contains spatial data
     :type file_h: a Python ``file`` object or a string path to the file
-    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the file
+    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the
+        file
 
     Example:
 
@@ -988,7 +990,8 @@ Geometry Factories
     :type string: str
     :param srid: spatial reference identifier
     :type srid: int
-    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
+    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the
+            string
 
     ``fromstr(string, srid)`` is equivalent to
     :class:`GEOSGeometry(string, srid) <GEOSGeometry>`.
@@ -1144,8 +1147,8 @@ include the SRID value (in other words, EWKB).
 .. class:: WKTWriter(dim=2, trim=False, precision=None)
 
     This class allows outputting the WKT representation of a geometry. See the
-    :attr:`WKBWriter.outdim`, :attr:`trim`, and :attr:`precision` attributes for
-    details about the constructor arguments.
+    :attr:`WKBWriter.outdim`, :attr:`trim`, and :attr:`precision` attributes
+    for details about the constructor arguments.
 
     .. method:: WKTWriter.write(geom)
 

@@ -3,7 +3,8 @@ The flatpages app
 =================
 
 .. module:: django.contrib.flatpages
-   :synopsis: A framework for managing simple ?flat? HTML content in a database.
+   :synopsis: A framework for managing simple ?flat? HTML content in a
+              database.
 
 Django comes with an optional "flatpages" application. It lets you store "flat"
 HTML content in a database and handles the management for you via Django's

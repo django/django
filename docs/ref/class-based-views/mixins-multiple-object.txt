@@ -78,8 +78,9 @@ Multiple object mixins
 
     .. attribute:: ordering
 
-        A string or list of strings specifying the ordering to apply to the ``queryset``.
-        Valid values are the same as those for :meth:`~django.db.models.query.QuerySet.order_by`.
+        A string or list of strings specifying the ordering to apply to the
+        ``queryset``. Valid values are the same as those for
+        :meth:`~django.db.models.query.QuerySet.order_by`.
 
     .. attribute:: paginate_by
 
@@ -106,10 +107,10 @@ Multiple object mixins
     .. attribute:: paginator_class
 
        The paginator class to be used for pagination. By default,
-       :class:`django.core.paginator.Paginator` is used. If the custom paginator
-       class doesn't have the same constructor interface as
-       :class:`django.core.paginator.Paginator`, you will also need to
-       provide an implementation for :meth:`get_paginator`.
+       :class:`django.core.paginator.Paginator` is used. If the custom
+       paginator class doesn't have the same constructor interface as
+       :class:`django.core.paginator.Paginator`, you will also need to provide
+       an implementation for :meth:`get_paginator`.
 
     .. attribute:: context_object_name
 
@@ -122,8 +123,8 @@ Multiple object mixins
 
     .. method:: get_ordering()
 
-        Returns a string (or iterable of strings) that defines the ordering that
-        will be applied to the ``queryset``.
+        Returns a string (or iterable of strings) that defines the ordering
+        that will be applied to the ``queryset``.
 
         Returns :attr:`ordering` by default.
 
@@ -132,10 +133,10 @@ Multiple object mixins
         Returns a 4-tuple containing (``paginator``, ``page``, ``object_list``,
         ``is_paginated``).
 
-        Constructed by paginating ``queryset`` into pages of size ``page_size``.
-        If the request contains a ``page`` argument, either as a captured URL
-        argument or as a GET argument, ``object_list`` will correspond to the
-        objects from that page.
+        Constructed by paginating ``queryset`` into pages of size
+        ``page_size``. If the request contains a ``page`` argument, either as a
+        captured URL argument or as a GET argument, ``object_list`` will
+        correspond to the objects from that page.
 
     .. method:: get_paginate_by(queryset)
 

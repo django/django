@@ -247,8 +247,8 @@ Forms
   transitional renderers will be deprecated, for removal in Django 6.0. The
   ``FORM_RENDERER`` declaration can be removed at that time.
 
-* If the new ``<div>`` output style is not appropriate for your project, you should
-  define a renderer subclass specifying
+* If the new ``<div>`` output style is not appropriate for your project, you
+  should define a renderer subclass specifying
   :attr:`~django.forms.renderers.BaseRenderer.form_template_name` and
   :attr:`~django.forms.renderers.BaseRenderer.formset_template_name` for your
   required style, and set :setting:`FORM_RENDERER` accordingly.

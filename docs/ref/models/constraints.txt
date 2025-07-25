@@ -288,10 +288,10 @@ Defaults to :attr:`.BaseConstraint.violation_error_code`, when either
 is not set.
 
 If :attr:`.UniqueConstraint.fields` is set without a
-:attr:`.UniqueConstraint.condition`, defaults to the :attr:`Meta.unique_together
-<django.db.models.Options.unique_together>` error code when there are multiple
-fields, and to the :attr:`.Field.unique` error code when there is a single
-field.
+:attr:`.UniqueConstraint.condition`, defaults to the
+:attr:`Meta.unique_together <django.db.models.Options.unique_together>` error
+code when there are multiple fields, and to the :attr:`.Field.unique` error
+code when there is a single field.
 
 .. versionchanged:: 5.2
 
@@ -313,10 +313,10 @@ Defaults to :attr:`.BaseConstraint.violation_error_message`, when either
 is not set.
 
 If :attr:`.UniqueConstraint.fields` is set without a
-:attr:`.UniqueConstraint.condition`, defaults to the :attr:`Meta.unique_together
-<django.db.models.Options.unique_together>` error message when there are
-multiple fields, and to the :attr:`.Field.unique` error message when there is a
-single field.
+:attr:`.UniqueConstraint.condition`, defaults to the
+:attr:`Meta.unique_together <django.db.models.Options.unique_together>` error
+message when there are multiple fields, and to the :attr:`.Field.unique` error
+message when there is a single field.
 
 .. versionchanged:: 5.2
 

@@ -189,8 +189,8 @@ You can do it like this::
 
 Notice first that we've moved ``make_published`` into a method and renamed the
 ``modeladmin`` parameter to ``self``, and second that we've now put the string
-``'make_published'`` in ``actions`` instead of a direct function reference. This
-tells the :class:`ModelAdmin` to look up the action as a method.
+``'make_published'`` in ``actions`` instead of a direct function reference.
+This tells the :class:`ModelAdmin` to look up the action as a method.
 
 Defining actions as methods gives the action more idiomatic access to the
 :class:`ModelAdmin` itself, allowing the action to call any of the methods
@@ -286,10 +286,10 @@ Making actions available site-wide
 
 .. method:: AdminSite.add_action(action, name=None)
 
-    Some actions are best if they're made available to *any* object in the admin
-    site -- the export action defined above would be a good candidate. You can
-    make an action globally available using :meth:`AdminSite.add_action`. For
-    example::
+    Some actions are best if they're made available to *any* object in the
+    admin site -- the export action defined above would be a good candidate.
+    You can make an action globally available using
+    :meth:`AdminSite.add_action`. For example::
 
         from django.contrib import admin
 
@@ -297,8 +297,8 @@ Making actions available site-wide
 
     This makes the ``export_selected_objects`` action globally available as an
     action named "export_selected_objects". You can explicitly give the action
-    a name -- good if you later want to programmatically :ref:`remove the action
-    <disabling-admin-actions>` -- by passing a second argument to
+    a name -- good if you later want to programmatically :ref:`remove the
+    action <disabling-admin-actions>` -- by passing a second argument to
     :meth:`AdminSite.add_action`::
 
         admin.site.add_action(export_selected_objects, "export_selected")
@@ -317,11 +317,11 @@ Disabling a site-wide action
 
 .. method:: AdminSite.disable_action(name)
 
-    If you need to disable a :ref:`site-wide action <adminsite-actions>` you can
-    call :meth:`AdminSite.disable_action`.
+    If you need to disable a :ref:`site-wide action <adminsite-actions>` you
+    can call :meth:`AdminSite.disable_action`.
 
-    For example, you can use this method to remove the built-in "delete selected
-    objects" action::
+    For example, you can use this method to remove the built-in "delete
+    selected objects" action::
 
         admin.site.disable_action("delete_selected")
 
@@ -367,8 +367,8 @@ Conditionally enabling or disabling actions
     Finally, you can conditionally enable or disable actions on a per-request
     (and hence per-user basis) by overriding :meth:`ModelAdmin.get_actions`.
 
-    This returns a dictionary of actions allowed. The keys are action names, and
-    the values are ``(function, name, short_description)`` tuples.
+    This returns a dictionary of actions allowed. The keys are action names,
+    and the values are ``(function, name, short_description)`` tuples.
 
     For example, if you only want users whose names begin with 'J' to be able
     to delete objects in bulk::

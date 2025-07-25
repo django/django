@@ -230,8 +230,8 @@ its own thread).
 
 The async context can be imposed upon you by the environment in which you are
 running your Django code. For example, Jupyter_ notebooks and IPython_
-interactive shells both transparently provide an active event loop so that it is
-easier to interact with asynchronous APIs.
+interactive shells both transparently provide an active event loop so that it
+is easier to interact with asynchronous APIs.
 
 If you're using an IPython shell, you can disable this event loop by running:
 

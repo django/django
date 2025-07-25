@@ -13,8 +13,8 @@ validation (accessing the ``errors`` attribute or calling ``full_clean()``
 directly), but normally they won't be needed.
 
 In general, any cleaning method can raise ``ValidationError`` if there is a
-problem with the data it is processing, passing the relevant information to
-the ``ValidationError`` constructor. :ref:`See below <raising-validation-error>`
+problem with the data it is processing, passing the relevant information to the
+``ValidationError`` constructor. :ref:`See below <raising-validation-error>`
 for the best practice in raising ``ValidationError``. If no ``ValidationError``
 is raised, the method should return the cleaned (normalized) data as a Python
 object.

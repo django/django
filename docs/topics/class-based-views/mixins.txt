@@ -112,11 +112,10 @@ context data for template renders.
 
 To then make a :class:`~django.template.response.TemplateResponse`,
 :class:`DetailView` uses
-:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`,
-which extends :class:`~django.views.generic.base.TemplateResponseMixin`,
-overriding
-:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`
-as discussed above. It actually provides a fairly sophisticated set of options,
+:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`, which
+extends :class:`~django.views.generic.base.TemplateResponseMixin`, overriding
+:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names` as
+discussed above. It actually provides a fairly sophisticated set of options,
 but the main one that most people are going to use is
 ``<app_label>/<model_name>_detail.html``. The ``_detail`` part can be changed
 by setting
@@ -135,20 +134,18 @@ paginated) list of objects, typically a
 using that list of objects.
 
 To get the objects, :class:`~django.views.generic.list.ListView` uses
-:class:`~django.views.generic.list.MultipleObjectMixin`, which
-provides both
-:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`
-and
-:meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`. Unlike
-with :class:`~django.views.generic.detail.SingleObjectMixin`, there's no need
-to key off parts of the URL to figure out the queryset to work with, so the
-default uses the
+:class:`~django.views.generic.list.MultipleObjectMixin`, which provides both
+:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` and
+:meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`.
+Unlike with :class:`~django.views.generic.detail.SingleObjectMixin`, there's no
+need to key off parts of the URL to figure out the queryset to work with, so
+the default uses the
 :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` or
-:attr:`~django.views.generic.list.MultipleObjectMixin.model` attribute
-on the view class. A common reason to override
-:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`
-here would be to dynamically vary the objects, such as depending on
-the current user or to exclude posts in the future for a blog.
+:attr:`~django.views.generic.list.MultipleObjectMixin.model` attribute on the
+view class. A common reason to override
+:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` here would
+be to dynamically vary the objects, such as depending on the current user or to
+exclude posts in the future for a blog.
 
 :class:`~django.views.generic.list.MultipleObjectMixin` also overrides
 :meth:`~django.views.generic.base.ContextMixin.get_context_data` to
@@ -159,13 +156,12 @@ it.
 
 To make a :class:`~django.template.response.TemplateResponse`,
 :class:`ListView` then uses
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`;
-as with :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`; as
+with :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
 above, this overrides ``get_template_names()`` to provide :meth:`a range of
-options <django.views.generic.list.MultipleObjectTemplateResponseMixin>`,
-with the most commonly-used being
-``<app_label>/<model_name>_list.html``, with the ``_list`` part again
-being taken from the
+options <django.views.generic.list.MultipleObjectTemplateResponseMixin>`, with
+the most commonly-used being ``<app_label>/<model_name>_list.html``, with the
+``_list`` part again being taken from the
 :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 attribute. (The date based generic views use suffixes such as ``_archive``,
 ``_archive_year`` and so on to use different templates for the various
@@ -635,8 +631,9 @@ For example, a JSON mixin might look something like this::
     information on how to correctly transform Django models and querysets into
     JSON.
 
-This mixin provides a ``render_to_json_response()`` method with the same signature
-as :func:`~django.views.generic.base.TemplateResponseMixin.render_to_response`.
+This mixin provides a ``render_to_json_response()`` method with the same
+signature as
+:func:`~django.views.generic.base.TemplateResponseMixin.render_to_response`.
 To use it, we need to mix it into a ``TemplateView`` for example, and override
 ``render_to_response()`` to call ``render_to_json_response()`` instead::
 

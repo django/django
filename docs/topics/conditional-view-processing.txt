@@ -11,8 +11,9 @@ used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc.).
 For each page (response) that Django sends back from a view, it might provide
 two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
 headers are optional on HTTP responses. They can be set by your view function,
-or you can rely on the :class:`~django.middleware.http.ConditionalGetMiddleware`
-middleware to set the ``ETag`` header.
+or you can rely on the
+:class:`~django.middleware.http.ConditionalGetMiddleware` middleware to set the
+``ETag`` header.
 
 When the client next requests the same resource, it might send along a header
 such as either :rfc:`If-Modified-Since <9110#section-13.1.3>` or

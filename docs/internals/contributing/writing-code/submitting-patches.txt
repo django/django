@@ -204,9 +204,12 @@ whether to accept it.
 
 Some examples of DEPs that have been approved and fully implemented:
 
-* `DEP 181: ORM Expressions <https://github.com/django/deps/blob/main/final/0181-orm-expressions.rst>`_
-* `DEP 182: Multiple Template Engines <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
-* `DEP 201: Simplified routing syntax <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
+* `DEP 181: ORM Expressions
+  <https://github.com/django/deps/blob/main/final/0181-orm-expressions.rst>`_
+* `DEP 182: Multiple Template Engines
+  <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
+* `DEP 201: Simplified routing syntax
+  <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
 
 .. _Django Forum: https://forum.djangoproject.com/
 .. _Django Enhancement Proposals: https://github.com/django/deps
@@ -226,19 +229,19 @@ There are a couple of reasons that code in Django might be deprecated:
   no longer needs to support the older version of Python that doesn't include
   the library, the library will be deprecated in Django.
 
-As the :ref:`deprecation policy<internal-release-deprecation-policy>` describes,
-the first release of Django that deprecates a feature (``A.B``) should raise a
-``RemovedInDjangoXXWarning`` (where XX is the Django version where the feature
-will be removed) when the deprecated feature is invoked. Assuming we have good
-test coverage, these warnings are converted to errors when :ref:`running the
-test suite <running-unit-tests>` with warnings enabled:
+As the :ref:`deprecation policy<internal-release-deprecation-policy>`
+describes, the first release of Django that deprecates a feature (``A.B``)
+should raise a ``RemovedInDjangoXXWarning`` (where XX is the Django version
+where the feature will be removed) when the deprecated feature is invoked.
+Assuming we have good test coverage, these warnings are converted to errors
+when :ref:`running the test suite <running-unit-tests>` with warnings enabled:
 ``python -Wa runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
 you need to eliminate or silence any warnings generated when running the tests.
 
-The first step is to remove any use of the deprecated behavior by Django itself.
-Next you can silence warnings in tests that actually test the deprecated
-behavior by using the ``ignore_warnings`` decorator, either at the test or class
-level:
+The first step is to remove any use of the deprecated behavior by Django
+itself. Next you can silence warnings in tests that actually test the
+deprecated behavior by using the ``ignore_warnings`` decorator, either at the
+test or class level:
 
 #) In a particular test::
 
@@ -305,8 +308,9 @@ Finally, there are a couple of updates to Django's documentation to make:
    applicable, to the current release notes (``docs/releases/A.B.txt``) under
    the "Features deprecated in A.B" heading.
 
-#) Add an entry in the deprecation timeline (``docs/internals/deprecation.txt``)
-   under the appropriate version describing what code will be removed.
+#) Add an entry in the deprecation timeline
+   (``docs/internals/deprecation.txt``) under the appropriate version
+   describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
 In each :term:`feature release <Feature release>`, all
@@ -402,10 +406,10 @@ Bugs
 
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
-* If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
-  to the stable version of Django, is there a release note in
-  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the main
-  branch don't need a release note.
+* If it's a bug that :ref:`qualifies for a backport
+  <supported-versions-policy>` to the stable version of Django, is there a
+  release note in ``docs/releases/A.B.C.txt``? Bug fixes that will be applied
+  only to the main branch don't need a release note.
 
 New Features
 ------------

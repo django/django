@@ -172,8 +172,8 @@ Other bugfixes and changes
 * Wrapped database exceptions in ``_set_autocommit``
   (:ticket:`22321`).
 
-* Fixed atomicity when closing a database connection or when the database server
-  disconnects (:ticket:`21239` and :ticket:`21202`)
+* Fixed atomicity when closing a database connection or when the database
+  server disconnects (:ticket:`21239` and :ticket:`21202`)
 
 * Fixed regression in ``prefetch_related`` that caused the related objects
   query to include an unnecessary join

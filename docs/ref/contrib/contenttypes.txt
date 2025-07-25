@@ -188,8 +188,8 @@ The ``ContentTypeManager``
 
     .. method:: get_for_id(id)
 
-        Lookup a :class:`~django.contrib.contenttypes.models.ContentType` by ID.
-        Since this method uses the same shared cache as
+        Lookup a :class:`~django.contrib.contenttypes.models.ContentType` by
+        ID. Since this method uses the same shared cache as
         :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`,
         it's preferred to use this method over the usual
         ``ContentType.objects.get(pk=id)``
@@ -338,10 +338,11 @@ model:
 .. admonition:: Serializing references to ``ContentType`` objects
 
    If you're serializing data (for example, when generating
-   :class:`~django.test.TransactionTestCase.fixtures`) from a model that implements
-   generic relations, you should probably be using a natural key to uniquely
-   identify related :class:`~django.contrib.contenttypes.models.ContentType`
-   objects. See :ref:`natural keys<topics-serialization-natural-keys>` and
+   :class:`~django.test.TransactionTestCase.fixtures`) from a model that
+   implements generic relations, you should probably be using a natural key to
+   uniquely identify related
+   :class:`~django.contrib.contenttypes.models.ContentType` objects. See
+   :ref:`natural keys<topics-serialization-natural-keys>` and
    :option:`dumpdata --natural-foreign` for more information.
 
 This will enable an API similar to the one used for a normal

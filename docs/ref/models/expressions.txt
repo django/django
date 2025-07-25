@@ -261,8 +261,8 @@ different fields with arithmetic::
 
 If the fields that you're combining are of different types you'll need to tell
 Django what kind of field will be returned. Most expressions support
-:ref:`output_field<output-field>` for this case, but since ``F()`` does not, you
-will need to wrap the expression with :class:`ExpressionWrapper`::
+:ref:`output_field<output-field>` for this case, but since ``F()`` does not,
+you will need to wrap the expression with :class:`ExpressionWrapper`::
 
     from django.db.models import DateTimeField, ExpressionWrapper, F
 
@@ -404,14 +404,15 @@ The ``Func`` API is as follows:
                     )
 
         To avoid an SQL injection vulnerability, ``extra_context`` :ref:`must
-        not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
-        as these values are interpolated into the SQL string rather than passed
-        as query parameters, where the database driver would escape them.
+        not contain untrusted user input
+        <avoiding-sql-injection-in-query-expressions>` as these values are
+        interpolated into the SQL string rather than passed as query
+        parameters, where the database driver would escape them.
 
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
-joined together with ``arg_joiner``, and then interpolated into the ``template``
-as the ``expressions`` placeholder.
+joined together with ``arg_joiner``, and then interpolated into the
+``template`` as the ``expressions`` placeholder.
 
 Positional arguments can be expressions or Python values. Strings are
 assumed to be column references and will be wrapped in ``F()`` expressions
@@ -1381,14 +1382,17 @@ class::
 
     Length.as_sqlserver = sqlserver_length
 
-You can also customize the SQL using the ``template`` parameter of ``as_sql()``.
+You can also customize the SQL using the ``template`` parameter of
+``as_sql()``.
 
 We use ``as_sqlserver()`` because ``django.db.connection.vendor`` returns
 ``sqlserver`` for the backend.
 
 Third-party backends can register their functions in the top level
-``__init__.py`` file of the backend package or in a top level ``expressions.py``
-file (or package) that is imported from the top level ``__init__.py``.
+``__init__.py`` file of the backend package or in a top level
+``expressions.py`` file (or package) that is imported from the top level
+``__init__.py``.
 
 For user projects wishing to patch the backend that they're using, this code
-should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>` method.
+should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>`
+method.

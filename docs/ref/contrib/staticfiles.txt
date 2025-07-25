@@ -67,12 +67,12 @@ This is used by the
 default.
 
 By default, collected files receive permissions from
-:setting:`FILE_UPLOAD_PERMISSIONS` and collected directories receive permissions
-from :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`. If you would like different
-permissions for these files and/or directories, you can subclass either of the
-:ref:`static files storage classes <staticfiles-storages>` and specify the
-``file_permissions_mode`` and/or ``directory_permissions_mode`` parameters,
-respectively. For example::
+:setting:`FILE_UPLOAD_PERMISSIONS` and collected directories receive
+permissions from :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`. If you would
+like different permissions for these files and/or directories, you can subclass
+either of the :ref:`static files storage classes <staticfiles-storages>` and
+specify the ``file_permissions_mode`` and/or ``directory_permissions_mode``
+parameters, respectively. For example::
 
     from django.contrib.staticfiles import storage
 
@@ -280,10 +280,11 @@ counterparts and update the cache appropriately.
 
 .. class:: storage.ManifestStaticFilesStorage
 
-A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
-storage backend which stores the file names it handles by appending the MD5
-hash of the file's content to the filename. For example, the file
-``css/styles.css`` would also be saved as ``css/styles.55e7cbb9ba48.css``.
+A subclass of the
+:class:`~django.contrib.staticfiles.storage.StaticFilesStorage` storage backend
+which stores the file names it handles by appending the MD5 hash of the file's
+content to the filename. For example, the file ``css/styles.css`` would also be
+saved as ``css/styles.55e7cbb9ba48.css``.
 
 The purpose of this storage is to keep serving the old files in case some
 pages still refer to those files, e.g. because they are cached by you or
@@ -551,12 +552,13 @@ Specialized test case to support 'live testing'
 
 .. class:: testing.StaticLiveServerTestCase
 
-This unittest TestCase subclass extends :class:`django.test.LiveServerTestCase`.
+This unittest TestCase subclass extends
+:class:`django.test.LiveServerTestCase`.
 
 Just like its parent, you can use it to write tests that involve running the
-code under test and consuming it with testing tools through HTTP (e.g. Selenium,
-PhantomJS, etc.), because of which it's needed that the static assets are also
-published.
+code under test and consuming it with testing tools through HTTP (e.g.
+Selenium, PhantomJS, etc.), because of which it's needed that the static assets
+are also published.
 
 But given the fact that it makes use of the
 :func:`django.contrib.staticfiles.views.serve` view described above, it can

@@ -86,11 +86,12 @@ set by some proxy configurations.
 It has been demonstrated that this mechanism cannot be made reliable enough for
 general-purpose use, and that (despite documentation to the contrary) its
 inclusion in Django may lead application developers to assume that the value of
-``REMOTE_ADDR`` is "safe" or in some way reliable as a source of authentication.
+``REMOTE_ADDR`` is "safe" or in some way reliable as a source of
+authentication.
 
 While not directly a security issue, we've decided to remove this middleware
-with the Django 1.1 release. It has been replaced with a class that does nothing
-other than raise a ``DeprecationWarning``.
+with the Django 1.1 release. It has been replaced with a class that does
+nothing other than raise a ``DeprecationWarning``.
 
 If you've been relying on this middleware, the easiest upgrade path is:
 
@@ -124,10 +125,10 @@ Changes to how model formsets are saved
 In Django 1.1, :class:`~django.forms.models.BaseModelFormSet` now calls
 ``ModelForm.save()``.
 
-This is backwards-incompatible if you were modifying ``self.initial`` in a model
-formset's ``__init__``, or if you relied on the internal ``_total_form_count``
-or ``_initial_form_count`` attributes of BaseFormSet. Those attributes are now
-public methods.
+This is backwards-incompatible if you were modifying ``self.initial`` in a
+model formset's ``__init__``, or if you relied on the internal
+``_total_form_count`` or ``_initial_form_count`` attributes of BaseFormSet.
+Those attributes are now public methods.
 
 Fixed the ``join`` filter's escaping behavior
 ---------------------------------------------
@@ -224,11 +225,11 @@ A number of features have been added to Django's model layer:
 "Unmanaged" models
 ~~~~~~~~~~~~~~~~~~
 
-You can now control whether or not Django manages the life-cycle of the database
-tables for a model using the :attr:`~Options.managed` model option. This
-defaults to ``True``, meaning that Django will create the appropriate database
-tables in ``syncdb`` and remove them as part of the ``reset``
-command. That is, Django *manages* the database table's lifecycle.
+You can now control whether or not Django manages the life-cycle of the
+database tables for a model using the :attr:`~Options.managed` model option.
+This defaults to ``True``, meaning that Django will create the appropriate
+database tables in ``syncdb`` and remove them as part of the ``reset`` command.
+That is, Django *manages* the database table's lifecycle.
 
 If you set this to ``False``, however, no database table creating or deletion
 will be automatically performed for this model. This is useful if the model
@@ -275,15 +276,16 @@ Test performance improvements
 
 .. currentmodule:: django.test
 
-Tests written using Django's :doc:`testing framework </topics/testing/index>` now run
-dramatically faster (as much as 10 times faster in many cases).
+Tests written using Django's :doc:`testing framework </topics/testing/index>`
+now run dramatically faster (as much as 10 times faster in many cases).
 
 This was accomplished through the introduction of transaction-based tests: when
-using :class:`django.test.TestCase`, your tests will now be run in a transaction
-which is rolled back when finished, instead of by flushing and re-populating the
-database. This results in an immense speedup for most types of unit tests. See
-the documentation for :class:`TestCase` and :class:`TransactionTestCase` for a
-full description, and some important notes on database support.
+using :class:`django.test.TestCase`, your tests will now be run in a
+transaction which is rolled back when finished, instead of by flushing and
+re-populating the database. This results in an immense speedup for most types
+of unit tests. See the documentation for :class:`TestCase` and
+:class:`TransactionTestCase` for a full description, and some important notes
+on database support.
 
 Test client improvements
 ------------------------
@@ -339,11 +341,11 @@ URL namespaces
 Django 1.1 improves :ref:`named URL patterns <naming-url-patterns>` with the
 introduction of URL "namespaces."
 
-In short, this feature allows the same group of URLs, from the same application,
-to be included in a Django URLConf multiple times, with varying (and potentially
-nested) named prefixes which will be used when performing reverse resolution. In
-other words, reusable applications like Django's admin interface may be
-registered multiple times without URL conflicts.
+In short, this feature allows the same group of URLs, from the same
+application, to be included in a Django URLConf multiple times, with varying
+(and potentially nested) named prefixes which will be used when performing
+reverse resolution. In other words, reusable applications like Django's admin
+interface may be registered multiple times without URL conflicts.
 
 For full details, see :ref:`the documentation on defining URL namespaces
 <topics-http-defining-url-namespaces>`.
@@ -391,22 +393,21 @@ Other new features and changes introduced since Django 1.0 include:
 * The ``include()`` function in Django URLconf modules can now accept sequences
   of URL patterns (generated by ``patterns()``) in addition to module names.
 
-* Instances of Django forms (see :doc:`the forms overview </topics/forms/index>`)
-  now have two additional methods, ``hidden_fields()`` and ``visible_fields()``,
-  which return the list of hidden -- i.e., ``<input type="hidden">`` -- and
-  visible fields on the form, respectively.
+* Instances of Django forms (see :doc:`the forms overview
+  </topics/forms/index>`) now have two additional methods, ``hidden_fields()``
+  and ``visible_fields()``, which return the list of hidden -- i.e.,
+  ``<input type="hidden">`` -- and visible fields on the form, respectively.
 
 * The ``redirect_to`` generic view
-  now accepts an additional keyword argument
-  ``permanent``. If ``permanent`` is ``True``, the view will emit an HTTP
-  permanent redirect (status code 301). If ``False``, the view will emit an HTTP
-  temporary redirect (status code 302).
+  now accepts an additional keyword argument ``permanent``. If ``permanent`` is
+  ``True``, the view will emit an HTTP permanent redirect (status code 301). If
+  ``False``, the view will emit an HTTP temporary redirect (status code 302).
 
-* A new database lookup type -- ``week_day`` -- has been added for ``DateField``
-  and ``DateTimeField``. This type of lookup accepts a number between 1 (Sunday)
-  and 7 (Saturday), and returns objects where the field value matches that day
-  of the week. See :ref:`the full list of lookup types <field-lookups>` for
-  details.
+* A new database lookup type -- ``week_day`` -- has been added for
+  ``DateField`` and ``DateTimeField``. This type of lookup accepts a number
+  between 1 (Sunday) and 7 (Saturday), and returns objects where the field
+  value matches that day of the week. See :ref:`the full list of lookup types
+  <field-lookups>` for details.
 
 * The ``{% for %}`` tag in Django's template language now accepts an optional
   ``{% empty %}`` clause, to be displayed when ``{% for %}`` is asked to loop
@@ -453,7 +454,7 @@ Django:
 * :doc:`How to contribute to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
-triaging tickets and helping to test proposed bugfixes -- are always welcome and
-appreciated.
+triaging tickets and helping to test proposed bugfixes -- are always welcome
+and appreciated.
 
 And that's the way it is.

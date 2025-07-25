@@ -15,13 +15,14 @@ have loaded in a hidden frame or iframe.
 An example of clickjacking
 ==========================
 
-Suppose an online store has a page where a logged-in user can click "Buy Now" to
-purchase an item. A user has chosen to stay logged into the store all the time
-for convenience. An attacker site might create an "I Like Ponies" button on one
-of their own pages, and load the store's page in a transparent iframe such that
-the "Buy Now" button is invisibly overlaid on the "I Like Ponies" button. If the
-user visits the attacker's site, clicking "I Like Ponies" will cause an
-inadvertent click on the "Buy Now" button and an unknowing purchase of the item.
+Suppose an online store has a page where a logged-in user can click "Buy Now"
+to purchase an item. A user has chosen to stay logged into the store all the
+time for convenience. An attacker site might create an "I Like Ponies" button
+on one of their own pages, and load the store's page in a transparent iframe
+such that the "Buy Now" button is invisibly overlaid on the "I Like Ponies"
+button. If the user visits the attacker's site, clicking "I Like Ponies" will
+cause an inadvertent click on the "Buy Now" button and an unknowing purchase of
+the item.
 
 .. _clickjacking-prevention:
 
@@ -93,8 +94,8 @@ that tells the middleware not to set the header::
 Setting ``X-Frame-Options`` per view
 ------------------------------------
 
-To set the ``X-Frame-Options`` header on a per view basis, Django provides these
-decorators::
+To set the ``X-Frame-Options`` header on a per view basis, Django provides
+these decorators::
 
     from django.http import HttpResponse
     from django.views.decorators.clickjacking import xframe_options_deny

@@ -102,9 +102,10 @@ Single object mixins
 
         Returns context data for displaying the object.
 
-        The base implementation of this method requires that the ``self.object``
-        attribute be set by the view (even if ``None``). Be sure to do this if
-        you are using this mixin without one of the built-in views that does so.
+        The base implementation of this method requires that the
+        ``self.object`` attribute be set by the view (even if ``None``). Be
+        sure to do this if you are using this mixin without one of the built-in
+        views that does so.
 
         It returns a dictionary with these contents:
 

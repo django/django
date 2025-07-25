@@ -108,9 +108,9 @@ All are optional.
 
 .. attribute:: BaseSpatialField.srid
 
-Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry field to
-the given value. Defaults to 4326 (also known as `WGS84`__, units are in degrees
-of longitude and latitude).
+Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry
+field to the given value. Defaults to 4326 (also known as `WGS84`__, units are
+in degrees of longitude and latitude).
 
 __ https://en.wikipedia.org/wiki/WGS84
 
@@ -121,12 +121,12 @@ Selecting an SRID
 
 Choosing an appropriate SRID for your model is an important decision that the
 developer should consider carefully. The SRID is an integer specifier that
-corresponds to the projection system that will be used to interpret the data
-in the spatial database. [#fnsrid]_  Projection systems give the context to the
+corresponds to the projection system that will be used to interpret the data in
+the spatial database. [#fnsrid]_  Projection systems give the context to the
 coordinates that specify a location. Although the details of `geodesy`__ are
 beyond the scope of this documentation, the general problem is that the earth
-is spherical and representations of the earth (e.g., paper maps, web maps)
-are not.
+is spherical and representations of the earth (e.g., paper maps, web maps) are
+not.
 
 Most people are familiar with using latitude and longitude to reference a
 location on the earth's surface. However, latitude and longitude are angles,
@@ -139,7 +139,7 @@ Thus, additional computation is required to obtain distances in planar units
 (e.g., kilometers and miles). Using a geographic coordinate system may
 introduce complications for the developer later on. For example, SpatiaLite
 does not have the capability to perform distance calculations between
-geometries using geographic coordinate systems, e.g. constructing a query to 
+geometries using geographic coordinate systems, e.g. constructing a query to
 find all points within 5 miles of a county boundary stored as WGS84. [#fndist]_
 
 Portions of the earth's surface may projected onto a two-dimensional, or
@@ -263,7 +263,7 @@ geography column to a geometry type in the query::
 
 For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
-<https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
+<https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`__.
 
 .. rubric:: Footnotes
 .. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <https://www.ogc.org/standard/sfs/>`_.

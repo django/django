@@ -165,7 +165,8 @@ Minor features
 
 * You can now specify :attr:`ModelAdmin.show_full_result_count
   <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
-  or not the full count of objects should be displayed on a filtered admin page.
+  or not the full count of objects should be displayed on a filtered admin
+  page.
 
 * The ``AdminSite.password_change()`` method now has an ``extra_context``
   parameter.
@@ -219,7 +220,8 @@ Minor features
   available.
 
 * It is now allowed to include a subquery as a geographic lookup argument, for
-  example ``City.objects.filter(point__within=Country.objects.filter(continent='Africa').values('mpoly'))``.
+  example
+  ``City.objects.filter(point__within=Country.objects.filter(continent='Africa').values('mpoly'))``.
 
 * The SpatiaLite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
@@ -280,10 +282,10 @@ Database backends
 
 * The MySQL backend no longer strips microseconds from ``datetime`` values as
   MySQL 5.6.4 and up supports fractional seconds depending on the declaration
-  of the datetime field (when ``DATETIME`` includes fractional precision greater
-  than 0). New datetime database columns created with Django 1.8 and MySQL 5.6.4
-  and up will support microseconds. See the :ref:`MySQL database notes
-  <mysql-fractional-seconds>` for more details.
+  of the datetime field (when ``DATETIME`` includes fractional precision
+  greater than 0). New datetime database columns created with Django 1.8 and
+  MySQL 5.6.4 and up will support microseconds. See the :ref:`MySQL database
+  notes <mysql-fractional-seconds>` for more details.
 
 * The MySQL backend no longer creates explicit indexes for foreign keys when
   using the InnoDB storage engine, as MySQL already creates them automatically.
@@ -350,11 +352,11 @@ Forms
   override the top list choice label when :class:`~django.forms.DateField`
   is not required.
 
-* After an :class:`~django.forms.ImageField` has been cleaned and validated, the
-  ``UploadedFile`` object will have an additional ``image`` attribute containing
-  the Pillow ``Image`` instance used to check if the file was a valid image. It
-  will also update ``UploadedFile.content_type`` with the image's content type
-  as determined by Pillow.
+* After an :class:`~django.forms.ImageField` has been cleaned and validated,
+  the ``UploadedFile`` object will have an additional ``image`` attribute
+  containing the Pillow ``Image`` instance used to check if the file was a
+  valid image. It will also update ``UploadedFile.content_type`` with the
+  image's content type as determined by Pillow.
 
 * You can now pass a callable that returns an iterable of choices when
   instantiating a :class:`~django.forms.ChoiceField`.
@@ -362,8 +364,9 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* Generic views that use :class:`~django.views.generic.list.MultipleObjectMixin`
-  may now specify the ordering applied to the
+* Generic views that use
+  :class:`~django.views.generic.list.MultipleObjectMixin` may now specify the
+  ordering applied to the
   :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` by setting
   :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` or overriding
   :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering`.
@@ -375,12 +378,13 @@ Generic Views
   so that it'll perform its lookup using both the primary key and the slug.
 
 * The :meth:`~django.views.generic.edit.FormMixin.get_form` method doesn't
-  require a ``form_class`` to be provided anymore. If not provided ``form_class``
-  defaults to :meth:`~django.views.generic.edit.FormMixin.get_form_class`.
+  require a ``form_class`` to be provided anymore. If not provided
+  ``form_class`` defaults to
+  :meth:`~django.views.generic.edit.FormMixin.get_form_class`.
 
 * Placeholders in :attr:`ModelFormMixin.success_url
-  <django.views.generic.edit.ModelFormMixin.success_url>` now support the Python
-  :py:meth:`str.format` syntax. The legacy ``%(<foo>)s`` syntax is still
+  <django.views.generic.edit.ModelFormMixin.success_url>` now support the
+  Python :py:meth:`str.format` syntax. The legacy ``%(<foo>)s`` syntax is still
   supported but will be removed in Django 1.10.
 
 Internationalization
@@ -455,8 +459,8 @@ Middleware
   attribute allows you to customize the redirects issued by the middleware.
 
 * A debug message will be logged to the ``django.request`` logger when a
-  middleware raises a :exc:`~django.core.exceptions.MiddlewareNotUsed` exception
-  in :setting:`DEBUG` mode.
+  middleware raises a :exc:`~django.core.exceptions.MiddlewareNotUsed`
+  exception in :setting:`DEBUG` mode.
 
 Migrations
 ~~~~~~~~~~
@@ -528,7 +532,8 @@ Models
   <django.db.models.Model.refresh_from_db>`.
 
 * You can now get the set of deferred fields for a model using
-  :meth:`Model.get_deferred_fields() <django.db.models.Model.get_deferred_fields>`.
+  :meth:`Model.get_deferred_fields()
+  <django.db.models.Model.get_deferred_fields>`.
 
 * Model field ``default``’s are now used when primary key field's are set to
   ``None``.
@@ -556,8 +561,8 @@ System Check Framework
 Templates
 ~~~~~~~~~
 
-* :tfilter:`urlize` now supports domain-only links that include characters after
-  the top-level domain (e.g. ``djangoproject.com/`` and
+* :tfilter:`urlize` now supports domain-only links that include characters
+  after the top-level domain (e.g. ``djangoproject.com/`` and
   ``djangoproject.com/download/``).
 
 * :tfilter:`urlize` doesn't treat exclamation marks at the end of a domain or
@@ -648,8 +653,8 @@ Tests
 
 * Added test client support for file uploads with file-like objects.
 
-* A shared cache is now used when testing with an SQLite in-memory database when
-  using Python 3.4+ and SQLite 3.7.13+. This allows sharing the database
+* A shared cache is now used when testing with an SQLite in-memory database
+  when using Python 3.4+ and SQLite 3.7.13+. This allows sharing the database
   between threads.
 
 Validators
@@ -694,7 +699,8 @@ Assigning unsaved objects to relations raises an error
 .. note::
 
     To more easily allow in-memory usage of models, this change was reverted in
-    Django 1.8.4 and replaced with a check during ``model.save()``. For example:
+    Django 1.8.4 and replaced with a check during ``model.save()``. For
+    example:
 
     .. code-block:: pycon
 
@@ -840,8 +846,8 @@ your current fields). A migration for
 Support for PostgreSQL versions older than 9.0
 ----------------------------------------------
 
-The end of upstream support periods was reached in July 2014 for PostgreSQL 8.4.
-As a consequence, Django 1.8 sets 9.0 as the minimum PostgreSQL version it
+The end of upstream support periods was reached in July 2014 for PostgreSQL
+8.4. As a consequence, Django 1.8 sets 9.0 as the minimum PostgreSQL version it
 officially supports.
 
 This also includes dropping support for PostGIS 1.3 and 1.4 as these versions
@@ -877,11 +883,12 @@ creating a test user). The exact privileges required now are detailed in
 ``AbstractUser.last_login`` allows null values
 ----------------------------------------------
 
-The :attr:`AbstractUser.last_login <django.contrib.auth.models.User.last_login>`
-field now allows null values. Previously, it defaulted to the time when the user
-was created which was misleading if the user never logged in. If you are using
-the default user (:class:`django.contrib.auth.models.User`), run the database
-migration included in ``contrib.auth``.
+The :attr:`AbstractUser.last_login
+<django.contrib.auth.models.User.last_login>` field now allows null values.
+Previously, it defaulted to the time when the user was created which was
+misleading if the user never logged in. If you are using the default user
+(:class:`django.contrib.auth.models.User`), run the database migration included
+in ``contrib.auth``.
 
 If you are using a custom user model that inherits from ``AbstractUser``,
 you'll need to run :djadmin:`makemigrations` and generate a migration for your
@@ -917,14 +924,14 @@ for users who haven't logged in, you can run this query::
 Priority of context processors for ``TemplateResponse`` brought in line with ``render``
 ---------------------------------------------------------------------------------------
 
-The :class:`~django.template.response.TemplateResponse` constructor is designed to be a
-drop-in replacement for the :func:`~django.shortcuts.render` function. However,
-it had a slight incompatibility, in that for ``TemplateResponse``, context data
-from the passed in context dictionary could be shadowed by context data returned
-from context processors, whereas for ``render`` it was the other way
-around. This was a bug, and the behavior of ``render`` is more appropriate,
-since it allows the globally defined context processors to be overridden locally
-in the view. If you were relying on the fact context data in a
+The :class:`~django.template.response.TemplateResponse` constructor is designed
+to be a drop-in replacement for the :func:`~django.shortcuts.render` function.
+However, it had a slight incompatibility, in that for ``TemplateResponse``,
+context data from the passed in context dictionary could be shadowed by context
+data returned from context processors, whereas for ``render`` it was the other
+way around. This was a bug, and the behavior of ``render`` is more appropriate,
+since it allows the globally defined context processors to be overridden
+locally in the view. If you were relying on the fact context data in a
 ``TemplateResponse`` could be overridden using a context processor, you will
 need to change your code.
 
@@ -1281,9 +1288,9 @@ written (and is better written) as::
         url("^other/$", views.otherview),
     )
 
-Thus ``patterns()`` serves little purpose and is a burden when teaching new users
-(answering the newbie's question "why do I need this empty string as the first
-argument to ``patterns()``?"). For these reasons, we are deprecating it.
+Thus ``patterns()`` serves little purpose and is a burden when teaching new
+users (answering the newbie's question "why do I need this empty string as the
+first argument to ``patterns()``?"). For these reasons, we are deprecating it.
 Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
 ``django.conf.urls.url()`` instances. For example::
 
@@ -1362,10 +1369,12 @@ the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
         name="django.contrib.sitemaps.views.sitemap",
     )
 
-to ensure compatibility when reversing by Python path is removed in Django 1.10.
+to ensure compatibility when reversing by Python path is removed in Django
+1.10.
 
-Similarly for GIS sitemaps, add ``name='django.contrib.gis.sitemaps.views.kml'``
-or ``name='django.contrib.gis.sitemaps.views.kmz'``.
+Similarly for GIS sitemaps, add
+``name='django.contrib.gis.sitemaps.views.kml'`` or
+``name='django.contrib.gis.sitemaps.views.kmz'``.
 
 If you are using a Python path for the :setting:`LOGIN_URL` or
 :setting:`LOGIN_REDIRECT_URL` setting, use the name of the ``url()`` instead.
@@ -1376,10 +1385,10 @@ Aggregate methods and modules
 -----------------------------
 
 The ``django.db.models.sql.aggregates`` and
-``django.contrib.gis.db.models.sql.aggregates`` modules (both private API), have
-been deprecated as ``django.db.models.aggregates`` and
-``django.contrib.gis.db.models.aggregates`` are now also responsible
-for SQL generation. The old modules will be removed in Django 1.10.
+``django.contrib.gis.db.models.sql.aggregates`` modules (both private API),
+have been deprecated as ``django.db.models.aggregates`` and
+``django.contrib.gis.db.models.aggregates`` are now also responsible for SQL
+generation. The old modules will be removed in Django 1.10.
 
 If you were using the old modules, see :doc:`Query Expressions
 </ref/models/expressions>` for instructions on rewriting custom aggregates
@@ -1487,9 +1496,9 @@ It's a legacy option that should no longer be necessary.
 ----------------
 
 ``django.db.models.fields.subclassing.SubfieldBase`` has been deprecated and
-will be removed in Django 1.10. Historically, it was used to handle fields where
-type conversion was needed when loading from the database, but it was not used
-in ``.values()`` calls or in aggregates. It has been replaced with
+will be removed in Django 1.10. Historically, it was used to handle fields
+where type conversion was needed when loading from the database, but it was not
+used in ``.values()`` calls or in aggregates. It has been replaced with
 :meth:`~django.db.models.Field.from_db_value`.
 
 The new approach doesn't call the :meth:`~django.db.models.Field.to_python`
@@ -1522,7 +1531,7 @@ sure to provide a default value for the ``form_class`` argument since it's
 now optional.
 
 Rendering templates loaded by :func:`~django.template.loader.get_template` with a :class:`~django.template.Context`
----------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
 
 The return type of :func:`~django.template.loader.get_template` has changed
 in Django 1.8: instead of a :class:`django.template.Template`, it returns a
@@ -1638,21 +1647,21 @@ deprecated: you should rename your ``qn`` arguments to ``compiler``, and call
 Default value of ``RedirectView.permanent``
 -------------------------------------------
 
-The default value of the
-:attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
-attribute will change from ``True`` to ``False`` in Django 1.9.
+The default value of the :attr:`RedirectView.permanent
+<django.views.generic.base.RedirectView.permanent>` attribute will change from
+``True`` to ``False`` in Django 1.9.
 
 Using ``AuthenticationMiddleware`` without ``SessionAuthenticationMiddleware``
 ------------------------------------------------------------------------------
 
-``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` was
-added in Django 1.7. In Django 1.7.2, its functionality was moved to
-``auth.get_user()`` and, for backwards compatibility, enabled only if
+``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` was added in
+Django 1.7. In Django 1.7.2, its functionality was moved to ``auth.get_user()``
+and, for backwards compatibility, enabled only if
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
 ``MIDDLEWARE_CLASSES``.
 
-In Django 1.10, session verification will be enabled regardless of whether or not
-``SessionAuthenticationMiddleware`` is enabled (at which point
+In Django 1.10, session verification will be enabled regardless of whether or
+not ``SessionAuthenticationMiddleware`` is enabled (at which point
 ``SessionAuthenticationMiddleware`` will have no significance). You can add it
 to your ``MIDDLEWARE_CLASSES`` sometime before then to opt-in. Please read the
 :ref:`upgrade considerations <session-invalidation-on-password-change>` first.
@@ -1784,8 +1793,8 @@ remove usage of these features.
   deprecation warning in the latter class.
 
 * Usage of the hardcoded *Hold down "Control", or "Command" on a Mac, to select
-  more than one.* string to override or append to user-provided ``help_text`` in
-  forms for ``ManyToMany`` model fields is not performed by Django anymore
+  more than one.* string to override or append to user-provided ``help_text``
+  in forms for ``ManyToMany`` model fields is not performed by Django anymore
   either at the model or forms layer.
 
 * The ``Model._meta.get_(add|change|delete)_permission`` methods are removed.

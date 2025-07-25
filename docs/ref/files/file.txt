@@ -36,11 +36,11 @@ The ``File`` class
             Some subclasses of :class:`File`, including
             :class:`~django.core.files.base.ContentFile` and
             :class:`~django.db.models.fields.files.FieldFile`, may replace this
-            attribute with an object other than a Python :py:term:`file object`.
-            In these cases, this attribute may itself be a :class:`File`
-            subclass (and not necessarily the same subclass). Whenever
-            possible, use the attributes and methods of the subclass itself
-            rather than the those of the subclass's ``file`` attribute.
+            attribute with an object other than a Python :py:term:`file
+            object`. In these cases, this attribute may itself be a
+            :class:`File` subclass (and not necessarily the same subclass).
+            Whenever possible, use the attributes and methods of the subclass
+            itself rather than the those of the subclass's ``file`` attribute.
 
     .. attribute:: mode
 

@@ -438,10 +438,10 @@ Next, we mark the current point in history as being "bad" since the test fails:
 
 Now, we need to find a point in git history before the regression was
 introduced (i.e. a point where the test passes). Use something like
-``git checkout HEAD~100`` to check out an earlier revision (100 commits earlier,
-in this case). Check if the test fails. If so, mark that point as "bad"
-(``git bisect bad``), then check out an earlier revision and recheck. Once you
-find a revision where your test passes, mark it as "good":
+``git checkout HEAD~100`` to check out an earlier revision (100 commits
+earlier, in this case). Check if the test fails. If so, mark that point as
+"bad" (``git bisect bad``), then check out an earlier revision and recheck.
+Once you find a revision where your test passes, mark it as "good":
 
 .. code-block:: shell
 

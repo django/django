@@ -160,7 +160,8 @@ read it. This is especially important in a shared-hosting environment.
 Available settings
 ==================
 
-For a full list of available settings, see the :doc:`settings reference </ref/settings>`.
+For a full list of available settings, see the
+:doc:`settings reference </ref/settings>`.
 
 Creating your own settings
 ==========================

@@ -10,8 +10,8 @@ views.
 
 Many of Django's built-in class-based views inherit from other class-based
 views or various mixins. Because this inheritance chain is very important, the
-ancestor classes are  documented under the section title of **Ancestors (MRO)**.
-MRO is an acronym for Method Resolution Order.
+ancestor classes are  documented under the section title of **Ancestors
+(MRO)**. MRO is an acronym for Method Resolution Order.
 
 ``View``
 ========
@@ -103,9 +103,9 @@ MRO is an acronym for Method Resolution Order.
         delegate to a method that matches the HTTP method; a ``GET`` will be
         delegated to ``get()``, a ``POST`` to ``post()``, and so on.
 
-        By default, a ``HEAD`` request will be delegated to ``get()``.
-        If you need to handle ``HEAD`` requests in a different way than ``GET``,
-        you can override the ``head()`` method. See
+        By default, a ``HEAD`` request will be delegated to ``get()``. If you
+        need to handle ``HEAD`` requests in a different way than ``GET``, you
+        can override the ``head()`` method. See
         :ref:`supporting-other-http-methods` for an example.
 
     .. method:: http_method_not_allowed(request, *args, **kwargs)

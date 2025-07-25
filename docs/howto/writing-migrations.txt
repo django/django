@@ -173,7 +173,8 @@ the respective field according to your needs.
             migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
         ]
 
-* Now you can apply the migrations as usual with the :djadmin:`migrate` command.
+* Now you can apply the migrations as usual with the :djadmin:`migrate`
+  command.
 
   Note there is a race condition if you allow objects to be created while this
   migration is running. Objects created after the ``AddField`` and before
@@ -277,12 +278,13 @@ Migrating data between third-party apps
 You can use a data migration to move data from one third-party application to
 another.
 
-If you plan to remove the old app later, you'll need to set the ``dependencies``
-property based on whether or not the old app is installed. Otherwise, you'll
-have missing dependencies once you uninstall the old app. Similarly, you'll
-need to catch :exc:`LookupError` in the ``apps.get_model()`` call that
-retrieves models from the old app. This approach allows you to deploy your
-project anywhere without first installing and then uninstalling the old app.
+If you plan to remove the old app later, you'll need to set the
+``dependencies`` property based on whether or not the old app is installed.
+Otherwise, you'll have missing dependencies once you uninstall the old app.
+Similarly, you'll need to catch :exc:`LookupError` in the ``apps.get_model()``
+call that retrieves models from the old app. This approach allows you to deploy
+your project anywhere without first installing and then uninstalling the old
+app.
 
 Here's a sample migration:
 

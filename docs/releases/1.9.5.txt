@@ -47,5 +47,5 @@ Bugfixes
 * Fixed a migrations crash on SQLite when renaming the primary key of a model
   containing a ``ForeignKey`` to ``'self'`` (:ticket:`26384`).
 
-* Fixed ``JSONField`` inadvertently escaping its contents when displaying values
-  after failed form validation (:ticket:`25532`).
+* Fixed ``JSONField`` inadvertently escaping its contents when displaying
+  values after failed form validation (:ticket:`25532`).

@@ -54,8 +54,8 @@ command and a list of its available options.
 App names
 ---------
 
-Many commands take a list of "app names." An "app name" is the basename of
-the package containing your models. For example, if your :setting:`INSTALLED_APPS`
+Many commands take a list of "app names." An "app name" is the basename of the
+package containing your models. For example, if your :setting:`INSTALLED_APPS`
 contains the string ``'mysite.blog'``, the app name is ``blog``.
 
 Determining the version
@@ -126,13 +126,14 @@ Lists all available tags.
 
 .. django-admin-option:: --deploy
 
-Activates some additional checks that are only relevant in a deployment setting.
+Activates some additional checks that are only relevant in a deployment
+setting.
 
 You can use this option in your local development environment, but since your
-local development settings module may not have many of your production settings,
-you will probably want to point the ``check`` command at a different settings
-module, either by setting the :envvar:`DJANGO_SETTINGS_MODULE` environment
-variable, or by passing the ``--settings`` option:
+local development settings module may not have many of your production
+settings, you will probably want to point the ``check`` command at a different
+settings module, either by setting the :envvar:`DJANGO_SETTINGS_MODULE`
+environment variable, or by passing the ``--settings`` option:
 
 .. console::
 
@@ -317,8 +318,8 @@ When result of ``dumpdata`` is saved as a file, it can serve as a
 
 Note that ``dumpdata`` uses the default manager on the model for selecting the
 records to dump. If you're using a :ref:`custom manager <custom-managers>` as
-the default manager and it filters some of the available records, not all of the
-objects will be dumped.
+the default manager and it filters some of the available records, not all of
+the objects will be dumped.
 
 .. django-admin-option:: --all, -a
 
@@ -459,12 +460,12 @@ Django doesn't create database defaults when a
 Similarly, database defaults aren't translated to model field defaults or
 detected in any fashion by ``inspectdb``.
 
-By default, ``inspectdb`` creates unmanaged models. That is, ``managed = False``
-in the model's ``Meta`` class tells Django not to manage each table's creation,
-modification, and deletion. If you do want to allow Django to manage the
-table's lifecycle, you'll need to change the
-:attr:`~django.db.models.Options.managed` option to ``True`` (or remove
-it because ``True`` is its default value).
+By default, ``inspectdb`` creates unmanaged models. That is, ``managed =
+False`` in the model's ``Meta`` class tells Django not to manage each table's
+creation, modification, and deletion. If you do want to allow Django to manage
+the table's lifecycle, you'll need to change the
+:attr:`~django.db.models.Options.managed` option to ``True`` (or remove it
+because ``True`` is its default value).
 
 Database-specific notes
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -860,8 +861,8 @@ optimized.
 .. django-admin:: runserver [addrport]
 
 Starts a lightweight development web server on the local machine. By default,
-the server runs on port 8000 on the IP address ``127.0.0.1``. You can pass in an
-IP address and port number explicitly.
+the server runs on port 8000 on the IP address ``127.0.0.1``. You can pass in
+an IP address and port number explicitly.
 
 If you run this script as a user with normal privileges (recommended), you
 might not have access to start a port on a low port number. Low port numbers
@@ -1234,10 +1235,10 @@ Specifies the database for which to print the SQL. Defaults to ``default``.
 
 .. django-admin:: squashmigrations app_label [start_migration_name] migration_name
 
-Squashes the migrations for ``app_label`` up to and including ``migration_name``
-down into fewer migrations, if possible. The resulting squashed migrations
-can live alongside the unsquashed ones safely. For more information,
-please read :ref:`migration-squashing`.
+Squashes the migrations for ``app_label`` up to and including
+``migration_name`` down into fewer migrations, if possible. The resulting
+squashed migrations can live alongside the unsquashed ones safely. For more
+information, please read :ref:`migration-squashing`.
 
 When ``start_migration_name`` is given, Django will only include migrations
 starting from and including this migration. This helps to mitigate the
@@ -1633,9 +1634,9 @@ For example, this command:
 
 This is useful in a number of ways:
 
-* When you're writing :doc:`unit tests </topics/testing/overview>` of how your views
-  act with certain fixture data, you can use ``testserver`` to interact with
-  the views in a web browser, manually.
+* When you're writing :doc:`unit tests </topics/testing/overview>` of how your
+  views act with certain fixture data, you can use ``testserver`` to interact
+  with the views in a web browser, manually.
 
 * Let's say you're developing your Django application and have a "pristine"
   copy of a database that you'd like to interact with. You can dump your
@@ -1758,10 +1759,10 @@ it when running interactively.
 
 Specifies the database into which the superuser object will be saved.
 
-You can subclass the management command and override ``get_input_data()`` if you
-want to customize data input and validation. Consult the source code for
-details on the existing implementation and the method's parameters. For example,
-it could be useful if you have a ``ForeignKey`` in
+You can subclass the management command and override ``get_input_data()`` if
+you want to customize data input and validation. Consult the source code for
+details on the existing implementation and the method's parameters. For
+example, it could be useful if you have a ``ForeignKey`` in
 :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` and want to
 allow creating an instance instead of entering the primary key of an existing
 instance.
@@ -1831,8 +1832,8 @@ Please refer to its :djadmin:`description <collectstatic>` in the
 This command is only available if the :doc:`static files application
 </howto/static-files/index>` (``django.contrib.staticfiles``) is installed.
 
-Please refer to its :djadmin:`description <findstatic>` in the :doc:`staticfiles
-</ref/contrib/staticfiles>` documentation.
+Please refer to its :djadmin:`description <findstatic>` in the
+:doc:`staticfiles </ref/contrib/staticfiles>` documentation.
 
 Default options
 ===============
@@ -2085,8 +2086,8 @@ Bash completion
 ---------------
 
 If you use the Bash shell, consider installing the Django bash completion
-script, which lives in :source:`extras/django_bash_completion` in the Django source
-distribution. It enables tab-completion of ``django-admin`` and
+script, which lives in :source:`extras/django_bash_completion` in the Django
+source distribution. It enables tab-completion of ``django-admin`` and
 ``manage.py`` commands, so you can, for instance...
 
 * Type ``django-admin``.
@@ -2150,7 +2151,8 @@ Examples::
       management.call_command(loaddata.Command(), "test_data", verbosity=0)
 
 Note that command options that take no arguments are passed as keywords
-with ``True`` or ``False``, as you can see with the ``interactive`` option above.
+with ``True`` or ``False``, as you can see with the ``interactive`` option
+above.
 
 Named arguments can be passed by using either one of the following syntaxes::
 

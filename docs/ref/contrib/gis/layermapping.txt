@@ -21,12 +21,12 @@ then inserting into a GeoDjango model.
 
 .. warning ::
 
-    GIS data sources, like shapefiles, may be very large. If you find
-    that :class:`LayerMapping` is using too much memory, set
-    :setting:`DEBUG` to ``False`` in your settings. When :setting:`DEBUG`
-    is set to ``True``, Django :ref:`automatically logs <faq-see-raw-sql-queries>`
-    *every* SQL query -- and when SQL statements contain geometries, this may
-    consume more memory than is typical.
+    GIS data sources, like shapefiles, may be very large. If you find that
+    :class:`LayerMapping` is using too much memory, set :setting:`DEBUG` to
+    ``False`` in your settings. When :setting:`DEBUG` is set to ``True``,
+    Django :ref:`automatically logs <faq-see-raw-sql-queries>` *every* SQL
+    query -- and when SQL statements contain geometries, this may consume more
+    memory than is typical.
 
 Example
 =======
@@ -52,7 +52,8 @@ Example
         PRIMEM["Greenwich",0],
         UNIT["Degree",0.017453292519943295]]
 
-#. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
+#. Now we define our corresponding Django model (make sure to use
+   :djadmin:`migrate`)::
 
     from django.contrib.gis.db import models
 

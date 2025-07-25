@@ -19,11 +19,12 @@ instructions are available for:
 
 .. admonition:: Use the Source
 
-    Because GeoDjango takes advantage of the latest in the open source geospatial
-    software technology, recent versions of the libraries are necessary.
-    If binary packages aren't available for your platform, installation from
-    source may be required. When compiling the libraries from source, please
-    follow the directions closely, especially if you're a beginner.
+    Because GeoDjango takes advantage of the latest in the open source
+    geospatial software technology, recent versions of the libraries are
+    necessary. If binary packages aren't available for your platform,
+    installation from source may be required. When compiling the libraries from
+    source, please follow the directions closely, especially if you're a
+    beginner.
 
 Requirements
 ============
@@ -99,7 +100,8 @@ Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 Like other Django contrib applications, you will *only* need to add
 :mod:`django.contrib.gis` to :setting:`INSTALLED_APPS` in your settings.
 This is so that the ``gis`` templates can be located -- if not done, then
-features such as the geographic admin or KML sitemaps will not function properly.
+features such as the geographic admin or KML sitemaps will not function
+properly.
 
 Troubleshooting
 ===============
@@ -145,10 +147,11 @@ could place the following in their bash profile:
 Setting system library path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On GNU/Linux systems, there is typically a file in ``/etc/ld.so.conf``, which may include
-additional paths from files in another directory, such as ``/etc/ld.so.conf.d``.
-As the root user, add the custom library path (like ``/usr/local/lib``) on a
-new line in ``ld.so.conf``. This is *one* example of how to do so:
+On GNU/Linux systems, there is typically a file in ``/etc/ld.so.conf``, which
+may include additional paths from files in another directory, such as
+``/etc/ld.so.conf.d``. As the root user, add the custom library path (like
+``/usr/local/lib``) on a new line in ``ld.so.conf``. This is *one* example of
+how to do so:
 
 .. code-block:: shell
 
@@ -174,10 +177,11 @@ module) to discover libraries. The ``find_library`` routine uses a program
 called ``objdump`` (part of the ``binutils`` package) to verify a shared
 library on GNU/Linux systems. Thus, if ``binutils`` is not installed on your
 Linux system then Python's ctypes may not be able to find your library even if
-your library path is set correctly and geospatial libraries were built perfectly.
+your library path is set correctly and geospatial libraries were built
+perfectly.
 
-The ``binutils`` package may be installed on Debian and Ubuntu systems using the
-following command:
+The ``binutils`` package may be installed on Debian and Ubuntu systems using
+the following command:
 
 .. code-block:: shell
 
@@ -279,9 +283,10 @@ __ https://brew.sh/
 Fink
 ^^^^
 
-`Kurt Schwehr`__ has been gracious enough to create GeoDjango packages for users
-of the `Fink`__ package system. `Different packages are available`__ (starting
-with ``django-gis``), depending on which version of Python you want to use.
+`Kurt Schwehr`__ has been gracious enough to create GeoDjango packages for
+users of the `Fink`__ package system. `Different packages are available`__
+(starting with ``django-gis``), depending on which version of Python you want
+to use.
 
 __ https://schwehr.blogspot.com/
 __ https://www.finkproject.org/

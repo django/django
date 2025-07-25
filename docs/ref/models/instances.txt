@@ -87,7 +87,8 @@ fields are present, then ``values`` are guaranteed to be in the order
 to each of the missing fields.
 
 In addition to creating the new model, the ``from_db()`` method must set the
-``adding`` and ``db`` flags in the new instance's :attr:`~Model._state` attribute.
+``adding`` and ``db`` flags in the new instance's :attr:`~Model._state`
+attribute.
 
 Below is an example showing how to record the initial values of fields that
 are loaded from the database::
@@ -485,11 +486,11 @@ rather than relying on the auto-assignment of the ID:
 
 If you assign auto-primary-key values manually, make sure not to use an
 already-existing primary-key value! If you create a new object with an explicit
-primary-key value that already exists in the database, Django will assume you're
-changing the existing record rather than creating a new one.
+primary-key value that already exists in the database, Django will assume
+you're changing the existing record rather than creating a new one.
 
-Given the above ``'Cheddar Talk'`` blog example, this example would override the
-previous record in the database::
+Given the above ``'Cheddar Talk'`` blog example, this example would override
+the previous record in the database::
 
     b4 = Blog(id=3, name="Not Cheddar", tagline="Anything but cheese.")
     b4.save()  # Overrides the previous blog with ID=3!
@@ -563,17 +564,18 @@ exists in the database. Otherwise, Django executes an ``INSERT``.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
-primary-key value is unused. For more on this nuance, see `Explicitly specifying
-auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
+primary-key value is unused. For more on this nuance, see `Explicitly
+specifying auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_
+below.
 
 In Django 1.5 and earlier, Django did a ``SELECT`` when the primary key
-attribute was set. If the ``SELECT`` found a row, then Django did an ``UPDATE``,
-otherwise it did an ``INSERT``. The old algorithm results in one more query in
-the ``UPDATE`` case. There are some rare cases where the database doesn't
-report that a row was updated even if the database contains a row for the
-object's primary key value. An example is the PostgreSQL ``ON UPDATE`` trigger
-which returns ``NULL``. In such cases it is possible to revert to the old
-algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+attribute was set. If the ``SELECT`` found a row, then Django did an
+``UPDATE``, otherwise it did an ``INSERT``. The old algorithm results in one
+more query in the ``UPDATE`` case. There are some rare cases where the database
+doesn't report that a row was updated even if the database contains a row for
+the object's primary key value. An example is the PostgreSQL ``ON UPDATE``
+trigger which returns ``NULL``. In such cases it is possible to revert to the
+old algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
 option to ``True``.
 
 .. _ref-models-force-insert:

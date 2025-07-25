@@ -29,7 +29,8 @@ Model Form API reference. For introductory material about model forms, see the
 
     ``widgets`` is a dictionary of model field names mapped to a widget.
 
-    ``localized_fields`` is a list of names of fields which should be localized.
+    ``localized_fields`` is a list of names of fields which should be
+    localized.
 
     ``labels`` is a dictionary of model field names mapped to a label.
 
@@ -43,11 +44,11 @@ Model Form API reference. For introductory material about model forms, see the
 
     See :ref:`modelforms-factory` for example usage.
 
-    You must provide the list of fields explicitly, either via keyword arguments
-    ``fields`` or ``exclude``, or the corresponding attributes on the form's
-    inner ``Meta`` class. See :ref:`modelforms-selecting-fields` for more
-    information. Omitting any definition of the fields to use will result in
-    an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+    You must provide the list of fields explicitly, either via keyword
+    arguments ``fields`` or ``exclude``, or the corresponding attributes on the
+    form's inner ``Meta`` class. See :ref:`modelforms-selecting-fields` for
+    more information. Omitting any definition of the fields to use will result
+    in an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 ``modelformset_factory``
 ========================

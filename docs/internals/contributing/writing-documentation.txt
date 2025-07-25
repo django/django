@@ -205,8 +205,8 @@ All Python code blocks should be formatted using the :pypi:`blacken-docs`
 auto-formatter. This is automatically run by the :ref:`pre-commit hook
 <coding-style-pre-commit>` if configured.
 
-The check can also be run manually: provided that ``blacken-docs`` is installed,
-run the following command from the ``docs`` directory:
+The check can also be run manually: provided that ``blacken-docs`` is
+installed, run the following command from the ``docs`` directory:
 
 .. console::
 
@@ -245,8 +245,8 @@ Entries that have a status of "broken" need to be fixed. Those that have a
 status of "redirected" may need to be updated to point to the canonical
 location, e.g. the scheme has changed ``http://`` → ``https://``. In certain
 cases, we do not want to update a "redirected" link, e.g. a rewrite to always
-point to the latest or stable version of the documentation, e.g. ``/en/stable/`` →
-``/en/3.2/``.
+point to the latest or stable version of the documentation, e.g.
+``/en/stable/`` → ``/en/3.2/``.
 
 Writing style
 =============
@@ -523,12 +523,12 @@ General improvements or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
 as the ``versionadded`` mentioned above.
 
-These ``versionadded`` and ``versionchanged`` blocks should be "self-contained."
-In other words, since we only keep these annotations around for two releases,
-it's nice to be able to remove the annotation and its contents without having
-to reflow, reindent, or edit the surrounding text. For example, instead of
-putting the entire description of a new or changed feature in a block, do
-something like this:
+These ``versionadded`` and ``versionchanged`` blocks should be
+"self-contained." In other words, since we only keep these annotations around
+for two releases, it's nice to be able to remove the annotation and its
+contents without having to reflow, reindent, or edit the surrounding text. For
+example, instead of putting the entire description of a new or changed feature
+in a block, do something like this:
 
 .. code-block:: rst
 
@@ -659,12 +659,12 @@ you'd like to help translate the documentation into another language.
 ``django-admin`` man page
 =========================
 
-Sphinx can generate a manual page for the
-:doc:`django-admin </ref/django-admin>` command. This is configured in
-``docs/conf.py``. Unlike other documentation output, this man page should be
-included in the Django repository and the releases as
-``docs/man/django-admin.1``. There isn't a need to update this file when
-updating the documentation, as it's updated once as part of the release process.
+Sphinx can generate a manual page for the :doc:`django-admin
+</ref/django-admin>` command. This is configured in ``docs/conf.py``. Unlike
+other documentation output, this man page should be included in the Django
+repository and the releases as ``docs/man/django-admin.1``. There isn't a need
+to update this file when updating the documentation, as it's updated once as
+part of the release process.
 
 To generate an updated version of the man page, in the ``docs`` directory, run:
 
