@@ -220,7 +220,7 @@ class HttpRequest:
                 )
             raise DisallowedHost(msg)
 
-        if not validate_port(parsed_host.port):
+        if validate and not validate_port(parsed_host.port):
             raise DisallowedHost("The port provided is not valid")
 
         return parsed_host
