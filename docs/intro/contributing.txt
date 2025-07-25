@@ -132,6 +132,8 @@ that they don't interfere with each other.
 It's a good idea to keep all your virtual environments in one place, for
 example in ``.virtualenvs/`` in your home directory.
 
+.. _intro-contributing-install-local-copy:
+
 Create a new virtual environment by running:
 
 .. console::
@@ -168,8 +170,6 @@ command line to help you keep track of which one you are using. Anything you
 install through ``pip`` while this name is displayed will be installed in that
 virtual environment, isolated from other environments and system-wide packages.
 
-.. _intro-contributing-install-local-copy:
-
 Go ahead and install the previously cloned copy of Django:
 
 .. console::
@@ -178,21 +178,7 @@ Go ahead and install the previously cloned copy of Django:
 
 The installed version of Django is now pointing at your local copy by installing
 in editable mode. You will immediately see any changes you make to it, which is
-of great help when writing your first contribution.
-
-Creating projects with a local copy of Django
----------------------------------------------
-
-It may be helpful to test your local changes with a Django project. First you
-have to create a new virtual environment, :ref:`install the previously cloned
-local copy of Django in editable mode <intro-contributing-install-local-copy>`,
-and create a new Django project outside of your local copy of Django. You will
-immediately see any changes you make to Django in your new project, which is
-of great help when writing your first contribution, especially if testing
-any changes to the UI.
-
-You can follow the :doc:`tutorial</intro/tutorial01>` for help in creating a
-Django project.
+of great help when testing your first contribution.
 
 Running Django's test suite for the first time
 ==============================================
