@@ -895,7 +895,8 @@ def validate_port(port):
 
     Checks that the port is a number and that it's between 1 and 65535.
 
-    Note: This function doesn't instantly return False if the port contains leading zeros.
+    Note: This function doesn't instantly return Falseif the port contains
+    leading zeros.
 
     Return ``True`` for a valid port, ``False`` otherwise.
     """
