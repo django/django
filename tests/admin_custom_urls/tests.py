@@ -95,7 +95,11 @@ class AdminCustomUrlsTest(TestCase):
         )
         response = self.client.get(url)
         self.assertContains(response, "Change action")
-        self.assertContains(response, 'value="path/to/html/document.html"')
+        self.assertContains(
+            response,
+            '<div class="readonly">path/to/html/document.html</div>',
+            html=True,
+        )
 
     def test_post_save_add_redirect(self):
         """
